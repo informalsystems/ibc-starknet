@@ -6,7 +6,7 @@ license = { workspace = true }
 rust-version = { workspace = true }
 version = { workspace = true }
 repository = { workspace = true }
-readme = { workspace = true }
+readme = "./../README.md"
 keywords = [ "starknet", "ibc", "light-client" ]
 description = """
 """
