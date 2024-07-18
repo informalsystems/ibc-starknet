@@ -1,0 +1,30 @@
+[package]
+name = "ibc-client-starknet"
+authors = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+repository = { workspace = true }
+readme = { workspace = true }
+keywords = [ "starknet", "ibc", "light-client" ]
+description = """
+"""
+
+[lints]
+workspace = true
+
+[dependencies]
+# external dependencies
+derive_more = { workspace = true }
+
+# ibc dependencies
+ibc-core                  = { workspace = true }
+ibc-client-starknet-types = { path = "./../types" }
+
+[features]
+default = [ "std" ]
+std = [
+  "ibc-core/std",
+  "ibc-client-starknet-types/std",
+]

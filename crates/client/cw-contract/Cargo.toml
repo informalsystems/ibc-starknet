@@ -1,0 +1,31 @@
+[package]
+name = "ibc-client-starknet-cw"
+authors = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+readme = { workspace = true }
+keywords = [ "ibc", "light-client", "starknet", "CosmWasm" ]
+description = """
+"""
+
+[lib]
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+# ibc dependencies
+ibc-core            = { workspace = true }
+ibc-client-cw       = { workspace = true }
+ibc-client-starknet = { path = "./../impls" }
+
+# cosmwasm dependencies
+cosmwasm-std = "2.1.0"
+
+[features]
+default = [ "std" ]
+std = [
+  "ibc-core/std",
+  "ibc-client-cw/std",
+]
