@@ -1,0 +1,21 @@
+[package]
+name = "ibc-client-starknet-types"
+authors = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+rust-version = { workspace = true }
+version = { workspace = true }
+repository = { workspace = true }
+readme = "./../README.md"
+keywords = [ "starknet", "ibc", "light-client", "data-structures" ]
+description = """
+"""
+
+[lints]
+workspace = true
+
+[dependencies]
+
+[features]
+default = [ "std" ]
+std     = [  ]
