@@ -1,22 +1,15 @@
 use starknet::ContractAddress;
 use starknet_ibc::core::types::{PortId, ChannelId};
 
+/// Maximum memo length allowed for ICS-20 transfers. This bound corresponds to
+/// the `MaximumMemoLength` in the `ibc-go`.
+pub(crate) const MAXIMUM_MEMO_LENGTH: u32 = 32768;
+
 #[derive(Drop, Serde, Store)]
 pub struct MsgTransfer {
-    port_id_on_a: PortId,
-    chan_id_on_a: ChannelId,
-    packet_data: PacketData,
-}
-
-#[derive(Drop, Serde, Store)]
-pub struct PrefixedCoin {
-    denom: ByteArray,
-    amount: u64,
-}
-
-#[derive(Drop, Serde, Store)]
-pub struct Memo {
-    memo: ByteArray,
+    pub port_id_on_a: PortId,
+    pub chan_id_on_a: ChannelId,
+    pub packet_data: PacketData,
 }
 
 #[derive(Drop, Serde, Store)]
@@ -26,3 +19,15 @@ pub struct PacketData {
     pub receiver: ContractAddress,
     pub memo: Memo,
 }
+
+#[derive(Drop, Serde, Store)]
+pub struct PrefixedCoin {
+    pub denom: felt252,
+    pub amount: u256,
+}
+
+#[derive(Drop, Serde, Store)]
+pub struct Memo {
+    pub memo: ByteArray,
+}
+

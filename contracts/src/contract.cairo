@@ -11,9 +11,11 @@ pub(crate) mod Transfer {
     impl ERC20MixinImpl = ERC20Component::ERC20MixinImpl<ContractState>;
     impl ERC20InternalImpl = ERC20Component::InternalImpl<ContractState>;
 
+    #[abi(embed_v0)]
+    impl ICS20TransferImpl = ICS20TransferComponent::Transfer<ContractState>;
     impl TransferValidationImpl = ICS20TransferComponent::TransferValidationImpl<ContractState>;
     impl TransferExecutionImpl = ICS20TransferComponent::TransferExecutionImpl<ContractState>;
-    impl TransferInternalImpl = ICS20TransferComponent::InternalImpl<ContractState>;
+    impl TransferInternalImpl = ICS20TransferComponent::TransferInternalImpl<ContractState>;
 
     #[storage]
     struct Storage {
@@ -51,8 +53,8 @@ mod tests {
     use starknet::ContractAddress;
     use starknet::contract_address_const;
     use starknet::syscalls::deploy_syscall;
-    use starknet_ibc::Transfer;
     use starknet_ibc::apps::transfer::interface::{ITransferDispatcher, ITransferDispatcherTrait,};
+    use super::Transfer;
 
     fn deploy() -> (ITransferDispatcher, ContractAddress) {
         let recipient: ContractAddress = contract_address_const::<'sender'>();
