@@ -8,9 +8,8 @@ use ibc_core::host::types::path::{ClientConsensusStatePath, ClientStatePath};
 use ibc_core::primitives::proto::Any;
 use ibc_core::primitives::Timestamp;
 
-use crate::ConsensusState;
-
 use super::ClientState;
+use crate::ConsensusState;
 
 impl<E> ClientStateExecution<E> for ClientState
 where

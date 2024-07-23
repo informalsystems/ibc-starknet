@@ -5,9 +5,8 @@ use ibc_core::client::types::Status;
 use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::primitives::proto::Any;
 
-use crate::ConsensusState;
-
 use super::ClientState;
+use crate::ConsensusState;
 
 impl<V> ClientStateValidation<V> for ClientState
 where
