@@ -78,15 +78,11 @@ This will put the contract classes at:
 # Declare and deploy the contract
 
 ```bash
-starkli declare --compiler-version 2.6.2 --nonce 0 contracts/target/dev/starknet_ibc_simple_storage.contract_class.json
+starkli declare --compiler-version 2.6.2 contracts/target/dev/starknet_ibc_simple_storage.contract_class.json
 ```
 
 This will declare the contract class. Note down the `CONTRACT_CLASS` from the
 output.
-
-> [!NOTE]\
-> `--nonce` is required for
-> [`starknet-devnet-rs`](https://0xspaceshard.github.io/starknet-devnet-rs/docs/account-impersonation).
 
 ```bash
 starkli deploy <CONTRACT_CLASS>
