@@ -20,7 +20,7 @@ This will spawn a local devnet listening on `127.0.0.1:5050`.
 > Set the environment variables `STARKNET_RPC=http://127.0.0.1:5050` for
 > `starkli` or use `--rpc` flag.
 
-One can also use docker to spawn a local devnet:
+You can also use docker to spawn a local devnet:
 
 ```bash
 docker run -p 5050:5050 -it shardlabs/starknet-devnet-rs --seed=10 --accounts=10 --state-archive-capacity=full
@@ -29,7 +29,7 @@ docker run -p 5050:5050 -it shardlabs/starknet-devnet-rs --seed=10 --accounts=10
 # Managing accounts
 
 `starknet-devnet` will output the list of wallets created during the
-initialization of the devnet.
+initialization of the devnet:
 
 ```console
 $ starknet-devnet
@@ -50,7 +50,7 @@ Chain ID: SN_SEPOLIA (0x534e5f5345504f4c4941)
 ...
 ```
 
-One can use `starkli` to generate the keystores of the initialized wallets:
+You can use `starkli` to generate the keystores of the initialized wallets:
 
 ```bash
 mkdir -p deployer
@@ -58,7 +58,7 @@ starkli signer keystore from-key --private-key-stdin --password "" deployer/keys
 starkli account fetch 0x275c4e8756d0a8bd080d828f29fbb61968981e4db8ad61b9eaeb17174242e14 --output deployer/account_1.json
 ```
 
-One may add the other accounts similarly.
+The keystores of the other wallets can be generated similarly.
 
 > [!TIP]\
 > Set the environment variables `STARKNET_ACCOUNT=deployer/account_1.json` and
@@ -72,7 +72,7 @@ cd contracts
 scarb build
 ```
 
-This will put the contract classes at:
+This will compile the contract classes at:
 `contracts/targets/dev/*.contract_class.json`
 
 # Declare and deploy the contract
@@ -81,14 +81,15 @@ This will put the contract classes at:
 starkli declare --compiler-version 2.6.2 contracts/target/dev/starknet_ibc_simple_storage.contract_class.json
 ```
 
-This will declare the contract class. Note down the `CONTRACT_CLASS` from the
-output.
+This will declare the contract class on the _Starknet_. Note down the
+`CONTRACT_CLASS` from the output.
 
 ```bash
 starkli deploy <CONTRACT_CLASS>
 ```
 
-This will deploy the contract. Note down the `CONTRACT_ADDRESS` from the output.
+This will deploy the contract on the _Starknet_. Note down the
+`CONTRACT_ADDRESS` from the output.
 
 # Interact with the contract
 
