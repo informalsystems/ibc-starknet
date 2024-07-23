@@ -812,6 +812,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "ibc-client-dummy"
+version = "0.1.0"
+dependencies = [
+ "derive_more 0.99.18",
+ "ibc-core",
+]
+
+[[package]]
+name = "ibc-client-dummy-cw"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-std",
+ "ibc-client-cw",
+ "ibc-client-dummy",
+ "ibc-core",
+]
+
+[[package]]
 name = "ibc-client-starknet"
 version = "0.1.0"
 dependencies = [

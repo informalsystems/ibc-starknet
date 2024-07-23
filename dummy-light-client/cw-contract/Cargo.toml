@@ -1,0 +1,30 @@
+[package]
+name         = "ibc-client-dummy-cw"
+authors      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
+repository   = { workspace = true }
+rust-version = { workspace = true }
+version      = { workspace = true }
+readme       = "./../README.md"
+keywords     = [ "dummy", "ibc", "light-client", "CosmWasm" ]
+description  = "CosmWasm contract for dummy IBC client."
+
+[lib]
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+# ibc dependencies
+ibc-core         = { workspace = true }
+ibc-client-cw    = { workspace = true }
+ibc-client-dummy = { path = "./../impls" }
+
+# cosmwasm dependencies
+cosmwasm-std = "2.1.0"
+
+[features]
+default = [ "std" ]
+std = [
+  "ibc-core/std",
+  "ibc-client-cw/std",
+]

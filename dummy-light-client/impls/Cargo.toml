@@ -1,0 +1,27 @@
+[package]
+name         = "ibc-client-dummy"
+authors      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
+rust-version = { workspace = true }
+version      = { workspace = true }
+repository   = { workspace = true }
+readme       = "./../README.md"
+keywords     = [ "dummy", "test", "ibc", "light-client" ]
+description  = "A light client without any validation. Only for testing."
+
+[lints]
+workspace = true
+
+[dependencies]
+# external dependencies
+derive_more = { workspace = true }
+
+# ibc dependencies
+ibc-core = { workspace = true }
+
+[features]
+default = [ "std" ]
+std = [
+  "ibc-core/std",
+]
