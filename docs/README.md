@@ -160,7 +160,7 @@ Cairo uses `felt252` to represent strings. We can use `starkli to-cairo-string`
 and `starkli parse-cairo-string` to convert and parse a string to `felt252`,
 respectively.
 
-### Tuple
+#### Tuple
 
 Tuple is serialized as it is.
 
