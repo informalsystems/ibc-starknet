@@ -231,7 +231,7 @@ Array is serialized as a list of numerals where the first numeral is the length
 and then the serialized elements.
 
 ```
-[10,20,30]: 3, 10, 20, 30
+[10, 20, 30]: 3, 10, 20, 30
 ```
 
 ## References
