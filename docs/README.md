@@ -180,6 +180,6 @@ and then the serialized elements.
 ## References
 
 - [Getting started with Cairo](https://www.cairo-lang.org/tutorials/getting-started-with-cairo)
-- [Compile, deploy, interact](https://book.starknet.io/ch02-02-compile-deploy-interact.html)
+- [Compile, deploy, interact with Cairo contracts](https://book.starknet.io/ch02-02-compile-deploy-interact.html)
 - [Cairo book](https://book.cairo-lang.org)
 - [Serialization of Cairo types](https://docs.starknet.io/architecture-and-concepts/smart-contracts/serialization-of-cairo-types/)
