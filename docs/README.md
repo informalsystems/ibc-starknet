@@ -15,7 +15,7 @@ This will spawn a local devnet listening on `127.0.0.1:5050`.
 `--state-archive-capacity=full` is required for historical state queries.
 
 > [!TIP]\
-> Set the environment variables `STARKNET_RPC=http://127.0.0.1:5050` for
+> Set the environment variables `STARKNET_RPC=http://<HOST>:<PORT>` for
 > `starkli` or use `--rpc` flag.
 
 You can also use docker to spawn a local devnet:
@@ -24,14 +24,22 @@ You can also use docker to spawn a local devnet:
 docker run -p 5050:5050 -it shardlabs/starknet-devnet-rs --seed=0 --accounts=3 --state-archive-capacity=full
 ```
 
-## Managing accounts
+## Managing accounts and contracts
 
 `starknet-devnet` will output the list of wallets created during the
 initialization of the devnet:
 
 ```console
-$ starknet-devnet
-...
+$ starknet-devnet --seed 0 --accounts 3 --state-archive-capacity full
+Predeployed FeeToken
+ETH Address: 0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7
+STRK Address: 0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7
+Class Hash: 0x046ded64ae2dead6448e247234bab192a9c483644395b66f2155f2614e5804b0
+
+Predeployed UDC
+Address: 0x41A78E741E5AF2FEC34B695679BC6891742439F7AFB8484ECD7766661AD02BF
+Class Hash: 0x7B3E05F48F0C69E4A65CE5E076A66271A527AFF2C34CE1083EC6E1526997A69
+
 Chain ID: SN_SEPOLIA (0x534e5f5345504f4c4941)
 
 | Account address |  0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691
@@ -45,46 +53,81 @@ Chain ID: SN_SEPOLIA (0x534e5f5345504f4c4941)
 | Account address |  0x49dfb8ce986e21d354ac93ea65e6a11f639c1934ea253e5ff14ca62eca0f38e
 | Private key     |  0xa20a02f0ac53692d144b20cb371a60d7
 | Public key      |  0xb8fd4ddd415902d96f61b7ad201022d495997c2dff8eb9e0eb86253e30fabc
-...
+
+Predeployed accounts using class with hash: 0x61dac032f228abef9c6626f995015233097ae253a7f72d68552db02f2971b8f
+Initial balance of each account: 1000000000000000000000 WEI and FRI
+Seed to replicate this account sequence: 0
+2024-07-24T16:44:22.432749Z  INFO starknet_devnet: Starknet Devnet listening on 127.0.0.1:5050
 ```
 
-You can use `starkli` to generate the keystores of the initialized wallets:
+There are two Openzeppelin ERC20 contracts deployed on the devnet:
 
-```bash
-mkdir -p deployer
-starkli signer keystore from-key --private-key-stdin --password "" deployer/keystore_1.json <<< 0x71d7bb07b9a64f6f78ac4c816aff4da9
-starkli account fetch 0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691 --output deployer/account_1.json
-```
-
-The keystores of the other wallets can be generated similarly.
+- ETH: `0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7`
+- STRK: `0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7`
 
 > [!TIP]\
-> Set the environment variables `STARKNET_ACCOUNT=deployer/account_1.json` and
-> `STARKNET_KEYSTORE=deployer/keystore_1.json` for `starkli` or use `--account`
-> and `--keystore` flags.
+> The `*.contract_class.json` file for these contracts can be fetched by
+> `starkli class-at <CONTRACT_ADDRESS>`. The contract class contains the type
+> information of the contract types and functions - which are necessary for
+> value (de)serialization.
 
-## Compile the contract
+There is also a UDC or Universal Deployment Contract deployed on the devnet at
+`0x41A78E741E5AF2FEC34B695679BC6891742439F7AFB8484ECD7766661AD02BF` which allows
+deploying new contracts.
+
+Also, there are three accounts created and deployed from Openzeppelin account
+contract class.
+
+> [!TIP]\
+> Set the environment variables `STARKNET_PRIVATE_KEY=<PRIVATE_KEY>` or use
+> `--private-key` flag in `starkli` to submit a transaction from an account.
+
+## Manage ERC20 contracts
+
+Everything on the Starknet is a contract. The accounts and tokens are deployed
+as contracts as any other normal contracts. So you have to use the general
+purpose contract APIs to manage a token.
+
+I am sure there are specialized client applications for the Openzeppelin
+contracts. But for now, we will use `starkli` and its subcommands: `call` and
+`invoke`.
+
+### Check balance
+
+```bash
+starkli call <ERC20_CONTRACT_ADDRESS> balance_of <ACCOUNT_ADDRESS>
+```
+
+Note that the result is two `u128` values - because the balance is stored in
+`u256`. We need to deserialize it to get the actual balance.
+
+### Transfer fund
+
+```bash
+starkli invoke --private-key <SENDER_PRIVATE_KEY> <ERC20_CONTRACT_ADDRESS> transfer <RECIPIENT_ADDRESS> <VALUE1> <VALUE2>
+```
+
+Note that the `VALUE1` and `VALUE2` are two `u128` in the serialized form of the
+`u256` value of the amount to transfer.
+
+> [!NOTE]\
+> For more details, check the [serialization of Cairo types](#references) in the
+> references.
+
+Apart from `balance_of` and `transfer`, the ERC20 contract has other functions,
+such as `mint`, `approve`, `allowance`, `total_supply` etc.
+
+## Compile a custom contract
+
+Considering the project structure, you can execute the following commands to
+compile the contract:
 
 ```bash
 cd contracts
 scarb build
 ```
 
-This will compile the contract classes at:
-`contracts/targets/dev/*.contract_class.json`
-
-## Declare and deploy the contract
-
-```bash
-starkli declare --compiler-version 2.6.2 contracts/target/dev/starknet_ibc_<CONTRACT_NAME>.contract_class.json
-```
-
-This will declare the contract class on the _Starknet_. Note down the
-`CONTRACT_CLASS` from the output.
-
-## Deploy, query, and update the contract
-
-We will assume the following is our Cairo contract:
+We will assume we are compiling the following Cairo contract:
 
 ```cairo
 #[starknet::interface]
@@ -119,6 +162,20 @@ mod simple_storage {
     }
 }
 ```
+
+This will compile the contract classes at:
+`contracts/targets/dev/starknet_ibc_simple_storage.contract_class.json`
+
+## Declare and deploy the contract
+
+```bash
+starkli declare --compiler-version 2.6.2 contracts/target/dev/starknet_ibc_simple_storage.contract_class.json
+```
+
+This will declare the contract class on the _Starknet_. Note down the
+`CONTRACT_CLASS` from the output.
+
+## Deploy, query, and update the contract
 
 ### Deploy the contract with the initial state
 
