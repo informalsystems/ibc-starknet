@@ -2,5 +2,7 @@
 corelib/
 target/
 
+.env
+
 # vscode
 .vscode/

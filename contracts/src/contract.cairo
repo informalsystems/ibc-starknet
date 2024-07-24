@@ -13,6 +13,7 @@ pub(crate) mod Transfer {
 
     #[abi(embed_v0)]
     impl ICS20TransferImpl = ICS20TransferComponent::Transfer<ContractState>;
+    impl TransferreableImpl = ICS20TransferComponent::Transferrable<ContractState>;
     impl TransferValidationImpl = ICS20TransferComponent::TransferValidationImpl<ContractState>;
     impl TransferExecutionImpl = ICS20TransferComponent::TransferExecutionImpl<ContractState>;
     impl TransferInternalImpl = ICS20TransferComponent::TransferInternalImpl<ContractState>;
@@ -35,40 +36,7 @@ pub(crate) mod Transfer {
     }
 
     #[constructor]
-    fn constructor(
-        ref self: ContractState,
-        name: ByteArray,
-        symbol: ByteArray,
-        fixed_supply: u256,
-        recipient: ContractAddress,
-        owner: ContractAddress
-    ) {
-        self.erc20.initializer(name, symbol);
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use core::starknet::SyscallResultTrait;
-    use starknet::ContractAddress;
-    use starknet::contract_address_const;
-    use starknet::syscalls::deploy_syscall;
-    use starknet_ibc::apps::transfer::interface::{ITransferDispatcher, ITransferDispatcherTrait,};
-    use super::Transfer;
-
-    fn deploy() -> (ITransferDispatcher, ContractAddress) {
-        let recipient: ContractAddress = contract_address_const::<'sender'>();
-
-        let (contract_address, _) = deploy_syscall(
-            Transfer::TEST_CLASS_HASH.try_into().unwrap(), recipient.into(), array![0].span(), false
-        )
-            .unwrap_syscall();
-
-        (ITransferDispatcher { contract_address }, contract_address)
-    }
-
-    #[test]
-    fn test_transfer() {
-        deploy();
+    fn constructor(ref self: ContractState,) {
+        self.transfer.initializer();
     }
 }

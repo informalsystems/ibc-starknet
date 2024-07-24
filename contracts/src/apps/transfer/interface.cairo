@@ -11,6 +11,12 @@ pub trait ITransfer<TContractState> {
 }
 
 #[starknet::interface]
+pub trait ITransferrable<TContractState> {
+    fn can_send(self: @TContractState);
+    fn can_receive(self: @TContractState);
+}
+
+#[starknet::interface]
 pub trait ITransferValidationContext<TContractState> {
     fn escrow_validate(
         self: @TContractState,
@@ -38,10 +44,10 @@ pub trait ITransferExecutionContext<TContractState> {
     fn escrow_execute(
         ref self: TContractState,
         from_address: ContractAddress,
-        port_id: felt252,
-        channel_id: felt252,
+        port_id: PortId,
+        channel_id: ChannelId,
         coin: PrefixedCoin,
-        memo: ByteArray,
+        memo: Memo,
     );
     fn unescrow_execute(
         ref self: TContractState,

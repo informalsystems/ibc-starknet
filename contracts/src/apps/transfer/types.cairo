@@ -5,14 +5,14 @@ use starknet_ibc::core::types::{PortId, ChannelId};
 /// the `MaximumMemoLength` in the `ibc-go`.
 pub(crate) const MAXIMUM_MEMO_LENGTH: u32 = 32768;
 
-#[derive(Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde, Store)]
 pub struct MsgTransfer {
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
     pub packet_data: PacketData,
 }
 
-#[derive(Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde, Store)]
 pub struct PacketData {
     pub token: PrefixedCoin,
     pub sender: ContractAddress,
@@ -20,13 +20,13 @@ pub struct PacketData {
     pub memo: Memo,
 }
 
-#[derive(Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde, Store)]
 pub struct PrefixedCoin {
     pub denom: felt252,
     pub amount: u256,
 }
 
-#[derive(Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde, Store)]
 pub struct Memo {
     pub memo: ByteArray,
 }
