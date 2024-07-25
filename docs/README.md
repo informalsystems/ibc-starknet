@@ -4,6 +4,7 @@
 
 - [`scarb`](https://docs.swmansion.com/scarb/download.html)
 - [`starknet-devnet`](https://0xspaceshard.github.io/starknet-devnet-rs/docs/running/install)
+- [`cainome`](https://github.com/cartridge-gg/cainome)
 
 ## Spawning a local devnet
 
