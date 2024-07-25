@@ -16,6 +16,7 @@ workspace = true
 [dependencies]
 # external dependencies
 derive_more = { workspace = true }
+serde       = { workspace = true, optional = true }
 
 # ibc dependencies
 ibc-core                  = { workspace = true }
@@ -26,4 +27,9 @@ default = [ "std" ]
 std = [
   "ibc-core/std",
   "ibc-client-starknet-types/std",
+]
+serde = [
+  "dep:serde",
+  "ibc-core/serde",
+  "ibc-client-starknet-types/serde",
 ]

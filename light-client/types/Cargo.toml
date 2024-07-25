@@ -17,7 +17,12 @@ workspace = true
 [dependencies]
 ibc-core    = { workspace = true }
 derive_more = { workspace = true }
+serde       = { workspace = true, optional = true }
 
 [features]
 default = [ "std" ]
-std     = [  ]
+std = [  ]
+serde = [
+  "dep:serde",
+  "ibc-core/serde",
+]
