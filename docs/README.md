@@ -67,7 +67,7 @@ There are two Openzeppelin ERC20 contracts deployed on the devnet:
 
 > [!TIP]\
 > The `*.contract_class.json` file for these contracts can be fetched by
-> `starkli class-at <CONTRACT_ADDRESS>`. The contract class contains the type
+> `starkli class-at <CONTRACT_ADDRESS>`. The contract class contains the ABI
 > information of the contract types and functions - which are necessary for
 > value (de)serialization.
 
@@ -234,9 +234,27 @@ and then the serialized elements.
 [10, 20, 30]: 3, 10, 20, 30
 ```
 
+## Generating Rust bindings for the contract
+
+To simplify the (de)serialization process, we can generate Rust bindings for the
+contract calls and types using
+[`cainome`](https://github.com/cartridge-gg/cainome). It is very similar to
+generating Rust code for protobuf definitions using `protoc` and `tonic`.
+
+The following will generate a Rust code for the Openzeppelin ERC20 contract at
+`gen/erc20.rs`.
+
+```console
+$ cargo install --features=build-binary --git https://github.com/cartridge-gg/cainome
+$ mkdir codegen
+$ cainome --output-dir gen --contract-name erc20 --execution-version v3 --rpc-url http://127.0.0.1:5050 --rust \
+    --contract-address 0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7
+```
+
 ## References
 
 - [Getting started with Cairo](https://www.cairo-lang.org/tutorials/getting-started-with-cairo)
 - [Compile, deploy, interact with Cairo contracts](https://book.starknet.io/ch02-02-compile-deploy-interact.html)
 - [Cairo book](https://book.cairo-lang.org)
-- [Serialization of Cairo types](https://docs.starknet.io/architecture-and-concepts/smart-contracts/serialization-of-cairo-types/)
+- [Serialization of Cairo types](https://docs.starknet.io/architecture-and-concepts/smart-contracts/serialization-of-cairo-types)
+- [Parsing Cairo ABI](https://www.starknetjs.com/docs/guides/automatic_cairo_abi_parsing)
