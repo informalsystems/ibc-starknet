@@ -77,11 +77,17 @@ There is also a UDC or Universal Deployment Contract deployed on the devnet at
 deploying new contracts.
 
 Also, there are three accounts created and deployed from Openzeppelin account
-contract class.
+contract class. The account config of these accounts can be fetched from the
+devnet.
+
+```bash
+starkli account fetch <ACCOUNT_ADDRESS> --output <ACCOUNT_CONFIG_FILE>
+```
 
 > [!TIP]\
-> Set the environment variables `STARKNET_PRIVATE_KEY=<PRIVATE_KEY>` or use
-> `--private-key` flag in `starkli` to submit a transaction from an account.
+> Set the environment variables `STARKNET_ACCOUNT=<ACCOUNT_CONFIG_FILE>` and
+> `STARKNET_PRIVATE_KEY=<PRIVATE_KEY>` or use `--account` and `--private-key`
+> flag in `starkli` to submit a transaction from an account.
 
 ## Manage ERC20 contracts
 
