@@ -1,4 +1,4 @@
-# Getting started with `starknet-devnet` and `cairo` contracts
+# Get started with `starknet-devnet` and `cairo` contracts
 
 ## Dependencies
 
@@ -6,7 +6,7 @@
 - [`starknet-devnet`](https://0xspaceshard.github.io/starknet-devnet-rs/docs/running/install)
 - [`cainome`](https://github.com/cartridge-gg/cainome)
 
-## Spawning a local devnet
+## Spawn a local devnet
 
 ```bash
 starknet-devnet --seed=0 --accounts=3 --state-archive-capacity=full
@@ -25,7 +25,7 @@ You can also use docker to spawn a local devnet:
 docker run -p 5050:5050 -it shardlabs/starknet-devnet-rs --seed=0 --accounts=3 --state-archive-capacity=full
 ```
 
-## Managing accounts and contracts
+## Manage accounts and contracts
 
 `starknet-devnet` will output the list of wallets created during the
 initialization of the devnet:
@@ -206,7 +206,7 @@ starkli invoke <CONTRACT_ADDRESS> set 0x811 # updates to 0x811
 starkli call <CONTRACT_ADDRESS> get # prints 0x811
 ```
 
-### Passing complex-typed inputs to the contract
+### Pass complex-typed inputs to the contract
 
 In our example contract, the `set` function takes a single argument `x: u128`.
 If it was `set(x: u128, y: u128)`, we could have passed the arguments as a list
@@ -241,7 +241,7 @@ and then the serialized elements.
 [10, 20, 30]: 3, 10, 20, 30
 ```
 
-## Generating Rust bindings for the contract
+## Generate Rust bindings for a contract
 
 To simplify the (de)serialization process, we can generate Rust bindings for the
 contract calls and types using
