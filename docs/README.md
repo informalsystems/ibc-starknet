@@ -253,6 +253,77 @@ $ cainome --rust --output-dir gen --contract-name erc20 --execution-version v3 -
 $ cainome --rust --output-dir gen --execution-version v3 --artifacts-path contracts/target/dev
 ```
 
+You can also use `cainome::rs::abigen` macro to generate the bindings in
+runtime.
+
+```rust
+use cainome::rs::abigen;
+
+abigen!(
+    StarknetIbcSimpleStorage,
+    "<ABSOLUTE_PATH_OF_PROJECT>/target/dev/starknet_ibc_simple_storage.contract_class.json"
+);
+```
+
+With this, you can write client code in Rust to interact with the contract.
+
+```rust
+use <IMPORT_PATH_TO_CODEGEN>::{StarknetIbcSimpleStorage, StarknetIbcSimpleStorageReader};
+use starknet::{
+    accounts::{ExecutionEncoding, SingleOwnerAccount},
+    core::types::Felt,
+    providers::{jsonrpc::HttpTransport, AnyProvider, JsonRpcClient},
+    signers::{LocalWallet, SigningKey},
+};
+use std::sync::Arc;
+use url::Url;
+
+const CONTRACT_ADDRESS: &str = "<CONTRACT_ADDRESS>";
+const ACCOUNT_0: &str = "0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691";
+const PRIVKEY_0: &str = "0x71d7bb07b9a64f6f78ac4c816aff4da9";
+const CHAIN_ID: &str = "0x534e5f5345504f4c4941";
+
+#[tokio::main]
+async fn main() {
+    let rpc_url = Url::parse("http://0.0.0.0:5050").expect("Expecting Starknet RPC URL");
+    let provider =
+        AnyProvider::JsonRpcHttp(JsonRpcClient::new(HttpTransport::new(rpc_url.clone())));
+    let contract_address = Felt::from_hex(CONTRACT_ADDRESS).unwrap();
+
+    let contract = StarknetIbcSimpleStorageReader::new(contract_address, &provider);
+
+    let stored_data: u128 = contract.get().call().await.expect("Call to `get` failed");
+    println!("initial values: {:?}", stored_data);
+
+    let signer = LocalWallet::from(SigningKey::from_secret_scalar(
+        Felt::from_hex(PRIVKEY_0).unwrap(),
+    ));
+    let account = Arc::new(SingleOwnerAccount::new(
+        provider,
+        signer,
+        Felt::from_hex(ACCOUNT_0).unwrap(),
+        Felt::from_hex(CHAIN_ID).unwrap(),
+        ExecutionEncoding::New,
+    ));
+
+    let contract = StarknetIbcSimpleStorage::new(contract_address, account);
+
+    // increment the value
+    let set_call = contract.set(&(stored_data + 1));
+
+    let estimated_fee = set_call.estimate_fee().await.expect("Fail to estimate");
+    println!("Estimated fee: {:?}", estimated_fee);
+
+    let tx_res = set_call.send().await.expect("Call to `set` failed");
+    println!("Transaction sent {:?}", tx_res);
+
+    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+
+    let stored_data: u128 = contract.get().call().await.expect("Call to `get` failed");
+    println!("values after invoke: {:?}", stored_data);
+}
+```
+
 ## References
 
 - [Getting started with Cairo](https://www.cairo-lang.org/tutorials/getting-started-with-cairo)
