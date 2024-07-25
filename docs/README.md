@@ -247,8 +247,10 @@ The following will generate a Rust code for the Openzeppelin ERC20 contract at
 ```console
 $ cargo install --features=build-binary --git https://github.com/cartridge-gg/cainome
 $ mkdir codegen
-$ cainome --output-dir gen --contract-name erc20 --execution-version v3 --rpc-url http://127.0.0.1:5050 --rust \
+$ cainome --rust --output-dir gen --contract-name erc20 --execution-version v3 --rpc-url http://127.0.0.1:5050 \
     --contract-address 0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7
+# or, from local contract class file
+$ cainome --rust --output-dir gen --execution-version v3 --artifacts-path contracts/target/dev
 ```
 
 ## References
