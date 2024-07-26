@@ -17,7 +17,6 @@ repository   = "https://github.com/informalsystems/ibc-starknet"
 unsafe_code          = "forbid"
 dead_code            = "deny"
 rust_2018_idioms     = "deny"
-trivial_casts        = "deny"
 unused_import_braces = "deny"
 unused_variables     = "allow"
 
