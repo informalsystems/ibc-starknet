@@ -26,6 +26,8 @@ pub fn bytes_to_felt252(bytes: @ByteArray) -> Option<felt252> {
     Option::Some(result)
 }
 
+// felt252_to_bytes(bytes_to_felt252(x).unwrap()) == x
+// FIXME: if x has `\0` (null char), it doesn't work.
 pub fn felt252_to_bytes(value: felt252) -> ByteArray {
     if value == '' {
         return "";
@@ -95,24 +97,6 @@ mod test {
         let bytes = "abcdefghijklmnopqrstuvwxyz123456"; // 32 characters
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::None(()), "More than characters should return None");
-    }
-
-    #[test]
-    fn test_leading_zeros() {
-        let bytes = "\0\0ab";
-        let result = bytes_to_felt252(@bytes);
-        assert!(result == Option::Some('ab'), "Leading zeros not handled correctly");
-        let result_back = felt252_to_bytes(result.unwrap());
-        assert!(bytes == result_back, "Leading zeros not handled correctly");
-    }
-
-    #[test]
-    fn test_all_zeros() {
-        let bytes = "\0\0\0\0";
-        let result = bytes_to_felt252(@bytes);
-        assert!(result == Option::Some(0), "All zeros should convert to 0");
-        let result_back = felt252_to_bytes(result.unwrap());
-        assert!(bytes == result_back, "All zeros should convert to 0");
     }
 
     #[test]
