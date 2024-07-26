@@ -1,4 +1,4 @@
 pub mod apps;
-pub mod contract;
+pub mod presets;
 pub mod core;
 pub mod tests;

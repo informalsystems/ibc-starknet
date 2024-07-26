@@ -54,14 +54,14 @@ declare() {
 
 # deploy the contract
 deploy() {
-    if [[ $CLASS_HASH == "" ]]; then
+    if [[ $ICS20_CLASS_HASH == "" ]]; then
         class_hash=$(declare)
     else
         class_hash=$CLASS_HASH
     fi
 
     output=$(
-        starkli deploy --not-unique \
+        starkli deploy --not-unique $ERC20_CLASS_HASH \
         --watch $class_hash \
         --rpc $RPC_URL \
         --account $ACCOUNT_SRC \

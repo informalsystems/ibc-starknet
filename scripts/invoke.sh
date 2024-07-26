@@ -12,7 +12,7 @@ invoke() {
     fi
 
     output=$(
-        starkli invoke $address register_token 1 0x4e91934ce777f807d6bc90fd3b06e1fa49e942ab1fb70a072ca1ad61dc2998d \
+        starkli invoke $address send_exectue \
         --rpc $RPC_URL \
         --account $ACCOUNT_SRC \
         --keystore $KEYSTORE_SRC \
