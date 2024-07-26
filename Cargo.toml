@@ -16,7 +16,7 @@ repository   = "https://github.com/informalsystems/ibc-starknet"
 [workspace.lints.rust]
 unsafe_code          = "forbid"
 dead_code            = "deny"
-rust_2018_idioms     = "deny"
+rust_2018_idioms     = { level = "deny", priority = -1 }
 unused_import_braces = "deny"
 unused_variables     = "allow"
 
