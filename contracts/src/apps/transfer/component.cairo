@@ -169,7 +169,7 @@ pub mod ICS20TransferComponent {
     }
 
     #[generate_trait]
-    impl RecvPacketInernalImpl<
+    impl RecvPacketInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of RecvPacketInternal<TContractState> {
         fn _recv_validate(self: @ComponentState<TContractState>, packet: Packet) -> Denom {
