@@ -26,15 +26,39 @@ pub fn bytes_to_felt252(bytes: @ByteArray) -> Option<felt252> {
     Option::Some(result)
 }
 
+pub fn felt252_to_bytes(value: felt252) -> ByteArray {
+    if value == '' {
+        return "";
+    }
+
+    let mut result: ByteArray = "";
+    let mut remaining: u256 = value.into();
+
+    loop {
+        let byte_value = (remaining % 0x100); // 256
+        remaining /= 0x100; // 256
+
+        result.append_byte(byte_value.try_into().unwrap());
+        if remaining == 0 {
+            break;
+        }
+    };
+
+    result.rev()
+}
+
+
 #[cfg(test)]
 mod test {
-    use super::bytes_to_felt252;
+    use super::{bytes_to_felt252, felt252_to_bytes};
 
     #[test]
     fn test_empty_string() {
         let bytes = "";
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::Some(0), "Empty string should convert to 0");
+        let result_back = felt252_to_bytes(result.unwrap());
+        assert!(bytes == result_back, "Empty string should convert to 0");
     }
 
     #[test]
@@ -42,6 +66,8 @@ mod test {
         let bytes = "A";
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::Some('A'), "Single character conversion failed");
+        let result_back = felt252_to_bytes(result.unwrap());
+        assert!(bytes == result_back, "Single character conversion failed");
     }
 
     #[test]
@@ -49,6 +75,8 @@ mod test {
         let bytes = "abc";
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::Some('abc'), "Multiple byte conversion failed");
+        let result_back = felt252_to_bytes(result.unwrap());
+        assert!(bytes == result_back, "Multiple byte conversion failed");
     }
 
     #[test]
@@ -58,6 +86,8 @@ mod test {
         assert!(
             result == Option::Some('abcdefghijklmnopqrstuvwxyz12345'), "Max bytes conversion failed"
         );
+        let result_back = felt252_to_bytes(result.unwrap());
+        assert!(bytes == result_back, "Max bytes conversion failed");
     }
 
     #[test]
@@ -72,6 +102,8 @@ mod test {
         let bytes = "\0\0ab";
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::Some('ab'), "Leading zeros not handled correctly");
+        let result_back = felt252_to_bytes(result.unwrap());
+        assert!(bytes == result_back, "Leading zeros not handled correctly");
     }
 
     #[test]
@@ -79,6 +111,8 @@ mod test {
         let bytes = "\0\0\0\0";
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::Some(0), "All zeros should convert to 0");
+        let result_back = felt252_to_bytes(result.unwrap());
+        assert!(bytes == result_back, "All zeros should convert to 0");
     }
 
     #[test]
@@ -86,5 +120,7 @@ mod test {
         let bytes = "!@#$";
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::Some('!@#$'), "Special characters conversion failed");
+        let result_back = felt252_to_bytes(result.unwrap());
+        assert!(bytes == result_back, "Special characters conversion failed");
     }
 }
