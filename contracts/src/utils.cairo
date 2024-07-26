@@ -42,9 +42,9 @@ pub fn felt252_to_bytes(felt: felt252) -> ByteArray {
             break;
         }
 
-        let byte_value: u8 = (remaining % 0x100).try_into().unwrap(); // 256
+        let byte_value = remaining % 0x100; // 256
 
-        result.append_byte(byte_value);
+        result.append_byte(byte_value.try_into().unwrap());
 
         remaining /= 0x100; // 256
     };
