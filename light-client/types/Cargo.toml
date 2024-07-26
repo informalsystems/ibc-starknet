@@ -15,7 +15,11 @@ description = """
 workspace = true
 
 [dependencies]
+serde = { workspace = true, optional = true }
 
 [features]
 default = [ "std" ]
-std     = [  ]
+std = [  ]
+serde = [
+  "dep:serde",
+]

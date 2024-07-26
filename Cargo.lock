@@ -818,6 +818,7 @@ dependencies = [
  "derive_more 0.99.18",
  "ibc-client-starknet-types",
  "ibc-core",
+ "serde",
 ]
 
 [[package]]
@@ -833,6 +834,9 @@ dependencies = [
 [[package]]
 name = "ibc-client-starknet-types"
 version = "0.1.0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "ibc-client-wasm-types"
