@@ -1,3 +1,5 @@
+// Note: if bytes has leading `\0` (null char), `felt252` forgets that information.
+// bytes_to_felt252(felt252_to_bytes(x)).unwrap() == x
 pub fn bytes_to_felt252(bytes: @ByteArray) -> Option<felt252> {
     if bytes.len() == 0 {
         return Option::Some('');
@@ -27,23 +29,24 @@ pub fn bytes_to_felt252(bytes: @ByteArray) -> Option<felt252> {
 }
 
 // felt252_to_bytes(bytes_to_felt252(x).unwrap()) == x
-// FIXME: if x has `\0` (null char), it doesn't work.
-pub fn felt252_to_bytes(value: felt252) -> ByteArray {
-    if value == '' {
+pub fn felt252_to_bytes(felt: felt252) -> ByteArray {
+    if felt == '' {
         return "";
     }
 
     let mut result: ByteArray = "";
-    let mut remaining: u256 = value.into();
+    let mut remaining: u256 = felt.into();
 
     loop {
-        let byte_value = (remaining % 0x100); // 256
-        remaining /= 0x100; // 256
-
-        result.append_byte(byte_value.try_into().unwrap());
         if remaining == 0 {
             break;
         }
+
+        let byte_value: u8 = (remaining % 0x100).try_into().unwrap(); // 256
+
+        result.append_byte(byte_value);
+
+        remaining /= 0x100; // 256
     };
 
     result.rev()
@@ -60,7 +63,7 @@ mod test {
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::Some(0), "Empty string should convert to 0");
         let result_back = felt252_to_bytes(result.unwrap());
-        assert!(bytes == result_back, "Empty string should convert to 0");
+        assert!(result_back == bytes, "Empty string should convert to 0");
     }
 
     #[test]
@@ -69,7 +72,7 @@ mod test {
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::Some('A'), "Single character conversion failed");
         let result_back = felt252_to_bytes(result.unwrap());
-        assert!(bytes == result_back, "Single character conversion failed");
+        assert!(result_back == bytes, "Single character conversion failed");
     }
 
     #[test]
@@ -78,7 +81,7 @@ mod test {
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::Some('abc'), "Multiple byte conversion failed");
         let result_back = felt252_to_bytes(result.unwrap());
-        assert!(bytes == result_back, "Multiple byte conversion failed");
+        assert!(result_back == bytes, "Multiple byte conversion failed");
     }
 
     #[test]
@@ -89,7 +92,7 @@ mod test {
             result == Option::Some('abcdefghijklmnopqrstuvwxyz12345'), "Max bytes conversion failed"
         );
         let result_back = felt252_to_bytes(result.unwrap());
-        assert!(bytes == result_back, "Max bytes conversion failed");
+        assert!(result_back == bytes, "Max bytes conversion failed");
     }
 
     #[test]
@@ -105,6 +108,25 @@ mod test {
         let result = bytes_to_felt252(@bytes);
         assert!(result == Option::Some('!@#$'), "Special characters conversion failed");
         let result_back = felt252_to_bytes(result.unwrap());
-        assert!(bytes == result_back, "Special characters conversion failed");
+        assert!(result_back == bytes, "Special characters conversion failed");
+    }
+
+    #[test]
+    fn test_null_character() {
+        let bytes = "abc\0def\0";
+        let result = bytes_to_felt252(@bytes);
+        assert!(result == Option::Some('abc\0def\0'), "Null character conversion failed");
+        let result_back = felt252_to_bytes(result.unwrap());
+        assert!(result_back == bytes, "Null character conversion failed");
+    }
+
+    #[test]
+    fn test_leading_null_characters() {
+        let bytes = "\0\0\0abc";
+        let result = bytes_to_felt252(@bytes);
+        assert!(result == Option::Some('\0\0\0abc'), "Leading null character conversion failed");
+        let result_back = felt252_to_bytes(result.unwrap());
+        // trims the leading null characters
+        assert!(result_back == "abc", "Leading null character conversion failed");
     }
 }
