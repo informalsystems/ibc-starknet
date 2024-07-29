@@ -30,8 +30,8 @@ where
             .json_rpc_client()
             .call(
                 FunctionCall {
-                    contract_address: contract_address.clone(),
-                    entry_point_selector: entry_point_selector.clone(),
+                    contract_address: *contract_address,
+                    entry_point_selector: *entry_point_selector,
                     calldata: calldata.clone(),
                 },
                 block_id,
