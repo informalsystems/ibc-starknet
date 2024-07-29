@@ -699,6 +699,7 @@ dependencies = [
  "hermes-relayer-components",
  "hermes-starknet-chain-components",
  "starknet",
+ "url",
 ]
 
 [[package]]

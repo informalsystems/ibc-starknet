@@ -26,9 +26,10 @@ ibc                             = { version = "0.53.0" }
 cgp-core                        = { version = "0.1.0" }
 cgp-error-eyre                  = { version = "0.1.0" }
 cgp-component-macro             = { version = "0.1.0" }
-clap                            = { version = "4.5.8" }
 
+clap                            = { version = "4.5.8" }
 starknet                        = { version = "0.11.0" }
+url                             = { version = "2.4.0" }
 
 hermes-runtime-components               = { version = "0.1.0" }
 hermes-async-runtime-components         = { version = "0.1.0" }
