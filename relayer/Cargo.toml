@@ -5,6 +5,7 @@ resolver = "2"
 members = [
     "crates/starknet-chain-components",
     "crates/starknet-chain-context",
+    "crates/starknet-integration-tests",
 ]
 
 [workspace.package]
@@ -45,6 +46,12 @@ hermes-tracing-logging-components       = { version = "0.1.0" }
 hermes-logger                           = { version = "0.1.0" }
 
 hermes-relayer-components               = { version = "0.1.0" }
+
+hermes-cosmos-chain-components          = { version = "0.1.0" }
+hermes-cosmos-relayer                   = { version = "0.1.0" }
+hermes-cosmos-wasm-relayer              = { version = "0.1.0" }
+hermes-cosmos-test-components           = { version = "0.1.0" }
+hermes-cosmos-integration-tests         = { version = "0.1.0" }
 
 hermes-any-counterparty                 = { version = "0.1.0" }
 
@@ -107,6 +114,8 @@ hermes-ibc-test-suite               = { git = "https://github.com/informalsystem
 hermes-cli                          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cli-components               = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cli-framework                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+
+hermes-any-counterparty             = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 
 hermes-cosmos-chain-components      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-relayer               = { git = "https://github.com/informalsystems/hermes-sdk.git" }
