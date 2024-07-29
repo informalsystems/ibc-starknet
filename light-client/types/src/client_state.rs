@@ -2,6 +2,8 @@ use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
 use ibc_core::primitives::proto::{Any, Protobuf};
 
+const TYPE_URL: &str = "/DummyClientState";
+
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq, derive_more::From)]
 pub struct ClientState {
@@ -14,7 +16,7 @@ impl TryFrom<Any> for ClientState {
     type Error = ClientError;
 
     fn try_from(raw: Any) -> Result<Self, Self::Error> {
-        if raw.type_url != "/DummyClientState" {
+        if raw.type_url != TYPE_URL {
             return Err(ClientError::UnknownClientStateType {
                 client_state_type: raw.type_url,
             });
