@@ -43,7 +43,7 @@ impl TryFrom<Any> for ConsensusState {
 impl From<ConsensusState> for Any {
     fn from(consensus_state: ConsensusState) -> Self {
         Self {
-            type_url: "/DummyConsensusState".to_string(),
+            type_url: CONSENSUS_STATE_TYPE_URL.to_string(),
             value: vec![],
         }
     }

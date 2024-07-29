@@ -33,7 +33,7 @@ impl TryFrom<Any> for ClientState {
 impl From<ClientState> for Any {
     fn from(client_state: ClientState) -> Self {
         Self {
-            type_url: "/DummyClientState".to_string(),
+            type_url: CLIENT_STATE_TYPE_URL.to_string(),
             value: client_state
                 .latest_height
                 .revision_number()
