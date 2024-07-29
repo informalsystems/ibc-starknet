@@ -4,6 +4,7 @@ resolver = "2"
 
 members = [
     "crates/starknet-chain-components",
+    "crates/starknet-chain-context",
 ]
 
 [workspace.package]
@@ -28,7 +29,6 @@ cgp-component-macro             = { version = "0.1.0" }
 clap                            = { version = "4.5.8" }
 
 starknet                        = { version = "0.11.0" }
-starknet-types-core             = { version = "0.1.4" }
 
 hermes-runtime-components               = { version = "0.1.0" }
 hermes-async-runtime-components         = { version = "0.1.0" }
@@ -47,6 +47,10 @@ hermes-relayer-components               = { version = "0.1.0" }
 hermes-any-counterparty                 = { version = "0.1.0" }
 
 hermes-cli-components                   = { version = "0.1.0" }
+
+hermes-starknet-chain-components        = { version = "0.1.0" }
+hermes-starknet-chain-context           = { version = "0.1.0" }
+
 
 [patch.crates-io]
 ibc                         = { git = "https://github.com/cosmos/ibc-rs.git", rev = "5dc0b09" }
@@ -110,3 +114,6 @@ hermes-cosmos-integration-tests     = { git = "https://github.com/informalsystem
 
 hermes-wasm-client-components       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-wasm-test-components         = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+
+hermes-starknet-chain-components    = { path = "./crates/starknet-chain-components" }
+hermes-starknet-chain-context       = { path = "./crates/starknet-chain-context" }

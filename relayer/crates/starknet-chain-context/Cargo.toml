@@ -1,0 +1,17 @@
+[package]
+name         = "hermes-starknet-chain-context"
+version      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
+keywords     = { workspace = true }
+repository   = { workspace = true }
+authors      = { workspace = true }
+rust-version = { workspace = true }
+readme       = "README.md"
+
+[dependencies]
+cgp-core                                = { workspace = true }
+hermes-relayer-components               = { workspace = true }
+hermes-starknet-chain-components        = { workspace = true }
+
+starknet    = { workspace = true }
