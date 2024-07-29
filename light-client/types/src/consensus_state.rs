@@ -2,7 +2,7 @@ use ibc_core::client::types::error::ClientError;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
 use ibc_core::primitives::proto::{Any, Protobuf};
 
-pub const TYPE_URL: &str = "/DummyConsensusState";
+pub const CONSENSUS_STATE_TYPE_URL: &str = "/DummyConsensusState";
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq, derive_more::From)]
@@ -30,7 +30,7 @@ impl TryFrom<Any> for ConsensusState {
     type Error = ClientError;
 
     fn try_from(raw: Any) -> Result<Self, Self::Error> {
-        if raw.type_url != TYPE_URL || !raw.value.is_empty() {
+        if raw.type_url != CONSENSUS_STATE_TYPE_URL || !raw.value.is_empty() {
             return Err(ClientError::UnknownConsensusStateType {
                 consensus_state_type: raw.type_url,
             });
