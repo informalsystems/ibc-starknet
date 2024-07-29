@@ -15,7 +15,9 @@ impl TryFrom<Any> for ClientState {
 
     fn try_from(raw: Any) -> Result<Self, Self::Error> {
         if raw.type_url != "/DummyClientState" {
-            return Err(ClientError::from("invalid type URL or empty value"));
+            return Err(ClientError::UnknownClientStateType {
+                client_state_type: raw.type_url,
+            });
         }
 
         let revision_number = u64::from_be_bytes(raw.value.try_into().unwrap());

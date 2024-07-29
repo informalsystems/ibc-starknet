@@ -29,7 +29,9 @@ impl TryFrom<Any> for ConsensusState {
 
     fn try_from(raw: Any) -> Result<Self, Self::Error> {
         if raw.type_url != "/DummyConsensusState" || !raw.value.is_empty() {
-            return Err(ClientError::from("invalid type URL or empty value"));
+            return Err(ClientError::UnknownConsensusStateType {
+                consensus_state_type: raw.type_url,
+            });
         }
 
         Ok(Self::default())
