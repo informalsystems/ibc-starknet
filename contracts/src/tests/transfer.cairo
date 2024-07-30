@@ -83,13 +83,17 @@ fn test_mint_burn_roundtrip() {
     // -----------------------------------------------------------
 
     // Submit a `RecvPacket`, which will create a new ERC20 contract.
-    ics20.recv_dispatcher().recv_execute(dummy_recv_packet(HOSTED_PREFIXED_DENOM(), OWNER(), RECIPIENT()));
+    ics20
+        .recv_dispatcher()
+        .recv_execute(dummy_recv_packet(HOSTED_PREFIXED_DENOM(), OWNER(), RECIPIENT()));
 
     // Assert the `RecvEvent` emitted.
     ics20.assert_recv_event();
 
     // Submit another `RecvPacket`, which will mint the amount of tokens.
-    ics20.recv_dispatcher().recv_execute(dummy_recv_packet(HOSTED_PREFIXED_DENOM(), OWNER(), RECIPIENT()));
+    ics20
+        .recv_dispatcher()
+        .recv_execute(dummy_recv_packet(HOSTED_PREFIXED_DENOM(), OWNER(), RECIPIENT()));
 
     // Assert the `RecvEvent` emitted.
     let event = ics20.assert_recv_event();
