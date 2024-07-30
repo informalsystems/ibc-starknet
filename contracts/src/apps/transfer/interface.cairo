@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
-use starknet_ibc::apps::transfer::types::{MsgTransfer, Packet, Memo};
-use starknet_ibc::core::types::{PortId, ChannelId};
+use starknet_ibc::apps::transfer::types::{MsgTransfer, PrefixedDenom};
+use starknet_ibc::core::channel::types::Packet;
 
 #[starknet::interface]
 pub trait ISendTransfer<TContractState> {
@@ -15,8 +15,9 @@ pub trait IRecvPacket<TContractState> {
 }
 
 #[starknet::interface]
-pub trait ITransferrable<TContractState> {
-    fn can_send(self: @TContractState);
-    fn can_receive(self: @TContractState);
+pub trait ITokenAddress<TContractState> {
+    fn ibc_token_address(
+        self: @TContractState, prefixed_denom: PrefixedDenom
+    ) -> Option<ContractAddress>;
 }
 

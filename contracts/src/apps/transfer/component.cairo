@@ -1,10 +1,3 @@
-use core::array::ArrayTrait;
-use core::serde::Serde;
-use core::to_byte_array::FormatAsByteArray;
-use core::traits::TryInto;
-use starknet::ContractAddress;
-use starknet_ibc::apps::transfer::errors::ICS20Errors;
-
 #[starknet::component]
 pub mod ICS20TransferComponent {
     use core::array::ArrayTrait;
@@ -12,152 +5,131 @@ pub mod ICS20TransferComponent {
     use core::num::traits::Zero;
     use core::option::OptionTrait;
     use core::starknet::SyscallResultTrait;
-    use core::traits::TryInto;
-    use openzeppelin::token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
     use openzeppelin::utils::serde::SerializedAppend;
     use starknet::ClassHash;
     use starknet::ContractAddress;
-    use starknet::get_caller_address;
     use starknet::get_contract_address;
-    use starknet::syscalls::deploy_syscall;
-    use starknet_ibc::apps::transfer::errors::ICS20Errors;
-    use starknet_ibc::apps::transfer::interface::{ISendTransfer, IRecvPacket, ITransferrable};
+    use starknet_ibc::apps::transfer::errors::TransferErrors;
+    use starknet_ibc::apps::transfer::interface::{ISendTransfer, IRecvPacket, ITokenAddress};
     use starknet_ibc::apps::transfer::types::{
-        MsgTransfer, Packet, Token, Denom, DenomTrait, Memo, MAXIMUM_MEMO_LENGTH
+        MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo,
+        TracePrefixTrait, ERC20TokenTrait, ERC20Token, MAXIMUM_MEMO_LENGTH, ValidateBasicTrait,
+        PrefixedDenomTrait
     };
-    use starknet_ibc::core::types::{PortId, ChannelId};
+    use starknet_ibc::apps::transferrable::interface::ITransferrable;
+    use starknet_ibc::core::channel::types::Packet;
+    use starknet_ibc::core::host::types::{PortId, ChannelId, ChannelIdTrait};
 
     #[storage]
     struct Storage {
         erc20_class_hash: ClassHash,
         salt: felt252,
-        governor: ContractAddress,
-        send_capability: bool,
-        receive_capability: bool,
-        minted_token_name_to_address: LegacyMap<felt252, ContractAddress>,
-        minted_token_address_to_name: LegacyMap<ContractAddress, felt252>,
+        ibc_token_name_to_address: LegacyMap<felt252, ContractAddress>,
+        ibc_token_address_to_name: LegacyMap<ContractAddress, felt252>,
     }
 
     #[event]
     #[derive(Debug, Drop, starknet::Event)]
     pub enum Event {
-        TransferEvent: TransferEvent,
+        SendEvent: SendEvent,
         RecvEvent: RecvEvent,
     }
 
     #[derive(Debug, Drop, Serde, starknet::Event)]
-    pub struct TransferEvent {
-        sender: ContractAddress,
-        receiver: ContractAddress,
-        amount: u256,
-        denom: Denom,
-        memo: Memo,
+    pub struct SendEvent {
+        #[key]
+        pub sender: ContractAddress,
+        #[key]
+        pub receiver: ContractAddress,
+        #[key]
+        pub denom: PrefixedDenom,
+        pub amount: u256,
+        pub memo: Memo,
     }
 
     #[derive(Debug, Drop, Serde, starknet::Event)]
     pub struct RecvEvent {
-        sender: ContractAddress,
-        receiver: ContractAddress,
-        denom: Denom,
-        amount: u256,
-        memo: Memo,
-        success: bool,
+        #[key]
+        pub sender: ContractAddress,
+        #[key]
+        pub receiver: ContractAddress,
+        #[key]
+        pub denom: PrefixedDenom,
+        pub amount: u256,
+        pub memo: Memo,
+        pub success: bool,
     }
 
     #[embeddable_as(SendTransfer)]
     impl SendTransferImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState,
+        +HasComponent<TContractState>,
+        +ITransferrable<TContractState>,
+        +Drop<TContractState>
     > of ISendTransfer<ComponentState<TContractState>> {
         fn send_validate(self: @ComponentState<TContractState>, msg: MsgTransfer) {
-            self._send_validate(msg);
-        }
+            self.get_contract().can_send();
 
-        fn send_execute(ref self: ComponentState<TContractState>, msg: MsgTransfer) {
-            self._send_execute(msg);
-        }
-    }
+            msg.validate_basic();
 
-    #[generate_trait]
-    impl SendTransferInternalImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
-    > of SendTransferInternal<TContractState> {
-        fn _send_validate(self: @ComponentState<TContractState>, msg: MsgTransfer) -> Denom {
-            self.can_send();
-
-            assert(msg.packet_data.sender.is_non_zero(), ICS20Errors::INVALID_SENDER);
-            assert(!msg.packet_data.token.denom.is_zero(), ICS20Errors::INVALID_DENOM);
-            assert(msg.packet_data.token.amount.is_non_zero(), ICS20Errors::ZERO_AMOUNT);
-            assert(
-                msg.packet_data.memo.memo.len() < MAXIMUM_MEMO_LENGTH,
-                ICS20Errors::MAXIMUM_MEMO_LENGTH
-            );
-
-            match @msg.packet_data.token.denom {
-                Denom::Native(_) => {
+            match @msg.packet_data.denom.base {
+                Denom::Native(erc20_token) => {
                     self
                         .escrow_validate(
                             msg.packet_data.sender.clone(),
                             msg.port_id_on_a.clone(),
                             msg.chan_id_on_a.clone(),
-                            msg.packet_data.token.clone(),
+                            erc20_token.clone(),
+                            msg.packet_data.amount,
                             msg.packet_data.memo.clone(),
                         );
                 },
-                Denom::IBC(_) => {
+                Denom::Hosted(_) => {
                     self
                         .burn_validate(
                             msg.packet_data.sender.clone(),
-                            msg.packet_data.token.clone(),
+                            msg.packet_data.denom.clone(),
+                            msg.packet_data.amount,
                             msg.packet_data.memo.clone(),
                         );
                 }
             }
-
-            msg.packet_data.token.denom
         }
 
-        fn _send_execute(ref self: ComponentState<TContractState>, msg: MsgTransfer) -> Denom {
-            let denom = self._send_validate(msg.clone());
+        fn send_execute(ref self: ComponentState<TContractState>, msg: MsgTransfer) {
+            self.send_validate(msg.clone());
 
-            match @denom {
-                Denom::Native(_) => {
+            match @msg.packet_data.denom.base {
+                Denom::Native(erc20_token) => {
                     self
                         .escrow_execute(
                             msg.packet_data.sender.clone(),
-                            msg.port_id_on_a.clone(),
-                            msg.chan_id_on_a.clone(),
-                            msg.packet_data.token.clone(),
+                            erc20_token.clone(),
+                            msg.packet_data.amount,
                             msg.packet_data.memo.clone(),
                         );
                 },
-                Denom::IBC(_) => {
+                Denom::Hosted(_) => {
                     self
                         .burn_execute(
                             msg.packet_data.sender.clone(),
-                            msg.packet_data.token.clone(),
+                            msg.packet_data.denom.clone(),
+                            msg.packet_data.amount,
                             msg.packet_data.memo.clone(),
                         );
                 }
             }
 
-            self
-                .emit(
-                    TransferEvent {
-                        sender: msg.packet_data.sender.clone(),
-                        receiver: msg.packet_data.receiver.clone(),
-                        amount: msg.packet_data.token.amount,
-                        denom: denom.clone(),
-                        memo: msg.packet_data.memo.clone(),
-                    }
-                );
-
-            denom
+            self.emit_send_event(msg.packet_data);
         }
     }
 
     #[embeddable_as(RecvPacket)]
     impl RecvPacketImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState,
+        +HasComponent<TContractState>,
+        +ITransferrable<TContractState>,
+        +Drop<TContractState>
     > of IRecvPacket<ComponentState<TContractState>> {
         fn recv_validate(self: @ComponentState<TContractState>, packet: Packet) {
             self._recv_validate(packet);
@@ -170,96 +142,123 @@ pub mod ICS20TransferComponent {
 
     #[generate_trait]
     impl RecvPacketInternalImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
-    > of RecvPacketInternal<TContractState> {
-        fn _recv_validate(self: @ComponentState<TContractState>, packet: Packet) -> Denom {
-            self.can_receive();
+        TContractState,
+        +HasComponent<TContractState>,
+        +ITransferrable<TContractState>,
+        +Drop<TContractState>
+    > of RecvPacketInternalTrait<TContractState> {
+        fn _recv_validate(self: @ComponentState<TContractState>, packet: Packet) -> PacketData {
+            self.get_contract().can_receive();
 
-            assert(packet.data.receiver.is_non_zero(), ICS20Errors::INVALID_RECEIVEER);
-            assert(!packet.data.token.denom.is_zero(), ICS20Errors::INVALID_DENOM);
-            assert(packet.data.token.amount.is_non_zero(), ICS20Errors::ZERO_AMOUNT);
+            let mut pakcet_data_span = packet.data.span();
 
-            match @packet.data.token.denom {
-                Denom::Native(_) => {
+            let maybe_packet_data: Option<PacketData> = Serde::deserialize(ref pakcet_data_span);
+
+            assert(maybe_packet_data.is_some(), TransferErrors::INVALID_PACKET_DATA);
+
+            let packet_date = maybe_packet_data.unwrap();
+
+            packet_date.validate_basic();
+
+            match @packet_date.denom.base {
+                Denom::Native(erc20_token) => {
                     self
                         .unescrow_validate(
-                            packet.data.receiver.clone(),
+                            packet_date.receiver.clone(),
                             packet.port_id_on_a.clone(),
                             packet.chan_id_on_a.clone(),
-                            packet.data.token.clone(),
+                            erc20_token.clone(),
+                            packet_date.amount,
                         );
                 },
-                Denom::IBC(_) => {
-                    self.mint_validate(packet.data.receiver.clone(), packet.data.token.clone(),);
+                Denom::Hosted(_) => {
+                    self
+                        .mint_validate(
+                            packet_date.receiver.clone(),
+                            packet_date.denom.clone(),
+                            packet_date.amount
+                        );
                 }
             }
 
-            packet.data.token.denom
+            packet_date
         }
 
-        fn _recv_execute(ref self: ComponentState<TContractState>, packet: Packet) -> Denom {
-            let denom = self._recv_validate(packet.clone());
+        fn _recv_execute(ref self: ComponentState<TContractState>, packet: Packet) -> PacketData {
+            let mut packet_data = self._recv_validate(packet.clone());
 
-            match @denom {
-                Denom::Native(_) => {
+            let trace_prefix = TracePrefixTrait::new(
+                packet.port_id_on_a.clone(), packet.chan_id_on_a.clone()
+            );
+
+            match @packet_data.denom.base {
+                Denom::Native(erc20_token) => {
+                    packet_data.denom.remove_prefix(@trace_prefix);
+
                     self
                         .unescrow_execute(
-                            packet.data.receiver.clone(),
+                            packet_data.receiver.clone(),
                             packet.port_id_on_a.clone(),
                             packet.chan_id_on_a.clone(),
-                            packet.data.token.clone(),
-                        );
+                            erc20_token.clone(),
+                            packet_data.amount,
+                        )
                 },
-                Denom::IBC(_) => {
-                    self.mint_execute(packet.data.receiver.clone(), packet.data.token.clone(),);
+                Denom::Hosted(_) => {
+                    packet_data.denom.add_prefix(trace_prefix);
+
+                    self
+                        .mint_execute(
+                            packet_data.receiver.clone(),
+                            packet_data.denom.clone(),
+                            packet_data.amount
+                        )
                 }
-            }
+            };
 
-            self
-                .emit(
-                    RecvEvent {
-                        sender: packet.data.sender.clone(),
-                        receiver: packet.data.receiver.clone(),
-                        denom: denom.clone(),
-                        amount: packet.data.token.amount,
-                        memo: packet.data.memo.clone(),
-                        success: true,
-                    }
-                );
+            self.emit_recv_event(packet_data.clone(), true);
 
-            denom
+            packet_data
         }
     }
 
-    #[embeddable_as(TransferrableImpl)]
-    pub impl Transferrable<
+    #[embeddable_as(IBCTokenAddress)]
+    impl ITokenAddressImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
-    > of ITransferrable<ComponentState<TContractState>> {
-        fn can_send(self: @ComponentState<TContractState>) {
-            let send_capability = self.send_capability.read();
-            assert(send_capability, ICS20Errors::NO_SEND_CAPABILITY);
-        }
-        fn can_receive(self: @ComponentState<TContractState>) {
-            let receive_capability = self.receive_capability.read();
-            assert(receive_capability, ICS20Errors::NO_RECEIVE_CAPABILITY);
+    > of ITokenAddress<ComponentState<TContractState>> {
+        fn ibc_token_address(
+            self: @ComponentState<TContractState>, prefixed_denom: PrefixedDenom
+        ) -> Option<ContractAddress> {
+            let denom_key = prefixed_denom.compute_key();
+
+            let token_address = self.ibc_token_name_to_address.read(denom_key);
+
+            if token_address.is_non_zero() {
+                Option::Some(token_address)
+            } else {
+                Option::None
+            }
         }
     }
 
     #[generate_trait]
     pub(crate) impl TransferValidationImpl<
-        TContractState, +HasComponent<TContractState>,
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferValidationTrait<TContractState> {
         fn escrow_validate(
             self: @ComponentState<TContractState>,
             from_account: ContractAddress,
             port_id: PortId,
             channel_id: ChannelId,
-            token: Token,
+            denom: ERC20Token,
+            amount: u256,
             memo: Memo,
         ) {
-            let contract_address = token.denom.native().unwrap();
-            let balance = ERC20ABIDispatcher { contract_address }.balance_of(from_account);
-            assert(balance > token.amount, ICS20Errors::INSUFFICIENT_BALANCE);
+            let balance = denom.balance_of(from_account);
+
+            assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
+
+            self.assert_non_ibc_token(denom, port_id, channel_id);
         }
 
         fn unescrow_validate(
@@ -267,29 +266,41 @@ pub mod ICS20TransferComponent {
             to_account: ContractAddress,
             port_id: PortId,
             channel_id: ChannelId,
-            token: Token,
+            denom: ERC20Token,
+            amount: u256,
         ) {
-            let contract_address = token.denom.native().unwrap();
-            let balance = ERC20ABIDispatcher { contract_address }
-                .balance_of(get_contract_address());
-            assert(token.amount > balance, ICS20Errors::INSUFFICIENT_BALANCE);
+            let balance = denom.balance_of(get_contract_address());
+
+            assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
+
+            self.assert_non_ibc_token(denom, port_id, channel_id);
         }
 
         fn mint_validate(
-            self: @ComponentState<TContractState>, account: ContractAddress, token: Token,
-        ) {}
+            self: @ComponentState<TContractState>,
+            account: ContractAddress,
+            denom: PrefixedDenom,
+            amount: u256,
+        ) { // NOTE: Normally, the minting process does not require any checks.
+        // However, an implementer might choose to incorporate custom
+        // checks, such as blacklisting.
+        }
 
         fn burn_validate(
             self: @ComponentState<TContractState>,
             account: ContractAddress,
-            token: Token,
+            denom: PrefixedDenom,
+            amount: u256,
             memo: Memo,
         ) {
-            let contract_address = self
-                .minted_token_name_to_address
-                .read(token.denom.ibc().unwrap());
-            let balance = ERC20ABIDispatcher { contract_address }.balance_of(account);
-            assert(token.amount > balance, ICS20Errors::INSUFFICIENT_BALANCE);
+            let token_address: ERC20Token = self
+                .ibc_token_name_to_address
+                .read(denom.compute_key())
+                .into();
+
+            let balance = token_address.balance_of(account);
+
+            assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
         }
     }
 
@@ -300,14 +311,11 @@ pub mod ICS20TransferComponent {
         fn escrow_execute(
             ref self: ComponentState<TContractState>,
             from_account: ContractAddress,
-            port_id: PortId,
-            channel_id: ChannelId,
-            token: Token,
+            denom: ERC20Token,
+            amount: u256,
             memo: Memo,
         ) {
-            let contract_address = token.denom.native().unwrap();
-            ERC20ABIDispatcher { contract_address }
-                .transfer_from(from_account, get_contract_address(), token.amount);
+            denom.transfer_from(from_account, get_contract_address(), amount);
         }
 
         fn unescrow_execute(
@@ -315,31 +323,44 @@ pub mod ICS20TransferComponent {
             to_account: ContractAddress,
             port_id: PortId,
             channel_id: ChannelId,
-            token: Token,
-        ) {}
+            denom: ERC20Token,
+            amount: u256,
+        ) {
+            denom.transfer(to_account, amount);
+        }
 
         fn mint_execute(
-            ref self: ComponentState<TContractState>, account: ContractAddress, token: Token,
+            ref self: ComponentState<TContractState>,
+            account: ContractAddress,
+            denom: PrefixedDenom,
+            amount: u256,
         ) {
-            let ibc_denom = token.denom.ibc().unwrap();
+            let token_address: ERC20Token = self
+                .ibc_token_name_to_address
+                .read(denom.compute_key())
+                .into();
 
-            let contract_address = self.minted_token_name_to_address.read(ibc_denom);
-
-            let contract_address = if contract_address.is_non_zero() {
-                contract_address
+            if token_address.is_non_zero() {
+                token_address.mint(account, amount);
             } else {
-                self.create_token(account, token)
-            };
-
-            ERC20ABIDispatcher { contract_address }.transfer(account, token.amount);
+                self.create_token(account, denom, amount);
+            }
         }
 
         fn burn_execute(
             ref self: ComponentState<TContractState>,
             account: ContractAddress,
-            token: Token,
+            denom: PrefixedDenom,
+            amount: u256,
             memo: Memo,
-        ) {}
+        ) {
+            let token_address: ERC20Token = self
+                .ibc_token_name_to_address
+                .read(denom.compute_key())
+                .into();
+
+            token_address.burn(account, amount);
+        }
     }
 
     #[generate_trait]
@@ -347,34 +368,103 @@ pub mod ICS20TransferComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferInternalTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash) {
-            self.governor.write(get_caller_address());
             self.erc20_class_hash.write(erc20_class_hash);
             self.salt.write(0);
-            self.send_capability.write(true);
-            self.receive_capability.write(true);
         }
 
         fn create_token(
-            ref self: ComponentState<TContractState>, account: ContractAddress, token: Token
+            ref self: ComponentState<TContractState>,
+            account: ContractAddress,
+            denom: PrefixedDenom,
+            amount: u256,
         ) -> ContractAddress {
             let salt = self.salt.read();
 
-            let mut call_data = array![];
-            call_data.append_serde(token.denom.clone());
-            call_data
-                .append_serde(token.denom); // TODO: determine what should be set as symbol here.
-            call_data.append_serde(token.amount);
-            call_data.append_serde(account);
-            call_data.append_serde(get_contract_address());
+            let name = denom.base.hosted().unwrap();
 
-            let (address, _) = deploy_syscall(
-                self.erc20_class_hash.read(), salt, call_data.span(), false,
-            )
-                .unwrap_syscall();
+            let erc20_token = ERC20TokenTrait::create(
+                self.erc20_class_hash.read(),
+                salt,
+                name.clone(),
+                name, // TODO: Detemine the symbol
+                amount,
+                account,
+                get_contract_address()
+            );
+
+            self.record_ibc_token(denom, erc20_token.address);
 
             self.salt.write(salt + 1);
 
-            address
+            erc20_token.address
+        }
+
+        fn record_ibc_token(
+            ref self: ComponentState<TContractState>,
+            denom: PrefixedDenom,
+            token_address: ContractAddress,
+        ) {
+            let denom_key = denom.compute_key();
+
+            self.ibc_token_name_to_address.write(denom_key, token_address);
+
+            self.ibc_token_address_to_name.write(token_address, denom_key);
+        }
+
+        fn assert_non_ibc_token(
+            self: @ComponentState<TContractState>,
+            denom: ERC20Token,
+            port_id: PortId,
+            channel_id: ChannelId,
+        ) {
+            let token_key = self.ibc_token_address_to_name.read(denom.address);
+
+            if token_key.is_non_zero() {
+                let trace_prefix = TracePrefixTrait::new(port_id, channel_id);
+
+                let denom = PrefixedDenom {
+                    trace_path: array![trace_prefix], base: Denom::Native(denom),
+                };
+
+                // Checks if the token is an IBC-created token. If so, it cannot
+                // be transferred back to the source by escrowing. A prefixed
+                // denom should be passed to burn instead.
+                assert(token_key == denom.compute_key(), TransferErrors::INVALID_DENOM);
+            }
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl TransferEventImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+    > of TransferEventTrait<TContractState> {
+        fn emit_send_event(ref self: ComponentState<TContractState>, packet_date: PacketData,) {
+            self
+                .emit(
+                    SendEvent {
+                        sender: packet_date.sender,
+                        receiver: packet_date.receiver,
+                        denom: packet_date.denom,
+                        amount: packet_date.amount,
+                        memo: packet_date.memo,
+                    }
+                );
+        }
+
+        fn emit_recv_event(
+            ref self: ComponentState<TContractState>, packet_date: PacketData, success: bool,
+        ) {
+            self
+                .emit(
+                    RecvEvent {
+                        sender: packet_date.sender,
+                        receiver: packet_date.receiver,
+                        denom: packet_date.denom,
+                        amount: packet_date.amount,
+                        memo: packet_date.memo,
+                        success,
+                    }
+                );
         }
     }
 }

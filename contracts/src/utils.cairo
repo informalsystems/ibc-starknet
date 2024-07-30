@@ -1,3 +1,8 @@
+/// Converts a generic type 'T' to a felt252.
+pub trait ToFelt252Trait<T> {
+    fn try_to_felt252(self: @T) -> Option<felt252>;
+}
+
 // Note: if bytes has leading `\0` (null char), `felt252` forgets that information.
 // bytes_to_felt252(felt252_to_bytes(x)).unwrap() == x
 pub fn bytes_to_felt252(bytes: @ByteArray) -> Option<felt252> {

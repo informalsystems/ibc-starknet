@@ -1,4 +1,3 @@
-#[cfg(test)]
 mod erc20;
 mod transfer;
 
