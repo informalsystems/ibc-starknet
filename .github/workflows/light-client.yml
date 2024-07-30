@@ -1,4 +1,4 @@
-name: Rust
+name: Light Client
 on:
   pull_request:
     paths:

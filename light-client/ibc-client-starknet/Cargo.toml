@@ -20,7 +20,7 @@ serde       = { workspace = true, optional = true }
 
 # ibc dependencies
 ibc-core                  = { workspace = true }
-ibc-client-starknet-types = { path = "./../types" }
+ibc-client-starknet-types = { workspace = true }
 
 [features]
 default = [ "std" ]

@@ -17,7 +17,7 @@ crate-type = [ "cdylib", "rlib" ]
 # ibc dependencies
 ibc-core            = { workspace = true }
 ibc-client-cw       = { workspace = true }
-ibc-client-starknet = { path = "./../impls" }
+ibc-client-starknet = { workspace = true }
 
 # cosmwasm dependencies
 cosmwasm-std = "2.1.0"
