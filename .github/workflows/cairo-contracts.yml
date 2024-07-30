@@ -27,4 +27,4 @@ jobs:
       - name: Install Just
         uses: extractions/setup-just@v1
       - name: Run Tests
-        run: just test-contracts
+        run: just test-cairo-contracts
