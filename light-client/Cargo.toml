@@ -1,0 +1,55 @@
+[workspace]
+resolver = "2"
+members = [
+  "./ibc-client-starknet",
+  "./ibc-client-starknet-cw",
+  "./ibc-client-starknet-types",
+]
+
+[workspace.package]
+version      = "0.1.0"
+license      = "MIT OR Apache-2.0"
+edition      = "2021"
+rust-version = "1.72.1"
+publish      = false
+authors      = [ "Informal Systems <hello@informal.systems>" ]
+repository   = "https://github.com/informalsystems/ibc-starknet"
+
+[workspace.dependencies]
+ibc-client-starknet       = { version = "0.1.0" }
+ibc-client-starknet-cw    = { version = "0.1.0" }
+ibc-client-starknet-types = { version = "0.1.0" }
+
+# external dependencies
+derive_more = { version = "0.99.11", features = [ "from", "try_into" ] }
+serde       = { version = "1.0.204", features = [ "derive" ] }
+
+# ibc depedenencies
+ibc-core      = { version = "0.53.0", default-features = false, features = [ "borsh", "schema" ] }
+ibc-client-cw = { version = "0.53.0", default-features = false }
+
+[patch.crates-io]
+ibc-core      = { git = "https://github.com/cosmos/ibc-rs.git", rev = "d239ae7" }
+ibc-client-cw = { git = "https://github.com/cosmos/ibc-rs.git", rev = "d239ae7" }
+
+ibc-client-starknet       = { path = "./ibc-client-starknet" }
+ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
+ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
+
+[workspace.lints.rust]
+unsafe_code          = "forbid"
+dead_code            = "deny"
+rust_2018_idioms     = { level = "deny", priority = -1 }
+trivial_casts        = "deny"
+unused_import_braces = "deny"
+unused_variables     = "allow"
+
+[workspace.lints.clippy]
+debug_assert_with_mut_call    = "deny"
+doc_link_with_quotes          = "deny"
+inefficient_to_string         = "deny"
+map_flatten                   = "deny"
+manual_ok_or                  = "deny"
+match_same_arms               = "deny"
+semicolon_if_nothing_returned = "deny"
+uninlined_format_args         = "deny"

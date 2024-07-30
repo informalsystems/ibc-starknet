@@ -4,20 +4,31 @@ install-tools:
 	cargo install typos-cli taplo-cli
 
 build-cw-contract:
-  cd ./light-client/cw-contract && cargo build --target wasm32-unknown-unknown
-
-# Runs formatter and clippy for all the cargo and scarb packages
-lint:
-  @cargo +nightly fmt --all -- --check && \
-  cargo clippy --all-targets --all-features -- -D warnings && \
-  cargo clippy --all-targets --no-default-features -- -D warnings && \
-  taplo fmt --check && \
-  cd ./contracts && scarb fmt
+  cd ./light-client && cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
 
 # Builds the Cairo contracts
-build-contracts:
-  cd ./contracts && scarb build
+build-cairo-contracts:
+  cd ./cairo-contracts && \
+  scarb build
 
 # Tests the Cairo contracts
-test-contracts:
-  cd ./contracts && scarb test
+test-cairo-contracts:
+  cd ./cairo-contracts && \
+  scarb test
+
+lint: lint-toml lint-light-client lint-cairo
+
+lint-toml:
+  taplo fmt --check
+
+# Runs formatter and clippy for all the cargo and scarb packages
+lint-light-client:
+  cd ./light-client && \
+  cargo +nightly fmt --all -- --check && \
+  cargo clippy --all-targets --all-features -- -D warnings && \
+  cargo clippy --all-targets --no-default-features -- -D warnings
+
+# Runs formatter and clippy for all the cargo and scarb packages
+lint-cairo:
+  cd ./cairo-contracts && \
+  scarb fmt --check
