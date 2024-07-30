@@ -13,6 +13,7 @@ readme       = "README.md"
 cgp-core                         = { workspace = true }
 hermes-error                     = { workspace = true }
 hermes-relayer-components        = { workspace = true }
+hermes-runtime-components        = { workspace = true }
 hermes-starknet-chain-components = { workspace = true }
 hermes-starknet-chain-context    = { workspace = true }
 hermes-cosmos-integration-tests  = { workspace = true }

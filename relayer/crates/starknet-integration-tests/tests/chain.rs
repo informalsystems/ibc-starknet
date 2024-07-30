@@ -1,7 +1,9 @@
+use core::time::Duration;
 use std::sync::Arc;
 
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::types::Error;
+use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
@@ -81,6 +83,20 @@ fn test_starknet_chain_client() {
                 .await?;
 
             println!("invoke result tx hash: {}", tx_hash);
+
+            runtime.sleep(Duration::from_secs(1)).await;
+
+            let result = chain
+                .call_contract(
+                    &felt!("0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"),
+                    &selector!("balance_of"),
+                    &vec![felt!(
+                        "0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"
+                    )],
+                )
+                .await?;
+
+            println!("query balance_of result: {:?}", result);
 
             <Result<(), Error>>::Ok(())
         })

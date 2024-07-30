@@ -1655,6 +1655,7 @@ dependencies = [
  "hermes-cosmos-integration-tests",
  "hermes-error",
  "hermes-relayer-components",
+ "hermes-runtime-components",
  "hermes-starknet-chain-components",
  "hermes-starknet-chain-context",
  "starknet",
