@@ -1,15 +1,14 @@
 [package]
-name = "ibc-client-starknet"
-authors = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
+name         = "ibc-client-starknet"
+authors      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
 rust-version = { workspace = true }
-version = { workspace = true }
-repository = { workspace = true }
-readme = "./../README.md"
-keywords = [ "starknet", "ibc", "light-client" ]
-description = """
-"""
+version      = { workspace = true }
+repository   = { workspace = true }
+readme       = "./../README.md"
+keywords     = [ "starknet", "ibc", "light-client" ]
+description  = ""
 
 [lints]
 workspace = true
@@ -17,6 +16,7 @@ workspace = true
 [dependencies]
 # external dependencies
 derive_more = { workspace = true }
+serde       = { workspace = true, optional = true }
 
 # ibc dependencies
 ibc-core                  = { workspace = true }
@@ -27,4 +27,9 @@ default = [ "std" ]
 std = [
   "ibc-core/std",
   "ibc-client-starknet-types/std",
+]
+serde = [
+  "dep:serde",
+  "ibc-core/serde",
+  "ibc-client-starknet-types/serde",
 ]

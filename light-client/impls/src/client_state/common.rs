@@ -12,19 +12,19 @@ use super::ClientState;
 
 impl ClientStateCommon for ClientState {
     fn verify_consensus_state(&self, consensus_state: Any) -> Result<(), ClientError> {
-        todo!()
+        Ok(())
     }
 
     fn client_type(&self) -> ClientType {
-        todo!()
+        "blind-001".parse().unwrap()
     }
 
-    fn latest_height(&self) -> ibc_core::client::types::Height {
-        todo!()
+    fn latest_height(&self) -> Height {
+        self.0.latest_height
     }
 
     fn validate_proof_height(&self, proof_height: Height) -> Result<(), ClientError> {
-        todo!()
+        Ok(())
     }
 
     fn verify_upgrade_client(
@@ -35,11 +35,11 @@ impl ClientStateCommon for ClientState {
         proof_upgrade_consensus_state: CommitmentProofBytes,
         root: &CommitmentRoot,
     ) -> Result<(), ClientError> {
-        todo!()
+        Ok(())
     }
 
     fn serialize_path(&self, path: Path) -> Result<PathBytes, ClientError> {
-        todo!()
+        Ok(path.to_string().as_bytes().to_vec().into())
     }
 
     fn verify_membership_raw(
@@ -50,7 +50,7 @@ impl ClientStateCommon for ClientState {
         path: PathBytes,
         value: Vec<u8>,
     ) -> Result<(), ClientError> {
-        todo!()
+        Ok(())
     }
 
     fn verify_non_membership_raw(
@@ -60,6 +60,6 @@ impl ClientStateCommon for ClientState {
         root: &CommitmentRoot,
         path: PathBytes,
     ) -> Result<(), ClientError> {
-        todo!()
+        Ok(())
     }
 }
