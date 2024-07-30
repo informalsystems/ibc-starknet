@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use cgp_core::prelude::*;
-use starknet::accounts::Account;
+use starknet::accounts::ConnectedAccount;
 
 use crate::traits::account::{
     HasStarknetAccountType, ProvideStarknetAccountType, StarknetAccountGetter,
@@ -13,7 +13,7 @@ impl<Chain, Tag> ProvideStarknetAccountType<Chain> for GetStarknetAccountField<T
 where
     Chain: Async + HasField<Tag>,
     Tag: Async,
-    Chain::Field: Async + Account,
+    Chain::Field: Async + ConnectedAccount,
 {
     type Account = Chain::Field;
 }
