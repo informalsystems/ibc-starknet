@@ -3,5 +3,7 @@ corelib/
 target/
 **/Cargo.lock
 
+.env
+
 # vscode
 .vscode/
