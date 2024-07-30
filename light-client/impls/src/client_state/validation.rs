@@ -6,10 +6,11 @@ use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::primitives::proto::Any;
 
 use super::ClientState;
+use crate::ConsensusState;
 
 impl<V> ClientStateValidation<V> for ClientState
 where
-    V: ClientValidationContext,
+    V: ClientValidationContext<ClientStateRef = ClientState, ConsensusStateRef = ConsensusState>,
 {
     fn verify_client_message(
         &self,
@@ -17,7 +18,7 @@ where
         client_id: &ClientId,
         client_message: Any,
     ) -> Result<(), ClientError> {
-        todo!()
+        Ok(())
     }
 
     fn check_for_misbehaviour(
@@ -26,14 +27,14 @@ where
         client_id: &ClientId,
         client_message: Any,
     ) -> Result<bool, ClientError> {
-        todo!()
+        Ok(false)
     }
 
     fn status(&self, ctx: &V, client_id: &ClientId) -> Result<Status, ClientError> {
-        todo!()
+        Ok(Status::Active)
     }
 
     fn check_substitute(&self, ctx: &V, substitute_client_state: Any) -> Result<(), ClientError> {
-        todo!()
+        Ok(())
     }
 }
