@@ -2,8 +2,8 @@ use cgp_core::error::CanRaiseError;
 use starknet::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::traits::client::HasJsonRpcClient;
 use crate::traits::contract::call::ContractCaller;
+use crate::traits::provider::HasStarknetProvider;
 use crate::traits::types::address::HasAddressType;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasMethodSelectorType;
@@ -15,7 +15,7 @@ where
     Chain: HasAddressType<Address = Felt>
         + HasMethodSelectorType<MethodSelector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
-        + HasJsonRpcClient
+        + HasStarknetProvider
         + CanRaiseError<ProviderError>,
 {
     async fn call_contract(
@@ -27,7 +27,7 @@ where
         let block_id = BlockId::Tag(BlockTag::Pending);
 
         let res = chain
-            .json_rpc_client()
+            .provider()
             .call(
                 FunctionCall {
                     contract_address: *contract_address,
