@@ -2,7 +2,7 @@ use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
 use ibc_core::primitives::proto::{Any, Protobuf};
 
-pub const CLIENT_STATE_TYPE_URL: &str = "/DummyClientState";
+pub const CLIENT_STATE_TYPE_URL: &str = "/StarknetClientState";
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq, derive_more::From)]
