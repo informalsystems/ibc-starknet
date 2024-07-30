@@ -2,8 +2,12 @@ use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeCompon
 use cgp_core::prelude::*;
 use hermes_error::impls::ProvideHermesError;
 use hermes_starknet_chain_components::components::*;
+use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::traits::client::JsonRpcClientGetter;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
+use hermes_starknet_chain_components::traits::provider::{
+    HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
+};
 use hermes_starknet_chain_components::traits::types::address::HasAddressType;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasMethodSelectorType;
@@ -14,6 +18,7 @@ use url::Url;
 
 use crate::impls::error::HandleStarknetError;
 
+#[derive(HasField)]
 pub struct StarknetChain {
     pub rpc_client: JsonRpcClient<HttpTransport>,
 }
@@ -36,6 +41,11 @@ delegate_components! {
     StarknetChainContextComponents {
         ErrorTypeComponent: ProvideHermesError,
         ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        [
+            StarknetProviderTypeComponent,
+            StarknetProviderGetterComponent,
+        ]:
+            GetStarknetProviderField<symbol!("rpc_client")>,
     }
 }
 
@@ -57,6 +67,7 @@ pub trait CanUseStarknetChain:
     HasAddressType<Address = Felt>
     + HasMethodSelectorType<MethodSelector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
+    + HasStarknetProvider
     + CanCallContract
 {
 }
