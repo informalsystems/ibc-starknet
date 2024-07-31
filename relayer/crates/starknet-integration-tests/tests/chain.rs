@@ -50,6 +50,7 @@ fn test_starknet_chain_client() {
             );
 
             let chain = StarknetChain {
+                runtime: runtime.clone(),
                 rpc_client,
                 account,
             };

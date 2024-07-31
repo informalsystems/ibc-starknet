@@ -1641,6 +1641,8 @@ dependencies = [
  "eyre",
  "hermes-error",
  "hermes-relayer-components",
+ "hermes-runtime",
+ "hermes-runtime-components",
  "hermes-starknet-chain-components",
  "starknet",
  "url",

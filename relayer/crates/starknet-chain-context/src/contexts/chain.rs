@@ -3,6 +3,11 @@ use std::sync::Arc;
 use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
 use cgp_core::prelude::*;
 use hermes_error::impls::ProvideHermesError;
+use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
+use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_runtime_components::traits::runtime::{
+    ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
+};
 use hermes_starknet_chain_components::components::*;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
@@ -30,6 +35,7 @@ use crate::impls::error::HandleStarknetError;
 
 #[derive(HasField)]
 pub struct StarknetChain {
+    pub runtime: HermesRuntime,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
 }
@@ -44,6 +50,11 @@ delegate_components! {
     StarknetChainContextComponents {
         ErrorTypeComponent: ProvideHermesError,
         ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        [
+            RuntimeTypeComponent,
+            RuntimeGetterComponent,
+        ]:
+            ProvideDefaultRuntimeField,
         [
             StarknetProviderTypeComponent,
             StarknetProviderGetterComponent,
@@ -77,6 +88,7 @@ pub trait CanUseStarknetChain:
     + HasBlobType<Blob = Vec<Felt>>
     + HasStarknetProvider
     + HasStarknetAccount
+    + CanSendMessages
     + CanCallContract
     + CanInvokeContract
     + CanQueryTokenBalance

@@ -1,4 +1,5 @@
 use cgp_core::prelude::*;
+pub use hermes_relayer_components::chain::traits::send_message::MessageSenderComponent;
 pub use hermes_relayer_components::chain::traits::types::event::EventTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::message::MessageTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
@@ -6,6 +7,7 @@ pub use hermes_relayer_components::transaction::traits::types::tx_hash::Transact
 use crate::impls::contract::call::CallStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
+use crate::impls::send_message::SendCallMessages;
 use crate::impls::transfer::TransferErc20Token;
 use crate::impls::types::address::ProvideFeltAddressType;
 use crate::impls::types::amount::ProvideU256Amount;
@@ -37,6 +39,8 @@ define_components! {
             ProvideFeltTxHash,
         MethodSelectorTypeComponent:
             ProvideFeltMethodSelector,
+        MessageSenderComponent:
+            SendCallMessages,
         ContractCallerComponent:
             CallStarknetContract,
         ContractInvokerComponent:
