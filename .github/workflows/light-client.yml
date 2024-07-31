@@ -2,8 +2,7 @@ name: Light Client
 on:
   pull_request:
     paths:
-      - .github/workflows/rust.yaml
-      - contracts/**
+      - .github/workflows/light-client.yaml
       - light-client/**
       - "**/Cargo.toml"
       - "**/Cargo.lock"

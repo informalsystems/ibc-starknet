@@ -2,8 +2,8 @@ name: Cairo Contracts
 on:
   pull_request:
     paths:
-      - .github/workflows/tests.yaml
-      - contracts/**
+      - .github/workflows/cairo-contracts.yaml
+      - cairo-contracts/**
       - justfile
 
   push:
