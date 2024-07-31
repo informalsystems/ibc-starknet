@@ -16,8 +16,13 @@ pub trait IRecvPacket<TContractState> {
 
 #[starknet::interface]
 pub trait ITokenAddress<TContractState> {
-    fn ibc_token_address(
-        self: @TContractState, prefixed_denom: PrefixedDenom
-    ) -> Option<ContractAddress>;
+    /// Returns the contract address of an IBC token given its key.
+    ///
+    /// NOTE: The token key is the Poseidon hash of the token's name, with the name
+    /// prefixed by the source trace path. For example, if the base denomination
+    /// is `uatom` and it is transferred on `transfer/channel-0`, the token key is the
+    /// Poseidon hash of `transfer/channel-0/uatom`. Hashing the name is delegated
+    /// to the client as it is more cost-effective to perform off-chain.
+    fn ibc_token_address(self: @TContractState, token_key: felt252) -> Option<ContractAddress>;
 }
 

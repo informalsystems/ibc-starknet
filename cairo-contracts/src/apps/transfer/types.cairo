@@ -1,9 +1,10 @@
+use core::array::ArrayTrait;
+use core::hash::{HashStateTrait, HashStateExTrait};
 use core::num::traits::Zero;
+use core::poseidon::PoseidonTrait;
+use core::poseidon::poseidon_hash_span;
 use core::serde::Serde;
 use core::starknet::SyscallResultTrait;
-use core::to_byte_array::FormatAsByteArray;
-use core::traits::Into;
-use core::traits::TryInto;
 use openzeppelin::token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use openzeppelin::utils::serde::SerializedAppend;
 use starknet::ClassHash;
@@ -16,6 +17,7 @@ use starknet_ibc::apps::mintable::interface::{
 use starknet_ibc::apps::transfer::errors::TransferErrors;
 use starknet_ibc::core::client::types::{Height, Timestamp};
 use starknet_ibc::core::host::types::{PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence};
+use starknet_ibc::utils::ValidateBasicTrait;
 
 /// Maximum memo length allowed for ICS-20 transfers. This bound corresponds to
 /// the `MaximumMemoLength` in the `ibc-go`.
@@ -33,8 +35,6 @@ pub struct MsgTransfer {
 
 impl MsgTransferValidateBasicImpl of ValidateBasicTrait<MsgTransfer> {
     fn validate_basic(self: @MsgTransfer) {
-        // self.port_id_on_a.validate();
-        // self.chan_id_on_a.validate();
         self.packet_data.validate_basic();
     }
 }
@@ -87,7 +87,14 @@ impl PrefixedDenomImpl of PrefixedDenomTrait {
     }
 
     fn compute_key(self: @PrefixedDenom) -> felt252 {
-        1
+        let mut serialized_prefixed_denom: Array<felt252> = ArrayTrait::new();
+        let mut trace_path_span = self.trace_path.span();
+        while let Option::Some(path) = trace_path_span
+            .pop_front() {
+                Serde::serialize(path, ref serialized_prefixed_denom);
+            };
+        Serde::serialize(self.base, ref serialized_prefixed_denom);
+        PoseidonTrait::new().update(poseidon_hash_span(serialized_prefixed_denom.span())).finalize()
     }
 }
 
@@ -99,21 +106,11 @@ pub struct TracePrefix {
 
 pub trait TracePrefixTrait {
     fn new(port_id: PortId, channel_id: ChannelId) -> TracePrefix;
-    fn shorthand(self: @TracePrefix) -> ByteArray;
 }
 
 impl TracePrefixImpl of TracePrefixTrait {
     fn new(port_id: PortId, channel_id: ChannelId) -> TracePrefix {
         TracePrefix { port_id: port_id, channel_id: channel_id, }
-    }
-
-    fn shorthand(self: @TracePrefix) -> ByteArray {
-        assert(self.port_id == @PortIdTrait::transfer(), 'port_id must be transfer');
-        let mut shorthand: ByteArray = "";
-        shorthand.append(@"tr");
-        shorthand.append(@"/");
-        shorthand.append(@self.channel_id.index().format_as_byte_array(10));
-        shorthand
     }
 }
 
@@ -260,6 +257,3 @@ impl MemoValidateBasicImpl of ValidateBasicTrait<Memo> {
     }
 }
 
-pub trait ValidateBasicTrait<T> {
-    fn validate_basic(self: @T);
-}

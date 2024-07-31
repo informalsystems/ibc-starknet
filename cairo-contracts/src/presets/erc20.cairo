@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod ERC20 {
+pub(crate) mod ERC20Mintable {
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::{ContractAddress, ClassHash};
@@ -50,13 +50,13 @@ pub(crate) mod ERC20 {
         ref self: ContractState,
         name: ByteArray,
         symbol: ByteArray,
-        fixed_supply: u256,
+        initial_supply: u256,
         recipient: ContractAddress,
         owner: ContractAddress
     ) {
         self.ownable.initializer(owner);
         self.mintable.initializer();
         self.erc20.initializer(name, symbol);
-        self.erc20.mint(recipient, fixed_supply);
+        self.erc20.mint(recipient, initial_supply);
     }
 }

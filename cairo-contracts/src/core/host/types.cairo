@@ -1,14 +1,25 @@
 use core::byte_array::ByteArrayTrait;
+use core::hash::{HashStateTrait, HashStateExTrait};
+use core::poseidon::PoseidonTrait;
+use core::poseidon::poseidon_hash_span;
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
 use starknet::ContractAddress;
 use starknet::Store;
 use starknet_ibc::core::host::errors::HostErrors;
-use starknet_ibc::utils::{ToFelt252Trait, bytes_to_felt252};
+use starknet_ibc::utils::ComputeKeyTrait;
 
 #[derive(Clone, Debug, Drop, PartialEq, Eq, Serde, Store)]
 pub struct ChannelId {
     pub channel_id: ByteArray,
+}
+
+impl ChannelIdKey of ComputeKeyTrait<ChannelId> {
+    fn compute_key(self: @ChannelId) -> felt252 {
+        let mut serialized_channel_id: Array<felt252> = ArrayTrait::new();
+        Serde::serialize(self, ref serialized_channel_id);
+        PoseidonTrait::new().update(poseidon_hash_span(serialized_channel_id.span())).finalize()
+    }
 }
 
 pub trait ChannelIdTrait {
@@ -83,15 +94,17 @@ pub impl ChannelIdImpl of ChannelIdTrait {
     }
 }
 
-impl ChannelIdToFelt252 of ToFelt252Trait<ChannelId> {
-    fn try_to_felt252(self: @ChannelId) -> Option<felt252> {
-        bytes_to_felt252(self.channel_id)
-    }
-}
-
 #[derive(Clone, Debug, Drop, PartialEq, Eq, Serde, Store)]
 pub struct PortId {
     pub port_id: ByteArray,
+}
+
+impl PortIdKey of ComputeKeyTrait<PortId> {
+    fn compute_key(self: @PortId) -> felt252 {
+        let mut serialized_port_id: Array<felt252> = ArrayTrait::new();
+        Serde::serialize(self, ref serialized_port_id);
+        PoseidonTrait::new().update(poseidon_hash_span(serialized_port_id.span())).finalize()
+    }
 }
 
 pub trait PortIdTrait {
@@ -121,12 +134,6 @@ pub impl PortIdImpl of PortIdTrait {
 
     fn transfer() -> PortId {
         PortId { port_id: "transfer", }
-    }
-}
-
-impl PortIdToFelt252 of ToFelt252Trait<PortId> {
-    fn try_to_felt252(self: @PortId) -> Option<felt252> {
-        bytes_to_felt252(self.port_id)
     }
 }
 

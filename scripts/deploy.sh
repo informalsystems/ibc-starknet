@@ -19,9 +19,9 @@ version() {
 build() {
     version
 
-    cd "$(dirname "$0")/../contracts"
+    cd "$(dirname "$0")/../cairo-contracts"
 
-    output=$(scarb build 2>&1)
+    output=$(scarb build 1>&2)
 
     if [[ $output == *"Error"* ]]; then
         echo "Error: $output"
@@ -57,12 +57,12 @@ deploy() {
     if [[ $ICS20_CLASS_HASH == "" ]]; then
         class_hash=$(declare)
     else
-        class_hash=$CLASS_HASH
+        class_hash=$ICS20_CLASS_HASH
     fi
 
     output=$(
-        starkli deploy --not-unique $ERC20_CLASS_HASH \
-        --watch $class_hash \
+        starkli deploy --not-unique \
+        --watch $class_hash $ERC20_CLASS_HASH \
         --rpc $RPC_URL \
         --account $ACCOUNT_SRC \
         --keystore $KEYSTORE_SRC \

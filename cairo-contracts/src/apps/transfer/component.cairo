@@ -12,11 +12,12 @@ pub mod ICS20TransferComponent {
     use starknet_ibc::apps::transfer::interface::{ISendTransfer, IRecvPacket, ITokenAddress};
     use starknet_ibc::apps::transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo,
-        TracePrefixTrait, ERC20TokenTrait, ERC20Token, ValidateBasicTrait, PrefixedDenomTrait
+        TracePrefixTrait, ERC20TokenTrait, ERC20Token, PrefixedDenomTrait
     };
     use starknet_ibc::apps::transferrable::interface::ITransferrable;
     use starknet_ibc::core::channel::types::Packet;
     use starknet_ibc::core::host::types::{PortId, ChannelId, ChannelIdTrait};
+    use starknet_ibc::utils::{ComputeKeyTrait, ValidateBasicTrait};
 
     #[storage]
     struct Storage {
@@ -186,7 +187,7 @@ pub mod ICS20TransferComponent {
             let mut packet_data = self._recv_validate(packet.clone());
 
             let trace_prefix = TracePrefixTrait::new(
-                packet.port_id_on_a.clone(), packet.chan_id_on_a.clone()
+                packet.port_id_on_b.clone(), packet.chan_id_on_b.clone()
             );
 
             match @packet_data.denom.base {
@@ -225,11 +226,9 @@ pub mod ICS20TransferComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ITokenAddress<ComponentState<TContractState>> {
         fn ibc_token_address(
-            self: @ComponentState<TContractState>, prefixed_denom: PrefixedDenom
+            self: @ComponentState<TContractState>, token_key: felt252
         ) -> Option<ContractAddress> {
-            let denom_key = prefixed_denom.compute_key();
-
-            let token_address = self.ibc_token_name_to_address.read(denom_key);
+            let token_address = self.ibc_token_name_to_address.read(token_key);
 
             if token_address.is_non_zero() {
                 Option::Some(token_address)
@@ -341,7 +340,11 @@ pub mod ICS20TransferComponent {
             if token_address.is_non_zero() {
                 token_address.mint(account, amount);
             } else {
-                self.create_token(account, denom, amount);
+                let name = denom.base.hosted().unwrap();
+
+                let token_address = self.create_token(account, name, amount);
+
+                self.record_ibc_token(denom, token_address);
             }
         }
 
@@ -373,24 +376,24 @@ pub mod ICS20TransferComponent {
         fn create_token(
             ref self: ComponentState<TContractState>,
             account: ContractAddress,
-            denom: PrefixedDenom,
+            name: ByteArray,
             amount: u256,
         ) -> ContractAddress {
             let salt = self.salt.read();
 
-            let name = denom.base.hosted().unwrap();
+            let mut symbol: ByteArray = "IBC/";
+
+            symbol.append(@name);
 
             let erc20_token = ERC20TokenTrait::create(
                 self.erc20_class_hash.read(),
                 salt,
-                name.clone(),
-                name, // TODO: Detemine the symbol
+                name,
+                symbol, // TODO: Determine what the symbol should be.
                 amount,
                 account,
                 get_contract_address()
             );
-
-            self.record_ibc_token(denom, erc20_token.address);
 
             self.salt.write(salt + 1);
 
