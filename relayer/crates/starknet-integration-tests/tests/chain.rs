@@ -1,9 +1,7 @@
-use core::time::Duration;
 use std::sync::Arc;
 
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::types::Error;
-use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
@@ -72,8 +70,6 @@ fn test_starknet_chain_client() {
                 .await?;
 
             println!("performed transfer of 100 ETH");
-
-            runtime.sleep(Duration::from_secs(1)).await;
 
             let sender_balance_b = chain
                 .query_token_balance(&token_address, &account_address)
