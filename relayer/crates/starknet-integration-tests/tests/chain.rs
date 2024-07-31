@@ -4,11 +4,11 @@ use std::sync::Arc;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::sleep::CanSleep;
-use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
+use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
-use starknet::macros::{felt, selector};
+use starknet::macros::felt;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
 use starknet::signers::{LocalWallet, SigningKey};
@@ -58,39 +58,37 @@ fn test_starknet_chain_client() {
                    0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1
             */
 
-            let balace_a1 = chain
+            let balance_a1 = chain
                 .query_token_balance(
                     &felt!("0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"),
                     &felt!("0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"),
                 )
                 .await?;
 
-            println!("balance A1: {}", balace_a1);
+            println!("balance A1: {}", balance_a1);
 
-            let tx_hash = chain
-                .invoke_contract(
+            chain
+                .transfer_token(
                     &felt!("0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"),
-                    &selector!("transfer"),
-                    &vec![
-                        felt!("0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"),
-                        felt!("0x100"),
-                        felt!("0x0"),
-                    ],
+                    &felt!("0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"),
+                    &100u32.into(),
                 )
                 .await?;
 
-            println!("invoke result tx hash: {}", tx_hash);
+            println!("invoke result tx hash");
 
             runtime.sleep(Duration::from_secs(1)).await;
 
-            let balace_a2 = chain
+            let balance_a2 = chain
                 .query_token_balance(
                     &felt!("0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"),
                     &felt!("0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"),
                 )
                 .await?;
 
-            println!("balance A2: {}", balace_a2);
+            println!("balance A2: {}", balance_a2);
+
+            assert_eq!(balance_a2, balance_a1 + 100u32.into());
 
             <Result<(), Error>>::Ok(())
         })
