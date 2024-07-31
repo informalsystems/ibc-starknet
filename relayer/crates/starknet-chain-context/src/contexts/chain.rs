@@ -3,11 +3,18 @@ use std::sync::Arc;
 use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
 use cgp_core::prelude::*;
 use hermes_error::impls::ProvideHermesError;
+use hermes_logging_components::contexts::no_logger::ProvideNoLogger;
+use hermes_logging_components::traits::has_logger::{
+    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
+};
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
+use hermes_relayer_components::error::traits::retry::HasRetryableError;
+use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
+use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
-    ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
+    HasRuntime, ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
 };
 use hermes_starknet_chain_components::components::*;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
@@ -57,6 +64,12 @@ delegate_components! {
         ]:
             ProvideDefaultRuntimeField,
         [
+            LoggerTypeComponent,
+            LoggerGetterComponent,
+            GlobalLoggerGetterComponent,
+        ]:
+            ProvideNoLogger,
+        [
             StarknetProviderTypeComponent,
             StarknetProviderGetterComponent,
         ]:
@@ -84,17 +97,22 @@ impl JsonRpcClientGetter<StarknetChain> for StarknetChainContextComponents {
 }
 
 pub trait CanUseStarknetChain:
-    HasAddressType<Address = Felt>
+    HasRuntime
+    + HasLogger
+    + HasAddressType<Address = Felt>
     + HasMethodSelectorType<MethodSelector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
     + HasStarknetProvider
     + HasStarknetAccount
     + CanSendMessages
     + CanSubmitTx
+    + CanQueryTxResponse
+    + CanPollTxResponse
     + CanCallContract
     + CanInvokeContract
     + CanQueryTokenBalance
     + CanTransferToken
+    + HasRetryableError
 {
 }
 

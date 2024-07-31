@@ -1640,6 +1640,8 @@ dependencies = [
  "cgp-core",
  "eyre",
  "hermes-error",
+ "hermes-logger",
+ "hermes-logging-components",
  "hermes-relayer-components",
  "hermes-runtime",
  "hermes-runtime-components",
