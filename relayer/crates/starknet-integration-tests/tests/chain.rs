@@ -32,6 +32,11 @@ fn test_starknet_chain_client() {
             let account_address =
                 felt!("0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691");
 
+            let token_address =
+                felt!("0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7");
+            let recipient_address =
+                felt!("0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1");
+
             let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
 
             let chain_id = rpc_client.chain_id().await?;
@@ -49,46 +54,40 @@ fn test_starknet_chain_client() {
                 account,
             };
 
-            /*
-               Test running a query that is equivalent to the following starkli call:
-
-               starkli call \
-                   0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7 \
-                   balanceOf \
-                   0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1
-            */
-
-            let balance_a1 = chain
-                .query_token_balance(
-                    &felt!("0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"),
-                    &felt!("0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"),
-                )
+            let sender_balance_a = chain
+                .query_token_balance(&token_address, &account_address)
                 .await?;
 
-            println!("balance A1: {}", balance_a1);
+            println!("sender balance before: {}", sender_balance_a);
+
+            let recipient_balance_a = chain
+                .query_token_balance(&token_address, &recipient_address)
+                .await?;
+
+            println!("recipient balance before: {}", recipient_balance_a);
 
             chain
-                .transfer_token(
-                    &felt!("0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"),
-                    &felt!("0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"),
-                    &100u32.into(),
-                )
+                .transfer_token(&token_address, &recipient_address, &100u32.into())
                 .await?;
 
-            println!("invoke result tx hash");
+            println!("performed transfer of 100 ETH");
 
             runtime.sleep(Duration::from_secs(1)).await;
 
-            let balance_a2 = chain
-                .query_token_balance(
-                    &felt!("0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"),
-                    &felt!("0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"),
-                )
+            let sender_balance_b = chain
+                .query_token_balance(&token_address, &account_address)
                 .await?;
 
-            println!("balance A2: {}", balance_a2);
+            println!("sender balance after transfer: {}", sender_balance_b);
 
-            assert_eq!(balance_a2, balance_a1 + 100u32.into());
+            let recipient_balance_b = chain
+                .query_token_balance(&token_address, &recipient_address)
+                .await?;
+
+            println!("recipient balance transfer: {}", recipient_balance_b);
+
+            assert_eq!(sender_balance_b, sender_balance_a - 100u32.into());
+            assert_eq!(recipient_balance_b, recipient_balance_a + 100u32.into());
 
             <Result<(), Error>>::Ok(())
         })
