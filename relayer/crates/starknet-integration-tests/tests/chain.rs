@@ -4,7 +4,6 @@ use std::sync::Arc;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::sleep::CanSleep;
-use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
