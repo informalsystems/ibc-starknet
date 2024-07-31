@@ -1,48 +1,23 @@
-use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
-use starknet::accounts::{Account, Call};
-use starknet::core::types::Felt;
+use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 
-use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
 use crate::traits::contract::invoke::ContractInvoker;
-use crate::traits::provider::HasStarknetProvider;
-use crate::traits::types::address::HasAddressType;
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasMethodSelectorType;
+use crate::traits::contract::message::CanBuildInvokeContractMessage;
 
 pub struct InvokeStarknetContract;
 
 impl<Chain> ContractInvoker<Chain> for InvokeStarknetContract
 where
-    Chain: HasAddressType<Address = Felt>
-        + HasMethodSelectorType<MethodSelector = Felt>
-        + HasBlobType<Blob = Vec<Felt>>
-        + HasTransactionHashType<TxHash = Felt>
-        + HasStarknetProvider
-        + HasStarknetAccount
-        + CanRaiseAccountErrors,
+    Chain: CanBuildInvokeContractMessage + CanSendSingleMessage,
 {
     async fn invoke_contract(
         chain: &Chain,
-        contract_address: &Felt,
-        entry_point_selector: &Felt,
-        calldata: &Vec<Felt>,
-    ) -> Result<Felt, Chain::Error> {
-        let account = chain.account();
+        contract_address: &Chain::Address,
+        entry_point_selector: &Chain::MethodSelector,
+        calldata: &Chain::Blob,
+    ) -> Result<Vec<Chain::Event>, Chain::Error> {
+        let message =
+            chain.build_invoke_contract_message(contract_address, entry_point_selector, calldata);
 
-        let call = Call {
-            to: *contract_address,
-            selector: *entry_point_selector,
-            calldata: calldata.clone(),
-        };
-
-        let execution = account.execute_v3(vec![call]);
-
-        let tx_hash = execution
-            .send()
-            .await
-            .map_err(Chain::raise_error)?
-            .transaction_hash;
-
-        Ok(tx_hash)
+        chain.send_message(message).await
     }
 }

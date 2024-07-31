@@ -70,7 +70,6 @@ ibc-client-tendermint = { git = "https://github.com/cosmos/ibc-rs.git", rev = "5
 ibc-client-wasm-types = { git = "https://github.com/cosmos/ibc-rs.git", rev = "5dc0b09" }
 ibc-app-transfer      = { git = "https://github.com/cosmos/ibc-rs.git", rev = "5dc0b09" }
 ibc-primitives        = { git = "https://github.com/cosmos/ibc-rs.git", rev = "5dc0b09" }
-ibc-query             = { git = "https://github.com/cosmos/ibc-rs.git", rev = "5dc0b09" }
 ibc-derive            = { git = "https://github.com/cosmos/ibc-rs.git", rev = "5dc0b09" }
 
 cgp-core                = { git = "https://github.com/informalsystems/cgp.git" }
@@ -111,15 +110,10 @@ hermes-logger                     = { git = "https://github.com/informalsystems/
 hermes-test-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-ibc-test-suite  = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 
-hermes-cli            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cli-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cli-framework  = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-
 hermes-any-counterparty = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 
 hermes-cosmos-chain-components  = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cosmos-wasm-relayer      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-test-components   = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-integration-tests = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 

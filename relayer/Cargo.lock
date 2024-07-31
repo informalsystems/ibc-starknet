@@ -1640,7 +1640,11 @@ dependencies = [
  "cgp-core",
  "eyre",
  "hermes-error",
+ "hermes-logger",
+ "hermes-logging-components",
  "hermes-relayer-components",
+ "hermes-runtime",
+ "hermes-runtime-components",
  "hermes-starknet-chain-components",
  "starknet",
  "url",
@@ -5355,28 +5359,3 @@ dependencies = [
  "quote",
  "syn 2.0.72",
 ]
-
-[[patch.unused]]
-name = "hermes-cli"
-version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#659e5bb934421413f4d19586027baba0520d6101"
-
-[[patch.unused]]
-name = "hermes-cli-components"
-version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#659e5bb934421413f4d19586027baba0520d6101"
-
-[[patch.unused]]
-name = "hermes-cli-framework"
-version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#659e5bb934421413f4d19586027baba0520d6101"
-
-[[patch.unused]]
-name = "hermes-cosmos-wasm-relayer"
-version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#659e5bb934421413f4d19586027baba0520d6101"
-
-[[patch.unused]]
-name = "ibc-query"
-version = "0.53.0"
-source = "git+https://github.com/cosmos/ibc-rs.git?rev=5dc0b09#5dc0b09fd953914d574e47e87f785a079e37e73f"
