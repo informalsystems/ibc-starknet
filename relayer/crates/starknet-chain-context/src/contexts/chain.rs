@@ -4,6 +4,7 @@ use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeCompon
 use cgp_core::prelude::*;
 use hermes_error::impls::ProvideHermesError;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
+use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
@@ -89,6 +90,7 @@ pub trait CanUseStarknetChain:
     + HasStarknetProvider
     + HasStarknetAccount
     + CanSendMessages
+    + CanSubmitTx
     + CanCallContract
     + CanInvokeContract
     + CanQueryTokenBalance
