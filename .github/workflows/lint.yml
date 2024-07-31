@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/lint.yaml
-      - contracts/**
+      - cairo-contracts/**
       - light-client/**
       - "**/Cargo.toml"
       - "**/Cargo.lock"

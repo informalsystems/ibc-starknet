@@ -5,7 +5,6 @@ pub mod ICS20TransferComponent {
     use core::num::traits::Zero;
     use core::option::OptionTrait;
     use core::starknet::SyscallResultTrait;
-    use openzeppelin::utils::serde::SerializedAppend;
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet::get_contract_address;
@@ -13,8 +12,7 @@ pub mod ICS20TransferComponent {
     use starknet_ibc::apps::transfer::interface::{ISendTransfer, IRecvPacket, ITokenAddress};
     use starknet_ibc::apps::transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo,
-        TracePrefixTrait, ERC20TokenTrait, ERC20Token, MAXIMUM_MEMO_LENGTH, ValidateBasicTrait,
-        PrefixedDenomTrait
+        TracePrefixTrait, ERC20TokenTrait, ERC20Token, ValidateBasicTrait, PrefixedDenomTrait
     };
     use starknet_ibc::apps::transferrable::interface::ITransferrable;
     use starknet_ibc::core::channel::types::Packet;
@@ -438,7 +436,7 @@ pub mod ICS20TransferComponent {
     pub(crate) impl TransferEventImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferEventTrait<TContractState> {
-        fn emit_send_event(ref self: ComponentState<TContractState>, packet_date: PacketData,) {
+        fn emit_send_event(ref self: ComponentState<TContractState>, packet_date: PacketData) {
             self
                 .emit(
                     SendEvent {
