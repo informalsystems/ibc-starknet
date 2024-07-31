@@ -15,6 +15,7 @@ use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContrac
 use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
+use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::types::address::HasAddressType;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasMethodSelectorType;
@@ -77,6 +78,7 @@ pub trait CanUseStarknetChain:
     + HasStarknetAccount
     + CanCallContract
     + CanInvokeContract
+    + CanQueryTokenBalance
 {
 }
 
