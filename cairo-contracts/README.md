@@ -24,20 +24,56 @@ scarb build
 ```
 
 The command will compile the contracts and output the compiled contracts as JSON
-file in the `cairo-contracts/target/dev` directory, which you can then deploy to
-Starknet.
+files in the `cairo-contracts/target/dev` directory, which you can then deploy
+to Starknet.
 
-- ERC20 contract: `starknet_ibc_ERC20.contract_class.json`
+- ERC20 Mintable contract: `starknet_ibc_ERC20.contract_class.json`
 - Token Transfer contract: `starknet_ibc_transfer.contract_class.json`
 
 ## How to deploy
 
-To deploy the contracts, you first need to setup a Starknet account locally. You
-can find the instructions in the [Starknet
-documentation](https://docs.starknet.io/quick-start/set-up-an-account/).
+### Create Starknet account
 
-Next, create an `.env` file in the root directory of the project. You can use the
-`.env.example` file as a template, which contains the following content:
+To deploy the contracts, you first need to setup a Starknet account locally. You
+can find the details in the [Starknet
+documentation](https://docs.starknet.io/quick-start/set-up-an-account/), but
+briefly you have to create a signer and an account descriptor. The signer is a
+smart contract with a private key for signing transactions, which can be created
+as follows:
+
+```bash
+# Create the default directory
+mkdir -p ~/.starkli-wallets/deployer
+
+# Generate the keystore file from a private key
+starkli signer keystore from-key ~/.starkli-wallets/deployer/keystore.json
+
+# Paste the private key of your smart wallet.
+# You can obtain the private key from your smart wallet (e.g. Braavos or ArgentX)
+Enter private key:
+
+# Enter a password of your choice.
+Enter password:
+
+# To view the details of the created keystore file.
+cat ~/.starkli-wallets/deployer/keystore.json
+```
+
+The account descriptor is a JSON file that contains the info of the signer,
+which can be created as follows:
+
+```bash
+# Generates the account descriptor file
+starkli account fetch <SMART_WALLET_ADDRESS> --output ~/.starkli-wallets/deployer/account.json
+
+# To see the details of your Account Descriptor file.
+cat ~/.starkli-wallets/deployer/account.json
+```
+
+### Setup environment
+
+Next, create an `.env` file in the root directory of the project. You can use
+the `.env.example` file as a template, which contains the following content:
 
 ```bash
 ERC20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_ERC20Mintable.contract_class.json}
@@ -58,6 +94,8 @@ If you have previously declared the contracts on-chain, you can fill in the
 `ERC20_CLASS_HASH` and `ICS20_CLASS_HASH` fields to use that particular versions
 for deploying the contracts. Otherwise, the script will declare the contracts as
 well.
+
+### Deploy contracts
 
 Now that you have set up the environment, you can deploy the contracts by
 running the following command:
