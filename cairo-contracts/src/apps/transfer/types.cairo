@@ -15,6 +15,7 @@ use starknet_ibc::apps::mintable::interface::{
     IERC20MintableDispatcher, IERC20MintableDispatcherTrait
 };
 use starknet_ibc::apps::transfer::errors::TransferErrors;
+use starknet_ibc::apps::transfer::TRANSFER_PORT_ID_HASH;
 use starknet_ibc::core::client::types::{Height, Timestamp};
 use starknet_ibc::core::host::types::{PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence};
 use starknet_ibc::utils::ValidateBasicTrait;
@@ -35,6 +36,8 @@ pub struct MsgTransfer {
 
 impl MsgTransferValidateBasicImpl of ValidateBasicTrait<MsgTransfer> {
     fn validate_basic(self: @MsgTransfer) {
+        self.port_id_on_a.validate(TRANSFER_PORT_ID_HASH);
+        self.chan_id_on_a.validate();
         self.packet_data.validate_basic();
     }
 }
