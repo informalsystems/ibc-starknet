@@ -98,7 +98,7 @@ pub(crate) fn assert_numeric(char_bytes: u8) {
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
     use super::{PortId, ChannelId, ChannelIdTrait};
 
     #[test]

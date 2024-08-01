@@ -9,6 +9,7 @@ use starknet_ibc::apps::transfer::types::PrefixedDenomTrait;
 use starknet_ibc::tests::config::TestConfigTrait;
 use starknet_ibc::tests::constants::{SUPPLY, OWNER, RECIPIENT,};
 use starknet_ibc::tests::setup::{ERC20ContractTrait, ICS20TransferContractTrait};
+use starknet_ibc::utils::ComputeKeyTrait;
 
 #[test]
 fn test_escrow_unescrow_roundtrip() {

@@ -14,11 +14,11 @@ use starknet::syscalls::deploy_syscall;
 use starknet_ibc::apps::mintable::interface::{
     IERC20MintableDispatcher, IERC20MintableDispatcherTrait
 };
-use starknet_ibc::apps::transfer::errors::TransferErrors;
 use starknet_ibc::apps::transfer::TRANSFER_PORT_ID_HASH;
+use starknet_ibc::apps::transfer::errors::TransferErrors;
 use starknet_ibc::core::client::types::{Height, Timestamp};
 use starknet_ibc::core::host::types::{PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence};
-use starknet_ibc::utils::ValidateBasicTrait;
+use starknet_ibc::utils::{ValidateBasicTrait, ComputeKeyTrait};
 
 /// Maximum memo length allowed for ICS-20 transfers. This bound corresponds to
 /// the `MaximumMemoLength` in the `ibc-go`.
@@ -71,7 +71,6 @@ pub trait PrefixedDenomTrait {
     fn starts_with(self: @PrefixedDenom, prefix: @TracePrefix) -> bool;
     fn add_prefix(ref self: PrefixedDenom, prefix: TracePrefix);
     fn remove_prefix(ref self: PrefixedDenom, prefix: @TracePrefix);
-    fn compute_key(self: @PrefixedDenom) -> felt252;
 }
 
 impl PrefixedDenomImpl of PrefixedDenomTrait {
@@ -88,7 +87,9 @@ impl PrefixedDenomImpl of PrefixedDenomTrait {
             self.trace_path.pop_front().unwrap();
         }
     }
+}
 
+impl PrefixedDenomKeyImpl of ComputeKeyTrait<PrefixedDenom> {
     fn compute_key(self: @PrefixedDenom) -> felt252 {
         let mut serialized_prefixed_denom: Array<felt252> = ArrayTrait::new();
         let mut trace_path_span = self.trace_path.span();
