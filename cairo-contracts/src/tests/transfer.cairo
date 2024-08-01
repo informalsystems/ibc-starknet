@@ -1,11 +1,4 @@
-use openzeppelin::token::erc20::ERC20ABIDispatcherTrait;
 use starknet::ContractAddress;
-use starknet::testing;
-use starknet_ibc::apps::transfer::component::ICS20TransferComponent::Event as TransferEvent;
-use starknet_ibc::apps::transfer::interface::{
-    ISendTransferDispatcherTrait, IRecvPacketDispatcherTrait, ITokenAddressDispatcherTrait
-};
-use starknet_ibc::apps::transfer::types::PrefixedDenomTrait;
 use starknet_ibc::tests::config::TestConfigTrait;
 use starknet_ibc::tests::constants::{SUPPLY, OWNER, RECIPIENT,};
 use starknet_ibc::tests::setup::{ERC20ContractTrait, ICS20TransferContractTrait};
