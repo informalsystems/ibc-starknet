@@ -25,7 +25,7 @@ use crate::impls::tx_response::{DefaultPollTimeout, QueryTransactionReceipt};
 use crate::impls::types::address::ProvideFeltAddressType;
 use crate::impls::types::amount::ProvideU256Amount;
 use crate::impls::types::blob::ProvideFeltBlobType;
-use crate::impls::types::event::ProvideDummyEvent;
+use crate::impls::types::event::ProvideStarknetEvent;
 use crate::impls::types::message::ProvideCallMessage;
 use crate::impls::types::method::ProvideFeltMethodSelector;
 use crate::impls::types::transaction::ProvideCallTransaction;
@@ -51,7 +51,7 @@ define_components! {
         MessageTypeComponent:
             ProvideCallMessage,
         EventTypeComponent:
-            ProvideDummyEvent,
+            ProvideStarknetEvent,
         AmountTypeComponent:
             ProvideU256Amount,
         TransactionTypeComponent:

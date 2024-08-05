@@ -6,6 +6,7 @@ use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxR
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
 use starknet::accounts::Call;
+use starknet::core::types::{ExecuteInvocation, OrderedEvent, TransactionTrace};
 
 use crate::types::tx_response::TxResponse;
 
@@ -17,22 +18,35 @@ where
         + CanSubmitTx<Transaction = Vec<Call>>
         + HasTxResponseType<TxResponse = TxResponse>
         + CanPollTxResponse
-        + HasEventType
+        + HasEventType<Event = OrderedEvent>
         + HasErrorType,
 {
     async fn send_messages(
         chain: &Chain,
         messages: Vec<Call>,
     ) -> Result<Vec<Vec<Chain::Event>>, Chain::Error> {
-        // stub events
-        let events = messages.iter().map(|_| Vec::new()).collect();
-
         let tx_hash = chain.submit_tx(&messages).await?;
 
-        let receipt = chain.poll_tx_response(&tx_hash).await?;
+        let tx_response = chain.poll_tx_response(&tx_hash).await?;
 
-        println!("tx resceipt: {:?}", receipt);
+        println!("tx response: {:?}", tx_response);
 
-        Ok(events)
+        match tx_response.trace {
+            TransactionTrace::Invoke(trace) => match trace.execute_invocation {
+                ExecuteInvocation::Success(trace) => {
+                    let events = trace.calls.into_iter().map(|call| call.events).collect();
+
+                    println!("events: {:?}", events);
+
+                    Ok(events)
+                }
+                ExecuteInvocation::Reverted(trace) => {
+                    todo!()
+                }
+            },
+            _ => {
+                todo!()
+            }
+        }
     }
 }
