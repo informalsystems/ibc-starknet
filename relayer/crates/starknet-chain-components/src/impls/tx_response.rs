@@ -5,17 +5,18 @@ use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeout
 use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerier;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
-use starknet::core::types::{Felt, StarknetError, TransactionReceiptWithBlockInfo};
+use starknet::core::types::{Felt, StarknetError};
 use starknet::providers::{Provider, ProviderError};
 
 use crate::traits::provider::HasStarknetProvider;
+use crate::types::tx_response::TxResponse;
 
 pub struct QueryTransactionReceipt;
 
 impl<Chain> TxResponseQuerier<Chain> for QueryTransactionReceipt
 where
     Chain: HasTransactionHashType<TxHash = Felt>
-        + HasTxResponseType<TxResponse = TransactionReceiptWithBlockInfo>
+        + HasTxResponseType<TxResponse = TxResponse>
         + HasStarknetProvider
         + CanRaiseError<ProviderError>,
 {
@@ -23,10 +24,19 @@ where
         chain: &Chain,
         tx_hash: &Felt,
     ) -> Result<Option<Chain::TxResponse>, Chain::Error> {
-        let result = chain.provider().get_transaction_receipt(tx_hash).await;
+        let provider = chain.provider();
+
+        let result = provider.get_transaction_receipt(tx_hash).await;
 
         match result {
-            Ok(receipt) => Ok(Some(receipt)),
+            Ok(receipt) => {
+                let trace = provider
+                    .trace_transaction(tx_hash)
+                    .await
+                    .map_err(Chain::raise_error)?;
+
+                Ok(Some(TxResponse { receipt, trace }))
+            }
             Err(ProviderError::StarknetError(StarknetError::TransactionHashNotFound)) => Ok(None),
             Err(e) => Err(Chain::raise_error(e)),
         }

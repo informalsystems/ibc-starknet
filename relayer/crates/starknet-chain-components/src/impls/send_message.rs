@@ -6,7 +6,8 @@ use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxR
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
 use starknet::accounts::Call;
-use starknet::core::types::TransactionReceiptWithBlockInfo;
+
+use crate::types::tx_response::TxResponse;
 
 pub struct SendCallMessages;
 
@@ -14,7 +15,7 @@ impl<Chain> MessageSender<Chain> for SendCallMessages
 where
     Chain: HasMessageType<Message = Call>
         + CanSubmitTx<Transaction = Vec<Call>>
-        + HasTxResponseType<TxResponse = TransactionReceiptWithBlockInfo>
+        + HasTxResponseType<TxResponse = TxResponse>
         + CanPollTxResponse
         + HasEventType
         + HasErrorType,

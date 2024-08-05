@@ -30,7 +30,7 @@ use crate::impls::types::message::ProvideCallMessage;
 use crate::impls::types::method::ProvideFeltMethodSelector;
 use crate::impls::types::transaction::ProvideCallTransaction;
 use crate::impls::types::tx_hash::ProvideFeltTxHash;
-use crate::impls::types::tx_response::ProvideTransactionReceipt;
+use crate::impls::types::tx_response::ProvideStarknetTxResponse;
 pub use crate::traits::contract::call::ContractCallerComponent;
 pub use crate::traits::contract::invoke::ContractInvokerComponent;
 pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
@@ -59,7 +59,7 @@ define_components! {
         TransactionHashTypeComponent:
             ProvideFeltTxHash,
         TxResponseTypeComponent:
-            ProvideTransactionReceipt,
+            ProvideStarknetTxResponse,
         MethodSelectorTypeComponent:
             ProvideFeltMethodSelector,
         MessageSenderComponent:
