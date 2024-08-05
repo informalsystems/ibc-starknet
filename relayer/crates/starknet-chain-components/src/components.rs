@@ -16,6 +16,7 @@ pub use hermes_relayer_components::transaction::traits::types::tx_response::TxRe
 use crate::impls::contract::call::CallStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
+use crate::impls::messages::transfer::BuildTransferErc20TokenMessage;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::send_message::SendCallMessages;
 use crate::impls::submit_tx::SubmitCallTransaction;
@@ -24,15 +25,16 @@ use crate::impls::tx_response::{DefaultPollTimeout, QueryTransactionReceipt};
 use crate::impls::types::address::ProvideFeltAddressType;
 use crate::impls::types::amount::ProvideU256Amount;
 use crate::impls::types::blob::ProvideFeltBlobType;
-use crate::impls::types::event::ProvideDummyEvent;
+use crate::impls::types::event::ProvideStarknetEvent;
 use crate::impls::types::message::ProvideCallMessage;
 use crate::impls::types::method::ProvideFeltMethodSelector;
 use crate::impls::types::transaction::ProvideCallTransaction;
 use crate::impls::types::tx_hash::ProvideFeltTxHash;
-use crate::impls::types::tx_response::ProvideTransactionReceipt;
+use crate::impls::types::tx_response::ProvideStarknetTxResponse;
 pub use crate::traits::contract::call::ContractCallerComponent;
 pub use crate::traits::contract::invoke::ContractInvokerComponent;
 pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
+pub use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
 pub use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
 pub use crate::traits::transfer::TokenTransferComponent;
 pub use crate::traits::types::address::AddressTypeComponent;
@@ -49,7 +51,7 @@ define_components! {
         MessageTypeComponent:
             ProvideCallMessage,
         EventTypeComponent:
-            ProvideDummyEvent,
+            ProvideStarknetEvent,
         AmountTypeComponent:
             ProvideU256Amount,
         TransactionTypeComponent:
@@ -57,7 +59,7 @@ define_components! {
         TransactionHashTypeComponent:
             ProvideFeltTxHash,
         TxResponseTypeComponent:
-            ProvideTransactionReceipt,
+            ProvideStarknetTxResponse,
         MethodSelectorTypeComponent:
             ProvideFeltMethodSelector,
         MessageSenderComponent:
@@ -76,11 +78,13 @@ define_components! {
             InvokeStarknetContract,
         InvokeContractMessageBuilderComponent:
             BuildInvokeContractCall,
-        TokenBalanceQuerierComponent:
-            QueryErc20TokenBalance,
-        TokenTransferComponent:
-            TransferErc20Token,
         RetryableErrorComponent:
             ReturnRetryable<false>,
+        TransferTokenMessageBuilderComponent:
+            BuildTransferErc20TokenMessage,
+        TokenTransferComponent:
+            TransferErc20Token,
+        TokenBalanceQuerierComponent:
+            QueryErc20TokenBalance,
     }
 }

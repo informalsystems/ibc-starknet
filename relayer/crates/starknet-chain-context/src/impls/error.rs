@@ -12,7 +12,9 @@ use hermes_error::traits::wrap::WrapError;
 use hermes_error::types::Error;
 use hermes_relayer_components::transaction::impls::poll_tx_response::TxNoResponseError;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
+use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use starknet::accounts::{single_owner, AccountError};
+use starknet::core::types::RevertedInvocation;
 use starknet::providers::ProviderError;
 use starknet::signers::local_wallet;
 
@@ -36,7 +38,9 @@ delegate_components! {
         ]:
             DisplayError,
         [
-            <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>
+            RevertedInvocation,
+            UnexpectedTransactionTraceType,
+            <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
         ]:
             DebugError,
         [

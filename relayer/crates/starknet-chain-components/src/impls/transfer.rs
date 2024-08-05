@@ -1,7 +1,8 @@
-use starknet::core::types::{Felt, U256};
+use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
+use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::traits::contract::invoke::CanInvokeContract;
+use crate::traits::messages::transfer::CanBuildTransferTokenMessage;
 use crate::traits::transfer::TokenTransferer;
 use crate::traits::types::address::HasAddressType;
 use crate::traits::types::amount::HasAmountType;
@@ -14,25 +15,22 @@ pub struct TransferErc20Token;
 
 impl<Chain> TokenTransferer<Chain> for TransferErc20Token
 where
-    Chain: HasAddressType<Address = Felt>
-        + HasAmountType<Amount = U256>
-        + HasBlobType<Blob = Vec<Felt>>
-        + HasMethodSelectorType<MethodSelector = Felt>
-        + CanInvokeContract,
+    Chain: HasAddressType
+        + HasAmountType
+        + HasBlobType
+        + HasMethodSelectorType
+        + CanBuildTransferTokenMessage
+        + CanSendSingleMessage,
 {
     async fn transfer_token(
         chain: &Chain,
-        token_address: &Felt,
-        recipient: &Felt,
-        amount: &U256,
+        token_address: &Chain::Address,
+        recipient: &Chain::Address,
+        amount: &Chain::Amount,
     ) -> Result<(), Chain::Error> {
-        let _tx_hash = chain
-            .invoke_contract(
-                token_address,
-                &TRANSFER_SELECTOR,
-                &vec![*recipient, amount.low().into(), amount.high().into()],
-            )
-            .await?;
+        let message = chain.build_transfer_token_message(token_address, recipient, amount);
+
+        chain.send_message(message).await?;
 
         Ok(())
     }

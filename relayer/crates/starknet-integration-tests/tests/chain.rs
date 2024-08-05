@@ -2,8 +2,9 @@ use std::sync::Arc;
 
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::types::Error;
+use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
+use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
-use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::macros::felt;
@@ -65,9 +66,15 @@ fn test_starknet_chain_client() {
 
             println!("recipient balance before: {}", recipient_balance_a);
 
-            chain
-                .transfer_token(&token_address, &recipient_address, &100u32.into())
-                .await?;
+            let message = chain.build_transfer_token_message(
+                &token_address,
+                &recipient_address,
+                &100u32.into(),
+            );
+
+            let events = chain.send_messages(vec![message]).await?;
+
+            println!("events from sending transfer token message: {:?}", events);
 
             println!("performed transfer of 100 ETH");
 
