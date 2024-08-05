@@ -6,7 +6,6 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
-use starknet::macros::felt;
 
 // Note: the test needs to be run with starknet-devnet-rs with the seed 0:
 //
@@ -33,14 +32,11 @@ fn test_starknet_chain_client() {
 
             let chain = &chain_driver.chain;
 
-            let account_address =
-                felt!("0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691");
+            let account_address = chain_driver.relayer_wallet.account_address;
 
-            let token_address =
-                felt!("0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7");
+            let token_address = chain_driver.genesis_config.transfer_denom;
 
-            let recipient_address =
-                felt!("0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1");
+            let recipient_address = chain_driver.user_wallet_a.account_address;
 
             let sender_balance_a = chain
                 .query_token_balance(&token_address, &account_address)

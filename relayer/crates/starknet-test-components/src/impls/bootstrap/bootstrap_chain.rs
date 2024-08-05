@@ -64,7 +64,15 @@ where
             .map_err(Bootstrap::raise_error)?;
 
         // Use a hard-coded seed 0 for now
-        let genesis_config = StarknetGenesisConfig { seed: 0 };
+        let genesis_config = StarknetGenesisConfig {
+            seed: 0,
+            transfer_denom: felt!(
+                "0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7"
+            ),
+            staking_denom: felt!(
+                "0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d"
+            ),
+        };
 
         let node_config = StarknetNodeConfig { rpc_port };
 

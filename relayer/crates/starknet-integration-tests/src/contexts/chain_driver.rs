@@ -17,6 +17,9 @@ pub struct StarknetChainDriver {
     pub node_config: StarknetNodeConfig,
     pub wallets: BTreeMap<String, StarknetWallet>,
     pub chain_process: Child,
+    pub relayer_wallet: StarknetWallet,
+    pub user_wallet_a: StarknetWallet,
+    pub user_wallet_b: StarknetWallet,
 }
 
 pub struct StarknetChainDriverComponents;

@@ -103,7 +103,18 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
     ) -> Result<StarknetChainDriver, HermesError> {
         let relayer_wallet = wallets
             .get("relayer")
-            .ok_or_else(|| StarknetBootstrap::raise_error("expect relayer wallet to be present"))?;
+            .ok_or_else(|| StarknetBootstrap::raise_error("expect relayer wallet to be present"))?
+            .clone();
+
+        let user_wallet_a = wallets
+            .get("user-a")
+            .ok_or_else(|| StarknetBootstrap::raise_error("expect relayer wallet to be present"))?
+            .clone();
+
+        let user_wallet_b = wallets
+            .get("user-b")
+            .ok_or_else(|| StarknetBootstrap::raise_error("expect relayer wallet to be present"))?
+            .clone();
 
         let json_rpc_url = Url::parse(&format!("http://localhost:{}/", node_config.rpc_port))?;
 
@@ -134,6 +145,9 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             node_config,
             wallets,
             chain_process,
+            relayer_wallet,
+            user_wallet_a,
+            user_wallet_b,
         };
 
         Ok(chain_driver)
