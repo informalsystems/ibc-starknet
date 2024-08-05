@@ -1,4 +1,6 @@
-use cgp_core::error::HasErrorType;
+use core::fmt::Debug;
+
+use cgp_core::error::CanRaiseError;
 use hermes_relayer_components::chain::traits::send_message::MessageSender;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
@@ -6,20 +8,27 @@ use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxR
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
 use starknet::accounts::Call;
-use starknet::core::types::{ExecuteInvocation, OrderedEvent, TransactionTrace};
+use starknet::core::types::{
+    ExecuteInvocation, OrderedEvent, RevertedInvocation, TransactionTrace,
+};
 
 use crate::types::tx_response::TxResponse;
 
 pub struct SendCallMessages;
+
+pub struct UnexpectedTransactionTraceType {
+    pub trace: TransactionTrace,
+}
 
 impl<Chain> MessageSender<Chain> for SendCallMessages
 where
     Chain: HasMessageType<Message = Call>
         + CanSubmitTx<Transaction = Vec<Call>>
         + HasTxResponseType<TxResponse = TxResponse>
-        + CanPollTxResponse
         + HasEventType<Event = OrderedEvent>
-        + HasErrorType,
+        + CanPollTxResponse
+        + CanRaiseError<RevertedInvocation>
+        + CanRaiseError<UnexpectedTransactionTraceType>,
 {
     async fn send_messages(
         chain: &Chain,
@@ -29,24 +38,30 @@ where
 
         let tx_response = chain.poll_tx_response(&tx_hash).await?;
 
-        println!("tx response: {:?}", tx_response);
-
         match tx_response.trace {
             TransactionTrace::Invoke(trace) => match trace.execute_invocation {
                 ExecuteInvocation::Success(trace) => {
                     let events = trace.calls.into_iter().map(|call| call.events).collect();
 
-                    println!("events: {:?}", events);
-
                     Ok(events)
                 }
-                ExecuteInvocation::Reverted(trace) => {
-                    todo!()
-                }
+                ExecuteInvocation::Reverted(trace) => Err(Chain::raise_error(trace)),
             },
-            _ => {
-                todo!()
+            trace => {
+                // The transaction for sending Call messages should always return an Invoke trace.
+                // The other type of transactions such as Declare would have to be submitted as non message.
+                Err(Chain::raise_error(UnexpectedTransactionTraceType { trace }))
             }
         }
+    }
+}
+
+impl Debug for UnexpectedTransactionTraceType {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(
+            f,
+            "Expected transaction trace to be of type Invoke, but instead got: {:?}",
+            self.trace
+        )
     }
 }

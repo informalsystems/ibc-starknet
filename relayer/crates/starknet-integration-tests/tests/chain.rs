@@ -72,7 +72,9 @@ fn test_starknet_chain_client() {
                 &100u32.into(),
             );
 
-            chain.send_messages(vec![message]).await?;
+            let events = chain.send_messages(vec![message]).await?;
+
+            println!("events from sending transfer token message: {:?}", events);
 
             println!("performed transfer of 100 ETH");
 
