@@ -32,7 +32,9 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasMethodSelectorType;
+use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
+use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
 use starknet::accounts::SingleOwnerAccount;
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
@@ -79,6 +81,8 @@ delegate_components! {
             StarknetAccountGetterComponent,
         ]:
             GetStarknetAccountField<symbol!("account")>,
+        WalletTypeComponent:
+            ProvideStarknetWalletType,
     }
 }
 

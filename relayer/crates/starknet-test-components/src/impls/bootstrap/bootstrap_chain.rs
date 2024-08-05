@@ -58,7 +58,7 @@ where
         // For now, we hard code the wallets generated from devnet-rs
         let wallets = BTreeMap::from([
             (
-                "user-a".into(),
+                "relayer".into(),
                 StarknetWallet {
                     account_address: felt!(
                         "0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691"
@@ -70,7 +70,7 @@ where
                 },
             ),
             (
-                "user-b".into(),
+                "user-a".into(),
                 StarknetWallet {
                     account_address: felt!(
                         "0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"
@@ -82,7 +82,7 @@ where
                 },
             ),
             (
-                "user-c".into(),
+                "user-b".into(),
                 StarknetWallet {
                     account_address: felt!(
                         "0x49dfb8ce986e21d354ac93ea65e6a11f639c1934ea253e5ff14ca62eca0f38e"
