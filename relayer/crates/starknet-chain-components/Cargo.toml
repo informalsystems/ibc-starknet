@@ -12,5 +12,6 @@ readme       = "README.md"
 [dependencies]
 cgp-core                  = { workspace = true }
 hermes-relayer-components = { workspace = true }
+hermes-test-components    = { workspace = true }
 
 starknet = { workspace = true }

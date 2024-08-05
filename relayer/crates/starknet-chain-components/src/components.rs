@@ -1,5 +1,6 @@
 use cgp_core::prelude::*;
 pub use hermes_relayer_components::chain::traits::send_message::MessageSenderComponent;
+pub use hermes_relayer_components::chain::traits::types::chain_id::ChainIdTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::event::EventTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::message::MessageTypeComponent;
 use hermes_relayer_components::error::impls::retry::ReturnRetryable;
@@ -12,6 +13,9 @@ pub use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterCo
 pub use hermes_relayer_components::transaction::traits::types::transaction::TransactionTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
+pub use hermes_test_components::chain::traits::types::address::AddressTypeComponent;
+pub use hermes_test_components::chain::traits::types::amount::AmountTypeComponent;
+pub use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
 
 use crate::impls::contract::call::CallStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
@@ -25,6 +29,8 @@ use crate::impls::tx_response::{DefaultPollTimeout, QueryTransactionReceipt};
 use crate::impls::types::address::ProvideFeltAddressType;
 use crate::impls::types::amount::ProvideU256Amount;
 use crate::impls::types::blob::ProvideFeltBlobType;
+use crate::impls::types::chain_id::ProvideFeltChainId;
+use crate::impls::types::denom::ProvideTokenAddressDenom;
 use crate::impls::types::event::ProvideStarknetEvent;
 use crate::impls::types::message::ProvideCallMessage;
 use crate::impls::types::method::ProvideFeltMethodSelector;
@@ -37,13 +43,13 @@ pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
 pub use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
 pub use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
 pub use crate::traits::transfer::TokenTransferComponent;
-pub use crate::traits::types::address::AddressTypeComponent;
-pub use crate::traits::types::amount::AmountTypeComponent;
 pub use crate::traits::types::blob::BlobTypeComponent;
 pub use crate::traits::types::method::MethodSelectorTypeComponent;
 
 define_components! {
     StarknetChainComponents {
+        ChainIdTypeComponent:
+            ProvideFeltChainId,
         AddressTypeComponent:
             ProvideFeltAddressType,
         BlobTypeComponent:
@@ -54,6 +60,8 @@ define_components! {
             ProvideStarknetEvent,
         AmountTypeComponent:
             ProvideU256Amount,
+        DenomTypeComponent:
+            ProvideTokenAddressDenom,
         TransactionTypeComponent:
             ProvideCallTransaction,
         TransactionHashTypeComponent:

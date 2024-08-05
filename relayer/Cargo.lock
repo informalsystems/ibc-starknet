@@ -1630,6 +1630,7 @@ version = "0.1.0"
 dependencies = [
  "cgp-core",
  "hermes-relayer-components",
+ "hermes-test-components",
  "starknet",
 ]
 
@@ -1646,6 +1647,8 @@ dependencies = [
  "hermes-runtime",
  "hermes-runtime-components",
  "hermes-starknet-chain-components",
+ "hermes-starknet-test-components",
+ "hermes-test-components",
  "starknet",
  "url",
 ]
@@ -1657,13 +1660,31 @@ dependencies = [
  "cgp-core",
  "eyre",
  "hermes-cosmos-integration-tests",
+ "hermes-cosmos-test-components",
  "hermes-error",
  "hermes-relayer-components",
+ "hermes-runtime",
  "hermes-runtime-components",
  "hermes-starknet-chain-components",
  "hermes-starknet-chain-context",
+ "hermes-starknet-test-components",
+ "hermes-test-components",
  "starknet",
+ "tokio",
  "url",
+]
+
+[[package]]
+name = "hermes-starknet-test-components"
+version = "0.1.0"
+dependencies = [
+ "cgp-core",
+ "hermes-cosmos-test-components",
+ "hermes-relayer-components",
+ "hermes-runtime-components",
+ "hermes-starknet-chain-components",
+ "hermes-test-components",
+ "starknet",
 ]
 
 [[package]]

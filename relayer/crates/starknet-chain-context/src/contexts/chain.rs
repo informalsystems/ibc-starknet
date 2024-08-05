@@ -8,6 +8,7 @@ use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
 };
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
+use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
@@ -30,9 +31,11 @@ use hermes_starknet_chain_components::traits::provider::{
 };
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
-use hermes_starknet_chain_components::traits::types::address::HasAddressType;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasMethodSelectorType;
+use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
+use hermes_test_components::chain::traits::types::address::HasAddressType;
+use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
 use starknet::accounts::SingleOwnerAccount;
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
@@ -44,6 +47,7 @@ use crate::impls::error::HandleStarknetError;
 #[derive(HasField)]
 pub struct StarknetChain {
     pub runtime: HermesRuntime,
+    pub chain_id: Felt,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
 }
@@ -79,6 +83,8 @@ delegate_components! {
             StarknetAccountGetterComponent,
         ]:
             GetStarknetAccountField<symbol!("account")>,
+        WalletTypeComponent:
+            ProvideStarknetWalletType,
     }
 }
 
@@ -93,6 +99,12 @@ with_starknet_chain_components! {
 impl JsonRpcClientGetter<StarknetChain> for StarknetChainContextComponents {
     fn json_rpc_client(chain: &StarknetChain) -> &JsonRpcClient<HttpTransport> {
         &chain.rpc_client
+    }
+}
+
+impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
+    fn chain_id(chain: &StarknetChain) -> &Felt {
+        &chain.chain_id
     }
 }
 

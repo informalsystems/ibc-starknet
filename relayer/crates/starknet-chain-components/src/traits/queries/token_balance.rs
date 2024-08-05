@@ -1,7 +1,6 @@
 use cgp_core::prelude::*;
-
-use crate::traits::types::address::HasAddressType;
-use crate::traits::types::amount::HasAmountType;
+use hermes_test_components::chain::traits::types::address::HasAddressType;
+use hermes_test_components::chain::traits::types::amount::HasAmountType;
 
 #[derive_component(TokenBalanceQuerierComponent, TokenBalanceQuerier<Chain>)]
 #[async_trait]

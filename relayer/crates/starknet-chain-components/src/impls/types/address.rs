@@ -1,7 +1,6 @@
 use cgp_core::Async;
+use hermes_test_components::chain::traits::types::address::ProvideAddressType;
 use starknet::core::types::Felt;
-
-use crate::traits::types::address::ProvideAddressType;
 
 pub struct ProvideFeltAddressType;
 

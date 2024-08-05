@@ -1,10 +1,10 @@
 use cgp_core::error::CanRaiseError;
+use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet::providers::{Provider, ProviderError};
 
 use crate::traits::contract::call::ContractCaller;
 use crate::traits::provider::HasStarknetProvider;
-use crate::traits::types::address::HasAddressType;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasMethodSelectorType;
 

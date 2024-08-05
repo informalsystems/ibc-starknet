@@ -12,6 +12,7 @@ use hermes_error::traits::wrap::WrapError;
 use hermes_error::types::Error;
 use hermes_relayer_components::transaction::impls::poll_tx_response::TxNoResponseError;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
+use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use starknet::accounts::{single_owner, AccountError};
 use starknet::core::types::RevertedInvocation;
@@ -30,6 +31,7 @@ delegate_components! {
             Report,
             ProviderError,
             SignError,
+            TokioRuntimeError,
             AccountError<SignError>,
         ]: ReportError,
         [
