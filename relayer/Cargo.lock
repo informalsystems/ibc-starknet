@@ -1662,8 +1662,19 @@ dependencies = [
  "hermes-runtime-components",
  "hermes-starknet-chain-components",
  "hermes-starknet-chain-context",
+ "hermes-starknet-test-components",
  "starknet",
  "url",
+]
+
+[[package]]
+name = "hermes-starknet-test-components"
+version = "0.1.0"
+dependencies = [
+ "cgp-core",
+ "hermes-relayer-components",
+ "hermes-starknet-chain-components",
+ "starknet",
 ]
 
 [[package]]
