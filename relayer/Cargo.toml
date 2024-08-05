@@ -55,15 +55,15 @@ hermes-cosmos-wasm-relayer      = { version = "0.1.0" }
 hermes-cosmos-test-components   = { version = "0.1.0" }
 hermes-cosmos-integration-tests = { version = "0.1.0" }
 
-hermes-any-counterparty           = { version = "0.1.0" }
+hermes-any-counterparty = { version = "0.1.0" }
 
-hermes-cli-components             = { version = "0.1.0" }
+hermes-cli-components = { version = "0.1.0" }
 
-hermes-test-components            = { version = "0.1.0" }
+hermes-test-components = { version = "0.1.0" }
 
-hermes-starknet-chain-components  = { version = "0.1.0" }
-hermes-starknet-test-components   = { version = "0.1.0" }
-hermes-starknet-chain-context     = { version = "0.1.0" }
+hermes-starknet-chain-components = { version = "0.1.0" }
+hermes-starknet-test-components  = { version = "0.1.0" }
+hermes-starknet-chain-context    = { version = "0.1.0" }
 
 [patch.crates-io]
 ibc                   = { git = "https://github.com/cosmos/ibc-rs.git", rev = "5dc0b09" }
@@ -124,6 +124,6 @@ hermes-cosmos-integration-tests = { git = "https://github.com/informalsystems/he
 hermes-wasm-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-wasm-test-components   = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 
-hermes-starknet-chain-components  = { path = "./crates/starknet-chain-components" }
-hermes-starknet-test-components   = { path = "./crates/starknet-test-components" }
-hermes-starknet-chain-context     = { path = "./crates/starknet-chain-context" }
+hermes-starknet-chain-components = { path = "./crates/starknet-chain-components" }
+hermes-starknet-test-components  = { path = "./crates/starknet-test-components" }
+hermes-starknet-chain-context    = { path = "./crates/starknet-chain-context" }

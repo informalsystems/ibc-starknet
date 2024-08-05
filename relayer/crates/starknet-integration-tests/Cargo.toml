@@ -10,17 +10,17 @@ rust-version = { workspace = true }
 readme       = "README.md"
 
 [dependencies]
-cgp-core                            = { workspace = true }
-hermes-error                        = { workspace = true }
-hermes-runtime                      = { workspace = true }
-hermes-relayer-components           = { workspace = true }
-hermes-test-components              = { workspace = true }
-hermes-runtime-components           = { workspace = true }
-hermes-starknet-chain-components    = { workspace = true }
-hermes-starknet-test-components     = { workspace = true }
-hermes-starknet-chain-context       = { workspace = true }
-hermes-cosmos-test-components       = { workspace = true }
-hermes-cosmos-integration-tests     = { workspace = true }
+cgp-core                         = { workspace = true }
+hermes-error                     = { workspace = true }
+hermes-runtime                   = { workspace = true }
+hermes-relayer-components        = { workspace = true }
+hermes-test-components           = { workspace = true }
+hermes-runtime-components        = { workspace = true }
+hermes-starknet-chain-components = { workspace = true }
+hermes-starknet-test-components  = { workspace = true }
+hermes-starknet-chain-context    = { workspace = true }
+hermes-cosmos-test-components    = { workspace = true }
+hermes-cosmos-integration-tests  = { workspace = true }
 
 starknet = { workspace = true }
 url      = { workspace = true }
