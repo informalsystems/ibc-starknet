@@ -16,6 +16,7 @@ pub use hermes_relayer_components::transaction::traits::types::tx_response::TxRe
 use crate::impls::contract::call::CallStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
+use crate::impls::messages::transfer::BuildTransferErc20TokenMessage;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::send_message::SendCallMessages;
 use crate::impls::submit_tx::SubmitCallTransaction;
@@ -33,6 +34,7 @@ use crate::impls::types::tx_response::ProvideTransactionReceipt;
 pub use crate::traits::contract::call::ContractCallerComponent;
 pub use crate::traits::contract::invoke::ContractInvokerComponent;
 pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
+pub use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
 pub use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
 pub use crate::traits::transfer::TokenTransferComponent;
 pub use crate::traits::types::address::AddressTypeComponent;
@@ -76,11 +78,13 @@ define_components! {
             InvokeStarknetContract,
         InvokeContractMessageBuilderComponent:
             BuildInvokeContractCall,
-        TokenBalanceQuerierComponent:
-            QueryErc20TokenBalance,
-        TokenTransferComponent:
-            TransferErc20Token,
         RetryableErrorComponent:
             ReturnRetryable<false>,
+        TransferTokenMessageBuilderComponent:
+            BuildTransferErc20TokenMessage,
+        TokenTransferComponent:
+            TransferErc20Token,
+        TokenBalanceQuerierComponent:
+            QueryErc20TokenBalance,
     }
 }
