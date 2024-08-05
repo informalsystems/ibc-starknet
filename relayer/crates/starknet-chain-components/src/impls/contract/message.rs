@@ -1,9 +1,9 @@
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
+use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
 
 use crate::traits::contract::message::InvokeContractMessageBuilder;
-use crate::traits::types::address::HasAddressType;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasMethodSelectorType;
 

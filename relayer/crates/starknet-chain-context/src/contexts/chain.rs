@@ -30,9 +30,9 @@ use hermes_starknet_chain_components::traits::provider::{
 };
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
-use hermes_starknet_chain_components::traits::types::address::HasAddressType;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasMethodSelectorType;
+use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::accounts::SingleOwnerAccount;
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;

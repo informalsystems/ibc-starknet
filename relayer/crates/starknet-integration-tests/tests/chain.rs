@@ -5,6 +5,7 @@ use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
+use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::macros::felt;
@@ -68,9 +69,8 @@ fn test_starknet_chain_client() {
             println!("recipient balance before: {}", recipient_balance_a);
 
             let message = chain.build_transfer_token_message(
-                &token_address,
                 &recipient_address,
-                &100u32.into(),
+                &StarknetAmount::new(100u32.into(), token_address),
             );
 
             let events = chain.send_messages(vec![message]).await?;
@@ -91,8 +91,14 @@ fn test_starknet_chain_client() {
 
             println!("recipient balance transfer: {}", recipient_balance_b);
 
-            assert_eq!(sender_balance_b, sender_balance_a - 100u32.into());
-            assert_eq!(recipient_balance_b, recipient_balance_a + 100u32.into());
+            assert_eq!(
+                sender_balance_b.quantity,
+                sender_balance_a.quantity - 100u32.into()
+            );
+            assert_eq!(
+                recipient_balance_b.quantity,
+                recipient_balance_a.quantity + 100u32.into()
+            );
 
             <Result<(), Error>>::Ok(())
         })

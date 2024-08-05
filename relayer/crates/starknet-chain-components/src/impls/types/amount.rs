@@ -1,10 +1,19 @@
 use cgp_core::Async;
-use starknet::core::types::U256;
+use hermes_test_components::chain::traits::types::amount::ProvideAmountType;
+use hermes_test_components::chain::traits::types::denom::HasDenomType;
+use starknet::core::types::Felt;
 
-use crate::traits::types::amount::ProvideAmountType;
+use crate::types::amount::StarknetAmount;
 
 pub struct ProvideU256Amount;
 
-impl<Chain: Async> ProvideAmountType<Chain> for ProvideU256Amount {
-    type Amount = U256;
+impl<Chain: Async> ProvideAmountType<Chain> for ProvideU256Amount
+where
+    Chain: HasDenomType<Denom = Felt>,
+{
+    type Amount = StarknetAmount;
+
+    fn amount_denom(amount: &StarknetAmount) -> &Felt {
+        &amount.token_address
+    }
 }

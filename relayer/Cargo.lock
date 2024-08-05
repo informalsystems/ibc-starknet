@@ -1630,6 +1630,7 @@ version = "0.1.0"
 dependencies = [
  "cgp-core",
  "hermes-relayer-components",
+ "hermes-test-components",
  "starknet",
 ]
 
@@ -1646,6 +1647,7 @@ dependencies = [
  "hermes-runtime",
  "hermes-runtime-components",
  "hermes-starknet-chain-components",
+ "hermes-test-components",
  "starknet",
  "url",
 ]
