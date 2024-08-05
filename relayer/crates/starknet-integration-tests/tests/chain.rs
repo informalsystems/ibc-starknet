@@ -29,7 +29,7 @@ fn test_starknet_chain_client() {
                 chain_store_dir: "./test-data".into(),
             };
 
-            let chain_driver = bootstrap.bootstrap_chain("devnet").await?;
+            let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
 
             let chain = &chain_driver.chain;
 

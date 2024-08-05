@@ -3,11 +3,14 @@ use std::collections::BTreeMap;
 use cgp_core::error::CanRaiseError;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::CanBuildChainDriver;
 use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::CanStartChainFullNode;
+use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::HasChainStoreDir;
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
+use hermes_runtime_components::traits::fs::create_dir::CanCreateDir;
 use hermes_runtime_components::traits::fs::file_path::HasFilePathType;
 use hermes_runtime_components::traits::os::child_process::HasChildProcessType;
 use hermes_runtime_components::traits::os::reserve_port::CanReserveTcpPort;
+use hermes_runtime_components::traits::random::CanGenerateRandom;
 use hermes_runtime_components::traits::runtime::HasRuntime;
 use hermes_test_components::bootstrap::traits::chain::ChainBootstrapper;
 use hermes_test_components::chain::traits::types::wallet::HasWalletType;
@@ -28,18 +31,32 @@ where
         + HasChainGenesisConfigType<ChainGenesisConfig = StarknetGenesisConfig>
         + CanBuildChainDriver
         + CanStartChainFullNode
+        + HasChainStoreDir
         + CanRaiseError<Runtime::Error>,
-    Runtime: HasChildProcessType + CanReserveTcpPort + HasFilePathType,
+    Runtime: HasChildProcessType
+        + CanReserveTcpPort
+        + HasFilePathType
+        + CanGenerateRandom<u32>
+        + CanCreateDir,
     Bootstrap::Chain: HasWalletType<Wallet = StarknetWallet>,
 {
     async fn bootstrap_chain(
         bootstrap: &Bootstrap,
-        _chain_id_prefix: &str,
+        chain_id_prefix: &str,
     ) -> Result<Bootstrap::ChainDriver, Bootstrap::Error> {
         let runtime = bootstrap.runtime();
 
-        // stub
-        let chain_home_dir = Runtime::file_path_from_string(".");
+        let postfix = runtime.generate_random().await;
+
+        let chain_home_dir = Runtime::join_file_path(
+            bootstrap.chain_store_dir(),
+            &Runtime::file_path_from_string(&format!("{chain_id_prefix}-{postfix}")),
+        );
+
+        runtime
+            .create_dir(&chain_home_dir)
+            .await
+            .map_err(Bootstrap::raise_error)?;
 
         let rpc_port = runtime
             .reserve_tcp_port()
