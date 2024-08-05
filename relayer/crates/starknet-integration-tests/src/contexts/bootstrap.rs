@@ -12,6 +12,7 @@ use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::{
     CanStartChainFullNode, ChainFullNodeStarterComponent,
 };
 use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::ChainCommandPathGetter;
+use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::ChainStoreDirGetter;
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
@@ -43,6 +44,7 @@ use crate::contexts::chain_driver::StarknetChainDriver;
 pub struct StarknetBootstrap {
     pub runtime: HermesRuntime,
     pub chain_command_path: PathBuf,
+    pub chain_store_dir: PathBuf,
 }
 
 pub struct StarknetBootstrapComponents;
@@ -71,18 +73,24 @@ delegate_components! {
     }
 }
 
-impl ChainCommandPathGetter<StarknetBootstrap> for StarknetBootstrapComponents {
-    fn chain_command_path(bootstrap: &StarknetBootstrap) -> &PathBuf {
-        &bootstrap.chain_command_path
-    }
-}
-
 impl ProvideChainType<StarknetBootstrap> for StarknetBootstrapComponents {
     type Chain = StarknetChain;
 }
 
 impl ProvideChainDriverType<StarknetBootstrap> for StarknetBootstrapComponents {
     type ChainDriver = StarknetChainDriver;
+}
+
+impl ChainCommandPathGetter<StarknetBootstrap> for StarknetBootstrapComponents {
+    fn chain_command_path(bootstrap: &StarknetBootstrap) -> &PathBuf {
+        &bootstrap.chain_command_path
+    }
+}
+
+impl ChainStoreDirGetter<StarknetBootstrap> for StarknetBootstrapComponents {
+    fn chain_store_dir(bootstrap: &StarknetBootstrap) -> &PathBuf {
+        &bootstrap.chain_store_dir
+    }
 }
 
 impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
@@ -115,6 +123,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
 
         let chain = StarknetChain {
             runtime: bootstrap.runtime.clone(),
+            chain_id,
             rpc_client,
             account,
         };

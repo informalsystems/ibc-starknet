@@ -26,6 +26,7 @@ fn test_starknet_chain_client() {
             let bootstrap = StarknetBootstrap {
                 runtime: runtime.clone(),
                 chain_command_path,
+                chain_store_dir: "./test-data".into(),
             };
 
             let chain_driver = bootstrap.bootstrap_chain("devnet").await?;
