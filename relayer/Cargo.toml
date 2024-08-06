@@ -23,17 +23,19 @@ rust-version = "1.79"
 overflow-checks = true
 
 [workspace.dependencies]
-async-trait         = { version = "0.1.81" }
 ibc                 = { version = "0.53.0" }
 cgp-core            = { version = "0.1.0" }
 cgp-error-eyre      = { version = "0.1.0" }
 cgp-component-macro = { version = "0.1.0" }
 
-clap     = { version = "4.5.8" }
-starknet = { version = "0.11.0" }
-url      = { version = "2.4.0" }
-eyre     = { version = "0.6.12" }
-tokio    = { version = "1.38" }
+clap       = { version = "4.5.8" }
+starknet   = { version = "0.11.0" }
+url        = { version = "2.4.0" }
+eyre       = { version = "0.6.12" }
+tokio      = { version = "1.38" }
+serde_json = { version = "1.0" }
+
+cairo-lang-starknet-classes = { version = "2.6.4" }
 
 hermes-runtime-components       = { version = "0.1.0" }
 hermes-async-runtime-components = { version = "0.1.0" }
@@ -127,3 +129,5 @@ hermes-wasm-test-components   = { git = "https://github.com/informalsystems/herm
 hermes-starknet-chain-components = { path = "./crates/starknet-chain-components" }
 hermes-starknet-test-components  = { path = "./crates/starknet-test-components" }
 hermes-starknet-chain-context    = { path = "./crates/starknet-chain-context" }
+
+cairo-lang-starknet-classes = { git = "https://github.com/starkware-libs/cairo", tag = "v2.6.4" }
