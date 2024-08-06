@@ -26,6 +26,7 @@ use hermes_starknet_chain_components::traits::account::{
 use hermes_starknet_chain_components::traits::client::JsonRpcClientGetter;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
+use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
 use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
@@ -123,9 +124,10 @@ pub trait CanUseStarknetChain:
     + CanPollTxResponse
     + CanCallContract
     + CanInvokeContract
+    + CanDeclareContract
+    + CanDeployContract
     + CanQueryTokenBalance
     + CanTransferToken
-    + CanDeclareContract
     + HasRetryableError
 {
 }

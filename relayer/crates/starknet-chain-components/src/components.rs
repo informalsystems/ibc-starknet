@@ -19,6 +19,7 @@ pub use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
 
 use crate::impls::contract::call::CallStarknetContract;
 use crate::impls::contract::declare::DeclareSierraContract;
+use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::messages::transfer::BuildTransferErc20TokenMessage;
@@ -41,6 +42,7 @@ use crate::impls::types::tx_hash::ProvideFeltTxHash;
 use crate::impls::types::tx_response::ProvideStarknetTxResponse;
 pub use crate::traits::contract::call::ContractCallerComponent;
 pub use crate::traits::contract::declare::ContractDeclarerComponent;
+pub use crate::traits::contract::deploy::ContractDeployerComponent;
 pub use crate::traits::contract::invoke::ContractInvokerComponent;
 pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
 pub use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
@@ -97,6 +99,8 @@ define_components! {
             InvokeStarknetContract,
         ContractDeclarerComponent:
             DeclareSierraContract,
+        ContractDeployerComponent:
+            DeployStarknetContract,
         InvokeContractMessageBuilderComponent:
             BuildInvokeContractCall,
         RetryableErrorComponent:
