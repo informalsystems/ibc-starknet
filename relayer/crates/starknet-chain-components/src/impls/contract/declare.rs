@@ -10,13 +10,14 @@ use starknet::accounts::Account;
 use starknet::core::types::contract::{
     CompiledClass, ComputeClassHashError, JsonError, SierraClass,
 };
-use starknet::core::types::{BlockId, BlockTag, Felt};
+use starknet::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
 use starknet::providers::Provider;
 
 use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
 use crate::traits::contract::declare::ContractDeclarer;
 use crate::traits::provider::HasStarknetProvider;
 use crate::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
+use crate::types::tx_response::TxResponse;
 
 pub struct DeclareSierraContract;
 
@@ -26,11 +27,12 @@ where
         + HasContractClassHashType<ContractClassHash = Felt>
         + HasStarknetProvider
         + HasStarknetAccount
-        + CanPollTxResponse<TxHash = Felt>
+        + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>
         + CanRaiseAccountErrors
         + CanRaiseError<serde_json::error::Error>
         + CanRaiseError<JsonError>
         + CanRaiseError<ComputeClassHashError>
+        + CanRaiseError<RevertedInvocation>
         + CanRaiseError<StarknetSierraCompilationError>,
 {
     async fn declare_contract(
@@ -83,9 +85,13 @@ where
 
         let declare_result = declaration.send().await.map_err(Chain::raise_error)?;
 
-        chain
+        let tx_response = chain
             .poll_tx_response(&declare_result.transaction_hash)
             .await?;
+
+        if let Some(reverted) = tx_response.is_reverted() {
+            return Err(Chain::raise_error(reverted));
+        }
 
         Ok(declare_result.class_hash)
     }

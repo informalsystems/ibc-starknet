@@ -8,7 +8,6 @@ use starknet::signers::SigningKey;
 
 use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
 use crate::traits::contract::deploy::ContractDeployer;
-use crate::traits::provider::HasStarknetProvider;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::contract_class::HasContractClassHashType;
 use crate::types::tx_response::TxResponse;
@@ -51,6 +50,10 @@ where
             .transaction_hash;
 
         let tx_response = chain.poll_tx_response(&tx_hash).await?;
+
+        if let Some(reverted) = tx_response.is_reverted() {
+            return Err(Chain::raise_error(reverted));
+        }
 
         Ok(deployed_address)
     }
