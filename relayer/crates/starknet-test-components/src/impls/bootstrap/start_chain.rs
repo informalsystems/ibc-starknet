@@ -29,11 +29,20 @@ where
     ) -> Result<Runtime::ChildProcess, Bootstrap::Error> {
         let chain_command = bootstrap.chain_command_path();
 
+        let chain_state_path = Runtime::join_file_path(
+            &chain_home_dir,
+            &Runtime::file_path_from_string("chain-state.json"),
+        );
+
         let args = [
             "--seed",
             &chain_genesis_config.seed.to_string(),
             "--port",
             &chain_node_config.rpc_port.to_string(),
+            "--dump-on",
+            "block",
+            "--dump-path",
+            &Runtime::file_path_to_string(&chain_state_path),
         ];
 
         let stdout_path = Runtime::join_file_path(

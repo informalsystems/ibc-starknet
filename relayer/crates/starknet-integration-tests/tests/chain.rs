@@ -1,3 +1,5 @@
+use std::time::SystemTime;
+
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
@@ -25,10 +27,14 @@ fn test_starknet_chain_client() {
                 .unwrap_or("starknet-devnet".into())
                 .into();
 
+            let timestamp = SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)?
+                .as_secs();
+
             let bootstrap = StarknetBootstrap {
                 runtime: runtime.clone(),
                 chain_command_path,
-                chain_store_dir: "./test-data".into(),
+                chain_store_dir: format!("./test-data/{timestamp}").into(),
             };
 
             let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
