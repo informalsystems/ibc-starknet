@@ -52,6 +52,7 @@ where
             return Ok(class_hash);
         }
 
+        // Compile Sierra class to Casm, following code in starkli
         let casm_class_hash = {
             let mut class = contract_class.clone();
             class.abi.clear();
@@ -71,9 +72,7 @@ where
             let casm_class = serde_json::from_str::<CompiledClass>(&casm_class_json)
                 .map_err(Chain::raise_error)?;
 
-            let casm_class_hash = casm_class.class_hash().map_err(Chain::raise_error)?;
-
-            casm_class_hash
+            casm_class.class_hash().map_err(Chain::raise_error)?
         };
 
         let flattened_class = contract_class

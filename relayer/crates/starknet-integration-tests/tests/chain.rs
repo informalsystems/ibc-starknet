@@ -98,9 +98,9 @@ fn test_starknet_chain_client() {
             }
 
             {
-                // Test declare and deploy contracts
+                // Test deployment of ERC20 contract
 
-                let contract_path = std::env::var("STARKNET_CONTRACT")?;
+                let contract_path = std::env::var("ERC20_CONTRACT")?;
 
                 let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
 
@@ -116,11 +116,14 @@ fn test_starknet_chain_client() {
 
                 let token_name = ByteArray::cairo_serialize(&ByteArray::from_string("token")?);
 
-                calldata.extend(token_name.clone());
-                calldata.extend(token_name.clone());
-                calldata.extend(U256::cairo_serialize(&U256 { low: 100, high: 0 }));
-                calldata.push(relayer_address);
-                calldata.push(relayer_address);
+                // Manually construct the contract arguments into Vec<Felt> calldata for now
+
+                calldata.extend(token_name.clone()); //name: ByteArray
+                calldata.extend(token_name.clone()); // symbol: ByteArray
+
+                calldata.extend(U256::cairo_serialize(&U256 { low: 100, high: 0 })); // fixed_supply: u256
+                calldata.push(relayer_address); // recipient: ContractAddress
+                calldata.push(relayer_address); // owner: ContractAddress
 
                 let token_address = chain.deploy_contract(&class_hash, false, &calldata).await?;
 

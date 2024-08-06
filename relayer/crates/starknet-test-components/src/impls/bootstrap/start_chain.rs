@@ -30,7 +30,7 @@ where
         let chain_command = bootstrap.chain_command_path();
 
         let chain_state_path = Runtime::join_file_path(
-            &chain_home_dir,
+            chain_home_dir,
             &Runtime::file_path_from_string("chain-state.json"),
         );
 
