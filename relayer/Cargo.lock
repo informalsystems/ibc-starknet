@@ -2005,6 +2005,7 @@ dependencies = [
  "hermes-starknet-chain-context",
  "hermes-starknet-test-components",
  "hermes-test-components",
+ "serde_json",
  "starknet",
  "tokio",
  "url",
