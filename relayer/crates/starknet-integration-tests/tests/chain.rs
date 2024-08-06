@@ -1,10 +1,12 @@
 use std::time::SystemTime;
 
+use cainome_cairo_serde::{ByteArray, CairoSerde, U256};
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
+use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
@@ -106,7 +108,31 @@ fn test_starknet_chain_client() {
 
                 let class_hash = chain.declare_contract(&contract).await?;
 
-                println!("declared class: {}", class_hash);
+                println!("declared class: {:?}", class_hash);
+
+                let mut calldata = Vec::new();
+
+                let relayer_address = chain_driver.relayer_wallet.account_address;
+
+                let token_name = ByteArray::cairo_serialize(&ByteArray::from_string("token")?);
+
+                calldata.extend(token_name.clone());
+                calldata.extend(token_name.clone());
+                calldata.extend(U256::cairo_serialize(&U256 { low: 100, high: 0 }));
+                calldata.push(relayer_address);
+                calldata.push(relayer_address);
+
+                let token_address = chain.deploy_contract(&class_hash, false, &calldata).await?;
+
+                println!("deployed contract to address: {:?}", token_address);
+
+                let balance = chain
+                    .query_token_balance(&token_address, &relayer_address)
+                    .await?;
+
+                println!("initial balance: {}", balance);
+
+                assert_eq!(balance.quantity, 100u32.into());
             }
 
             <Result<(), Error>>::Ok(())

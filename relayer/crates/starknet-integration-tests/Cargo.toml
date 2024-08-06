@@ -27,3 +27,4 @@ url      = { workspace = true }
 eyre     = { workspace = true }
 tokio    = { workspace = true }
 serde_json    = { workspace = true }
+cainome-cairo-serde    = { workspace = true }

@@ -536,6 +536,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cainome-cairo-serde"
+version = "0.1.0"
+source = "git+https://github.com/cartridge-gg/cainome#595c04414f1a2ab75c806a4e44c173776b6a790d"
+dependencies = [
+ "serde",
+ "starknet",
+ "thiserror",
+]
+
+[[package]]
 name = "cairo-felt"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1993,6 +2003,7 @@ dependencies = [
 name = "hermes-starknet-integration-tests"
 version = "0.1.0"
 dependencies = [
+ "cainome-cairo-serde",
  "cgp-core",
  "eyre",
  "hermes-cosmos-integration-tests",
