@@ -5,3 +5,5 @@ pub struct TxResponse {
     pub receipt: TransactionReceiptWithBlockInfo,
     pub trace: TransactionTrace,
 }
+
+impl TxResponse {}
