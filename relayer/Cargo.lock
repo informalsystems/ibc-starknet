@@ -1972,6 +1972,7 @@ dependencies = [
 name = "hermes-starknet-chain-context"
 version = "0.1.0"
 dependencies = [
+ "cairo-lang-starknet-classes",
  "cgp-core",
  "eyre",
  "hermes-error",
@@ -1983,6 +1984,7 @@ dependencies = [
  "hermes-starknet-chain-components",
  "hermes-starknet-test-components",
  "hermes-test-components",
+ "serde_json",
  "starknet",
  "url",
 ]
