@@ -57,18 +57,20 @@
             inherit nixpkgs;
             inherit (inputs) scarb-src cairo-src;
           };
+
+          rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
         in
         {
           packages = {
-            inherit starknet-devnet cairo scarb;
+            inherit starknet-devnet cairo scarb rust-nightly;
           };
 
           devShells = {
             default = nixpkgs.mkShell {
               buildInputs = [
                 starknet-devnet
-                cairo
-                scarb
+                # cairo
+                # scarb
 
                 nixpkgs.pkg-config
                 nixpkgs.protobuf

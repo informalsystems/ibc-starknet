@@ -54,4 +54,4 @@ jobs:
       - name: Install Just
         uses: extractions/setup-just@v1
       - name: Run linters
-        run: just lint
+        run: nix develop -c just lint
