@@ -1,3 +1,3 @@
 [toolchain]
 channel = "nightly"
-profile = "minimal"
+profile = "default"

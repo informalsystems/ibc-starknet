@@ -58,30 +58,45 @@
             inherit (inputs) scarb-src cairo-src;
           };
 
+          rust = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+
           rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
+
+          starknet-deps = [
+            starknet-devnet
+            cairo
+            scarb
+          ];
+
+          tools = [
+                nixpkgs.pkg-config
+                nixpkgs.protobuf
+                nixpkgs.cargo-nextest
+                nixpkgs.taplo
+                nixpkgs.just
+                nixpkgs.nixfmt-rfc-style
+          ];
         in
         {
           packages = {
-            inherit starknet-devnet cairo scarb rust-nightly;
+            inherit starknet-devnet cairo scarb rust rust-nightly;
           };
 
           devShells = {
             default = nixpkgs.mkShell {
+              buildInputs = starknet-deps ++ tools;
+            };
+
+            rust = nixpkgs.mkShell {
               buildInputs = [
-                starknet-devnet
-                # cairo
-                # scarb
+                rust
+              ] ++ starknet-deps ++ tools;
+            };
 
-                nixpkgs.pkg-config
-                nixpkgs.protobuf
-                nixpkgs.rustc
-                nixpkgs.cargo
-                nixpkgs.cargo-nextest
-
-                nixpkgs.taplo
-                nixpkgs.just
-                nixpkgs.nixfmt-rfc-style
-              ];
+            rust-nightly = nixpkgs.mkShell {
+              buildInputs = [
+                rust-nightly
+              ] ++ starknet-deps ++ tools;
             };
           };
         }
