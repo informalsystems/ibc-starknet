@@ -16,6 +16,11 @@
       url = "github:starkware-libs/cairo/v2.6.4";
       flake = false;
     };
+
+    scarb-src = {
+      url = "github:software-mansion/scarb/v2.6.5";
+      flake = false;
+    };
   };
 
   outputs =
@@ -47,10 +52,15 @@
             inherit nixpkgs;
             inherit (inputs) cairo-src;
           };
+
+          scarb = import ./nix/scarb.nix {
+            inherit nixpkgs;
+            inherit (inputs) scarb-src;
+          };
         in
         {
           packages = {
-            inherit starknet-devnet cairo;
+            inherit starknet-devnet cairo scarb;
           };
 
           devShells = {
@@ -58,6 +68,7 @@
               buildInputs = [
                 starknet-devnet
                 cairo
+                scarb
 
                 nixpkgs.pkg-config
                 nixpkgs.protobuf

@@ -127,6 +127,7 @@
         "flake-utils": "flake-utils_2",
         "nixpkgs": "nixpkgs_2",
         "rust-overlay": "rust-overlay",
+        "scarb-src": "scarb-src",
         "starknet-devnet-src": "starknet-devnet-src"
       }
     },
@@ -145,6 +146,23 @@
       "original": {
         "owner": "oxalica",
         "repo": "rust-overlay",
+        "type": "github"
+      }
+    },
+    "scarb-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1718105428,
+        "narHash": "sha256-VUXiaqa/T6WBxPzbcQ82MvEc8WNnUdvx9Nw+1PP3cNQ=",
+        "owner": "software-mansion",
+        "repo": "scarb",
+        "rev": "d49f543948a7ae8a7d3108c8ff8f6b17dc15ef78",
+        "type": "github"
+      },
+      "original": {
+        "owner": "software-mansion",
+        "ref": "v2.6.5",
+        "repo": "scarb",
         "type": "github"
       }
     },
