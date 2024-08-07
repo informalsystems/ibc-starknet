@@ -55,7 +55,7 @@
 
           scarb = import ./nix/scarb.nix {
             inherit nixpkgs;
-            inherit (inputs) scarb-src;
+            inherit (inputs) scarb-src cairo-src;
           };
         in
         {

@@ -4,14 +4,14 @@
 }:
 let
   cairo = nixpkgs.rustPlatform.buildRustPackage {
-    pname = "cairo";
+    name = "cairo";
     version = "2.6.4";
 
     doCheck = false;
 
     src = cairo-src;
 
-    cargoHash = "sha256-yuJGG+PlZ5lQ1poil4sdhoEOJYgTQzBwVUy2UgUiUbc=";
+    cargoHash = "sha256-vmJvWXecLvty7GvoI26Mn4cFlBh2WswKmwBHxiCXFpE=";
   };
 in
 cairo
