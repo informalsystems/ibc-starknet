@@ -60,6 +60,8 @@
 
           rust = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
 
+          rust-wasm = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-wasm.toml;
+
           rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
 
           starknet-deps = [
@@ -96,6 +98,12 @@
             rust-nightly = nixpkgs.mkShell {
               buildInputs = [
                 rust-nightly
+              ] ++ starknet-deps ++ tools;
+            };
+
+            rust-wasm = nixpkgs.mkShell {
+              buildInputs = [
+                rust-wasm
               ] ++ starknet-deps ++ tools;
             };
           };

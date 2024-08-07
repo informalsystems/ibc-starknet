@@ -34,11 +34,17 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust toolchains
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: cachix/install-nix-action@V27
         with:
-          target: wasm32-unknown-unknown
-      - name: Install Just
-        uses: extractions/setup-just@v1
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: cachix/cachix-action@v15
+        with:
+          name: ibc-starknet
+          extraPullNames: hermes-sdk,cosmos-nix
+      - uses: Swatinem/rust-cache@v2
       - name: Build CosmWasm light client contract
-        run: just build-cw-contract
+        working-directory: ./light-client
+        run: |
+          nix develop ..#rust-wasm -c \
+            cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
