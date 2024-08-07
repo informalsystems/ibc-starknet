@@ -18,6 +18,8 @@ pub use hermes_test_components::chain::traits::types::amount::AmountTypeComponen
 pub use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
 
 use crate::impls::contract::call::CallStarknetContract;
+use crate::impls::contract::declare::DeclareSierraContract;
+use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::messages::transfer::BuildTransferErc20TokenMessage;
@@ -30,6 +32,7 @@ use crate::impls::types::address::ProvideFeltAddressType;
 use crate::impls::types::amount::ProvideU256Amount;
 use crate::impls::types::blob::ProvideFeltBlobType;
 use crate::impls::types::chain_id::ProvideFeltChainId;
+use crate::impls::types::contract::ProvideStarknetContractTypes;
 use crate::impls::types::denom::ProvideTokenAddressDenom;
 use crate::impls::types::event::ProvideStarknetEvent;
 use crate::impls::types::message::ProvideCallMessage;
@@ -38,12 +41,17 @@ use crate::impls::types::transaction::ProvideCallTransaction;
 use crate::impls::types::tx_hash::ProvideFeltTxHash;
 use crate::impls::types::tx_response::ProvideStarknetTxResponse;
 pub use crate::traits::contract::call::ContractCallerComponent;
+pub use crate::traits::contract::declare::ContractDeclarerComponent;
+pub use crate::traits::contract::deploy::ContractDeployerComponent;
 pub use crate::traits::contract::invoke::ContractInvokerComponent;
 pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
 pub use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
 pub use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
 pub use crate::traits::transfer::TokenTransferComponent;
 pub use crate::traits::types::blob::BlobTypeComponent;
+pub use crate::traits::types::contract_class::{
+    ContractClassHashTypeComponent, ContractClassTypeComponent,
+};
 pub use crate::traits::types::method::MethodSelectorTypeComponent;
 
 define_components! {
@@ -70,6 +78,11 @@ define_components! {
             ProvideStarknetTxResponse,
         MethodSelectorTypeComponent:
             ProvideFeltMethodSelector,
+        [
+            ContractClassTypeComponent,
+            ContractClassHashTypeComponent,
+        ]:
+            ProvideStarknetContractTypes,
         MessageSenderComponent:
             SendCallMessages,
         TxSubmitterComponent:
@@ -84,6 +97,10 @@ define_components! {
             CallStarknetContract,
         ContractInvokerComponent:
             InvokeStarknetContract,
+        ContractDeclarerComponent:
+            DeclareSierraContract,
+        ContractDeployerComponent:
+            DeployStarknetContract,
         InvokeContractMessageBuilderComponent:
             BuildInvokeContractCall,
         RetryableErrorComponent:

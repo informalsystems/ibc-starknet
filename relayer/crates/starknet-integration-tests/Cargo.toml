@@ -22,7 +22,9 @@ hermes-starknet-chain-context    = { workspace = true }
 hermes-cosmos-test-components    = { workspace = true }
 hermes-cosmos-integration-tests  = { workspace = true }
 
-starknet = { workspace = true }
-url      = { workspace = true }
-eyre     = { workspace = true }
-tokio    = { workspace = true }
+starknet            = { workspace = true }
+url                 = { workspace = true }
+eyre                = { workspace = true }
+tokio               = { workspace = true }
+serde_json          = { workspace = true }
+cainome-cairo-serde = { workspace = true }

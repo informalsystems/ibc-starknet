@@ -1,5 +1,6 @@
 use std::convert::Infallible;
 
+use cairo_lang_starknet_classes::casm_contract_class::StarknetSierraCompilationError;
 use cgp_core::prelude::*;
 use eyre::Report;
 use hermes_error::handlers::debug::DebugError;
@@ -15,6 +16,7 @@ use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransacti
 use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use starknet::accounts::{single_owner, AccountError};
+use starknet::core::types::contract::{ComputeClassHashError, JsonError};
 use starknet::core::types::RevertedInvocation;
 use starknet::providers::ProviderError;
 use starknet::signers::local_wallet;
@@ -33,6 +35,10 @@ delegate_components! {
             SignError,
             TokioRuntimeError,
             AccountError<SignError>,
+            serde_json::error::Error,
+            JsonError,
+            ComputeClassHashError,
+            StarknetSierraCompilationError,
         ]: ReportError,
         [
             <'a> &'a str,
