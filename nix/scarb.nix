@@ -1,7 +1,7 @@
 {
-  nixpkgs
-, scarb-src
-, cairo-src
+  nixpkgs,
+  scarb-src,
+  cairo-src,
 }:
 let
   cairo = nixpkgs.rustPlatform.buildRustPackage {

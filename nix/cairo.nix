@@ -1,7 +1,4 @@
-{
-  nixpkgs
-, cairo-src
-}:
+{ nixpkgs, cairo-src }:
 let
   cairo = nixpkgs.rustPlatform.buildRustPackage {
     name = "cairo";
