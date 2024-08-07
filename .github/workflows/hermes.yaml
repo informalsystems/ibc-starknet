@@ -21,8 +21,8 @@ jobs:
             experimental-features = nix-command flakes
       - uses: cachix/cachix-action@v15
         with:
-          name: hermes-sdk
-          extraPullNames: cosmos-nix
+          name: ibc-starknet
+          extraPullNames: hermes-sdk,cosmos-nix
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
@@ -31,5 +31,7 @@ jobs:
       - name: run integration tests
         env:
           RUST_BACKTRACE: 1
+        working-directory: ./relayer
         run: |
-            cd relayer && cargo clippy
+          nix shell ..#cargo-nextest ..#protobuf ..#starknet-devnet -c \
+            cargo nextest run --test-threads=2
