@@ -40,8 +40,6 @@
         {
           packages = {
             inherit starknet-devnet;
-
-            inherit (nixpkgs) protobuf cargo-nextest rustc cargo;
           };
 
           devShells = {
@@ -54,6 +52,10 @@
                 rustc
                 cargo
                 cargo-nextest
+
+                taplo
+                just
+                nixfmt-rfc-style
               ];
             };
           };

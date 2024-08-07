@@ -23,10 +23,6 @@ jobs:
         with:
           name: ibc-starknet
           extraPullNames: hermes-sdk,cosmos-nix
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
       - uses: Swatinem/rust-cache@v2
       - name: run integration tests
         env:
@@ -35,5 +31,5 @@ jobs:
         run: |
           export ERC20_CONTRACT="$(pwd)/../artifacts/openzeppelin_ERC20Upgradeable.contract_class.json"
 
-          nix shell ..#cargo-nextest ..#protobuf ..#starknet-devnet -c \
+          nix develop -i -k TERM -k ERC20_CONTRACT -k RUST_BACKTRACE -c \
             cargo nextest run --test-threads=2
