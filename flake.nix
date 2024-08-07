@@ -1,5 +1,5 @@
 {
-  description = "Nix development dependencies for ibc-rs";
+  description = "Nix development dependencies for ibc-starknet";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
@@ -41,9 +41,21 @@
           packages = {
             inherit starknet-devnet;
 
-            inherit (nixpkgs) protobuf cargo-nextest;
+            inherit (nixpkgs) protobuf cargo-nextest rustc cargo;
+          };
 
-            openssl = nixpkgs.openssl.dev;
+          devShells = {
+            default = nixpkgs.mkShell {
+              buildInputs = with nixpkgs; [
+                starknet-devnet
+
+                pkg-config
+                protobuf
+                rustc
+                cargo
+                cargo-nextest
+              ];
+            };
           };
         }
       );
