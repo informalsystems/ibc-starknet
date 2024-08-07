@@ -32,10 +32,10 @@ jobs:
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
-          nix develop -c \
-            scarb build
+          nix shell ..#scarb -c \
+            scarb test
       - name: Run Tests
         working-directory: ./cairo-contracts
         run: |
-          nix develop -c \
+          nix shell ..#scarb -c \
             scarb test

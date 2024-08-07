@@ -47,5 +47,5 @@ jobs:
       - name: Build CosmWasm light client contract
         working-directory: ./light-client
         run: |
-          nix develop ..#rust-wasm -c \
+          nix shell ..#rust-wasm -c \
             cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown

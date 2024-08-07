@@ -81,7 +81,7 @@
         in
         {
           packages = {
-            inherit starknet-devnet cairo scarb rust rust-nightly;
+            inherit starknet-devnet cairo scarb rust rust-nightly rust-wasm;
           };
 
           devShells = {
