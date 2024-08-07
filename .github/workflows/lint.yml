@@ -43,5 +43,6 @@ jobs:
         with:
           name: ibc-starknet
           extraPullNames: hermes-sdk,cosmos-nix
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Run linters
         run: nix develop .#rust-nightly -c just lint
