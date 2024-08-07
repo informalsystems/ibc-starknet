@@ -5,9 +5,15 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url = "github:numtide/flake-utils";
+    cairo-nix.url = "github:cairo-nix/cairo-nix";
 
     starknet-devnet-src = {
       url = "github:0xSpaceShard/starknet-devnet-rs";
+      flake = false;
+    };
+
+    cairo-src = {
+      url = "github:starkware-libs/cairo/v2.6.4";
       flake = false;
     };
   };
@@ -36,26 +42,32 @@
             inherit nixpkgs;
             inherit (inputs) starknet-devnet-src;
           };
+
+          cairo = import ./nix/cairo.nix {
+            inherit nixpkgs;
+            inherit (inputs) cairo-src;
+          };
         in
         {
           packages = {
-            inherit starknet-devnet;
+            inherit starknet-devnet cairo;
           };
 
           devShells = {
             default = nixpkgs.mkShell {
-              buildInputs = with nixpkgs; [
+              buildInputs = [
                 starknet-devnet
+                cairo
 
-                pkg-config
-                protobuf
-                rustc
-                cargo
-                cargo-nextest
+                nixpkgs.pkg-config
+                nixpkgs.protobuf
+                nixpkgs.rustc
+                nixpkgs.cargo
+                nixpkgs.cargo-nextest
 
-                taplo
-                just
-                nixfmt-rfc-style
+                nixpkgs.taplo
+                nixpkgs.just
+                nixpkgs.nixfmt-rfc-style
               ];
             };
           };
