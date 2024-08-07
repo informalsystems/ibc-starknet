@@ -1,7 +1,4 @@
-{
-  nixpkgs
-, starknet-devnet-src
-}:
+{ nixpkgs, starknet-devnet-src }:
 let
   starknet-devnet = nixpkgs.rustPlatform.buildRustPackage {
     name = "starknet-devnet";
@@ -14,9 +11,7 @@ let
     OPENSSL_NO_VENDOR = 1;
     PKG_CONFIG_PATH = "${nixpkgs.openssl.dev}/lib/pkgconfig";
 
-    nativeBuildInputs = [
-      nixpkgs.pkg-config
-    ];
+    nativeBuildInputs = [ nixpkgs.pkg-config ];
 
     doCheck = false;
   };
