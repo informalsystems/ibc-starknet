@@ -13,7 +13,7 @@ where
 {
     fn decode_mut(
         encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<u128, Encoding::Error> {
         let felt = encoding.decode_mut(buffer)?;
         let bytes = &felt.to_bytes_be()[16..];

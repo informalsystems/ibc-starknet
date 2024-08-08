@@ -44,7 +44,7 @@ where
 {
     fn decode_mut(
         encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<Vec<u8>, Encoding::Error> {
         let chunks_count: usize = encoding.decode_mut(buffer)?;
 

@@ -22,7 +22,7 @@ where
 {
     fn decode_mut(
         encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<Value, Encoding::Error> {
         encoding.decode_mut(buffer)
     }

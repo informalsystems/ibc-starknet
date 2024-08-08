@@ -38,7 +38,7 @@ where
 {
     fn decode_mut(
         encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<(ValueA, ValueB), Encoding::Error> {
         let a = EncoderA::decode_mut(encoding, buffer)?;
         let b = EncoderB::decode_mut(encoding, buffer)?;

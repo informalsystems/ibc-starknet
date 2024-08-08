@@ -23,12 +23,15 @@ where
     }
 }
 
-impl<Encoding, Strategy, DecodeBuffer> MutDecoder<Encoding, Strategy, ()> for EncodeEnd
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ()> for EncodeEnd
 where
-    Encoding: HasDecodeBufferType<DecodeBuffer = DecodeBuffer> + CanRaiseError<NonEmptyBuffer>,
-    DecodeBuffer: Iterator,
+    Encoding: HasDecodeBufferType + CanRaiseError<NonEmptyBuffer>,
+    for<'a> Encoding::DecodeBuffer<'a>: Iterator,
 {
-    fn decode_mut(_encoding: &Encoding, buffer: &mut DecodeBuffer) -> Result<(), Encoding::Error> {
+    fn decode_mut(
+        _encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
+    ) -> Result<(), Encoding::Error> {
         match buffer.next() {
             Some(_) => Err(Encoding::raise_error(NonEmptyBuffer)),
             None => Ok(()),

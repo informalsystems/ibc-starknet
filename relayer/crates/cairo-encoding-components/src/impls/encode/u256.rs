@@ -27,7 +27,7 @@ where
 {
     fn decode_mut(
         encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<U256, Encoding::Error> {
         let low = encoding.decode_mut(buffer)?;
         let high = encoding.decode_mut(buffer)?;

@@ -27,15 +27,14 @@ where
     }
 }
 
-impl<Encoding, Strategy, DecodeBuffer> MutDecoder<Encoding, Strategy, Felt> for EncodeFelt
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Felt> for EncodeFelt
 where
-    Encoding:
-        HasDecodeBufferType<DecodeBuffer = DecodeBuffer> + CanRaiseError<UnexpectedEndOfBuffer>,
-    DecodeBuffer: Iterator<Item = Felt>,
+    Encoding: HasDecodeBufferType + CanRaiseError<UnexpectedEndOfBuffer>,
+    for<'a> Encoding::DecodeBuffer<'a>: Iterator<Item = Felt>,
 {
     fn decode_mut(
         _encoding: &Encoding,
-        buffer: &mut DecodeBuffer,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<Felt, Encoding::Error> {
         let value = buffer
             .next()

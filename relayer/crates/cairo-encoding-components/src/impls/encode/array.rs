@@ -31,7 +31,7 @@ where
 {
     fn decode_mut(
         encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<[Value; SIZE], Encoding::Error> {
         let mut out = Vec::with_capacity(SIZE);
 
