@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  cosmostarknet-integration-tests:
+  starknet-integration-tests:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
@@ -32,5 +32,5 @@ jobs:
         run: |
           export ERC20_CONTRACT="$(pwd)/../artifacts/openzeppelin_ERC20Upgradeable.contract_class.json"
 
-          nix develop -c \
+          nix develop ..#rust -c \
             cargo nextest run --test-threads=2
