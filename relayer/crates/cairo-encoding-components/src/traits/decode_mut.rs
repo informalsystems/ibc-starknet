@@ -1,8 +1,11 @@
 use cgp_core::prelude::*;
+use hermes_encoding_components::traits::encoded::HasEncodedType;
 
 #[derive_component(DecodeBufferTypeComponent, ProvideDecodeBufferType<Encoding>)]
-pub trait HasDecodeBufferType {
+pub trait HasDecodeBufferType: HasEncodedType {
     type DecodeBuffer;
+
+    fn from_encoded(encoded: &Self::Encoded) -> Self::DecodeBuffer;
 }
 
 #[derive_component(MutDecoderComponent, MutDecoder<Encoding>)]

@@ -1,4 +1,5 @@
 pub mod array;
+pub mod buffer;
 pub mod byte_array;
 pub mod end;
 pub mod felt;
