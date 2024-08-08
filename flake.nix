@@ -65,11 +65,7 @@
           rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
 
           starknet-pkgs = {
-            inherit
-              starknet-devnet
-              cairo
-              scarb
-            ;
+            inherit starknet-devnet cairo scarb;
           };
 
           tools = {
@@ -79,39 +75,33 @@
               cargo-nextest
               taplo
               just
-              nixfmt-rfc-style
-            ;
+              ;
+
+            nixfmt = nixpkgs.nixfmt-rfc-style;
           };
 
           shell-deps = (builtins.attrValues starknet-pkgs) ++ (builtins.attrValues tools);
         in
         {
           packages = {
-            inherit starknet-devnet cairo scarb rust rust-nightly rust-wasm;
+            inherit
+              starknet-devnet
+              cairo
+              scarb
+              rust
+              rust-nightly
+              rust-wasm
+              ;
           } // tools // starknet-pkgs;
 
           devShells = {
-            default = nixpkgs.mkShell {
-              buildInputs = shell-deps;
-            };
+            default = nixpkgs.mkShell { buildInputs = shell-deps; };
 
-            rust = nixpkgs.mkShell {
-              buildInputs = [
-                rust
-              ] ++ shell-deps;
-            };
+            rust = nixpkgs.mkShell { buildInputs = [ rust ] ++ shell-deps; };
 
-            rust-nightly = nixpkgs.mkShell {
-              buildInputs = [
-                rust-nightly
-              ] ++ shell-deps;
-            };
+            rust-nightly = nixpkgs.mkShell { buildInputs = [ rust-nightly ] ++ shell-deps; };
 
-            rust-wasm = nixpkgs.mkShell {
-              buildInputs = [
-                rust-wasm
-              ] ++ shell-deps;
-            };
+            rust-wasm = nixpkgs.mkShell { buildInputs = [ rust-wasm ] ++ shell-deps; };
           };
         }
       );
