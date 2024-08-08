@@ -5,11 +5,9 @@ use crate::impls::encode::from_felt::EncodeFromFelt;
 use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use crate::traits::encode_mut::MutEncoderComponent;
 
-
 pub struct EncodeU128;
 
-impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, u128>
-    for EncodeU128
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, u128> for EncodeU128
 where
     Encoding: CanDecodeMut<Strategy, Felt>,
 {
