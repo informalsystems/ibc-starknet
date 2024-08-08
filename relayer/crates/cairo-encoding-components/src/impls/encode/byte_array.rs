@@ -1,5 +1,6 @@
 use starknet::core::types::Felt;
 
+use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use crate::traits::encode_mut::{CanEncodeMut, MutEncoder};
 
 pub struct EncodeByteArray;
@@ -34,5 +35,39 @@ where
         encoding.encode_mut(&pending_word_len, buffer)?;
 
         Ok(())
+    }
+}
+
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Vec<u8>> for EncodeByteArray
+where
+    Encoding: CanDecodeMut<Strategy, Felt> + CanDecodeMut<Strategy, usize>,
+{
+    fn decode_mut(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer,
+    ) -> Result<Vec<u8>, Encoding::Error> {
+        let chunks_count: usize = encoding.decode_mut(buffer)?;
+
+        let mut out = <Vec<u8>>::new();
+
+        for _ in 0..chunks_count {
+            let felt: Felt = encoding.decode_mut(buffer)?;
+
+            let bytes = &felt.to_bytes_be()[1..];
+
+            out.extend(bytes);
+        }
+
+        let pending_word: Felt = encoding.decode_mut(buffer)?;
+        let pending_word_len: usize = encoding.decode_mut(buffer)?;
+
+        if pending_word_len > 0 {
+            let offset = 32 - pending_word_len;
+            let bytes = &pending_word.to_bytes_be()[offset..];
+
+            out.extend(bytes);
+        }
+
+        Ok(out)
     }
 }
