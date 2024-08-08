@@ -58,7 +58,7 @@ jobs:
       - name: Format Cairo
         working-directory: ./cairo-contracts
         run: |
-          nix shell .#taplo -c \
+          nix shell ..#scarb -c \
             scarb fmt --check
 
       - name: Format Light Client
