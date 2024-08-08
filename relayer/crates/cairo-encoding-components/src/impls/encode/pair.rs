@@ -2,13 +2,16 @@ use std::marker::PhantomData;
 
 use cgp_core::error::HasErrorType;
 
+use crate::impls::encode::with_context::EncodeWithContext;
 use crate::traits::decode_mut::{HasDecodeBufferType, MutDecoder};
 use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
 
-pub struct EncodePair<EncoderA, EncoderB>(pub PhantomData<(EncoderA, EncoderB)>);
+pub struct EncoderPair<EncoderA, EncoderB>(pub PhantomData<(EncoderA, EncoderB)>);
+
+pub type EncodeCons<NextEncode> = EncoderPair<EncodeWithContext, NextEncode>;
 
 impl<Encoding, Strategy, EncoderA, EncoderB, ValueA, ValueB>
-    MutEncoder<Encoding, Strategy, (ValueA, ValueB)> for EncodePair<EncoderA, EncoderB>
+    MutEncoder<Encoding, Strategy, (ValueA, ValueB)> for EncoderPair<EncoderA, EncoderB>
 where
     Encoding: HasEncodeBufferType + HasErrorType,
     EncoderA: MutEncoder<Encoding, Strategy, ValueA>,
@@ -27,7 +30,7 @@ where
 }
 
 impl<Encoding, Strategy, EncoderA, EncoderB, ValueA, ValueB>
-    MutDecoder<Encoding, Strategy, (ValueA, ValueB)> for EncodePair<EncoderA, EncoderB>
+    MutDecoder<Encoding, Strategy, (ValueA, ValueB)> for EncoderPair<EncoderA, EncoderB>
 where
     Encoding: HasDecodeBufferType + HasErrorType,
     EncoderA: MutDecoder<Encoding, Strategy, ValueA>,
