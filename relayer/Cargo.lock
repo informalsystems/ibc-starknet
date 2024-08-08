@@ -1727,6 +1727,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "hermes-cairo-encoding-components"
+version = "0.1.0"
+dependencies = [
+ "cairo-lang-starknet-classes",
+ "cgp-core",
+ "hermes-encoding-components",
+ "hermes-relayer-components",
+ "serde_json",
+ "starknet",
+]
+
+[[package]]
 name = "hermes-cosmos-chain-components"
 version = "0.1.0"
 source = "git+https://github.com/informalsystems/hermes-sdk.git#659e5bb934421413f4d19586027baba0520d6101"
