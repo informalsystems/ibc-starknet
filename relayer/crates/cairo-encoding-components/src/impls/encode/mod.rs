@@ -4,5 +4,6 @@ pub mod end;
 pub mod felt;
 pub mod from_felt;
 pub mod iter;
+pub mod pair;
 pub mod u128;
 pub mod u256;
