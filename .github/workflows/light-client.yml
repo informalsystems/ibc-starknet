@@ -44,6 +44,19 @@ jobs:
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            light-client -> light-client/target
+
+      - name: Run Clippy
+        working-directory: ./light-client
+        run: |
+          nix shell ..#rust -c \
+            cargo clippy --all-targets --all-features -- -D warnings
+
+          nix shell ..#rust -c \
+            cargo clippy --all-targets --no-default-features -- -D warnings
+
       - name: Build CosmWasm light client contract
         working-directory: ./light-client
         run: |

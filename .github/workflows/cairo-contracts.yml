@@ -29,11 +29,13 @@ jobs:
           name: ibc-starknet
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
           nix shell ..#scarb -c \
             scarb test
+
       - name: Run Tests
         working-directory: ./cairo-contracts
         run: |

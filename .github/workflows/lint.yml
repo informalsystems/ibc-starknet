@@ -44,5 +44,26 @@ jobs:
           name: ibc-starknet
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Run linters
-        run: nix develop .#rust-nightly -c just lint
+
+      - name: Format Toml
+        run: |
+          nix shell .#taplo -c \
+            taplo fmt --check
+
+      - name: Format Cairo
+        working-directory: ./cairo-contracts
+        run: |
+          nix shell .#taplo -c \
+            scarb fmt --check
+
+      - name: Format Light Client
+        working-directory: ./light-client
+        run: |
+          nix shell ..#rust-nightly -c \
+            cargo fmt --all -- --check
+
+      - name: Format Relayer
+        working-directory: ./relayer
+        run: |
+          nix shell ..#rust-nightly -c \
+            cargo fmt --all -- --check
