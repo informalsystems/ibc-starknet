@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  cosmostarknet-integration-tests:
+  starknet-integration-tests:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
@@ -23,13 +23,24 @@ jobs:
         with:
           name: ibc-starknet
           extraPullNames: hermes-sdk,cosmos-nix
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - uses: Swatinem/rust-cache@v2
-      - name: run integration tests
+        with:
+          workspaces: |
+            relayer -> relayer/target
+
+      - name: Run Clippy
+        working-directory: ./relayer
+        run: |
+          nix shell ..#rust -c \
+            cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run Integration Tests
         env:
           RUST_BACKTRACE: 1
         working-directory: ./relayer
         run: |
           export ERC20_CONTRACT="$(pwd)/../artifacts/openzeppelin_ERC20Upgradeable.contract_class.json"
 
-          nix develop -i -k TERM -k ERC20_CONTRACT -k RUST_BACKTRACE -c \
+          nix develop ..#rust -c \
             cargo nextest run --test-threads=2

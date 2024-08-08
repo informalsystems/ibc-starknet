@@ -20,11 +20,24 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - name: Install Scarb
-        uses: software-mansion/setup-scarb@v1
+      - uses: cachix/install-nix-action@V27
         with:
-            scarb-version: "2.6.5"
-      - name: Install Just
-        uses: extractions/setup-just@v1
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: cachix/cachix-action@v15
+        with:
+          name: ibc-starknet
+          extraPullNames: hermes-sdk,cosmos-nix
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build Cairo contracts
+        working-directory: ./cairo-contracts
+        run: |
+          nix shell ..#scarb -c \
+            scarb test
+
       - name: Run Tests
-        run: just test-cairo-contracts
+        working-directory: ./cairo-contracts
+        run: |
+          nix shell ..#scarb -c \
+            scarb test

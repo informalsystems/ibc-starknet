@@ -16,7 +16,7 @@ test-cairo-contracts:
   cd ./cairo-contracts && \
   scarb test
 
-lint: lint-toml lint-light-client lint-cairo
+lint: lint-toml lint-light-client lint-cairo lint-nix lint-relayer
 
 lint-toml:
   taplo fmt --check
@@ -24,7 +24,13 @@ lint-toml:
 # Runs formatter and clippy for all the cargo and scarb packages
 lint-light-client:
   cd ./light-client && \
-  cargo +nightly fmt --all -- --check && \
+  cargo fmt --all -- --check && \
+  cargo clippy --all-targets --all-features -- -D warnings && \
+  cargo clippy --all-targets --no-default-features -- -D warnings
+
+lint-relayer:
+  cd ./relayer && \
+  cargo fmt --all -- --check && \
   cargo clippy --all-targets --all-features -- -D warnings && \
   cargo clippy --all-targets --no-default-features -- -D warnings
 
@@ -32,3 +38,7 @@ lint-light-client:
 lint-cairo:
   cd ./cairo-contracts && \
   scarb fmt --check
+
+lint-nix:
+  cd ./relayer && \
+  nixfmt --check .

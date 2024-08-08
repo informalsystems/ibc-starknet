@@ -35,23 +35,40 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - name: Install Rust toolchains
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: cachix/install-nix-action@V27
         with:
-            toolchain: nightly
-            components: rustfmt
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: cachix/cachix-action@v15
         with:
-            components: clippy
-      - name: Install Taplo
-        uses: baptiste0928/cargo-install@v3
-        with:
-            crate: taplo-cli
-      - name: Install Scarb
-        uses: software-mansion/setup-scarb@v1
-        with:
-            scarb-version: "2.6.5"
-      - name: Install Just
-        uses: extractions/setup-just@v1
-      - name: Run linters
-        run: just lint
+          name: ibc-starknet
+          extraPullNames: hermes-sdk,cosmos-nix
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Format Toml
+        run: |
+          nix shell .#taplo -c \
+            taplo fmt --check
+
+      - name: Format Nix
+        run: |
+          nix shell .#nixfmt -c \
+            nixfmt --check .
+
+      - name: Format Cairo
+        working-directory: ./cairo-contracts
+        run: |
+          nix shell ..#scarb -c \
+            scarb fmt --check
+
+      - name: Format Light Client
+        working-directory: ./light-client
+        run: |
+          nix shell ..#rust-nightly -c \
+            cargo fmt --all -- --check
+
+      - name: Format Relayer
+        working-directory: ./relayer
+        run: |
+          nix shell ..#rust-nightly -c \
+            cargo fmt --all -- --check
