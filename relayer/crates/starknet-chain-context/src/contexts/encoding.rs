@@ -61,6 +61,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecodeMut<ViaCairo, u64>
     + CanEncodeAndDecodeMut<ViaCairo, usize>
     + CanEncodeAndDecodeMut<ViaCairo, Vec<u8>>
+    + CanEncodeAndDecodeMut<ViaCairo, String>
 {
 }
 

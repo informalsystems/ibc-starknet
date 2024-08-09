@@ -1,5 +1,6 @@
 use core::num::TryFromIntError;
 use std::convert::Infallible;
+use std::string::FromUtf8Error;
 
 use cairo_lang_starknet_classes::casm_contract_class::StarknetSierraCompilationError;
 use cgp_core::prelude::*;
@@ -34,6 +35,7 @@ delegate_components! {
         [
             Report,
             TryFromIntError,
+            FromUtf8Error,
             ProviderError,
             SignError,
             TokioRuntimeError,
