@@ -1,4 +1,7 @@
 use cgp_core::error::CanRaiseError;
+use hermes_cairo_encoding_components::strategy::ViaCairo;
+use hermes_encoding_components::traits::decoder::CanDecode;
+use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use starknet::core::types::{Felt, U256};
@@ -14,14 +17,17 @@ pub struct QueryErc20TokenBalance;
 
 pub const BALANCE_SELECTOR: Felt = selector!("balance_of");
 
-impl<Chain> TokenBalanceQuerier<Chain> for QueryErc20TokenBalance
+impl<Chain, Encoding> TokenBalanceQuerier<Chain> for QueryErc20TokenBalance
 where
     Chain: HasAddressType<Address = Felt>
         + HasAmountType<Amount = StarknetAmount>
         + HasBlobType<Blob = Vec<Felt>>
         + HasMethodSelectorType<MethodSelector = Felt>
         + CanCallContract
-        + CanRaiseError<&'static str>,
+        + HasEncoding<Encoding = Encoding>
+        + CanRaiseError<&'static str>
+        + CanRaiseError<Encoding::Error>,
+    Encoding: CanDecode<ViaCairo, U256, Encoded = Vec<Felt>>,
 {
     async fn query_token_balance(
         chain: &Chain,
@@ -32,16 +38,10 @@ where
             .call_contract(token_address, &BALANCE_SELECTOR, &vec![*account_address])
             .await?;
 
-        let [e1, e2]: [Felt; 2] = output.try_into().map_err(|_| {
-            Chain::raise_error(
-                "expect output returned from balance_of query to be consist of two felt252 values",
-            )
-        })?;
-
-        let low = u128::from_be_bytes(e1.to_bytes_be()[16..].try_into().unwrap());
-        let high = u128::from_be_bytes(e2.to_bytes_be()[16..].try_into().unwrap());
-
-        let quantity = U256::from_words(low, high);
+        let quantity = chain
+            .encoding()
+            .decode(&output)
+            .map_err(Chain::raise_error)?;
 
         Ok(StarknetAmount {
             quantity,
