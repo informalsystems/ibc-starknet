@@ -5,6 +5,7 @@ use std::string::FromUtf8Error;
 use cairo_lang_starknet_classes::casm_contract_class::StarknetSierraCompilationError;
 use cgp_core::prelude::*;
 use eyre::Report;
+use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use hermes_error::handlers::debug::DebugError;
 use hermes_error::handlers::display::DisplayError;
@@ -54,6 +55,7 @@ delegate_components! {
             RevertedInvocation,
             UnexpectedTransactionTraceType,
             UnexpectedEndOfBuffer,
+            NonEmptyBuffer,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
         ]:
             DebugError,

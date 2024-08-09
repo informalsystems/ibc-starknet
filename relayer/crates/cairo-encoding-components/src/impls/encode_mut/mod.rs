@@ -10,5 +10,6 @@ pub mod pair;
 pub mod string;
 pub mod u128;
 pub mod u256;
+pub mod unit;
 pub mod vec;
 pub mod with_context;

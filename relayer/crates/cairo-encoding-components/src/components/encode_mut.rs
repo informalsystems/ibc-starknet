@@ -7,6 +7,7 @@ use crate::impls::encode_mut::from_u128::EncodeFromU128;
 use crate::impls::encode_mut::string::EncodeUtf8String;
 use crate::impls::encode_mut::u128::EncodeU128;
 use crate::impls::encode_mut::u256::EncodeU256;
+use crate::impls::encode_mut::unit::EncodeNothing;
 use crate::strategy::ViaCairo;
 
 define_components! {
@@ -18,5 +19,6 @@ define_components! {
         (ViaCairo, u64): EncodeFromU128,
         (ViaCairo, usize): EncodeFromU128,
         (ViaCairo, String): EncodeUtf8String,
+        (ViaCairo, ()): EncodeNothing,
     }
 }

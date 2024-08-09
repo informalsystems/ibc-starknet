@@ -1,6 +1,9 @@
 use cgp_core::prelude::*;
+pub use hermes_encoding_components::traits::decoder::DecoderComponent;
 pub use hermes_encoding_components::traits::encoded::EncodedTypeComponent;
+pub use hermes_encoding_components::traits::encoder::EncoderComponent;
 
+use crate::impls::encode::buffer::EncodeWithMutBuffer;
 use crate::impls::types::decode_buffer::ProvideVecIterDecodeBuffer;
 use crate::impls::types::encode_buffer::ProvideVecEncodeBuffer;
 use crate::impls::types::encoded::ProvideVecFeltEncodedType;
@@ -15,5 +18,10 @@ define_components! {
             ProvideVecEncodeBuffer,
         DecodeBufferTypeComponent:
             ProvideVecIterDecodeBuffer,
+        [
+            EncoderComponent,
+            DecoderComponent,
+        ]:
+            EncodeWithMutBuffer,
     }
 }

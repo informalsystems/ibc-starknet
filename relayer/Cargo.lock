@@ -1998,6 +1998,7 @@ dependencies = [
  "cgp-core",
  "eyre",
  "hermes-cairo-encoding-components",
+ "hermes-encoding-components",
  "hermes-error",
  "hermes-logger",
  "hermes-logging-components",

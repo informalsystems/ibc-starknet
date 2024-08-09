@@ -1,30 +1,16 @@
 use core::fmt::Debug;
 
-use cgp_core::error::{CanRaiseError, HasErrorType};
+use cgp_core::error::CanRaiseError;
 
 use crate::traits::decode_mut::{HasDecodeBufferType, MutDecoder};
-use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
 
-pub struct EncodeEnd;
+pub struct DecodeEnd;
 
 #[derive(Copy, Clone)]
 pub struct NonEmptyBuffer;
 
-impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ()> for EncodeEnd
-where
-    Encoding: HasEncodeBufferType + HasErrorType,
-{
-    fn encode_mut(
-        _encoding: &Encoding,
-        _value: &(),
-        _buffer: &mut Encoding::EncodeBuffer,
-    ) -> Result<(), Encoding::Error> {
-        Ok(())
-    }
-}
-
 #[allow(unused_mut)]
-impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ()> for EncodeEnd
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ()> for DecodeEnd
 where
     Encoding: HasDecodeBufferType + CanRaiseError<NonEmptyBuffer>,
     for<'a> Encoding::DecodeBuffer<'a>: Iterator,
