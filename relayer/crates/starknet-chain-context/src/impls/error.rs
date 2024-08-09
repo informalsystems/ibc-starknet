@@ -3,6 +3,7 @@ use std::convert::Infallible;
 use cairo_lang_starknet_classes::casm_contract_class::StarknetSierraCompilationError;
 use cgp_core::prelude::*;
 use eyre::Report;
+use hermes_cairo_encoding_components::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use hermes_error::handlers::debug::DebugError;
 use hermes_error::handlers::display::DisplayError;
 use hermes_error::handlers::identity::ReturnError;
@@ -48,6 +49,7 @@ delegate_components! {
         [
             RevertedInvocation,
             UnexpectedTransactionTraceType,
+            UnexpectedEndOfBuffer,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
         ]:
             DebugError,

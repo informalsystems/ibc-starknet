@@ -32,7 +32,7 @@ where
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Felt> for EncodeFelt
 where
     Encoding: HasDecodeBufferType + CanRaiseError<UnexpectedEndOfBuffer>,
-    for<'a> Encoding::DecodeBuffer<'a>: Iterator<Item = Felt>,
+    for<'a> Encoding::DecodeBuffer<'a>: CanIterFeltBuffer<'a>,
 {
     fn decode_mut(
         _encoding: &Encoding,
@@ -42,6 +42,10 @@ where
             .next()
             .ok_or_else(|| Encoding::raise_error(UnexpectedEndOfBuffer))?;
 
-        Ok(value)
+        Ok(*value)
     }
 }
+
+pub trait CanIterFeltBuffer<'a>: Iterator<Item = &'a Felt> {}
+
+impl<'a, Buffer> CanIterFeltBuffer<'a> for Buffer where Buffer: Iterator<Item = &'a Felt> {}
