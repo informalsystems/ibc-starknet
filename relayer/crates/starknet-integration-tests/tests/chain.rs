@@ -67,7 +67,7 @@ fn test_starknet_chain_client() {
                 let message = chain.build_transfer_token_message(
                     &recipient_address,
                     &StarknetAmount::new(100u32.into(), token_address),
-                );
+                )?;
 
                 let events = chain.send_messages(vec![message]).await?;
 
