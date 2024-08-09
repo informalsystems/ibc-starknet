@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use cgp_core::error::HasErrorType;
 
-use crate::impls::encode::with_context::EncodeWithContext;
+use crate::impls::encode_mut::with_context::EncodeWithContext;
 use crate::traits::decode_mut::{HasDecodeBufferType, MutDecoder};
 use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
 
