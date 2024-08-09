@@ -1,8 +1,9 @@
+use cgp_core::prelude::*;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use starknet::accounts::Call;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
 use crate::traits::messages::transfer::TransferTokenMessageBuilder;
@@ -13,6 +14,12 @@ use crate::types::amount::StarknetAmount;
 pub const TRANSFER_SELECTOR: Felt = selector!("transfer");
 
 pub struct BuildTransferErc20TokenMessage;
+
+#[derive(Debug, HasField)]
+pub struct TransferErc20TokenMessage {
+    pub recipient: Felt,
+    pub amount: U256,
+}
 
 impl<Chain> TransferTokenMessageBuilder<Chain> for BuildTransferErc20TokenMessage
 where
