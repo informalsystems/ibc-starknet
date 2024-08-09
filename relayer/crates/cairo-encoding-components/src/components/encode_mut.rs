@@ -1,5 +1,5 @@
 use cgp_core::prelude::*;
-use starknet::core::types::{Felt, U256};
+pub use starknet::core::types::{Felt, U256};
 
 use crate::impls::encode_mut::byte_array::EncodeByteArray;
 use crate::impls::encode_mut::felt::EncodeFelt;
