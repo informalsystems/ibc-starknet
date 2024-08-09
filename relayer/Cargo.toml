@@ -37,7 +37,6 @@ tokio      = { version = "1.38" }
 serde_json = { version = "1.0" }
 
 cairo-lang-starknet-classes = { version = "2.6.4" }
-cainome-cairo-serde         = { version = "0.1.0" }
 
 hermes-runtime-components       = { version = "0.1.0" }
 hermes-async-runtime-components = { version = "0.1.0" }
@@ -135,4 +134,3 @@ hermes-starknet-test-components  = { path = "./crates/starknet-test-components" 
 hermes-starknet-chain-context    = { path = "./crates/starknet-chain-context" }
 
 cairo-lang-starknet-classes = { git = "https://github.com/starkware-libs/cairo", tag = "v2.6.4" }
-cainome-cairo-serde         = { git = "https://github.com/cartridge-gg/cainome" }

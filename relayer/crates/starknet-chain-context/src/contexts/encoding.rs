@@ -4,9 +4,7 @@ use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeCompon
 use cgp_core::prelude::*;
 use hermes_cairo_encoding_components::components::encode_mut::*;
 use hermes_cairo_encoding_components::components::encoding::*;
-use hermes_cairo_encoding_components::impls::encode_mut::combine::Combine;
 use hermes_cairo_encoding_components::impls::encode_mut::delegate::DelegateEncodeMutComponents;
-use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_cairo_encoding_components::impls::encode_mut::pair::EncodeCons;
 use hermes_cairo_encoding_components::impls::encode_mut::with_context::EncodeWithContext;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
@@ -26,7 +24,12 @@ use hermes_encoding_components::traits::has_encoding::{
 };
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
-use hermes_starknet_chain_components::impls::messages::transfer::TransferErc20TokenMessage;
+use hermes_starknet_chain_components::impls::messages::deploy_erc20::{
+    DeployErc20TokenMessage, DeployErc20TokenMessageEncoder,
+};
+use hermes_starknet_chain_components::impls::messages::transfer::{
+    TransferErc20TokenMessage, TransferErc20TokenMessageEncoder,
+};
 use starknet::core::types::{Felt, U256};
 
 use crate::impls::error::HandleStarknetError;
@@ -71,11 +74,8 @@ with_cairo_encode_mut_components! {
 
 delegate_components! {
     StarknetEncodeMutComponents {
-        (ViaCairo, TransferErc20TokenMessage):
-            Combine<
-                EncodeField<symbol!("recipient")>,
-                EncodeField<symbol!("amount")>,
-            >,
+        (ViaCairo, TransferErc20TokenMessage): TransferErc20TokenMessageEncoder,
+        (ViaCairo, DeployErc20TokenMessage): DeployErc20TokenMessageEncoder,
     }
 }
 
@@ -117,6 +117,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, Vec<u8>>
     + CanEncodeAndDecode<ViaCairo, String>
     + CanEncode<ViaCairo, TransferErc20TokenMessage>
+    + CanEncode<ViaCairo, DeployErc20TokenMessage>
 {
 }
 
