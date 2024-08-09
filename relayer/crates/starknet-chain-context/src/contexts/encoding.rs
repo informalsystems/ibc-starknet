@@ -2,14 +2,20 @@ use core::slice::Iter;
 
 use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
 use cgp_core::prelude::*;
+use hermes_cairo_encoding_components::components::encode_mut::CairoEncodeMutComponents;
 use hermes_cairo_encoding_components::components::encoding::*;
+use hermes_cairo_encoding_components::impls::encode_mut::delegate::DelegateEncodeMutComponents;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
-use hermes_cairo_encoding_components::traits::decode_mut::HasDecodeBufferType;
+use hermes_cairo_encoding_components::traits::decode_mut::{
+    HasDecodeBufferType, MutDecoderComponent,
+};
 use hermes_cairo_encoding_components::traits::encode_and_decode_mut::CanEncodeAndDecodeMut;
-use hermes_cairo_encoding_components::traits::encode_mut::HasEncodeBufferType;
+use hermes_cairo_encoding_components::traits::encode_mut::{
+    HasEncodeBufferType, MutEncoderComponent,
+};
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, U256};
 
 use crate::impls::error::HandleStarknetError;
 
@@ -25,6 +31,11 @@ delegate_components! {
     CairoEncodingContextComponents {
         ErrorTypeComponent: ProvideHermesError,
         ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        [
+            MutEncoderComponent,
+            MutDecoderComponent,
+        ]:
+            DelegateEncodeMutComponents<CairoEncodeMutComponents>,
     }
 }
 
@@ -41,6 +52,8 @@ pub trait CanUseCairoEncoding:
     + HasEncodeBufferType<EncodeBuffer = Vec<Felt>>
     + for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Iter<'a, Felt>>
     + CanEncodeAndDecodeMut<ViaCairo, Felt>
+    + CanEncodeAndDecodeMut<ViaCairo, u128>
+    + CanEncodeAndDecodeMut<ViaCairo, U256> // + CanEncodeAndDecodeMut<ViaCairo, Vec<u8>>
 {
 }
 
