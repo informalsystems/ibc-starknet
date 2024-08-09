@@ -1,5 +1,6 @@
 pub mod array;
 pub mod byte_array;
+pub mod delegate;
 pub mod end;
 pub mod felt;
 pub mod from_felt;
