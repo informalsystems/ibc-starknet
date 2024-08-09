@@ -15,8 +15,12 @@ use hermes_cairo_encoding_components::traits::encode_and_decode_mut::MutEncoderA
 use hermes_cairo_encoding_components::traits::encode_mut::{
     HasEncodeBufferType, MutEncoderComponent,
 };
+use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_encoding_components::traits::encoded::HasEncodedType;
+use hermes_encoding_components::traits::has_encoding::{
+    DefaultEncodingGetter, EncodingGetterComponent, HasEncodingType, ProvideEncodingType,
+};
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
 use starknet::core::types::{Felt, U256};
@@ -48,6 +52,30 @@ with_cairo_encoding_components! {
         CairoEncodingContextComponents {
             @CairoEncodingComponents: CairoEncodingComponents,
         }
+    }
+}
+
+pub struct ProvideCairoEncoding;
+
+delegate_components! {
+    ProvideCairoEncoding {
+        EncodingGetterComponent: GetDefaultEncoding,
+    }
+}
+
+impl<Context> ProvideEncodingType<Context> for ProvideCairoEncoding
+where
+    Context: Async,
+{
+    type Encoding = CairoEncoding;
+}
+
+impl<Context> DefaultEncodingGetter<Context> for ProvideCairoEncoding
+where
+    Context: HasEncodingType<Encoding = CairoEncoding>,
+{
+    fn default_encoding() -> &'static CairoEncoding {
+        &CairoEncoding
     }
 }
 
