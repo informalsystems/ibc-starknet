@@ -1,7 +1,8 @@
 use hermes_encoding_components::traits::decoder::Decoder;
 use hermes_encoding_components::traits::encoder::Encoder;
 
-use crate::traits::decode_mut::CanDecodeMut;
+use crate::impls::encode_mut::end::EncodeEnd;
+use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use crate::traits::encode_mut::CanEncodeMut;
 
 pub struct EncodeWithMutBuffer;
@@ -22,10 +23,14 @@ where
 impl<Encoding, Strategy, Value> Decoder<Encoding, Strategy, Value> for EncodeWithMutBuffer
 where
     Encoding: CanDecodeMut<Strategy, Value>,
+    EncodeEnd: MutDecoder<Encoding, Strategy, Value>,
 {
     fn decode(encoding: &Encoding, encoded: &Encoding::Encoded) -> Result<Value, Encoding::Error> {
         let mut buffer = Encoding::from_encoded(encoded);
 
-        encoding.decode_mut(&mut buffer)
+        let value = encoding.decode_mut(&mut buffer)?;
+        EncodeEnd::decode_mut(encoding, &mut buffer)?;
+
+        Ok(value)
     }
 }
