@@ -1,10 +1,12 @@
 use std::time::SystemTime;
 
-use cainome_cairo_serde::{ByteArray, CairoSerde, U256};
 use hermes_cosmos_integration_tests::init::init_test_runtime;
+use hermes_encoding_components::traits::encoder::CanEncode;
+use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
+use hermes_starknet_chain_components::impls::messages::deploy_erc20::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
@@ -67,7 +69,7 @@ fn test_starknet_chain_client() {
                 let message = chain.build_transfer_token_message(
                     &recipient_address,
                     &StarknetAmount::new(100u32.into(), token_address),
-                );
+                )?;
 
                 let events = chain.send_messages(vec![message]).await?;
 
@@ -110,20 +112,17 @@ fn test_starknet_chain_client() {
 
                 println!("declared class: {:?}", class_hash);
 
-                let mut calldata = Vec::new();
-
                 let relayer_address = chain_driver.relayer_wallet.account_address;
 
-                let token_name = ByteArray::cairo_serialize(&ByteArray::from_string("token")?);
+                let deploy_message = DeployErc20TokenMessage {
+                    name: "token".into(),
+                    symbol: "token".into(),
+                    fixed_supply: 100u32.into(),
+                    recipient: relayer_address,
+                    owner: relayer_address,
+                };
 
-                // Manually construct the contract arguments into Vec<Felt> calldata for now
-
-                calldata.extend(token_name.clone()); //name: ByteArray
-                calldata.extend(token_name.clone()); // symbol: ByteArray
-
-                calldata.extend(U256::cairo_serialize(&U256 { low: 100, high: 0 })); // fixed_supply: u256
-                calldata.push(relayer_address); // recipient: ContractAddress
-                calldata.push(relayer_address); // owner: ContractAddress
+                let calldata = chain.encoding().encode(&deploy_message)?;
 
                 let token_address = chain.deploy_contract(&class_hash, false, &calldata).await?;
 

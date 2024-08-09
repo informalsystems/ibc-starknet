@@ -1,8 +1,14 @@
+use cgp_core::prelude::*;
+use hermes_cairo_encoding_components::impls::encode_mut::combine::Combine;
+use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
+use hermes_cairo_encoding_components::strategy::ViaCairo;
+use hermes_encoding_components::traits::encoder::CanEncode;
+use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use starknet::accounts::Call;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
 use crate::traits::messages::transfer::TransferTokenMessageBuilder;
@@ -14,25 +20,47 @@ pub const TRANSFER_SELECTOR: Felt = selector!("transfer");
 
 pub struct BuildTransferErc20TokenMessage;
 
-impl<Chain> TransferTokenMessageBuilder<Chain> for BuildTransferErc20TokenMessage
+#[derive(Debug, HasField)]
+pub struct TransferErc20TokenMessage {
+    pub recipient: Felt,
+    pub amount: U256,
+}
+
+pub type TransferErc20TokenMessageEncoder =
+    Combine<EncodeField<symbol!("recipient")>, EncodeField<symbol!("amount")>>;
+
+impl<Chain, Encoding> TransferTokenMessageBuilder<Chain> for BuildTransferErc20TokenMessage
 where
     Chain: HasAddressType<Address = Felt>
         + HasAmountType<Amount = StarknetAmount>
         + HasBlobType<Blob = Vec<Felt>>
         + HasMethodSelectorType<MethodSelector = Felt>
-        + HasMessageType<Message = Call>,
+        + HasMessageType<Message = Call>
+        + HasEncoding<Encoding = Encoding>
+        + CanRaiseError<Encoding::Error>,
+    Encoding: CanEncode<ViaCairo, TransferErc20TokenMessage, Encoded = Vec<Felt>>,
 {
     fn build_transfer_token_message(
-        _chain: &Chain,
+        chain: &Chain,
         recipient: &Felt,
         amount: &StarknetAmount,
-    ) -> Call {
-        let quantity = amount.quantity;
+    ) -> Result<Call, Chain::Error> {
+        let message = TransferErc20TokenMessage {
+            recipient: *recipient,
+            amount: amount.quantity,
+        };
 
-        Call {
+        let calldata = chain
+            .encoding()
+            .encode(&message)
+            .map_err(Chain::raise_error)?;
+
+        let call = Call {
             to: amount.token_address,
             selector: TRANSFER_SELECTOR,
-            calldata: vec![*recipient, quantity.low().into(), quantity.high().into()],
-        }
+            calldata,
+        };
+
+        Ok(call)
     }
 }

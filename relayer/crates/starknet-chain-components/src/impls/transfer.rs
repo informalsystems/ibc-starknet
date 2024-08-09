@@ -27,7 +27,7 @@ where
         recipient: &Chain::Address,
         amount: &Chain::Amount,
     ) -> Result<(), Chain::Error> {
-        let message = chain.build_transfer_token_message(recipient, amount);
+        let message = chain.build_transfer_token_message(recipient, amount)?;
 
         chain.send_message(message).await?;
 

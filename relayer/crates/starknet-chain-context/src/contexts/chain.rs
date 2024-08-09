@@ -2,6 +2,9 @@ use std::sync::Arc;
 
 use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
 use cgp_core::prelude::*;
+use hermes_encoding_components::traits::has_encoding::{
+    DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeComponent,
+};
 use hermes_error::impls::ProvideHermesError;
 use hermes_logging_components::contexts::no_logger::ProvideNoLogger;
 use hermes_logging_components::traits::has_logger::{
@@ -44,6 +47,7 @@ use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 use starknet::signers::LocalWallet;
 
+use crate::contexts::encoding::ProvideCairoEncoding;
 use crate::impls::error::HandleStarknetError;
 
 #[derive(HasField)]
@@ -75,6 +79,12 @@ delegate_components! {
             GlobalLoggerGetterComponent,
         ]:
             ProvideNoLogger,
+        [
+            EncodingTypeComponent,
+            EncodingGetterComponent,
+            DefaultEncodingGetterComponent,
+        ]:
+            ProvideCairoEncoding,
         [
             StarknetProviderTypeComponent,
             StarknetProviderGetterComponent,

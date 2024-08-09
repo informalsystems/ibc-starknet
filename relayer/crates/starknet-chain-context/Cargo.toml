@@ -15,10 +15,12 @@ hermes-error                     = { workspace = true }
 hermes-runtime                   = { workspace = true }
 hermes-runtime-components        = { workspace = true }
 hermes-logging-components        = { workspace = true }
+hermes-encoding-components       = { workspace = true }
 hermes-logger                    = { workspace = true }
 hermes-relayer-components        = { workspace = true }
 hermes-test-components           = { workspace = true }
 hermes-starknet-chain-components = { workspace = true }
+hermes-cairo-encoding-components = { workspace = true }
 hermes-starknet-test-components  = { workspace = true }
 
 starknet                    = { workspace = true }
