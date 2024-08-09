@@ -1,11 +1,12 @@
 use cgp_core::prelude::*;
-use hermes_encoding_components::traits::encoded::EncodedTypeComponent;
+pub use hermes_encoding_components::traits::encoded::EncodedTypeComponent;
 
+use crate::components::encode_mut::CairoEncodeMutComponents;
 use crate::impls::types::decode_buffer::ProvideVecIterDecodeBuffer;
 use crate::impls::types::encode_buffer::ProvideVecEncodeBuffer;
 use crate::impls::types::encoded::ProvideVecFeltEncodedType;
-use crate::traits::decode_mut::DecodeBufferTypeComponent;
-use crate::traits::encode_mut::EncodeBufferTypeComponent;
+pub use crate::traits::decode_mut::{DecodeBufferTypeComponent, MutDecoderComponent};
+pub use crate::traits::encode_mut::{EncodeBufferTypeComponent, MutEncoderComponent};
 
 define_components! {
     CairoEncodingComponents {
@@ -15,5 +16,10 @@ define_components! {
             ProvideVecEncodeBuffer,
         DecodeBufferTypeComponent:
             ProvideVecIterDecodeBuffer,
+        [
+            MutEncoderComponent,
+            MutDecoderComponent,
+        ]:
+            CairoEncodeMutComponents,
     }
 }

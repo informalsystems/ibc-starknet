@@ -1997,6 +1997,7 @@ dependencies = [
  "cairo-lang-starknet-classes",
  "cgp-core",
  "eyre",
+ "hermes-cairo-encoding-components",
  "hermes-error",
  "hermes-logger",
  "hermes-logging-components",

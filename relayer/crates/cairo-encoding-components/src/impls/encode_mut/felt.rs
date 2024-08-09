@@ -11,6 +11,7 @@ pub struct EncodeFelt;
 #[derive(Debug, Copy, Clone)]
 pub struct UnexpectedEndOfBuffer;
 
+#[allow(unused_mut)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Felt> for EncodeFelt
 where
     Encoding: HasEncodeBufferType + HasErrorType,
@@ -19,7 +20,7 @@ where
     fn encode_mut(
         _encoding: &Encoding,
         value: &Felt,
-        buffer: &mut Encoding::EncodeBuffer,
+        mut buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
         buffer.extend(iter::once(*value));
 
