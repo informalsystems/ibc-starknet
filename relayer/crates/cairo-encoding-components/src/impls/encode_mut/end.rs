@@ -23,6 +23,7 @@ where
     }
 }
 
+#[allow(unused_mut)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ()> for EncodeEnd
 where
     Encoding: HasDecodeBufferType + CanRaiseError<NonEmptyBuffer>,
@@ -30,7 +31,7 @@ where
 {
     fn decode_mut(
         _encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer<'_>,
+        mut buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<(), Encoding::Error> {
         match buffer.next() {
             Some(_) => Err(Encoding::raise_error(NonEmptyBuffer)),

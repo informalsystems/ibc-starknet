@@ -27,6 +27,7 @@ where
     }
 }
 
+#[allow(unused_mut)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Felt> for EncodeFelt
 where
     Encoding: HasDecodeBufferType + CanRaiseError<UnexpectedEndOfBuffer>,
@@ -34,7 +35,7 @@ where
 {
     fn decode_mut(
         _encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer<'_>,
+        mut buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<Felt, Encoding::Error> {
         let value = buffer
             .next()
