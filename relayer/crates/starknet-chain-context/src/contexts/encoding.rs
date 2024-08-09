@@ -5,11 +5,15 @@ use cgp_core::prelude::*;
 use hermes_cairo_encoding_components::components::encode_mut::CairoEncodeMutComponents;
 use hermes_cairo_encoding_components::components::encoding::*;
 use hermes_cairo_encoding_components::impls::encode_mut::delegate::DelegateEncodeMutComponents;
+use hermes_cairo_encoding_components::impls::encode_mut::pair::EncoderPair;
+use hermes_cairo_encoding_components::impls::encode_mut::with_context::EncodeWithContext;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::traits::decode_mut::{
     HasDecodeBufferType, MutDecoderComponent,
 };
-use hermes_cairo_encoding_components::traits::encode_and_decode_mut::CanEncodeAndDecodeMut;
+use hermes_cairo_encoding_components::traits::encode_and_decode_mut::{
+    CanEncodeAndDecodeMut, MutEncoderAndDecoder,
+};
 use hermes_cairo_encoding_components::traits::encode_mut::{
     HasEncodeBufferType, MutEncoderComponent,
 };
@@ -61,3 +65,10 @@ pub trait CanUseCairoEncoding:
 }
 
 impl CanUseCairoEncoding for CairoEncoding {}
+
+pub trait CanUsePairEncoder:
+    MutEncoderAndDecoder<CairoEncoding, ViaCairo, (u128, Vec<u8>)>
+{
+}
+
+impl CanUsePairEncoder for EncoderPair<EncodeWithContext, EncodeWithContext> {}

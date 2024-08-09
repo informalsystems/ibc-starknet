@@ -1,9 +1,9 @@
 use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use crate::traits::encode_mut::{CanEncodeMut, MutEncoder};
 
-pub struct EncodeVec;
+pub struct EncodeList;
 
-impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Vec<Value>> for EncodeVec
+impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Vec<Value>> for EncodeList
 where
     Encoding: CanEncodeMut<Strategy, Value>,
 {
@@ -20,7 +20,7 @@ where
     }
 }
 
-impl<Encoding, Strategy, Value> MutDecoder<Encoding, Strategy, Vec<Value>> for EncodeVec
+impl<Encoding, Strategy, Value> MutDecoder<Encoding, Strategy, Vec<Value>> for EncodeList
 where
     Encoding: CanDecodeMut<Strategy, Value> + CanDecodeMut<Strategy, usize>,
 {

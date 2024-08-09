@@ -7,6 +7,7 @@ pub mod from_felt;
 pub mod from_u128;
 pub mod iter;
 pub mod pair;
+pub mod string;
 pub mod u128;
 pub mod u256;
 pub mod vec;
