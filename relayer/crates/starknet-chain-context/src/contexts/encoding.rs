@@ -53,7 +53,10 @@ pub trait CanUseCairoEncoding:
     + for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Iter<'a, Felt>>
     + CanEncodeAndDecodeMut<ViaCairo, Felt>
     + CanEncodeAndDecodeMut<ViaCairo, u128>
-    + CanEncodeAndDecodeMut<ViaCairo, U256> // + CanEncodeAndDecodeMut<ViaCairo, Vec<u8>>
+    + CanEncodeAndDecodeMut<ViaCairo, U256>
+    + CanEncodeAndDecodeMut<ViaCairo, u64>
+    + CanEncodeAndDecodeMut<ViaCairo, usize>
+    + CanEncodeAndDecodeMut<ViaCairo, Vec<u8>>
 {
 }
 

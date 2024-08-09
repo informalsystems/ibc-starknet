@@ -1,3 +1,4 @@
+use core::num::TryFromIntError;
 use std::convert::Infallible;
 
 use cairo_lang_starknet_classes::casm_contract_class::StarknetSierraCompilationError;
@@ -32,6 +33,7 @@ delegate_components! {
         Infallible: HandleInfallible,
         [
             Report,
+            TryFromIntError,
             ProviderError,
             SignError,
             TokioRuntimeError,
