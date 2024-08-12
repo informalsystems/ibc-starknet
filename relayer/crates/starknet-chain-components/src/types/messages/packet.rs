@@ -6,6 +6,7 @@ use starknet::core::types::Felt;
 
 use crate::types::messages::height::Height;
 
+#[derive(HasField)]
 pub struct Packet {
     pub sequence: u64,
     pub src_port_id: String,
@@ -13,8 +14,8 @@ pub struct Packet {
     pub dst_port_id: String,
     pub dst_channel_id: String,
     pub data: Vec<Felt>,
-    pub timeout_height_on_b: Height,
-    pub timeout_timestamp_on_b: u64,
+    pub timeout_height: Height,
+    pub timeout_timestamp: u64,
 }
 
 pub type EncodePacket = CombineEncoders<
@@ -25,7 +26,7 @@ pub type EncodePacket = CombineEncoders<
         EncodeField<symbol!("dst_port_id")>,
         EncodeField<symbol!("dst_channel_id")>,
         EncodeField<symbol!("data")>,
-        EncodeField<symbol!("timeout_height_on_b")>,
-        EncodeField<symbol!("timeout_timestamp_on_b")>,
+        EncodeField<symbol!("timeout_height")>,
+        EncodeField<symbol!("timeout_timestamp")>,
     ],
 >;

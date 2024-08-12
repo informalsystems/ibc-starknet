@@ -15,7 +15,7 @@ pub enum Denom {
 
 #[derive(HasField)]
 pub struct PrefixedDenom {
-    pub trace_path: Vec<[String; 2]>,
+    pub trace_path: Vec<TracePrefix>,
     pub base: Denom,
 }
 
@@ -23,6 +23,19 @@ pub type EncodePrefixedDenom = CombineEncoders<
     HList![
         EncodeField<symbol!("trace_path")>,
         EncodeField<symbol!("base")>,
+    ],
+>;
+
+#[derive(HasField)]
+pub struct TracePrefix {
+    pub port_id: String,
+    pub channel_id: String,
+}
+
+pub type EncodeTracePrefix = CombineEncoders<
+    HList![
+        EncodeField<symbol!("port_id")>,
+        EncodeField<symbol!("channel_id")>,
     ],
 >;
 

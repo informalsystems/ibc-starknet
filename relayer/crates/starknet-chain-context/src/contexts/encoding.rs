@@ -8,6 +8,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::delegate::DelegateEncod
 use hermes_cairo_encoding_components::impls::encode_mut::option::EncodeOption;
 use hermes_cairo_encoding_components::impls::encode_mut::pair::EncodeCons;
 use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
+use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
 use hermes_cairo_encoding_components::impls::encode_mut::with_context::EncodeWithContext;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::traits::decode_mut::{
@@ -32,6 +33,14 @@ use hermes_starknet_chain_components::impls::messages::deploy_erc20::{
 use hermes_starknet_chain_components::impls::messages::transfer::{
     TransferErc20TokenMessage, TransferErc20TokenMessageEncoder,
 };
+use hermes_starknet_chain_components::types::messages::denom::{
+    Denom, EncodeDenom, EncodePrefixedDenom, EncodeTracePrefix, PrefixedDenom, TracePrefix,
+};
+use hermes_starknet_chain_components::types::messages::height::{EncodeHeight, Height};
+use hermes_starknet_chain_components::types::messages::ibc_transfer::{
+    EncodeIbcTransferMessage, IbcTransferMessage,
+};
+use hermes_starknet_chain_components::types::messages::packet::{EncodePacket, Packet};
 use starknet::core::types::{Felt, U256};
 
 use crate::impls::error::HandleStarknetError;
@@ -80,6 +89,13 @@ delegate_components! {
         <V> (ViaCairo, Option<V>): EncodeOption,
         (ViaCairo, TransferErc20TokenMessage): TransferErc20TokenMessageEncoder,
         (ViaCairo, DeployErc20TokenMessage): DeployErc20TokenMessageEncoder,
+        (ViaCairo, Denom): EncodeDenom,
+        (ViaCairo, TracePrefix): EncodeTracePrefix,
+        (ViaCairo, Vec<TracePrefix>): EncodeList,
+        (ViaCairo, PrefixedDenom): EncodePrefixedDenom,
+        (ViaCairo, IbcTransferMessage): EncodeIbcTransferMessage,
+        (ViaCairo, Height): EncodeHeight,
+        (ViaCairo, Packet): EncodePacket,
     }
 }
 
@@ -125,6 +141,11 @@ pub trait CanUseCairoEncoding:
     + CanEncode<ViaCairo, DeployErc20TokenMessage>
     + CanEncode<ViaCairo, Option<String>>
     + for<'a> CanEncode<ViaCairo, &'a String>
+    + CanEncode<ViaCairo, Denom>
+    + CanEncode<ViaCairo, PrefixedDenom>
+    + CanEncode<ViaCairo, IbcTransferMessage>
+    + CanEncode<ViaCairo, Height>
+    + CanEncode<ViaCairo, Packet>
 {
 }
 
