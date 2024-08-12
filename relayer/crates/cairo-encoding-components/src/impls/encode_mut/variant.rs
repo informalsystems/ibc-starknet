@@ -2,19 +2,18 @@ use std::marker::PhantomData;
 
 use cgp_core::error::HasErrorType;
 
-use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
+use crate::traits::encode_mut::{CanEncodeMut, HasEncodeBufferType, MutEncoder};
 use crate::types::either::{Either, Void};
-use crate::types::nat::{Nat, S};
+use crate::types::nat::{Nat, S, Z};
 
-pub struct SumEncoders<N, Encoders>(pub PhantomData<(N, Encoders)>);
+pub struct SumEncoders<Index, Remain>(pub PhantomData<(Index, Remain)>);
 
-impl<Encoding, Strategy, ValueA, ValueB, N, Encoder, InEncoders>
-    MutEncoder<Encoding, Strategy, Either<ValueA, ValueB>> for SumEncoders<N, (Encoder, InEncoders)>
+impl<Encoding, Strategy, ValueA, ValueB, I, N>
+    MutEncoder<Encoding, Strategy, Either<ValueA, ValueB>> for SumEncoders<I, S<N>>
 where
-    Encoding: HasEncodeBufferType + HasErrorType,
-    Encoder: MutEncoder<Encoding, Strategy, ValueA>,
-    N: Nat,
-    SumEncoders<S<N>, InEncoders>: MutEncoder<Encoding, Strategy, ValueB>,
+    Encoding: CanEncodeMut<Strategy, ValueA>,
+    I: Nat,
+    SumEncoders<S<I>, N>: MutEncoder<Encoding, Strategy, ValueB>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -22,23 +21,25 @@ where
         buffer: &mut <Encoding as HasEncodeBufferType>::EncodeBuffer,
     ) -> Result<(), <Encoding as HasErrorType>::Error> {
         match value {
-            Either::Left(value) => Encoder::encode_mut(encoding, value, buffer),
-            Either::Right(value) => {
-                <SumEncoders<S<N>, InEncoders>>::encode_mut(encoding, value, buffer)
-            }
+            Either::Left(value) => encoding.encode_mut(value, buffer),
+            Either::Right(value) => <SumEncoders<S<I>, N>>::encode_mut(encoding, value, buffer),
         }
     }
 }
 
-impl<Encoding, Strategy, N> MutEncoder<Encoding, Strategy, Void> for SumEncoders<N, ()>
+impl<Encoding, Strategy, Value, I> MutEncoder<Encoding, Strategy, Either<Value, Void>>
+    for SumEncoders<I, Z>
 where
-    Encoding: HasEncodeBufferType + HasErrorType,
+    Encoding: CanEncodeMut<Strategy, Value>,
 {
     fn encode_mut(
-        _encoding: &Encoding,
-        _value: &Void,
-        _buffer: &mut Encoding::EncodeBuffer,
+        encoding: &Encoding,
+        value: &Either<Value, Void>,
+        buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
-        Ok(())
+        match value {
+            Either::Left(value) => encoding.encode_mut(value, buffer),
+            Either::Right(value) => match *value {},
+        }
     }
 }
