@@ -3,31 +3,10 @@ use std::marker::PhantomData;
 use cgp_core::error::HasErrorType;
 
 use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
+use crate::types::either::{Either, Void};
+use crate::types::nat::{Nat, S};
 
 pub struct SumEncoders<N, Encoders>(pub PhantomData<(N, Encoders)>);
-
-pub enum Either<A, B> {
-    Left(A),
-    Right(B),
-}
-
-pub enum Void {}
-
-pub struct Z;
-
-pub struct S<N>(pub PhantomData<N>);
-
-pub trait Nat {
-    const N: usize;
-}
-
-impl Nat for Z {
-    const N: usize = 0;
-}
-
-impl<N: Nat> Nat for S<N> {
-    const N: usize = N::N + 1;
-}
 
 impl<Encoding, Strategy, ValueA, ValueB, N, Encoder, InEncoders>
     MutEncoder<Encoding, Strategy, Either<ValueA, ValueB>> for SumEncoders<N, (Encoder, InEncoders)>

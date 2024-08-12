@@ -1,8 +1,10 @@
 use cgp_core::error::HasErrorType;
 
-use crate::impls::encode_mut::variant::{Either, SumEncoders, Void, Z};
+use crate::impls::encode_mut::variant::SumEncoders;
 use crate::impls::encode_mut::with_context::EncodeWithContext;
 use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
+use crate::types::either::{Either, Void};
+use crate::types::nat::Z;
 use crate::HList;
 
 pub struct EncodeOption;
