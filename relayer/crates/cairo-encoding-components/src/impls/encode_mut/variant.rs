@@ -6,6 +6,8 @@ use crate::traits::encode_mut::{CanEncodeMut, HasEncodeBufferType, MutEncoder};
 use crate::types::either::{Either, Void};
 use crate::types::nat::{Nat, S, Z};
 
+pub type EncodeVariants<N> = SumEncoders<Z, N>;
+
 pub struct SumEncoders<Index, Remain>(pub PhantomData<(Index, Remain)>);
 
 impl<Encoding, Strategy, ValueA, ValueB, I, N>
