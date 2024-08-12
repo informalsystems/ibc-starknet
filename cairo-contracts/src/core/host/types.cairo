@@ -5,11 +5,10 @@ use core::poseidon::poseidon_hash_span;
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
 use starknet::ContractAddress;
-use starknet::Store;
 use starknet_ibc::core::host::errors::HostErrors;
 use starknet_ibc::utils::poseidon_hash;
 
-#[derive(Clone, Debug, Drop, PartialEq, Eq, Serde, Store)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct ChannelId {
     pub channel_id: ByteArray,
 }
@@ -68,7 +67,7 @@ pub impl ChannelIdImpl of ChannelIdTrait {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Eq, Serde, Store)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct PortId {
     pub port_id: ByteArray,
 }
@@ -88,7 +87,7 @@ pub impl PortIdImpl of PortIdTrait {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Eq, Serde, Store)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct Sequence {
     pub sequence: u64,
 }

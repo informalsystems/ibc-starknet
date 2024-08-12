@@ -9,7 +9,6 @@ use openzeppelin::token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use openzeppelin::utils::serde::SerializedAppend;
 use starknet::ClassHash;
 use starknet::ContractAddress;
-use starknet::Store;
 use starknet::syscalls::deploy_syscall;
 use starknet_ibc::apps::mintable::interface::{
     IERC20MintableDispatcher, IERC20MintableDispatcherTrait
@@ -25,7 +24,7 @@ use starknet_ibc::utils::{ValidateBasicTrait, ComputeKeyTrait};
 pub(crate) const MAXIMUM_MEMO_LENGTH: u32 = 32768;
 
 /// Message used to build an ICS20 token transfer packet.
-#[derive(Clone, Debug, Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde)]
 pub struct MsgTransfer {
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
@@ -42,7 +41,7 @@ impl MsgTransferValidateBasicImpl of ValidateBasicTrait<MsgTransfer> {
     }
 }
 
-#[derive(Clone, Debug, Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde)]
 pub struct PacketData {
     pub denom: PrefixedDenom,
     pub amount: u256,
@@ -61,7 +60,7 @@ impl PacketDataValidateBasicImpl of ValidateBasicTrait<PacketData> {
     }
 }
 
-#[derive(Clone, Debug, Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde)]
 pub struct PrefixedDenom {
     pub trace_path: Array<TracePrefix>,
     pub base: Denom,
@@ -93,16 +92,15 @@ impl PrefixedDenomKeyImpl of ComputeKeyTrait<PrefixedDenom> {
     fn compute_key(self: @PrefixedDenom) -> felt252 {
         let mut serialized_prefixed_denom: Array<felt252> = ArrayTrait::new();
         let mut trace_path_span = self.trace_path.span();
-        while let Option::Some(path) = trace_path_span
-            .pop_front() {
-                Serde::serialize(path, ref serialized_prefixed_denom);
-            };
+        while let Option::Some(path) = trace_path_span.pop_front() {
+            Serde::serialize(path, ref serialized_prefixed_denom);
+        };
         Serde::serialize(self.base, ref serialized_prefixed_denom);
         PoseidonTrait::new().update(poseidon_hash_span(serialized_prefixed_denom.span())).finalize()
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Eq, Serde, Store)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct TracePrefix {
     pub port_id: PortId,
     pub channel_id: ChannelId,
@@ -118,13 +116,13 @@ impl TracePrefixImpl of TracePrefixTrait {
     }
 }
 
-#[derive(Clone, Debug, Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde)]
 pub enum Denom {
     Native: ERC20Token,
     Hosted: ByteArray,
 }
 
-#[derive(Clone, Debug, Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde)]
 pub struct ERC20Token {
     pub address: ContractAddress,
 }
@@ -250,7 +248,7 @@ pub impl ContractAddressIntoDenom of Into<ContractAddress, Denom> {
     }
 }
 
-#[derive(Clone, Debug, Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde)]
 pub struct Memo {
     pub memo: ByteArray,
 }

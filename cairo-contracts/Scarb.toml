@@ -3,8 +3,8 @@ name          = "starknet_ibc"
 version       = "0.1.0"
 license       = "Apache-2.0"
 edition       = "2023_11"
-cairo-version = "2.6.4"
-scarb-version = "2.6.5"
+cairo-version = "2.7.0"
+scarb-version = "2.7.0"
 repository    = "https://github.com/informalsystems/ibc-starknet"
 authors       = [ "Informal Systems <hello@informal.systems>" ]
 Readme        = "README.md"
@@ -12,9 +12,13 @@ keywords      = [ "ethereum", "starknet", "cairo", "ibc", "ibc-rs" ]
 description   = "Collection of Cairo components and contracts that implement and integrate IBC protocol with Starknet"
 
 [dependencies]
-starknet     = ">=2.6.0"
-openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.14.0" }
-snforge_std  = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.25.0" }
+starknet     = "2.7.0"
+openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.0" }
+snforge_std  = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.26.0" }
+
+[dev-dependencies]
+cairo_test = "2.7.0"
+openzeppelin_testing = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.0" }
 
 [lib]
 

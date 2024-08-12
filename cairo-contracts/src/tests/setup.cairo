@@ -1,5 +1,5 @@
 use core::option::OptionTrait;
-use openzeppelin::tests::utils::{deploy, pop_log};
+use openzeppelin_testing::{deploy, pop_log};
 use openzeppelin::token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use openzeppelin::utils::serde::SerializedAppend;
 use starknet::ContractAddress;
@@ -18,7 +18,7 @@ use starknet_ibc::core::channel::types::Packet;
 use starknet_ibc::presets::{Transfer, ERC20Mintable};
 use starknet_ibc::tests::constants::{NAME, SYMBOL, SUPPLY, OWNER};
 
-#[derive(Clone, Debug, Drop, PartialEq, Eq)]
+#[derive(Clone, Debug, Drop, PartialEq)]
 pub struct ICS20TransferContract {
     pub contract_address: ContractAddress,
 }
@@ -89,7 +89,7 @@ pub impl ICS20TransferContractImpl of ICS20TransferContractTrait {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Eq)]
+#[derive(Clone, Debug, Drop, PartialEq)]
 pub struct ERC20Contract {
     pub contract_address: ContractAddress,
 }

@@ -8,6 +8,7 @@ pub mod ICS20TransferComponent {
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet::get_contract_address;
+    use starknet::storage::Map;
     use starknet_ibc::apps::transfer::errors::TransferErrors;
     use starknet_ibc::apps::transfer::interface::{ISendTransfer, IRecvPacket, ITokenAddress};
     use starknet_ibc::apps::transfer::types::{
@@ -23,8 +24,8 @@ pub mod ICS20TransferComponent {
     struct Storage {
         erc20_class_hash: ClassHash,
         salt: felt252,
-        ibc_token_name_to_address: LegacyMap<felt252, ContractAddress>,
-        ibc_token_address_to_name: LegacyMap<ContractAddress, felt252>,
+        ibc_token_name_to_address: Map<felt252, ContractAddress>,
+        ibc_token_address_to_name: Map<ContractAddress, felt252>,
     }
 
     #[event]
