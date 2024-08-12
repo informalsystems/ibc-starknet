@@ -26,5 +26,5 @@ hermes-cosmos-integration-tests  = { workspace = true }
 starknet   = { workspace = true }
 url        = { workspace = true }
 eyre       = { workspace = true }
-tokio      = { workspace = true }
+tokio      = { workspace = true, features = [ "full" ] }
 serde_json = { workspace = true }

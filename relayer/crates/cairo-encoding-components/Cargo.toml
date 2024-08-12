@@ -14,6 +14,4 @@ cgp-core                   = { workspace = true }
 hermes-relayer-components  = { workspace = true }
 hermes-encoding-components = { workspace = true }
 
-starknet                    = { workspace = true }
-serde_json                  = { workspace = true }
-cairo-lang-starknet-classes = { workspace = true }
+starknet = { workspace = true }
