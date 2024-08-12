@@ -4,14 +4,14 @@ use cgp_core::error::HasErrorType;
 
 use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
 
+pub struct SumEncoders<N, Encoders>(pub PhantomData<(N, Encoders)>);
+
 pub enum Either<A, B> {
     Left(A),
     Right(B),
 }
 
 pub enum Void {}
-
-pub struct SumEncoders<N, Encoders>(pub PhantomData<(N, Encoders)>);
 
 pub struct Z;
 
@@ -25,14 +25,12 @@ impl Nat for Z {
     const N: usize = 0;
 }
 
-impl<N: Nat> Nat for S<N>
-{
+impl<N: Nat> Nat for S<N> {
     const N: usize = N::N + 1;
 }
 
 impl<Encoding, Strategy, ValueA, ValueB, N, Encoder, InEncoders>
-    MutEncoder<Encoding, Strategy, Either<ValueA, ValueB>>
-    for SumEncoders<N, (Encoder, InEncoders)>
+    MutEncoder<Encoding, Strategy, Either<ValueA, ValueB>> for SumEncoders<N, (Encoder, InEncoders)>
 where
     Encoding: HasEncodeBufferType + HasErrorType,
     Encoder: MutEncoder<Encoding, Strategy, ValueA>,
@@ -42,19 +40,16 @@ where
     fn encode_mut(
         encoding: &Encoding,
         value: &Either<ValueA, ValueB>,
-        buffer: &mut <Encoding  as  HasEncodeBufferType>::EncodeBuffer
-    ) -> Result<(),<Encoding  as  HasErrorType>::Error> {
+        buffer: &mut <Encoding as HasEncodeBufferType>::EncodeBuffer,
+    ) -> Result<(), <Encoding as HasErrorType>::Error> {
         match value {
-            Either::Left(value) => {
-                Encoder::encode_mut(encoding, value, buffer)
-            }
+            Either::Left(value) => Encoder::encode_mut(encoding, value, buffer),
             Either::Right(value) => {
                 <SumEncoders<S<N>, InEncoders>>::encode_mut(encoding, value, buffer)
             }
         }
     }
 }
-
 
 impl<Encoding, Strategy, N> MutEncoder<Encoding, Strategy, Void> for SumEncoders<N, ()>
 where
