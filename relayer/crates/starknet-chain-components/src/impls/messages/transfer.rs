@@ -2,6 +2,7 @@ use cgp_core::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
+use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::traits::encoder::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
@@ -26,10 +27,12 @@ pub struct TransferErc20TokenMessage {
     pub amount: U256,
 }
 
-pub type TransferErc20TokenMessageEncoder = CombineEncoders<(
-    EncodeField<symbol!("recipient")>,
-    (EncodeField<symbol!("amount")>, ()),
-)>;
+pub type TransferErc20TokenMessageEncoder = CombineEncoders<
+    HList![
+        EncodeField<symbol!("recipient")>,
+        EncodeField<symbol!("amount")>
+    ],
+>;
 
 impl<Chain, Encoding> TransferTokenMessageBuilder<Chain> for BuildTransferErc20TokenMessage
 where
