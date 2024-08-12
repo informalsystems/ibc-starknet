@@ -119,6 +119,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, u64>
     + CanEncodeAndDecode<ViaCairo, usize>
     + CanEncodeAndDecode<ViaCairo, Vec<u8>>
+    + CanEncodeAndDecode<ViaCairo, Vec<Felt>>
     + CanEncodeAndDecode<ViaCairo, String>
     + CanEncode<ViaCairo, TransferErc20TokenMessage>
     + CanEncode<ViaCairo, DeployErc20TokenMessage>
