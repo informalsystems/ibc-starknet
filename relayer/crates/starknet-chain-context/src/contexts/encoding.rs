@@ -6,6 +6,7 @@ use hermes_cairo_encoding_components::components::encode_mut::*;
 use hermes_cairo_encoding_components::components::encoding::*;
 use hermes_cairo_encoding_components::impls::encode_mut::delegate::DelegateEncodeMutComponents;
 use hermes_cairo_encoding_components::impls::encode_mut::pair::EncodeCons;
+use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
 use hermes_cairo_encoding_components::impls::encode_mut::with_context::EncodeWithContext;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::traits::decode_mut::{
@@ -74,6 +75,7 @@ with_cairo_encode_mut_components! {
 
 delegate_components! {
     StarknetEncodeMutComponents {
+        <'a, V> (ViaCairo, &'a V): EncodeDeref,
         (ViaCairo, TransferErc20TokenMessage): TransferErc20TokenMessageEncoder,
         (ViaCairo, DeployErc20TokenMessage): DeployErc20TokenMessageEncoder,
     }
@@ -118,6 +120,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, String>
     + CanEncode<ViaCairo, TransferErc20TokenMessage>
     + CanEncode<ViaCairo, DeployErc20TokenMessage>
+    + for<'a> CanEncode<ViaCairo, &'a DeployErc20TokenMessage>
 {
 }
 

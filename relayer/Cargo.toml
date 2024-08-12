@@ -24,7 +24,6 @@ rust-version = "1.79"
 overflow-checks = true
 
 [workspace.dependencies]
-ibc                 = { version = "0.53.0" }
 cgp-core            = { version = "0.1.0" }
 cgp-error-eyre      = { version = "0.1.0" }
 cgp-component-macro = { version = "0.1.0" }
