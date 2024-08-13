@@ -5,13 +5,15 @@ pub struct EncodeList;
 
 impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Vec<Value>> for EncodeList
 where
-    Encoding: CanEncodeMut<Strategy, Value>,
+    Encoding: CanEncodeMut<Strategy, Value> + CanEncodeMut<Strategy, usize>,
 {
     fn encode_mut(
         encoding: &Encoding,
         value: &Vec<Value>,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&value.len(), buffer)?;
+
         for item in value.iter() {
             encoding.encode_mut(item, buffer)?;
         }

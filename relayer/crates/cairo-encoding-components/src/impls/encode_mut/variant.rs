@@ -13,7 +13,7 @@ pub struct SumEncoders<Index, Remain>(pub PhantomData<(Index, Remain)>);
 impl<Encoding, Strategy, ValueA, ValueB, I, N>
     MutEncoder<Encoding, Strategy, Either<ValueA, ValueB>> for SumEncoders<I, S<N>>
 where
-    Encoding: CanEncodeMut<Strategy, ValueA>,
+    Encoding: CanEncodeMut<Strategy, ValueA> + CanEncodeMut<Strategy, usize>,
     I: Nat,
     SumEncoders<S<I>, N>: MutEncoder<Encoding, Strategy, ValueB>,
 {
@@ -23,7 +23,11 @@ where
         buffer: &mut <Encoding as HasEncodeBufferType>::EncodeBuffer,
     ) -> Result<(), <Encoding as HasErrorType>::Error> {
         match value {
-            Either::Left(value) => encoding.encode_mut(value, buffer),
+            Either::Left(value) => {
+                encoding.encode_mut(&I::N, buffer)?;
+
+                encoding.encode_mut(value, buffer)
+            }
             Either::Right(value) => <SumEncoders<S<I>, N>>::encode_mut(encoding, value, buffer),
         }
     }
@@ -32,7 +36,8 @@ where
 impl<Encoding, Strategy, Value, I> MutEncoder<Encoding, Strategy, Either<Value, Void>>
     for SumEncoders<I, Z>
 where
-    Encoding: CanEncodeMut<Strategy, Value>,
+    Encoding: CanEncodeMut<Strategy, Value> + CanEncodeMut<Strategy, usize>,
+    I: Nat,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -40,7 +45,10 @@ where
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
         match value {
-            Either::Left(value) => encoding.encode_mut(value, buffer),
+            Either::Left(value) => {
+                encoding.encode_mut(&I::N, buffer)?;
+                encoding.encode_mut(value, buffer)
+            }
             Either::Right(value) => match *value {},
         }
     }
