@@ -14,7 +14,6 @@ use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
-use starknet::core::types::contract::SierraClass;
 
 #[test]
 fn test_starknet_chain_client() {
@@ -103,7 +102,7 @@ fn test_starknet_chain_client() {
 
                 let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
 
-                let contract: SierraClass = serde_json::from_str(&contract_str)?;
+                let contract = serde_json::from_str(&contract_str)?;
 
                 let class_hash = chain.declare_contract(&contract).await?;
 
