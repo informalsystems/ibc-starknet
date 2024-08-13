@@ -119,6 +119,8 @@ fn test_starknet_ics20_contract() {
 
                 let calldata = encoding.encode(&packet)?;
 
+                println!("calldata: {:?}", calldata);
+
                 let message = Call {
                     to: ics20_contract_address,
                     selector: selector!("recv_execute"),

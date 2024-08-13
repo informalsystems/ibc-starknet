@@ -18,10 +18,13 @@ use hermes_error::types::Error;
 use hermes_relayer_components::transaction::impls::poll_tx_response::TxNoResponseError;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_runtime::types::error::TokioRuntimeError;
+use hermes_starknet_chain_components::impls::error::account::RaiseAccountError;
+use hermes_starknet_chain_components::impls::error::provider::RaiseProviderError;
+use hermes_starknet_chain_components::impls::error::starknet::RaiseStarknetError;
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use starknet::accounts::{single_owner, AccountError};
 use starknet::core::types::contract::{ComputeClassHashError, JsonError};
-use starknet::core::types::RevertedInvocation;
+use starknet::core::types::{RevertedInvocation, StarknetError};
 use starknet::providers::ProviderError;
 use starknet::signers::local_wallet;
 
@@ -37,10 +40,8 @@ delegate_components! {
             Report,
             TryFromIntError,
             FromUtf8Error,
-            ProviderError,
             SignError,
             TokioRuntimeError,
-            AccountError<SignError>,
             serde_json::error::Error,
             JsonError,
             ComputeClassHashError,
@@ -64,5 +65,8 @@ delegate_components! {
             WrapError<String, Error>,
         ]:
             WrapErrorDetail,
+        StarknetError: RaiseStarknetError,
+        ProviderError: RaiseProviderError,
+        AccountError<SignError>: RaiseAccountError,
     }
 }
