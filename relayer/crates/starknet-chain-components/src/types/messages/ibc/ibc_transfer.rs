@@ -4,7 +4,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_cairo_encoding_components::HList;
 use starknet::core::types::{Felt, U256};
 
-use crate::types::messages::denom::PrefixedDenom;
+use crate::types::messages::ibc::denom::PrefixedDenom;
 
 #[derive(HasField)]
 pub struct IbcTransferMessage {

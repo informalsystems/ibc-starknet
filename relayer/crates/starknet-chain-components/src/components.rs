@@ -22,7 +22,6 @@ use crate::impls::contract::declare::DeclareSierraContract;
 use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
-use crate::impls::messages::transfer::BuildTransferErc20TokenMessage;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::send_message::SendCallMessages;
 use crate::impls::submit_tx::SubmitCallTransaction;
@@ -53,6 +52,7 @@ pub use crate::traits::types::contract_class::{
     ContractClassHashTypeComponent, ContractClassTypeComponent,
 };
 pub use crate::traits::types::method::MethodSelectorTypeComponent;
+use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
 
 define_components! {
     StarknetChainComponents {

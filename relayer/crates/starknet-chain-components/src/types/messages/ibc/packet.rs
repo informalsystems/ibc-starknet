@@ -4,7 +4,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_cairo_encoding_components::HList;
 use starknet::core::types::Felt;
 
-use crate::types::messages::height::Height;
+use crate::types::messages::ibc::height::Height;
 
 #[derive(HasField)]
 pub struct Packet {
