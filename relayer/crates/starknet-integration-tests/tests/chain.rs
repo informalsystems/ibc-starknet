@@ -6,19 +6,16 @@ use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
-use hermes_starknet_chain_components::impls::messages::deploy_erc20::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
+use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::core::types::contract::SierraClass;
 
-// Note: the test needs to be run with starknet-devnet-rs with the seed 0:
-//
-// $ starknet-devnet --seed 0
 #[test]
 fn test_starknet_chain_client() {
     let runtime = init_test_runtime();

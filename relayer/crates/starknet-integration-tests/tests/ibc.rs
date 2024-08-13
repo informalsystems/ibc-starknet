@@ -4,23 +4,15 @@ use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encoder::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_error::types::Error;
-use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
-use hermes_starknet_chain_components::impls::messages::deploy_erc20::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
-use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
-use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::core::types::contract::SierraClass;
 
-// Note: the test needs to be run with starknet-devnet-rs with the seed 0:
-//
-// $ starknet-devnet --seed 0
 #[test]
-fn test_starknet_chain_client() {
+fn test_starknet_ics20_contract() {
     let runtime = init_test_runtime();
 
     runtime
@@ -45,9 +37,7 @@ fn test_starknet_chain_client() {
 
             let chain = &chain_driver.chain;
 
-            {
-                // Test deployment of ERC20 contract
-
+            let erc20_class_hash = {
                 let contract_path = std::env::var("ERC20_CONTRACT")?;
 
                 let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
@@ -56,24 +46,36 @@ fn test_starknet_chain_client() {
 
                 let class_hash = chain.declare_contract(&contract).await?;
 
-                println!("declared class: {:?}", class_hash);
+                println!("declared ERC20 class: {:?}", class_hash);
 
-                let relayer_address = chain_driver.relayer_wallet.account_address;
+                class_hash
+            };
 
-                let deploy_message = DeployErc20TokenMessage {
-                    name: "token".into(),
-                    symbol: "token".into(),
-                    fixed_supply: 100u32.into(),
-                    recipient: relayer_address,
-                    owner: relayer_address,
-                };
+            let ics20_class_hash = {
+                let contract_path = std::env::var("ICS20_CONTRACT")?;
 
-                let calldata = chain.encoding().encode(&deploy_message)?;
+                let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
 
-                let token_address = chain.deploy_contract(&class_hash, false, &calldata).await?;
+                let contract: SierraClass = serde_json::from_str(&contract_str)?;
 
-                println!("deployed contract to address: {:?}", token_address);
-            }
+                let class_hash = chain.declare_contract(&contract).await?;
+
+                println!("declared ICS20 class: {:?}", class_hash);
+
+                class_hash
+            };
+
+            let _ics20_contract_address = {
+                let calldata = chain.encoding().encode(&erc20_class_hash)?;
+
+                let contract_address = chain
+                    .deploy_contract(&ics20_class_hash, false, &calldata)
+                    .await?;
+
+                println!("deployed ICS20 contract to address: {:?}", contract_address);
+
+                contract_address
+            };
 
             <Result<(), Error>>::Ok(())
         })
