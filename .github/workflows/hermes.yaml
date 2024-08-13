@@ -24,6 +24,7 @@ jobs:
           name: ibc-starknet
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
@@ -35,12 +36,19 @@ jobs:
           nix shell ..#rust -c \
             cargo clippy --all-targets --all-features -- -D warnings
 
+      - name: Build Cairo contracts
+        working-directory: ./cairo-contracts
+        run: |
+          nix shell ..#scarb -c \
+            scarb build
+
       - name: Run Integration Tests
         env:
           RUST_BACKTRACE: 1
         working-directory: ./relayer
         run: |
-          export ERC20_CONTRACT="$(pwd)/../artifacts/openzeppelin_ERC20Upgradeable.contract_class.json"
+          export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_ERC20Mintable.contract_class.json"
+          export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/target/dev/starknet_ibc_Transfer.contract_class.json"
 
           nix develop ..#rust -c \
             cargo nextest run --test-threads=2
