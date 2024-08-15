@@ -1,15 +1,14 @@
 use cgp_core::error::HasErrorType;
 
-use crate::impls::encode_mut::variant::SumEncoders;
-use crate::impls::encode_mut::with_context::EncodeWithContext;
+use crate::impls::encode_mut::variant::EncodeVariants;
 use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
 use crate::types::either::Either;
-use crate::types::nat::Z;
-use crate::{HList, Sum};
+use crate::types::nat::{S, Z};
+use crate::Sum;
 
 pub struct EncodeOption;
 
-pub type OptionEncoder = SumEncoders<Z, HList![EncodeWithContext, EncodeWithContext]>;
+pub type OptionEncoder = EncodeVariants<S<Z>>;
 
 impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Option<Value>> for EncodeOption
 where

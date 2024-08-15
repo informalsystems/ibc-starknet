@@ -27,7 +27,7 @@ pub struct TransferErc20TokenMessage {
     pub amount: U256,
 }
 
-pub type TransferErc20TokenMessageEncoder = CombineEncoders<
+pub type EncodeTransferErc20TokenMessage = CombineEncoders<
     HList![
         EncodeField<symbol!("recipient")>,
         EncodeField<symbol!("amount")>

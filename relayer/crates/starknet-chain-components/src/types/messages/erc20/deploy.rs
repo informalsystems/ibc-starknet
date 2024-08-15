@@ -13,7 +13,7 @@ pub struct DeployErc20TokenMessage {
     pub owner: Felt,
 }
 
-pub type DeployErc20TokenMessageEncoder = CombineEncoders<
+pub type EncodeDeployErc20TokenMessage = CombineEncoders<
     HList![
         EncodeField<symbol!("name")>,
         EncodeField<symbol!("symbol")>,
