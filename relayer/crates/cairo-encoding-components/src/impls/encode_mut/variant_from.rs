@@ -5,17 +5,19 @@ use cgp_core::error::HasErrorType;
 use crate::impls::encode_mut::variant::SumEncoders;
 use crate::traits::decode_mut::{HasDecodeBufferType, MutDecoder};
 use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
+use crate::traits::size::HasSize;
 use crate::traits::transform::{Transformer, TransformerRef};
 use crate::types::nat::Z;
 
-pub struct EncodeVariantFrom<N, Transform>(pub PhantomData<(N, Transform)>);
+pub struct EncodeVariantFrom<Transform>(pub PhantomData<Transform>);
 
 impl<Encoding, Strategy, N, Transform> MutEncoder<Encoding, Strategy, Transform::From>
-    for EncodeVariantFrom<N, Transform>
+    for EncodeVariantFrom<Transform>
 where
     Encoding: HasEncodeBufferType + HasErrorType,
     SumEncoders<Z, N>: for<'a> MutEncoder<Encoding, Strategy, Transform::To<'a>>,
     Transform: TransformerRef,
+    for<'a> Transform::To<'a>: HasSize<Size = N>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -28,11 +30,12 @@ where
 }
 
 impl<Encoding, Strategy, N, Transform, Source, Target> MutDecoder<Encoding, Strategy, Target>
-    for EncodeVariantFrom<N, Transform>
+    for EncodeVariantFrom<Transform>
 where
     Encoding: HasDecodeBufferType + HasErrorType,
     SumEncoders<Z, N>: MutDecoder<Encoding, Strategy, Source>,
     Transform: Transformer<From = Source, To = Target>,
+    Source: HasSize<Size = N>,
 {
     fn decode_mut(
         encoding: &Encoding,

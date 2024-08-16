@@ -7,7 +7,6 @@ use crate::traits::decode_mut::MutDecoderComponent;
 use crate::traits::encode_mut::MutEncoderComponent;
 use crate::traits::transform::{Transformer, TransformerRef};
 use crate::types::either::Either;
-use crate::types::nat::{S, Z};
 use crate::Sum;
 
 pub struct EncodeOption<T>(pub PhantomData<T>);
@@ -17,7 +16,7 @@ delegate_components! {
         [
             MutEncoderComponent,
             MutDecoderComponent,
-        ]: EncodeVariantFrom<S<Z>, TransformOption<T>>,
+        ]: EncodeVariantFrom<TransformOption<T>>,
     }
 }
 
