@@ -5,6 +5,7 @@ pub mod delegate;
 pub mod end;
 pub mod felt;
 pub mod field;
+pub mod from;
 pub mod from_felt;
 pub mod from_u128;
 pub mod iter;

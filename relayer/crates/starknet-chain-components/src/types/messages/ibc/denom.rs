@@ -1,8 +1,12 @@
 use cgp_core::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
+use hermes_cairo_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_cairo_encoding_components::impls::encode_mut::variant::EncodeVariants;
-use hermes_cairo_encoding_components::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
+use hermes_cairo_encoding_components::traits::decode_mut::MutDecoderComponent;
+use hermes_cairo_encoding_components::traits::encode_mut::{
+    HasEncodeBufferType, MutEncoder, MutEncoderComponent,
+};
 use hermes_cairo_encoding_components::types::either::Either;
 use hermes_cairo_encoding_components::types::nat::{S, Z};
 use hermes_cairo_encoding_components::{HList, Sum};
@@ -32,12 +36,38 @@ pub struct TracePrefix {
     pub channel_id: String,
 }
 
-pub type EncodeTracePrefix = CombineEncoders<
-    HList![
-        EncodeField<symbol!("port_id")>,
-        EncodeField<symbol!("channel_id")>,
-    ],
->;
+pub struct EncodeTracePrefix;
+
+delegate_components! {
+    EncodeTracePrefix {
+        MutEncoderComponent: CombineEncoders<
+            HList![
+                EncodeField<symbol!("port_id")>,
+                EncodeField<symbol!("channel_id")>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<(String, String)>,
+    }
+}
+
+impl From<(String, String)> for TracePrefix {
+    fn from((port_id, channel_id): (String, String)) -> Self {
+        Self {
+            port_id,
+            channel_id,
+        }
+    }
+}
+
+// impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, TracePrefix>
+//     for EncodeTracePrefix
+// where
+//     Encoding: CanDecode<Strategy, String>,
+// {
+//     fn decode_mut(encoding: &Encoding,buffer: &mut Encoding::DecodeBuffer<'_>) -> Result<TracePrefix,Encoding::Error> {
+//         let port_id =
+//     }
+// }
 
 pub struct EncodeDenom;
 
