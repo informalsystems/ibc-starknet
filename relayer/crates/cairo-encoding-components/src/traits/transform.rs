@@ -1,3 +1,5 @@
-pub trait Transformer<From, To> {
-    fn transform(from: From) -> To;
+pub trait Transformer<From> {
+    type To;
+
+    fn transform(from: From) -> Self::To;
 }

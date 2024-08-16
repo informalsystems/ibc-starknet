@@ -9,7 +9,7 @@ impl<Encoding, Strategy, Transform, Source, Target> MutDecoder<Encoding, Strateg
     for DecodeFrom<Transform, Source>
 where
     Encoding: CanDecodeMut<Strategy, Source>,
-    Transform: Transformer<Source, Target>,
+    Transform: Transformer<Source, To = Target>,
 {
     fn decode_mut(
         encoding: &Encoding,

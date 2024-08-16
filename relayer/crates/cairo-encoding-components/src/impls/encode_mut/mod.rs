@@ -17,5 +17,6 @@ pub mod u128;
 pub mod u256;
 pub mod unit;
 pub mod variant;
+pub mod variant_from;
 pub mod vec;
 pub mod with_context;

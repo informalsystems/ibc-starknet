@@ -51,7 +51,9 @@ delegate_components! {
     }
 }
 
-impl Transformer<(String, String), TracePrefix> for EncodeTracePrefix {
+impl Transformer<(String, String)> for EncodeTracePrefix {
+    type To = TracePrefix;
+
     fn transform((port_id, channel_id): (String, String)) -> TracePrefix {
         TracePrefix {
             port_id,
