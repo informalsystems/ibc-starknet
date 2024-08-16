@@ -8,12 +8,10 @@ use crate::Sum;
 
 pub struct EncodeOption;
 
-pub type OptionEncoder = EncodeVariants<S<Z>>;
-
 impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Option<Value>> for EncodeOption
 where
     Encoding: HasEncodeBufferType + HasErrorType,
-    OptionEncoder: for<'a> MutEncoder<Encoding, Strategy, Sum![&'a Value, ()]>,
+    EncodeVariants<S<Z>>: for<'a> MutEncoder<Encoding, Strategy, Sum![&'a Value, ()]>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -25,7 +23,7 @@ where
             None => Either::Right(Either::Left(())),
         };
 
-        OptionEncoder::encode_mut(encoding, &sum, buffer)?;
+        <EncodeVariants<S<Z>>>::encode_mut(encoding, &sum, buffer)?;
 
         Ok(())
     }

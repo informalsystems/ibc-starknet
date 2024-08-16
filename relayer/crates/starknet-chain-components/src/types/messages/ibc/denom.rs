@@ -7,6 +7,7 @@ use hermes_cairo_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_cairo_encoding_components::traits::encode_mut::{
     HasEncodeBufferType, MutEncoder, MutEncoderComponent,
 };
+use hermes_cairo_encoding_components::traits::transform::Transformer;
 use hermes_cairo_encoding_components::types::either::Either;
 use hermes_cairo_encoding_components::types::nat::{S, Z};
 use hermes_cairo_encoding_components::{HList, Sum};
@@ -46,28 +47,18 @@ delegate_components! {
                 EncodeField<symbol!("channel_id")>,
             ],
         >,
-        MutDecoderComponent: DecodeFrom<(String, String)>,
+        MutDecoderComponent: DecodeFrom<EncodeTracePrefix, (String, String)>,
     }
 }
 
-impl From<(String, String)> for TracePrefix {
-    fn from((port_id, channel_id): (String, String)) -> Self {
-        Self {
+impl Transformer<(String, String), TracePrefix> for EncodeTracePrefix {
+    fn transform((port_id, channel_id): (String, String)) -> TracePrefix {
+        TracePrefix {
             port_id,
             channel_id,
         }
     }
 }
-
-// impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, TracePrefix>
-//     for EncodeTracePrefix
-// where
-//     Encoding: CanDecode<Strategy, String>,
-// {
-//     fn decode_mut(encoding: &Encoding,buffer: &mut Encoding::DecodeBuffer<'_>) -> Result<TracePrefix,Encoding::Error> {
-//         let port_id =
-//     }
-// }
 
 pub struct EncodeDenom;
 

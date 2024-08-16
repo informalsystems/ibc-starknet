@@ -1,19 +1,21 @@
 use core::marker::PhantomData;
 
 use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use crate::traits::transform::Transformer;
 
-pub struct DecodeFrom<Source>(pub PhantomData<Source>);
+pub struct DecodeFrom<Transform, Source>(pub PhantomData<(Transform, Source)>);
 
-impl<Encoding, Strategy, Source, Value> MutDecoder<Encoding, Strategy, Value> for DecodeFrom<Source>
+impl<Encoding, Strategy, Transform, Source, Target> MutDecoder<Encoding, Strategy, Target>
+    for DecodeFrom<Transform, Source>
 where
     Encoding: CanDecodeMut<Strategy, Source>,
-    Value: From<Source>,
+    Transform: Transformer<Source, Target>,
 {
     fn decode_mut(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'_>,
-    ) -> Result<Value, Encoding::Error> {
+    ) -> Result<Target, Encoding::Error> {
         let source = encoding.decode_mut(buffer)?;
-        Ok(source.into())
+        Ok(Transform::transform(source))
     }
 }
