@@ -24,7 +24,7 @@ impl<Encoding> DecodeBufferPeeker<Encoding, Felt> for ProvideVecIterDecodeBuffer
 where
     Encoding: for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Peekable<Iter<'a, Felt>>>,
 {
-    fn peek<'a>(buffer: &'a mut Peekable<Iter<'_, Felt>>) -> Option<&'a Felt> {
+    fn peek_decode_buffer<'a>(buffer: &'a mut Peekable<Iter<'_, Felt>>) -> Option<&'a Felt> {
         buffer.peek().map(Deref::deref)
     }
 }

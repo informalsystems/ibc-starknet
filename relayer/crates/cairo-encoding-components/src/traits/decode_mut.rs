@@ -15,5 +15,5 @@ pub trait CanDecodeMut<Strategy, Value>: HasDecodeBufferType + HasErrorType {
 
 #[derive_component(DecodeBufferPeekerComponent, DecodeBufferPeeker<Encoding>)]
 pub trait CanPeekDecodeBuffer<Value>: HasDecodeBufferType {
-    fn peek<'a>(buffer: &'a mut Self::DecodeBuffer<'_>) -> Option<&'a Value>;
+    fn peek_decode_buffer<'a>(buffer: &'a mut Self::DecodeBuffer<'_>) -> Option<&'a Value>;
 }
