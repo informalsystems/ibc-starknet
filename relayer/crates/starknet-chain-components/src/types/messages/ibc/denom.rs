@@ -2,15 +2,11 @@ use cgp_core::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_cairo_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_cairo_encoding_components::impls::encode_mut::variant::EncodeVariants;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_cairo_encoding_components::traits::decode_mut::MutDecoderComponent;
-use hermes_cairo_encoding_components::traits::encode_mut::{
-    HasEncodeBufferType, MutEncoder, MutEncoderComponent,
-};
+use hermes_cairo_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_cairo_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_cairo_encoding_components::types::either::Either;
-use hermes_cairo_encoding_components::types::nat::{S, Z};
 use hermes_cairo_encoding_components::{HList, Sum};
 use starknet::core::types::Felt;
 
@@ -69,7 +65,7 @@ pub struct EncodeDenom;
 delegate_components! {
     EncodeDenom {
         [
-            // MutEncoderComponent,
+            MutEncoderComponent,
             MutDecoderComponent,
         ]: EncodeVariantFrom<EncodeDenom>,
     }
@@ -97,26 +93,5 @@ impl Transformer for EncodeDenom {
             Either::Right(Either::Left(value)) => Denom::Hosted(value),
             Either::Right(Either::Right(value)) => match value {},
         }
-    }
-}
-
-impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Denom> for EncodeDenom
-where
-    Encoding: HasEncodeBufferType + HasErrorType,
-    EncodeVariants<S<Z>>: for<'a> MutEncoder<Encoding, Strategy, Sum![Felt, &'a String]>,
-{
-    fn encode_mut(
-        encoding: &Encoding,
-        value: &Denom,
-        buffer: &mut Encoding::EncodeBuffer,
-    ) -> Result<(), Encoding::Error> {
-        let sum = match value {
-            Denom::Native(denom) => Either::Left(*denom),
-            Denom::Hosted(denom) => Either::Right(Either::Left(denom)),
-        };
-
-        <EncodeVariants<S<Z>>>::encode_mut(encoding, &sum, buffer)?;
-
-        Ok(())
     }
 }
