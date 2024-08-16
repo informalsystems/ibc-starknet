@@ -13,8 +13,6 @@ pub(crate) mod TransferMock {
     use starknet_ibc::apps::transferrable::component::TransferrableComponent::TransferrableInternalTrait;
     use starknet_ibc::apps::transferrable::component::TransferrableComponent;
     use starknet_ibc::core::host::types::{PortId, ChannelId, ChannelIdTrait};
-    use starknet_ibc::tests::mocks::interface::ITransferExecute;
-    use starknet_ibc::tests::mocks::interface::ITransferValidate;
 
     component!(path: TransferrableComponent, storage: transferrable, event: TransferrableEvent);
     component!(path: ICS20TransferComponent, storage: transfer, event: ICS20TransferEvent);
@@ -27,7 +25,6 @@ pub(crate) mod TransferMock {
         ICS20TransferComponent::SendTransfer<ContractState>;
     #[abi(embed_v0)]
     impl ICS20RecvPacketImpl = ICS20TransferComponent::RecvPacket<ContractState>;
-
     #[abi(embed_v0)]
     impl ICS20TokenAddressImpl =
         ICS20TransferComponent::IBCTokenAddress<ContractState>;
@@ -58,8 +55,10 @@ pub(crate) mod TransferMock {
         self.transfer.initializer(erc20_class_hash);
     }
 
-    #[abi(embed_v0)]
-    impl TransferValidateImpl of ITransferValidate<ContractState> {
+    #[abi(per_item)]
+    #[generate_trait]
+    impl TransferValidateImpl of TransferValidateTrait {
+        #[external(v0)]
         fn escrow_validate(
             self: @ContractState,
             from_account: ContractAddress,
@@ -72,6 +71,7 @@ pub(crate) mod TransferMock {
             self.transfer.escrow_validate(from_account, port_id, channel_id, denom, amount, memo,);
         }
 
+        #[external(v0)]
         fn unescrow_validate(
             self: @ContractState,
             to_account: ContractAddress,
@@ -83,12 +83,14 @@ pub(crate) mod TransferMock {
             self.transfer.unescrow_validate(to_account, port_id, channel_id, denom, amount,);
         }
 
+        #[external(v0)]
         fn mint_validate(
             self: @ContractState, account: ContractAddress, denom: PrefixedDenom, amount: u256,
         ) {
             self.transfer.mint_validate(account, denom, amount);
         }
 
+        #[external(v0)]
         fn burn_validate(
             self: @ContractState,
             account: ContractAddress,
@@ -100,8 +102,10 @@ pub(crate) mod TransferMock {
         }
     }
 
-    #[abi(embed_v0)]
-    impl TransferExecuteImpl of ITransferExecute<ContractState> {
+    #[abi(per_item)]
+    #[generate_trait]
+    impl TransferExecuteImpl of TransferExecuteTrait {
+        #[external(v0)]
         fn escrow_execute(
             ref self: ContractState,
             from_account: ContractAddress,
@@ -112,6 +116,7 @@ pub(crate) mod TransferMock {
             self.transfer.escrow_execute(from_account, denom, amount, memo);
         }
 
+        #[external(v0)]
         fn unescrow_execute(
             ref self: ContractState,
             to_account: ContractAddress,
@@ -123,12 +128,14 @@ pub(crate) mod TransferMock {
             self.transfer.unescrow_execute(to_account, port_id, channel_id, denom, amount);
         }
 
+        #[external(v0)]
         fn mint_execute(
             ref self: ContractState, account: ContractAddress, denom: PrefixedDenom, amount: u256,
         ) {
             self.transfer.mint_execute(account, denom, amount);
         }
 
+        #[external(v0)]
         fn burn_execute(
             ref self: ContractState,
             account: ContractAddress,
