@@ -1,3 +1,4 @@
+use core::iter::Peekable;
 use core::slice::Iter;
 
 use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
@@ -6,18 +7,21 @@ use hermes_cairo_encoding_components::components::encode_mut::*;
 use hermes_cairo_encoding_components::components::encoding::*;
 use hermes_cairo_encoding_components::impls::encode_mut::delegate::DelegateEncodeMutComponents;
 use hermes_cairo_encoding_components::impls::encode_mut::option::EncodeOption;
-use hermes_cairo_encoding_components::impls::encode_mut::pair::EncodeCons;
+use hermes_cairo_encoding_components::impls::encode_mut::pair::{EncodeCons, EncoderPair};
 use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
+use hermes_cairo_encoding_components::impls::encode_mut::tagged::EncodeTagged;
 use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
 use hermes_cairo_encoding_components::impls::encode_mut::with_context::EncodeWithContext;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::traits::decode_mut::{
-    HasDecodeBufferType, MutDecoderComponent,
+    CanPeekDecodeBuffer, HasDecodeBufferType, MutDecoderComponent,
 };
 use hermes_cairo_encoding_components::traits::encode_and_decode_mut::MutEncoderAndDecoder;
 use hermes_cairo_encoding_components::traits::encode_mut::{
     HasEncodeBufferType, MutEncoderComponent,
 };
+use hermes_cairo_encoding_components::types::tagged::Tagged;
+use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_encoding_components::traits::encoded::HasEncodedType;
@@ -86,7 +90,9 @@ with_cairo_encode_mut_components! {
 delegate_components! {
     StarknetEncodeMutComponents {
         <'a, V> (ViaCairo, &'a V): EncodeDeref,
-        <V> (ViaCairo, Option<V>): EncodeOption,
+        <V> (ViaCairo, Option<V>): EncodeOption<V>,
+        <Tag, Value> (ViaCairo, Tagged<Tag, Value>): EncodeTagged,
+        <A, B> (ViaCairo, (A, B)): EncoderPair<EncodeWithContext, EncodeWithContext>,
         (ViaCairo, TransferErc20TokenMessage): EncodeTransferErc20TokenMessage,
         (ViaCairo, DeployErc20TokenMessage): EncodeDeployErc20TokenMessage,
         (ViaCairo, Denom): EncodeDenom,
@@ -127,7 +133,9 @@ pub trait CanUseCairoEncoding:
     HasErrorType<Error = HermesError>
     + HasEncodedType<Encoded = Vec<Felt>>
     + HasEncodeBufferType<EncodeBuffer = Vec<Felt>>
-    + for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Iter<'a, Felt>>
+    + for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Peekable<Iter<'a, Felt>>>
+    + CanPeekDecodeBuffer<Felt>
+    + CanEncodeAndDecode<ViaCairo, ()>
     + CanEncodeAndDecode<ViaCairo, Felt>
     + CanEncodeAndDecode<ViaCairo, Felt>
     + CanEncodeAndDecode<ViaCairo, u128>
@@ -139,13 +147,16 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, String>
     + CanEncode<ViaCairo, TransferErc20TokenMessage>
     + CanEncode<ViaCairo, DeployErc20TokenMessage>
-    + CanEncode<ViaCairo, Option<String>>
+    + CanEncodeAndDecode<ViaCairo, Option<String>>
     + for<'a> CanEncode<ViaCairo, &'a String>
-    + CanEncode<ViaCairo, Denom>
-    + CanEncode<ViaCairo, PrefixedDenom>
+    + CanEncodeAndDecode<ViaCairo, Denom>
+    + CanEncodeAndDecode<ViaCairo, PrefixedDenom>
+    + CanEncodeAndDecode<ViaCairo, TracePrefix>
+    + CanEncodeAndDecode<ViaCairo, Vec<TracePrefix>>
     + CanEncode<ViaCairo, IbcTransferMessage>
-    + CanEncode<ViaCairo, Height>
-    + CanEncode<ViaCairo, Packet>
+    + CanEncodeAndDecode<ViaCairo, Height>
+    + CanEncodeAndDecode<ViaCairo, Packet>
+    + CanEncode<ViaCairo, HList![String, String, String]>
 {
 }
 

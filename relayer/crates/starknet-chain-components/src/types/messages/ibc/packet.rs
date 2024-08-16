@@ -1,6 +1,10 @@
 use cgp_core::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
+use hermes_cairo_encoding_components::impls::encode_mut::from::DecodeFrom;
+use hermes_cairo_encoding_components::traits::decode_mut::MutDecoderComponent;
+use hermes_cairo_encoding_components::traits::encode_mut::MutEncoderComponent;
+use hermes_cairo_encoding_components::traits::transform::Transformer;
 use hermes_cairo_encoding_components::HList;
 use starknet::core::types::Felt;
 
@@ -18,15 +22,55 @@ pub struct Packet {
     pub timeout_timestamp: u64,
 }
 
-pub type EncodePacket = CombineEncoders<
-    HList![
-        EncodeField<symbol!("sequence")>,
-        EncodeField<symbol!("src_port_id")>,
-        EncodeField<symbol!("src_channel_id")>,
-        EncodeField<symbol!("dst_port_id")>,
-        EncodeField<symbol!("dst_channel_id")>,
-        EncodeField<symbol!("data")>,
-        EncodeField<symbol!("timeout_height")>,
-        EncodeField<symbol!("timeout_timestamp")>,
-    ],
->;
+pub struct EncodePacket;
+
+delegate_components! {
+    EncodePacket {
+        MutEncoderComponent: CombineEncoders<
+            HList![
+                EncodeField<symbol!("sequence")>,
+                EncodeField<symbol!("src_port_id")>,
+                EncodeField<symbol!("src_channel_id")>,
+                EncodeField<symbol!("dst_port_id")>,
+                EncodeField<symbol!("dst_channel_id")>,
+                EncodeField<symbol!("data")>,
+                EncodeField<symbol!("timeout_height")>,
+                EncodeField<symbol!("timeout_timestamp")>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<Self>,
+    }
+}
+
+impl Transformer for EncodePacket {
+    type From = HList![u64, String, String, String, String, Vec<Felt>, Height, u64,];
+
+    type To = Packet;
+
+    fn transform(
+        (
+            sequence,
+            (
+                src_port_id,
+                (
+                    src_channel_id,
+                    (
+                        dst_port_id,
+                        (dst_channel_id, (data, (timeout_height, (timeout_timestamp, ())))),
+                    ),
+                ),
+            ),
+        ): Self::From,
+    ) -> Packet {
+        Packet {
+            sequence,
+            src_port_id,
+            src_channel_id,
+            dst_port_id,
+            dst_channel_id,
+            data,
+            timeout_height,
+            timeout_timestamp,
+        }
+    }
+}

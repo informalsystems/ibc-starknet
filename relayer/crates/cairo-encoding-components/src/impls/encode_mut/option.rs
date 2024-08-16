@@ -1,32 +1,51 @@
-use cgp_core::error::HasErrorType;
+use std::marker::PhantomData;
 
-use crate::impls::encode_mut::variant::EncodeVariants;
-use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
+use cgp_core::prelude::*;
+
+use crate::impls::encode_mut::variant_from::EncodeVariantFrom;
+use crate::traits::decode_mut::MutDecoderComponent;
+use crate::traits::encode_mut::MutEncoderComponent;
+use crate::traits::transform::{Transformer, TransformerRef};
 use crate::types::either::Either;
-use crate::types::nat::{S, Z};
 use crate::Sum;
 
-pub struct EncodeOption;
+pub struct EncodeOption<T>(pub PhantomData<T>);
 
-pub type OptionEncoder = EncodeVariants<S<Z>>;
+delegate_components! {
+    <T> EncodeOption<T> {
+        [
+            MutEncoderComponent,
+            MutDecoderComponent,
+        ]: EncodeVariantFrom<TransformOption<T>>,
+    }
+}
 
-impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Option<Value>> for EncodeOption
-where
-    Encoding: HasEncodeBufferType + HasErrorType,
-    OptionEncoder: for<'a> MutEncoder<Encoding, Strategy, Sum![&'a Value, ()]>,
-{
-    fn encode_mut(
-        encoding: &Encoding,
-        value: &Option<Value>,
-        buffer: &mut Encoding::EncodeBuffer,
-    ) -> Result<(), Encoding::Error> {
-        let sum = match value {
+pub struct TransformOption<T>(pub PhantomData<T>);
+
+impl<T> TransformerRef for TransformOption<T> {
+    type From = Option<T>;
+    type To<'a> = Sum![&'a T, ()]
+        where Self: 'a
+    ;
+
+    fn transform<'a>(value: &'a Option<T>) -> Sum![&'a T, ()] {
+        match value {
             Some(value) => Either::Left(value),
             None => Either::Right(Either::Left(())),
-        };
+        }
+    }
+}
 
-        OptionEncoder::encode_mut(encoding, &sum, buffer)?;
+impl<T> Transformer for TransformOption<T> {
+    type From = Sum![T, ()];
 
-        Ok(())
+    type To = Option<T>;
+
+    fn transform(value: Sum![T, ()]) -> Option<T> {
+        match value {
+            Either::Left(value) => Some(value),
+            Either::Right(Either::Left(())) => None,
+            Either::Right(Either::Right(value)) => match value {},
+        }
     }
 }

@@ -7,7 +7,7 @@ use crate::impls::encode::buffer::EncodeWithMutBuffer;
 use crate::impls::types::decode_buffer::ProvideVecIterDecodeBuffer;
 use crate::impls::types::encode_buffer::ProvideVecEncodeBuffer;
 use crate::impls::types::encoded::ProvideVecFeltEncodedType;
-pub use crate::traits::decode_mut::DecodeBufferTypeComponent;
+pub use crate::traits::decode_mut::{DecodeBufferPeekerComponent, DecodeBufferTypeComponent};
 pub use crate::traits::encode_mut::EncodeBufferTypeComponent;
 
 define_components! {
@@ -16,7 +16,10 @@ define_components! {
             ProvideVecFeltEncodedType,
         EncodeBufferTypeComponent:
             ProvideVecEncodeBuffer,
-        DecodeBufferTypeComponent:
+        [
+            DecodeBufferTypeComponent,
+            DecodeBufferPeekerComponent,
+        ]:
             ProvideVecIterDecodeBuffer,
         [
             EncoderComponent,
