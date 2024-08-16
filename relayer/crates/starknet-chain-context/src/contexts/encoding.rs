@@ -88,7 +88,7 @@ with_cairo_encode_mut_components! {
 delegate_components! {
     StarknetEncodeMutComponents {
         <'a, V> (ViaCairo, &'a V): EncodeDeref,
-        <V> (ViaCairo, Option<V>): EncodeOption,
+        <V> (ViaCairo, Option<V>): EncodeOption<V>,
         <A, B> (ViaCairo, (A, B)): EncoderPair<EncodeWithContext, EncodeWithContext>,
         (ViaCairo, TransferErc20TokenMessage): EncodeTransferErc20TokenMessage,
         (ViaCairo, DeployErc20TokenMessage): EncodeDeployErc20TokenMessage,
