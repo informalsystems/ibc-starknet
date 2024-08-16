@@ -10,7 +10,6 @@ pub(crate) mod TransferMock {
         PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo, TracePrefixTrait,
         ERC20TokenTrait, ERC20Token, PrefixedDenomTrait
     };
-    use starknet_ibc::apps::transferrable::component::TransferrableComponent::TransferrableInternalTrait;
     use starknet_ibc::apps::transferrable::component::TransferrableComponent;
     use starknet_ibc::core::host::types::{PortId, ChannelId, ChannelIdTrait};
 
@@ -20,6 +19,8 @@ pub(crate) mod TransferMock {
     #[abi(embed_v0)]
     impl ICS20TransferreableImpl =
         TransferrableComponent::Transferrable<ContractState>;
+    impl ICS20TransferreableInternalImpl =
+        TransferrableComponent::TransferrableInternalImpl<ContractState>;
     #[abi(embed_v0)]
     impl ICS20SendTransferImpl =
         ICS20TransferComponent::SendTransfer<ContractState>;
