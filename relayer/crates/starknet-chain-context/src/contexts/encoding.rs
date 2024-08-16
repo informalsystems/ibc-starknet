@@ -1,3 +1,4 @@
+use core::iter::Peekable;
 use core::slice::Iter;
 
 use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
@@ -12,7 +13,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
 use hermes_cairo_encoding_components::impls::encode_mut::with_context::EncodeWithContext;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::traits::decode_mut::{
-    HasDecodeBufferType, MutDecoderComponent,
+    CanPeekDecodeBuffer, HasDecodeBufferType, MutDecoderComponent,
 };
 use hermes_cairo_encoding_components::traits::encode_and_decode_mut::MutEncoderAndDecoder;
 use hermes_cairo_encoding_components::traits::encode_mut::{
@@ -127,7 +128,8 @@ pub trait CanUseCairoEncoding:
     HasErrorType<Error = HermesError>
     + HasEncodedType<Encoded = Vec<Felt>>
     + HasEncodeBufferType<EncodeBuffer = Vec<Felt>>
-    + for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Iter<'a, Felt>>
+    + for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Peekable<Iter<'a, Felt>>>
+    + CanPeekDecodeBuffer<Felt>
     + CanEncodeAndDecode<ViaCairo, Felt>
     + CanEncodeAndDecode<ViaCairo, Felt>
     + CanEncodeAndDecode<ViaCairo, u128>
