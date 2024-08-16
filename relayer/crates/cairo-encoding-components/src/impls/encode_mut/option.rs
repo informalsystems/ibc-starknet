@@ -3,8 +3,9 @@ use std::marker::PhantomData;
 use cgp_core::prelude::*;
 
 use crate::impls::encode_mut::variant_from::EncodeVariantFrom;
+use crate::traits::decode_mut::MutDecoderComponent;
 use crate::traits::encode_mut::MutEncoderComponent;
-use crate::traits::transform::TransformerRef;
+use crate::traits::transform::{Transformer, TransformerRef};
 use crate::types::either::Either;
 use crate::types::nat::{S, Z};
 use crate::Sum;
@@ -13,7 +14,10 @@ pub struct EncodeOption<T>(pub PhantomData<T>);
 
 delegate_components! {
     <T> EncodeOption<T> {
-        MutEncoderComponent: EncodeVariantFrom<S<Z>, TransformOption<T>>
+        [
+            MutEncoderComponent,
+            MutDecoderComponent,
+        ]: EncodeVariantFrom<S<Z>, TransformOption<T>>,
     }
 }
 
@@ -29,6 +33,20 @@ impl<T> TransformerRef for TransformOption<T> {
         match value {
             Some(value) => Either::Left(value),
             None => Either::Right(Either::Left(())),
+        }
+    }
+}
+
+impl<T> Transformer for TransformOption<T> {
+    type From = Sum![T, ()];
+
+    type To = Option<T>;
+
+    fn transform(value: Sum![T, ()]) -> Option<T> {
+        match value {
+            Either::Left(value) => Some(value),
+            Either::Right(Either::Left(())) => None,
+            Either::Right(Either::Right(value)) => match value {},
         }
     }
 }

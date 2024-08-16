@@ -13,6 +13,7 @@ pub mod option;
 pub mod pair;
 pub mod reference;
 pub mod string;
+pub mod tagged;
 pub mod u128;
 pub mod u256;
 pub mod unit;

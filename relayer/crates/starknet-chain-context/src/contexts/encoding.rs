@@ -9,6 +9,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::delegate::DelegateEncod
 use hermes_cairo_encoding_components::impls::encode_mut::option::EncodeOption;
 use hermes_cairo_encoding_components::impls::encode_mut::pair::{EncodeCons, EncoderPair};
 use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
+use hermes_cairo_encoding_components::impls::encode_mut::tagged::EncodeTagged;
 use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
 use hermes_cairo_encoding_components::impls::encode_mut::with_context::EncodeWithContext;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
@@ -19,6 +20,7 @@ use hermes_cairo_encoding_components::traits::encode_and_decode_mut::MutEncoderA
 use hermes_cairo_encoding_components::traits::encode_mut::{
     HasEncodeBufferType, MutEncoderComponent,
 };
+use hermes_cairo_encoding_components::types::tagged::Tagged;
 use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
@@ -89,6 +91,7 @@ delegate_components! {
     StarknetEncodeMutComponents {
         <'a, V> (ViaCairo, &'a V): EncodeDeref,
         <V> (ViaCairo, Option<V>): EncodeOption<V>,
+        <Tag, Value> (ViaCairo, Tagged<Tag, Value>): EncodeTagged,
         <A, B> (ViaCairo, (A, B)): EncoderPair<EncodeWithContext, EncodeWithContext>,
         (ViaCairo, TransferErc20TokenMessage): EncodeTransferErc20TokenMessage,
         (ViaCairo, DeployErc20TokenMessage): EncodeDeployErc20TokenMessage,
@@ -144,7 +147,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, String>
     + CanEncode<ViaCairo, TransferErc20TokenMessage>
     + CanEncode<ViaCairo, DeployErc20TokenMessage>
-    + CanEncode<ViaCairo, Option<String>>
+    // + CanEncodeAndDecode<ViaCairo, Option<String>>
     + for<'a> CanEncode<ViaCairo, &'a String>
     + CanEncode<ViaCairo, Denom>
     + CanEncode<ViaCairo, PrefixedDenom>
