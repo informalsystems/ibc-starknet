@@ -7,7 +7,7 @@ use crate::traits::decode_mut::{HasDecodeBufferType, MutDecoder};
 use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
 use crate::traits::size::HasSize;
 use crate::traits::transform::{Transformer, TransformerRef};
-use crate::types::nat::Z;
+use crate::types::nat::{S, Z};
 
 pub struct EncodeVariantFrom<Transform>(pub PhantomData<Transform>);
 
@@ -17,7 +17,7 @@ where
     Encoding: HasEncodeBufferType + HasErrorType,
     SumEncoders<Z, N>: for<'a> MutEncoder<Encoding, Strategy, Transform::To<'a>>,
     Transform: TransformerRef,
-    for<'a> Transform::To<'a>: HasSize<Size = N>,
+    for<'a> Transform::To<'a>: HasSize<Size = S<N>>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -35,7 +35,7 @@ where
     Encoding: HasDecodeBufferType + HasErrorType,
     SumEncoders<Z, N>: MutDecoder<Encoding, Strategy, Source>,
     Transform: Transformer<From = Source, To = Target>,
-    Source: HasSize<Size = N>,
+    Source: HasSize<Size = S<N>>,
 {
     fn decode_mut(
         encoding: &Encoding,

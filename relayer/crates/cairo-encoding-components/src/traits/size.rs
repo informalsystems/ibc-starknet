@@ -1,8 +1,8 @@
 use crate::types::either::{Either, Void};
-use crate::types::nat::{Nat, S, Z};
+use crate::types::nat::{S, Z};
 
 pub trait HasSize {
-    type Size: Nat;
+    type Size;
 }
 
 impl<A, B> HasSize for Either<A, B>

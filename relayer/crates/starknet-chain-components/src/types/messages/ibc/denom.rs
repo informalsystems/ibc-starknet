@@ -3,11 +3,12 @@ use hermes_cairo_encoding_components::impls::encode_mut::combine::CombineEncoder
 use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_cairo_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_cairo_encoding_components::impls::encode_mut::variant::EncodeVariants;
+use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_cairo_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_cairo_encoding_components::traits::encode_mut::{
     HasEncodeBufferType, MutEncoder, MutEncoderComponent,
 };
-use hermes_cairo_encoding_components::traits::transform::Transformer;
+use hermes_cairo_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_cairo_encoding_components::types::either::Either;
 use hermes_cairo_encoding_components::types::nat::{S, Z};
 use hermes_cairo_encoding_components::{HList, Sum};
@@ -64,6 +65,40 @@ impl Transformer for EncodeTracePrefix {
 }
 
 pub struct EncodeDenom;
+
+delegate_components! {
+    EncodeDenom {
+        [
+            // MutEncoderComponent,
+            MutDecoderComponent,
+        ]: EncodeVariantFrom<EncodeDenom>,
+    }
+}
+
+impl TransformerRef for EncodeDenom {
+    type From = Denom;
+    type To<'a> = Sum![Felt, &'a String];
+
+    fn transform<'a>(from: &'a Denom) -> Sum![Felt, &'a String] {
+        match from {
+            Denom::Native(denom) => Either::Left(*denom),
+            Denom::Hosted(denom) => Either::Right(Either::Left(denom)),
+        }
+    }
+}
+
+impl Transformer for EncodeDenom {
+    type From = Sum![Felt, String];
+    type To = Denom;
+
+    fn transform(value: Sum![Felt, String]) -> Denom {
+        match value {
+            Either::Left(value) => Denom::Native(value),
+            Either::Right(Either::Left(value)) => Denom::Hosted(value),
+            Either::Right(Either::Right(value)) => match value {},
+        }
+    }
+}
 
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Denom> for EncodeDenom
 where

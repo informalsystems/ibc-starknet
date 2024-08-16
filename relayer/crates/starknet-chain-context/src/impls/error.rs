@@ -7,6 +7,7 @@ use cgp_core::prelude::*;
 use eyre::Report;
 use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::felt::UnexpectedEndOfBuffer;
+use hermes_cairo_encoding_components::impls::encode_mut::variant::VariantIndexOutOfBound;
 use hermes_error::handlers::debug::DebugError;
 use hermes_error::handlers::display::DisplayError;
 use hermes_error::handlers::identity::ReturnError;
@@ -57,6 +58,7 @@ delegate_components! {
             UnexpectedTransactionTraceType,
             UnexpectedEndOfBuffer,
             NonEmptyBuffer,
+            VariantIndexOutOfBound,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
         ]:
             DebugError,

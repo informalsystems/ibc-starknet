@@ -12,6 +12,11 @@ use crate::types::nat::{Nat, S, Z};
 
 pub type EncodeVariants<N> = SumEncoders<Z, N>;
 
+#[derive(Debug)]
+pub struct VariantIndexOutOfBound {
+    pub index: usize,
+}
+
 pub struct SumEncoders<Index, Remain>(pub PhantomData<(Index, Remain)>);
 
 impl<Encoding, Strategy, ValueA, ValueB, I, N>
@@ -84,6 +89,48 @@ where
         } else {
             let decoded = SumEncoders::decode_mut(encoding, buffer)?;
             Ok(Either::Right(decoded))
+        }
+    }
+}
+
+// impl<Encoding, Strategy, I>
+//     MutDecoder<Encoding, Strategy, Void> for SumEncoders<I, Z>
+// where
+//     Encoding: CanDecodeMut<Strategy, usize>
+//         + CanRaiseError<VariantIndexOutOfBound>,
+//     I: Nat,
+// {
+//     fn decode_mut(
+//         encoding: &Encoding,
+//         buffer: &mut Encoding::DecodeBuffer<'_>,
+//     ) -> Result<Void, Encoding::Error> {
+//         let index: usize = encoding.decode_mut(buffer)?;
+
+//         Err(Encoding::raise_error(VariantIndexOutOfBound { index }))
+//     }
+// }
+
+impl<Encoding, Strategy, Value, I> MutDecoder<Encoding, Strategy, Either<Value, Void>>
+    for SumEncoders<I, Z>
+where
+    Encoding: CanDecodeMut<Strategy, Value>
+        + CanDecodeMut<Strategy, usize>
+        + CanPeekDecodeBuffer<Felt>
+        + CanRaiseError<VariantIndexOutOfBound>,
+    I: Nat,
+{
+    fn decode_mut(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
+    ) -> Result<Either<Value, Void>, Encoding::Error> {
+        let index: usize = encoding.decode_mut(buffer)?;
+
+        if index != I::N {
+            Err(Encoding::raise_error(VariantIndexOutOfBound { index }))
+        } else {
+            let decoded = encoding.decode_mut(buffer)?;
+
+            Ok(Either::Left(decoded))
         }
     }
 }

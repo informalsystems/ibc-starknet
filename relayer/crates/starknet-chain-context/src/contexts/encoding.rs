@@ -20,8 +20,10 @@ use hermes_cairo_encoding_components::traits::encode_and_decode_mut::MutEncoderA
 use hermes_cairo_encoding_components::traits::encode_mut::{
     HasEncodeBufferType, MutEncoderComponent,
 };
+use hermes_cairo_encoding_components::traits::size::HasSize;
+use hermes_cairo_encoding_components::types::nat::{S, Z};
 use hermes_cairo_encoding_components::types::tagged::Tagged;
-use hermes_cairo_encoding_components::HList;
+use hermes_cairo_encoding_components::{HList, Sum};
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_encoding_components::traits::encoded::HasEncodedType;
@@ -147,7 +149,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, String>
     + CanEncode<ViaCairo, TransferErc20TokenMessage>
     + CanEncode<ViaCairo, DeployErc20TokenMessage>
-    // + CanEncodeAndDecode<ViaCairo, Option<String>>
+    + CanEncodeAndDecode<ViaCairo, Option<String>>
     + for<'a> CanEncode<ViaCairo, &'a String>
     + CanEncode<ViaCairo, Denom>
     + CanEncode<ViaCairo, PrefixedDenom>
@@ -167,3 +169,7 @@ pub trait CanUsePairEncoder:
 }
 
 impl CanUsePairEncoder for EncodeCons<EncodeCons<EncodeWithContext>> {}
+
+pub trait HasSizeTwo: HasSize<Size = S<S<Z>>> {}
+
+impl HasSizeTwo for Sum![String, ()] {}
