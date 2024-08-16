@@ -150,11 +150,12 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, Option<String>>
     + for<'a> CanEncode<ViaCairo, &'a String>
     + CanEncodeAndDecode<ViaCairo, Denom>
-    + CanEncode<ViaCairo, PrefixedDenom>
+    + CanEncodeAndDecode<ViaCairo, PrefixedDenom>
     + CanEncodeAndDecode<ViaCairo, TracePrefix>
+    + CanEncodeAndDecode<ViaCairo, Vec<TracePrefix>>
     + CanEncode<ViaCairo, IbcTransferMessage>
-    + CanEncode<ViaCairo, Height>
-    + CanEncode<ViaCairo, Packet>
+    + CanEncodeAndDecode<ViaCairo, Height>
+    + CanEncodeAndDecode<ViaCairo, Packet>
     + CanEncode<ViaCairo, HList![String, String, String]>
 {
 }

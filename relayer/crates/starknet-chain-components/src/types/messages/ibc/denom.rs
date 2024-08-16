@@ -21,12 +21,28 @@ pub struct PrefixedDenom {
     pub base: Denom,
 }
 
-pub type EncodePrefixedDenom = CombineEncoders<
-    HList![
-        EncodeField<symbol!("trace_path")>,
-        EncodeField<symbol!("base")>,
-    ],
->;
+pub struct EncodePrefixedDenom;
+
+delegate_components! {
+    EncodePrefixedDenom {
+        MutEncoderComponent: CombineEncoders<
+            HList![
+                EncodeField<symbol!("trace_path")>,
+                EncodeField<symbol!("base")>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<Self>,
+    }
+}
+
+impl Transformer for EncodePrefixedDenom {
+    type From = (Vec<TracePrefix>, Denom);
+    type To = PrefixedDenom;
+
+    fn transform((trace_path, base): (Vec<TracePrefix>, Denom)) -> PrefixedDenom {
+        PrefixedDenom { trace_path, base }
+    }
+}
 
 #[derive(HasField)]
 pub struct TracePrefix {
@@ -44,7 +60,7 @@ delegate_components! {
                 EncodeField<symbol!("channel_id")>,
             ],
         >,
-        MutDecoderComponent: DecodeFrom<EncodeTracePrefix, (String, String)>,
+        MutDecoderComponent: DecodeFrom<Self>,
     }
 }
 

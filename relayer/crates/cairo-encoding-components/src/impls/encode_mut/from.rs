@@ -3,10 +3,10 @@ use core::marker::PhantomData;
 use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use crate::traits::transform::Transformer;
 
-pub struct DecodeFrom<Transform, Source>(pub PhantomData<(Transform, Source)>);
+pub struct DecodeFrom<Transform>(pub PhantomData<Transform>);
 
 impl<Encoding, Strategy, Transform, Source, Target> MutDecoder<Encoding, Strategy, Target>
-    for DecodeFrom<Transform, Source>
+    for DecodeFrom<Transform>
 where
     Encoding: CanDecodeMut<Strategy, Source>,
     Transform: Transformer<From = Source, To = Target>,
