@@ -1,10 +1,14 @@
+use cgp_core::error::CanRaiseError;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::traits::decoder::CanDecode;
-use starknet::core::types::{Felt, U256};
+use hermes_encoding_components::traits::encoded::HasEncodedType;
+use hermes_encoding_components::traits::has_encoding::HasEncoding;
+use hermes_relayer_components::chain::traits::types::event::HasEventType;
+use starknet::core::types::{Felt, OrderedEvent, U256};
+use starknet::macros::selector;
 
-use crate::traits::event::{CanDecodeStarknetEvent, StarknetEventDecoder};
-use crate::traits::types::method::HasSelectorType;
+use crate::traits::event::{CanDecodeEvent, EventDecoder, EventSelectorMissing};
 
 pub enum Erc20Event {
     Transfer(TransferEvent),
@@ -25,56 +29,78 @@ pub struct ApprovalEvent {
 
 pub struct DecodeErc20Events;
 
-impl<Encoding> StarknetEventDecoder<Encoding, Erc20Event> for DecodeErc20Events
+impl<Chain> EventDecoder<Chain, Erc20Event> for DecodeErc20Events
 where
-    Encoding: HasSelectorType<Selector = Felt>
-        + CanDecodeStarknetEvent<TransferEvent>
-        + CanDecodeStarknetEvent<ApprovalEvent>,
+    Chain: HasEventType<Event = OrderedEvent>
+        + CanDecodeEvent<TransferEvent>
+        + CanDecodeEvent<ApprovalEvent>
+        + for<'a> CanRaiseError<EventSelectorMissing<'a, Chain>>,
 {
     fn decode_event(
-        encoding: &Encoding,
-        selector: &Encoding::Selector,
-        keys: &Encoding::Encoded,
-        values: &Encoding::Encoded,
-    ) -> Result<Erc20Event, Encoding::Error> {
-        todo!()
+        chain: &Chain,
+        event: &OrderedEvent,
+    ) -> Result<Option<Erc20Event>, Chain::Error> {
+        let selector = event
+            .keys
+            .get(0)
+            .ok_or_else(|| Chain::raise_error(EventSelectorMissing { event }))?;
+
+        if selector == &selector!("Transfer") {
+            Ok(chain.decode_event(event)?.map(Erc20Event::Transfer))
+        } else if selector == &selector!("Approval") {
+            Ok(chain.decode_event(event)?.map(Erc20Event::Approval))
+        } else {
+            Ok(None)
+        }
     }
 }
 
-impl<Encoding> StarknetEventDecoder<Encoding, TransferEvent> for DecodeErc20Events
+impl<Chain, Encoding> EventDecoder<Chain, TransferEvent> for DecodeErc20Events
 where
-    Encoding: HasSelectorType + CanDecode<ViaCairo, HList![Felt, Felt]> + CanDecode<ViaCairo, U256>,
+    Chain: HasEventType<Event = OrderedEvent>
+        + HasEncoding<Encoding = Encoding>
+        + CanRaiseError<Encoding::Error>,
+    Encoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, HList![Felt, Felt]>
+        + CanDecode<ViaCairo, U256>,
 {
     fn decode_event(
-        encoding: &Encoding,
-        _selector: &Encoding::Selector,
-        keys: &Encoding::Encoded,
-        values: &Encoding::Encoded,
-    ) -> Result<TransferEvent, Encoding::Error> {
-        let (from, (to, ())) = encoding.decode(keys)?;
-        let value = encoding.decode(values)?;
+        chain: &Chain,
+        event: &OrderedEvent,
+    ) -> Result<Option<TransferEvent>, Chain::Error> {
+        let encoding = chain.encoding();
 
-        Ok(TransferEvent { from, to, value })
+        let (from, (to, ())) = encoding.decode(&event.keys).map_err(Chain::raise_error)?;
+
+        let value = encoding.decode(&event.data).map_err(Chain::raise_error)?;
+
+        Ok(Some(TransferEvent { from, to, value }))
     }
 }
 
-impl<Encoding> StarknetEventDecoder<Encoding, ApprovalEvent> for DecodeErc20Events
+impl<Chain, Encoding> EventDecoder<Chain, ApprovalEvent> for DecodeErc20Events
 where
-    Encoding: HasSelectorType + CanDecode<ViaCairo, HList![Felt, Felt]> + CanDecode<ViaCairo, U256>,
+    Chain: HasEventType<Event = OrderedEvent>
+        + HasEncoding<Encoding = Encoding>
+        + CanRaiseError<Encoding::Error>,
+    Encoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, HList![Felt, Felt]>
+        + CanDecode<ViaCairo, U256>,
 {
     fn decode_event(
-        encoding: &Encoding,
-        _selector: &Encoding::Selector,
-        keys: &Encoding::Encoded,
-        values: &Encoding::Encoded,
-    ) -> Result<ApprovalEvent, Encoding::Error> {
-        let (owner, (spender, ())) = encoding.decode(keys)?;
-        let value = encoding.decode(values)?;
+        chain: &Chain,
+        event: &OrderedEvent,
+    ) -> Result<Option<ApprovalEvent>, Chain::Error> {
+        let encoding = chain.encoding();
 
-        Ok(ApprovalEvent {
+        let (owner, (spender, ())) = encoding.decode(&event.keys).map_err(Chain::raise_error)?;
+
+        let value = encoding.decode(&event.data).map_err(Chain::raise_error)?;
+
+        Ok(Some(ApprovalEvent {
             owner,
             spender,
             value,
-        })
+        }))
     }
 }
