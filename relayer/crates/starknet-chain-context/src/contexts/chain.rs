@@ -31,6 +31,9 @@ use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
+use hermes_starknet_chain_components::traits::event::{
+    CanDecodeEvent, DelegateEventDecoders, EventDecoderComponent,
+};
 use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
@@ -38,6 +41,9 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
+use hermes_starknet_chain_components::types::events::erc20::{
+    ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent,
+};
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
@@ -85,6 +91,8 @@ delegate_components! {
             DefaultEncodingGetterComponent,
         ]:
             ProvideCairoEncoding,
+        EventDecoderComponent:
+            DelegateEventDecoders<StarknetEventDecoders>,
         [
             StarknetProviderTypeComponent,
             StarknetProviderGetterComponent,
@@ -105,6 +113,18 @@ with_starknet_chain_components! {
         StarknetChainContextComponents {
             @StarknetChainComponents: StarknetChainComponents,
         }
+    }
+}
+
+pub struct StarknetEventDecoders;
+
+delegate_components! {
+    StarknetEventDecoders {
+        [
+            Erc20Event,
+            TransferEvent,
+            ApprovalEvent,
+        ]: DecodeErc20Events,
     }
 }
 
@@ -139,6 +159,7 @@ pub trait CanUseStarknetChain:
     + CanQueryTokenBalance
     + CanTransferToken
     + HasRetryableError
+    + CanDecodeEvent<Erc20Event>
 {
 }
 

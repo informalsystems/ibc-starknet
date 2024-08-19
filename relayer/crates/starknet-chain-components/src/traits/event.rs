@@ -1,4 +1,5 @@
 use core::fmt::Debug;
+use std::marker::PhantomData;
 
 use cgp_core::prelude::*;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
@@ -14,6 +15,19 @@ pub struct UnknownEvent<'a, Chain: HasEventType> {
 
 pub struct EventSelectorMissing<'a, Chain: HasEventType> {
     pub event: &'a Chain::Event,
+}
+
+pub struct DelegateEventDecoders<Components>(pub PhantomData<Components>);
+
+impl<Chain, Components, Event> EventDecoder<Chain, Event> for DelegateEventDecoders<Components>
+where
+    Chain: HasEventType + HasErrorType,
+    Components: DelegateComponent<Event>,
+    Components::Delegate: EventDecoder<Chain, Event>,
+{
+    fn decode_event(chain: &Chain, event: &Chain::Event) -> Result<Event, Chain::Error> {
+        Components::Delegate::decode_event(chain, event)
+    }
 }
 
 impl<'a, Chain> Debug for EventSelectorMissing<'a, Chain>
