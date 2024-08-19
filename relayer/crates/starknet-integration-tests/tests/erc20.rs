@@ -16,7 +16,7 @@ use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 
 #[test]
-fn test_starknet_chain_client() {
+fn test_erc20_transfer() {
     let runtime = init_test_runtime();
 
     runtime
@@ -41,12 +41,48 @@ fn test_starknet_chain_client() {
 
             let chain = &chain_driver.chain;
 
+            let token_address = {
+                // Test deployment of ERC20 contract
+                let contract_path = std::env::var("ERC20_CONTRACT")?;
+
+                let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+
+                let contract = serde_json::from_str(&contract_str)?;
+
+                let class_hash = chain.declare_contract(&contract).await?;
+
+                println!("declared class: {:?}", class_hash);
+
+                let relayer_address = chain_driver.relayer_wallet.account_address;
+
+                let deploy_message = DeployErc20TokenMessage {
+                    name: "token".into(),
+                    symbol: "token".into(),
+                    fixed_supply: 1000u32.into(),
+                    recipient: relayer_address,
+                    owner: relayer_address,
+                };
+
+                let calldata = chain.encoding().encode(&deploy_message)?;
+
+                let token_address = chain.deploy_contract(&class_hash, false, &calldata).await?;
+
+                println!("deployed ERC20 contract to address: {:?}", token_address);
+
+                let balance = chain
+                    .query_token_balance(&token_address, &relayer_address)
+                    .await?;
+
+                println!("initial balance: {}", balance);
+
+                assert_eq!(balance.quantity, 1000u32.into());
+
+                token_address
+            };
+
             {
                 // Test local ERC20 token transfer
-
                 let account_address = chain_driver.relayer_wallet.account_address;
-
-                let token_address = chain_driver.genesis_config.transfer_denom;
 
                 let recipient_address = chain_driver.user_wallet_a.account_address;
 
@@ -71,7 +107,7 @@ fn test_starknet_chain_client() {
 
                 println!("events from sending transfer token message: {:?}", events);
 
-                println!("performed transfer of 100 ETH");
+                println!("performed transfer of 100 tokens");
 
                 let sender_balance_b = chain
                     .query_token_balance(&token_address, &account_address)
@@ -93,44 +129,6 @@ fn test_starknet_chain_client() {
                     recipient_balance_b.quantity,
                     recipient_balance_a.quantity + 100u32.into()
                 );
-            }
-
-            {
-                // Test deployment of ERC20 contract
-
-                let contract_path = std::env::var("ERC20_CONTRACT")?;
-
-                let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-                let contract = serde_json::from_str(&contract_str)?;
-
-                let class_hash = chain.declare_contract(&contract).await?;
-
-                println!("declared class: {:?}", class_hash);
-
-                let relayer_address = chain_driver.relayer_wallet.account_address;
-
-                let deploy_message = DeployErc20TokenMessage {
-                    name: "token".into(),
-                    symbol: "token".into(),
-                    fixed_supply: 100u32.into(),
-                    recipient: relayer_address,
-                    owner: relayer_address,
-                };
-
-                let calldata = chain.encoding().encode(&deploy_message)?;
-
-                let token_address = chain.deploy_contract(&class_hash, false, &calldata).await?;
-
-                println!("deployed contract to address: {:?}", token_address);
-
-                let balance = chain
-                    .query_token_balance(&token_address, &relayer_address)
-                    .await?;
-
-                println!("initial balance: {}", balance);
-
-                assert_eq!(balance.quantity, 100u32.into());
             }
 
             <Result<(), Error>>::Ok(())
