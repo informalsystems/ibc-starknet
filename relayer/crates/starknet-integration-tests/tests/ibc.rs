@@ -8,6 +8,8 @@ use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
+use hermes_starknet_chain_components::traits::event::CanParseEvents;
+use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, PrefixedDenom};
 use hermes_starknet_chain_components::types::messages::ibc::height::Height;
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::IbcTransferMessage;
@@ -108,7 +110,7 @@ fn test_starknet_ics20_contract() {
                     src_port_id: "transfer".into(),
                     src_channel_id: "channel-1".into(),
                     dst_port_id: "transfer".into(),
-                    dst_channel_id: "channel-1".into(),
+                    dst_channel_id: "channel-2".into(),
                     data: packet_data,
                     timeout_height: Height {
                         revision_number: 0,
@@ -119,8 +121,6 @@ fn test_starknet_ics20_contract() {
 
                 let calldata = encoding.encode(&packet)?;
 
-                println!("calldata: {:?}", calldata);
-
                 let message = Call {
                     to: ics20_contract_address,
                     selector: selector!("recv_execute"),
@@ -129,7 +129,9 @@ fn test_starknet_ics20_contract() {
 
                 let events = chain.send_message(message).await?;
 
-                println!("recv_execute events: {:?}", events);
+                let ibc_transfer_events: Vec<IbcTransferEvent> = chain.parse_events(&events)?;
+
+                println!("recv_execute events: {:?}", ibc_transfer_events);
             }
 
             <Result<(), Error>>::Ok(())

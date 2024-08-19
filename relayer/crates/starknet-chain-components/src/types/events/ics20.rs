@@ -24,6 +24,7 @@ pub struct ReceiveIbcTransferEvent {
     pub denom: PrefixedDenom,
     pub amount: U256,
     pub memo: String,
+    pub success: bool,
 }
 
 pub struct ParseIbcTransferEvent;
@@ -55,7 +56,7 @@ where
         + CanRaiseError<Encoding::Error>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, HList![Felt, Felt, PrefixedDenom]>
-        + CanDecode<ViaCairo, HList![U256, String]>,
+        + CanDecode<ViaCairo, HList![U256, String, bool]>,
 {
     fn parse_event(
         chain: &Chain,
@@ -66,7 +67,8 @@ where
         let (sender, (receiver, (denom, ()))) =
             encoding.decode(&event.keys).map_err(Chain::raise_error)?;
 
-        let (amount, (memo, ())) = encoding.decode(&event.data).map_err(Chain::raise_error)?;
+        let (amount, (memo, (success, ()))) =
+            encoding.decode(&event.data).map_err(Chain::raise_error)?;
 
         Ok(ReceiveIbcTransferEvent {
             sender,
@@ -74,6 +76,7 @@ where
             denom,
             amount,
             memo,
+            success,
         })
     }
 }

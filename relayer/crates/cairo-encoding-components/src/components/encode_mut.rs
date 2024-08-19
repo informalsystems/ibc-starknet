@@ -1,6 +1,7 @@
 use cgp_core::prelude::*;
 pub use starknet::core::types::{Felt, U256};
 
+use crate::impls::encode_mut::bool::EncodeBool;
 use crate::impls::encode_mut::byte_array::EncodeByteArray;
 use crate::impls::encode_mut::felt::EncodeFelt;
 use crate::impls::encode_mut::from_u128::EncodeFromU128;
@@ -18,6 +19,7 @@ define_components! {
         (ViaCairo, U256): EncodeU256,
         (ViaCairo, Vec<u8>): EncodeByteArray,
         (ViaCairo, Vec<Felt>): EncodeList,
+        (ViaCairo, bool): EncodeBool,
         (ViaCairo, u64): EncodeFromU128,
         (ViaCairo, usize): EncodeFromU128,
         (ViaCairo, String): EncodeUtf8String,

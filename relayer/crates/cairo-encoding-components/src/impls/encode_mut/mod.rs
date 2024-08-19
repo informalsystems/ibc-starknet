@@ -1,4 +1,5 @@
 pub mod array;
+pub mod bool;
 pub mod byte_array;
 pub mod combine;
 pub mod delegate;
