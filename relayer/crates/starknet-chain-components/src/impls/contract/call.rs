@@ -6,14 +6,14 @@ use starknet::providers::{Provider, ProviderError};
 use crate::traits::contract::call::ContractCaller;
 use crate::traits::provider::HasStarknetProvider;
 use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasMethodSelectorType;
+use crate::traits::types::method::HasSelectorType;
 
 pub struct CallStarknetContract;
 
 impl<Chain> ContractCaller<Chain> for CallStarknetContract
 where
     Chain: HasAddressType<Address = Felt>
-        + HasMethodSelectorType<MethodSelector = Felt>
+        + HasSelectorType<Selector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
         + HasStarknetProvider
         + CanRaiseError<ProviderError>,

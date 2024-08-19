@@ -12,7 +12,7 @@ where
     async fn invoke_contract(
         chain: &Chain,
         contract_address: &Chain::Address,
-        entry_point_selector: &Chain::MethodSelector,
+        entry_point_selector: &Chain::Selector,
         calldata: &Chain::Blob,
     ) -> Result<Vec<Chain::Event>, Chain::Error> {
         let message =

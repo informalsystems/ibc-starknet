@@ -86,6 +86,9 @@ fn test_erc20_transfer() {
 
                 let recipient_address = chain_driver.user_wallet_a.account_address;
 
+                println!("sender address: {:?}", account_address);
+                println!("recipient address: {:?}", recipient_address);
+
                 let sender_balance_a = chain
                     .query_token_balance(&token_address, &account_address)
                     .await?;
@@ -100,10 +103,10 @@ fn test_erc20_transfer() {
 
                 let message = chain.build_transfer_token_message(
                     &recipient_address,
-                    &StarknetAmount::new(100u32.into(), token_address),
+                    &StarknetAmount::new(50u32.into(), token_address),
                 )?;
 
-                let events = chain.send_messages(vec![message]).await?;
+                let events = chain.send_messages(vec![message.clone(), message]).await?;
 
                 println!("events from sending transfer token message: {:?}", events);
 

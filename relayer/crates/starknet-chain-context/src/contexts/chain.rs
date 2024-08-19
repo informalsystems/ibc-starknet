@@ -37,7 +37,7 @@ use hermes_starknet_chain_components::traits::provider::{
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
-use hermes_starknet_chain_components::traits::types::method::HasMethodSelectorType;
+use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
@@ -124,7 +124,7 @@ pub trait CanUseStarknetChain:
     HasRuntime
     + HasLogger
     + HasAddressType<Address = Felt>
-    + HasMethodSelectorType<MethodSelector = Felt>
+    + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
     + HasStarknetProvider
     + HasStarknetAccount

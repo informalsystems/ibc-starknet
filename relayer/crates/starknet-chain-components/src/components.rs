@@ -35,7 +35,7 @@ use crate::impls::types::contract::ProvideStarknetContractTypes;
 use crate::impls::types::denom::ProvideTokenAddressDenom;
 use crate::impls::types::event::ProvideStarknetEvent;
 use crate::impls::types::message::ProvideCallMessage;
-use crate::impls::types::method::ProvideFeltMethodSelector;
+use crate::impls::types::method::ProvideFeltSelector;
 use crate::impls::types::transaction::ProvideCallTransaction;
 use crate::impls::types::tx_hash::ProvideFeltTxHash;
 use crate::impls::types::tx_response::ProvideStarknetTxResponse;
@@ -51,7 +51,7 @@ pub use crate::traits::types::blob::BlobTypeComponent;
 pub use crate::traits::types::contract_class::{
     ContractClassHashTypeComponent, ContractClassTypeComponent,
 };
-pub use crate::traits::types::method::MethodSelectorTypeComponent;
+pub use crate::traits::types::method::SelectorTypeComponent;
 use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
 
 define_components! {
@@ -76,8 +76,8 @@ define_components! {
             ProvideFeltTxHash,
         TxResponseTypeComponent:
             ProvideStarknetTxResponse,
-        MethodSelectorTypeComponent:
-            ProvideFeltMethodSelector,
+        SelectorTypeComponent:
+            ProvideFeltSelector,
         [
             ContractClassTypeComponent,
             ContractClassHashTypeComponent,
