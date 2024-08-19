@@ -16,6 +16,7 @@ use hermes_error::handlers::report::ReportError;
 use hermes_error::handlers::wrap::WrapErrorDetail;
 use hermes_error::traits::wrap::WrapError;
 use hermes_error::types::Error;
+use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::transaction::impls::poll_tx_response::TxNoResponseError;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_runtime::types::error::TokioRuntimeError;
@@ -23,6 +24,7 @@ use hermes_starknet_chain_components::impls::error::account::RaiseAccountError;
 use hermes_starknet_chain_components::impls::error::provider::RaiseProviderError;
 use hermes_starknet_chain_components::impls::error::starknet::RaiseStarknetError;
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
+use hermes_starknet_chain_components::traits::event::{EventSelectorMissing, UnknownEvent};
 use starknet::accounts::{single_owner, AccountError};
 use starknet::core::types::contract::{ComputeClassHashError, JsonError};
 use starknet::core::types::{RevertedInvocation, StarknetError};
@@ -60,6 +62,8 @@ delegate_components! {
             NonEmptyBuffer,
             VariantIndexOutOfBound,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
+            <'a, Chain: HasEventType> EventSelectorMissing<'a, Chain>,
+            <'a, Chain: HasEventType> UnknownEvent<'a, Chain>,
         ]:
             DebugError,
         [
