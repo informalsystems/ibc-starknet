@@ -36,21 +36,18 @@ where
         + CanDecodeEvent<ApprovalEvent>
         + for<'a> CanRaiseError<EventSelectorMissing<'a, Chain>>,
 {
-    fn decode_event(
-        chain: &Chain,
-        event: &OrderedEvent,
-    ) -> Result<Option<Erc20Event>, Chain::Error> {
+    fn decode_event(chain: &Chain, event: &OrderedEvent) -> Result<Erc20Event, Chain::Error> {
         let selector = event
             .keys
             .get(0)
             .ok_or_else(|| Chain::raise_error(EventSelectorMissing { event }))?;
 
         if selector == &selector!("Transfer") {
-            Ok(chain.decode_event(event)?.map(Erc20Event::Transfer))
+            Ok(Erc20Event::Transfer(chain.decode_event(event)?))
         } else if selector == &selector!("Approval") {
-            Ok(chain.decode_event(event)?.map(Erc20Event::Approval))
+            Ok(Erc20Event::Approval(chain.decode_event(event)?))
         } else {
-            Ok(None)
+            todo!()
         }
     }
 }
@@ -64,17 +61,14 @@ where
         + CanDecode<ViaCairo, HList![Felt, Felt]>
         + CanDecode<ViaCairo, U256>,
 {
-    fn decode_event(
-        chain: &Chain,
-        event: &OrderedEvent,
-    ) -> Result<Option<TransferEvent>, Chain::Error> {
+    fn decode_event(chain: &Chain, event: &OrderedEvent) -> Result<TransferEvent, Chain::Error> {
         let encoding = chain.encoding();
 
         let (from, (to, ())) = encoding.decode(&event.keys).map_err(Chain::raise_error)?;
 
         let value = encoding.decode(&event.data).map_err(Chain::raise_error)?;
 
-        Ok(Some(TransferEvent { from, to, value }))
+        Ok(TransferEvent { from, to, value })
     }
 }
 
@@ -87,20 +81,17 @@ where
         + CanDecode<ViaCairo, HList![Felt, Felt]>
         + CanDecode<ViaCairo, U256>,
 {
-    fn decode_event(
-        chain: &Chain,
-        event: &OrderedEvent,
-    ) -> Result<Option<ApprovalEvent>, Chain::Error> {
+    fn decode_event(chain: &Chain, event: &OrderedEvent) -> Result<ApprovalEvent, Chain::Error> {
         let encoding = chain.encoding();
 
         let (owner, (spender, ())) = encoding.decode(&event.keys).map_err(Chain::raise_error)?;
 
         let value = encoding.decode(&event.data).map_err(Chain::raise_error)?;
 
-        Ok(Some(ApprovalEvent {
+        Ok(ApprovalEvent {
             owner,
             spender,
             value,
-        }))
+        })
     }
 }
