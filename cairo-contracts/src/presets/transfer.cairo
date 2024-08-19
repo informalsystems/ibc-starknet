@@ -1,10 +1,8 @@
 #[starknet::contract]
 pub(crate) mod Transfer {
     use starknet::ClassHash;
-    use starknet_ibc::apps::governance::component::IBCGovernanceComponent::GovernanceInternalTrait;
     use starknet_ibc::apps::governance::component::IBCGovernanceComponent;
     use starknet_ibc::apps::transfer::component::ICS20TransferComponent;
-    use starknet_ibc::apps::transferrable::component::TransferrableComponent::TransferrableInternalTrait;
     use starknet_ibc::apps::transferrable::component::TransferrableComponent;
 
     component!(path: IBCGovernanceComponent, storage: governance, event: IBCGovernanceEvent);
@@ -13,9 +11,14 @@ pub(crate) mod Transfer {
 
     #[abi(embed_v0)]
     impl IBCGovernanceImpl = IBCGovernanceComponent::Governance<ContractState>;
+    impl IBCGovernanceInternalImpl = IBCGovernanceComponent::GovernanceInternalImpl<ContractState>;
+
     #[abi(embed_v0)]
     impl ICS20TransferreableImpl =
         TransferrableComponent::Transferrable<ContractState>;
+    impl ICS20TransferreableInternal =
+        TransferrableComponent::TransferrableInternalImpl<ContractState>;
+
     #[abi(embed_v0)]
     impl ICS20SendTransferImpl =
         ICS20TransferComponent::SendTransfer<ContractState>;

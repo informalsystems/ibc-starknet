@@ -1,4 +1,5 @@
 use core::array::ArrayTrait;
+use core::byte_array::ByteArrayTrait;
 use core::hash::{HashStateTrait, HashStateExTrait};
 use core::num::traits::Zero;
 use core::poseidon::PoseidonTrait;
@@ -71,6 +72,7 @@ pub trait PrefixedDenomTrait {
     fn starts_with(self: @PrefixedDenom, prefix: @TracePrefix) -> bool;
     fn add_prefix(ref self: PrefixedDenom, prefix: TracePrefix);
     fn remove_prefix(ref self: PrefixedDenom, prefix: @TracePrefix);
+    fn as_byte_array(self: @PrefixedDenom) -> ByteArray;
 }
 
 impl PrefixedDenomImpl of PrefixedDenomTrait {
@@ -86,6 +88,20 @@ impl PrefixedDenomImpl of PrefixedDenomTrait {
         if self.starts_with(prefix) {
             self.trace_path.pop_front().unwrap();
         }
+    }
+
+    fn as_byte_array(self: @PrefixedDenom) -> ByteArray {
+        let mut denom_prefix: ByteArray = "";
+        let mut trace_path_span = self.trace_path.span();
+        while let Option::Some(path) = trace_path_span
+            .pop_front() {
+                denom_prefix.append(path.port_id.port_id);
+                denom_prefix.append(@"/");
+                denom_prefix.append(path.channel_id.channel_id);
+                denom_prefix.append(@"/");
+            };
+        denom_prefix.append(@self.base.hosted().unwrap());
+        denom_prefix
     }
 }
 
