@@ -11,17 +11,20 @@ use starknet::macros::selector;
 use crate::traits::event::{CanDecodeEvent, EventDecoder, EventSelectorMissing, UnknownEvent};
 use crate::types::event::StarknetEvent;
 
+#[derive(Debug)]
 pub enum Erc20Event {
     Transfer(TransferEvent),
     Approval(ApprovalEvent),
 }
 
+#[derive(Debug)]
 pub struct TransferEvent {
     pub from: Felt,
     pub to: Felt,
     pub value: U256,
 }
 
+#[derive(Debug)]
 pub struct ApprovalEvent {
     pub owner: Felt,
     pub spender: Felt,

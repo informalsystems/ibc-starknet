@@ -4,13 +4,15 @@ use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encoder::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_error::types::Error;
-use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
+use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
+use hermes_starknet_chain_components::traits::event::CanDecodeEvents;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
+use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
@@ -101,16 +103,34 @@ fn test_erc20_transfer() {
 
                 println!("recipient balance before: {}", recipient_balance_a);
 
+                let transfer_amount = 100u32.into();
+
                 let message = chain.build_transfer_token_message(
                     &recipient_address,
-                    &StarknetAmount::new(50u32.into(), token_address),
+                    &StarknetAmount::new(transfer_amount, token_address),
                 )?;
 
-                let events = chain.send_messages(vec![message.clone(), message]).await?;
-
-                println!("events from sending transfer token message: {:?}", events);
+                let events = chain.send_message(message).await?;
 
                 println!("performed transfer of 100 tokens");
+
+                let erc20_events: Vec<Erc20Event> = chain.decode_events(&events)?;
+
+                println!(
+                    "events from sending transfer token message: {:?}",
+                    erc20_events
+                );
+
+                match &erc20_events[0] {
+                    Erc20Event::Transfer(transfer) => {
+                        assert_eq!(transfer.from, account_address);
+                        assert_eq!(transfer.to, recipient_address);
+                        assert_eq!(transfer.value, transfer_amount);
+                    }
+                    _ => {
+                        panic!("expected a Transfer event to be emitted");
+                    }
+                }
 
                 let sender_balance_b = chain
                     .query_token_balance(&token_address, &account_address)
@@ -126,11 +146,11 @@ fn test_erc20_transfer() {
 
                 assert_eq!(
                     sender_balance_b.quantity,
-                    sender_balance_a.quantity - 100u32.into()
+                    sender_balance_a.quantity - transfer_amount
                 );
                 assert_eq!(
                     recipient_balance_b.quantity,
-                    recipient_balance_a.quantity + 100u32.into()
+                    recipient_balance_a.quantity + transfer_amount
                 );
             }
 

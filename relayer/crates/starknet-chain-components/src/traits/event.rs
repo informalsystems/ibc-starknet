@@ -19,6 +19,26 @@ pub struct EventSelectorMissing<'a, Chain: HasEventType> {
 
 pub struct DelegateEventDecoders<Components>(pub PhantomData<Components>);
 
+pub trait CanDecodeEvents<Event>: HasEventType + HasErrorType {
+    fn decode_events(&self, events: &[Self::Event]) -> Result<Vec<Event>, Self::Error>;
+}
+
+impl<Chain, Event> CanDecodeEvents<Event> for Chain
+where
+    Chain: CanDecodeEvent<Event>,
+{
+    fn decode_events(&self, events: &[Self::Event]) -> Result<Vec<Event>, Self::Error> {
+        let mut parsed_events = Vec::new();
+
+        for event in events.iter() {
+            let parsed_event = self.decode_event(event)?;
+            parsed_events.push(parsed_event);
+        }
+
+        Ok(parsed_events)
+    }
+}
+
 impl<Chain, Components, Event> EventDecoder<Chain, Event> for DelegateEventDecoders<Components>
 where
     Chain: HasEventType + HasErrorType,
