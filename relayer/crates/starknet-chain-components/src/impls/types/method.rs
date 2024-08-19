@@ -1,10 +1,10 @@
 use cgp_core::Async;
 use starknet::core::types::Felt;
 
-use crate::traits::types::method::ProvideMethodSelectorType;
+use crate::traits::types::method::ProvideSelectorType;
 
-pub struct ProvideFeltMethodSelector;
+pub struct ProvideFeltSelector;
 
-impl<Chain: Async> ProvideMethodSelectorType<Chain> for ProvideFeltMethodSelector {
-    type MethodSelector = Felt;
+impl<Chain: Async> ProvideSelectorType<Chain> for ProvideFeltSelector {
+    type Selector = Felt;
 }

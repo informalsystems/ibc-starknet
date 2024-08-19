@@ -5,14 +5,14 @@ use starknet::core::types::Felt;
 
 use crate::traits::contract::message::InvokeContractMessageBuilder;
 use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasMethodSelectorType;
+use crate::traits::types::method::HasSelectorType;
 
 pub struct BuildInvokeContractCall;
 
 impl<Chain> InvokeContractMessageBuilder<Chain> for BuildInvokeContractCall
 where
     Chain: HasAddressType<Address = Felt>
-        + HasMethodSelectorType<MethodSelector = Felt>
+        + HasSelectorType<Selector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
         + HasMessageType<Message = Call>,
 {

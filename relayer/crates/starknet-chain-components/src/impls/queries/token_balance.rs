@@ -10,7 +10,7 @@ use starknet::macros::selector;
 use crate::traits::contract::call::CanCallContract;
 use crate::traits::queries::token_balance::TokenBalanceQuerier;
 use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasMethodSelectorType;
+use crate::traits::types::method::HasSelectorType;
 use crate::types::amount::StarknetAmount;
 
 pub struct QueryErc20TokenBalance;
@@ -22,7 +22,7 @@ where
     Chain: HasAddressType<Address = Felt>
         + HasAmountType<Amount = StarknetAmount>
         + HasBlobType<Blob = Vec<Felt>>
-        + HasMethodSelectorType<MethodSelector = Felt>
+        + HasSelectorType<Selector = Felt>
         + CanCallContract
         + HasEncoding<Encoding = Encoding>
         + CanRaiseError<&'static str>

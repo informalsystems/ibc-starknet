@@ -1,9 +1,10 @@
 use cgp_core::Async;
 use hermes_relayer_components::chain::traits::types::event::ProvideEventType;
-use starknet::core::types::OrderedEvent;
+
+use crate::types::event::StarknetEvent;
 
 pub struct ProvideStarknetEvent;
 
 impl<Chain: Async> ProvideEventType<Chain> for ProvideStarknetEvent {
-    type Event = OrderedEvent;
+    type Event = StarknetEvent;
 }
