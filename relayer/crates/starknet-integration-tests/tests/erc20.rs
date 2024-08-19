@@ -8,7 +8,7 @@ use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::traits::event::CanDecodeEvents;
+use hermes_starknet_chain_components::traits::event::CanParseEvents;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
@@ -114,7 +114,7 @@ fn test_erc20_transfer() {
 
                 println!("performed transfer of 100 tokens");
 
-                let erc20_events: Vec<Erc20Event> = chain.decode_events(&events)?;
+                let erc20_events: Vec<Erc20Event> = chain.parse_events(&events)?;
 
                 println!(
                     "events from sending transfer token message: {:?}",

@@ -32,7 +32,7 @@ use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContr
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
 use hermes_starknet_chain_components::traits::event::{
-    CanDecodeEvent, DelegateEventDecoders, EventDecoderComponent,
+    CanParseEvent, DelegateEventDecoders, EventParserComponent,
 };
 use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
@@ -91,7 +91,7 @@ delegate_components! {
             DefaultEncodingGetterComponent,
         ]:
             ProvideCairoEncoding,
-        EventDecoderComponent:
+        EventParserComponent:
             DelegateEventDecoders<StarknetEventDecoders>,
         [
             StarknetProviderTypeComponent,
@@ -159,7 +159,7 @@ pub trait CanUseStarknetChain:
     + CanQueryTokenBalance
     + CanTransferToken
     + HasRetryableError
-    + CanDecodeEvent<Erc20Event>
+    + CanParseEvent<Erc20Event>
 {
 }
 

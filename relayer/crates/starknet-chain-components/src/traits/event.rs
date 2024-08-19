@@ -4,9 +4,9 @@ use std::marker::PhantomData;
 use cgp_core::prelude::*;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 
-#[derive_component(EventDecoderComponent, EventDecoder<Chain>)]
-pub trait CanDecodeEvent<Event>: HasEventType + HasErrorType {
-    fn decode_event(&self, event: &Self::Event) -> Result<Event, Self::Error>;
+#[derive_component(EventParserComponent, EventParser<Chain>)]
+pub trait CanParseEvent<Event>: HasEventType + HasErrorType {
+    fn parse_event(&self, event: &Self::Event) -> Result<Event, Self::Error>;
 }
 
 pub struct UnknownEvent<'a, Chain: HasEventType> {
@@ -19,19 +19,19 @@ pub struct EventSelectorMissing<'a, Chain: HasEventType> {
 
 pub struct DelegateEventDecoders<Components>(pub PhantomData<Components>);
 
-pub trait CanDecodeEvents<Event>: HasEventType + HasErrorType {
-    fn decode_events(&self, events: &[Self::Event]) -> Result<Vec<Event>, Self::Error>;
+pub trait CanParseEvents<Event>: HasEventType + HasErrorType {
+    fn parse_events(&self, events: &[Self::Event]) -> Result<Vec<Event>, Self::Error>;
 }
 
-impl<Chain, Event> CanDecodeEvents<Event> for Chain
+impl<Chain, Event> CanParseEvents<Event> for Chain
 where
-    Chain: CanDecodeEvent<Event>,
+    Chain: CanParseEvent<Event>,
 {
-    fn decode_events(&self, events: &[Self::Event]) -> Result<Vec<Event>, Self::Error> {
+    fn parse_events(&self, events: &[Self::Event]) -> Result<Vec<Event>, Self::Error> {
         let mut parsed_events = Vec::new();
 
         for event in events.iter() {
-            let parsed_event = self.decode_event(event)?;
+            let parsed_event = self.parse_event(event)?;
             parsed_events.push(parsed_event);
         }
 
@@ -39,14 +39,14 @@ where
     }
 }
 
-impl<Chain, Components, Event> EventDecoder<Chain, Event> for DelegateEventDecoders<Components>
+impl<Chain, Components, Event> EventParser<Chain, Event> for DelegateEventDecoders<Components>
 where
     Chain: HasEventType + HasErrorType,
     Components: DelegateComponent<Event>,
-    Components::Delegate: EventDecoder<Chain, Event>,
+    Components::Delegate: EventParser<Chain, Event>,
 {
-    fn decode_event(chain: &Chain, event: &Chain::Event) -> Result<Event, Chain::Error> {
-        Components::Delegate::decode_event(chain, event)
+    fn parse_event(chain: &Chain, event: &Chain::Event) -> Result<Event, Chain::Error> {
+        Components::Delegate::parse_event(chain, event)
     }
 }
 

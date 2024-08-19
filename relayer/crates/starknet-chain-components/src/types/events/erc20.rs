@@ -8,7 +8,7 @@ use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::traits::event::{CanDecodeEvent, EventDecoder, EventSelectorMissing, UnknownEvent};
+use crate::traits::event::{CanParseEvent, EventParser, EventSelectorMissing, UnknownEvent};
 use crate::types::event::StarknetEvent;
 
 #[derive(Debug)]
@@ -33,30 +33,30 @@ pub struct ApprovalEvent {
 
 pub struct DecodeErc20Events;
 
-impl<Chain> EventDecoder<Chain, Erc20Event> for DecodeErc20Events
+impl<Chain> EventParser<Chain, Erc20Event> for DecodeErc20Events
 where
     Chain: HasEventType<Event = StarknetEvent>
-        + CanDecodeEvent<TransferEvent>
-        + CanDecodeEvent<ApprovalEvent>
+        + CanParseEvent<TransferEvent>
+        + CanParseEvent<ApprovalEvent>
         + for<'a> CanRaiseError<EventSelectorMissing<'a, Chain>>
         + for<'a> CanRaiseError<UnknownEvent<'a, Chain>>,
 {
-    fn decode_event(chain: &Chain, event: &StarknetEvent) -> Result<Erc20Event, Chain::Error> {
+    fn parse_event(chain: &Chain, event: &StarknetEvent) -> Result<Erc20Event, Chain::Error> {
         let selector = event
             .selector
             .ok_or_else(|| Chain::raise_error(EventSelectorMissing { event }))?;
 
         if selector == selector!("Transfer") {
-            Ok(Erc20Event::Transfer(chain.decode_event(event)?))
+            Ok(Erc20Event::Transfer(chain.parse_event(event)?))
         } else if selector == selector!("Approval") {
-            Ok(Erc20Event::Approval(chain.decode_event(event)?))
+            Ok(Erc20Event::Approval(chain.parse_event(event)?))
         } else {
             Err(Chain::raise_error(UnknownEvent { event }))
         }
     }
 }
 
-impl<Chain, Encoding> EventDecoder<Chain, TransferEvent> for DecodeErc20Events
+impl<Chain, Encoding> EventParser<Chain, TransferEvent> for DecodeErc20Events
 where
     Chain: HasEventType<Event = StarknetEvent>
         + HasEncoding<Encoding = Encoding>
@@ -65,7 +65,7 @@ where
         + CanDecode<ViaCairo, HList![Felt, Felt]>
         + CanDecode<ViaCairo, U256>,
 {
-    fn decode_event(chain: &Chain, event: &StarknetEvent) -> Result<TransferEvent, Chain::Error> {
+    fn parse_event(chain: &Chain, event: &StarknetEvent) -> Result<TransferEvent, Chain::Error> {
         let encoding = chain.encoding();
 
         let (from, (to, ())) = encoding.decode(&event.keys).map_err(Chain::raise_error)?;
@@ -76,7 +76,7 @@ where
     }
 }
 
-impl<Chain, Encoding> EventDecoder<Chain, ApprovalEvent> for DecodeErc20Events
+impl<Chain, Encoding> EventParser<Chain, ApprovalEvent> for DecodeErc20Events
 where
     Chain: HasEventType<Event = StarknetEvent>
         + HasEncoding<Encoding = Encoding>
@@ -85,7 +85,7 @@ where
         + CanDecode<ViaCairo, HList![Felt, Felt]>
         + CanDecode<ViaCairo, U256>,
 {
-    fn decode_event(chain: &Chain, event: &StarknetEvent) -> Result<ApprovalEvent, Chain::Error> {
+    fn parse_event(chain: &Chain, event: &StarknetEvent) -> Result<ApprovalEvent, Chain::Error> {
         let encoding = chain.encoding();
 
         let (owner, (spender, ())) = encoding.decode(&event.keys).map_err(Chain::raise_error)?;
