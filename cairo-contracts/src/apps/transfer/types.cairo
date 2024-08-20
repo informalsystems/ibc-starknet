@@ -17,8 +17,8 @@ use starknet_ibc::apps::mintable::interface::{
 };
 use starknet_ibc::apps::transfer::TRANSFER_PORT_ID_HASH;
 use starknet_ibc::apps::transfer::errors::TransferErrors;
-use starknet_ibc::core::client::types::{Height, Timestamp};
-use starknet_ibc::core::host::types::{PortId, PortIdTrait, ChannelId, ChannelIdTrait};
+use starknet_ibc::core::client::{Height, Timestamp};
+use starknet_ibc::core::host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait};
 use starknet_ibc::utils::{ValidateBasicTrait, ComputeKeyTrait};
 
 /// Maximum memo length allowed for ICS-20 transfers. This bound corresponds to

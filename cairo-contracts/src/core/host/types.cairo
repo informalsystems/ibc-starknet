@@ -10,27 +10,46 @@ use starknet_ibc::core::host::errors::HostErrors;
 use starknet_ibc::utils::poseidon_hash;
 
 #[derive(Clone, Debug, Drop, PartialEq, Eq, Serde, Store)]
+pub struct ClientId {
+    pub client_type: felt252,
+    pub sequence: u64,
+}
+
+pub trait ClientIdTrait {
+    fn new(client_type: felt252, sequence: u64) -> ClientId;
+    fn validate(self: @ClientId, client_id_hash: felt252);
+}
+
+pub impl ClientIdImpl of ClientIdTrait {
+    fn new(client_type: felt252, sequence: u64) -> ClientId {
+        ClientId { client_type, sequence }
+    }
+
+    fn validate(self: @ClientId, client_id_hash: felt252) {}
+}
+
+#[derive(Clone, Debug, Drop, PartialEq, Eq, Serde, Store)]
 pub struct ChannelId {
     pub channel_id: ByteArray,
 }
 
 pub trait ChannelIdTrait {
-    fn new(index: u64) -> ChannelId;
-    fn index(self: @ChannelId) -> u64;
+    fn new(sequence: u64) -> ChannelId;
+    fn sequence(self: @ChannelId) -> u64;
     fn validate(self: @ChannelId);
 }
 
 pub impl ChannelIdImpl of ChannelIdTrait {
-    fn new(index: u64) -> ChannelId {
+    fn new(sequence: u64) -> ChannelId {
         let mut channel_id: ByteArray = "";
         channel_id.append(@"channel-");
-        channel_id.append(@index.format_as_byte_array(10));
+        channel_id.append(@sequence.format_as_byte_array(10));
         ChannelId { channel_id }
     }
 
-    fn index(self: @ChannelId) -> u64 {
+    fn sequence(self: @ChannelId) -> u64 {
         let mut i = self.channel_id.len();
-        let mut index: u256 = 0;
+        let mut sequence: u256 = 0;
         let mut multiplier: u256 = 1;
 
         loop {
@@ -41,13 +60,13 @@ pub impl ChannelIdImpl of ChannelIdTrait {
 
             assert_numeric(char_byte);
 
-            index += multiplier * (char_byte - 48).into();
+            sequence += multiplier * (char_byte - 48).into();
 
             i -= 1;
             multiplier *= 10;
         };
 
-        index.try_into().unwrap()
+        sequence.try_into().unwrap()
     }
 
     fn validate(self: @ChannelId) {
@@ -58,7 +77,7 @@ pub impl ChannelIdImpl of ChannelIdTrait {
 
         let mut expected_channel_id: ByteArray = "channel-";
 
-        expected_channel_id.append(@self.index().format_as_byte_array(10));
+        expected_channel_id.append(@self.sequence().format_as_byte_array(10));
 
         let self_hash = poseidon_hash(self);
 

@@ -5,8 +5,8 @@ use starknet_ibc::apps::transfer::types::{
     MsgTransfer, PacketData, PrefixedDenom, Denom, Memo, TracePrefixTrait
 };
 use starknet_ibc::core::channel::types::Packet;
-use starknet_ibc::core::client::types::{Height, Timestamp};
-use starknet_ibc::core::host::types::{PortId, ChannelId, Sequence};
+use starknet_ibc::core::client::{Height, Timestamp};
+use starknet_ibc::core::host::{PortId, ChannelId, Sequence};
 use starknet_ibc::tests::constants::{PUBKEY, NAME, AMOUNT, SUPPLY};
 
 #[derive(Clone, Debug, Drop, Serde)]
