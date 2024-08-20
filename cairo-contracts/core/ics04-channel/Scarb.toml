@@ -13,8 +13,8 @@ description   = { workspace = true }
 
 [dependencies]
 # external dependencies
-starknet     = { workspace = true }
-snforge_std  = { workspace = true }
+starknet    = { workspace = true }
+snforge_std = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_core_host   = { workspace = true }

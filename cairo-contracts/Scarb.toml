@@ -1,14 +1,14 @@
 [workspace]
 members = [
-    "utils",
-    "core/ics24-host",
-    "core/ics02-client",
-    "core/ics04-channel",
-    "clients/ics07-tendermint",
-    "apps/ics20-transfer",
-    "testing",
-    "ibc",
-    "presets",
+  "utils",
+  "core/ics24-host",
+  "core/ics02-client",
+  "core/ics04-channel",
+  "clients/ics07-tendermint",
+  "apps/ics20-transfer",
+  "testing",
+  "ibc",
+  "presets",
 ]
 
 [workspace.package]
