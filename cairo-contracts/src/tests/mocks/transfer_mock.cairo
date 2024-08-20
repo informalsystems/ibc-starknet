@@ -11,7 +11,7 @@ pub(crate) mod TransferMock {
         ERC20TokenTrait, ERC20Token, PrefixedDenomTrait
     };
     use starknet_ibc::apps::transferrable::component::TransferrableComponent;
-    use starknet_ibc::core::host::types::{PortId, ChannelId, ChannelIdTrait};
+    use starknet_ibc::core::host::{PortId, ChannelId, ChannelIdTrait};
 
     component!(path: TransferrableComponent, storage: transferrable, event: TransferrableEvent);
     component!(path: ICS20TransferComponent, storage: transfer, event: ICS20TransferEvent);

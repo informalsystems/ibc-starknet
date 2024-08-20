@@ -16,7 +16,7 @@ pub mod ICS20TransferComponent {
     };
     use starknet_ibc::apps::transferrable::interface::ITransferrable;
     use starknet_ibc::core::channel::types::Packet;
-    use starknet_ibc::core::host::types::{PortId, ChannelId, ChannelIdTrait};
+    use starknet_ibc::core::host::{PortId, ChannelId, ChannelIdTrait};
     use starknet_ibc::utils::{ComputeKeyTrait, ValidateBasicTrait};
 
     #[storage]
