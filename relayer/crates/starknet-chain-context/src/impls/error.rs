@@ -5,6 +5,7 @@ use std::string::FromUtf8Error;
 use cairo_lang_starknet_classes::casm_contract_class::StarknetSierraCompilationError;
 use cgp_core::prelude::*;
 use eyre::Report;
+use hermes_cairo_encoding_components::impls::encode_mut::bool::DecodeBoolError;
 use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::variant::VariantIndexOutOfBound;
@@ -61,6 +62,7 @@ delegate_components! {
             UnexpectedEndOfBuffer,
             NonEmptyBuffer,
             VariantIndexOutOfBound,
+            DecodeBoolError,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
             <'a, Chain: HasEventType> EventSelectorMissing<'a, Chain>,
             <'a, Chain: HasEventType> UnknownEvent<'a, Chain>,

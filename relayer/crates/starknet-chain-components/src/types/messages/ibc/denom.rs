@@ -10,15 +10,22 @@ use hermes_cairo_encoding_components::types::either::Either;
 use hermes_cairo_encoding_components::{HList, Sum};
 use starknet::core::types::Felt;
 
+#[derive(Debug)]
 pub enum Denom {
     Native(Felt),
     Hosted(String),
 }
 
-#[derive(HasField)]
+#[derive(Debug, HasField)]
 pub struct PrefixedDenom {
     pub trace_path: Vec<TracePrefix>,
     pub base: Denom,
+}
+
+#[derive(Debug, HasField)]
+pub struct TracePrefix {
+    pub port_id: String,
+    pub channel_id: String,
 }
 
 pub struct EncodePrefixedDenom;
@@ -42,12 +49,6 @@ impl Transformer for EncodePrefixedDenom {
     fn transform((trace_path, base): (Vec<TracePrefix>, Denom)) -> PrefixedDenom {
         PrefixedDenom { trace_path, base }
     }
-}
-
-#[derive(HasField)]
-pub struct TracePrefix {
-    pub port_id: String,
-    pub channel_id: String,
 }
 
 pub struct EncodeTracePrefix;
