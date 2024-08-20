@@ -42,8 +42,8 @@ jobs:
           RUST_BACKTRACE: 1
         working-directory: ./relayer
         run: |
-          export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_ERC20Mintable.contract_class.json"
-          export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_Transfer.contract_class.json"
+          export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_presets_ERC20Mintable.contract_class.json"
+          export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_presets_Transfer.contract_class.json"
 
           nix develop ..#rust -c \
             cargo nextest run --test-threads=2
