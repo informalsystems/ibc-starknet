@@ -13,7 +13,7 @@ pub use consensus_state::{
     TendermintConsensusState, TendermintConsensusStateImpl, TendermintConsensusStateTrait
 };
 
-pub use errors::ICS07Errors;
+pub use errors::TendermintErrors;
 pub use header::{
     TendermintHeader, TendermintHeaderImpl, TendermintHeaderIntoConsensusState,
     TendermintHeaderTrait

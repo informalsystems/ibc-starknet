@@ -1,4 +1,4 @@
-use starknet_ibc::clients::tendermint::{ICS07Errors, TendermintConsensusState};
+use starknet_ibc::clients::tendermint::{TendermintErrors, TendermintConsensusState};
 use starknet_ibc::core::client::Height;
 
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
@@ -17,7 +17,7 @@ pub impl TendermintHeaderImpl of TendermintHeaderTrait {
 
         let maybe_header = Serde::<TendermintHeader>::deserialize(ref header_span);
 
-        assert(maybe_header.is_some(), ICS07Errors::INVALID_HEADER);
+        assert(maybe_header.is_some(), TendermintErrors::INVALID_HEADER);
 
         maybe_header.unwrap()
     }

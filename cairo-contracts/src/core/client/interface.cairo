@@ -1,12 +1,8 @@
 use starknet::ContractAddress;
-use starknet_ibc::apps::transfer::types::{MsgTransfer, PrefixedDenom};
-use starknet_ibc::core::channel::types::Packet;
-use starknet_ibc::core::client::types::Height;
-use starknet_ibc::core::client::types::{Status, UpdateResult};
 use starknet_ibc::core::client::{
-    MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient
+    MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Status,
+    UpdateResult
 };
-use starknet_ibc::core::host::ClientId;
 
 #[starknet::interface]
 pub trait IClientHandler<TContractState> {

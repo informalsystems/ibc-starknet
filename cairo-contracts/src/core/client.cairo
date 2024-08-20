@@ -9,7 +9,7 @@ pub use component::ICS02ClientComponent;
 
 pub use contract::{ClientContract, ClientContractTrait};
 
-pub use errors::ICS02Errors;
+pub use errors::ClientErrors;
 
 pub use interface::{
     IClientHandler, IClientHandlerDispatcher, IClientState, IClientStateDispatcher,

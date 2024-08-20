@@ -1,19 +1,16 @@
 #[starknet::component]
 pub mod ICS07ClientComponent {
     use core::num::traits::zero::Zero;
-    use core::traits::Into;
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc::clients::tendermint::{
         TendermintClientState, TendermintClientStateImpl, TendermintConsensusState,
-        TendermintConsensusStateImpl, TendermintHeader, TendermintHeaderImpl,
-        TendermintConsensusStateTrait, TendermintClientStateTrait, ICS07Errors
+        TendermintConsensusStateImpl, TendermintHeader, TendermintHeaderImpl, TendermintErrors
     };
     use starknet_ibc::core::client::{
         MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Timestamp,
         Status, StatusTrait, UpdateResult, IClientHandler, IClientState, IClientStateValidation,
         IClientStateExecution
     };
-    use starknet_ibc::core::host::ClientId;
 
     #[storage]
     struct Storage {
@@ -55,15 +52,15 @@ pub mod ICS07ClientComponent {
         fn create_validate(
             self: @ComponentState<TContractState>, msg: MsgCreateClient, client_sequence: u64
         ) {
-            assert(msg.client_type == self.client_type(), ICS07Errors::INVALID_CLIENT_TYPE);
+            assert(msg.client_type == self.client_type(), TendermintErrors::INVALID_CLIENT_TYPE);
 
-            assert(!msg.client_state.is_empty(), ICS07Errors::EMPTY_CLIENT_STATE);
+            assert(!msg.client_state.is_empty(), TendermintErrors::EMPTY_CLIENT_STATE);
 
-            assert(!msg.consensus_state.is_empty(), ICS07Errors::EMPTY_CONSENSUS_STATE);
+            assert(!msg.consensus_state.is_empty(), TendermintErrors::EMPTY_CONSENSUS_STATE);
 
             let status = self.status(msg.client_state, client_sequence);
 
-            assert(status.is_active(), ICS07Errors::INACTIVE_CLIENT);
+            assert(status.is_active(), TendermintErrors::INACTIVE_CLIENT);
         }
 
         fn create_execute(
@@ -79,10 +76,11 @@ pub mod ICS07ClientComponent {
     > of UpdateClientTrait<TContractState> {
         fn update_validate(self: @ComponentState<TContractState>, msg: MsgUpdateClient) {
             assert(
-                msg.client_id.client_type == self.client_type(), ICS07Errors::INVALID_CLIENT_TYPE
+                msg.client_id.client_type == self.client_type(),
+                TendermintErrors::INVALID_CLIENT_TYPE
             );
 
-            assert(!msg.client_message.is_empty(), ICS07Errors::EMPTY_CLIENT_MESSAGE);
+            assert(!msg.client_message.is_empty(), TendermintErrors::EMPTY_CLIENT_MESSAGE);
 
             let tendermint_client_state: TendermintClientState = self
                 .client_states
@@ -90,7 +88,7 @@ pub mod ICS07ClientComponent {
 
             let status = self._status(tendermint_client_state, msg.client_id.sequence);
 
-            assert(status.is_active(), ICS07Errors::INACTIVE_CLIENT);
+            assert(status.is_active(), TendermintErrors::INACTIVE_CLIENT);
 
             self.verify_client_message(msg.client_id.sequence, msg.client_message);
         }

@@ -1,13 +1,12 @@
 #[starknet::component]
 pub mod ICS02ClientComponent {
     use starknet::ContractAddress;
-    use starknet_ibc::core::client::ICS02Errors;
-    use starknet_ibc::core::client::StatusTrait;
+    use starknet_ibc::core::client::ClientErrors;
     use starknet_ibc::core::client::{
         MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, UpdateResult
     };
     use starknet_ibc::core::client::{ClientContract, ClientContractTrait};
-    use starknet_ibc::core::host::{ClientId, ClientIdImpl, ClientIdTrait};
+    use starknet_ibc::core::host::{ClientId, ClientIdImpl};
 
     #[storage]
     struct Storage {
@@ -117,7 +116,7 @@ pub mod ICS02ClientComponent {
         ) -> ClientContract {
             let client: ClientContract = self.supported_clients.read(client_type).into();
 
-            assert(client.is_non_zero(), ICS02Errors::UNSUPPORTED_CLIENT_TYPE);
+            assert(client.is_non_zero(), ClientErrors::UNSUPPORTED_CLIENT_TYPE);
 
             client
         }

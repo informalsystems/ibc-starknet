@@ -1,4 +1,4 @@
-pub mod ICS07Errors {
+pub mod TendermintErrors {
     pub const EMPTY_CLIENT_STATE: felt252 = 'ICS07: empty client state';
     pub const EMPTY_CLIENT_MESSAGE: felt252 = 'ICS07: empty client message';
     pub const EMPTY_CONSENSUS_STATE: felt252 = 'ICS07: empty consensus state';

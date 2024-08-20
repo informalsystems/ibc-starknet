@@ -1,4 +1,4 @@
-use starknet_ibc::clients::tendermint::ICS07Errors;
+use starknet_ibc::clients::tendermint::TendermintErrors;
 use starknet_ibc::core::client::{Height, Status};
 
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
@@ -20,7 +20,7 @@ pub impl TendermintConsensusStateImpl of TendermintConsensusStateTrait {
             TendermintConsensusState
         >::deserialize(ref consensus_state_span);
 
-        assert(maybe_consensus_state.is_some(), ICS07Errors::INVALID_CLIENT_STATE);
+        assert(maybe_consensus_state.is_some(), TendermintErrors::INVALID_CLIENT_STATE);
 
         maybe_consensus_state.unwrap()
     }
