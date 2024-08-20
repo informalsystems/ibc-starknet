@@ -1,5 +1,17 @@
-[package]
-name          = "starknet_ibc"
+[workspace]
+members = [
+    "utils",
+    "core/ics24-host",
+    "core/ics02-client",
+    "core/ics04-channel",
+    "clients/ics07-tendermint",
+    "apps/ics20-transfer",
+    "testing",
+    "ibc",
+    "presets",
+]
+
+[workspace.package]
 version       = "0.1.0"
 license       = "Apache-2.0"
 edition       = "2023_11"
@@ -8,20 +20,24 @@ scarb-version = "2.6.5"
 repository    = "https://github.com/informalsystems/ibc-starknet"
 authors       = [ "Informal Systems <hello@informal.systems>" ]
 Readme        = "README.md"
-keywords      = [ "ethereum", "starknet", "cairo", "ibc", "ibc-rs" ]
+keywords      = [ "ethereum", "starknet", "ibc", "cairo", "contracts" ]
 description   = "Collection of Cairo components and contracts that implement and integrate IBC protocol with Starknet"
 
-[dependencies]
+[workspace.dependencies]
+# external dependencies
 starknet     = ">=2.6.0"
 openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.14.0" }
 snforge_std  = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.25.0" }
 
-[lib]
+# ibc dependencies
+starknet_ibc_utils             = { path = "utils" }
+starknet_ibc_core_host         = { path = "core/ics24-host" }
+starknet_ibc_core_client       = { path = "core/ics02-client" }
+starknet_ibc_core_channel      = { path = "core/ics04-channel" }
+starknet_ibc_client_tendermint = { path = "clients/ics07-tendermint" }
+starknet_ibc_app_transfer      = { path = "apps/ics20-transfer" }
+starknet_ibc_testing           = { path = "testing" }
+starknet_ibc_presets           = { path = "presets" }
 
-[[target.starknet-contract]]
-allowed-libfuncs-list.name = "experimental"
-sierra                     = true
-casm                       = false
-
-[tool.fmt]
+[workspace.tool.fmt]
 sort-module-level-items = true
