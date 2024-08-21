@@ -168,9 +168,10 @@ pub impl ContractAddressIntoDenom of Into<ContractAddress, Denom> {
 
 /// Represents a participant either sending or receiving a packet.
 #[derive(Clone, Debug, Drop, Serde)]
-pub struct Participant {
-    pub address: Array<felt252>,
-}
+pub enum Participant {
+    Native: ContractAddress,
+    External: Array<felt252>,
+  }
 
 pub trait ParticipantTrait {
     fn is_non_zero(self: @Participant) -> bool;
@@ -178,42 +179,37 @@ pub trait ParticipantTrait {
 
 impl ParticipantImpl of ParticipantTrait {
     fn is_non_zero(self: @Participant) -> bool {
-        let size = self.address.len();
-
-        if size.is_zero() {
-            return false;
+        match self {
+            Participant::Native(contract_address) => contract_address.is_non_zero(),
+            Participant::External(array) => {
+                match array.len() {
+                    0 => false,
+                    1 => array[0].is_non_zero(),
+                    _ => true,
+                }
+            }
         }
-
-        if size == 1 {
-            return self.address.at(0).is_non_zero();
-        }
-
-        true
     }
 }
 
 impl ParticipantTryIntoContractAddress of TryInto<Participant, ContractAddress> {
     fn try_into(self: Participant) -> Option<ContractAddress> {
-        let mut Participant_span = self.address.span();
-        let maybe_contract_address = Serde::deserialize(ref Participant_span);
-
-        // NOTE: There's an odd behavior when trying to deserialize a
-        // Cosmos-encoded address. In some cases, the address may incorrectly
-        // deserialize to `Some(1)`. To prevent this, we explicitly check for
-        // that scenario.
-        if let Option::Some(addr) = maybe_contract_address {
-            if addr.is_non_zero() && addr != contract_address_const::<1>() {
-                return Option::Some(addr);
-            }
+        match self {
+            Participant::Native(contract_address) => Option::Some(contract_address),
+            _ => Option::None,
         }
+    }
+}
 
-        Option::None
+impl ContractAddressIntoParticipant of Into<ContractAddress, Participant> {
+    fn into(self: ContractAddress) -> Participant {
+        Participant::Native(self)
     }
 }
 
 impl ArrayFelt252IntoParticipant of Into<Array<felt252>, Participant> {
     fn into(self: Array<felt252>) -> Participant {
-        Participant { address: self }
+        Participant::External(self)
     }
 }
 

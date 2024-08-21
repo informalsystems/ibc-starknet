@@ -24,6 +24,10 @@ pub(crate) fn OWNER() -> ContractAddress {
     contract_address_const::<'OWNER'>()
 }
 
+pub(crate) fn STARKNET() -> Participant {
+    OWNER().into()
+}
+
 pub(crate) fn COSMOS() -> Participant {
     let bech32_address: ByteArray = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng";
     let mut serialized_address: Array<felt252> = ArrayTrait::new();
@@ -31,9 +35,3 @@ pub(crate) fn COSMOS() -> Participant {
     serialized_address.into()
 }
 
-pub(crate) fn STARKNET() -> Participant {
-    let starknet_address = OWNER();
-    let mut serialized_address: Array<felt252> = ArrayTrait::new();
-    Serde::serialize(@starknet_address, ref serialized_address);
-    serialized_address.into()
-}
