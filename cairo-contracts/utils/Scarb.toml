@@ -1,0 +1,23 @@
+[package]
+name          = "starknet_ibc_utils"
+version       = { workspace = true }
+edition       = { workspace = true }
+cairo-version = { workspace = true }
+scarb-version = { workspace = true }
+authors       = { workspace = true }
+repository    = { workspace = true }
+license       = { workspace = true }
+Readme        = { workspace = true }
+keywords      = { workspace = true }
+description   = { workspace = true }
+
+[dependencies]
+# external dependencies
+starknet     = { workspace = true }
+openzeppelin = { workspace = true }
+snforge_std  = { workspace = true }
+
+[lib]
+
+[tool]
+fmt = { workspace = true }
