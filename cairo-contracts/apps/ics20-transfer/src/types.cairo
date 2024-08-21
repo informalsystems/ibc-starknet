@@ -171,7 +171,7 @@ pub impl ContractAddressIntoDenom of Into<ContractAddress, Denom> {
 pub enum Participant {
     Native: ContractAddress,
     External: Array<felt252>,
-  }
+}
 
 pub trait ParticipantTrait {
     fn is_non_zero(self: @Participant) -> bool;
