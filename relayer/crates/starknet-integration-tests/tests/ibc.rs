@@ -98,8 +98,8 @@ fn test_starknet_ics20_contract() {
                         base: Denom::Hosted("uatom".into()),
                     },
                     amount: 99u32.into(),
-                    sender: account_address,
-                    receiver: recipient_address,
+                    sender: vec![account_address],
+                    receiver: vec![recipient_address], // TODO: use a Cosmos serialized address once `CosmosChainDriver` integrated.
                     memo: "".into(),
                 };
 

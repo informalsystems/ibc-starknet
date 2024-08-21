@@ -10,8 +10,8 @@ use crate::types::messages::ibc::denom::PrefixedDenom;
 pub struct IbcTransferMessage {
     pub denom: PrefixedDenom,
     pub amount: U256,
-    pub sender: Felt,
-    pub receiver: Felt,
+    pub sender: Vec<Felt>,
+    pub receiver: Vec<Felt>,
     pub memo: String,
 }
 
