@@ -2050,6 +2050,7 @@ dependencies = [
  "cgp-core",
  "eyre",
  "hermes-cairo-encoding-components",
+ "hermes-cosmos-chain-components",
  "hermes-cosmos-relayer",
  "hermes-encoding-components",
  "hermes-error",

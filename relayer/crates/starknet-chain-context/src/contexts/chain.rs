@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
 use cgp_core::prelude::*;
+use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeComponent,
@@ -23,7 +24,8 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
 };
-use hermes_starknet_chain_components::components::*;
+use hermes_starknet_chain_components::components::chain::*;
+use hermes_starknet_chain_components::components::cosmos_to_starknet::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::traits::account::{
@@ -139,6 +141,12 @@ delegate_components! {
             ReceiveIbcTransferEvent,
         ]:
             ParseIbcTransferEvent,
+    }
+}
+
+delegate_components! {
+    DelegateCosmosChainComponents {
+        StarknetChain: StarknetToCosmosComponents,
     }
 }
 
