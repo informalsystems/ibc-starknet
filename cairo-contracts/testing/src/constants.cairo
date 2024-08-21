@@ -37,17 +37,3 @@ pub(crate) fn STARKNET() -> Participant {
     Serde::serialize(@starknet_address, ref serialized_address);
     serialized_address.into()
 }
-
-#[cfg(test)]
-mod tests {
-    use super::COSMOS;
-
-    #[test]
-    fn cosmos_address_serde_roundtrip() {
-        let cosmos = COSMOS();
-        let size = cosmos.address.len();
-        println!("size: {}", size);
-    }
-
-
-}
