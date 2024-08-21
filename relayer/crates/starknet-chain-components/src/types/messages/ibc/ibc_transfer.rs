@@ -11,7 +11,7 @@ pub struct IbcTransferMessage {
     pub denom: PrefixedDenom,
     pub amount: U256,
     pub sender: Vec<Felt>,
-    pub receiver: Vec<Felt>,
+    pub receiver: Felt,
     pub memo: String,
 }
 

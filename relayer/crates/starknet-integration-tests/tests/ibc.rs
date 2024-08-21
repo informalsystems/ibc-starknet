@@ -89,12 +89,10 @@ fn test_starknet_ics20_contract() {
 
             {
                 // TODO: once `CosmosChainDriver` integrated, read the sender address from there.
-                let encoded_sender_address = encoding
+                let sender_address = encoding
                     .encode(&"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string())?;
 
                 let recipient_address = chain_driver.user_wallet_a.account_address;
-
-                let encoded_recipient_address = encoding.encode(&recipient_address)?;
 
                 let transfer_message = IbcTransferMessage {
                     denom: PrefixedDenom {
@@ -102,8 +100,8 @@ fn test_starknet_ics20_contract() {
                         base: Denom::Hosted("uatom".into()),
                     },
                     amount: 99u32.into(),
-                    sender: encoded_sender_address,
-                    receiver: encoded_recipient_address,
+                    sender: sender_address,
+                    receiver: recipient_address,
                     memo: "".into(),
                 };
 
