@@ -579,7 +579,7 @@ dependencies = [
  "cairo-felt",
  "cairo-lang-utils",
  "const-fnv1a-hash",
- "convert_case",
+ "convert_case 0.6.0",
  "derivative",
  "itertools 0.11.0",
  "lalrpop",
@@ -662,7 +662,7 @@ dependencies = [
  "cairo-lang-sierra",
  "cairo-lang-sierra-to-casm",
  "cairo-lang-utils",
- "convert_case",
+ "convert_case 0.6.0",
  "itertools 0.11.0",
  "num-bigint",
  "num-integer",
@@ -895,6 +895,12 @@ dependencies = [
  "quote",
  "syn 1.0.109",
 ]
+
+[[package]]
+name = "convert_case"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
 
 [[package]]
 name = "convert_case"
@@ -1147,8 +1153,10 @@ version = "0.99.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f33878137e4dafd7fa914ad4e259e18a4e8e532b9617a2d0150262bf53abfce"
 dependencies = [
+ "convert_case 0.4.0",
  "proc-macro2",
  "quote",
+ "rustc_version",
  "syn 2.0.72",
 ]
 
@@ -2029,6 +2037,7 @@ dependencies = [
  "hermes-encoding-components",
  "hermes-relayer-components",
  "hermes-test-components",
+ "ibc-client-starknet-types",
  "serde_json",
  "starknet",
 ]
@@ -2041,6 +2050,7 @@ dependencies = [
  "cgp-core",
  "eyre",
  "hermes-cairo-encoding-components",
+ "hermes-cosmos-relayer",
  "hermes-encoding-components",
  "hermes-error",
  "hermes-logger",
@@ -2416,6 +2426,14 @@ source = "git+https://github.com/cosmos/ibc-rs.git?rev=5dc0b09#5dc0b09fd953914d5
 dependencies = [
  "ibc-app-nft-transfer",
  "ibc-app-transfer",
+]
+
+[[package]]
+name = "ibc-client-starknet-types"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "ibc-core",
 ]
 
 [[package]]

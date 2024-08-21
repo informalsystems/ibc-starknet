@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
 use cgp_core::prelude::*;
+use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeComponent,
 };
@@ -12,6 +13,8 @@ use hermes_logging_components::traits::has_logger::{
 };
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
+use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
+use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
@@ -41,6 +44,9 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
+use hermes_starknet_chain_components::types::client::{
+    StarknetClientState, StarknetConsensusState,
+};
 use hermes_starknet_chain_components::types::events::erc20::{
     ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent,
 };
@@ -154,6 +160,8 @@ pub trait CanUseStarknetChain:
     + HasAddressType<Address = Felt>
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
+    + HasClientStateType<CosmosChain, ClientState = StarknetClientState>
+    + HasConsensusStateType<CosmosChain, ConsensusState = StarknetConsensusState>
     + HasStarknetProvider
     + HasStarknetAccount
     + CanSendMessages
