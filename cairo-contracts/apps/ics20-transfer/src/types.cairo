@@ -4,6 +4,7 @@ use core::num::traits::Zero;
 use core::poseidon::PoseidonTrait;
 use core::poseidon::poseidon_hash_span;
 use starknet::ContractAddress;
+use starknet::contract_address_const;
 use starknet_ibc_app_transfer::{
     ERC20Contract, ERC20ContractTrait, TransferErrors, TRANSFER_PORT_ID_HASH
 };
@@ -194,7 +195,19 @@ impl ParticipantImpl of ParticipantTrait {
 impl ParticipantTryIntoContractAddress of TryInto<Participant, ContractAddress> {
     fn try_into(self: Participant) -> Option<ContractAddress> {
         let mut Participant_span = self.address.span();
-        Serde::deserialize(ref Participant_span)
+        let maybe_contract_address = Serde::deserialize(ref Participant_span);
+
+        // NOTE: There's an odd behavior when trying to deserialize a
+        // Cosmos-encoded address. In some cases, the address may incorrectly
+        // deserialize to `Some(1)`. To prevent this, we explicitly check for
+        // that scenario.
+        if let Option::Some(addr) = maybe_contract_address {
+            if addr.is_non_zero() && addr != contract_address_const::<1>() {
+                return Option::Some(addr);
+            }
+        }
+
+        Option::None
     }
 }
 

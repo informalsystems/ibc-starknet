@@ -163,15 +163,15 @@ pub mod ICS20TransferComponent {
 
             assert(maybe_packet_data.is_some(), TransferErrors::INVALID_PACKET_DATA);
 
-            let packet_date = maybe_packet_data.unwrap();
+            let packet_data = maybe_packet_data.unwrap();
 
-            packet_date.validate_basic();
+            packet_data.validate_basic();
 
-            let receiver: Option<ContractAddress> = packet_date.receiver.clone().try_into();
+            let receiver: Option<ContractAddress> = packet_data.receiver.clone().try_into();
 
             assert(receiver.is_some(), TransferErrors::INVALID_RECEIVER);
 
-            match @packet_date.denom.base {
+            match @packet_data.denom.base {
                 Denom::Native(erc20_token) => {
                     self
                         .unescrow_validate(
@@ -179,18 +179,18 @@ pub mod ICS20TransferComponent {
                             packet.port_id_on_a.clone(),
                             packet.chan_id_on_a.clone(),
                             erc20_token.clone(),
-                            packet_date.amount,
+                            packet_data.amount,
                         );
                 },
                 Denom::Hosted(_) => {
                     self
                         .mint_validate(
-                            receiver.unwrap(), packet_date.denom.clone(), packet_date.amount
+                            receiver.unwrap(), packet_data.denom.clone(), packet_data.amount
                         );
                 }
             }
 
-            packet_date
+            packet_data
         }
 
         fn _recv_execute(ref self: ComponentState<TContractState>, packet: Packet) -> PacketData {
@@ -449,30 +449,30 @@ pub mod ICS20TransferComponent {
     pub(crate) impl TransferEventImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferEventTrait<TContractState> {
-        fn emit_send_event(ref self: ComponentState<TContractState>, packet_date: PacketData) {
+        fn emit_send_event(ref self: ComponentState<TContractState>, packet_data: PacketData) {
             self
                 .emit(
                     SendEvent {
-                        sender: packet_date.sender,
-                        receiver: packet_date.receiver,
-                        denom: packet_date.denom,
-                        amount: packet_date.amount,
-                        memo: packet_date.memo,
+                        sender: packet_data.sender,
+                        receiver: packet_data.receiver,
+                        denom: packet_data.denom,
+                        amount: packet_data.amount,
+                        memo: packet_data.memo,
                     }
                 );
         }
 
         fn emit_recv_event(
-            ref self: ComponentState<TContractState>, packet_date: PacketData, success: bool,
+            ref self: ComponentState<TContractState>, packet_data: PacketData, success: bool,
         ) {
             self
                 .emit(
                     RecvEvent {
-                        sender: packet_date.sender,
-                        receiver: packet_date.receiver,
-                        denom: packet_date.denom,
-                        amount: packet_date.amount,
-                        memo: packet_date.memo,
+                        sender: packet_data.sender,
+                        receiver: packet_data.receiver,
+                        denom: packet_data.denom,
+                        amount: packet_data.amount,
+                        memo: packet_data.memo,
                         success,
                     }
                 );

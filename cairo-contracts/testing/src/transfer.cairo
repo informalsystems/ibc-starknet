@@ -47,7 +47,7 @@ fn test_escrow_unescrow_roundtrip() {
 
     cfg.prefix_native_denom();
 
-    let recv_packet = cfg.dummy_recv_packet(cfg.native_denom, STARKNET(), COSMOS());
+    let recv_packet = cfg.dummy_recv_packet(cfg.native_denom, COSMOS(), STARKNET());
 
     // Submit a `RecvPacket` to the `Transfer` contract.
     ics20.recv_execute(recv_packet);
@@ -58,7 +58,7 @@ fn test_escrow_unescrow_roundtrip() {
     erc20.assert_balance(ics20.contract_address, 0);
 
     // Check the balance of the recipient.
-    erc20.assert_balance(event.receiver.try_into().unwrap(), cfg.amount);
+    erc20.assert_balance(event.receiver.try_into().unwrap(), SUPPLY);
 }
 
 #[test]
@@ -76,7 +76,7 @@ fn test_mint_burn_roundtrip() {
     // Mint
     // -----------------------------------------------------------
 
-    let recv_packet = cfg.dummy_recv_packet(cfg.hosted_denom.clone(), STARKNET(), COSMOS());
+    let recv_packet = cfg.dummy_recv_packet(cfg.hosted_denom.clone(), COSMOS(), STARKNET());
 
     // Submit a `RecvPacket`, which will create a new ERC20 contract.
     ics20.recv_execute(recv_packet.clone());
@@ -106,7 +106,7 @@ fn test_mint_burn_roundtrip() {
     // Burn
     // -----------------------------------------------------------
 
-    let msg_transfer = cfg.dummy_msg_transder(cfg.hosted_denom, COSMOS(), STARKNET());
+    let msg_transfer = cfg.dummy_msg_transder(cfg.hosted_denom, STARKNET(), COSMOS());
 
     // Owner approves the amount of allowance for the `Transfer` contract.
     ics20.send_execute(msg_transfer);
