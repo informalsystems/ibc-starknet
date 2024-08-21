@@ -1,3 +1,4 @@
+use core::array::ArrayTrait;
 use core::hash::{HashStateTrait, HashStateExTrait};
 use core::num::traits::Zero;
 use core::poseidon::PoseidonTrait;
@@ -36,8 +37,8 @@ impl MsgTransferValidateBasicImpl of ValidateBasicTrait<MsgTransfer> {
 pub struct PacketData {
     pub denom: PrefixedDenom,
     pub amount: u256,
-    pub sender: ContractAddress,
-    pub receiver: ContractAddress,
+    pub sender: Participant,
+    pub receiver: Participant,
     pub memo: Memo,
 }
 
@@ -161,6 +162,35 @@ pub impl DenomImpl of DenomTrait {
 pub impl ContractAddressIntoDenom of Into<ContractAddress, Denom> {
     fn into(self: ContractAddress) -> Denom {
         Denom::Native(ERC20Contract { address: self })
+    }
+}
+
+/// Represents a participant either sending or receiving a packet.
+#[derive(Clone, Debug, Drop, Serde)]
+pub struct Participant {
+    pub address: Array<felt252>,
+}
+
+pub trait ParticipantTrait {
+    fn is_non_zero(self: @Participant) -> bool;
+}
+
+impl ParticipantImpl of ParticipantTrait {
+    fn is_non_zero(self: @Participant) -> bool {
+        !self.address.is_empty()
+    }
+}
+
+impl ParticipantTryIntoContractAddress of TryInto<Participant, ContractAddress> {
+    fn try_into(self: Participant) -> Option<ContractAddress> {
+        let mut Participant_span = self.address.span();
+        Serde::deserialize(ref Participant_span)
+    }
+}
+
+impl ArrayFelt252IntoParticipant of Into<Array<felt252>, Participant> {
+    fn into(self: Array<felt252>) -> Participant {
+        Participant { address: self }
     }
 }
 

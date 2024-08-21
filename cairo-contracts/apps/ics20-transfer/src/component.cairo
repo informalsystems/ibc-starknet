@@ -1,5 +1,6 @@
 #[starknet::component]
 pub mod ICS20TransferComponent {
+    use core::traits::TryInto;
     use core::array::ArrayTrait;
     use core::clone::Clone;
     use core::num::traits::Zero;
@@ -11,7 +12,7 @@ pub mod ICS20TransferComponent {
     use starknet_ibc_app_transfer::transferrable::ITransferrable;
     use starknet_ibc_app_transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo,
-        TracePrefixTrait, PrefixedDenomTrait
+        TracePrefixTrait, PrefixedDenomTrait, Participant
     };
     use starknet_ibc_app_transfer::{
         ERC20Contract, ERC20ContractTrait, ISendTransfer, IRecvPacket, ITokenAddress, TransferErrors
@@ -38,9 +39,9 @@ pub mod ICS20TransferComponent {
     #[derive(Debug, Drop, Serde, starknet::Event)]
     pub struct SendEvent {
         #[key]
-        pub sender: ContractAddress,
+        pub sender: Participant,
         #[key]
-        pub receiver: ContractAddress,
+        pub receiver: Participant,
         #[key]
         pub denom: PrefixedDenom,
         pub amount: u256,
@@ -50,9 +51,9 @@ pub mod ICS20TransferComponent {
     #[derive(Debug, Drop, Serde, starknet::Event)]
     pub struct RecvEvent {
         #[key]
-        pub sender: ContractAddress,
+        pub sender: Participant,
         #[key]
-        pub receiver: ContractAddress,
+        pub receiver: Participant,
         #[key]
         pub denom: PrefixedDenom,
         pub amount: u256,
@@ -72,11 +73,15 @@ pub mod ICS20TransferComponent {
 
             msg.validate_basic();
 
+            let sender: Option<ContractAddress> = msg.packet_data.sender.clone().try_into();
+
+            assert(sender.is_some(), TransferErrors::INVALID_SENDER);
+
             match @msg.packet_data.denom.base {
                 Denom::Native(erc20_token) => {
                     self
                         .escrow_validate(
-                            msg.packet_data.sender.clone(),
+                            sender.unwrap(),
                             msg.port_id_on_a.clone(),
                             msg.chan_id_on_a.clone(),
                             erc20_token.clone(),
@@ -87,7 +92,7 @@ pub mod ICS20TransferComponent {
                 Denom::Hosted(_) => {
                     self
                         .burn_validate(
-                            msg.packet_data.sender.clone(),
+                            sender.unwrap(),
                             msg.packet_data.denom.clone(),
                             msg.packet_data.amount,
                             msg.packet_data.memo.clone(),
@@ -99,11 +104,13 @@ pub mod ICS20TransferComponent {
         fn send_execute(ref self: ComponentState<TContractState>, msg: MsgTransfer) {
             self.send_validate(msg.clone());
 
+            let sender: Option<ContractAddress> = msg.packet_data.sender.clone().try_into();
+
             match @msg.packet_data.denom.base {
                 Denom::Native(erc20_token) => {
                     self
                         .escrow_execute(
-                            msg.packet_data.sender.clone(),
+                            sender.unwrap(),
                             erc20_token.clone(),
                             msg.packet_data.amount,
                             msg.packet_data.memo.clone(),
@@ -112,7 +119,7 @@ pub mod ICS20TransferComponent {
                 Denom::Hosted(_) => {
                     self
                         .burn_execute(
-                            msg.packet_data.sender.clone(),
+                            sender.unwrap(),
                             msg.packet_data.denom.clone(),
                             msg.packet_data.amount,
                             msg.packet_data.memo.clone(),
@@ -160,11 +167,15 @@ pub mod ICS20TransferComponent {
 
             packet_date.validate_basic();
 
+            let receiver: Option<ContractAddress> = packet_date.receiver.clone().try_into();
+
+            assert(receiver.is_some(), TransferErrors::INVALID_RECEIVER);
+
             match @packet_date.denom.base {
                 Denom::Native(erc20_token) => {
                     self
                         .unescrow_validate(
-                            packet_date.receiver.clone(),
+                            receiver.unwrap(),
                             packet.port_id_on_a.clone(),
                             packet.chan_id_on_a.clone(),
                             erc20_token.clone(),
@@ -174,7 +185,7 @@ pub mod ICS20TransferComponent {
                 Denom::Hosted(_) => {
                     self
                         .mint_validate(
-                            packet_date.receiver.clone(),
+                            receiver.unwrap(),
                             packet_date.denom.clone(),
                             packet_date.amount
                         );
@@ -191,13 +202,15 @@ pub mod ICS20TransferComponent {
                 packet.port_id_on_b.clone(), packet.chan_id_on_b.clone()
             );
 
+            let receiver: Option<ContractAddress> = packet_data.receiver.clone().try_into();
+
             match @packet_data.denom.base {
                 Denom::Native(erc20_token) => {
                     packet_data.denom.remove_prefix(@trace_prefix);
 
                     self
                         .unescrow_execute(
-                            packet_data.receiver.clone(),
+                            receiver.unwrap(),
                             packet.port_id_on_a.clone(),
                             packet.chan_id_on_a.clone(),
                             erc20_token.clone(),
@@ -209,7 +222,7 @@ pub mod ICS20TransferComponent {
 
                     self
                         .mint_execute(
-                            packet_data.receiver.clone(),
+                            receiver.unwrap(),
                             packet_data.denom.clone(),
                             packet_data.amount
                         )

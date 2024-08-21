@@ -2,7 +2,7 @@ use starknet::ContractAddress;
 use starknet_ibc_app_transfer::TRANSFER_PORT_ID;
 use starknet_ibc_app_transfer::types::PrefixedDenomTrait;
 use starknet_ibc_app_transfer::types::{
-    MsgTransfer, PacketData, PrefixedDenom, Denom, Memo, TracePrefixTrait
+    MsgTransfer, PacketData, PrefixedDenom, Denom, Memo, TracePrefixTrait, Participant
 };
 use starknet_ibc_core_channel::Packet;
 use starknet_ibc_core_client::{Height, Timestamp};
@@ -24,13 +24,13 @@ pub trait TestConfigTrait {
     fn prefix_native_denom(ref self: TestConfig);
     fn prefix_hosted_denom(ref self: TestConfig);
     fn dummy_msg_transder(
-        self: @TestConfig, denom: PrefixedDenom, sender: ContractAddress, receiver: ContractAddress
+        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> MsgTransfer;
     fn dummy_recv_packet(
-        self: @TestConfig, denom: PrefixedDenom, sender: ContractAddress, receiver: ContractAddress
+        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> Packet;
     fn dummy_packet_data(
-        self: @TestConfig, denom: PrefixedDenom, sender: ContractAddress, receiver: ContractAddress
+        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> PacketData;
 }
 
@@ -78,7 +78,7 @@ impl TestConfigImpl of TestConfigTrait {
     }
 
     fn dummy_msg_transder(
-        self: @TestConfig, denom: PrefixedDenom, sender: ContractAddress, receiver: ContractAddress
+        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> MsgTransfer {
         MsgTransfer {
             port_id_on_a: PortId { port_id: TRANSFER_PORT_ID() },
@@ -90,7 +90,7 @@ impl TestConfigImpl of TestConfigTrait {
     }
 
     fn dummy_recv_packet(
-        self: @TestConfig, denom: PrefixedDenom, sender: ContractAddress, receiver: ContractAddress
+        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> Packet {
         let mut serialized_data = array![];
         Serde::serialize(@self.dummy_packet_data(denom, sender, receiver), ref serialized_data);
@@ -108,7 +108,7 @@ impl TestConfigImpl of TestConfigTrait {
     }
 
     fn dummy_packet_data(
-        self: @TestConfig, denom: PrefixedDenom, sender: ContractAddress, receiver: ContractAddress
+        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> PacketData {
         PacketData { denom, amount: *self.amount, sender, receiver, memo: Memo { memo: "" }, }
     }
