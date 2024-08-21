@@ -3,11 +3,11 @@ use hermes_cairo_encoding_components::impls::encode_mut::combine::CombineEncoder
 use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_cairo_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
-use hermes_cairo_encoding_components::traits::decode_mut::MutDecoderComponent;
-use hermes_cairo_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_cairo_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_cairo_encoding_components::types::either::Either;
 use hermes_cairo_encoding_components::{HList, Sum};
+use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
+use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use starknet::core::types::Felt;
 
 #[derive(Debug)]

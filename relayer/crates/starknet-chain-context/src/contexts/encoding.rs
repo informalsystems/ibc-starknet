@@ -13,22 +13,21 @@ use hermes_cairo_encoding_components::impls::encode_mut::tagged::EncodeTagged;
 use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
 use hermes_cairo_encoding_components::impls::encode_mut::with_context::EncodeWithContext;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
-use hermes_cairo_encoding_components::traits::decode_mut::{
-    CanPeekDecodeBuffer, HasDecodeBufferType, MutDecoderComponent,
-};
-use hermes_cairo_encoding_components::traits::encode_and_decode_mut::MutEncoderAndDecoder;
-use hermes_cairo_encoding_components::traits::encode_mut::{
-    HasEncodeBufferType, MutEncoderComponent,
-};
+use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::tagged::Tagged;
 use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
+use hermes_encoding_components::traits::decode_mut::{CanPeekDecodeBuffer, MutDecoderComponent};
+use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
-use hermes_encoding_components::traits::encoded::HasEncodedType;
-use hermes_encoding_components::traits::encoder::CanEncode;
+use hermes_encoding_components::traits::encode_and_decode_mut::MutEncoderAndDecoder;
+use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, EncodingGetterComponent, HasEncodingType, ProvideEncodingType,
 };
+use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
+use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
+use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::{
@@ -114,16 +113,16 @@ delegate_components! {
     }
 }
 
-impl<Context> ProvideEncodingType<Context> for ProvideCairoEncoding
+impl<Context> ProvideEncodingType<Context, AsFelt> for ProvideCairoEncoding
 where
     Context: Async,
 {
     type Encoding = CairoEncoding;
 }
 
-impl<Context> DefaultEncodingGetter<Context> for ProvideCairoEncoding
+impl<Context> DefaultEncodingGetter<Context, AsFelt> for ProvideCairoEncoding
 where
-    Context: HasEncodingType<Encoding = CairoEncoding>,
+    Context: HasEncodingType<AsFelt, Encoding = CairoEncoding>,
 {
     fn default_encoding() -> &'static CairoEncoding {
         &CairoEncoding

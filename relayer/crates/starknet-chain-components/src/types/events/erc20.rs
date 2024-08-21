@@ -1,9 +1,10 @@
 use cgp_core::error::CanRaiseError;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
+use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::HList;
-use hermes_encoding_components::traits::decoder::CanDecode;
-use hermes_encoding_components::traits::encoded::HasEncodedType;
+use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
+use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
@@ -59,7 +60,7 @@ where
 impl<Chain, Encoding> EventParser<Chain, TransferEvent> for DecodeErc20Events
 where
     Chain: HasEventType<Event = StarknetEvent>
-        + HasEncoding<Encoding = Encoding>
+        + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseError<Encoding::Error>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, HList![Felt, Felt]>
@@ -79,7 +80,7 @@ where
 impl<Chain, Encoding> EventParser<Chain, ApprovalEvent> for DecodeErc20Events
 where
     Chain: HasEventType<Event = StarknetEvent>
-        + HasEncoding<Encoding = Encoding>
+        + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseError<Encoding::Error>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, HList![Felt, Felt]>
