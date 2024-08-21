@@ -11,6 +11,7 @@ use starknet::macros::selector;
 use crate::traits::event::{CanParseEvent, EventParser, EventSelectorMissing, UnknownEvent};
 use crate::types::event::StarknetEvent;
 use crate::types::messages::ibc::denom::PrefixedDenom;
+use crate::types::messages::ibc::ibc_transfer::Participant;
 
 #[derive(Debug)]
 pub enum IbcTransferEvent {
@@ -19,8 +20,8 @@ pub enum IbcTransferEvent {
 
 #[derive(Debug)]
 pub struct ReceiveIbcTransferEvent {
-    pub sender: Vec<Felt>,
-    pub receiver: Felt,
+    pub sender: Participant,
+    pub receiver: Participant,
     pub denom: PrefixedDenom,
     pub amount: U256,
     pub memo: String,
@@ -55,7 +56,7 @@ where
         + HasEncoding<Encoding = Encoding>
         + CanRaiseError<Encoding::Error>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, HList![Vec<Felt>, Felt, PrefixedDenom]>
+        + CanDecode<ViaCairo, HList![Participant, Participant, PrefixedDenom]>
         + CanDecode<ViaCairo, HList![U256, String, bool]>,
 {
     fn parse_event(

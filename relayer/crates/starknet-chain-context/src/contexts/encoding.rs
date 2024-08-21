@@ -42,7 +42,7 @@ use hermes_starknet_chain_components::types::messages::ibc::denom::{
 };
 use hermes_starknet_chain_components::types::messages::ibc::height::{EncodeHeight, Height};
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
-    EncodeIbcTransferMessage, IbcTransferMessage,
+    EncodeIbcTransferMessage, EncodeParticipant, IbcTransferMessage, Participant,
 };
 use hermes_starknet_chain_components::types::messages::ibc::packet::{EncodePacket, Packet};
 use starknet::core::types::{Felt, U256};
@@ -99,6 +99,7 @@ delegate_components! {
         (ViaCairo, TracePrefix): EncodeTracePrefix,
         (ViaCairo, Vec<TracePrefix>): EncodeList,
         (ViaCairo, PrefixedDenom): EncodePrefixedDenom,
+        (ViaCairo, Participant): EncodeParticipant,
         (ViaCairo, IbcTransferMessage): EncodeIbcTransferMessage,
         (ViaCairo, Height): EncodeHeight,
         (ViaCairo, Packet): EncodePacket,
@@ -153,6 +154,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, PrefixedDenom>
     + CanEncodeAndDecode<ViaCairo, TracePrefix>
     + CanEncodeAndDecode<ViaCairo, Vec<TracePrefix>>
+    + CanEncodeAndDecode<ViaCairo, Participant>
     + CanEncode<ViaCairo, IbcTransferMessage>
     + CanEncodeAndDecode<ViaCairo, Height>
     + CanEncodeAndDecode<ViaCairo, Packet>

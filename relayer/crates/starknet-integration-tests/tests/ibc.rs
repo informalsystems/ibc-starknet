@@ -12,7 +12,9 @@ use hermes_starknet_chain_components::traits::event::CanParseEvents;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, PrefixedDenom};
 use hermes_starknet_chain_components::types::messages::ibc::height::Height;
-use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::IbcTransferMessage;
+use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
+    IbcTransferMessage, Participant,
+};
 use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
@@ -100,8 +102,8 @@ fn test_starknet_ics20_contract() {
                         base: Denom::Hosted("uatom".into()),
                     },
                     amount: 99u32.into(),
-                    sender: sender_address,
-                    receiver: recipient_address,
+                    sender: Participant::External(sender_address),
+                    receiver: Participant::Native(recipient_address),
                     memo: "".into(),
                 };
 
