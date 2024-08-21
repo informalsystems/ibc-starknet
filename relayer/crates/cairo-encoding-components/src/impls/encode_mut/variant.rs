@@ -1,12 +1,15 @@
 use core::marker::PhantomData;
 
 use cgp_core::error::{CanRaiseError, HasErrorType};
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, CanPeekDecodeBuffer, MutDecoder,
+};
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 use starknet::core::types::Felt;
 
 use crate::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use crate::impls::encode_mut::u128::felt_to_u128;
-use crate::traits::decode_mut::{CanDecodeMut, CanPeekDecodeBuffer, MutDecoder};
-use crate::traits::encode_mut::{CanEncodeMut, HasEncodeBufferType, MutEncoder};
 use crate::types::either::{Either, Void};
 use crate::types::nat::{Nat, S, Z};
 
@@ -92,23 +95,6 @@ where
         }
     }
 }
-
-// impl<Encoding, Strategy, I>
-//     MutDecoder<Encoding, Strategy, Void> for SumEncoders<I, Z>
-// where
-//     Encoding: CanDecodeMut<Strategy, usize>
-//         + CanRaiseError<VariantIndexOutOfBound>,
-//     I: Nat,
-// {
-//     fn decode_mut(
-//         encoding: &Encoding,
-//         buffer: &mut Encoding::DecodeBuffer<'_>,
-//     ) -> Result<Void, Encoding::Error> {
-//         let index: usize = encoding.decode_mut(buffer)?;
-
-//         Err(Encoding::raise_error(VariantIndexOutOfBound { index }))
-//     }
-// }
 
 impl<Encoding, Strategy, Value, I> MutDecoder<Encoding, Strategy, Either<Value, Void>>
     for SumEncoders<I, Z>

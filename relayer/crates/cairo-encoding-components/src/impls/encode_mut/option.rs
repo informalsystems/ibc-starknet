@@ -1,10 +1,10 @@
 use std::marker::PhantomData;
 
 use cgp_core::prelude::*;
+use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
+use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 
 use crate::impls::encode_mut::variant_from::EncodeVariantFrom;
-use crate::traits::decode_mut::MutDecoderComponent;
-use crate::traits::encode_mut::MutEncoderComponent;
 use crate::traits::transform::{Transformer, TransformerRef};
 use crate::types::either::Either;
 use crate::Sum;

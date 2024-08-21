@@ -1,4 +1,4 @@
-use crate::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 
 pub struct EncodeArray;
 

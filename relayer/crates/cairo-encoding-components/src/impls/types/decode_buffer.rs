@@ -2,10 +2,12 @@ use core::iter::Peekable;
 use core::ops::Deref;
 use core::slice::Iter;
 
-use hermes_encoding_components::traits::encoded::HasEncodedType;
+use hermes_encoding_components::traits::decode_mut::DecodeBufferPeeker;
+use hermes_encoding_components::traits::types::decode_buffer::{
+    HasDecodeBufferType, ProvideDecodeBufferType,
+};
+use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use starknet::core::types::Felt;
-
-use crate::traits::decode_mut::{DecodeBufferPeeker, HasDecodeBufferType, ProvideDecodeBufferType};
 
 pub struct ProvideVecIterDecodeBuffer;
 

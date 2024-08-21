@@ -1,10 +1,11 @@
 use core::iter;
 
 use cgp_core::error::{CanRaiseError, HasErrorType};
+use hermes_encoding_components::traits::decode_mut::MutDecoder;
+use hermes_encoding_components::traits::encode_mut::MutEncoder;
+use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
+use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 use starknet::core::types::Felt;
-
-use crate::traits::decode_mut::{HasDecodeBufferType, MutDecoder};
-use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
 
 pub struct EncodeFelt;
 
