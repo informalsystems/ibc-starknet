@@ -1,11 +1,11 @@
 #[starknet::component]
 pub mod ICS20TransferComponent {
-    use core::traits::TryInto;
     use core::array::ArrayTrait;
     use core::clone::Clone;
     use core::num::traits::Zero;
     use core::option::OptionTrait;
     use core::starknet::SyscallResultTrait;
+    use core::traits::TryInto;
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet::get_contract_address;
@@ -185,9 +185,7 @@ pub mod ICS20TransferComponent {
                 Denom::Hosted(_) => {
                     self
                         .mint_validate(
-                            receiver.unwrap(),
-                            packet_date.denom.clone(),
-                            packet_date.amount
+                            receiver.unwrap(), packet_date.denom.clone(), packet_date.amount
                         );
                 }
             }
@@ -222,9 +220,7 @@ pub mod ICS20TransferComponent {
 
                     self
                         .mint_execute(
-                            receiver.unwrap(),
-                            packet_data.denom.clone(),
-                            packet_data.amount
+                            receiver.unwrap(), packet_data.denom.clone(), packet_data.amount
                         )
                 }
             };
