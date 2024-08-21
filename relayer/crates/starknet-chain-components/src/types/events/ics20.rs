@@ -19,8 +19,8 @@ pub enum IbcTransferEvent {
 
 #[derive(Debug)]
 pub struct ReceiveIbcTransferEvent {
-    pub sender: Felt,
-    pub receiver: Felt,
+    pub sender: Vec<Felt>,
+    pub receiver: Vec<Felt>,
     pub denom: PrefixedDenom,
     pub amount: U256,
     pub memo: String,
@@ -55,7 +55,7 @@ where
         + HasEncoding<Encoding = Encoding>
         + CanRaiseError<Encoding::Error>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, HList![Felt, Felt, PrefixedDenom]>
+        + CanDecode<ViaCairo, HList![Vec<Felt>, Vec<Felt>, PrefixedDenom]>
         + CanDecode<ViaCairo, HList![U256, String, bool]>,
 {
     fn parse_event(
