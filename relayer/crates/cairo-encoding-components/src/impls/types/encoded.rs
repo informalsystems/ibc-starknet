@@ -1,5 +1,5 @@
 use cgp_core::Async;
-use hermes_encoding_components::traits::encoded::ProvideEncodedType;
+use hermes_encoding_components::traits::types::encoded::ProvideEncodedType;
 use starknet::core::types::Felt;
 
 pub struct ProvideVecFeltEncodedType;

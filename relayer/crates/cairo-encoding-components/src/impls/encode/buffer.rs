@@ -1,9 +1,9 @@
-use hermes_encoding_components::traits::decoder::Decoder;
-use hermes_encoding_components::traits::encoder::Encoder;
+use hermes_encoding_components::traits::decode::Decoder;
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode::Encoder;
+use hermes_encoding_components::traits::encode_mut::CanEncodeMut;
 
 use crate::impls::encode_mut::end::DecodeEnd;
-use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use crate::traits::encode_mut::CanEncodeMut;
 
 pub struct EncodeWithMutBuffer;
 

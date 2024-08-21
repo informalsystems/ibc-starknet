@@ -1,9 +1,9 @@
 use cgp_core::prelude::DelegateComponent;
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use starknet::core::types::Felt;
 
 use crate::impls::encode_mut::from_felt::EncodeFromFelt;
-use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use crate::traits::encode_mut::MutEncoderComponent;
 
 pub struct EncodeU128;
 

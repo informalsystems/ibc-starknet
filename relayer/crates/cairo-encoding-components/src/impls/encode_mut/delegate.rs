@@ -2,9 +2,10 @@ use std::marker::PhantomData;
 
 use cgp_core::error::HasErrorType;
 use cgp_core::prelude::DelegateComponent;
-
-use crate::traits::decode_mut::{HasDecodeBufferType, MutDecoder};
-use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
+use hermes_encoding_components::traits::decode_mut::MutDecoder;
+use hermes_encoding_components::traits::encode_mut::MutEncoder;
+use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
+use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 
 pub struct DelegateEncodeMutComponents<Components>(pub PhantomData<Components>);
 
