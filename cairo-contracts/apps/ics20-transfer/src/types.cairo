@@ -177,7 +177,17 @@ pub trait ParticipantTrait {
 
 impl ParticipantImpl of ParticipantTrait {
     fn is_non_zero(self: @Participant) -> bool {
-        !self.address.is_empty()
+        let size = self.address.len();
+
+        if size.is_zero() {
+            return false;
+        }
+
+        if size == 1 {
+            return self.address.at(0).is_non_zero();
+        }
+
+        true
     }
 }
 
