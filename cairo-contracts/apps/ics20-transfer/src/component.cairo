@@ -69,7 +69,7 @@ pub mod ICS20TransferComponent {
         #[key]
         pub symbol: ByteArray,
         #[key]
-        pub token_address: ContractAddress,
+        pub address: ContractAddress,
         pub initial_supply: u256,
     }
 
@@ -496,10 +496,10 @@ pub mod ICS20TransferComponent {
             ref self: ComponentState<TContractState>,
             name: ByteArray,
             symbol: ByteArray,
-            token_address: ContractAddress,
+            address: ContractAddress,
             initial_supply: u256,
         ) {
-            self.emit(CreateTokenEvent { name, symbol, token_address, initial_supply });
+            self.emit(CreateTokenEvent { name, symbol, address, initial_supply });
         }
     }
 }
