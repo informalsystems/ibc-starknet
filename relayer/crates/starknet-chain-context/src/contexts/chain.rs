@@ -45,7 +45,7 @@ use hermes_starknet_chain_components::types::events::erc20::{
     ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent,
 };
 use hermes_starknet_chain_components::types::events::ics20::{
-    IbcTransferEvent, ParseIbcTransferEvent, ReceiveIbcTransferEvent,
+    CreateIbcTokenEvent, IbcTransferEvent, ParseIbcTransferEvent, ReceiveIbcTransferEvent,
 };
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
@@ -131,6 +131,7 @@ delegate_components! {
         [
             IbcTransferEvent,
             ReceiveIbcTransferEvent,
+            CreateIbcTokenEvent,
         ]:
             ParseIbcTransferEvent,
     }
