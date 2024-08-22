@@ -81,6 +81,9 @@ fn test_mint_burn_roundtrip() {
     // Submit a `RecvPacket`, which will create a new ERC20 contract.
     ics20.recv_execute(recv_packet.clone());
 
+    // Assert the `CreateTokenEvent` emitted.
+    ics20.assert_create_token_event();
+
     // Assert the `RecvEvent` emitted.
     ics20.assert_recv_event();
 

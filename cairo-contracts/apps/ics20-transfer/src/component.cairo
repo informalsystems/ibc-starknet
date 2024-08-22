@@ -34,6 +34,7 @@ pub mod ICS20TransferComponent {
     pub enum Event {
         SendEvent: SendEvent,
         RecvEvent: RecvEvent,
+        CreateTokenEvent: CreateTokenEvent,
     }
 
     #[derive(Debug, Drop, Serde, starknet::Event)]
@@ -59,6 +60,17 @@ pub mod ICS20TransferComponent {
         pub amount: u256,
         pub memo: Memo,
         pub success: bool,
+    }
+
+    #[derive(Debug, Drop, Serde, starknet::Event)]
+    pub struct CreateTokenEvent {
+        #[key]
+        pub name: ByteArray,
+        #[key]
+        pub symbol: ByteArray,
+        #[key]
+        pub token_address: ContractAddress,
+        pub initial_supply: u256,
     }
 
     #[embeddable_as(SendTransfer)]
@@ -398,14 +410,16 @@ pub mod ICS20TransferComponent {
             let erc20_token = ERC20ContractTrait::create(
                 self.erc20_class_hash.read(),
                 salt,
-                name,
-                symbol, // TODO: Determine what the symbol should be.
-                amount,
+                name.clone(),
+                symbol.clone(), // TODO: Determine what the symbol should be.
+                amount.clone(),
                 account,
                 get_contract_address()
             );
 
             self.salt.write(salt + 1);
+
+            self.emit_create_token_event(name, symbol, erc20_token.address, amount);
 
             erc20_token.address
         }
@@ -476,6 +490,16 @@ pub mod ICS20TransferComponent {
                         success,
                     }
                 );
+        }
+
+        fn emit_create_token_event(
+            ref self: ComponentState<TContractState>,
+            name: ByteArray,
+            symbol: ByteArray,
+            token_address: ContractAddress,
+            initial_supply: u256,
+        ) {
+            self.emit(CreateTokenEvent { name, symbol, token_address, initial_supply });
         }
     }
 }

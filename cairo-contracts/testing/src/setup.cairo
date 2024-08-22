@@ -5,7 +5,7 @@ use openzeppelin::utils::serde::SerializedAppend;
 use starknet::ContractAddress;
 use starknet::testing;
 use starknet_ibc_app_transfer::ICS20TransferComponent::{
-    Event as TransferEvent, SendEvent, RecvEvent
+    Event as TransferEvent, SendEvent, RecvEvent, CreateTokenEvent
 };
 use starknet_ibc_app_transfer::types::MsgTransfer;
 use starknet_ibc_app_transfer::{
@@ -35,6 +35,7 @@ pub trait ICS20TransferContractTrait {
     fn pop_event(self: @ICS20TransferContract) -> Option<TransferEvent>;
     fn assert_send_event(self: @ICS20TransferContract) -> SendEvent;
     fn assert_recv_event(self: @ICS20TransferContract) -> RecvEvent;
+    fn assert_create_token_event(self: @ICS20TransferContract) -> CreateTokenEvent;
 }
 
 pub impl ICS20TransferContractImpl of ICS20TransferContractTrait {
@@ -84,6 +85,13 @@ pub impl ICS20TransferContractImpl of ICS20TransferContractTrait {
     fn assert_recv_event(self: @ICS20TransferContract) -> RecvEvent {
         match self.pop_event().expect('no event') {
             TransferEvent::RecvEvent(e) => e,
+            _ => panic!("unexpected event"),
+        }
+    }
+
+    fn assert_create_token_event(self: @ICS20TransferContract) -> CreateTokenEvent {
+        match self.pop_event().expect('no event') {
+            TransferEvent::CreateTokenEvent(e) => e,
             _ => panic!("unexpected event"),
         }
     }
