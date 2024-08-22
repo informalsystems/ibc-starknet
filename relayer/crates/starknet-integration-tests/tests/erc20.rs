@@ -2,7 +2,6 @@ use std::time::SystemTime;
 
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
@@ -14,6 +13,7 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
+use hermes_starknet_chain_context::contexts::cairo_encoding::StarknetCairoEncoding;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 
@@ -65,7 +65,7 @@ fn test_erc20_transfer() {
                     owner: relayer_address,
                 };
 
-                let calldata = chain.encoding().encode(&deploy_message)?;
+                let calldata = StarknetCairoEncoding.encode(&deploy_message)?;
 
                 let token_address = chain.deploy_contract(&class_hash, false, &calldata).await?;
 

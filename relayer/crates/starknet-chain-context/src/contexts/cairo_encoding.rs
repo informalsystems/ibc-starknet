@@ -36,18 +36,18 @@ use starknet::core::types::{Felt, U256};
 
 use crate::impls::error::HandleStarknetError;
 
-pub struct CairoEncoding;
+pub struct StarknetCairoEncoding;
 
-pub struct CairoEncodingContextComponents;
+pub struct StarknetCairoEncodingContextComponents;
 
 pub struct StarknetEncodeMutComponents;
 
-impl HasComponents for CairoEncoding {
-    type Components = CairoEncodingContextComponents;
+impl HasComponents for StarknetCairoEncoding {
+    type Components = StarknetCairoEncodingContextComponents;
 }
 
 delegate_components! {
-    CairoEncodingContextComponents {
+    StarknetCairoEncodingContextComponents {
         ErrorTypeComponent: ProvideHermesError,
         ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
     }
@@ -55,7 +55,7 @@ delegate_components! {
 
 hermes_starknet_chain_components::with_starknet_cairo_encoding_components! {
     delegate_components! {
-        CairoEncodingContextComponents {
+        StarknetCairoEncodingContextComponents {
             @StarknetCairoEncodingComponents: StarknetCairoEncodingComponents,
         }
     }
@@ -73,15 +73,15 @@ impl<Context> ProvideEncodingType<Context, AsFelt> for ProvideCairoEncoding
 where
     Context: Async,
 {
-    type Encoding = CairoEncoding;
+    type Encoding = StarknetCairoEncoding;
 }
 
 impl<Context> DefaultEncodingGetter<Context, AsFelt> for ProvideCairoEncoding
 where
-    Context: HasEncodingType<AsFelt, Encoding = CairoEncoding>,
+    Context: HasEncodingType<AsFelt, Encoding = StarknetCairoEncoding>,
 {
-    fn default_encoding() -> &'static CairoEncoding {
-        &CairoEncoding
+    fn default_encoding() -> &'static StarknetCairoEncoding {
+        &StarknetCairoEncoding
     }
 }
 
@@ -117,10 +117,10 @@ pub trait CanUseCairoEncoding:
 {
 }
 
-impl CanUseCairoEncoding for CairoEncoding {}
+impl CanUseCairoEncoding for StarknetCairoEncoding {}
 
 pub trait CanUsePairEncoder:
-    MutEncoderAndDecoder<CairoEncoding, ViaCairo, (u128, (Vec<u8>, U256))>
+    MutEncoderAndDecoder<StarknetCairoEncoding, ViaCairo, (u128, (Vec<u8>, U256))>
 {
 }
 

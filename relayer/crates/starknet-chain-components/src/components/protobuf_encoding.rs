@@ -24,7 +24,7 @@ use crate::types::client::{
 };
 
 define_components! {
-    StarnetProtobufEncodingComponents {
+    StarknetProtobufEncodingComponents {
         EncodedTypeComponent:
             ProvideEncodedBytes,
         SchemaTypeComponent:

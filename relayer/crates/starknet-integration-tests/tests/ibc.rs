@@ -2,7 +2,6 @@ use std::time::SystemTime;
 
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
@@ -16,6 +15,7 @@ use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
     IbcTransferMessage, Participant,
 };
 use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
+use hermes_starknet_chain_context::contexts::cairo_encoding::StarknetCairoEncoding;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::accounts::Call;
@@ -47,7 +47,7 @@ fn test_starknet_ics20_contract() {
 
             let chain = &chain_driver.chain;
 
-            let encoding = chain.encoding();
+            let encoding = StarknetCairoEncoding;
 
             let erc20_class_hash = {
                 let contract_path = std::env::var("ERC20_CONTRACT")?;

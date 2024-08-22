@@ -2,11 +2,14 @@ use std::sync::Arc;
 
 use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
 use cgp_core::prelude::*;
+use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
+use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
 use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeComponent,
+    DefaultEncodingGetter, EncodingGetterComponent, ProvideEncodingType,
 };
+use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::ProvideHermesError;
 use hermes_logging_components::contexts::no_logger::ProvideNoLogger;
 use hermes_logging_components::traits::has_logger::{
@@ -64,7 +67,8 @@ use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 use starknet::signers::LocalWallet;
 
-use crate::contexts::cairo_encoding::ProvideCairoEncoding;
+use crate::contexts::cairo_encoding::StarknetCairoEncoding;
+use crate::contexts::protobuf_encoding::StarknetProtobufEncoding;
 use crate::impls::error::HandleStarknetError;
 
 #[derive(HasField)]
@@ -96,12 +100,7 @@ delegate_components! {
             GlobalLoggerGetterComponent,
         ]:
             ProvideNoLogger,
-        [
-            EncodingTypeComponent,
-            EncodingGetterComponent,
-            DefaultEncodingGetterComponent,
-        ]:
-            ProvideCairoEncoding,
+        EncodingGetterComponent: GetDefaultEncoding,
         EventParserComponent:
             DelegateEventDecoders<StarknetEventDecoders>,
         [
@@ -148,6 +147,26 @@ delegate_components! {
 delegate_components! {
     DelegateCosmosChainComponents {
         StarknetChain: StarknetToCosmosComponents,
+    }
+}
+
+impl ProvideEncodingType<StarknetChain, AsFelt> for StarknetChainContextComponents {
+    type Encoding = StarknetCairoEncoding;
+}
+
+impl DefaultEncodingGetter<StarknetChain, AsFelt> for StarknetChainContextComponents {
+    fn default_encoding() -> &'static StarknetCairoEncoding {
+        &StarknetCairoEncoding
+    }
+}
+
+impl ProvideEncodingType<StarknetChain, AsBytes> for StarknetChainContextComponents {
+    type Encoding = StarknetProtobufEncoding;
+}
+
+impl DefaultEncodingGetter<StarknetChain, AsBytes> for StarknetChainContextComponents {
+    fn default_encoding() -> &'static StarknetProtobufEncoding {
+        &StarknetProtobufEncoding
     }
 }
 

@@ -2057,6 +2057,7 @@ dependencies = [
  "hermes-error",
  "hermes-logger",
  "hermes-logging-components",
+ "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
  "hermes-runtime",
  "hermes-runtime-components",
