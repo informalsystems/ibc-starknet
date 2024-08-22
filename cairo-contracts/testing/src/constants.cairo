@@ -1,6 +1,7 @@
 use core::serde::Serde;
 use starknet::ContractAddress;
 use starknet::contract_address_const;
+use starknet_ibc_app_transfer::types::Participant;
 
 pub(crate) const SUPPLY: u256 = 2000;
 pub(crate) const DECIMALS: u8 = 18_u8;
@@ -23,7 +24,14 @@ pub(crate) fn OWNER() -> ContractAddress {
     contract_address_const::<'OWNER'>()
 }
 
-pub(crate) fn RECIPIENT() -> ContractAddress {
-    contract_address_const::<'RECIPIENT'>()
+pub(crate) fn STARKNET() -> Participant {
+    OWNER().into()
+}
+
+pub(crate) fn COSMOS() -> Participant {
+    let bech32_address: ByteArray = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng";
+    let mut serialized_address: Array<felt252> = ArrayTrait::new();
+    Serde::serialize(@bech32_address, ref serialized_address);
+    serialized_address.into()
 }
 

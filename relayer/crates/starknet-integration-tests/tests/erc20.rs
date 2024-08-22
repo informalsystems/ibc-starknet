@@ -1,7 +1,7 @@
 use std::time::SystemTime;
 
 use hermes_cosmos_integration_tests::init::init_test_runtime;
-use hermes_encoding_components::traits::encoder::CanEncode;
+use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;

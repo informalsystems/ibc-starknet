@@ -1,8 +1,10 @@
+use core::array::ArrayTrait;
 use core::hash::{HashStateTrait, HashStateExTrait};
 use core::num::traits::Zero;
 use core::poseidon::PoseidonTrait;
 use core::poseidon::poseidon_hash_span;
 use starknet::ContractAddress;
+use starknet::contract_address_const;
 use starknet_ibc_app_transfer::{
     ERC20Contract, ERC20ContractTrait, TransferErrors, TRANSFER_PORT_ID_HASH
 };
@@ -36,8 +38,8 @@ impl MsgTransferValidateBasicImpl of ValidateBasicTrait<MsgTransfer> {
 pub struct PacketData {
     pub denom: PrefixedDenom,
     pub amount: u256,
-    pub sender: ContractAddress,
-    pub receiver: ContractAddress,
+    pub sender: Participant,
+    pub receiver: Participant,
     pub memo: Memo,
 }
 
@@ -161,6 +163,53 @@ pub impl DenomImpl of DenomTrait {
 pub impl ContractAddressIntoDenom of Into<ContractAddress, Denom> {
     fn into(self: ContractAddress) -> Denom {
         Denom::Native(ERC20Contract { address: self })
+    }
+}
+
+/// Represents a participant either sending or receiving a packet.
+#[derive(Clone, Debug, Drop, Serde)]
+pub enum Participant {
+    Native: ContractAddress,
+    External: Array<felt252>,
+}
+
+pub trait ParticipantTrait {
+    fn is_non_zero(self: @Participant) -> bool;
+}
+
+impl ParticipantImpl of ParticipantTrait {
+    fn is_non_zero(self: @Participant) -> bool {
+        match self {
+            Participant::Native(contract_address) => contract_address.is_non_zero(),
+            Participant::External(array) => {
+                match array.len() {
+                    0 => false,
+                    1 => array[0].is_non_zero(),
+                    _ => true,
+                }
+            }
+        }
+    }
+}
+
+impl ParticipantTryIntoContractAddress of TryInto<Participant, ContractAddress> {
+    fn try_into(self: Participant) -> Option<ContractAddress> {
+        match self {
+            Participant::Native(contract_address) => Option::Some(contract_address),
+            _ => Option::None,
+        }
+    }
+}
+
+impl ContractAddressIntoParticipant of Into<ContractAddress, Participant> {
+    fn into(self: ContractAddress) -> Participant {
+        Participant::Native(self)
+    }
+}
+
+impl ArrayFelt252IntoParticipant of Into<Array<felt252>, Participant> {
+    fn into(self: Array<felt252>) -> Participant {
+        Participant::External(self)
     }
 }
 

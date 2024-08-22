@@ -2,10 +2,10 @@ use std::string::FromUtf8Error;
 
 use cgp_core::error::CanRaiseError;
 use cgp_core::prelude::DelegateComponent;
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 
 use crate::impls::encode_mut::byte_array::EncodeByteArray;
-use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use crate::traits::encode_mut::MutEncoderComponent;
 
 pub struct EncodeUtf8String;
 

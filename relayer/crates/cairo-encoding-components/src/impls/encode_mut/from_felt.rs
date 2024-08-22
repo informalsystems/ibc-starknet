@@ -1,6 +1,5 @@
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use starknet::core::types::Felt;
-
-use crate::traits::encode_mut::{CanEncodeMut, MutEncoder};
 
 pub struct EncodeFromFelt;
 

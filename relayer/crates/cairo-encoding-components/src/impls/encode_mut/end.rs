@@ -1,8 +1,8 @@
 use core::fmt::Debug;
 
 use cgp_core::error::CanRaiseError;
-
-use crate::traits::decode_mut::{HasDecodeBufferType, MutDecoder};
+use hermes_encoding_components::traits::decode_mut::MutDecoder;
+use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 
 pub struct DecodeEnd;
 

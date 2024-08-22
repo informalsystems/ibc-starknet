@@ -1,10 +1,9 @@
 use core::fmt::Debug;
 
 use cgp_core::error::CanRaiseError;
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use starknet::core::types::Felt;
-
-use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use crate::traits::encode_mut::{CanEncodeMut, MutEncoder};
 
 pub struct EncodeBool;
 

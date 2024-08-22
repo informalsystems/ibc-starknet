@@ -1,6 +1,7 @@
+use core::traits::TryInto;
 use starknet::ContractAddress;
 use starknet_ibc_testing::config::TestConfigTrait;
-use starknet_ibc_testing::constants::{SUPPLY, OWNER, RECIPIENT,};
+use starknet_ibc_testing::constants::{SUPPLY, OWNER, COSMOS, STARKNET};
 use starknet_ibc_testing::setup::{ERC20ContractTrait, ICS20TransferContractTrait};
 use starknet_ibc_utils::ComputeKeyTrait;
 
@@ -26,7 +27,7 @@ fn test_escrow_unescrow_roundtrip() {
     // Owner approves the amount of allowance for the `Transfer` contract.
     erc20.approve(OWNER(), ics20.contract_address, cfg.amount);
 
-    let msg_transfer = cfg.dummy_msg_transder(cfg.native_denom.clone(), OWNER(), RECIPIENT());
+    let msg_transfer = cfg.dummy_msg_transder(cfg.native_denom.clone(), STARKNET(), COSMOS());
 
     // Submit a `MsgTransfer` to the `Transfer` contract.
     ics20.send_execute(msg_transfer);
@@ -35,7 +36,7 @@ fn test_escrow_unescrow_roundtrip() {
     let event = ics20.assert_send_event();
 
     // Check the balance of the sender.
-    erc20.assert_balance(event.sender, SUPPLY - cfg.amount);
+    erc20.assert_balance(event.sender.try_into().unwrap(), SUPPLY - cfg.amount);
 
     // Check the balance of the `Transfer` contract.
     erc20.assert_balance(ics20.contract_address, cfg.amount);
@@ -46,7 +47,7 @@ fn test_escrow_unescrow_roundtrip() {
 
     cfg.prefix_native_denom();
 
-    let recv_packet = cfg.dummy_recv_packet(cfg.native_denom, OWNER(), RECIPIENT());
+    let recv_packet = cfg.dummy_recv_packet(cfg.native_denom, COSMOS(), STARKNET());
 
     // Submit a `RecvPacket` to the `Transfer` contract.
     ics20.recv_execute(recv_packet);
@@ -57,7 +58,7 @@ fn test_escrow_unescrow_roundtrip() {
     erc20.assert_balance(ics20.contract_address, 0);
 
     // Check the balance of the recipient.
-    erc20.assert_balance(event.receiver, cfg.amount);
+    erc20.assert_balance(event.receiver.try_into().unwrap(), SUPPLY);
 }
 
 #[test]
@@ -75,10 +76,13 @@ fn test_mint_burn_roundtrip() {
     // Mint
     // -----------------------------------------------------------
 
-    let recv_packet = cfg.dummy_recv_packet(cfg.hosted_denom.clone(), OWNER(), RECIPIENT());
+    let recv_packet = cfg.dummy_recv_packet(cfg.hosted_denom.clone(), COSMOS(), STARKNET());
 
     // Submit a `RecvPacket`, which will create a new ERC20 contract.
     ics20.recv_execute(recv_packet.clone());
+
+    // Assert the `CreateTokenEvent` emitted.
+    ics20.assert_create_token_event();
 
     // Assert the `RecvEvent` emitted.
     ics20.assert_recv_event();
@@ -96,7 +100,7 @@ fn test_mint_burn_roundtrip() {
 
     let erc20 = ERC20ContractTrait::setup_with_addr(token_address);
 
-    erc20.assert_balance(event.receiver, cfg.amount * 2);
+    erc20.assert_balance(event.receiver.try_into().unwrap(), cfg.amount * 2);
 
     // Check the total supply of the ERC20 contract.
     erc20.assert_total_supply(cfg.amount * 2);
@@ -105,7 +109,7 @@ fn test_mint_burn_roundtrip() {
     // Burn
     // -----------------------------------------------------------
 
-    let msg_transfer = cfg.dummy_msg_transder(cfg.hosted_denom, RECIPIENT(), OWNER());
+    let msg_transfer = cfg.dummy_msg_transder(cfg.hosted_denom, STARKNET(), COSMOS());
 
     // Owner approves the amount of allowance for the `Transfer` contract.
     ics20.send_execute(msg_transfer);
@@ -114,7 +118,7 @@ fn test_mint_burn_roundtrip() {
     let event = ics20.assert_send_event();
 
     // Check the balance of the sender.
-    erc20.assert_balance(event.sender, cfg.amount);
+    erc20.assert_balance(event.sender.try_into().unwrap(), cfg.amount);
 
     // Check the balance of the `Transfer` contract.
     erc20.assert_balance(ics20.contract_address, 0);
