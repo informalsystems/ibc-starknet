@@ -12,7 +12,9 @@ use hermes_starknet_chain_components::traits::event::CanParseEvents;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, PrefixedDenom};
 use hermes_starknet_chain_components::types::messages::ibc::height::Height;
-use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::IbcTransferMessage;
+use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
+    IbcTransferMessage, Participant,
+};
 use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
@@ -88,7 +90,9 @@ fn test_starknet_ics20_contract() {
             };
 
             {
-                let account_address = chain_driver.relayer_wallet.account_address;
+                // TODO: once `CosmosChainDriver` integrated, read the sender address from there.
+                let sender_address = encoding
+                    .encode(&"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string())?;
 
                 let recipient_address = chain_driver.user_wallet_a.account_address;
 
@@ -98,8 +102,8 @@ fn test_starknet_ics20_contract() {
                         base: Denom::Hosted("uatom".into()),
                     },
                     amount: 99u32.into(),
-                    sender: account_address,
-                    receiver: recipient_address,
+                    sender: Participant::External(sender_address),
+                    receiver: Participant::Native(recipient_address),
                     memo: "".into(),
                 };
 
