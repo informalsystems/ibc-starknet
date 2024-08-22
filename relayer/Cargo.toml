@@ -45,29 +45,22 @@ hermes-runtime-components       = { version = "0.1.0" }
 hermes-async-runtime-components = { version = "0.1.0" }
 hermes-tokio-runtime-components = { version = "0.1.0" }
 hermes-runtime                  = { version = "0.1.0" }
-
 hermes-error               = { version = "0.1.0" }
 hermes-encoding-components = { version = "0.1.0" }
-
 hermes-logging-components         = { version = "0.1.0" }
 hermes-tracing-logging-components = { version = "0.1.0" }
 hermes-logger                     = { version = "0.1.0" }
-
 hermes-relayer-components = { version = "0.1.0" }
-
 hermes-cosmos-chain-components  = { version = "0.1.0" }
 hermes-cosmos-relayer           = { version = "0.1.0" }
 hermes-cosmos-wasm-relayer      = { version = "0.1.0" }
 hermes-cosmos-test-components   = { version = "0.1.0" }
 hermes-cosmos-integration-tests = { version = "0.1.0" }
-
 hermes-any-counterparty = { version = "0.1.0" }
-
 hermes-cli-components = { version = "0.1.0" }
-
 hermes-test-components = { version = "0.1.0" }
-
 hermes-cairo-encoding-components = { version = "0.1.0" }
+hermes-protobuf-encoding-components = { version = "0.1.0" }
 hermes-starknet-chain-components = { version = "0.1.0" }
 hermes-starknet-test-components  = { version = "0.1.0" }
 hermes-starknet-chain-context    = { version = "0.1.0" }
