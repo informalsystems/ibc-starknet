@@ -2038,7 +2038,10 @@ dependencies = [
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
  "hermes-test-components",
+ "hermes-wasm-client-components",
+ "ibc",
  "ibc-client-starknet-types",
+ "prost-types",
  "serde_json",
  "starknet",
 ]
