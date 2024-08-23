@@ -18,143 +18,139 @@ use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 
 #[test]
-fn test_erc20_transfer() {
+fn test_erc20_transfer() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
-    runtime
-        .runtime
-        .clone()
-        .block_on(async move {
-            let chain_command_path = std::env::var("STARKNET_BIN")
-                .unwrap_or("starknet-devnet".into())
-                .into();
+    runtime.runtime.clone().block_on(async move {
+        let chain_command_path = std::env::var("STARKNET_BIN")
+            .unwrap_or("starknet-devnet".into())
+            .into();
 
-            let timestamp = SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)?
-                .as_secs();
+        let timestamp = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)?
+            .as_secs();
 
-            let bootstrap = StarknetBootstrap {
-                runtime: runtime.clone(),
-                chain_command_path,
-                chain_store_dir: format!("./test-data/{timestamp}").into(),
+        let bootstrap = StarknetBootstrap {
+            runtime: runtime.clone(),
+            chain_command_path,
+            chain_store_dir: format!("./test-data/{timestamp}").into(),
+        };
+
+        let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
+
+        let chain = &chain_driver.chain;
+
+        let token_address = {
+            // Test deployment of ERC20 contract
+            let contract_path = std::env::var("ERC20_CONTRACT")?;
+
+            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+
+            let contract = serde_json::from_str(&contract_str)?;
+
+            let class_hash = chain.declare_contract(&contract).await?;
+
+            println!("declared class: {:?}", class_hash);
+
+            let relayer_address = chain_driver.relayer_wallet.account_address;
+
+            let deploy_message = DeployErc20TokenMessage {
+                name: "token".into(),
+                symbol: "token".into(),
+                fixed_supply: 1000u32.into(),
+                recipient: relayer_address,
+                owner: relayer_address,
             };
 
-            let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
+            let calldata = StarknetCairoEncoding.encode(&deploy_message)?;
 
-            let chain = &chain_driver.chain;
+            let token_address = chain.deploy_contract(&class_hash, false, &calldata).await?;
 
-            let token_address = {
-                // Test deployment of ERC20 contract
-                let contract_path = std::env::var("ERC20_CONTRACT")?;
+            println!("deployed ERC20 contract to address: {:?}", token_address);
 
-                let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+            let balance = chain
+                .query_token_balance(&token_address, &relayer_address)
+                .await?;
 
-                let contract = serde_json::from_str(&contract_str)?;
+            println!("initial balance: {}", balance);
 
-                let class_hash = chain.declare_contract(&contract).await?;
+            assert_eq!(balance.quantity, 1000u32.into());
 
-                println!("declared class: {:?}", class_hash);
+            token_address
+        };
 
-                let relayer_address = chain_driver.relayer_wallet.account_address;
+        {
+            // Test local ERC20 token transfer
+            let account_address = chain_driver.relayer_wallet.account_address;
 
-                let deploy_message = DeployErc20TokenMessage {
-                    name: "token".into(),
-                    symbol: "token".into(),
-                    fixed_supply: 1000u32.into(),
-                    recipient: relayer_address,
-                    owner: relayer_address,
-                };
+            let recipient_address = chain_driver.user_wallet_a.account_address;
 
-                let calldata = StarknetCairoEncoding.encode(&deploy_message)?;
+            println!("sender address: {:?}", account_address);
+            println!("recipient address: {:?}", recipient_address);
 
-                let token_address = chain.deploy_contract(&class_hash, false, &calldata).await?;
+            let sender_balance_a = chain
+                .query_token_balance(&token_address, &account_address)
+                .await?;
 
-                println!("deployed ERC20 contract to address: {:?}", token_address);
+            println!("sender balance before: {}", sender_balance_a);
 
-                let balance = chain
-                    .query_token_balance(&token_address, &relayer_address)
-                    .await?;
+            let recipient_balance_a = chain
+                .query_token_balance(&token_address, &recipient_address)
+                .await?;
 
-                println!("initial balance: {}", balance);
+            println!("recipient balance before: {}", recipient_balance_a);
 
-                assert_eq!(balance.quantity, 1000u32.into());
+            let transfer_amount = 100u32.into();
 
-                token_address
-            };
+            let message = chain.build_transfer_token_message(
+                &recipient_address,
+                &StarknetAmount::new(transfer_amount, token_address),
+            )?;
 
-            {
-                // Test local ERC20 token transfer
-                let account_address = chain_driver.relayer_wallet.account_address;
+            let events = chain.send_message(message).await?;
 
-                let recipient_address = chain_driver.user_wallet_a.account_address;
+            println!("performed transfer of 100 tokens");
 
-                println!("sender address: {:?}", account_address);
-                println!("recipient address: {:?}", recipient_address);
+            let erc20_events: Vec<Erc20Event> = chain.parse_events(&events)?;
 
-                let sender_balance_a = chain
-                    .query_token_balance(&token_address, &account_address)
-                    .await?;
+            println!(
+                "events from sending transfer token message: {:?}",
+                erc20_events
+            );
 
-                println!("sender balance before: {}", sender_balance_a);
-
-                let recipient_balance_a = chain
-                    .query_token_balance(&token_address, &recipient_address)
-                    .await?;
-
-                println!("recipient balance before: {}", recipient_balance_a);
-
-                let transfer_amount = 100u32.into();
-
-                let message = chain.build_transfer_token_message(
-                    &recipient_address,
-                    &StarknetAmount::new(transfer_amount, token_address),
-                )?;
-
-                let events = chain.send_message(message).await?;
-
-                println!("performed transfer of 100 tokens");
-
-                let erc20_events: Vec<Erc20Event> = chain.parse_events(&events)?;
-
-                println!(
-                    "events from sending transfer token message: {:?}",
-                    erc20_events
-                );
-
-                match &erc20_events[0] {
-                    Erc20Event::Transfer(transfer) => {
-                        assert_eq!(transfer.from, account_address);
-                        assert_eq!(transfer.to, recipient_address);
-                        assert_eq!(transfer.value, transfer_amount);
-                    }
-                    _ => {
-                        panic!("expected a Transfer event to be emitted");
-                    }
+            match &erc20_events[0] {
+                Erc20Event::Transfer(transfer) => {
+                    assert_eq!(transfer.from, account_address);
+                    assert_eq!(transfer.to, recipient_address);
+                    assert_eq!(transfer.value, transfer_amount);
                 }
-
-                let sender_balance_b = chain
-                    .query_token_balance(&token_address, &account_address)
-                    .await?;
-
-                println!("sender balance after transfer: {}", sender_balance_b);
-
-                let recipient_balance_b = chain
-                    .query_token_balance(&token_address, &recipient_address)
-                    .await?;
-
-                println!("recipient balance transfer: {}", recipient_balance_b);
-
-                assert_eq!(
-                    sender_balance_b.quantity,
-                    sender_balance_a.quantity - transfer_amount
-                );
-                assert_eq!(
-                    recipient_balance_b.quantity,
-                    recipient_balance_a.quantity + transfer_amount
-                );
+                _ => {
+                    panic!("expected a Transfer event to be emitted");
+                }
             }
 
-            <Result<(), Error>>::Ok(())
-        })
-        .unwrap();
+            let sender_balance_b = chain
+                .query_token_balance(&token_address, &account_address)
+                .await?;
+
+            println!("sender balance after transfer: {}", sender_balance_b);
+
+            let recipient_balance_b = chain
+                .query_token_balance(&token_address, &recipient_address)
+                .await?;
+
+            println!("recipient balance transfer: {}", recipient_balance_b);
+
+            assert_eq!(
+                sender_balance_b.quantity,
+                sender_balance_a.quantity - transfer_amount
+            );
+            assert_eq!(
+                recipient_balance_b.quantity,
+                recipient_balance_a.quantity + transfer_amount
+            );
+        }
+
+        Ok(())
+    })
 }

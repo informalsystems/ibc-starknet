@@ -8,7 +8,7 @@ pub const CONSENSUS_STATE_TYPE_URL: &str = "/StarknetConsensusState";
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq, derive_more::From)]
 pub struct ConsensusState {
-    root: CommitmentRoot,
+    pub root: CommitmentRoot,
 }
 
 #[derive(Clone, Message)]

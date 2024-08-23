@@ -42,7 +42,7 @@ jobs:
         working-directory: ./light-client
         run: |
           nix shell ..#rust-wasm -c \
-            cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
+            cargo build --release -p ibc-client-starknet-cw --target wasm32-unknown-unknown
 
       - name: Run Integration Tests
         env:
@@ -51,7 +51,7 @@ jobs:
         run: |
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_presets_ERC20Mintable.contract_class.json"
           export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_presets_Transfer.contract_class.json"
-          export STARKNET_WASM_CLIENT_PATH="$(pwd)/../target/wasm32-unknown-unknown/debug/ibc_client_starknet_cw.wasm"
+          export STARKNET_WASM_CLIENT_PATH="$(pwd)/../light-client/target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm"
 
           nix develop ..#rust -c \
             cargo nextest run --test-threads=2

@@ -2077,6 +2077,7 @@ version = "0.1.0"
 dependencies = [
  "cgp-core",
  "eyre",
+ "hermes-cosmos-chain-components",
  "hermes-cosmos-integration-tests",
  "hermes-cosmos-relayer",
  "hermes-cosmos-test-components",
@@ -2090,6 +2091,7 @@ dependencies = [
  "hermes-starknet-chain-context",
  "hermes-starknet-test-components",
  "hermes-test-components",
+ "ibc",
  "rand",
  "serde_json",
  "sha2 0.10.8",
