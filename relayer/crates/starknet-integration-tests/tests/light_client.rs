@@ -13,9 +13,8 @@ use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientB
 use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
-use hermes_starknet_chain_components::types::client::{
-    StarknetClientState, StarknetConsensusState,
-};
+use hermes_starknet_chain_components::types::client_state::StarknetClientState;
+use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
 use hermes_starknet_chain_context::contexts::protobuf_encoding::StarknetProtobufEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;

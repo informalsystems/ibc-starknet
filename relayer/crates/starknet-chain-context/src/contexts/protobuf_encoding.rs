@@ -5,9 +5,10 @@ use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_error::impls::ProvideHermesError;
 use hermes_protobuf_encoding_components::types::{Any, ViaProtobuf};
 use hermes_starknet_chain_components::components::protobuf_encoding::*;
-use hermes_starknet_chain_components::types::client::{
-    StarknetClientState, StarknetConsensusState,
+use hermes_starknet_chain_components::types::client_state::{
+    StarknetClientState, WasmStarknetClientState,
 };
+use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
 
 use crate::impls::error::HandleStarknetError;
 
@@ -39,6 +40,10 @@ pub trait CanUseStarknetProtobufEncoding:
     + CanEncodeAndDecode<ViaProtobuf, StarknetConsensusState>
     + CanConvert<StarknetClientState, Any>
     + CanConvert<Any, StarknetClientState>
+    + CanConvert<StarknetConsensusState, Any>
+    + CanConvert<Any, StarknetConsensusState>
+    + CanConvert<WasmStarknetClientState, Any>
+    + CanConvert<Any, WasmStarknetClientState>
 {
 }
 

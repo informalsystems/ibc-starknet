@@ -17,11 +17,18 @@ use hermes_protobuf_encoding_components::impls::from_context::EncodeFromContext;
 use hermes_protobuf_encoding_components::impls::protobuf::EncodeAsProtobuf;
 use hermes_protobuf_encoding_components::impls::via_any::EncodeViaAny;
 use hermes_protobuf_encoding_components::types::{Any, ViaAny, ViaProtobuf};
-
-use crate::types::client::{
-    ProtoStarknetClientState, ProtoStarknetConsensusState, StarknetClientState,
-    StarknetConsensusState,
+use hermes_wasm_client_components::impls::encoding::components::WasmEncodingComponents;
+use hermes_wasm_client_components::types::client_state::{ProtoWasmClientState, WasmClientState};
+use hermes_wasm_client_components::types::consensus_state::{
+    DecodeViaWasmConsensusState, EncodeViaWasmConsensusState, ProtoWasmConsensusState,
+    WasmConsensusState,
 };
+
+use crate::types::client_state::{
+    EncodeWasmStarknetClientState, ProtoStarknetClientState, StarknetClientState,
+    WasmStarknetClientState,
+};
+use crate::types::consensus_state::{ProtoStarknetConsensusState, StarknetConsensusState};
 
 define_components! {
     StarknetProtobufEncodingComponents {
@@ -62,6 +69,16 @@ delegate_components! {
         (ViaProtobuf, ProtoStarknetConsensusState): EncodeAsProtobuf,
 
         (ViaProtobuf, Any): EncodeAsProtobuf,
+
+        [
+            (ViaAny, WasmClientState),
+            (ViaProtobuf, WasmClientState),
+            (ViaProtobuf, ProtoWasmClientState),
+            (ViaAny, WasmConsensusState),
+            (ViaProtobuf, WasmConsensusState),
+            (ViaProtobuf, ProtoWasmConsensusState),
+        ]:
+            WasmEncodingComponents,
     }
 }
 
@@ -76,8 +93,26 @@ delegate_components! {
         (StarknetClientState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
         (Any, StarknetClientState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
 
-        (StarknetConsensusState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
-        (Any, StarknetConsensusState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
+        [
+            (WasmClientState, ProtoWasmClientState),
+            (ProtoWasmClientState, WasmClientState),
+            (WasmConsensusState, ProtoWasmConsensusState),
+            (ProtoWasmConsensusState, WasmConsensusState),
+            (WasmClientState, Any),
+            (Any, WasmClientState),
+            (WasmConsensusState, Any),
+            (Any, WasmConsensusState),
+        ]:
+            WasmEncodingComponents,
+
+        [
+            (Any, WasmStarknetClientState),
+            (WasmStarknetClientState, Any),
+        ]:
+            EncodeWasmStarknetClientState,
+
+        (StarknetConsensusState, Any): EncodeViaWasmConsensusState,
+        (Any, StarknetConsensusState): DecodeViaWasmConsensusState,
     }
 }
 
@@ -85,6 +120,11 @@ delegate_components! {
     StarknetTypeUrlSchemas {
         StarknetClientState: StarknetClientStateUrl,
         StarknetConsensusState: StarknetConsensusStateUrl,
+        [
+            WasmClientState,
+            WasmConsensusState,
+        ]:
+            WasmEncodingComponents,
     }
 }
 
