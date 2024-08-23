@@ -17,6 +17,7 @@ use hermes_error::handlers::report::ReportError;
 use hermes_error::handlers::wrap::WrapErrorDetail;
 use hermes_error::traits::wrap::WrapError;
 use hermes_error::types::Error;
+use hermes_protobuf_encoding_components::impls::any::TypeUrlMismatchError;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::transaction::impls::poll_tx_response::TxNoResponseError;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
@@ -68,6 +69,7 @@ delegate_components! {
             NonEmptyBuffer,
             VariantIndexOutOfBound,
             DecodeBoolError,
+            TypeUrlMismatchError,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
             <'a, Chain: HasEventType> EventSelectorMissing<'a, Chain>,
             <'a, Chain: HasEventType> UnknownEvent<'a, Chain>,

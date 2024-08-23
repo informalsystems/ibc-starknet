@@ -215,4 +215,4 @@ impl CanUseStarknetChain for StarknetChain {}
 
 pub trait CanUseCosmosChainWithStarknet: CanQueryClientState<StarknetChain> {}
 
-// impl CanUseCosmosChainWithStarknet for CosmosChain {}
+impl CanUseCosmosChainWithStarknet for CosmosChain {}

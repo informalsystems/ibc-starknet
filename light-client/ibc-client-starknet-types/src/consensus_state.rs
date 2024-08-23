@@ -11,7 +11,7 @@ pub struct ConsensusState {
     root: CommitmentRoot,
 }
 
-#[derive(Message)]
+#[derive(Clone, Message)]
 pub struct ProtoConsensusState {
     #[prost(message, tag = "1")]
     pub root: Option<Vec<u8>>,

@@ -12,7 +12,7 @@ pub struct ClientState {
     pub latest_height: Height,
 }
 
-#[derive(Message)]
+#[derive(Clone, Message)]
 pub struct ProtoClientState {
     #[prost(message, tag = "1")]
     pub latest_height: Option<ProtoHeight>,
