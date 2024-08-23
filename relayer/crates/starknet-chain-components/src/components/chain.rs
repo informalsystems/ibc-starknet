@@ -4,6 +4,9 @@ pub use hermes_relayer_components::chain::traits::types::chain_id::ChainIdTypeCo
 pub use hermes_relayer_components::chain::traits::types::client_state::ClientStateTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::consensus_state::ConsensusStateTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::event::EventTypeComponent;
+pub use hermes_relayer_components::chain::traits::types::height::{
+    HeightFieldComponent, HeightTypeComponent,
+};
 pub use hermes_relayer_components::chain::traits::types::message::MessageTypeComponent;
 use hermes_relayer_components::error::impls::retry::ReturnRetryable;
 pub use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
@@ -55,12 +58,18 @@ pub use crate::traits::types::contract_class::{
     ContractClassHashTypeComponent, ContractClassTypeComponent,
 };
 pub use crate::traits::types::method::SelectorTypeComponent;
+use crate::types::height::ProvideStarknetHeight;
 use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
 
 define_components! {
     StarknetChainComponents {
         ChainIdTypeComponent:
             ProvideFeltChainId,
+        [
+            HeightTypeComponent,
+            HeightFieldComponent,
+        ]:
+            ProvideStarknetHeight,
         AddressTypeComponent:
             ProvideFeltAddressType,
         BlobTypeComponent:

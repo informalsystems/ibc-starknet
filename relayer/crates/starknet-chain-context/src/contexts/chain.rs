@@ -16,6 +16,7 @@ use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
 };
 use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
+use hermes_relayer_components::chain::traits::queries::consensus_state::CanQueryConsensusState;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
@@ -213,6 +214,9 @@ pub trait CanUseStarknetChain:
 
 impl CanUseStarknetChain for StarknetChain {}
 
-pub trait CanUseCosmosChainWithStarknet: CanQueryClientState<StarknetChain> {}
+pub trait CanUseCosmosChainWithStarknet:
+    CanQueryClientState<StarknetChain> + CanQueryConsensusState<StarknetChain>
+{
+}
 
 impl CanUseCosmosChainWithStarknet for CosmosChain {}
