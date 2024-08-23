@@ -26,6 +26,8 @@ use hermes_starknet_chain_components::impls::error::provider::RaiseProviderError
 use hermes_starknet_chain_components::impls::error::starknet::RaiseStarknetError;
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use hermes_starknet_chain_components::traits::event::{EventSelectorMissing, UnknownEvent};
+use ibc::core::client::types::error::ClientError;
+use prost::{DecodeError, EncodeError};
 use starknet::accounts::{single_owner, AccountError};
 use starknet::core::types::contract::{ComputeClassHashError, JsonError};
 use starknet::core::types::{RevertedInvocation, StarknetError};
@@ -48,6 +50,9 @@ delegate_components! {
             TokioRuntimeError,
             serde_json::error::Error,
             JsonError,
+            EncodeError,
+            DecodeError,
+            ClientError,
             ComputeClassHashError,
             StarknetSierraCompilationError,
         ]: ReportError,

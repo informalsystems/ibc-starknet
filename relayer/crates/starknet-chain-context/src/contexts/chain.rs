@@ -7,7 +7,7 @@ use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainCom
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
 use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetter, EncodingGetterComponent, ProvideEncodingType,
+    DefaultEncodingGetter, EncodingGetterComponent, HasDefaultEncoding, ProvideEncodingType,
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::ProvideHermesError;
@@ -15,6 +15,7 @@ use hermes_logging_components::contexts::no_logger::ProvideNoLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
 };
+use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
@@ -185,6 +186,8 @@ impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
 pub trait CanUseStarknetChain:
     HasRuntime
     + HasLogger
+    + HasDefaultEncoding<AsBytes, Encoding = StarknetProtobufEncoding>
+    + HasDefaultEncoding<AsFelt, Encoding = StarknetCairoEncoding>
     + HasAddressType<Address = Felt>
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
@@ -209,3 +212,7 @@ pub trait CanUseStarknetChain:
 }
 
 impl CanUseStarknetChain for StarknetChain {}
+
+pub trait CanUseCosmosChainWithStarknet: CanQueryClientState<StarknetChain> {}
+
+// impl CanUseCosmosChainWithStarknet for CosmosChain {}

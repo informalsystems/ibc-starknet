@@ -2064,6 +2064,8 @@ dependencies = [
  "hermes-starknet-chain-components",
  "hermes-starknet-test-components",
  "hermes-test-components",
+ "ibc",
+ "prost",
  "serde_json",
  "starknet",
  "url",
