@@ -30,12 +30,19 @@ jobs:
         with:
           workspaces: |
             relayer -> relayer/target
+            light-client -> light-client/target
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
           nix shell ..#scarb -c \
             scarb build
+
+      - name: Build Starknet Wasm light client
+        working-directory: ./light-client
+        run: |
+          nix shell ..#rust-wasm -c \
+            cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
 
       - name: Run Integration Tests
         env:
@@ -44,6 +51,7 @@ jobs:
         run: |
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_presets_ERC20Mintable.contract_class.json"
           export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_presets_Transfer.contract_class.json"
+          export STARKNET_WASM_CLIENT_PATH="$(pwd)/../target/wasm32-unknown-unknown/debug/ibc_client_starknet_cw.wasm"
 
           nix develop ..#rust -c \
             cargo nextest run --test-threads=2

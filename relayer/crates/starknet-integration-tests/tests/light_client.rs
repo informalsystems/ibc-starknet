@@ -25,7 +25,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
     let store_dir = std::env::current_dir()?.join(format!("test-data/{store_postfix}"));
 
     let wasm_client_code_path = PathBuf::from(
-        var("WASM_STARKNET_CLIENT_PATH").expect("Wasm blob for Starknet light client is required"),
+        var("STARKNET_WASM_CLIENT_PATH").expect("Wasm blob for Starknet light client is required"),
     );
 
     let cosmos_builder = Arc::new(CosmosBuilder::new_with_default(runtime.clone()));
