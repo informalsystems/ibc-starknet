@@ -5,6 +5,8 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
 use hermes_cosmos_chain_components::types::messages::client::create::CosmosCreateClientMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
@@ -13,7 +15,9 @@ use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientB
 use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
-use hermes_starknet_chain_components::types::client_state::StarknetClientState;
+use hermes_starknet_chain_components::types::client_state::{
+    StarknetClientState, WasmStarknetClientState,
+};
 use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
 use hermes_starknet_chain_context::contexts::protobuf_encoding::StarknetProtobufEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
@@ -42,11 +46,13 @@ fn test_starknet_light_client() -> Result<(), Error> {
     runtime.runtime.clone().block_on(async move {
         let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
 
-        let _wasm_code_hash: [u8; 32] = {
+        let wasm_code_hash: [u8; 32] = {
             let mut hasher = Sha256::new();
             hasher.update(&wasm_client_byte_code);
             hasher.finalize().into()
         };
+
+        println!("Will Wasm Starknet client with code hash: {:?}", BASE64_STANDARD.encode(wasm_code_hash));
 
         let cosmos_bootstrap = Arc::new(CosmosWithWasmClientBootstrap {
             runtime: runtime.clone(),
@@ -65,8 +71,11 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let cosmos_chain = cosmos_chain_driver.chain();
 
-        let client_state = StarknetClientState {
-            latest_height: Height::new(0, 1)?,
+        let client_state = WasmStarknetClientState {
+            wasm_code_hash: wasm_code_hash.into(),
+            client_state: StarknetClientState {
+                latest_height: Height::new(0, 1)?,
+            },
         };
 
         let consensus_state = StarknetConsensusState {

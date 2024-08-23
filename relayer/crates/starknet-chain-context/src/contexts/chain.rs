@@ -51,7 +51,7 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
-use hermes_starknet_chain_components::types::client_state::StarknetClientState;
+use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
 use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
 use hermes_starknet_chain_components::types::events::erc20::{
     ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent,
@@ -191,7 +191,7 @@ pub trait CanUseStarknetChain:
     + HasAddressType<Address = Felt>
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
-    + HasClientStateType<CosmosChain, ClientState = StarknetClientState>
+    + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = StarknetConsensusState>
     + HasStarknetProvider
     + HasStarknetAccount
