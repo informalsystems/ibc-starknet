@@ -6,7 +6,7 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url = "github:numtide/flake-utils";
     cairo-nix.url = "github:cairo-nix/cairo-nix";
-    cosmos-nix-wasm.url = github:informalsystems/cosmos.nix/jonathan/ibc-go-wasm;
+    cosmos-nix.url = github:informalsystems/cosmos.nix;
 
     starknet-devnet-src = {
       url = "github:0xSpaceShard/starknet-devnet-rs";
@@ -44,9 +44,9 @@
             overlays = [ inputs.rust-overlay.overlays.default ];
           };
 
-          cosmos-nix-wasm = inputs.cosmos-nix-wasm.packages.${system};
+          cosmos-nix = inputs.cosmos-nix.packages.${system};
 
-          wasm-simapp = cosmos-nix-wasm.ibc-go-v7-wasm-simapp;
+          wasm-simapp = cosmos-nix.ibc-go-v8-wasm-simapp;
 
           starknet-devnet = import ./nix/starknet-devnet.nix {
             inherit nixpkgs;

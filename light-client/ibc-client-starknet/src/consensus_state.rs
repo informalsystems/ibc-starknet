@@ -37,6 +37,6 @@ impl ConsensusStateTrait for ConsensusState {
     }
 
     fn timestamp(&self) -> Timestamp {
-        Timestamp::none()
+        Timestamp::now()
     }
 }

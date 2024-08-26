@@ -52,7 +52,10 @@ fn test_starknet_light_client() -> Result<(), Error> {
             hasher.finalize().into()
         };
 
-        println!("Will Wasm Starknet client with code hash: {:?}", BASE64_STANDARD.encode(wasm_code_hash));
+        println!(
+            "Will Wasm Starknet client with code hash: {:?}",
+            BASE64_STANDARD.encode(wasm_code_hash)
+        );
 
         let cosmos_bootstrap = Arc::new(CosmosWithWasmClientBootstrap {
             runtime: runtime.clone(),

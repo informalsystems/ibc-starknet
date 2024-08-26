@@ -128,7 +128,7 @@ fn update_client_and_consensus_state<E: ClientExecutionContext>(
     ctx.store_update_meta(
         client_id.clone(),
         client_height,
-        Timestamp::none(),
+        Timestamp::now(),
         Height::min(0),
     )?;
 
