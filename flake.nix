@@ -6,7 +6,7 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url = "github:numtide/flake-utils";
     cairo-nix.url = "github:cairo-nix/cairo-nix";
-    cosmos-nix.url = github:informalsystems/cosmos.nix;
+    cosmos-nix.url = "github:informalsystems/cosmos.nix";
 
     starknet-devnet-src = {
       url = "github:0xSpaceShard/starknet-devnet-rs";
@@ -70,7 +70,12 @@
           rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
 
           starknet-pkgs = {
-            inherit starknet-devnet cairo scarb wasm-simapp;
+            inherit
+              starknet-devnet
+              cairo
+              scarb
+              wasm-simapp
+              ;
           };
 
           tools = {
@@ -83,7 +88,6 @@
               ;
 
             nixfmt = nixpkgs.nixfmt-rfc-style;
-
           };
 
           shell-deps = (builtins.attrValues starknet-pkgs) ++ (builtins.attrValues tools);
@@ -109,6 +113,8 @@
 
             rust-wasm = nixpkgs.mkShell { buildInputs = [ rust-wasm ] ++ shell-deps; };
           };
+
+          formatter = tools.nixfmt;
         }
       );
 }
