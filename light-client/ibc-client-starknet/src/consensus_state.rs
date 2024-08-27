@@ -31,6 +31,6 @@ impl ConsensusStateTrait for ConsensusState {
     }
 
     fn timestamp(&self) -> Timestamp {
-        self.0.time.clone()
+        self.0.time
     }
 }
