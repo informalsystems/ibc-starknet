@@ -2,6 +2,7 @@ pub mod address;
 pub mod amount;
 pub mod blob;
 pub mod chain_id;
+pub mod client;
 pub mod contract;
 pub mod denom;
 pub mod event;

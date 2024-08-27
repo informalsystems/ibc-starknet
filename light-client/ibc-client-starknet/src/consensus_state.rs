@@ -9,12 +9,6 @@ use ibc_core::primitives::Timestamp;
 #[derive(Clone, Debug, PartialEq, derive_more::From)]
 pub struct ConsensusState(pub ConsensusStateType);
 
-impl Default for ConsensusState {
-    fn default() -> Self {
-        ConsensusStateType::default().into()
-    }
-}
-
 impl Protobuf<Any> for ConsensusState {}
 
 impl TryFrom<Any> for ConsensusState {
@@ -37,6 +31,6 @@ impl ConsensusStateTrait for ConsensusState {
     }
 
     fn timestamp(&self) -> Timestamp {
-        Timestamp::none()
+        self.0.time
     }
 }

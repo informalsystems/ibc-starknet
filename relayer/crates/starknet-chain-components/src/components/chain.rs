@@ -1,7 +1,12 @@
 use cgp_core::prelude::*;
 pub use hermes_relayer_components::chain::traits::send_message::MessageSenderComponent;
 pub use hermes_relayer_components::chain::traits::types::chain_id::ChainIdTypeComponent;
+pub use hermes_relayer_components::chain::traits::types::client_state::ClientStateTypeComponent;
+pub use hermes_relayer_components::chain::traits::types::consensus_state::ConsensusStateTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::event::EventTypeComponent;
+pub use hermes_relayer_components::chain::traits::types::height::{
+    HeightFieldComponent, HeightTypeComponent,
+};
 pub use hermes_relayer_components::chain::traits::types::message::MessageTypeComponent;
 use hermes_relayer_components::error::impls::retry::ReturnRetryable;
 pub use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
@@ -31,6 +36,7 @@ use crate::impls::types::address::ProvideFeltAddressType;
 use crate::impls::types::amount::ProvideU256Amount;
 use crate::impls::types::blob::ProvideFeltBlobType;
 use crate::impls::types::chain_id::ProvideFeltChainId;
+use crate::impls::types::client::ProvideStarknetIbcClientTypes;
 use crate::impls::types::contract::ProvideStarknetContractTypes;
 use crate::impls::types::denom::ProvideTokenAddressDenom;
 use crate::impls::types::event::ProvideStarknetEvent;
@@ -52,12 +58,18 @@ pub use crate::traits::types::contract_class::{
     ContractClassHashTypeComponent, ContractClassTypeComponent,
 };
 pub use crate::traits::types::method::SelectorTypeComponent;
+use crate::types::height::ProvideStarknetHeight;
 use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
 
 define_components! {
     StarknetChainComponents {
         ChainIdTypeComponent:
             ProvideFeltChainId,
+        [
+            HeightTypeComponent,
+            HeightFieldComponent,
+        ]:
+            ProvideStarknetHeight,
         AddressTypeComponent:
             ProvideFeltAddressType,
         BlobTypeComponent:
@@ -83,6 +95,11 @@ define_components! {
             ContractClassHashTypeComponent,
         ]:
             ProvideStarknetContractTypes,
+        [
+            ClientStateTypeComponent,
+            ConsensusStateTypeComponent,
+        ]:
+            ProvideStarknetIbcClientTypes,
         MessageSenderComponent:
             SendCallMessages,
         TxSubmitterComponent:

@@ -1,20 +1,22 @@
 use ibc_client_starknet_types::ClientState as ClientStateType;
 use ibc_core::client::context::client_state::ClientStateExecution;
-use ibc_core::client::context::prelude::ClientStateCommon;
+use ibc_core::client::context::prelude::{ClientStateCommon, ConsensusState};
 use ibc_core::client::context::ClientExecutionContext;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
 use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::host::types::path::{ClientConsensusStatePath, ClientStatePath};
 use ibc_core::primitives::proto::Any;
-use ibc_core::primitives::Timestamp;
 
 use super::ClientState;
-use crate::ConsensusState;
+use crate::ConsensusState as StarknetConsensusState;
 
 impl<E> ClientStateExecution<E> for ClientState
 where
-    E: ClientExecutionContext<ClientStateMut = ClientState, ConsensusStateRef = ConsensusState>,
+    E: ClientExecutionContext<
+        ClientStateMut = ClientState,
+        ConsensusStateRef = StarknetConsensusState,
+    >,
 {
     fn initialise(
         &self,
@@ -45,12 +47,14 @@ where
 
         let new_client_state = ClientStateType { latest_height }.into();
 
+        let new_consensus_state = StarknetConsensusState::try_from(header)?;
+
         update_client_and_consensus_state(
             ctx,
             latest_height,
             client_id,
             new_client_state,
-            ConsensusState::default(),
+            new_consensus_state,
         )?;
 
         Ok(vec![latest_height])
@@ -116,6 +120,7 @@ fn update_client_and_consensus_state<E: ClientExecutionContext>(
     client_state: E::ClientStateRef,
     consensus_state: E::ConsensusStateRef,
 ) -> Result<(), ClientError> {
+    let timestamp = consensus_state.timestamp();
     ctx.store_consensus_state(
         ClientConsensusStatePath::new(
             client_id.clone(),
@@ -125,12 +130,7 @@ fn update_client_and_consensus_state<E: ClientExecutionContext>(
         consensus_state,
     )?;
     ctx.store_client_state(ClientStatePath::new(client_id.clone()), client_state)?;
-    ctx.store_update_meta(
-        client_id.clone(),
-        client_height,
-        Timestamp::none(),
-        Height::min(0),
-    )?;
+    ctx.store_update_meta(client_id.clone(), client_height, timestamp, Height::min(0))?;
 
     Ok(())
 }

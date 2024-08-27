@@ -15,8 +15,11 @@ description = """
 workspace = true
 
 [dependencies]
+ibc-proto   = { workspace = true }
 ibc-core    = { workspace = true }
+tendermint  = { workspace = true }
 derive_more = { workspace = true }
+prost       = { workspace = true }
 serde       = { workspace = true, optional = true }
 
 [features]
