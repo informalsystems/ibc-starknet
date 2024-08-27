@@ -15,7 +15,7 @@ ibc                                 = { workspace = true }
 hermes-relayer-components           = { workspace = true }
 hermes-test-components              = { workspace = true }
 hermes-encoding-components          = { workspace = true }
-hermes-wasm-client-components          = { workspace = true }
+hermes-wasm-client-components       = { workspace = true }
 hermes-cairo-encoding-components    = { workspace = true }
 hermes-protobuf-encoding-components = { workspace = true }
 
@@ -23,4 +23,4 @@ starknet                    = { workspace = true }
 serde_json                  = { workspace = true }
 cairo-lang-starknet-classes = { workspace = true }
 ibc-client-starknet-types   = { workspace = true }
-prost-types   = { workspace = true }
+prost-types                 = { workspace = true }

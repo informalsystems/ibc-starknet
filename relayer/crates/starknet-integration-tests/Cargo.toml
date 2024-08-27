@@ -21,11 +21,11 @@ hermes-starknet-chain-components = { workspace = true }
 hermes-starknet-test-components  = { workspace = true }
 hermes-starknet-chain-context    = { workspace = true }
 hermes-cosmos-test-components    = { workspace = true }
-hermes-cosmos-chain-components    = { workspace = true }
+hermes-cosmos-chain-components   = { workspace = true }
 hermes-cosmos-integration-tests  = { workspace = true }
 hermes-cosmos-relayer            = { workspace = true }
 hermes-cosmos-wasm-relayer       = { workspace = true }
-ibc       = { workspace = true }
+ibc                              = { workspace = true }
 
 starknet   = { workspace = true }
 url        = { workspace = true }
@@ -34,4 +34,4 @@ tokio      = { workspace = true }
 serde_json = { workspace = true }
 rand       = { workspace = true }
 sha2       = { workspace = true }
-base64 = "0.22.1"
+base64     = "0.22.1"
