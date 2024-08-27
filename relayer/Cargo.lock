@@ -2151,7 +2151,6 @@ dependencies = [
 name = "hermes-starknet-integration-tests"
 version = "0.1.0"
 dependencies = [
- "base64 0.22.1",
  "cgp-core",
  "eyre",
  "hermes-cosmos-chain-components",
@@ -2585,6 +2584,7 @@ dependencies = [
  "ibc-core",
  "ibc-proto",
  "prost",
+ "tendermint",
 ]
 
 [[package]]

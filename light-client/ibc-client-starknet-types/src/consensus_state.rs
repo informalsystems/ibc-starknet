@@ -1,6 +1,8 @@
 use ibc_core::client::types::error::ClientError;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
 use ibc_core::primitives::proto::{Any, Protobuf};
+use ibc_core::primitives::Timestamp;
+use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
 use prost::Message;
 
 pub const CONSENSUS_STATE_TYPE_URL: &str = "/StarknetConsensusState";
@@ -9,25 +11,20 @@ pub const CONSENSUS_STATE_TYPE_URL: &str = "/StarknetConsensusState";
 #[derive(Clone, Debug, PartialEq, derive_more::From)]
 pub struct ConsensusState {
     pub root: CommitmentRoot,
+    pub time: Timestamp,
 }
 
 #[derive(Clone, Message)]
 pub struct ProtoConsensusState {
     #[prost(message, tag = "1")]
     pub root: Option<Vec<u8>>,
+    #[prost(message, tag = "2")]
+    pub timestamp: Option<ProtoTimestamp>,
 }
 
 impl ConsensusState {
     pub fn root(&self) -> &CommitmentRoot {
         &self.root
-    }
-}
-
-impl Default for ConsensusState {
-    fn default() -> Self {
-        Self {
-            root: CommitmentRoot::from(vec![]),
-        }
     }
 }
 
@@ -37,7 +34,7 @@ impl TryFrom<Any> for ConsensusState {
     type Error = ClientError;
 
     fn try_from(raw: Any) -> Result<Self, Self::Error> {
-        if raw.type_url != CONSENSUS_STATE_TYPE_URL || !raw.value.is_empty() {
+        if raw.type_url != CONSENSUS_STATE_TYPE_URL {
             return Err(ClientError::UnknownConsensusStateType {
                 consensus_state_type: raw.type_url,
             });
@@ -65,6 +62,7 @@ impl From<ConsensusState> for ProtoConsensusState {
     fn from(consensus_state: ConsensusState) -> Self {
         ProtoConsensusState {
             root: Some(consensus_state.root.into_vec()),
+            timestamp: Some(consensus_state.time.into()),
         }
     }
 }
@@ -80,6 +78,16 @@ impl TryFrom<ProtoConsensusState> for ConsensusState {
             })?
             .into();
 
-        Ok(ConsensusState { root })
+        let time = proto_consensus_state
+            .timestamp
+            .ok_or_else(|| ClientError::Other {
+                description: "empty timestamp".into(),
+            })?
+            .try_into()
+            .map_err(|e| ClientError::Other {
+                description: format!("timestamp error: {e}"),
+            })?;
+
+        Ok(ConsensusState { root, time })
     }
 }

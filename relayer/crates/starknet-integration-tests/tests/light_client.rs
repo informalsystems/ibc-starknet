@@ -5,8 +5,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use base64::prelude::BASE64_STANDARD;
-use base64::Engine;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
 use hermes_cosmos_chain_components::types::messages::client::create::CosmosCreateClientMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
@@ -23,6 +21,7 @@ use hermes_starknet_chain_context::contexts::protobuf_encoding::StarknetProtobuf
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::client::types::Height;
+use ibc::core::primitives::Timestamp;
 use sha2::{Digest, Sha256};
 
 #[test]
@@ -52,11 +51,6 @@ fn test_starknet_light_client() -> Result<(), Error> {
             hasher.finalize().into()
         };
 
-        println!(
-            "Will Wasm Starknet client with code hash: {:?}",
-            BASE64_STANDARD.encode(wasm_code_hash)
-        );
-
         let cosmos_bootstrap = Arc::new(CosmosWithWasmClientBootstrap {
             runtime: runtime.clone(),
             builder: cosmos_builder,
@@ -83,13 +77,16 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let consensus_state = StarknetConsensusState {
             root: vec![1, 2, 3].into(),
+            time: Timestamp::now(),
         };
 
         let encoding = StarknetProtobufEncoding;
 
+        let consensus_state_any = encoding.convert(&consensus_state)?;
+
         let create_client_message = CosmosCreateClientMessage {
             client_state: encoding.convert(&client_state)?,
-            consensus_state: encoding.convert(&consensus_state)?,
+            consensus_state: consensus_state_any,
         }
         .to_cosmos_message();
 

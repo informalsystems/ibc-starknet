@@ -65,7 +65,7 @@ delegate_components! {
 
         (ViaAny, StarknetConsensusState): EncodeViaAny<ViaProtobuf>,
 
-        (ViaProtobuf,StarknetConsensusState): ConvertAndEncode<ProtoStarknetConsensusState>,
+        (ViaProtobuf, StarknetConsensusState): ConvertAndEncode<ProtoStarknetConsensusState>,
         (ViaProtobuf, ProtoStarknetConsensusState): EncodeAsProtobuf,
 
         (ViaProtobuf, Any): EncodeAsProtobuf,
@@ -128,6 +128,6 @@ delegate_components! {
     }
 }
 
-impl_type_url!(StarknetClientStateUrl, "/StarknetClientState",);
+impl_type_url!(StarknetClientStateUrl, "/StarknetClientState");
 
-impl_type_url!(StarknetConsensusStateUrl, "/StarknetConsensusState",);
+impl_type_url!(StarknetConsensusStateUrl, "/StarknetConsensusState");
