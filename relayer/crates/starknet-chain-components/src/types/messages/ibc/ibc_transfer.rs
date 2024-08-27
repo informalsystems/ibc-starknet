@@ -30,7 +30,7 @@ pub type EncodeIbcTransferMessage = CombineEncoders<
     ],
 >;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Participant {
     Native(Felt),
     External(Vec<Felt>),

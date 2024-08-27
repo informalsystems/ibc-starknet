@@ -1,5 +1,6 @@
 use std::time::SystemTime;
 
+use eyre::eyre;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
@@ -19,6 +20,7 @@ use hermes_starknet_chain_context::contexts::cairo_encoding::StarknetCairoEncodi
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::accounts::Call;
+use starknet::core::types::U256;
 use starknet::macros::selector;
 
 #[test]
@@ -93,13 +95,15 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let recipient_address = chain_driver.user_wallet_a.account_address;
 
+            let amount = U256::from(99u32);
+
             let transfer_message = IbcTransferMessage {
                 denom: PrefixedDenom {
                     trace_path: Vec::new(),
                     base: Denom::Hosted("uatom".into()),
                 },
-                amount: 99u32.into(),
-                sender: Participant::External(sender_address),
+                amount,
+                sender: Participant::External(sender_address.clone()),
                 receiver: Participant::Native(recipient_address),
                 memo: "".into(),
             };
@@ -132,7 +136,50 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let ibc_transfer_events: Vec<IbcTransferEvent> = chain.parse_events(&events)?;
 
-            println!("recv_execute events: {:?}", ibc_transfer_events);
+            {
+                let receive_transfer_event = ibc_transfer_events
+                    .iter()
+                    .find_map(|event| {
+                        if let IbcTransferEvent::Receive(event) = event {
+                            Some(event)
+                        } else {
+                            None
+                        }
+                    })
+                    .ok_or_else(|| eyre!("expect create token event"))?;
+
+                assert_eq!(receive_transfer_event.amount, amount);
+
+                assert_eq!(
+                    receive_transfer_event.sender,
+                    Participant::External(sender_address)
+                );
+                assert_eq!(
+                    receive_transfer_event.receiver,
+                    Participant::Native(recipient_address)
+                );
+            }
+
+            let _token_address = {
+                let create_token_event = ibc_transfer_events
+                    .iter()
+                    .find_map(|event| {
+                        if let IbcTransferEvent::CreateToken(event) = event {
+                            Some(event)
+                        } else {
+                            None
+                        }
+                    })
+                    .ok_or_else(|| eyre!("expect create token event"))?;
+
+                assert_eq!(create_token_event.initial_supply, amount);
+
+                let token_address = create_token_event.address;
+
+                println!("created token address: {:?}", token_address);
+
+                token_address
+            };
         }
 
         Ok(())
