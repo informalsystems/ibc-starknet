@@ -8,7 +8,7 @@ pub use client_state::{
     TendermintClientState, TendermintClientStateImpl, TendermintClientStateTrait
 };
 
-pub use component::ICS07ClientComponent;
+pub use component::TendermintClientComponent;
 pub use consensus_state::{
     TendermintConsensusState, TendermintConsensusStateImpl, TendermintConsensusStateTrait
 };

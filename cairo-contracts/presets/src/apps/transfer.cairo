@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod Transfer {
+pub(crate) mod TransferApp {
     use starknet::ClassHash;
     use starknet_ibc_app_transfer::ICS20TransferComponent;
     use starknet_ibc_app_transfer::transferrable::TransferrableComponent;

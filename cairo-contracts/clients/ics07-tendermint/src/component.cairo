@@ -1,5 +1,5 @@
 #[starknet::component]
-pub mod ICS07ClientComponent {
+pub mod TendermintClientComponent {
     use core::num::traits::zero::Zero;
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_client_tendermint::{
@@ -8,12 +8,15 @@ pub mod ICS07ClientComponent {
     };
     use starknet_ibc_core_client::{
         MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Timestamp,
-        Status, StatusTrait, UpdateResult, IClientHandler, IClientState, IClientStateValidation,
-        IClientStateExecution
+        Status, StatusTrait, CreateResponse, CreateResponseImpl, UpdateResponse, IClientHandler,
+        IClientState, IClientStateValidation, IClientStateExecution
     };
+    use starknet_ibc_core_host::ClientIdImpl;
+    use starknet_ibc_utils::ValidateBasicTrait;
 
     #[storage]
     struct Storage {
+        client_sequence: u64,
         client_states: LegacyMap<u64, TendermintClientState>,
         consensus_states: LegacyMap<(u64, Height), TendermintConsensusState>,
         client_processed_times: LegacyMap<(u64, Height), u64>,
@@ -24,18 +27,20 @@ pub mod ICS07ClientComponent {
     #[derive(Debug, Drop, starknet::Event)]
     pub enum Event {}
 
-    #[embeddable_as(ICS07ClientHandler)]
+    #[embeddable_as(TendermintClientHandler)]
     impl ClientHandlerImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of IClientHandler<ComponentState<TContractState>> {
         fn create(
-            ref self: ComponentState<TContractState>, msg: MsgCreateClient, client_sequence: u64,
-        ) {
-            self.create_validate(msg.clone(), client_sequence);
-            self.create_execute(msg, client_sequence);
+            ref self: ComponentState<TContractState>, msg: MsgCreateClient
+        ) -> CreateResponse {
+            self.create_validate(msg.clone());
+            self.create_execute(msg)
         }
 
-        fn update(ref self: ComponentState<TContractState>, msg: MsgUpdateClient) -> UpdateResult {
+        fn update(
+            ref self: ComponentState<TContractState>, msg: MsgUpdateClient
+        ) -> UpdateResponse {
             self.update_validate(msg.clone());
             self.update_execute(msg)
         }
@@ -49,14 +54,12 @@ pub mod ICS07ClientComponent {
     pub impl CreateClientImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of CreateClientTrait<TContractState> {
-        fn create_validate(
-            self: @ComponentState<TContractState>, msg: MsgCreateClient, client_sequence: u64
-        ) {
+        fn create_validate(self: @ComponentState<TContractState>, msg: MsgCreateClient) {
+            msg.validate_basic();
+
             assert(msg.client_type == self.client_type(), TendermintErrors::INVALID_CLIENT_TYPE);
 
-            assert(!msg.client_state.is_empty(), TendermintErrors::EMPTY_CLIENT_STATE);
-
-            assert(!msg.consensus_state.is_empty(), TendermintErrors::EMPTY_CONSENSUS_STATE);
+            let client_sequence = self.client_sequence.read();
 
             let status = self.status(msg.client_state, client_sequence);
 
@@ -64,9 +67,11 @@ pub mod ICS07ClientComponent {
         }
 
         fn create_execute(
-            ref self: ComponentState<TContractState>, msg: MsgCreateClient, client_sequence: u64
-        ) {
-            self.initialize(client_sequence, msg.client_state, msg.consensus_state);
+            ref self: ComponentState<TContractState>, msg: MsgCreateClient
+        ) -> CreateResponse {
+            let client_sequence = self.client_sequence.read();
+
+            self.initialize(client_sequence, msg.client_state, msg.consensus_state)
         }
     }
 
@@ -75,12 +80,12 @@ pub mod ICS07ClientComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of UpdateClientTrait<TContractState> {
         fn update_validate(self: @ComponentState<TContractState>, msg: MsgUpdateClient) {
+            msg.validate_basic();
+
             assert(
                 msg.client_id.client_type == self.client_type(),
                 TendermintErrors::INVALID_CLIENT_TYPE
             );
-
-            assert(!msg.client_message.is_empty(), TendermintErrors::EMPTY_CLIENT_MESSAGE);
 
             let tendermint_client_state: TendermintClientState = self
                 .client_states
@@ -95,7 +100,7 @@ pub mod ICS07ClientComponent {
 
         fn update_execute(
             ref self: ComponentState<TContractState>, msg: MsgUpdateClient
-        ) -> UpdateResult {
+        ) -> UpdateResponse {
             if self.verify_misbehaviour(msg.client_id.sequence, msg.client_message.clone()) {
                 return self
                     .update_on_misbehaviour(msg.client_id.sequence, msg.client_message.clone());
@@ -109,7 +114,9 @@ pub mod ICS07ClientComponent {
     pub impl RecoverClientImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of RecoverClientTrait<TContractState> {
-        fn recover_validate(self: @ComponentState<TContractState>, msg: MsgRecoverClient) {}
+        fn recover_validate(self: @ComponentState<TContractState>, msg: MsgRecoverClient) {
+            msg.validate_basic();
+        }
 
         fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {}
     }
@@ -118,12 +125,14 @@ pub mod ICS07ClientComponent {
     pub impl UpgradeClientImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of UpgradeClientTrait<TContractState> {
-        fn upgrade_validate(self: @ComponentState<TContractState>, msg: MsgUpgradeClient,) {}
+        fn upgrade_validate(self: @ComponentState<TContractState>, msg: MsgUpgradeClient) {
+            msg.validate_basic();
+        }
 
         fn upgrade_execute(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient,) {}
     }
 
-    #[embeddable_as(ICS07ClientState)]
+    #[embeddable_as(TendermintCommonClientState)]
     impl ClientStateImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of IClientState<ComponentState<TContractState>> {
@@ -150,7 +159,7 @@ pub mod ICS07ClientComponent {
         }
     }
 
-    #[embeddable_as(ICS07ClientValidation)]
+    #[embeddable_as(TendermintClientValidation)]
     impl ClientValidationImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of IClientStateValidation<ComponentState<TContractState>> {
@@ -182,7 +191,7 @@ pub mod ICS07ClientComponent {
         ) {}
     }
 
-    #[embeddable_as(ICS07ClientExecution)]
+    #[embeddable_as(TendermintClientExecution)]
     impl ClientExecutionImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of IClientStateExecution<ComponentState<TContractState>> {
@@ -191,7 +200,7 @@ pub mod ICS07ClientComponent {
             client_sequence: u64,
             client_state: Array<felt252>,
             consensus_state: Array<felt252>
-        ) {
+        ) -> CreateResponse {
             let tendermint_client_state = TendermintClientStateImpl::deserialize(client_state);
 
             let tendermint_consensus_state = TendermintConsensusStateImpl::deserialize(
@@ -200,15 +209,19 @@ pub mod ICS07ClientComponent {
 
             self
                 ._update_state(
-                    client_sequence, tendermint_client_state, tendermint_consensus_state
+                    client_sequence, tendermint_client_state.clone(), tendermint_consensus_state
                 );
+
+            let client_id = ClientIdImpl::new(self.client_type(), client_sequence);
+
+            CreateResponseImpl::new(client_id, tendermint_client_state.latest_height)
         }
 
         fn update_state(
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
             client_message: Array<felt252>
-        ) -> UpdateResult {
+        ) -> UpdateResponse {
             let header: TendermintHeader = TendermintHeaderImpl::deserialize(client_message);
 
             let header_height = header.clone().trusted_height;
@@ -236,14 +249,14 @@ pub mod ICS07ClientComponent {
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
             client_message: Array<felt252>
-        ) -> UpdateResult {
+        ) -> UpdateResponse {
             let header = TendermintHeaderImpl::deserialize(client_message);
 
             let mut client_state = self.client_states.read(client_sequence);
 
             client_state.freeze(header.trusted_height);
 
-            UpdateResult::Misbehaviour
+            UpdateResponse::Misbehaviour
         }
 
         fn update_on_recover(

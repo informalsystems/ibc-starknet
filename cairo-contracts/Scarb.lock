@@ -75,6 +75,7 @@ dependencies = [
  "openzeppelin",
  "snforge_std",
  "starknet_ibc_app_transfer",
+ "starknet_ibc_client_tendermint",
  "starknet_ibc_core_client",
  "starknet_ibc_utils",
 ]

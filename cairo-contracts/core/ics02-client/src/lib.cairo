@@ -1,5 +1,5 @@
 mod client_call;
-mod component;
+mod components;
 mod errors;
 mod interface;
 mod msgs;
@@ -7,7 +7,9 @@ mod types;
 
 pub use client_call::{ClientContract, ClientContractTrait};
 
-pub use component::ICS02ClientComponent;
+pub use components::events::ClientEventEmitterComponent;
+
+pub use components::handler::ClientHandlerComponent;
 
 pub use errors::ClientErrors;
 
@@ -21,6 +23,6 @@ pub use interface::{
 pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient,};
 
 pub use types::{
-    UpdateResult, Status, StatusImpl, StatusTrait, Height, HeightPartialOrd, Timestamp,
-    HeightsIntoUpdateResult
+    CreateResponse, CreateResponseImpl, UpdateResponse, Status, StatusImpl, StatusTrait, Height,
+    HeightPartialOrd, Timestamp, HeightsIntoUpdateResponse
 };
