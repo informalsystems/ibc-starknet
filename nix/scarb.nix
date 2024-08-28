@@ -12,7 +12,7 @@ let
 
     src = scarb-src;
 
-    cargoHash = "sha256-Lg+Ggc51u73Y7O3KAcTMSO7FhcidKPc0aAcVrTr8lf8=";
+    cargoHash = "sha256-EYepqNEixfuwBQDWUAkIUpJcyTwkh6bnBck+M4VROMY=";
 
     SCARB_CORELIB_LOCAL_PATH = cairo-src + "/corelib";
   };

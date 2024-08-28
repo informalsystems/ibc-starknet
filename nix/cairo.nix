@@ -8,7 +8,7 @@ let
 
     src = cairo-src;
 
-    cargoHash = "sha256-vmJvWXecLvty7GvoI26Mn4cFlBh2WswKmwBHxiCXFpE=";
+    cargoHash = "sha256-yufWRaLxazbo64jjbH4MGLWqF7K7dWZhBjIBHLaRVHw=";
   };
 in
 cairo
