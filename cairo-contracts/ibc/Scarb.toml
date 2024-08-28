@@ -12,13 +12,13 @@ keywords      = { workspace = true }
 description   = "Meta crate re-exporting all IBC core, client, and application components"
 
 [dependencies]
-starknet_ibc_utils             = { workspace = true }
-starknet_ibc_core_host         = { workspace = true }
-starknet_ibc_core_client       = { workspace = true }
-starknet_ibc_core_channel      = { workspace = true }
-starknet_ibc_client_tendermint = { workspace = true }
-starknet_ibc_app_transfer      = { workspace = true }
-starknet_ibc_testing           = { workspace = true }
+starknet_ibc_utils           = { workspace = true }
+starknet_ibc_core_host       = { workspace = true }
+starknet_ibc_core_client     = { workspace = true }
+starknet_ibc_core_channel    = { workspace = true }
+starknet_ibc_client_cometbft = { workspace = true }
+starknet_ibc_app_transfer    = { workspace = true }
+starknet_ibc_testing         = { workspace = true }
 
 [lib]
 

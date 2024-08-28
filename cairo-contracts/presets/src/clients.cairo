@@ -1,1 +1,1 @@
-pub mod tendermint;
+pub mod cometbft;

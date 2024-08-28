@@ -1,33 +1,33 @@
 #[starknet::contract]
-pub(crate) mod TendermintClient {
-    use starknet_ibc_client_tendermint::TendermintClientComponent;
+pub(crate) mod CometClient {
+    use starknet_ibc_client_cometbft::CometClientComponent;
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
     component!(path: IBCGovernanceComponent, storage: governance, event: IBCGovernanceEvent);
-    component!(path: TendermintClientComponent, storage: client, event: TendermintClientEvent);
+    component!(path: CometClientComponent, storage: client, event: CometClientEvent);
 
     #[abi(embed_v0)]
     impl IBCGovernanceImpl = IBCGovernanceComponent::Governance<ContractState>;
     impl IBCGovernanceInternalImpl = IBCGovernanceComponent::GovernanceInternalImpl<ContractState>;
 
     #[abi(embed_v0)]
-    impl TendermintClientHandlerImpl =
-        TendermintClientComponent::TendermintClientHandler<ContractState>;
+    impl CometClientHandlerImpl =
+        CometClientComponent::CometClientHandler<ContractState>;
     #[abi(embed_v0)]
-    impl TendermintCommonClientStateImpl =
-        TendermintClientComponent::TendermintCommonClientState<ContractState>;
+    impl CometCommonClientStateImpl =
+        CometClientComponent::CometCommonClientState<ContractState>;
+
     #[abi(embed_v0)]
-    impl TendermintClientValidationImpl =
-        TendermintClientComponent::TendermintClientValidation<ContractState>;
-    impl TendermintClientExecutionImpl =
-        TendermintClientComponent::TendermintClientExecution<ContractState>;
+    impl CometClientValidationImpl =
+        CometClientComponent::CometClientValidation<ContractState>;
+    impl CometClientExecutionImpl = CometClientComponent::CometClientExecution<ContractState>;
 
     #[storage]
     struct Storage {
         #[substorage(v0)]
         governance: IBCGovernanceComponent::Storage,
         #[substorage(v0)]
-        client: TendermintClientComponent::Storage,
+        client: CometClientComponent::Storage,
     }
 
     #[event]
@@ -36,7 +36,7 @@ pub(crate) mod TendermintClient {
         #[flat]
         IBCGovernanceEvent: IBCGovernanceComponent::Event,
         #[flat]
-        TendermintClientEvent: TendermintClientComponent::Event,
+        CometClientEvent: CometClientComponent::Event,
     }
 
     #[constructor]

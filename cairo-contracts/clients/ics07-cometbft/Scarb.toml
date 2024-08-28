@@ -1,5 +1,5 @@
 [package]
-name          = "starknet_ibc_client_tendermint"
+name          = "starknet_ibc_client_cometbft"
 version       = { workspace = true }
 edition       = { workspace = true }
 cairo-version = { workspace = true }

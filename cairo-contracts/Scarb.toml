@@ -4,7 +4,7 @@ members = [
   "core/ics24-host",
   "core/ics02-client",
   "core/ics04-channel",
-  "clients/ics07-tendermint",
+  "clients/ics07-cometbft",
   "apps/ics20-transfer",
   "testing",
   "ibc",
@@ -30,14 +30,14 @@ openzeppelin = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", ta
 snforge_std  = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.25.0" }
 
 # ibc dependencies
-starknet_ibc_utils             = { path = "utils" }
-starknet_ibc_core_host         = { path = "core/ics24-host" }
-starknet_ibc_core_client       = { path = "core/ics02-client" }
-starknet_ibc_core_channel      = { path = "core/ics04-channel" }
-starknet_ibc_client_tendermint = { path = "clients/ics07-tendermint" }
-starknet_ibc_app_transfer      = { path = "apps/ics20-transfer" }
-starknet_ibc_testing           = { path = "testing" }
-starknet_ibc_presets           = { path = "presets" }
+starknet_ibc_utils           = { path = "utils" }
+starknet_ibc_core_host       = { path = "core/ics24-host" }
+starknet_ibc_core_client     = { path = "core/ics02-client" }
+starknet_ibc_core_channel    = { path = "core/ics04-channel" }
+starknet_ibc_client_cometbft = { path = "clients/ics07-cometbft" }
+starknet_ibc_app_transfer    = { path = "apps/ics20-transfer" }
+starknet_ibc_testing         = { path = "testing" }
+starknet_ibc_presets         = { path = "presets" }
 
 [workspace.tool.fmt]
 sort-module-level-items = true
