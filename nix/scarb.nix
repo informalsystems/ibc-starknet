@@ -6,7 +6,7 @@
 let
   cairo = nixpkgs.rustPlatform.buildRustPackage {
     name = "scarb";
-    version = "2.6.5";
+    version = "2.7.0";
 
     doCheck = false;
 
