@@ -27,8 +27,10 @@ description   = "Collection of Cairo components and contracts that implement and
 # external dependencies
 cairo_test           = "2.7.0"
 starknet             = "2.7.0"
-openzeppelin         = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
+openzeppelin_access  = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
+openzeppelin_token   = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
 openzeppelin_testing = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
+openzeppelin_utils   = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
 snforge_std          = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.27.0" }
 
 # ibc dependencies

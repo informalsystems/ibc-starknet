@@ -2,22 +2,6 @@
 version = 1
 
 [[package]]
-name = "openzeppelin"
-version = "0.15.1"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
-dependencies = [
- "openzeppelin_access",
- "openzeppelin_account",
- "openzeppelin_governance",
- "openzeppelin_introspection",
- "openzeppelin_presets",
- "openzeppelin_security",
- "openzeppelin_token",
- "openzeppelin_upgrades",
- "openzeppelin_utils",
-]
-
-[[package]]
 name = "openzeppelin_access"
 version = "0.15.1"
 source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
@@ -50,23 +34,6 @@ version = "0.15.1"
 source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 
 [[package]]
-name = "openzeppelin_presets"
-version = "0.15.1"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
-dependencies = [
- "openzeppelin_access",
- "openzeppelin_account",
- "openzeppelin_introspection",
- "openzeppelin_token",
- "openzeppelin_upgrades",
-]
-
-[[package]]
-name = "openzeppelin_security"
-version = "0.15.1"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
-
-[[package]]
 name = "openzeppelin_token"
 version = "0.15.1"
 source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
@@ -75,11 +42,6 @@ dependencies = [
  "openzeppelin_governance",
  "openzeppelin_introspection",
 ]
-
-[[package]]
-name = "openzeppelin_upgrades"
-version = "0.15.1"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 
 [[package]]
 name = "openzeppelin_utils"
@@ -108,7 +70,8 @@ dependencies = [
 name = "starknet_ibc_app_transfer"
 version = "0.1.0"
 dependencies = [
- "openzeppelin",
+ "openzeppelin_token",
+ "openzeppelin_utils",
  "snforge_std",
  "starknet_ibc_core_channel",
  "starknet_ibc_core_host",
@@ -152,7 +115,8 @@ dependencies = [
 name = "starknet_ibc_presets"
 version = "0.1.0"
 dependencies = [
- "openzeppelin",
+ "openzeppelin_access",
+ "openzeppelin_token",
  "snforge_std",
  "starknet_ibc_app_transfer",
  "starknet_ibc_client_cometbft",
@@ -164,7 +128,8 @@ dependencies = [
 name = "starknet_ibc_testing"
 version = "0.1.0"
 dependencies = [
- "openzeppelin",
+ "openzeppelin_token",
+ "openzeppelin_utils",
  "snforge_std",
  "starknet_ibc_app_transfer",
  "starknet_ibc_core_client",
@@ -176,6 +141,6 @@ dependencies = [
 name = "starknet_ibc_utils"
 version = "0.1.0"
 dependencies = [
- "openzeppelin",
+ "openzeppelin_token",
  "snforge_std",
 ]

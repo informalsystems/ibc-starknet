@@ -1,7 +1,7 @@
 use core::option::OptionTrait;
-use openzeppelin::token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
-use openzeppelin::utils::serde::SerializedAppend;
 use openzeppelin_testing::{deploy, pop_log};
+use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
+use openzeppelin_utils::serde::SerializedAppend;
 use starknet::ContractAddress;
 use starknet::testing;
 use starknet_ibc_app_transfer::ICS20TransferComponent::{

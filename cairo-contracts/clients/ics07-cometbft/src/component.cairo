@@ -1,8 +1,8 @@
 #[starknet::component]
 pub mod CometClientComponent {
     use core::num::traits::zero::Zero;
-    use starknet::{get_block_timestamp, get_block_number};
     use starknet::storage::Map;
+    use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_client_cometbft::{
         CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
         CometHeader, CometHeaderImpl, CometErrors

@@ -1,7 +1,7 @@
 #[starknet::contract]
 pub(crate) mod ERC20Mintable {
-    use openzeppelin::access::ownable::OwnableComponent;
-    use openzeppelin::token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
+    use openzeppelin_access::ownable::OwnableComponent;
+    use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::{ContractAddress, ClassHash};
     use starknet_ibc_utils::mintable::ERC20MintableComponent::ERC20MintableInternalTrait;
     use starknet_ibc_utils::mintable::ERC20MintableComponent;

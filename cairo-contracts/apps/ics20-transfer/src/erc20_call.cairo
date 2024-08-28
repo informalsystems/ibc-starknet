@@ -1,7 +1,7 @@
 use core::num::traits::Zero;
 use core::starknet::SyscallResultTrait;
-use openzeppelin::token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
-use openzeppelin::utils::serde::SerializedAppend;
+use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
+use openzeppelin_utils::serde::SerializedAppend;
 use starknet::syscalls::deploy_syscall;
 use starknet::{ClassHash, ContractAddress};
 use starknet_ibc_utils::mintable::{IERC20MintableDispatcher, IERC20MintableDispatcherTrait};
