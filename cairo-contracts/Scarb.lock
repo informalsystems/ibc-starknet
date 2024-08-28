@@ -34,6 +34,14 @@ version = "0.15.1"
 source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 
 [[package]]
+name = "openzeppelin_testing"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
+dependencies = [
+ "snforge_std",
+]
+
+[[package]]
 name = "openzeppelin_token"
 version = "0.15.1"
 source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
@@ -50,8 +58,8 @@ source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f
 
 [[package]]
 name = "snforge_std"
-version = "0.27.0"
-source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.27.0#2d99b7c00678ef0363881ee0273550c44a9263de"
+version = "0.26.0"
+source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.26.0#50eb589db65e113efe4f09241feb59b574228c7e"
 
 [[package]]
 name = "starknet_ibc"
@@ -72,7 +80,6 @@ version = "0.1.0"
 dependencies = [
  "openzeppelin_token",
  "openzeppelin_utils",
- "snforge_std",
  "starknet_ibc_core_channel",
  "starknet_ibc_core_host",
  "starknet_ibc_utils",
@@ -82,7 +89,6 @@ dependencies = [
 name = "starknet_ibc_client_cometbft"
 version = "0.1.0"
 dependencies = [
- "snforge_std",
  "starknet_ibc_core_client",
 ]
 
@@ -90,7 +96,6 @@ dependencies = [
 name = "starknet_ibc_core_channel"
 version = "0.1.0"
 dependencies = [
- "snforge_std",
  "starknet_ibc_core_client",
  "starknet_ibc_core_host",
 ]
@@ -99,7 +104,6 @@ dependencies = [
 name = "starknet_ibc_core_client"
 version = "0.1.0"
 dependencies = [
- "snforge_std",
  "starknet_ibc_core_host",
 ]
 
@@ -117,7 +121,6 @@ version = "0.1.0"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_token",
- "snforge_std",
  "starknet_ibc_app_transfer",
  "starknet_ibc_client_cometbft",
  "starknet_ibc_core_client",
@@ -128,6 +131,7 @@ dependencies = [
 name = "starknet_ibc_testing"
 version = "0.1.0"
 dependencies = [
+ "openzeppelin_testing",
  "openzeppelin_token",
  "openzeppelin_utils",
  "snforge_std",

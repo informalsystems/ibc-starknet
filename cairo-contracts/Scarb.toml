@@ -31,7 +31,7 @@ openzeppelin_access  = { git = "https://github.com/OpenZeppelin/cairo-contracts.
 openzeppelin_token   = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
 openzeppelin_testing = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
 openzeppelin_utils   = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
-snforge_std          = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.27.0" }
+snforge_std          = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.26.0" }
 
 # ibc dependencies
 starknet_ibc_utils           = { path = "utils" }
