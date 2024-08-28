@@ -7,11 +7,16 @@ use ibc_core::commitment_types::commitment::{
 use ibc_core::host::types::identifiers::ClientType;
 use ibc_core::host::types::path::{Path, PathBytes};
 use ibc_core::primitives::proto::Any;
+use ibc_core::primitives::Timestamp;
 
 use super::ClientState;
 
 impl ClientStateCommon for ClientState {
-    fn verify_consensus_state(&self, consensus_state: Any) -> Result<(), ClientError> {
+    fn verify_consensus_state(
+        &self,
+        consensus_state: Any,
+        host_timestamp: &Timestamp,
+    ) -> Result<(), ClientError> {
         Ok(())
     }
 

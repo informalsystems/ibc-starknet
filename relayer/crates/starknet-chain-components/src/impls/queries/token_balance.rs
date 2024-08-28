@@ -1,6 +1,7 @@
 use cgp_core::error::CanRaiseError;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
-use hermes_encoding_components::traits::decoder::CanDecode;
+use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
@@ -10,7 +11,7 @@ use starknet::macros::selector;
 use crate::traits::contract::call::CanCallContract;
 use crate::traits::queries::token_balance::TokenBalanceQuerier;
 use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasMethodSelectorType;
+use crate::traits::types::method::HasSelectorType;
 use crate::types::amount::StarknetAmount;
 
 pub struct QueryErc20TokenBalance;
@@ -22,9 +23,9 @@ where
     Chain: HasAddressType<Address = Felt>
         + HasAmountType<Amount = StarknetAmount>
         + HasBlobType<Blob = Vec<Felt>>
-        + HasMethodSelectorType<MethodSelector = Felt>
+        + HasSelectorType<Selector = Felt>
         + CanCallContract
-        + HasEncoding<Encoding = Encoding>
+        + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseError<&'static str>
         + CanRaiseError<Encoding::Error>,
     Encoding: CanDecode<ViaCairo, U256, Encoded = Vec<Felt>>,

@@ -1,8 +1,8 @@
 use std::marker::PhantomData;
 
 use cgp_core::error::HasErrorType;
-
-use crate::traits::encode_mut::{HasEncodeBufferType, MutEncoder};
+use hermes_encoding_components::traits::encode_mut::MutEncoder;
+use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 
 pub struct CombineEncoders<Encoders>(pub PhantomData<Encoders>);
 

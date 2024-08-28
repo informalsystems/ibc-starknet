@@ -1,5 +1,5 @@
-use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use crate::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 
 pub struct EncodeWithContext;
 

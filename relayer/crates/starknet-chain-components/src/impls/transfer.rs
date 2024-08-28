@@ -7,7 +7,7 @@ use starknet::macros::selector;
 use crate::traits::messages::transfer::CanBuildTransferTokenMessage;
 use crate::traits::transfer::TokenTransferer;
 use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasMethodSelectorType;
+use crate::traits::types::method::HasSelectorType;
 
 pub const TRANSFER_SELECTOR: Felt = selector!("transfer");
 
@@ -18,7 +18,7 @@ where
     Chain: HasAddressType
         + HasAmountType
         + HasBlobType
-        + HasMethodSelectorType
+        + HasSelectorType
         + CanBuildTransferTokenMessage
         + CanSendSingleMessage,
 {

@@ -8,10 +8,9 @@ use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxR
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
 use starknet::accounts::Call;
-use starknet::core::types::{
-    ExecuteInvocation, OrderedEvent, RevertedInvocation, TransactionTrace,
-};
+use starknet::core::types::{ExecuteInvocation, RevertedInvocation, TransactionTrace};
 
+use crate::types::event::StarknetEvent;
 use crate::types::tx_response::TxResponse;
 
 pub struct SendCallMessages;
@@ -25,7 +24,7 @@ where
     Chain: HasMessageType<Message = Call>
         + CanSubmitTx<Transaction = Vec<Call>>
         + HasTxResponseType<TxResponse = TxResponse>
-        + HasEventType<Event = OrderedEvent>
+        + HasEventType<Event = StarknetEvent>
         + CanPollTxResponse
         + CanRaiseError<RevertedInvocation>
         + CanRaiseError<UnexpectedTransactionTraceType>,
@@ -41,7 +40,11 @@ where
         match tx_response.trace {
             TransactionTrace::Invoke(trace) => match trace.execute_invocation {
                 ExecuteInvocation::Success(trace) => {
-                    let events = trace.calls.into_iter().map(|call| call.events).collect();
+                    let events = trace
+                        .calls
+                        .into_iter()
+                        .map(|call| call.events.into_iter().map(StarknetEvent::from).collect())
+                        .collect();
 
                     Ok(events)
                 }

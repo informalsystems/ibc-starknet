@@ -19,6 +19,6 @@ impl StarknetAmount {
 
 impl Display for StarknetAmount {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}-{}", self.quantity, self.token_address)
+        write!(f, "{}-{:?}", self.quantity, self.token_address)
     }
 }

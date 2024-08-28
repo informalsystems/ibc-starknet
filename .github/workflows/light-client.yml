@@ -43,6 +43,33 @@ jobs:
           name: ibc-starknet
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            light-client -> light-client/target
+
+      - name: Build CosmWasm light client contract
+        working-directory: ./light-client
+        run: |
+          nix shell ..#rust-wasm -c \
+            cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
+
+  lint-light-client:
+    name: Lint CosmWasm Light Client Contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@V27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: cachix/cachix-action@v15
+        with:
+          name: ibc-starknet
+          extraPullNames: hermes-sdk,cosmos-nix
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
@@ -56,9 +83,3 @@ jobs:
 
           nix shell ..#rust -c \
             cargo clippy --all-targets --no-default-features -- -D warnings
-
-      - name: Build CosmWasm light client contract
-        working-directory: ./light-client
-        run: |
-          nix shell ..#rust-wasm -c \
-            cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown

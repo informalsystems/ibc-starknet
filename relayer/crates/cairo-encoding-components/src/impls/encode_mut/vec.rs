@@ -1,17 +1,19 @@
-use crate::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use crate::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 
 pub struct EncodeList;
 
 impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Vec<Value>> for EncodeList
 where
-    Encoding: CanEncodeMut<Strategy, Value>,
+    Encoding: CanEncodeMut<Strategy, Value> + CanEncodeMut<Strategy, usize>,
 {
     fn encode_mut(
         encoding: &Encoding,
         value: &Vec<Value>,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&value.len(), buffer)?;
+
         for item in value.iter() {
             encoding.encode_mut(item, buffer)?;
         }

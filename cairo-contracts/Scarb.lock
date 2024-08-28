@@ -3,8 +3,8 @@ version = 1
 
 [[package]]
 name = "openzeppelin"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_account",
@@ -19,8 +19,8 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_access"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 dependencies = [
  "openzeppelin_introspection",
  "openzeppelin_utils",
@@ -28,18 +28,17 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_account"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 dependencies = [
  "openzeppelin_introspection",
- "openzeppelin_token",
  "openzeppelin_utils",
 ]
 
 [[package]]
 name = "openzeppelin_governance"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_introspection",
@@ -47,13 +46,13 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_introspection"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 
 [[package]]
 name = "openzeppelin_presets"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_account",
@@ -64,21 +63,13 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_security"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
-
-[[package]]
-name = "openzeppelin_testing"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
-dependencies = [
- "snforge_std",
-]
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 
 [[package]]
 name = "openzeppelin_token"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 dependencies = [
  "openzeppelin_account",
  "openzeppelin_governance",
@@ -87,24 +78,104 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_upgrades"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 
 [[package]]
 name = "openzeppelin_utils"
-version = "0.15.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.0#f57642960f1c8cffafefb88bfff418eca8510634"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 
 [[package]]
 name = "snforge_std"
-version = "0.26.0"
-source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.26.0#50eb589db65e113efe4f09241feb59b574228c7e"
+version = "0.27.0"
+source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.27.0#2d99b7c00678ef0363881ee0273550c44a9263de"
 
 [[package]]
 name = "starknet_ibc"
 version = "0.1.0"
 dependencies = [
+ "starknet_ibc_app_transfer",
+ "starknet_ibc_client_cometbft",
+ "starknet_ibc_core_channel",
+ "starknet_ibc_core_client",
+ "starknet_ibc_core_host",
+ "starknet_ibc_testing",
+ "starknet_ibc_utils",
+]
+
+[[package]]
+name = "starknet_ibc_app_transfer"
+version = "0.1.0"
+dependencies = [
  "openzeppelin",
- "openzeppelin_testing",
+ "snforge_std",
+ "starknet_ibc_core_channel",
+ "starknet_ibc_core_host",
+ "starknet_ibc_utils",
+]
+
+[[package]]
+name = "starknet_ibc_client_cometbft"
+version = "0.1.0"
+dependencies = [
+ "snforge_std",
+ "starknet_ibc_core_client",
+]
+
+[[package]]
+name = "starknet_ibc_core_channel"
+version = "0.1.0"
+dependencies = [
+ "snforge_std",
+ "starknet_ibc_core_client",
+ "starknet_ibc_core_host",
+]
+
+[[package]]
+name = "starknet_ibc_core_client"
+version = "0.1.0"
+dependencies = [
+ "snforge_std",
+ "starknet_ibc_core_host",
+]
+
+[[package]]
+name = "starknet_ibc_core_host"
+version = "0.1.0"
+dependencies = [
+ "snforge_std",
+ "starknet_ibc_utils",
+]
+
+[[package]]
+name = "starknet_ibc_presets"
+version = "0.1.0"
+dependencies = [
+ "openzeppelin",
+ "snforge_std",
+ "starknet_ibc_app_transfer",
+ "starknet_ibc_client_cometbft",
+ "starknet_ibc_core_client",
+ "starknet_ibc_utils",
+]
+
+[[package]]
+name = "starknet_ibc_testing"
+version = "0.1.0"
+dependencies = [
+ "openzeppelin",
+ "snforge_std",
+ "starknet_ibc_app_transfer",
+ "starknet_ibc_core_client",
+ "starknet_ibc_presets",
+ "starknet_ibc_utils",
+]
+
+[[package]]
+name = "starknet_ibc_utils"
+version = "0.1.0"
+dependencies = [
+ "openzeppelin",
  "snforge_std",
 ]

@@ -1,0 +1,26 @@
+[package]
+name          = "starknet_ibc"
+version       = { workspace = true }
+edition       = { workspace = true }
+cairo-version = { workspace = true }
+scarb-version = { workspace = true }
+authors       = { workspace = true }
+repository    = { workspace = true }
+license       = { workspace = true }
+Readme        = { workspace = true }
+keywords      = { workspace = true }
+description   = "Meta crate re-exporting all IBC core, client, and application components"
+
+[dependencies]
+starknet_ibc_utils           = { workspace = true }
+starknet_ibc_core_host       = { workspace = true }
+starknet_ibc_core_client     = { workspace = true }
+starknet_ibc_core_channel    = { workspace = true }
+starknet_ibc_client_cometbft = { workspace = true }
+starknet_ibc_app_transfer    = { workspace = true }
+starknet_ibc_testing         = { workspace = true }
+
+[lib]
+
+[tool]
+fmt = { workspace = true }

@@ -11,6 +11,7 @@ concurrency:
 
 jobs:
   starknet-integration-tests:
+    name: Run Starknet Integration Tests
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
@@ -24,6 +25,53 @@ jobs:
           name: ibc-starknet
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            relayer -> relayer/target
+            light-client -> light-client/target
+
+      - name: Build Cairo contracts
+        working-directory: ./cairo-contracts
+        run: |
+          nix shell ..#scarb -c \
+            scarb build
+
+      - name: Build Starknet Wasm light client
+        working-directory: ./light-client
+        run: |
+          nix shell ..#rust-wasm -c \
+            cargo build --release -p ibc-client-starknet-cw --target wasm32-unknown-unknown
+
+      - name: Run Integration Tests
+        env:
+          RUST_BACKTRACE: 1
+        working-directory: ./relayer
+        run: |
+          export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_presets_ERC20Mintable.contract_class.json"
+          export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_presets_TransferApp.contract_class.json"
+          export STARKNET_WASM_CLIENT_PATH="$(pwd)/../light-client/target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm"
+
+          nix develop ..#rust -c \
+            cargo nextest run --test-threads=2
+
+  lint-relayer:
+    name: Lint Relayer Code
+    runs-on: ubuntu-20.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@V27
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - uses: cachix/cachix-action@v15
+        with:
+          name: ibc-starknet
+          extraPullNames: hermes-sdk,cosmos-nix
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
@@ -34,13 +82,3 @@ jobs:
         run: |
           nix shell ..#rust -c \
             cargo clippy --all-targets --all-features -- -D warnings
-
-      - name: Run Integration Tests
-        env:
-          RUST_BACKTRACE: 1
-        working-directory: ./relayer
-        run: |
-          export ERC20_CONTRACT="$(pwd)/../artifacts/openzeppelin_ERC20Upgradeable.contract_class.json"
-
-          nix develop ..#rust -c \
-            cargo nextest run --test-threads=2
