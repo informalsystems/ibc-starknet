@@ -136,7 +136,7 @@ pub mod CometClientComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of IClientState<ComponentState<TContractState>> {
         fn client_type(self: @ComponentState<TContractState>) -> felt252 {
-            '07-Comet'
+            '07-cometbft'
         }
 
         fn latest_height(self: @ComponentState<TContractState>, client_sequence: u64) -> Height {
