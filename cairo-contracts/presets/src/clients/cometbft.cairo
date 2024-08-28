@@ -17,6 +17,9 @@ pub(crate) mod CometClient {
     impl CometCommonClientStateImpl =
         CometClientComponent::CometCommonClientState<ContractState>;
 
+    // NOTE: The client state validation interface is exposed for public use.
+    // However, only the handler contract can invoke the execution methods.
+
     #[abi(embed_v0)]
     impl CometClientValidationImpl =
         CometClientComponent::CometClientValidation<ContractState>;
