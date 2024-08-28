@@ -1,14 +1,12 @@
 use core::num::traits::Zero;
 use starknet::ContractAddress;
-use starknet_ibc_core_client::interface::{
+use starknet_ibc_core_client::{
     IClientHandler, IClientHandlerDispatcher, IClientStateDispatcher, IClientStateDispatcherTrait,
     IClientHandlerDispatcherTrait, IClientStateValidation, IClientStateValidationDispatcher,
-    IClientStateValidationDispatcherTrait,
+    IClientStateValidationDispatcherTrait, MsgCreateClient, MsgUpdateClient, MsgRecoverClient,
+    MsgUpgradeClient, CreateResponse, UpdateResponse, Height
 };
-use starknet_ibc_core_client::msgs::{
-    MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient
-};
-use starknet_ibc_core_client::{UpdateResult, Height};
+use starknet_ibc_core_host::ClientId;
 
 #[derive(Clone, Debug, Drop, Serde, Store)]
 pub struct ClientContract {
@@ -34,9 +32,9 @@ pub trait ClientContractTrait {
 
     fn latest_height(self: @ClientContract, client_sequence: u64) -> Height;
 
-    fn create(ref self: ClientContract, msg: MsgCreateClient, client_sequence: u64);
+    fn create(ref self: ClientContract, msg: MsgCreateClient) -> CreateResponse;
 
-    fn update(ref self: ClientContract, msg: MsgUpdateClient,) -> UpdateResult;
+    fn update(ref self: ClientContract, msg: MsgUpdateClient,) -> UpdateResponse;
 
     fn recover(ref self: ClientContract, msg: MsgRecoverClient,);
 
@@ -57,11 +55,11 @@ impl ClientContractImpl of ClientContractTrait {
         IClientStateDispatcher { contract_address: *self.address }.latest_height(client_sequence)
     }
 
-    fn create(ref self: ClientContract, msg: MsgCreateClient, client_sequence: u64) {
-        IClientHandlerDispatcher { contract_address: self.address }.create(msg, client_sequence)
+    fn create(ref self: ClientContract, msg: MsgCreateClient) -> CreateResponse {
+        IClientHandlerDispatcher { contract_address: self.address }.create(msg)
     }
 
-    fn update(ref self: ClientContract, msg: MsgUpdateClient,) -> UpdateResult {
+    fn update(ref self: ClientContract, msg: MsgUpdateClient,) -> UpdateResponse {
         IClientHandlerDispatcher { contract_address: self.address }.update(msg)
     }
 

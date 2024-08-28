@@ -1,8 +1,10 @@
+mod apps;
+mod clients;
+mod core;
 mod erc20;
-mod ibc;
-mod transfer;
 
+pub use apps::transfer::TransferApp;
+pub use clients::cometbft::CometClient;
+pub use core::ibc::IBC;
 pub use erc20::ERC20Mintable;
-pub use ibc::IBC;
-pub use transfer::Transfer;
 

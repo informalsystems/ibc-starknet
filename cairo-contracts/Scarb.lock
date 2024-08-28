@@ -16,7 +16,7 @@ name = "starknet_ibc"
 version = "0.1.0"
 dependencies = [
  "starknet_ibc_app_transfer",
- "starknet_ibc_client_tendermint",
+ "starknet_ibc_client_cometbft",
  "starknet_ibc_core_channel",
  "starknet_ibc_core_client",
  "starknet_ibc_core_host",
@@ -36,7 +36,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "starknet_ibc_client_tendermint"
+name = "starknet_ibc_client_cometbft"
 version = "0.1.0"
 dependencies = [
  "snforge_std",
@@ -75,6 +75,7 @@ dependencies = [
  "openzeppelin",
  "snforge_std",
  "starknet_ibc_app_transfer",
+ "starknet_ibc_client_cometbft",
  "starknet_ibc_core_client",
  "starknet_ibc_utils",
 ]

@@ -1,14 +1,31 @@
 use core::traits::PartialOrd;
+use starknet_ibc_core_host::ClientId;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
-pub enum UpdateResult {
+pub struct CreateResponse {
+    pub client_id: ClientId,
+    pub height: Height,
+}
+
+pub trait CreateResponseTrait {
+    fn new(client_id: ClientId, height: Height) -> CreateResponse;
+}
+
+pub impl CreateResponseImpl of CreateResponseTrait {
+    fn new(client_id: ClientId, height: Height) -> CreateResponse {
+        CreateResponse { client_id, height }
+    }
+}
+
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+pub enum UpdateResponse {
     Success: Array<Height>,
     Misbehaviour,
 }
 
-pub impl HeightsIntoUpdateResult of Into<Array<Height>, UpdateResult> {
-    fn into(self: Array<Height>) -> UpdateResult {
-        UpdateResult::Success(self)
+pub impl HeightsIntoUpdateResponse of Into<Array<Height>, UpdateResponse> {
+    fn into(self: Array<Height>) -> UpdateResponse {
+        UpdateResponse::Success(self)
     }
 }
 

@@ -15,7 +15,7 @@ use starknet_ibc_app_transfer::{
     ISendTransferDispatcherTrait, IRecvPacketDispatcherTrait, ITokenAddressDispatcherTrait
 };
 use starknet_ibc_core_channel::Packet;
-use starknet_ibc_presets::{Transfer, ERC20Mintable};
+use starknet_ibc_presets::{TransferApp, ERC20Mintable};
 use starknet_ibc_testing::constants::{NAME, SYMBOL, SUPPLY, OWNER};
 
 #[derive(Clone, Debug, Drop, PartialEq, Eq)]
@@ -43,7 +43,7 @@ pub impl ICS20TransferContractImpl of ICS20TransferContractTrait {
         let mut call_data = array![];
         call_data.append_serde(ERC20Mintable::TEST_CLASS_HASH);
 
-        let contract_address = deploy(Transfer::TEST_CLASS_HASH, call_data);
+        let contract_address = deploy(TransferApp::TEST_CLASS_HASH, call_data);
 
         ICS20TransferContract { contract_address }
     }
