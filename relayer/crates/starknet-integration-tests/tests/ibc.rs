@@ -126,13 +126,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let calldata = encoding.encode(&packet)?;
 
-            let message = Call {
+            Call {
                 to: ics20_contract_address,
                 selector: selector!("recv_execute"),
                 calldata,
-            };
-
-            message
+            }
         };
 
         let token_address = {
