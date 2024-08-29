@@ -1,5 +1,6 @@
 use std::time::SystemTime;
 
+use eyre::eyre;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
@@ -8,6 +9,7 @@ use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::event::CanParseEvents;
+use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, PrefixedDenom};
 use hermes_starknet_chain_components::types::messages::ibc::height::Height;
@@ -86,20 +88,22 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             contract_address
         };
 
-        {
-            // TODO: once `CosmosChainDriver` integrated, read the sender address from there.
-            let sender_address =
-                encoding.encode(&"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string())?;
+        // stub
+        let sender_address =
+            encoding.encode(&"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string())?;
 
-            let recipient_address = chain_driver.user_wallet_a.account_address;
+        let recipient_address = chain_driver.user_wallet_a.account_address;
 
+        let amount = 99u32;
+
+        let message = {
             let transfer_message = IbcTransferMessage {
                 denom: PrefixedDenom {
                     trace_path: Vec::new(),
                     base: Denom::Hosted("uatom".into()),
                 },
-                amount: 99u32.into(),
-                sender: Participant::External(sender_address),
+                amount: amount.into(),
+                sender: Participant::External(sender_address.clone()),
                 receiver: Participant::Native(recipient_address),
                 memo: "".into(),
             };
@@ -122,17 +126,95 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let calldata = encoding.encode(&packet)?;
 
-            let message = Call {
+            Call {
                 to: ics20_contract_address,
                 selector: selector!("recv_execute"),
                 calldata,
-            };
+            }
+        };
 
-            let events = chain.send_message(message).await?;
+        let token_address = {
+            let events = chain.send_message(message.clone()).await?;
 
             let ibc_transfer_events: Vec<IbcTransferEvent> = chain.parse_events(&events)?;
 
-            println!("recv_execute events: {:?}", ibc_transfer_events);
+            println!("ibc_transfer_events: {:?}", ibc_transfer_events);
+
+            {
+                let receive_transfer_event = ibc_transfer_events
+                    .iter()
+                    .find_map(|event| {
+                        if let IbcTransferEvent::Receive(event) = event {
+                            Some(event)
+                        } else {
+                            None
+                        }
+                    })
+                    .ok_or_else(|| eyre!("expect create token event"))?;
+
+                assert_eq!(receive_transfer_event.amount, amount.into());
+
+                assert_eq!(
+                    receive_transfer_event.sender,
+                    Participant::External(sender_address)
+                );
+                assert_eq!(
+                    receive_transfer_event.receiver,
+                    Participant::Native(recipient_address)
+                );
+            }
+
+            let token_address = {
+                let create_token_event = ibc_transfer_events
+                    .iter()
+                    .find_map(|event| {
+                        if let IbcTransferEvent::CreateToken(event) = event {
+                            Some(event)
+                        } else {
+                            None
+                        }
+                    })
+                    .ok_or_else(|| eyre!("expect create token event"))?;
+
+                assert_eq!(create_token_event.initial_supply, amount.into());
+
+                let token_address = create_token_event.address;
+
+                println!("created token address: {:?}", token_address);
+
+                token_address
+            };
+
+            {
+                let recipient_balance = chain
+                    .query_token_balance(&token_address, &recipient_address)
+                    .await?;
+
+                println!("recipient balance after transfer: {}", recipient_balance);
+
+                assert_eq!(recipient_balance.quantity, amount.into());
+            }
+
+            token_address
+        };
+
+        {
+            // Send the same transfer message a second time
+            let events = chain.send_message(message.clone()).await?;
+
+            let ibc_transfer_events_2: Vec<IbcTransferEvent> = chain.parse_events(&events)?;
+
+            println!("ibc_transfer_events 2: {:?}", ibc_transfer_events_2);
+
+            {
+                let recipient_balance = chain
+                    .query_token_balance(&token_address, &recipient_address)
+                    .await?;
+
+                println!("recipient balance after transfer: {}", recipient_balance);
+
+                assert_eq!(recipient_balance.quantity, (amount * 2).into(),);
+            }
         }
 
         Ok(())
