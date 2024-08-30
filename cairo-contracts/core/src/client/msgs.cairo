@@ -1,6 +1,6 @@
 use core::num::traits::zero::Zero;
-use starknet_ibc_core_client::ClientErrors;
-use starknet_ibc_core_host::ClientId;
+use starknet_ibc_core::client::ClientErrors;
+use starknet_ibc_core::host::ClientId;
 use starknet_ibc_utils::ValidateBasicTrait;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]

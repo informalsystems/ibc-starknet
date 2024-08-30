@@ -18,8 +18,8 @@ pub mod ICS20TransferComponent {
     use starknet_ibc_apps::transfer::{
         ERC20Contract, ERC20ContractTrait, TransferErrors
     };
-    use starknet_ibc_core_channel::Packet;
-    use starknet_ibc_core_host::{PortId, ChannelId, ChannelIdTrait};
+    use starknet_ibc_core::channel::Packet;
+    use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
     use starknet_ibc_utils::{ComputeKeyTrait, ValidateBasicTrait};
 
     #[storage]

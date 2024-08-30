@@ -8,8 +8,8 @@ use starknet::contract_address_const;
 use starknet_ibc_apps::transfer::{
     ERC20Contract, ERC20ContractTrait, TransferErrors, TRANSFER_PORT_ID_HASH
 };
-use starknet_ibc_core_client::{Height, Timestamp};
-use starknet_ibc_core_host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait};
+use starknet_ibc_core::client::{Height, Timestamp};
+use starknet_ibc_core::host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait};
 use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
 
 /// Maximum memo length allowed for ICS-20 transfers. This bound corresponds to

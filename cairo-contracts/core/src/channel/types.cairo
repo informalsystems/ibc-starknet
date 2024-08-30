@@ -1,5 +1,5 @@
-use starknet_ibc_core_client::{Height, Timestamp};
-use starknet_ibc_core_host::{ChannelId, PortId, Sequence};
+use starknet_ibc_core::client::{Height, Timestamp};
+use starknet_ibc_core::host::{ChannelId, PortId, Sequence};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct Packet {

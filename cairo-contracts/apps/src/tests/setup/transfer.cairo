@@ -11,7 +11,7 @@ use starknet_ibc_apps::transfer::interfaces::{
     ISendTransferDispatcher, IRecvPacketDispatcher, ITokenAddressDispatcher,
     ISendTransferDispatcherTrait, IRecvPacketDispatcherTrait, ITokenAddressDispatcherTrait
 };
-use starknet_ibc_core_channel::Packet;
+use starknet_ibc_core::channel::Packet;
 
 #[derive(Drop, Serde)]
 pub struct TransferAppHandle {

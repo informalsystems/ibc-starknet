@@ -1,5 +1,5 @@
 use starknet::ContractAddress;
-use starknet_ibc_core_client::{
+use starknet_ibc_core::client::{
     MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Status,
     CreateResponse, UpdateResponse
 };

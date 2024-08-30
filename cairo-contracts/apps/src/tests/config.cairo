@@ -4,10 +4,10 @@ use starknet_ibc_apps::transfer::types::PrefixedDenomTrait;
 use starknet_ibc_apps::transfer::types::{
     MsgTransfer, PacketData, PrefixedDenom, Denom, Memo, TracePrefixTrait, Participant
 };
-use starknet_ibc_core_channel::Packet;
-use starknet_ibc_core_client::{Height, Timestamp};
-use starknet_ibc_core_host::{PortId, ChannelId, Sequence};
-use starknet_ibc_testing::constants::{PUBKEY, NAME, AMOUNT, SUPPLY};
+use starknet_ibc_core::channel::Packet;
+use starknet_ibc_core::client::{Height, Timestamp};
+use starknet_ibc_core::host::{PortId, ChannelId, Sequence};
+use starknet_ibc_apps::tests::constants::{PUBKEY, NAME, AMOUNT, SUPPLY};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct TestConfig {

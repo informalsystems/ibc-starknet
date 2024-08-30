@@ -7,12 +7,12 @@ pub mod CometClientComponent {
         CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
         CometHeader, CometHeaderImpl, CometErrors
     };
-    use starknet_ibc_core_client::{
+    use starknet_ibc_core::client::{
         MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Timestamp,
         Status, StatusTrait, CreateResponse, CreateResponseImpl, UpdateResponse, IClientHandler,
         IClientState, IClientStateValidation, IClientStateExecution
     };
-    use starknet_ibc_core_host::ClientIdImpl;
+    use starknet_ibc_core::host::ClientIdImpl;
     use starknet_ibc_utils::ValidateBasicTrait;
 
     #[storage]

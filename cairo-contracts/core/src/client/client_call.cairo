@@ -1,12 +1,12 @@
 use core::num::traits::Zero;
 use starknet::ContractAddress;
-use starknet_ibc_core_client::{
+use starknet_ibc_core::client::{
     IClientHandler, IClientHandlerDispatcher, IClientStateDispatcher, IClientStateDispatcherTrait,
     IClientHandlerDispatcherTrait, IClientStateValidation, IClientStateValidationDispatcher,
     IClientStateValidationDispatcherTrait, MsgCreateClient, MsgUpdateClient, MsgRecoverClient,
     MsgUpgradeClient, CreateResponse, UpdateResponse, Height
 };
-use starknet_ibc_core_host::ClientId;
+use starknet_ibc_core::host::ClientId;
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct ClientContract {

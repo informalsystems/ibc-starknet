@@ -6,7 +6,7 @@ use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
 use starknet::ContractAddress;
 use starknet::Store;
-use starknet_ibc_core_host::errors::HostErrors;
+use starknet_ibc_core::host::errors::HostErrors;
 use starknet_ibc_utils::poseidon_hash;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]

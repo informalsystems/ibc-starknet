@@ -16,7 +16,7 @@ description   = { workspace = true }
 starknet = { workspace = true }
 
 # ibc dependencies
-starknet_ibc_core_client = { workspace = true }
+starknet_ibc_core = { workspace = true }
 
 [lib]
 

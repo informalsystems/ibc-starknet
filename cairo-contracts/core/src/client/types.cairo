@@ -1,5 +1,5 @@
 use core::traits::PartialOrd;
-use starknet_ibc_core_host::ClientId;
+use starknet_ibc_core::host::ClientId;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct CreateResponse {

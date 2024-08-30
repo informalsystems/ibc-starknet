@@ -1,6 +1,6 @@
 #[starknet::contract]
 pub mod IBC {
-    use starknet_ibc_core_client::ClientHandlerComponent;
+    use starknet_ibc_core::client::ClientHandlerComponent;
 
     component!(path: ClientHandlerComponent, storage: client, event: ClientHandlerEvent);
 

@@ -13,14 +13,15 @@ description   = { workspace = true }
 
 [dependencies]
 # external dependencies
-starknet           = { workspace = true }
-openzeppelin_token = { workspace = true }
-openzeppelin_utils = { workspace = true }
+openzeppelin_token   = { workspace = true }
+openzeppelin_testing = { workspace = true }
+openzeppelin_utils   = { workspace = true }
+snforge_std          = { workspace = true }
+starknet             = { workspace = true }
 
 # ibc dependencies
-starknet_ibc_utils        = { workspace = true }
-starknet_ibc_core_channel = { workspace = true }
-starknet_ibc_core_host    = { workspace = true }
+starknet_ibc_utils = { workspace = true }
+starknet_ibc_core  = { workspace = true }
 
 [lib]
 
