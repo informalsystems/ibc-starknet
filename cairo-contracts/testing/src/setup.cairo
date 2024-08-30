@@ -26,14 +26,14 @@ use starknet_ibc_presets::{TransferApp, ERC20Mintable};
 use starknet_ibc_testing::constants::{NAME, SYMBOL, SUPPLY, OWNER};
 
 #[derive(Drop, Serde)]
-pub struct TransferAppHandler {
+pub struct TransferAppHandle {
     pub contract_address: ContractAddress,
     pub spy: EventSpy,
 }
 
 #[generate_trait]
-pub impl TransferAppHandlerImpl of TransferAppHandlerTrait {
-    fn setup(erc20_class: ContractClass) -> TransferAppHandler {
+pub impl TransferAppHandleImpl of TransferAppHandleTrait {
+    fn setup(erc20_class: ContractClass) -> TransferAppHandle {
         let mut call_data = array![];
 
         call_data.append_serde(erc20_class.class_hash);
@@ -42,32 +42,32 @@ pub impl TransferAppHandlerImpl of TransferAppHandlerTrait {
 
         let spy = spy_events();
 
-        TransferAppHandler { contract_address, spy }
+        TransferAppHandle { contract_address, spy }
     }
 
-    fn send_dispatcher(self: @TransferAppHandler) -> ISendTransferDispatcher {
+    fn send_dispatcher(self: @TransferAppHandle) -> ISendTransferDispatcher {
         ISendTransferDispatcher { contract_address: *self.contract_address }
     }
 
-    fn recv_dispatcher(self: @TransferAppHandler) -> IRecvPacketDispatcher {
+    fn recv_dispatcher(self: @TransferAppHandle) -> IRecvPacketDispatcher {
         IRecvPacketDispatcher { contract_address: *self.contract_address }
     }
 
-    fn ibc_token_address(self: @TransferAppHandler, token_key: felt252) -> Option<ContractAddress> {
+    fn ibc_token_address(self: @TransferAppHandle, token_key: felt252) -> Option<ContractAddress> {
         ITokenAddressDispatcher { contract_address: *self.contract_address }
             .ibc_token_address(token_key)
     }
 
-    fn send_execute(self: @TransferAppHandler, msg: MsgTransfer) {
+    fn send_execute(self: @TransferAppHandle, msg: MsgTransfer) {
         self.send_dispatcher().send_execute(msg);
     }
 
-    fn recv_execute(self: @TransferAppHandler, packet: Packet) {
+    fn recv_execute(self: @TransferAppHandle, packet: Packet) {
         self.recv_dispatcher().recv_execute(packet);
     }
 
     fn assert_send_event(
-        ref self: TransferAppHandler,
+        ref self: TransferAppHandle,
         sender: Participant,
         receiver: Participant,
         denom: PrefixedDenom,
@@ -80,7 +80,7 @@ pub impl TransferAppHandlerImpl of TransferAppHandlerTrait {
     }
 
     fn assert_recv_event(
-        ref self: TransferAppHandler,
+        ref self: TransferAppHandle,
         sender: Participant,
         receiver: Participant,
         denom: PrefixedDenom,
@@ -94,7 +94,7 @@ pub impl TransferAppHandlerImpl of TransferAppHandlerTrait {
     }
 
     fn assert_create_token_event(
-        ref self: TransferAppHandler,
+        ref self: TransferAppHandle,
         name: ByteArray,
         symbol: ByteArray,
         address: ContractAddress,
@@ -106,7 +106,7 @@ pub impl TransferAppHandlerImpl of TransferAppHandlerTrait {
         self.spy.assert_emitted_single(self.contract_address, expected);
     }
 
-    fn drop_all_events(ref self: TransferAppHandler) {
+    fn drop_all_events(ref self: TransferAppHandle) {
         self.spy.drop_all_events();
     }
 }

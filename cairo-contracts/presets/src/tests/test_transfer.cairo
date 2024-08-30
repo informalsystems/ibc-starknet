@@ -1,12 +1,11 @@
 use core::traits::TryInto;
-use openzeppelin_testing::EventSpyExt;
 use openzeppelin_testing::declare_class;
-use snforge_std::{start_cheat_caller_address, EventSpyTrait, spy_events};
+use snforge_std::start_cheat_caller_address;
 use starknet::ContractAddress;
 use starknet_ibc_app_transfer::ERC20Contract;
 use starknet_ibc_testing::config::TestConfigTrait;
 use starknet_ibc_testing::constants::{NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET};
-use starknet_ibc_testing::setup::{ERC20ContractTrait, TransferAppHandlerTrait};
+use starknet_ibc_testing::setup::{ERC20ContractTrait, TransferAppHandleTrait};
 use starknet_ibc_utils::ComputeKeyTrait;
 
 #[test]
@@ -22,7 +21,7 @@ fn test_escrow_unescrow_roundtrip() {
     let mut erc20 = ERC20ContractTrait::setup(erc20_contract_class);
 
     // Deploy an ICS20 Token Transfer contract.
-    let mut ics20 = TransferAppHandlerTrait::setup(erc20_contract_class);
+    let mut ics20 = TransferAppHandleTrait::setup(erc20_contract_class);
 
     let mut cfg = TestConfigTrait::default();
 
@@ -32,12 +31,12 @@ fn test_escrow_unescrow_roundtrip() {
     // Escrow
     // -----------------------------------------------------------
 
-    // Owner approves the amount of allowance for the `Transfer` contract.
+    // Owner approves the amount of allowance for the `TransferApp` contract.
     erc20.approve(OWNER(), ics20.contract_address, cfg.amount);
 
     let msg_transfer = cfg.dummy_msg_transder(cfg.native_denom.clone(), STARKNET(), COSMOS());
 
-    // Submit a `MsgTransfer` to the `Transfer` contract.
+    // Submit a `MsgTransfer` to the `TransferApp` contract.
     ics20.send_execute(msg_transfer);
 
     // Assert the `SendEvent` emitted.
@@ -46,7 +45,7 @@ fn test_escrow_unescrow_roundtrip() {
     // Check the balance of the sender.
     erc20.assert_balance(OWNER(), SUPPLY - cfg.amount);
 
-    // Check the balance of the `Transfer` contract.
+    // Check the balance of the `TransferApp` contract.
     erc20.assert_balance(ics20.contract_address, cfg.amount);
 
     // -----------------------------------------------------------
@@ -59,7 +58,7 @@ fn test_escrow_unescrow_roundtrip() {
 
     let recv_packet = cfg.dummy_recv_packet(prefixed_denom.clone(), COSMOS(), STARKNET());
 
-    // Submit a `RecvPacket` to the `Transfer` contract.
+    // Submit a `RecvPacket` to the `TransferApp` contract.
     ics20.recv_execute(recv_packet);
 
     // Assert the `RecvEvent` emitted.
@@ -81,7 +80,7 @@ fn test_mint_burn_roundtrip() {
     let erc20_contract_class = declare_class("ERC20Mintable");
 
     // Deploy an ICS20 Token Transfer contract.
-    let mut ics20 = TransferAppHandlerTrait::setup(erc20_contract_class);
+    let mut ics20 = TransferAppHandleTrait::setup(erc20_contract_class);
 
     let mut cfg = TestConfigTrait::default();
 
