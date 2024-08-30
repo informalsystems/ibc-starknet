@@ -2,15 +2,15 @@
 let
   snforge = nixpkgs.rustPlatform.buildRustPackage {
     name = "snforge";
-    version = "0.26.0";
+    version = "0.29.0";
 
     src = snforge-src;
 
     cargoLock = {
       lockFile = snforge-src + "/Cargo.lock";
       outputHashes = {
-        "starknet-0.9.0" = "sha256-E3FyLhVxauojw2L2AFvDlntwXFGnsGKfi/YHWHrJRy0=";
-        "trace-data-0.3.0" = "sha256-wtAdQ4Z/p8s9f8T32FXV4TqKmVbCFDBPx/Xjet4UgsI=";
+        "starknet-0.10.0" = "sha256-/cDjAPsNQNtO/kTUK6PpaxyTgAMc6LhfXxrcfom20fE=";
+        "trace-data-0.4.0" = "sha256-C5rgp+wthWkjNBkY1PlHfLkGexrmjOQpUgbPKPrKf7g=";
       };
     };
 

@@ -24,7 +24,7 @@
     };
 
     snforge-src = {
-      url = "github:foundry-rs/starknet-foundry/v0.26.0";
+      url = "github:foundry-rs/starknet-foundry/v0.29.0";
       flake = false;
     };
   };

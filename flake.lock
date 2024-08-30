@@ -1787,16 +1787,16 @@
     "snforge-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1720012972,
-        "narHash": "sha256-2vUZ4aKz5sl6KJsPiQB5gabePkEtFqpbRjaoHjFxBSc=",
+        "lastModified": 1724941386,
+        "narHash": "sha256-lQS47w3XO4/OIqUsdPXinNbhSHChlGgUKLlcS2tUvqk=",
         "owner": "foundry-rs",
         "repo": "starknet-foundry",
-        "rev": "50eb589db65e113efe4f09241feb59b574228c7e",
+        "rev": "d37d2272ca6c915117646de76cdf26ec06e44f61",
         "type": "github"
       },
       "original": {
         "owner": "foundry-rs",
-        "ref": "v0.26.0",
+        "ref": "v0.29.0",
         "repo": "starknet-foundry",
         "type": "github"
       }
