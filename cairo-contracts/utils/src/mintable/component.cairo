@@ -1,9 +1,9 @@
 #[starknet::component]
 pub mod ERC20MintableComponent {
     use core::num::traits::Zero;
-    use openzeppelin::token::erc20::ERC20Component::InternalTrait;
-    use openzeppelin::token::erc20::ERC20Component;
-    use openzeppelin::token::erc20::erc20::ERC20Component::Transfer;
+    use openzeppelin_token::erc20::ERC20Component::InternalTrait;
+    use openzeppelin_token::erc20::ERC20Component;
+    use openzeppelin_token::erc20::erc20::ERC20Component::Transfer;
     use starknet::ContractAddress;
     use starknet::get_caller_address;
     use starknet_ibc_utils::mintable::errors::MintableErrors;

@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod IBC {
+pub mod IBC {
     use starknet_ibc_core_client::ClientHandlerComponent;
 
     component!(path: ClientHandlerComponent, storage: client, event: ClientHandlerEvent);

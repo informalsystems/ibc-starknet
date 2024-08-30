@@ -18,23 +18,8 @@ pub struct TestConfig {
     pub amount: u256,
 }
 
-pub trait TestConfigTrait {
-    fn default() -> TestConfig;
-    fn set_native_denom(ref self: TestConfig, native_token_address: ContractAddress);
-    fn prefix_native_denom(ref self: TestConfig);
-    fn prefix_hosted_denom(ref self: TestConfig);
-    fn dummy_msg_transder(
-        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
-    ) -> MsgTransfer;
-    fn dummy_recv_packet(
-        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
-    ) -> Packet;
-    fn dummy_packet_data(
-        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
-    ) -> PacketData;
-}
-
-impl TestConfigImpl of TestConfigTrait {
+#[generate_trait]
+pub impl TestConfigImpl of TestConfigTrait {
     fn default() -> TestConfig {
         let native_denom = PrefixedDenom {
             trace_path: array![], base: Denom::Native(PUBKEY().into())
@@ -61,20 +46,29 @@ impl TestConfigImpl of TestConfigTrait {
     }
 
 
-    fn prefix_native_denom(ref self: TestConfig) {
+    fn prefix_native_denom(self: @TestConfig) -> PrefixedDenom {
         let trace_prefix = TracePrefixTrait::new(
             PortId { port_id: TRANSFER_PORT_ID() },
             ChannelId { channel_id: self.chan_id_on_a.clone() }
         );
-        self.native_denom.add_prefix(trace_prefix);
+        let mut native_denom = self.native_denom.clone();
+
+        native_denom.add_prefix(trace_prefix);
+
+        native_denom
     }
 
-    fn prefix_hosted_denom(ref self: TestConfig) {
+    fn prefix_hosted_denom(self: @TestConfig) -> PrefixedDenom {
         let trace_prefix = TracePrefixTrait::new(
             PortId { port_id: TRANSFER_PORT_ID() },
             ChannelId { channel_id: self.chan_id_on_b.clone() }
         );
-        self.hosted_denom.add_prefix(trace_prefix);
+
+        let mut hosted_denom = self.hosted_denom.clone();
+
+        hosted_denom.add_prefix(trace_prefix);
+
+        hosted_denom
     }
 
     fn dummy_msg_transder(

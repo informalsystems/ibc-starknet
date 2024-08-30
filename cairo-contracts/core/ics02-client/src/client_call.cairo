@@ -8,7 +8,7 @@ use starknet_ibc_core_client::{
 };
 use starknet_ibc_core_host::ClientId;
 
-#[derive(Clone, Debug, Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde)]
 pub struct ClientContract {
     pub address: ContractAddress,
 }

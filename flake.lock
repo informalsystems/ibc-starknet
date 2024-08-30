@@ -87,16 +87,16 @@
     "cairo-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1718030142,
-        "narHash": "sha256-AjhTjbup3lOwHSBk9KQk8KjRrWAZYZwuG4YHgNfi6qE=",
+        "lastModified": 1722496142,
+        "narHash": "sha256-aI/5sFQ2C24KP3dRwwRse5LBV5PJjXn8EMyOJBXGTMw=",
         "owner": "starkware-libs",
         "repo": "cairo",
-        "rev": "b4459a56578d26746658704fda9841772f84d4af",
+        "rev": "223ca99633f50809c4b574df55545b042494d8d0",
         "type": "github"
       },
       "original": {
         "owner": "starkware-libs",
-        "ref": "v2.6.4",
+        "ref": "v2.7.0",
         "repo": "cairo",
         "type": "github"
       }
@@ -1493,11 +1493,11 @@
     },
     "nixpkgs_6": {
       "locked": {
-        "lastModified": 1722957468,
-        "narHash": "sha256-SQ0TCC4aklOhN/OzcztrKqDLY8SjpIZcyvTulzhDXs0=",
+        "lastModified": 1724999960,
+        "narHash": "sha256-LB3jqSGW5u1ZcUcX6vO/qBOq5oXHlmOCxsTXGMEitp4=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "2a13929e1f191b3690dd2f2db13098b04adb9043",
+        "rev": "b96f849e725333eb2b1c7f1cb84ff102062468ba",
         "type": "github"
       },
       "original": {
@@ -1645,6 +1645,7 @@
         "nixpkgs": "nixpkgs_6",
         "rust-overlay": "rust-overlay_2",
         "scarb-src": "scarb-src",
+        "snforge-src": "snforge-src",
         "starknet-devnet-src": "starknet-devnet-src"
       }
     },
@@ -1672,11 +1673,11 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "lastModified": 1722997267,
-        "narHash": "sha256-8Pncp8IKd0f0N711CRrCGTC4iLfBE+/5kaMqyWxnYic=",
+        "lastModified": 1724984647,
+        "narHash": "sha256-BC6MUq0CTdmAu/cueVcdWTI+S95s0mJcn19SoEgd7gU=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "d720bf3cebac38c2426d77ee2e59943012854cb8",
+        "rev": "87b6cffc276795b46ef544d7ed8d7fed6ad9c8e4",
         "type": "github"
       },
       "original": {
@@ -1706,16 +1707,16 @@
     "scarb-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1718105428,
-        "narHash": "sha256-VUXiaqa/T6WBxPzbcQ82MvEc8WNnUdvx9Nw+1PP3cNQ=",
+        "lastModified": 1722509315,
+        "narHash": "sha256-fV9ou50bvNyA1VFY+9YA3OgeQ95kctDrkKA4S2iIwVc=",
         "owner": "software-mansion",
         "repo": "scarb",
-        "rev": "d49f543948a7ae8a7d3108c8ff8f6b17dc15ef78",
+        "rev": "e9a2b8716daf7388bfab5e4b0a2656e1b0c02d4d",
         "type": "github"
       },
       "original": {
         "owner": "software-mansion",
-        "ref": "v2.6.5",
+        "ref": "v2.7.0",
         "repo": "scarb",
         "type": "github"
       }
@@ -1780,6 +1781,23 @@
         "owner": "skip-mev",
         "ref": "v0.2.0",
         "repo": "slinky",
+        "type": "github"
+      }
+    },
+    "snforge-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1724941386,
+        "narHash": "sha256-lQS47w3XO4/OIqUsdPXinNbhSHChlGgUKLlcS2tUvqk=",
+        "owner": "foundry-rs",
+        "repo": "starknet-foundry",
+        "rev": "d37d2272ca6c915117646de76cdf26ec06e44f61",
+        "type": "github"
+      },
+      "original": {
+        "owner": "foundry-rs",
+        "ref": "v0.29.0",
+        "repo": "starknet-foundry",
         "type": "github"
       }
     },

@@ -16,7 +16,9 @@ You can find the preset implementations of these contracts in the
 
 ## How to build
 
-To build the contracts, you simply need to run the following command:
+Install `scarb v2.7.0` with the instruction provided in the [Scarb
+Documentation](https://docs.swmansion.com/scarb/download.html). Then, to build
+the contracts, you simply need to run the following command:
 
 ```bash
 cd cairo-contracts
@@ -81,6 +83,7 @@ ICS20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ib
 RPC_URL=https://starknet-sepolia.public.blastapi.io/rpc/v0_7
 ACCOUNT_SRC="${HOME}/.starkli-wallets/deployer/account.json"
 KEYSTORE_SRC="${HOME}/.starkli-wallets/deployer/keystore.json"
+COMPILER_VERSION=2.6.2
 KEYSTORE_PASS=<KEYSTORE_PASSWORD>
 ERC20_CLASS_HASH=""
 ICS20_CLASS_HASH=""
@@ -106,6 +109,12 @@ running the following command:
 
 The script will deploy a single instance of the ICS20 contract to the Starknet
 network and return the contract address.
+
+>[!NOTE]
+>The deployment will, by default, occur on the Starknet Sepolia testnet. To
+>ensure compatibility, verify that your current Scarb version is supported by
+>the Starknet testnet by reviewing the [Starknet release
+>notes.](https://docs.starknet.io/starknet-versions/version-notes/#starknet_environments)
 
 ## How to invoke
 

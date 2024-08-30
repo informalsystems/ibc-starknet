@@ -14,12 +14,17 @@
     };
 
     cairo-src = {
-      url = "github:starkware-libs/cairo/v2.6.4";
+      url = "github:starkware-libs/cairo/v2.7.0";
       flake = false;
     };
 
     scarb-src = {
-      url = "github:software-mansion/scarb/v2.6.5";
+      url = "github:software-mansion/scarb/v2.7.0";
+      flake = false;
+    };
+
+    snforge-src = {
+      url = "github:foundry-rs/starknet-foundry/v0.29.0";
       flake = false;
     };
   };
@@ -63,6 +68,11 @@
             inherit (inputs) scarb-src cairo-src;
           };
 
+          snforge = import ./nix/snforge.nix {
+            inherit nixpkgs;
+            inherit (inputs) snforge-src;
+          };
+
           rust = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
 
           rust-wasm = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-wasm.toml;
@@ -74,6 +84,7 @@
               starknet-devnet
               cairo
               scarb
+              snforge
               wasm-simapp
               ;
           };
@@ -98,6 +109,7 @@
               starknet-devnet
               cairo
               scarb
+              snforge
               rust
               rust-nightly
               rust-wasm

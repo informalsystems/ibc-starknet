@@ -3,6 +3,11 @@ corelib/
 target/
 **/Cargo.lock
 
+# snforge
+.snfoundry_cache/
+.snfoundry_trace/
+.snfoundry_versioned_programs/
+
 .env
 
 # vscode

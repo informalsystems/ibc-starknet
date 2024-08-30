@@ -13,15 +13,19 @@ description   = { workspace = true }
 
 [dependencies]
 # external dependencies
-starknet     = { workspace = true }
-openzeppelin = { workspace = true }
-snforge_std  = { workspace = true }
+starknet             = { workspace = true }
+openzeppelin_token   = { workspace = true }
+openzeppelin_testing = { workspace = true }
+openzeppelin_utils   = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_utils        = { workspace = true }
 starknet_ibc_core_client  = { workspace = true }
 starknet_ibc_app_transfer = { workspace = true }
-starknet_ibc_presets      = { workspace = true }
+
+[dev-dependencies]
+snforge_std = { workspace = true }
+cairo_test  = { workspace = true }
 
 [lib]
 

@@ -1,6 +1,7 @@
 #[starknet::component]
 pub mod ClientHandlerComponent {
     use starknet::ContractAddress;
+    use starknet::storage::Map;
     use starknet_ibc_core_client::ClientEventEmitterComponent::ClientEventTrait as ClientEventTrait2;
     use starknet_ibc_core_client::ClientEventEmitterComponent;
     use starknet_ibc_core_client::{
@@ -12,7 +13,7 @@ pub mod ClientHandlerComponent {
 
     #[storage]
     struct Storage {
-        supported_clients: LegacyMap<felt252, ContractAddress>,
+        supported_clients: Map<felt252, ContractAddress>,
     }
 
     #[event]

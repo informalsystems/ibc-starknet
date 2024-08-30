@@ -84,13 +84,12 @@ impl PrefixedDenomImpl of PrefixedDenomTrait {
     fn as_byte_array(self: @PrefixedDenom) -> ByteArray {
         let mut denom_prefix: ByteArray = "";
         let mut trace_path_span = self.trace_path.span();
-        while let Option::Some(path) = trace_path_span
-            .pop_front() {
-                denom_prefix.append(path.port_id.port_id);
-                denom_prefix.append(@"/");
-                denom_prefix.append(path.channel_id.channel_id);
-                denom_prefix.append(@"/");
-            };
+        while let Option::Some(path) = trace_path_span.pop_front() {
+            denom_prefix.append(path.port_id.port_id);
+            denom_prefix.append(@"/");
+            denom_prefix.append(path.channel_id.channel_id);
+            denom_prefix.append(@"/");
+        };
         denom_prefix.append(@self.base.hosted().unwrap());
         denom_prefix
     }
@@ -100,16 +99,15 @@ impl PrefixedDenomKeyImpl of ComputeKeyTrait<PrefixedDenom> {
     fn compute_key(self: @PrefixedDenom) -> felt252 {
         let mut serialized_prefixed_denom: Array<felt252> = ArrayTrait::new();
         let mut trace_path_span = self.trace_path.span();
-        while let Option::Some(path) = trace_path_span
-            .pop_front() {
-                Serde::serialize(path, ref serialized_prefixed_denom);
-            };
+        while let Option::Some(path) = trace_path_span.pop_front() {
+            Serde::serialize(path, ref serialized_prefixed_denom);
+        };
         Serde::serialize(self.base, ref serialized_prefixed_denom);
         PoseidonTrait::new().update(poseidon_hash_span(serialized_prefixed_denom.span())).finalize()
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Eq, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct TracePrefix {
     pub port_id: PortId,
     pub channel_id: ChannelId,
@@ -213,7 +211,7 @@ impl ArrayFelt252IntoParticipant of Into<Array<felt252>, Participant> {
     }
 }
 
-#[derive(Clone, Debug, Drop, Serde, Store)]
+#[derive(Clone, Debug, Drop, Serde)]
 pub struct Memo {
     pub memo: ByteArray,
 }

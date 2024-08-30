@@ -2,14 +2,64 @@
 version = 1
 
 [[package]]
-name = "openzeppelin"
-version = "0.14.0"
-source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.14.0#f091c4f51ddeb10297db984acae965328c5a4e5b"
+name = "openzeppelin_access"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
+dependencies = [
+ "openzeppelin_introspection",
+ "openzeppelin_utils",
+]
+
+[[package]]
+name = "openzeppelin_account"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
+dependencies = [
+ "openzeppelin_introspection",
+ "openzeppelin_utils",
+]
+
+[[package]]
+name = "openzeppelin_governance"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
+dependencies = [
+ "openzeppelin_access",
+ "openzeppelin_introspection",
+]
+
+[[package]]
+name = "openzeppelin_introspection"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
+
+[[package]]
+name = "openzeppelin_testing"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
+dependencies = [
+ "snforge_std",
+]
+
+[[package]]
+name = "openzeppelin_token"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
+dependencies = [
+ "openzeppelin_account",
+ "openzeppelin_governance",
+ "openzeppelin_introspection",
+]
+
+[[package]]
+name = "openzeppelin_utils"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 
 [[package]]
 name = "snforge_std"
-version = "0.25.0"
-source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.25.0#5b366e24821e530fea97f11b211d220e8493fbea"
+version = "0.26.0"
+source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.26.0#50eb589db65e113efe4f09241feb59b574228c7e"
 
 [[package]]
 name = "starknet_ibc"
@@ -28,8 +78,8 @@ dependencies = [
 name = "starknet_ibc_app_transfer"
 version = "0.1.0"
 dependencies = [
- "openzeppelin",
- "snforge_std",
+ "openzeppelin_token",
+ "openzeppelin_utils",
  "starknet_ibc_core_channel",
  "starknet_ibc_core_host",
  "starknet_ibc_utils",
@@ -39,7 +89,6 @@ dependencies = [
 name = "starknet_ibc_client_cometbft"
 version = "0.1.0"
 dependencies = [
- "snforge_std",
  "starknet_ibc_core_client",
 ]
 
@@ -47,7 +96,6 @@ dependencies = [
 name = "starknet_ibc_core_channel"
 version = "0.1.0"
 dependencies = [
- "snforge_std",
  "starknet_ibc_core_client",
  "starknet_ibc_core_host",
 ]
@@ -56,7 +104,6 @@ dependencies = [
 name = "starknet_ibc_core_client"
 version = "0.1.0"
 dependencies = [
- "snforge_std",
  "starknet_ibc_core_host",
 ]
 
@@ -72,11 +119,12 @@ dependencies = [
 name = "starknet_ibc_presets"
 version = "0.1.0"
 dependencies = [
- "openzeppelin",
- "snforge_std",
+ "openzeppelin_access",
+ "openzeppelin_token",
  "starknet_ibc_app_transfer",
  "starknet_ibc_client_cometbft",
  "starknet_ibc_core_client",
+ "starknet_ibc_testing",
  "starknet_ibc_utils",
 ]
 
@@ -84,11 +132,12 @@ dependencies = [
 name = "starknet_ibc_testing"
 version = "0.1.0"
 dependencies = [
- "openzeppelin",
+ "openzeppelin_testing",
+ "openzeppelin_token",
+ "openzeppelin_utils",
  "snforge_std",
  "starknet_ibc_app_transfer",
  "starknet_ibc_core_client",
- "starknet_ibc_presets",
  "starknet_ibc_utils",
 ]
 
@@ -96,6 +145,6 @@ dependencies = [
 name = "starknet_ibc_utils"
 version = "0.1.0"
 dependencies = [
- "openzeppelin",
+ "openzeppelin_token",
  "snforge_std",
 ]

@@ -2,7 +2,7 @@
 // granting external access to all internal validation and execution functions
 // for testing purposes.
 #[starknet::contract]
-pub(crate) mod TransferMock {
+pub(crate) mod MockTransferApp {
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet_ibc_app_transfer::ICS20TransferComponent;

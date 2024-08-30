@@ -1,6 +1,7 @@
 #[starknet::component]
 pub mod CometClientComponent {
     use core::num::traits::zero::Zero;
+    use starknet::storage::Map;
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_client_cometbft::{
         CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
@@ -17,10 +18,10 @@ pub mod CometClientComponent {
     #[storage]
     struct Storage {
         client_sequence: u64,
-        client_states: LegacyMap<u64, CometClientState>,
-        consensus_states: LegacyMap<(u64, Height), CometConsensusState>,
-        client_processed_times: LegacyMap<(u64, Height), u64>,
-        client_processed_heights: LegacyMap<(u64, Height), u64>,
+        client_states: Map<u64, CometClientState>,
+        consensus_states: Map<(u64, Height), CometConsensusState>,
+        client_processed_times: Map<(u64, Height), u64>,
+        client_processed_heights: Map<(u64, Height), u64>,
     }
 
     #[event]

@@ -9,6 +9,7 @@ pub mod ICS20TransferComponent {
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet::get_contract_address;
+    use starknet::storage::Map;
     use starknet_ibc_app_transfer::transferrable::ITransferrable;
     use starknet_ibc_app_transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo,
@@ -25,8 +26,8 @@ pub mod ICS20TransferComponent {
     struct Storage {
         erc20_class_hash: ClassHash,
         salt: felt252,
-        ibc_token_name_to_address: LegacyMap<felt252, ContractAddress>,
-        ibc_token_address_to_name: LegacyMap<ContractAddress, felt252>,
+        ibc_token_name_to_address: Map<felt252, ContractAddress>,
+        ibc_token_address_to_name: Map<ContractAddress, felt252>,
     }
 
     #[event]
@@ -499,7 +500,8 @@ pub mod ICS20TransferComponent {
             address: ContractAddress,
             initial_supply: u256,
         ) {
-            self.emit(CreateTokenEvent { name, symbol, address, initial_supply });
+            let event = CreateTokenEvent { name, symbol, address, initial_supply };
+            self.emit(event);
         }
     }
 }
