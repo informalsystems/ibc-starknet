@@ -18,6 +18,7 @@ description   = "Collection of Cairo components and contracts that implement and
 [workspace.dependencies]
 # external dependencies
 # starknet     = ">=2.8.0"
+cairo_test = "2.8.0"
 
 # ibc dependencies
 

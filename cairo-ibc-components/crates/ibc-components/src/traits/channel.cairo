@@ -20,7 +20,7 @@ pub trait ProvideChannelPacketApi {
     ) -> Result<(), Self::IbcTypes::Error>;
 }
 
-pub trait ProvideChannelStorage {
+pub trait ProvideChannelBinding {
     type Context;
 
     impl IbcTypes: ProvideIbcTypes;
@@ -32,6 +32,12 @@ pub trait ProvideChannelStorage {
     fn counterparty_channel_id(context: @Self::Context) -> @Self::IbcTypes::CounterpartyChannelId;
 
     fn counterparty_port_id(context: @Self::Context) -> @Self::IbcTypes::CounterpartyPortId;
+}
+
+pub trait ProvideChannelStorage {
+    type Context;
+
+    impl IbcTypes: ProvideIbcTypes;
 
     fn commit_receive_packet(
         context: @Self::Context,

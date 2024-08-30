@@ -2,7 +2,7 @@ use starknet_ibc_components::cosmos::types::Packet;
 
 use starknet_ibc_components::traits::ProvideIbcTypes;
 
-impl ProvideCosmosIbcTypes of ProvideIbcTypes {
+pub impl ProvideCosmosIbcTypes of ProvideIbcTypes {
     type Error = felt252;
 
     type LocalAddress = felt252;
