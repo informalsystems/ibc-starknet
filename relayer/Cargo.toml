@@ -42,7 +42,7 @@ prost-types = { version = "0.13.1" }
 ibc                       = { version = "0.54.0" }
 ibc-client-starknet-types = { version = "0.1.0" }
 
-cairo-lang-starknet-classes = { version = "2.6.4" }
+cairo-lang-starknet-classes = { version = "2.7.0" }
 
 hermes-runtime-components           = { version = "0.1.0" }
 hermes-async-runtime-components     = { version = "0.1.0" }
@@ -128,4 +128,4 @@ hermes-starknet-chain-context    = { path = "./crates/starknet-chain-context" }
 
 ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types" }
 
-cairo-lang-starknet-classes = { git = "https://github.com/starkware-libs/cairo", tag = "v2.6.4" }
+cairo-lang-starknet-classes = { git = "https://github.com/starkware-libs/cairo", tag = "v2.7.0" }
