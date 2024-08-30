@@ -4,7 +4,7 @@ members = [
   "core",
   "clients",
   "apps",
-  "presets",
+  "contracts",
 ]
 
 [package]
@@ -43,18 +43,18 @@ openzeppelin_utils   = { git = "https://github.com/OpenZeppelin/cairo-contracts.
 snforge_std          = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.26.0" }
 
 # ibc dependencies
-starknet_ibc_apps    = { path = "apps" }
-starknet_ibc_core    = { path = "core" }
-starknet_ibc_clients = { path = "clients" }
-starknet_ibc_presets = { path = "presets" }
-starknet_ibc_utils   = { path = "utils" }
+starknet_ibc_apps      = { path = "apps" }
+starknet_ibc_core      = { path = "core" }
+starknet_ibc_clients   = { path = "clients" }
+starknet_ibc_contracts = { path = "contracts" }
+starknet_ibc_utils     = { path = "utils" }
 
 [dependencies]
-starknet_ibc_apps    = { workspace = true }
-starknet_ibc_core    = { workspace = true }
-starknet_ibc_clients = { workspace = true }
-starknet_ibc_presets = { workspace = true }
-starknet_ibc_utils   = { workspace = true }
+starknet_ibc_apps      = { workspace = true }
+starknet_ibc_core      = { workspace = true }
+starknet_ibc_clients   = { workspace = true }
+starknet_ibc_contracts = { workspace = true }
+starknet_ibc_utils     = { workspace = true }
 
 [lib]
 

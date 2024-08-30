@@ -67,8 +67,8 @@ version = "0.1.0"
 dependencies = [
  "starknet_ibc_apps",
  "starknet_ibc_clients",
+ "starknet_ibc_contracts",
  "starknet_ibc_core",
- "starknet_ibc_presets",
  "starknet_ibc_utils",
 ]
 
@@ -92,15 +92,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "starknet_ibc_core"
-version = "0.1.0"
-dependencies = [
- "snforge_std",
- "starknet_ibc_utils",
-]
-
-[[package]]
-name = "starknet_ibc_presets"
+name = "starknet_ibc_contracts"
 version = "0.1.0"
 dependencies = [
  "openzeppelin_access",
@@ -108,6 +100,14 @@ dependencies = [
  "starknet_ibc_apps",
  "starknet_ibc_clients",
  "starknet_ibc_core",
+ "starknet_ibc_utils",
+]
+
+[[package]]
+name = "starknet_ibc_core"
+version = "0.1.0"
+dependencies = [
+ "snforge_std",
  "starknet_ibc_utils",
 ]
 

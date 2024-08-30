@@ -1,5 +1,5 @@
 [package]
-name          = "starknet_ibc_presets"
+name          = "starknet_ibc_contracts"
 version       = { workspace = true }
 edition       = { workspace = true }
 cairo-version = { workspace = true }
