@@ -1,9 +1,13 @@
+use openzeppelin_testing::EventSpyExt;
 use core::traits::TryInto;
 use starknet::ContractAddress;
+use openzeppelin_testing::declare_class;
+use starknet_ibc_app_transfer::ERC20Contract;
 use starknet_ibc_testing::config::TestConfigTrait;
-use starknet_ibc_testing::constants::{SUPPLY, OWNER, COSMOS, STARKNET};
-use starknet_ibc_testing::setup::{ERC20ContractTrait, ICS20TransferContractTrait};
+use starknet_ibc_testing::constants::{NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET};
+use starknet_ibc_testing::setup::{ERC20ContractTrait, TransferAppHandlerTrait};
 use starknet_ibc_utils::ComputeKeyTrait;
+use snforge_std::{start_cheat_caller_address, EventSpyTrait, spy_events};
 
 #[test]
 fn test_escrow_unescrow_roundtrip() {
@@ -11,14 +15,18 @@ fn test_escrow_unescrow_roundtrip() {
     // Setup Contracts
     // -----------------------------------------------------------
 
+    // Declare the ERC20 contract class.
+    let erc20_contract_class = declare_class("ERC20Mintable");
+
     // Deploy an ERC20 contract.
-    let erc20 = ERC20ContractTrait::setup();
+    let mut erc20 = ERC20ContractTrait::setup(erc20_contract_class);
 
     // Deploy an ICS20 Token Transfer contract.
-    let ics20 = ICS20TransferContractTrait::setup();
+    let mut ics20 = TransferAppHandlerTrait::setup(erc20_contract_class);
 
     let mut cfg = TestConfigTrait::default();
-    cfg.set_native_denom(erc20.contract_address);
+
+    cfg.set_native_denom(erc20.address);
 
     // -----------------------------------------------------------
     // Escrow
@@ -33,10 +41,10 @@ fn test_escrow_unescrow_roundtrip() {
     ics20.send_execute(msg_transfer);
 
     // Assert the `SendEvent` emitted.
-    let event = ics20.assert_send_event();
+    ics20.assert_send_event(STARKNET(), COSMOS(), cfg.native_denom.clone(), cfg.amount);
 
     // Check the balance of the sender.
-    erc20.assert_balance(event.sender.try_into().unwrap(), SUPPLY - cfg.amount);
+    erc20.assert_balance(OWNER(), SUPPLY - cfg.amount);
 
     // Check the balance of the `Transfer` contract.
     erc20.assert_balance(ics20.contract_address, cfg.amount);
@@ -45,20 +53,22 @@ fn test_escrow_unescrow_roundtrip() {
     // Unescrow
     // -----------------------------------------------------------
 
-    cfg.prefix_native_denom();
+    ics20.drop_all_events();
 
-    let recv_packet = cfg.dummy_recv_packet(cfg.native_denom, COSMOS(), STARKNET());
+    let prefixed_denom = cfg.prefix_native_denom();
+
+    let recv_packet = cfg.dummy_recv_packet(prefixed_denom.clone(), COSMOS(), STARKNET());
 
     // Submit a `RecvPacket` to the `Transfer` contract.
     ics20.recv_execute(recv_packet);
 
     // Assert the `RecvEvent` emitted.
-    let event = ics20.assert_recv_event();
+    ics20.assert_recv_event(COSMOS(), STARKNET(), prefixed_denom, cfg.amount, true);
 
     erc20.assert_balance(ics20.contract_address, 0);
 
     // Check the balance of the recipient.
-    erc20.assert_balance(event.receiver.try_into().unwrap(), SUPPLY);
+    erc20.assert_balance(OWNER(), SUPPLY);
 }
 
 #[test]
@@ -67,8 +77,11 @@ fn test_mint_burn_roundtrip() {
     // Setup Contracts
     // -----------------------------------------------------------
 
+    // Declare the ERC20 contract class.
+    let erc20_contract_class = declare_class("ERC20Mintable");
+
     // Deploy an ICS20 Token Transfer contract.
-    let ics20 = ICS20TransferContractTrait::setup();
+    let mut ics20 = TransferAppHandlerTrait::setup(erc20_contract_class);
 
     let mut cfg = TestConfigTrait::default();
 
@@ -81,26 +94,29 @@ fn test_mint_burn_roundtrip() {
     // Submit a `RecvPacket`, which will create a new ERC20 contract.
     ics20.recv_execute(recv_packet.clone());
 
+    let prefixed_denom = cfg.prefix_hosted_denom();
+
+    // Fetch the token address.
+    let token_address = ics20.ibc_token_address(prefixed_denom.compute_key()).unwrap();
+
     // Assert the `CreateTokenEvent` emitted.
-    ics20.assert_create_token_event();
+    ics20.assert_create_token_event(NAME(), SYMBOL(), token_address, cfg.amount);
 
     // Assert the `RecvEvent` emitted.
-    ics20.assert_recv_event();
+    ics20.assert_recv_event(COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true);
+
+    ics20.drop_all_events();
 
     // Submit another `RecvPacket`, which will mint the amount of tokens.
     ics20.recv_execute(recv_packet);
 
     // Assert the `RecvEvent` emitted.
-    let event = ics20.assert_recv_event();
+    ics20.assert_recv_event(COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true);
 
-    cfg.prefix_hosted_denom();
+    let erc20: ERC20Contract = token_address.into();
 
     // Check the balance of the receiver.
-    let token_address = ics20.ibc_token_address(cfg.hosted_denom.compute_key()).unwrap();
-
-    let erc20 = ERC20ContractTrait::setup_with_addr(token_address);
-
-    erc20.assert_balance(event.receiver.try_into().unwrap(), cfg.amount * 2);
+    erc20.assert_balance(OWNER(), cfg.amount * 2);
 
     // Check the total supply of the ERC20 contract.
     erc20.assert_total_supply(cfg.amount * 2);
@@ -109,18 +125,20 @@ fn test_mint_burn_roundtrip() {
     // Burn
     // -----------------------------------------------------------
 
-    let msg_transfer = cfg.dummy_msg_transder(cfg.hosted_denom, STARKNET(), COSMOS());
+    ics20.drop_all_events();
 
-    // Owner approves the amount of allowance for the `Transfer` contract.
+    let msg_transfer = cfg.dummy_msg_transder(prefixed_denom.clone(), STARKNET(), COSMOS());
+
+    // Owner approves the amount of allowance for the `TransferApp` contract.
     ics20.send_execute(msg_transfer);
 
     // Assert the `SendEvent` emitted.
-    let event = ics20.assert_send_event();
+    ics20.assert_send_event(STARKNET(), COSMOS(), prefixed_denom, cfg.amount);
 
     // Check the balance of the sender.
-    erc20.assert_balance(event.sender.try_into().unwrap(), cfg.amount);
+    erc20.assert_balance(OWNER(), cfg.amount);
 
-    // Check the balance of the `Transfer` contract.
+    // Check the balance of the `TransferApp` contract.
     erc20.assert_balance(ics20.contract_address, 0);
 
     // Chekck the total supply of the ERC20 contract.

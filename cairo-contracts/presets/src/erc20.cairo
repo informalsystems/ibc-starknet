@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod ERC20Mintable {
+pub mod ERC20Mintable {
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::{ContractAddress, ClassHash};

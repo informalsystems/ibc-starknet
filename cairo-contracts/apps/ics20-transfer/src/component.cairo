@@ -500,7 +500,8 @@ pub mod ICS20TransferComponent {
             address: ContractAddress,
             initial_supply: u256,
         ) {
-            self.emit(CreateTokenEvent { name, symbol, address, initial_supply });
+            let event = CreateTokenEvent { name, symbol, address, initial_supply };
+            self.emit(event);
         }
     }
 }

@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod CometClient {
+pub mod CometClient {
     use starknet_ibc_client_cometbft::CometClientComponent;
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 

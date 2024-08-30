@@ -124,6 +124,7 @@ dependencies = [
  "starknet_ibc_app_transfer",
  "starknet_ibc_client_cometbft",
  "starknet_ibc_core_client",
+ "starknet_ibc_testing",
  "starknet_ibc_utils",
 ]
 
@@ -137,7 +138,6 @@ dependencies = [
  "snforge_std",
  "starknet_ibc_app_transfer",
  "starknet_ibc_core_client",
- "starknet_ibc_presets",
  "starknet_ibc_utils",
 ]
 

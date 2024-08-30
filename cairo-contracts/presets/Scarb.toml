@@ -23,6 +23,9 @@ starknet_ibc_core_client     = { workspace = true }
 starknet_ibc_client_cometbft = { workspace = true }
 starknet_ibc_app_transfer    = { workspace = true }
 
+[dev-dependencies]
+starknet_ibc_testing = { workspace = true }
+
 [lib]
 
 [tool]
