@@ -19,8 +19,18 @@ description   = "Collection of Cairo components and contracts that implement and
 # external dependencies
 # starknet     = ">=2.8.0"
 cairo_test = "2.8.0"
+starknet_ibc_components = { version = "0.1.0", path = "./crates/ibc-components" }
 
 # ibc dependencies
 
 [workspace.tool.fmt]
 sort-module-level-items = true
+
+# [package]
+# name = "starknet_ibc"
+# version.workspace = true
+
+# [lib]
+
+# [dependencies]
+# starknet_ibc_components = { workspace = true }

@@ -7,50 +7,42 @@ use crate::traits::{ProvideChannelBinding, ProvideChannelPacketApi};
 #[derive(Drop)]
 pub struct Context {}
 
-pub impl DummyChannelPacketHandler of ProvideChannelPacketApi {
-    type Context = Context;
-
-    impl IbcTypes = ProvideCosmosIbcTypes;
-
+pub impl DummyChannelPacketHandler of ProvideChannelPacketApi<Context, ProvideCosmosIbcTypes> {
     fn handle_receive_packet(
-        context: @Self::Context, packet: @Self::IbcTypes::IncomingPacket,
-    ) -> Result<Self::IbcTypes::IncomingPacketAck, Self::IbcTypes::Error> {
+        context: @Context, packet: @ProvideCosmosIbcTypes::IncomingPacket,
+    ) -> Result<ProvideCosmosIbcTypes::IncomingPacketAck, ProvideCosmosIbcTypes::Error> {
         panic!("todo")
     }
 
     fn handle_send_packet(
-        context: @Self::Context, packet: @Self::IbcTypes::OutgoingPacketData,
-    ) -> Result<Self::IbcTypes::OutgoingPacket, Self::IbcTypes::Error> {
+        context: @Context, packet: @ProvideCosmosIbcTypes::OutgoingPacketData,
+    ) -> Result<ProvideCosmosIbcTypes::OutgoingPacket, ProvideCosmosIbcTypes::Error> {
         panic!("todo")
     }
 
     fn handle_receive_ack_packet(
-        context: @Self::Context,
-        packet: @Self::IbcTypes::OutgoingPacket,
-        packet_ack: @Self::IbcTypes::OutgoingPacketAck,
-    ) -> Result<(), Self::IbcTypes::Error> {
+        context: @Context,
+        packet: @ProvideCosmosIbcTypes::OutgoingPacket,
+        packet_ack: @ProvideCosmosIbcTypes::OutgoingPacketAck,
+    ) -> Result<(), ProvideCosmosIbcTypes::Error> {
         panic!("todo")
     }
 }
 
-pub impl DummyChannelBinding of ProvideChannelBinding {
-    type Context = Context;
-
-    impl IbcTypes = ProvideCosmosIbcTypes;
-
-    fn local_channel_id(context: @Self::Context) -> @Self::IbcTypes::LocalChannelId {
+pub impl DummyChannelBinding of ProvideChannelBinding<Context, ProvideCosmosIbcTypes> {
+    fn local_channel_id(context: @Context) -> @ProvideCosmosIbcTypes::LocalChannelId {
         @'channel-1'
     }
 
-    fn local_port_id(context: @Self::Context) -> @Self::IbcTypes::LocalPortId {
+    fn local_port_id(context: @Context) -> @ProvideCosmosIbcTypes::LocalPortId {
         @'channel-2'
     }
 
-    fn counterparty_channel_id(context: @Self::Context) -> @Self::IbcTypes::CounterpartyChannelId {
+    fn counterparty_channel_id(context: @Context) -> @ProvideCosmosIbcTypes::CounterpartyChannelId {
         @'transfer'
     }
 
-    fn counterparty_port_id(context: @Self::Context) -> @Self::IbcTypes::CounterpartyPortId {
+    fn counterparty_port_id(context: @Context) -> @ProvideCosmosIbcTypes::CounterpartyPortId {
         @'transfer'
     }
 }

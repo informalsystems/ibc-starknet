@@ -51,7 +51,7 @@ pub trait ProvideIbcTypes {
 
     type OutgoingPacketAckHash;
 
-    impl LocalChannelIdEq: PartialEq<Self::LocalChannelId>;
+    // impl LocalChannelIdEq: PartialEq<Self::LocalChannelId>;
 
     fn hash_incoming_packet(packet: @Self::IncomingPacket) -> Self::IncomingPacketHash;
 
