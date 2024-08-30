@@ -1,10 +1,10 @@
 [workspace]
 members = [
-  "utils",
+  "apps",
   "core",
   "clients",
-  "apps",
   "contracts",
+  "utils",
 ]
 
 [package]
