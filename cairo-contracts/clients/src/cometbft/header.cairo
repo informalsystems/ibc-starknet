@@ -1,4 +1,4 @@
-use starknet_ibc_client_cometbft::{CometErrors, CometConsensusState};
+use starknet_ibc_clients::cometbft::{CometErrors, CometConsensusState};
 use starknet_ibc_core_client::Height;
 
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]

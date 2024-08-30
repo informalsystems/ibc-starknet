@@ -2,7 +2,7 @@ use openzeppelin_testing::deploy;
 use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use snforge_std::{ContractClass, start_cheat_caller_address};
 use starknet::ContractAddress;
-use starknet_ibc_app_transfer::ERC20Contract;
+use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_testing::constants::{NAME, SYMBOL, SUPPLY, OWNER};
 
 

@@ -1,7 +1,7 @@
 use core::serde::Serde;
 use starknet::ContractAddress;
 use starknet::contract_address_const;
-use starknet_ibc_app_transfer::types::Participant;
+use starknet_ibc_apps::transfer::types::Participant;
 
 pub const SUPPLY: u256 = 2000;
 pub const DECIMALS: u8 = 18_u8;

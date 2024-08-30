@@ -21,7 +21,7 @@ openzeppelin_utils   = { workspace = true }
 # ibc dependencies
 starknet_ibc_utils        = { workspace = true }
 starknet_ibc_core_client  = { workspace = true }
-starknet_ibc_app_transfer = { workspace = true }
+starknet_ibc_apps         = { workspace = true }
 
 [dev-dependencies]
 snforge_std = { workspace = true }

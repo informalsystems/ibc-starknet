@@ -65,17 +65,18 @@ source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.26.0#50eb589
 name = "starknet_ibc"
 version = "0.1.0"
 dependencies = [
- "starknet_ibc_app_transfer",
- "starknet_ibc_client_cometbft",
+ "starknet_ibc_apps",
+ "starknet_ibc_clients",
  "starknet_ibc_core_channel",
  "starknet_ibc_core_client",
  "starknet_ibc_core_host",
+ "starknet_ibc_presets",
  "starknet_ibc_testing",
  "starknet_ibc_utils",
 ]
 
 [[package]]
-name = "starknet_ibc_app_transfer"
+name = "starknet_ibc_apps"
 version = "0.1.0"
 dependencies = [
  "openzeppelin_token",
@@ -86,7 +87,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "starknet_ibc_client_cometbft"
+name = "starknet_ibc_clients"
 version = "0.1.0"
 dependencies = [
  "starknet_ibc_core_client",
@@ -121,8 +122,8 @@ version = "0.1.0"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_token",
- "starknet_ibc_app_transfer",
- "starknet_ibc_client_cometbft",
+ "starknet_ibc_apps",
+ "starknet_ibc_clients",
  "starknet_ibc_core_client",
  "starknet_ibc_testing",
  "starknet_ibc_utils",
@@ -136,7 +137,7 @@ dependencies = [
  "openzeppelin_token",
  "openzeppelin_utils",
  "snforge_std",
- "starknet_ibc_app_transfer",
+ "starknet_ibc_apps",
  "starknet_ibc_core_client",
  "starknet_ibc_utils",
 ]

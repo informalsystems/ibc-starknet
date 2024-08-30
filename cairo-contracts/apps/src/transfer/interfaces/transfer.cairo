@@ -1,5 +1,5 @@
 use starknet::ContractAddress;
-use starknet_ibc_app_transfer::types::{MsgTransfer, PrefixedDenom};
+use starknet_ibc_apps::transfer::types::{MsgTransfer, PrefixedDenom};
 use starknet_ibc_core_channel::Packet;
 
 #[starknet::interface]

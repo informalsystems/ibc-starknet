@@ -1,5 +1,5 @@
 [package]
-name          = "starknet_ibc_app_transfer"
+name          = "starknet_ibc_apps"
 version       = { workspace = true }
 edition       = { workspace = true }
 cairo-version = { workspace = true }

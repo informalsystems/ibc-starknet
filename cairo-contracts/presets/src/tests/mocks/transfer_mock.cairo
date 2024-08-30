@@ -5,13 +5,12 @@
 pub(crate) mod MockTransferApp {
     use starknet::ClassHash;
     use starknet::ContractAddress;
-    use starknet_ibc_app_transfer::ICS20TransferComponent;
-    use starknet_ibc_app_transfer::transferrable::TransferrableComponent;
-    use starknet_ibc_app_transfer::types::{
+    use starknet_ibc_apps::transfer::components::{ICS20TransferComponent, TransferrableComponent};
+    use starknet_ibc_apps::transfer::types::{
         PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo, TracePrefixTrait,
         PrefixedDenomTrait
     };
-    use starknet_ibc_app_transfer::{ERC20Contract, ERC20ContractTrait};
+    use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait};
     use starknet_ibc_core_host::{PortId, ChannelId, ChannelIdTrait};
 
     component!(path: TransferrableComponent, storage: transferrable, event: TransferrableEvent);

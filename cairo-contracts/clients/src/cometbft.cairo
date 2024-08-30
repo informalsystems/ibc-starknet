@@ -11,4 +11,3 @@ pub use consensus_state::{CometConsensusState, CometConsensusStateImpl, CometCon
 
 pub use errors::CometErrors;
 pub use header::{CometHeader, CometHeaderImpl, CometHeaderIntoConsensusState, CometHeaderTrait};
-

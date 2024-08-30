@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
-use starknet_ibc_app_transfer::TRANSFER_PORT_ID;
-use starknet_ibc_app_transfer::types::PrefixedDenomTrait;
-use starknet_ibc_app_transfer::types::{
+use starknet_ibc_apps::transfer::TRANSFER_PORT_ID;
+use starknet_ibc_apps::transfer::types::PrefixedDenomTrait;
+use starknet_ibc_apps::transfer::types::{
     MsgTransfer, PacketData, PrefixedDenom, Denom, Memo, TracePrefixTrait, Participant
 };
 use starknet_ibc_core_channel::Packet;

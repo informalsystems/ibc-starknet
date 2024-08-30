@@ -1,6 +1,6 @@
 #[starknet::contract]
 pub mod CometClient {
-    use starknet_ibc_client_cometbft::CometClientComponent;
+    use starknet_ibc_clients::cometbft::CometClientComponent;
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
     component!(path: IBCGovernanceComponent, storage: governance, event: IBCGovernanceEvent);

@@ -1,8 +1,7 @@
 #[starknet::contract]
 pub mod TransferApp {
     use starknet::ClassHash;
-    use starknet_ibc_app_transfer::ICS20TransferComponent;
-    use starknet_ibc_app_transfer::transferrable::TransferrableComponent;
+    use starknet_ibc_apps::transfer::components::{ICS20TransferComponent, TransferrableComponent};
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
     component!(path: IBCGovernanceComponent, storage: governance, event: IBCGovernanceEvent);

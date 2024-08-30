@@ -1,7 +1,7 @@
 #[starknet::component]
 pub mod TransferrableComponent {
-    use starknet_ibc_app_transfer::TransferErrors;
-    use starknet_ibc_app_transfer::transferrable::interface::ITransferrable;
+    use starknet_ibc_apps::transfer::TransferErrors;
+    use starknet_ibc_apps::transfer::interfaces::ITransferrable;
 
     #[storage]
     struct Storage {

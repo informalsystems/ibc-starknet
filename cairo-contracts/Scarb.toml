@@ -4,21 +4,33 @@ members = [
   "core/ics24-host",
   "core/ics02-client",
   "core/ics04-channel",
-  "clients/ics07-cometbft",
-  "apps/ics20-transfer",
+  "clients",
+  "apps",
   "testing",
-  "ibc",
   "presets",
 ]
 
+[package]
+name        = "starknet_ibc"
+version       = { workspace = true }
+edition       = { workspace = true }
+cairo-version = { workspace = true }
+scarb-version = { workspace = true }
+license       = { workspace = true }
+authors       = { workspace = true }
+repository    = { workspace = true }
+Readme        = { workspace = true }
+keywords      = { workspace = true }
+description   = { workspace = true }
+
 [workspace.package]
 version       = "0.1.0"
-license       = "Apache-2.0"
 edition       = "2023_11"
 cairo-version = "2.7.0"
 scarb-version = "2.7.0"
-repository    = "https://github.com/informalsystems/ibc-starknet"
+license       = "Apache-2.0"
 authors       = [ "Informal Systems <hello@informal.systems>" ]
+repository    = "https://github.com/informalsystems/ibc-starknet"
 Readme        = "README.md"
 keywords      = [ "ethereum", "starknet", "ibc", "cairo", "contracts" ]
 description   = "Collection of Cairo components and contracts that implement and integrate IBC protocol with Starknet"
@@ -34,14 +46,34 @@ openzeppelin_utils   = { git = "https://github.com/OpenZeppelin/cairo-contracts.
 snforge_std          = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.26.0" }
 
 # ibc dependencies
-starknet_ibc_utils           = { path = "utils" }
-starknet_ibc_core_host       = { path = "core/ics24-host" }
-starknet_ibc_core_client     = { path = "core/ics02-client" }
-starknet_ibc_core_channel    = { path = "core/ics04-channel" }
-starknet_ibc_client_cometbft = { path = "clients/ics07-cometbft" }
-starknet_ibc_app_transfer    = { path = "apps/ics20-transfer" }
-starknet_ibc_testing         = { path = "testing" }
-starknet_ibc_presets         = { path = "presets" }
+starknet_ibc_utils        = { path = "utils" }
+starknet_ibc_core_host    = { path = "core/ics24-host" }
+starknet_ibc_core_client  = { path = "core/ics02-client" }
+starknet_ibc_core_channel = { path = "core/ics04-channel" }
+starknet_ibc_clients      = { path = "clients" }
+starknet_ibc_apps         = { path = "apps" }
+starknet_ibc_testing      = { path = "testing" }
+starknet_ibc_presets      = { path = "presets" }
+
+[dependencies]
+starknet_ibc_apps         = { workspace = true }
+starknet_ibc_core_host    = { workspace = true }
+starknet_ibc_core_client  = { workspace = true }
+starknet_ibc_core_channel = { workspace = true }
+starknet_ibc_clients      = { workspace = true }
+starknet_ibc_presets      = { workspace = true }
+starknet_ibc_utils        = { workspace = true }
+starknet_ibc_testing      = { workspace = true }
+
+[lib]
+
+[[target.starknet-contract]]
+allowed-libfuncs-list.name = "experimental"
+sierra = true
+casm = false
 
 [workspace.tool.fmt]
 sort-module-level-items = true
+
+[tool]
+fmt = { workspace = true }

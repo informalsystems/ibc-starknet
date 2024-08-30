@@ -5,7 +5,7 @@ use core::poseidon::PoseidonTrait;
 use core::poseidon::poseidon_hash_span;
 use starknet::ContractAddress;
 use starknet::contract_address_const;
-use starknet_ibc_app_transfer::{
+use starknet_ibc_apps::transfer::{
     ERC20Contract, ERC20ContractTrait, TransferErrors, TRANSFER_PORT_ID_HASH
 };
 use starknet_ibc_core_client::{Height, Timestamp};
