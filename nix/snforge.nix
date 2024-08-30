@@ -1,7 +1,7 @@
 { nixpkgs, snforge-src }:
 let
   snforge = nixpkgs.rustPlatform.buildRustPackage {
-    name = "snforge";
+    pname = "forge";
     version = "0.29.0";
 
     src = snforge-src;
