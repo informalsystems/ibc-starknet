@@ -1,13 +1,13 @@
-use openzeppelin_testing::EventSpyExt;
 use core::traits::TryInto;
-use starknet::ContractAddress;
+use openzeppelin_testing::EventSpyExt;
 use openzeppelin_testing::declare_class;
+use snforge_std::{start_cheat_caller_address, EventSpyTrait, spy_events};
+use starknet::ContractAddress;
 use starknet_ibc_app_transfer::ERC20Contract;
 use starknet_ibc_testing::config::TestConfigTrait;
 use starknet_ibc_testing::constants::{NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET};
 use starknet_ibc_testing::setup::{ERC20ContractTrait, TransferAppHandlerTrait};
 use starknet_ibc_utils::ComputeKeyTrait;
-use snforge_std::{start_cheat_caller_address, EventSpyTrait, spy_events};
 
 #[test]
 fn test_escrow_unescrow_roundtrip() {

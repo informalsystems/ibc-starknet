@@ -1,14 +1,14 @@
 use core::option::OptionTrait;
 use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
-use snforge_std::EventSpyTrait;
 use openzeppelin_testing::{declare_class, deploy, declare_and_deploy};
 use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use openzeppelin_utils::serde::SerializedAppend;
-use snforge_std::{EventSpy, spy_events};
-use snforge_std::start_cheat_caller_address;
 use snforge_std::ContractClass;
-use starknet::ContractAddress;
+use snforge_std::EventSpyTrait;
+use snforge_std::start_cheat_caller_address;
+use snforge_std::{EventSpy, spy_events};
 use starknet::ClassHash;
+use starknet::ContractAddress;
 use starknet::testing;
 use starknet_ibc_app_transfer::ERC20Contract;
 use starknet_ibc_app_transfer::ICS20TransferComponent::{
@@ -53,9 +53,7 @@ pub impl TransferAppHandlerImpl of TransferAppHandlerTrait {
         IRecvPacketDispatcher { contract_address: *self.contract_address }
     }
 
-    fn ibc_token_address(
-        self: @TransferAppHandler, token_key: felt252
-    ) -> Option<ContractAddress> {
+    fn ibc_token_address(self: @TransferAppHandler, token_key: felt252) -> Option<ContractAddress> {
         ITokenAddressDispatcher { contract_address: *self.contract_address }
             .ibc_token_address(token_key)
     }
@@ -75,7 +73,9 @@ pub impl TransferAppHandlerImpl of TransferAppHandlerTrait {
         denom: PrefixedDenom,
         amount: u256
     ) {
-        let expected = TransferEvent::SendEvent(SendEvent { sender, receiver, denom, amount, memo: Memo { memo: "" }});
+        let expected = TransferEvent::SendEvent(
+            SendEvent { sender, receiver, denom, amount, memo: Memo { memo: "" } }
+        );
         self.spy.assert_emitted_single(self.contract_address, expected);
     }
 
@@ -87,9 +87,9 @@ pub impl TransferAppHandlerImpl of TransferAppHandlerTrait {
         amount: u256,
         success: bool
     ) {
-        let expected = TransferEvent::RecvEvent(RecvEvent {
-            sender, receiver, denom, amount, memo: Memo { memo: "" }, success,
-        });
+        let expected = TransferEvent::RecvEvent(
+            RecvEvent { sender, receiver, denom, amount, memo: Memo { memo: "" }, success, }
+        );
         self.spy.assert_emitted_single(self.contract_address, expected);
     }
 
@@ -100,7 +100,9 @@ pub impl TransferAppHandlerImpl of TransferAppHandlerTrait {
         address: ContractAddress,
         initial_supply: u256
     ) {
-        let expected = TransferEvent::CreateTokenEvent(CreateTokenEvent { name, symbol, address, initial_supply });
+        let expected = TransferEvent::CreateTokenEvent(
+            CreateTokenEvent { name, symbol, address, initial_supply }
+        );
         self.spy.assert_emitted_single(self.contract_address, expected);
     }
 
