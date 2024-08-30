@@ -1645,6 +1645,7 @@
         "nixpkgs": "nixpkgs_6",
         "rust-overlay": "rust-overlay_2",
         "scarb-src": "scarb-src",
+        "snforge-src": "snforge-src",
         "starknet-devnet-src": "starknet-devnet-src"
       }
     },
@@ -1780,6 +1781,23 @@
         "owner": "skip-mev",
         "ref": "v0.2.0",
         "repo": "slinky",
+        "type": "github"
+      }
+    },
+    "snforge-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1720012972,
+        "narHash": "sha256-2vUZ4aKz5sl6KJsPiQB5gabePkEtFqpbRjaoHjFxBSc=",
+        "owner": "foundry-rs",
+        "repo": "starknet-foundry",
+        "rev": "50eb589db65e113efe4f09241feb59b574228c7e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "foundry-rs",
+        "ref": "v0.26.0",
+        "repo": "starknet-foundry",
         "type": "github"
       }
     },

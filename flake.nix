@@ -24,7 +24,7 @@
     };
 
     snforge-src = {
-      url = "github:foundry-rs/starknet-foundry";
+      url = "github:foundry-rs/starknet-foundry/v0.26.0";
       flake = false;
     };
   };
@@ -70,7 +70,7 @@
 
           snforge = import ./nix/snforge.nix {
             inherit nixpkgs;
-            inherit (inputs) snforge-src cairo-src;
+            inherit (inputs) snforge-src;
           };
 
           rust = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
