@@ -3,26 +3,17 @@ use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
 use openzeppelin_testing::{declare_class, deploy, declare_and_deploy};
 use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use openzeppelin_utils::serde::SerializedAppend;
-use snforge_std::ContractClass;
-use snforge_std::EventSpyTrait;
-use snforge_std::start_cheat_caller_address;
-use snforge_std::{EventSpy, spy_events};
-use starknet::ClassHash;
-use starknet::ContractAddress;
-use starknet::testing;
-use starknet_ibc_app_transfer::ERC20Contract;
+use snforge_std::{EventSpy, spy_events, ContractClass, start_cheat_caller_address};
+use starknet::{ClassHash, ContractAddress, testing};
 use starknet_ibc_app_transfer::ICS20TransferComponent::{
     Event as TransferEvent, SendEvent, RecvEvent, CreateTokenEvent
 };
 use starknet_ibc_app_transfer::types::{MsgTransfer, Participant, PrefixedDenom, Memo};
 use starknet_ibc_app_transfer::{
-    ISendTransferDispatcher, IRecvPacketDispatcher, ITokenAddressDispatcher,
-};
-use starknet_ibc_app_transfer::{
+    ISendTransferDispatcher, IRecvPacketDispatcher, ITokenAddressDispatcher, ERC20Contract,
     ISendTransferDispatcherTrait, IRecvPacketDispatcherTrait, ITokenAddressDispatcherTrait
 };
 use starknet_ibc_core_channel::Packet;
-use starknet_ibc_presets::{TransferApp, ERC20Mintable};
 use starknet_ibc_testing::constants::{NAME, SYMBOL, SUPPLY, OWNER};
 
 #[derive(Drop, Serde)]
@@ -131,12 +122,12 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
 
     fn assert_balance(self: @ERC20Contract, account: ContractAddress, expected: u256) {
         let balance = self.dispatcher().balance_of(account);
-        assert_eq!(balance, expected);
+        assert(balance == expected, 'balance mismatch');
     }
 
     fn assert_total_supply(self: @ERC20Contract, expected: u256) {
         let total_supply = self.dispatcher().total_supply();
-        assert_eq!(total_supply, expected);
+        assert(total_supply == expected, 'total supply mismatch');
     }
 }
 
