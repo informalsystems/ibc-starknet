@@ -8,7 +8,7 @@ members = [
 ]
 
 [package]
-name        = "starknet_ibc"
+name          = "starknet_ibc"
 version       = { workspace = true }
 edition       = { workspace = true }
 cairo-version = { workspace = true }
@@ -60,8 +60,8 @@ starknet_ibc_utils     = { workspace = true }
 
 [[target.starknet-contract]]
 allowed-libfuncs-list.name = "experimental"
-sierra = true
-casm = false
+sierra                     = true
+casm                       = false
 
 [workspace.tool.fmt]
 sort-module-level-items = true
