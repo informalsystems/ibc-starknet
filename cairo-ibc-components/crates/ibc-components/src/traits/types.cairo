@@ -1,4 +1,6 @@
 pub trait ProvideIbcTypes {
+    type Error;
+
     type LocalAddress;
 
     type CounterpartyAddress;
@@ -36,6 +38,24 @@ pub trait ProvideIbcTypes {
     type IncomingPacketData;
 
     type OutgoingPacketData;
+
+    type IncomingPacketAck;
+
+    type OutgoingPacketAck;
+
+    type IncomingPacketHash;
+
+    type OutgoingPacketHash;
+
+    type IncomingPacketAckHash;
+
+    type OutgoingPacketAckHash;
+
+    impl LocalChannelIdEq: PartialEq<Self::LocalChannelId>;
+
+    fn hash_incoming_packet(packet: @Self::IncomingPacket) -> Self::IncomingPacketHash;
+
+    fn hash_outgoing_packet(packet: @Self::IncomingPacket) -> Self::OutgoingPacketHash;
 
     fn incoming_packet_src_channel_id(
         packet: @Self::IncomingPacket

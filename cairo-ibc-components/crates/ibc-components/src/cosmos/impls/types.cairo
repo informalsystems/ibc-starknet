@@ -3,6 +3,8 @@ use starknet_ibc_components::cosmos::types::Packet;
 use starknet_ibc_components::traits::ProvideIbcTypes;
 
 impl ProvideCosmosIbcTypes of ProvideIbcTypes {
+    type Error = felt252;
+
     type LocalAddress = felt252;
 
     type CounterpartyAddress = ByteArray;
@@ -35,11 +37,31 @@ impl ProvideCosmosIbcTypes of ProvideIbcTypes {
 
     type IncomingPacket = Packet;
 
-    type OutgoingPacket = ByteArray;
+    type OutgoingPacket = Packet;
 
     type IncomingPacketData = ByteArray;
 
     type OutgoingPacketData = ByteArray;
+
+    type IncomingPacketAck = ByteArray;
+
+    type OutgoingPacketAck = ByteArray;
+
+    type IncomingPacketHash = felt252;
+
+    type OutgoingPacketHash = felt252;
+
+    type IncomingPacketAckHash = felt252;
+
+    type OutgoingPacketAckHash = felt252;
+
+    fn hash_incoming_packet(packet: @Self::IncomingPacket) -> Self::IncomingPacketHash {
+        'dummy'
+    }
+
+    fn hash_outgoing_packet(packet: @Self::IncomingPacket) -> Self::OutgoingPacketHash {
+        'dummy'
+    }
 
     fn incoming_packet_src_channel_id(
         packet: @Self::IncomingPacket
