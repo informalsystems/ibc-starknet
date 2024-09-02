@@ -51,11 +51,21 @@
 
           cosmos-nix = inputs.cosmos-nix.packages.${system};
 
+          rust = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+
+          rust-wasm = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-wasm.toml;
+
+          rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
+
+          rust-1_79 = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-1.79.toml;
+
           wasm-simapp = cosmos-nix.ibc-go-v8-wasm-simapp;
 
           starknet-devnet = import ./nix/starknet-devnet.nix {
             inherit nixpkgs;
             inherit (inputs) starknet-devnet-src;
+
+            rust = rust-1_79;
           };
 
           cairo = import ./nix/cairo.nix {
@@ -72,12 +82,6 @@
             inherit nixpkgs;
             inherit (inputs) snforge-src;
           };
-
-          rust = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
-
-          rust-wasm = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-wasm.toml;
-
-          rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
 
           starknet-pkgs = {
             inherit
