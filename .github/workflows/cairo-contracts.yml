@@ -34,5 +34,5 @@ jobs:
       - name: Run Tests
         working-directory: ./cairo-contracts
         run: |
-          nix shell ..#snforge ..#scarb  -c \
+          nix develop -c \
             snforge test

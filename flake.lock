@@ -1646,7 +1646,8 @@
         "rust-overlay": "rust-overlay_2",
         "scarb-src": "scarb-src",
         "snforge-src": "snforge-src",
-        "starknet-devnet-src": "starknet-devnet-src"
+        "starknet-devnet-src": "starknet-devnet-src",
+        "universal-sierra-compiler-src": "universal-sierra-compiler-src"
       }
     },
     "rust-overlay": {
@@ -1981,6 +1982,23 @@
         "owner": "umee-network",
         "ref": "v2.0.0",
         "repo": "umee",
+        "type": "github"
+      }
+    },
+    "universal-sierra-compiler-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1722609504,
+        "narHash": "sha256-qa6r4qJxl3XrxUlP5V6ap9bzuQrcR2iREPCg967MBi8=",
+        "owner": "software-mansion",
+        "repo": "universal-sierra-compiler",
+        "rev": "fd6cab4c9887b625660f7c48a137b885451e6349",
+        "type": "github"
+      },
+      "original": {
+        "owner": "software-mansion",
+        "ref": "v2.2.0",
+        "repo": "universal-sierra-compiler",
         "type": "github"
       }
     },
