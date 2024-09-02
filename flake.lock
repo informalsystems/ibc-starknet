@@ -87,16 +87,16 @@
     "cairo-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1722496142,
-        "narHash": "sha256-aI/5sFQ2C24KP3dRwwRse5LBV5PJjXn8EMyOJBXGTMw=",
+        "lastModified": 1723546896,
+        "narHash": "sha256-4nLrTMwpRD6CcQcNqWHbCg3/OHHGMlrkcREX9p8gafE=",
         "owner": "starkware-libs",
         "repo": "cairo",
-        "rev": "223ca99633f50809c4b574df55545b042494d8d0",
+        "rev": "964a02d84c6bde5b39d4ef333eeecf7e588da135",
         "type": "github"
       },
       "original": {
         "owner": "starkware-libs",
-        "ref": "v2.7.0",
+        "ref": "v2.7.1",
         "repo": "cairo",
         "type": "github"
       }
@@ -1707,16 +1707,16 @@
     "scarb-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1722509315,
-        "narHash": "sha256-fV9ou50bvNyA1VFY+9YA3OgeQ95kctDrkKA4S2iIwVc=",
+        "lastModified": 1723563370,
+        "narHash": "sha256-ZMxH4EmllvestXh42VxPFLSQhZpgQCajYCYtquJfyAI=",
         "owner": "software-mansion",
         "repo": "scarb",
-        "rev": "e9a2b8716daf7388bfab5e4b0a2656e1b0c02d4d",
+        "rev": "e288874ba65f228ce3ae9aa55eef9f169824e998",
         "type": "github"
       },
       "original": {
         "owner": "software-mansion",
-        "ref": "v2.7.0",
+        "ref": "v2.7.1",
         "repo": "scarb",
         "type": "github"
       }
