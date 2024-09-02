@@ -1,5 +1,5 @@
 #[starknet::component]
-pub mod ICS20TransferComponent {
+pub mod TokenTransferComponent {
     use core::array::ArrayTrait;
     use core::clone::Clone;
     use core::num::traits::Zero;

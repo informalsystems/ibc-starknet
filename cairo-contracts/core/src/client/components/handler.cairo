@@ -31,12 +31,12 @@ pub mod ClientHandlerComponent {
     }
 
     #[generate_trait]
-    pub impl ICS02ClientImpl<
+    pub impl CoreClientImpl<
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
         impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>
-    > of ICS02ClientTrait<TContractState> {
+    > of CoreClientTrait<TContractState> {
         fn create_client(ref self: ComponentState<TContractState>, msg: MsgCreateClient) {
             let mut client = self.get_client(msg.client_type);
 

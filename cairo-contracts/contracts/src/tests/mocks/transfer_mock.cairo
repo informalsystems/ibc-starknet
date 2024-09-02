@@ -5,7 +5,7 @@
 pub(crate) mod MockTransferApp {
     use starknet::ClassHash;
     use starknet::ContractAddress;
-    use starknet_ibc_apps::transfer::components::{ICS20TransferComponent, TransferrableComponent};
+    use starknet_ibc_apps::transfer::components::{TokenTransferComponent, TransferrableComponent};
     use starknet_ibc_apps::transfer::types::{
         PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo, TracePrefixTrait,
         PrefixedDenomTrait
@@ -14,31 +14,31 @@ pub(crate) mod MockTransferApp {
     use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
 
     component!(path: TransferrableComponent, storage: transferrable, event: TransferrableEvent);
-    component!(path: ICS20TransferComponent, storage: transfer, event: ICS20TransferEvent);
+    component!(path: TokenTransferComponent, storage: transfer, event: TokenTransferEvent);
 
     #[abi(embed_v0)]
-    impl ICS20TransferreableImpl =
+    impl TokenTransferreableImpl =
         TransferrableComponent::Transferrable<ContractState>;
-    impl ICS20TransferreableInternalImpl =
+    impl TokenTransferreableInternalImpl =
         TransferrableComponent::TransferrableInternalImpl<ContractState>;
     #[abi(embed_v0)]
-    impl ICS20SendTransferImpl =
-        ICS20TransferComponent::SendTransfer<ContractState>;
+    impl TokenSendTransferImpl =
+        TokenTransferComponent::SendTransfer<ContractState>;
     #[abi(embed_v0)]
-    impl ICS20RecvPacketImpl = ICS20TransferComponent::RecvPacket<ContractState>;
+    impl TokenRecvPacketImpl = TokenTransferComponent::RecvPacket<ContractState>;
     #[abi(embed_v0)]
-    impl ICS20TokenAddressImpl =
-        ICS20TransferComponent::IBCTokenAddress<ContractState>;
-    impl TransferValidationImpl = ICS20TransferComponent::TransferValidationImpl<ContractState>;
-    impl TransferExecutionImpl = ICS20TransferComponent::TransferExecutionImpl<ContractState>;
-    impl TransferInternalImpl = ICS20TransferComponent::TransferInternalImpl<ContractState>;
+    impl TokenTokenAddressImpl =
+        TokenTransferComponent::IBCTokenAddress<ContractState>;
+    impl TransferValidationImpl = TokenTransferComponent::TransferValidationImpl<ContractState>;
+    impl TransferExecutionImpl = TokenTransferComponent::TransferExecutionImpl<ContractState>;
+    impl TransferInternalImpl = TokenTransferComponent::TransferInternalImpl<ContractState>;
 
     #[storage]
     struct Storage {
         #[substorage(v0)]
         transferrable: TransferrableComponent::Storage,
         #[substorage(v0)]
-        transfer: ICS20TransferComponent::Storage,
+        transfer: TokenTransferComponent::Storage,
     }
 
     #[event]
@@ -47,7 +47,7 @@ pub(crate) mod MockTransferApp {
         #[flat]
         TransferrableEvent: TransferrableComponent::Event,
         #[flat]
-        ICS20TransferEvent: ICS20TransferComponent::Event,
+        TokenTransferEvent: TokenTransferComponent::Event,
     }
 
     #[constructor]

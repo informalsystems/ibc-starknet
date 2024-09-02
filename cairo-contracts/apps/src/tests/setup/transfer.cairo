@@ -3,7 +3,7 @@ use openzeppelin_testing::{declare_class, declare_and_deploy};
 use openzeppelin_utils::serde::SerializedAppend;
 use snforge_std::{EventSpy, spy_events, ContractClass};
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::components::ICS20TransferComponent::{
+use starknet_ibc_apps::transfer::components::TokenTransferComponent::{
     Event, SendEvent, RecvEvent, CreateTokenEvent
 };
 use starknet_ibc_apps::transfer::types::{MsgTransfer, Participant, PrefixedDenom, Memo};
