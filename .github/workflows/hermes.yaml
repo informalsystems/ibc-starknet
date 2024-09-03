@@ -36,7 +36,7 @@ jobs:
         working-directory: ./cairo-contracts
         run: |
           nix shell ..#scarb -c \
-            scarb build
+            scarb build -p starknet_ibc_contracts
 
       - name: Build Starknet Wasm light client
         working-directory: ./light-client
