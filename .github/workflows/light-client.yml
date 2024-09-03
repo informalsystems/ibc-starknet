@@ -1,14 +1,6 @@
 name: Light Client
 on:
-  pull_request:
-    paths:
-      - .github/workflows/light-client.yaml
-      - light-client/**
-      - "**/Cargo.toml"
-      - "**/Cargo.lock"
-      - justfile
-      - README.md
-
+  pull_request: {}
   push:
     tags:
       - v[0-9]+.*

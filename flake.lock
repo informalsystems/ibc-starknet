@@ -87,16 +87,16 @@
     "cairo-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1722496142,
-        "narHash": "sha256-aI/5sFQ2C24KP3dRwwRse5LBV5PJjXn8EMyOJBXGTMw=",
+        "lastModified": 1723546896,
+        "narHash": "sha256-4nLrTMwpRD6CcQcNqWHbCg3/OHHGMlrkcREX9p8gafE=",
         "owner": "starkware-libs",
         "repo": "cairo",
-        "rev": "223ca99633f50809c4b574df55545b042494d8d0",
+        "rev": "964a02d84c6bde5b39d4ef333eeecf7e588da135",
         "type": "github"
       },
       "original": {
         "owner": "starkware-libs",
-        "ref": "v2.7.0",
+        "ref": "v2.7.1",
         "repo": "cairo",
         "type": "github"
       }
@@ -1493,11 +1493,11 @@
     },
     "nixpkgs_6": {
       "locked": {
-        "lastModified": 1724999960,
-        "narHash": "sha256-LB3jqSGW5u1ZcUcX6vO/qBOq5oXHlmOCxsTXGMEitp4=",
+        "lastModified": 1725194671,
+        "narHash": "sha256-tLGCFEFTB5TaOKkpfw3iYT9dnk4awTP/q4w+ROpMfuw=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "b96f849e725333eb2b1c7f1cb84ff102062468ba",
+        "rev": "b833ff01a0d694b910daca6e2ff4a3f26dee478c",
         "type": "github"
       },
       "original": {
@@ -1646,7 +1646,8 @@
         "rust-overlay": "rust-overlay_2",
         "scarb-src": "scarb-src",
         "snforge-src": "snforge-src",
-        "starknet-devnet-src": "starknet-devnet-src"
+        "starknet-devnet-src": "starknet-devnet-src",
+        "universal-sierra-compiler-src": "universal-sierra-compiler-src"
       }
     },
     "rust-overlay": {
@@ -1673,11 +1674,11 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "lastModified": 1724984647,
-        "narHash": "sha256-BC6MUq0CTdmAu/cueVcdWTI+S95s0mJcn19SoEgd7gU=",
+        "lastModified": 1725243956,
+        "narHash": "sha256-0A5ZP8uDCyBdYUzayZfy6JFdTefP79oZVAjyqA/yuSI=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "87b6cffc276795b46ef544d7ed8d7fed6ad9c8e4",
+        "rev": "a10c8092d5f82622be79ed4dd12289f72011f850",
         "type": "github"
       },
       "original": {
@@ -1707,16 +1708,16 @@
     "scarb-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1722509315,
-        "narHash": "sha256-fV9ou50bvNyA1VFY+9YA3OgeQ95kctDrkKA4S2iIwVc=",
+        "lastModified": 1723563370,
+        "narHash": "sha256-ZMxH4EmllvestXh42VxPFLSQhZpgQCajYCYtquJfyAI=",
         "owner": "software-mansion",
         "repo": "scarb",
-        "rev": "e9a2b8716daf7388bfab5e4b0a2656e1b0c02d4d",
+        "rev": "e288874ba65f228ce3ae9aa55eef9f169824e998",
         "type": "github"
       },
       "original": {
         "owner": "software-mansion",
-        "ref": "v2.7.0",
+        "ref": "v2.7.1",
         "repo": "scarb",
         "type": "github"
       }
@@ -1820,11 +1821,11 @@
     "starknet-devnet-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1722592942,
-        "narHash": "sha256-SAOZ6M6jmzmF+H3B7IPiyb1CRFv2WoFArlVzgyDXmmQ=",
+        "lastModified": 1724938603,
+        "narHash": "sha256-Z/zB0BlSldfjdMraSryBOdWJloT1ryfOpSM21kHK7JU=",
         "owner": "0xSpaceShard",
         "repo": "starknet-devnet-rs",
-        "rev": "0a73e4331a246a79f88c21c0364e62c82966e7a6",
+        "rev": "0050fac5c151daae82105cfe27e7ea5fa0665f15",
         "type": "github"
       },
       "original": {
@@ -1981,6 +1982,23 @@
         "owner": "umee-network",
         "ref": "v2.0.0",
         "repo": "umee",
+        "type": "github"
+      }
+    },
+    "universal-sierra-compiler-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1722609504,
+        "narHash": "sha256-qa6r4qJxl3XrxUlP5V6ap9bzuQrcR2iREPCg967MBi8=",
+        "owner": "software-mansion",
+        "repo": "universal-sierra-compiler",
+        "rev": "fd6cab4c9887b625660f7c48a137b885451e6349",
+        "type": "github"
+      },
+      "original": {
+        "owner": "software-mansion",
+        "ref": "v2.2.0",
+        "repo": "universal-sierra-compiler",
         "type": "github"
       }
     },
