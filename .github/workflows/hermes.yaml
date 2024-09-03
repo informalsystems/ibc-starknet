@@ -36,7 +36,7 @@ jobs:
         working-directory: ./cairo-contracts
         run: |
           nix shell ..#scarb -c \
-            scarb build
+            scarb build -p starknet_ibc_contracts
 
       - name: Build Starknet Wasm light client
         working-directory: ./light-client
@@ -49,8 +49,8 @@ jobs:
           RUST_BACKTRACE: 1
         working-directory: ./relayer
         run: |
-          export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_presets_ERC20Mintable.contract_class.json"
-          export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_presets_TransferApp.contract_class.json"
+          export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
+          export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json"
           export STARKNET_WASM_CLIENT_PATH="$(pwd)/../light-client/target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm"
 
           nix develop ..#rust -c \

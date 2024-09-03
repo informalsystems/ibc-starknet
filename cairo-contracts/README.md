@@ -9,7 +9,7 @@ flexible supply through permissioned minting and burning capabilities, unlike
 the traditional ERC20 contract with a fixed supply.
 
 You can find the preset implementations of these contracts in the
-`cairo-contracts/presets` directory. The directory includes:
+`cairo-contracts/contracts` directory. The directory includes:
 
 - `erc20.cairo` - The ERC20 mintable contract implementation.
 - `transfer.cairo` - The ICS-20 transfer contract implementation.
@@ -22,7 +22,7 @@ the contracts, you simply need to run the following command:
 
 ```bash
 cd cairo-contracts
-scarb build
+scarb build -p starknet_ibc_contracts
 ```
 
 The command will compile the contracts and output the compiled contracts as JSON
@@ -78,8 +78,8 @@ Next, create an `.env` file in the root directory of the project. You can use
 the `.env.example` file as a template, which contains the following content:
 
 ```bash
-ERC20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_ERC20Mintable.contract_class.json}
-ICS20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_Transfer.contract_class.json}
+ERC20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json}
+ICS20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json}
 RPC_URL=https://starknet-sepolia.public.blastapi.io/rpc/v0_7
 ACCOUNT_SRC="${HOME}/.starkli-wallets/deployer/account.json"
 KEYSTORE_SRC="${HOME}/.starkli-wallets/deployer/keystore.json"
