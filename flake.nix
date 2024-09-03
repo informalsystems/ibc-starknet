@@ -14,17 +14,22 @@
     };
 
     cairo-src = {
-      url = "github:starkware-libs/cairo/v2.7.0";
+      url = "github:starkware-libs/cairo/v2.7.1";
       flake = false;
     };
 
     scarb-src = {
-      url = "github:software-mansion/scarb/v2.7.0";
+      url = "github:software-mansion/scarb/v2.7.1";
       flake = false;
     };
 
     snforge-src = {
       url = "github:foundry-rs/starknet-foundry/v0.29.0";
+      flake = false;
+    };
+
+    universal-sierra-compiler-src = {
+      url = "github:software-mansion/universal-sierra-compiler/v2.2.0";
       flake = false;
     };
   };
@@ -51,11 +56,21 @@
 
           cosmos-nix = inputs.cosmos-nix.packages.${system};
 
+          rust = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+
+          rust-wasm = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-wasm.toml;
+
+          rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
+
+          rust-1_79 = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-1.79.toml;
+
           wasm-simapp = cosmos-nix.ibc-go-v8-wasm-simapp;
 
           starknet-devnet = import ./nix/starknet-devnet.nix {
             inherit nixpkgs;
             inherit (inputs) starknet-devnet-src;
+
+            rust = rust-1_79;
           };
 
           cairo = import ./nix/cairo.nix {
@@ -73,11 +88,12 @@
             inherit (inputs) snforge-src;
           };
 
-          rust = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+          universal-sierra-compiler = import ./nix/universal-sierra-compiler.nix {
+            inherit nixpkgs;
+            inherit (inputs) universal-sierra-compiler-src;
 
-          rust-wasm = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-wasm.toml;
-
-          rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
+            rust = rust-1_79;
+          };
 
           starknet-pkgs = {
             inherit
@@ -85,6 +101,7 @@
               cairo
               scarb
               snforge
+              universal-sierra-compiler
               wasm-simapp
               ;
           };

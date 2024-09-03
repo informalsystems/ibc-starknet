@@ -1,6 +1,15 @@
-{ nixpkgs, starknet-devnet-src }:
+{
+  nixpkgs,
+  rust,
+  starknet-devnet-src,
+}:
 let
-  starknet-devnet = nixpkgs.rustPlatform.buildRustPackage {
+  rust-platform = nixpkgs.makeRustPlatform {
+    cargo = rust;
+    rustc = rust;
+  };
+
+  starknet-devnet = rust-platform.buildRustPackage {
     name = "starknet-devnet";
     src = starknet-devnet-src;
 
