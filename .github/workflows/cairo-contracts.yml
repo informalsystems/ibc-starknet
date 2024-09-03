@@ -35,7 +35,7 @@ jobs:
         working-directory: ./cairo-contracts
         run: |
           nix shell ..#scarb -c \
-            scarb build -p starkent_ibc_contracts
+            scarb build -p starknet_ibc_contracts
 
       - name: Run Tests
         working-directory: ./cairo-contracts
