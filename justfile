@@ -9,12 +9,12 @@ build-cw-contract:
 # Builds the Cairo contracts
 build-cairo-contracts:
   cd ./cairo-contracts && \
-  scarb build
+  scarb build -p starknet_ibc_contracts
 
 # Tests the Cairo contracts
 test-cairo-contracts:
   cd ./cairo-contracts && \
-  scarb test
+  snforge test --workspace
 
 lint: lint-toml lint-light-client lint-cairo lint-nix lint-relayer
 

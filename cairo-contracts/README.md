@@ -22,7 +22,7 @@ the contracts, you simply need to run the following command:
 
 ```bash
 cd cairo-contracts
-scarb build
+scarb build -p starknet_ibc_contracts
 ```
 
 The command will compile the contracts and output the compiled contracts as JSON

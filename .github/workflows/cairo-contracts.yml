@@ -25,14 +25,20 @@ jobs:
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
+      - name: Check Meta Package
+        working-directory: ./cairo-contracts
+        run: |
+          nix shell ..#scarb -c \
+            scarb check
+
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
           nix shell ..#scarb -c \
-            scarb build
+            scarb build -p starkent_ibc_contracts
 
       - name: Run Tests
         working-directory: ./cairo-contracts
         run: |
           nix develop -c \
-            snforge test
+            snforge test --workspace
