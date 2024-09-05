@@ -1,7 +1,7 @@
 use std::string::FromUtf8Error;
 
-use cgp_core::error::CanRaiseError;
-use cgp_core::prelude::DelegateComponent;
+use cgp::core::error::CanRaiseError;
+use cgp::prelude::DelegateComponent;
 use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 

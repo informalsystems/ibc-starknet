@@ -1,4 +1,4 @@
-use cgp_core::Async;
+use cgp::core::Async;
 use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
 

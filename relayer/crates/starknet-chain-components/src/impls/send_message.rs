@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-use cgp_core::error::CanRaiseError;
+use cgp::core::error::CanRaiseError;
 use hermes_relayer_components::chain::traits::send_message::MessageSender;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;

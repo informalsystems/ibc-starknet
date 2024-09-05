@@ -1,4 +1,4 @@
-use cgp_core::Async;
+use cgp::core::Async;
 use hermes_encoding_components::traits::types::encode_buffer::ProvideEncodeBufferType;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use starknet::core::types::Felt;

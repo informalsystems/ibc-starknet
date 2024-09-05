@@ -1,4 +1,4 @@
-use cgp_core::Async;
+use cgp::core::Async;
 use hermes_relayer_components::chain::traits::types::event::ProvideEventType;
 
 use crate::types::event::StarknetEvent;

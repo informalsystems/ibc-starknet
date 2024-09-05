@@ -1,4 +1,4 @@
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 

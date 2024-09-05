@@ -1,4 +1,4 @@
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 pub use hermes_encoding_components::traits::decode::DecoderComponent;
 pub use hermes_encoding_components::traits::decode_mut::DecodeBufferPeekerComponent;
 pub use hermes_encoding_components::traits::encode::EncoderComponent;

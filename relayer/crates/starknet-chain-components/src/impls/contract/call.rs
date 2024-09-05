@@ -1,4 +1,4 @@
-use cgp_core::error::CanRaiseError;
+use cgp::core::error::CanRaiseError;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet::providers::{Provider, ProviderError};

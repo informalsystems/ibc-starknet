@@ -1,4 +1,4 @@
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 use hermes_encoding_components::impls::convert::{ConvertFrom, TryConvertFrom};
 use hermes_encoding_components::impls::convert_and_encode::ConvertAndEncode;
 use hermes_encoding_components::impls::delegate::DelegateEncoding;

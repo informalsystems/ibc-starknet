@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 use std::marker::PhantomData;
 
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 
 #[derive_component(EventParserComponent, EventParser<Chain>)]

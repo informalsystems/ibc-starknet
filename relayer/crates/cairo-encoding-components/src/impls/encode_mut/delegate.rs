@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
-use cgp_core::error::HasErrorType;
-use cgp_core::prelude::DelegateComponent;
+use cgp::core::error::HasErrorType;
+use cgp::prelude::DelegateComponent;
 use hermes_encoding_components::traits::decode_mut::MutDecoder;
 use hermes_encoding_components::traits::encode_mut::MutEncoder;
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;

@@ -3,7 +3,7 @@ use std::convert::Infallible;
 use std::string::FromUtf8Error;
 
 use cairo_lang_starknet_classes::casm_contract_class::StarknetSierraCompilationError;
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 use eyre::Report;
 use hermes_cairo_encoding_components::impls::encode_mut::bool::DecodeBoolError;
 use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;

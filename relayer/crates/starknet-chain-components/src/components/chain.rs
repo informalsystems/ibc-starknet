@@ -1,4 +1,4 @@
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 pub use hermes_relayer_components::chain::traits::send_message::MessageSenderComponent;
 pub use hermes_relayer_components::chain::traits::types::chain_id::ChainIdTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::client_state::ClientStateTypeComponent;

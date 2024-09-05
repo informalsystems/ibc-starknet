@@ -1,4 +1,4 @@
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 use starknet::providers::Provider;
 
 #[derive_component(StarknetProviderTypeComponent, ProvideStarknetProviderType<Chain>)]

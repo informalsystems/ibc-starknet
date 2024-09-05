@@ -4,7 +4,7 @@ use cairo_lang_starknet_classes::casm_contract_class::{
     CasmContractClass, StarknetSierraCompilationError,
 };
 use cairo_lang_starknet_classes::contract_class::ContractClass;
-use cgp_core::error::CanRaiseError;
+use cgp::core::error::CanRaiseError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use starknet::accounts::Account;
 use starknet::core::types::contract::{

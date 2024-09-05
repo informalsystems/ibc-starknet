@@ -1,4 +1,4 @@
-use cgp_core::error::CanRaiseError;
+use cgp::core::error::CanRaiseError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::contract::ContractFactory;

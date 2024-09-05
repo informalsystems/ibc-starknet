@@ -1,4 +1,4 @@
-use cgp_core::prelude::DelegateComponent;
+use cgp::prelude::DelegateComponent;
 use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use starknet::core::types::Felt;

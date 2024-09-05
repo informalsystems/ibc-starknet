@@ -10,7 +10,7 @@ rust-version = { workspace = true }
 readme       = "README.md"
 
 [dependencies]
-cgp-core                         = { workspace = true }
+cgp                              = { workspace = true }
 hermes-runtime-components        = { workspace = true }
 hermes-relayer-components        = { workspace = true }
 hermes-test-components           = { workspace = true }

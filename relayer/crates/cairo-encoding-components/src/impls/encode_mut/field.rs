@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use cgp_core::field::HasField;
+use cgp::core::field::HasField;
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 
 pub struct EncodeField<Tag>(pub PhantomData<Tag>);

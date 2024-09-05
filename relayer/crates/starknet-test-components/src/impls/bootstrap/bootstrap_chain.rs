@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use cgp_core::error::CanRaiseError;
+use cgp::core::error::CanRaiseError;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::CanBuildChainDriver;
 use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::CanStartChainFullNode;
 use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::HasChainStoreDir;

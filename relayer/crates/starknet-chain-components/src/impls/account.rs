@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 use starknet::accounts::ConnectedAccount;
 
 use crate::traits::account::{
