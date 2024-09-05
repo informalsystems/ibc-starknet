@@ -1,16 +1,16 @@
 use starknet::ContractAddress;
-use starknet_ibc_apps::tests::constants::{PUBKEY, NAME, AMOUNT, SUPPLY};
 use starknet_ibc_apps::transfer::TRANSFER_PORT_ID;
 use starknet_ibc_apps::transfer::types::PrefixedDenomTrait;
 use starknet_ibc_apps::transfer::types::{
     MsgTransfer, PacketData, PrefixedDenom, Denom, Memo, TracePrefixTrait, Participant
 };
+use starknet_ibc_contracts::tests::constants::{PUBKEY, NAME, AMOUNT, SUPPLY};
 use starknet_ibc_core::channel::Packet;
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{PortId, ChannelId, Sequence};
 
 #[derive(Clone, Debug, Drop, Serde)]
-pub struct TestConfig {
+pub struct TransferAppConfig {
     pub native_denom: PrefixedDenom,
     pub hosted_denom: PrefixedDenom,
     pub chan_id_on_a: ByteArray,
@@ -19,15 +19,15 @@ pub struct TestConfig {
 }
 
 #[generate_trait]
-pub impl TestConfigImpl of TestConfigTrait {
-    fn default() -> TestConfig {
+pub impl TransferAppConfigImpl of TransferAppConfigTrait {
+    fn default() -> TransferAppConfig {
         let native_denom = PrefixedDenom {
             trace_path: array![], base: Denom::Native(PUBKEY().into())
         };
 
         let hosted_denom = PrefixedDenom { trace_path: array![], base: Denom::Hosted(NAME()) };
 
-        TestConfig {
+        TransferAppConfig {
             native_denom,
             hosted_denom,
             chan_id_on_a: "channel-0",
@@ -36,7 +36,7 @@ pub impl TestConfigImpl of TestConfigTrait {
         }
     }
 
-    fn set_native_denom(ref self: TestConfig, native_token_address: ContractAddress) {
+    fn set_native_denom(ref self: TransferAppConfig, native_token_address: ContractAddress) {
         self
             .native_denom =
                 PrefixedDenom {
@@ -46,7 +46,7 @@ pub impl TestConfigImpl of TestConfigTrait {
     }
 
 
-    fn prefix_native_denom(self: @TestConfig) -> PrefixedDenom {
+    fn prefix_native_denom(self: @TransferAppConfig) -> PrefixedDenom {
         let trace_prefix = TracePrefixTrait::new(
             PortId { port_id: TRANSFER_PORT_ID() },
             ChannelId { channel_id: self.chan_id_on_a.clone() }
@@ -58,7 +58,7 @@ pub impl TestConfigImpl of TestConfigTrait {
         native_denom
     }
 
-    fn prefix_hosted_denom(self: @TestConfig) -> PrefixedDenom {
+    fn prefix_hosted_denom(self: @TransferAppConfig) -> PrefixedDenom {
         let trace_prefix = TracePrefixTrait::new(
             PortId { port_id: TRANSFER_PORT_ID() },
             ChannelId { channel_id: self.chan_id_on_b.clone() }
@@ -72,7 +72,7 @@ pub impl TestConfigImpl of TestConfigTrait {
     }
 
     fn dummy_msg_transder(
-        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> MsgTransfer {
         MsgTransfer {
             port_id_on_a: PortId { port_id: TRANSFER_PORT_ID() },
@@ -84,7 +84,7 @@ pub impl TestConfigImpl of TestConfigTrait {
     }
 
     fn dummy_recv_packet(
-        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> Packet {
         let mut serialized_data = array![];
         Serde::serialize(@self.dummy_packet_data(denom, sender, receiver), ref serialized_data);
@@ -102,7 +102,7 @@ pub impl TestConfigImpl of TestConfigTrait {
     }
 
     fn dummy_packet_data(
-        self: @TestConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> PacketData {
         PacketData { denom, amount: *self.amount, sender, receiver, memo: Memo { memo: "" }, }
     }

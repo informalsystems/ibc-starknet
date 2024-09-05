@@ -9,10 +9,7 @@ pub struct CreateResponse {
     pub height: Height,
 }
 
-pub trait CreateResponseTrait {
-    fn new(client_id: ClientId, height: Height) -> CreateResponse;
-}
-
+#[generate_trait]
 pub impl CreateResponseImpl of CreateResponseTrait {
     fn new(client_id: ClientId, height: Height) -> CreateResponse {
         CreateResponse { client_id, height }
@@ -38,12 +35,7 @@ pub enum Status {
     Frozen: Height,
 }
 
-pub trait StatusTrait {
-    fn is_active(self: @Status) -> bool;
-    fn is_expired(self: @Status) -> bool;
-    fn is_frozen(self: @Status) -> bool;
-}
-
+#[generate_trait]
 pub impl StatusImpl of StatusTrait {
     fn is_active(self: @Status) -> bool {
         match self {

@@ -1,7 +1,6 @@
 # Installs development tools including nightly rustfmt, taplo-cli, etc.
 install-tools:
-	rustup component add rustfmt --toolchain nightly
-  rustup target add wasm32-unknown-unknown
+	rustup component add rustfmt --toolchain nightly && rustup target add wasm32-unknown-unknown
 	cargo install typos-cli taplo-cli
 
 build-cw-contract:

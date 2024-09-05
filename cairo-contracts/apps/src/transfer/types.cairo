@@ -59,14 +59,8 @@ pub struct PrefixedDenom {
     pub base: Denom,
 }
 
-pub trait PrefixedDenomTrait {
-    fn starts_with(self: @PrefixedDenom, prefix: @TracePrefix) -> bool;
-    fn add_prefix(ref self: PrefixedDenom, prefix: TracePrefix);
-    fn remove_prefix(ref self: PrefixedDenom, prefix: @TracePrefix);
-    fn as_byte_array(self: @PrefixedDenom) -> ByteArray;
-}
-
-impl PrefixedDenomImpl of PrefixedDenomTrait {
+#[generate_trait]
+pub impl PrefixedDenomImpl of PrefixedDenomTrait {
     fn starts_with(self: @PrefixedDenom, prefix: @TracePrefix) -> bool {
         self.trace_path.at(0) == prefix
     }
@@ -113,11 +107,8 @@ pub struct TracePrefix {
     pub channel_id: ChannelId,
 }
 
-pub trait TracePrefixTrait {
-    fn new(port_id: PortId, channel_id: ChannelId) -> TracePrefix;
-}
-
-impl TracePrefixImpl of TracePrefixTrait {
+#[generate_trait]
+pub impl TracePrefixImpl of TracePrefixTrait {
     fn new(port_id: PortId, channel_id: ChannelId) -> TracePrefix {
         TracePrefix { port_id: port_id, channel_id: channel_id, }
     }
@@ -129,12 +120,7 @@ pub enum Denom {
     Hosted: ByteArray,
 }
 
-pub trait DenomTrait {
-    fn is_non_zero(self: @Denom) -> bool;
-    fn native(self: @Denom) -> Option<ContractAddress>;
-    fn hosted(self: @Denom) -> Option<ByteArray>;
-}
-
+#[generate_trait]
 pub impl DenomImpl of DenomTrait {
     fn is_non_zero(self: @Denom) -> bool {
         match self {
@@ -171,11 +157,8 @@ pub enum Participant {
     External: Array<felt252>,
 }
 
-pub trait ParticipantTrait {
-    fn is_non_zero(self: @Participant) -> bool;
-}
-
-impl ParticipantImpl of ParticipantTrait {
+#[generate_trait]
+pub impl ParticipantImpl of ParticipantTrait {
     fn is_non_zero(self: @Participant) -> bool {
         match self {
             Participant::Native(contract_address) => contract_address.is_non_zero(),

@@ -23,27 +23,8 @@ impl ERC20ContractIntoFelt252 of Into<ERC20Contract, felt252> {
     }
 }
 
-pub trait ERC20ContractTrait {
-    fn is_non_zero(self: @ERC20Contract) -> bool;
-    fn create(
-        class_hash: ClassHash,
-        salt: felt252,
-        name: ByteArray,
-        symbol: ByteArray,
-        amount: u256,
-        recipient: ContractAddress,
-        owner: ContractAddress
-    ) -> ERC20Contract;
-    fn transfer(self: @ERC20Contract, recipient: ContractAddress, amount: u256) -> bool;
-    fn transfer_from(
-        self: @ERC20Contract, sender: ContractAddress, recipient: ContractAddress, amount: u256
-    ) -> bool;
-    fn mint(self: @ERC20Contract, recipient: ContractAddress, amount: u256);
-    fn burn(self: @ERC20Contract, account: ContractAddress, amount: u256);
-    fn balance_of(self: @ERC20Contract, from_account: ContractAddress) -> u256;
-}
-
-impl ERC20ContractImpl of ERC20ContractTrait {
+#[generate_trait]
+pub impl ERC20ContractImpl of ERC20ContractTrait {
     fn is_non_zero(self: @ERC20Contract) -> bool {
         self.address.is_non_zero()
     }
