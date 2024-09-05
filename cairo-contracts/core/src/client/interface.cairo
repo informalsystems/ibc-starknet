@@ -6,18 +6,20 @@ use starknet_ibc_core::client::{
 
 #[starknet::interface]
 pub trait IClientHandler<TContractState> {
-    fn create(ref self: TContractState, msg: MsgCreateClient) -> CreateResponse;
+    fn create_client(ref self: TContractState, msg: MsgCreateClient) -> CreateResponse;
 
-    fn update(ref self: TContractState, msg: MsgUpdateClient) -> UpdateResponse;
+    fn update_client(ref self: TContractState, msg: MsgUpdateClient) -> UpdateResponse;
 
-    fn recover(ref self: TContractState, msg: MsgRecoverClient);
+    fn recover_client(ref self: TContractState, msg: MsgRecoverClient);
 
-    fn upgrade(ref self: TContractState, msg: MsgUpgradeClient);
+    fn upgrade_client(ref self: TContractState, msg: MsgUpgradeClient);
 }
 
 #[starknet::interface]
 pub trait IRegisterClient<TContractState> {
-    fn register(ref self: TContractState, client_type: felt252, client_address: ContractAddress);
+    fn register_client(
+        ref self: TContractState, client_type: felt252, client_address: ContractAddress
+    );
 }
 
 #[starknet::interface]
@@ -26,7 +28,7 @@ pub trait IClientState<TContractState> {
 
     fn latest_height(self: @TContractState, client_sequence: u64) -> Height;
 
-    fn status(self: @TContractState, client_state: Array<felt252>, client_sequence: u64) -> Status;
+    fn status(self: @TContractState, client_sequence: u64) -> Status;
 }
 
 #[starknet::interface]

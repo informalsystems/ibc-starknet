@@ -1,3 +1,4 @@
+use core::num::traits::Zero;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Height, Status};
 
@@ -7,12 +8,12 @@ pub struct CometConsensusState {
     pub root: felt252,
 }
 
-pub trait CometConsensusStateTrait {
-    fn deserialize(consensus_state: Array<felt252>,) -> CometConsensusState;
-    fn status(self: @CometConsensusState, host_timestamp: u64, trusting_period: u64) -> Status;
-}
-
+#[generate_trait]
 pub impl CometConsensusStateImpl of CometConsensusStateTrait {
+    fn is_zero(self: @CometConsensusState) -> bool {
+        self.root.is_zero() && self.timestamp.is_zero()
+    }
+
     fn deserialize(consensus_state: Array<felt252>,) -> CometConsensusState {
         let mut consensus_state_span = consensus_state.span();
 
@@ -26,6 +27,8 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
     }
 
     fn status(self: @CometConsensusState, host_timestamp: u64, trusting_period: u64) -> Status {
+        assert(host_timestamp >= *self.timestamp, CometErrors::INVALID_HEADER_TIMESTAMP);
+
         let elapsed_time = host_timestamp - *self.timestamp;
 
         if elapsed_time < trusting_period {

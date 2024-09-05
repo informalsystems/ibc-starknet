@@ -56,18 +56,18 @@ impl ClientContractImpl of ClientContractTrait {
     }
 
     fn create(ref self: ClientContract, msg: MsgCreateClient) -> CreateResponse {
-        IClientHandlerDispatcher { contract_address: self.address }.create(msg)
+        IClientHandlerDispatcher { contract_address: self.address }.create_client(msg)
     }
 
     fn update(ref self: ClientContract, msg: MsgUpdateClient,) -> UpdateResponse {
-        IClientHandlerDispatcher { contract_address: self.address }.update(msg)
+        IClientHandlerDispatcher { contract_address: self.address }.update_client(msg)
     }
 
     fn recover(ref self: ClientContract, msg: MsgRecoverClient,) {
-        IClientHandlerDispatcher { contract_address: self.address }.recover(msg)
+        IClientHandlerDispatcher { contract_address: self.address }.recover_client(msg)
     }
 
     fn upgrade(ref self: ClientContract, msg: MsgUpgradeClient,) {
-        IClientHandlerDispatcher { contract_address: self.address }.upgrade(msg)
+        IClientHandlerDispatcher { contract_address: self.address }.upgrade_client(msg)
     }
 }

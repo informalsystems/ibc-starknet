@@ -25,6 +25,7 @@ pub impl CometHeaderImpl of CometHeaderTrait {
 
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct SignedHeader {
+    pub height: Height,
     pub time: u64,
     pub root: felt252,
 }
