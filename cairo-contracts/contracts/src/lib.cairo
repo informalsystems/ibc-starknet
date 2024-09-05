@@ -6,6 +6,6 @@ mod tests;
 
 pub use apps::transfer::TransferApp;
 pub use clients::cometbft::CometClient;
-pub use core::ibc::IBC;
+pub use core::IBCCore;
 pub use erc20::ERC20Mintable;
 

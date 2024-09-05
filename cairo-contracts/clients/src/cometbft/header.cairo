@@ -7,10 +7,7 @@ pub struct CometHeader {
     pub signed_header: SignedHeader,
 }
 
-pub trait CometHeaderTrait {
-    fn deserialize(header: Array<felt252>,) -> CometHeader;
-}
-
+#[generate_trait]
 pub impl CometHeaderImpl of CometHeaderTrait {
     fn deserialize(header: Array<felt252>,) -> CometHeader {
         let mut header_span = header.span();

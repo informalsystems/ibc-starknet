@@ -15,11 +15,7 @@ pub struct ClientId {
     pub sequence: u64,
 }
 
-pub trait ClientIdTrait {
-    fn new(client_type: felt252, sequence: u64) -> ClientId;
-    fn validate(self: @ClientId, client_id_hash: felt252);
-}
-
+#[generate_trait]
 pub impl ClientIdImpl of ClientIdTrait {
     fn new(client_type: felt252, sequence: u64) -> ClientId {
         ClientId { client_type, sequence }
@@ -33,12 +29,7 @@ pub struct ChannelId {
     pub channel_id: ByteArray,
 }
 
-pub trait ChannelIdTrait {
-    fn new(sequence: u64) -> ChannelId;
-    fn sequence(self: @ChannelId) -> u64;
-    fn validate(self: @ChannelId);
-}
-
+#[generate_trait]
 pub impl ChannelIdImpl of ChannelIdTrait {
     fn new(sequence: u64) -> ChannelId {
         let mut channel_id: ByteArray = "";
@@ -92,10 +83,7 @@ pub struct PortId {
     pub port_id: ByteArray,
 }
 
-pub trait PortIdTrait {
-    fn validate(self: @PortId, port_id_hash: felt252);
-}
-
+#[generate_trait]
 pub impl PortIdImpl of PortIdTrait {
     fn validate(self: @PortId, port_id_hash: felt252) {
         let port_id_len = self.port_id.len();

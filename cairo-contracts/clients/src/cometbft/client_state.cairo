@@ -8,12 +8,7 @@ pub struct CometClientState {
     pub status: Status,
 }
 
-pub trait CometClientStateTrait {
-    fn deserialize(client_state: Array<felt252>,) -> CometClientState;
-    fn update(ref self: CometClientState, new_height: Height);
-    fn freeze(ref self: CometClientState, freezing_height: Height);
-}
-
+#[generate_trait]
 pub impl CometClientStateImpl of CometClientStateTrait {
     fn deserialize(client_state: Array<felt252>,) -> CometClientState {
         let mut client_state_span = client_state.span();

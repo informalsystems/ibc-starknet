@@ -25,24 +25,8 @@ impl ClientContractIntoFelt252 of Into<ClientContract, felt252> {
     }
 }
 
-pub trait ClientContractTrait {
-    fn is_non_zero(self: @ClientContract) -> bool;
-
-    fn client_type(self: @ClientContract) -> felt252;
-
-    fn latest_height(self: @ClientContract, client_sequence: u64) -> Height;
-
-    fn create(ref self: ClientContract, msg: MsgCreateClient) -> CreateResponse;
-
-    fn update(ref self: ClientContract, msg: MsgUpdateClient,) -> UpdateResponse;
-
-    fn recover(ref self: ClientContract, msg: MsgRecoverClient,);
-
-    fn upgrade(ref self: ClientContract, msg: MsgUpgradeClient,);
-}
-
-
-impl ClientContractImpl of ClientContractTrait {
+#[generate_trait]
+pub impl ClientContractImpl of ClientContractTrait {
     fn is_non_zero(self: @ClientContract) -> bool {
         self.address.is_non_zero()
     }
