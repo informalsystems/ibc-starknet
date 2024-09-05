@@ -24,7 +24,7 @@ pub impl IBCCoreHandleImpl of IBCCoreHandleTrait {
     fn setup() -> IBCCoreHandle {
         let mut call_data = array![];
 
-        let contract_address = declare_and_deploy("IBC", call_data);
+        let contract_address = declare_and_deploy("IBCCore", call_data);
 
         let spy = spy_events();
 
