@@ -2,8 +2,9 @@
 pub mod ClientHandlerComponent {
     use starknet::ContractAddress;
     use starknet::storage::Map;
-    use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventTrait as ClientEventTrait2;
+    use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
     use starknet_ibc_core::client::ClientEventEmitterComponent;
+    use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient};
     use starknet_ibc_core::client::{
         MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height,
         CreateResponse, UpdateResponse, ClientErrors
@@ -18,10 +19,7 @@ pub mod ClientHandlerComponent {
 
     #[event]
     #[derive(Debug, Drop, starknet::Event)]
-    pub enum Event {
-        #[flat]
-        ClientHandlerEvent: ClientEventEmitterComponent::Event,
-    }
+    pub enum Event {}
 
     #[generate_trait]
     pub impl ClientInitializerImpl<
@@ -30,31 +28,39 @@ pub mod ClientHandlerComponent {
         fn initializer(ref self: ComponentState<TContractState>) {}
     }
 
-    #[generate_trait]
-    pub impl CoreClientImpl<
+    #[embeddable_as(CoreClientHandler)]
+    pub impl CoreClientHandlerImpl<
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
         impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>
-    > of CoreClientTrait<TContractState> {
-        fn create_client(ref self: ComponentState<TContractState>, msg: MsgCreateClient) {
+    > of IClientHandler<ComponentState<TContractState>> {
+        fn create_client(
+            ref self: ComponentState<TContractState>, msg: MsgCreateClient
+        ) -> CreateResponse {
             let mut client = self.get_client(msg.client_type);
 
             let create_resp = client.create(msg);
 
-            self.emit_create_client_event(create_resp);
+            self.emit_create_client_event(create_resp.clone());
+
+            create_resp
         }
 
-        fn update_client(ref self: ComponentState<TContractState>, msg: MsgUpdateClient) {
+        fn update_client(
+            ref self: ComponentState<TContractState>, msg: MsgUpdateClient
+        ) -> UpdateResponse {
             let mut client = self.get_client(msg.client_id.client_type);
 
             let update_result = client.update(msg.clone());
 
-            match update_result {
+            match update_result.clone() {
                 UpdateResponse::Success(heights) => self
                     .emit_update_client_event(msg.client_id, heights, msg.client_message),
                 UpdateResponse::Misbehaviour => self.emit_misbehaviour_event(msg.client_id),
             }
+
+            update_result
         }
 
         fn recover_client(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
@@ -74,6 +80,20 @@ pub mod ClientHandlerComponent {
         }
     }
 
+    #[embeddable_as(CoreRegisterClient)]
+    pub impl CoreRegisterClientImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+    > of IRegisterClient<ComponentState<TContractState>> {
+        fn register_client(
+            ref self: ComponentState<TContractState>,
+            client_type: felt252,
+            client_address: ContractAddress
+        ) {
+            self.supported_clients.write(client_type, client_address);
+        }
+    }
+
+
     #[generate_trait]
     pub(crate) impl ClientInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
@@ -87,23 +107,15 @@ pub mod ClientHandlerComponent {
 
             client
         }
-
-        fn register_client(
-            ref self: ComponentState<TContractState>,
-            client_type: felt252,
-            client_address: ContractAddress
-        ) {
-            self.supported_clients.write(client_type, client_address);
-        }
     }
 
     #[generate_trait]
-    pub(crate) impl ClientEventImpl<
+    pub(crate) impl EventEmitterImpl<
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
         impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>
-    > of ClientEventTrait<TContractState> {
+    > of EventEmitterTrait<TContractState> {
         fn emit_create_client_event(
             ref self: ComponentState<TContractState>, create_resp: CreateResponse
         ) {

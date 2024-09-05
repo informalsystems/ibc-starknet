@@ -1,2 +1,2 @@
-pub mod transfer;
 pub mod tests;
+pub mod transfer;

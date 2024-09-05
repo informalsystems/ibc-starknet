@@ -10,4 +10,6 @@ pub use component::CometClientComponent;
 pub use consensus_state::{CometConsensusState, CometConsensusStateImpl, CometConsensusStateTrait};
 
 pub use errors::CometErrors;
-pub use header::{CometHeader, CometHeaderImpl, CometHeaderIntoConsensusState, CometHeaderTrait};
+pub use header::{
+    CometHeader, CometHeaderImpl, CometHeaderIntoConsensusState, CometHeaderTrait, SignedHeader
+};

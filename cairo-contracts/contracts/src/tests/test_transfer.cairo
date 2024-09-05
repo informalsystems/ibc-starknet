@@ -2,10 +2,10 @@ use core::traits::TryInto;
 use openzeppelin_testing::declare_class;
 use snforge_std::start_cheat_caller_address;
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::tests::config::TestConfigTrait;
 use starknet_ibc_apps::tests::constants::{NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET};
 use starknet_ibc_apps::tests::setup::{ERC20ContractTrait, TransferAppHandleTrait};
+use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_utils::ComputeKeyTrait;
 
 #[test]

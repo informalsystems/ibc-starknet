@@ -38,7 +38,7 @@ lint-relayer:
 # Runs formatter and clippy for all the cargo and scarb packages
 lint-cairo:
   cd ./cairo-contracts && \
-  scarb fmt --check
+  scarb fmt --check --workspace
 
 lint-nix:
   cd ./relayer && \

@@ -10,14 +10,14 @@ pub mod TokenTransferComponent {
     use starknet::ContractAddress;
     use starknet::get_contract_address;
     use starknet::storage::Map;
-    use starknet_ibc_apps::transfer::interfaces::{ITransferrable, ISendTransfer, IRecvPacket, ITokenAddress};
+    use starknet_ibc_apps::transfer::interfaces::{
+        ITransferrable, ISendTransfer, IRecvPacket, ITokenAddress
+    };
     use starknet_ibc_apps::transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo,
         TracePrefixTrait, PrefixedDenomTrait, Participant
     };
-    use starknet_ibc_apps::transfer::{
-        ERC20Contract, ERC20ContractTrait, TransferErrors
-    };
+    use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait, TransferErrors};
     use starknet_ibc_core::channel::Packet;
     use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
     use starknet_ibc_utils::{ComputeKeyTrait, ValidateBasicTrait};

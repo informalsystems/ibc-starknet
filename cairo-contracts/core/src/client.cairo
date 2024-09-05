@@ -17,10 +17,11 @@ pub use interface::{
     IClientHandler, IClientHandlerDispatcher, IClientState, IClientStateDispatcher,
     IClientStateDispatcherTrait, IClientHandlerDispatcherTrait, IClientStateValidation,
     IClientStateValidationDispatcher, IClientStateValidationDispatcherTrait, IClientStateExecution,
-    IClientStateExecutionDispatcher, IClientStateExecutionDispatcherTrait,
+    IClientStateExecutionDispatcher, IClientStateExecutionDispatcherTrait, IRegisterClient,
+    IRegisterClientDispatcher, IRegisterClientDispatcherTrait
 };
 
-pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient,};
+pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient};
 
 pub use types::{
     CreateResponse, CreateResponseImpl, UpdateResponse, Status, StatusImpl, StatusTrait, Height,

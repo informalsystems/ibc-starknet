@@ -32,23 +32,23 @@ pub mod CometClientComponent {
     impl ClientHandlerImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of IClientHandler<ComponentState<TContractState>> {
-        fn create(
+        fn create_client(
             ref self: ComponentState<TContractState>, msg: MsgCreateClient
         ) -> CreateResponse {
             self.create_validate(msg.clone());
             self.create_execute(msg)
         }
 
-        fn update(
+        fn update_client(
             ref self: ComponentState<TContractState>, msg: MsgUpdateClient
         ) -> UpdateResponse {
             self.update_validate(msg.clone());
             self.update_execute(msg)
         }
 
-        fn recover(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {}
+        fn recover_client(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {}
 
-        fn upgrade(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {}
+        fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {}
     }
 
     #[generate_trait]
@@ -62,7 +62,11 @@ pub mod CometClientComponent {
 
             let client_sequence = self.client_sequence.read();
 
-            let status = self.status(msg.client_state, client_sequence);
+            let comet_client_state = CometClientStateImpl::deserialize(msg.client_state);
+
+            let comet_consensus_state = CometConsensusStateImpl::deserialize(msg.consensus_state);
+
+            let status = self._status(comet_client_state, comet_consensus_state, client_sequence);
 
             assert(status.is_active(), CometErrors::INACTIVE_CLIENT);
         }
@@ -87,11 +91,18 @@ pub mod CometClientComponent {
                 msg.client_id.client_type == self.client_type(), CometErrors::INVALID_CLIENT_TYPE
             );
 
-            let Comet_client_state: CometClientState = self
-                .client_states
-                .read(msg.client_id.sequence);
+            let client_sequence = msg.client_id.sequence;
 
-            let status = self._status(Comet_client_state, msg.client_id.sequence);
+            let comet_client_state: CometClientState = self.client_states.read(client_sequence);
+
+            let latest_consensus_state = self
+                .consensus_states
+                .read((client_sequence, comet_client_state.latest_height.clone()));
+
+            assert(!latest_consensus_state.is_zero(), CometErrors::ZERO_CONSENSUS_STATE);
+
+            let status = self
+                ._status(comet_client_state, latest_consensus_state, msg.client_id.sequence);
 
             assert(status.is_active(), CometErrors::INACTIVE_CLIENT);
 
@@ -141,19 +152,21 @@ pub mod CometClientComponent {
         }
 
         fn latest_height(self: @ComponentState<TContractState>, client_sequence: u64) -> Height {
-            let Comet_client_state: CometClientState = self.client_states.read(client_sequence);
+            let comet_client_state: CometClientState = self.client_states.read(client_sequence);
 
-            Comet_client_state.latest_height
+            comet_client_state.latest_height
         }
 
-        fn status(
-            self: @ComponentState<TContractState>,
-            client_state: Array<felt252>,
-            client_sequence: u64
-        ) -> Status {
-            let Comet_client_state = CometClientStateImpl::deserialize(client_state);
+        fn status(self: @ComponentState<TContractState>, client_sequence: u64) -> Status {
+            let comet_client_state: CometClientState = self.client_states.read(client_sequence);
 
-            self._status(Comet_client_state, client_sequence)
+            let latest_consensus_state = self
+                .consensus_states
+                .read((client_sequence, comet_client_state.latest_height.clone()));
+
+            assert(!latest_consensus_state.is_zero(), CometErrors::ZERO_CONSENSUS_STATE);
+
+            self._status(comet_client_state, latest_consensus_state, client_sequence)
         }
     }
 
@@ -199,15 +212,15 @@ pub mod CometClientComponent {
             client_state: Array<felt252>,
             consensus_state: Array<felt252>
         ) -> CreateResponse {
-            let Comet_client_state = CometClientStateImpl::deserialize(client_state);
+            let comet_client_state = CometClientStateImpl::deserialize(client_state);
 
-            let Comet_consensus_state = CometConsensusStateImpl::deserialize(consensus_state);
+            let comet_consensus_state = CometConsensusStateImpl::deserialize(consensus_state);
 
-            self._update_state(client_sequence, Comet_client_state.clone(), Comet_consensus_state);
+            self._update_state(client_sequence, comet_client_state.clone(), comet_consensus_state);
 
             let client_id = ClientIdImpl::new(self.client_type(), client_sequence);
 
-            CreateResponseImpl::new(client_id, Comet_client_state.latest_height)
+            CreateResponseImpl::new(client_id, comet_client_state.latest_height)
         }
 
         fn update_state(
@@ -217,7 +230,7 @@ pub mod CometClientComponent {
         ) -> UpdateResponse {
             let header: CometHeader = CometHeaderImpl::deserialize(client_message);
 
-            let header_height = header.clone().trusted_height;
+            let header_height = header.clone().signed_header.height;
 
             // TODO: Implement consensus state pruning mechanism.
 
@@ -225,7 +238,7 @@ pub mod CometClientComponent {
                 .consensus_states
                 .read((client_sequence, header_height.clone()));
 
-            if maybe_consensus_state.root.is_zero() {
+            if maybe_consensus_state.is_zero() {
                 let mut client_state = self.client_states.read(client_sequence);
 
                 client_state.update(header_height.clone());
@@ -274,20 +287,17 @@ pub mod CometClientComponent {
         fn _status(
             self: @ComponentState<TContractState>,
             client_state: CometClientState,
+            consensus_state: CometConsensusState,
             client_sequence: u64
         ) -> Status {
             if !client_state.status.is_active() {
                 return client_state.status;
             }
 
-            let latest_consensus_state = self
-                .consensus_states
-                .read((client_sequence, client_state.latest_height));
-
             let host_timestamp = get_block_timestamp();
 
-            let consensus_state_status = latest_consensus_state
-                .status(host_timestamp, client_state.trusting_period,);
+            let consensus_state_status = consensus_state
+                .status(host_timestamp, client_state.trusting_period);
 
             if !consensus_state_status.is_active() {
                 return consensus_state_status;

@@ -50,9 +50,9 @@ pub mod ClientEventEmitterComponent {
     pub struct UpgradeClientEvent {}
 
     #[generate_trait]
-    pub impl ClientEventImpl<
+    pub impl ClientEventEmitterImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
-    > of ClientEventTrait<TContractState> {
+    > of ClientEventEmitterTrait<TContractState> {
         fn emit_create_client_event(
             ref self: ComponentState<TContractState>, create_resp: CreateResponse
         ) {

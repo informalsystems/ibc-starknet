@@ -59,7 +59,7 @@ jobs:
         working-directory: ./cairo-contracts
         run: |
           nix shell ..#scarb -c \
-            scarb fmt --check
+            scarb fmt --workspace --check
 
       - name: Format Light Client
         working-directory: ./light-client

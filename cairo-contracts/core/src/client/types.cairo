@@ -71,6 +71,15 @@ pub struct Height {
     pub revision_height: u64,
 }
 
+pub impl HeightAdd of Add<Height> {
+    fn add(lhs: Height, rhs: Height) -> Height {
+        Height {
+            revision_number: lhs.revision_number + rhs.revision_number,
+            revision_height: lhs.revision_height + rhs.revision_height,
+        }
+    }
+}
+
 pub impl HeightPartialOrd of PartialOrd<Height> {
     fn le(lhs: Height, rhs: Height) -> bool {
         lhs.revision_number < rhs.revision_number
