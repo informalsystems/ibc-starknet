@@ -1,4 +1,6 @@
+use core::num::traits::CheckedAdd;
 use core::traits::PartialOrd;
+use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::host::ClientId;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
@@ -73,9 +75,14 @@ pub struct Height {
 
 pub impl HeightAdd of Add<Height> {
     fn add(lhs: Height, rhs: Height) -> Height {
+        let revision_number = lhs.revision_number.checked_add(rhs.revision_number);
+        let revision_height = lhs.revision_height.checked_add(rhs.revision_height);
+
+        assert(revision_number.is_some(), ClientErrors::OVERFLOWED_HEIGHT);
+        assert(revision_height.is_some(), ClientErrors::OVERFLOWED_HEIGHT);
+
         Height {
-            revision_number: lhs.revision_number + rhs.revision_number,
-            revision_height: lhs.revision_height + rhs.revision_height,
+            revision_number: revision_number.unwrap(), revision_height: revision_height.unwrap(),
         }
     }
 }

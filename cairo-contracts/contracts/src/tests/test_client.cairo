@@ -85,8 +85,15 @@ fn test_update_client_ok() {
 
     ibc.drop_all_events();
 
+    // Update the client to a new height.
+    let updating_height = cfg.latest_height.clone()
+        + Height { revision_number: 0, revision_height: 5 };
+
     // Create a `MsgUpdateClient` message.
-    let msg = cfg.dummy_msg_update_client(create_resp.client_id, create_resp.height);
+    let msg = cfg
+        .dummy_msg_update_client(
+            create_resp.client_id, create_resp.height, updating_height.clone()
+        );
 
     // Submit a `MsgUpdateClient` to the IBC core contract.
     let update_resp = ibc.update_client(msg.clone());
@@ -104,11 +111,7 @@ fn test_update_client_ok() {
 
     assert(comet.client_type() == cfg.client_type, 'client type mismatch');
 
-    assert(
-        comet.latest_height(0) == cfg.latest_height
-            + Height { revision_number: 0, revision_height: 1 },
-        'latest height mismatch'
-    );
+    assert(comet.latest_height(0) == updating_height, 'latest height mismatch');
 
     assert(comet.status(0).is_active(), 'status mismatch');
 }

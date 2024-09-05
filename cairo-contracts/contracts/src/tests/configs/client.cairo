@@ -49,20 +49,18 @@ pub impl ClientConfigImpl of ClientConfigTrait {
     }
 
     fn dummy_msg_update_client(
-        self: @ClientConfig, client_id: ClientId, trusted_height: Height
+        self: @ClientConfig, client_id: ClientId, trusted_height: Height, latest_height: Height
     ) -> MsgUpdateClient {
         let mut serialized_header: Array<felt252> = ArrayTrait::new();
 
         let signed_header = SignedHeader {
-            height: self.latest_height.clone() + Height { revision_number: 0, revision_height: 1 },
-            time: *self.latest_timestamp + 1,
-            root: '1'
+            height: latest_height, time: *self.latest_timestamp + 1, root: '1'
         };
 
-        let header = CometHeader { trusted_height, signed_header, };
+        let header = CometHeader { trusted_height, signed_header };
 
         Serde::serialize(@header, ref serialized_header);
 
-        MsgUpdateClient { client_id, client_message: serialized_header, }
+        MsgUpdateClient { client_id, client_message: serialized_header }
     }
 }
