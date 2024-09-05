@@ -1,4 +1,4 @@
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::components::encode_mut::*;
 pub use hermes_cairo_encoding_components::components::encoding::*;
 use hermes_cairo_encoding_components::impls::encode_mut::delegate::DelegateEncodeMutComponents;

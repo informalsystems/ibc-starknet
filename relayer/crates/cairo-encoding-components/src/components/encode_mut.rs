@@ -1,4 +1,4 @@
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 pub use starknet::core::types::{Felt, U256};
 
 use crate::impls::encode_mut::bool::EncodeBool;

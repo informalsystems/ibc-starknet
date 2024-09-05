@@ -1,4 +1,4 @@
-use cgp_core::Async;
+use cgp::core::Async;
 use hermes_relayer_components::transaction::traits::types::tx_hash::ProvideTransactionHashType;
 use starknet::core::types::Felt;
 

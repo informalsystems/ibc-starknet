@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-use cgp_core::error::{CanRaiseError, ErrorRaiser};
+use cgp::core::error::{CanRaiseError, ErrorRaiser};
 use starknet::accounts::AccountError;
 use starknet::providers::ProviderError;
 

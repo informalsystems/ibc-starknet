@@ -1,5 +1,5 @@
-use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
-use cgp_core::prelude::*;
+use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_error::impls::ProvideHermesError;

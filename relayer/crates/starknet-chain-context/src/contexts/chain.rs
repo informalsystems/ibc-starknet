@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
-use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
-use cgp_core::prelude::*;
+use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;

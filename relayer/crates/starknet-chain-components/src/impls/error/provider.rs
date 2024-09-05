@@ -1,4 +1,4 @@
-use cgp_core::error::{CanRaiseError, ErrorRaiser};
+use cgp::core::error::{CanRaiseError, ErrorRaiser};
 use starknet::core::types::StarknetError;
 use starknet::providers::ProviderError;
 

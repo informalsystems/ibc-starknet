@@ -1,4 +1,4 @@
-use cgp_core::error::HasErrorType;
+use cgp::core::error::HasErrorType;
 use hermes_encoding_components::traits::decode_mut::MutDecoder;
 use hermes_encoding_components::traits::encode_mut::MutEncoder;
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;

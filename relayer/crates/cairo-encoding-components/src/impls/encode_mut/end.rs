@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-use cgp_core::error::CanRaiseError;
+use cgp::core::error::CanRaiseError;
 use hermes_encoding_components::traits::decode_mut::MutDecoder;
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 

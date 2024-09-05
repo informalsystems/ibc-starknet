@@ -1,4 +1,4 @@
-use cgp_core::Async;
+use cgp::core::Async;
 use starknet::core::types::Felt;
 
 use crate::traits::types::method::ProvideSelectorType;

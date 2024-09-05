@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
-use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
-use cgp_core::prelude::*;
+use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::prelude::*;
 use hermes_error::impls::ProvideHermesError;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetError;

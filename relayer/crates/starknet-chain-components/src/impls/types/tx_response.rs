@@ -1,4 +1,4 @@
-use cgp_core::Async;
+use cgp::core::Async;
 use hermes_relayer_components::transaction::traits::types::tx_response::ProvideTxResponseType;
 
 use crate::types::tx_response::TxResponse;

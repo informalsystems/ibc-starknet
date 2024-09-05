@@ -1,8 +1,8 @@
 use core::iter::Peekable;
 use core::slice::Iter;
 
-use cgp_core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
-use cgp_core::prelude::*;
+use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::pair::EncodeCons;
 use hermes_cairo_encoding_components::impls::encode_mut::with_context::EncodeWithContext;
 use hermes_cairo_encoding_components::strategy::ViaCairo;

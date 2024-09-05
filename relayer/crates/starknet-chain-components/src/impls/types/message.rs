@@ -1,4 +1,4 @@
-use cgp_core::Async;
+use cgp::core::Async;
 use hermes_relayer_components::chain::traits::types::message::ProvideMessageType;
 use starknet::accounts::Call;
 

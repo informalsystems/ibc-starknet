@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-use cgp_core::error::CanRaiseError;
+use cgp::core::error::CanRaiseError;
 use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use starknet::core::types::Felt;

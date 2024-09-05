@@ -1,6 +1,6 @@
 use core::time::Duration;
 
-use cgp_core::error::CanRaiseError;
+use cgp::core::error::CanRaiseError;
 use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeoutGetter;
 use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerier;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;

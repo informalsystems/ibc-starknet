@@ -1,4 +1,4 @@
-use cgp_core::prelude::*;
+use cgp::prelude::*;
 use starknet::accounts::{Account, AccountError, ConnectedAccount};
 
 #[derive_component(StarknetAccountTypeComponent, ProvideStarknetAccountType<Chain>)]
