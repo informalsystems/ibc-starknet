@@ -1,3 +1,3 @@
-mod client;
+mod comet;
 
-pub use client::{ClientConfig, ClientConfigImpl, ClientConfigTrait};
+pub use comet::{CometClientConfig, CometClientConfigImpl, CometClientConfigTrait};

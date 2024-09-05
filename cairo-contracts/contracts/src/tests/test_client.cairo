@@ -1,5 +1,5 @@
 use snforge_std::cheat_block_timestamp_global;
-use starknet_ibc_contracts::tests::configs::ClientConfigTrait;
+use starknet_ibc_contracts::tests::configs::CometClientConfigTrait;
 use starknet_ibc_contracts::tests::setups::{
     IBCCoreHandle, IBCCoreHandleTrait, CometClientHandle, CometClientHandleTrait
 };
@@ -8,28 +8,28 @@ use starknet_ibc_core::client::{UpdateResponse, Height};
 
 // Deploys the IBC core and Comet client contracts, and registers the Comet
 // client into the IBC core.
-fn setup_client_contracts(client_type: felt252) -> (IBCCoreHandle, CometClientHandle) {
-    // Deploy an IBC Core contract.
+fn setup_contracts(client_type: felt252) -> (IBCCoreHandle, CometClientHandle) {
+    // Deploy an IBC core contract.
     let mut ibc = IBCCoreHandleTrait::setup();
 
-    // Deploy a Comet Client contract.
+    // Deploy a Comet client contract.
     let comet = CometClientHandleTrait::setup();
 
-    // Register the Comet Client into the IBC core contract.
+    // Register the Comet client into the IBC core contract.
     ibc.register_client(client_type, comet.contract_address);
 
     (ibc, comet)
 }
 
 #[test]
-fn test_create_client_ok() {
+fn test_create_comet_client_ok() {
     // -----------------------------------------------------------
     // Setup Contracts
     // -----------------------------------------------------------
 
-    let mut cfg = ClientConfigTrait::default();
+    let mut cfg = CometClientConfigTrait::default();
 
-    let (mut ibc, comet) = setup_client_contracts(cfg.client_type);
+    let (mut ibc, comet) = setup_contracts(cfg.client_type);
 
     // -----------------------------------------------------------
     // Create Client
@@ -58,14 +58,14 @@ fn test_create_client_ok() {
 }
 
 #[test]
-fn test_update_client_ok() {
+fn test_update_comet_client_ok() {
     // -----------------------------------------------------------
     // Setup Contracts
     // -----------------------------------------------------------
 
-    let mut cfg = ClientConfigTrait::default();
+    let mut cfg = CometClientConfigTrait::default();
 
-    let (mut ibc, comet) = setup_client_contracts(cfg.client_type);
+    let (mut ibc, comet) = setup_contracts(cfg.client_type);
 
     // -----------------------------------------------------------
     // Create Client

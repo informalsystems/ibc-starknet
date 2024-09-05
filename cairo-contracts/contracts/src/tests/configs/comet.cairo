@@ -6,7 +6,7 @@ use starknet_ibc_core::client::{MsgCreateClient, MsgUpdateClient, Height, Status
 use starknet_ibc_core::host::ClientId;
 
 #[derive(Clone, Debug, Drop, Serde)]
-pub struct ClientConfig {
+pub struct CometClientConfig {
     pub client_type: felt252,
     pub latest_height: Height,
     pub latest_timestamp: u64,
@@ -14,9 +14,9 @@ pub struct ClientConfig {
 }
 
 #[generate_trait]
-pub impl ClientConfigImpl of ClientConfigTrait {
-    fn default() -> ClientConfig {
-        ClientConfig {
+pub impl CometClientConfigImpl of CometClientConfigTrait {
+    fn default() -> CometClientConfig {
+        CometClientConfig {
             client_type: '07-cometbft',
             latest_height: Height { revision_number: 0, revision_height: 10 },
             latest_timestamp: 10,
@@ -24,7 +24,7 @@ pub impl ClientConfigImpl of ClientConfigTrait {
         }
     }
 
-    fn dummy_msg_create_client(self: @ClientConfig) -> MsgCreateClient {
+    fn dummy_msg_create_client(self: @CometClientConfig) -> MsgCreateClient {
         let mut serialized_client_state: Array<felt252> = ArrayTrait::new();
 
         let client_state = CometClientState {
@@ -49,7 +49,7 @@ pub impl ClientConfigImpl of ClientConfigTrait {
     }
 
     fn dummy_msg_update_client(
-        self: @ClientConfig, client_id: ClientId, trusted_height: Height, latest_height: Height
+        self: @CometClientConfig, client_id: ClientId, trusted_height: Height, latest_height: Height
     ) -> MsgUpdateClient {
         let mut serialized_header: Array<felt252> = ArrayTrait::new();
 
