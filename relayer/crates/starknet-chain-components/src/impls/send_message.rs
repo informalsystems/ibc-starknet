@@ -64,7 +64,7 @@ where
 pub fn extract_events_from_function_invocation(
     invocation: FunctionInvocation,
 ) -> Vec<StarknetEvent> {
-    let events = invocation
+    let mut events: Vec<StarknetEvent> = invocation
         .events
         .into_iter()
         .map(|event| {
@@ -75,6 +75,11 @@ pub fn extract_events_from_function_invocation(
             )
         })
         .collect();
+
+    for inner in invocation.calls {
+        let mut in_events = extract_events_from_function_invocation(inner);
+        events.append(&mut in_events);
+    }
 
     events
 }

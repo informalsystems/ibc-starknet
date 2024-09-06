@@ -142,10 +142,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let token_address = {
             let events = chain.send_message(message.clone()).await?;
 
+            println!("IBC transfer raw events: {:?}", events);
+
             let ibc_transfer_events: Vec<IbcTransferEvent> =
                 event_encoding.filter_decode_events(&events)?;
 
-            println!("ibc_transfer_events: {:?}", ibc_transfer_events);
+            println!("IBC transfer events: {:?}", ibc_transfer_events);
 
             {
                 let receive_transfer_event = ibc_transfer_events
