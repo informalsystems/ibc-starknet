@@ -123,6 +123,8 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             println!("performed transfer of 100 tokens");
 
+            println!("raw events: {:?}", events);
+
             let erc20_events: Vec<Erc20Event> = event_encoding.filter_decode_events(&events)?;
 
             println!(

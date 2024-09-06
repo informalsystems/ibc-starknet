@@ -48,8 +48,8 @@ where
                                 .into_iter()
                                 .map(|event| {
                                     StarknetEvent::from_ordered_event(
-                                        trace.contract_address,
-                                        trace.class_hash,
+                                        call.contract_address,
+                                        call.class_hash,
                                         event,
                                     )
                                 })
