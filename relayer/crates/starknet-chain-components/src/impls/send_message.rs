@@ -45,7 +45,7 @@ where
                     let events = invocation
                         .calls
                         .into_iter()
-                        .map(|invocation| extract_events_from_function_invocation(invocation))
+                        .map(extract_events_from_function_invocation)
                         .collect();
 
                     Ok(events)
