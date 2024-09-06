@@ -41,9 +41,6 @@ use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
-use hermes_starknet_chain_components::traits::event::{
-    CanParseEvent, DelegateEventDecoders, EventParserComponent,
-};
 use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
@@ -53,12 +50,6 @@ use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
 use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
-use hermes_starknet_chain_components::types::events::erc20::{
-    ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent,
-};
-use hermes_starknet_chain_components::types::events::ics20::{
-    CreateIbcTokenEvent, IbcTransferEvent, ParseIbcTransferEvent, ReceiveIbcTransferEvent,
-};
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
@@ -68,8 +59,8 @@ use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 use starknet::signers::LocalWallet;
 
-use crate::contexts::cairo_encoding::StarknetCairoEncoding;
-use crate::contexts::protobuf_encoding::StarknetProtobufEncoding;
+use crate::contexts::encoding::cairo::StarknetCairoEncoding;
+use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use crate::impls::error::HandleStarknetError;
 
 #[derive(HasField)]
@@ -102,8 +93,6 @@ delegate_components! {
         ]:
             ProvideNoLogger,
         EncodingGetterComponent: GetDefaultEncoding,
-        EventParserComponent:
-            DelegateEventDecoders<StarknetEventDecoders>,
         [
             StarknetProviderTypeComponent,
             StarknetProviderGetterComponent,
@@ -124,24 +113,6 @@ with_starknet_chain_components! {
         StarknetChainContextComponents {
             @StarknetChainComponents: StarknetChainComponents,
         }
-    }
-}
-
-pub struct StarknetEventDecoders;
-
-delegate_components! {
-    StarknetEventDecoders {
-        [
-            Erc20Event,
-            TransferEvent,
-            ApprovalEvent,
-        ]: DecodeErc20Events,
-        [
-            IbcTransferEvent,
-            ReceiveIbcTransferEvent,
-            CreateIbcTokenEvent,
-        ]:
-            ParseIbcTransferEvent,
     }
 }
 
@@ -206,8 +177,6 @@ pub trait CanUseStarknetChain:
     + CanQueryTokenBalance
     + CanTransferToken
     + HasRetryableError
-    + CanParseEvent<Erc20Event>
-    + CanParseEvent<IbcTransferEvent>
 {
 }
 

@@ -21,7 +21,7 @@ use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferTyp
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
-use hermes_starknet_chain_components::components::cairo_encoding::*;
+use hermes_starknet_chain_components::components::encoding::cairo::*;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::erc20::transfer::TransferErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{

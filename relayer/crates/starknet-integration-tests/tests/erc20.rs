@@ -5,15 +5,16 @@ use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
+use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::traits::event::CanParseEvents;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
-use hermes_starknet_chain_context::contexts::cairo_encoding::StarknetCairoEncoding;
+use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
+use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 
@@ -40,7 +41,7 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
         let chain = &chain_driver.chain;
 
-        let token_address = {
+        let erc20_class_hash = {
             // Test deployment of ERC20 contract
             let contract_path = std::env::var("ERC20_CONTRACT")?;
 
@@ -52,6 +53,10 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             println!("declared class: {:?}", class_hash);
 
+            class_hash
+        };
+
+        let token_address = {
             let relayer_address = chain_driver.relayer_wallet.account_address;
 
             let deploy_message = DeployErc20TokenMessage {
@@ -64,7 +69,9 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             let calldata = StarknetCairoEncoding.encode(&deploy_message)?;
 
-            let token_address = chain.deploy_contract(&class_hash, false, &calldata).await?;
+            let token_address = chain
+                .deploy_contract(&erc20_class_hash, false, &calldata)
+                .await?;
 
             println!("deployed ERC20 contract to address: {:?}", token_address);
 
@@ -77,6 +84,11 @@ fn test_erc20_transfer() -> Result<(), Error> {
             assert_eq!(balance.quantity, 1000u32.into());
 
             token_address
+        };
+
+        let event_encoding = StarknetEventEncoding {
+            erc20_hashes: [erc20_class_hash].into(),
+            ics20_hashes: Default::default(),
         };
 
         {
@@ -111,7 +123,9 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             println!("performed transfer of 100 tokens");
 
-            let erc20_events: Vec<Erc20Event> = chain.parse_events(&events)?;
+            println!("raw events: {:?}", events);
+
+            let erc20_events: Vec<Erc20Event> = event_encoding.filter_decode_events(&events)?;
 
             println!(
                 "events from sending transfer token message: {:?}",

@@ -17,7 +17,7 @@ use hermes_starknet_chain_components::types::client_state::{
     StarknetClientState, WasmStarknetClientState,
 };
 use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
-use hermes_starknet_chain_context::contexts::protobuf_encoding::StarknetProtobufEncoding;
+use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::client::types::Height;

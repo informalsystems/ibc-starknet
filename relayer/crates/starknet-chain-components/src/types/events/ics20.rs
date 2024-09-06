@@ -2,15 +2,13 @@ use cgp::core::error::CanRaiseError;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::HList;
-use hermes_encoding_components::traits::decode::CanDecode;
+use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::traits::event::{CanParseEvent, EventParser, EventSelectorMissing, UnknownEvent};
-use crate::types::event::StarknetEvent;
+use crate::types::event::{StarknetEvent, UnknownEvent};
 use crate::types::messages::ibc::denom::PrefixedDenom;
 use crate::types::messages::ibc::ibc_transfer::Participant;
 
@@ -37,51 +35,57 @@ pub struct CreateIbcTokenEvent {
     pub address: Felt,
     pub initial_supply: U256,
 }
-pub struct ParseIbcTransferEvent;
 
-impl<Chain> EventParser<Chain, IbcTransferEvent> for ParseIbcTransferEvent
+pub struct DecodeIbcTransferEvents;
+
+impl<Encoding, Strategy> Decoder<Encoding, Strategy, IbcTransferEvent> for DecodeIbcTransferEvents
 where
-    Chain: HasEventType<Event = StarknetEvent>
-        + CanParseEvent<ReceiveIbcTransferEvent>
-        + CanParseEvent<CreateIbcTokenEvent>
-        + for<'a> CanRaiseError<EventSelectorMissing<'a, Chain>>
-        + for<'a> CanRaiseError<UnknownEvent<'a, Chain>>,
+    Encoding: HasEncodedType<Encoded = StarknetEvent>
+        + CanDecode<Strategy, ReceiveIbcTransferEvent>
+        + CanDecode<Strategy, CreateIbcTokenEvent>
+        + for<'a> CanRaiseError<UnknownEvent<'a>>,
 {
-    fn parse_event(chain: &Chain, event: &StarknetEvent) -> Result<IbcTransferEvent, Chain::Error> {
+    fn decode(
+        encoding: &Encoding,
+        event: &StarknetEvent,
+    ) -> Result<IbcTransferEvent, Encoding::Error> {
         let selector = event
             .selector
-            .ok_or_else(|| Chain::raise_error(EventSelectorMissing { event }))?;
+            .ok_or_else(|| Encoding::raise_error(UnknownEvent { event }))?;
 
         if selector == selector!("RecvEvent") {
-            Ok(IbcTransferEvent::Receive(chain.parse_event(event)?))
+            Ok(IbcTransferEvent::Receive(encoding.decode(event)?))
         } else if selector == selector!("CreateTokenEvent") {
-            Ok(IbcTransferEvent::CreateToken(chain.parse_event(event)?))
+            Ok(IbcTransferEvent::CreateToken(encoding.decode(event)?))
         } else {
-            Err(Chain::raise_error(UnknownEvent { event }))
+            Err(Encoding::raise_error(UnknownEvent { event }))
         }
     }
 }
 
-impl<Chain, Encoding> EventParser<Chain, ReceiveIbcTransferEvent> for ParseIbcTransferEvent
+impl<EventEncoding, CairoEncoding, Strategy>
+    Decoder<EventEncoding, Strategy, ReceiveIbcTransferEvent> for DecodeIbcTransferEvents
 where
-    Chain: HasEventType<Event = StarknetEvent>
-        + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanRaiseError<Encoding::Error>,
-    Encoding: HasEncodedType<Encoded = Vec<Felt>>
+    EventEncoding: HasEncodedType<Encoded = StarknetEvent>
+        + HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + CanRaiseError<CairoEncoding::Error>,
+    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, HList![Participant, Participant, PrefixedDenom]>
         + CanDecode<ViaCairo, HList![U256, String, bool]>,
 {
-    fn parse_event(
-        chain: &Chain,
+    fn decode(
+        event_encoding: &EventEncoding,
         event: &StarknetEvent,
-    ) -> Result<ReceiveIbcTransferEvent, Chain::Error> {
-        let encoding = chain.encoding();
+    ) -> Result<ReceiveIbcTransferEvent, EventEncoding::Error> {
+        let cairo_encoding = event_encoding.encoding();
 
-        let (sender, (receiver, (denom, ()))) =
-            encoding.decode(&event.keys).map_err(Chain::raise_error)?;
+        let (sender, (receiver, (denom, ()))) = cairo_encoding
+            .decode(&event.keys)
+            .map_err(EventEncoding::raise_error)?;
 
-        let (amount, (memo, (success, ()))) =
-            encoding.decode(&event.data).map_err(Chain::raise_error)?;
+        let (amount, (memo, (success, ()))) = cairo_encoding
+            .decode(&event.data)
+            .map_err(EventEncoding::raise_error)?;
 
         Ok(ReceiveIbcTransferEvent {
             sender,
@@ -94,25 +98,29 @@ where
     }
 }
 
-impl<Chain, Encoding> EventParser<Chain, CreateIbcTokenEvent> for ParseIbcTransferEvent
+impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, CreateIbcTokenEvent>
+    for DecodeIbcTransferEvents
 where
-    Chain: HasEventType<Event = StarknetEvent>
-        + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanRaiseError<Encoding::Error>,
-    Encoding: HasEncodedType<Encoded = Vec<Felt>>
+    EventEncoding: HasEncodedType<Encoded = StarknetEvent>
+        + HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + CanRaiseError<CairoEncoding::Error>,
+    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, HList![String, String, Felt]>
         + CanDecode<ViaCairo, HList![U256]>,
 {
-    fn parse_event(
-        chain: &Chain,
+    fn decode(
+        event_encoding: &EventEncoding,
         event: &StarknetEvent,
-    ) -> Result<CreateIbcTokenEvent, Chain::Error> {
-        let encoding = chain.encoding();
+    ) -> Result<CreateIbcTokenEvent, EventEncoding::Error> {
+        let cairo_encoding = event_encoding.encoding();
 
-        let (name, (symbol, (address, ()))) =
-            encoding.decode(&event.keys).map_err(Chain::raise_error)?;
+        let (name, (symbol, (address, ()))) = cairo_encoding
+            .decode(&event.keys)
+            .map_err(EventEncoding::raise_error)?;
 
-        let (initial_supply, ()) = encoding.decode(&event.data).map_err(Chain::raise_error)?;
+        let (initial_supply, ()) = cairo_encoding
+            .decode(&event.data)
+            .map_err(EventEncoding::raise_error)?;
 
         Ok(CreateIbcTokenEvent {
             name,

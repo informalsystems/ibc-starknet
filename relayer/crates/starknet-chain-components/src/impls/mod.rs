@@ -1,5 +1,6 @@
 pub mod account;
 pub mod contract;
+pub mod encoding;
 pub mod error;
 pub mod provider;
 pub mod queries;
