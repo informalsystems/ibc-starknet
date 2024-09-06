@@ -5,6 +5,7 @@ use hermes_encoding_components::impls::delegate::DelegateEncoding;
 pub use hermes_encoding_components::traits::decode::DecoderComponent;
 use hermes_encoding_components::traits::types::encoded::ProvideEncodedType;
 
+use crate::impls::encoding::option::DecodeOptionalByClassHash;
 use crate::types::event::StarknetEvent;
 use crate::types::events::erc20::{ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent};
 use crate::types::events::ics20::{
@@ -40,5 +41,9 @@ delegate_components! {
             (ViaCairo, CreateIbcTokenEvent),
         ]:
             DecodeIbcTransferEvents,
+        (ViaCairo, Option<Erc20Event>):
+            DecodeOptionalByClassHash<symbol!("erc20_hashes")>,
+        (ViaCairo, Option<IbcTransferEvent>):
+            DecodeOptionalByClassHash<symbol!("ics20_hashes")>,
     }
 }
