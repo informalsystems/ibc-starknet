@@ -13,7 +13,7 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
-use hermes_starknet_chain_context::contexts::cairo_encoding::StarknetCairoEncoding;
+use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 

@@ -17,7 +17,7 @@ use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
     IbcTransferMessage, Participant,
 };
 use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
-use hermes_starknet_chain_context::contexts::cairo_encoding::StarknetCairoEncoding;
+use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::accounts::Call;

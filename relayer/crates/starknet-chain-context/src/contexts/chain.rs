@@ -68,8 +68,8 @@ use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 use starknet::signers::LocalWallet;
 
-use crate::contexts::cairo_encoding::StarknetCairoEncoding;
-use crate::contexts::protobuf_encoding::StarknetProtobufEncoding;
+use crate::contexts::encoding::cairo::StarknetCairoEncoding;
+use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use crate::impls::error::HandleStarknetError;
 
 #[derive(HasField)]
