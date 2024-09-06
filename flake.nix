@@ -108,7 +108,6 @@
 
           tools = {
             inherit (nixpkgs)
-              pkg-config
               protobuf
               cargo-nextest
               taplo
@@ -118,7 +117,12 @@
             nixfmt = nixpkgs.nixfmt-rfc-style;
           };
 
-          shell-deps = (builtins.attrValues starknet-pkgs) ++ (builtins.attrValues tools);
+          mac-deps = nixpkgs.lib.optional nixpkgs.stdenv.isDarwin [
+            nixpkgs.libiconv
+            nixpkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+          ];
+
+          shell-deps = (builtins.attrValues starknet-pkgs) ++ (builtins.attrValues tools) ++ mac-deps;
         in
         {
           packages = {
