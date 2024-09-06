@@ -393,11 +393,7 @@ pub mod TokenTransferComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferInternalTrait<TContractState> {
         fn get_token(self: @ComponentState<TContractState>, token_key: felt252) -> ERC20Contract {
-            let token_address = self.read_ibc_token_address(token_key);
-
-            assert(token_address.is_non_zero(), TransferErrors::ZERO_TOKEN_ADDRESS);
-
-            token_address.into()
+            self.read_ibc_token_address(token_key).into()
         }
 
         fn create_token(
