@@ -43,7 +43,18 @@ where
                     let events = trace
                         .calls
                         .into_iter()
-                        .map(|call| call.events.into_iter().map(StarknetEvent::from).collect())
+                        .map(|call| {
+                            call.events
+                                .into_iter()
+                                .map(|event| {
+                                    StarknetEvent::from_ordered_event(
+                                        trace.contract_address,
+                                        trace.class_hash,
+                                        event,
+                                    )
+                                })
+                                .collect()
+                        })
                         .collect();
 
                     Ok(events)
