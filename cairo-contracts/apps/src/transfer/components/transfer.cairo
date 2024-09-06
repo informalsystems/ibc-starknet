@@ -26,8 +26,8 @@ pub mod TokenTransferComponent {
     struct Storage {
         erc20_class_hash: ClassHash,
         salt: felt252,
-        ibc_token_name_to_address: Map<felt252, ContractAddress>,
-        ibc_token_address_to_name: Map<ContractAddress, felt252>,
+        ibc_token_key_to_address: Map<felt252, ContractAddress>,
+        ibc_token_address_to_key: Map<ContractAddress, felt252>,
     }
 
     #[event]
@@ -72,6 +72,16 @@ pub mod TokenTransferComponent {
         #[key]
         pub address: ContractAddress,
         pub initial_supply: u256,
+    }
+
+    #[generate_trait]
+    pub impl TransferInitializerImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+    > of TransferInitializerTrait<TContractState> {
+        fn initializer(ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash) {
+            self.write_erc20_class_hash(erc20_class_hash);
+            self.write_salt(0);
+        }
     }
 
     #[embeddable_as(SendTransfer)]
@@ -251,7 +261,7 @@ pub mod TokenTransferComponent {
         fn ibc_token_address(
             self: @ComponentState<TContractState>, token_key: felt252
         ) -> Option<ContractAddress> {
-            let token_address = self.ibc_token_name_to_address.read(token_key);
+            let token_address = self.read_ibc_token_address(token_key);
 
             if token_address.is_non_zero() {
                 Option::Some(token_address)
@@ -313,12 +323,9 @@ pub mod TokenTransferComponent {
             amount: u256,
             memo: Memo,
         ) {
-            let token_address: ERC20Contract = self
-                .ibc_token_name_to_address
-                .read(denom.compute_key())
-                .into();
+            let token = self.get_token(denom.compute_key());
 
-            let balance = token_address.balance_of(account);
+            let balance = token.balance_of(account);
 
             assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
         }
@@ -355,13 +362,10 @@ pub mod TokenTransferComponent {
             denom: PrefixedDenom,
             amount: u256,
         ) {
-            let token_address: ERC20Contract = self
-                .ibc_token_name_to_address
-                .read(denom.compute_key())
-                .into();
+            let token = self.get_token(denom.compute_key());
 
-            if token_address.is_non_zero() {
-                token_address.mint(account, amount);
+            if token.is_non_zero() {
+                token.mint(account, amount);
             } else {
                 let name = denom.base.hosted().unwrap();
 
@@ -378,22 +382,24 @@ pub mod TokenTransferComponent {
             amount: u256,
             memo: Memo,
         ) {
-            let token_address: ERC20Contract = self
-                .ibc_token_name_to_address
-                .read(denom.compute_key())
-                .into();
+            let token = self.get_token(denom.compute_key());
 
-            token_address.burn(account, amount);
+            token.burn(account, amount);
         }
     }
 
     #[generate_trait]
-    pub impl TransferInternalImpl<
+    impl TransferInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferInternalTrait<TContractState> {
-        fn initializer(ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash) {
-            self.erc20_class_hash.write(erc20_class_hash);
-            self.salt.write(0);
+        fn get_token(
+            self: @ComponentState<TContractState>, token_key: felt252
+        ) -> ERC20Contract {
+            let token_address = self.read_ibc_token_address(token_key);
+
+            assert(token_address.is_non_zero(), TransferErrors::ZERO_TOKEN_ADDRESS);
+
+            token_address.into()
         }
 
         fn create_token(
@@ -402,14 +408,14 @@ pub mod TokenTransferComponent {
             name: ByteArray,
             amount: u256,
         ) -> ContractAddress {
-            let salt = self.salt.read();
+            let salt = self.read_salt();
 
             let mut symbol: ByteArray = "IBC/";
 
             symbol.append(@name);
 
             let erc20_token = ERC20ContractTrait::create(
-                self.erc20_class_hash.read(),
+                self.read_erc20_class_hash(),
                 salt,
                 name.clone(),
                 symbol.clone(), // TODO: Determine what the symbol should be.
@@ -418,7 +424,7 @@ pub mod TokenTransferComponent {
                 get_contract_address()
             );
 
-            self.salt.write(salt + 1);
+            self.write_salt(salt + 1);
 
             self.emit_create_token_event(name, symbol, erc20_token.address, amount);
 
@@ -432,9 +438,9 @@ pub mod TokenTransferComponent {
         ) {
             let denom_key = denom.compute_key();
 
-            self.ibc_token_name_to_address.write(denom_key, token_address);
+            self.write_ibc_token_key_to_address(denom_key, token_address);
 
-            self.ibc_token_address_to_name.write(token_address, denom_key);
+            self.write_ibc_token_address_to_key(token_address, denom_key);
         }
 
         fn assert_non_ibc_token(
@@ -443,7 +449,7 @@ pub mod TokenTransferComponent {
             port_id: PortId,
             channel_id: ChannelId,
         ) {
-            let token_key = self.ibc_token_address_to_name.read(denom.address);
+            let token_key = self.read_ibc_token_key(denom.address);
 
             if token_key.is_non_zero() {
                 let trace_prefix = TracePrefixTrait::new(port_id, channel_id);
@@ -461,7 +467,63 @@ pub mod TokenTransferComponent {
     }
 
     #[generate_trait]
-    pub(crate) impl TransferEventImpl<
+    impl TransferReaderImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+    > of TransferReaderTrait<TContractState> {
+        fn read_erc20_class_hash(self: @ComponentState<TContractState>) -> ClassHash {
+            self.erc20_class_hash.read()
+        }
+
+        fn read_salt(self: @ComponentState<TContractState>) -> felt252 {
+            self.salt.read()
+        }
+
+        fn read_ibc_token_address(
+            self: @ComponentState<TContractState>, token_key: felt252
+        ) -> ContractAddress {
+            self.ibc_token_key_to_address.read(token_key)
+        }
+
+        fn read_ibc_token_key(
+            self: @ComponentState<TContractState>, token_address: ContractAddress
+        ) -> felt252 {
+            self.ibc_token_address_to_key.read(token_address)
+        }
+    }
+
+    #[generate_trait]
+    impl TransferWriterImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+    > of TransferWriterTrait<TContractState> {
+        fn write_erc20_class_hash(
+            ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash
+        ) {
+            self.erc20_class_hash.write(erc20_class_hash);
+        }
+
+        fn write_salt(ref self: ComponentState<TContractState>, salt: felt252) {
+            self.salt.write(salt);
+        }
+
+        fn write_ibc_token_key_to_address(
+            ref self: ComponentState<TContractState>,
+            token_key: felt252,
+            token_address: ContractAddress,
+        ) {
+            self.ibc_token_key_to_address.write(token_key, token_address);
+        }
+
+        fn write_ibc_token_address_to_key(
+            ref self: ComponentState<TContractState>,
+            token_address: ContractAddress,
+            token_key: felt252,
+        ) {
+            self.ibc_token_address_to_key.write(token_address, token_key);
+        }
+    }
+
+    #[generate_trait]
+    impl TransferEventImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferEventTrait<TContractState> {
         fn emit_send_event(ref self: ComponentState<TContractState>, packet_data: PacketData) {

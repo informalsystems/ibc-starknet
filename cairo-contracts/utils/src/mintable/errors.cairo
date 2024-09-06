@@ -5,5 +5,6 @@ pub mod MintableErrors {
     pub const MINT_TO_ZERO: felt252 = 'ERC20: mint to 0';
     pub const INSUFFICIENT_BALANCE: felt252 = 'ERC20: insufficient balance';
     pub const INSUFFICIENT_SUPPLY: felt252 = 'ERC20: insufficient supply';
+    pub const OVERFLOWED_AMOUNT: felt252 = 'ERC20: overflowed amount';
 }
 

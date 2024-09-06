@@ -1,5 +1,7 @@
 #[starknet::component]
 pub mod ERC20MintableComponent {
+    use core::num::traits::CheckedAdd;
+    use core::num::traits::CheckedSub;
     use core::num::traits::Zero;
     use openzeppelin_token::erc20::ERC20Component::InternalTrait;
     use openzeppelin_token::erc20::ERC20Component;
@@ -28,7 +30,7 @@ pub mod ERC20MintableComponent {
         fn permissioned_mint(
             ref self: ComponentState<TContractState>, recipient: ContractAddress, amount: u256
         ) {
-            let permitted_minter = self.permission.read();
+            let permitted_minter = self.read_permission();
             assert(permitted_minter == get_caller_address(), MintableErrors::UNAUTHORIZED_MINTER);
 
             self.mint(recipient, amount);
@@ -37,7 +39,7 @@ pub mod ERC20MintableComponent {
         fn permissioned_burn(
             ref self: ComponentState<TContractState>, account: ContractAddress, amount: u256
         ) {
-            let permitted_burner = self.permission.read();
+            let permitted_burner = self.read_permission();
             assert(permitted_burner == get_caller_address(), MintableErrors::UNAUTHORIZED_BURNER);
             self.burn(account, amount);
         }
@@ -51,36 +53,119 @@ pub mod ERC20MintableComponent {
         impl ERC20: ERC20Component::HasComponent<TContractState>
     > of ERC20MintableInternalTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>) {
-            self.permission.write(get_caller_address());
+            self.write_permission(get_caller_address());
         }
 
         fn mint(
             ref self: ComponentState<TContractState>, recipient: ContractAddress, amount: u256
         ) {
-            let mut erc20_comp = get_dep_component_mut!(ref self, ERC20);
             assert(recipient.is_non_zero(), MintableErrors::MINT_TO_ZERO);
 
-            erc20_comp.ERC20_total_supply.write(erc20_comp.ERC20_total_supply.read() + amount);
-            erc20_comp
-                .ERC20_balances
-                .write(recipient, erc20_comp.ERC20_balances.read(recipient) + amount);
+            let new_amount = self.read_total_supply().checked_add(amount);
 
-            erc20_comp.emit(Transfer { from: Zero::zero(), to: recipient, value: amount });
+            assert(new_amount.is_some(), MintableErrors::OVERFLOWED_AMOUNT);
+
+            self.write_total_supply(new_amount.unwrap());
+
+            let new_balance = self.read_balance(recipient).checked_add(amount);
+
+            assert(new_balance.is_some(), MintableErrors::OVERFLOWED_AMOUNT);
+
+            self.write_balance(recipient, new_balance.unwrap());
+
+            self.emit_transfer_event(Zero::zero(), recipient, amount);
         }
 
         fn burn(ref self: ComponentState<TContractState>, account: ContractAddress, amount: u256) {
-            let mut erc20_comp = get_dep_component_mut!(ref self, ERC20);
             assert(account.is_non_zero(), MintableErrors::BURN_FROM_ZERO);
 
-            let total_supply = erc20_comp.ERC20_total_supply.read();
+            let total_supply = self.read_total_supply();
+
             assert(total_supply >= amount, MintableErrors::INSUFFICIENT_SUPPLY);
-            erc20_comp.ERC20_total_supply.write(total_supply - amount);
 
-            let balance = erc20_comp.ERC20_balances.read(account);
+            let new_amount = total_supply.checked_sub(amount);
+
+            assert(new_amount.is_some(), MintableErrors::OVERFLOWED_AMOUNT);
+
+            self.write_total_supply(new_amount.unwrap());
+
+            let balance = self.read_balance(account);
+
             assert(balance >= amount, MintableErrors::INSUFFICIENT_BALANCE);
-            erc20_comp.ERC20_balances.write(account, balance - amount);
 
-            erc20_comp.emit(Transfer { from: account, to: Zero::zero(), value: amount });
+            let new_balance = balance.checked_sub(amount);
+
+            assert(new_balance.is_some(), MintableErrors::OVERFLOWED_AMOUNT);
+
+            self.write_balance(account, new_balance.unwrap());
+
+            self.emit_transfer_event(account, Zero::zero(), amount);
+        }
+    }
+
+    #[generate_trait]
+    impl ERC20ReaderImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl ERC20: ERC20Component::HasComponent<TContractState>
+    > of ERC20ReaderTrait<TContractState> {
+        fn read_permission(self: @ComponentState<TContractState>) -> ContractAddress {
+            self.permission.read()
+        }
+
+        fn read_balance(self: @ComponentState<TContractState>, account: ContractAddress) -> u256 {
+            let erc20_comp = get_dep_component!(self, ERC20);
+            erc20_comp.ERC20_balances.read(account)
+        }
+
+        fn read_total_supply(self: @ComponentState<TContractState>) -> u256 {
+            let erc20_comp = get_dep_component!(self, ERC20);
+            erc20_comp.ERC20_total_supply.read()
+        }
+    }
+
+    #[generate_trait]
+    impl ERC20WriterImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl ERC20: ERC20Component::HasComponent<TContractState>
+    > of ERC20WriterTrait<TContractState> {
+        fn write_permission(
+            ref self: ComponentState<TContractState>, permitted_minter: ContractAddress
+        ) {
+            self.permission.write(permitted_minter);
+        }
+
+        fn write_balance(
+            ref self: ComponentState<TContractState>, account: ContractAddress, amount: u256
+        ) {
+            let mut erc20_comp = get_dep_component_mut!(ref self, ERC20);
+            erc20_comp.ERC20_balances.write(account, amount);
+        }
+
+        fn write_total_supply(ref self: ComponentState<TContractState>, amount: u256) {
+            let mut erc20_comp = get_dep_component_mut!(ref self, ERC20);
+            erc20_comp.ERC20_total_supply.write(amount);
+        }
+    }
+
+    #[generate_trait]
+    impl ERC20EventEmitterImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl ERC20: ERC20Component::HasComponent<TContractState>
+    > of ERC20EventEmitterTrait<TContractState> {
+        fn emit_transfer_event(
+            ref self: ComponentState<TContractState>,
+            from: ContractAddress,
+            to: ContractAddress,
+            value: u256
+        ) {
+            let mut erc20_comp = get_dep_component_mut!(ref self, ERC20);
+            erc20_comp.emit(Transfer { from, to, value });
         }
     }
 }

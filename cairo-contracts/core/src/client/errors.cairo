@@ -1,6 +1,6 @@
 pub mod ClientErrors {
-    pub const UNSUPPORTED_CLIENT_TYPE: felt252 = 'ICS02: unsupported client type';
-    pub const ZERO_CLIENT_TYPE: felt252 = 'ICS02: zero client type';
+    pub const ZERO_CLIENT_TYPE: felt252 = 'ICS02: client type is 0';
+    pub const ZERO_CLIENT_ADDRESS: felt252 = 'ICS02: client address is 0';
     pub const EMPTY_CLIENT_STATE: felt252 = 'ICS02: empty client state';
     pub const EMPTY_CONSENSUS_STATE: felt252 = 'ICS02: empty consensus state';
     pub const EMPTY_CLIENT_MESSAGE: felt252 = 'ICS02: empty client message';
