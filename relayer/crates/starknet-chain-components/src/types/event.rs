@@ -9,6 +9,7 @@ pub struct StarknetEvent {
     pub data: Vec<Felt>,
 }
 
+#[derive(Debug)]
 pub struct UnknownEvent<'a> {
     pub event: &'a StarknetEvent,
 }

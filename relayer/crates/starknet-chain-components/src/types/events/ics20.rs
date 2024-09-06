@@ -5,7 +5,6 @@ use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
@@ -36,9 +35,10 @@ pub struct CreateIbcTokenEvent {
     pub address: Felt,
     pub initial_supply: U256,
 }
-pub struct ParseIbcTransferEvent;
 
-impl<Encoding, Strategy> Decoder<Encoding, Strategy, IbcTransferEvent> for ParseIbcTransferEvent
+pub struct DecodeIbcTransferEvents;
+
+impl<Encoding, Strategy> Decoder<Encoding, Strategy, IbcTransferEvent> for DecodeIbcTransferEvents
 where
     Encoding: HasEncodedType<Encoded = StarknetEvent>
         + CanDecode<Strategy, ReceiveIbcTransferEvent>
@@ -64,7 +64,7 @@ where
 }
 
 impl<EventEncoding, CairoEncoding, Strategy>
-    Decoder<EventEncoding, Strategy, ReceiveIbcTransferEvent> for ParseIbcTransferEvent
+    Decoder<EventEncoding, Strategy, ReceiveIbcTransferEvent> for DecodeIbcTransferEvents
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
@@ -99,7 +99,7 @@ where
 }
 
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, CreateIbcTokenEvent>
-    for ParseIbcTransferEvent
+    for DecodeIbcTransferEvents
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
