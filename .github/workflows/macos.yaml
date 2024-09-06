@@ -11,7 +11,7 @@ on:
 jobs:
   test-contracts:
     name: Build MacOS Nix dependencies
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -27,4 +27,7 @@ jobs:
 
       - name: Run Nix build
         run: |
+          ls -la /opt/homebrew
+          sudo rm -rf /opt/homebrew
+          nix build -L .#cairo
           nix develop -c true
