@@ -8,7 +8,9 @@ use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxR
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
 use starknet::accounts::Call;
-use starknet::core::types::{ExecuteInvocation, RevertedInvocation, TransactionTrace};
+use starknet::core::types::{
+    ExecuteInvocation, FunctionInvocation, RevertedInvocation, TransactionTrace,
+};
 
 use crate::types::event::StarknetEvent;
 use crate::types::tx_response::TxResponse;
@@ -39,22 +41,11 @@ where
 
         match tx_response.trace {
             TransactionTrace::Invoke(trace) => match trace.execute_invocation {
-                ExecuteInvocation::Success(trace) => {
-                    let events = trace
+                ExecuteInvocation::Success(invocation) => {
+                    let events = invocation
                         .calls
                         .into_iter()
-                        .map(|call| {
-                            call.events
-                                .into_iter()
-                                .map(|event| {
-                                    StarknetEvent::from_ordered_event(
-                                        call.contract_address,
-                                        call.class_hash,
-                                        event,
-                                    )
-                                })
-                                .collect()
-                        })
+                        .map(|invocation| extract_events_from_function_invocation(invocation))
                         .collect();
 
                     Ok(events)
@@ -68,6 +59,24 @@ where
             }
         }
     }
+}
+
+pub fn extract_events_from_function_invocation(
+    invocation: FunctionInvocation,
+) -> Vec<StarknetEvent> {
+    let events = invocation
+        .events
+        .into_iter()
+        .map(|event| {
+            StarknetEvent::from_ordered_event(
+                invocation.contract_address,
+                invocation.class_hash,
+                event,
+            )
+        })
+        .collect();
+
+    events
 }
 
 impl Debug for UnexpectedTransactionTraceType {
