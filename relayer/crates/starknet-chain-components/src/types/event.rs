@@ -9,6 +9,10 @@ pub struct StarknetEvent {
     pub data: Vec<Felt>,
 }
 
+pub struct UnknownEvent<'a> {
+    pub event: &'a StarknetEvent,
+}
+
 impl StarknetEvent {
     pub fn from_ordered_event(
         contract_address: Felt,
