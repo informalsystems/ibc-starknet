@@ -108,3 +108,9 @@ pub struct Timestamp {
     pub timestamp: u64,
 }
 
+pub impl U64IntoTimestamp of Into<u64, Timestamp> {
+    fn into(self: u64) -> Timestamp {
+        Timestamp { timestamp: self }
+    }
+}
+

@@ -31,7 +31,7 @@ pub(crate) mod MockTransferApp {
         TokenTransferComponent::IBCTokenAddress<ContractState>;
     impl TransferValidationImpl = TokenTransferComponent::TransferValidationImpl<ContractState>;
     impl TransferExecutionImpl = TokenTransferComponent::TransferExecutionImpl<ContractState>;
-    impl TransferInternalImpl = TokenTransferComponent::TransferInternalImpl<ContractState>;
+    impl TransferInitializerImpl = TokenTransferComponent::TransferInitializerImpl<ContractState>;
 
     #[storage]
     struct Storage {

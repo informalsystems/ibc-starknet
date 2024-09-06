@@ -1,5 +1,6 @@
 #[starknet::component]
 pub mod ClientHandlerComponent {
+    use core::num::traits::Zero;
     use starknet::ContractAddress;
     use starknet::storage::Map;
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
@@ -95,22 +96,22 @@ pub mod ClientHandlerComponent {
 
 
     #[generate_trait]
-    pub(crate) impl ClientInternalImpl<
+    impl ClientInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientInternalTrait<TContractState> {
         fn get_client(
             ref self: ComponentState<TContractState>, client_type: felt252
         ) -> ClientContract {
-            let client: ClientContract = self.supported_clients.read(client_type).into();
+            let client_address = self.supported_clients.read(client_type);
 
-            assert(client.is_non_zero(), ClientErrors::UNSUPPORTED_CLIENT_TYPE);
+            assert(client_address.is_non_zero(), ClientErrors::ZERO_CLIENT_ADDRESS);
 
-            client
+            client_address.into()
         }
     }
 
     #[generate_trait]
-    pub(crate) impl EventEmitterImpl<
+    impl EventEmitterImpl<
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,

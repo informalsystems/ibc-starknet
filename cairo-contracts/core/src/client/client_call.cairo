@@ -27,10 +27,6 @@ impl ClientContractIntoFelt252 of Into<ClientContract, felt252> {
 
 #[generate_trait]
 pub impl ClientContractImpl of ClientContractTrait {
-    fn is_non_zero(self: @ClientContract) -> bool {
-        self.address.is_non_zero()
-    }
-
     fn client_type(self: @ClientContract) -> felt252 {
         IClientStateDispatcher { contract_address: *self.address }.client_type()
     }
