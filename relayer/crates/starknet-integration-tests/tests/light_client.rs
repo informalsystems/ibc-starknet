@@ -7,12 +7,15 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
 use hermes_cosmos_chain_components::types::messages::client::create::CosmosCreateClientMessage;
+use hermes_cosmos_chain_components::types::messages::client::update::CosmosUpdateClientMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
+use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
+use hermes_relayer_components::chain::traits::types::create_client::HasCreateClientEvent;
 use hermes_starknet_chain_components::types::client_state::{
     StarknetClientState, WasmStarknetClientState,
 };
@@ -22,6 +25,8 @@ use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::client::types::Height;
 use ibc::core::primitives::Timestamp;
+use ibc_proto::google::protobuf::Any as IbcAny;
+use prost_types::Any;
 use sha2::{Digest, Sha256};
 
 #[test]
@@ -68,29 +73,68 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let cosmos_chain = cosmos_chain_driver.chain();
 
-        let client_state = WasmStarknetClientState {
-            wasm_code_hash: wasm_code_hash.into(),
-            client_state: StarknetClientState {
-                latest_height: Height::new(0, 1)?,
-            },
-        };
-
-        let consensus_state = StarknetConsensusState {
-            root: vec![1, 2, 3].into(),
-            time: Timestamp::now(),
-        };
-
         let encoding = StarknetProtobufEncoding;
 
-        let consensus_state_any = encoding.convert(&consensus_state)?;
+        let client_id = {
+            let client_state = WasmStarknetClientState {
+                wasm_code_hash: wasm_code_hash.into(),
+                client_state: StarknetClientState {
+                    latest_height: Height::new(0, 1)?,
+                },
+            };
 
-        let create_client_message = CosmosCreateClientMessage {
-            client_state: encoding.convert(&client_state)?,
-            consensus_state: consensus_state_any,
+            let consensus_state = StarknetConsensusState {
+                root: vec![1, 2, 3].into(),
+                time: Timestamp::now(),
+            };
+
+            let consensus_state_any = encoding.convert(&consensus_state)?;
+
+            let create_client_message = CosmosCreateClientMessage {
+                client_state: encoding.convert(&client_state)?,
+                consensus_state: consensus_state_any,
+            }
+            .to_cosmos_message();
+
+            let events = cosmos_chain.send_message(create_client_message).await?;
+
+            println!("create client events: {:?}", events);
+
+            let client_id = events
+                .into_iter()
+                .find_map(|event| {
+                    <CosmosChain as HasCreateClientEvent<CosmosChain>>::try_extract_create_client_event(event)
+                })
+                .unwrap()
+                .client_id;
+
+            println!("created client id: {:?}", client_id);
+
+            client_id
+        };
+
+        {
+            let consensus_state = StarknetConsensusState {
+                root: vec![4, 5, 6].into(),
+                time: Timestamp::now(),
+            };
+
+            let consensus_state_any: Any = encoding.convert(&consensus_state)?;
+
+            let update_client_message = CosmosUpdateClientMessage {
+                client_id,
+                header: IbcAny {
+                    type_url: consensus_state_any.type_url,
+                    value: consensus_state_any.value,
+                },
+            }
+            .to_cosmos_message();
+
+            let events = cosmos_chain.send_message(update_client_message).await?;
+
+            println!("update client events: {:?}", events);
         }
-        .to_cosmos_message();
 
-        cosmos_chain.send_message(create_client_message).await?;
 
         Ok(())
     })

@@ -39,6 +39,7 @@ prost-types                 = { version = "0.13.1" }
 cairo-lang-starknet-classes = { version = "2.7.0" }
 
 ibc                       = { version = "0.54.0" }
+ibc-proto                 = { version = "0.47.0" }
 ibc-client-starknet-types = { version = "0.1.0" }
 
 hermes-runtime-components           = { version = "0.1.0" }

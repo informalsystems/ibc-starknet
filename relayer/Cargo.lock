@@ -2148,6 +2148,8 @@ dependencies = [
  "hermes-starknet-test-components",
  "hermes-test-components",
  "ibc",
+ "ibc-proto",
+ "prost-types",
  "rand",
  "serde_json",
  "sha2 0.10.8",

@@ -24,9 +24,9 @@ impl From<WasmStarknetClientState> for ClientState {
     }
 }
 
-pub struct EncodeWasmStarknetClientState;
+pub struct ConvertWasmStarknetClientState;
 
-impl<Encoding> Converter<Encoding, WasmStarknetClientState, Any> for EncodeWasmStarknetClientState
+impl<Encoding> Converter<Encoding, WasmStarknetClientState, Any> for ConvertWasmStarknetClientState
 where
     Encoding: HasEncodedType<Encoded = Vec<u8>>
         + CanEncode<ViaAny, ClientState>
@@ -50,7 +50,7 @@ where
     }
 }
 
-impl<Encoding> Converter<Encoding, Any, WasmStarknetClientState> for EncodeWasmStarknetClientState
+impl<Encoding> Converter<Encoding, Any, WasmStarknetClientState> for ConvertWasmStarknetClientState
 where
     Encoding: HasEncodedType<Encoded = Vec<u8>>
         + CanDecode<ViaAny, ClientState>

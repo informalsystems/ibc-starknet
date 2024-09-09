@@ -25,10 +25,12 @@ use hermes_wasm_client_components::types::consensus_state::{
 };
 
 use crate::types::client_state::{
-    EncodeWasmStarknetClientState, ProtoStarknetClientState, StarknetClientState,
+    ConvertWasmStarknetClientState, ProtoStarknetClientState, StarknetClientState,
     WasmStarknetClientState,
 };
-use crate::types::consensus_state::{ProtoStarknetConsensusState, StarknetConsensusState};
+use crate::types::consensus_state::{
+    ProtoStarknetConsensusState, StarknetConsensusState, WasmStarknetConsensusState,
+};
 
 define_components! {
     StarknetProtobufEncodingComponents {
@@ -109,7 +111,13 @@ delegate_components! {
             (Any, WasmStarknetClientState),
             (WasmStarknetClientState, Any),
         ]:
-            EncodeWasmStarknetClientState,
+            ConvertWasmStarknetClientState,
+
+        [
+            (Any, WasmStarknetConsensusState),
+            (WasmStarknetConsensusState, Any),
+        ]:
+            ConvertWasmStarknetClientState,
 
         (StarknetConsensusState, Any): EncodeViaWasmConsensusState,
         (Any, StarknetConsensusState): DecodeViaWasmConsensusState,
