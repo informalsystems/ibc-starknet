@@ -1,0 +1,17 @@
+[package]
+name         = "hermes-starknet-relayer"
+version      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
+keywords     = { workspace = true }
+repository   = { workspace = true }
+authors      = { workspace = true }
+rust-version = { workspace = true }
+readme       = "README.md"
+
+[dependencies]
+cgp                           = { workspace = true }
+ibc                           = { workspace = true }
+hermes-error                  = { workspace = true }
+hermes-runtime                = { workspace = true }
+hermes-starknet-chain-context = { workspace = true }

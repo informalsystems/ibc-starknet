@@ -6,6 +6,7 @@ members = [
   "crates/cairo-encoding-components",
   "crates/starknet-chain-components",
   "crates/starknet-chain-context",
+  "crates/starknet-relayer",
   "crates/starknet-test-components",
   "crates/starknet-integration-tests",
 ]
@@ -72,6 +73,7 @@ hermes-cairo-encoding-components = { path = "./crates/cairo-encoding-components"
 hermes-starknet-chain-components = { path = "./crates/starknet-chain-components" }
 hermes-starknet-test-components  = { path = "./crates/starknet-test-components" }
 hermes-starknet-chain-context    = { path = "./crates/starknet-chain-context" }
+hermes-starknet-relayer          = { path = "./crates/starknet-relayer" }
 
 ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types" }
 

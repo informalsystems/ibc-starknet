@@ -102,8 +102,6 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let events = cosmos_chain.send_message(create_client_message).await?;
 
-            println!("create client events: {:?}", events);
-
             let client_id = events
                 .into_iter()
                 .find_map(|event| {

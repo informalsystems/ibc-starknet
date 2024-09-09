@@ -39,6 +39,8 @@ where
             &chain_genesis_config.seed.to_string(),
             "--port",
             &chain_node_config.rpc_port.to_string(),
+            "--block-generation-on",
+            "1s",
             "--dump-on",
             "block",
             "--dump-path",

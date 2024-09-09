@@ -2142,6 +2142,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "hermes-starknet-relayer"
+version = "0.1.0"
+dependencies = [
+ "cgp",
+ "hermes-error",
+ "hermes-runtime",
+ "hermes-starknet-chain-context",
+ "ibc",
+]
+
+[[package]]
 name = "hermes-starknet-test-components"
 version = "0.1.0"
 dependencies = [
