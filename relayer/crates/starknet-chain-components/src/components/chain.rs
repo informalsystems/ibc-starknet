@@ -1,4 +1,5 @@
 use cgp::prelude::*;
+pub use hermes_relayer_components::chain::traits::queries::chain_status::ChainStatusQuerierComponent;
 pub use hermes_relayer_components::chain::traits::send_message::MessageSenderComponent;
 pub use hermes_relayer_components::chain::traits::types::chain_id::ChainIdTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::client_state::ClientStateTypeComponent;
@@ -8,6 +9,8 @@ pub use hermes_relayer_components::chain::traits::types::height::{
     HeightFieldComponent, HeightTypeComponent,
 };
 pub use hermes_relayer_components::chain::traits::types::message::MessageTypeComponent;
+pub use hermes_relayer_components::chain::traits::types::status::ChainStatusTypeComponent;
+pub use hermes_relayer_components::chain::traits::types::timestamp::TimestampTypeComponent;
 use hermes_relayer_components::error::impls::retry::ReturnRetryable;
 pub use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
 pub use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeoutGetterComponent;
@@ -27,6 +30,7 @@ use crate::impls::contract::declare::DeclareSierraContract;
 use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
+use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::send_message::SendCallMessages;
 use crate::impls::submit_tx::SubmitCallTransaction;
@@ -40,8 +44,11 @@ use crate::impls::types::client::ProvideStarknetIbcClientTypes;
 use crate::impls::types::contract::ProvideStarknetContractTypes;
 use crate::impls::types::denom::ProvideTokenAddressDenom;
 use crate::impls::types::event::ProvideStarknetEvent;
+use crate::impls::types::height::ProvideStarknetHeight;
 use crate::impls::types::message::ProvideCallMessage;
 use crate::impls::types::method::ProvideFeltSelector;
+use crate::impls::types::status::ProvideStarknetChainStatusType;
+use crate::impls::types::timestamp::ProvideStarknetTimestampType;
 use crate::impls::types::transaction::ProvideCallTransaction;
 use crate::impls::types::tx_hash::ProvideFeltTxHash;
 use crate::impls::types::tx_response::ProvideStarknetTxResponse;
@@ -58,7 +65,6 @@ pub use crate::traits::types::contract_class::{
     ContractClassHashTypeComponent, ContractClassTypeComponent,
 };
 pub use crate::traits::types::method::SelectorTypeComponent;
-use crate::types::height::ProvideStarknetHeight;
 use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
 
 define_components! {
@@ -70,6 +76,10 @@ define_components! {
             HeightFieldComponent,
         ]:
             ProvideStarknetHeight,
+        TimestampTypeComponent:
+            ProvideStarknetTimestampType,
+        ChainStatusTypeComponent:
+            ProvideStarknetChainStatusType,
         AddressTypeComponent:
             ProvideFeltAddressType,
         BlobTypeComponent:
@@ -100,6 +110,8 @@ define_components! {
             ConsensusStateTypeComponent,
         ]:
             ProvideStarknetIbcClientTypes,
+        ChainStatusQuerierComponent:
+            QueryStarknetChainStatus,
         MessageSenderComponent:
             SendCallMessages,
         TxSubmitterComponent:

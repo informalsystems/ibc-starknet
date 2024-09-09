@@ -1733,8 +1733,7 @@ checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
 [[package]]
 name = "hermes-any-counterparty"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "953baf43f881d8e5f0c13b9ed08a089e4514f40ab28243bfce3afea58b19292e"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "cgp-error-eyre",
@@ -1751,8 +1750,7 @@ dependencies = [
 [[package]]
 name = "hermes-async-runtime-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "49ebd58f534e8951d1f5fecad31e2622150bafcbabca5b26456256dbe09531f9"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "async-trait",
  "cgp",
@@ -1775,19 +1773,16 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-chain-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6fd5551d353d08dbd2502c5fac5487c292662cc387b175c72e297d2045e6796"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "bech32 0.9.1",
  "cgp",
- "cgp-component-macro",
  "eyre",
  "futures",
  "hermes-encoding-components",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
  "hermes-relayer-components-extra",
- "hermes-runtime",
  "http 1.1.0",
  "ibc",
  "ibc-proto",
@@ -1810,8 +1805,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-integration-tests"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba81cdbce165224dad2bb46d94dbd72ab91c7dee78349fa903209123b716010d"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "eyre",
@@ -1845,8 +1839,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-relayer"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c97425140376d0d3756e8d851280b9adf61973a3e650d62e15b101df0f959773"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "eyre",
@@ -1892,8 +1885,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-test-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c47a605965aa2ace76186ce0fd5d251edecc47a94df9579c31ef5e76d12b91ee"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "hdpath",
@@ -1918,8 +1910,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-wasm-relayer"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fdde1d45448e718affba18c22c27f4f202f42d57c32238e0471e841009b5069"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "eyre",
@@ -1970,8 +1961,7 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3b65ff1e8765232fb550bd30d9159c6ebd54827122ffa9575d5a3ff22c68b72"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
 ]
@@ -1979,8 +1969,7 @@ dependencies = [
 [[package]]
 name = "hermes-error"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd31d7da382967dfcf33f0a62704876d271c101ade9b8fc542a2cec61cb8baac"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "eyre",
@@ -1990,8 +1979,7 @@ dependencies = [
 [[package]]
 name = "hermes-ibc-test-suite"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fb509b9720088703ccf111f63e626b0597c22bf6c23c54facc3f3ec46564425"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "hermes-logging-components",
@@ -2002,8 +1990,7 @@ dependencies = [
 [[package]]
 name = "hermes-logger"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b4a7eaf2c85295add84cbe86016085c831e2c2b2d2be9c3d8decdc09bf54488"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "hermes-logging-components",
@@ -2015,8 +2002,7 @@ dependencies = [
 [[package]]
 name = "hermes-logging-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d30569fdc5eb626e938225dfddcbf1a946cd45ee254a18326763b67747bb4938"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
 ]
@@ -2024,8 +2010,7 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c200637bd33c20c7038f5880c04a898f4ee2ab27a09b2168060552095560078b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -2036,8 +2021,7 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e7e22a8df3d40132a35059bfbdcb38f1ee40a1b4148c4f3dcebc8958993e1ab0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -2048,8 +2032,7 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components-extra"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cdd245e3a539a562b8cf1430feaf1efd4630fa1132c6c756f94c55aa3eb5c9a6"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "hermes-logging-components",
@@ -2060,8 +2043,7 @@ dependencies = [
 [[package]]
 name = "hermes-runtime"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61d1b64498f9972a1267c77e3804823f7e9bc73a5cfdcc6d22172fa71e7d57c3"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "hermes-async-runtime-components",
@@ -2073,8 +2055,7 @@ dependencies = [
 [[package]]
 name = "hermes-runtime-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "991db35393e0c62db2ca738c5a9a6fec2d54e8b4d814ac96f4deb83ebf8a885a"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
 ]
@@ -2176,8 +2157,7 @@ dependencies = [
 [[package]]
 name = "hermes-test-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6266d0255b20877d5a250f0218eadadec1aeb322de54f5fcf6214e3a45c0d13"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "hermes-relayer-components",
@@ -2188,8 +2168,7 @@ dependencies = [
 [[package]]
 name = "hermes-tokio-runtime-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c53d99adcb1526d7b9ed5954ad84fbcd33fb4b74c0a07e815efde8c1cd41f97"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "futures",
@@ -2203,8 +2182,7 @@ dependencies = [
 [[package]]
 name = "hermes-tracing-logging-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "84e6fe47336097bb6ef1f1eb2e25b565bde6e49768757e6a4945a16b957bb9a2"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "hermes-logging-components",
@@ -2216,8 +2194,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-client-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f988b126a93012851c3dd6bbfc9c0fed29787fe7297d96437dae156c906d236e"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "cgp-error-eyre",
@@ -2235,8 +2212,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-test-components"
 version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "728777e6a0ae478bf58084891742f7b5670c3a3b54c5b6b3586914daa78d7d5e"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/minor-refactoring#7452cd8f39fffb835f8781cb1d7efb31b1fe93e1"
 dependencies = [
  "cgp",
  "cgp-error-eyre",

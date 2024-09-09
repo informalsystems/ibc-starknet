@@ -28,7 +28,6 @@ use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::client::types::Height;
 use ibc::core::primitives::Timestamp;
-use ibc_proto::google::protobuf::Any as IbcAny;
 use prost_types::Any;
 use sha2::{Digest, Sha256};
 
@@ -132,10 +131,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let update_client_message = CosmosUpdateClientMessage {
                 client_id,
-                header: IbcAny {
-                    type_url: header_any.type_url,
-                    value: header_any.value,
-                },
+                header: header_any,
             }
             .to_cosmos_message();
 
