@@ -12,6 +12,7 @@ readme       = "README.md"
 [dependencies]
 cgp                                 = { workspace = true }
 ibc                                 = { workspace = true }
+ibc-proto                           = { workspace = true }
 hermes-relayer-components           = { workspace = true }
 hermes-test-components              = { workspace = true }
 hermes-encoding-components          = { workspace = true }

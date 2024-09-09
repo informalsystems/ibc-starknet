@@ -35,4 +35,5 @@ tokio      = { workspace = true }
 serde_json = { workspace = true }
 rand       = { workspace = true }
 sha2       = { workspace = true }
+prost = { workspace = true }
 prost-types = { workspace = true }

@@ -19,13 +19,17 @@ use hermes_relayer_components::chain::traits::types::create_client::HasCreateCli
 use hermes_starknet_chain_components::types::client_state::{
     StarknetClientState, WasmStarknetClientState,
 };
-use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
+use hermes_starknet_chain_components::types::consensus_state::{
+    StarknetConsensusState, WasmStarknetConsensusState,
+};
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
+use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::client::types::Height;
 use ibc::core::primitives::Timestamp;
 use ibc_proto::google::protobuf::Any as IbcAny;
+use prost::Message;
 use prost_types::Any;
 use sha2::{Digest, Sha256};
 
@@ -83,9 +87,11 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 },
             };
 
-            let consensus_state = StarknetConsensusState {
-                root: vec![1, 2, 3].into(),
-                time: Timestamp::now(),
+            let consensus_state = WasmStarknetConsensusState {
+                consensus_state: StarknetConsensusState {
+                    root: vec![1, 2, 3].into(),
+                    time: Timestamp::now(),
+                }
             };
 
             let consensus_state_any = encoding.convert(&consensus_state)?;
@@ -121,6 +127,10 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let consensus_state_any: Any = encoding.convert(&consensus_state)?;
 
+            let wasm_client_header = ClientMessage {
+                data: consensus_state_any.encode_to_vec(),
+            };
+
             let update_client_message = CosmosUpdateClientMessage {
                 client_id,
                 header: IbcAny {
@@ -134,7 +144,6 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             println!("update client events: {:?}", events);
         }
-
 
         Ok(())
     })
