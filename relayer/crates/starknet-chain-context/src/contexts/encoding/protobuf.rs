@@ -8,7 +8,9 @@ use hermes_starknet_chain_components::components::encoding::protobuf::*;
 use hermes_starknet_chain_components::types::client_state::{
     StarknetClientState, WasmStarknetClientState,
 };
-use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
+use hermes_starknet_chain_components::types::consensus_state::{
+    StarknetConsensusState, WasmStarknetConsensusState,
+};
 
 use crate::impls::error::HandleStarknetError;
 
@@ -44,6 +46,8 @@ pub trait CanUseStarknetProtobufEncoding:
     + CanConvert<Any, StarknetConsensusState>
     + CanConvert<WasmStarknetClientState, Any>
     + CanConvert<Any, WasmStarknetClientState>
+    + CanConvert<WasmStarknetConsensusState, Any>
+    + CanConvert<Any, WasmStarknetConsensusState>
 {
 }
 

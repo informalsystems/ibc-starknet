@@ -20,8 +20,7 @@ use hermes_protobuf_encoding_components::types::{Any, ViaAny, ViaProtobuf};
 use hermes_wasm_client_components::impls::encoding::components::WasmEncodingComponents;
 use hermes_wasm_client_components::types::client_state::{ProtoWasmClientState, WasmClientState};
 use hermes_wasm_client_components::types::consensus_state::{
-    DecodeViaWasmConsensusState, EncodeViaWasmConsensusState, ProtoWasmConsensusState,
-    WasmConsensusState,
+    ProtoWasmConsensusState, WasmConsensusState,
 };
 
 use crate::types::client_state::{
@@ -29,7 +28,8 @@ use crate::types::client_state::{
     WasmStarknetClientState,
 };
 use crate::types::consensus_state::{
-    ProtoStarknetConsensusState, StarknetConsensusState, WasmStarknetConsensusState,
+    ConvertWasmStarknetConsensusState, ProtoStarknetConsensusState, StarknetConsensusState,
+    WasmStarknetConsensusState,
 };
 
 define_components! {
@@ -95,6 +95,9 @@ delegate_components! {
         (StarknetClientState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
         (Any, StarknetClientState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
 
+        (StarknetConsensusState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
+        (Any, StarknetConsensusState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
+
         [
             (WasmClientState, ProtoWasmClientState),
             (ProtoWasmClientState, WasmClientState),
@@ -117,10 +120,8 @@ delegate_components! {
             (Any, WasmStarknetConsensusState),
             (WasmStarknetConsensusState, Any),
         ]:
-            ConvertWasmStarknetClientState,
+            ConvertWasmStarknetConsensusState,
 
-        (StarknetConsensusState, Any): EncodeViaWasmConsensusState,
-        (Any, StarknetConsensusState): DecodeViaWasmConsensusState,
     }
 }
 
