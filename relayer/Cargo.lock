@@ -2146,10 +2146,17 @@ name = "hermes-starknet-relayer"
 version = "0.1.0"
 dependencies = [
  "cgp",
+ "hermes-cosmos-relayer",
+ "hermes-encoding-components",
  "hermes-error",
+ "hermes-logger",
+ "hermes-logging-components",
+ "hermes-relayer-components",
  "hermes-runtime",
+ "hermes-runtime-components",
  "hermes-starknet-chain-context",
  "ibc",
+ "ibc-relayer-types",
 ]
 
 [[package]]

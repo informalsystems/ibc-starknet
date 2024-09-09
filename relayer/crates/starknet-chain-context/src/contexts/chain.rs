@@ -64,7 +64,7 @@ use crate::contexts::encoding::cairo::StarknetCairoEncoding;
 use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use crate::impls::error::HandleStarknetError;
 
-#[derive(HasField)]
+#[derive(HasField, Clone)]
 pub struct StarknetChain {
     pub runtime: HermesRuntime,
     pub chain_id: Felt,
