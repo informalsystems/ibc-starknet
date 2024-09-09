@@ -16,6 +16,7 @@ use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 use hermes_relayer_components::chain::traits::types::create_client::HasCreateClientEvent;
+use hermes_starknet_chain_components::types::client_header::StarknetClientHeader;
 use hermes_starknet_chain_components::types::client_state::{
     StarknetClientState, WasmStarknetClientState,
 };
@@ -25,11 +26,9 @@ use hermes_starknet_chain_components::types::consensus_state::{
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
-use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::client::types::Height;
 use ibc::core::primitives::Timestamp;
 use ibc_proto::google::protobuf::Any as IbcAny;
-use prost::Message;
 use prost_types::Any;
 use sha2::{Digest, Sha256};
 
@@ -125,17 +124,17 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 time: Timestamp::now(),
             };
 
-            let consensus_state_any: Any = encoding.convert(&consensus_state)?;
-
-            let wasm_client_header = ClientMessage {
-                data: consensus_state_any.encode_to_vec(),
+            let header = StarknetClientHeader {
+                consensus_state
             };
+
+            let header_any: Any = encoding.convert(&header)?;
 
             let update_client_message = CosmosUpdateClientMessage {
                 client_id,
                 header: IbcAny {
-                    type_url: consensus_state_any.type_url,
-                    value: consensus_state_any.value,
+                    type_url: header_any.type_url,
+                    value: header_any.value,
                 },
             }
             .to_cosmos_message();
