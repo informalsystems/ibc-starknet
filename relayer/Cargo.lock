@@ -2080,6 +2080,7 @@ dependencies = [
  "prost-types",
  "serde_json",
  "starknet",
+ "tonic",
 ]
 
 [[package]]
