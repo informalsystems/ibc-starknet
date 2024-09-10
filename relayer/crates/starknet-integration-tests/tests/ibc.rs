@@ -85,13 +85,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let ics20_contract_address = {
             let owner_call_data = cairo_encoding.encode(&Felt::from(1))?; // dummy owner
-            let erc20_call_date = cairo_encoding.encode(&erc20_class_hash)?;
+            let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
 
             let contract_address = chain
                 .deploy_contract(
                     &ics20_class_hash,
                     false,
-                    &[owner_call_data, erc20_call_date].concat(),
+                    &[owner_call_data, erc20_call_data].concat(),
                 )
                 .await?;
 
