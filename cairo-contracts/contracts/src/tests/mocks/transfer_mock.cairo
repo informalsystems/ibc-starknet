@@ -18,11 +18,19 @@ pub(crate) mod MockTransferApp {
     component!(path: TransferrableComponent, storage: transferrable, event: TransferrableEvent);
     component!(path: TokenTransferComponent, storage: transfer, event: TokenTransferEvent);
 
+    // Ownable Mixin
+    #[abi(embed_v0)]
+    impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
+    impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
+
+    // Transferrable
     #[abi(embed_v0)]
     impl TokenTransferreableImpl =
         TransferrableComponent::Transferrable<ContractState>;
     impl TokenTransferreableInternalImpl =
         TransferrableComponent::TransferrableInternalImpl<ContractState>;
+
+    // Token Transfer
     #[abi(embed_v0)]
     impl TokenSendTransferImpl =
         TokenTransferComponent::SendTransfer<ContractState>;
@@ -58,8 +66,9 @@ pub(crate) mod MockTransferApp {
 
     #[constructor]
     fn constructor(ref self: ContractState, owner: ContractAddress, erc20_class_hash: ClassHash) {
+        self.ownable.initializer(owner);
         self.transferrable.initializer();
-        self.transfer.initializer(owner, erc20_class_hash);
+        self.transfer.initializer(erc20_class_hash);
     }
 
     #[external(v0)]

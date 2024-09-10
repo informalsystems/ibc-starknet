@@ -6,7 +6,6 @@ pub mod TokenTransferComponent {
     use core::option::OptionTrait;
     use core::starknet::SyscallResultTrait;
     use core::traits::TryInto;
-    use openzeppelin_access::ownable::OwnableComponent::InternalTrait;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
     use starknet::ClassHash;
@@ -82,19 +81,11 @@ pub mod TokenTransferComponent {
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
-        impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of TransferInitializerTrait<TContractState> {
         fn initializer(
             ref self: ComponentState<TContractState>,
-            owner: ContractAddress,
             erc20_class_hash: ClassHash
         ) {
-            assert(owner.is_non_zero(), TransferErrors::ZERO_OWNER);
-
-            let mut ownable_comp = get_dep_component_mut!(ref self, Ownable);
-
-            ownable_comp.initializer(owner);
-
             assert(erc20_class_hash.is_non_zero(), TransferErrors::ZERO_ERC20_CLASS_HASH);
 
             self.write_erc20_class_hash(erc20_class_hash);

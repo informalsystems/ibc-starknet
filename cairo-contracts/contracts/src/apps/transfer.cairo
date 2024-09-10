@@ -1,9 +1,11 @@
 #[starknet::contract]
 pub mod TransferApp {
+    use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet_ibc_apps::transfer::components::{TokenTransferComponent, TransferrableComponent};
+    use starknet_ibc_apps::transfer::TransferErrors;
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
@@ -11,16 +13,24 @@ pub mod TransferApp {
     component!(path: TransferrableComponent, storage: transferrable, event: TransferrableEvent);
     component!(path: TokenTransferComponent, storage: transfer, event: TokenTransferEvent);
 
+    // Ownable Mixin
+    #[abi(embed_v0)]
+    impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
+    impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
+
+    // IBC Governance
     #[abi(embed_v0)]
     impl IBCGovernanceImpl = IBCGovernanceComponent::Governance<ContractState>;
     impl IBCGovernanceInternalImpl = IBCGovernanceComponent::GovernanceInternalImpl<ContractState>;
 
+    // Transferrable
     #[abi(embed_v0)]
     impl TokenTransferreableImpl =
         TransferrableComponent::Transferrable<ContractState>;
     impl TokenTransferreableInternal =
         TransferrableComponent::TransferrableInternalImpl<ContractState>;
 
+    // Token Transfer
     #[abi(embed_v0)]
     impl TokenSendTransferImpl =
         TokenTransferComponent::SendTransfer<ContractState>;
@@ -60,8 +70,10 @@ pub mod TransferApp {
 
     #[constructor]
     fn constructor(ref self: ContractState, owner: ContractAddress, erc20_class_hash: ClassHash) {
+        assert(owner.is_non_zero(), TransferErrors::ZERO_OWNER);
+        self.ownable.initializer(owner);
         self.governance.initializer();
         self.transferrable.initializer();
-        self.transfer.initializer(owner, erc20_class_hash);
+        self.transfer.initializer(erc20_class_hash);
     }
 }
