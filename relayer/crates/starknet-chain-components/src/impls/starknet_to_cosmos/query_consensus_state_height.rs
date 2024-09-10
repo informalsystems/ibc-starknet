@@ -35,7 +35,7 @@ where
         };
 
         let response = client
-            .consensus_state_heights(tonic::Request::new(request.into()))
+            .consensus_state_heights(tonic::Request::new(request))
             .await
             .map_err(Chain::raise_error)?
             .into_inner();

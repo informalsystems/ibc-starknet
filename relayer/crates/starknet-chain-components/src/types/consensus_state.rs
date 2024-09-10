@@ -43,7 +43,7 @@ where
         encoding: &Encoding,
         consensus_state_any: &Any,
     ) -> Result<WasmStarknetConsensusState, Encoding::Error> {
-        let consensus_state = DecodeViaWasmConsensusState::convert(encoding, &consensus_state_any)?;
+        let consensus_state = DecodeViaWasmConsensusState::convert(encoding, consensus_state_any)?;
 
         Ok(WasmStarknetConsensusState { consensus_state })
     }

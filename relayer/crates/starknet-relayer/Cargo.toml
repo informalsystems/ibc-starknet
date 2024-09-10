@@ -23,4 +23,4 @@ hermes-relayer-components     = { workspace = true }
 hermes-cosmos-relayer         = { workspace = true }
 hermes-starknet-chain-context = { workspace = true }
 
-eyre                           = { workspace = true }
+eyre = { workspace = true }
