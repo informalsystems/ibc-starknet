@@ -11,6 +11,7 @@ use starknet_ibc_apps::transfer::interfaces::{
     ISendTransferDispatcherTrait, IRecvPacketDispatcherTrait, ITokenAddressDispatcherTrait
 };
 use starknet_ibc_apps::transfer::types::{MsgTransfer, Participant, PrefixedDenom, Memo};
+use starknet_ibc_contracts::tests::constants::OWNER;
 use starknet_ibc_core::channel::Packet;
 
 #[derive(Drop, Serde)]
@@ -24,6 +25,7 @@ pub impl TransferAppHandleImpl of TransferAppHandleTrait {
     fn setup(erc20_class: ContractClass) -> TransferAppHandle {
         let mut call_data = array![];
 
+        call_data.append_serde(OWNER());
         call_data.append_serde(erc20_class.class_hash);
 
         let contract_address = declare_and_deploy("TransferApp", call_data);

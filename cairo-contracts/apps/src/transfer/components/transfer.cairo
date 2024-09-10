@@ -6,6 +6,9 @@ pub mod TokenTransferComponent {
     use core::option::OptionTrait;
     use core::starknet::SyscallResultTrait;
     use core::traits::TryInto;
+    use openzeppelin_access::ownable::OwnableComponent::InternalTrait;
+    use openzeppelin_access::ownable::OwnableComponent;
+    use openzeppelin_access::ownable::interface::IOwnable;
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet::get_contract_address;
@@ -24,7 +27,6 @@ pub mod TokenTransferComponent {
 
     #[storage]
     struct Storage {
-        owner: ContractAddress,
         erc20_class_hash: ClassHash,
         salt: felt252,
         ibc_token_key_to_address: Map<felt252, ContractAddress>,
@@ -77,10 +79,26 @@ pub mod TokenTransferComponent {
 
     #[generate_trait]
     pub impl TransferInitializerImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of TransferInitializerTrait<TContractState> {
-        fn initializer(ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash) {
+        fn initializer(
+            ref self: ComponentState<TContractState>,
+            owner: ContractAddress,
+            erc20_class_hash: ClassHash
+        ) {
+            assert(owner.is_non_zero(), TransferErrors::ZERO_OWNER);
+
+            let mut ownable_comp = get_dep_component_mut!(ref self, Ownable);
+
+            ownable_comp.initializer(owner);
+
+            assert(erc20_class_hash.is_non_zero(), TransferErrors::ZERO_ERC20_CLASS_HASH);
+
             self.write_erc20_class_hash(erc20_class_hash);
+
             self.write_salt(0);
         }
     }
@@ -176,10 +194,14 @@ pub mod TokenTransferComponent {
         TContractState,
         +HasComponent<TContractState>,
         +ITransferrable<TContractState>,
-        +Drop<TContractState>
+        +Drop<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of IAppCallback<ComponentState<TContractState>> {
         fn on_recv_packet(ref self: ComponentState<TContractState>, packet: Packet) {
-            assert(self.read_owner() == get_contract_address(), TransferErrors::INVALID_OWNER);
+            let ownable_comp = get_dep_component!(@self, Ownable);
+
+            assert(ownable_comp.owner() == get_contract_address(), TransferErrors::INVALID_OWNER);
+
             self._recv_execute(packet);
         }
     }
@@ -478,10 +500,6 @@ pub mod TokenTransferComponent {
     impl TransferReaderImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferReaderTrait<TContractState> {
-        fn read_owner(self: @ComponentState<TContractState>) -> ContractAddress {
-            self.owner.read()
-        }
-
         fn read_erc20_class_hash(self: @ComponentState<TContractState>) -> ClassHash {
             self.erc20_class_hash.read()
         }
@@ -507,10 +525,6 @@ pub mod TokenTransferComponent {
     impl TransferWriterImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferWriterTrait<TContractState> {
-        fn write_owner(ref self: ComponentState<TContractState>, owner: ContractAddress) {
-            self.owner.write(owner);
-        }
-
         fn write_erc20_class_hash(
             ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash
         ) {

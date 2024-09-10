@@ -19,6 +19,4 @@ impl ApplicationContractIntoFelt252 of Into<ApplicationContract, felt252> {
 }
 
 #[generate_trait]
-pub impl ApplicationContractImpl of ApplicationContractTrait {
-
-}
+pub impl ApplicationContractImpl of ApplicationContractTrait {}
