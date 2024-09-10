@@ -22,6 +22,7 @@ use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
+use hermes_relayer_components::chain::traits::types::packet::HasIbcPacketTypes;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
@@ -165,6 +166,7 @@ pub trait CanUseStarknetChain:
     + HasBlobType<Blob = Vec<Felt>>
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = StarknetConsensusState>
+    + HasIbcPacketTypes<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount
     + CanQueryChainStatus

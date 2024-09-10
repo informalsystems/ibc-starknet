@@ -1,4 +1,9 @@
 use cgp::prelude::*;
+pub use hermes_cosmos_chain_components::components::client::{
+    IbcPacketTypesProviderComponent, PacketFieldsReaderComponent,
+};
+use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
+use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
 pub use hermes_relayer_components::chain::traits::queries::chain_status::ChainStatusQuerierComponent;
 pub use hermes_relayer_components::chain::traits::send_message::MessageSenderComponent;
 pub use hermes_relayer_components::chain::traits::types::chain_id::ChainIdTypeComponent;
@@ -8,6 +13,7 @@ pub use hermes_relayer_components::chain::traits::types::event::EventTypeCompone
 pub use hermes_relayer_components::chain::traits::types::height::{
     HeightFieldComponent, HeightTypeComponent,
 };
+pub use hermes_relayer_components::chain::traits::types::ibc::IbcChainTypesComponent;
 pub use hermes_relayer_components::chain::traits::types::message::MessageTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::status::ChainStatusTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::timestamp::TimestampTypeComponent;
@@ -106,10 +112,17 @@ define_components! {
         ]:
             ProvideStarknetContractTypes,
         [
+            IbcChainTypesComponent,
+            IbcPacketTypesProviderComponent,
+        ]:
+            ProvideCosmosChainTypes,
+        [
             ClientStateTypeComponent,
             ConsensusStateTypeComponent,
         ]:
             ProvideStarknetIbcClientTypes,
+        PacketFieldsReaderComponent:
+            CosmosPacketFieldReader,
         ChainStatusQuerierComponent:
             QueryStarknetChainStatus,
         MessageSenderComponent:
