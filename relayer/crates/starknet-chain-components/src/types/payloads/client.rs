@@ -1,7 +1,8 @@
 use cgp::prelude::*;
 
+use crate::types::client_header::StarknetClientHeader;
 use crate::types::client_state::WasmStarknetClientState;
-use crate::types::consensus_state::{StarknetConsensusState, WasmStarknetConsensusState};
+use crate::types::consensus_state::WasmStarknetConsensusState;
 
 #[derive(Debug, HasField)]
 pub struct StarknetCreateClientPayload {
@@ -14,5 +15,5 @@ pub struct StarknetCreateClientPayloadOptions {
 }
 
 pub struct StarknetUpdateClientPayload {
-    pub consensus_state: StarknetConsensusState,
+    pub header: StarknetClientHeader,
 }

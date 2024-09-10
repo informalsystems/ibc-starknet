@@ -5,6 +5,7 @@ use hermes_relayer_components::chain::traits::types::height::HasHeightType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use ibc::primitives::Timestamp;
 
+use crate::types::client_header::StarknetClientHeader;
 use crate::types::consensus_state::StarknetConsensusState;
 use crate::types::payloads::client::StarknetUpdateClientPayload;
 use crate::types::status::StarknetChainStatus;
@@ -34,6 +35,8 @@ where
             time: Timestamp::now(),
         };
 
-        Ok(StarknetUpdateClientPayload { consensus_state })
+        let header = StarknetClientHeader { consensus_state };
+
+        Ok(StarknetUpdateClientPayload { header })
     }
 }

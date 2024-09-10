@@ -6,6 +6,7 @@ pub mod payload_builders;
 pub mod provider;
 pub mod queries;
 pub mod send_message;
+pub mod starknet_to_cosmos;
 pub mod submit_tx;
 pub mod transfer;
 pub mod tx_response;
