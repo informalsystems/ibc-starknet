@@ -172,6 +172,21 @@ pub mod CometClientComponent {
     impl ClientValidationImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of IClientStateValidation<ComponentState<TContractState>> {
+        fn verify_membership(
+            self: @ComponentState<TContractState>,
+            client_sequence: u64,
+            key: felt252,
+            value: Array<felt252>,
+            proof: Array<felt252>
+        ) {}
+
+        fn verify_non_membership(
+            self: @ComponentState<TContractState>,
+            client_sequence: u64,
+            key: felt252,
+            proof: Array<felt252>
+        ) {}
+
         fn verify_client_message(
             self: @ComponentState<TContractState>,
             client_sequence: u64,
@@ -283,6 +298,16 @@ pub mod CometClientComponent {
     impl ClientInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientInternalTrait<TContractState> {
+        fn _root(self: @ComponentState<TContractState>, client_sequence: u64) -> felt252 {
+            let latest_height = self.latest_height(client_sequence);
+
+            let latest_consensus_state = self.read_consensus_state(client_sequence, latest_height);
+
+            assert(!latest_consensus_state.is_zero(), CometErrors::ZERO_CONSENSUS_STATE);
+
+            latest_consensus_state.root
+        }
+
         fn _status(
             self: @ComponentState<TContractState>,
             client_state: CometClientState,

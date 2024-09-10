@@ -8,9 +8,8 @@ pub mod ClientHandlerComponent {
     use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient};
     use starknet_ibc_core::client::{
         MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height,
-        CreateResponse, UpdateResponse, ClientErrors
+        CreateResponse, UpdateResponse, ClientErrors, ClientContract, ClientContractTrait
     };
-    use starknet_ibc_core::client::{ClientContract, ClientContractTrait};
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
 
     #[storage]
@@ -96,11 +95,11 @@ pub mod ClientHandlerComponent {
 
 
     #[generate_trait]
-    impl ClientInternalImpl<
+    pub(crate) impl ClientInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientInternalTrait<TContractState> {
         fn get_client(
-            ref self: ComponentState<TContractState>, client_type: felt252
+            self: @ComponentState<TContractState>, client_type: felt252
         ) -> ClientContract {
             let client_address = self.supported_clients.read(client_type);
 

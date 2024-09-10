@@ -1,8 +1,13 @@
 #[starknet::contract]
 pub mod IBCCore {
+    use starknet_ibc_core::channel::ChannelEventEmitterComponent;
+    use starknet_ibc_core::channel::ChannelHandlerComponent;
     use starknet_ibc_core::client::ClientEventEmitterComponent;
     use starknet_ibc_core::client::ClientHandlerComponent;
 
+    // -----------------------------------------------------------
+    // Setup Client Components
+    // -----------------------------------------------------------
     component!(
         path: ClientEventEmitterComponent, storage: client_emitter, event: ClientEventEmitterEvent
     );
@@ -16,12 +21,30 @@ pub mod IBCCore {
         ClientHandlerComponent::CoreRegisterClient<ContractState>;
     impl ClientInitializerImpl = ClientHandlerComponent::ClientInitializerImpl<ContractState>;
 
+    // -----------------------------------------------------------
+    // Setup Channel Components
+    // -----------------------------------------------------------
+
+    component!(
+        path: ChannelEventEmitterComponent,
+        storage: channel_emitter,
+        event: ChannelEventEmitterEvent
+    );
+    component!(path: ChannelHandlerComponent, storage: channel_handler, event: ChannelHandlerEvent);
+
+    impl ChannelInitializerImpl = ChannelHandlerComponent::ChannelInitializerImpl<ContractState>;
+
+
     #[storage]
     struct Storage {
         #[substorage(v0)]
         client_emitter: ClientEventEmitterComponent::Storage,
         #[substorage(v0)]
         client_handler: ClientHandlerComponent::Storage,
+        #[substorage(v0)]
+        channel_emitter: ChannelEventEmitterComponent::Storage,
+        #[substorage(v0)]
+        channel_handler: ChannelHandlerComponent::Storage,
     }
 
     #[event]
@@ -31,10 +54,15 @@ pub mod IBCCore {
         ClientEventEmitterEvent: ClientEventEmitterComponent::Event,
         #[flat]
         ClientHandlerEvent: ClientHandlerComponent::Event,
+        #[flat]
+        ChannelEventEmitterEvent: ChannelEventEmitterComponent::Event,
+        #[flat]
+        ChannelHandlerEvent: ChannelHandlerComponent::Event,
     }
 
     #[constructor]
     fn constructor(ref self: ContractState) {
         self.client_handler.initializer();
+        self.channel_handler.initializer();
     }
 }

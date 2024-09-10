@@ -9,7 +9,7 @@ use starknet::Store;
 use starknet_ibc_core::host::errors::HostErrors;
 use starknet_ibc_utils::poseidon_hash;
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ClientId {
     pub client_type: felt252,
     pub sequence: u64,
@@ -24,7 +24,7 @@ pub impl ClientIdImpl of ClientIdTrait {
     fn validate(self: @ClientId, client_id_hash: felt252) {}
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ChannelId {
     pub channel_id: ByteArray,
 }
@@ -78,7 +78,7 @@ pub impl ChannelIdImpl of ChannelIdTrait {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct PortId {
     pub port_id: ByteArray,
 }

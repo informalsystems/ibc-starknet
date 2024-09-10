@@ -25,5 +25,5 @@ pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeCli
 
 pub use types::{
     CreateResponse, CreateResponseImpl, UpdateResponse, Status, StatusImpl, StatusTrait, Height,
-    HeightPartialOrd, Timestamp, HeightsIntoUpdateResponse
+    HeightPartialOrd, HeightsIntoUpdateResponse, Timestamp, TimestampPartialOrd
 };

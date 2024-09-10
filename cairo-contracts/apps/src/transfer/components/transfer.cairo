@@ -18,12 +18,13 @@ pub mod TokenTransferComponent {
         TracePrefixTrait, PrefixedDenomTrait, Participant
     };
     use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait, TransferErrors};
-    use starknet_ibc_core::channel::Packet;
+    use starknet_ibc_core::channel::{Packet, IAppCallback};
     use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
     use starknet_ibc_utils::{ComputeKeyTrait, ValidateBasicTrait};
 
     #[storage]
     struct Storage {
+        owner: ContractAddress,
         erc20_class_hash: ClassHash,
         salt: felt252,
         ibc_token_key_to_address: Map<felt252, ContractAddress>,
@@ -166,6 +167,19 @@ pub mod TokenTransferComponent {
         }
 
         fn recv_execute(ref self: ComponentState<TContractState>, packet: Packet) {
+            self._recv_execute(packet);
+        }
+    }
+
+    #[embeddable_as(AppCallback)]
+    impl AppCallbackImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +ITransferrable<TContractState>,
+        +Drop<TContractState>
+    > of IAppCallback<ComponentState<TContractState>> {
+        fn on_recv_packet(ref self: ComponentState<TContractState>, packet: Packet) {
+            assert(self.read_owner() == get_contract_address(), TransferErrors::INVALID_OWNER);
             self._recv_execute(packet);
         }
     }
@@ -464,6 +478,10 @@ pub mod TokenTransferComponent {
     impl TransferReaderImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferReaderTrait<TContractState> {
+        fn read_owner(self: @ComponentState<TContractState>) -> ContractAddress {
+            self.owner.read()
+        }
+
         fn read_erc20_class_hash(self: @ComponentState<TContractState>) -> ClassHash {
             self.erc20_class_hash.read()
         }
@@ -489,6 +507,10 @@ pub mod TokenTransferComponent {
     impl TransferWriterImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferWriterTrait<TContractState> {
+        fn write_owner(ref self: ComponentState<TContractState>, owner: ContractAddress) {
+            self.owner.write(owner);
+        }
+
         fn write_erc20_class_hash(
             ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash
         ) {

@@ -79,23 +79,23 @@ pub impl HeightAdd of Add<Height> {
     }
 }
 
-pub impl HeightPartialOrd of PartialOrd<Height> {
-    fn le(lhs: Height, rhs: Height) -> bool {
+pub impl HeightPartialOrd of PartialOrd<@Height> {
+    fn le(lhs: @Height, rhs: @Height) -> bool {
         lhs.revision_number < rhs.revision_number
             || (lhs.revision_number == rhs.revision_number
                 && lhs.revision_height <= rhs.revision_height)
     }
-    fn ge(lhs: Height, rhs: Height) -> bool {
+    fn ge(lhs: @Height, rhs: @Height) -> bool {
         lhs.revision_number > rhs.revision_number
             || (lhs.revision_number == rhs.revision_number
                 && lhs.revision_height >= rhs.revision_height)
     }
-    fn lt(lhs: Height, rhs: Height) -> bool {
+    fn lt(lhs: @Height, rhs: @Height) -> bool {
         lhs.revision_number < rhs.revision_number
             || (lhs.revision_number == rhs.revision_number
                 && lhs.revision_height < rhs.revision_height)
     }
-    fn gt(lhs: Height, rhs: Height) -> bool {
+    fn gt(lhs: @Height, rhs: @Height) -> bool {
         lhs.revision_number > rhs.revision_number
             || (lhs.revision_number == rhs.revision_number
                 && lhs.revision_height > rhs.revision_height)
@@ -106,6 +106,21 @@ pub impl HeightPartialOrd of PartialOrd<Height> {
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct Timestamp {
     pub timestamp: u64,
+}
+
+pub impl TimestampPartialOrd of PartialOrd<@Timestamp> {
+    fn le(lhs: @Timestamp, rhs: @Timestamp) -> bool {
+        lhs.timestamp <= rhs.timestamp
+    }
+    fn ge(lhs: @Timestamp, rhs: @Timestamp) -> bool {
+        lhs.timestamp >= rhs.timestamp
+    }
+    fn lt(lhs: @Timestamp, rhs: @Timestamp) -> bool {
+        lhs.timestamp < rhs.timestamp
+    }
+    fn gt(lhs: @Timestamp, rhs: @Timestamp) -> bool {
+        lhs.timestamp > rhs.timestamp
+    }
 }
 
 pub impl U64IntoTimestamp of Into<u64, Timestamp> {
