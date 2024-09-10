@@ -3,7 +3,7 @@
 use std::env::var;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
@@ -18,6 +18,7 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::CanQuery
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::DestinationTarget;
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
+use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
@@ -108,26 +109,32 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 )
                 .await?;
 
+            let client_height = client_state.client_state.latest_height.revision_height();
+
             let consensus_state =
                 <CosmosChain as CanQueryConsensusState<StarknetChain>>::query_consensus_state(
                     cosmos_chain,
                     &client_id,
-                    &client_state.client_state.latest_height.revision_height(),
+                    &client_height,
                     &cosmos_chain.query_chain_height().await?,
                 )
                 .await?;
 
             println!(
-                "initial consensus state root: {:?}",
+                "initial consensus state height {} and root: {:?}",
+                client_height,
                 consensus_state.consensus_state.root.into_vec()
             );
         }
 
         {
+            runtime.sleep(Duration::from_secs(1)).await;
+
             let starknet_status = starknet_chain.query_chain_status().await?;
 
             println!(
-                "updating Starknet client to Cosmos to root: {:?}",
+                "updating Starknet client to Cosmos to height {} and root: {:?}",
+                starknet_status.height,
                 starknet_status.block_hash.to_bytes_be()
             );
 
@@ -144,9 +151,9 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 )
                 .await?;
 
-            println!(
-                "updated consensus state root: {:?}",
-                consensus_state.consensus_state.root.into_vec()
+            assert_eq!(
+                consensus_state.consensus_state.root.into_vec(),
+                starknet_status.block_hash.to_bytes_be()
             );
         }
 
