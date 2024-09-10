@@ -5,6 +5,8 @@ use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeout
 use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerier;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
+use hermes_runtime_components::traits::runtime::HasRuntime;
+use hermes_runtime_components::traits::sleep::CanSleep;
 use starknet::core::types::{Felt, StarknetError};
 use starknet::providers::{Provider, ProviderError};
 
@@ -18,6 +20,7 @@ where
     Chain: HasTransactionHashType<TxHash = Felt>
         + HasTxResponseType<TxResponse = TxResponse>
         + HasStarknetProvider
+        + HasRuntime<Runtime: CanSleep>
         + CanRaiseError<ProviderError>,
 {
     async fn query_tx_response(
@@ -34,6 +37,10 @@ where
                     .trace_transaction(tx_hash)
                     .await
                     .map_err(Chain::raise_error)?;
+
+                // Wait for a second for the starknet-devnet chain to progress.
+                // We may not need this when we transition to a production chain.
+                chain.runtime().sleep(Duration::from_secs(1)).await;
 
                 Ok(Some(TxResponse { receipt, trace }))
             }

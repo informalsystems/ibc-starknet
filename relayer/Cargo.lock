@@ -2071,6 +2071,7 @@ dependencies = [
  "hermes-encoding-components",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
+ "hermes-runtime-components",
  "hermes-test-components",
  "hermes-wasm-client-components",
  "ibc",
