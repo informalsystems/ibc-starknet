@@ -1,6 +1,5 @@
 name: MacOS Build
 on:
-  pull_request: {}
   push:
     tags:
       - v[0-9]+.*

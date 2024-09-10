@@ -15,12 +15,19 @@ use hermes_logging_components::contexts::no_logger::ProvideNoLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
 };
+use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
+use hermes_relayer_components::chain::traits::message_builders::update_client::CanBuildUpdateClientMessage;
+use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
+use hermes_relayer_components::chain::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
+use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
 use hermes_relayer_components::chain::traits::queries::consensus_state::CanQueryConsensusState;
+use hermes_relayer_components::chain::traits::queries::consensus_state_height::CanQueryConsensusStateHeight;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
+use hermes_relayer_components::chain::traits::types::packet::HasIbcPacketTypes;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
@@ -30,7 +37,7 @@ use hermes_runtime_components::traits::runtime::{
     HasRuntime, ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
 };
 use hermes_starknet_chain_components::components::chain::*;
-use hermes_starknet_chain_components::components::cosmos_to_starknet::StarknetToCosmosComponents;
+use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::traits::account::{
@@ -49,7 +56,7 @@ use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
-use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
+use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
@@ -61,9 +68,9 @@ use starknet::signers::LocalWallet;
 
 use crate::contexts::encoding::cairo::StarknetCairoEncoding;
 use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
-use crate::impls::error::HandleStarknetError;
+use crate::impls::error::HandleStarknetChainError;
 
-#[derive(HasField)]
+#[derive(HasField, Clone)]
 pub struct StarknetChain {
     pub runtime: HermesRuntime,
     pub chain_id: Felt,
@@ -80,7 +87,7 @@ impl HasComponents for StarknetChain {
 delegate_components! {
     StarknetChainContextComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
         [
             RuntimeTypeComponent,
             RuntimeGetterComponent,
@@ -163,9 +170,11 @@ pub trait CanUseStarknetChain:
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
-    + HasConsensusStateType<CosmosChain, ConsensusState = StarknetConsensusState>
+    + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
+    + HasIbcPacketTypes<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount
+    + CanQueryChainStatus
     + CanSendMessages
     + CanSubmitTx
     + CanQueryTxResponse
@@ -177,13 +186,19 @@ pub trait CanUseStarknetChain:
     + CanQueryTokenBalance
     + CanTransferToken
     + HasRetryableError
+    + CanBuildCreateClientPayload<CosmosChain>
+    + CanBuildUpdateClientPayload<CosmosChain>
 {
 }
 
 impl CanUseStarknetChain for StarknetChain {}
 
 pub trait CanUseCosmosChainWithStarknet:
-    CanQueryClientState<StarknetChain> + CanQueryConsensusState<StarknetChain>
+    CanQueryClientState<StarknetChain>
+    + CanQueryConsensusState<StarknetChain>
+    + CanBuildCreateClientMessage<StarknetChain>
+    + CanBuildUpdateClientMessage<StarknetChain>
+    + CanQueryConsensusStateHeight<StarknetChain>
 {
 }
 

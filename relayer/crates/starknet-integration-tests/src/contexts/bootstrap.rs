@@ -20,7 +20,7 @@ use hermes_runtime_components::traits::runtime::{
     HasRuntime, ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
 };
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::impls::error::HandleStarknetError;
+use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::impls::bootstrap::bootstrap_chain::BootstrapStarknetDevnet;
 use hermes_starknet_test_components::impls::bootstrap::start_chain::StartStarknetDevnet;
 use hermes_starknet_test_components::impls::types::genesis_config::ProvideStarknetGenesisConfigType;
@@ -56,7 +56,7 @@ impl HasComponents for StarknetBootstrap {
 delegate_components! {
     StarknetBootstrapComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
         [
             RuntimeTypeComponent,
             RuntimeGetterComponent,

@@ -17,7 +17,7 @@ use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use starknet::core::types::Felt;
 
 use crate::contexts::encoding::cairo::{ProvideCairoEncoding, StarknetCairoEncoding};
-use crate::impls::error::HandleStarknetError;
+use crate::impls::error::HandleStarknetChainError;
 
 #[derive(HasField)]
 pub struct StarknetEventEncoding {
@@ -42,7 +42,7 @@ with_starknet_event_encoding_components! {
 delegate_components! {
     StarknetEventEncodingContextComponents{
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
         [
             EncodingTypeComponent,
             EncodingGetterComponent,
