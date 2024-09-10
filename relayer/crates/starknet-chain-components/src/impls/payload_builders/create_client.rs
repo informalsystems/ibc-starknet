@@ -1,4 +1,4 @@
-use cgp::prelude::{CanRaiseError, HasErrorType};
+use cgp::prelude::CanRaiseError;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CreateClientPayloadBuilder;
 use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_relayer_components::chain::traits::types::create_client::{

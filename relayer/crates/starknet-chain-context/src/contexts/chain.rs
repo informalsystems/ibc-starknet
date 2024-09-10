@@ -15,6 +15,8 @@ use hermes_logging_components::contexts::no_logger::ProvideNoLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
 };
+use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
+use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
 use hermes_relayer_components::chain::traits::queries::consensus_state::CanQueryConsensusState;
@@ -181,13 +183,16 @@ pub trait CanUseStarknetChain:
     + CanQueryTokenBalance
     + CanTransferToken
     + HasRetryableError
+    + CanBuildCreateClientPayload<CosmosChain>
 {
 }
 
 impl CanUseStarknetChain for StarknetChain {}
 
 pub trait CanUseCosmosChainWithStarknet:
-    CanQueryClientState<StarknetChain> + CanQueryConsensusState<StarknetChain>
+    CanQueryClientState<StarknetChain>
+    + CanQueryConsensusState<StarknetChain>
+    + CanBuildCreateClientMessage<StarknetChain>
 {
 }
 

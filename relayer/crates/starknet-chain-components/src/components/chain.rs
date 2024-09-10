@@ -1,7 +1,7 @@
 use cgp::prelude::*;
 pub use hermes_cosmos_chain_components::components::client::{
-    CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
-    IbcPacketTypesProviderComponent, PacketFieldsReaderComponent,
+    CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent,
+    CreateClientPayloadTypeComponent, IbcPacketTypesProviderComponent, PacketFieldsReaderComponent,
 };
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
@@ -37,6 +37,7 @@ use crate::impls::contract::declare::DeclareSierraContract;
 use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
+use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::send_message::SendCallMessages;
@@ -160,5 +161,7 @@ define_components! {
             TransferErc20Token,
         TokenBalanceQuerierComponent:
             QueryErc20TokenBalance,
+        CreateClientPayloadBuilderComponent:
+            BuildStarknetCreateClientPayload,
     }
 }
