@@ -1,7 +1,8 @@
 use cgp::prelude::*;
 pub use hermes_cosmos_chain_components::components::client::{
-    CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent,
-    CreateClientPayloadTypeComponent, IbcPacketTypesProviderComponent, PacketFieldsReaderComponent,
+    ClientStateFieldsGetterComponent, CreateClientPayloadBuilderComponent,
+    CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
+    IbcPacketTypesProviderComponent, PacketFieldsReaderComponent,
     UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
 };
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
@@ -124,6 +125,7 @@ define_components! {
         [
             ClientStateTypeComponent,
             ConsensusStateTypeComponent,
+            ClientStateFieldsGetterComponent,
         ]:
             ProvideStarknetIbcClientTypes,
         [

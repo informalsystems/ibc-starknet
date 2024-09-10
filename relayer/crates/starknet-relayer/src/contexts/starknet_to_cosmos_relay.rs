@@ -11,7 +11,9 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::components::default::relay::*;
 use hermes_relayer_components::error::impls::retry::ReturnMaxRetry;
 use hermes_relayer_components::error::traits::retry::MaxErrorRetryGetterComponent;
-use hermes_relayer_components::relay::traits::chains::{HasRelayChains, ProvideRelayChains};
+use hermes_relayer_components::relay::traits::chains::{
+    CanRaiseRelayChainErrors, HasRelayChains, ProvideRelayChains,
+};
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::DestinationTarget;
 use hermes_runtime::types::runtime::HermesRuntime;
@@ -94,6 +96,9 @@ impl ProvideRelayChains<StarknetToCosmosRelay> for StarknetToCosmosRelayComponen
 pub trait CanUseStarknetToCosmosRelay:
     HasRelayChains<SrcChain = StarknetChain, DstChain = CosmosChain>
     + CanCreateClient<DestinationTarget>
+    + CanRaiseRelayChainErrors
+// + CanBuildTargetUpdateClientMessage<DestinationTarget>
+// + CanSendTargetUpdateClientMessage<DestinationTarget>
 {
 }
 
