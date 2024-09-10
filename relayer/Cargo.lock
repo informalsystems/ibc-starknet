@@ -2147,6 +2147,7 @@ name = "hermes-starknet-relayer"
 version = "0.1.0"
 dependencies = [
  "cgp",
+ "eyre",
  "hermes-cosmos-relayer",
  "hermes-encoding-components",
  "hermes-error",

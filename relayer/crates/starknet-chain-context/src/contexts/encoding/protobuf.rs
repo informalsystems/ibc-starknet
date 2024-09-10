@@ -14,7 +14,7 @@ use hermes_starknet_chain_components::types::consensus_state::{
 };
 use ibc::clients::wasm_types::client_message::ClientMessage;
 
-use crate::impls::error::HandleStarknetError;
+use crate::impls::error::HandleStarknetChainError;
 
 pub struct StarknetProtobufEncoding;
 
@@ -27,7 +27,7 @@ impl HasComponents for StarknetProtobufEncoding {
 delegate_components! {
     StarknetProtobufEncodingContextComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
     }
 }
 

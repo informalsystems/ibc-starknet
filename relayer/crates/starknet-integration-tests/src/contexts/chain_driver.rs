@@ -4,7 +4,7 @@ use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeCompo
 use cgp::prelude::*;
 use hermes_error::impls::ProvideHermesError;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::impls::error::HandleStarknetError;
+use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
 use hermes_starknet_test_components::types::wallet::StarknetWallet;
@@ -31,7 +31,7 @@ impl HasComponents for StarknetChainDriver {
 delegate_components! {
     StarknetChainDriverComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
     }
 }
 

@@ -65,7 +65,7 @@ use starknet::signers::LocalWallet;
 
 use crate::contexts::encoding::cairo::StarknetCairoEncoding;
 use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
-use crate::impls::error::HandleStarknetError;
+use crate::impls::error::HandleStarknetChainError;
 
 #[derive(HasField, Clone)]
 pub struct StarknetChain {
@@ -84,7 +84,7 @@ impl HasComponents for StarknetChain {
 delegate_components! {
     StarknetChainContextComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
         [
             RuntimeTypeComponent,
             RuntimeGetterComponent,

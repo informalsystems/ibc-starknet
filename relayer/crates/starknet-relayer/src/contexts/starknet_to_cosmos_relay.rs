@@ -9,21 +9,24 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::components::default::relay::*;
 use hermes_relayer_components::error::impls::retry::ReturnMaxRetry;
 use hermes_relayer_components::error::traits::retry::MaxErrorRetryGetterComponent;
-use hermes_relayer_components::relay::traits::chains::ProvideRelayChains;
+use hermes_relayer_components::relay::traits::chains::{HasRelayChains, ProvideRelayChains};
+use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
+use hermes_relayer_components::relay::traits::target::DestinationTarget;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
 };
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::impls::error::HandleStarknetError;
 use ibc_relayer_types::core::ics04_channel::packet::Packet;
 use ibc_relayer_types::core::ics24_host::identifier::ClientId;
+
+use crate::impls::error::HandleStarknetRelayError;
 
 #[derive(Clone, HasField)]
 pub struct StarknetToCosmosRelay {
     pub runtime: HermesRuntime,
-    pub src_chain: CosmosChain,
-    pub dst_chain: StarknetChain,
+    pub src_chain: StarknetChain,
+    pub dst_chain: CosmosChain,
     pub src_client_id: ClientId,
     pub dst_client_id: ClientId,
 }
@@ -45,7 +48,7 @@ with_default_relay_components! {
 delegate_components! {
     StarknetToCosmosRelayComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetRelayError>,
         [
             RuntimeTypeComponent,
             RuntimeGetterComponent,
@@ -63,18 +66,18 @@ delegate_components! {
 }
 
 impl ProvideRelayChains<StarknetToCosmosRelay> for StarknetToCosmosRelayComponents {
-    type SrcChain = CosmosChain;
+    type SrcChain = StarknetChain;
 
     type DstChain = CosmosChain;
 
     type Packet = Packet;
 
-    fn src_chain(relay: &StarknetToCosmosRelay) -> &CosmosChain {
+    fn src_chain(relay: &StarknetToCosmosRelay) -> &StarknetChain {
         &relay.src_chain
     }
 
     fn dst_chain(relay: &StarknetToCosmosRelay) -> &CosmosChain {
-        &relay.src_chain
+        &relay.dst_chain
     }
 
     fn src_client_id(relay: &StarknetToCosmosRelay) -> &ClientId {
@@ -85,3 +88,11 @@ impl ProvideRelayChains<StarknetToCosmosRelay> for StarknetToCosmosRelayComponen
         &relay.dst_client_id
     }
 }
+
+pub trait CanUseStarknetToCosmosRelay:
+    HasRelayChains<SrcChain = StarknetChain, DstChain = CosmosChain>
+    + CanCreateClient<DestinationTarget>
+{
+}
+
+impl CanUseStarknetToCosmosRelay for StarknetToCosmosRelay {}
