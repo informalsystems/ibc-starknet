@@ -1,3 +1,5 @@
+use alloc::sync::Arc;
+
 use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
@@ -25,8 +27,8 @@ use crate::impls::error::HandleStarknetRelayError;
 #[derive(Clone, HasField)]
 pub struct StarknetToCosmosRelay {
     pub runtime: HermesRuntime,
-    pub src_chain: StarknetChain,
-    pub dst_chain: CosmosChain,
+    pub src_chain: Arc<StarknetChain>,
+    pub dst_chain: Arc<CosmosChain>,
     pub src_client_id: ClientId,
     pub dst_client_id: ClientId,
 }

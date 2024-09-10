@@ -40,7 +40,7 @@ where
             "--port",
             &chain_node_config.rpc_port.to_string(),
             "--block-generation-on",
-            "1s",
+            "1",
             "--dump-on",
             "block",
             "--dump-path",
