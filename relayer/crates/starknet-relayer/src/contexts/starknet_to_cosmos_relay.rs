@@ -1,5 +1,3 @@
-use alloc::sync::Arc;
-
 use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
@@ -8,11 +6,9 @@ use hermes_logger::ProvideHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeComponent,
 };
-use hermes_relayer_components::chain::traits::message_builders::update_client::UpdateClientMessageBuilder;
 use hermes_relayer_components::components::default::relay::*;
 use hermes_relayer_components::error::impls::retry::ReturnMaxRetry;
 use hermes_relayer_components::error::traits::retry::MaxErrorRetryGetterComponent;
-use hermes_relayer_components::relay::impls::update_client::build::BuildUpdateClientMessages;
 use hermes_relayer_components::relay::traits::chains::{
     CanRaiseRelayChainErrors, HasRelayChains, ProvideRelayChains,
 };
@@ -20,7 +16,6 @@ use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::DestinationTarget;
 use hermes_relayer_components::relay::traits::update_client_message_builder::{
     CanBuildTargetUpdateClientMessage, CanSendTargetUpdateClientMessage,
-    TargetUpdateClientMessageBuilder,
 };
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
@@ -35,8 +30,8 @@ use crate::impls::error::HandleStarknetRelayError;
 #[derive(Clone, HasField)]
 pub struct StarknetToCosmosRelay {
     pub runtime: HermesRuntime,
-    pub src_chain: Arc<StarknetChain>,
-    pub dst_chain: Arc<CosmosChain>,
+    pub src_chain: StarknetChain,
+    pub dst_chain: CosmosChain,
     pub src_client_id: ClientId,
     pub dst_client_id: ClientId,
 }

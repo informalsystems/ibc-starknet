@@ -5,26 +5,19 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
-use hermes_cosmos_chain_components::types::messages::client::update::CosmosUpdateClientMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
-use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_error::types::Error;
-use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
+use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::DestinationTarget;
-use hermes_starknet_chain_components::types::client_header::StarknetClientHeader;
-use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
+use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
-use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
-use ibc::core::primitives::Timestamp;
-use prost_types::Any;
 use sha2::{Digest, Sha256};
 
 #[test]
@@ -81,8 +74,6 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let starknet_chain = &starknet_chain_driver.chain;
 
-        let encoding = StarknetProtobufEncoding;
-
         let client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
@@ -94,25 +85,20 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         println!("created client id: {:?}", client_id);
 
+        let starknet_to_cosmos_relay = StarknetToCosmosRelay {
+            runtime: runtime.clone(),
+            src_chain: starknet_chain.clone(),
+            dst_chain: cosmos_chain.clone(),
+            src_client_id: client_id.clone(), // TODO: stub
+            dst_client_id: client_id.clone(),
+        };
+
         {
-            let consensus_state = StarknetConsensusState {
-                root: vec![4, 5, 6].into(),
-                time: Timestamp::now(),
-            };
+            let status = starknet_chain.query_chain_status().await?;
 
-            let header = StarknetClientHeader { consensus_state };
-
-            let header_any: Any = encoding.convert(&header)?;
-
-            let update_client_message = CosmosUpdateClientMessage {
-                client_id,
-                header: header_any,
-            }
-            .to_cosmos_message();
-
-            let events = cosmos_chain.send_message(update_client_message).await?;
-
-            println!("update client events: {:?}", events);
+            starknet_to_cosmos_relay
+                .send_target_update_client_messages(DestinationTarget, &status.block_number)
+                .await?;
         }
 
         Ok(())
