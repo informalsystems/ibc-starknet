@@ -22,7 +22,7 @@ where
             .map_err(Chain::raise_error)?;
 
         Ok(StarknetChainStatus {
-            block_number: status.block_number,
+            height: status.block_number,
             block_hash: status.block_hash,
         })
     }

@@ -13,7 +13,7 @@ where
     type ChainStatus = StarknetChainStatus;
 
     fn chain_status_height(status: &StarknetChainStatus) -> &u64 {
-        &status.block_number
+        &status.height
     }
 
     fn chain_status_timestamp(_status: &Self::ChainStatus) -> &() {

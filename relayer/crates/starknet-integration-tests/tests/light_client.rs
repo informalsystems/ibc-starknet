@@ -13,6 +13,7 @@ use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
 };
+use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
 use hermes_relayer_components::chain::traits::queries::consensus_state::CanQueryConsensusState;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::DestinationTarget;
@@ -99,6 +100,30 @@ fn test_starknet_light_client() -> Result<(), Error> {
         };
 
         {
+            let client_state =
+                <CosmosChain as CanQueryClientState<StarknetChain>>::query_client_state(
+                    cosmos_chain,
+                    &client_id,
+                    &cosmos_chain.query_chain_height().await?,
+                )
+                .await?;
+
+            let consensus_state =
+                <CosmosChain as CanQueryConsensusState<StarknetChain>>::query_consensus_state(
+                    cosmos_chain,
+                    &client_id,
+                    &client_state.client_state.latest_height.revision_height(),
+                    &cosmos_chain.query_chain_height().await?,
+                )
+                .await?;
+
+            println!(
+                "initial consensus state root: {:?}",
+                consensus_state.consensus_state.root.into_vec()
+            );
+        }
+
+        {
             let starknet_status = starknet_chain.query_chain_status().await?;
 
             println!(
@@ -107,17 +132,14 @@ fn test_starknet_light_client() -> Result<(), Error> {
             );
 
             starknet_to_cosmos_relay
-                .send_target_update_client_messages(
-                    DestinationTarget,
-                    &starknet_status.block_number,
-                )
+                .send_target_update_client_messages(DestinationTarget, &starknet_status.height)
                 .await?;
 
             let consensus_state =
                 <CosmosChain as CanQueryConsensusState<StarknetChain>>::query_consensus_state(
                     cosmos_chain,
                     &client_id,
-                    &starknet_status.block_number,
+                    &starknet_status.height,
                     &cosmos_chain.query_chain_height().await?,
                 )
                 .await?;
