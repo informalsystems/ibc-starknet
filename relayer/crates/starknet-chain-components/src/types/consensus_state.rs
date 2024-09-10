@@ -12,6 +12,7 @@ pub type ProtoStarknetConsensusState = ProtoConsensusState;
 
 pub const STARKNET_CONSENSUS_STATE_TYPE_URL: &str = CONSENSUS_STATE_TYPE_URL;
 
+#[derive(Debug)]
 pub struct WasmStarknetConsensusState {
     pub consensus_state: StarknetConsensusState,
 }

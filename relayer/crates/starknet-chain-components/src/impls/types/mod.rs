@@ -9,6 +9,7 @@ pub mod event;
 pub mod height;
 pub mod message;
 pub mod method;
+pub mod payloads;
 pub mod status;
 pub mod timestamp;
 pub mod transaction;

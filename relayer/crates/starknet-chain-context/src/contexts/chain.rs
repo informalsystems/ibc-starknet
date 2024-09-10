@@ -51,7 +51,7 @@ use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
-use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
+use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
@@ -165,7 +165,7 @@ pub trait CanUseStarknetChain:
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
-    + HasConsensusStateType<CosmosChain, ConsensusState = StarknetConsensusState>
+    + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
     + HasIbcPacketTypes<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount

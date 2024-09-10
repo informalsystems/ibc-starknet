@@ -1,5 +1,6 @@
 use cgp::prelude::*;
 pub use hermes_cosmos_chain_components::components::client::{
+    CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
     IbcPacketTypesProviderComponent, PacketFieldsReaderComponent,
 };
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
@@ -53,6 +54,7 @@ use crate::impls::types::event::ProvideStarknetEvent;
 use crate::impls::types::height::ProvideStarknetHeight;
 use crate::impls::types::message::ProvideCallMessage;
 use crate::impls::types::method::ProvideFeltSelector;
+use crate::impls::types::payloads::ProvideStarknetPayloadTypes;
 use crate::impls::types::status::ProvideStarknetChainStatusType;
 use crate::impls::types::timestamp::ProvideStarknetTimestampType;
 use crate::impls::types::transaction::ProvideCallTransaction;
@@ -121,6 +123,11 @@ define_components! {
             ConsensusStateTypeComponent,
         ]:
             ProvideStarknetIbcClientTypes,
+        [
+            CreateClientPayloadTypeComponent,
+            CreateClientPayloadOptionsTypeComponent,
+        ]:
+            ProvideStarknetPayloadTypes,
         PacketFieldsReaderComponent:
             CosmosPacketFieldReader,
         ChainStatusQuerierComponent:

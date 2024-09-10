@@ -13,6 +13,7 @@ pub type ProtoStarknetClientState = ProtoClientState;
 
 pub const STARKNET_CLIENT_STATE_TYPE_URL: &str = CLIENT_STATE_TYPE_URL;
 
+#[derive(Debug)]
 pub struct WasmStarknetClientState {
     pub client_state: ClientState,
     pub wasm_code_hash: Vec<u8>,
