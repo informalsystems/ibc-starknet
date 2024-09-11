@@ -1,18 +1,30 @@
 [package]
-name = "starknet_ibc_core"
-version = "0.1.0"
-description = "<DESCRIPTION HERE>"
-edition.workspace = true
+name          = "starknet_ibc_core"
+version       = { workspace = true }
+edition       = { workspace = true }
+cairo-version = { workspace = true }
+scarb-version = { workspace = true }
+authors       = { workspace = true }
+repository    = { workspace = true }
+license       = { workspace = true }
+Readme        = { workspace = true }
+keywords      = { workspace = true }
+description = """
+    Provides the implementation of IBC core components for Starknet.
+"""
 
-[scripts]
-test.workspace = true
+[lib]
 
 [tool]
-fmt.workspace = true
+fmt = { workspace = true }
 
 [dependencies]
+# external dependencies
 starknet = { workspace = true }
-starknet_ibc_utils = { path = "../utils" }
+
+# ibc dependencies
+starknet_ibc_utils = { workspace = true }
 
 [dev-dependencies]
-snforge_std.workspace = true
+cairo_test  = { workspace = true }
+snforge_std = { workspace = true }

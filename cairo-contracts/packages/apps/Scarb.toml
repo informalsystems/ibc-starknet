@@ -1,21 +1,34 @@
 [package]
-name = "starknet_ibc_apps"
-version = "0.1.0"
-description = "<DESCRIPTION HERE>"
-edition.workspace = true
+name          = "starknet_ibc_apps"
+version       = { workspace = true }
+edition       = { workspace = true }
+cairo-version = { workspace = true }
+scarb-version = { workspace = true }
+authors       = { workspace = true }
+repository    = { workspace = true }
+license       = { workspace = true }
+Readme        = { workspace = true }
+keywords      = { workspace = true }
+description   = """
+    Provides the implementation of IBC applications for Starknet.
+"""
+
+[lib]
 
 [scripts]
-test.workspace = true
+test = { workspace = true }
 
 [tool]
-fmt.workspace = true
+fmt = { workspace = true }
 
 [dependencies]
-openzeppelin_token.workspace = true
-openzeppelin_utils.workspace = true
-starknet.workspace = true
-starknet_ibc_core = { path = "../core" }
-starknet_ibc_utils = { path = "../utils" }
+# external dependencies
+openzeppelin_token   = { workspace = true }
+openzeppelin_testing = { workspace = true }
+openzeppelin_utils   = { workspace = true }
+snforge_std          = { workspace = true }
+starknet             = { workspace = true }
 
-[dev-dependencies]
-snforge_std.workspace = true
+# ibc dependencies
+starknet_ibc_core  = { workspace = true }
+starknet_ibc_utils = { workspace = true }

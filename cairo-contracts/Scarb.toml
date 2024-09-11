@@ -8,13 +8,16 @@ members = [
 ]
 
 [workspace.package]
-edition = "2023_11"
+version       = "0.1.0"
+edition       = "2023_11"
 cairo-version = "2.7.0"
-authors = ["Informal Systems <hello@informal.systems>"]
-description = "Collection of Cairo components and contracts that implement and integrate IBC protocol with Starknet"
-repository = "https://github.com/informalsystems/ibc-starknet"
-license = "Apache-2.0"
-keywords = ["ethereum", "starknet", "ibc", "cairo", "contracts"]
+scarb-version = "2.7.0"
+license       = "Apache-2.0"
+authors       = [ "Informal Systems <hello@informal.systems>" ]
+repository    = "https://github.com/informalsystems/ibc-starknet"
+Readme        = "README.md"
+keywords      = [ "ethereum", "starknet", "ibc", "cairo", "contracts" ]
+description   = "Collection of Cairo components and contracts that implement and integrate IBC protocol with Starknet"
 
 [workspace.scripts]
 test = "snforge test"
@@ -41,7 +44,7 @@ sort-module-level-items = true
 
 [package]
 name          = "starknet_ibc"
-version       = "0.1.0"
+version       = { workspace = true }
 edition       = { workspace = true }
 cairo-version = { workspace = true }
 scarb-version = { workspace = true }
@@ -55,10 +58,10 @@ description   = { workspace = true }
 [lib]
 
 [scripts]
-test.workspace = true
+test = { workspace = true }
 
 [tool]
-fmt.workspace = true
+fmt = { workspace = true }
 
 [dependencies]
 starknet_ibc_apps      = { workspace = true }

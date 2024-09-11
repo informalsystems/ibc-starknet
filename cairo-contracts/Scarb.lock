@@ -34,6 +34,14 @@ version = "0.15.1"
 source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
 
 [[package]]
+name = "openzeppelin_testing"
+version = "0.15.1"
+source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
+dependencies = [
+ "snforge_std",
+]
+
+[[package]]
 name = "openzeppelin_token"
 version = "0.15.1"
 source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f8a93d762858714095a1d391afffa9e21df6983"
@@ -68,6 +76,7 @@ dependencies = [
 name = "starknet_ibc_apps"
 version = "0.1.0"
 dependencies = [
+ "openzeppelin_testing",
  "openzeppelin_token",
  "openzeppelin_utils",
  "snforge_std",
@@ -79,7 +88,6 @@ dependencies = [
 name = "starknet_ibc_clients"
 version = "0.1.0"
 dependencies = [
- "snforge_std",
  "starknet_ibc_core",
 ]
 

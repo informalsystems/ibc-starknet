@@ -9,7 +9,9 @@ repository    = { workspace = true }
 license       = { workspace = true }
 Readme        = { workspace = true }
 keywords      = { workspace = true }
-description   = { workspace = true }
+description   = """
+    A set of IBC Cairo contracts that integrate IBC protocol with Starknet.
+"""
 
 [dependencies]
 # external dependencies
