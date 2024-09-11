@@ -41,4 +41,4 @@ jobs:
         working-directory: ./cairo-contracts
         run: |
           nix develop -c \
-            snforge test --workspace
+            snforge test --w

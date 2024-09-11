@@ -14,7 +14,7 @@ build-cairo-contracts:
 # Tests the Cairo contracts
 test-cairo-contracts:
   cd ./cairo-contracts && \
-  snforge test --workspace
+  snforge test -w
 
 lint: lint-toml lint-light-client lint-cairo lint-nix lint-relayer
 
@@ -37,7 +37,7 @@ lint-relayer:
 # Runs formatter and clippy for all the cargo and scarb packages
 lint-cairo:
   cd ./cairo-contracts && \
-  scarb fmt --check --workspace
+  scarb fmt -w --check
 
 lint-nix:
   cd ./relayer && \
