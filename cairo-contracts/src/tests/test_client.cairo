@@ -1,5 +1,5 @@
 use snforge_std::cheat_block_timestamp_global;
-use starknet_ibc_contracts::tests::configs::CometClientConfigTrait;
+use starknet_ibc_contracts::tests::configs::comet::CometClientConfigTrait;
 use starknet_ibc_contracts::tests::setups::{
     IBCCoreHandle, IBCCoreHandleTrait, CometClientHandle, CometClientHandleTrait
 };

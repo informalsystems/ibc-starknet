@@ -1,0 +1,18 @@
+[package]
+name = "starknet_ibc_utils"
+version = "0.1.0"
+description = "<DESCRIPTION HERE>"
+edition.workspace = true
+
+[scripts]
+test.workspace = true
+
+[tool]
+fmt.workspace = true
+
+[dependencies]
+openzeppelin_token = { workspace = true }
+starknet = { workspace = true }
+
+[dev-dependencies]
+snforge_std.workspace = true

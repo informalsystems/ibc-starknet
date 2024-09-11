@@ -59,24 +59,12 @@ source = "git+https://github.com/OpenZeppelin/cairo-contracts.git?tag=v0.15.1#2f
 [[package]]
 name = "snforge_std"
 version = "0.26.0"
-source = "git+https://github.com/foundry-rs/starknet-foundry?tag=v0.26.0#50eb589db65e113efe4f09241feb59b574228c7e"
-
-[[package]]
-name = "starknet_ibc"
-version = "0.1.0"
-dependencies = [
- "starknet_ibc_apps",
- "starknet_ibc_clients",
- "starknet_ibc_contracts",
- "starknet_ibc_core",
- "starknet_ibc_utils",
-]
+source = "git+https://github.com/foundry-rs/starknet-foundry.git?tag=v0.26.0#50eb589db65e113efe4f09241feb59b574228c7e"
 
 [[package]]
 name = "starknet_ibc_apps"
 version = "0.1.0"
 dependencies = [
- "openzeppelin_testing",
  "openzeppelin_token",
  "openzeppelin_utils",
  "snforge_std",
@@ -88,6 +76,7 @@ dependencies = [
 name = "starknet_ibc_clients"
 version = "0.1.0"
 dependencies = [
+ "snforge_std",
  "starknet_ibc_core",
 ]
 
@@ -96,7 +85,10 @@ name = "starknet_ibc_contracts"
 version = "0.1.0"
 dependencies = [
  "openzeppelin_access",
+ "openzeppelin_testing",
  "openzeppelin_token",
+ "openzeppelin_utils",
+ "snforge_std",
  "starknet_ibc_apps",
  "starknet_ibc_clients",
  "starknet_ibc_core",

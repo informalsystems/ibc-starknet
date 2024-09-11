@@ -1,0 +1,18 @@
+[package]
+name = "starknet_ibc_core"
+version = "0.1.0"
+description = "<DESCRIPTION HERE>"
+edition.workspace = true
+
+[scripts]
+test.workspace = true
+
+[tool]
+fmt.workspace = true
+
+[dependencies]
+starknet = { workspace = true }
+starknet_ibc_utils = { path = "../utils" }
+
+[dev-dependencies]
+snforge_std.workspace = true
