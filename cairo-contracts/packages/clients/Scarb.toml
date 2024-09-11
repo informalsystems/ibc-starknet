@@ -1,5 +1,5 @@
 [package]
-name          = "starknet_ibc_utils"
+name          = "starknet_ibc_clients"
 version       = { workspace = true }
 edition       = { workspace = true }
 cairo-version = { workspace = true }
@@ -9,15 +9,22 @@ repository    = { workspace = true }
 license       = { workspace = true }
 Readme        = { workspace = true }
 keywords      = { workspace = true }
-description   = { workspace = true }
 
-[dependencies]
-# external dependencies
-openzeppelin_token = { workspace = true }
-snforge_std        = { workspace = true }
-starknet           = { workspace = true }
+description = """
+    Provides the implementation of IBC clients for Starknet.
+"""
 
 [lib]
 
+[scripts]
+test = { workspace = true }
+
 [tool]
 fmt = { workspace = true }
+
+[dependencies]
+# external dependencies
+starknet = { workspace = true }
+
+# ibc dependencies
+starknet_ibc_core = { workspace = true }

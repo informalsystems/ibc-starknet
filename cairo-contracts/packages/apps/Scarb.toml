@@ -9,7 +9,18 @@ repository    = { workspace = true }
 license       = { workspace = true }
 Readme        = { workspace = true }
 keywords      = { workspace = true }
-description   = { workspace = true }
+
+description = """
+    Provides the implementation of IBC applications for Starknet.
+"""
+
+[lib]
+
+[scripts]
+test = { workspace = true }
+
+[tool]
+fmt = { workspace = true }
 
 [dependencies]
 # external dependencies
@@ -22,8 +33,3 @@ starknet             = { workspace = true }
 # ibc dependencies
 starknet_ibc_core  = { workspace = true }
 starknet_ibc_utils = { workspace = true }
-
-[lib]
-
-[tool]
-fmt = { workspace = true }
