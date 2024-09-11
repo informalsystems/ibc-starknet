@@ -75,7 +75,6 @@ pub enum ChannelState {
 
 #[derive(Clone, Debug, Drop, Serde, starknet::Store)]
 pub enum ChannelOrdering {
-    None,
     Unordered,
     Ordered,
 }
@@ -86,3 +85,13 @@ pub struct Counterparty {
     pub chan_id: ChannelId,
 }
 
+#[derive(Clone, Debug, Drop, Serde)]
+pub struct Acknowledgement {
+    pub ack: felt252,
+}
+
+
+#[derive(Clone, Debug, Drop, Serde, starknet::Store)]
+pub enum Receipt {
+    Ok
+}

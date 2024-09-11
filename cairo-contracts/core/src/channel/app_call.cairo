@@ -1,5 +1,7 @@
 use starknet::ContractAddress;
-use starknet_ibc_core::channel::{IAppCallback, IAppCallbackDispatcher, IAppCallbackDispatcherTrait};
+use starknet_ibc_core::channel::{
+    IAppCallback, IAppCallbackDispatcher, IAppCallbackDispatcherTrait, Packet, Acknowledgement
+};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct ApplicationContract {
@@ -19,4 +21,8 @@ impl ApplicationContractIntoFelt252 of Into<ApplicationContract, felt252> {
 }
 
 #[generate_trait]
-pub impl ApplicationContractImpl of ApplicationContractTrait {}
+pub impl ApplicationContractImpl of ApplicationContractTrait {
+    fn on_recv_packet(self: @ApplicationContract, packet: Packet) -> Acknowledgement {
+        IAppCallbackDispatcher { contract_address: *self.address }.on_recv_packet(packet)
+    }
+}

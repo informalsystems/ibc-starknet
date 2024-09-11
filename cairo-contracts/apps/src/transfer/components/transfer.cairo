@@ -20,7 +20,7 @@ pub mod TokenTransferComponent {
         TracePrefixTrait, PrefixedDenomTrait, Participant
     };
     use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait, TransferErrors};
-    use starknet_ibc_core::channel::{Packet, IAppCallback};
+    use starknet_ibc_core::channel::{Packet, Acknowledgement, IAppCallback};
     use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
     use starknet_ibc_utils::{ComputeKeyTrait, ValidateBasicTrait};
 
@@ -78,14 +78,9 @@ pub mod TokenTransferComponent {
 
     #[generate_trait]
     pub impl TransferInitializerImpl<
-        TContractState,
-        +HasComponent<TContractState>,
-        +Drop<TContractState>,
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of TransferInitializerTrait<TContractState> {
-        fn initializer(
-            ref self: ComponentState<TContractState>,
-            erc20_class_hash: ClassHash
-        ) {
+        fn initializer(ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash) {
             assert(erc20_class_hash.is_non_zero(), TransferErrors::ZERO_ERC20_CLASS_HASH);
 
             self.write_erc20_class_hash(erc20_class_hash);
@@ -188,12 +183,16 @@ pub mod TokenTransferComponent {
         +Drop<TContractState>,
         impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of IAppCallback<ComponentState<TContractState>> {
-        fn on_recv_packet(ref self: ComponentState<TContractState>, packet: Packet) {
+        fn on_recv_packet(
+            ref self: ComponentState<TContractState>, packet: Packet
+        ) -> Acknowledgement {
             let ownable_comp = get_dep_component!(@self, Ownable);
 
             assert(ownable_comp.owner() == get_contract_address(), TransferErrors::INVALID_OWNER);
 
             self._recv_execute(packet);
+
+            Acknowledgement { ack: '0' }
         }
     }
 

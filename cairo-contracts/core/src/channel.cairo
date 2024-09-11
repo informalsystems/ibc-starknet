@@ -2,6 +2,7 @@ mod app_call;
 mod components;
 mod errors;
 mod interface;
+mod keys;
 mod msgs;
 mod types;
 
@@ -13,8 +14,9 @@ pub use interface::{
     IChannelHandler, IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, IAppCallback,
     IAppCallbackDispatcher, IAppCallbackDispatcherTrait
 };
+pub use keys::{channel_end_key, packet_receipt_key};
 pub use msgs::{MsgRecvPacket, MsgRecvPacketImpl, MsgRecvPacketTrait};
 pub use types::{
     Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
-    ChannelOrdering, Counterparty
+    ChannelOrdering, Counterparty, Acknowledgement, Receipt
 };

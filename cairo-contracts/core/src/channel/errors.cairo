@@ -5,4 +5,5 @@ pub mod ChannelErrors {
     pub const TIMED_OUT_PACKET: felt252 = 'ICS04: packet timed out';
     pub const INACTIVE_CLIENT: felt252 = 'ICS04: inactive client';
     pub const INVALID_PROOF_HEIGHT: felt252 = 'ICS04: invalid proof height';
+    pub const UNSUPPORTED_PORT_ID: felt252 = 'ICS04: unsupported port id';
 }

@@ -34,7 +34,6 @@ pub mod IBCCore {
 
     impl ChannelInitializerImpl = ChannelHandlerComponent::ChannelInitializerImpl<ContractState>;
 
-
     #[storage]
     struct Storage {
         #[substorage(v0)]

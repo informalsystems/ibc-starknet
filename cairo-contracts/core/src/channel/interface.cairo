@@ -1,4 +1,4 @@
-use starknet_ibc_core::channel::{Packet, MsgRecvPacket};
+use starknet_ibc_core::channel::{Packet, MsgRecvPacket, Acknowledgement};
 
 #[starknet::interface]
 pub trait IChannelHandler<TContractState> {
@@ -7,5 +7,5 @@ pub trait IChannelHandler<TContractState> {
 
 #[starknet::interface]
 pub trait IAppCallback<TContractState> {
-    fn on_recv_packet(ref self: TContractState, packet: Packet);
+    fn on_recv_packet(ref self: TContractState, packet: Packet) -> Acknowledgement;
 }

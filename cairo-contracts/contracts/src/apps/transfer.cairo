@@ -4,8 +4,8 @@ pub mod TransferApp {
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::ClassHash;
     use starknet::ContractAddress;
-    use starknet_ibc_apps::transfer::components::{TokenTransferComponent, TransferrableComponent};
     use starknet_ibc_apps::transfer::TransferErrors;
+    use starknet_ibc_apps::transfer::components::{TokenTransferComponent, TransferrableComponent};
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);

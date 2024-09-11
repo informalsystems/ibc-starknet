@@ -1,13 +1,12 @@
 use core::byte_array::ByteArrayTrait;
 use core::hash::{HashStateTrait, HashStateExTrait};
 use core::poseidon::PoseidonTrait;
-use core::poseidon::poseidon_hash_span;
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
 use starknet::ContractAddress;
 use starknet::Store;
 use starknet_ibc_core::host::errors::HostErrors;
-use starknet_ibc_utils::poseidon_hash;
+use starknet_ibc_utils::{ComputeKeyTrait, poseidon_hash};
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ClientId {
@@ -90,10 +89,11 @@ pub impl PortIdImpl of PortIdTrait {
 
         assert(port_id_len > 2, HostErrors::INVALID_IDENTIFIER_LENGTH);
         assert(port_id_len <= 128, HostErrors::INVALID_IDENTIFIER_LENGTH);
-
-        assert(poseidon_hash(self) == port_id_hash, HostErrors::INVALID_PORT_ID);
+        assert(self.compute_key() == port_id_hash, HostErrors::INVALID_PORT_ID);
     }
 }
+
+impl PortIdKeyImpl of ComputeKeyTrait<PortId> {}
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct Sequence {

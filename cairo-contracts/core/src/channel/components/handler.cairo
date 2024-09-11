@@ -7,16 +7,18 @@ pub mod ChannelHandlerComponent {
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, MsgRecvPacket, MsgRecvPacketTrait,
-        ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait
+        ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ApplicationContract,
+        ApplicationContractTrait, ChannelOrdering, Receipt, channel_end_key, packet_receipt_key,
     };
     use starknet_ibc_core::client::{ClientHandlerComponent, ClientContractTrait, StatusTrait};
-    use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
+    use starknet_ibc_core::host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait};
     use starknet_ibc_core::router::{RouterHandlerComponent, IRouter};
-    use starknet_ibc_utils::ValidateBasicTrait;
+    use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
 
     #[storage]
     struct Storage {
-        pub channel_ends: Map<(felt252, u64), ChannelEnd>,
+        pub channel_ends: Map<felt252, ChannelEnd>,
+        pub packet_receipts: Map<felt252, Receipt>,
     }
 
     #[event]
@@ -40,8 +42,12 @@ pub mod ChannelHandlerComponent {
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
         fn recv_packet(ref self: ComponentState<TContractState>, msg: MsgRecvPacket) {
-            self.recv_packet_validate(msg.clone());
-            self.recv_packet_execute(msg);
+            let chan_end_on_b = self
+                .read_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b);
+
+            self.recv_packet_validate(msg.clone(), chan_end_on_b.clone());
+
+            self.recv_packet_execute(msg, chan_end_on_b);
         }
     }
 
@@ -54,11 +60,10 @@ pub mod ChannelHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of RecvPacketTrait<TContractState> {
-        fn recv_packet_validate(self: @ComponentState<TContractState>, msg: MsgRecvPacket) {
+        fn recv_packet_validate(
+            self: @ComponentState<TContractState>, msg: MsgRecvPacket, chan_end_on_b: ChannelEnd
+        ) {
             msg.validate_basic();
-
-            let chan_end_on_b = self
-                .read_channel_end(msg.packet.port_id_on_b.clone(), msg.packet.chan_id_on_b.clone());
 
             assert(chan_end_on_b.is_open(), ChannelErrors::INVALID_CHANNEL_STATE);
 
@@ -98,10 +103,25 @@ pub mod ChannelHandlerComponent {
                     msg.proof_commitment_on_a
                 );
         }
-        fn recv_packet_execute(ref self: ComponentState<TContractState>, msg: MsgRecvPacket) {
+        fn recv_packet_execute(
+            ref self: ComponentState<TContractState>, msg: MsgRecvPacket, chan_end_on_b: ChannelEnd
+        ) {
+            // Check if another relayer already relayed the packet.
+            match chan_end_on_b.ordering {
+                ChannelOrdering::Unordered => {},
+                ChannelOrdering::Ordered => { return; }
+            };
+
             let router_comp = get_dep_component!(@self, RouterHandler);
 
-            let _app_address = router_comp.get_app_address('transfer');
+            let maybe_app_address = router_comp
+                .get_app_address(msg.packet.port_id_on_b.compute_key());
+
+            assert(maybe_app_address.is_some(), ChannelErrors::UNSUPPORTED_PORT_ID);
+
+            let app: ApplicationContract = maybe_app_address.unwrap().into();
+
+            let _ack = app.on_recv_packet(msg.packet);
         }
     }
 
@@ -110,9 +130,15 @@ pub mod ChannelHandlerComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ChannelReaderTrait<TContractState> {
         fn read_channel_end(
-            self: @ComponentState<TContractState>, port_id: PortId, channel_id: ChannelId
+            self: @ComponentState<TContractState>, port_id: @PortId, channel_id: @ChannelId
         ) -> ChannelEnd {
-            self.channel_ends.read(('0', channel_id.sequence()))
+            self.channel_ends.read(channel_end_key(port_id, channel_id))
+        }
+
+        fn read_packet_receipt(
+            self: @ComponentState<TContractState>, port_id: @PortId, channel_id: @ChannelId, sequence: @u64
+        ) -> Receipt {
+            self.packet_receipts.read(packet_receipt_key(port_id, channel_id, sequence))
         }
     }
 
@@ -122,11 +148,21 @@ pub mod ChannelHandlerComponent {
     > of ChannelWriterTrait<TContractState> {
         fn write_channel_end(
             ref self: ComponentState<TContractState>,
-            port_id: PortId,
-            channel_id: ChannelId,
+            port_id: @PortId,
+            channel_id: @ChannelId,
             channel_end: ChannelEnd
         ) {
-            self.channel_ends.write(('0', channel_id.sequence()), channel_end);
+            self.channel_ends.write(channel_end_key(port_id, channel_id), channel_end);
+        }
+
+        fn write_packet_receipt(
+            ref self: ComponentState<TContractState>,
+            port_id: @PortId,
+            channel_id: @ChannelId,
+            sequence: @u64,
+            receipt: Receipt
+        ) {
+            self.packet_receipts.write(packet_receipt_key(port_id, channel_id, sequence), receipt);
         }
     }
 
@@ -138,4 +174,3 @@ pub mod ChannelHandlerComponent {
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>
     > of EventEmitterTrait<TContractState> {}
 }
-
