@@ -1,6 +1,6 @@
 [package]
 name          = "starknet_ibc_contracts"
-version       = "0.1.0"
+version       = { workspace = true }
 edition       = { workspace = true }
 cairo-version = { workspace = true }
 scarb-version = { workspace = true }
@@ -14,6 +14,14 @@ description = """
     A set of IBC Cairo contracts that integrate IBC protocol with Starknet.
 """
 
+[lib]
+
+[scripts]
+test = { workspace = true }
+
+[tool]
+fmt = { workspace = true }
+
 [dependencies]
 # external dependencies
 openzeppelin_access = { workspace = true }
@@ -25,11 +33,6 @@ starknet_ibc_apps    = { workspace = true }
 starknet_ibc_core    = { workspace = true }
 starknet_ibc_clients = { workspace = true }
 starknet_ibc_utils   = { workspace = true }
-
-[lib]
-
-[tool]
-fmt = { workspace = true }
 
 [[target.starknet-contract]]
 allowed-libfuncs-list.name = "experimental"

@@ -16,6 +16,9 @@ description = """
 
 [lib]
 
+[scripts]
+test = { workspace = true }
+
 [tool]
 fmt = { workspace = true }
 
