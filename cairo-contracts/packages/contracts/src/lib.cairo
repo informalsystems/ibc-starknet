@@ -1,11 +1,12 @@
 pub mod core;
 pub mod erc20;
-
 pub mod apps {
-    pub mod transfer;
+    mod transfer;
+    pub use transfer::TransferApp;
 }
 pub mod clients {
-    pub mod cometbft;
+    mod cometbft;
+    pub use cometbft::CometClient;
 }
 mod tests {
     #[cfg(test)]
