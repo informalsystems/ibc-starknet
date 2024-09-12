@@ -9,7 +9,7 @@ use starknet_ibc_apps::transfer::{
 };
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait};
-use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait, KeyBuilderImpl};
+use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait, LocalKeyBuilderImpl};
 
 /// Maximum memo length allowed for ICS-20 transfers. This bound corresponds to
 /// the `MaximumMemoLength` in the `ibc-go`.
@@ -90,7 +90,7 @@ pub impl PrefixedDenomImpl of PrefixedDenomTrait {
 
 impl PrefixedDenomKeyImpl of ComputeKeyTrait<PrefixedDenom> {
     fn compute_key(self: @PrefixedDenom) -> felt252 {
-        let mut key_builder = KeyBuilderImpl::init();
+        let mut key_builder = LocalKeyBuilderImpl::init();
         let mut trace_path_span = self.trace_path.span();
         while let Option::Some(path) = trace_path_span.pop_front() {
             key_builder.append_serde(path);

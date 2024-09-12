@@ -77,6 +77,12 @@ pub impl ChannelIdImpl of ChannelIdTrait {
     }
 }
 
+pub impl ChannelIdIntoByteArray of Into<ChannelId, ByteArray> {
+    fn into(self: ChannelId) -> ByteArray {
+        self.channel_id
+    }
+}
+
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct PortId {
     pub port_id: ByteArray,
@@ -93,11 +99,23 @@ pub impl PortIdImpl of PortIdTrait {
     }
 }
 
+pub impl PortIdIntoByteArray of Into<PortId, ByteArray> {
+    fn into(self: PortId) -> ByteArray {
+        self.port_id
+    }
+}
+
 impl PortIdKeyImpl of ComputeKeyTrait<PortId> {}
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct Sequence {
     pub sequence: u64,
+}
+
+pub impl SequenceIntoByteArray of Into<Sequence, ByteArray> {
+    fn into(self: Sequence) -> ByteArray {
+        self.sequence.format_as_byte_array(10)
+    }
 }
 
 pub(crate) fn assert_numeric(char_bytes: u8) {

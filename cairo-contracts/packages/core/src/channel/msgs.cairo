@@ -5,7 +5,7 @@ use starknet_ibc_utils::ValidateBasicTrait;
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct MsgRecvPacket {
     pub packet: Packet,
-    pub proof_commitment_on_a: Array<felt252>,
+    pub proof_commitment_on_a: Array<u8>,
     pub proof_height_on_a: Height,
 }
 

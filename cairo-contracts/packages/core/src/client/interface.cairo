@@ -36,13 +36,13 @@ pub trait IClientStateValidation<TContractState> {
     fn verify_membership(
         self: @TContractState,
         client_sequence: u64,
-        key: felt252,
-        value: Array<felt252>,
-        proof: Array<felt252>
+        path: ByteArray,
+        value: Array<u8>,
+        proof: Array<u8>
     );
 
     fn verify_non_membership(
-        self: @TContractState, client_sequence: u64, key: felt252, proof: Array<felt252>
+        self: @TContractState, client_sequence: u64, path: ByteArray, proof: Array<u8>
     );
 
     fn verify_client_message(

@@ -29,7 +29,7 @@ pub impl PacketImpl of PacketTrait {
         );
     }
 
-    fn compute_packet_commitment(self: @Packet) -> Array<felt252> {
+    fn compute_packet_commitment(self: @Packet) -> Array<u8> {
         array![]
     }
 }

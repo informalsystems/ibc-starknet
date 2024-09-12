@@ -42,19 +42,19 @@ pub impl ClientContractImpl of ClientContractTrait {
     fn verify_membership(
         self: @ClientContract,
         client_sequence: u64,
-        key: felt252,
-        value: Array<felt252>,
-        proof: Array<felt252>
+        path: ByteArray,
+        value: Array<u8>,
+        proof: Array<u8>
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
-            .verify_membership(client_sequence, key, value, proof)
+            .verify_membership(client_sequence, path, value, proof)
     }
 
     fn verify_non_membership(
-        self: @ClientContract, client_sequence: u64, key: felt252, proof: Array<felt252>
+        self: @ClientContract, client_sequence: u64, path: ByteArray, proof: Array<u8>
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
-            .verify_non_membership(client_sequence, key, proof)
+            .verify_non_membership(client_sequence, path, proof)
     }
     fn create(ref self: ClientContract, msg: MsgCreateClient) -> CreateResponse {
         IClientHandlerDispatcher { contract_address: self.address }.create_client(msg)

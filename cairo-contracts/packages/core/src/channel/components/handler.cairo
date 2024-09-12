@@ -9,9 +9,10 @@ pub mod ChannelHandlerComponent {
         ChannelEventEmitterComponent, IChannelHandler, MsgRecvPacket, MsgRecvPacketTrait,
         ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ApplicationContract,
         ApplicationContractTrait, ChannelOrdering, Receipt, channel_end_key, packet_receipt_key,
+        commitment_path
     };
     use starknet_ibc_core::client::{ClientHandlerComponent, ClientContractTrait, StatusTrait};
-    use starknet_ibc_core::host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait};
+    use starknet_ibc_core::host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence};
     use starknet_ibc_core::router::{RouterHandlerComponent, IRouter};
     use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
 
@@ -95,10 +96,19 @@ pub mod ChannelHandlerComponent {
 
             let packet_commitment_on_a = msg.packet.compute_packet_commitment();
 
+            let mut path: ByteArray =
+                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+
+            let commitment_path = commitment_path(
+                msg.packet.port_id_on_a, msg.packet.chan_id_on_a, msg.packet.seq_on_a
+            );
+
+            path.append(@commitment_path);
+
             client
                 .verify_membership(
                     chan_end_on_b.client_id.sequence,
-                    'commitment path', // TODO: implement commitment path
+                    path,
                     packet_commitment_on_a,
                     msg.proof_commitment_on_a
                 );
@@ -139,7 +149,7 @@ pub mod ChannelHandlerComponent {
             self: @ComponentState<TContractState>,
             port_id: @PortId,
             channel_id: @ChannelId,
-            sequence: @u64
+            sequence: @Sequence
         ) -> Receipt {
             self.packet_receipts.read(packet_receipt_key(port_id, channel_id, sequence))
         }
@@ -162,7 +172,7 @@ pub mod ChannelHandlerComponent {
             ref self: ComponentState<TContractState>,
             port_id: @PortId,
             channel_id: @ChannelId,
-            sequence: @u64,
+            sequence: @Sequence,
             receipt: Receipt
         ) {
             self.packet_receipts.write(packet_receipt_key(port_id, channel_id, sequence), receipt);
