@@ -20,15 +20,20 @@ use hermes_protobuf_encoding_components::types::{Any, ViaAny, ViaProtobuf};
 use hermes_wasm_client_components::impls::encoding::components::WasmEncodingComponents;
 use hermes_wasm_client_components::types::client_state::{ProtoWasmClientState, WasmClientState};
 use hermes_wasm_client_components::types::consensus_state::{
-    DecodeViaWasmConsensusState, EncodeViaWasmConsensusState, ProtoWasmConsensusState,
-    WasmConsensusState,
+    ProtoWasmConsensusState, WasmConsensusState,
 };
+use ibc::clients::wasm_types::client_message::ClientMessage;
+use ibc_proto::ibc::lightclients::wasm::v1::ClientMessage as ProtoClientMessage;
 
+use crate::types::client_header::{ConvertStarknetClientHeader, StarknetClientHeader};
 use crate::types::client_state::{
-    EncodeWasmStarknetClientState, ProtoStarknetClientState, StarknetClientState,
+    ConvertWasmStarknetClientState, ProtoStarknetClientState, StarknetClientState,
     WasmStarknetClientState,
 };
-use crate::types::consensus_state::{ProtoStarknetConsensusState, StarknetConsensusState};
+use crate::types::consensus_state::{
+    ConvertWasmStarknetConsensusState, ProtoStarknetConsensusState, StarknetConsensusState,
+    WasmStarknetConsensusState,
+};
 
 define_components! {
     StarknetProtobufEncodingComponents {
@@ -68,6 +73,11 @@ delegate_components! {
         (ViaProtobuf, StarknetConsensusState): ConvertAndEncode<ProtoStarknetConsensusState>,
         (ViaProtobuf, ProtoStarknetConsensusState): EncodeAsProtobuf,
 
+        (ViaAny, ClientMessage): EncodeViaAny<ViaProtobuf>,
+
+        (ViaProtobuf, ClientMessage): ConvertAndEncode<ProtoClientMessage>,
+        (ViaProtobuf, ProtoClientMessage): EncodeAsProtobuf,
+
         (ViaProtobuf, Any): EncodeAsProtobuf,
 
         [
@@ -90,8 +100,17 @@ delegate_components! {
         (StarknetConsensusState, ProtoStarknetConsensusState): ConvertFrom,
         (ProtoStarknetConsensusState, StarknetConsensusState): TryConvertFrom,
 
+        (ClientMessage, ProtoClientMessage): ConvertFrom,
+        (ProtoClientMessage, ClientMessage): TryConvertFrom,
+
         (StarknetClientState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
         (Any, StarknetClientState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
+
+        (StarknetConsensusState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
+        (Any, StarknetConsensusState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
+
+        (ClientMessage, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
+        (Any, ClientMessage): DecodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
 
         [
             (WasmClientState, ProtoWasmClientState),
@@ -109,10 +128,20 @@ delegate_components! {
             (Any, WasmStarknetClientState),
             (WasmStarknetClientState, Any),
         ]:
-            EncodeWasmStarknetClientState,
+            ConvertWasmStarknetClientState,
 
-        (StarknetConsensusState, Any): EncodeViaWasmConsensusState,
-        (Any, StarknetConsensusState): DecodeViaWasmConsensusState,
+        [
+            (Any, WasmStarknetConsensusState),
+            (WasmStarknetConsensusState, Any),
+        ]:
+            ConvertWasmStarknetConsensusState,
+
+        [
+            (Any, StarknetClientHeader),
+            (StarknetClientHeader, Any),
+        ]:
+            ConvertStarknetClientHeader,
+
     }
 }
 
@@ -120,6 +149,7 @@ delegate_components! {
     StarknetTypeUrlSchemas {
         StarknetClientState: StarknetClientStateUrl,
         StarknetConsensusState: StarknetConsensusStateUrl,
+        ClientMessage: ClientMessageUrl,
         [
             WasmClientState,
             WasmConsensusState,
@@ -131,3 +161,5 @@ delegate_components! {
 impl_type_url!(StarknetClientStateUrl, "/StarknetClientState");
 
 impl_type_url!(StarknetConsensusStateUrl, "/StarknetConsensusState");
+
+impl_type_url!(ClientMessageUrl, "/ibc.lightclients.wasm.v1.ClientMessage");

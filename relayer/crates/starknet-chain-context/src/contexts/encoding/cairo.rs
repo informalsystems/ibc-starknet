@@ -34,7 +34,7 @@ use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
 use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
 use starknet::core::types::{Felt, U256};
 
-use crate::impls::error::HandleStarknetError;
+use crate::impls::error::HandleStarknetChainError;
 
 pub struct StarknetCairoEncoding;
 
@@ -49,7 +49,7 @@ impl HasComponents for StarknetCairoEncoding {
 delegate_components! {
     StarknetCairoEncodingContextComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetError>,
+        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
     }
 }
 

@@ -17,12 +17,16 @@ let
       lockFile = starknet-devnet-src + "/Cargo.lock";
     };
 
+    doCheck = false;
+
     OPENSSL_NO_VENDOR = 1;
     PKG_CONFIG_PATH = "${nixpkgs.openssl.dev}/lib/pkgconfig";
 
     nativeBuildInputs = [ nixpkgs.pkg-config ];
 
-    doCheck = false;
+    buildInputs = nixpkgs.lib.optionals nixpkgs.stdenv.isDarwin [
+      nixpkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+    ];
   };
 in
 starknet-devnet

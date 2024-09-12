@@ -1,11 +1,46 @@
 [workspace]
 members = [
-  "apps",
-  "core",
-  "clients",
-  "contracts",
-  "utils",
+  "packages/apps",
+  "packages/clients",
+  "packages/contracts",
+  "packages/core",
+  "packages/utils",
 ]
+
+[workspace.package]
+version       = "0.1.0"
+edition       = "2023_11"
+cairo-version = "2.7.0"
+scarb-version = "2.7.0"
+license       = "Apache-2.0"
+authors       = [ "Informal Systems <hello@informal.systems>" ]
+repository    = "https://github.com/informalsystems/ibc-starknet"
+Readme        = "README.md"
+keywords      = [ "ethereum", "starknet", "ibc", "cairo", "contracts" ]
+description   = "Collection of Cairo components and contracts that implement and integrate IBC protocol with Starknet"
+
+[workspace.scripts]
+test = "snforge test"
+
+[workspace.dependencies]
+# external dependencies
+cairo_test           = "2.7.0"
+starknet             = "2.7.0"
+openzeppelin_access  = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
+openzeppelin_token   = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
+openzeppelin_testing = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
+openzeppelin_utils   = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
+snforge_std          = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.26.0" }
+
+# ibc dependencies
+starknet_ibc_apps      = { path = "packages/apps" }
+starknet_ibc_clients   = { path = "packages/clients" }
+starknet_ibc_contracts = { path = "packages/contracts" }
+starknet_ibc_core      = { path = "packages/core" }
+starknet_ibc_utils     = { path = "packages/utils" }
+
+[workspace.tool.fmt]
+sort-module-level-items = true
 
 [package]
 name          = "starknet_ibc"
@@ -20,34 +55,13 @@ Readme        = { workspace = true }
 keywords      = { workspace = true }
 description   = { workspace = true }
 
-[workspace.package]
-version       = "0.1.0"
-edition       = "2023_11"
-cairo-version = "2.7.0"
-scarb-version = "2.7.0"
-license       = "Apache-2.0"
-authors       = [ "Informal Systems <hello@informal.systems>" ]
-repository    = "https://github.com/informalsystems/ibc-starknet"
-Readme        = "README.md"
-keywords      = [ "ethereum", "starknet", "ibc", "cairo", "contracts" ]
-description   = "Collection of Cairo components and contracts that implement and integrate IBC protocol with Starknet"
+[lib]
 
-[workspace.dependencies]
-# external dependencies
-cairo_test           = "2.7.0"
-starknet             = "2.7.0"
-openzeppelin_access  = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
-openzeppelin_token   = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
-openzeppelin_testing = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
-openzeppelin_utils   = { git = "https://github.com/OpenZeppelin/cairo-contracts.git", tag = "v0.15.1" }
-snforge_std          = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.26.0" }
+[scripts]
+test = { workspace = true }
 
-# ibc dependencies
-starknet_ibc_apps      = { path = "apps" }
-starknet_ibc_core      = { path = "core" }
-starknet_ibc_clients   = { path = "clients" }
-starknet_ibc_contracts = { path = "contracts" }
-starknet_ibc_utils     = { path = "utils" }
+[tool]
+fmt = { workspace = true }
 
 [dependencies]
 starknet_ibc_apps      = { workspace = true }
@@ -55,16 +69,3 @@ starknet_ibc_core      = { workspace = true }
 starknet_ibc_clients   = { workspace = true }
 starknet_ibc_contracts = { workspace = true }
 starknet_ibc_utils     = { workspace = true }
-
-[lib]
-
-[[target.starknet-contract]]
-allowed-libfuncs-list.name = "experimental"
-sierra                     = true
-casm                       = false
-
-[workspace.tool.fmt]
-sort-module-level-items = true
-
-[tool]
-fmt = { workspace = true }

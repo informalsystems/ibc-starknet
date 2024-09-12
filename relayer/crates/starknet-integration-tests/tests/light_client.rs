@@ -3,25 +3,28 @@
 use std::env::var;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
-use hermes_cosmos_chain_components::types::messages::client::create::CosmosCreateClientMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
+use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
-use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_error::types::Error;
-use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
-use hermes_starknet_chain_components::types::client_state::{
-    StarknetClientState, WasmStarknetClientState,
+use hermes_relayer_components::chain::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
 };
-use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
-use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
+use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
+use hermes_relayer_components::chain::traits::queries::consensus_state::CanQueryConsensusState;
+use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
+use hermes_relayer_components::relay::traits::target::DestinationTarget;
+use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
+use hermes_runtime_components::traits::sleep::CanSleep;
+use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
+use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
-use ibc::core::client::types::Height;
-use ibc::core::primitives::Timestamp;
 use sha2::{Digest, Sha256};
 
 #[test]
@@ -64,33 +67,95 @@ fn test_starknet_light_client() -> Result<(), Error> {
             governance_proposal_authority: "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn".into(), // TODO: don't hard code this
         });
 
+        let starknet_bootstrap = StarknetBootstrap {
+            runtime: runtime.clone(),
+            chain_command_path: "starknet-devnet".into(),
+            chain_store_dir: store_dir,
+        };
+
         let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
+
+        let starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
 
         let cosmos_chain = cosmos_chain_driver.chain();
 
-        let client_state = WasmStarknetClientState {
-            wasm_code_hash: wasm_code_hash.into(),
-            client_state: StarknetClientState {
-                latest_height: Height::new(0, 1)?,
-            },
+        let starknet_chain = &starknet_chain_driver.chain;
+
+        let client_id = StarknetToCosmosRelay::create_client(
+            DestinationTarget,
+            cosmos_chain,
+            starknet_chain,
+            &StarknetCreateClientPayloadOptions { wasm_code_hash },
+            &(),
+        )
+        .await?;
+
+        println!("created client id: {:?}", client_id);
+
+        let starknet_to_cosmos_relay = StarknetToCosmosRelay {
+            runtime: runtime.clone(),
+            src_chain: starknet_chain.clone(),
+            dst_chain: cosmos_chain.clone(),
+            src_client_id: client_id.clone(), // TODO: stub
+            dst_client_id: client_id.clone(),
         };
 
-        let consensus_state = StarknetConsensusState {
-            root: vec![1, 2, 3].into(),
-            time: Timestamp::now(),
-        };
+        {
+            let client_state =
+                <CosmosChain as CanQueryClientState<StarknetChain>>::query_client_state(
+                    cosmos_chain,
+                    &client_id,
+                    &cosmos_chain.query_chain_height().await?,
+                )
+                .await?;
 
-        let encoding = StarknetProtobufEncoding;
+            let client_height = client_state.client_state.latest_height.revision_height();
 
-        let consensus_state_any = encoding.convert(&consensus_state)?;
+            let consensus_state =
+                <CosmosChain as CanQueryConsensusState<StarknetChain>>::query_consensus_state(
+                    cosmos_chain,
+                    &client_id,
+                    &client_height,
+                    &cosmos_chain.query_chain_height().await?,
+                )
+                .await?;
 
-        let create_client_message = CosmosCreateClientMessage {
-            client_state: encoding.convert(&client_state)?,
-            consensus_state: consensus_state_any,
+            println!(
+                "initial consensus state height {} and root: {:?}",
+                client_height,
+                consensus_state.consensus_state.root.into_vec()
+            );
         }
-        .to_cosmos_message();
 
-        cosmos_chain.send_message(create_client_message).await?;
+        {
+            runtime.sleep(Duration::from_secs(1)).await;
+
+            let starknet_status = starknet_chain.query_chain_status().await?;
+
+            println!(
+                "updating Starknet client to Cosmos to height {} and root: {:?}",
+                starknet_status.height,
+                starknet_status.block_hash.to_bytes_be()
+            );
+
+            starknet_to_cosmos_relay
+                .send_target_update_client_messages(DestinationTarget, &starknet_status.height)
+                .await?;
+
+            let consensus_state =
+                <CosmosChain as CanQueryConsensusState<StarknetChain>>::query_consensus_state(
+                    cosmos_chain,
+                    &client_id,
+                    &starknet_status.height,
+                    &cosmos_chain.query_chain_height().await?,
+                )
+                .await?;
+
+            assert_eq!(
+                consensus_state.consensus_state.root.into_vec(),
+                starknet_status.block_hash.to_bytes_be()
+            );
+        }
 
         Ok(())
     })

@@ -34,12 +34,12 @@ use starknet::core::types::{RevertedInvocation, StarknetError};
 use starknet::providers::ProviderError;
 use starknet::signers::local_wallet;
 
-pub struct HandleStarknetError;
+pub struct HandleStarknetChainError;
 
 pub type SignError = single_owner::SignError<local_wallet::SignError>;
 
 delegate_components! {
-    HandleStarknetError {
+    HandleStarknetChainError {
         Error: ReturnError,
         Infallible: HandleInfallible,
         [

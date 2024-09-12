@@ -1,0 +1,29 @@
+[package]
+name          = "starknet_ibc_utils"
+version       = { workspace = true }
+edition       = { workspace = true }
+cairo-version = { workspace = true }
+scarb-version = { workspace = true }
+authors       = { workspace = true }
+repository    = { workspace = true }
+license       = { workspace = true }
+Readme        = { workspace = true }
+keywords      = { workspace = true }
+
+description = """
+    Provides a set of utility components used for integrating IBC protocol with Starknet.
+"""
+
+[lib]
+
+[scripts]
+test = { workspace = true }
+
+[tool]
+fmt = { workspace = true }
+
+[dependencies]
+# external dependencies
+openzeppelin_token = { workspace = true }
+snforge_std        = { workspace = true }
+starknet           = { workspace = true }

@@ -13,6 +13,7 @@ pub type ProtoStarknetClientState = ProtoClientState;
 
 pub const STARKNET_CLIENT_STATE_TYPE_URL: &str = CLIENT_STATE_TYPE_URL;
 
+#[derive(Debug)]
 pub struct WasmStarknetClientState {
     pub client_state: ClientState,
     pub wasm_code_hash: Vec<u8>,
@@ -24,9 +25,9 @@ impl From<WasmStarknetClientState> for ClientState {
     }
 }
 
-pub struct EncodeWasmStarknetClientState;
+pub struct ConvertWasmStarknetClientState;
 
-impl<Encoding> Converter<Encoding, WasmStarknetClientState, Any> for EncodeWasmStarknetClientState
+impl<Encoding> Converter<Encoding, WasmStarknetClientState, Any> for ConvertWasmStarknetClientState
 where
     Encoding: HasEncodedType<Encoded = Vec<u8>>
         + CanEncode<ViaAny, ClientState>
@@ -50,7 +51,7 @@ where
     }
 }
 
-impl<Encoding> Converter<Encoding, Any, WasmStarknetClientState> for EncodeWasmStarknetClientState
+impl<Encoding> Converter<Encoding, Any, WasmStarknetClientState> for ConvertWasmStarknetClientState
 where
     Encoding: HasEncodedType<Encoded = Vec<u8>>
         + CanDecode<ViaAny, ClientState>
