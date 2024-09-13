@@ -5,6 +5,7 @@ members = [
   "packages/contracts",
   "packages/core",
   "packages/utils",
+  "protobuf",
 ]
 
 [workspace.package]
