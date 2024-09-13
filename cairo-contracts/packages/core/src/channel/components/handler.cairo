@@ -53,12 +53,10 @@ pub mod ChannelHandlerComponent {
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
         fn recv_packet(ref self: ComponentState<TContractState>, msg: MsgRecvPacket) {
-            let maybe_chan_end_on_b = self
-                .read_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b);
-
-            assert(maybe_chan_end_on_b.is_some(), ChannelErrors::MISSING_CHANNEL_END);
-
-            let chan_end_on_b = maybe_chan_end_on_b.unwrap();
+            let chan_end_on_b = self.get_channel_end(
+                @msg.packet.port_id_on_b,
+                @msg.packet.chan_id_on_b,
+            );
 
             self.recv_packet_validate(msg.clone(), chan_end_on_b.clone());
 
@@ -80,11 +78,11 @@ pub mod ChannelHandlerComponent {
         ) {
             msg.validate_basic();
 
-            chan_end_on_b.validate(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
-
             // TODO: verify connection end if we ever decide to implement ICS-03
 
-            self.assert_packet_not_timed_out(@msg.packet);
+            chan_end_on_b.validate(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
+
+            self.assert_not_timed_out(@msg.packet);
 
             self.assert_proof_membership(msg.clone(), chan_end_on_b.clone());
 
@@ -203,9 +201,7 @@ pub mod ChannelHandlerComponent {
                 );
         }
 
-        fn assert_packet_not_timed_out(
-            self: @ComponentState<TContractState>, packet: @Packet
-        ) {
+        fn assert_not_timed_out(self: @ComponentState<TContractState>, packet: @Packet) {
             let host_height = get_block_number();
 
             let host_timestamp = get_block_timestamp();
@@ -233,6 +229,19 @@ pub mod ChannelHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChannelInternalTrait<TContractState> {
+        fn get_channel_end(
+            self: @ComponentState<TContractState>,
+            local_port_id: @PortId,
+            local_channel_id: @ChannelId,
+        ) -> ChannelEnd {
+            let maybe_chan_end = self.read_channel_end(local_port_id, local_channel_id);
+
+            assert(maybe_chan_end.is_some(), ChannelErrors::MISSING_CHANNEL_END);
+
+            maybe_chan_end.unwrap()
+
+        }
+
         fn get_client(
             self: @ComponentState<TContractState>, client_type: felt252
         ) -> ClientContract {
