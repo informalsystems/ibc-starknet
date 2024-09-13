@@ -3,7 +3,7 @@ pub mod RouterHandlerComponent {
     use core::num::traits::Zero;
     use starknet::ContractAddress;
     use starknet::storage::Map;
-    use starknet_ibc_core::router::IRouter;
+    use starknet_ibc_core::router::{RouterErrors, IRouter, ApplicationContract};
 
     #[storage]
     struct Storage {
@@ -45,6 +45,21 @@ pub mod RouterHandlerComponent {
 
         fn release_port_id(ref self: ComponentState<TContractState>, port_id: felt252) {
             self.remove_app_address(port_id)
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl RouterInternalImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+    > of RouterInternalTrait<TContractState> {
+        fn get_app(
+            self: @ComponentState<TContractState>, port_id_key: felt252
+        ) -> ApplicationContract {
+            let maybe_app_address = self.get_app_address(port_id_key);
+
+            assert(maybe_app_address.is_some(), RouterErrors::UNSUPPORTED_PORT_ID);
+
+            maybe_app_address.unwrap().into()
         }
     }
 

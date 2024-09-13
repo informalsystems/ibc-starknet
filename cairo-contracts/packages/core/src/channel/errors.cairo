@@ -9,5 +9,4 @@ pub mod ChannelErrors {
     pub const MISSING_CHANNEL_END: felt252 = 'ICS04: missing channel end';
     pub const PACKET_ALREADY_RECEIVED: felt252 = 'ICS04: packet already received';
     pub const TIMED_OUT_PACKET: felt252 = 'ICS04: packet timed out';
-    pub const UNSUPPORTED_PORT_ID: felt252 = 'ICS04: unsupported port id';
 }

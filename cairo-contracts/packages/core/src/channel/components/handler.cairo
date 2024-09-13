@@ -1,14 +1,14 @@
 #[starknet::component]
 pub mod ChannelHandlerComponent {
     use ClientHandlerComponent::ClientInternalTrait;
+    use RouterHandlerComponent::RouterInternalTrait;
     use starknet::ContractAddress;
     use starknet::storage::Map;
     use starknet::storage::StoragePathEntry;
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, MsgRecvPacket, MsgRecvPacketTrait,
-        ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ApplicationContract,
-        ApplicationContractTrait, ChannelOrdering, Receipt
+        ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, StatusTrait
@@ -17,7 +17,9 @@ pub mod ChannelHandlerComponent {
         PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence, SequencePartialOrd,
         channel_end_key, receipt_key, ack_key, commitment_path, next_sequence_recv_key
     };
-    use starknet_ibc_core::router::{RouterHandlerComponent, IRouter};
+    use starknet_ibc_core::router::{
+        RouterHandlerComponent, IRouter, ApplicationContractTrait, ApplicationContract
+    };
     use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
 
     #[storage]
@@ -125,11 +127,10 @@ pub mod ChannelHandlerComponent {
 
             match chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
-                    let reciept_resp = self.read_packet_receipt(
-                        @msg.packet.port_id_on_b,
-                        @msg.packet.chan_id_on_b,
-                        @msg.packet.seq_on_a
-                    );
+                    let reciept_resp = self
+                        .read_packet_receipt(
+                            @msg.packet.port_id_on_b, @msg.packet.chan_id_on_b, @msg.packet.seq_on_a
+                        );
 
                     assert(reciept_resp.is_some(), ChannelErrors::PACKET_ALREADY_RECEIVED);
 
@@ -167,15 +168,7 @@ pub mod ChannelHandlerComponent {
         fn recv_packet_execute(
             ref self: ComponentState<TContractState>, msg: MsgRecvPacket, chan_end_on_b: ChannelEnd
         ) {
-
-            let router_comp = get_dep_component!(@self, RouterHandler);
-
-            let maybe_app_address = router_comp
-                .get_app_address(msg.packet.port_id_on_b.compute_key());
-
-            assert(maybe_app_address.is_some(), ChannelErrors::UNSUPPORTED_PORT_ID);
-
-            let app: ApplicationContract = maybe_app_address.unwrap().into();
+            let app = self.get_app(@msg.packet.port_id_on_b);
 
             let _ack = app.on_recv_packet(msg.packet);
         }
@@ -206,6 +199,12 @@ pub mod ChannelHandlerComponent {
             let client_comp = get_dep_component!(self, ClientHandler);
 
             client_comp.get_client(client_type)
+        }
+
+        fn get_app(self: @ComponentState<TContractState>, port_id: @PortId) -> ApplicationContract {
+            let router_comp = get_dep_component!(self, RouterHandler);
+
+            router_comp.get_app(port_id.compute_key())
         }
     }
 

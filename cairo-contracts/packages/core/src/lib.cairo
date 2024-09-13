@@ -1,14 +1,22 @@
-pub mod router;
 pub mod tests;
-pub mod channel {
+pub mod router {
     mod app_call;
+    mod component;
+    mod errors;
+    mod interface;
+
+    pub use app_call::{ApplicationContract, ApplicationContractImpl, ApplicationContractTrait};
+    pub use component::RouterHandlerComponent;
+    pub use errors::RouterErrors;
+    pub use interface::{IRouter, IRouterDispatcher, IRouterDispatcherTrait};
+}
+pub mod channel {
     mod components;
     mod errors;
     mod interface;
     mod msgs;
     mod types;
 
-    pub use app_call::{ApplicationContract, ApplicationContractImpl, ApplicationContractTrait};
     pub use components::events::ChannelEventEmitterComponent;
     pub use components::handler::ChannelHandlerComponent;
     pub use errors::ChannelErrors;
