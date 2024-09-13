@@ -1,4 +1,5 @@
 use ChannelHandlerComponent::ChannelReaderTrait;
+use core::num::traits::Zero;
 use snforge_std::{spy_events, test_address, start_cheat_caller_address};
 use starknet::ContractAddress;
 use starknet::contract_address_const;
@@ -31,7 +32,7 @@ fn test_read_empty_storage() {
     assert!(receipt_resp.is_none());
 
     let ack_resp = state.read_packet_ack(@PORT_ID(), @CHANNEL_ID(), @SEQUENCE());
-    assert!(ack_resp.len() == 0);
+    assert!(ack_resp.is_zero());
 }
 
 #[test]

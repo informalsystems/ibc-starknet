@@ -29,7 +29,7 @@ pub impl PacketImpl of PacketTrait {
         );
     }
 
-    fn compute_packet_commitment(self: @Packet) -> Array<u8> {
+    fn compute_commitment(self: @Packet) -> Array<u8> {
         array![]
     }
 }
@@ -91,5 +91,14 @@ pub struct Acknowledgement {
     pub ack: felt252,
 }
 
+#[generate_trait]
+pub impl AcknowledgementImpl of AcknowledgementTrait {
+    fn compute_commitment(self: @Acknowledgement) -> felt252 {
+        ''
+    }
+}
+
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
-pub struct Receipt {}
+pub enum Receipt {
+    Ok
+}

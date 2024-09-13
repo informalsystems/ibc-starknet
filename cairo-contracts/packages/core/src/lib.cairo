@@ -27,7 +27,8 @@ pub mod channel {
     pub use msgs::{MsgRecvPacket, MsgRecvPacketImpl, MsgRecvPacketTrait};
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
-        ChannelOrdering, Counterparty, Acknowledgement, Receipt,
+        ChannelOrdering, Counterparty, Acknowledgement, AcknowledgementImpl, AcknowledgementTrait,
+        Receipt,
     };
 }
 pub mod client {

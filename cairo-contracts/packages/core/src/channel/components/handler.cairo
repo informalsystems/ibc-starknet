@@ -1,14 +1,16 @@
 #[starknet::component]
 pub mod ChannelHandlerComponent {
+    use ChannelEventEmitterComponent::ChannelEventEmitterTrait;
     use ClientHandlerComponent::ClientInternalTrait;
     use RouterHandlerComponent::RouterInternalTrait;
+    use core::num::traits::Zero;
     use starknet::ContractAddress;
     use starknet::storage::Map;
-    use starknet::storage::StoragePathEntry;
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, MsgRecvPacket, MsgRecvPacketTrait,
-        ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt
+        ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt,
+        AcknowledgementTrait, Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, StatusTrait
@@ -26,7 +28,7 @@ pub mod ChannelHandlerComponent {
     struct Storage {
         pub channel_ends: Map<felt252, Option<ChannelEnd>>,
         pub packet_receipts: Map<felt252, Option<Receipt>>,
-        pub packet_acks: Map<felt252, ByteArray>,
+        pub packet_acks: Map<felt252, felt252>,
         pub recv_sequences: Map<felt252, Sequence>,
     }
 
@@ -104,7 +106,7 @@ pub mod ChannelHandlerComponent {
 
             msg.verify_proof_height(@client_latest_height);
 
-            let packet_commitment_on_a = msg.packet.compute_packet_commitment();
+            let packet_commitment_on_a = msg.packet.compute_commitment();
 
             let mut path: ByteArray =
                 "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
@@ -125,7 +127,7 @@ pub mod ChannelHandlerComponent {
                     msg.proof_commitment_on_a.clone()
                 );
 
-            match chan_end_on_b.ordering {
+            match @chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
                     let reciept_resp = self
                         .read_packet_receipt(
@@ -170,7 +172,39 @@ pub mod ChannelHandlerComponent {
         ) {
             let app = self.get_app(@msg.packet.port_id_on_b);
 
-            let _ack = app.on_recv_packet(msg.packet);
+            let ack = app.on_recv_packet(msg.packet.clone());
+
+            match @chan_end_on_b.ordering {
+                ChannelOrdering::Unordered => {
+                    self
+                        .write_packet_receipt(
+                            @msg.packet.port_id_on_b,
+                            @msg.packet.chan_id_on_b,
+                            @msg.packet.seq_on_a,
+                            Receipt::Ok
+                        );
+                },
+                ChannelOrdering::Ordered => {
+                    self
+                        .write_next_sequence_recv(
+                            @msg.packet.port_id_on_b,
+                            @msg.packet.chan_id_on_b,
+                            msg.packet.seq_on_a.clone()
+                        );
+                }
+            };
+
+            self
+                .write_packet_ack(
+                    @msg.packet.port_id_on_b,
+                    @msg.packet.chan_id_on_b,
+                    @msg.packet.seq_on_a,
+                    ack.compute_commitment()
+                );
+
+            self.emit_recv_packet_event(msg.packet.clone(), chan_end_on_b.ordering);
+
+            self.emit_write_ack_event(msg.packet, ack);
         }
 
         fn assert_ack_not_exists(
@@ -181,7 +215,7 @@ pub mod ChannelHandlerComponent {
         ) {
             let ack = self.read_packet_ack(port_id, channel_id, sequence);
 
-            assert(ack.len() == 0, ChannelErrors::ACK_ALREADY_EXISTS);
+            assert(ack.is_zero(), ChannelErrors::ACK_ALREADY_EXISTS);
         }
     }
 
@@ -232,7 +266,7 @@ pub mod ChannelHandlerComponent {
             port_id: @PortId,
             channel_id: @ChannelId,
             sequence: @Sequence
-        ) -> ByteArray {
+        ) -> felt252 {
             self.packet_acks.read(ack_key(port_id, channel_id, sequence))
         }
 
@@ -275,7 +309,7 @@ pub mod ChannelHandlerComponent {
             port_id: @PortId,
             channel_id: @ChannelId,
             sequence: @Sequence,
-            ack: ByteArray
+            ack: felt252
         ) {
             self.packet_acks.write(ack_key(port_id, channel_id, sequence), ack);
         }
@@ -296,5 +330,45 @@ pub mod ChannelHandlerComponent {
         +HasComponent<TContractState>,
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>
-    > of EventEmitterTrait<TContractState> {}
+    > of EventEmitterTrait<TContractState> {
+        fn emit_send_packet_event(
+            ref self: ComponentState<TContractState>, packet: Packet, ordering: ChannelOrdering
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter.emit_send_packet_event(packet, ordering);
+        }
+
+        fn emit_recv_packet_event(
+            ref self: ComponentState<TContractState>, packet: Packet, ordering: ChannelOrdering
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter.emit_recv_packet_event(packet, ordering);
+        }
+
+        fn emit_write_ack_event(
+            ref self: ComponentState<TContractState>, packet: Packet, ack: Acknowledgement
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter.emit_write_ack_event(packet, ack);
+        }
+
+        fn emit_ack_packet_event(
+            ref self: ComponentState<TContractState>, packet: Packet, ordering: ChannelOrdering
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter.emit_ack_packet_event(packet, ordering);
+        }
+
+        fn emit_timeout_packet_event(
+            ref self: ComponentState<TContractState>, packet: Packet, ordering: ChannelOrdering
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter.emit_timeout_packet_event(packet, ordering);
+        }
+    }
 }
