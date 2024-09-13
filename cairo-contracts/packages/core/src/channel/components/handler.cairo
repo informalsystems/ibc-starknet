@@ -10,10 +10,12 @@ pub mod ChannelHandlerComponent {
         ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ApplicationContract,
         ApplicationContractTrait, ChannelOrdering, Receipt
     };
-    use starknet_ibc_core::client::{ClientHandlerComponent, ClientContractTrait, StatusTrait};
+    use starknet_ibc_core::client::{
+        ClientHandlerComponent, ClientContract, ClientContractTrait, StatusTrait
+    };
     use starknet_ibc_core::host::{
-        PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence, channel_end_key, receipt_key,
-        ack_key, commitment_path
+        PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence, SequencePartialOrd,
+        channel_end_key, receipt_key, ack_key, commitment_path, next_sequence_recv_key
     };
     use starknet_ibc_core::router::{RouterHandlerComponent, IRouter};
     use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
@@ -23,6 +25,7 @@ pub mod ChannelHandlerComponent {
         pub channel_ends: Map<felt252, Option<ChannelEnd>>,
         pub packet_receipts: Map<felt252, Option<Receipt>>,
         pub packet_acks: Map<felt252, ByteArray>,
+        pub recv_sequences: Map<felt252, Sequence>,
     }
 
     #[event]
@@ -89,9 +92,7 @@ pub mod ChannelHandlerComponent {
 
             msg.packet.check_timed_out(@host_height, @host_timestamp);
 
-            let client_comp = get_dep_component!(self, ClientHandler);
-
-            let client = client_comp.get_client(chan_end_on_b.client_id.client_type);
+            let client = self.get_client(chan_end_on_b.client_id.client_type);
 
             let client_status = client.status(chan_end_on_b.client_id.sequence);
 
@@ -119,30 +120,53 @@ pub mod ChannelHandlerComponent {
                     chan_end_on_b.client_id.sequence,
                     path,
                     packet_commitment_on_a,
-                    msg.proof_commitment_on_a
+                    msg.proof_commitment_on_a.clone()
                 );
 
             match chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
-                    let ack = self
-                        .read_packet_ack(
-                            @msg.packet.port_id_on_a, @msg.packet.chan_id_on_a, @msg.packet.seq_on_a
+                    let reciept_resp = self.read_packet_receipt(
+                        @msg.packet.port_id_on_b,
+                        @msg.packet.chan_id_on_b,
+                        @msg.packet.seq_on_a
+                    );
+
+                    assert(reciept_resp.is_some(), ChannelErrors::PACKET_ALREADY_RECEIVED);
+
+                    self
+                        .assert_ack_not_exists(
+                            @msg.packet.port_id_on_b, @msg.packet.chan_id_on_b, @msg.packet.seq_on_a
+                        );
+                },
+                ChannelOrdering::Ordered => {
+                    let next_sequence_recv = self
+                        .read_next_sequence_recv(
+                            @msg.packet.port_id_on_b, @msg.packet.chan_id_on_b
                         );
 
-                    assert(ack.len() == 0, ChannelErrors::ACK_ALREADY_EXISTS);
-                },
-                ChannelOrdering::Ordered => {}
+                    assert(
+                        @next_sequence_recv >= @msg.packet.seq_on_a,
+                        ChannelErrors::INVALID_PACKET_SEQUENCE
+                    );
+
+                    // If the packet sequence matches the expected next
+                    // sequence, we check if the ack not exists. As the
+                    // existance means the packet was already relayed.
+                    if next_sequence_recv == msg.packet.seq_on_a {
+                        self
+                            .assert_ack_not_exists(
+                                @msg.packet.port_id_on_b,
+                                @msg.packet.chan_id_on_b,
+                                @msg.packet.seq_on_a
+                            );
+                    }
+                }
             };
         }
 
         fn recv_packet_execute(
             ref self: ComponentState<TContractState>, msg: MsgRecvPacket, chan_end_on_b: ChannelEnd
         ) {
-            // Check if another relayer already relayed the packet.
-            match chan_end_on_b.ordering {
-                ChannelOrdering::Unordered => {},
-                ChannelOrdering::Ordered => { return; }
-            };
 
             let router_comp = get_dep_component!(@self, RouterHandler);
 
@@ -154,6 +178,34 @@ pub mod ChannelHandlerComponent {
             let app: ApplicationContract = maybe_app_address.unwrap().into();
 
             let _ack = app.on_recv_packet(msg.packet);
+        }
+
+        fn assert_ack_not_exists(
+            self: @ComponentState<TContractState>,
+            port_id: @PortId,
+            channel_id: @ChannelId,
+            sequence: @Sequence
+        ) {
+            let ack = self.read_packet_ack(port_id, channel_id, sequence);
+
+            assert(ack.len() == 0, ChannelErrors::ACK_ALREADY_EXISTS);
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl ChannelInternalImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of ChannelInternalTrait<TContractState> {
+        fn get_client(
+            self: @ComponentState<TContractState>, client_type: felt252
+        ) -> ClientContract {
+            let client_comp = get_dep_component!(self, ClientHandler);
+
+            client_comp.get_client(client_type)
         }
     }
 
@@ -183,6 +235,12 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence
         ) -> ByteArray {
             self.packet_acks.read(ack_key(port_id, channel_id, sequence))
+        }
+
+        fn read_next_sequence_recv(
+            self: @ComponentState<TContractState>, port_id: @PortId, channel_id: @ChannelId
+        ) -> Sequence {
+            self.recv_sequences.read(next_sequence_recv_key(port_id, channel_id))
         }
     }
 
@@ -221,6 +279,15 @@ pub mod ChannelHandlerComponent {
             ack: ByteArray
         ) {
             self.packet_acks.write(ack_key(port_id, channel_id, sequence), ack);
+        }
+
+        fn write_next_sequence_recv(
+            ref self: ComponentState<TContractState>,
+            port_id: @PortId,
+            channel_id: @ChannelId,
+            sequence: Sequence
+        ) {
+            self.recv_sequences.write(next_sequence_recv_key(port_id, channel_id), sequence);
         }
     }
 

@@ -107,9 +107,24 @@ pub impl PortIdIntoByteArray of Into<PortId, ByteArray> {
 
 impl PortIdKeyImpl of ComputeKeyTrait<PortId> {}
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Sequence {
     pub sequence: u64,
+}
+
+pub impl SequencePartialOrd of PartialOrd<@Sequence> {
+    fn le(lhs: @Sequence, rhs: @Sequence) -> bool {
+        lhs.sequence <= rhs.sequence
+    }
+    fn ge(lhs: @Sequence, rhs: @Sequence) -> bool {
+        lhs.sequence >= rhs.sequence
+    }
+    fn lt(lhs: @Sequence, rhs: @Sequence) -> bool {
+        lhs.sequence < rhs.sequence
+    }
+    fn gt(lhs: @Sequence, rhs: @Sequence) -> bool {
+        lhs.sequence > rhs.sequence
+    }
 }
 
 pub impl SequenceIntoByteArray of Into<Sequence, ByteArray> {

@@ -57,10 +57,10 @@ pub mod host {
     pub use errors::HostErrors;
     pub use identifiers::{
         ClientId, ClientIdImpl, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdTrait,
-        Sequence
+        Sequence, SequencePartialOrd
     };
 
-    pub use keys::{channel_end_key, receipt_key, ack_key};
+    pub use keys::{channel_end_key, receipt_key, ack_key, next_sequence_recv_key};
     pub use paths::{commitment_path};
     pub use prefixes::{
         CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX,

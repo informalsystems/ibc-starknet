@@ -27,16 +27,6 @@ pub fn ack_path(port_id: PortId, channel_id: ChannelId, sequence: Sequence) -> B
     key_builder.path()
 }
 
-
-/// Constructs the next sequence receive path for the given port ID and channel ID.
-pub fn next_sequence_recv_path(port_id: PortId, channel_id: ChannelId) -> ByteArray {
-    let mut key_builder = RemotePathBuilderImpl::init();
-    append_prefix(ref key_builder, NEXT_SEQ_RECV_PREFIX());
-    append_port(ref key_builder, port_id);
-    append_channel(ref key_builder, channel_id);
-    key_builder.path()
-}
-
 pub fn append_prefix(ref path_builer: RemotePathBuilder, prefix: ByteArray) {
     path_builer.append(prefix);
 }
