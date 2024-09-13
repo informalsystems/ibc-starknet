@@ -80,52 +80,13 @@ pub mod ChannelHandlerComponent {
         ) {
             msg.validate_basic();
 
-            assert(chan_end_on_b.is_open(), ChannelErrors::INVALID_CHANNEL_STATE);
-
-            assert(
-                chan_end_on_b
-                    .counterparty_matches(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a),
-                ChannelErrors::INVALID_COUNTERPARTY
-            );
+            chan_end_on_b.validate(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
 
             // TODO: verify connection end if we ever decide to implement ICS-03
 
-            let host_height = get_block_number();
+            self.assert_packet_not_timed_out(@msg.packet);
 
-            let host_timestamp = get_block_timestamp();
-
-            msg.packet.check_timed_out(@host_height, @host_timestamp);
-
-            let client = self.get_client(chan_end_on_b.client_id.client_type);
-
-            let client_status = client.status(chan_end_on_b.client_id.sequence);
-
-            assert(client_status.is_active(), ChannelErrors::INACTIVE_CLIENT);
-
-            let client_latest_height = client.latest_height(chan_end_on_b.client_id.sequence);
-
-            msg.verify_proof_height(@client_latest_height);
-
-            let packet_commitment_on_a = msg.packet.compute_commitment();
-
-            let mut path: ByteArray =
-                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
-
-            let commitment_path = commitment_path(
-                msg.packet.port_id_on_a.clone(),
-                msg.packet.chan_id_on_a.clone(),
-                msg.packet.seq_on_a.clone()
-            );
-
-            path.append(@commitment_path);
-
-            client
-                .verify_membership(
-                    chan_end_on_b.client_id.sequence,
-                    path,
-                    packet_commitment_on_a,
-                    msg.proof_commitment_on_a.clone()
-                );
+            self.assert_proof_membership(msg.clone(), chan_end_on_b.clone());
 
             match @chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
@@ -205,6 +166,51 @@ pub mod ChannelHandlerComponent {
             self.emit_recv_packet_event(msg.packet.clone(), chan_end_on_b.ordering);
 
             self.emit_write_ack_event(msg.packet, ack);
+        }
+
+        fn assert_proof_membership(
+            self: @ComponentState<TContractState>, msg: MsgRecvPacket, chan_end_on_b: ChannelEnd
+        ) {
+            let client = self.get_client(chan_end_on_b.client_id.client_type);
+
+            let client_status = client.status(chan_end_on_b.client_id.sequence);
+
+            assert(client_status.is_active(), ChannelErrors::INACTIVE_CLIENT);
+
+            let client_latest_height = client.latest_height(chan_end_on_b.client_id.sequence);
+
+            msg.verify_proof_height(@client_latest_height);
+
+            let packet_commitment_on_a = msg.packet.compute_commitment();
+
+            let mut path: ByteArray =
+                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+
+            let commitment_path = commitment_path(
+                msg.packet.port_id_on_a.clone(),
+                msg.packet.chan_id_on_a.clone(),
+                msg.packet.seq_on_a.clone()
+            );
+
+            path.append(@commitment_path);
+
+            client
+                .verify_membership(
+                    chan_end_on_b.client_id.sequence,
+                    path,
+                    packet_commitment_on_a,
+                    msg.proof_commitment_on_a.clone()
+                );
+        }
+
+        fn assert_packet_not_timed_out(
+            self: @ComponentState<TContractState>, packet: @Packet
+        ) {
+            let host_height = get_block_number();
+
+            let host_timestamp = get_block_timestamp();
+
+            packet.check_timed_out(@host_height, @host_timestamp);
         }
 
         fn assert_ack_not_exists(

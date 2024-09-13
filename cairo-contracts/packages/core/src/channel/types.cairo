@@ -63,6 +63,15 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         self.remote.port_id == counterparty_port_id
             && self.remote.channel_id == counterparty_channel_id
     }
+
+    fn validate(self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_chan_id: @ChannelId) {
+        assert(self.is_open(), ChannelErrors::INVALID_CHANNEL_STATE);
+        assert(
+            self
+                .counterparty_matches(counterparty_port_id, counterparty_chan_id),
+            ChannelErrors::INVALID_COUNTERPARTY
+        );
+    }
 }
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
