@@ -96,7 +96,7 @@ fn test_mint_burn_roundtrip() {
     let prefixed_denom = cfg.prefix_hosted_denom();
 
     // Fetch the token address.
-    let token_address = ics20.ibc_token_address(prefixed_denom.compute_key()).unwrap();
+    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
 
     // Assert the `CreateTokenEvent` emitted.
     ics20.assert_create_token_event(NAME(), SYMBOL(), token_address, cfg.amount);

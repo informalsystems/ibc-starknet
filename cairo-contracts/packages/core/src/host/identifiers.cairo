@@ -1,15 +1,14 @@
 use core::byte_array::ByteArrayTrait;
 use core::hash::{HashStateTrait, HashStateExTrait};
 use core::poseidon::PoseidonTrait;
-use core::poseidon::poseidon_hash_span;
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
 use starknet::ContractAddress;
 use starknet::Store;
 use starknet_ibc_core::host::errors::HostErrors;
-use starknet_ibc_utils::poseidon_hash;
+use starknet_ibc_utils::{ComputeKeyTrait, poseidon_hash};
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ClientId {
     pub client_type: felt252,
     pub sequence: u64,
@@ -24,7 +23,7 @@ pub impl ClientIdImpl of ClientIdTrait {
     fn validate(self: @ClientId, client_id_hash: felt252) {}
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ChannelId {
     pub channel_id: ByteArray,
 }
@@ -78,7 +77,13 @@ pub impl ChannelIdImpl of ChannelIdTrait {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+pub impl ChannelIdIntoByteArray of Into<ChannelId, ByteArray> {
+    fn into(self: ChannelId) -> ByteArray {
+        self.channel_id
+    }
+}
+
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct PortId {
     pub port_id: ByteArray,
 }
@@ -90,14 +95,42 @@ pub impl PortIdImpl of PortIdTrait {
 
         assert(port_id_len > 2, HostErrors::INVALID_IDENTIFIER_LENGTH);
         assert(port_id_len <= 128, HostErrors::INVALID_IDENTIFIER_LENGTH);
-
-        assert(poseidon_hash(self) == port_id_hash, HostErrors::INVALID_PORT_ID);
+        assert(self.key() == port_id_hash, HostErrors::INVALID_PORT_ID);
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+pub impl PortIdIntoByteArray of Into<PortId, ByteArray> {
+    fn into(self: PortId) -> ByteArray {
+        self.port_id
+    }
+}
+
+impl PortIdKeyImpl of ComputeKeyTrait<PortId> {}
+
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Sequence {
     pub sequence: u64,
+}
+
+pub impl SequencePartialOrd of PartialOrd<@Sequence> {
+    fn le(lhs: @Sequence, rhs: @Sequence) -> bool {
+        lhs.sequence <= rhs.sequence
+    }
+    fn ge(lhs: @Sequence, rhs: @Sequence) -> bool {
+        lhs.sequence >= rhs.sequence
+    }
+    fn lt(lhs: @Sequence, rhs: @Sequence) -> bool {
+        lhs.sequence < rhs.sequence
+    }
+    fn gt(lhs: @Sequence, rhs: @Sequence) -> bool {
+        lhs.sequence > rhs.sequence
+    }
+}
+
+pub impl SequenceIntoByteArray of Into<Sequence, ByteArray> {
+    fn into(self: Sequence) -> ByteArray {
+        self.sequence.format_as_byte_array(10)
+    }
 }
 
 pub(crate) fn assert_numeric(char_bytes: u8) {

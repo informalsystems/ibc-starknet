@@ -6,6 +6,8 @@ pub mod TokenTransferComponent {
     use core::option::OptionTrait;
     use core::starknet::SyscallResultTrait;
     use core::traits::TryInto;
+    use openzeppelin_access::ownable::OwnableComponent;
+    use openzeppelin_access::ownable::interface::IOwnable;
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet::get_contract_address;
@@ -18,7 +20,7 @@ pub mod TokenTransferComponent {
         TracePrefixTrait, PrefixedDenomTrait, Participant
     };
     use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait, TransferErrors};
-    use starknet_ibc_core::channel::Packet;
+    use starknet_ibc_core::channel::{Packet, Acknowledgement, IAppCallback};
     use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
     use starknet_ibc_utils::{ComputeKeyTrait, ValidateBasicTrait};
 
@@ -76,10 +78,13 @@ pub mod TokenTransferComponent {
 
     #[generate_trait]
     pub impl TransferInitializerImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of TransferInitializerTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash) {
+            assert(erc20_class_hash.is_non_zero(), TransferErrors::ZERO_ERC20_CLASS_HASH);
+
             self.write_erc20_class_hash(erc20_class_hash);
+
             self.write_salt(0);
         }
     }
@@ -167,6 +172,27 @@ pub mod TokenTransferComponent {
 
         fn recv_execute(ref self: ComponentState<TContractState>, packet: Packet) {
             self._recv_execute(packet);
+        }
+    }
+
+    #[embeddable_as(AppCallback)]
+    impl AppCallbackImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +ITransferrable<TContractState>,
+        +Drop<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
+    > of IAppCallback<ComponentState<TContractState>> {
+        fn on_recv_packet(
+            ref self: ComponentState<TContractState>, packet: Packet
+        ) -> Acknowledgement {
+            let ownable_comp = get_dep_component!(@self, Ownable);
+
+            assert(ownable_comp.owner() == get_contract_address(), TransferErrors::INVALID_OWNER);
+
+            self._recv_execute(packet);
+
+            Acknowledgement { ack: '0' }
         }
     }
 
@@ -323,7 +349,7 @@ pub mod TokenTransferComponent {
             amount: u256,
             memo: Memo,
         ) {
-            let token = self.get_token(denom.compute_key());
+            let token = self.get_token(denom.key());
 
             let balance = token.balance_of(account);
 
@@ -362,7 +388,7 @@ pub mod TokenTransferComponent {
             denom: PrefixedDenom,
             amount: u256,
         ) {
-            let token = self.get_token(denom.compute_key());
+            let token = self.get_token(denom.key());
 
             if token.is_non_zero() {
                 token.mint(account, amount);
@@ -382,7 +408,7 @@ pub mod TokenTransferComponent {
             amount: u256,
             memo: Memo,
         ) {
-            let token = self.get_token(denom.compute_key());
+            let token = self.get_token(denom.key());
 
             token.burn(account, amount);
         }
@@ -430,7 +456,7 @@ pub mod TokenTransferComponent {
             denom: PrefixedDenom,
             token_address: ContractAddress,
         ) {
-            let denom_key = denom.compute_key();
+            let denom_key = denom.key();
 
             self.write_ibc_token_key_to_address(denom_key, token_address);
 
@@ -455,7 +481,7 @@ pub mod TokenTransferComponent {
                 // Checks if the token is an IBC-created token. If so, it cannot
                 // be transferred back to the source by escrowing. A prefixed
                 // denom should be passed to burn instead.
-                assert(token_key == denom.compute_key(), TransferErrors::INVALID_DENOM);
+                assert(token_key == denom.key(), TransferErrors::INVALID_DENOM);
             }
         }
     }

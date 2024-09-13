@@ -24,6 +24,7 @@ fmt = { workspace = true }
 
 [dependencies]
 # external dependencies
+openzeppelin_access  = { workspace = true }
 openzeppelin_token   = { workspace = true }
 openzeppelin_testing = { workspace = true }
 openzeppelin_utils   = { workspace = true }

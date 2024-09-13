@@ -4,7 +4,7 @@ use starknet_ibc_core::client::{
     IClientHandler, IClientHandlerDispatcher, IClientStateDispatcher, IClientStateDispatcherTrait,
     IClientHandlerDispatcherTrait, IClientStateValidation, IClientStateValidationDispatcher,
     IClientStateValidationDispatcherTrait, MsgCreateClient, MsgUpdateClient, MsgRecoverClient,
-    MsgUpgradeClient, CreateResponse, UpdateResponse, Height
+    MsgUpgradeClient, CreateResponse, UpdateResponse, Height, Status
 };
 use starknet_ibc_core::host::ClientId;
 
@@ -35,6 +35,27 @@ pub impl ClientContractImpl of ClientContractTrait {
         IClientStateDispatcher { contract_address: *self.address }.latest_height(client_sequence)
     }
 
+    fn status(self: @ClientContract, client_sequence: u64) -> Status {
+        IClientStateDispatcher { contract_address: *self.address }.status(client_sequence)
+    }
+
+    fn verify_membership(
+        self: @ClientContract,
+        client_sequence: u64,
+        path: ByteArray,
+        value: Array<u8>,
+        proof: Array<u8>
+    ) {
+        IClientStateValidationDispatcher { contract_address: *self.address }
+            .verify_membership(client_sequence, path, value, proof)
+    }
+
+    fn verify_non_membership(
+        self: @ClientContract, client_sequence: u64, path: ByteArray, proof: Array<u8>
+    ) {
+        IClientStateValidationDispatcher { contract_address: *self.address }
+            .verify_non_membership(client_sequence, path, proof)
+    }
     fn create(ref self: ClientContract, msg: MsgCreateClient) -> CreateResponse {
         IClientHandlerDispatcher { contract_address: self.address }.create_client(msg)
     }

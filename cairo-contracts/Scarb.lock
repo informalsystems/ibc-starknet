@@ -76,6 +76,7 @@ dependencies = [
 name = "starknet_ibc_apps"
 version = "0.1.0"
 dependencies = [
+ "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",
  "openzeppelin_utils",

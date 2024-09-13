@@ -22,6 +22,7 @@ use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncod
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::accounts::Call;
+use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 #[test]
@@ -83,10 +84,15 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         };
 
         let ics20_contract_address = {
-            let calldata = cairo_encoding.encode(&erc20_class_hash)?;
+            let owner_call_data = cairo_encoding.encode(&Felt::from(1))?; // dummy owner
+            let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
 
             let contract_address = chain
-                .deploy_contract(&ics20_class_hash, false, &calldata)
+                .deploy_contract(
+                    &ics20_class_hash,
+                    false,
+                    &[owner_call_data, erc20_call_data].concat(),
+                )
                 .await?;
 
             println!("deployed ICS20 contract to address: {:?}", contract_address);

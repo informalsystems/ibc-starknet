@@ -1,5 +1,5 @@
 use starknet_ibc_clients::cometbft::CometErrors;
-use starknet_ibc_core::client::{Height, Status};
+use starknet_ibc_core::client::{Height, HeightPartialOrd, Status};
 
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct CometClientState {
@@ -21,7 +21,7 @@ pub impl CometClientStateImpl of CometClientStateTrait {
     }
 
     fn update(ref self: CometClientState, new_height: Height) {
-        if self.latest_height.clone() < new_height.clone() {
+        if @self.latest_height < @new_height {
             self.latest_height = new_height;
         }
     }

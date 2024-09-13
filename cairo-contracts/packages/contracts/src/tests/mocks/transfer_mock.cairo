@@ -3,6 +3,7 @@
 // for testing purposes.
 #[starknet::contract]
 pub(crate) mod MockTransferApp {
+    use openzeppelin_access::ownable::OwnableComponent;
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet_ibc_apps::transfer::components::{TokenTransferComponent, TransferrableComponent};
@@ -13,14 +14,23 @@ pub(crate) mod MockTransferApp {
     use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait};
     use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
 
+    component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: TransferrableComponent, storage: transferrable, event: TransferrableEvent);
     component!(path: TokenTransferComponent, storage: transfer, event: TokenTransferEvent);
 
+    // Ownable Mixin
+    #[abi(embed_v0)]
+    impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
+    impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
+
+    // Transferrable
     #[abi(embed_v0)]
     impl TokenTransferreableImpl =
         TransferrableComponent::Transferrable<ContractState>;
     impl TokenTransferreableInternalImpl =
         TransferrableComponent::TransferrableInternalImpl<ContractState>;
+
+    // Token Transfer
     #[abi(embed_v0)]
     impl TokenSendTransferImpl =
         TokenTransferComponent::SendTransfer<ContractState>;
@@ -36,14 +46,18 @@ pub(crate) mod MockTransferApp {
     #[storage]
     struct Storage {
         #[substorage(v0)]
+        ownable: OwnableComponent::Storage,
+        #[substorage(v0)]
         transferrable: TransferrableComponent::Storage,
         #[substorage(v0)]
         transfer: TokenTransferComponent::Storage,
     }
 
     #[event]
-    #[derive(Debug, Drop, starknet::Event)]
+    #[derive(Drop, starknet::Event)]
     pub enum Event {
+        #[flat]
+        OwnableEvent: OwnableComponent::Event,
         #[flat]
         TransferrableEvent: TransferrableComponent::Event,
         #[flat]
@@ -51,7 +65,8 @@ pub(crate) mod MockTransferApp {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, erc20_class_hash: ClassHash) {
+    fn constructor(ref self: ContractState, owner: ContractAddress, erc20_class_hash: ClassHash) {
+        self.ownable.initializer(owner);
         self.transferrable.initializer();
         self.transfer.initializer(erc20_class_hash);
     }

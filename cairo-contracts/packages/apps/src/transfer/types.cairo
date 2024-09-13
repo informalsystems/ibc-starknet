@@ -2,7 +2,6 @@ use core::array::ArrayTrait;
 use core::hash::{HashStateTrait, HashStateExTrait};
 use core::num::traits::Zero;
 use core::poseidon::PoseidonTrait;
-use core::poseidon::poseidon_hash_span;
 use starknet::ContractAddress;
 use starknet::contract_address_const;
 use starknet_ibc_apps::transfer::{
@@ -10,7 +9,7 @@ use starknet_ibc_apps::transfer::{
 };
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait};
-use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
+use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait, LocalKeyBuilderImpl};
 
 /// Maximum memo length allowed for ICS-20 transfers. This bound corresponds to
 /// the `MaximumMemoLength` in the `ibc-go`.
@@ -90,14 +89,14 @@ pub impl PrefixedDenomImpl of PrefixedDenomTrait {
 }
 
 impl PrefixedDenomKeyImpl of ComputeKeyTrait<PrefixedDenom> {
-    fn compute_key(self: @PrefixedDenom) -> felt252 {
-        let mut serialized_prefixed_denom: Array<felt252> = ArrayTrait::new();
+    fn key(self: @PrefixedDenom) -> felt252 {
+        let mut key_builder = LocalKeyBuilderImpl::init();
         let mut trace_path_span = self.trace_path.span();
         while let Option::Some(path) = trace_path_span.pop_front() {
-            Serde::serialize(path, ref serialized_prefixed_denom);
+            key_builder.append_serde(path);
         };
-        Serde::serialize(self.base, ref serialized_prefixed_denom);
-        PoseidonTrait::new().update(poseidon_hash_span(serialized_prefixed_denom.span())).finalize()
+        key_builder.append_serde(self.base);
+        key_builder.key()
     }
 }
 
