@@ -6,6 +6,7 @@ use starknet_ibc_core::host::{ChannelId, PortId, Sequence};
 use starknet_ibc_utils::LocalKeyBuilderTrait;
 use starknet_ibc_utils::{LocalKeyBuilderImpl, LocalKeyBuilder};
 
+/// Constructs the channel end local key for the given port ID and channel ID.
 pub fn channel_end_key(port_id: @PortId, channel_id: @ChannelId) -> felt252 {
     let mut key_builder = LocalKeyBuilderImpl::init();
     key_builder.append_serde(@CHANNEL_ENDS_PREFIX());
@@ -14,6 +15,7 @@ pub fn channel_end_key(port_id: @PortId, channel_id: @ChannelId) -> felt252 {
     key_builder.key()
 }
 
+/// Constructs the receipt local key for the given port ID, channel ID, and sequence.
 pub fn receipt_key(port_id: @PortId, channel_id: @ChannelId, sequence: @Sequence) -> felt252 {
     let mut key_builder = LocalKeyBuilderImpl::init();
     key_builder.append_serde(@RECEIPTS_PREFIX());
@@ -23,7 +25,7 @@ pub fn receipt_key(port_id: @PortId, channel_id: @ChannelId, sequence: @Sequence
     key_builder.key()
 }
 
-/// Constructs the next receive sequence local key for the given port ID and channel ID.
+/// Constructs the next sequence receive local key for the given port ID and channel ID.
 pub fn next_sequence_recv_key(port_id: @PortId, channel_id: @ChannelId) -> felt252 {
     let mut key_builder = LocalKeyBuilderImpl::init();
     key_builder.append_serde(@NEXT_SEQ_RECV_PREFIX());
@@ -32,7 +34,7 @@ pub fn next_sequence_recv_key(port_id: @PortId, channel_id: @ChannelId) -> felt2
     key_builder.key()
 }
 
-
+/// Constructs the acknowledgement local key for the given port ID, channel ID, and sequence.
 pub fn ack_key(port_id: @PortId, channel_id: @ChannelId, sequence: @Sequence) -> felt252 {
     let mut key_builder = LocalKeyBuilderImpl::init();
     key_builder.append_serde(@ACKS_PREFIX());
