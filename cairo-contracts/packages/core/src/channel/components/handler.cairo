@@ -53,10 +53,8 @@ pub mod ChannelHandlerComponent {
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
         fn recv_packet(ref self: ComponentState<TContractState>, msg: MsgRecvPacket) {
-            let chan_end_on_b = self.get_channel_end(
-                @msg.packet.port_id_on_b,
-                @msg.packet.chan_id_on_b,
-            );
+            let chan_end_on_b = self
+                .get_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b,);
 
             self.recv_packet_validate(msg.clone(), chan_end_on_b.clone());
 
@@ -239,7 +237,6 @@ pub mod ChannelHandlerComponent {
             assert(maybe_chan_end.is_some(), ChannelErrors::MISSING_CHANNEL_END);
 
             maybe_chan_end.unwrap()
-
         }
 
         fn get_client(
