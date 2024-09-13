@@ -11,7 +11,7 @@ pub fn channel_end_key(port_id: @PortId, channel_id: @ChannelId) -> felt252 {
     key_builder.append_serde(@CHANNEL_ENDS_PREFIX());
     append_serde_port(ref key_builder, port_id);
     append_serde_channel(ref key_builder, channel_id);
-    key_builder.compute_key()
+    key_builder.key()
 }
 
 pub fn receipt_key(port_id: @PortId, channel_id: @ChannelId, sequence: @Sequence) -> felt252 {
@@ -20,7 +20,7 @@ pub fn receipt_key(port_id: @PortId, channel_id: @ChannelId, sequence: @Sequence
     append_serde_port(ref key_builder, port_id);
     append_serde_channel(ref key_builder, channel_id);
     append_serde_sequence(ref key_builder, sequence);
-    key_builder.compute_key()
+    key_builder.key()
 }
 
 /// Constructs the next receive sequence local key for the given port ID and channel ID.
@@ -29,7 +29,7 @@ pub fn next_sequence_recv_key(port_id: @PortId, channel_id: @ChannelId) -> felt2
     key_builder.append_serde(@NEXT_SEQ_RECV_PREFIX());
     append_serde_port(ref key_builder, port_id);
     append_serde_channel(ref key_builder, channel_id);
-    key_builder.compute_key()
+    key_builder.key()
 }
 
 
@@ -39,7 +39,7 @@ pub fn ack_key(port_id: @PortId, channel_id: @ChannelId, sequence: @Sequence) ->
     append_serde_port(ref key_builder, port_id);
     append_serde_channel(ref key_builder, channel_id);
     append_serde_sequence(ref key_builder, sequence);
-    key_builder.compute_key()
+    key_builder.key()
 }
 
 pub fn append_serde_port(ref key_builder: LocalKeyBuilder, port_id: @PortId) {

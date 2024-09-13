@@ -8,7 +8,7 @@ pub trait ValidateBasicTrait<T> {
 }
 
 pub trait ComputeKeyTrait<T, +Serde<T>, +Drop<T>> {
-    fn compute_key(self: @T) -> felt252 {
+    fn key(self: @T) -> felt252 {
         poseidon_hash(self)
     }
 }
@@ -16,7 +16,7 @@ pub trait ComputeKeyTrait<T, +Serde<T>, +Drop<T>> {
 pub fn poseidon_hash<T, +Serde<T>, +Drop<T>>(data: @T) -> felt252 {
     let mut key_builder = LocalKeyBuilderImpl::init();
     key_builder.append_serde(data);
-    key_builder.compute_key()
+    key_builder.key()
 }
 
 #[derive(Drop, Serde)]
@@ -34,7 +34,7 @@ pub impl LocalKeyBuilderImpl of LocalKeyBuilderTrait {
         value.serialize(ref self.data);
     }
 
-    fn compute_key(self: @LocalKeyBuilder) -> felt252 {
+    fn key(self: @LocalKeyBuilder) -> felt252 {
         PoseidonTrait::new().update(poseidon_hash_span(self.data.span())).finalize()
     }
 }

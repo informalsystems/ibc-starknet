@@ -349,7 +349,7 @@ pub mod TokenTransferComponent {
             amount: u256,
             memo: Memo,
         ) {
-            let token = self.get_token(denom.compute_key());
+            let token = self.get_token(denom.key());
 
             let balance = token.balance_of(account);
 
@@ -388,7 +388,7 @@ pub mod TokenTransferComponent {
             denom: PrefixedDenom,
             amount: u256,
         ) {
-            let token = self.get_token(denom.compute_key());
+            let token = self.get_token(denom.key());
 
             if token.is_non_zero() {
                 token.mint(account, amount);
@@ -408,7 +408,7 @@ pub mod TokenTransferComponent {
             amount: u256,
             memo: Memo,
         ) {
-            let token = self.get_token(denom.compute_key());
+            let token = self.get_token(denom.key());
 
             token.burn(account, amount);
         }
@@ -456,7 +456,7 @@ pub mod TokenTransferComponent {
             denom: PrefixedDenom,
             token_address: ContractAddress,
         ) {
-            let denom_key = denom.compute_key();
+            let denom_key = denom.key();
 
             self.write_ibc_token_key_to_address(denom_key, token_address);
 
@@ -481,7 +481,7 @@ pub mod TokenTransferComponent {
                 // Checks if the token is an IBC-created token. If so, it cannot
                 // be transferred back to the source by escrowing. A prefixed
                 // denom should be passed to burn instead.
-                assert(token_key == denom.compute_key(), TransferErrors::INVALID_DENOM);
+                assert(token_key == denom.key(), TransferErrors::INVALID_DENOM);
             }
         }
     }

@@ -95,7 +95,7 @@ pub impl PortIdImpl of PortIdTrait {
 
         assert(port_id_len > 2, HostErrors::INVALID_IDENTIFIER_LENGTH);
         assert(port_id_len <= 128, HostErrors::INVALID_IDENTIFIER_LENGTH);
-        assert(self.compute_key() == port_id_hash, HostErrors::INVALID_PORT_ID);
+        assert(self.key() == port_id_hash, HostErrors::INVALID_PORT_ID);
     }
 }
 

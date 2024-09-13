@@ -250,7 +250,7 @@ pub mod ChannelHandlerComponent {
         fn get_app(self: @ComponentState<TContractState>, port_id: @PortId) -> ApplicationContract {
             let router_comp = get_dep_component!(self, RouterHandler);
 
-            router_comp.get_app(port_id.compute_key())
+            router_comp.get_app(port_id.key())
         }
     }
 
