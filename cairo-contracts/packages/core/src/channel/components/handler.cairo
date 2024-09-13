@@ -13,15 +13,15 @@ pub mod ChannelHandlerComponent {
     use starknet_ibc_core::client::{ClientHandlerComponent, ClientContractTrait, StatusTrait};
     use starknet_ibc_core::host::{
         PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence, channel_end_key, receipt_key,
-        commitment_path
+        ack_key, commitment_path
     };
     use starknet_ibc_core::router::{RouterHandlerComponent, IRouter};
     use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
 
     #[storage]
     struct Storage {
-        pub channel_ends: Map<felt252, ChannelEnd>,
-        pub packet_receipts: Map<felt252, Receipt>,
+        pub channel_ends: Map<felt252, Option<ChannelEnd>>,
+        pub packet_receipts: Map<felt252, Option<Receipt>>,
         pub packet_acks: Map<felt252, ByteArray>,
     }
 
@@ -120,10 +120,12 @@ pub mod ChannelHandlerComponent {
 
             match chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
-                    let _receipt = self
-                        .read_packet_receipt(
+                    let ack = self
+                        .read_packet_ack(
                             @msg.packet.port_id_on_a, @msg.packet.chan_id_on_a, @msg.packet.seq_on_a
                         );
+
+                    assert(ack.len() == 0, ChannelErrors::ACK_ALREADY_EXISTS);
                 },
                 ChannelOrdering::Ordered => {}
             };
@@ -158,7 +160,11 @@ pub mod ChannelHandlerComponent {
         fn read_channel_end(
             self: @ComponentState<TContractState>, port_id: @PortId, channel_id: @ChannelId
         ) -> ChannelEnd {
-            self.channel_ends.read(channel_end_key(port_id, channel_id))
+            let maybe_chan_end = self.channel_ends.read(channel_end_key(port_id, channel_id));
+
+            assert(maybe_chan_end.is_some(), ChannelErrors::MISSING_CHANNEL_END);
+
+            maybe_chan_end.unwrap()
         }
 
         fn read_packet_receipt(
@@ -166,8 +172,17 @@ pub mod ChannelHandlerComponent {
             port_id: @PortId,
             channel_id: @ChannelId,
             sequence: @Sequence
-        ) -> Receipt {
+        ) -> Option<Receipt> {
             self.packet_receipts.read(receipt_key(port_id, channel_id, sequence))
+        }
+
+        fn read_packet_ack(
+            self: @ComponentState<TContractState>,
+            port_id: @PortId,
+            channel_id: @ChannelId,
+            sequence: @Sequence
+        ) -> ByteArray {
+            self.packet_acks.read(ack_key(port_id, channel_id, sequence))
         }
     }
 
@@ -181,7 +196,9 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             channel_end: ChannelEnd
         ) {
-            self.channel_ends.write(channel_end_key(port_id, channel_id), channel_end);
+            self
+                .channel_ends
+                .write(channel_end_key(port_id, channel_id), Option::Some(channel_end));
         }
 
         fn write_packet_receipt(
@@ -191,7 +208,19 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence,
             receipt: Receipt
         ) {
-            self.packet_receipts.write(receipt_key(port_id, channel_id, sequence), receipt);
+            self
+                .packet_receipts
+                .write(receipt_key(port_id, channel_id, sequence), Option::Some(receipt));
+        }
+
+        fn write_packet_ack(
+            ref self: ComponentState<TContractState>,
+            port_id: @PortId,
+            channel_id: @ChannelId,
+            sequence: @Sequence,
+            ack: ByteArray
+        ) {
+            self.packet_acks.write(ack_key(port_id, channel_id, sequence), ack);
         }
     }
 

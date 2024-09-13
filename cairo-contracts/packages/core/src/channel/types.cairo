@@ -38,7 +38,7 @@ impl PacketValidateBasicImpl of ValidateBasicTrait<Packet> {
     fn validate_basic(self: @Packet) {}
 }
 
-#[derive(Clone, Debug, Drop, Serde, starknet::Store)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ChannelEnd {
     pub state: ChannelState,
     pub ordering: ChannelOrdering,
@@ -58,9 +58,10 @@ pub impl ChannelEndImpl of ChannelEndTrait {
 
     /// Returns true if the counterparty matches the given counterparty.
     fn counterparty_matches(
-        self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_chan_id: @ChannelId
+        self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_channel_id: @ChannelId
     ) -> bool {
-        self.remote.port_id == counterparty_port_id && self.remote.chan_id == counterparty_chan_id
+        self.remote.port_id == counterparty_port_id
+            && self.remote.channel_id == counterparty_channel_id
     }
 }
 
@@ -73,7 +74,7 @@ pub enum ChannelState {
     Closed,
 }
 
-#[derive(Clone, Debug, Drop, Serde, starknet::Store)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub enum ChannelOrdering {
     Unordered,
     Ordered,
@@ -82,7 +83,7 @@ pub enum ChannelOrdering {
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Counterparty {
     pub port_id: PortId,
-    pub chan_id: ChannelId,
+    pub channel_id: ChannelId,
 }
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -90,7 +91,5 @@ pub struct Acknowledgement {
     pub ack: felt252,
 }
 
-#[derive(Clone, Debug, Drop, Serde, starknet::Store)]
-pub enum Receipt {
-    Ok
-}
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+pub struct Receipt {}

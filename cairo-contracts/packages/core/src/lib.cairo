@@ -1,5 +1,5 @@
 pub mod router;
-
+pub mod tests;
 pub mod channel {
     mod app_call;
     mod components;
@@ -19,7 +19,7 @@ pub mod channel {
     pub use msgs::{MsgRecvPacket, MsgRecvPacketImpl, MsgRecvPacketTrait};
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
-        ChannelOrdering, Counterparty, Acknowledgement, Receipt
+        ChannelOrdering, Counterparty, Acknowledgement, Receipt,
     };
 }
 pub mod client {
