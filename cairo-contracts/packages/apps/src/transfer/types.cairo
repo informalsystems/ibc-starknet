@@ -89,14 +89,14 @@ pub impl PrefixedDenomImpl of PrefixedDenomTrait {
 }
 
 impl PrefixedDenomKeyImpl of ComputeKeyTrait<PrefixedDenom> {
-    fn compute_key(self: @PrefixedDenom) -> felt252 {
+    fn key(self: @PrefixedDenom) -> felt252 {
         let mut key_builder = LocalKeyBuilderImpl::init();
         let mut trace_path_span = self.trace_path.span();
         while let Option::Some(path) = trace_path_span.pop_front() {
             key_builder.append_serde(path);
         };
         key_builder.append_serde(self.base);
-        key_builder.compute_key()
+        key_builder.key()
     }
 }
 
