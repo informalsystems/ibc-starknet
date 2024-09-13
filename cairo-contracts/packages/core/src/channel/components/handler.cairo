@@ -46,8 +46,12 @@ pub mod ChannelHandlerComponent {
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
         fn recv_packet(ref self: ComponentState<TContractState>, msg: MsgRecvPacket) {
-            let chan_end_on_b = self
+            let maybe_chan_end_on_b = self
                 .read_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b);
+
+            assert(maybe_chan_end_on_b.is_some(), ChannelErrors::MISSING_CHANNEL_END);
+
+            let chan_end_on_b = maybe_chan_end_on_b.unwrap();
 
             self.recv_packet_validate(msg.clone(), chan_end_on_b.clone());
 
@@ -159,12 +163,8 @@ pub mod ChannelHandlerComponent {
     > of ChannelReaderTrait<TContractState> {
         fn read_channel_end(
             self: @ComponentState<TContractState>, port_id: @PortId, channel_id: @ChannelId
-        ) -> ChannelEnd {
-            let maybe_chan_end = self.channel_ends.read(channel_end_key(port_id, channel_id));
-
-            assert(maybe_chan_end.is_some(), ChannelErrors::MISSING_CHANNEL_END);
-
-            maybe_chan_end.unwrap()
+        ) -> Option<ChannelEnd> {
+            self.channel_ends.read(channel_end_key(port_id, channel_id))
         }
 
         fn read_packet_receipt(

@@ -22,24 +22,16 @@ fn setup() -> ComponentState {
 }
 
 #[test]
-fn test_read_empty_packet_receipt() {
+fn test_read_empty_storage() {
     let state = setup();
-    let receipt_res = state.read_packet_receipt(@PORT_ID(), @CHANNEL_ID(), @SEQUENCE());
-    assert!(receipt_res.is_none());
-}
+    let channel_end_resp = state.read_channel_end(@PORT_ID(), @CHANNEL_ID());
+    assert!(channel_end_resp.is_none());
 
-#[test]
-fn test_read_empty_packet_ack() {
-    let state = setup();
-    let ack_res = state.read_packet_ack(@PORT_ID(), @CHANNEL_ID(), @SEQUENCE());
-    assert!(ack_res.len() == 0);
-}
+    let receipt_resp = state.read_packet_receipt(@PORT_ID(), @CHANNEL_ID(), @SEQUENCE());
+    assert!(receipt_resp.is_none());
 
-#[test]
-#[should_panic]
-fn test_read_empty_channel_end() {
-    let state = setup();
-    state.read_channel_end(@PORT_ID(), @CHANNEL_ID());
+    let ack_resp = state.read_packet_ack(@PORT_ID(), @CHANNEL_ID(), @SEQUENCE());
+    assert!(ack_resp.len() == 0);
 }
 
 #[test]
@@ -47,5 +39,5 @@ fn test_channel_end_storage() {
     let mut state = setup();
     state.write_channel_end(@PORT_ID(), @CHANNEL_ID(), CHANNEL_END());
     let chan_end_res = state.read_channel_end(@PORT_ID(), @CHANNEL_ID());
-    assert_eq!(chan_end_res, CHANNEL_END());
+    assert_eq!(chan_end_res, Option::Some(CHANNEL_END()));
 }
