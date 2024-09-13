@@ -8,11 +8,13 @@ pub mod ChannelHandlerComponent {
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, MsgRecvPacket, MsgRecvPacketTrait,
         ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ApplicationContract,
-        ApplicationContractTrait, ChannelOrdering, Receipt, channel_end_key, packet_receipt_key,
-        commitment_path
+        ApplicationContractTrait, ChannelOrdering, Receipt
     };
     use starknet_ibc_core::client::{ClientHandlerComponent, ClientContractTrait, StatusTrait};
-    use starknet_ibc_core::host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence};
+    use starknet_ibc_core::host::{
+        PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence, channel_end_key, receipt_key,
+        commitment_path
+    };
     use starknet_ibc_core::router::{RouterHandlerComponent, IRouter};
     use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
 
@@ -20,6 +22,7 @@ pub mod ChannelHandlerComponent {
     struct Storage {
         pub channel_ends: Map<felt252, ChannelEnd>,
         pub packet_receipts: Map<felt252, Receipt>,
+        pub packet_acks: Map<felt252, ByteArray>,
     }
 
     #[event]
@@ -100,7 +103,9 @@ pub mod ChannelHandlerComponent {
                 "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
 
             let commitment_path = commitment_path(
-                msg.packet.port_id_on_a, msg.packet.chan_id_on_a, msg.packet.seq_on_a
+                msg.packet.port_id_on_a.clone(),
+                msg.packet.chan_id_on_a.clone(),
+                msg.packet.seq_on_a.clone()
             );
 
             path.append(@commitment_path);
@@ -112,7 +117,18 @@ pub mod ChannelHandlerComponent {
                     packet_commitment_on_a,
                     msg.proof_commitment_on_a
                 );
+
+            match chan_end_on_b.ordering {
+                ChannelOrdering::Unordered => {
+                    let _receipt = self
+                        .read_packet_receipt(
+                            @msg.packet.port_id_on_a, @msg.packet.chan_id_on_a, @msg.packet.seq_on_a
+                        );
+                },
+                ChannelOrdering::Ordered => {}
+            };
         }
+
         fn recv_packet_execute(
             ref self: ComponentState<TContractState>, msg: MsgRecvPacket, chan_end_on_b: ChannelEnd
         ) {
@@ -151,7 +167,7 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: @Sequence
         ) -> Receipt {
-            self.packet_receipts.read(packet_receipt_key(port_id, channel_id, sequence))
+            self.packet_receipts.read(receipt_key(port_id, channel_id, sequence))
         }
     }
 
@@ -175,7 +191,7 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence,
             receipt: Receipt
         ) {
-            self.packet_receipts.write(packet_receipt_key(port_id, channel_id, sequence), receipt);
+            self.packet_receipts.write(receipt_key(port_id, channel_id, sequence), receipt);
         }
     }
 

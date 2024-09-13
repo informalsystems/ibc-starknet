@@ -5,9 +5,7 @@ pub mod channel {
     mod components;
     mod errors;
     mod interface;
-    mod keys;
     mod msgs;
-    mod paths;
     mod types;
 
     pub use app_call::{ApplicationContract, ApplicationContractImpl, ApplicationContractTrait};
@@ -18,9 +16,7 @@ pub mod channel {
         IChannelHandler, IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, IAppCallback,
         IAppCallbackDispatcher, IAppCallbackDispatcherTrait
     };
-    pub use keys::{channel_end_key, packet_receipt_key};
     pub use msgs::{MsgRecvPacket, MsgRecvPacketImpl, MsgRecvPacketTrait};
-    pub use paths::commitment_path;
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
         ChannelOrdering, Counterparty, Acknowledgement, Receipt
@@ -54,11 +50,20 @@ pub mod client {
 }
 pub mod host {
     mod errors;
-    mod types;
-
+    mod identifiers;
+    mod keys;
+    mod paths;
+    mod prefixes;
     pub use errors::HostErrors;
-    pub use types::{
+    pub use identifiers::{
         ClientId, ClientIdImpl, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdTrait,
         Sequence
+    };
+
+    pub use keys::{channel_end_key, receipt_key, ack_key};
+    pub use paths::{commitment_path};
+    pub use prefixes::{
+        CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX,
+        ACKS_PREFIX, RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX
     };
 }

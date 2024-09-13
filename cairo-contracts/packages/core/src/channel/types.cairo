@@ -90,7 +90,6 @@ pub struct Acknowledgement {
     pub ack: felt252,
 }
 
-
 #[derive(Clone, Debug, Drop, Serde, starknet::Store)]
 pub enum Receipt {
     Ok
