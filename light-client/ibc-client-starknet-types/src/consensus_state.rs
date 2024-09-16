@@ -28,8 +28,6 @@ impl ConsensusState {
     }
 }
 
-// impl Protobuf<Any> for ConsensusState {}
-
 impl TryFrom<Any> for ConsensusState {
     type Error = ClientError;
 

@@ -1,4 +1,4 @@
-use ibc_client_starknet_types::ClientState as ClientStateType;
+use ibc_client_starknet_types::StarknetClientState as ClientStateType;
 use ibc_core::client::context::client_state::ClientStateExecution;
 use ibc_core::client::context::prelude::{ClientStateCommon, ConsensusState};
 use ibc_core::client::context::ClientExecutionContext;

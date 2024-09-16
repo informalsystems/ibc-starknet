@@ -8,9 +8,11 @@ pub const CLIENT_STATE_TYPE_URL: &str = "/StarknetClientState";
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq, derive_more::From)]
-pub struct ClientState {
+pub struct StarknetClientState {
     pub latest_height: Height,
 }
+
+pub struct EncodeClientState;
 
 #[derive(Clone, Message)]
 pub struct ProtoClientState {
@@ -18,9 +20,7 @@ pub struct ProtoClientState {
     pub latest_height: Option<ProtoHeight>,
 }
 
-// impl Protobuf<Any> for ClientState {}
-
-impl TryFrom<ProtoClientState> for ClientState {
+impl TryFrom<ProtoClientState> for StarknetClientState {
     type Error = ClientError;
 
     fn try_from(proto_client_state: ProtoClientState) -> Result<Self, Self::Error> {
@@ -30,21 +30,21 @@ impl TryFrom<ProtoClientState> for ClientState {
             .try_into()
             .map_err(|_| ClientError::InvalidHeight)?;
 
-        let client_state = ClientState { latest_height };
+        let client_state = StarknetClientState { latest_height };
 
         Ok(client_state)
     }
 }
 
-impl From<ClientState> for ProtoClientState {
-    fn from(client_state: ClientState) -> Self {
+impl From<StarknetClientState> for ProtoClientState {
+    fn from(client_state: StarknetClientState) -> Self {
         ProtoClientState {
             latest_height: Some(client_state.latest_height.into()),
         }
     }
 }
 
-impl TryFrom<Any> for ClientState {
+impl TryFrom<Any> for StarknetClientState {
     type Error = ClientError;
 
     fn try_from(raw: Any) -> Result<Self, ClientError> {
@@ -63,8 +63,8 @@ impl TryFrom<Any> for ClientState {
     }
 }
 
-impl From<ClientState> for Any {
-    fn from(client_state: ClientState) -> Self {
+impl From<StarknetClientState> for Any {
+    fn from(client_state: StarknetClientState) -> Self {
         Self {
             type_url: CLIENT_STATE_TYPE_URL.to_string(),
             value: ProtoClientState::from(client_state).encode_to_vec(),

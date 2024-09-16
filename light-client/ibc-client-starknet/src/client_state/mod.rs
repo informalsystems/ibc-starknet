@@ -2,7 +2,7 @@ pub mod common;
 pub mod execution;
 pub mod validation;
 
-use ibc_client_starknet_types::ClientState as ClientStateType;
+use ibc_client_starknet_types::StarknetClientState as ClientStateType;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::primitives::proto::{Any, Protobuf};
 
