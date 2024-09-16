@@ -1,8 +1,6 @@
 pub mod array;
 pub mod bool;
 pub mod byte_array;
-pub mod combine;
-pub mod delegate;
 pub mod end;
 pub mod felt;
 pub mod field;

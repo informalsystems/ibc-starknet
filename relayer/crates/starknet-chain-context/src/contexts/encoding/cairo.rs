@@ -12,7 +12,9 @@ use hermes_encoding_components::impls::with_context::EncodeWithContext;
 use hermes_encoding_components::traits::decode_mut::CanPeekDecodeBuffer;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
-use hermes_encoding_components::traits::encode_and_decode_mut::MutEncoderAndDecoder;
+use hermes_encoding_components::traits::encode_and_decode_mut::{
+    CanEncodeAndDecodeMut, MutEncoderAndDecoder,
+};
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, EncodingGetterComponent, HasEncodingType, ProvideEncodingType,
 };

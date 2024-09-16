@@ -1,9 +1,9 @@
 use cgp::prelude::*;
-use hermes_cairo_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::HList;
+use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;

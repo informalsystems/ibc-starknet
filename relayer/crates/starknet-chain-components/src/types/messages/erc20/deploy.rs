@@ -1,7 +1,7 @@
 use cgp::prelude::*;
-use hermes_cairo_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_cairo_encoding_components::HList;
+use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use starknet::core::types::{Felt, U256};
 
 #[derive(HasField)]

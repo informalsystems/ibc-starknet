@@ -1,7 +1,6 @@
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::components::encode_mut::*;
 pub use hermes_cairo_encoding_components::components::encoding::*;
-use hermes_cairo_encoding_components::impls::encode_mut::delegate::DelegateEncodeMutComponents;
 use hermes_cairo_encoding_components::impls::encode_mut::option::EncodeOption;
 use hermes_cairo_encoding_components::impls::encode_mut::pair::EncoderPair;
 use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
@@ -9,6 +8,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::tagged::EncodeTagged;
 use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::tagged::Tagged;
+use hermes_encoding_components::impls::delegate::DelegateEncoding;
 use hermes_encoding_components::impls::with_context::EncodeWithContext;
 pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 pub use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
@@ -34,7 +34,9 @@ define_components! {
         [
             EncodedTypeComponent,
             EncodeBufferTypeComponent,
+            EncodeBufferFinalizerComponent,
             DecodeBufferTypeComponent,
+            DecodeBufferBuilderComponent,
             DecodeBufferPeekerComponent,
             EncoderComponent,
             DecoderComponent,
@@ -43,7 +45,7 @@ define_components! {
             MutEncoderComponent,
             MutDecoderComponent,
         ]:
-            DelegateEncodeMutComponents<StarknetEncodeMutComponents>
+            DelegateEncoding<StarknetEncodeMutComponents>
     }
 }
 
@@ -52,7 +54,7 @@ pub struct StarknetEncodeMutComponents;
 with_cairo_encode_mut_components! {
     delegate_components! {
         StarknetEncodeMutComponents {
-            @CairoEncodeMutComponents: DelegateEncodeMutComponents<CairoEncodeMutComponents>,
+            @CairoEncodeMutComponents: DelegateEncoding<CairoEncodeMutComponents>,
         }
     }
 }
