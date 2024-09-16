@@ -1,6 +1,6 @@
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
-use ibc_core::primitives::proto::{Any, Protobuf};
+use ibc_core::primitives::proto::Any;
 use ibc_proto::ibc::core::client::v1::Height as ProtoHeight;
 use prost::Message;
 
@@ -18,7 +18,7 @@ pub struct ProtoClientState {
     pub latest_height: Option<ProtoHeight>,
 }
 
-impl Protobuf<Any> for ClientState {}
+// impl Protobuf<Any> for ClientState {}
 
 impl TryFrom<ProtoClientState> for ClientState {
     type Error = ClientError;

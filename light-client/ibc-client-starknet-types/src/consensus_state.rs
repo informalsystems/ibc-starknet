@@ -1,6 +1,6 @@
 use ibc_core::client::types::error::ClientError;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
-use ibc_core::primitives::proto::{Any, Protobuf};
+use ibc_core::primitives::proto::Any;
 use ibc_core::primitives::Timestamp;
 use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
 use prost::Message;
@@ -28,7 +28,7 @@ impl ConsensusState {
     }
 }
 
-impl Protobuf<Any> for ConsensusState {}
+// impl Protobuf<Any> for ConsensusState {}
 
 impl TryFrom<Any> for ConsensusState {
     type Error = ClientError;

@@ -2576,6 +2576,8 @@ name = "ibc-client-starknet-types"
 version = "0.1.0"
 dependencies = [
  "derive_more",
+ "hermes-encoding-components",
+ "hermes-protobuf-encoding-components",
  "ibc-core",
  "ibc-proto",
  "prost",

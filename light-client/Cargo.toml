@@ -31,10 +31,8 @@ ibc-client-cw = { version = "0.54.0", default-features = false }
 ibc-proto     = { version = "0.47.0", default-features = false }
 tendermint    = { version = "0.38.0", default-features = false }
 
-[patch.crates-io]
-ibc-client-starknet       = { path = "./ibc-client-starknet" }
-ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
-ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
+hermes-encoding-components          = { version = "0.1.0" }
+hermes-protobuf-encoding-components = { version = "0.1.0" }
 
 [workspace.lints.rust]
 unsafe_code          = "forbid"
@@ -53,3 +51,11 @@ manual_ok_or                  = "deny"
 match_same_arms               = "deny"
 semicolon_if_nothing_returned = "deny"
 uninlined_format_args         = "deny"
+
+[patch.crates-io]
+ibc-client-starknet       = { path = "./ibc-client-starknet" }
+ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
+ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
+
+hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
