@@ -9,19 +9,19 @@ pub fn PORT_ID() -> PortId {
     PortId { port_id: "transfer" }
 }
 
-pub fn CHANNEL_ID() -> ChannelId {
-    ChannelId { channel_id: "channel-0" }
+pub fn CHANNEL_ID(index: u64) -> ChannelId {
+    ChannelId { channel_id: format!("channel-{index}") }
 }
 
-pub fn SEQUENCE() -> Sequence {
-    Sequence { sequence: 1 }
+pub fn SEQUENCE(sequence: u64) -> Sequence {
+    Sequence { sequence }
 }
 
 pub fn CHANNEL_END() -> ChannelEnd {
     ChannelEnd {
         state: ChannelState::Open,
-        ordering: ChannelOrdering::Ordered,
-        remote: Counterparty { port_id: PORT_ID(), channel_id: CHANNEL_ID(), },
+        ordering: ChannelOrdering::Unordered,
+        remote: Counterparty { port_id: PORT_ID(), channel_id: CHANNEL_ID(0), },
         client_id: CLIENT_ID(),
     }
 }

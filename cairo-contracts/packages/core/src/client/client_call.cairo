@@ -4,7 +4,7 @@ use starknet_ibc_core::client::{
     IClientHandler, IClientHandlerDispatcher, IClientStateDispatcher, IClientStateDispatcherTrait,
     IClientHandlerDispatcherTrait, IClientStateValidation, IClientStateValidationDispatcher,
     IClientStateValidationDispatcherTrait, MsgCreateClient, MsgUpdateClient, MsgRecoverClient,
-    MsgUpgradeClient, CreateResponse, UpdateResponse, Height, Status
+    MsgUpgradeClient, CreateResponse, UpdateResponse, Height, Status, StatusTrait, ClientErrors
 };
 use starknet_ibc_core::host::ClientId;
 

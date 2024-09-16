@@ -16,12 +16,13 @@ pub mod ChannelHandlerComponent {
         ClientHandlerComponent, ClientContract, ClientContractTrait, StatusTrait
     };
     use starknet_ibc_core::host::{
-        PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence, SequencePartialOrd,
+        PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence, SequenceImpl, SequencePartialOrd,
         channel_end_key, receipt_key, ack_key, commitment_path, next_sequence_recv_key
     };
     use starknet_ibc_core::router::{
         RouterHandlerComponent, IRouter, ApplicationContractTrait, ApplicationContract
     };
+    use starknet_ibc_core::tests::{PORT_ID, CHANNEL_ID, CHANNEL_END};
     use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
 
     #[storage]
@@ -40,7 +41,13 @@ pub mod ChannelHandlerComponent {
     pub impl ChannelInitializerImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ChannelInitializerTrait<TContractState> {
-        fn initializer(ref self: ComponentState<TContractState>) {}
+        fn initializer(ref self: ComponentState<TContractState>) {
+            // TODO: Initialize a temporary dummy `ChannelEnd` for testing the
+            // handlers. This should be removed once the channel handshake is
+            // implemented.
+            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(0), CHANNEL_END());
+            self.write_next_sequence_recv(@PORT_ID(), @CHANNEL_ID(0), SequenceImpl::zero());
+        }
     }
 
     #[embeddable_as(CoreChannelHandler)]

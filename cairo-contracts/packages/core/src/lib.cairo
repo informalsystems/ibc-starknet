@@ -66,7 +66,7 @@ pub mod host {
     pub use errors::HostErrors;
     pub use identifiers::{
         ClientId, ClientIdImpl, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdTrait,
-        Sequence, SequencePartialOrd
+        Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd
     };
 
     pub use keys::{channel_end_key, receipt_key, ack_key, next_sequence_recv_key};
