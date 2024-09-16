@@ -7,12 +7,13 @@ use starknet_ibc_apps::transfer::components::TokenTransferComponent::{
     Event, SendEvent, RecvEvent, CreateTokenEvent
 };
 use starknet_ibc_apps::transfer::interfaces::{
-    ISendTransferDispatcher, IRecvPacketDispatcher, ITokenAddressDispatcher,
-    ISendTransferDispatcherTrait, IRecvPacketDispatcherTrait, ITokenAddressDispatcherTrait
+    ISendTransferDispatcher, ITokenAddressDispatcher, ISendTransferDispatcherTrait,
+    ITokenAddressDispatcherTrait,
 };
 use starknet_ibc_apps::transfer::types::{MsgTransfer, Participant, PrefixedDenom, Memo};
 use starknet_ibc_contracts::tests::constants::OWNER;
 use starknet_ibc_core::channel::Packet;
+use starknet_ibc_core::channel::{IAppCallback, IAppCallbackDispatcher, IAppCallbackDispatcherTrait};
 
 #[derive(Drop, Serde)]
 pub struct TransferAppHandle {
@@ -22,10 +23,10 @@ pub struct TransferAppHandle {
 
 #[generate_trait]
 pub impl TransferAppHandleImpl of TransferAppHandleTrait {
-    fn setup(erc20_class: ContractClass) -> TransferAppHandle {
+    fn setup(owner: ContractAddress, erc20_class: ContractClass) -> TransferAppHandle {
         let mut call_data = array![];
 
-        call_data.append_serde(OWNER());
+        call_data.append_serde(owner);
         call_data.append_serde(erc20_class.class_hash);
 
         let contract_address = declare_and_deploy("TransferApp", call_data);
@@ -39,8 +40,8 @@ pub impl TransferAppHandleImpl of TransferAppHandleTrait {
         ISendTransferDispatcher { contract_address: *self.contract_address }
     }
 
-    fn recv_dispatcher(self: @TransferAppHandle) -> IRecvPacketDispatcher {
-        IRecvPacketDispatcher { contract_address: *self.contract_address }
+    fn callback_dispatcher(self: @TransferAppHandle) -> IAppCallbackDispatcher {
+        IAppCallbackDispatcher { contract_address: *self.contract_address }
     }
 
     fn ibc_token_address(self: @TransferAppHandle, token_key: felt252) -> Option<ContractAddress> {
@@ -48,12 +49,12 @@ pub impl TransferAppHandleImpl of TransferAppHandleTrait {
             .ibc_token_address(token_key)
     }
 
-    fn send_execute(self: @TransferAppHandle, msg: MsgTransfer) {
-        self.send_dispatcher().send_execute(msg);
+    fn send_transfer(self: @TransferAppHandle, msg: MsgTransfer) {
+        self.send_dispatcher().send_transfer(msg);
     }
 
-    fn recv_execute(self: @TransferAppHandle, packet: Packet) {
-        self.recv_dispatcher().recv_execute(packet);
+    fn on_recv_packet(self: @TransferAppHandle, packet: Packet) {
+        self.callback_dispatcher().on_recv_packet(packet);
     }
 
     fn assert_send_event(

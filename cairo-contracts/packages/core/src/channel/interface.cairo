@@ -8,4 +8,6 @@ pub trait IChannelHandler<TContractState> {
 #[starknet::interface]
 pub trait IAppCallback<TContractState> {
     fn on_recv_packet(ref self: TContractState, packet: Packet) -> Acknowledgement;
+    fn on_acknowledgement_packet(ref self: TContractState, packet: Packet, ack: Acknowledgement);
+    fn on_timeout_packet(ref self: TContractState, packet: Packet);
 }
