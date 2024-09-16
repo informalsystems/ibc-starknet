@@ -25,9 +25,9 @@ use hermes_protobuf_encoding_components::impls::types::encode_buffer::ProvideByt
 use hermes_protobuf_encoding_components::impls::via_any::EncodeViaAny;
 pub use hermes_protobuf_encoding_components::traits::length::EncodedLengthGetterComponent;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
-use hermes_wasm_client_components::impls::encoding::components::WasmEncodingComponents;
-use hermes_wasm_client_components::types::client_state::WasmClientState;
-use hermes_wasm_client_components::types::consensus_state::WasmConsensusState;
+use hermes_wasm_encoding_components::components::WasmEncodingComponents;
+use hermes_wasm_encoding_components::types::client_state::WasmClientState;
+use hermes_wasm_encoding_components::types::consensus_state::WasmConsensusState;
 use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::client::types::Height;
 use ibc_proto::ibc::lightclients::wasm::v1::ClientMessage as ProtoClientMessage;

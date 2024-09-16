@@ -13,8 +13,8 @@ use hermes_starknet_chain_components::types::client_state::{
 use hermes_starknet_chain_components::types::consensus_state::{
     StarknetConsensusState, WasmStarknetConsensusState,
 };
-use hermes_wasm_client_components::types::client_state::WasmClientState;
-use hermes_wasm_client_components::types::consensus_state::WasmConsensusState;
+use hermes_wasm_encoding_components::types::client_state::WasmClientState;
+use hermes_wasm_encoding_components::types::consensus_state::WasmConsensusState;
 use ibc::clients::wasm_types::client_message::ClientMessage;
 
 use crate::impls::error::HandleStarknetChainError;
