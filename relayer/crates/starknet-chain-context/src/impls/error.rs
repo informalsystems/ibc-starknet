@@ -1,4 +1,6 @@
+use core::array::TryFromSliceError;
 use core::num::TryFromIntError;
+use core::str::Utf8Error;
 use std::convert::Infallible;
 use std::string::FromUtf8Error;
 
@@ -18,6 +20,10 @@ use hermes_error::handlers::wrap::WrapErrorDetail;
 use hermes_error::traits::wrap::WrapError;
 use hermes_error::types::Error;
 use hermes_protobuf_encoding_components::impls::any::TypeUrlMismatchError;
+use hermes_protobuf_encoding_components::impls::encode_mut::chunk::{
+    InvalidWireType, UnsupportedWireType,
+};
+use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::RequiredFieldTagNotFound;
 use hermes_relayer_components::transaction::impls::poll_tx_response::TxNoResponseError;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_runtime::types::error::TokioRuntimeError;
@@ -45,8 +51,10 @@ delegate_components! {
         [
             Report,
             TryFromIntError,
+            Utf8Error,
             FromUtf8Error,
             SignError,
+            TryFromSliceError,
             TokioRuntimeError,
             serde_json::error::Error,
             JsonError,
@@ -69,6 +77,9 @@ delegate_components! {
             VariantIndexOutOfBound,
             DecodeBoolError,
             TypeUrlMismatchError,
+            InvalidWireType,
+            UnsupportedWireType,
+            RequiredFieldTagNotFound,
             <'a> UnknownEvent<'a>,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
         ]:

@@ -13,6 +13,8 @@ use hermes_starknet_chain_components::types::client_state::{
 use hermes_starknet_chain_components::types::consensus_state::{
     StarknetConsensusState, WasmStarknetConsensusState,
 };
+use hermes_wasm_client_components::types::client_state::WasmClientState;
+use hermes_wasm_client_components::types::consensus_state::WasmConsensusState;
 use ibc::clients::wasm_types::client_message::ClientMessage;
 
 use crate::impls::error::HandleStarknetChainError;
@@ -44,6 +46,8 @@ pub trait CanUseStarknetProtobufEncoding:
     CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
     + CanEncodeAndDecode<ViaProtobuf, StarknetConsensusState>
     + CanEncodeAndDecode<ViaProtobuf, ClientMessage>
+    + CanEncodeAndDecode<ViaProtobuf, WasmClientState>
+    + CanEncodeAndDecode<ViaProtobuf, WasmConsensusState>
     + CanConvertBothWays<StarknetClientState, Any>
     + CanConvertBothWays<StarknetConsensusState, Any>
     + CanConvertBothWays<WasmStarknetClientState, Any>
