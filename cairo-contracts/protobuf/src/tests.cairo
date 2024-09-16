@@ -15,28 +15,13 @@ impl ProposerAsProtoMessage of ProtoMessage<Proposer> {
         ProtoCodecImpl::encode_length_delimited_raw(2, self.pub_key, ref output);
     }
 
-    fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> Proposer {
+    fn decode_raw(ref value: Proposer, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        let mut value = Default::<Proposer>::default();
+        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.address, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.pub_key, serialized, ref index);
 
-        while index < bound {
-            let tag = ProtobufTagImpl::decode(serialized[index]);
-            index += 1;
-
-            match tag.field_number {
-                0 => panic!("unsupported field number"),
-                1 => value
-                    .address = ProtoCodecImpl::decode_length_delimited_raw(serialized, ref index),
-                2 => value
-                    .pub_key = ProtoCodecImpl::decode_length_delimited_raw(serialized, ref index),
-                _ => panic!("unsupported field number"),
-            }
-        };
-
-        assert_eq!(index, bound, "invalid length for proposer");
-
-        value
+        assert(index == bound, 'invalid length for Proposer');
     }
 
     fn wire_type() -> WireType {
@@ -96,41 +81,21 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
         ProtoCodecImpl::encode_length_delimited_raw(8, self.validator_type, ref output);
     }
 
-    fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> TmHeader {
+    fn decode_raw(ref value: TmHeader, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        let mut value = Default::<TmHeader>::default();
+        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.height, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.active, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(3, ref value.chain_id, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(4, ref value.time, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(5, ref value.hash, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(6, ref value.indexes, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(7, ref value.proposer, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(
+            8, ref value.validator_type, serialized, ref index
+        );
 
-        while index < bound {
-            let tag = ProtobufTagImpl::decode(serialized[index]);
-            index += 1;
-
-            match tag.field_number {
-                0 => panic!("unsupported field number"),
-                1 => value
-                    .height = ProtoCodecImpl::decode_length_delimited_raw(serialized, ref index),
-                2 => value
-                    .active = ProtoCodecImpl::decode_length_delimited_raw(serialized, ref index),
-                3 => value
-                    .chain_id = ProtoCodecImpl::decode_length_delimited_raw(serialized, ref index),
-                4 => value
-                    .time = ProtoCodecImpl::decode_length_delimited_raw(serialized, ref index),
-                5 => value
-                    .hash = ProtoCodecImpl::decode_length_delimited_raw(serialized, ref index),
-                6 => value
-                    .indexes = ProtoCodecImpl::decode_length_delimited_raw(serialized, ref index),
-                7 => value
-                    .proposer = ProtoCodecImpl::decode_length_delimited_raw(serialized, ref index),
-                8 => value
-                    .validator_type =
-                        ProtoCodecImpl::decode_length_delimited_raw(serialized, ref index),
-                _ => panic!("unsupported field number"),
-            }
-        };
-
-        assert_eq!(index, bound, "invalid length for tm header");
-
-        value
+        assert(index == bound, 'invalid length for TmHeader');
     }
 
     fn wire_type() -> WireType {
