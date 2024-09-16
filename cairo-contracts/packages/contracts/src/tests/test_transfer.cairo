@@ -25,7 +25,10 @@ fn test_escrow_unescrow_roundtrip() {
     cfg.set_native_denom(erc20.address);
 
     // Deploy an ICS20 Token Transfer contract.
-    let mut ics20 = TransferAppHandleTrait::setup(erc20_contract_class);
+    let mut ics20 = TransferAppHandleTrait::setup(OWNER(), erc20_contract_class);
+
+    // Set the caller address, as callbacks are permissioned.
+    start_cheat_caller_address(ics20.contract_address, OWNER());
 
     // -----------------------------------------------------------
     // Escrow
@@ -59,7 +62,7 @@ fn test_escrow_unescrow_roundtrip() {
     let recv_packet = cfg.dummy_recv_packet(prefixed_denom.clone(), COSMOS(), STARKNET());
 
     // Submit a `RecvPacket` to the `TransferApp` contract.
-    ics20.recv_execute(recv_packet);
+    ics20.on_recv_packet(recv_packet);
 
     // Assert the `RecvEvent` emitted.
     ics20.assert_recv_event(COSMOS(), STARKNET(), prefixed_denom, cfg.amount, true);
@@ -82,7 +85,10 @@ fn test_mint_burn_roundtrip() {
     let erc20_contract_class = declare_class("ERC20Mintable");
 
     // Deploy an ICS20 Token Transfer contract.
-    let mut ics20 = TransferAppHandleTrait::setup(erc20_contract_class);
+    let mut ics20 = TransferAppHandleTrait::setup(OWNER(), erc20_contract_class);
+
+    // Set the caller address, as callbacks are permissioned.
+    start_cheat_caller_address(ics20.contract_address, OWNER());
 
     // -----------------------------------------------------------
     // Mint
@@ -91,7 +97,7 @@ fn test_mint_burn_roundtrip() {
     let recv_packet = cfg.dummy_recv_packet(cfg.hosted_denom.clone(), COSMOS(), STARKNET());
 
     // Submit a `RecvPacket`, which will create a new ERC20 contract.
-    ics20.recv_execute(recv_packet.clone());
+    ics20.on_recv_packet(recv_packet.clone());
 
     let prefixed_denom = cfg.prefix_hosted_denom();
 
@@ -107,7 +113,7 @@ fn test_mint_burn_roundtrip() {
     ics20.drop_all_events();
 
     // Submit another `RecvPacket`, which will mint the amount of tokens.
-    ics20.recv_execute(recv_packet);
+    ics20.on_recv_packet(recv_packet);
 
     // Assert the `RecvEvent` emitted.
     ics20.assert_recv_event(COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true);

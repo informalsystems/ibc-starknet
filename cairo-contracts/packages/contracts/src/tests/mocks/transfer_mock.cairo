@@ -35,7 +35,7 @@ pub(crate) mod MockTransferApp {
     impl TokenSendTransferImpl =
         TokenTransferComponent::SendTransfer<ContractState>;
     #[abi(embed_v0)]
-    impl TokenRecvPacketImpl = TokenTransferComponent::RecvPacket<ContractState>;
+    impl AppCallbackImpl = TokenTransferComponent::AppCallback<ContractState>;
     #[abi(embed_v0)]
     impl TokenTokenAddressImpl =
         TokenTransferComponent::IBCTokenAddress<ContractState>;

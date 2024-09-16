@@ -9,12 +9,6 @@ pub trait ISendTransfer<TContractState> {
 }
 
 #[starknet::interface]
-pub trait IRecvPacket<TContractState> {
-    fn recv_validate(self: @TContractState, packet: Packet);
-    fn recv_execute(ref self: TContractState, packet: Packet);
-}
-
-#[starknet::interface]
 pub trait ITokenAddress<TContractState> {
     /// Returns the contract address of an IBC token given its key.
     ///

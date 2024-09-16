@@ -10,10 +10,10 @@ pub mod TokenTransferComponent {
     use openzeppelin_access::ownable::interface::IOwnable;
     use starknet::ClassHash;
     use starknet::ContractAddress;
-    use starknet::get_contract_address;
+    use starknet::{get_contract_address, get_caller_address};
     use starknet::storage::Map;
     use starknet_ibc_apps::transfer::interfaces::{
-        ITransferrable, ISendTransfer, IRecvPacket, ITokenAddress
+        ITransferrable, ISendTransfer, ITokenAddress
     };
     use starknet_ibc_apps::transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo,
@@ -159,22 +159,6 @@ pub mod TokenTransferComponent {
         }
     }
 
-    #[embeddable_as(RecvPacket)]
-    impl RecvPacketImpl<
-        TContractState,
-        +HasComponent<TContractState>,
-        +ITransferrable<TContractState>,
-        +Drop<TContractState>
-    > of IRecvPacket<ComponentState<TContractState>> {
-        fn recv_validate(self: @ComponentState<TContractState>, packet: Packet) {
-            self._recv_validate(packet);
-        }
-
-        fn recv_execute(ref self: ComponentState<TContractState>, packet: Packet) {
-            self._recv_execute(packet);
-        }
-    }
-
     #[embeddable_as(AppCallback)]
     impl AppCallbackImpl<
         TContractState,
@@ -188,7 +172,7 @@ pub mod TokenTransferComponent {
         ) -> Acknowledgement {
             let ownable_comp = get_dep_component!(@self, Ownable);
 
-            assert(ownable_comp.owner() == get_contract_address(), TransferErrors::INVALID_OWNER);
+            assert(ownable_comp.owner() == get_caller_address(), TransferErrors::INVALID_OWNER);
 
             self._recv_execute(packet);
 
