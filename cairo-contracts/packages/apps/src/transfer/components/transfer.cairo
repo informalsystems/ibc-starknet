@@ -169,8 +169,8 @@ pub mod TokenTransferComponent {
         }
     }
 
-    #[embeddable_as(AppCallback)]
-    impl AppCallbackImpl<
+    #[embeddable_as(TransferAppCallback)]
+    impl TransferAppCallbackImpl<
         TContractState,
         +HasComponent<TContractState>,
         +ITransferrable<TContractState>,
@@ -180,13 +180,21 @@ pub mod TokenTransferComponent {
         fn on_recv_packet(
             ref self: ComponentState<TContractState>, packet: Packet
         ) -> Acknowledgement {
-            let ownable_comp = get_dep_component!(@self, Ownable);
-
-            assert(ownable_comp.owner() == get_caller_address(), TransferErrors::INVALID_OWNER);
+            self.assert_owner();
 
             self.recv_execute(packet);
 
             Acknowledgement { ack: '0' }
+        }
+
+        fn on_acknowledgement_packet(
+            ref self: ComponentState<TContractState>, packet: Packet, ack: Acknowledgement
+        ) {
+            self.assert_owner();
+        }
+
+        fn on_timeout_packet(ref self: ComponentState<TContractState>, packet: Packet) {
+            self.assert_owner();
         }
     }
 
@@ -405,6 +413,19 @@ pub mod TokenTransferComponent {
             let token = self.get_token(denom.key());
 
             token.burn(account, amount);
+        }
+    }
+
+    #[generate_trait]
+    impl OwnerAssertionImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
+    > of OwnerAssertionTrait<TContractState> {
+        fn assert_owner(self: @ComponentState<TContractState>) {
+            let ownable_comp = get_dep_component!(self, Ownable);
+            assert(ownable_comp.owner() == get_caller_address(), TransferErrors::INVALID_OWNER);
         }
     }
 
