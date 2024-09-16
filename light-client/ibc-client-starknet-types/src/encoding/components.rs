@@ -11,6 +11,9 @@ use hermes_protobuf_encoding_components::impls::encode::buffer::EncodeProtoWithM
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc_core::client::types::Height;
 
+use crate::encoding::impls::client_state::EncodeStarknetClientState;
+use crate::StarknetClientState;
+
 define_components! {
     StarknetLightClientEncodingComponents {
         [
@@ -42,6 +45,7 @@ delegate_components! {
     StarknetLightClientEncoderComponents {
         [
             (ViaProtobuf, Height),
+            (ViaProtobuf, StarknetClientState),
         ]: EncodeProtoWithMutBuffer,
     }
 }
@@ -51,5 +55,8 @@ delegate_components! {
         [
             (ViaProtobuf, Height),
         ]: CosmosEncodingComponents,
+
+        (ViaProtobuf, StarknetClientState):
+            EncodeStarknetClientState,
     }
 }

@@ -12,6 +12,7 @@ use hermes_protobuf_encoding_components::impls::encode_mut::chunk::{
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::RequiredFieldTagNotFound;
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc_client_starknet_types::encoding::components::*;
+use ibc_client_starknet_types::StarknetClientState;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
 use prost::DecodeError;
@@ -124,6 +125,9 @@ impl ErrorRaiser<StarknetLightClientEncoding, RequiredFieldTagNotFound>
     }
 }
 
-pub trait CanUseStarknetLightClientEncoding: CanEncodeAndDecode<ViaProtobuf, Height> {}
+pub trait CanUseStarknetLightClientEncoding:
+    CanEncodeAndDecode<ViaProtobuf, Height> + CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
+{
+}
 
 impl CanUseStarknetLightClientEncoding for StarknetLightClientEncoding {}
