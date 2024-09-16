@@ -4,6 +4,7 @@ use starknet_ibc_clients::cometbft::{
 
 use starknet_ibc_core::client::{MsgCreateClient, MsgUpdateClient, Height, Status};
 use starknet_ibc_core::host::ClientId;
+use starknet_ibc_core::tests::{HEIGHT, CLIENT_TYPE};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct CometClientConfig {
@@ -17,8 +18,8 @@ pub struct CometClientConfig {
 pub impl CometClientConfigImpl of CometClientConfigTrait {
     fn default() -> CometClientConfig {
         CometClientConfig {
-            client_type: '07-cometbft',
-            latest_height: Height { revision_number: 0, revision_height: 10 },
+            client_type: CLIENT_TYPE(),
+            latest_height: HEIGHT(10),
             latest_timestamp: 10,
             trusting_period: 10,
         }

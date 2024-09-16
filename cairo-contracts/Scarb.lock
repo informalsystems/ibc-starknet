@@ -108,6 +108,7 @@ dependencies = [
 name = "starknet_ibc_core"
 version = "0.1.0"
 dependencies = [
+ "openzeppelin_testing",
  "snforge_std",
  "starknet_ibc_utils",
 ]

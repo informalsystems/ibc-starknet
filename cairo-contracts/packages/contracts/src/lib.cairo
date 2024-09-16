@@ -10,19 +10,10 @@ pub mod clients {
 }
 mod tests {
     #[cfg(test)]
-    mod constants;
-    #[cfg(test)]
     mod test_client;
     #[cfg(test)]
     mod test_transfer;
     #[cfg(test)]
-    mod configs {
-        pub(crate) mod comet;
-        pub(crate) mod transfer;
-    }
-    mod mocks {
-        mod transfer_mock;
-    }
     #[cfg(test)]
     mod setups {
         mod comet;

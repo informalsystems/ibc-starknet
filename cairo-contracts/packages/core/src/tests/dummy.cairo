@@ -1,8 +1,22 @@
+use starknet::{contract_address_const, ContractAddress};
 use starknet_ibc_core::channel::{ChannelEnd, ChannelState, ChannelOrdering, Counterparty};
+use starknet_ibc_core::client::Height;
 use starknet_ibc_core::host::{ClientId, PortId, ChannelId, Sequence};
 
+pub fn HEIGHT(revision_height: u64) -> Height {
+    Height { revision_number: 0, revision_height }
+}
+
+pub fn CLIENT() -> ContractAddress {
+    contract_address_const::<'COMETBFT'>()
+}
+
+pub fn CLIENT_TYPE() -> felt252 {
+    '07-cometbft'
+}
+
 pub fn CLIENT_ID() -> ClientId {
-    ClientId { client_type: '07-cometbft', sequence: 0 }
+    ClientId { client_type: CLIENT_TYPE(), sequence: 0 }
 }
 
 pub fn PORT_ID() -> PortId {

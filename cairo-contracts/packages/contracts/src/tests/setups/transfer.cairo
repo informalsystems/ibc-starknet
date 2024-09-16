@@ -3,15 +3,15 @@ use openzeppelin_testing::{declare_class, declare_and_deploy};
 use openzeppelin_utils::serde::SerializedAppend;
 use snforge_std::{EventSpy, spy_events, ContractClass};
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::components::TokenTransferComponent::{
+use starknet_ibc_apps::tests::OWNER;
+use starknet_ibc_apps::transfer::TokenTransferComponent::{
     Event, SendEvent, RecvEvent, CreateTokenEvent
 };
-use starknet_ibc_apps::transfer::interfaces::{
+use starknet_ibc_apps::transfer::types::{MsgTransfer, Participant, PrefixedDenom, Memo};
+use starknet_ibc_apps::transfer::{
     ISendTransferDispatcher, ITokenAddressDispatcher, ISendTransferDispatcherTrait,
     ITokenAddressDispatcherTrait,
 };
-use starknet_ibc_apps::transfer::types::{MsgTransfer, Participant, PrefixedDenom, Memo};
-use starknet_ibc_contracts::tests::constants::OWNER;
 use starknet_ibc_core::channel::Packet;
 use starknet_ibc_core::channel::{IAppCallback, IAppCallbackDispatcher, IAppCallbackDispatcherTrait};
 
@@ -55,49 +55,5 @@ pub impl TransferAppHandleImpl of TransferAppHandleTrait {
 
     fn on_recv_packet(self: @TransferAppHandle, packet: Packet) {
         self.callback_dispatcher().on_recv_packet(packet);
-    }
-
-    fn assert_send_event(
-        ref self: TransferAppHandle,
-        sender: Participant,
-        receiver: Participant,
-        denom: PrefixedDenom,
-        amount: u256
-    ) {
-        let expected = Event::SendEvent(
-            SendEvent { sender, receiver, denom, amount, memo: Memo { memo: "" } }
-        );
-        self.spy.assert_emitted_single(self.contract_address, expected);
-    }
-
-    fn assert_recv_event(
-        ref self: TransferAppHandle,
-        sender: Participant,
-        receiver: Participant,
-        denom: PrefixedDenom,
-        amount: u256,
-        success: bool
-    ) {
-        let expected = Event::RecvEvent(
-            RecvEvent { sender, receiver, denom, amount, memo: Memo { memo: "" }, success, }
-        );
-        self.spy.assert_emitted_single(self.contract_address, expected);
-    }
-
-    fn assert_create_token_event(
-        ref self: TransferAppHandle,
-        name: ByteArray,
-        symbol: ByteArray,
-        address: ContractAddress,
-        initial_supply: u256
-    ) {
-        let expected = Event::CreateTokenEvent(
-            CreateTokenEvent { name, symbol, address, initial_supply }
-        );
-        self.spy.assert_emitted_single(self.contract_address, expected);
-    }
-
-    fn drop_all_events(ref self: TransferAppHandle) {
-        self.spy.drop_all_events();
     }
 }

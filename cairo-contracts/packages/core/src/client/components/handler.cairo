@@ -89,10 +89,9 @@ pub mod ClientHandlerComponent {
             client_type: felt252,
             client_address: ContractAddress
         ) {
-            self.supported_clients.write(client_type, client_address);
+            self.write_supported_client(client_type, client_address);
         }
     }
-
 
     #[generate_trait]
     pub(crate) impl ClientInternalImpl<
@@ -101,7 +100,7 @@ pub mod ClientHandlerComponent {
         fn get_client(
             self: @ComponentState<TContractState>, client_type: felt252
         ) -> ClientContract {
-            let client_address = self.supported_clients.read(client_type);
+            let client_address = self.read_supported_client(client_type);
 
             assert(client_address.is_non_zero(), ClientErrors::ZERO_CLIENT_ADDRESS);
 
@@ -110,7 +109,31 @@ pub mod ClientHandlerComponent {
     }
 
     #[generate_trait]
-    impl EventEmitterImpl<
+    pub(crate) impl ClientReaderImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+    > of ClientReaderTrait<TContractState> {
+        fn read_supported_client(
+            self: @ComponentState<TContractState>, client_type: felt252
+        ) -> ContractAddress {
+            self.supported_clients.read(client_type)
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl ClientWriterImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+    > of ClientWriterTrait<TContractState> {
+        fn write_supported_client(
+            ref self: ComponentState<TContractState>,
+            client_type: felt252,
+            client_address: ContractAddress
+        ) {
+            self.supported_clients.write(client_type, client_address);
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl EventEmitterImpl<
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,

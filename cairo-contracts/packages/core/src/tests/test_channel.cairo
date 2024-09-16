@@ -8,7 +8,7 @@ use starknet_ibc_core::channel::ChannelHandlerComponent::{
 };
 use starknet_ibc_core::channel::ChannelHandlerComponent;
 use starknet_ibc_core::host::SequenceTrait;
-use starknet_ibc_core::tests::mocks::channel_handler::MockChannelHandler;
+use starknet_ibc_core::tests::mocks::MockChannelHandler;
 use starknet_ibc_core::tests::{CHANNEL_END, CHANNEL_ID, CLIENT_ID, PORT_ID, SEQUENCE};
 
 type ComponentState = ChannelHandlerComponent::ComponentState<MockChannelHandler::ContractState>;
@@ -24,7 +24,7 @@ fn setup() -> ComponentState {
 }
 
 #[test]
-fn test_intial_states() {
+fn test_intial_state() {
     let state = setup();
     let channel_end_resp = state.read_channel_end(@PORT_ID(), @CHANNEL_ID(0));
     assert!(channel_end_resp.is_some());
@@ -43,7 +43,7 @@ fn test_intial_states() {
 }
 
 #[test]
-fn test_channel_end_storage() {
+fn test_write_channel_end_ok() {
     let mut state = setup();
     state.write_channel_end(@PORT_ID(), @CHANNEL_ID(1), CHANNEL_END());
     let chan_end_res = state.read_channel_end(@PORT_ID(), @CHANNEL_ID(1));
