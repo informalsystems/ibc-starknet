@@ -1,5 +1,3 @@
-#![allow(macro_expanded_macro_exports_accessed_by_absolute_paths)]
-
 mod client_message;
 mod client_state;
 mod consensus_state;

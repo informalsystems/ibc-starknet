@@ -7,6 +7,7 @@ use hermes_encoding_components::impls::delegate::DelegateEncoding;
 pub use hermes_protobuf_encoding_components::components::{
     DecodeBufferTypeComponent, EncodeBufferTypeComponent, EncodedTypeComponent, SchemaTypeComponent,
 };
+use hermes_protobuf_encoding_components::impls::encode::buffer::EncodeProtoWithMutBuffer;
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc_core::client::types::Height;
 
@@ -41,7 +42,7 @@ delegate_components! {
     StarknetLightClientEncoderComponents {
         [
             (ViaProtobuf, Height),
-        ]: CosmosEncodingComponents,
+        ]: EncodeProtoWithMutBuffer,
     }
 }
 

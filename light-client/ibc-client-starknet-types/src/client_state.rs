@@ -12,8 +12,6 @@ pub struct StarknetClientState {
     pub latest_height: Height,
 }
 
-pub struct EncodeClientState;
-
 #[derive(Clone, Message)]
 pub struct ProtoClientState {
     #[prost(message, tag = "1")]
