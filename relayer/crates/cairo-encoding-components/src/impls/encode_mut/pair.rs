@@ -1,12 +1,11 @@
 use std::marker::PhantomData;
 
 use cgp::core::error::HasErrorType;
+use hermes_encoding_components::impls::with_context::EncodeWithContext;
 use hermes_encoding_components::traits::decode_mut::MutDecoder;
 use hermes_encoding_components::traits::encode_mut::MutEncoder;
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
-
-use crate::impls::encode_mut::with_context::EncodeWithContext;
 
 pub struct EncoderPair<EncoderA, EncoderB>(pub PhantomData<(EncoderA, EncoderB)>);
 

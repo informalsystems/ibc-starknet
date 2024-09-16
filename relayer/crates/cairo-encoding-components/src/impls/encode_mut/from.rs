@@ -1,8 +1,7 @@
 use core::marker::PhantomData;
 
 use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-
-use crate::traits::transform::Transformer;
+use hermes_encoding_components::traits::transform::Transformer;
 
 pub struct DecodeFrom<Transform>(pub PhantomData<Transform>);
 

@@ -2,7 +2,7 @@ use hermes_encoding_components::traits::convert::{CanConvert, Converter};
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_protobuf_encoding_components::types::ViaAny;
+use hermes_protobuf_encoding_components::types::strategy::ViaAny;
 use ibc::clients::wasm_types::client_message::ClientMessage;
 use prost_types::Any;
 

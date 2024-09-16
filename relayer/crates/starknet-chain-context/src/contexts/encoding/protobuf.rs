@@ -3,7 +3,8 @@ use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::CanConvertBothWays;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_error::impls::ProvideHermesError;
-use hermes_protobuf_encoding_components::types::{Any, ViaProtobuf};
+use hermes_protobuf_encoding_components::types::any::Any;
+use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use hermes_starknet_chain_components::components::encoding::protobuf::*;
 use hermes_starknet_chain_components::types::client_header::StarknetClientHeader;
 use hermes_starknet_chain_components::types::client_state::{

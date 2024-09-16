@@ -1,10 +1,11 @@
 use cgp::prelude::*;
 use hermes_encoding_components::impls::convert::{ConvertFrom, TryConvertFrom};
-use hermes_encoding_components::impls::convert_and_encode::ConvertAndEncode;
 use hermes_encoding_components::impls::delegate::DelegateEncoding;
-use hermes_encoding_components::impls::encoded::ProvideEncodedBytes;
-use hermes_encoding_components::impls::return_encoded::ReturnEncoded;
-use hermes_encoding_components::impls::schema::ProvideStringSchema;
+use hermes_encoding_components::impls::encode::convert_and_encode::ConvertAndEncode;
+use hermes_encoding_components::impls::encode::return_encoded::ReturnEncoded;
+use hermes_encoding_components::impls::types::encoded::ProvideEncodedBytes;
+use hermes_encoding_components::impls::types::schema::ProvideStringSchema;
+use hermes_encoding_components::impls::with_context::EncodeWithContext;
 pub use hermes_encoding_components::traits::convert::ConverterComponent;
 pub use hermes_encoding_components::traits::decode::DecoderComponent;
 pub use hermes_encoding_components::traits::encode::EncoderComponent;
@@ -13,17 +14,15 @@ pub use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent
 pub use hermes_encoding_components::traits::types::schema::SchemaTypeComponent;
 use hermes_protobuf_encoding_components::impl_type_url;
 use hermes_protobuf_encoding_components::impls::any::{DecodeAsAnyProtobuf, EncodeAsAnyProtobuf};
-use hermes_protobuf_encoding_components::impls::from_context::EncodeFromContext;
 use hermes_protobuf_encoding_components::impls::protobuf::EncodeAsProtobuf;
 use hermes_protobuf_encoding_components::impls::via_any::EncodeViaAny;
-use hermes_protobuf_encoding_components::types::{Any, ViaAny, ViaProtobuf};
+use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use hermes_wasm_client_components::impls::encoding::components::WasmEncodingComponents;
-use hermes_wasm_client_components::types::client_state::{ProtoWasmClientState, WasmClientState};
-use hermes_wasm_client_components::types::consensus_state::{
-    ProtoWasmConsensusState, WasmConsensusState,
-};
+use hermes_wasm_client_components::types::client_state::WasmClientState;
+use hermes_wasm_client_components::types::consensus_state::WasmConsensusState;
 use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc_proto::ibc::lightclients::wasm::v1::ClientMessage as ProtoClientMessage;
+use prost_types::Any;
 
 use crate::types::client_header::{ConvertStarknetClientHeader, StarknetClientHeader};
 use crate::types::client_state::{
@@ -83,10 +82,8 @@ delegate_components! {
         [
             (ViaAny, WasmClientState),
             (ViaProtobuf, WasmClientState),
-            (ViaProtobuf, ProtoWasmClientState),
             (ViaAny, WasmConsensusState),
             (ViaProtobuf, WasmConsensusState),
-            (ViaProtobuf, ProtoWasmConsensusState),
         ]:
             WasmEncodingComponents,
     }
@@ -103,20 +100,16 @@ delegate_components! {
         (ClientMessage, ProtoClientMessage): ConvertFrom,
         (ProtoClientMessage, ClientMessage): TryConvertFrom,
 
-        (StarknetClientState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
-        (Any, StarknetClientState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
+        (StarknetClientState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
+        (Any, StarknetClientState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
 
-        (StarknetConsensusState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
-        (Any, StarknetConsensusState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
+        (StarknetConsensusState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
+        (Any, StarknetConsensusState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
 
-        (ClientMessage, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
-        (Any, ClientMessage): DecodeAsAnyProtobuf<ViaProtobuf, EncodeFromContext>,
+        (ClientMessage, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
+        (Any, ClientMessage): DecodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
 
         [
-            (WasmClientState, ProtoWasmClientState),
-            (ProtoWasmClientState, WasmClientState),
-            (WasmConsensusState, ProtoWasmConsensusState),
-            (ProtoWasmConsensusState, WasmConsensusState),
             (WasmClientState, Any),
             (Any, WasmClientState),
             (WasmConsensusState, Any),

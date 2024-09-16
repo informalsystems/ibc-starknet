@@ -21,4 +21,3 @@ pub mod unit;
 pub mod variant;
 pub mod variant_from;
 pub mod vec;
-pub mod with_context;
