@@ -100,7 +100,7 @@ pub mod TokenTransferComponent {
     }
 
     #[generate_trait]
-    pub(crate) impl SendTransferInternalImpl<
+    impl SendTransferInternalImpl<
         TContractState,
         +HasComponent<TContractState>,
         +ITransferrable<TContractState>,
