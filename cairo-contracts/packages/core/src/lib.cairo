@@ -24,7 +24,7 @@ pub mod channel {
         IChannelHandler, IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, IAppCallback,
         IAppCallbackDispatcher, IAppCallbackDispatcherTrait
     };
-    pub use msgs::{MsgRecvPacket, MsgRecvPacketImpl, MsgRecvPacketTrait};
+    pub use msgs::MsgRecvPacket;
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
         ChannelOrdering, Counterparty, Acknowledgement, AcknowledgementImpl, AcknowledgementTrait,
@@ -39,7 +39,10 @@ pub mod client {
     mod msgs;
     mod types;
 
-    pub use client_call::{ClientContract, ClientContractTrait};
+    pub use client_call::{
+        ClientContract, ClientContractImpl, ClientContractTrait, ClientContractHandlerImpl,
+        ClientContractHandlerTrait
+    };
     pub use components::events::ClientEventEmitterComponent;
     pub use components::handler::ClientHandlerComponent;
     pub use errors::ClientErrors;

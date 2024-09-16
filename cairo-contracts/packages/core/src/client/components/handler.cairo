@@ -8,7 +8,7 @@ pub mod ClientHandlerComponent {
     use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient};
     use starknet_ibc_core::client::{
         MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height,
-        CreateResponse, UpdateResponse, ClientErrors, ClientContract, ClientContractTrait
+        CreateResponse, UpdateResponse, ClientErrors, ClientContract, ClientContractHandlerTrait
     };
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
 
