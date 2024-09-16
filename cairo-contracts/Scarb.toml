@@ -6,6 +6,7 @@ members = [
   "packages/core",
   "packages/utils",
   "protobuf",
+  "cometbft",
 ]
 
 [workspace.package]
