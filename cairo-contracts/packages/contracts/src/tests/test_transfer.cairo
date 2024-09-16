@@ -40,7 +40,7 @@ fn test_escrow_unescrow_roundtrip() {
     let msg_transfer = cfg.dummy_msg_transder(cfg.native_denom.clone(), STARKNET(), COSMOS());
 
     // Submit a `MsgTransfer` to the `TransferApp` contract.
-    ics20.send_execute(msg_transfer);
+    ics20.send_transfer(msg_transfer);
 
     // Assert the `SendEvent` emitted.
     ics20.assert_send_event(STARKNET(), COSMOS(), cfg.native_denom.clone(), cfg.amount);
@@ -135,7 +135,7 @@ fn test_mint_burn_roundtrip() {
     let msg_transfer = cfg.dummy_msg_transder(prefixed_denom.clone(), STARKNET(), COSMOS());
 
     // Owner approves the amount of allowance for the `TransferApp` contract.
-    ics20.send_execute(msg_transfer);
+    ics20.send_transfer(msg_transfer);
 
     // Assert the `SendEvent` emitted.
     ics20.assert_send_event(STARKNET(), COSMOS(), prefixed_denom, cfg.amount);

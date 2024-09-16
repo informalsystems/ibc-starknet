@@ -10,11 +10,9 @@ pub mod TokenTransferComponent {
     use openzeppelin_access::ownable::interface::IOwnable;
     use starknet::ClassHash;
     use starknet::ContractAddress;
-    use starknet::{get_contract_address, get_caller_address};
     use starknet::storage::Map;
-    use starknet_ibc_apps::transfer::interfaces::{
-        ITransferrable, ISendTransfer, ITokenAddress
-    };
+    use starknet::{get_contract_address, get_caller_address};
+    use starknet_ibc_apps::transfer::interfaces::{ITransferrable, ISendTransfer, ITokenAddress};
     use starknet_ibc_apps::transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo,
         TracePrefixTrait, PrefixedDenomTrait, Participant
@@ -96,6 +94,18 @@ pub mod TokenTransferComponent {
         +ITransferrable<TContractState>,
         +Drop<TContractState>
     > of ISendTransfer<ComponentState<TContractState>> {
+        fn send_transfer(ref self: ComponentState<TContractState>, msg: MsgTransfer) {
+            self.send_execute(msg);
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl SendTransferInternalImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +ITransferrable<TContractState>,
+        +Drop<TContractState>
+    > of SendTransferInternalTrait<TContractState> {
         fn send_validate(self: @ComponentState<TContractState>, msg: MsgTransfer) {
             self.get_contract().can_send();
 
@@ -174,7 +184,7 @@ pub mod TokenTransferComponent {
 
             assert(ownable_comp.owner() == get_caller_address(), TransferErrors::INVALID_OWNER);
 
-            self._recv_execute(packet);
+            self.recv_execute(packet);
 
             Acknowledgement { ack: '0' }
         }
@@ -187,7 +197,7 @@ pub mod TokenTransferComponent {
         +ITransferrable<TContractState>,
         +Drop<TContractState>
     > of RecvPacketInternalTrait<TContractState> {
-        fn _recv_validate(self: @ComponentState<TContractState>, packet: Packet) -> PacketData {
+        fn recv_validate(self: @ComponentState<TContractState>, packet: Packet) -> PacketData {
             self.get_contract().can_receive();
 
             let mut pakcet_data_span = packet.data.span();
@@ -226,8 +236,8 @@ pub mod TokenTransferComponent {
             packet_data
         }
 
-        fn _recv_execute(ref self: ComponentState<TContractState>, packet: Packet) -> PacketData {
-            let mut packet_data = self._recv_validate(packet.clone());
+        fn recv_execute(ref self: ComponentState<TContractState>, packet: Packet) -> PacketData {
+            let mut packet_data = self.recv_validate(packet.clone());
 
             let trace_prefix = TracePrefixTrait::new(
                 packet.port_id_on_b.clone(), packet.chan_id_on_b.clone()

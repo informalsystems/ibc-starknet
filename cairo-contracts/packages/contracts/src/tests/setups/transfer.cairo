@@ -7,13 +7,13 @@ use starknet_ibc_apps::transfer::components::TokenTransferComponent::{
     Event, SendEvent, RecvEvent, CreateTokenEvent
 };
 use starknet_ibc_apps::transfer::interfaces::{
-    ISendTransferDispatcher, ITokenAddressDispatcher,
-    ISendTransferDispatcherTrait, ITokenAddressDispatcherTrait,
+    ISendTransferDispatcher, ITokenAddressDispatcher, ISendTransferDispatcherTrait,
+    ITokenAddressDispatcherTrait,
 };
-use starknet_ibc_core::channel::{IAppCallback, IAppCallbackDispatcher, IAppCallbackDispatcherTrait};
 use starknet_ibc_apps::transfer::types::{MsgTransfer, Participant, PrefixedDenom, Memo};
 use starknet_ibc_contracts::tests::constants::OWNER;
 use starknet_ibc_core::channel::Packet;
+use starknet_ibc_core::channel::{IAppCallback, IAppCallbackDispatcher, IAppCallbackDispatcherTrait};
 
 #[derive(Drop, Serde)]
 pub struct TransferAppHandle {
@@ -49,8 +49,8 @@ pub impl TransferAppHandleImpl of TransferAppHandleTrait {
             .ibc_token_address(token_key)
     }
 
-    fn send_execute(self: @TransferAppHandle, msg: MsgTransfer) {
-        self.send_dispatcher().send_execute(msg);
+    fn send_transfer(self: @TransferAppHandle, msg: MsgTransfer) {
+        self.send_dispatcher().send_transfer(msg);
     }
 
     fn on_recv_packet(self: @TransferAppHandle, packet: Packet) {

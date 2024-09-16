@@ -4,8 +4,7 @@ use starknet_ibc_core::channel::Packet;
 
 #[starknet::interface]
 pub trait ISendTransfer<TContractState> {
-    fn send_validate(self: @TContractState, msg: MsgTransfer);
-    fn send_execute(ref self: TContractState, msg: MsgTransfer);
+    fn send_transfer(ref self: TContractState, msg: MsgTransfer);
 }
 
 #[starknet::interface]
