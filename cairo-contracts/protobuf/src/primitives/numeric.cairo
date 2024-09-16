@@ -59,7 +59,9 @@ use protobuf::primitives::utils::{
 //     }
 // }
 
-pub impl NumberAsProtoMessage<T, +Into<T, u64>, +TryInto<u64, T>, +Copy<T>> of ProtoMessage<T> {
+pub impl NumberAsProtoMessage<
+    T, +Into<T, u64>, +TryInto<u64, T>, +Copy<T>, +Drop<T>
+> of ProtoMessage<T> {
     fn encode_raw(self: @T, ref output: ByteArray) {
         let num = (*self).into();
 
@@ -69,9 +71,9 @@ pub impl NumberAsProtoMessage<T, +Into<T, u64>, +TryInto<u64, T>, +Copy<T>> of P
         }
     }
 
-    fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> T {
+    fn decode_raw(ref value: T, serialized: @ByteArray, ref index: usize, length: usize) {
         assert(length == 0, 'invalid length for u64');
-        decode_varint_u64(serialized, ref index).try_into().unwrap()
+        value = decode_varint_u64(serialized, ref index).try_into().unwrap()
     }
 
     fn wire_type() -> WireType {
@@ -85,9 +87,10 @@ pub impl I32AsProtoMessage of ProtoMessage<i32> {
         NumberAsProtoMessage::<u32>::encode_raw(@num, ref output);
     }
 
-    fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> i32 {
-        let num = NumberAsProtoMessage::<u32>::decode_raw(serialized, ref index, length);
-        decode_2_complement_32(@num)
+    fn decode_raw(ref value: i32, serialized: @ByteArray, ref index: usize, length: usize) {
+        let mut num = 0;
+        NumberAsProtoMessage::<u32>::decode_raw(ref num, serialized, ref index, length);
+        value = decode_2_complement_32(@num)
     }
 
     fn wire_type() -> WireType {
@@ -101,9 +104,10 @@ pub impl I64AsProtoMessage of ProtoMessage<i64> {
         NumberAsProtoMessage::<u64>::encode_raw(@num, ref output);
     }
 
-    fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> i64 {
-        let num = NumberAsProtoMessage::<u64>::decode_raw(serialized, ref index, length);
-        decode_2_complement_64(@num)
+    fn decode_raw(ref value: i64, serialized: @ByteArray, ref index: usize, length: usize) {
+        let mut num = 0;
+        NumberAsProtoMessage::<u64>::decode_raw(ref num, serialized, ref index, length);
+        value = decode_2_complement_64(@num)
     }
 
     fn wire_type() -> WireType {
@@ -124,13 +128,13 @@ pub impl BoolAsProtoMessage of ProtoMessage<bool> {
         }
     }
 
-    fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> bool {
+    fn decode_raw(ref value: bool, serialized: @ByteArray, ref index: usize, length: usize) {
         assert(length == 0, 'invalid length for bool');
         let num = decode_varint_u64(serialized, ref index);
         if num != 0 && num != 1 {
             panic!("invalid boolean value");
         }
-        num == 1
+        value = num == 1
     }
 
     fn wire_type() -> WireType {

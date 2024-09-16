@@ -2,7 +2,7 @@ use protobuf::types::tag::{WireType, ProtobufTag, ProtobufTagImpl};
 use protobuf::primitives::numeric::NumberAsProtoMessage;
 
 pub trait ProtoMessage<T> {
-    fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> T;
+    fn decode_raw(ref value: T, serialized: @ByteArray, ref index: usize, length: usize);
     fn encode_raw(self: @T, ref output: ByteArray);
     fn wire_type() -> WireType;
 }
@@ -11,14 +11,16 @@ pub struct ProtoCodec {}
 
 #[generate_trait]
 pub impl ProtoCodecImpl of ProtoCodecTrait {
-    fn decode<T, +ProtoMessage<T>, +Drop<T>>(serialized: @ByteArray) -> T {
+    fn decode<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(serialized: @ByteArray) -> T {
         let mut index = 0;
         let length = if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
             serialized.len()
         } else {
             0
         };
-        ProtoMessage::<T>::decode_raw(serialized, ref index, length)
+        let mut value = Default::<T>::default();
+        ProtoMessage::<T>::decode_raw(ref value, serialized, ref index, length);
+        value
     }
 
     fn encode<T, +ProtoMessage<T>>(value: @T) -> ByteArray {
@@ -29,14 +31,26 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
 
 
     fn decode_length_delimited_raw<T, +ProtoMessage<T>, +Drop<T>>(
-        serialized: @ByteArray, ref index: usize
-    ) -> T {
-        let length = if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
-            ProtoMessage::<usize>::decode_raw(serialized, ref index, 0)
-        } else {
-            0
-        };
-        ProtoMessage::<T>::decode_raw(serialized, ref index, length)
+        field_number: u8, ref value: T, serialized: @ByteArray, ref index: usize
+    ) {
+        if index < serialized.len() {
+            let tag = ProtobufTagImpl::decode(serialized[index]);
+            if tag.field_number == field_number {
+                index += 1;
+
+                let write_type = ProtoMessage::<T>::wire_type();
+
+                assert(write_type == tag.wire_type, 'unexpected wire type');
+
+                let mut length = 0;
+
+                if write_type == WireType::LengthDelimited {
+                    ProtoMessage::<usize>::decode_raw(ref length, serialized, ref index, 0);
+                }
+
+                ProtoMessage::<T>::decode_raw(ref value, serialized, ref index, length);
+            }
+        }
     }
 
     fn encode_length_delimited_raw<T, +ProtoMessage<T>>(

@@ -7,18 +7,15 @@ pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
         output.append(self);
     }
 
-    fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> ByteArray {
+    fn decode_raw(ref value: ByteArray, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        let mut byte_array = "";
         while index < bound {
-            byte_array.append_byte(serialized[index]);
+            value.append_byte(serialized[index]);
             index += 1;
         };
 
         assert(index == bound, 'invalid length for byte array');
-
-        byte_array
     }
 
     fn wire_type() -> WireType {
@@ -26,7 +23,7 @@ pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
     }
 }
 
-pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>> of ProtoMessage<Array<T>> {
+pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of ProtoMessage<Array<T>> {
     fn encode_raw(self: @Array<T>, ref output: ByteArray) {
         let mut i = 0;
         while i < self.len() {
@@ -35,25 +32,26 @@ pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>> of ProtoMessage<Arra
         };
     }
 
-    fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> Array<T> {
+    fn decode_raw(ref value: Array<T>, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
-
-        let mut items = array![];
 
         if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
             while index < bound {
-                let length = ProtoMessage::<usize>::decode_raw(serialized, ref index, 0);
-                items.append(ProtoMessage::<T>::decode_raw(serialized, ref index, length));
+                let mut length = 0;
+                ProtoMessage::<usize>::decode_raw(ref length, serialized, ref index, 0);
+                let mut item = Default::<T>::default();
+                ProtoMessage::<T>::decode_raw(ref item, serialized, ref index, length);
+                value.append(item);
             }
         } else {
             while index < bound {
-                items.append(ProtoMessage::<T>::decode_raw(serialized, ref index, 0));
+                let mut item = Default::<T>::default();
+                ProtoMessage::<T>::decode_raw(ref item, serialized, ref index, 0);
+                value.append(item);
             }
         }
 
         assert(index == bound, 'invalid length for array');
-
-        items
     }
 
     fn wire_type() -> WireType {
