@@ -62,6 +62,8 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
                 }
 
                 ProtoMessage::<T>::decode_raw(ref value, serialized, ref index, length);
+            } else if tag.field_number < field_number {
+                panic!("unexpected field number order");
             }
         }
     }

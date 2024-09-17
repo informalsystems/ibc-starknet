@@ -307,6 +307,19 @@ fn test_proto_to_cairo_struct_absent_field() {
 }
 
 #[test]
+#[should_panic]
+fn test_proto_to_cairo_struct_non_canonical_order() {
+    let proto_bytes: Array<u8> = array![
+        32, 128, 204, 185, 255, 5, 8, 246, 255, 255, 255, 255, 255, 255, 255, 255, 1,
+    ];
+    let mut bytes_array = "";
+    while bytes_array.len() < proto_bytes.len() {
+        bytes_array.append_byte(*proto_bytes[bytes_array.len()]);
+    };
+    ProtoCodecImpl::decode::<TmHeader>(@bytes_array);
+}
+
+#[test]
 fn test_proto_to_any() {
     let header = TmHeader {
         height: -10,
