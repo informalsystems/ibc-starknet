@@ -18,10 +18,10 @@ impl HeightAsProtoMessage of ProtoMessage<Height> {
     fn decode_raw(ref value: Height, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
         ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.revision_number, serialized, ref index
+            1, ref value.revision_number, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.revision_height, serialized, ref index
+            2, ref value.revision_height, serialized, ref index, bound
         );
         assert(index == bound, 'invalid length for Height');
     }
@@ -35,7 +35,7 @@ impl HeightAsProtoMessage of ProtoMessage<Height> {
     }
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct MerkleRoot {
     pub hash: ByteArray,
 }
@@ -47,7 +47,9 @@ impl MerkleRootAsProtoMessage of ProtoMessage<MerkleRoot> {
 
     fn decode_raw(ref value: MerkleRoot, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.hash, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(
+            1, ref value.hash, serialized, ref index, bound
+        );
         assert(index == bound, 'invalid length for MerkleRoot');
     }
 

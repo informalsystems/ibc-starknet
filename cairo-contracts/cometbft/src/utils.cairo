@@ -16,9 +16,11 @@ impl FractionAsProtoMessage of ProtoMessage<Fraction> {
     fn decode_raw(ref value: Fraction, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.numerator, serialized, ref index);
         ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.denominator, serialized, ref index
+            1, ref value.numerator, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            2, ref value.denominator, serialized, ref index, bound
         );
 
         assert(index == bound, 'invalid length for Fraction');

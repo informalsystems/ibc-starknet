@@ -9,7 +9,7 @@ use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
 use protobuf::primitives::numeric::{NumberAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ClientState {
     chain_id: ByteArray,
     trust_level: Fraction,
@@ -43,36 +43,38 @@ impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
 
     fn decode_raw(ref value: ClientState, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.chain_id, serialized, ref index);
         ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.trust_level, serialized, ref index
+            1, ref value.chain_id, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.trusting_period, serialized, ref index
+            2, ref value.trust_level, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            4, ref value.unbonding_period, serialized, ref index
+            3, ref value.trusting_period, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            5, ref value.max_clock_drift, serialized, ref index
+            4, ref value.unbonding_period, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            6, ref value.frozen_height, serialized, ref index
+            5, ref value.max_clock_drift, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            7, ref value.latest_height, serialized, ref index
+            6, ref value.frozen_height, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            8, ref value.proof_specs, serialized, ref index
+            7, ref value.latest_height, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            9, ref value.upgrade_path, serialized, ref index
+            8, ref value.proof_specs, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            10, ref value.allow_update_after_expiry, serialized, ref index
+            9, ref value.upgrade_path, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            11, ref value.allow_update_after_misbehaviour, serialized, ref index
+            10, ref value.allow_update_after_expiry, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            11, ref value.allow_update_after_misbehaviour, serialized, ref index, bound
         );
         assert(index == bound, 'invalid length for ClientState');
     }
@@ -87,7 +89,7 @@ impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
 }
 
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ConsensusState {
     timestamp: Timestamp,
     root: MerkleRoot,
@@ -105,10 +107,14 @@ impl ConsensusStateAsProtoMessage of ProtoMessage<ConsensusState> {
         ref value: ConsensusState, serialized: @ByteArray, ref index: usize, length: usize
     ) {
         let bound = index + length;
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.timestamp, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.root, serialized, ref index);
         ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.next_validators_hash, serialized, ref index
+            1, ref value.timestamp, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            2, ref value.root, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            3, ref value.next_validators_hash, serialized, ref index, bound
         );
         assert(index == bound, 'invalid length for CS');
     }
@@ -122,7 +128,7 @@ impl ConsensusStateAsProtoMessage of ProtoMessage<ConsensusState> {
     }
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Misbehaviour {
     client_id: ByteArray,
     header_1: Header,
@@ -140,9 +146,15 @@ impl MisbehaviourAsProtoMessage of ProtoMessage<Misbehaviour> {
         ref value: Misbehaviour, serialized: @ByteArray, ref index: usize, length: usize
     ) {
         let bound = index + length;
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.client_id, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.header_1, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(3, ref value.header_2, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(
+            1, ref value.client_id, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            2, ref value.header_1, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            3, ref value.header_2, serialized, ref index, bound
+        );
         assert(index == bound, 'invalid length for Misbehaviour');
     }
 
@@ -155,7 +167,7 @@ impl MisbehaviourAsProtoMessage of ProtoMessage<Misbehaviour> {
     }
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Header {
     signed_header: SignedHeader,
     validator_set: ValidatorSet,
@@ -174,16 +186,16 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
     fn decode_raw(ref value: Header, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
         ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.signed_header, serialized, ref index
+            1, ref value.signed_header, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.validator_set, serialized, ref index
+            2, ref value.validator_set, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.trusted_height, serialized, ref index
+            3, ref value.trusted_height, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            4, ref value.trusted_validator_set, serialized, ref index
+            4, ref value.trusted_validator_set, serialized, ref index, bound
         );
         assert(index == bound, 'invalid length for Header');
     }

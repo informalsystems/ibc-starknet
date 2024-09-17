@@ -101,7 +101,7 @@ impl U64IntoLengthOp of Into<u64, LengthOp> {
     }
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct InnerSpec {
     pub child_order: Array<i32>,
     pub child_size: i32,
@@ -124,19 +124,23 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
     fn decode_raw(ref value: InnerSpec, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
         ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.child_order, serialized, ref index
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.child_size, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.min_prefix_length, serialized, ref index
+            1, ref value.child_order, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            4, ref value.max_prefix_length, serialized, ref index
+            2, ref value.child_size, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            5, ref value.empty_child, serialized, ref index
+            3, ref value.min_prefix_length, serialized, ref index, bound
         );
-        ProtoCodecImpl::decode_length_delimited_raw(6, ref value.hash, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(
+            4, ref value.max_prefix_length, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            5, ref value.empty_child, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            6, ref value.hash, serialized, ref index, bound
+        );
         assert(index == bound, 'invalid length for InnerSpec');
     }
 
@@ -149,7 +153,7 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
     }
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct LeafOp {
     pub hash: HashOp,
     pub prehash_key: HashOp,
@@ -169,15 +173,21 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
 
     fn decode_raw(ref value: LeafOp, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.hash, serialized, ref index);
         ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.prehash_key, serialized, ref index
+            1, ref value.hash, serialized, ref index, bound
         );
         ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.prehash_value, serialized, ref index
+            2, ref value.prehash_key, serialized, ref index, bound
         );
-        ProtoCodecImpl::decode_length_delimited_raw(4, ref value.length, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(5, ref value.prefix, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(
+            3, ref value.prehash_value, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            4, ref value.length, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            5, ref value.prefix, serialized, ref index, bound
+        );
         assert(index == bound, 'invalid length for LeafOp');
     }
 
@@ -190,7 +200,7 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
     }
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ProofSpec {
     pub leaf_spec: LeafOp,
     pub inner_spec: InnerSpec,
@@ -212,12 +222,20 @@ impl ProofSpecAsProtoMessage of ProtoMessage<ProofSpec> {
 
     fn decode_raw(ref value: ProofSpec, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.leaf_spec, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.inner_spec, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(3, ref value.max_depth, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(4, ref value.min_depth, serialized, ref index);
         ProtoCodecImpl::decode_length_delimited_raw(
-            5, ref value.prehash_key_before_comparison, serialized, ref index
+            1, ref value.leaf_spec, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            2, ref value.inner_spec, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            3, ref value.max_depth, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            4, ref value.min_depth, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            5, ref value.prehash_key_before_comparison, serialized, ref index, bound
         );
         assert(index == bound, 'invalid length for ProofSpec');
     }
