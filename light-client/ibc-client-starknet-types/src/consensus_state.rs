@@ -1,3 +1,4 @@
+use cgp::prelude::*;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
 use ibc_core::primitives::proto::Any;
@@ -8,7 +9,7 @@ use prost::Message;
 pub const CONSENSUS_STATE_TYPE_URL: &str = "/StarknetConsensusState";
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Clone, Debug, PartialEq, derive_more::From)]
+#[derive(Clone, Debug, PartialEq, derive_more::From, HasField)]
 pub struct StarknetConsensusState {
     pub root: CommitmentRoot,
     pub time: Timestamp,

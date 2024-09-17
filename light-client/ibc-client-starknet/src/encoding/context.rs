@@ -16,7 +16,7 @@ use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_
 use hermes_protobuf_encoding_components::types::any::Any;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use ibc_client_starknet_types::encoding::components::*;
-use ibc_client_starknet_types::StarknetClientState;
+use ibc_client_starknet_types::{StarknetClientState, StarknetConsensusState};
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
@@ -154,11 +154,14 @@ impl ErrorRaiser<StarknetLightClientEncoding, TypeUrlMismatchError>
 pub trait CanUseStarknetLightClientEncoding:
     CanEncodeAndDecode<ViaProtobuf, Any>
     + CanEncodeAndDecode<ViaProtobuf, Height>
-    + CanEncodeAndDecode<ViaProtobuf, CommitmentRoot>
     + CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
+    + CanEncodeAndDecode<ViaProtobuf, StarknetConsensusState>
     + CanEncodeAndDecode<ViaAny, StarknetClientState>
+    + CanEncodeAndDecode<ViaAny, StarknetConsensusState>
     + CanConvertBothWays<Any, StarknetClientState>
+    + CanConvertBothWays<Any, StarknetConsensusState>
     + CanEncodeAndDecodeMut<ViaProtobuf, Timestamp>
+    + CanEncodeAndDecodeMut<ViaProtobuf, CommitmentRoot>
 {
 }
 

@@ -22,8 +22,9 @@ use ibc_core::primitives::Timestamp;
 
 use crate::encoding::impls::client_state::EncodeStarknetClientState;
 use crate::encoding::impls::commitment_root::EncodeCommitmentRoot;
+use crate::encoding::impls::consensus_state::EncodeStarknetConsensusState;
 use crate::encoding::impls::timestamp::EncodeTimestamp;
-use crate::StarknetClientState;
+use crate::{StarknetClientState, StarknetConsensusState};
 
 define_components! {
     StarknetLightClientEncodingComponents {
@@ -65,11 +66,14 @@ delegate_components! {
         [
             (ViaProtobuf, Any),
             (ViaProtobuf, Height),
-            (ViaProtobuf, CommitmentRoot),
             (ViaProtobuf, StarknetClientState),
+            (ViaProtobuf, StarknetConsensusState),
         ]: EncodeProtoWithMutBuffer,
 
-        (ViaAny, StarknetClientState): EncodeViaAny<ViaProtobuf>,
+        [
+            (ViaAny, StarknetClientState),
+            (ViaAny, StarknetConsensusState),
+        ]: EncodeViaAny<ViaProtobuf>,
     }
 }
 
@@ -83,6 +87,9 @@ delegate_components! {
         (ViaProtobuf, StarknetClientState):
             EncodeStarknetClientState,
 
+        (ViaProtobuf, StarknetConsensusState):
+            EncodeStarknetConsensusState,
+
         (ViaProtobuf, CommitmentRoot):
             EncodeCommitmentRoot,
 
@@ -93,15 +100,25 @@ delegate_components! {
 
 delegate_components! {
     StarknetLightClientConverterComponents {
-        (StarknetClientState, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
-        (Any, StarknetClientState): DecodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
+        [
+            (StarknetClientState, Any),
+            (StarknetConsensusState, Any),
+        ]: EncodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
+
+        [
+            (Any, StarknetClientState),
+            (Any, StarknetConsensusState),
+        ]: DecodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
     }
 }
 
 delegate_components! {
     StarknetLightClientTypeUrlSchemas {
         StarknetClientState: StarknetClientStateUrl,
+        StarknetConsensusState: StarknetConsensusStateUrl,
     }
 }
 
 impl_type_url!(StarknetClientStateUrl, "/StarknetClientState",);
+
+impl_type_url!(StarknetConsensusStateUrl, "/StarknetConsensusState",);

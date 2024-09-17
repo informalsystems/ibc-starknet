@@ -20,7 +20,7 @@ impl TryFrom<Any> for ClientState {
     type Error = ClientError;
 
     fn try_from(any: Any) -> Result<Self, Self::Error> {
-        let client_state = StarknetLightClientEncoding.convert(&ProstAny {
+        let client_state: ClientStateType = StarknetLightClientEncoding.convert(&ProstAny {
             type_url: any.type_url,
             value: any.value,
         })?;
