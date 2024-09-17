@@ -1,8 +1,8 @@
 use openzeppelin_testing::declare_class;
 use starknet_ibc_apps::tests::{TransferAppConfigTrait, OWNER};
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_contracts::tests::setups::{ClientHandle, ERC20Handle, AppHandle, AppContract};
-use starknet_ibc_contracts::tests::setups::{CoreContract, CoreHandle};
+use starknet_ibc_contracts::tests::handles::{ClientHandle, ERC20Handle, AppHandle, AppContract};
+use starknet_ibc_contracts::tests::handles::{CoreContract, CoreHandle};
 use starknet_ibc_core::client::ClientContract;
 
 // Deploys an instance of IBC core, Cometbft ligth client, and Token Transfer
@@ -12,13 +12,13 @@ fn setup_contracts(
     client_type: felt252
 ) -> (CoreContract, ClientContract, AppContract, ERC20Contract) {
     // Deploy an IBC core contract.
-    let mut ibc = CoreHandle::setup();
+    let mut core = CoreHandle::setup();
 
     // Deploy a Comet client contract.
     let comet = ClientHandle::setup_cometbft();
 
     // Register the Comet client into the IBC core contract.
-    ibc.register_client(client_type, comet.address);
+    core.register_client(client_type, comet.address);
 
     // Declare the ERC20 contract class.
     let erc20_contract_class = declare_class("ERC20Mintable");
@@ -29,6 +29,6 @@ fn setup_contracts(
     // Deploy an ICS20 Token Transfer contract.
     let mut ics20 = AppHandle::setup_transfer(OWNER(), erc20_contract_class);
 
-    (ibc, comet, ics20, erc20)
+    (core, comet, ics20, erc20)
 }
 

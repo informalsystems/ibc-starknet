@@ -2,7 +2,7 @@ use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::cheat_block_timestamp_global;
 use snforge_std::spy_events;
 use starknet_ibc_clients::tests::CometClientConfigTrait;
-use starknet_ibc_contracts::tests::setups::{CoreContract, CoreHandle, ClientHandle};
+use starknet_ibc_contracts::tests::handles::{CoreContract, CoreHandle, ClientHandle};
 use starknet_ibc_core::client::{
     UpdateResponse, Height, StatusTrait, ClientContract, ClientContractTrait
 };
@@ -12,15 +12,15 @@ use starknet_ibc_core::tests::ClientEventSpyExt;
 // client into the IBC core.
 fn setup_contracts(client_type: felt252) -> (CoreContract, ClientContract) {
     // Deploy an IBC core contract.
-    let mut ibc = CoreHandle::setup();
+    let mut core = CoreHandle::setup();
 
     // Deploy a Comet client contract.
     let comet = ClientHandle::setup_cometbft();
 
     // Register the Comet client into the IBC core contract.
-    ibc.register_client(client_type, comet.address);
+    core.register_client(client_type, comet.address);
 
-    (ibc, comet)
+    (core, comet)
 }
 
 #[test]
@@ -31,7 +31,7 @@ fn test_create_comet_client_ok() {
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let (mut ibc, comet) = setup_contracts(cfg.client_type);
+    let (mut core, comet) = setup_contracts(cfg.client_type);
 
     let mut spy = spy_events();
 
@@ -45,14 +45,14 @@ fn test_create_comet_client_ok() {
     let msg = cfg.dummy_msg_create_client();
 
     // Submit a `MsgCreateClient` to the IBC core contract.
-    let resp = ibc.create_client(msg);
+    let resp = core.create_client(msg);
 
     // -----------------------------------------------------------
     // Check Results
     // -----------------------------------------------------------
 
     // Assert the `CreateClientEvent` emitted.
-    spy.assert_create_client_event(ibc.address, resp.client_id, resp.height);
+    spy.assert_create_client_event(core.address, resp.client_id, resp.height);
 
     assert_eq!(comet.client_type(), cfg.client_type);
 
@@ -69,7 +69,7 @@ fn test_update_comet_client_ok() {
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let (mut ibc, comet) = setup_contracts(cfg.client_type);
+    let (mut core, comet) = setup_contracts(cfg.client_type);
 
     let mut spy = spy_events();
 
@@ -83,7 +83,7 @@ fn test_update_comet_client_ok() {
     let msg_create_client = cfg.dummy_msg_create_client();
 
     // Submit a `MsgCreateClient` to the IBC core contract.
-    let create_resp = ibc.create_client(msg_create_client);
+    let create_resp = core.create_client(msg_create_client);
 
     // -----------------------------------------------------------
     // Update Client
@@ -102,7 +102,7 @@ fn test_update_comet_client_ok() {
         );
 
     // Submit a `MsgUpdateClient` to the IBC core contract.
-    let update_resp = ibc.update_client(msg.clone());
+    let update_resp = core.update_client(msg.clone());
 
     // -----------------------------------------------------------
     // Check Results
@@ -110,7 +110,7 @@ fn test_update_comet_client_ok() {
 
     if let UpdateResponse::Success(heights) = update_resp {
         // Assert the `UpdateClientEvent` emitted.
-        spy.assert_update_client_event(ibc.address, msg.client_id, heights, msg.client_message);
+        spy.assert_update_client_event(core.address, msg.client_id, heights, msg.client_message);
     } else {
         panic!("update client failed");
     }

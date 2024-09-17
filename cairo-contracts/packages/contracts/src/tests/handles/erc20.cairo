@@ -20,13 +20,13 @@ pub impl ERC20HandleImpl of ERC20Handle {
     }
 
     fn assert_balance(self: @ERC20Contract, account: ContractAddress, expected: u256) {
-        let balance = self.dispatcher().balance_of(account);
-        assert_eq!(balance, expected);
+        let balance = self.balance_of(account);
+        assert(balance == expected, 'balance mismatch');
     }
 
     fn assert_total_supply(self: @ERC20Contract, expected: u256) {
-        let total_supply = self.dispatcher().total_supply();
-        assert_eq!(total_supply, expected);
+        let total_supply = self.total_supply();
+        assert(total_supply == expected, 'total supply mismatch');
     }
 }
 
