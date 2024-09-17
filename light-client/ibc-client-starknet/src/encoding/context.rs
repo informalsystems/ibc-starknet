@@ -5,6 +5,7 @@ use core::str::Utf8Error;
 
 use cgp::core::error::{ErrorRaiser, ProvideErrorType};
 use cgp::prelude::*;
+use hermes_encoding_components::traits::convert::CanConvertBothWays;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_protobuf_encoding_components::impls::any::TypeUrlMismatchError;
 use hermes_protobuf_encoding_components::impls::encode_mut::chunk::{
@@ -142,6 +143,7 @@ pub trait CanUseStarknetLightClientEncoding:
     + CanEncodeAndDecode<ViaProtobuf, Any>
     + CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
     + CanEncodeAndDecode<ViaAny, StarknetClientState>
+    + CanConvertBothWays<Any, StarknetClientState>
 {
 }
 
