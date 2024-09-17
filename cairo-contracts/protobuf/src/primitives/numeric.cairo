@@ -79,6 +79,10 @@ pub impl NumberAsProtoMessage<
     fn wire_type() -> WireType {
         WireType::Varint
     }
+
+    fn type_url() -> ByteArray {
+        ""
+    }
 }
 
 pub impl I32AsProtoMessage of ProtoMessage<i32> {
@@ -96,6 +100,10 @@ pub impl I32AsProtoMessage of ProtoMessage<i32> {
     fn wire_type() -> WireType {
         WireType::Varint
     }
+
+    fn type_url() -> ByteArray {
+        ""
+    }
 }
 
 pub impl I64AsProtoMessage of ProtoMessage<i64> {
@@ -112,6 +120,10 @@ pub impl I64AsProtoMessage of ProtoMessage<i64> {
 
     fn wire_type() -> WireType {
         WireType::Varint
+    }
+
+    fn type_url() -> ByteArray {
+        ""
     }
 }
 
@@ -139,5 +151,9 @@ pub impl BoolAsProtoMessage of ProtoMessage<bool> {
 
     fn wire_type() -> WireType {
         WireType::Varint
+    }
+
+    fn type_url() -> ByteArray {
+        ""
     }
 }

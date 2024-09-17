@@ -27,6 +27,10 @@ impl DuractionAsProtoMessage of ProtoMessage<Duration> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "type.googleapis.com/google.protobuf.Duration"
+    }
 }
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
@@ -53,6 +57,10 @@ impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "type.googleapis.com/google.protobuf.Timestamp"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -78,5 +86,9 @@ impl AnyAsProtoMessage of ProtoMessage<Any> {
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
+    }
+
+    fn type_url() -> ByteArray {
+        "type.googleapis.com/google.protobuf.Any"
     }
 }

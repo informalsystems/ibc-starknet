@@ -21,6 +21,10 @@ pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        ""
+    }
 }
 
 pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of ProtoMessage<Array<T>> {
@@ -56,5 +60,9 @@ pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of Prot
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
+    }
+
+    fn type_url() -> ByteArray {
+        ""
     }
 }

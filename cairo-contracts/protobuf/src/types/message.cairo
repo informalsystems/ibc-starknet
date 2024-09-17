@@ -1,10 +1,12 @@
 use protobuf::types::tag::{WireType, ProtobufTag, ProtobufTagImpl};
 use protobuf::primitives::numeric::NumberAsProtoMessage;
+use protobuf::types::wkt::Any;
 
 pub trait ProtoMessage<T> {
     fn decode_raw(ref value: T, serialized: @ByteArray, ref index: usize, length: usize);
     fn encode_raw(self: @T, ref output: ByteArray);
     fn wire_type() -> WireType;
+    fn type_url() -> ByteArray;
 }
 
 pub struct ProtoCodec {}
