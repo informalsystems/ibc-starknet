@@ -30,6 +30,8 @@ use hermes_wasm_encoding_components::types::client_state::WasmClientState;
 use hermes_wasm_encoding_components::types::consensus_state::WasmConsensusState;
 use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::client::types::Height;
+use ibc::core::commitment_types::commitment::CommitmentRoot;
+use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::encoding::components::StarknetLightClientEncodingComponents;
 use ibc_proto::ibc::lightclients::wasm::v1::ClientMessage as ProtoClientMessage;
 use prost_types::Any;
@@ -40,7 +42,7 @@ use crate::types::client_state::{
     WasmStarknetClientState,
 };
 use crate::types::consensus_state::{
-    ConvertWasmStarknetConsensusState, ProtoStarknetConsensusState, StarknetConsensusState,
+    ConvertWasmStarknetConsensusState, StarknetConsensusState,
     WasmStarknetConsensusState,
 };
 
@@ -84,6 +86,7 @@ delegate_components! {
     StarknetEncoderComponents {
         [
             (ViaProtobuf, StarknetClientState),
+            (ViaProtobuf, StarknetConsensusState),
         ]:
             StarknetLightClientEncodingComponents,
 
@@ -92,9 +95,6 @@ delegate_components! {
         (ViaAny, StarknetClientState): EncodeViaAny<ViaProtobuf>,
 
         (ViaAny, StarknetConsensusState): EncodeViaAny<ViaProtobuf>,
-
-        (ViaProtobuf, StarknetConsensusState): ConvertAndEncode<ProtoStarknetConsensusState>,
-        (ViaProtobuf, ProtoStarknetConsensusState): EncodeAsProtobuf,
 
         (ViaAny, ClientMessage): EncodeViaAny<ViaProtobuf>,
 
@@ -123,6 +123,9 @@ delegate_components! {
 
         [
             (ViaProtobuf, StarknetClientState),
+            (ViaProtobuf, StarknetConsensusState),
+            (ViaProtobuf, CommitmentRoot),
+            (ViaProtobuf, Timestamp),
         ]:
             StarknetLightClientEncodingComponents,
     }
@@ -130,9 +133,6 @@ delegate_components! {
 
 delegate_components! {
     StarknetConverterComponents {
-        (StarknetConsensusState, ProtoStarknetConsensusState): ConvertFrom,
-        (ProtoStarknetConsensusState, StarknetConsensusState): TryConvertFrom,
-
         (ClientMessage, ProtoClientMessage): ConvertFrom,
         (ProtoClientMessage, ClientMessage): TryConvertFrom,
 
