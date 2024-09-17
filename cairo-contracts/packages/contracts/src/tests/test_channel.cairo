@@ -1,8 +1,9 @@
 use openzeppelin_testing::declare_class;
 use starknet_ibc_apps::tests::{TransferAppConfigTrait, OWNER};
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_contracts::tests::handles::{ClientHandle, ERC20Handle, AppHandle, AppContract};
-use starknet_ibc_contracts::tests::handles::{CoreContract, CoreHandle};
+use starknet_ibc_contracts::tests::{
+    ClientHandle, ERC20Handle, AppHandle, AppContract, CoreContract, CoreHandle
+};
 use starknet_ibc_core::client::ClientContract;
 
 // Deploys an instance of IBC core, Cometbft ligth client, and Token Transfer

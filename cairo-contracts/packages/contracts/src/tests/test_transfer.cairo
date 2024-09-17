@@ -9,7 +9,7 @@ use starknet_ibc_apps::tests::{
     TransferAppConfigTrait, NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET
 };
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_contracts::tests::handles::{ERC20Handle, AppHandle, AppContract};
+use starknet_ibc_contracts::tests::{ERC20Handle, AppHandle, AppContract};
 use starknet_ibc_utils::ComputeKeyTrait;
 
 // Deploys an instance of ERC20 and ICS20 Token Transfer contracts.

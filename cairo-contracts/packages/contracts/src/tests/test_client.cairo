@@ -2,7 +2,7 @@ use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::cheat_block_timestamp_global;
 use snforge_std::spy_events;
 use starknet_ibc_clients::tests::CometClientConfigTrait;
-use starknet_ibc_contracts::tests::handles::{CoreContract, CoreHandle, ClientHandle};
+use starknet_ibc_contracts::tests::{CoreContract, CoreHandle, ClientHandle};
 use starknet_ibc_core::client::{
     UpdateResponse, Height, StatusTrait, ClientContract, ClientContractTrait
 };

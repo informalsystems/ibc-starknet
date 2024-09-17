@@ -16,15 +16,15 @@ mod tests {
     #[cfg(test)]
     mod test_transfer;
 
-    pub mod handles {
-        mod app;
-        mod client;
-        mod core;
-        mod erc20;
+    pub use handles::app::{AppContract, AppHandleImpl, AppHandle};
+    pub use handles::client::{ClientHandleImpl, ClientHandle};
+    pub use handles::core::{CoreContract, CoreHandleImpl, CoreHandle};
+    pub use handles::erc20::{ERC20HandleImpl, ERC20Handle};
 
-        pub(crate) use app::{AppContract, AppHandleImpl, AppHandle};
-        pub(crate) use client::{ClientHandleImpl, ClientHandle};
-        pub(crate) use core::{CoreContract, CoreHandleImpl, CoreHandle};
-        pub(crate) use erc20::{ERC20HandleImpl, ERC20Handle};
+    mod handles {
+        pub mod app;
+        pub mod client;
+        pub mod core;
+        pub mod erc20;
     }
 }
