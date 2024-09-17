@@ -1,5 +1,5 @@
 use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
-use protobuf::types::tag::{WireType, ProtobufTagImpl};
+use protobuf::types::tag::WireType;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
 use protobuf::primitives::numeric::{BoolAsProtoMessage, NumberAsProtoMessage, I64AsProtoMessage};
 
@@ -51,7 +51,7 @@ impl U64IntoValidatorType of Into<u64, ValidatorType> {
         match self {
             0 => ValidatorType::Full,
             1 => ValidatorType::Light,
-            _ => panic!("invalid validator type"),
+            _ => panic!("invalid ValidatorType"),
         }
     }
 }

@@ -3,7 +3,7 @@ use protobuf::types::tag::WireType;
 use protobuf::primitives::numeric::{I32AsProtoMessage, I64AsProtoMessage};
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub struct Duration {
     pub seconds: i64,
     pub nanos: i32,
@@ -29,7 +29,7 @@ impl DuractionAsProtoMessage of ProtoMessage<Duration> {
     }
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub struct Timestamp {
     pub seconds: i64,
     pub nanos: i32,
