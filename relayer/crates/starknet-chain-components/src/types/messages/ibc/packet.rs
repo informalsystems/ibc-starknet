@@ -1,7 +1,7 @@
 use cgp::prelude::*;
-use hermes_cairo_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
+use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::impls::with_context::EncodeWithContext;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
@@ -29,14 +29,14 @@ delegate_components! {
     EncodePacket {
         MutEncoderComponent: CombineEncoders<
             HList![
-                EncodeField<symbol!("sequence")>,
-                EncodeField<symbol!("src_port_id")>,
-                EncodeField<symbol!("src_channel_id")>,
-                EncodeField<symbol!("dst_port_id")>,
-                EncodeField<symbol!("dst_channel_id")>,
-                EncodeField<symbol!("data")>,
-                EncodeField<symbol!("timeout_height")>,
-                EncodeField<symbol!("timeout_timestamp")>,
+                EncodeField<symbol!("sequence"), EncodeWithContext>,
+                EncodeField<symbol!("src_port_id"), EncodeWithContext>,
+                EncodeField<symbol!("src_channel_id"), EncodeWithContext>,
+                EncodeField<symbol!("dst_port_id"), EncodeWithContext>,
+                EncodeField<symbol!("dst_channel_id"), EncodeWithContext>,
+                EncodeField<symbol!("data"), EncodeWithContext>,
+                EncodeField<symbol!("timeout_height"), EncodeWithContext>,
+                EncodeField<symbol!("timeout_timestamp"), EncodeWithContext>,
             ],
         >,
         MutDecoderComponent: DecodeFrom<Self, EncodeWithContext>,

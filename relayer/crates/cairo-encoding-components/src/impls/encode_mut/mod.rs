@@ -3,7 +3,6 @@ pub mod bool;
 pub mod byte_array;
 pub mod end;
 pub mod felt;
-pub mod field;
 pub mod from_felt;
 pub mod from_u128;
 pub mod iter;
