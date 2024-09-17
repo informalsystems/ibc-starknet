@@ -1,5 +1,5 @@
 use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
-use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
+use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{NumberAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
 
@@ -113,7 +113,7 @@ pub struct InnerSpec {
 
 impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
     fn encode_raw(self: @InnerSpec, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.child_order, ref output);
+        ProtoCodecImpl::encode_repeated(1, self.child_order, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(2, self.child_size, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(3, self.min_prefix_length, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(4, self.max_prefix_length, ref output);
@@ -123,9 +123,7 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
 
     fn decode_raw(ref value: InnerSpec, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.child_order, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_repeated(1, ref value.child_order, serialized, ref index, bound);
         ProtoCodecImpl::decode_length_delimited_raw(
             2, ref value.child_size, serialized, ref index, bound
         );

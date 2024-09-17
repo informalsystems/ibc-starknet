@@ -1,6 +1,6 @@
 use protobuf::types::wkt::Timestamp;
 use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
-use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
+use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{
     NumberAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, BoolAsProtoMessage
 };
@@ -291,7 +291,7 @@ impl CommitAsProtoMessage of ProtoMessage<Commit> {
         ProtoCodecImpl::encode_length_delimited_raw(1, self.height, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(2, self.round, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(3, self.block_id, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(4, self.signatures, ref output);
+        ProtoCodecImpl::encode_repeated(4, self.signatures, ref output);
     }
 
     fn decode_raw(ref value: Commit, serialized: @ByteArray, ref index: usize, length: usize) {
@@ -306,9 +306,7 @@ impl CommitAsProtoMessage of ProtoMessage<Commit> {
         ProtoCodecImpl::decode_length_delimited_raw(
             3, ref value.block_id, serialized, ref index, bound
         );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            4, ref value.signatures, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_repeated(4, ref value.signatures, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for Commit');
     }
@@ -446,7 +444,7 @@ pub struct ValidatorSet {
 
 impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
     fn encode_raw(self: @ValidatorSet, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.validators, ref output);
+        ProtoCodecImpl::encode_repeated(1, self.validators, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(2, self.proposer, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(3, self.total_voting_power, ref output);
     }
@@ -456,9 +454,7 @@ impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
     ) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.validators, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_repeated(1, ref value.validators, serialized, ref index, bound);
         ProtoCodecImpl::decode_length_delimited_raw(
             2, ref value.proposer, serialized, ref index, bound
         );

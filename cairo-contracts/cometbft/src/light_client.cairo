@@ -5,7 +5,7 @@ use cometbft::utils::Fraction;
 use cometbft::types::{SignedHeader, ValidatorSet};
 
 use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
-use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
+use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{NumberAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
 
@@ -33,8 +33,8 @@ impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
         ProtoCodecImpl::encode_length_delimited_raw(5, self.max_clock_drift, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(6, self.frozen_height, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(7, self.latest_height, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(8, self.proof_specs, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(9, self.upgrade_path, ref output);
+        ProtoCodecImpl::encode_repeated(8, self.proof_specs, ref output);
+        ProtoCodecImpl::encode_repeated(9, self.upgrade_path, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(10, self.allow_update_after_expiry, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(
             11, self.allow_update_after_misbehaviour, ref output
@@ -64,12 +64,8 @@ impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
         ProtoCodecImpl::decode_length_delimited_raw(
             7, ref value.latest_height, serialized, ref index, bound
         );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            8, ref value.proof_specs, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            9, ref value.upgrade_path, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_repeated(8, ref value.proof_specs, serialized, ref index, bound);
+        ProtoCodecImpl::decode_repeated(9, ref value.upgrade_path, serialized, ref index, bound);
         ProtoCodecImpl::decode_length_delimited_raw(
             10, ref value.allow_update_after_expiry, serialized, ref index, bound
         );
