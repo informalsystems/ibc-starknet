@@ -9,6 +9,7 @@ pub mod clients {
     pub use cometbft::CometClient;
 }
 mod tests {
+    mod setup;
     #[cfg(test)]
     mod test_channel;
     #[cfg(test)]
@@ -20,6 +21,7 @@ mod tests {
     pub use handles::client::{ClientHandleImpl, ClientHandle};
     pub use handles::core::{CoreContract, CoreHandleImpl, CoreHandle};
     pub use handles::erc20::{ERC20HandleImpl, ERC20Handle};
+    pub use setup::{Setup, SetupImpl, SetupTrait};
 
     mod handles {
         pub mod app;

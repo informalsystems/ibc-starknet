@@ -22,7 +22,7 @@ pub struct AppContract {
 
 #[generate_trait]
 pub impl AppHandleImpl of AppHandle {
-    fn setup_transfer(owner: ContractAddress, erc20_class: ContractClass) -> AppContract {
+    fn deploy_transfer(owner: ContractAddress, erc20_class: ContractClass) -> AppContract {
         let mut call_data = array![];
 
         call_data.append_serde(owner);

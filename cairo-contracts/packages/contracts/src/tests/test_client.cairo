@@ -2,26 +2,11 @@ use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::cheat_block_timestamp_global;
 use snforge_std::spy_events;
 use starknet_ibc_clients::tests::CometClientConfigTrait;
-use starknet_ibc_contracts::tests::{CoreContract, CoreHandle, ClientHandle};
+use starknet_ibc_contracts::tests::{CoreHandle, SetupImpl};
 use starknet_ibc_core::client::{
     UpdateResponse, Height, StatusTrait, ClientContract, ClientContractTrait
 };
-use starknet_ibc_core::tests::ClientEventSpyExt;
-
-// Deploys the IBC core and Comet client contracts, and registers the Comet
-// client into the IBC core.
-fn setup_contracts(client_type: felt252) -> (CoreContract, ClientContract) {
-    // Deploy an IBC core contract.
-    let mut core = CoreHandle::setup();
-
-    // Deploy a Comet client contract.
-    let comet = ClientHandle::setup_cometbft();
-
-    // Register the Comet client into the IBC core contract.
-    core.register_client(client_type, comet.address);
-
-    (core, comet)
-}
+use starknet_ibc_core::tests::{ClientEventSpyExt, HEIGHT};
 
 #[test]
 fn test_create_comet_client_ok() {
@@ -31,7 +16,11 @@ fn test_create_comet_client_ok() {
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let (mut core, comet) = setup_contracts(cfg.client_type);
+    let setup = SetupImpl::default();
+
+    let mut core = setup.deploy_core();
+
+    let mut comet = setup.deploy_cometbft(ref core);
 
     let mut spy = spy_events();
 
@@ -64,12 +53,16 @@ fn test_create_comet_client_ok() {
 #[test]
 fn test_update_comet_client_ok() {
     // -----------------------------------------------------------
-    // Setup Contracts
+    // Setup Essentials
     // -----------------------------------------------------------
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let (mut core, comet) = setup_contracts(cfg.client_type);
+    let setup = SetupImpl::default();
+
+    let mut core = setup.deploy_core();
+
+    let comet = setup.deploy_cometbft(ref core);
 
     let mut spy = spy_events();
 
@@ -92,8 +85,7 @@ fn test_update_comet_client_ok() {
     spy.drop_all_events();
 
     // Update the client to a new height.
-    let updating_height = cfg.latest_height.clone()
-        + Height { revision_number: 0, revision_height: 5 };
+    let updating_height = cfg.latest_height.clone() + HEIGHT(5);
 
     // Create a `MsgUpdateClient` message.
     let msg = cfg

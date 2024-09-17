@@ -51,7 +51,7 @@ pub mod ChannelHandlerComponent {
     }
 
     #[embeddable_as(CoreChannelHandler)]
-    pub impl CoreChannelHandlerImpl<
+    impl CoreChannelHandlerImpl<
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,

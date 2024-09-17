@@ -1,5 +1,3 @@
-use core::traits::TryInto;
-use openzeppelin_testing::declare_class;
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::spy_events;
 use snforge_std::start_cheat_caller_address;
@@ -9,22 +7,8 @@ use starknet_ibc_apps::tests::{
     TransferAppConfigTrait, NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET
 };
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_contracts::tests::{ERC20Handle, AppHandle, AppContract};
+use starknet_ibc_contracts::tests::{SetupImpl, ERC20Handle, AppHandle};
 use starknet_ibc_utils::ComputeKeyTrait;
-
-// Deploys an instance of ERC20 and ICS20 Token Transfer contracts.
-fn setup_contracts() -> (ERC20Contract, AppContract) {
-    // Declare the ERC20 contract class.
-    let erc20_contract_class = declare_class("ERC20Mintable");
-
-    // Deploy an ERC20 contract.
-    let mut erc20 = ERC20Handle::setup(erc20_contract_class);
-
-    // Deploy an ICS20 Token Transfer contract.
-    let mut ics20 = AppHandle::setup_transfer(OWNER(), erc20_contract_class);
-
-    (erc20, ics20)
-}
 
 #[test]
 fn test_escrow_unescrow_roundtrip() {
@@ -34,7 +18,11 @@ fn test_escrow_unescrow_roundtrip() {
 
     let mut cfg = TransferAppConfigTrait::default();
 
-    let (mut erc20, mut ics20) = setup_contracts();
+    let setup = SetupImpl::default();
+
+    let mut erc20 = setup.deploy_erc20();
+
+    let mut ics20 = setup.deploy_trasnfer();
 
     cfg.set_native_denom(erc20.address);
 
@@ -97,7 +85,9 @@ fn test_mint_burn_roundtrip() {
 
     let mut cfg = TransferAppConfigTrait::default();
 
-    let (_, mut ics20) = setup_contracts();
+    let setup = SetupImpl::default();
+
+    let mut ics20 = setup.deploy_trasnfer();
 
     // Set the caller address, as callbacks are permissioned.
     start_cheat_caller_address(ics20.address, OWNER());

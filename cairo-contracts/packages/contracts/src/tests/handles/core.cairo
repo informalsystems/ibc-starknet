@@ -21,7 +21,7 @@ pub struct CoreContract {
 
 #[generate_trait]
 pub impl CoreHandleImpl of CoreHandle {
-    fn setup() -> CoreContract {
+    fn deploy() -> CoreContract {
         let mut call_data = array![];
 
         let address = declare_and_deploy("IBCCore", call_data);

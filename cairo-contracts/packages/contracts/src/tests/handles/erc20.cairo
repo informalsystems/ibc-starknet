@@ -7,7 +7,7 @@ use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait};
 
 #[generate_trait]
 pub impl ERC20HandleImpl of ERC20Handle {
-    fn setup(contract_class: ContractClass) -> ERC20Contract {
+    fn deploy(contract_class: ContractClass) -> ERC20Contract {
         deploy(contract_class, dummy_erc20_call_data()).into()
     }
 

@@ -1,35 +1,30 @@
-use openzeppelin_testing::declare_class;
-use starknet_ibc_apps::tests::{TransferAppConfigTrait, OWNER};
-use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_contracts::tests::{
-    ClientHandle, ERC20Handle, AppHandle, AppContract, CoreContract, CoreHandle
-};
-use starknet_ibc_core::client::ClientContract;
+use starknet_ibc_apps::tests::{TransferAppConfigTrait, COSMOS, STARKNET};
+use starknet_ibc_contracts::tests::{SetupImpl, CoreHandle};
 
-// Deploys an instance of IBC core, Cometbft ligth client, and Token Transfer
-// applicaiton contracts, and registers the client and application into the core
-// contract.
-fn setup_contracts(
-    client_type: felt252
-) -> (CoreContract, ClientContract, AppContract, ERC20Contract) {
-    // Deploy an IBC core contract.
-    let mut core = CoreHandle::setup();
+#[test]
+#[should_panic]
+fn test_recv_packet_ok() {
+    // -----------------------------------------------------------
+    // Setup Essentials
+    // -----------------------------------------------------------
 
-    // Deploy a Comet client contract.
-    let comet = ClientHandle::setup_cometbft();
+    let mut transfer_cfg = TransferAppConfigTrait::default();
 
-    // Register the Comet client into the IBC core contract.
-    core.register_client(client_type, comet.address);
+    let setup = SetupImpl::default();
 
-    // Declare the ERC20 contract class.
-    let erc20_contract_class = declare_class("ERC20Mintable");
+    let mut core = setup.deploy_core();
 
-    // Deploy an ERC20 contract.
-    let mut erc20 = ERC20Handle::setup(erc20_contract_class);
+    let _comet = setup.deploy_cometbft(ref core);
 
-    // Deploy an ICS20 Token Transfer contract.
-    let mut ics20 = AppHandle::setup_transfer(OWNER(), erc20_contract_class);
+    let _ics20 = setup.deploy_trasnfer();
 
-    (core, comet, ics20, erc20)
+    // -----------------------------------------------------------
+    // Receive Packet
+    // -----------------------------------------------------------
+
+    let msg = transfer_cfg
+        .dummy_msg_recv_packet(transfer_cfg.hosted_denom.clone(), COSMOS(), STARKNET());
+
+    core.recv_packet(msg);
 }
 
