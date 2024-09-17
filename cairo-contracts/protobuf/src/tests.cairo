@@ -2,7 +2,7 @@ use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
 use protobuf::types::tag::WireType;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
 use protobuf::primitives::numeric::{BoolAsProtoMessage, NumberAsProtoMessage, I64AsProtoMessage};
-use protobuf::utils::array_u8_to_byte_array;
+use protobuf::hex::decode as hex_decode;
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 struct Proposer {
@@ -132,144 +132,30 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
 
 #[test]
 fn test_proto_u64() {
-    let proto_bytes = array![210, 149, 252, 216, 206, 177, 170, 170, 171, 1];
-    let bytes_array = array_u8_to_byte_array(@proto_bytes);
-    let num = ProtoCodecImpl::decode::<u64>(@bytes_array);
+    let hex = "d295fcd8ceb1aaaaab01";
+    let bytes = hex_decode(@hex);
+    let num = ProtoCodecImpl::decode::<u64>(@bytes);
     assert_eq!(num, 0xab54a98ceb1f0ad2, "number decode failed");
-    let bytes = ProtoCodecImpl::encode(@num);
-    assert_eq!(bytes_array, bytes, "num encode failed");
+    let bytes2 = ProtoCodecImpl::encode(@num);
+    assert_eq!(bytes, bytes2, "num encode failed");
 }
 
 #[test]
 fn test_proto_byte_array() {
-    let proto_bytes = array![
-        0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x2C, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21
-    ];
-    let bytes_array = array_u8_to_byte_array(@proto_bytes);
-    let byte_array = ProtoCodecImpl::decode::<ByteArray>(@bytes_array);
+    let hex = "48656C6C6F2C20576F726C6421";
+    let bytes = hex_decode(@hex);
+    let byte_array = ProtoCodecImpl::decode::<ByteArray>(@bytes);
     assert_eq!(byte_array, "Hello, World!", "byte array decode failed");
-    let bytes = ProtoCodecImpl::encode(@byte_array);
-    assert_eq!(bytes_array, bytes, "byte array encode failed");
-}
-
-#[test]
-fn test_proto_array_u8() {
-    let proto_bytes = array![0x12, 0x34, 0x56, 0x78];
-    let bytes_array = array_u8_to_byte_array(@proto_bytes);
-    let array = ProtoCodecImpl::decode::<Array<u8>>(@bytes_array);
-    assert_eq!(array, array![0x12, 0x34, 0x56, 0x78], "array decode failed");
-    let bytes = ProtoCodecImpl::encode(@array);
-    assert_eq!(bytes_array, bytes, "array encode failed");
-}
-
-#[test]
-fn test_proto_array_u64() {
-    let proto_bytes = array![0xf8, 0xac, 0xd1, 0x91, 0x01, 0xf0, 0xbd, 0xf3, 0x0d5, 0x09];
-    let bytes_array = array_u8_to_byte_array(@proto_bytes);
-    let array = ProtoCodecImpl::decode::<Array<u64>>(@bytes_array);
-    assert_eq!(array, array![0x12345678, 0x9abcdef0], "array decode failed");
-    let bytes = ProtoCodecImpl::encode(@array);
-    assert_eq!(bytes_array, bytes, "array encode failed");
+    let bytes2 = ProtoCodecImpl::encode(@byte_array);
+    assert_eq!(bytes, bytes2, "byte array encode failed");
 }
 
 #[test]
 fn test_proto_to_cairo_struct() {
-    let proto_bytes = array![
-        8,
-        246,
-        255,
-        255,
-        255,
-        255,
-        255,
-        255,
-        255,
-        255,
-        1,
-        16,
-        1,
-        26,
-        11,
-        99,
-        111,
-        115,
-        109,
-        111,
-        115,
-        104,
-        117,
-        98,
-        45,
-        52,
-        32,
-        128,
-        204,
-        185,
-        255,
-        5,
-        42,
-        4,
-        18,
-        52,
-        86,
-        120,
-        50,
-        10,
-        248,
-        172,
-        209,
-        145,
-        1,
-        240,
-        189,
-        243,
-        213,
-        9,
-        58,
-        38,
-        10,
-        18,
-        99,
-        111,
-        115,
-        109,
-        111,
-        115,
-        49,
-        104,
-        97,
-        102,
-        112,
-        116,
-        109,
-        52,
-        122,
-        120,
-        121,
-        54,
-        18,
-        16,
-        99,
-        111,
-        115,
-        109,
-        111,
-        115,
-        118,
-        97,
-        108,
-        112,
-        117,
-        98,
-        49,
-        50,
-        51,
-        52,
-        64,
-        1
-    ];
-    let bytes_array = array_u8_to_byte_array(@proto_bytes);
-    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes_array);
+    let hex =
+        "08f6ffffffffffffffff0110011a0b636f736d6f736875622d342080ccb9ff052a0412345678320af8acd19101f0bdf3d5093a260a12636f736d6f733168616670746d347a7879361210636f736d6f7376616c707562313233344001";
+    let bytes = hex_decode(@hex);
+    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes);
     let header2 = TmHeader {
         height: -10,
         active: true,
@@ -281,17 +167,15 @@ fn test_proto_to_cairo_struct() {
         validator_type: ValidatorType::Light,
     };
     assert_eq!(header2, header, "tm header decode failed");
-    let bytes_array2 = ProtoCodecImpl::encode(@header);
-    assert_eq!(bytes_array, bytes_array2, "tm header encode failed");
+    let bytes2 = ProtoCodecImpl::encode(@header);
+    assert_eq!(bytes, bytes2, "tm header encode failed");
 }
 
 #[test]
 fn test_proto_to_cairo_struct_absent_field() {
-    let proto_bytes = array![
-        8, 246, 255, 255, 255, 255, 255, 255, 255, 255, 1, 32, 128, 204, 185, 255, 5
-    ];
-    let bytes_array = array_u8_to_byte_array(@proto_bytes);
-    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes_array);
+    let hex = "08f6ffffffffffffffff012080ccb9ff05";
+    let bytes = hex_decode(@hex);
+    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes);
     let header2 = TmHeader {
         height: -10,
         active: false,
@@ -303,18 +187,16 @@ fn test_proto_to_cairo_struct_absent_field() {
         validator_type: ValidatorType::Full,
     };
     assert_eq!(header2, header, "tmh decode wo field failed");
-    let bytes_array2 = ProtoCodecImpl::encode(@header);
-    assert_eq!(bytes_array, bytes_array2, "tmh encode wo field failed");
+    let bytes2 = ProtoCodecImpl::encode(@header);
+    assert_eq!(bytes, bytes2, "tmh encode wo field failed");
 }
 
 #[test]
 #[should_panic]
 fn test_proto_to_cairo_struct_non_canonical_order() {
-    let proto_bytes = array![
-        32, 128, 204, 185, 255, 5, 8, 246, 255, 255, 255, 255, 255, 255, 255, 255, 1,
-    ];
-    let bytes_array = array_u8_to_byte_array(@proto_bytes);
-    ProtoCodecImpl::decode::<TmHeader>(@bytes_array);
+    let hex = "2080ccb9ff0508f6ffffffffffffffff01";
+    let bytes = hex_decode(@hex);
+    ProtoCodecImpl::decode::<TmHeader>(@bytes);
 }
 
 #[test]

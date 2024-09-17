@@ -78,15 +78,15 @@ mod tests {
         decode_varint_u64, encode_varint_u64, decode_2_complement_64, encode_2_complement_64
     };
 
-    use protobuf::utils::array_u8_to_byte_array;
+    use protobuf::hex::decode as hex_decode;
 
     #[test]
     fn test_encode_decode_varint_u64() {
         let value = 0x1234567890ABCDEF;
         let bytes = encode_varint_u64(@value);
-        let expected_bytes = array![0xef, 0x9b, 0xaf, 0x85, 0x89, 0xcf, 0x95, 0x9a, 0x12];
-        let mut bytearray = array_u8_to_byte_array(@expected_bytes);
-        assert_eq!(bytearray, bytes, "invalid encoded bytes");
+        let hex = "ef9baf8589cf959a12";
+        let bytes2 = hex_decode(@hex);
+        assert_eq!(bytes, bytes2, "invalid encoded bytes");
         let mut index = 0;
         let decoded = decode_varint_u64(@bytes, ref index);
         assert_eq!(decoded, value, "invalid decoded value");
