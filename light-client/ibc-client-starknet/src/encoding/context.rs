@@ -18,6 +18,7 @@ use ibc_client_starknet_types::encoding::components::*;
 use ibc_client_starknet_types::StarknetClientState;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
+use ibc_core::commitment_types::commitment::CommitmentRoot;
 use prost::DecodeError;
 
 pub struct StarknetLightClientEncoding;
@@ -139,8 +140,9 @@ impl ErrorRaiser<StarknetLightClientEncoding, TypeUrlMismatchError>
 }
 
 pub trait CanUseStarknetLightClientEncoding:
-    CanEncodeAndDecode<ViaProtobuf, Height>
-    + CanEncodeAndDecode<ViaProtobuf, Any>
+    CanEncodeAndDecode<ViaProtobuf, Any>
+    + CanEncodeAndDecode<ViaProtobuf, Height>
+    + CanEncodeAndDecode<ViaProtobuf, CommitmentRoot>
     + CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
     + CanEncodeAndDecode<ViaAny, StarknetClientState>
     + CanConvertBothWays<Any, StarknetClientState>

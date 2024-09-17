@@ -17,8 +17,10 @@ use hermes_protobuf_encoding_components::impls::via_any::EncodeViaAny;
 use hermes_protobuf_encoding_components::types::any::Any;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use ibc_core::client::types::Height;
+use ibc_core::commitment_types::commitment::CommitmentRoot;
 
 use crate::encoding::impls::client_state::EncodeStarknetClientState;
+use crate::encoding::impls::commitment_root::EncodeCommitmentRoot;
 use crate::StarknetClientState;
 
 define_components! {
@@ -59,9 +61,10 @@ pub struct StarknetLightClientConverterComponents;
 delegate_components! {
     StarknetLightClientEncoderComponents {
         [
-            (ViaProtobuf, Height),
-            (ViaProtobuf, StarknetClientState),
             (ViaProtobuf, Any),
+            (ViaProtobuf, Height),
+            (ViaProtobuf, CommitmentRoot),
+            (ViaProtobuf, StarknetClientState),
         ]: EncodeProtoWithMutBuffer,
 
         (ViaAny, StarknetClientState): EncodeViaAny<ViaProtobuf>,
@@ -77,6 +80,9 @@ delegate_components! {
 
         (ViaProtobuf, StarknetClientState):
             EncodeStarknetClientState,
+
+        (ViaProtobuf, CommitmentRoot):
+            EncodeCommitmentRoot,
     }
 }
 

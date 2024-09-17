@@ -9,7 +9,7 @@ pub const CONSENSUS_STATE_TYPE_URL: &str = "/StarknetConsensusState";
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq, derive_more::From)]
-pub struct ConsensusState {
+pub struct StarknetConsensusState {
     pub root: CommitmentRoot,
     pub time: Timestamp,
 }
@@ -22,13 +22,13 @@ pub struct ProtoConsensusState {
     pub timestamp: Option<ProtoTimestamp>,
 }
 
-impl ConsensusState {
+impl StarknetConsensusState {
     pub fn root(&self) -> &CommitmentRoot {
         &self.root
     }
 }
 
-impl TryFrom<Any> for ConsensusState {
+impl TryFrom<Any> for StarknetConsensusState {
     type Error = ClientError;
 
     fn try_from(raw: Any) -> Result<Self, Self::Error> {
@@ -47,8 +47,8 @@ impl TryFrom<Any> for ConsensusState {
     }
 }
 
-impl From<ConsensusState> for Any {
-    fn from(consensus_state: ConsensusState) -> Self {
+impl From<StarknetConsensusState> for Any {
+    fn from(consensus_state: StarknetConsensusState) -> Self {
         Self {
             type_url: CONSENSUS_STATE_TYPE_URL.to_string(),
             value: ProtoConsensusState::from(consensus_state).encode_to_vec(),
@@ -56,8 +56,8 @@ impl From<ConsensusState> for Any {
     }
 }
 
-impl From<ConsensusState> for ProtoConsensusState {
-    fn from(consensus_state: ConsensusState) -> Self {
+impl From<StarknetConsensusState> for ProtoConsensusState {
+    fn from(consensus_state: StarknetConsensusState) -> Self {
         ProtoConsensusState {
             root: Some(consensus_state.root.into_vec()),
             timestamp: Some(consensus_state.time.into()),
@@ -65,7 +65,7 @@ impl From<ConsensusState> for ProtoConsensusState {
     }
 }
 
-impl TryFrom<ProtoConsensusState> for ConsensusState {
+impl TryFrom<ProtoConsensusState> for StarknetConsensusState {
     type Error = ClientError;
 
     fn try_from(proto_consensus_state: ProtoConsensusState) -> Result<Self, Self::Error> {
@@ -86,6 +86,6 @@ impl TryFrom<ProtoConsensusState> for ConsensusState {
                 description: format!("timestamp error: {e}"),
             })?;
 
-        Ok(ConsensusState { root, time })
+        Ok(StarknetConsensusState { root, time })
     }
 }
