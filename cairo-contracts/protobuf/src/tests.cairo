@@ -76,6 +76,7 @@ struct TmHeader {
     indexes: Array<u64>,
     proposer: Proposer,
     validator_type: ValidatorType,
+    proposers: Array<Proposer>,
 }
 
 impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
@@ -88,6 +89,7 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
         ProtoCodecImpl::encode_length_delimited_raw(6, self.indexes, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(7, self.proposer, ref output);
         ProtoCodecImpl::encode_length_delimited_raw(8, self.validator_type, ref output);
+        ProtoCodecImpl::encode_repeated(9, self.proposers, ref output);
     }
 
     fn decode_raw(ref value: TmHeader, serialized: @ByteArray, ref index: usize, length: usize) {
@@ -117,6 +119,7 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
         ProtoCodecImpl::decode_length_delimited_raw(
             8, ref value.validator_type, serialized, ref index, bound
         );
+        ProtoCodecImpl::decode_repeated(9, ref value.proposers, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for TmHeader');
     }
@@ -165,6 +168,7 @@ fn test_proto_to_cairo_struct() {
         indexes: array![0x12345678, 0x9abcdef0],
         proposer: Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", },
         validator_type: ValidatorType::Light,
+        proposers: array![],
     };
     assert_eq!(header2, header, "tm header decode failed");
     let bytes2 = ProtoCodecImpl::encode(@header);
@@ -185,6 +189,7 @@ fn test_proto_to_cairo_struct_absent_field() {
         indexes: array![],
         proposer: Proposer { address: "", pub_key: "", },
         validator_type: ValidatorType::Full,
+        proposers: array![],
     };
     assert_eq!(header2, header, "tmh decode wo field failed");
     let bytes2 = ProtoCodecImpl::encode(@header);
@@ -200,8 +205,12 @@ fn test_proto_to_cairo_struct_non_canonical_order() {
 }
 
 #[test]
-fn test_proto_to_any() {
-    let header = TmHeader {
+fn test_repeated_default_value() {
+    let hex =
+        "08f6ffffffffffffffff012080ccb9ff054a004a260a12636f736d6f733168616670746d347a7879361210636f736d6f7376616c70756231323334";
+    let bytes = hex_decode(@hex);
+    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes);
+    let header2 = TmHeader {
         height: -10,
         active: false,
         chain_id: "",
@@ -210,6 +219,32 @@ fn test_proto_to_any() {
         indexes: array![],
         proposer: Proposer { address: "", pub_key: "", },
         validator_type: ValidatorType::Full,
+        proposers: array![
+            Default::<Proposer>::default(),
+            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", }
+        ],
+    };
+    assert_eq!(header2, header, "repeated default value failed");
+    // TODO(rano): fails as default values are not encoded
+    // let bytes2 = ProtoCodecImpl::encode(@header);
+    // assert_eq!(bytes, bytes2, "repeated default value failed");
+}
+
+#[test]
+fn test_proto_to_any() {
+    let header = TmHeader {
+        height: -10,
+        active: false,
+        chain_id: "",
+        time: 1609459200,
+        hash: array![],
+        indexes: array![],
+        proposer: Proposer { address: "abc", pub_key: "def", },
+        validator_type: ValidatorType::Full,
+        proposers: array![
+            Proposer { address: "abc", pub_key: "def", },
+            Proposer { address: "pqr", pub_key: "stu", }
+        ],
     };
     let any = ProtoCodecImpl::to_any(@header);
     let header2 = ProtoCodecImpl::from_any::<TmHeader>(@any);

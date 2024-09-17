@@ -117,14 +117,20 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
         assert(index <= bound, 'invalid length for repeated');
     }
 
-    // when packed=false or repeated non-scalars
+    // for unpacked repeated fields (default for non-scalars)
     fn encode_repeated<T, +ProtoMessage<T>, +Clone<T>, +Drop<T>>(
         field_number: u8, value: @Array<T>, ref output: ByteArray
     ) {
         let mut i = 0;
         while i < value.len() {
-            // TODO(rano): what about default values?
-            Self::encode_length_delimited_raw(field_number, value[i], ref output);
+            let mut buf = "";
+            Self::encode_length_delimited_raw(field_number, value[i], ref buf);
+            if buf.len() > 0 {
+                output.append(@buf);
+            } else {
+                // TODO(rano): need to force encode default values
+            }
+
             i += 1;
         }
     }
