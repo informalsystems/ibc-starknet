@@ -15,3 +15,14 @@ pub mod cometbft {
         CometHeader, CometHeaderImpl, CometHeaderIntoConsensusState, CometHeaderTrait, SignedHeader
     };
 }
+pub mod tests {
+    mod config;
+    #[cfg(test)]
+    mod test_cometbft;
+
+    pub use config::{CometClientConfig, CometClientConfigImpl, CometClientConfigTrait};
+    pub(crate) use mocks::mock_cometbft::MockCometClient;
+    mod mocks {
+        pub(crate) mod mock_cometbft;
+    }
+}

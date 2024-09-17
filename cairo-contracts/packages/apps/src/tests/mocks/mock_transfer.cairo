@@ -1,17 +1,14 @@
-// This mock contract extends the preset ICS-20 token transfer component,
-// granting external access to all internal validation and execution functions
-// for testing purposes.
 #[starknet::contract]
 pub(crate) mod MockTransferApp {
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::ClassHash;
     use starknet::ContractAddress;
-    use starknet_ibc_apps::transfer::components::{TokenTransferComponent, TransferrableComponent};
     use starknet_ibc_apps::transfer::types::{
         PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo, TracePrefixTrait,
         PrefixedDenomTrait
     };
     use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait};
+    use starknet_ibc_apps::transfer::{TokenTransferComponent, TransferrableComponent};
     use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
@@ -114,7 +111,6 @@ pub(crate) mod MockTransferApp {
     ) {
         self.transfer.burn_validate(account, denom, amount, memo);
     }
-
 
     #[external(v0)]
     fn escrow_execute(

@@ -8,20 +8,21 @@ pub mod ChannelHandlerComponent {
     use starknet::storage::Map;
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
-        ChannelEventEmitterComponent, IChannelHandler, MsgRecvPacket, MsgRecvPacketTrait,
-        ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt,
-        AcknowledgementTrait, Packet, Acknowledgement
+        ChannelEventEmitterComponent, IChannelHandler, MsgRecvPacket, ChannelEnd, ChannelEndTrait,
+        ChannelErrors, PacketTrait, ChannelOrdering, Receipt, AcknowledgementTrait, Packet,
+        Acknowledgement
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, StatusTrait
     };
     use starknet_ibc_core::host::{
-        PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence, SequencePartialOrd,
+        PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence, SequenceImpl, SequencePartialOrd,
         channel_end_key, receipt_key, ack_key, commitment_path, next_sequence_recv_key
     };
     use starknet_ibc_core::router::{
         RouterHandlerComponent, IRouter, ApplicationContractTrait, ApplicationContract
     };
+    use starknet_ibc_core::tests::{PORT_ID, CHANNEL_ID, CHANNEL_END};
     use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
 
     #[storage]
@@ -40,7 +41,13 @@ pub mod ChannelHandlerComponent {
     pub impl ChannelInitializerImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ChannelInitializerTrait<TContractState> {
-        fn initializer(ref self: ComponentState<TContractState>) {}
+        fn initializer(ref self: ComponentState<TContractState>) {
+            // TODO: Initialize a temporary dummy `ChannelEnd` for testing the
+            // handlers. This should be removed once the channel handshake is
+            // implemented.
+            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(0), CHANNEL_END());
+            self.write_next_sequence_recv(@PORT_ID(), @CHANNEL_ID(0), SequenceImpl::zero());
+        }
     }
 
     #[embeddable_as(CoreChannelHandler)]
@@ -80,9 +87,15 @@ pub mod ChannelHandlerComponent {
 
             chan_end_on_b.validate(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
 
-            self.assert_not_timed_out(@msg.packet);
+            self.verify_not_timed_out(@msg.packet);
 
-            self.assert_proof_membership(msg.clone(), chan_end_on_b.clone());
+            let client = self.get_client(chan_end_on_b.client_id.client_type);
+
+            client.verify_is_active(chan_end_on_b.client_id.sequence);
+
+            client.verify_proof_height(@msg.proof_height_on_a, chan_end_on_b.client_id.sequence);
+
+            self.verify_packet_commitment(@client, chan_end_on_b.clone(), msg.clone());
 
             match @chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
@@ -94,7 +107,7 @@ pub mod ChannelHandlerComponent {
                     assert(reciept_resp.is_some(), ChannelErrors::PACKET_ALREADY_RECEIVED);
 
                     self
-                        .assert_ack_not_exists(
+                        .verify_ack_not_exists(
                             @msg.packet.port_id_on_b, @msg.packet.chan_id_on_b, @msg.packet.seq_on_a
                         );
                 },
@@ -114,7 +127,7 @@ pub mod ChannelHandlerComponent {
                     // existance means the packet was already relayed.
                     if next_sequence_recv == msg.packet.seq_on_a {
                         self
-                            .assert_ack_not_exists(
+                            .verify_ack_not_exists(
                                 @msg.packet.port_id_on_b,
                                 @msg.packet.chan_id_on_b,
                                 @msg.packet.seq_on_a
@@ -164,19 +177,12 @@ pub mod ChannelHandlerComponent {
             self.emit_write_ack_event(msg.packet, ack);
         }
 
-        fn assert_proof_membership(
-            self: @ComponentState<TContractState>, msg: MsgRecvPacket, chan_end_on_b: ChannelEnd
+        fn verify_packet_commitment(
+            self: @ComponentState<TContractState>,
+            client: @ClientContract,
+            chan_end_on_b: ChannelEnd,
+            msg: MsgRecvPacket
         ) {
-            let client = self.get_client(chan_end_on_b.client_id.client_type);
-
-            let client_status = client.status(chan_end_on_b.client_id.sequence);
-
-            assert(client_status.is_active(), ChannelErrors::INACTIVE_CLIENT);
-
-            let client_latest_height = client.latest_height(chan_end_on_b.client_id.sequence);
-
-            msg.verify_proof_height(@client_latest_height);
-
             let packet_commitment_on_a = msg.packet.compute_commitment();
 
             let mut path: ByteArray =
@@ -199,7 +205,7 @@ pub mod ChannelHandlerComponent {
                 );
         }
 
-        fn assert_not_timed_out(self: @ComponentState<TContractState>, packet: @Packet) {
+        fn verify_not_timed_out(self: @ComponentState<TContractState>, packet: @Packet) {
             let host_height = get_block_number();
 
             let host_timestamp = get_block_timestamp();
@@ -207,7 +213,7 @@ pub mod ChannelHandlerComponent {
             packet.check_timed_out(@host_height, @host_timestamp);
         }
 
-        fn assert_ack_not_exists(
+        fn verify_ack_not_exists(
             self: @ComponentState<TContractState>,
             port_id: @PortId,
             channel_id: @ChannelId,

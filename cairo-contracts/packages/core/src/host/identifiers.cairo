@@ -1,5 +1,6 @@
 use core::byte_array::ByteArrayTrait;
 use core::hash::{HashStateTrait, HashStateExTrait};
+use core::num::traits::Zero;
 use core::poseidon::PoseidonTrait;
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
@@ -110,6 +111,17 @@ impl PortIdKeyImpl of ComputeKeyTrait<PortId> {}
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Sequence {
     pub sequence: u64,
+}
+
+#[generate_trait]
+pub impl SequenceImpl of SequenceTrait {
+    fn zero() -> Sequence {
+        Sequence { sequence: 0 }
+    }
+
+    fn is_zero(self: @Sequence) -> bool {
+        self.sequence.is_zero()
+    }
 }
 
 pub impl SequencePartialOrd of PartialOrd<@Sequence> {

@@ -52,7 +52,7 @@ pub mod CometClientComponent {
     }
 
     #[generate_trait]
-    pub impl CreateClientImpl<
+    pub(crate) impl CreateClientImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of CreateClientTrait<TContractState> {
         fn create_validate(self: @ComponentState<TContractState>, msg: MsgCreateClient) {
@@ -81,7 +81,7 @@ pub mod CometClientComponent {
     }
 
     #[generate_trait]
-    pub impl UpdateClientImpl<
+    pub(crate) impl UpdateClientImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of UpdateClientTrait<TContractState> {
         fn update_validate(self: @ComponentState<TContractState>, msg: MsgUpdateClient) {
@@ -121,7 +121,7 @@ pub mod CometClientComponent {
     }
 
     #[generate_trait]
-    pub impl RecoverClientImpl<
+    pub(crate) impl RecoverClientImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of RecoverClientTrait<TContractState> {
         fn recover_validate(self: @ComponentState<TContractState>, msg: MsgRecoverClient) {
@@ -132,7 +132,7 @@ pub mod CometClientComponent {
     }
 
     #[generate_trait]
-    pub impl UpgradeClientImpl<
+    pub(crate) impl UpgradeClientImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of UpgradeClientTrait<TContractState> {
         fn upgrade_validate(self: @ComponentState<TContractState>, msg: MsgUpgradeClient) {
@@ -295,7 +295,7 @@ pub mod CometClientComponent {
     }
 
     #[generate_trait]
-    impl ClientInternalImpl<
+    pub(crate) impl ClientInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientInternalTrait<TContractState> {
         fn _root(self: @ComponentState<TContractState>, client_sequence: u64) -> felt252 {
@@ -355,11 +355,13 @@ pub mod CometClientComponent {
                 .write_client_processed_time(
                     client_sequence, latest_height.clone(), host_timestamp
                 );
+
+            self.write_client_sequence(client_sequence + 1);
         }
     }
 
     #[generate_trait]
-    impl ClientReaderImpl<
+    pub(crate) impl ClientReaderImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientReaderTrait<TContractState> {
         fn read_client_sequence(self: @ComponentState<TContractState>) -> u64 {
@@ -392,7 +394,7 @@ pub mod CometClientComponent {
     }
 
     #[generate_trait]
-    impl ClientWriterImpl<
+    pub(crate) impl ClientWriterImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientWriterTrait<TContractState> {
         fn write_client_sequence(ref self: ComponentState<TContractState>, client_sequence: u64) {

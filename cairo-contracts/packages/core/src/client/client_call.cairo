@@ -4,7 +4,8 @@ use starknet_ibc_core::client::{
     IClientHandler, IClientHandlerDispatcher, IClientStateDispatcher, IClientStateDispatcherTrait,
     IClientHandlerDispatcherTrait, IClientStateValidation, IClientStateValidationDispatcher,
     IClientStateValidationDispatcherTrait, MsgCreateClient, MsgUpdateClient, MsgRecoverClient,
-    MsgUpgradeClient, CreateResponse, UpdateResponse, Height, Status
+    MsgUpgradeClient, CreateResponse, UpdateResponse, Height, HeightPartialOrd, Status, StatusTrait,
+    ClientErrors
 };
 use starknet_ibc_core::host::ClientId;
 
@@ -39,6 +40,16 @@ pub impl ClientContractImpl of ClientContractTrait {
         IClientStateDispatcher { contract_address: *self.address }.status(client_sequence)
     }
 
+    fn verify_is_active(self: @ClientContract, client_sequence: u64) {
+        let client_status = self.status(client_sequence);
+        assert(client_status.is_active(), ClientErrors::INACTIVE_CLIENT);
+    }
+
+    fn verify_proof_height(self: @ClientContract, proof_height: @Height, client_sequence: u64) {
+        let client_latest_height = self.latest_height(client_sequence);
+        assert(proof_height >= @client_latest_height, ClientErrors::INVALID_PROOF_HEIGHT);
+    }
+
     fn verify_membership(
         self: @ClientContract,
         client_sequence: u64,
@@ -56,6 +67,10 @@ pub impl ClientContractImpl of ClientContractTrait {
         IClientStateValidationDispatcher { contract_address: *self.address }
             .verify_non_membership(client_sequence, path, proof)
     }
+}
+
+#[generate_trait]
+pub impl ClientContractHandlerImpl of ClientContractHandlerTrait {
     fn create(ref self: ClientContract, msg: MsgCreateClient) -> CreateResponse {
         IClientHandlerDispatcher { contract_address: self.address }.create_client(msg)
     }

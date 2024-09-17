@@ -1,20 +1,21 @@
 use starknet::ContractAddress;
+use starknet_ibc_apps::tests::{PUBKEY, NAME, AMOUNT, SUPPLY, EMPTY_MEMO};
 use starknet_ibc_apps::transfer::TRANSFER_PORT_ID;
 use starknet_ibc_apps::transfer::types::PrefixedDenomTrait;
 use starknet_ibc_apps::transfer::types::{
     MsgTransfer, PacketData, PrefixedDenom, Denom, Memo, TracePrefixTrait, Participant
 };
-use starknet_ibc_contracts::tests::constants::{PUBKEY, NAME, AMOUNT, SUPPLY};
 use starknet_ibc_core::channel::Packet;
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{PortId, ChannelId, Sequence};
+use starknet_ibc_core::tests::{PORT_ID, CHANNEL_ID};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct TransferAppConfig {
     pub native_denom: PrefixedDenom,
     pub hosted_denom: PrefixedDenom,
-    pub chan_id_on_a: ByteArray,
-    pub chan_id_on_b: ByteArray,
+    pub chan_id_on_a: ChannelId,
+    pub chan_id_on_b: ChannelId,
     pub amount: u256,
 }
 
@@ -30,8 +31,8 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         TransferAppConfig {
             native_denom,
             hosted_denom,
-            chan_id_on_a: "channel-0",
-            chan_id_on_b: "channel-1",
+            chan_id_on_a: CHANNEL_ID(0),
+            chan_id_on_b: CHANNEL_ID(1),
             amount: AMOUNT,
         }
     }
@@ -47,10 +48,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
 
 
     fn prefix_native_denom(self: @TransferAppConfig) -> PrefixedDenom {
-        let trace_prefix = TracePrefixTrait::new(
-            PortId { port_id: TRANSFER_PORT_ID() },
-            ChannelId { channel_id: self.chan_id_on_a.clone() }
-        );
+        let trace_prefix = TracePrefixTrait::new(PORT_ID(), self.chan_id_on_a.clone());
         let mut native_denom = self.native_denom.clone();
 
         native_denom.add_prefix(trace_prefix);
@@ -59,10 +57,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     }
 
     fn prefix_hosted_denom(self: @TransferAppConfig) -> PrefixedDenom {
-        let trace_prefix = TracePrefixTrait::new(
-            PortId { port_id: TRANSFER_PORT_ID() },
-            ChannelId { channel_id: self.chan_id_on_b.clone() }
-        );
+        let trace_prefix = TracePrefixTrait::new(PORT_ID(), self.chan_id_on_b.clone());
 
         let mut hosted_denom = self.hosted_denom.clone();
 
@@ -75,8 +70,8 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> MsgTransfer {
         MsgTransfer {
-            port_id_on_a: PortId { port_id: TRANSFER_PORT_ID() },
-            chan_id_on_a: ChannelId { channel_id: self.chan_id_on_a.clone() },
+            port_id_on_a: PORT_ID(),
+            chan_id_on_a: self.chan_id_on_a.clone(),
             packet_data: self.dummy_packet_data(denom, sender, receiver),
             timeout_height_on_b: Height { revision_number: 0, revision_height: 1000 },
             timeout_timestamp_on_b: Timestamp { timestamp: 1000 }
@@ -91,10 +86,10 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
 
         Packet {
             seq_on_a: Sequence { sequence: 0 },
-            port_id_on_a: PortId { port_id: TRANSFER_PORT_ID() },
-            chan_id_on_a: ChannelId { channel_id: self.chan_id_on_a.clone() },
-            port_id_on_b: PortId { port_id: TRANSFER_PORT_ID() },
-            chan_id_on_b: ChannelId { channel_id: self.chan_id_on_b.clone() },
+            port_id_on_a: PORT_ID(),
+            chan_id_on_a: self.chan_id_on_a.clone(),
+            port_id_on_b: PORT_ID(),
+            chan_id_on_b: self.chan_id_on_b.clone(),
             data: serialized_data,
             timeout_height_on_b: Height { revision_number: 0, revision_height: 1000 },
             timeout_timestamp_on_b: Timestamp { timestamp: 1000 }
@@ -104,6 +99,6 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     fn dummy_packet_data(
         self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> PacketData {
-        PacketData { denom, amount: *self.amount, sender, receiver, memo: Memo { memo: "" }, }
+        PacketData { denom, amount: *self.amount, sender, receiver, memo: EMPTY_MEMO() }
     }
 }

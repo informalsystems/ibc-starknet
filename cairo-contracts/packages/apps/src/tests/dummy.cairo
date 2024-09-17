@@ -1,7 +1,8 @@
 use core::serde::Serde;
-use starknet::ContractAddress;
+use starknet::class_hash::class_hash_const;
 use starknet::contract_address_const;
-use starknet_ibc_apps::transfer::types::Participant;
+use starknet::{ContractAddress, ClassHash};
+use starknet_ibc_apps::transfer::types::{Participant, Memo};
 
 pub const SUPPLY: u256 = 2000;
 pub const DECIMALS: u8 = 18_u8;
@@ -24,6 +25,10 @@ pub fn OWNER() -> ContractAddress {
     contract_address_const::<'OWNER'>()
 }
 
+pub fn CLASS_HASH() -> ClassHash {
+    class_hash_const::<'ERC20Mintable'>()
+}
+
 pub fn STARKNET() -> Participant {
     OWNER().into()
 }
@@ -33,5 +38,9 @@ pub fn COSMOS() -> Participant {
     let mut serialized_address: Array<felt252> = ArrayTrait::new();
     Serde::serialize(@bech32_address, ref serialized_address);
     serialized_address.into()
+}
+
+pub fn EMPTY_MEMO() -> Memo {
+    Memo { memo: "" }
 }
 

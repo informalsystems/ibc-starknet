@@ -1,10 +1,13 @@
+use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::cheat_block_timestamp_global;
-use starknet_ibc_contracts::tests::configs::comet::CometClientConfigTrait;
+use snforge_std::spy_events;
+use starknet_ibc_clients::tests::CometClientConfigTrait;
 use starknet_ibc_contracts::tests::setups::{
     IBCCoreHandle, IBCCoreHandleTrait, CometClientHandle, CometClientHandleTrait
 };
 use starknet_ibc_core::client::StatusTrait;
 use starknet_ibc_core::client::{UpdateResponse, Height};
+use starknet_ibc_core::tests::ClientEventSpyExt;
 
 // Deploys the IBC core and Comet client contracts, and registers the Comet
 // client into the IBC core.
@@ -31,6 +34,8 @@ fn test_create_comet_client_ok() {
 
     let (mut ibc, comet) = setup_contracts(cfg.client_type);
 
+    let mut spy = spy_events();
+
     // -----------------------------------------------------------
     // Create Client
     // -----------------------------------------------------------
@@ -48,13 +53,13 @@ fn test_create_comet_client_ok() {
     // -----------------------------------------------------------
 
     // Assert the `CreateClientEvent` emitted.
-    ibc.assert_create_event(resp.client_id, resp.height);
+    spy.assert_create_client_event(ibc.contract_address, resp.client_id, resp.height);
 
-    assert(comet.client_type() == cfg.client_type, 'client type mismatch');
+    assert_eq!(comet.client_type(), cfg.client_type);
 
-    assert(comet.latest_height(0) == cfg.latest_height, 'latest height mismatch');
+    assert_eq!(comet.latest_height(0), cfg.latest_height);
 
-    assert(comet.status(0).is_active(), 'status mismatch');
+    assert!(comet.status(0).is_active());
 }
 
 #[test]
@@ -66,6 +71,8 @@ fn test_update_comet_client_ok() {
     let mut cfg = CometClientConfigTrait::default();
 
     let (mut ibc, comet) = setup_contracts(cfg.client_type);
+
+    let mut spy = spy_events();
 
     // -----------------------------------------------------------
     // Create Client
@@ -83,7 +90,7 @@ fn test_update_comet_client_ok() {
     // Update Client
     // -----------------------------------------------------------
 
-    ibc.drop_all_events();
+    spy.drop_all_events();
 
     // Update the client to a new height.
     let updating_height = cfg.latest_height.clone()
@@ -104,14 +111,17 @@ fn test_update_comet_client_ok() {
 
     if let UpdateResponse::Success(heights) = update_resp {
         // Assert the `UpdateClientEvent` emitted.
-        ibc.assert_update_event(msg.client_id, heights, msg.client_message);
+        spy
+            .assert_update_client_event(
+                ibc.contract_address, msg.client_id, heights, msg.client_message
+            );
     } else {
         panic!("update client failed");
     }
 
-    assert(comet.client_type() == cfg.client_type, 'client type mismatch');
+    assert_eq!(comet.client_type(), cfg.client_type);
 
-    assert(comet.latest_height(0) == updating_height, 'latest height mismatch');
+    assert_eq!(comet.latest_height(0), updating_height);
 
-    assert(comet.status(0).is_active(), 'status mismatch');
+    assert!(comet.status(0).is_active());
 }

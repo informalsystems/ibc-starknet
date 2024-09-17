@@ -12,12 +12,12 @@ pub mod TokenTransferComponent {
     use starknet::ContractAddress;
     use starknet::storage::Map;
     use starknet::{get_contract_address, get_caller_address};
-    use starknet_ibc_apps::transfer::interfaces::{ITransferrable, ISendTransfer, ITokenAddress};
     use starknet_ibc_apps::transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo,
         TracePrefixTrait, PrefixedDenomTrait, Participant
     };
     use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait, TransferErrors};
+    use starknet_ibc_apps::transfer::{ITransferrable, ISendTransfer, ITokenAddress};
     use starknet_ibc_core::channel::{Packet, Acknowledgement, IAppCallback};
     use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
     use starknet_ibc_utils::{ComputeKeyTrait, ValidateBasicTrait};
@@ -100,7 +100,7 @@ pub mod TokenTransferComponent {
     }
 
     #[generate_trait]
-    impl SendTransferInternalImpl<
+    pub(crate) impl SendTransferInternalImpl<
         TContractState,
         +HasComponent<TContractState>,
         +ITransferrable<TContractState>,
@@ -199,7 +199,7 @@ pub mod TokenTransferComponent {
     }
 
     #[generate_trait]
-    impl RecvPacketInternalImpl<
+    pub(crate) impl RecvPacketInternalImpl<
         TContractState,
         +HasComponent<TContractState>,
         +ITransferrable<TContractState>,
@@ -417,7 +417,7 @@ pub mod TokenTransferComponent {
     }
 
     #[generate_trait]
-    impl OwnerAssertionImpl<
+    pub(crate) impl OwnerAssertionImpl<
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
@@ -430,7 +430,7 @@ pub mod TokenTransferComponent {
     }
 
     #[generate_trait]
-    impl TransferInternalImpl<
+    pub(crate) impl TransferInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferInternalTrait<TContractState> {
         fn get_token(self: @ComponentState<TContractState>, token_key: felt252) -> ERC20Contract {
@@ -502,7 +502,7 @@ pub mod TokenTransferComponent {
     }
 
     #[generate_trait]
-    impl TransferReaderImpl<
+    pub(crate) impl TransferReaderImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferReaderTrait<TContractState> {
         fn read_erc20_class_hash(self: @ComponentState<TContractState>) -> ClassHash {
@@ -527,7 +527,7 @@ pub mod TokenTransferComponent {
     }
 
     #[generate_trait]
-    impl TransferWriterImpl<
+    pub(crate) impl TransferWriterImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferWriterTrait<TContractState> {
         fn write_erc20_class_hash(
@@ -558,7 +558,7 @@ pub mod TokenTransferComponent {
     }
 
     #[generate_trait]
-    impl TransferEventImpl<
+    pub(crate) impl TransferEventImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferEventTrait<TContractState> {
         fn emit_send_event(ref self: ComponentState<TContractState>, packet_data: PacketData) {

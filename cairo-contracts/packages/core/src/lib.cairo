@@ -1,4 +1,22 @@
-pub mod tests;
+pub mod tests {
+    mod dummy;
+    mod extend_spy;
+    #[cfg(test)]
+    mod test_channel;
+    #[cfg(test)]
+    mod test_client;
+
+    pub use dummy::{
+        HEIGHT, CLIENT, CLIENT_TYPE, CLIENT_ID, PORT_ID, CHANNEL_ID, SEQUENCE, CHANNEL_END
+    };
+    pub use extend_spy::ClientEventSpyExt;
+    pub(crate) mod mocks {
+        mod mock_channel;
+        mod mock_client;
+        pub(crate) use mock_channel::MockChannelHandler;
+        pub(crate) use mock_client::MockClientHandler;
+    }
+}
 pub mod router {
     mod app_call;
     mod component;
@@ -11,7 +29,6 @@ pub mod router {
     pub use interface::{IRouter, IRouterDispatcher, IRouterDispatcherTrait};
 }
 pub mod channel {
-    mod components;
     mod errors;
     mod interface;
     mod msgs;
@@ -24,22 +41,28 @@ pub mod channel {
         IChannelHandler, IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, IAppCallback,
         IAppCallbackDispatcher, IAppCallbackDispatcherTrait
     };
-    pub use msgs::{MsgRecvPacket, MsgRecvPacketImpl, MsgRecvPacketTrait};
+    pub use msgs::MsgRecvPacket;
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
         ChannelOrdering, Counterparty, Acknowledgement, AcknowledgementImpl, AcknowledgementTrait,
         Receipt,
     };
+    mod components {
+        pub mod events;
+        pub mod handler;
+    }
 }
 pub mod client {
     mod client_call;
-    mod components;
     mod errors;
     mod interface;
     mod msgs;
     mod types;
 
-    pub use client_call::{ClientContract, ClientContractTrait};
+    pub use client_call::{
+        ClientContract, ClientContractImpl, ClientContractTrait, ClientContractHandlerImpl,
+        ClientContractHandlerTrait
+    };
     pub use components::events::ClientEventEmitterComponent;
     pub use components::handler::ClientHandlerComponent;
     pub use errors::ClientErrors;
@@ -56,6 +79,10 @@ pub mod client {
         CreateResponse, CreateResponseImpl, UpdateResponse, Status, StatusImpl, StatusTrait, Height,
         HeightPartialOrd, HeightsIntoUpdateResponse, Timestamp, TimestampPartialOrd
     };
+    mod components {
+        pub mod events;
+        pub mod handler;
+    }
 }
 pub mod host {
     mod errors;
@@ -66,7 +93,7 @@ pub mod host {
     pub use errors::HostErrors;
     pub use identifiers::{
         ClientId, ClientIdImpl, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdTrait,
-        Sequence, SequencePartialOrd
+        Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd
     };
 
     pub use keys::{channel_end_key, receipt_key, ack_key, next_sequence_recv_key};
