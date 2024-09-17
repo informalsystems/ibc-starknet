@@ -2,6 +2,7 @@ use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
 use protobuf::types::tag::WireType;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
 use protobuf::primitives::numeric::{BoolAsProtoMessage, NumberAsProtoMessage, I64AsProtoMessage};
+use protobuf::utils::array_u8_to_byte_array;
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 struct Proposer {
@@ -113,11 +114,8 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
 
 #[test]
 fn test_proto_u64() {
-    let bytes = array![210, 149, 252, 216, 206, 177, 170, 170, 171, 1];
-    let mut bytes_array = "";
-    while bytes_array.len() < bytes.len() {
-        bytes_array.append_byte(*bytes[bytes_array.len()]);
-    };
+    let proto_bytes = array![210, 149, 252, 216, 206, 177, 170, 170, 171, 1];
+    let bytes_array = array_u8_to_byte_array(@proto_bytes);
     let num = ProtoCodecImpl::decode::<u64>(@bytes_array);
     assert_eq!(num, 0xab54a98ceb1f0ad2, "number decode failed");
     let bytes = ProtoCodecImpl::encode(@num);
@@ -126,13 +124,10 @@ fn test_proto_u64() {
 
 #[test]
 fn test_proto_byte_array() {
-    let bytes = array![
+    let proto_bytes = array![
         0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x2C, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64, 0x21
     ];
-    let mut bytes_array = "";
-    while bytes_array.len() < bytes.len() {
-        bytes_array.append_byte(*bytes[bytes_array.len()]);
-    };
+    let bytes_array = array_u8_to_byte_array(@proto_bytes);
     let byte_array = ProtoCodecImpl::decode::<ByteArray>(@bytes_array);
     assert_eq!(byte_array, "Hello, World!", "byte array decode failed");
     let bytes = ProtoCodecImpl::encode(@byte_array);
@@ -141,11 +136,8 @@ fn test_proto_byte_array() {
 
 #[test]
 fn test_proto_array_u8() {
-    let bytes = array![0x12, 0x34, 0x56, 0x78];
-    let mut bytes_array = "";
-    while bytes_array.len() < bytes.len() {
-        bytes_array.append_byte(*bytes[bytes_array.len()]);
-    };
+    let proto_bytes = array![0x12, 0x34, 0x56, 0x78];
+    let bytes_array = array_u8_to_byte_array(@proto_bytes);
     let array = ProtoCodecImpl::decode::<Array<u8>>(@bytes_array);
     assert_eq!(array, array![0x12, 0x34, 0x56, 0x78], "array decode failed");
     let bytes = ProtoCodecImpl::encode(@array);
@@ -154,11 +146,8 @@ fn test_proto_array_u8() {
 
 #[test]
 fn test_proto_array_u64() {
-    let bytes = array![0xf8, 0xac, 0xd1, 0x91, 0x01, 0xf0, 0xbd, 0xf3, 0x0d5, 0x09];
-    let mut bytes_array = "";
-    while bytes_array.len() < bytes.len() {
-        bytes_array.append_byte(*bytes[bytes_array.len()]);
-    };
+    let proto_bytes = array![0xf8, 0xac, 0xd1, 0x91, 0x01, 0xf0, 0xbd, 0xf3, 0x0d5, 0x09];
+    let bytes_array = array_u8_to_byte_array(@proto_bytes);
     let array = ProtoCodecImpl::decode::<Array<u64>>(@bytes_array);
     assert_eq!(array, array![0x12345678, 0x9abcdef0], "array decode failed");
     let bytes = ProtoCodecImpl::encode(@array);
@@ -167,7 +156,7 @@ fn test_proto_array_u64() {
 
 #[test]
 fn test_proto_to_cairo_struct() {
-    let proto_bytes: Array<u8> = array![
+    let proto_bytes = array![
         8,
         246,
         255,
@@ -261,10 +250,7 @@ fn test_proto_to_cairo_struct() {
         64,
         1
     ];
-    let mut bytes_array = "";
-    while bytes_array.len() < proto_bytes.len() {
-        bytes_array.append_byte(*proto_bytes[bytes_array.len()]);
-    };
+    let bytes_array = array_u8_to_byte_array(@proto_bytes);
     let header = ProtoCodecImpl::decode::<TmHeader>(@bytes_array);
     let header2 = TmHeader {
         height: -10,
@@ -283,13 +269,10 @@ fn test_proto_to_cairo_struct() {
 
 #[test]
 fn test_proto_to_cairo_struct_absent_field() {
-    let proto_bytes: Array<u8> = array![
+    let proto_bytes = array![
         8, 246, 255, 255, 255, 255, 255, 255, 255, 255, 1, 32, 128, 204, 185, 255, 5
     ];
-    let mut bytes_array = "";
-    while bytes_array.len() < proto_bytes.len() {
-        bytes_array.append_byte(*proto_bytes[bytes_array.len()]);
-    };
+    let bytes_array = array_u8_to_byte_array(@proto_bytes);
     let header = ProtoCodecImpl::decode::<TmHeader>(@bytes_array);
     let header2 = TmHeader {
         height: -10,
@@ -309,13 +292,10 @@ fn test_proto_to_cairo_struct_absent_field() {
 #[test]
 #[should_panic]
 fn test_proto_to_cairo_struct_non_canonical_order() {
-    let proto_bytes: Array<u8> = array![
+    let proto_bytes = array![
         32, 128, 204, 185, 255, 5, 8, 246, 255, 255, 255, 255, 255, 255, 255, 255, 1,
     ];
-    let mut bytes_array = "";
-    while bytes_array.len() < proto_bytes.len() {
-        bytes_array.append_byte(*proto_bytes[bytes_array.len()]);
-    };
+    let bytes_array = array_u8_to_byte_array(@proto_bytes);
     ProtoCodecImpl::decode::<TmHeader>(@bytes_array);
 }
 
