@@ -305,3 +305,20 @@ fn test_proto_to_cairo_struct_absent_field() {
     let bytes_array2 = ProtoCodecImpl::encode(@header);
     assert_eq!(bytes_array, bytes_array2, "tmh encode wo field failed");
 }
+
+#[test]
+fn test_proto_to_any() {
+    let header = TmHeader {
+        height: -10,
+        active: false,
+        chain_id: "",
+        time: 1609459200,
+        hash: array![],
+        indexes: array![],
+        proposer: Proposer { address: "", pub_key: "", },
+        validator_type: ValidatorType::Full,
+    };
+    let any = ProtoCodecImpl::to_any(@header);
+    let header2 = ProtoCodecImpl::from_any::<TmHeader>(@any);
+    assert_eq!(header2, header, "any conversion failed");
+}
