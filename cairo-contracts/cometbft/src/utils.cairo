@@ -1,7 +1,7 @@
 use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
 use protobuf::types::tag::WireType;
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub struct Fraction {
     pub numerator: u64,
     pub denominator: u64,
