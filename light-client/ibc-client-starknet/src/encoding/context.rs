@@ -6,11 +6,13 @@ use core::str::Utf8Error;
 use cgp::core::error::{ErrorRaiser, ProvideErrorType};
 use cgp::prelude::*;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
+use hermes_protobuf_encoding_components::impls::any::TypeUrlMismatchError;
 use hermes_protobuf_encoding_components::impls::encode_mut::chunk::{
     InvalidWireType, UnsupportedWireType,
 };
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::RequiredFieldTagNotFound;
-use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
+use hermes_protobuf_encoding_components::types::any::Any;
+use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use ibc_client_starknet_types::encoding::components::*;
 use ibc_client_starknet_types::StarknetClientState;
 use ibc_core::client::types::error::ClientError;
@@ -125,8 +127,21 @@ impl ErrorRaiser<StarknetLightClientEncoding, RequiredFieldTagNotFound>
     }
 }
 
+impl ErrorRaiser<StarknetLightClientEncoding, TypeUrlMismatchError>
+    for StarknetLightClientEncodingContextComponents
+{
+    fn raise_error(e: TypeUrlMismatchError) -> ClientError {
+        ClientError::Other {
+            description: format!("{:?}", e),
+        }
+    }
+}
+
 pub trait CanUseStarknetLightClientEncoding:
-    CanEncodeAndDecode<ViaProtobuf, Height> + CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
+    CanEncodeAndDecode<ViaProtobuf, Height>
+    + CanEncodeAndDecode<ViaProtobuf, Any>
+    + CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
+    + CanEncodeAndDecode<ViaAny, StarknetClientState>
 {
 }
 
