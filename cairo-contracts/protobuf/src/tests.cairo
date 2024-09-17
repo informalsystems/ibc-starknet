@@ -27,6 +27,10 @@ impl ProposerAsProtoMessage of ProtoMessage<Proposer> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "test/dummy.Proposer"
+    }
 }
 
 
@@ -100,6 +104,10 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
+    }
+
+    fn type_url() -> ByteArray {
+        "test/dummy.TmHeader"
     }
 }
 
