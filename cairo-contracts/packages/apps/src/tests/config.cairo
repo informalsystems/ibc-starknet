@@ -5,10 +5,10 @@ use starknet_ibc_apps::transfer::types::PrefixedDenomTrait;
 use starknet_ibc_apps::transfer::types::{
     MsgTransfer, PacketData, PrefixedDenom, Denom, Memo, TracePrefixTrait, Participant
 };
-use starknet_ibc_core::channel::Packet;
-use starknet_ibc_core::client::{Height, Timestamp};
+use starknet_ibc_core::channel::{Packet, MsgRecvPacket};
+use starknet_ibc_core::client::Timestamp;
 use starknet_ibc_core::host::{PortId, ChannelId, Sequence};
-use starknet_ibc_core::tests::{PORT_ID, CHANNEL_ID};
+use starknet_ibc_core::tests::{PORT_ID, CHANNEL_ID, HEIGHT};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct TransferAppConfig {
@@ -46,7 +46,6 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
                 };
     }
 
-
     fn prefix_native_denom(self: @TransferAppConfig) -> PrefixedDenom {
         let trace_prefix = TracePrefixTrait::new(PORT_ID(), self.chan_id_on_a.clone());
         let mut native_denom = self.native_denom.clone();
@@ -73,8 +72,18 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
             port_id_on_a: PORT_ID(),
             chan_id_on_a: self.chan_id_on_a.clone(),
             packet_data: self.dummy_packet_data(denom, sender, receiver),
-            timeout_height_on_b: Height { revision_number: 0, revision_height: 1000 },
+            timeout_height_on_b: HEIGHT(1000),
             timeout_timestamp_on_b: Timestamp { timestamp: 1000 }
+        }
+    }
+
+    fn dummy_msg_recv_packet(
+        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+    ) -> MsgRecvPacket {
+        MsgRecvPacket {
+            packet: self.dummy_recv_packet(denom, sender, receiver),
+            proof_commitment_on_a: array![],
+            proof_height_on_a: HEIGHT(10),
         }
     }
 
@@ -91,7 +100,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
             port_id_on_b: PORT_ID(),
             chan_id_on_b: self.chan_id_on_b.clone(),
             data: serialized_data,
-            timeout_height_on_b: Height { revision_number: 0, revision_height: 1000 },
+            timeout_height_on_b: HEIGHT(1000),
             timeout_timestamp_on_b: Timestamp { timestamp: 1000 }
         }
     }

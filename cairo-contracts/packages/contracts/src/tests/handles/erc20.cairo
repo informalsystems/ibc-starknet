@@ -3,16 +3,12 @@ use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use snforge_std::{ContractClass, start_cheat_caller_address};
 use starknet::ContractAddress;
 use starknet_ibc_apps::tests::{NAME, SYMBOL, SUPPLY, OWNER};
-use starknet_ibc_apps::transfer::ERC20Contract;
+use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait};
 
 #[generate_trait]
-pub impl ERC20ContractImpl of ERC20ContractTrait {
-    fn setup(contract_class: ContractClass) -> ERC20Contract {
+pub impl ERC20HandleImpl of ERC20Handle {
+    fn deploy(contract_class: ContractClass) -> ERC20Contract {
         deploy(contract_class, dummy_erc20_call_data()).into()
-    }
-
-    fn dispatcher(self: @ERC20Contract) -> ERC20ABIDispatcher {
-        ERC20ABIDispatcher { contract_address: *self.address }
     }
 
     fn approve(
@@ -24,13 +20,13 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
     }
 
     fn assert_balance(self: @ERC20Contract, account: ContractAddress, expected: u256) {
-        let balance = self.dispatcher().balance_of(account);
-        assert_eq!(balance, expected);
+        let balance = self.balance_of(account);
+        assert(balance == expected, 'balance mismatch');
     }
 
     fn assert_total_supply(self: @ERC20Contract, expected: u256) {
-        let total_supply = self.dispatcher().total_supply();
-        assert_eq!(total_supply, expected);
+        let total_supply = self.total_supply();
+        assert(total_supply == expected, 'total supply mismatch');
     }
 }
 

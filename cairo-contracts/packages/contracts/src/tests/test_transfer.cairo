@@ -1,5 +1,3 @@
-use core::traits::TryInto;
-use openzeppelin_testing::declare_class;
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::spy_events;
 use snforge_std::start_cheat_caller_address;
@@ -9,30 +7,27 @@ use starknet_ibc_apps::tests::{
     TransferAppConfigTrait, NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET
 };
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_contracts::tests::setups::{ERC20ContractTrait, TransferAppHandleTrait};
+use starknet_ibc_contracts::tests::{SetupImpl, ERC20Handle, AppHandle};
 use starknet_ibc_utils::ComputeKeyTrait;
 
 #[test]
 fn test_escrow_unescrow_roundtrip() {
     // -----------------------------------------------------------
-    // Setup Contracts
+    // Setup Essentials
     // -----------------------------------------------------------
 
     let mut cfg = TransferAppConfigTrait::default();
 
-    // Declare the ERC20 contract class.
-    let erc20_contract_class = declare_class("ERC20Mintable");
+    let setup = SetupImpl::default();
 
-    // Deploy an ERC20 contract.
-    let mut erc20 = ERC20ContractTrait::setup(erc20_contract_class);
+    let mut erc20 = setup.deploy_erc20();
+
+    let mut ics20 = setup.deploy_trasnfer();
 
     cfg.set_native_denom(erc20.address);
 
-    // Deploy an ICS20 Token Transfer contract.
-    let mut ics20 = TransferAppHandleTrait::setup(OWNER(), erc20_contract_class);
-
-    // Set the caller address, as callbacks are permissioned.
-    start_cheat_caller_address(ics20.contract_address, OWNER());
+    // Set the caller address to `OWNER`, as ICS-20 callbacks are permissioned.
+    start_cheat_caller_address(ics20.address, OWNER());
 
     let mut spy = spy_events();
 
@@ -41,7 +36,7 @@ fn test_escrow_unescrow_roundtrip() {
     // -----------------------------------------------------------
 
     // Owner approves the amount of allowance for the `TransferApp` contract.
-    erc20.approve(OWNER(), ics20.contract_address, cfg.amount);
+    erc20.approve(OWNER(), ics20.address, cfg.amount);
 
     let msg_transfer = cfg.dummy_msg_transder(cfg.native_denom.clone(), STARKNET(), COSMOS());
 
@@ -51,14 +46,14 @@ fn test_escrow_unescrow_roundtrip() {
     // Assert the `SendEvent` emitted.
     spy
         .assert_send_event(
-            ics20.contract_address, STARKNET(), COSMOS(), cfg.native_denom.clone(), cfg.amount
+            ics20.address, STARKNET(), COSMOS(), cfg.native_denom.clone(), cfg.amount
         );
 
     // Check the balance of the sender.
     erc20.assert_balance(OWNER(), SUPPLY - cfg.amount);
 
     // Check the balance of the `TransferApp` contract.
-    erc20.assert_balance(ics20.contract_address, cfg.amount);
+    erc20.assert_balance(ics20.address, cfg.amount);
 
     // -----------------------------------------------------------
     // Unescrow
@@ -74,12 +69,9 @@ fn test_escrow_unescrow_roundtrip() {
     ics20.on_recv_packet(recv_packet);
 
     // Assert the `RecvEvent` emitted.
-    spy
-        .assert_recv_event(
-            ics20.contract_address, COSMOS(), STARKNET(), prefixed_denom, cfg.amount, true
-        );
+    spy.assert_recv_event(ics20.address, COSMOS(), STARKNET(), prefixed_denom, cfg.amount, true);
 
-    erc20.assert_balance(ics20.contract_address, 0);
+    erc20.assert_balance(ics20.address, 0);
 
     // Check the balance of the recipient.
     erc20.assert_balance(OWNER(), SUPPLY);
@@ -88,19 +80,17 @@ fn test_escrow_unescrow_roundtrip() {
 #[test]
 fn test_mint_burn_roundtrip() {
     // -----------------------------------------------------------
-    // Setup Contracts
+    // Setup Essentials
     // -----------------------------------------------------------
 
     let mut cfg = TransferAppConfigTrait::default();
 
-    // Declare the ERC20 contract class.
-    let erc20_contract_class = declare_class("ERC20Mintable");
+    let setup = SetupImpl::default();
 
-    // Deploy an ICS20 Token Transfer contract.
-    let mut ics20 = TransferAppHandleTrait::setup(OWNER(), erc20_contract_class);
+    let mut ics20 = setup.deploy_trasnfer();
 
     // Set the caller address, as callbacks are permissioned.
-    start_cheat_caller_address(ics20.contract_address, OWNER());
+    start_cheat_caller_address(ics20.address, OWNER());
 
     let mut spy = spy_events();
 
@@ -119,15 +109,12 @@ fn test_mint_burn_roundtrip() {
     let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
 
     // Assert the `CreateTokenEvent` emitted.
-    spy
-        .assert_create_token_event(
-            ics20.contract_address, NAME(), SYMBOL(), token_address, cfg.amount
-        );
+    spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), token_address, cfg.amount);
 
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
-            ics20.contract_address, COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true
+            ics20.address, COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true
         );
 
     spy.drop_all_events();
@@ -138,7 +125,7 @@ fn test_mint_burn_roundtrip() {
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
-            ics20.contract_address, COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true
+            ics20.address, COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true
         );
 
     let erc20: ERC20Contract = token_address.into();
@@ -161,13 +148,13 @@ fn test_mint_burn_roundtrip() {
     ics20.send_transfer(msg_transfer);
 
     // Assert the `SendEvent` emitted.
-    spy.assert_send_event(ics20.contract_address, STARKNET(), COSMOS(), prefixed_denom, cfg.amount);
+    spy.assert_send_event(ics20.address, STARKNET(), COSMOS(), prefixed_denom, cfg.amount);
 
     // Check the balance of the sender.
     erc20.assert_balance(OWNER(), cfg.amount);
 
     // Check the balance of the `TransferApp` contract.
-    erc20.assert_balance(ics20.contract_address, 0);
+    erc20.assert_balance(ics20.address, 0);
 
     // Chekck the total supply of the ERC20 contract.
     erc20.assert_total_supply(cfg.amount);
