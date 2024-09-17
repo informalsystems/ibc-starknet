@@ -3,16 +3,12 @@ use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use snforge_std::{ContractClass, start_cheat_caller_address};
 use starknet::ContractAddress;
 use starknet_ibc_apps::tests::{NAME, SYMBOL, SUPPLY, OWNER};
-use starknet_ibc_apps::transfer::ERC20Contract;
+use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait};
 
 #[generate_trait]
-pub impl ERC20ContractImpl of ERC20ContractTrait {
+pub impl ERC20HandleImpl of ERC20Handle {
     fn setup(contract_class: ContractClass) -> ERC20Contract {
         deploy(contract_class, dummy_erc20_call_data()).into()
-    }
-
-    fn dispatcher(self: @ERC20Contract) -> ERC20ABIDispatcher {
-        ERC20ABIDispatcher { contract_address: *self.address }
     }
 
     fn approve(

@@ -46,7 +46,6 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
                 };
     }
 
-
     fn prefix_native_denom(self: @TransferAppConfig) -> PrefixedDenom {
         let trace_prefix = TracePrefixTrait::new(PORT_ID(), self.chan_id_on_a.clone());
         let mut native_denom = self.native_denom.clone();

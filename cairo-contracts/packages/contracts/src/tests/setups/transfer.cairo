@@ -16,44 +16,40 @@ use starknet_ibc_core::channel::Packet;
 use starknet_ibc_core::channel::{IAppCallback, IAppCallbackDispatcher, IAppCallbackDispatcherTrait};
 
 #[derive(Drop, Serde)]
-pub struct TransferAppHandle {
-    pub contract_address: ContractAddress,
-    pub spy: EventSpy,
+pub struct AppContract {
+    pub address: ContractAddress,
 }
 
 #[generate_trait]
-pub impl TransferAppHandleImpl of TransferAppHandleTrait {
-    fn setup(owner: ContractAddress, erc20_class: ContractClass) -> TransferAppHandle {
+pub impl AppHandleImpl of AppHandle {
+    fn setup_transfer(owner: ContractAddress, erc20_class: ContractClass) -> AppContract {
         let mut call_data = array![];
 
         call_data.append_serde(owner);
         call_data.append_serde(erc20_class.class_hash);
 
-        let contract_address = declare_and_deploy("TransferApp", call_data);
+        let address = declare_and_deploy("TransferApp", call_data);
 
-        let spy = spy_events();
-
-        TransferAppHandle { contract_address, spy }
+        AppContract { address }
     }
 
-    fn send_dispatcher(self: @TransferAppHandle) -> ISendTransferDispatcher {
-        ISendTransferDispatcher { contract_address: *self.contract_address }
+    fn send_dispatcher(self: @AppContract) -> ISendTransferDispatcher {
+        ISendTransferDispatcher { contract_address: *self.address }
     }
 
-    fn callback_dispatcher(self: @TransferAppHandle) -> IAppCallbackDispatcher {
-        IAppCallbackDispatcher { contract_address: *self.contract_address }
+    fn callback_dispatcher(self: @AppContract) -> IAppCallbackDispatcher {
+        IAppCallbackDispatcher { contract_address: *self.address }
     }
 
-    fn ibc_token_address(self: @TransferAppHandle, token_key: felt252) -> Option<ContractAddress> {
-        ITokenAddressDispatcher { contract_address: *self.contract_address }
-            .ibc_token_address(token_key)
+    fn ibc_token_address(self: @AppContract, token_key: felt252) -> Option<ContractAddress> {
+        ITokenAddressDispatcher { contract_address: *self.address }.ibc_token_address(token_key)
     }
 
-    fn send_transfer(self: @TransferAppHandle, msg: MsgTransfer) {
+    fn send_transfer(self: @AppContract, msg: MsgTransfer) {
         self.send_dispatcher().send_transfer(msg);
     }
 
-    fn on_recv_packet(self: @TransferAppHandle, packet: Packet) {
+    fn on_recv_packet(self: @AppContract, packet: Packet) {
         self.callback_dispatcher().on_recv_packet(packet);
     }
 }

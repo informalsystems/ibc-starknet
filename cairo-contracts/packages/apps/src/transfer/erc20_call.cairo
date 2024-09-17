@@ -29,6 +29,14 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
         self.address.is_non_zero()
     }
 
+    fn dispatcher(self: @ERC20Contract) -> ERC20ABIDispatcher {
+        ERC20ABIDispatcher { contract_address: *self.address }
+    }
+
+    fn mintable_dispatcher(self: @ERC20Contract) -> IERC20MintableDispatcher {
+        IERC20MintableDispatcher { contract_address: *self.address }
+    }
+
     fn create(
         class_hash: ClassHash,
         salt: felt252,
@@ -53,27 +61,28 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
     }
 
     fn transfer(self: @ERC20Contract, recipient: ContractAddress, amount: u256) -> bool {
-        ERC20ABIDispatcher { contract_address: *self.address }.transfer(recipient, amount)
+        self.dispatcher().transfer(recipient, amount)
     }
 
     fn transfer_from(
         self: @ERC20Contract, sender: ContractAddress, recipient: ContractAddress, amount: u256
     ) -> bool {
-        ERC20ABIDispatcher { contract_address: *self.address }
-            .transfer_from(sender, recipient, amount)
+        self.dispatcher().transfer_from(sender, recipient, amount)
     }
 
     fn mint(self: @ERC20Contract, recipient: ContractAddress, amount: u256) {
-        IERC20MintableDispatcher { contract_address: *self.address }
-            .permissioned_mint(recipient, amount)
+        self.mintable_dispatcher().permissioned_mint(recipient, amount)
     }
 
     fn burn(self: @ERC20Contract, account: ContractAddress, amount: u256) {
-        IERC20MintableDispatcher { contract_address: *self.address }
-            .permissioned_burn(account, amount)
+        self.mintable_dispatcher().permissioned_burn(account, amount)
     }
 
     fn balance_of(self: @ERC20Contract, from_account: ContractAddress) -> u256 {
-        ERC20ABIDispatcher { contract_address: *self.address }.balance_of(from_account)
+        self.dispatcher().balance_of(from_account)
+    }
+
+    fn total_supply(self: @ERC20Contract) -> u256 {
+        self.dispatcher().total_supply()
     }
 }

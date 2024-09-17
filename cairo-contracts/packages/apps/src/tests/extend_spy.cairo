@@ -18,7 +18,7 @@ pub impl TransferEventSpyExtImpl of TransferEventSpyExt {
         amount: u256
     ) {
         let expected = Event::SendEvent(
-            SendEvent { sender, receiver, denom, amount, memo: EMPTY_MEMO(), }
+            SendEvent { sender, receiver, denom, amount, memo: EMPTY_MEMO() }
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -33,7 +33,7 @@ pub impl TransferEventSpyExtImpl of TransferEventSpyExt {
         success: bool
     ) {
         let expected = Event::RecvEvent(
-            RecvEvent { sender, receiver, denom, amount, memo: EMPTY_MEMO(), success, }
+            RecvEvent { sender, receiver, denom, amount, memo: EMPTY_MEMO(), success }
         );
         self.assert_emitted_single(contract_address, expected);
     }
