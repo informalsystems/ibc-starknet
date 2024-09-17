@@ -126,7 +126,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, UnsupportedWireType>
 {
     fn raise_error(e: UnsupportedWireType) -> ClientError {
         ClientError::Other {
-            description: format!("{:?}", e),
+            description: format!("{e:?}"),
         }
     }
 }
@@ -136,7 +136,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, InvalidWireType>
 {
     fn raise_error(e: InvalidWireType) -> ClientError {
         ClientError::Other {
-            description: format!("{:?}", e),
+            description: format!("{e:?}"),
         }
     }
 }
@@ -146,7 +146,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, RequiredFieldTagNotFound>
 {
     fn raise_error(e: RequiredFieldTagNotFound) -> ClientError {
         ClientError::Other {
-            description: format!("{:?}", e),
+            description: format!("{e:?}"),
         }
     }
 }
@@ -156,7 +156,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, TypeUrlMismatchError>
 {
     fn raise_error(e: TypeUrlMismatchError) -> ClientError {
         ClientError::Other {
-            description: format!("{:?}", e),
+            description: format!("{e:?}"),
         }
     }
 }
