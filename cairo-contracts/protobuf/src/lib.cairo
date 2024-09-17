@@ -4,4 +4,4 @@ pub mod hex;
 pub mod utils;
 
 #[cfg(test)]
-pub mod tests;
+mod tests;
