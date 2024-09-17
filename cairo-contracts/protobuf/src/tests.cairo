@@ -4,7 +4,7 @@ use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
 use protobuf::primitives::numeric::{BoolAsProtoMessage, NumberAsProtoMessage, I64AsProtoMessage};
 use protobuf::utils::array_u8_to_byte_array;
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 struct Proposer {
     address: ByteArray,
     pub_key: ByteArray,
@@ -19,8 +19,12 @@ impl ProposerAsProtoMessage of ProtoMessage<Proposer> {
     fn decode_raw(ref value: Proposer, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.address, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.pub_key, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(
+            1, ref value.address, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            2, ref value.pub_key, serialized, ref index, bound
+        );
 
         assert(index == bound, 'invalid length for Proposer');
     }
@@ -62,7 +66,7 @@ impl U64IntoValidatorType of Into<u64, ValidatorType> {
 }
 
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 struct TmHeader {
     height: i64,
     active: bool,
@@ -89,15 +93,29 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
     fn decode_raw(ref value: TmHeader, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.height, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.active, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(3, ref value.chain_id, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(4, ref value.time, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(5, ref value.hash, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(6, ref value.indexes, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(7, ref value.proposer, serialized, ref index);
         ProtoCodecImpl::decode_length_delimited_raw(
-            8, ref value.validator_type, serialized, ref index
+            1, ref value.height, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            2, ref value.active, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            3, ref value.chain_id, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            4, ref value.time, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            5, ref value.hash, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            6, ref value.indexes, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            7, ref value.proposer, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            8, ref value.validator_type, serialized, ref index, bound
         );
 
         assert(index == bound, 'invalid length for TmHeader');

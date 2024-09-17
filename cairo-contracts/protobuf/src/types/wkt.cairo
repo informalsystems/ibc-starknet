@@ -18,8 +18,12 @@ impl DuractionAsProtoMessage of ProtoMessage<Duration> {
     fn decode_raw(ref value: Duration, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.seconds, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.nanos, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(
+            1, ref value.seconds, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            2, ref value.nanos, serialized, ref index, bound
+        );
 
         assert(index == bound, 'invalid length for Duration');
     }
@@ -48,8 +52,12 @@ impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
     fn decode_raw(ref value: Timestamp, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.seconds, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.nanos, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(
+            1, ref value.seconds, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            2, ref value.nanos, serialized, ref index, bound
+        );
 
         assert(index == bound, 'invalid length for Timestamp');
     }
@@ -63,7 +71,7 @@ impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
     }
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Any {
     pub type_url: ByteArray,
     pub value: ByteArray,
@@ -78,8 +86,12 @@ impl AnyAsProtoMessage of ProtoMessage<Any> {
     fn decode_raw(ref value: Any, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(1, ref value.type_url, serialized, ref index);
-        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.value, serialized, ref index);
+        ProtoCodecImpl::decode_length_delimited_raw(
+            1, ref value.type_url, serialized, ref index, bound
+        );
+        ProtoCodecImpl::decode_length_delimited_raw(
+            2, ref value.value, serialized, ref index, bound
+        );
 
         assert(index == bound, 'invalid length for Any');
     }

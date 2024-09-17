@@ -44,42 +44,57 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
 
 
     fn decode_length_delimited_raw<T, +ProtoMessage<T>, +Drop<T>>(
-        field_number: u8, ref value: T, serialized: @ByteArray, ref index: usize
+        field_number: u8, ref value: T, serialized: @ByteArray, ref index: usize, bound: usize
     ) {
-        if index < serialized.len() {
-            let tag = ProtobufTagImpl::decode(serialized[index]);
-            if tag.field_number == field_number {
-                index += 1;
+        loop {
+            assert(bound <= serialized.len(), 'invalid bound');
+            if index < serialized.len() && index < bound {
+                let tag = ProtobufTagImpl::decode(serialized[index]);
+                if tag.field_number == field_number {
+                    index += 1;
 
-                let write_type = ProtoMessage::<T>::wire_type();
+                    let wire_type = ProtoMessage::<T>::wire_type();
 
-                assert(write_type == tag.wire_type, 'unexpected wire type');
+                    assert(wire_type == tag.wire_type, 'unexpected wire type');
 
-                let mut length = 0;
+                    let mut length = 0;
 
-                if write_type == WireType::LengthDelimited {
-                    ProtoMessage::<usize>::decode_raw(ref length, serialized, ref index, 0);
+                    if wire_type == WireType::LengthDelimited {
+                        ProtoMessage::<usize>::decode_raw(ref length, serialized, ref index, 0);
+                    }
+
+                    ProtoMessage::<T>::decode_raw(ref value, serialized, ref index, length);
+                } else if tag.field_number < field_number {
+                    panic!(
+                        "unexpected field number order: at expected field {} but got older field {}",
+                        field_number,
+                        tag.field_number
+                    );
+                } else {
+                    break;
                 }
-
-                ProtoMessage::<T>::decode_raw(ref value, serialized, ref index, length);
-            } else if tag.field_number < field_number {
-                panic!("unexpected field number order");
             }
         }
     }
 
-    fn encode_length_delimited_raw<T, +ProtoMessage<T>>(
+    fn encode_length_delimited_raw<T, +ProtoMessage<T>, +Clone<T>, +Drop<T>>(
         field_number: u8, value: @T, ref output: ByteArray
     ) {
-        let mut bytes = "";
-        value.encode_raw(ref bytes);
-        if bytes.len() > 0 {
-            let wire_type = ProtoMessage::<T>::wire_type();
-            output.append_byte(ProtobufTag { field_number, wire_type }.encode());
-            if wire_type == WireType::LengthDelimited {
-                ProtoMessage::<usize>::encode_raw(@bytes.len(), ref output);
+        let mut value = value.clone();
+        loop {
+            // TODO(rano): fix for array.
+            let mut bytes = "";
+            value.encode_raw(ref bytes);
+            if bytes.len() > 0 {
+                let wire_type = ProtoMessage::<T>::wire_type();
+                output.append_byte(ProtobufTag { field_number, wire_type }.encode());
+                if wire_type == WireType::LengthDelimited {
+                    ProtoMessage::<usize>::encode_raw(@bytes.len(), ref output);
+                }
+                output.append(@bytes);
+            } else {
+                break;
             }
-            output.append(@bytes);
         }
     }
 }
