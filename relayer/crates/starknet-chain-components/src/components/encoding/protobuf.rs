@@ -37,12 +37,10 @@ use prost_types::Any;
 
 use crate::types::client_header::{ConvertStarknetClientHeader, StarknetClientHeader};
 use crate::types::client_state::{
-    ConvertWasmStarknetClientState, StarknetClientState,
-    WasmStarknetClientState,
+    ConvertWasmStarknetClientState, StarknetClientState, WasmStarknetClientState,
 };
 use crate::types::consensus_state::{
-    ConvertWasmStarknetConsensusState, StarknetConsensusState,
-    WasmStarknetConsensusState,
+    ConvertWasmStarknetConsensusState, StarknetConsensusState, WasmStarknetConsensusState,
 };
 
 define_components! {

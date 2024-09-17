@@ -3,10 +3,9 @@ use hermes_encoding_components::traits::convert::Converter;
 use hermes_wasm_encoding_components::impls::strategies::consensus_state::{
     DecodeViaWasmConsensusState, EncodeViaWasmConsensusState,
 };
+pub use ibc_client_starknet_types::StarknetConsensusState;
 use ibc_client_starknet_types::CONSENSUS_STATE_TYPE_URL;
 use prost_types::Any;
-
-pub use ibc_client_starknet_types::StarknetConsensusState;
 
 pub const STARKNET_CONSENSUS_STATE_TYPE_URL: &str = CONSENSUS_STATE_TYPE_URL;
 
