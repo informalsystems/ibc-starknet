@@ -1,6 +1,6 @@
 use core::array::TryFromSliceError;
 use core::convert::Infallible;
-use core::num::ParseIntError;
+use core::num::{ParseIntError, TryFromIntError};
 use core::str::Utf8Error;
 
 use cgp::core::error::{ErrorRaiser, ProvideErrorType};
@@ -85,6 +85,16 @@ impl ErrorRaiser<StarknetLightClientEncoding, ParseIntError>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: ParseIntError) -> ClientError {
+        ClientError::Other {
+            description: e.to_string(),
+        }
+    }
+}
+
+impl ErrorRaiser<StarknetLightClientEncoding, TryFromIntError>
+    for StarknetLightClientEncodingContextComponents
+{
+    fn raise_error(e: TryFromIntError) -> ClientError {
         ClientError::Other {
             description: e.to_string(),
         }

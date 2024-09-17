@@ -24,7 +24,7 @@ ibc-client-starknet-types = { version = "0.1.0" }
 derive_more = { version = "0.99.11", features = [ "from", "try_into" ] }
 serde       = { version = "1.0.204", features = [ "derive" ] }
 prost       = { version = "0.13.1" }
-prost-types = { version = "0.13.1" }
+prost-types  = { version = "0.13.1" }
 
 # ibc depedenencies
 ibc-core      = { version = "0.54.0", default-features = false, features = [ "borsh", "schema" ] }
@@ -61,7 +61,6 @@ ibc-client-starknet       = { path = "./ibc-client-starknet" }
 ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
 ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
 
-hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-wasm-encoding-components     = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/protobuf-encoding-improvements" }
+hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/protobuf-encoding-improvements" }
+hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/protobuf-encoding-improvements" }

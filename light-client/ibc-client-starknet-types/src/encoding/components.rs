@@ -21,9 +21,7 @@ use ibc_core::commitment_types::commitment::CommitmentRoot;
 use ibc_core::primitives::Timestamp;
 
 use crate::encoding::impls::client_state::EncodeStarknetClientState;
-use crate::encoding::impls::commitment_root::EncodeCommitmentRoot;
 use crate::encoding::impls::consensus_state::EncodeStarknetConsensusState;
-use crate::encoding::impls::timestamp::EncodeTimestamp;
 use crate::{StarknetClientState, StarknetConsensusState};
 
 define_components! {
@@ -82,6 +80,8 @@ delegate_components! {
         [
             (ViaProtobuf, Height),
             (ViaProtobuf, Any),
+            (ViaProtobuf, CommitmentRoot),
+            (ViaProtobuf, Timestamp),
         ]: CosmosEncodingComponents,
 
         (ViaProtobuf, StarknetClientState):
@@ -89,12 +89,6 @@ delegate_components! {
 
         (ViaProtobuf, StarknetConsensusState):
             EncodeStarknetConsensusState,
-
-        (ViaProtobuf, CommitmentRoot):
-            EncodeCommitmentRoot,
-
-        (ViaProtobuf, Timestamp):
-            EncodeTimestamp,
     }
 }
 
