@@ -30,6 +30,10 @@ impl ConsensusAsProtoMessage of ProtoMessage<Consensus> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "Consensus"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -58,6 +62,10 @@ impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "PartSetHeader"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -85,6 +93,10 @@ impl BlockIdAsProtoMessage of ProtoMessage<BlockId> {
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
+    }
+
+    fn type_url() -> ByteArray {
+        "BlockId"
     }
 }
 
@@ -164,6 +176,10 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "Header"
+    }
 }
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
@@ -232,6 +248,10 @@ impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "CommitSig"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -264,6 +284,10 @@ impl CommitAsProtoMessage of ProtoMessage<Commit> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "Commit"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -292,6 +316,10 @@ impl SignedHeaderAsProtoMessage of ProtoMessage<SignedHeader> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "SignedHeader"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -318,6 +346,10 @@ impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
+    }
+
+    fn type_url() -> ByteArray {
+        "PublicKey"
     }
 }
 
@@ -355,6 +387,10 @@ impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "Validator"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -387,5 +423,9 @@ impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
+    }
+
+    fn type_url() -> ByteArray {
+        "ValidatorSet"
     }
 }

@@ -27,4 +27,8 @@ impl FractionAsProtoMessage of ProtoMessage<Fraction> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "Fraction"
+    }
 }

@@ -80,6 +80,10 @@ impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "ClientState"
+    }
 }
 
 
@@ -112,6 +116,10 @@ impl ConsensusStateAsProtoMessage of ProtoMessage<ConsensusState> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "ConsensusState"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -140,6 +148,10 @@ impl MisbehaviourAsProtoMessage of ProtoMessage<Misbehaviour> {
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
+    }
+
+    fn type_url() -> ByteArray {
+        "Misbehaviour"
     }
 }
 
@@ -178,5 +190,9 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
+    }
+
+    fn type_url() -> ByteArray {
+        "Header"
     }
 }

@@ -29,6 +29,10 @@ impl HeightAsProtoMessage of ProtoMessage<Height> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "Height"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -49,5 +53,9 @@ impl MerkleRootAsProtoMessage of ProtoMessage<MerkleRoot> {
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
+    }
+
+    fn type_url() -> ByteArray {
+        "MerkleRoot"
     }
 }

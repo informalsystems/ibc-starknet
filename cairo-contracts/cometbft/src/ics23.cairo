@@ -143,6 +143,10 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "InnerSpec"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -180,6 +184,10 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+
+    fn type_url() -> ByteArray {
+        "LeafOp"
+    }
 }
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
@@ -216,5 +224,9 @@ impl ProofSpecAsProtoMessage of ProtoMessage<ProofSpec> {
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
+    }
+
+    fn type_url() -> ByteArray {
+        "ProofSpec"
     }
 }
