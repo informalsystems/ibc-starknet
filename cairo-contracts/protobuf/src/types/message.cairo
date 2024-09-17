@@ -31,6 +31,17 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
         bytes
     }
 
+    fn from_any<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(any: @Any) -> T {
+        if any.type_url != @ProtoMessage::<T>::type_url() {
+            panic!("unexpected type URL");
+        }
+        Self::decode::<T>(any.value)
+    }
+
+    fn to_any<T, +ProtoMessage<T>>(value: @T) -> Any {
+        Any { type_url: ProtoMessage::<T>::type_url(), value: Self::encode(value) }
+    }
+
 
     fn decode_length_delimited_raw<T, +ProtoMessage<T>, +Drop<T>>(
         field_number: u8, ref value: T, serialized: @ByteArray, ref index: usize
