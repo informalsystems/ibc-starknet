@@ -30,12 +30,13 @@ use hermes_wasm_encoding_components::types::client_state::WasmClientState;
 use hermes_wasm_encoding_components::types::consensus_state::WasmConsensusState;
 use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::client::types::Height;
+use ibc_client_starknet_types::encoding::components::StarknetLightClientEncodingComponents;
 use ibc_proto::ibc::lightclients::wasm::v1::ClientMessage as ProtoClientMessage;
 use prost_types::Any;
 
 use crate::types::client_header::{ConvertStarknetClientHeader, StarknetClientHeader};
 use crate::types::client_state::{
-    ConvertWasmStarknetClientState, ProtoStarknetClientState, StarknetClientState,
+    ConvertWasmStarknetClientState, StarknetClientState,
     WasmStarknetClientState,
 };
 use crate::types::consensus_state::{
@@ -81,12 +82,14 @@ pub struct StarknetTypeUrlSchemas;
 
 delegate_components! {
     StarknetEncoderComponents {
+        [
+            (ViaProtobuf, StarknetClientState),
+        ]:
+            StarknetLightClientEncodingComponents,
+
         (ViaProtobuf, Vec<u8>): ReturnEncoded,
 
         (ViaAny, StarknetClientState): EncodeViaAny<ViaProtobuf>,
-
-        (ViaProtobuf, StarknetClientState): ConvertAndEncode<ProtoStarknetClientState>,
-        (ViaProtobuf, ProtoStarknetClientState): EncodeAsProtobuf,
 
         (ViaAny, StarknetConsensusState): EncodeViaAny<ViaProtobuf>,
 
@@ -117,14 +120,16 @@ delegate_components! {
             (ViaProtobuf, WasmClientState),
             (ViaProtobuf, WasmConsensusState),
         ]: WasmEncodingComponents,
+
+        [
+            (ViaProtobuf, StarknetClientState),
+        ]:
+            StarknetLightClientEncodingComponents,
     }
 }
 
 delegate_components! {
     StarknetConverterComponents {
-        (StarknetClientState, ProtoStarknetClientState): ConvertFrom,
-        (ProtoStarknetClientState, StarknetClientState): TryConvertFrom,
-
         (StarknetConsensusState, ProtoStarknetConsensusState): ConvertFrom,
         (ProtoStarknetConsensusState, StarknetConsensusState): TryConvertFrom,
 

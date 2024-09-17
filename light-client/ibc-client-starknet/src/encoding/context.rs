@@ -7,6 +7,7 @@ use cgp::core::error::{ErrorRaiser, ProvideErrorType};
 use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::CanConvertBothWays;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
+use hermes_encoding_components::traits::encode_and_decode_mut::CanEncodeAndDecodeMut;
 use hermes_protobuf_encoding_components::impls::any::TypeUrlMismatchError;
 use hermes_protobuf_encoding_components::impls::encode_mut::chunk::{
     InvalidWireType, UnsupportedWireType,
@@ -19,6 +20,7 @@ use ibc_client_starknet_types::StarknetClientState;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
+use ibc_core::primitives::{Timestamp, TimestampError};
 use prost::DecodeError;
 
 pub struct StarknetLightClientEncoding;
@@ -99,6 +101,16 @@ impl ErrorRaiser<StarknetLightClientEncoding, TryFromSliceError>
     }
 }
 
+impl ErrorRaiser<StarknetLightClientEncoding, TimestampError>
+    for StarknetLightClientEncodingContextComponents
+{
+    fn raise_error(e: TimestampError) -> ClientError {
+        ClientError::Other {
+            description: e.to_string(),
+        }
+    }
+}
+
 impl ErrorRaiser<StarknetLightClientEncoding, UnsupportedWireType>
     for StarknetLightClientEncodingContextComponents
 {
@@ -146,6 +158,7 @@ pub trait CanUseStarknetLightClientEncoding:
     + CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
     + CanEncodeAndDecode<ViaAny, StarknetClientState>
     + CanConvertBothWays<Any, StarknetClientState>
+    + CanEncodeAndDecodeMut<ViaProtobuf, Timestamp>
 {
 }
 

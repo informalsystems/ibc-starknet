@@ -18,9 +18,11 @@ use hermes_protobuf_encoding_components::types::any::Any;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use ibc_core::client::types::Height;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
+use ibc_core::primitives::Timestamp;
 
 use crate::encoding::impls::client_state::EncodeStarknetClientState;
 use crate::encoding::impls::commitment_root::EncodeCommitmentRoot;
+use crate::encoding::impls::timestamp::EncodeTimestamp;
 use crate::StarknetClientState;
 
 define_components! {
@@ -83,6 +85,9 @@ delegate_components! {
 
         (ViaProtobuf, CommitmentRoot):
             EncodeCommitmentRoot,
+
+        (ViaProtobuf, Timestamp):
+            EncodeTimestamp,
     }
 }
 

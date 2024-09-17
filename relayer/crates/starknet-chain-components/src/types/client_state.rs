@@ -5,12 +5,7 @@ use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_protobuf_encoding_components::types::strategy::ViaAny;
 use hermes_wasm_encoding_components::types::client_state::WasmClientState;
 pub use ibc_client_starknet_types::StarknetClientState;
-use ibc_client_starknet_types::{ProtoClientState, CLIENT_STATE_TYPE_URL};
 use prost_types::Any;
-
-pub type ProtoStarknetClientState = ProtoClientState;
-
-pub const STARKNET_CLIENT_STATE_TYPE_URL: &str = CLIENT_STATE_TYPE_URL;
 
 #[derive(Debug)]
 pub struct WasmStarknetClientState {
