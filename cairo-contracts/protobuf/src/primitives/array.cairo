@@ -27,35 +27,45 @@ pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
     }
 }
 
+
+// for packed repeated fields (default for scalars)
 pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of ProtoMessage<Array<T>> {
     fn encode_raw(self: @Array<T>, ref output: ByteArray) {
-        // TODO(rano): need to pop the first item.
-        ProtoMessage::<T>::encode_raw(self[0], ref output);
+        let mut i = 0;
+        while i < self.len() {
+            ProtoMessage::<T>::encode_raw(self[i], ref output);
+            i += 1;
+        };
     }
 
     fn decode_raw(ref value: Array<T>, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
         if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
-            let mut length = 0;
-            ProtoMessage::<usize>::decode_raw(ref length, serialized, ref index, 0);
-            let mut item = Default::<T>::default();
-            ProtoMessage::<T>::decode_raw(ref item, serialized, ref index, length);
-            value.append(item);
+            while index < bound {
+                let mut length = 0;
+                ProtoMessage::<usize>::decode_raw(ref length, serialized, ref index, 0);
+                let mut item = Default::<T>::default();
+                ProtoMessage::<T>::decode_raw(ref item, serialized, ref index, length);
+                value.append(item);
+            }
         } else {
-            let mut item = Default::<T>::default();
-            ProtoMessage::<T>::decode_raw(ref item, serialized, ref index, 0);
-            value.append(item);
+            while index < bound {
+                let mut item = Default::<T>::default();
+                ProtoMessage::<T>::decode_raw(ref item, serialized, ref index, 0);
+                value.append(item);
+            }
         }
 
         assert(index == bound, 'invalid length for array');
     }
 
     fn wire_type() -> WireType {
-        ProtoMessage::<T>::wire_type()
+        WireType::LengthDelimited
     }
 
     fn type_url() -> ByteArray {
         ""
     }
 }
+
