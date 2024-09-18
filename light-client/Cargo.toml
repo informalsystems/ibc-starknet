@@ -61,6 +61,6 @@ ibc-client-starknet       = { path = "./ibc-client-starknet" }
 ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
 ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
 
-hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/protobuf-encoding-improvements" }
-hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/protobuf-encoding-improvements" }
-hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/protobuf-encoding-improvements" }
+hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git" }
