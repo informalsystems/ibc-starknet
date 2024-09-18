@@ -1,6 +1,6 @@
 use cgp::prelude::*;
+use ibc_client_starknet_types::header::StarknetHeader;
 
-use crate::types::client_header::StarknetClientHeader;
 use crate::types::client_state::WasmStarknetClientState;
 use crate::types::consensus_state::WasmStarknetConsensusState;
 
@@ -15,5 +15,5 @@ pub struct StarknetCreateClientPayloadOptions {
 }
 
 pub struct StarknetUpdateClientPayload {
-    pub header: StarknetClientHeader,
+    pub header: StarknetHeader,
 }

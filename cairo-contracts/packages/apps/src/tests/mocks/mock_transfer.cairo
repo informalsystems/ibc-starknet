@@ -3,13 +3,10 @@ pub(crate) mod MockTransferApp {
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::ClassHash;
     use starknet::ContractAddress;
-    use starknet_ibc_apps::transfer::types::{
-        PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo, TracePrefixTrait,
-        PrefixedDenomTrait
-    };
-    use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait};
+    use starknet_ibc_apps::transfer::ERC20Contract;
+    use starknet_ibc_apps::transfer::types::{PrefixedDenom, Memo};
     use starknet_ibc_apps::transfer::{TokenTransferComponent, TransferrableComponent};
-    use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
+    use starknet_ibc_core::host::{PortId, ChannelId};
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: TransferrableComponent, storage: transferrable, event: TransferrableEvent);

@@ -5,16 +5,19 @@ pub mod tests {
     mod test_channel;
     #[cfg(test)]
     mod test_client;
+    #[cfg(test)]
+    pub use mocks::mock_channel::MockChannelHandler;
+    #[cfg(test)]
+    pub use mocks::mock_client::MockClientHandler;
 
     pub use dummy::{
         HEIGHT, CLIENT, CLIENT_TYPE, CLIENT_ID, PORT_ID, CHANNEL_ID, SEQUENCE, CHANNEL_END
     };
     pub use extend_spy::ClientEventSpyExt;
-    pub(crate) mod mocks {
-        mod mock_channel;
-        mod mock_client;
-        pub(crate) use mock_channel::MockChannelHandler;
-        pub(crate) use mock_client::MockClientHandler;
+    #[cfg(test)]
+    pub mod mocks {
+        pub mod mock_channel;
+        pub mod mock_client;
     }
 }
 pub mod router {

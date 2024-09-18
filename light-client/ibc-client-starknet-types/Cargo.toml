@@ -15,12 +15,16 @@ description = """
 workspace = true
 
 [dependencies]
-ibc-proto   = { workspace = true }
-ibc-core    = { workspace = true }
-tendermint  = { workspace = true }
-derive_more = { workspace = true }
-prost       = { workspace = true }
-serde       = { workspace = true, optional = true }
+ibc-proto                           = { workspace = true }
+ibc-core                            = { workspace = true }
+tendermint                          = { workspace = true }
+derive_more                         = { workspace = true }
+prost                               = { workspace = true }
+serde                               = { workspace = true, optional = true }
+cgp                                 = { workspace = true }
+hermes-encoding-components          = { workspace = true }
+hermes-protobuf-encoding-components = { workspace = true }
+hermes-cosmos-encoding-components   = { workspace = true }
 
 [features]
 default = [ "std" ]

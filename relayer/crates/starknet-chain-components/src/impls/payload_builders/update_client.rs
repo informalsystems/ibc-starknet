@@ -4,12 +4,13 @@ use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryCha
 use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
 use hermes_relayer_components::chain::traits::types::height::HasHeightType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
+use ibc::core::client::types::Height;
 use ibc::primitives::Timestamp;
+use ibc_client_starknet_types::header::StarknetHeader;
 use starknet::core::types::{BlockId, MaybePendingBlockWithTxHashes};
 use starknet::providers::{Provider, ProviderError};
 
 use crate::traits::provider::HasStarknetProvider;
-use crate::types::client_header::StarknetClientHeader;
 use crate::types::consensus_state::StarknetConsensusState;
 use crate::types::payloads::client::StarknetUpdateClientPayload;
 use crate::types::status::StarknetChainStatus;
@@ -53,7 +54,12 @@ where
             time: Timestamp::now(),
         };
 
-        let header = StarknetClientHeader { consensus_state };
+        let height = Height::new(0, *target_height).unwrap();
+
+        let header = StarknetHeader {
+            height,
+            consensus_state,
+        };
 
         Ok(StarknetUpdateClientPayload { header })
     }

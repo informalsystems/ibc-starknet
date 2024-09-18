@@ -1,7 +1,6 @@
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::spy_events;
 use snforge_std::start_cheat_caller_address;
-use starknet::ContractAddress;
 use starknet_ibc_apps::tests::TransferEventSpyExt;
 use starknet_ibc_apps::tests::{
     TransferAppConfigTrait, NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET

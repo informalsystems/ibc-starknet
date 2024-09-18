@@ -1,11 +1,7 @@
 use core::byte_array::ByteArrayTrait;
-use core::hash::{HashStateTrait, HashStateExTrait};
 use core::num::traits::Zero;
-use core::poseidon::PoseidonTrait;
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
-use starknet::ContractAddress;
-use starknet::Store;
 use starknet_ibc_core::host::errors::HostErrors;
 use starknet_ibc_utils::{ComputeKeyTrait, poseidon_hash};
 
@@ -151,7 +147,7 @@ pub(crate) fn assert_numeric(char_bytes: u8) {
 
 #[cfg(test)]
 mod tests {
-    use super::{PortId, ChannelId, ChannelIdTrait};
+    use super::{ChannelId, ChannelIdTrait};
 
     #[test]
     fn test_channel_id_validate() {

@@ -1,7 +1,5 @@
-use core::hash::{HashStateTrait, HashStateExTrait};
-use core::poseidon::PoseidonTrait;
-use core::poseidon::poseidon_hash_span;
-use starknet_ibc_utils::UtilErrors;
+use core::hash::HashStateTrait;
+use core::poseidon::{PoseidonTrait, poseidon_hash_span};
 
 pub trait ValidateBasicTrait<T> {
     fn validate_basic(self: @T);

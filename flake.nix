@@ -14,17 +14,17 @@
     };
 
     cairo-src = {
-      url = "github:starkware-libs/cairo/v2.7.1";
+      url = "github:starkware-libs/cairo/v2.8.0";
       flake = false;
     };
 
     scarb-src = {
-      url = "github:software-mansion/scarb/v2.7.1";
+      url = "github:software-mansion/scarb/v2.8.0";
       flake = false;
     };
 
     snforge-src = {
-      url = "github:foundry-rs/starknet-foundry/v0.29.0";
+      url = "github:foundry-rs/starknet-foundry/v0.27.0";
       flake = false;
     };
 

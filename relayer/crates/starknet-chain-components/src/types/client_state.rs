@@ -2,24 +2,18 @@ use hermes_encoding_components::traits::convert::{CanConvert, Converter};
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_protobuf_encoding_components::types::ViaAny;
-use hermes_wasm_client_components::types::client_state::WasmClientState;
-use ibc_client_starknet_types::{ClientState, ProtoClientState, CLIENT_STATE_TYPE_URL};
+use hermes_protobuf_encoding_components::types::strategy::ViaAny;
+use hermes_wasm_encoding_components::types::client_state::WasmClientState;
+pub use ibc_client_starknet_types::StarknetClientState;
 use prost_types::Any;
-
-pub type StarknetClientState = ClientState;
-
-pub type ProtoStarknetClientState = ProtoClientState;
-
-pub const STARKNET_CLIENT_STATE_TYPE_URL: &str = CLIENT_STATE_TYPE_URL;
 
 #[derive(Debug)]
 pub struct WasmStarknetClientState {
-    pub client_state: ClientState,
+    pub client_state: StarknetClientState,
     pub wasm_code_hash: Vec<u8>,
 }
 
-impl From<WasmStarknetClientState> for ClientState {
+impl From<WasmStarknetClientState> for StarknetClientState {
     fn from(value: WasmStarknetClientState) -> Self {
         value.client_state
     }
@@ -30,7 +24,7 @@ pub struct ConvertWasmStarknetClientState;
 impl<Encoding> Converter<Encoding, WasmStarknetClientState, Any> for ConvertWasmStarknetClientState
 where
     Encoding: HasEncodedType<Encoded = Vec<u8>>
-        + CanEncode<ViaAny, ClientState>
+        + CanEncode<ViaAny, StarknetClientState>
         + CanConvert<WasmClientState, Any>,
 {
     fn convert(
@@ -54,7 +48,7 @@ where
 impl<Encoding> Converter<Encoding, Any, WasmStarknetClientState> for ConvertWasmStarknetClientState
 where
     Encoding: HasEncodedType<Encoded = Vec<u8>>
-        + CanDecode<ViaAny, ClientState>
+        + CanDecode<ViaAny, StarknetClientState>
         + CanConvert<Any, WasmClientState>,
 {
     fn convert(

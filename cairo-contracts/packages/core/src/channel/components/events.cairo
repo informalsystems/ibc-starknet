@@ -1,6 +1,5 @@
 #[starknet::component]
 pub mod ChannelEventEmitterComponent {
-    use starknet::ContractAddress;
     use starknet_ibc_core::channel::{Packet, ChannelOrdering, Acknowledgement};
     use starknet_ibc_core::client::{Height, Timestamp};
     use starknet_ibc_core::host::{PortId, ChannelId, Sequence};

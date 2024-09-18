@@ -1,9 +1,6 @@
 use core::array::ArrayTrait;
-use core::hash::{HashStateTrait, HashStateExTrait};
 use core::num::traits::Zero;
-use core::poseidon::PoseidonTrait;
 use starknet::ContractAddress;
-use starknet::contract_address_const;
 use starknet_ibc_apps::transfer::{
     ERC20Contract, ERC20ContractTrait, TransferErrors, TRANSFER_PORT_ID_HASH
 };

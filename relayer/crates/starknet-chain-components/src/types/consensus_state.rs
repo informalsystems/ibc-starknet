@@ -1,16 +1,10 @@
 use cgp::prelude::HasErrorType;
 use hermes_encoding_components::traits::convert::Converter;
-use hermes_wasm_client_components::types::consensus_state::{
+use hermes_wasm_encoding_components::impls::strategies::consensus_state::{
     DecodeViaWasmConsensusState, EncodeViaWasmConsensusState,
 };
-use ibc_client_starknet_types::{ConsensusState, ProtoConsensusState, CONSENSUS_STATE_TYPE_URL};
+pub use ibc_client_starknet_types::StarknetConsensusState;
 use prost_types::Any;
-
-pub type StarknetConsensusState = ConsensusState;
-
-pub type ProtoStarknetConsensusState = ProtoConsensusState;
-
-pub const STARKNET_CONSENSUS_STATE_TYPE_URL: &str = CONSENSUS_STATE_TYPE_URL;
 
 #[derive(Debug)]
 pub struct WasmStarknetConsensusState {

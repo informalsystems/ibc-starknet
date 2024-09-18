@@ -37,6 +37,8 @@ pub mod tests {
     mod extend_spy;
     #[cfg(test)]
     mod test_transfer;
+    #[cfg(test)]
+    pub use mocks::mock_transfer::MockTransferApp;
     pub use config::{TransferAppConfig, TransferAppConfigImpl, TransferAppConfigTrait};
     pub use dummy::{
         NAME, SYMBOL, PUBKEY, AMOUNT, SUPPLY, OWNER, STARKNET, COSMOS, SALT, DECIMALS, CLASS_HASH,
@@ -44,8 +46,8 @@ pub mod tests {
     };
 
     pub use extend_spy::{TransferEventSpyExtImpl, TransferEventSpyExt};
-    pub(crate) use mocks::mock_transfer::MockTransferApp;
+    #[cfg(test)]
     mod mocks {
-        pub(crate) mod mock_transfer;
+        pub mod mock_transfer;
     }
 }

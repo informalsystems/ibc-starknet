@@ -1,4 +1,6 @@
+use core::array::TryFromSliceError;
 use core::num::TryFromIntError;
+use core::str::Utf8Error;
 use std::convert::Infallible;
 use std::string::FromUtf8Error;
 
@@ -18,6 +20,10 @@ use hermes_error::handlers::wrap::WrapErrorDetail;
 use hermes_error::traits::wrap::WrapError;
 use hermes_error::types::Error;
 use hermes_protobuf_encoding_components::impls::any::TypeUrlMismatchError;
+use hermes_protobuf_encoding_components::impls::encode_mut::chunk::{
+    InvalidWireType, UnsupportedWireType,
+};
+use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::RequiredFieldTagNotFound;
 use hermes_relayer_components::transaction::impls::poll_tx_response::TxNoResponseError;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_runtime::types::error::TokioRuntimeError;
@@ -27,6 +33,7 @@ use hermes_starknet_chain_components::impls::error::starknet::RaiseStarknetError
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use hermes_starknet_chain_components::types::event::UnknownEvent;
 use ibc::core::client::types::error::ClientError;
+use ibc::primitives::TimestampError;
 use prost::{DecodeError, EncodeError};
 use starknet::accounts::{single_owner, AccountError};
 use starknet::core::types::contract::{ComputeClassHashError, JsonError};
@@ -45,14 +52,17 @@ delegate_components! {
         [
             Report,
             TryFromIntError,
+            Utf8Error,
             FromUtf8Error,
             SignError,
+            TryFromSliceError,
             TokioRuntimeError,
             serde_json::error::Error,
             JsonError,
             EncodeError,
             DecodeError,
             ClientError,
+            TimestampError,
             ComputeClassHashError,
             StarknetSierraCompilationError,
         ]: ReportError,
@@ -69,6 +79,9 @@ delegate_components! {
             VariantIndexOutOfBound,
             DecodeBoolError,
             TypeUrlMismatchError,
+            InvalidWireType,
+            UnsupportedWireType,
+            RequiredFieldTagNotFound,
             <'a> UnknownEvent<'a>,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
         ]:

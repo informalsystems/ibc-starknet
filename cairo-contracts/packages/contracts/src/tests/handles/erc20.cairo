@@ -1,5 +1,5 @@
 use openzeppelin_testing::deploy;
-use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
+use openzeppelin_token::erc20::ERC20ABIDispatcherTrait;
 use snforge_std::{ContractClass, start_cheat_caller_address};
 use starknet::ContractAddress;
 use starknet_ibc_apps::tests::{NAME, SYMBOL, SUPPLY, OWNER};
