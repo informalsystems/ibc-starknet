@@ -8,10 +8,10 @@ use hermes_relayer_components::chain::traits::message_builders::update_client::U
 use hermes_relayer_components::chain::traits::types::ibc::HasIbcChainTypes;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
+use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_relayer_types::core::ics24_host::identifier::ClientId;
 use prost_types::Any;
 
-use crate::types::client_header::StarknetClientHeader;
 use crate::types::payloads::client::StarknetUpdateClientPayload;
 
 pub struct BuildStarknetUpdateClientMessage;
@@ -24,7 +24,7 @@ where
         + CanRaiseError<Encoding::Error>,
     Counterparty: HasUpdateClientPayloadType<Chain, UpdateClientPayload = StarknetUpdateClientPayload>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>,
-    Encoding: Async + CanConvert<StarknetClientHeader, Any>,
+    Encoding: Async + CanConvert<StarknetHeader, Any>,
 {
     async fn build_update_client_message(
         _chain: &Chain,

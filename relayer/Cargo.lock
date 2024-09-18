@@ -2126,6 +2126,7 @@ dependencies = [
  "hermes-wasm-client-components",
  "hermes-wasm-encoding-components",
  "ibc",
+ "ibc-client-starknet-types",
  "prost",
  "serde_json",
  "starknet",

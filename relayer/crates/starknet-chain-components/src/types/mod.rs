@@ -1,5 +1,4 @@
 pub mod amount;
-pub mod client_header;
 pub mod client_state;
 pub mod consensus_state;
 pub mod event;

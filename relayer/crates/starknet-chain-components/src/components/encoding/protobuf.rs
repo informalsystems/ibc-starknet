@@ -32,10 +32,10 @@ use ibc::core::client::types::Height;
 use ibc::core::commitment_types::commitment::CommitmentRoot;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::encoding::components::StarknetLightClientEncodingComponents;
+use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_proto::ibc::lightclients::wasm::v1::ClientMessage as ProtoClientMessage;
 use prost_types::Any;
 
-use crate::types::client_header::{ConvertStarknetClientHeader, StarknetClientHeader};
 use crate::types::client_state::{
     ConvertWasmStarknetClientState, StarknetClientState, WasmStarknetClientState,
 };
@@ -89,16 +89,20 @@ delegate_components! {
         [
             (ViaProtobuf, StarknetClientState),
             (ViaProtobuf, StarknetConsensusState),
+            (ViaProtobuf, StarknetHeader),
 
             (ViaAny, StarknetClientState),
             (ViaAny, StarknetConsensusState),
+            (ViaAny, StarknetHeader),
         ]:
             StarknetLightClientEncodingComponents,
 
         [
             (ViaProtobuf, Any),
+
             (ViaAny, WasmClientState),
             (ViaProtobuf, WasmClientState),
+
             (ViaAny, WasmConsensusState),
             (ViaProtobuf, WasmConsensusState),
         ]:
@@ -117,6 +121,7 @@ delegate_components! {
         [
             (ViaProtobuf, StarknetClientState),
             (ViaProtobuf, StarknetConsensusState),
+            (ViaProtobuf, StarknetHeader),
             (ViaProtobuf, CommitmentRoot),
             (ViaProtobuf, Timestamp),
         ]:
@@ -137,6 +142,8 @@ delegate_components! {
             (Any, StarknetClientState),
             (StarknetConsensusState, Any),
             (Any, StarknetConsensusState),
+            (StarknetHeader, Any),
+            (Any, StarknetHeader),
         ]:
             StarknetLightClientEncodingComponents,
 
@@ -159,13 +166,6 @@ delegate_components! {
             (WasmStarknetConsensusState, Any),
         ]:
             ConvertWasmStarknetConsensusState,
-
-        [
-            (Any, StarknetClientHeader),
-            (StarknetClientHeader, Any),
-        ]:
-            ConvertStarknetClientHeader,
-
     }
 }
 
@@ -176,6 +176,7 @@ delegate_components! {
         [
             StarknetClientState,
             StarknetConsensusState,
+            StarknetHeader,
         ]:
             StarknetLightClientEncodingComponents,
 
