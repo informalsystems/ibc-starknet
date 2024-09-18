@@ -62,7 +62,6 @@ deploy() {
         starkli deploy --not-unique \
         --watch $IC20_CLASS_HASH $ERC20_CLASS_HASH \
         --rpc $RPC_URL \
-        --compiler-version $COMPILER_VERSION \
         --account $ACCOUNT_SRC \
         --keystore $KEYSTORE_SRC \
         --keystore-password $KEYSTORE_PASS \
