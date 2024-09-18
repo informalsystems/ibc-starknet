@@ -225,9 +225,8 @@ fn test_repeated_default_value() {
         ],
     };
     assert_eq!(header2, header, "repeated default value failed");
-    // TODO(rano): fails as default values are not encoded
-    // let bytes2 = ProtoCodecImpl::encode(@header);
-    // assert_eq!(bytes, bytes2, "repeated default value failed");
+    let bytes2 = ProtoCodecImpl::encode(@header);
+    assert_eq!(bytes, bytes2, "repeated default value failed");
 }
 
 #[test]
