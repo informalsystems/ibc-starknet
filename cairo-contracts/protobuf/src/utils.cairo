@@ -25,14 +25,14 @@ mod tests {
     #[test]
     fn test_byte_array_to_array_u8() {
         let input = "hello";
-        let expected = array![104, 101, 108, 108, 111];
+        let expected = array![0x68, 0x65, 0x6c, 0x6c, 0x6f];
         let actual = byte_array_to_array_u8(@input);
         assert_eq!(actual, expected);
     }
 
     #[test]
     fn test_array_u8_to_byte_array() {
-        let input = array![104, 101, 108, 108, 111];
+        let input = array![0x68, 0x65, 0x6c, 0x6c, 0x6f];
         let expected = "hello";
         let actual = array_u8_to_byte_array(@input);
         assert_eq!(actual, expected);
