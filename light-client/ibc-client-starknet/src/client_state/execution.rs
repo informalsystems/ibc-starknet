@@ -1,4 +1,7 @@
-use hermes_encoding_components::traits::convert::CanConvert;
+use hermes_cosmos_encoding_components::impls::any::ConvertIbcAny;
+use hermes_encoding_components::impls::convert::ConvertVia;
+use hermes_encoding_components::impls::with_context::WithContext;
+use hermes_encoding_components::traits::convert::Converter;
 use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_client_starknet_types::StarknetClientState as ClientStateType;
 use ibc_core::client::context::client_state::ClientStateExecution;
@@ -47,20 +50,26 @@ where
         client_id: &ClientId,
         header: Any,
     ) -> Result<Vec<Height>, ClientError> {
-        let latest_height = ctx.client_state(client_id)?.latest_height().increment();
+        let header: StarknetHeader = <ConvertVia<ProstAny, ConvertIbcAny, WithContext>>::convert(
+            &StarknetLightClientEncoding,
+            &header,
+        )?;
 
-        let new_client_state = ClientStateType { latest_height }.into();
+        let latest_height = header.height;
 
-        // let header: StarknetHeader = StarknetLightClientEncoding.convert(&header)?;
+        let new_consensus_state = header.consensus_state;
 
-        let new_consensus_state = StarknetConsensusState::try_from(header)?;
+        let new_client_state = ClientStateType {
+            latest_height: header.height,
+        }
+        .into();
 
         update_client_and_consensus_state(
             ctx,
             latest_height,
             client_id,
             new_client_state,
-            new_consensus_state,
+            new_consensus_state.into(),
         )?;
 
         Ok(vec![latest_height])
