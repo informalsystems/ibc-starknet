@@ -22,7 +22,10 @@ use ibc_core::primitives::Timestamp;
 
 use crate::encoding::impls::client_state::EncodeStarknetClientState;
 use crate::encoding::impls::consensus_state::EncodeStarknetConsensusState;
-use crate::{StarknetClientState, StarknetConsensusState};
+use crate::{
+    StarknetClientState, StarknetConsensusState, STARKNET_CLIENT_STATE_TYPE_URL,
+    STARKNET_CONSENSUS_STATE_TYPE_URL,
+};
 
 define_components! {
     StarknetLightClientEncodingComponents {
@@ -45,7 +48,7 @@ define_components! {
         ]:
             DelegateEncoding<StarknetLightClientEncodeMutComponents>,
         SchemaGetterComponent:
-            DelegateEncoding<StarknetLightClientTypeUrlSchemas>,
+            StarknetLightClientTypeUrlSchemas,
         ConverterComponent:
             DelegateEncoding<StarknetLightClientConverterComponents>,
     }
@@ -106,13 +109,14 @@ delegate_components! {
     }
 }
 
-delegate_components! {
-    StarknetLightClientTypeUrlSchemas {
-        StarknetClientState: StarknetClientStateUrl,
-        StarknetConsensusState: StarknetConsensusStateUrl,
-    }
-}
+impl_type_url!(
+    StarknetLightClientTypeUrlSchemas,
+    StarknetClientState,
+    STARKNET_CLIENT_STATE_TYPE_URL,
+);
 
-impl_type_url!(StarknetClientStateUrl, "/StarknetClientState",);
-
-impl_type_url!(StarknetConsensusStateUrl, "/StarknetConsensusState",);
+impl_type_url!(
+    StarknetLightClientTypeUrlSchemas,
+    StarknetConsensusState,
+    STARKNET_CONSENSUS_STATE_TYPE_URL,
+);

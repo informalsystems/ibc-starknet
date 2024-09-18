@@ -2,7 +2,7 @@ use cgp::prelude::*;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
 use ibc_core::primitives::Timestamp;
 
-pub const CONSENSUS_STATE_TYPE_URL: &str = "/StarknetConsensusState";
+pub const STARKNET_CONSENSUS_STATE_TYPE_URL: &str = "/StarknetConsensusState";
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq, derive_more::From, HasField)]

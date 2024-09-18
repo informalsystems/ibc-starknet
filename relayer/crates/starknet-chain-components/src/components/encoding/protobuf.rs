@@ -171,7 +171,7 @@ delegate_components! {
 
 delegate_components! {
     StarknetTypeUrlSchemas {
-        ClientMessage: ClientMessageUrl,
+        ClientMessage: Self,
 
         [
             StarknetClientState,
@@ -187,4 +187,8 @@ delegate_components! {
     }
 }
 
-impl_type_url!(ClientMessageUrl, "/ibc.lightclients.wasm.v1.ClientMessage");
+impl_type_url!(
+    StarknetTypeUrlSchemas,
+    ClientMessage,
+    "/ibc.lightclients.wasm.v1.ClientMessage",
+);
