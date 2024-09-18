@@ -3,7 +3,7 @@ use hermes_cosmos_encoding_components::components::{MutDecoderComponent, MutEnco
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::impls::with_context::EncodeWithContext;
+use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::transform::Transformer;
 use hermes_encoding_components::HList;
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::DecodeRequiredProtoField;
@@ -21,18 +21,18 @@ delegate_components! {
             CombineEncoders<HList![
                 EncodeField<
                     symbol!("height"),
-                    EncodeLengthDelimitedProtoField<1, EncodeWithContext>,
+                    EncodeLengthDelimitedProtoField<1, WithContext>,
                 >,
                 EncodeField<
                     symbol!("consensus_state"),
-                    EncodeLengthDelimitedProtoField<2, EncodeWithContext>,
+                    EncodeLengthDelimitedProtoField<2, WithContext>,
                 >,
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
             CombineEncoders<HList![
-                DecodeRequiredProtoField<1, EncodeWithContext>,
-                DecodeRequiredProtoField<2, EncodeWithContext>,
+                DecodeRequiredProtoField<1, WithContext>,
+                DecodeRequiredProtoField<2, WithContext>,
             ]>
         >,
     }

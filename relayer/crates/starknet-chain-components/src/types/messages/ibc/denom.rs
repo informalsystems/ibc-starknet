@@ -6,7 +6,7 @@ use hermes_cairo_encoding_components::{HList, Sum};
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::impls::with_context::EncodeWithContext;
+use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
@@ -36,11 +36,11 @@ delegate_components! {
     EncodePrefixedDenom {
         MutEncoderComponent: CombineEncoders<
             HList![
-                EncodeField<symbol!("trace_path"), EncodeWithContext>,
-                EncodeField<symbol!("base"), EncodeWithContext>,
+                EncodeField<symbol!("trace_path"), WithContext>,
+                EncodeField<symbol!("base"), WithContext>,
             ],
         >,
-        MutDecoderComponent: DecodeFrom<Self, EncodeWithContext>,
+        MutDecoderComponent: DecodeFrom<Self, WithContext>,
     }
 }
 
@@ -59,11 +59,11 @@ delegate_components! {
     EncodeTracePrefix {
         MutEncoderComponent: CombineEncoders<
             HList![
-                EncodeField<symbol!("port_id"), EncodeWithContext>,
-                EncodeField<symbol!("channel_id"), EncodeWithContext>,
+                EncodeField<symbol!("port_id"), WithContext>,
+                EncodeField<symbol!("channel_id"), WithContext>,
             ],
         >,
-        MutDecoderComponent: DecodeFrom<Self, EncodeWithContext>,
+        MutDecoderComponent: DecodeFrom<Self, WithContext>,
     }
 }
 

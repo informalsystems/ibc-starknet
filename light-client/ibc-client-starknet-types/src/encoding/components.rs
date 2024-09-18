@@ -4,7 +4,7 @@ pub use hermes_cosmos_encoding_components::components::{
     MutDecoderComponent, MutEncoderComponent,
 };
 use hermes_encoding_components::impls::delegate::DelegateEncoding;
-use hermes_encoding_components::impls::with_context::EncodeWithContext;
+use hermes_encoding_components::impls::with_context::WithContext;
 pub use hermes_encoding_components::traits::convert::ConverterComponent;
 pub use hermes_encoding_components::traits::schema::SchemaGetterComponent;
 pub use hermes_protobuf_encoding_components::components::{
@@ -108,13 +108,13 @@ delegate_components! {
             (StarknetClientState, Any),
             (StarknetConsensusState, Any),
             (StarknetHeader, Any),
-        ]: EncodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
+        ]: EncodeAsAnyProtobuf<ViaProtobuf, WithContext>,
 
         [
             (Any, StarknetClientState),
             (Any, StarknetConsensusState),
             (Any, StarknetHeader),
-        ]: DecodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
+        ]: DecodeAsAnyProtobuf<ViaProtobuf, WithContext>,
     }
 }
 

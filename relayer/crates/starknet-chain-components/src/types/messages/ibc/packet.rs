@@ -3,7 +3,7 @@ use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::impls::with_context::EncodeWithContext;
+use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
@@ -29,17 +29,17 @@ delegate_components! {
     EncodePacket {
         MutEncoderComponent: CombineEncoders<
             HList![
-                EncodeField<symbol!("sequence"), EncodeWithContext>,
-                EncodeField<symbol!("src_port_id"), EncodeWithContext>,
-                EncodeField<symbol!("src_channel_id"), EncodeWithContext>,
-                EncodeField<symbol!("dst_port_id"), EncodeWithContext>,
-                EncodeField<symbol!("dst_channel_id"), EncodeWithContext>,
-                EncodeField<symbol!("data"), EncodeWithContext>,
-                EncodeField<symbol!("timeout_height"), EncodeWithContext>,
-                EncodeField<symbol!("timeout_timestamp"), EncodeWithContext>,
+                EncodeField<symbol!("sequence"), WithContext>,
+                EncodeField<symbol!("src_port_id"), WithContext>,
+                EncodeField<symbol!("src_channel_id"), WithContext>,
+                EncodeField<symbol!("dst_port_id"), WithContext>,
+                EncodeField<symbol!("dst_channel_id"), WithContext>,
+                EncodeField<symbol!("data"), WithContext>,
+                EncodeField<symbol!("timeout_height"), WithContext>,
+                EncodeField<symbol!("timeout_timestamp"), WithContext>,
             ],
         >,
-        MutDecoderComponent: DecodeFrom<Self, EncodeWithContext>,
+        MutDecoderComponent: DecodeFrom<Self, WithContext>,
     }
 }
 

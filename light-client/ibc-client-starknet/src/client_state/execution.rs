@@ -1,3 +1,5 @@
+use hermes_encoding_components::traits::convert::CanConvert;
+use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_client_starknet_types::StarknetClientState as ClientStateType;
 use ibc_core::client::context::client_state::ClientStateExecution;
 use ibc_core::client::context::prelude::{ClientStateCommon, ConsensusState};
@@ -7,8 +9,10 @@ use ibc_core::client::types::Height;
 use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::host::types::path::{ClientConsensusStatePath, ClientStatePath};
 use ibc_core::primitives::proto::Any;
+use prost_types::Any as ProstAny;
 
 use super::ClientState;
+use crate::encoding::context::StarknetLightClientEncoding;
 use crate::ConsensusState as StarknetConsensusState;
 
 impl<E> ClientStateExecution<E> for ClientState
@@ -46,6 +50,8 @@ where
         let latest_height = ctx.client_state(client_id)?.latest_height().increment();
 
         let new_client_state = ClientStateType { latest_height }.into();
+
+        // let header: StarknetHeader = StarknetLightClientEncoding.convert(&header)?;
 
         let new_consensus_state = StarknetConsensusState::try_from(header)?;
 

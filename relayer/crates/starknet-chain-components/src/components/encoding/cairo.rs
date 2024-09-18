@@ -7,7 +7,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
 use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_encoding_components::impls::delegate::DelegateEncoding;
-use hermes_encoding_components::impls::with_context::EncodeWithContext;
+use hermes_encoding_components::impls::with_context::WithContext;
 pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 pub use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use starknet::core::types::{Felt, U256};
@@ -61,7 +61,7 @@ delegate_components! {
     StarknetEncodeMutComponents {
         <'a, V> (ViaCairo, &'a V): EncodeDeref,
         <V> (ViaCairo, Option<V>): EncodeOption<V>,
-        <A, B> (ViaCairo, (A, B)): EncoderPair<EncodeWithContext, EncodeWithContext>,
+        <A, B> (ViaCairo, (A, B)): EncoderPair<WithContext, WithContext>,
         (ViaCairo, TransferErc20TokenMessage): EncodeTransferErc20TokenMessage,
         (ViaCairo, DeployErc20TokenMessage): EncodeDeployErc20TokenMessage,
         (ViaCairo, Denom): EncodeDenom,

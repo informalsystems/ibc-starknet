@@ -173,6 +173,7 @@ pub trait CanUseStarknetLightClientEncoding:
     + CanEncodeAndDecode<ViaAny, StarknetHeader>
     + CanConvertBothWays<Any, StarknetClientState>
     + CanConvertBothWays<Any, StarknetConsensusState>
+    + CanConvertBothWays<Any, StarknetHeader>
     + CanEncodeAndDecodeMut<ViaProtobuf, Timestamp>
     + CanEncodeAndDecodeMut<ViaProtobuf, CommitmentRoot>
 {

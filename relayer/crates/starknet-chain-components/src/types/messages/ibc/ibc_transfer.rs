@@ -5,7 +5,7 @@ use hermes_cairo_encoding_components::types::either::Either;
 use hermes_cairo_encoding_components::{HList, Sum};
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_encoding_components::impls::with_context::EncodeWithContext;
+use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
@@ -24,11 +24,11 @@ pub struct IbcTransferMessage {
 
 pub type EncodeIbcTransferMessage = CombineEncoders<
     HList![
-        EncodeField<symbol!("denom"), EncodeWithContext>,
-        EncodeField<symbol!("amount"), EncodeWithContext>,
-        EncodeField<symbol!("sender"), EncodeWithContext>,
-        EncodeField<symbol!("receiver"), EncodeWithContext>,
-        EncodeField<symbol!("memo"), EncodeWithContext>,
+        EncodeField<symbol!("denom"), WithContext>,
+        EncodeField<symbol!("amount"), WithContext>,
+        EncodeField<symbol!("sender"), WithContext>,
+        EncodeField<symbol!("receiver"), WithContext>,
+        EncodeField<symbol!("memo"), WithContext>,
     ],
 >;
 

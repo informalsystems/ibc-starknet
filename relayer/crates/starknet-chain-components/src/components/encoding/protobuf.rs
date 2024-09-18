@@ -7,7 +7,7 @@ use hermes_encoding_components::impls::delegate::DelegateEncoding;
 use hermes_encoding_components::impls::encode::convert_and_encode::ConvertAndEncode;
 use hermes_encoding_components::impls::types::encoded::ProvideEncodedBytes;
 use hermes_encoding_components::impls::types::schema::ProvideStringSchema;
-use hermes_encoding_components::impls::with_context::EncodeWithContext;
+use hermes_encoding_components::impls::with_context::WithContext;
 pub use hermes_encoding_components::traits::convert::ConverterComponent;
 pub use hermes_encoding_components::traits::decode::DecoderComponent;
 pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
@@ -129,8 +129,8 @@ delegate_components! {
         (ClientMessage, ProtoClientMessage): ConvertFrom,
         (ProtoClientMessage, ClientMessage): TryConvertFrom,
 
-        (ClientMessage, Any): EncodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
-        (Any, ClientMessage): DecodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
+        (ClientMessage, Any): EncodeAsAnyProtobuf<ViaProtobuf, WithContext>,
+        (Any, ClientMessage): DecodeAsAnyProtobuf<ViaProtobuf, WithContext>,
 
         [
             (StarknetClientState, Any),
