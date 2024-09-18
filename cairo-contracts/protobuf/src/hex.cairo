@@ -10,10 +10,6 @@ pub fn digit_to_u4(value: u8) -> u8 {
     }
 }
 
-pub fn digit_to_u8(high: u8, low: u8) -> u8 {
-    return digit_to_u4(high) * 0x10 | digit_to_u4(low);
-}
-
 pub fn u4_to_digit(value: u8) -> u8 {
     if value < 10 {
         '0' + value
@@ -25,19 +21,13 @@ pub fn u4_to_digit(value: u8) -> u8 {
     }
 }
 
-pub fn u8_to_digit(value: u8) -> (u8, u8) {
-    let high = u4_to_digit(value / 0x10);
-    let low = u4_to_digit(value & 0x0F);
-    (high, low)
-}
-
 pub fn encode(input: @ByteArray) -> ByteArray {
     let mut output = "";
     let mut i = 0;
     while i < input.len() {
-        let (high, low) = u8_to_digit(input[i]);
-        output.append_byte(high);
-        output.append_byte(low);
+        let value = input[i];
+        output.append_byte(u4_to_digit(value / 0x10));
+        output.append_byte(u4_to_digit(value & 0x0F));
         i += 1;
     };
     output
@@ -48,7 +38,7 @@ pub fn decode(input: @ByteArray) -> ByteArray {
     let mut output = "";
     let mut i = 0;
     while i < input.len() {
-        let value = digit_to_u8(input[i], input[i + 1]);
+        let value = (digit_to_u4(input[i]) * 0x10) | digit_to_u4(input[i + 1]);
         output.append_byte(value);
         i += 2;
     };
@@ -57,34 +47,24 @@ pub fn decode(input: @ByteArray) -> ByteArray {
 
 #[cfg(test)]
 mod tests {
-    use super::{u8_to_digit, digit_to_u8, encode, decode};
+    use super::{digit_to_u4, u4_to_digit, encode, decode};
 
     #[test]
-    fn test_u8_to_digit() {
-        assert_eq!(u8_to_digit(0x00), ('0', '0'));
-        assert_eq!(u8_to_digit(0x01), ('0', '1'));
-        assert_eq!(u8_to_digit(0x0A), ('0', 'A'));
-        assert_eq!(u8_to_digit(0x0F), ('0', 'F'));
-        assert_eq!(u8_to_digit(0x10), ('1', '0'));
-        assert_eq!(u8_to_digit(0x1F), ('1', 'F'));
-        assert_eq!(u8_to_digit(0xA0), ('A', '0'));
-        assert_eq!(u8_to_digit(0xAF), ('A', 'F'));
-        assert_eq!(u8_to_digit(0xF0), ('F', '0'));
-        assert_eq!(u8_to_digit(0xFF), ('F', 'F'));
+    fn test_digit_to_u4() {
+        assert_eq!(digit_to_u4('0'), 0x00);
+        assert_eq!(digit_to_u4('1'), 0x01);
+        assert_eq!(digit_to_u4('A'), 0x0A);
+        assert_eq!(digit_to_u4('F'), 0x0F);
+        assert_eq!(digit_to_u4('a'), 0x0A);
+        assert_eq!(digit_to_u4('f'), 0x0F);
     }
 
     #[test]
-    fn test_digit_to_u8() {
-        assert_eq!(digit_to_u8('0', '0'), 0x00);
-        assert_eq!(digit_to_u8('0', '1'), 0x01);
-        assert_eq!(digit_to_u8('0', 'A'), 0x0A);
-        assert_eq!(digit_to_u8('0', 'F'), 0x0F);
-        assert_eq!(digit_to_u8('1', '0'), 0x10);
-        assert_eq!(digit_to_u8('1', 'F'), 0x1F);
-        assert_eq!(digit_to_u8('A', '0'), 0xA0);
-        assert_eq!(digit_to_u8('A', 'F'), 0xAF);
-        assert_eq!(digit_to_u8('F', '0'), 0xF0);
-        assert_eq!(digit_to_u8('F', 'F'), 0xFF);
+    fn test_u4_to_digit() {
+        assert_eq!(u4_to_digit(0x00), '0');
+        assert_eq!(u4_to_digit(0x01), '1');
+        assert_eq!(u4_to_digit(0x0A), 'A');
+        assert_eq!(u4_to_digit(0x0F), 'F');
     }
 
     #[test]
