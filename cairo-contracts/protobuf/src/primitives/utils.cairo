@@ -21,6 +21,9 @@ pub fn decode_varint_u64(bytes: @ByteArray, ref index: usize) -> u64 {
 }
 
 pub fn encode_varint_u64(value: @u64) -> ByteArray {
+    if value == @0 {
+        return "\x00";
+    }
     let mut bytes = "";
     let mut value = *value;
     while value > 0 {
@@ -79,6 +82,13 @@ mod tests {
     };
 
     use protobuf::hex::decode as hex_decode;
+
+    #[test]
+    fn test_encode_varint_u64_default() {
+        assert_eq!(encode_varint_u64(@0), hex_decode(@"00"));
+        let mut index = 0;
+        assert_eq!(decode_varint_u64(@hex_decode(@"00"), ref index), 0);
+    }
 
     #[test]
     fn test_encode_decode_varint_u64() {
