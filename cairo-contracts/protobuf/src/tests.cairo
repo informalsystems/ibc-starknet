@@ -187,21 +187,22 @@ fn test_proto_to_cairo_struct_non_canonical_order() {
 #[test]
 fn test_repeated_default_value() {
     let hex =
-        "08f6ffffffffffffffff012080ccb9ff054a004a260a12636f736d6f733168616670746d347a7879361210636f736d6f7376616c70756231323334";
+        "2080ccb9ff052a07120034005600784a260a12636f736d6f733168616670746d347a7879361210636f736d6f7376616c707562313233344a004a260a12636f736d6f733168616670746d347a7879361210636f736d6f7376616c70756231323334";
     let bytes = hex_decode(@hex);
     let header = ProtoCodecImpl::decode::<TmHeader>(@bytes);
     let header2 = TmHeader {
-        height: -10,
+        height: 0,
         active: false,
         chain_id: "",
         time: 1609459200,
-        hash: array![],
+        hash: array![0x12, 0x00, 0x34, 0x00, 0x56, 0x00, 0x78],
         indexes: array![],
         proposer: Proposer { address: "", pub_key: "", },
         validator_type: ValidatorType::Full,
         proposers: array![
+            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", },
             Default::<Proposer>::default(),
-            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", }
+            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", },
         ],
     };
     assert_eq!(header2, header, "repeated default value failed");
