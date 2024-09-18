@@ -80,12 +80,15 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
         }
     }
 
-    fn encode_length_delimited_raw<T, +ProtoMessage<T>, +Clone<T>, +Drop<T>>(
+    fn encode_length_delimited_raw<
+        T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Clone<T>, +Drop<T>
+    >(
         field_number: u8, value: @T, ref output: ByteArray
     ) {
-        let mut bytes = "";
-        value.encode_raw(ref bytes);
-        if bytes.len() > 0 {
+        // ignore default values
+        if value != @Default::<T>::default() {
+            let mut bytes = "";
+            value.encode_raw(ref bytes);
             let wire_type = ProtoMessage::<T>::wire_type();
             output.append_byte(ProtobufTag { field_number, wire_type }.encode());
             if wire_type == WireType::LengthDelimited {
@@ -118,18 +121,20 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
     }
 
     // for unpacked repeated fields (default for non-scalars)
-    fn encode_repeated<T, +ProtoMessage<T>, +Clone<T>, +Drop<T>>(
+    fn encode_repeated<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Clone<T>, +Drop<T>>(
         field_number: u8, value: @Array<T>, ref output: ByteArray
     ) {
         let mut i = 0;
         while i < value.len() {
-            let mut buf = "";
-            Self::encode_length_delimited_raw(field_number, value[i], ref buf);
-            if buf.len() > 0 {
-                output.append(@buf);
-            } else {
-                // TODO(rano): need to force encode default values
+            let mut bytes = "";
+            (value[i]).encode_raw(ref bytes);
+            // do not ignore default values
+            let wire_type = ProtoMessage::<T>::wire_type();
+            output.append_byte(ProtobufTag { field_number, wire_type }.encode());
+            if wire_type == WireType::LengthDelimited {
+                ProtoMessage::<usize>::encode_raw(@bytes.len(), ref output);
             }
+            output.append(@bytes);
 
             i += 1;
         }

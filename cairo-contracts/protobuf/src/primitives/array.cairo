@@ -32,10 +32,20 @@ pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
 pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of ProtoMessage<Array<T>> {
     fn encode_raw(self: @Array<T>, ref output: ByteArray) {
         let mut i = 0;
-        while i < self.len() {
-            ProtoMessage::<T>::encode_raw(self[i], ref output);
-            i += 1;
-        };
+        if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
+            while i < self.len() {
+                let mut bytes = "";
+                ProtoMessage::<T>::encode_raw(self[i], ref bytes);
+                ProtoMessage::<usize>::encode_raw(@bytes.len(), ref output);
+                output.append(@bytes);
+                i += 1;
+            };
+        } else {
+            while i < self.len() {
+                ProtoMessage::<T>::encode_raw(self[i], ref output);
+                i += 1;
+            };
+        }
     }
 
     fn decode_raw(ref value: Array<T>, serialized: @ByteArray, ref index: usize, length: usize) {

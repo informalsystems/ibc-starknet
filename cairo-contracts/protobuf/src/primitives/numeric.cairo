@@ -7,10 +7,8 @@ use protobuf::primitives::utils::{
 
 // impl U64AsProtoMessage of ProtoMessage<u64> {
 //     fn encode_raw(self: @u64, ref output: ByteArray) {
-//         if self != @Default::default() {
-//             let bytes = encode_varint_u64(self);
-//             output.append(@bytes);
-//         }
+//         let bytes = encode_varint_u64(self);
+//         output.append(@bytes);
 //     }
 
 //     fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> u64 {
@@ -25,10 +23,8 @@ use protobuf::primitives::utils::{
 
 // pub impl U32AsProtoMessage of ProtoMessage<u32> {
 //     fn encode_raw(self: @u32, ref output: ByteArray) {
-//         if self != @Default::default() {
-//             let bytes = encode_varint_u64(@(*self).into());
-//             output.append(@bytes);
-//         }
+//         let bytes = encode_varint_u64(@(*self).into());
+//         output.append(@bytes);
 //     }
 
 //     fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> u32 {
@@ -43,10 +39,8 @@ use protobuf::primitives::utils::{
 
 // pub impl U8AsProtoMessage of ProtoMessage<u8> {
 //     fn encode_raw(self: @u8, ref output: ByteArray) {
-//         if self != @Default::default() {
-//             let bytes = encode_varint_u64(@(*self).into());
-//             output.append(@bytes);
-//         }
+//         let bytes = encode_varint_u64(@(*self).into());
+//         output.append(@bytes);
 //     }
 
 //     fn decode_raw(serialized: @ByteArray, ref index: usize, length: usize) -> u8 {
@@ -65,10 +59,8 @@ pub impl NumberAsProtoMessage<
     fn encode_raw(self: @T, ref output: ByteArray) {
         let num = (*self).into();
 
-        if num != Default::default() {
-            let bytes = encode_varint_u64(@num);
-            output.append(@bytes);
-        }
+        let bytes = encode_varint_u64(@num);
+        output.append(@bytes);
     }
 
     fn decode_raw(ref value: T, serialized: @ByteArray, ref index: usize, length: usize) {
@@ -129,15 +121,13 @@ pub impl I64AsProtoMessage of ProtoMessage<i64> {
 
 pub impl BoolAsProtoMessage of ProtoMessage<bool> {
     fn encode_raw(self: @bool, ref output: ByteArray) {
-        if self != @Default::default() {
-            let num = if *self {
-                1
-            } else {
-                0
-            };
-            let bytes = encode_varint_u64(@num);
-            output.append(@bytes);
-        }
+        let num = if *self {
+            1
+        } else {
+            0
+        };
+        let bytes = encode_varint_u64(@num);
+        output.append(@bytes);
     }
 
     fn decode_raw(ref value: bool, serialized: @ByteArray, ref index: usize, length: usize) {
