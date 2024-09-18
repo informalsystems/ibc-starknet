@@ -43,7 +43,7 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
     }
 
 
-    fn decode_length_delimited_raw<T, +ProtoMessage<T>, +Drop<T>>(
+    fn decode_field<T, +ProtoMessage<T>, +Drop<T>>(
         field_number: u8, ref value: T, serialized: @ByteArray, ref index: usize, bound: usize
     ) {
         assert(bound <= serialized.len(), 'invalid bound');
@@ -80,9 +80,7 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
         }
     }
 
-    fn encode_length_delimited_raw<
-        T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Clone<T>, +Drop<T>
-    >(
+    fn encode_field<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Clone<T>, +Drop<T>>(
         field_number: u8, value: @T, ref output: ByteArray
     ) {
         // ignore default values
@@ -99,7 +97,7 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
     }
 
     // for unpacked repeated fields (default for non-scalars)
-    fn decode_repeated<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(
+    fn decode_repeated_field<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(
         field_number: u8,
         ref value: Array<T>,
         serialized: @ByteArray,
@@ -113,7 +111,7 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
             }
             let mut item = Default::<T>::default();
 
-            Self::decode_length_delimited_raw(field_number, ref item, serialized, ref index, bound);
+            Self::decode_field(field_number, ref item, serialized, ref index, bound);
             value.append(item);
         };
 
@@ -121,7 +119,7 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
     }
 
     // for unpacked repeated fields (default for non-scalars)
-    fn encode_repeated<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Clone<T>, +Drop<T>>(
+    fn encode_repeated_field<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Clone<T>, +Drop<T>>(
         field_number: u8, value: @Array<T>, ref output: ByteArray
     ) {
         let mut i = 0;

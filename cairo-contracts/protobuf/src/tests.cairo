@@ -12,19 +12,15 @@ struct Proposer {
 
 impl ProposerAsProtoMessage of ProtoMessage<Proposer> {
     fn encode_raw(self: @Proposer, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.address, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.pub_key, ref output);
+        ProtoCodecImpl::encode_field(1, self.address, ref output);
+        ProtoCodecImpl::encode_field(2, self.pub_key, ref output);
     }
 
     fn decode_raw(ref value: Proposer, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.address, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.pub_key, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_field(1, ref value.address, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.pub_key, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for Proposer');
     }
@@ -81,45 +77,29 @@ struct TmHeader {
 
 impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
     fn encode_raw(self: @TmHeader, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.height, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.active, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(3, self.chain_id, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(4, self.time, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(5, self.hash, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(6, self.indexes, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(7, self.proposer, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(8, self.validator_type, ref output);
-        ProtoCodecImpl::encode_repeated(9, self.proposers, ref output);
+        ProtoCodecImpl::encode_field(1, self.height, ref output);
+        ProtoCodecImpl::encode_field(2, self.active, ref output);
+        ProtoCodecImpl::encode_field(3, self.chain_id, ref output);
+        ProtoCodecImpl::encode_field(4, self.time, ref output);
+        ProtoCodecImpl::encode_field(5, self.hash, ref output);
+        ProtoCodecImpl::encode_field(6, self.indexes, ref output);
+        ProtoCodecImpl::encode_field(7, self.proposer, ref output);
+        ProtoCodecImpl::encode_field(8, self.validator_type, ref output);
+        ProtoCodecImpl::encode_repeated_field(9, self.proposers, ref output);
     }
 
     fn decode_raw(ref value: TmHeader, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.height, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.active, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.chain_id, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            4, ref value.time, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            5, ref value.hash, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            6, ref value.indexes, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            7, ref value.proposer, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            8, ref value.validator_type, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_repeated(9, ref value.proposers, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(1, ref value.height, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.active, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(3, ref value.chain_id, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(4, ref value.time, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(5, ref value.hash, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(6, ref value.indexes, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(7, ref value.proposer, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(8, ref value.validator_type, serialized, ref index, bound);
+        ProtoCodecImpl::decode_repeated_field(9, ref value.proposers, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for TmHeader');
     }

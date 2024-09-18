@@ -14,17 +14,15 @@ pub struct Consensus {
 
 impl ConsensusAsProtoMessage of ProtoMessage<Consensus> {
     fn encode_raw(self: @Consensus, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.block, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.app, ref output);
+        ProtoCodecImpl::encode_field(1, self.block, ref output);
+        ProtoCodecImpl::encode_field(2, self.app, ref output);
     }
 
     fn decode_raw(ref value: Consensus, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.block, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(2, ref value.app, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(1, ref value.block, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.app, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for Consensus');
     }
@@ -46,8 +44,8 @@ pub struct PartSetHeader {
 
 impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
     fn encode_raw(self: @PartSetHeader, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.total, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.hash, ref output);
+        ProtoCodecImpl::encode_field(1, self.total, ref output);
+        ProtoCodecImpl::encode_field(2, self.hash, ref output);
     }
 
     fn decode_raw(
@@ -55,12 +53,8 @@ impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
     ) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.total, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.hash, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_field(1, ref value.total, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.hash, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for PSH');
     }
@@ -82,19 +76,15 @@ pub struct BlockId {
 
 impl BlockIdAsProtoMessage of ProtoMessage<BlockId> {
     fn encode_raw(self: @BlockId, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.hash, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.part_set_header, ref output);
+        ProtoCodecImpl::encode_field(1, self.hash, ref output);
+        ProtoCodecImpl::encode_field(2, self.part_set_header, ref output);
     }
 
     fn decode_raw(ref value: BlockId, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.hash, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.part_set_header, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_field(1, ref value.hash, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.part_set_header, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for BlockId');
     }
@@ -128,67 +118,41 @@ pub struct Header {
 
 impl HeaderAsProtoMessage of ProtoMessage<Header> {
     fn encode_raw(self: @Header, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.version, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.chain_id, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(3, self.height, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(4, self.time, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(5, self.last_block_id, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(6, self.last_commit_hash, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(7, self.data_hash, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(8, self.validators_hash, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(9, self.next_validators_hash, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(10, self.consensus_hash, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(11, self.app_hash, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(12, self.last_results_hash, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(13, self.evidence_hash, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(14, self.proposer_address, ref output);
+        ProtoCodecImpl::encode_field(1, self.version, ref output);
+        ProtoCodecImpl::encode_field(2, self.chain_id, ref output);
+        ProtoCodecImpl::encode_field(3, self.height, ref output);
+        ProtoCodecImpl::encode_field(4, self.time, ref output);
+        ProtoCodecImpl::encode_field(5, self.last_block_id, ref output);
+        ProtoCodecImpl::encode_field(6, self.last_commit_hash, ref output);
+        ProtoCodecImpl::encode_field(7, self.data_hash, ref output);
+        ProtoCodecImpl::encode_field(8, self.validators_hash, ref output);
+        ProtoCodecImpl::encode_field(9, self.next_validators_hash, ref output);
+        ProtoCodecImpl::encode_field(10, self.consensus_hash, ref output);
+        ProtoCodecImpl::encode_field(11, self.app_hash, ref output);
+        ProtoCodecImpl::encode_field(12, self.last_results_hash, ref output);
+        ProtoCodecImpl::encode_field(13, self.evidence_hash, ref output);
+        ProtoCodecImpl::encode_field(14, self.proposer_address, ref output);
     }
 
     fn decode_raw(ref value: Header, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.version, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.chain_id, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.height, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            4, ref value.time, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            5, ref value.last_block_id, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            6, ref value.last_commit_hash, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            7, ref value.data_hash, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            8, ref value.validators_hash, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
+        ProtoCodecImpl::decode_field(1, ref value.version, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.chain_id, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(3, ref value.height, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(4, ref value.time, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(5, ref value.last_block_id, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(6, ref value.last_commit_hash, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(7, ref value.data_hash, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(8, ref value.validators_hash, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(
             9, ref value.next_validators_hash, serialized, ref index, bound
         );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            10, ref value.consensus_hash, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            11, ref value.app_hash, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            12, ref value.last_results_hash, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            13, ref value.evidence_hash, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            14, ref value.proposer_address, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_field(10, ref value.consensus_hash, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(11, ref value.app_hash, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(12, ref value.last_results_hash, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(13, ref value.evidence_hash, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(14, ref value.proposer_address, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for Header');
     }
@@ -244,27 +208,19 @@ pub struct CommitSig {
 
 impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
     fn encode_raw(self: @CommitSig, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.block_id_flag, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.validator_address, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(3, self.timestamp, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(4, self.signature, ref output);
+        ProtoCodecImpl::encode_field(1, self.block_id_flag, ref output);
+        ProtoCodecImpl::encode_field(2, self.validator_address, ref output);
+        ProtoCodecImpl::encode_field(3, self.timestamp, ref output);
+        ProtoCodecImpl::encode_field(4, self.signature, ref output);
     }
 
     fn decode_raw(ref value: CommitSig, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.block_id_flag, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.validator_address, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.timestamp, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            4, ref value.signature, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_field(1, ref value.block_id_flag, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.validator_address, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(3, ref value.timestamp, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(4, ref value.signature, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for CommitSig');
     }
@@ -288,25 +244,21 @@ pub struct Commit {
 
 impl CommitAsProtoMessage of ProtoMessage<Commit> {
     fn encode_raw(self: @Commit, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.height, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.round, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(3, self.block_id, ref output);
-        ProtoCodecImpl::encode_repeated(4, self.signatures, ref output);
+        ProtoCodecImpl::encode_field(1, self.height, ref output);
+        ProtoCodecImpl::encode_field(2, self.round, ref output);
+        ProtoCodecImpl::encode_field(3, self.block_id, ref output);
+        ProtoCodecImpl::encode_repeated_field(4, self.signatures, ref output);
     }
 
     fn decode_raw(ref value: Commit, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.height, serialized, ref index, bound
+        ProtoCodecImpl::decode_field(1, ref value.height, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.round, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(3, ref value.block_id, serialized, ref index, bound);
+        ProtoCodecImpl::decode_repeated_field(
+            4, ref value.signatures, serialized, ref index, bound
         );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.round, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.block_id, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_repeated(4, ref value.signatures, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for Commit');
     }
@@ -328,8 +280,8 @@ pub struct SignedHeader {
 
 impl SignedHeaderAsProtoMessage of ProtoMessage<SignedHeader> {
     fn encode_raw(self: @SignedHeader, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.header, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.commit, ref output);
+        ProtoCodecImpl::encode_field(1, self.header, ref output);
+        ProtoCodecImpl::encode_field(2, self.commit, ref output);
     }
 
     fn decode_raw(
@@ -337,12 +289,8 @@ impl SignedHeaderAsProtoMessage of ProtoMessage<SignedHeader> {
     ) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.header, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.commit, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_field(1, ref value.header, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.commit, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for SignedHeader');
     }
@@ -365,19 +313,15 @@ pub struct PublicKey {
 
 impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
     fn encode_raw(self: @PublicKey, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.ed25519, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.secp256k1, ref output);
+        ProtoCodecImpl::encode_field(1, self.ed25519, ref output);
+        ProtoCodecImpl::encode_field(2, self.secp256k1, ref output);
     }
 
     fn decode_raw(ref value: PublicKey, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.ed25519, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.secp256k1, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_field(1, ref value.ed25519, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.secp256k1, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for PublicKey');
     }
@@ -401,27 +345,19 @@ pub struct Validator {
 
 impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
     fn encode_raw(self: @Validator, ref output: ByteArray) {
-        ProtoCodecImpl::encode_length_delimited_raw(1, self.address, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.pub_key, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(3, self.voting_power, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(4, self.proposer_priority, ref output);
+        ProtoCodecImpl::encode_field(1, self.address, ref output);
+        ProtoCodecImpl::encode_field(2, self.pub_key, ref output);
+        ProtoCodecImpl::encode_field(3, self.voting_power, ref output);
+        ProtoCodecImpl::encode_field(4, self.proposer_priority, ref output);
     }
 
     fn decode_raw(ref value: Validator, serialized: @ByteArray, ref index: usize, length: usize) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_length_delimited_raw(
-            1, ref value.address, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.pub_key, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.voting_power, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            4, ref value.proposer_priority, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_field(1, ref value.address, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(2, ref value.pub_key, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(3, ref value.voting_power, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(4, ref value.proposer_priority, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for Validator');
     }
@@ -444,9 +380,9 @@ pub struct ValidatorSet {
 
 impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
     fn encode_raw(self: @ValidatorSet, ref output: ByteArray) {
-        ProtoCodecImpl::encode_repeated(1, self.validators, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(2, self.proposer, ref output);
-        ProtoCodecImpl::encode_length_delimited_raw(3, self.total_voting_power, ref output);
+        ProtoCodecImpl::encode_repeated_field(1, self.validators, ref output);
+        ProtoCodecImpl::encode_field(2, self.proposer, ref output);
+        ProtoCodecImpl::encode_field(3, self.total_voting_power, ref output);
     }
 
     fn decode_raw(
@@ -454,13 +390,11 @@ impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
     ) {
         let bound = index + length;
 
-        ProtoCodecImpl::decode_repeated(1, ref value.validators, serialized, ref index, bound);
-        ProtoCodecImpl::decode_length_delimited_raw(
-            2, ref value.proposer, serialized, ref index, bound
+        ProtoCodecImpl::decode_repeated_field(
+            1, ref value.validators, serialized, ref index, bound
         );
-        ProtoCodecImpl::decode_length_delimited_raw(
-            3, ref value.total_voting_power, serialized, ref index, bound
-        );
+        ProtoCodecImpl::decode_field(2, ref value.proposer, serialized, ref index, bound);
+        ProtoCodecImpl::decode_field(3, ref value.total_voting_power, serialized, ref index, bound);
 
         assert(index == bound, 'invalid length for ValidatorSet');
     }
