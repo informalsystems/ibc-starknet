@@ -1,15 +1,11 @@
 use ChannelHandlerComponent::ChannelReaderTrait;
 use core::num::traits::Zero;
-use snforge_std::{spy_events, test_address, start_cheat_caller_address};
-use starknet::ContractAddress;
-use starknet::contract_address_const;
 use starknet_ibc_core::channel::ChannelHandlerComponent::{
     ChannelInitializerImpl, ChannelWriterTrait
 };
 use starknet_ibc_core::channel::ChannelHandlerComponent;
 use starknet_ibc_core::host::SequenceTrait;
-use starknet_ibc_core::tests::mocks::MockChannelHandler;
-use starknet_ibc_core::tests::{CHANNEL_END, CHANNEL_ID, CLIENT_ID, PORT_ID, SEQUENCE};
+use starknet_ibc_core::tests::{CHANNEL_END, CHANNEL_ID, PORT_ID, SEQUENCE, MockChannelHandler};
 
 type ComponentState = ChannelHandlerComponent::ComponentState<MockChannelHandler::ContractState>;
 

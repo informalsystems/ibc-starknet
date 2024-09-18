@@ -1,6 +1,5 @@
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::types::{MsgTransfer, PrefixedDenom};
-use starknet_ibc_core::channel::Packet;
+use starknet_ibc_apps::transfer::types::MsgTransfer;
 
 #[starknet::interface]
 pub trait ISendTransfer<TContractState> {

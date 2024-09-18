@@ -21,7 +21,7 @@ build() {
 
     cd "$(dirname "$0")/../cairo-contracts"
 
-    output=$(scarb build 1>&2)
+    output=$(scarb build -p starknet_ibc_contracts 1>&2)
 
     if [[ $output == *"Error"* ]]; then
         echo "Error: $output"
@@ -62,7 +62,6 @@ deploy() {
         starkli deploy --not-unique \
         --watch $IC20_CLASS_HASH $ERC20_CLASS_HASH \
         --rpc $RPC_URL \
-        --compiler-version $COMPILER_VERSION \
         --account $ACCOUNT_SRC \
         --keystore $KEYSTORE_SRC \
         --keystore-password $KEYSTORE_PASS \

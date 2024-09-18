@@ -5,7 +5,7 @@ use starknet_ibc_apps::tests::EMPTY_MEMO;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
     Event, SendEvent, RecvEvent, CreateTokenEvent
 };
-use starknet_ibc_apps::transfer::types::{Participant, PrefixedDenom, Memo};
+use starknet_ibc_apps::transfer::types::{Participant, PrefixedDenom};
 
 #[generate_trait]
 pub impl TransferEventSpyExtImpl of TransferEventSpyExt {

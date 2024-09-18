@@ -1,9 +1,6 @@
 #[starknet::component]
 pub mod ERC20MintableComponent {
-    use core::num::traits::CheckedAdd;
-    use core::num::traits::CheckedSub;
-    use core::num::traits::Zero;
-    use openzeppelin_token::erc20::ERC20Component::InternalTrait;
+    use core::num::traits::{CheckedAdd, CheckedSub, Zero};
     use openzeppelin_token::erc20::ERC20Component;
     use openzeppelin_token::erc20::erc20::ERC20Component::Transfer;
     use starknet::ContractAddress;
