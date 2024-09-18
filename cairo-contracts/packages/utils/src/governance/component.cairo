@@ -1,7 +1,6 @@
 #[starknet::component]
 pub mod IBCGovernanceComponent {
-    use starknet::ContractAddress;
-    use starknet::get_caller_address;
+    use starknet::{ContractAddress, get_caller_address};
     use starknet_ibc_utils::governance::IGovernance;
 
     #[storage]

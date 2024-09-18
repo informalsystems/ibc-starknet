@@ -1,11 +1,9 @@
 use openzeppelin_testing::events::EventSpyExt;
-use snforge_std::cheat_block_timestamp_global;
 use snforge_std::spy_events;
+use snforge_std::start_cheat_block_timestamp_global;
 use starknet_ibc_clients::tests::CometClientConfigTrait;
 use starknet_ibc_contracts::tests::{CoreHandle, SetupImpl};
-use starknet_ibc_core::client::{
-    UpdateResponse, Height, StatusTrait, ClientContract, ClientContractTrait
-};
+use starknet_ibc_core::client::{UpdateResponse, StatusTrait, ClientContractTrait};
 use starknet_ibc_core::tests::{ClientEventSpyExt, HEIGHT};
 
 #[test]
@@ -29,7 +27,7 @@ fn test_create_comet_client_ok() {
     // -----------------------------------------------------------
 
     // Cheat the block timestamp to simulate the passage of time.
-    cheat_block_timestamp_global(cfg.latest_timestamp + 1);
+    start_cheat_block_timestamp_global(cfg.latest_timestamp + 1);
 
     let msg = cfg.dummy_msg_create_client();
 
@@ -71,7 +69,7 @@ fn test_update_comet_client_ok() {
     // -----------------------------------------------------------
 
     // Cheat the block timestamp to simulate the passage of time.
-    cheat_block_timestamp_global(cfg.latest_timestamp + 1);
+    start_cheat_block_timestamp_global(cfg.latest_timestamp + 1);
 
     let msg_create_client = cfg.dummy_msg_create_client();
 

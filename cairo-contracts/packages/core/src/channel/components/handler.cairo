@@ -4,7 +4,6 @@ pub mod ChannelHandlerComponent {
     use ClientHandlerComponent::ClientInternalTrait;
     use RouterHandlerComponent::RouterInternalTrait;
     use core::num::traits::Zero;
-    use starknet::ContractAddress;
     use starknet::storage::Map;
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
@@ -12,15 +11,13 @@ pub mod ChannelHandlerComponent {
         ChannelErrors, PacketTrait, ChannelOrdering, Receipt, AcknowledgementTrait, Packet,
         Acknowledgement
     };
-    use starknet_ibc_core::client::{
-        ClientHandlerComponent, ClientContract, ClientContractTrait, StatusTrait
-    };
+    use starknet_ibc_core::client::{ClientHandlerComponent, ClientContract, ClientContractTrait};
     use starknet_ibc_core::host::{
-        PortId, PortIdTrait, ChannelId, ChannelIdTrait, Sequence, SequenceImpl, SequencePartialOrd,
-        channel_end_key, receipt_key, ack_key, commitment_path, next_sequence_recv_key
+        PortId, ChannelId, Sequence, SequenceImpl, SequencePartialOrd, channel_end_key, receipt_key,
+        ack_key, commitment_path, next_sequence_recv_key
     };
     use starknet_ibc_core::router::{
-        RouterHandlerComponent, IRouter, ApplicationContractTrait, ApplicationContract
+        RouterHandlerComponent, ApplicationContractTrait, ApplicationContract
     };
     use starknet_ibc_core::tests::{PORT_ID, CHANNEL_ID, CHANNEL_END};
     use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};

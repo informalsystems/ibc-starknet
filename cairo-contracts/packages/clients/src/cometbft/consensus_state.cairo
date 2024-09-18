@@ -1,6 +1,6 @@
 use core::num::traits::Zero;
 use starknet_ibc_clients::cometbft::CometErrors;
-use starknet_ibc_core::client::{Height, Status};
+use starknet_ibc_core::client::Status;
 
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct CometConsensusState {

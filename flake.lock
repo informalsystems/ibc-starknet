@@ -87,16 +87,16 @@
     "cairo-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1723546896,
-        "narHash": "sha256-4nLrTMwpRD6CcQcNqWHbCg3/OHHGMlrkcREX9p8gafE=",
+        "lastModified": 1724756088,
+        "narHash": "sha256-zQ+kc4c8YI9vURUEQNqX55mTJBcc2NLp4K8kab3ZjEs=",
         "owner": "starkware-libs",
         "repo": "cairo",
-        "rev": "964a02d84c6bde5b39d4ef333eeecf7e588da135",
+        "rev": "93221753088d58f54f9a7f35a0bb338cf0bfb952",
         "type": "github"
       },
       "original": {
         "owner": "starkware-libs",
-        "ref": "v2.7.1",
+        "ref": "v2.8.0",
         "repo": "cairo",
         "type": "github"
       }
@@ -1708,16 +1708,16 @@
     "scarb-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1723563370,
-        "narHash": "sha256-ZMxH4EmllvestXh42VxPFLSQhZpgQCajYCYtquJfyAI=",
+        "lastModified": 1724772354,
+        "narHash": "sha256-9BLeGDeJcCi/QpT43EpVZ61gkJ446IjT9kC2MtQazBs=",
         "owner": "software-mansion",
         "repo": "scarb",
-        "rev": "e288874ba65f228ce3ae9aa55eef9f169824e998",
+        "rev": "09590f5fc07365c3e4188b0e8fa2e774a8269d68",
         "type": "github"
       },
       "original": {
         "owner": "software-mansion",
-        "ref": "v2.7.1",
+        "ref": "v2.8.0",
         "repo": "scarb",
         "type": "github"
       }
@@ -1788,16 +1788,16 @@
     "snforge-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1724941386,
-        "narHash": "sha256-lQS47w3XO4/OIqUsdPXinNbhSHChlGgUKLlcS2tUvqk=",
+        "lastModified": 1721815918,
+        "narHash": "sha256-PkgGaJvVibXGWCvwz2IYC5Ow86fH0MAg7D8OJU0nEjo=",
         "owner": "foundry-rs",
         "repo": "starknet-foundry",
-        "rev": "d37d2272ca6c915117646de76cdf26ec06e44f61",
+        "rev": "2d99b7c00678ef0363881ee0273550c44a9263de",
         "type": "github"
       },
       "original": {
         "owner": "foundry-rs",
-        "ref": "v0.29.0",
+        "ref": "v0.27.0",
         "repo": "starknet-foundry",
         "type": "github"
       }

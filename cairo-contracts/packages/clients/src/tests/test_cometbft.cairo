@@ -1,4 +1,4 @@
-use snforge_std::cheat_block_timestamp_global;
+use snforge_std::start_cheat_block_timestamp_global;
 use starknet_ibc_clients::cometbft::CometClientComponent::{
     CometClientHandler, CometCommonClientState, ClientReaderImpl
 };
@@ -22,7 +22,7 @@ fn setup() -> ComponentState {
 fn test_create_client_ok() {
     let mut state = setup();
     let mut cfg = CometClientConfigTrait::default();
-    cheat_block_timestamp_global(cfg.latest_timestamp + 1);
+    start_cheat_block_timestamp_global(cfg.latest_timestamp + 1);
     let msg = cfg.dummy_msg_create_client();
     state.create_client(msg);
     assert_eq!(state.client_type(), cfg.client_type);
@@ -35,7 +35,7 @@ fn test_create_client_ok() {
 fn test_client_sequence_ok() {
     let mut state = setup();
     let mut cfg = CometClientConfigTrait::default();
-    cheat_block_timestamp_global(cfg.latest_timestamp + 1);
+    start_cheat_block_timestamp_global(cfg.latest_timestamp + 1);
     let msg = cfg.dummy_msg_create_client();
     state.create_client(msg.clone());
     state.create_client(msg);
@@ -46,7 +46,7 @@ fn test_client_sequence_ok() {
 fn test_update_client_ok() {
     let mut state = setup();
     let mut cfg = CometClientConfigTrait::default();
-    cheat_block_timestamp_global(cfg.latest_timestamp + 1);
+    start_cheat_block_timestamp_global(cfg.latest_timestamp + 1);
     let msg = cfg.dummy_msg_create_client();
     let create_resp = state.create_client(msg);
     let updating_height = cfg.latest_height.clone() + HEIGHT(5);

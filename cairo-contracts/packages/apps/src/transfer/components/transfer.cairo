@@ -4,7 +4,6 @@ pub mod TokenTransferComponent {
     use core::clone::Clone;
     use core::num::traits::Zero;
     use core::option::OptionTrait;
-    use core::starknet::SyscallResultTrait;
     use core::traits::TryInto;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
@@ -13,13 +12,13 @@ pub mod TokenTransferComponent {
     use starknet::storage::Map;
     use starknet::{get_contract_address, get_caller_address};
     use starknet_ibc_apps::transfer::types::{
-        MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, TracePrefix, Memo,
-        TracePrefixTrait, PrefixedDenomTrait, Participant
+        MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, Memo, TracePrefixTrait,
+        PrefixedDenomTrait, Participant
     };
     use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait, TransferErrors};
     use starknet_ibc_apps::transfer::{ITransferrable, ISendTransfer, ITokenAddress};
     use starknet_ibc_core::channel::{Packet, Acknowledgement, IAppCallback};
-    use starknet_ibc_core::host::{PortId, ChannelId, ChannelIdTrait};
+    use starknet_ibc_core::host::{PortId, ChannelId};
     use starknet_ibc_utils::{ComputeKeyTrait, ValidateBasicTrait};
 
     #[storage]

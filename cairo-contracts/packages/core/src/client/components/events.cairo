@@ -1,11 +1,6 @@
 #[starknet::component]
 pub mod ClientEventEmitterComponent {
-    use starknet::ContractAddress;
-    use starknet_ibc_core::client::{
-        MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height,
-        CreateResponse, UpdateResponse, ClientErrors
-    };
-    use starknet_ibc_core::client::{ClientContract, ClientContractTrait};
+    use starknet_ibc_core::client::{Height, CreateResponse};
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
 
     #[storage]

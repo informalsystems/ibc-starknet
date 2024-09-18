@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
-    IAppCallback, IAppCallbackDispatcher, IAppCallbackDispatcherTrait, Packet, Acknowledgement
+    IAppCallbackDispatcher, IAppCallbackDispatcherTrait, Packet, Acknowledgement
 };
 
 #[derive(Clone, Debug, Drop, Serde)]

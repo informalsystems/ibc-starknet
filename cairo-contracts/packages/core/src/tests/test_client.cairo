@@ -1,15 +1,14 @@
 use ClientHandlerComponent::ClientReaderTrait;
 use core::num::traits::Zero;
-use snforge_std::{spy_events, test_address, start_cheat_caller_address};
-use starknet::ContractAddress;
-use starknet::contract_address_const;
+use snforge_std::{spy_events, test_address};
 use starknet_ibc_core::client::ClientHandlerComponent::{
     ClientInitializerImpl, CoreRegisterClientImpl, CoreClientHandlerImpl, EventEmitterImpl,
     ClientInternalImpl
 };
 use starknet_ibc_core::client::{ClientHandlerComponent, CreateResponse};
-use starknet_ibc_core::tests::mocks::MockClientHandler;
-use starknet_ibc_core::tests::{CLIENT, CLIENT_TYPE, CLIENT_ID, HEIGHT, ClientEventSpyExt};
+use starknet_ibc_core::tests::{
+    CLIENT, CLIENT_TYPE, CLIENT_ID, HEIGHT, ClientEventSpyExt, MockClientHandler
+};
 
 type ComponentState = ClientHandlerComponent::ComponentState<MockClientHandler::ContractState>;
 

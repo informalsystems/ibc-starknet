@@ -19,10 +19,12 @@ pub mod tests {
     mod config;
     #[cfg(test)]
     mod test_cometbft;
+    #[cfg(test)]
+    pub use mocks::mock_cometbft::MockCometClient;
 
     pub use config::{CometClientConfig, CometClientConfigImpl, CometClientConfigTrait};
-    pub(crate) use mocks::mock_cometbft::MockCometClient;
+    #[cfg(test)]
     mod mocks {
-        pub(crate) mod mock_cometbft;
+        pub mod mock_cometbft;
     }
 }

@@ -1,20 +1,14 @@
-use openzeppelin_testing::{declare_class, declare_and_deploy};
-use openzeppelin_utils::serde::SerializedAppend;
-use snforge_std::ContractClass;
+use openzeppelin_testing::declare_and_deploy;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
     IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, MsgRecvPacket
 };
-use starknet_ibc_core::client::ClientEventEmitterComponent::{
-    Event, CreateClientEvent, UpdateClientEvent
-};
 use starknet_ibc_core::client::{
     IClientHandlerDispatcher, IClientHandlerDispatcherTrait, IRegisterClientDispatcher,
-    IRegisterClientDispatcherTrait, MsgCreateClient, MsgUpdateClient, CreateResponse,
-    UpdateResponse, Height
+    IRegisterClientDispatcherTrait, MsgCreateClient, MsgUpdateClient, CreateResponse, UpdateResponse
 };
 
-#[derive(Drop, Serde)]
+#[derive(Copy, Drop, Serde)]
 pub struct CoreContract {
     pub address: ContractAddress
 }

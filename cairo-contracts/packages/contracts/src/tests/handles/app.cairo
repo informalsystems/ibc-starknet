@@ -1,19 +1,14 @@
-use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
-use openzeppelin_testing::{declare_class, declare_and_deploy};
+use openzeppelin_testing::declare_and_deploy;
+use openzeppelin_testing::events::EventSpyExtImpl;
 use openzeppelin_utils::serde::SerializedAppend;
-use snforge_std::{EventSpy, spy_events, ContractClass};
+use snforge_std::ContractClass;
 use starknet::ContractAddress;
-use starknet_ibc_apps::tests::OWNER;
-use starknet_ibc_apps::transfer::TokenTransferComponent::{
-    Event, SendEvent, RecvEvent, CreateTokenEvent
-};
-use starknet_ibc_apps::transfer::types::{MsgTransfer, Participant, PrefixedDenom, Memo};
+use starknet_ibc_apps::transfer::types::MsgTransfer;
 use starknet_ibc_apps::transfer::{
     ISendTransferDispatcher, ITokenAddressDispatcher, ISendTransferDispatcherTrait,
     ITokenAddressDispatcherTrait,
 };
-use starknet_ibc_core::channel::Packet;
-use starknet_ibc_core::channel::{IAppCallback, IAppCallbackDispatcher, IAppCallbackDispatcherTrait};
+use starknet_ibc_core::channel::{IAppCallbackDispatcher, IAppCallbackDispatcherTrait, Packet};
 
 #[derive(Drop, Serde)]
 pub struct AppContract {

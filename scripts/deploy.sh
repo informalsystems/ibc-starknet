@@ -21,7 +21,7 @@ build() {
 
     cd "$(dirname "$0")/../cairo-contracts"
 
-    output=$(scarb build 1>&2)
+    output=$(scarb build -p starknet_ibc_contracts 1>&2)
 
     if [[ $output == *"Error"* ]]; then
         echo "Error: $output"
