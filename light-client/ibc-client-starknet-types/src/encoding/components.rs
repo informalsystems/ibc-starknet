@@ -22,6 +22,8 @@ use ibc_core::primitives::Timestamp;
 
 use crate::encoding::impls::client_state::EncodeStarknetClientState;
 use crate::encoding::impls::consensus_state::EncodeStarknetConsensusState;
+use crate::encoding::impls::header::EncodeStarknetHeader;
+use crate::header::{StarknetHeader, STARKNET_HEADER_TYPE_URL};
 use crate::{
     StarknetClientState, StarknetConsensusState, STARKNET_CLIENT_STATE_TYPE_URL,
     STARKNET_CONSENSUS_STATE_TYPE_URL,
@@ -69,11 +71,13 @@ delegate_components! {
             (ViaProtobuf, Height),
             (ViaProtobuf, StarknetClientState),
             (ViaProtobuf, StarknetConsensusState),
+            (ViaProtobuf, StarknetHeader),
         ]: EncodeProtoWithMutBuffer,
 
         [
             (ViaAny, StarknetClientState),
             (ViaAny, StarknetConsensusState),
+            (ViaAny, StarknetHeader),
         ]: EncodeViaAny<ViaProtobuf>,
     }
 }
@@ -92,6 +96,9 @@ delegate_components! {
 
         (ViaProtobuf, StarknetConsensusState):
             EncodeStarknetConsensusState,
+
+        (ViaProtobuf, StarknetHeader):
+            EncodeStarknetHeader,
     }
 }
 
@@ -100,11 +107,13 @@ delegate_components! {
         [
             (StarknetClientState, Any),
             (StarknetConsensusState, Any),
+            (StarknetHeader, Any),
         ]: EncodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
 
         [
             (Any, StarknetClientState),
             (Any, StarknetConsensusState),
+            (Any, StarknetHeader),
         ]: DecodeAsAnyProtobuf<ViaProtobuf, EncodeWithContext>,
     }
 }
@@ -119,4 +128,10 @@ impl_type_url!(
     StarknetLightClientTypeUrlSchemas,
     StarknetConsensusState,
     STARKNET_CONSENSUS_STATE_TYPE_URL,
+);
+
+impl_type_url!(
+    StarknetLightClientTypeUrlSchemas,
+    StarknetHeader,
+    STARKNET_HEADER_TYPE_URL,
 );
