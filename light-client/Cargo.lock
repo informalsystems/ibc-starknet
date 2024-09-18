@@ -1000,7 +1000,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/protobuf-encoding-improvements#e07ea1ae49013ea568127717e46243878520942f"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/protobuf-encoding-improvements#8d4ad773b3dbc87131e4c6c8e2127a0ab982a5a2"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -1014,7 +1014,7 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/protobuf-encoding-improvements#e07ea1ae49013ea568127717e46243878520942f"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/protobuf-encoding-improvements#8d4ad773b3dbc87131e4c6c8e2127a0ab982a5a2"
 dependencies = [
  "cgp",
 ]
@@ -1022,7 +1022,7 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/protobuf-encoding-improvements#e07ea1ae49013ea568127717e46243878520942f"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/protobuf-encoding-improvements#8d4ad773b3dbc87131e4c6c8e2127a0ab982a5a2"
 dependencies = [
  "cgp",
  "hermes-encoding-components",

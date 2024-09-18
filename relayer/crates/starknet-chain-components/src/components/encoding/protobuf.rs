@@ -2,9 +2,7 @@ use cgp::prelude::*;
 pub use hermes_cosmos_chain_components::encoding::components::{
     DecodeBufferTypeComponent, EncodeBufferTypeComponent,
 };
-use hermes_encoding_components::impls::convert::{ConvertFrom, TryConvertFrom};
 use hermes_encoding_components::impls::delegate::DelegateEncoding;
-use hermes_encoding_components::impls::encode::convert_and_encode::ConvertAndEncode;
 use hermes_encoding_components::impls::types::encoded::ProvideEncodedBytes;
 use hermes_encoding_components::impls::types::schema::ProvideStringSchema;
 use hermes_encoding_components::impls::with_context::WithContext;
@@ -18,13 +16,15 @@ pub use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent
 pub use hermes_encoding_components::traits::types::schema::SchemaTypeComponent;
 use hermes_protobuf_encoding_components::impl_type_url;
 use hermes_protobuf_encoding_components::impls::any::{DecodeAsAnyProtobuf, EncodeAsAnyProtobuf};
-use hermes_protobuf_encoding_components::impls::protobuf::EncodeAsProtobuf;
 use hermes_protobuf_encoding_components::impls::types::decode_buffer::ProvideProtoChunksDecodeBuffer;
 use hermes_protobuf_encoding_components::impls::types::encode_buffer::ProvideBytesEncodeBuffer;
-use hermes_protobuf_encoding_components::impls::via_any::EncodeViaAny;
 pub use hermes_protobuf_encoding_components::traits::length::EncodedLengthGetterComponent;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use hermes_wasm_encoding_components::components::WasmEncodingComponents;
+use hermes_wasm_encoding_components::impls::convert::client_message::{
+    DecodeViaClientMessage, EncodeViaClientMessage,
+};
+use hermes_wasm_encoding_components::types::client_message::WasmClientMessage;
 use hermes_wasm_encoding_components::types::client_state::WasmClientState;
 use hermes_wasm_encoding_components::types::consensus_state::WasmConsensusState;
 use ibc::clients::wasm_types::client_message::ClientMessage;
@@ -33,7 +33,6 @@ use ibc::core::commitment_types::commitment::CommitmentRoot;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::encoding::components::StarknetLightClientEncodingComponents;
 use ibc_client_starknet_types::header::StarknetHeader;
-use ibc_proto::ibc::lightclients::wasm::v1::ClientMessage as ProtoClientMessage;
 use prost_types::Any;
 
 use crate::types::client_state::{
@@ -81,11 +80,6 @@ pub struct StarknetTypeUrlSchemas;
 
 delegate_components! {
     StarknetEncoderComponents {
-        (ViaAny, ClientMessage): EncodeViaAny<ViaProtobuf>,
-
-        (ViaProtobuf, ClientMessage): ConvertAndEncode<ProtoClientMessage>,
-        (ViaProtobuf, ProtoClientMessage): EncodeAsProtobuf,
-
         [
             (ViaProtobuf, StarknetClientState),
             (ViaProtobuf, StarknetConsensusState),
@@ -105,6 +99,9 @@ delegate_components! {
 
             (ViaAny, WasmConsensusState),
             (ViaProtobuf, WasmConsensusState),
+
+            (ViaAny, WasmClientMessage),
+            (ViaProtobuf, WasmClientMessage),
         ]:
             WasmEncodingComponents,
     }
@@ -116,6 +113,7 @@ delegate_components! {
             (ViaProtobuf, Height),
             (ViaProtobuf, WasmClientState),
             (ViaProtobuf, WasmConsensusState),
+            (ViaProtobuf, WasmClientMessage),
         ]: WasmEncodingComponents,
 
         [
@@ -131,19 +129,20 @@ delegate_components! {
 
 delegate_components! {
     StarknetConverterComponents {
-        (ClientMessage, ProtoClientMessage): ConvertFrom,
-        (ProtoClientMessage, ClientMessage): TryConvertFrom,
-
         (ClientMessage, Any): EncodeAsAnyProtobuf<ViaProtobuf, WithContext>,
         (Any, ClientMessage): DecodeAsAnyProtobuf<ViaProtobuf, WithContext>,
+
+        (StarknetHeader, Any):
+            EncodeViaClientMessage,
+
+        (Any, StarknetHeader):
+            DecodeViaClientMessage,
 
         [
             (StarknetClientState, Any),
             (Any, StarknetClientState),
             (StarknetConsensusState, Any),
             (Any, StarknetConsensusState),
-            (StarknetHeader, Any),
-            (Any, StarknetHeader),
         ]:
             StarknetLightClientEncodingComponents,
 
