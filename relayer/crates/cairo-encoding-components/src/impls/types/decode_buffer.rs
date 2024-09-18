@@ -4,19 +4,22 @@ use core::slice::Iter;
 
 use hermes_encoding_components::traits::decode_mut::DecodeBufferPeeker;
 use hermes_encoding_components::traits::types::decode_buffer::{
-    HasDecodeBufferType, ProvideDecodeBufferType,
+    DecodeBufferBuilder, HasDecodeBufferType, ProvideDecodeBufferType,
 };
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use starknet::core::types::Felt;
 
 pub struct ProvideVecIterDecodeBuffer;
 
-impl<Encoding> ProvideDecodeBufferType<Encoding> for ProvideVecIterDecodeBuffer
-where
-    Encoding: HasEncodedType<Encoded = Vec<Felt>>,
-{
+impl<Encoding> ProvideDecodeBufferType<Encoding> for ProvideVecIterDecodeBuffer {
     type DecodeBuffer<'a> = Peekable<Iter<'a, Felt>>;
+}
 
+impl<Encoding> DecodeBufferBuilder<Encoding> for ProvideVecIterDecodeBuffer
+where
+    Encoding: HasEncodedType<Encoded = Vec<Felt>>
+        + for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Peekable<Iter<'a, Felt>>>,
+{
     fn from_encoded<'a>(encoded: &'a Vec<Felt>) -> Peekable<Iter<'a, Felt>> {
         encoded.iter().peekable()
     }

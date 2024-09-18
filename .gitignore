@@ -1,7 +1,6 @@
 .DS_Store
 corelib/
 target/
-**/Cargo.lock
 
 # snforge
 .snfoundry_cache/

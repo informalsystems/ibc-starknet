@@ -128,7 +128,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         }
 
         {
-            runtime.sleep(Duration::from_secs(1)).await;
+            runtime.sleep(Duration::from_secs(2)).await;
 
             let starknet_status = starknet_chain.query_chain_status().await?;
 
