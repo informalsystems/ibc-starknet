@@ -5,6 +5,8 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
+use hermes_cosmos_chain_components::types::messages::connection::open_init::CosmosConnectionOpenInitMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
@@ -15,6 +17,8 @@ use hermes_relayer_components::chain::traits::queries::chain_status::{
 };
 use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
 use hermes_relayer_components::chain::traits::queries::consensus_state::CanQueryConsensusState;
+use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
+use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenInitEvent;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::DestinationTarget;
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
@@ -25,6 +29,7 @@ use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
+use ibc::core::connection::types::version::Version;
 use sha2::{Digest, Sha256};
 
 #[test]
@@ -156,6 +161,29 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 starknet_status.block_hash.to_bytes_be()
             );
         }
+
+        let connection_id = {
+            let open_init_message = CosmosConnectionOpenInitMessage {
+                client_id: client_id.clone(),
+                counterparty_client_id: client_id.clone(),
+                counterparty_commitment_prefix: "ibc".into(),
+                version: Version::compatibles().pop().unwrap(),
+                delay_period: Duration::from_secs(0),
+            };
+
+            let events = cosmos_chain.send_message(open_init_message.to_cosmos_message()).await?;
+
+            let connection_id = events
+                .into_iter()
+                .find_map(<CosmosChain as HasConnectionOpenInitEvent<StarknetChain>>::try_extract_connection_open_init_event)
+                .unwrap()
+                .connection_id
+            ;
+
+            println!("initialized connection on Cosmos: {connection_id}");
+
+            connection_id
+        };
 
         Ok(())
     })
