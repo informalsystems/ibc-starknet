@@ -1,6 +1,7 @@
 use cgp::prelude::CanRaiseError;
 use hermes_relayer_components::chain::traits::queries::chain_status::ChainStatusQuerier;
 use hermes_relayer_components::chain::traits::types::status::HasChainStatusType;
+use starknet::core::types::{BlockId, BlockTag, MaybePendingBlockWithTxHashes};
 use starknet::providers::{Provider, ProviderError};
 
 use crate::traits::provider::HasStarknetProvider;
@@ -12,18 +13,24 @@ impl<Chain> ChainStatusQuerier<Chain> for QueryStarknetChainStatus
 where
     Chain: HasChainStatusType<ChainStatus = StarknetChainStatus>
         + HasStarknetProvider
-        + CanRaiseError<ProviderError>,
+        + CanRaiseError<ProviderError>
+        + CanRaiseError<&'static str>,
 {
     async fn query_chain_status(chain: &Chain) -> Result<StarknetChainStatus, Chain::Error> {
-        let status = chain
+        let block = chain
             .provider()
-            .block_hash_and_number()
+            .get_block_with_tx_hashes(BlockId::Tag(BlockTag::Latest))
             .await
             .map_err(Chain::raise_error)?;
 
-        Ok(StarknetChainStatus {
-            height: status.block_number,
-            block_hash: status.block_hash,
-        })
+        match block {
+            MaybePendingBlockWithTxHashes::Block(block) => Ok(StarknetChainStatus {
+                height: block.block_number,
+                block_hash: block.block_hash,
+            }),
+            MaybePendingBlockWithTxHashes::PendingBlock(_) => Err(Chain::raise_error(
+                "expected finalized block, but given pending block",
+            )),
+        }
     }
 }
