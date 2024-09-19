@@ -6,7 +6,6 @@ pub enum WireType {
     StartGroup,
     EndGroup,
     Fixed32,
-    Unknown,
 }
 
 impl WireTypeToU8 of Into<WireType, u8> {
@@ -18,7 +17,6 @@ impl WireTypeToU8 of Into<WireType, u8> {
             WireType::StartGroup => 3,
             WireType::EndGroup => 4,
             WireType::Fixed32 => 5,
-            WireType::Unknown => panic!("Unsupported wire type"),
         }
     }
 }
@@ -32,7 +30,7 @@ impl U8ToWireType of Into<u8, WireType> {
             3 => WireType::StartGroup,
             4 => WireType::EndGroup,
             5 => WireType::Fixed32,
-            _ => { panic!("Unsupported wire type") },
+            _ => panic!("Unsupported wire type"),
         }
     }
 }
