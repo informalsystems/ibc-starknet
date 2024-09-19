@@ -85,9 +85,9 @@ mod tests {
 
     #[test]
     fn test_encode_varint_u64_default() {
-        assert_eq!(encode_varint_u64(@0), hex_decode(@"00"));
+        assert_eq!(encode_varint_u64(@0), "\x00");
         let mut index = 0;
-        assert_eq!(decode_varint_u64(@hex_decode(@"00"), ref index), 0);
+        assert_eq!(decode_varint_u64(@"\x00", ref index), 0);
     }
 
     #[test]

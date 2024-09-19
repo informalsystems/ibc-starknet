@@ -3,6 +3,7 @@ use protobuf::types::tag::WireType;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
 use protobuf::primitives::numeric::{BoolAsProtoMessage, NumberAsProtoMessage, I64AsProtoMessage};
 use protobuf::hex::decode as hex_decode;
+use protobuf::base64::decode as base64_decode;
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 struct Proposer {
@@ -135,9 +136,9 @@ fn test_proto_byte_array() {
 
 #[test]
 fn test_proto_to_cairo_struct() {
-    let hex =
-        "08f6ffffffffffffffff0110011a0b636f736d6f736875622d342080ccb9ff052a0412345678320af8acd19101f0bdf3d5093a260a12636f736d6f733168616670746d347a7879361210636f736d6f7376616c707562313233344001";
-    let bytes = hex_decode(@hex);
+    let base64 =
+        "CPb//////////wEQARoLY29zbW9zaHViLTQggMy5/wUqBBI0VngyCvis0ZEB8L3z1Qk6JgoSY29zbW9zMWhhZnB0bTR6eHk2EhBjb3Ntb3N2YWxwdWIxMjM0QAE=";
+    let bytes = base64_decode(@base64);
     let header = ProtoCodecImpl::decode::<TmHeader>(@bytes);
     let header2 = TmHeader {
         height: -10,
@@ -186,9 +187,9 @@ fn test_proto_to_cairo_struct_non_canonical_order() {
 
 #[test]
 fn test_repeated_default_value() {
-    let hex =
-        "2080ccb9ff052a07120034005600784a260a12636f736d6f733168616670746d347a7879361210636f736d6f7376616c707562313233344a004a260a12636f736d6f733168616670746d347a7879361210636f736d6f7376616c70756231323334";
-    let bytes = hex_decode(@hex);
+    let base64 =
+        "IIDMuf8FKgcSADQAVgB4SiYKEmNvc21vczFoYWZwdG00enh5NhIQY29zbW9zdmFscHViMTIzNEoASiYKEmNvc21vczFoYWZwdG00enh5NhIQY29zbW9zdmFscHViMTIzNA==";
+    let bytes = base64_decode(@base64);
     let header = ProtoCodecImpl::decode::<TmHeader>(@bytes);
     let header2 = TmHeader {
         height: 0,
