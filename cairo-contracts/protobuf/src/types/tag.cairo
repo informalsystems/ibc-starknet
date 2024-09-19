@@ -1,4 +1,4 @@
-#[derive(Copy, Debug, Clone, Drop, PartialEq)]
+#[derive(Copy, Debug, Drop, PartialEq, Serde)]
 pub enum WireType {
     Varint,
     Fixed64,
@@ -36,7 +36,7 @@ impl U8ToWireType of Into<u8, WireType> {
 }
 
 
-#[derive(Drop, PartialEq)]
+#[derive(Copy, Debug, Drop, PartialEq, Serde)]
 pub struct ProtobufTag {
     pub field_number: u8,
     pub wire_type: WireType,
