@@ -1,7 +1,7 @@
 use core::num::traits::zero::Zero;
 use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::host::ClientId;
-use starknet_ibc_utils::ValidateBasicTrait;
+use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct MsgCreateClient {
@@ -10,7 +10,7 @@ pub struct MsgCreateClient {
     pub consensus_state: Array<felt252>,
 }
 
-impl MsgCreateClientValidateBasicImpl of ValidateBasicTrait<MsgCreateClient> {
+impl MsgCreateClientValidateBasicImpl of ValidateBasic<MsgCreateClient> {
     fn validate_basic(self: @MsgCreateClient) {
         assert(self.client_type.is_non_zero(), ClientErrors::ZERO_CLIENT_TYPE);
 
@@ -26,7 +26,7 @@ pub struct MsgUpdateClient {
     pub client_message: Array<felt252>,
 }
 
-impl MsgUpdateClientValidateBasicImpl of ValidateBasicTrait<MsgUpdateClient> {
+impl MsgUpdateClientValidateBasicImpl of ValidateBasic<MsgUpdateClient> {
     fn validate_basic(self: @MsgUpdateClient) {
         assert(!self.client_message.is_empty(), ClientErrors::EMPTY_CLIENT_MESSAGE);
     }
@@ -38,7 +38,7 @@ pub struct MsgRecoverClient {
     pub substitute_client_id: ClientId,
 }
 
-impl MsgRecoverClientValidateBasicImpl of ValidateBasicTrait<MsgRecoverClient> {
+impl MsgRecoverClientValidateBasicImpl of ValidateBasic<MsgRecoverClient> {
     fn validate_basic(self: @MsgRecoverClient) {
         assert(
             self.subject_client_id.client_type == self.substitute_client_id.client_type,
@@ -52,6 +52,6 @@ pub struct MsgUpgradeClient {
     pub client_id: ClientId,
 }
 
-impl MsgUpgradeClientValidateBasicImpl of ValidateBasicTrait<MsgUpgradeClient> {
+impl MsgUpgradeClientValidateBasicImpl of ValidateBasic<MsgUpgradeClient> {
     fn validate_basic(self: @MsgUpgradeClient) {}
 }

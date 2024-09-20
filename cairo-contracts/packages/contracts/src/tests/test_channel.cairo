@@ -1,30 +1,77 @@
-use starknet_ibc_apps::tests::{TransferAppConfigTrait, COSMOS, STARKNET};
-use starknet_ibc_contracts::tests::{SetupImpl, CoreHandle};
+use snforge_std::spy_events;
+use starknet_ibc_apps::tests::TransferEventSpyExt;
+use starknet_ibc_apps::tests::{TransferAppConfigTrait, COSMOS, STARKNET, OWNER};
+use starknet_ibc_apps::transfer::ERC20Contract;
+use starknet_ibc_apps::transfer::TRANSFER_PORT_ID;
+use starknet_ibc_clients::tests::CometClientConfigTrait;
+use starknet_ibc_contracts::tests::{SetupImpl, CoreHandle, AppHandle, ERC20Handle};
+use starknet_ibc_core::tests::CLIENT_TYPE;
+use starknet_ibc_utils::ComputeKey;
 
 #[test]
-#[should_panic]
 fn test_recv_packet_ok() {
     // -----------------------------------------------------------
     // Setup Essentials
     // -----------------------------------------------------------
 
+    let mut comet_cfg = CometClientConfigTrait::default();
+
     let mut transfer_cfg = TransferAppConfigTrait::default();
 
-    let setup = SetupImpl::default();
+    let mut setup = SetupImpl::default();
 
     let mut core = setup.deploy_core();
 
-    let _comet = setup.deploy_cometbft(ref core);
+    let comet = setup.deploy_cometbft();
 
-    let _ics20 = setup.deploy_trasnfer();
+    core.register_client(CLIENT_TYPE(), comet.address);
+
+    let ics20 = setup.deploy_trasnfer();
+
+    core.register_app(TRANSFER_PORT_ID(), ics20.address);
+
+    let mut spy = spy_events();
 
     // -----------------------------------------------------------
-    // Receive Packet
+    // Create Client
+    // -----------------------------------------------------------
+
+    // Create a `MsgCreateClient` message.
+    let msg_create_client = comet_cfg.dummy_msg_create_client();
+
+    // Submit the message and create a client.
+    core.create_client(msg_create_client);
+
+    // -----------------------------------------------------------
+    // Receive Packet (from Cosmos to Starknet)
     // -----------------------------------------------------------
 
     let msg = transfer_cfg
         .dummy_msg_recv_packet(transfer_cfg.hosted_denom.clone(), COSMOS(), STARKNET());
 
     core.recv_packet(msg);
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    let prefixed_denom = transfer_cfg.prefix_hosted_denom();
+
+    // Assert the `RecvEvent` emitted.
+    spy
+        .assert_recv_event(
+            ics20.address, COSMOS(), STARKNET(), prefixed_denom.clone(), transfer_cfg.amount, true
+        );
+
+    // Fetch the token address.
+    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
+
+    let erc20: ERC20Contract = token_address.into();
+
+    // Check the balance of the receiver.
+    erc20.assert_balance(OWNER(), transfer_cfg.amount);
+
+    // Check the total supply of the ERC20 contract.
+    erc20.assert_total_supply(transfer_cfg.amount);
 }
 

@@ -1,7 +1,7 @@
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
 use starknet_ibc_core::host::{ClientId, ChannelId, PortId, Sequence};
-use starknet_ibc_utils::ValidateBasicTrait;
+use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct Packet {
@@ -34,7 +34,7 @@ pub impl PacketImpl of PacketTrait {
     }
 }
 
-impl PacketValidateBasicImpl of ValidateBasicTrait<Packet> {
+impl PacketValidateBasicImpl of ValidateBasic<Packet> {
     fn validate_basic(self: @Packet) {}
 }
 

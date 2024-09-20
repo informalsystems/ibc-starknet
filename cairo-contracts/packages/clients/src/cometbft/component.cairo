@@ -12,7 +12,7 @@ pub mod CometClientComponent {
         IClientState, IClientStateValidation, IClientStateExecution
     };
     use starknet_ibc_core::host::ClientIdImpl;
-    use starknet_ibc_utils::ValidateBasicTrait;
+    use starknet_ibc_utils::ValidateBasic;
 
     #[storage]
     struct Storage {

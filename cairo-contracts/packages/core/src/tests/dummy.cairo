@@ -35,7 +35,7 @@ pub fn CHANNEL_END() -> ChannelEnd {
     ChannelEnd {
         state: ChannelState::Open,
         ordering: ChannelOrdering::Unordered,
-        remote: Counterparty { port_id: PORT_ID(), channel_id: CHANNEL_ID(0), },
+        remote: Counterparty { port_id: PORT_ID(), channel_id: CHANNEL_ID(1), },
         client_id: CLIENT_ID(),
     }
 }

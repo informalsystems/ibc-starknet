@@ -95,8 +95,8 @@ pub mod host {
     mod prefixes;
     pub use errors::HostErrors;
     pub use identifiers::{
-        ClientId, ClientIdImpl, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdTrait,
-        Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd
+        ClientId, ClientIdImpl, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdImpl,
+        PortIdTrait, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd
     };
 
     pub use keys::{channel_end_key, receipt_key, ack_key, next_sequence_recv_key};

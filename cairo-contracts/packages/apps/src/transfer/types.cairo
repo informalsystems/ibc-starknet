@@ -6,7 +6,7 @@ use starknet_ibc_apps::transfer::{
 };
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait};
-use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait, LocalKeyBuilderImpl};
+use starknet_ibc_utils::{ValidateBasic, ComputeKey, LocalKeyBuilderImpl};
 
 /// Maximum memo length allowed for ICS-20 transfers. This bound corresponds to
 /// the `MaximumMemoLength` in the `ibc-go`.
@@ -22,7 +22,7 @@ pub struct MsgTransfer {
     pub timeout_timestamp_on_b: Timestamp,
 }
 
-impl MsgTransferValidateBasicImpl of ValidateBasicTrait<MsgTransfer> {
+impl MsgTransferValidateBasicImpl of ValidateBasic<MsgTransfer> {
     fn validate_basic(self: @MsgTransfer) {
         self.port_id_on_a.validate(TRANSFER_PORT_ID_HASH);
         self.chan_id_on_a.validate();
@@ -39,7 +39,7 @@ pub struct PacketData {
     pub memo: Memo,
 }
 
-impl PacketDataValidateBasicImpl of ValidateBasicTrait<PacketData> {
+impl PacketDataValidateBasicImpl of ValidateBasic<PacketData> {
     fn validate_basic(self: @PacketData) {
         assert(self.sender.is_non_zero(), TransferErrors::INVALID_SENDER);
         assert(self.receiver.is_non_zero(), TransferErrors::INVALID_RECEIVER);
@@ -85,7 +85,7 @@ pub impl PrefixedDenomImpl of PrefixedDenomTrait {
     }
 }
 
-impl PrefixedDenomKeyImpl of ComputeKeyTrait<PrefixedDenom> {
+impl PrefixedDenomKeyImpl of ComputeKey<PrefixedDenom> {
     fn key(self: @PrefixedDenom) -> felt252 {
         let mut key_builder = LocalKeyBuilderImpl::init();
         let mut trace_path_span = self.trace_path.span();
@@ -195,7 +195,7 @@ pub struct Memo {
     pub memo: ByteArray,
 }
 
-impl MemoValidateBasicImpl of ValidateBasicTrait<Memo> {
+impl MemoValidateBasicImpl of ValidateBasic<Memo> {
     fn validate_basic(self: @Memo) {
         assert(self.memo.len() <= MAXIMUM_MEMO_LENGTH, TransferErrors::MAXIMUM_MEMO_LENGTH);
     }

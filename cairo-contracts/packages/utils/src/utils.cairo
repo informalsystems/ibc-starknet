@@ -1,11 +1,11 @@
 use core::hash::HashStateTrait;
 use core::poseidon::{PoseidonTrait, poseidon_hash_span};
 
-pub trait ValidateBasicTrait<T> {
+pub trait ValidateBasic<T> {
     fn validate_basic(self: @T);
 }
 
-pub trait ComputeKeyTrait<T, +Serde<T>, +Drop<T>> {
+pub trait ComputeKey<T, +Serde<T>, +Drop<T>> {
     fn key(self: @T) -> felt252 {
         poseidon_hash(self)
     }
