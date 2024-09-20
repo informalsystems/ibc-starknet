@@ -87,6 +87,14 @@ pub struct PortId {
 
 #[generate_trait]
 pub impl PortIdImpl of PortIdTrait {
+    /// Constructs a new port identifier from a byte array with basic
+    /// validation.
+    fn new(port_id: ByteArray) -> PortId {
+        let port_id = PortId { port_id };
+        port_id.validate_basic();
+        port_id
+    }
+
     fn validate(self: @PortId, port_id_hash: felt252) {
         self.validate_basic();
         assert(self.key() == port_id_hash, HostErrors::INVALID_PORT_ID);
@@ -106,12 +114,6 @@ impl PortIdKeyImpl of ComputeKey<PortId> {}
 pub impl PortIdIntoByteArray of Into<PortId, ByteArray> {
     fn into(self: PortId) -> ByteArray {
         self.port_id
-    }
-}
-
-pub impl ByteArrayIntoPortId of Into<ByteArray, PortId> {
-    fn into(self: ByteArray) -> PortId {
-        PortId { port_id: self }
     }
 }
 

@@ -3,7 +3,7 @@ pub mod RouterHandlerComponent {
     use core::num::traits::Zero;
     use starknet::ContractAddress;
     use starknet::storage::Map;
-    use starknet_ibc_core::host::PortId;
+    use starknet_ibc_core::host::{PortId, PortIdImpl};
     use starknet_ibc_core::router::{RouterErrors, IRouter, ApplicationContract};
     use starknet_ibc_utils::ComputeKey;
 
@@ -30,7 +30,7 @@ pub mod RouterHandlerComponent {
         fn get_app_address(
             self: @ComponentState<TContractState>, port_id: ByteArray
         ) -> Option<ContractAddress> {
-            let app_address = self.read_app_address(port_id.into());
+            let app_address = self.read_app_address(PortIdImpl::new(port_id));
 
             if app_address.is_non_zero() {
                 Option::Some(app_address)
@@ -44,11 +44,11 @@ pub mod RouterHandlerComponent {
             port_id: ByteArray,
             app_address: ContractAddress
         ) {
-            self.write_app_address(port_id.into(), app_address)
+            self.write_app_address(PortIdImpl::new(port_id), app_address)
         }
 
         fn release_port_id(ref self: ComponentState<TContractState>, port_id: ByteArray) {
-            self.remove_app_address(port_id.into())
+            self.remove_app_address(PortIdImpl::new(port_id))
         }
     }
 
@@ -57,11 +57,11 @@ pub mod RouterHandlerComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of RouterInternalTrait<TContractState> {
         fn get_app(self: @ComponentState<TContractState>, port_id: PortId) -> ApplicationContract {
-            let maybe_app_address = self.get_app_address(port_id.port_id);
+            let maybe_app_address = self.read_app_address(port_id);
 
-            assert(maybe_app_address.is_some(), RouterErrors::UNSUPPORTED_PORT_ID);
+            assert(maybe_app_address.is_non_zero(), RouterErrors::UNSUPPORTED_PORT_ID);
 
-            maybe_app_address.unwrap().into()
+            maybe_app_address.into()
         }
     }
 
