@@ -3,7 +3,7 @@ use core::num::traits::Zero;
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
 use starknet_ibc_core::host::errors::HostErrors;
-use starknet_ibc_utils::{ComputeKeyTrait, poseidon_hash};
+use starknet_ibc_utils::{ValidateBasic, ComputeKey, poseidon_hash};
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ClientId {
@@ -88,13 +88,20 @@ pub struct PortId {
 #[generate_trait]
 pub impl PortIdImpl of PortIdTrait {
     fn validate(self: @PortId, port_id_hash: felt252) {
-        let port_id_len = self.port_id.len();
-
-        assert(port_id_len > 2, HostErrors::INVALID_IDENTIFIER_LENGTH);
-        assert(port_id_len <= 128, HostErrors::INVALID_IDENTIFIER_LENGTH);
+        self.validate_basic();
         assert(self.key() == port_id_hash, HostErrors::INVALID_PORT_ID);
     }
 }
+
+impl PortIdValidateBasic of ValidateBasic<PortId> {
+    fn validate_basic(self: @PortId) {
+        let port_id_len = self.port_id.len();
+        assert(port_id_len > 2, HostErrors::INVALID_IDENTIFIER_LENGTH);
+        assert(port_id_len <= 128, HostErrors::INVALID_IDENTIFIER_LENGTH);
+    }
+}
+
+impl PortIdKeyImpl of ComputeKey<PortId> {}
 
 pub impl PortIdIntoByteArray of Into<PortId, ByteArray> {
     fn into(self: PortId) -> ByteArray {
@@ -102,7 +109,11 @@ pub impl PortIdIntoByteArray of Into<PortId, ByteArray> {
     }
 }
 
-impl PortIdKeyImpl of ComputeKeyTrait<PortId> {}
+pub impl ByteArrayIntoPortId of Into<ByteArray, PortId> {
+    fn into(self: ByteArray) -> PortId {
+        PortId { port_id: self }
+    }
+}
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Sequence {

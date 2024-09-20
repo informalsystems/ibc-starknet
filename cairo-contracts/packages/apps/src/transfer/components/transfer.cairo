@@ -19,7 +19,7 @@ pub mod TokenTransferComponent {
     use starknet_ibc_apps::transfer::{ITransferrable, ISendTransfer, ITokenAddress};
     use starknet_ibc_core::channel::{Packet, Acknowledgement, IAppCallback};
     use starknet_ibc_core::host::{PortId, ChannelId};
-    use starknet_ibc_utils::{ComputeKeyTrait, ValidateBasicTrait};
+    use starknet_ibc_utils::{ComputeKey, ValidateBasic};
 
     #[storage]
     struct Storage {

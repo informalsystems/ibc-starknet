@@ -30,8 +30,8 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         TransferAppConfig {
             native_denom,
             hosted_denom,
-            chan_id_on_a: CHANNEL_ID(0),
-            chan_id_on_b: CHANNEL_ID(1),
+            chan_id_on_a: CHANNEL_ID(1),
+            chan_id_on_b: CHANNEL_ID(0),
             amount: AMOUNT,
         }
     }
@@ -81,7 +81,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     ) -> MsgRecvPacket {
         MsgRecvPacket {
             packet: self.dummy_recv_packet(denom, sender, receiver),
-            proof_commitment_on_a: array![],
+            proof_commitment_on_a: array![0],
             proof_height_on_a: HEIGHT(10),
         }
     }

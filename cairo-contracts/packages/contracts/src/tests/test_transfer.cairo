@@ -1,13 +1,12 @@
 use openzeppelin_testing::events::EventSpyExt;
-use snforge_std::spy_events;
-use snforge_std::start_cheat_caller_address;
+use snforge_std::{start_cheat_caller_address, spy_events};
 use starknet_ibc_apps::tests::TransferEventSpyExt;
 use starknet_ibc_apps::tests::{
     TransferAppConfigTrait, NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET
 };
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_contracts::tests::{SetupImpl, ERC20Handle, AppHandle};
-use starknet_ibc_utils::ComputeKeyTrait;
+use starknet_ibc_utils::ComputeKey;
 
 #[test]
 fn test_escrow_unescrow_roundtrip() {

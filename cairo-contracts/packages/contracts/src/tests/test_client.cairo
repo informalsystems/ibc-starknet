@@ -1,10 +1,9 @@
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::spy_events;
-use snforge_std::start_cheat_block_timestamp_global;
 use starknet_ibc_clients::tests::CometClientConfigTrait;
 use starknet_ibc_contracts::tests::{CoreHandle, SetupImpl};
 use starknet_ibc_core::client::{UpdateResponse, StatusTrait, ClientContractTrait};
-use starknet_ibc_core::tests::{ClientEventSpyExt, HEIGHT};
+use starknet_ibc_core::tests::{ClientEventSpyExt, HEIGHT, CLIENT_TYPE};
 
 #[test]
 fn test_create_comet_client_ok() {
@@ -14,20 +13,19 @@ fn test_create_comet_client_ok() {
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let setup = SetupImpl::default();
+    let mut setup = SetupImpl::default();
 
     let mut core = setup.deploy_core();
 
-    let mut comet = setup.deploy_cometbft(ref core);
+    let mut comet = setup.deploy_cometbft();
+
+    core.register_client(CLIENT_TYPE(), comet.address);
 
     let mut spy = spy_events();
 
     // -----------------------------------------------------------
     // Create Client
     // -----------------------------------------------------------
-
-    // Cheat the block timestamp to simulate the passage of time.
-    start_cheat_block_timestamp_global(cfg.latest_timestamp + 1);
 
     let msg = cfg.dummy_msg_create_client();
 
@@ -56,20 +54,19 @@ fn test_update_comet_client_ok() {
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let setup = SetupImpl::default();
+    let mut setup = SetupImpl::default();
 
     let mut core = setup.deploy_core();
 
-    let comet = setup.deploy_cometbft(ref core);
+    let comet = setup.deploy_cometbft();
+
+    core.register_client(CLIENT_TYPE(), comet.address);
 
     let mut spy = spy_events();
 
     // -----------------------------------------------------------
     // Create Client
     // -----------------------------------------------------------
-
-    // Cheat the block timestamp to simulate the passage of time.
-    start_cheat_block_timestamp_global(cfg.latest_timestamp + 1);
 
     let msg_create_client = cfg.dummy_msg_create_client();
 

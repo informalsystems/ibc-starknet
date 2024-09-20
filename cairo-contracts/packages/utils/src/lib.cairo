@@ -2,7 +2,7 @@ mod errors;
 mod utils;
 pub use errors::UtilErrors;
 pub use utils::{
-    ValidateBasicTrait, ComputeKeyTrait, LocalKeyBuilder, LocalKeyBuilderTrait, LocalKeyBuilderImpl,
+    ValidateBasic, ComputeKey, LocalKeyBuilder, LocalKeyBuilderTrait, LocalKeyBuilderImpl,
     poseidon_hash, RemotePathBuilderImpl, RemotePathBuilder, RemotePathBuilderTrait
 };
 pub mod governance {
