@@ -30,7 +30,7 @@ pub mod RouterHandlerComponent {
         fn get_app_address(
             self: @ComponentState<TContractState>, port_id: ByteArray
         ) -> Option<ContractAddress> {
-            let app_address = self.read_app_address(PortIdImpl::new(port_id));
+            let app_address = self.read_app_address(@PortIdImpl::new(port_id));
 
             if app_address.is_non_zero() {
                 Option::Some(app_address)
@@ -56,7 +56,7 @@ pub mod RouterHandlerComponent {
     pub(crate) impl RouterInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of RouterInternalTrait<TContractState> {
-        fn get_app(self: @ComponentState<TContractState>, port_id: PortId) -> ApplicationContract {
+        fn get_app(self: @ComponentState<TContractState>, port_id: @PortId) -> ApplicationContract {
             let maybe_app_address = self.read_app_address(port_id);
 
             assert(maybe_app_address.is_non_zero(), RouterErrors::UNSUPPORTED_PORT_ID);
@@ -70,7 +70,7 @@ pub mod RouterHandlerComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of RouterReaderTrait<TContractState> {
         fn read_app_address(
-            self: @ComponentState<TContractState>, port_id: PortId
+            self: @ComponentState<TContractState>, port_id: @PortId
         ) -> ContractAddress {
             self.port_id_to_app.read(port_id.key())
         }

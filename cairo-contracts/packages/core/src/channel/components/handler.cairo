@@ -137,7 +137,7 @@ pub mod ChannelHandlerComponent {
         fn recv_packet_execute(
             ref self: ComponentState<TContractState>, msg: MsgRecvPacket, chan_end_on_b: ChannelEnd
         ) {
-            let app = self.get_app(msg.packet.port_id_on_b.clone());
+            let app = self.get_app(@msg.packet.port_id_on_b);
 
             let ack = app.on_recv_packet(msg.packet.clone());
 
@@ -250,7 +250,7 @@ pub mod ChannelHandlerComponent {
             client_comp.get_client(client_type)
         }
 
-        fn get_app(self: @ComponentState<TContractState>, port_id: PortId) -> ApplicationContract {
+        fn get_app(self: @ComponentState<TContractState>, port_id: @PortId) -> ApplicationContract {
             let router_comp = get_dep_component!(self, RouterHandler);
 
             router_comp.get_app(port_id)
