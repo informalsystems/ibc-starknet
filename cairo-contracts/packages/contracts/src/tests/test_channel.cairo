@@ -5,6 +5,7 @@ use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::transfer::TRANSFER_PORT_ID;
 use starknet_ibc_clients::tests::CometClientConfigTrait;
 use starknet_ibc_contracts::tests::{SetupImpl, CoreHandle, AppHandle, ERC20Handle};
+use starknet_ibc_core::channel::ChannelEndTrait;
 use starknet_ibc_core::tests::CLIENT_TYPE;
 use starknet_ibc_utils::ComputeKey;
 
@@ -49,7 +50,7 @@ fn test_recv_packet_ok() {
     let msg = transfer_cfg
         .dummy_msg_recv_packet(transfer_cfg.hosted_denom.clone(), COSMOS(), STARKNET());
 
-    core.recv_packet(msg);
+    core.recv_packet(msg.clone());
 
     // -----------------------------------------------------------
     // Check Results
@@ -73,5 +74,19 @@ fn test_recv_packet_ok() {
 
     // Check the total supply of the ERC20 contract.
     erc20.assert_total_supply(transfer_cfg.amount);
+
+    // Retrieve the channel end on Starknet.
+    let chan_end_on_b = core
+        .channel_end(msg.packet.port_id_on_b.clone(), msg.packet.chan_id_on_b.clone());
+
+    // Assert the channel end is open.
+    assert!(chan_end_on_b.is_open());
+
+    // Retrieve the packet receipt.
+    let receipt = core
+        .packet_receipt(msg.packet.port_id_on_b, msg.packet.chan_id_on_b, msg.packet.seq_on_a,);
+
+    // Assert the packet receipt is true.
+    assert!(receipt);
 }
 

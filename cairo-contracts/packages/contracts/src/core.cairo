@@ -9,6 +9,7 @@ pub mod IBCCore {
     // -----------------------------------------------------------
     // Setup Client Components
     // -----------------------------------------------------------
+
     component!(
         path: ClientEventEmitterComponent, storage: client_emitter, event: ClientEventEmitterEvent
     );
@@ -36,6 +37,9 @@ pub mod IBCCore {
     #[abi(embed_v0)]
     impl CoreChannelHanderImpl =
         ChannelHandlerComponent::CoreChannelHandler<ContractState>;
+    #[abi(embed_v0)]
+    impl CoreChannelQueryImpl =
+        ChannelHandlerComponent::CoreChannelQuery<ContractState>;
     impl ChannelInitializerImpl = ChannelHandlerComponent::ChannelInitializerImpl<ContractState>;
 
     // -----------------------------------------------------------

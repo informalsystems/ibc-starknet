@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use starknet_ibc_core::client::{
-    IClientHandlerDispatcher, IClientStateDispatcher, IClientStateDispatcherTrait,
+    IClientHandlerDispatcher, IClientQueryDispatcher, IClientQueryDispatcherTrait,
     IClientHandlerDispatcherTrait, IClientStateValidationDispatcher,
     IClientStateValidationDispatcherTrait, MsgCreateClient, MsgUpdateClient, MsgRecoverClient,
     MsgUpgradeClient, CreateResponse, UpdateResponse, Height, HeightPartialOrd, Status, StatusTrait,
@@ -27,15 +27,15 @@ impl ClientContractIntoFelt252 of Into<ClientContract, felt252> {
 #[generate_trait]
 pub impl ClientContractImpl of ClientContractTrait {
     fn client_type(self: @ClientContract) -> felt252 {
-        IClientStateDispatcher { contract_address: *self.address }.client_type()
+        IClientQueryDispatcher { contract_address: *self.address }.client_type()
     }
 
     fn latest_height(self: @ClientContract, client_sequence: u64) -> Height {
-        IClientStateDispatcher { contract_address: *self.address }.latest_height(client_sequence)
+        IClientQueryDispatcher { contract_address: *self.address }.latest_height(client_sequence)
     }
 
     fn status(self: @ClientContract, client_sequence: u64) -> Status {
-        IClientStateDispatcher { contract_address: *self.address }.status(client_sequence)
+        IClientQueryDispatcher { contract_address: *self.address }.status(client_sequence)
     }
 
     fn verify_is_active(self: @ClientContract, client_sequence: u64) {

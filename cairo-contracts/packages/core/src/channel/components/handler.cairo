@@ -7,9 +7,9 @@ pub mod ChannelHandlerComponent {
     use starknet::storage::Map;
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
-        ChannelEventEmitterComponent, IChannelHandler, MsgRecvPacket, ChannelEnd, ChannelEndTrait,
-        ChannelErrors, PacketTrait, ChannelOrdering, Receipt, AcknowledgementTrait, Packet,
-        Acknowledgement
+        ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgRecvPacket, ChannelEnd,
+        ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt, AcknowledgementTrait,
+        Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{ClientHandlerComponent, ClientContract, ClientContractTrait};
     use starknet_ibc_core::host::{
@@ -34,6 +34,10 @@ pub mod ChannelHandlerComponent {
     #[derive(Debug, Drop, starknet::Event)]
     pub enum Event {}
 
+    // -----------------------------------------------------------
+    // Channel Initializer
+    // -----------------------------------------------------------
+
     #[generate_trait]
     pub impl ChannelInitializerImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
@@ -46,6 +50,10 @@ pub mod ChannelHandlerComponent {
             self.write_next_sequence_recv(@PORT_ID(), @CHANNEL_ID(0), SequenceImpl::zero());
         }
     }
+
+    // -----------------------------------------------------------
+    // IChannelHandler
+    // -----------------------------------------------------------
 
     #[embeddable_as(CoreChannelHandler)]
     impl CoreChannelHandlerImpl<
@@ -65,6 +73,55 @@ pub mod ChannelHandlerComponent {
             self.recv_packet_execute(msg, chan_end_on_b);
         }
     }
+
+    // -----------------------------------------------------------
+    // IChannelQuery
+    // -----------------------------------------------------------
+
+    #[embeddable_as(CoreChannelQuery)]
+    impl CoreChannelQueryImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
+    > of IChannelQuery<ComponentState<TContractState>> {
+        fn channel_end(
+            self: @ComponentState<TContractState>, port_id: PortId, channel_id: ChannelId
+        ) -> ChannelEnd {
+            let maybe_chan_end = self.read_channel_end(@port_id, @channel_id);
+
+            assert(maybe_chan_end.is_some(), ChannelErrors::MISSING_CHANNEL_END);
+
+            maybe_chan_end.unwrap()
+        }
+
+        fn packet_receipt(
+            self: @ComponentState<TContractState>,
+            port_id: PortId,
+            channel_id: ChannelId,
+            sequence: Sequence
+        ) -> bool {
+            let receipt = self.read_packet_receipt(@port_id, @channel_id, @sequence);
+
+            receipt.is_some()
+        }
+
+        fn packet_acknowledgement(
+            self: @ComponentState<TContractState>,
+            port_id: PortId,
+            channel_id: ChannelId,
+            sequence: Sequence
+        ) -> felt252 {
+            self.read_packet_ack(@port_id, @channel_id, @sequence)
+        }
+
+        fn next_sequence_recv(
+            self: @ComponentState<TContractState>, port_id: PortId, channel_id: ChannelId
+        ) -> Sequence {
+            self.read_next_sequence_recv(@port_id, @channel_id)
+        }
+    }
+
+    // -----------------------------------------------------------
+    // Channel handler implementations
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub(crate) impl RecvPacketImpl<
@@ -222,6 +279,10 @@ pub mod ChannelHandlerComponent {
         }
     }
 
+    // -----------------------------------------------------------
+    // Channel internal
+    // -----------------------------------------------------------
+
     #[generate_trait]
     pub(crate) impl ChannelInternalImpl<
         TContractState,
@@ -256,6 +317,10 @@ pub mod ChannelHandlerComponent {
             router_comp.get_app(port_id)
         }
     }
+
+    // -----------------------------------------------------------
+    // Channel reader/writer
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub(crate) impl ChannelReaderImpl<
@@ -338,6 +403,10 @@ pub mod ChannelHandlerComponent {
             self.recv_sequences.write(next_sequence_recv_key(port_id, channel_id), sequence);
         }
     }
+
+    // -----------------------------------------------------------
+    // Channel Event Emitter
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub(crate) impl EventEmitterImpl<

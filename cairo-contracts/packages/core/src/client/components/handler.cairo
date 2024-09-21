@@ -21,12 +21,20 @@ pub mod ClientHandlerComponent {
     #[derive(Debug, Drop, starknet::Event)]
     pub enum Event {}
 
+    // -----------------------------------------------------------
+    // Client Initializer
+    // -----------------------------------------------------------
+
     #[generate_trait]
     pub impl ClientInitializerImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientInitializerTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>) {}
     }
+
+    // -----------------------------------------------------------
+    // IClientHandler
+    // -----------------------------------------------------------
 
     #[embeddable_as(CoreClientHandler)]
     pub impl CoreClientHandlerImpl<
@@ -80,6 +88,10 @@ pub mod ClientHandlerComponent {
         }
     }
 
+    // -----------------------------------------------------------
+    // IRegisterClient
+    // -----------------------------------------------------------
+
     #[embeddable_as(CoreRegisterClient)]
     pub impl CoreRegisterClientImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
@@ -92,6 +104,10 @@ pub mod ClientHandlerComponent {
             self.write_supported_client(client_type, client_address);
         }
     }
+
+    // -----------------------------------------------------------
+    // Client Internal
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub(crate) impl ClientInternalImpl<
@@ -107,6 +123,10 @@ pub mod ClientHandlerComponent {
             client_address.into()
         }
     }
+
+    // -----------------------------------------------------------
+    // Client Reader/Writer
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub(crate) impl ClientReaderImpl<
@@ -131,6 +151,10 @@ pub mod ClientHandlerComponent {
             self.supported_clients.write(client_type, client_address);
         }
     }
+
+    // -----------------------------------------------------------
+    // Client Event Emitter
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub(crate) impl EventEmitterImpl<
