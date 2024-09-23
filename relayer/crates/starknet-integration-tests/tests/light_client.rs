@@ -6,12 +6,16 @@ use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
+use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_init::CosmosConnectionOpenInitMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
+use hermes_cosmos_relayer::contexts::encoding::CosmosEncoding;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
+use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_error::types::Error;
+use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
 };
@@ -30,6 +34,9 @@ use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmo
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::connection::types::version::Version;
+use ibc_relayer::chain::cosmos::client::Settings;
+use ibc_relayer::config::types::TrustThreshold;
+use ibc_relayer_types::Height;
 use sha2::{Digest, Sha256};
 
 #[test]
@@ -165,7 +172,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         let connection_id = {
             let open_init_message = CosmosConnectionOpenInitMessage {
                 client_id: client_id.clone(),
-                counterparty_client_id: client_id.clone(),
+                counterparty_client_id: client_id.clone(), // TODO: stub
                 counterparty_commitment_prefix: "ibc".into(),
                 version: Version::compatibles().pop().unwrap(),
                 delay_period: Duration::from_secs(0),
@@ -184,6 +191,35 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             connection_id
         };
+
+        {
+            let create_client_settings = Settings {
+                max_clock_drift: Duration::from_secs(40),
+                trusting_period: None,
+                trust_threshold: TrustThreshold::ONE_THIRD,
+            };
+
+            let payload = <CosmosChain as CanBuildCreateClientPayload<CosmosChain>>::build_create_client_payload(cosmos_chain, &create_client_settings,
+            ).await?;
+
+            let client_state = CosmosEncoding.convert(&payload.client_state)?;
+
+            runtime.sleep(Duration::from_secs(1)).await;
+
+            let open_ack_message = CosmosConnectionOpenAckMessage {
+                connection_id: connection_id.clone(),
+                counterparty_connection_id: connection_id.clone(), // TODO: stub
+                version: Version::compatibles().pop().unwrap(),
+                client_state,
+                update_height: Height::new(0, 1).unwrap(),
+                proof_try: [0; 32].into(),
+                proof_client: [0; 32].into(),
+                proof_consensus: [0; 32].into(),
+                proof_consensus_height: payload.client_state.latest_height,
+            };
+
+            cosmos_chain.send_message(open_ack_message.to_cosmos_message()).await?;
+        }
 
         Ok(())
     })

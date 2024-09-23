@@ -27,8 +27,10 @@ hermes-cosmos-integration-tests  = { workspace = true }
 hermes-cosmos-relayer            = { workspace = true }
 hermes-cosmos-wasm-relayer       = { workspace = true }
 
-ibc       = { workspace = true }
-ibc-proto = { workspace = true }
+ibc               = { workspace = true }
+ibc-proto         = { workspace = true }
+ibc-relayer       = { workspace = true }
+ibc-relayer-types = { workspace = true }
 
 starknet    = { workspace = true }
 url         = { workspace = true }

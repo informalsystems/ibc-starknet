@@ -2156,6 +2156,8 @@ dependencies = [
  "hermes-test-components",
  "ibc",
  "ibc-proto",
+ "ibc-relayer",
+ "ibc-relayer-types",
  "prost",
  "prost-types",
  "rand",
