@@ -199,6 +199,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
         };
 
         {
+            // Pretend that we have relayed ConnectionOpenTry to Starknet, and then send ConnectionOpenAck.
+
             let create_client_settings = Settings {
                 max_clock_drift: Duration::from_secs(40),
                 trusting_period: None,
@@ -218,7 +220,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 version: Version::compatibles().pop().unwrap(),
                 client_state,
                 update_height: Height::new(0, 1).unwrap(),
-                proof_try: [0; 32].into(),
+                proof_try: [0; 32].into(), // dummy proofs
                 proof_client: [0; 32].into(),
                 proof_consensus: [0; 32].into(),
                 proof_consensus_height: payload.client_state.latest_height,
@@ -232,7 +234,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 state: State::Init as i32,
                 ordering: Ordering::Unordered as i32,
                 counterparty: Some(Counterparty {
-                    port_id: "transfer".to_string(),
+                    port_id: "11b7f9bfa43d3facae74efa5dfe0030df98273271278291d67c16a4e6cd5f7c".to_string(), // stub application contract on Starknet as port ID
                     channel_id: "".to_string(),
                 }),
                 connection_hops: vec![connection_id.to_string()],
@@ -261,13 +263,15 @@ fn test_starknet_light_client() -> Result<(), Error> {
         };
 
         {
+            // Pretend that we have already done ChannelOpenTry on Starknet, and then continue with ChannelOpenAck
+
             let open_ack_message = CosmosChannelOpenAckMessage {
                 port_id: "transfer".into(),
                 channel_id: channel_id.to_string(),
-                counterparty_channel_id: "channel-0".into(),
+                counterparty_channel_id: "63c350000c404581a3385ec7b4324008b2965dd8fc5af768b87329d25e57cfa".into(), // stub channel contract on Starknet as channel ID
                 counterparty_version: "ics20-1".into(),
                 update_height: Height::new(0, 1).unwrap(),
-                proof_try: [0; 32].into(),
+                proof_try: [0; 32].into(), // dummy proofs
             };
 
             cosmos_chain.send_message(open_ack_message.to_cosmos_message()).await?;
