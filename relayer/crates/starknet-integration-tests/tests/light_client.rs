@@ -6,6 +6,7 @@ use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
+use hermes_cosmos_chain_components::types::messages::channel::open_init::CosmosChannelOpenInitMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_init::CosmosConnectionOpenInitMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
@@ -22,6 +23,7 @@ use hermes_relayer_components::chain::traits::queries::chain_status::{
 use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
 use hermes_relayer_components::chain::traits::queries::consensus_state::CanQueryConsensusState;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
+use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenInitEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenInitEvent;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::DestinationTarget;
@@ -33,9 +35,12 @@ use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
+use ibc::core::channel::types::channel::State;
 use ibc::core::connection::types::version::Version;
+use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
 use ibc_relayer::chain::cosmos::client::Settings;
 use ibc_relayer::config::types::TrustThreshold;
+use ibc_relayer_types::core::ics04_channel::channel::Ordering;
 use ibc_relayer_types::Height;
 use sha2::{Digest, Sha256};
 
@@ -220,6 +225,39 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             cosmos_chain.send_message(open_ack_message.to_cosmos_message()).await?;
         }
+
+        let channel_id = {
+            let channel = Channel {
+                state: State::Init as i32,
+                ordering: Ordering::Unordered as i32,
+                counterparty: Some(Counterparty {
+                    port_id: "transfer".to_string(),
+                    channel_id: "".to_string(),
+                }),
+                connection_hops: vec![connection_id.to_string()],
+                version: "ics20-1".into(),
+                upgrade_sequence: 0,
+            };
+
+            let open_init_message = CosmosChannelOpenInitMessage {
+                port_id: "transfer".into(),
+                channel,
+            };
+
+            let events = cosmos_chain.send_message(open_init_message.to_cosmos_message()).await?;
+
+
+            let channel_id = events
+                .into_iter()
+                .find_map(<CosmosChain as HasChannelOpenInitEvent<StarknetChain>>::try_extract_channel_open_init_event)
+                .unwrap()
+                .channel_id
+            ;
+
+            println!("initialized channel on Cosmos: {channel_id}");
+
+            channel_id
+        };
 
         Ok(())
     })
