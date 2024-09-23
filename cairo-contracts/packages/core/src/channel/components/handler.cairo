@@ -20,7 +20,7 @@ pub mod ChannelHandlerComponent {
         RouterHandlerComponent, ApplicationContractTrait, ApplicationContract
     };
     use starknet_ibc_core::tests::{PORT_ID, CHANNEL_ID, CHANNEL_END};
-    use starknet_ibc_utils::{ValidateBasicTrait, ComputeKeyTrait};
+    use starknet_ibc_utils::ValidateBasic;
 
     #[storage]
     struct Storage {
@@ -101,7 +101,7 @@ pub mod ChannelHandlerComponent {
                             @msg.packet.port_id_on_b, @msg.packet.chan_id_on_b, @msg.packet.seq_on_a
                         );
 
-                    assert(reciept_resp.is_some(), ChannelErrors::PACKET_ALREADY_RECEIVED);
+                    assert(reciept_resp.is_none(), ChannelErrors::PACKET_ALREADY_RECEIVED);
 
                     self
                         .verify_ack_not_exists(
@@ -253,7 +253,7 @@ pub mod ChannelHandlerComponent {
         fn get_app(self: @ComponentState<TContractState>, port_id: @PortId) -> ApplicationContract {
             let router_comp = get_dep_component!(self, RouterHandler);
 
-            router_comp.get_app(port_id.key())
+            router_comp.get_app(port_id)
         }
     }
 

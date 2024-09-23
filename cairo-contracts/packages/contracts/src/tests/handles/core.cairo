@@ -7,6 +7,7 @@ use starknet_ibc_core::client::{
     IClientHandlerDispatcher, IClientHandlerDispatcherTrait, IRegisterClientDispatcher,
     IRegisterClientDispatcherTrait, MsgCreateClient, MsgUpdateClient, CreateResponse, UpdateResponse
 };
+use starknet_ibc_core::router::{IRouterDispatcher, IRouterDispatcherTrait};
 
 #[derive(Copy, Drop, Serde)]
 pub struct CoreContract {
@@ -31,6 +32,10 @@ pub impl CoreHandleImpl of CoreHandle {
         IChannelHandlerDispatcher { contract_address: *self.address }
     }
 
+    fn router_dispatcher(self: @CoreContract) -> IRouterDispatcher {
+        IRouterDispatcher { contract_address: *self.address }
+    }
+
     fn register_dispatcher(self: @CoreContract) -> IRegisterClientDispatcher {
         IRegisterClientDispatcher { contract_address: *self.address }
     }
@@ -45,6 +50,10 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn register_client(self: @CoreContract, client_type: felt252, client_address: ContractAddress) {
         self.register_dispatcher().register_client(client_type, client_address)
+    }
+
+    fn register_app(self: @CoreContract, port_id: ByteArray, app_address: ContractAddress) {
+        self.router_dispatcher().bind_port_id(port_id, app_address)
     }
 
     fn recv_packet(self: @CoreContract, msg: MsgRecvPacket) {

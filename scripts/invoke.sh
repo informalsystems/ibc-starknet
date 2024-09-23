@@ -14,7 +14,6 @@ invoke() {
     output=$(
         starkli invoke $address ibc_token_address 0 \
         --rpc $RPC_URL \
-        --compiler-version $COMPILER_VERSION \
         --account $ACCOUNT_SRC \
         --keystore $KEYSTORE_SRC \
         --keystore-password $KEYSTORE_PASS \

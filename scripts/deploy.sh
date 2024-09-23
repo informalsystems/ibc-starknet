@@ -11,7 +11,7 @@ case "$OSTYPE" in
 esac
 
 version() {
-    starkli --version 1>&2
+    echo "starkli: $(starkli --version)"
     scarb --version 1>&2
 }
 
@@ -60,7 +60,7 @@ deploy() {
 
     output=$(
         starkli deploy --not-unique \
-        --watch $IC20_CLASS_HASH $ERC20_CLASS_HASH \
+        --watch $IC20_CLASS_HASH '1' $ERC20_CLASS_HASH \
         --rpc $RPC_URL \
         --account $ACCOUNT_SRC \
         --keystore $KEYSTORE_SRC \
