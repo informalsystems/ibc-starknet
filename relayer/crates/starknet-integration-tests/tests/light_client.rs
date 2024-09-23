@@ -6,6 +6,7 @@ use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
+use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_init::CosmosChannelOpenInitMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_init::CosmosConnectionOpenInitMessage;
@@ -258,6 +259,19 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             channel_id
         };
+
+        {
+            let open_ack_message = CosmosChannelOpenAckMessage {
+                port_id: "transfer".into(),
+                channel_id: channel_id.to_string(),
+                counterparty_channel_id: "channel-0".into(),
+                counterparty_version: "ics20-1".into(),
+                update_height: Height::new(0, 1).unwrap(),
+                proof_try: [0; 32].into(),
+            };
+
+            cosmos_chain.send_message(open_ack_message.to_cosmos_message()).await?;
+        }
 
         Ok(())
     })
