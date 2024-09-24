@@ -1,7 +1,7 @@
 use protobuf::types::wkt::Timestamp;
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, Name
+    DecodeContextImpl, ProtoName
 };
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{
@@ -33,7 +33,7 @@ impl ConsensusAsProtoMessage of ProtoMessage<Consensus> {
     }
 }
 
-impl ConsensusAsName of Name<Consensus> {
+impl ConsensusAsProtoName of ProtoName<Consensus> {
     fn type_url() -> ByteArray {
         "Consensus"
     }
@@ -63,7 +63,7 @@ impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
     }
 }
 
-impl PartSetHeaderAsName of Name<PartSetHeader> {
+impl PartSetHeaderAsProtoName of ProtoName<PartSetHeader> {
     fn type_url() -> ByteArray {
         "PartSetHeader"
     }
@@ -93,7 +93,7 @@ impl BlockIdAsProtoMessage of ProtoMessage<BlockId> {
     }
 }
 
-impl BlockIdAsName of Name<BlockId> {
+impl BlockIdAsProtoName of ProtoName<BlockId> {
     fn type_url() -> ByteArray {
         "BlockId"
     }
@@ -159,7 +159,7 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
     }
 }
 
-impl HeaderAsName of Name<Header> {
+impl HeaderAsProtoName of ProtoName<Header> {
     fn type_url() -> ByteArray {
         "Header"
     }
@@ -227,7 +227,7 @@ impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
     }
 }
 
-impl CommitSigAsName of Name<CommitSig> {
+impl CommitSigAsProtoName of ProtoName<CommitSig> {
     fn type_url() -> ByteArray {
         "CommitSig"
     }
@@ -263,7 +263,7 @@ impl CommitAsProtoMessage of ProtoMessage<Commit> {
     }
 }
 
-impl CommitAsName of Name<Commit> {
+impl CommitAsProtoName of ProtoName<Commit> {
     fn type_url() -> ByteArray {
         "Commit"
     }
@@ -293,7 +293,7 @@ impl SignedHeaderAsProtoMessage of ProtoMessage<SignedHeader> {
     }
 }
 
-impl SignedHeaderAsName of Name<SignedHeader> {
+impl SignedHeaderAsProtoName of ProtoName<SignedHeader> {
     fn type_url() -> ByteArray {
         "SignedHeader"
     }
@@ -324,7 +324,7 @@ impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
     }
 }
 
-impl PublicKeyAsName of Name<PublicKey> {
+impl PublicKeyAsProtoName of ProtoName<PublicKey> {
     fn type_url() -> ByteArray {
         "PublicKey"
     }
@@ -360,7 +360,7 @@ impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
     }
 }
 
-impl ValidatorAsName of Name<Validator> {
+impl ValidatorAsProtoName of ProtoName<Validator> {
     fn type_url() -> ByteArray {
         "Validator"
     }
@@ -393,7 +393,7 @@ impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
     }
 }
 
-impl ValidatorSetAsName of Name<ValidatorSet> {
+impl ValidatorSetAsProtoName of ProtoName<ValidatorSet> {
     fn type_url() -> ByteArray {
         "ValidatorSet"
     }

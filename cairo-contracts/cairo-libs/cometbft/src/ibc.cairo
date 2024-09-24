@@ -1,6 +1,6 @@
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, Name
+    DecodeContextImpl, ProtoName
 };
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
 use protobuf::primitives::numeric::UnsignedAsProtoMessage;
@@ -30,7 +30,7 @@ impl HeightAsProtoMessage of ProtoMessage<Height> {
     }
 }
 
-impl HeightAsName of Name<Height> {
+impl HeightAsProtoName of ProtoName<Height> {
     fn type_url() -> ByteArray {
         "ibc.core.client.v1.Height"
     }
@@ -57,7 +57,7 @@ impl MerkleRootAsProtoMessage of ProtoMessage<MerkleRoot> {
     }
 }
 
-impl MerkleRootAsName of Name<MerkleRoot> {
+impl MerkleRootAsProtoName of ProtoName<MerkleRoot> {
     fn type_url() -> ByteArray {
         "ibc.core.commitment.v1.MerkleRoot"
     }

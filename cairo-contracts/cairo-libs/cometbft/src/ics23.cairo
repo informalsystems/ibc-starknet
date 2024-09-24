@@ -1,6 +1,6 @@
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, Name
+    DecodeContextImpl, ProtoName
 };
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
@@ -140,7 +140,7 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
     }
 }
 
-impl InnerSpecAsName of Name<InnerSpec> {
+impl InnerSpecAsProtoName of ProtoName<InnerSpec> {
     fn type_url() -> ByteArray {
         "InnerSpec"
     }
@@ -179,7 +179,7 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
     }
 }
 
-impl LeafOpAsName of Name<LeafOp> {
+impl LeafOpAsProtoName of ProtoName<LeafOp> {
     fn type_url() -> ByteArray {
         "LeafOp"
     }
@@ -218,7 +218,7 @@ impl ProofSpecAsProtoMessage of ProtoMessage<ProofSpec> {
     }
 }
 
-impl ProofSpecAsName of Name<ProofSpec> {
+impl ProofSpecAsProtoName of ProtoName<ProofSpec> {
     fn type_url() -> ByteArray {
         "ProofSpec"
     }

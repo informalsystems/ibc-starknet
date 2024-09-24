@@ -6,7 +6,7 @@ use cometbft::types::{SignedHeader, ValidatorSet};
 
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, Name
+    DecodeContextImpl, ProtoName
 };
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
@@ -64,7 +64,7 @@ impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
 }
 
 
-impl ClientStateAsName of Name<ClientState> {
+impl ClientStateAsProtoName of ProtoName<ClientState> {
     fn type_url() -> ByteArray {
         "ClientState"
     }
@@ -98,7 +98,7 @@ impl ConsensusStateAsProtoMessage of ProtoMessage<ConsensusState> {
     }
 }
 
-impl ConsensusStateAsName of Name<ConsensusState> {
+impl ConsensusStateAsProtoName of ProtoName<ConsensusState> {
     fn type_url() -> ByteArray {
         "ConsensusState"
     }
@@ -131,7 +131,7 @@ impl MisbehaviourAsProtoMessage of ProtoMessage<Misbehaviour> {
     }
 }
 
-impl MisbehaviourAsName of Name<Misbehaviour> {
+impl MisbehaviourAsProtoName of ProtoName<Misbehaviour> {
     fn type_url() -> ByteArray {
         "Misbehaviour"
     }
@@ -167,7 +167,7 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
     }
 }
 
-pub impl HeaderAsName of Name<Header> {
+pub impl HeaderAsProtoName of ProtoName<Header> {
     fn type_url() -> ByteArray {
         "Header"
     }

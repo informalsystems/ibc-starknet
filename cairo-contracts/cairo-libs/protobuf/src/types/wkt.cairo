@@ -1,5 +1,5 @@
 use protobuf::types::message::{
-    ProtoMessage, Name, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    ProtoMessage, ProtoName, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
     DecodeContextImpl
 };
 use protobuf::types::tag::WireType;
@@ -30,7 +30,7 @@ impl DurationAsProtoMessage of ProtoMessage<Duration> {
     }
 }
 
-impl DurationAsName of Name<Duration> {
+impl DurationAsProtoName of ProtoName<Duration> {
     fn type_url() -> ByteArray {
         "type.googleapis.com/google.protobuf.Duration"
     }
@@ -60,7 +60,7 @@ impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
     }
 }
 
-impl TimestampAsName of Name<Timestamp> {
+impl TimestampAsProtoName of ProtoName<Timestamp> {
     fn type_url() -> ByteArray {
         "type.googleapis.com/google.protobuf.Timestamp"
     }
@@ -91,7 +91,7 @@ impl AnyAsProtoMessage of ProtoMessage<Any> {
 }
 
 
-impl AnyAsName of Name<Any> {
+impl AnyAsProtoName of ProtoName<Any> {
     fn type_url() -> ByteArray {
         "type.googleapis.com/google.protobuf.Any"
     }

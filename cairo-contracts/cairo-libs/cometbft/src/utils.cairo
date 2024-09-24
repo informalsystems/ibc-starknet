@@ -1,6 +1,6 @@
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, Name
+    DecodeContextImpl, ProtoName
 };
 use protobuf::types::tag::WireType;
 
@@ -28,7 +28,7 @@ impl FractionAsProtoMessage of ProtoMessage<Fraction> {
     }
 }
 
-impl FractionAsName of Name<Fraction> {
+impl FractionAsProtoName of ProtoName<Fraction> {
     fn type_url() -> ByteArray {
         "Fraction"
     }

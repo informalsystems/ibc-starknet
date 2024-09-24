@@ -8,7 +8,7 @@ pub trait ProtoMessage<T> {
     fn wire_type() -> WireType;
 }
 
-pub trait Name<T, +ProtoMessage<T>> {
+pub trait ProtoName<T, +ProtoMessage<T>> {
     fn type_url() -> ByteArray;
 }
 
@@ -164,14 +164,14 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
         context.buffer
     }
 
-    fn from_any<T, +Name<T>, +ProtoMessage<T>, +Drop<T>, +Default<T>>(any: @Any) -> T {
-        if any.type_url != @Name::<T>::type_url() {
+    fn from_any<T, +ProtoName<T>, +ProtoMessage<T>, +Drop<T>, +Default<T>>(any: @Any) -> T {
+        if any.type_url != @ProtoName::<T>::type_url() {
             panic!("unexpected type URL");
         }
         Self::decode::<T>(any.value)
     }
 
-    fn to_any<T, +Name<T>, +ProtoMessage<T>>(self: @T) -> Any {
-        Any { type_url: Name::<T>::type_url(), value: Self::encode(self) }
+    fn to_any<T, +ProtoName<T>, +ProtoMessage<T>>(self: @T) -> Any {
+        Any { type_url: ProtoName::<T>::type_url(), value: Self::encode(self) }
     }
 }

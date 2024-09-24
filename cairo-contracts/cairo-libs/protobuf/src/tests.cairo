@@ -1,5 +1,5 @@
 use protobuf::types::message::{
-    ProtoMessage, Name, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    ProtoMessage, ProtoName, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
     DecodeContextImpl
 };
 use protobuf::types::tag::WireType;
@@ -32,7 +32,7 @@ impl ProposerAsProtoMessage of ProtoMessage<Proposer> {
     }
 }
 
-impl ProposerAsName of Name<Proposer> {
+impl ProposerAsProtoName of ProtoName<Proposer> {
     fn type_url() -> ByteArray {
         "test/dummy.Proposer"
     }
@@ -111,7 +111,7 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
     }
 }
 
-pub impl TmHeaderAsName of Name<TmHeader> {
+pub impl TmHeaderAsProtoName of ProtoName<TmHeader> {
     fn type_url() -> ByteArray {
         "test/dummy.TmHeader"
     }
