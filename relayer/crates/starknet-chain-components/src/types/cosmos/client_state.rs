@@ -4,6 +4,7 @@ use hermes_cairo_encoding_components::types::either::Either;
 use hermes_cairo_encoding_components::Sum;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
+use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_encoding_components::HList;
@@ -18,13 +19,33 @@ pub struct CometClientState {
     pub status: ClientStatus,
 }
 
-pub type EncodeCometClientState = CombineEncoders<
-    HList![
-        EncodeField<symbol!("latest_height"), WithContext>,
-        EncodeField<symbol!("trusting_period"), WithContext>,
-        EncodeField<symbol!("status"), WithContext>,
-    ],
->;
+pub struct EncodeCometClientState;
+
+delegate_components! {
+    EncodeCometClientState {
+        MutEncoderComponent: CombineEncoders<
+            HList![
+                EncodeField<symbol!("latest_height"), WithContext>,
+                EncodeField<symbol!("trusting_period"), WithContext>,
+                EncodeField<symbol!("status"), WithContext>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<Self, WithContext>,
+    }
+}
+
+impl Transformer for EncodeCometClientState {
+    type From = HList![Height, u64, ClientStatus];
+    type To = CometClientState;
+
+    fn transform(HList![latest_height, trusting_period, status]: Self::From) -> CometClientState {
+        CometClientState {
+            latest_height,
+            trusting_period,
+            status,
+        }
+    }
+}
 
 #[derive(Debug)]
 pub enum ClientStatus {

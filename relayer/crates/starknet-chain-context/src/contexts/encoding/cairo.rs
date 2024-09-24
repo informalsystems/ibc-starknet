@@ -117,8 +117,8 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, Height>
     + CanEncodeAndDecode<ViaCairo, Packet>
     + CanEncodeAndDecode<ViaCairo, ClientStatus>
-    + CanEncode<ViaCairo, CometClientState>
-    + CanEncode<ViaCairo, CometConsensusState>
+    + CanEncodeAndDecode<ViaCairo, CometClientState>
+    + CanEncodeAndDecode<ViaCairo, CometConsensusState>
 {
 }
 
