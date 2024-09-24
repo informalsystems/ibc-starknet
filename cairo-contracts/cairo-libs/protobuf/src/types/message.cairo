@@ -1,6 +1,5 @@
 use protobuf::types::tag::{WireType, ProtobufTag, ProtobufTagImpl};
 use protobuf::primitives::numeric::UnsignedAsProtoMessage;
-use protobuf::types::wkt::Any;
 
 pub trait ProtoMessage<T> {
     fn decode_raw(ref self: T, ref context: DecodeContext, length: usize);
@@ -163,15 +162,5 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
         value.encode_raw(ref context);
         context.buffer
     }
-
-    fn from_any<T, +ProtoName<T>, +ProtoMessage<T>, +Drop<T>, +Default<T>>(any: @Any) -> T {
-        if any.type_url != @ProtoName::<T>::type_url() {
-            panic!("unexpected type URL");
-        }
-        Self::decode::<T>(any.value)
-    }
-
-    fn to_any<T, +ProtoName<T>, +ProtoMessage<T>>(self: @T) -> Any {
-        Any { type_url: ProtoName::<T>::type_url(), value: Self::encode(self) }
-    }
 }
+

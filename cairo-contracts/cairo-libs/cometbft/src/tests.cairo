@@ -1,4 +1,5 @@
 use protobuf::types::message::ProtoCodecImpl;
+use protobuf::types::wkt::Any;
 use protobuf::base64::decode as base64_decode;
 use cometbft::types::{ValidatorSet, SignedHeader, Header as TmHeader, Commit, CommitSig, Consensus};
 use cometbft::ibc::Height;
@@ -85,5 +86,8 @@ fn test_tm_lc_header_decode() {
     let header = ProtoCodecImpl::decode::<Header>(@bytes);
     let bytes2 = ProtoCodecImpl::encode(@header);
     assert_eq!(bytes, bytes2, "header encode/decode mismatch");
+    let any: Any = header.clone().into();
+    let header2: Header = any.try_into().unwrap();
+    assert_eq!(header2, header, "header any encode/decode mismatch");
 }
 

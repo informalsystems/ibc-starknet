@@ -1,7 +1,8 @@
 use protobuf::types::message::{
     ProtoMessage, ProtoName, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl
+    DecodeContextImpl,
 };
+use protobuf::types::wkt::Any;
 use protobuf::types::tag::WireType;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
 use protobuf::primitives::numeric::{BoolAsProtoMessage, I64AsProtoMessage};
@@ -230,7 +231,7 @@ fn test_proto_to_any() {
             Proposer { address: "pqr", pub_key: "stu", }
         ],
     };
-    let any = ProtoCodecImpl::to_any::<TmHeader>(@header);
-    let header2 = ProtoCodecImpl::from_any::<TmHeader>(@any);
+    let any: Any = header.clone().into();
+    let header2: TmHeader = any.try_into().unwrap();
     assert_eq!(header2, header, "any conversion failed");
 }

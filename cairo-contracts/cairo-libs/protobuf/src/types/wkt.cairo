@@ -96,3 +96,21 @@ impl AnyAsProtoName of ProtoName<Any> {
         "type.googleapis.com/google.protobuf.Any"
     }
 }
+
+pub impl ProtoMessageIntoAny<T, +ProtoName<T>, +ProtoMessage<T>, +Drop<T>> of Into<T, Any> {
+    fn into(self: T) -> Any {
+        Any { type_url: ProtoName::<T>::type_url(), value: ProtoCodecImpl::encode(@self), }
+    }
+}
+
+pub impl AnyTryIntoProtoMessage<
+    T, +ProtoName<T>, +ProtoMessage<T>, +Drop<T>, +Default<T>
+> of TryInto<Any, T> {
+    fn try_into(self: Any) -> Option<T> {
+        if self.type_url == ProtoName::<T>::type_url() {
+            Option::Some(ProtoCodecImpl::decode::<T>(@self.value))
+        } else {
+            Option::None
+        }
+    }
+}
