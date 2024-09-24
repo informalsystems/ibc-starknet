@@ -42,7 +42,8 @@ pub mod channel {
     pub use errors::ChannelErrors;
     pub use interface::{
         IChannelHandler, IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, IAppCallback,
-        IAppCallbackDispatcher, IAppCallbackDispatcherTrait
+        IAppCallbackDispatcher, IAppCallbackDispatcherTrait, IChannelQuery, IChannelQueryDispatcher,
+        IChannelQueryDispatcherTrait
     };
     pub use msgs::MsgRecvPacket;
     pub use types::{
@@ -70,12 +71,12 @@ pub mod client {
     pub use components::handler::ClientHandlerComponent;
     pub use errors::ClientErrors;
     pub use interface::{
-        IClientHandler, IClientHandlerDispatcher, IClientState, IClientStateDispatcher,
-        IClientStateDispatcherTrait, IClientHandlerDispatcherTrait, IClientStateValidation,
-        IClientStateValidationDispatcher, IClientStateValidationDispatcherTrait,
-        IClientStateExecution, IClientStateExecutionDispatcher,
-        IClientStateExecutionDispatcherTrait, IRegisterClient, IRegisterClientDispatcher,
-        IRegisterClientDispatcherTrait
+        IClientHandler, IClientHandlerDispatcher, IClientHandlerDispatcherTrait,
+        IClientStateValidation, IClientStateValidationDispatcher,
+        IClientStateValidationDispatcherTrait, IClientStateExecution,
+        IClientStateExecutionDispatcher, IClientStateExecutionDispatcherTrait, IRegisterClient,
+        IRegisterClientDispatcher, IRegisterClientDispatcherTrait, IClientQuery,
+        IClientQueryDispatcher, IClientQueryDispatcherTrait
     };
     pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient};
     pub use types::{

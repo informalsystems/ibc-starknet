@@ -8,8 +8,8 @@ pub(crate) mod MockCometClient {
     impl CometClientHandlerImpl =
         CometClientComponent::CometClientHandler<ContractState>;
     #[abi(embed_v0)]
-    impl CometCommonClientStateImpl =
-        CometClientComponent::CometCommonClientState<ContractState>;
+    impl CometClientQueryImpl =
+        CometClientComponent::CometClientQuery<ContractState>;
 
     #[abi(embed_v0)]
     impl CometClientValidationImpl =

@@ -1,6 +1,6 @@
 use snforge_std::start_cheat_block_timestamp_global;
 use starknet_ibc_clients::cometbft::CometClientComponent::{
-    CometClientHandler, CometCommonClientState, ClientReaderImpl
+    CometClientHandler, CometClientQuery, ClientReaderImpl
 };
 use starknet_ibc_clients::cometbft::CometClientComponent;
 use starknet_ibc_clients::tests::{MockCometClient, CometClientConfigTrait};

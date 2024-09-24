@@ -23,15 +23,6 @@ pub trait IRegisterClient<TContractState> {
 }
 
 #[starknet::interface]
-pub trait IClientState<TContractState> {
-    fn client_type(self: @TContractState) -> felt252;
-
-    fn latest_height(self: @TContractState, client_sequence: u64) -> Height;
-
-    fn status(self: @TContractState, client_sequence: u64) -> Status;
-}
-
-#[starknet::interface]
 pub trait IClientStateValidation<TContractState> {
     fn verify_membership(
         self: @TContractState,
@@ -95,4 +86,19 @@ pub trait IClientStateExecution<TContractState> {
         new_client_state: Array<felt252>,
         new_consensus_state: Array<felt252>,
     );
+}
+
+#[starknet::interface]
+pub trait IClientQuery<TContractState> {
+    fn client_type(self: @TContractState) -> felt252;
+
+    fn latest_height(self: @TContractState, client_sequence: u64) -> Height;
+
+    fn status(self: @TContractState, client_sequence: u64) -> Status;
+
+    fn client_state(self: @TContractState, client_sequence: u64) -> Array<felt252>;
+
+    fn consensus_state(
+        self: @TContractState, client_sequence: u64, height: Height
+    ) -> Array<felt252>;
 }

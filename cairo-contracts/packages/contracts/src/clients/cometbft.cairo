@@ -14,8 +14,8 @@ pub mod CometClient {
     impl CometClientHandlerImpl =
         CometClientComponent::CometClientHandler<ContractState>;
     #[abi(embed_v0)]
-    impl CometCommonClientStateImpl =
-        CometClientComponent::CometCommonClientState<ContractState>;
+    impl CometClientQueryImpl =
+        CometClientComponent::CometClientQuery<ContractState>;
 
     // NOTE: The client state validation interface is exposed for public use.
     // However, only the handler contract can invoke the execution methods.

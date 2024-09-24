@@ -16,12 +16,20 @@ pub mod RouterHandlerComponent {
     #[derive(Debug, Drop, starknet::Event)]
     pub enum Event {}
 
+    // -----------------------------------------------------------
+    // Router Initializer
+    // -----------------------------------------------------------
+
     #[generate_trait]
     pub impl RouterInitializerImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of RouterInitializerTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>) {}
     }
+
+    // -----------------------------------------------------------
+    // IRouter
+    // -----------------------------------------------------------
 
     #[embeddable_as(CoreRouterHandler)]
     impl CoreRouterHandlerImpl<
@@ -52,6 +60,10 @@ pub mod RouterHandlerComponent {
         }
     }
 
+    // -----------------------------------------------------------
+    // Router Internal
+    // -----------------------------------------------------------
+
     #[generate_trait]
     pub(crate) impl RouterInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
@@ -64,6 +76,10 @@ pub mod RouterHandlerComponent {
             maybe_app_address.into()
         }
     }
+
+    // -----------------------------------------------------------
+    // Router Reader/Writer
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub(crate) impl RouterReaderImpl<

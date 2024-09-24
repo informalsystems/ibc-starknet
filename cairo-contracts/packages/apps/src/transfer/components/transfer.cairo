@@ -73,6 +73,10 @@ pub mod TokenTransferComponent {
         pub initial_supply: u256,
     }
 
+    // -----------------------------------------------------------
+    // Transfer Initializer
+    // -----------------------------------------------------------
+
     #[generate_trait]
     pub impl TransferInitializerImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
@@ -86,6 +90,10 @@ pub mod TokenTransferComponent {
         }
     }
 
+    // -----------------------------------------------------------
+    // ISendTransfer
+    // -----------------------------------------------------------
+
     #[embeddable_as(SendTransfer)]
     impl SendTransferImpl<
         TContractState,
@@ -97,6 +105,64 @@ pub mod TokenTransferComponent {
             self.send_execute(msg);
         }
     }
+
+    // -----------------------------------------------------------
+    // IAppCallback
+    // -----------------------------------------------------------
+
+    #[embeddable_as(TransferAppCallback)]
+    impl TransferAppCallbackImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +ITransferrable<TContractState>,
+        +Drop<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
+    > of IAppCallback<ComponentState<TContractState>> {
+        fn on_recv_packet(
+            ref self: ComponentState<TContractState>, packet: Packet
+        ) -> Acknowledgement {
+            self.assert_owner();
+
+            self.recv_execute(packet);
+
+            Acknowledgement { ack: '0' }
+        }
+
+        fn on_acknowledgement_packet(
+            ref self: ComponentState<TContractState>, packet: Packet, ack: Acknowledgement
+        ) {
+            self.assert_owner();
+        }
+
+        fn on_timeout_packet(ref self: ComponentState<TContractState>, packet: Packet) {
+            self.assert_owner();
+        }
+    }
+
+    // -----------------------------------------------------------
+    // ITokenAddress
+    // -----------------------------------------------------------
+
+    #[embeddable_as(IBCTokenAddress)]
+    impl ITokenAddressImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+    > of ITokenAddress<ComponentState<TContractState>> {
+        fn ibc_token_address(
+            self: @ComponentState<TContractState>, token_key: felt252
+        ) -> Option<ContractAddress> {
+            let token_address = self.read_ibc_token_address(token_key);
+
+            if token_address.is_non_zero() {
+                Option::Some(token_address)
+            } else {
+                Option::None
+            }
+        }
+    }
+
+    // -----------------------------------------------------------
+    // Transfer Handlers
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub(crate) impl SendTransferInternalImpl<
@@ -165,35 +231,6 @@ pub mod TokenTransferComponent {
             }
 
             self.emit_send_event(msg.packet_data);
-        }
-    }
-
-    #[embeddable_as(TransferAppCallback)]
-    impl TransferAppCallbackImpl<
-        TContractState,
-        +HasComponent<TContractState>,
-        +ITransferrable<TContractState>,
-        +Drop<TContractState>,
-        impl Ownable: OwnableComponent::HasComponent<TContractState>,
-    > of IAppCallback<ComponentState<TContractState>> {
-        fn on_recv_packet(
-            ref self: ComponentState<TContractState>, packet: Packet
-        ) -> Acknowledgement {
-            self.assert_owner();
-
-            self.recv_execute(packet);
-
-            Acknowledgement { ack: '0' }
-        }
-
-        fn on_acknowledgement_packet(
-            ref self: ComponentState<TContractState>, packet: Packet, ack: Acknowledgement
-        ) {
-            self.assert_owner();
-        }
-
-        fn on_timeout_packet(ref self: ComponentState<TContractState>, packet: Packet) {
-            self.assert_owner();
         }
     }
 
@@ -281,22 +318,9 @@ pub mod TokenTransferComponent {
         }
     }
 
-    #[embeddable_as(IBCTokenAddress)]
-    impl ITokenAddressImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
-    > of ITokenAddress<ComponentState<TContractState>> {
-        fn ibc_token_address(
-            self: @ComponentState<TContractState>, token_key: felt252
-        ) -> Option<ContractAddress> {
-            let token_address = self.read_ibc_token_address(token_key);
-
-            if token_address.is_non_zero() {
-                Option::Some(token_address)
-            } else {
-                Option::None
-            }
-        }
-    }
+    // -----------------------------------------------------------
+    // Transfer Validation/Execution
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub impl TransferValidationImpl<
@@ -415,6 +439,10 @@ pub mod TokenTransferComponent {
         }
     }
 
+    // -----------------------------------------------------------
+    // Transfer Owner Assertion
+    // -----------------------------------------------------------
+
     #[generate_trait]
     pub(crate) impl OwnerAssertionImpl<
         TContractState,
@@ -427,6 +455,10 @@ pub mod TokenTransferComponent {
             assert(ownable_comp.owner() == get_caller_address(), TransferErrors::INVALID_OWNER);
         }
     }
+
+    // -----------------------------------------------------------
+    // Transfer Internal
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub(crate) impl TransferInternalImpl<
@@ -500,6 +532,10 @@ pub mod TokenTransferComponent {
         }
     }
 
+    // -----------------------------------------------------------
+    // Transfer Reader/Writer
+    // -----------------------------------------------------------
+
     #[generate_trait]
     pub(crate) impl TransferReaderImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
@@ -555,6 +591,10 @@ pub mod TokenTransferComponent {
             self.ibc_token_address_to_key.write(token_address, token_key);
         }
     }
+
+    // -----------------------------------------------------------
+    // Transfer Event Emitter
+    // -----------------------------------------------------------
 
     #[generate_trait]
     pub(crate) impl TransferEventImpl<
