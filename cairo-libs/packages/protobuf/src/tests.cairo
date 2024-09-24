@@ -21,11 +21,9 @@ impl ProposerAsProtoMessage of ProtoMessage<Proposer> {
         context.encode_field(2, self.pub_key);
     }
 
-    fn decode_raw(ref self: Proposer, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Proposer, ref context: DecodeContext) {
         context.decode_field(1, ref self.address);
         context.decode_field(2, ref self.pub_key);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -93,8 +91,7 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
         context.encode_repeated_field(9, self.proposers);
     }
 
-    fn decode_raw(ref self: TmHeader, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: TmHeader, ref context: DecodeContext) {
         context.decode_field(1, ref self.height);
         context.decode_field(2, ref self.active);
         context.decode_field(3, ref self.chain_id);
@@ -104,7 +101,6 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
         context.decode_field(7, ref self.proposer);
         context.decode_field(8, ref self.validator_type);
         context.decode_repeated_field(9, ref self.proposers);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {

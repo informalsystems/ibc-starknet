@@ -2,7 +2,7 @@ use protobuf::types::tag::{WireType, ProtobufTag, ProtobufTagImpl};
 use protobuf::primitives::numeric::UnsignedAsProtoMessage;
 
 pub trait ProtoMessage<T> {
-    fn decode_raw(ref self: T, ref context: DecodeContext, length: usize);
+    fn decode_raw(ref self: T, ref context: DecodeContext);
     fn encode_raw(self: @T, ref context: EncodeContext);
     fn wire_type() -> WireType;
 }
@@ -101,13 +101,15 @@ pub impl DecodeContextImpl of DecodeContextTrait {
 
                 assert(wire_type == tag.wire_type, 'unexpected wire type');
 
-                let mut length = 0;
-
                 if wire_type == WireType::LengthDelimited {
-                    length.decode_raw(ref self, 0);
+                    let mut length = 0;
+                    length.decode_raw(ref self);
+                    self.init_branch(length);
+                    value.decode_raw(ref self);
+                    self.end_branch();
+                } else {
+                    value.decode_raw(ref self);
                 }
-
-                value.decode_raw(ref self, length);
             } else if tag.field_number < field_number {
                 panic!(
                     "unexpected field number order: at expected field {} but got older field {}",
@@ -146,14 +148,15 @@ pub impl DecodeContextImpl of DecodeContextTrait {
 #[generate_trait]
 pub impl ProtoCodecImpl of ProtoCodecTrait {
     fn decode<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(serialized: @ByteArray) -> T {
-        let length = if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
-            serialized.len()
-        } else {
-            0
-        };
         let mut value = Default::<T>::default();
         let mut context = DecodeContextImpl::new(serialized);
-        value.decode_raw(ref context, length);
+        if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
+            context.init_branch(serialized.len());
+            value.decode_raw(ref context);
+            context.end_branch();
+        } else {
+            value.decode_raw(ref context);
+        };
         value
     }
 

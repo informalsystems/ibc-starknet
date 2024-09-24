@@ -1,3 +1,4 @@
+use super::super::types::message::DecodeContextTrait;
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl, DecodeContextImpl
 };
@@ -9,15 +10,11 @@ pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
         context.buffer.append(self);
     }
 
-    fn decode_raw(ref self: ByteArray, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
-
+    fn decode_raw(ref self: ByteArray, ref context: DecodeContext) {
         while context.can_read_branch() {
             self.append_byte(context.buffer[context.index]);
             context.index += 1;
         };
-
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -46,26 +43,24 @@ pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of Prot
         }
     }
 
-    fn decode_raw(ref self: Array<T>, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
-
+    fn decode_raw(ref self: Array<T>, ref context: DecodeContext) {
         if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
             while context.can_read_branch() {
                 let mut length = 0;
-                length.decode_raw(ref context, 0);
+                length.decode_raw(ref context);
                 let mut item = Default::<T>::default();
-                item.decode_raw(ref context, length);
+                context.init_branch(length);
+                item.decode_raw(ref context);
+                context.end_branch();
                 self.append(item);
             }
         } else {
             while context.can_read_branch() {
                 let mut item = Default::<T>::default();
-                item.decode_raw(ref context, 0);
+                item.decode_raw(ref context);
                 self.append(item);
             }
         }
-
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {

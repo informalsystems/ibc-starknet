@@ -21,11 +21,9 @@ impl ConsensusAsProtoMessage of ProtoMessage<Consensus> {
         context.encode_field(2, self.app);
     }
 
-    fn decode_raw(ref self: Consensus, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Consensus, ref context: DecodeContext) {
         context.decode_field(1, ref self.block);
         context.decode_field(2, ref self.app);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -51,11 +49,9 @@ impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
         context.encode_field(2, self.hash);
     }
 
-    fn decode_raw(ref self: PartSetHeader, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: PartSetHeader, ref context: DecodeContext) {
         context.decode_field(1, ref self.total);
         context.decode_field(2, ref self.hash);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -81,11 +77,9 @@ impl BlockIdAsProtoMessage of ProtoMessage<BlockId> {
         context.encode_field(2, self.part_set_header);
     }
 
-    fn decode_raw(ref self: BlockId, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: BlockId, ref context: DecodeContext) {
         context.decode_field(1, ref self.hash);
         context.decode_field(2, ref self.part_set_header);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -135,8 +129,7 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
         context.encode_field(14, self.proposer_address);
     }
 
-    fn decode_raw(ref self: Header, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Header, ref context: DecodeContext) {
         context.decode_field(1, ref self.version);
         context.decode_field(2, ref self.chain_id);
         context.decode_field(3, ref self.height);
@@ -151,7 +144,6 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
         context.decode_field(12, ref self.last_results_hash);
         context.decode_field(13, ref self.evidence_hash);
         context.decode_field(14, ref self.proposer_address);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -213,13 +205,11 @@ impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
         context.encode_field(4, self.signature);
     }
 
-    fn decode_raw(ref self: CommitSig, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: CommitSig, ref context: DecodeContext) {
         context.decode_field(1, ref self.block_id_flag);
         context.decode_field(2, ref self.validator_address);
         context.decode_field(3, ref self.timestamp);
         context.decode_field(4, ref self.signature);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -249,13 +239,11 @@ impl CommitAsProtoMessage of ProtoMessage<Commit> {
         context.encode_repeated_field(4, self.signatures);
     }
 
-    fn decode_raw(ref self: Commit, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Commit, ref context: DecodeContext) {
         context.decode_field(1, ref self.height);
         context.decode_field(2, ref self.round);
         context.decode_field(3, ref self.block_id);
         context.decode_repeated_field(4, ref self.signatures);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -281,11 +269,9 @@ impl SignedHeaderAsProtoMessage of ProtoMessage<SignedHeader> {
         context.encode_field(2, self.commit);
     }
 
-    fn decode_raw(ref self: SignedHeader, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: SignedHeader, ref context: DecodeContext) {
         context.decode_field(1, ref self.header);
         context.decode_field(2, ref self.commit);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -312,11 +298,9 @@ impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
         context.encode_field(2, self.secp256k1);
     }
 
-    fn decode_raw(ref self: PublicKey, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: PublicKey, ref context: DecodeContext) {
         context.decode_field(1, ref self.ed25519);
         context.decode_field(2, ref self.secp256k1);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -346,13 +330,11 @@ impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
         context.encode_field(4, self.proposer_priority);
     }
 
-    fn decode_raw(ref self: Validator, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Validator, ref context: DecodeContext) {
         context.decode_field(1, ref self.address);
         context.decode_field(2, ref self.pub_key);
         context.decode_field(3, ref self.voting_power);
         context.decode_field(4, ref self.proposer_priority);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -380,12 +362,10 @@ impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
         context.encode_field(3, self.total_voting_power);
     }
 
-    fn decode_raw(ref self: ValidatorSet, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: ValidatorSet, ref context: DecodeContext) {
         context.decode_repeated_field(1, ref self.validators);
         context.decode_field(2, ref self.proposer);
         context.decode_field(3, ref self.total_voting_power);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {

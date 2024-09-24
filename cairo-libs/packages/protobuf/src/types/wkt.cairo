@@ -18,11 +18,9 @@ impl DurationAsProtoMessage of ProtoMessage<Duration> {
         context.encode_field(2, self.nanos);
     }
 
-    fn decode_raw(ref self: Duration, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Duration, ref context: DecodeContext) {
         context.decode_field(1, ref self.seconds);
         context.decode_field(2, ref self.nanos);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -48,11 +46,9 @@ impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
         context.encode_field(2, self.nanos);
     }
 
-    fn decode_raw(ref self: Timestamp, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Timestamp, ref context: DecodeContext) {
         context.decode_field(1, ref self.seconds);
         context.decode_field(2, ref self.nanos);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -78,11 +74,9 @@ impl AnyAsProtoMessage of ProtoMessage<Any> {
         context.encode_field(2, self.value);
     }
 
-    fn decode_raw(ref self: Any, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Any, ref context: DecodeContext) {
         context.decode_field(1, ref self.type_url);
         context.decode_field(2, ref self.value);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {

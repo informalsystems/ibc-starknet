@@ -16,11 +16,9 @@ impl FractionAsProtoMessage of ProtoMessage<Fraction> {
         context.encode_field(2, self.denominator);
     }
 
-    fn decode_raw(ref self: Fraction, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Fraction, ref context: DecodeContext) {
         context.decode_field(1, ref self.numerator);
         context.decode_field(2, ref self.denominator);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {

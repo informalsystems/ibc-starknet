@@ -124,15 +124,13 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
         context.encode_field(6, self.hash);
     }
 
-    fn decode_raw(ref self: InnerSpec, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: InnerSpec, ref context: DecodeContext) {
         context.decode_repeated_field(1, ref self.child_order);
         context.decode_field(2, ref self.child_size);
         context.decode_field(3, ref self.min_prefix_length);
         context.decode_field(4, ref self.max_prefix_length);
         context.decode_field(5, ref self.empty_child);
         context.decode_field(6, ref self.hash);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -164,14 +162,12 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
         context.encode_field(5, self.prefix);
     }
 
-    fn decode_raw(ref self: LeafOp, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: LeafOp, ref context: DecodeContext) {
         context.decode_field(1, ref self.hash);
         context.decode_field(2, ref self.prehash_key);
         context.decode_field(3, ref self.prehash_value);
         context.decode_field(4, ref self.length);
         context.decode_field(5, ref self.prefix);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -203,14 +199,12 @@ impl ProofSpecAsProtoMessage of ProtoMessage<ProofSpec> {
         context.encode_field(5, self.prehash_key_before_comparison);
     }
 
-    fn decode_raw(ref self: ProofSpec, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: ProofSpec, ref context: DecodeContext) {
         context.decode_field(1, ref self.leaf_spec);
         context.decode_field(2, ref self.inner_spec);
         context.decode_field(3, ref self.max_depth);
         context.decode_field(4, ref self.min_depth);
         context.decode_field(5, ref self.prehash_key_before_comparison);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {

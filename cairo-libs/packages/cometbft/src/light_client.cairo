@@ -42,8 +42,7 @@ impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
         context.encode_field(11, self.allow_update_after_misbehaviour);
     }
 
-    fn decode_raw(ref self: ClientState, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: ClientState, ref context: DecodeContext) {
         context.decode_field(1, ref self.chain_id);
         context.decode_field(2, ref self.trust_level);
         context.decode_field(3, ref self.trusting_period);
@@ -55,7 +54,6 @@ impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
         context.decode_repeated_field(9, ref self.upgrade_path);
         context.decode_field(10, ref self.allow_update_after_expiry);
         context.decode_field(11, ref self.allow_update_after_misbehaviour);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -85,12 +83,10 @@ impl ConsensusStateAsProtoMessage of ProtoMessage<ConsensusState> {
         context.encode_field(3, self.next_validators_hash);
     }
 
-    fn decode_raw(ref self: ConsensusState, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: ConsensusState, ref context: DecodeContext) {
         context.decode_field(1, ref self.timestamp);
         context.decode_field(2, ref self.root);
         context.decode_field(3, ref self.next_validators_hash);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -118,12 +114,10 @@ impl MisbehaviourAsProtoMessage of ProtoMessage<Misbehaviour> {
         context.encode_field(3, self.header_2);
     }
 
-    fn decode_raw(ref self: Misbehaviour, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Misbehaviour, ref context: DecodeContext) {
         context.decode_field(1, ref self.client_id);
         context.decode_field(2, ref self.header_1);
         context.decode_field(3, ref self.header_2);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {
@@ -153,13 +147,11 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
         context.encode_field(4, self.trusted_validator_set);
     }
 
-    fn decode_raw(ref self: Header, ref context: DecodeContext, length: usize) {
-        context.init_branch(length);
+    fn decode_raw(ref self: Header, ref context: DecodeContext) {
         context.decode_field(1, ref self.signed_header);
         context.decode_field(2, ref self.validator_set);
         context.decode_field(3, ref self.trusted_height);
         context.decode_field(4, ref self.trusted_validator_set);
-        context.end_branch();
     }
 
     fn wire_type() -> WireType {

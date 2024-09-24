@@ -17,8 +17,7 @@ pub impl UnsignedAsProtoMessage<
         context.buffer.append(@bytes);
     }
 
-    fn decode_raw(ref self: T, ref context: DecodeContext, length: usize) {
-        assert(length == 0, 'invalid length for u64');
+    fn decode_raw(ref self: T, ref context: DecodeContext) {
         self = decode_varint_u64(context.buffer, ref context.index).try_into().unwrap()
     }
 
@@ -33,9 +32,9 @@ pub impl I32AsProtoMessage of ProtoMessage<i32> {
         num.encode_raw(ref context);
     }
 
-    fn decode_raw(ref self: i32, ref context: DecodeContext, length: usize) {
+    fn decode_raw(ref self: i32, ref context: DecodeContext) {
         let mut num: u32 = 0;
-        num.decode_raw(ref context, length);
+        num.decode_raw(ref context);
         self = decode_2_complement_32(@num)
     }
 
@@ -50,9 +49,9 @@ pub impl I64AsProtoMessage of ProtoMessage<i64> {
         num.encode_raw(ref context);
     }
 
-    fn decode_raw(ref self: i64, ref context: DecodeContext, length: usize) {
+    fn decode_raw(ref self: i64, ref context: DecodeContext) {
         let mut num: u64 = 0;
-        num.decode_raw(ref context, length);
+        num.decode_raw(ref context);
         self = decode_2_complement_64(@num)
     }
 
@@ -71,10 +70,9 @@ pub impl BoolAsProtoMessage of ProtoMessage<bool> {
         num.encode_raw(ref context);
     }
 
-    fn decode_raw(ref self: bool, ref context: DecodeContext, length: usize) {
-        assert(length == 0, 'invalid length for bool');
+    fn decode_raw(ref self: bool, ref context: DecodeContext) {
         let mut num: u64 = 0;
-        num.decode_raw(ref context, length);
+        num.decode_raw(ref context);
         if num != 0 && num != 1 {
             panic!("invalid boolean value");
         }
