@@ -8,7 +8,7 @@ pub trait ProtoMessage<T> {
     fn wire_type() -> WireType;
 }
 
-pub trait ProtoName<T, +ProtoMessage<T>> {
+pub trait ProtoName<T> {
     fn type_url() -> ByteArray;
 }
 
