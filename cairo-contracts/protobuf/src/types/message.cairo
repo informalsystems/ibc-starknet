@@ -1,56 +1,95 @@
 use protobuf::types::tag::{WireType, ProtobufTag, ProtobufTagImpl};
-use protobuf::primitives::numeric::NumberAsProtoMessage;
+use protobuf::primitives::numeric::UnsignedAsProtoMessage;
 use protobuf::types::wkt::Any;
 
 pub trait ProtoMessage<T> {
-    fn decode_raw(ref value: T, serialized: @ByteArray, ref index: usize, length: usize);
-    fn encode_raw(self: @T, ref output: ByteArray);
+    fn decode_raw(ref self: T, ref context: DecodeContext, length: usize);
+    fn encode_raw(self: @T, ref context: EncodeContext);
     fn wire_type() -> WireType;
+}
+
+pub trait Name<T, +ProtoMessage<T>> {
     fn type_url() -> ByteArray;
 }
 
-pub struct ProtoCodec {}
+#[derive(Drop)]
+pub struct EncodeContext {
+    pub buffer: ByteArray,
+}
 
 #[generate_trait]
-pub impl ProtoCodecImpl of ProtoCodecTrait {
-    fn decode<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(serialized: @ByteArray) -> T {
-        let mut index = 0;
-        let length = if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
-            serialized.len()
-        } else {
-            0
-        };
-        let mut value = Default::<T>::default();
-        ProtoMessage::<T>::decode_raw(ref value, serialized, ref index, length);
-        value
+pub impl EncodeContextImpl of EncodeContextTrait {
+    fn new() -> EncodeContext {
+        EncodeContext { buffer: "" }
     }
 
-    fn encode<T, +ProtoMessage<T>>(value: @T) -> ByteArray {
-        let mut bytes = "";
-        value.encode_raw(ref bytes);
-        bytes
-    }
-
-    fn from_any<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(any: @Any) -> T {
-        if any.type_url != @ProtoMessage::<T>::type_url() {
-            panic!("unexpected type URL");
+    fn encode_field<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Drop<T>>(
+        ref self: EncodeContext, field_number: u8, value: @T
+    ) {
+        // ignore default values
+        if value != @Default::<T>::default() {
+            let mut context2 = Self::new();
+            value.encode_raw(ref context2);
+            let wire_type = ProtoMessage::<T>::wire_type();
+            self.buffer.append_byte(ProtobufTag { field_number, wire_type }.encode());
+            if wire_type == WireType::LengthDelimited {
+                context2.buffer.len().encode_raw(ref self);
+            }
+            self.buffer.append(@context2.buffer);
         }
-        Self::decode::<T>(any.value)
     }
 
-    fn to_any<T, +ProtoMessage<T>>(value: @T) -> Any {
-        Any { type_url: ProtoMessage::<T>::type_url(), value: Self::encode(value) }
+    // for unpacked repeated fields (default for non-scalars)
+    fn encode_repeated_field<T, +ProtoMessage<T>>(
+        ref self: EncodeContext, field_number: u8, value: @Array<T>
+    ) {
+        let mut i = 0;
+        while i < value.len() {
+            let mut context2 = Self::new();
+            (value[i]).encode_raw(ref context2);
+            // do not ignore default values
+            let wire_type = ProtoMessage::<T>::wire_type();
+            self.buffer.append_byte(ProtobufTag { field_number, wire_type }.encode());
+            if wire_type == WireType::LengthDelimited {
+                context2.buffer.len().encode_raw(ref self);
+            }
+            self.buffer.append(@context2.buffer);
+
+            i += 1;
+        }
+    }
+}
+
+#[derive(Drop)]
+pub struct DecodeContext {
+    pub buffer: @ByteArray,
+    pub index: usize,
+    pub limits: Array<usize>,
+}
+
+#[generate_trait]
+pub impl DecodeContextImpl of DecodeContextTrait {
+    fn new(buffer: @ByteArray) -> DecodeContext {
+        DecodeContext { buffer, index: 0, limits: array![] }
     }
 
+    fn init_branch(ref self: DecodeContext, length: usize) {
+        let limit = self.index + length;
+        assert(limit <= self.buffer.len(), 'bigger limit for branch');
+        self.limits.append(self.index + length);
+    }
+
+    fn can_read_branch(ref self: DecodeContext) -> bool {
+        @self.index < self.limits[self.limits.len() - 1]
+    }
 
     fn decode_field<T, +ProtoMessage<T>, +Drop<T>>(
-        field_number: u8, ref value: T, serialized: @ByteArray, ref index: usize, bound: usize
+        ref self: DecodeContext, field_number: u8, ref value: T
     ) {
-        assert(bound <= serialized.len(), 'invalid bound');
-        if index < serialized.len() && index < bound {
-            let tag = ProtobufTagImpl::decode(serialized[index]);
+        if self.can_read_branch() {
+            let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
             if tag.field_number == field_number {
-                index += 1;
+                self.index += 1;
 
                 let wire_type = ProtoMessage::<T>::wire_type();
 
@@ -66,10 +105,10 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
                 let mut length = 0;
 
                 if wire_type == WireType::LengthDelimited {
-                    ProtoMessage::<usize>::decode_raw(ref length, serialized, ref index, 0);
+                    length.decode_raw(ref self, 0);
                 }
 
-                ProtoMessage::<T>::decode_raw(ref value, serialized, ref index, length);
+                value.decode_raw(ref self, length);
             } else if tag.field_number < field_number {
                 panic!(
                     "unexpected field number order: at expected field {} but got older field {}",
@@ -80,61 +119,59 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
         }
     }
 
-    fn encode_field<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Clone<T>, +Drop<T>>(
-        field_number: u8, value: @T, ref output: ByteArray
-    ) {
-        // ignore default values
-        if value != @Default::<T>::default() {
-            let mut bytes = "";
-            value.encode_raw(ref bytes);
-            let wire_type = ProtoMessage::<T>::wire_type();
-            output.append_byte(ProtobufTag { field_number, wire_type }.encode());
-            if wire_type == WireType::LengthDelimited {
-                ProtoMessage::<usize>::encode_raw(@bytes.len(), ref output);
-            }
-            output.append(@bytes);
-        }
-    }
-
     // for unpacked repeated fields (default for non-scalars)
-    fn decode_repeated_field<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(
-        field_number: u8,
-        ref value: Array<T>,
-        serialized: @ByteArray,
-        ref index: usize,
-        bound: usize
+    fn decode_repeated_field<T, +ProtoMessage<T>, +Default<T>, +Drop<T>>(
+        ref self: DecodeContext, field_number: u8, ref value: Array<T>
     ) {
-        while index < bound {
-            let tag = ProtobufTagImpl::decode(serialized[index]);
+        while self.can_read_branch() {
+            let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
             if tag.field_number != field_number {
                 break;
             }
             let mut item = Default::<T>::default();
 
-            Self::decode_field(field_number, ref item, serialized, ref index, bound);
+            self.decode_field(field_number, ref item);
             value.append(item);
         };
-
-        assert(index <= bound, 'invalid length for repeated');
     }
 
-    // for unpacked repeated fields (default for non-scalars)
-    fn encode_repeated_field<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Clone<T>, +Drop<T>>(
-        field_number: u8, value: @Array<T>, ref output: ByteArray
-    ) {
-        let mut i = 0;
-        while i < value.len() {
-            let mut bytes = "";
-            (value[i]).encode_raw(ref bytes);
-            // do not ignore default values
-            let wire_type = ProtoMessage::<T>::wire_type();
-            output.append_byte(ProtobufTag { field_number, wire_type }.encode());
-            if wire_type == WireType::LengthDelimited {
-                ProtoMessage::<usize>::encode_raw(@bytes.len(), ref output);
-            }
-            output.append(@bytes);
+    fn end_branch(ref self: DecodeContext) {
+        // TODO(rano): pop_back is not impl for Array<T>, this is inefficient
+        let mut span = self.limits.span();
+        let limit = span.pop_back().unwrap();
+        self.limits = span.into();
+        assert(limit == @self.index, 'smaller limit for branch');
+    }
+}
 
-            i += 1;
+#[generate_trait]
+pub impl ProtoCodecImpl of ProtoCodecTrait {
+    fn decode<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(serialized: @ByteArray) -> T {
+        let length = if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
+            serialized.len()
+        } else {
+            0
+        };
+        let mut value = Default::<T>::default();
+        let mut context = DecodeContextImpl::new(serialized);
+        value.decode_raw(ref context, length);
+        value
+    }
+
+    fn encode<T, +ProtoMessage<T>>(value: @T) -> ByteArray {
+        let mut context = EncodeContextImpl::new();
+        value.encode_raw(ref context);
+        context.buffer
+    }
+
+    fn from_any<T, +Name<T>, +ProtoMessage<T>, +Drop<T>, +Default<T>>(any: @Any) -> T {
+        if any.type_url != @Name::<T>::type_url() {
+            panic!("unexpected type URL");
         }
+        Self::decode::<T>(any.value)
+    }
+
+    fn to_any<T, +Name<T>, +ProtoMessage<T>>(self: @T) -> Any {
+        Any { type_url: Name::<T>::type_url(), value: Self::encode(self) }
     }
 }

@@ -1,6 +1,9 @@
-use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
+use protobuf::types::message::{
+    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    DecodeContextImpl, Name
+};
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
-use protobuf::primitives::numeric::NumberAsProtoMessage;
+use protobuf::primitives::numeric::UnsignedAsProtoMessage;
 use protobuf::types::tag::WireType;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
@@ -10,24 +13,26 @@ pub struct Height {
 }
 
 impl HeightAsProtoMessage of ProtoMessage<Height> {
-    fn encode_raw(self: @Height, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.revision_number, ref output);
-        ProtoCodecImpl::encode_field(2, self.revision_height, ref output);
+    fn encode_raw(self: @Height, ref context: EncodeContext) {
+        context.encode_field(1, self.revision_number);
+        context.encode_field(2, self.revision_height);
     }
 
-    fn decode_raw(ref value: Height, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-        ProtoCodecImpl::decode_field(1, ref value.revision_number, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.revision_height, serialized, ref index, bound);
-        assert(index == bound, 'invalid length for Height');
+    fn decode_raw(ref self: Height, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.revision_number);
+        context.decode_field(2, ref self.revision_height);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl HeightAsName of Name<Height> {
     fn type_url() -> ByteArray {
-        "Height"
+        "ibc.core.client.v1.Height"
     }
 }
 
@@ -37,21 +42,23 @@ pub struct MerkleRoot {
 }
 
 impl MerkleRootAsProtoMessage of ProtoMessage<MerkleRoot> {
-    fn encode_raw(self: @MerkleRoot, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.hash, ref output);
+    fn encode_raw(self: @MerkleRoot, ref context: EncodeContext) {
+        context.encode_field(1, self.hash);
     }
 
-    fn decode_raw(ref value: MerkleRoot, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-        ProtoCodecImpl::decode_field(1, ref value.hash, serialized, ref index, bound);
-        assert(index == bound, 'invalid length for MerkleRoot');
+    fn decode_raw(ref self: MerkleRoot, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.hash);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl MerkleRootAsName of Name<MerkleRoot> {
     fn type_url() -> ByteArray {
-        "MerkleRoot"
+        "ibc.core.commitment.v1.MerkleRoot"
     }
 }

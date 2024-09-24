@@ -1,4 +1,7 @@
-use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
+use protobuf::types::message::{
+    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    DecodeContextImpl, Name
+};
 use protobuf::types::tag::WireType;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
@@ -8,24 +11,24 @@ pub struct Fraction {
 }
 
 impl FractionAsProtoMessage of ProtoMessage<Fraction> {
-    fn encode_raw(self: @Fraction, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.numerator, ref output);
-        ProtoCodecImpl::encode_field(2, self.denominator, ref output);
+    fn encode_raw(self: @Fraction, ref context: EncodeContext) {
+        context.encode_field(1, self.numerator);
+        context.encode_field(2, self.denominator);
     }
 
-    fn decode_raw(ref value: Fraction, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.numerator, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.denominator, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for Fraction');
+    fn decode_raw(ref self: Fraction, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.numerator);
+        context.decode_field(2, ref self.denominator);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl FractionAsName of Name<Fraction> {
     fn type_url() -> ByteArray {
         "Fraction"
     }

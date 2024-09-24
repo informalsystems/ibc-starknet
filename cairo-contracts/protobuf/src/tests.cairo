@@ -1,7 +1,10 @@
-use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
+use protobuf::types::message::{
+    ProtoMessage, Name, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    DecodeContextImpl
+};
 use protobuf::types::tag::WireType;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
-use protobuf::primitives::numeric::{BoolAsProtoMessage, NumberAsProtoMessage, I64AsProtoMessage};
+use protobuf::primitives::numeric::{BoolAsProtoMessage, I64AsProtoMessage};
 use protobuf::hex::decode as hex_decode;
 use protobuf::base64::decode as base64_decode;
 
@@ -12,24 +15,24 @@ struct Proposer {
 }
 
 impl ProposerAsProtoMessage of ProtoMessage<Proposer> {
-    fn encode_raw(self: @Proposer, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.address, ref output);
-        ProtoCodecImpl::encode_field(2, self.pub_key, ref output);
+    fn encode_raw(self: @Proposer, ref context: EncodeContext) {
+        context.encode_field(1, self.address);
+        context.encode_field(2, self.pub_key);
     }
 
-    fn decode_raw(ref value: Proposer, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.address, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.pub_key, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for Proposer');
+    fn decode_raw(ref self: Proposer, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.address);
+        context.decode_field(2, ref self.pub_key);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl ProposerAsName of Name<Proposer> {
     fn type_url() -> ByteArray {
         "test/dummy.Proposer"
     }
@@ -77,38 +80,38 @@ struct TmHeader {
 }
 
 impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
-    fn encode_raw(self: @TmHeader, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.height, ref output);
-        ProtoCodecImpl::encode_field(2, self.active, ref output);
-        ProtoCodecImpl::encode_field(3, self.chain_id, ref output);
-        ProtoCodecImpl::encode_field(4, self.time, ref output);
-        ProtoCodecImpl::encode_field(5, self.hash, ref output);
-        ProtoCodecImpl::encode_field(6, self.indexes, ref output);
-        ProtoCodecImpl::encode_field(7, self.proposer, ref output);
-        ProtoCodecImpl::encode_field(8, self.validator_type, ref output);
-        ProtoCodecImpl::encode_repeated_field(9, self.proposers, ref output);
+    fn encode_raw(self: @TmHeader, ref context: EncodeContext) {
+        context.encode_field(1, self.height);
+        context.encode_field(2, self.active);
+        context.encode_field(3, self.chain_id);
+        context.encode_field(4, self.time);
+        context.encode_field(5, self.hash);
+        context.encode_field(6, self.indexes);
+        context.encode_field(7, self.proposer);
+        context.encode_field(8, self.validator_type);
+        context.encode_repeated_field(9, self.proposers);
     }
 
-    fn decode_raw(ref value: TmHeader, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.height, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.active, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(3, ref value.chain_id, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(4, ref value.time, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(5, ref value.hash, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(6, ref value.indexes, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(7, ref value.proposer, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(8, ref value.validator_type, serialized, ref index, bound);
-        ProtoCodecImpl::decode_repeated_field(9, ref value.proposers, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for TmHeader');
+    fn decode_raw(ref self: TmHeader, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.height);
+        context.decode_field(2, ref self.active);
+        context.decode_field(3, ref self.chain_id);
+        context.decode_field(4, ref self.time);
+        context.decode_field(5, ref self.hash);
+        context.decode_field(6, ref self.indexes);
+        context.decode_field(7, ref self.proposer);
+        context.decode_field(8, ref self.validator_type);
+        context.decode_repeated_field(9, ref self.proposers);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+pub impl TmHeaderAsName of Name<TmHeader> {
     fn type_url() -> ByteArray {
         "test/dummy.TmHeader"
     }
@@ -227,7 +230,7 @@ fn test_proto_to_any() {
             Proposer { address: "pqr", pub_key: "stu", }
         ],
     };
-    let any = ProtoCodecImpl::to_any(@header);
+    let any = ProtoCodecImpl::to_any::<TmHeader>(@header);
     let header2 = ProtoCodecImpl::from_any::<TmHeader>(@any);
     assert_eq!(header2, header, "any conversion failed");
 }

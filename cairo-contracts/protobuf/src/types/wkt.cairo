@@ -1,4 +1,7 @@
-use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
+use protobuf::types::message::{
+    ProtoMessage, Name, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    DecodeContextImpl
+};
 use protobuf::types::tag::WireType;
 use protobuf::primitives::numeric::{I32AsProtoMessage, I64AsProtoMessage};
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
@@ -9,25 +12,25 @@ pub struct Duration {
     pub nanos: i32,
 }
 
-impl DuractionAsProtoMessage of ProtoMessage<Duration> {
-    fn encode_raw(self: @Duration, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.seconds, ref output);
-        ProtoCodecImpl::encode_field(2, self.nanos, ref output);
+impl DurationAsProtoMessage of ProtoMessage<Duration> {
+    fn encode_raw(self: @Duration, ref context: EncodeContext) {
+        context.encode_field(1, self.seconds);
+        context.encode_field(2, self.nanos);
     }
 
-    fn decode_raw(ref value: Duration, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.seconds, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.nanos, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for Duration');
+    fn decode_raw(ref self: Duration, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.seconds);
+        context.decode_field(2, ref self.nanos);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl DurationAsName of Name<Duration> {
     fn type_url() -> ByteArray {
         "type.googleapis.com/google.protobuf.Duration"
     }
@@ -40,24 +43,24 @@ pub struct Timestamp {
 }
 
 impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
-    fn encode_raw(self: @Timestamp, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.seconds, ref output);
-        ProtoCodecImpl::encode_field(2, self.nanos, ref output);
+    fn encode_raw(self: @Timestamp, ref context: EncodeContext) {
+        context.encode_field(1, self.seconds);
+        context.encode_field(2, self.nanos);
     }
 
-    fn decode_raw(ref value: Timestamp, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.seconds, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.nanos, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for Timestamp');
+    fn decode_raw(ref self: Timestamp, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.seconds);
+        context.decode_field(2, ref self.nanos);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl TimestampAsName of Name<Timestamp> {
     fn type_url() -> ByteArray {
         "type.googleapis.com/google.protobuf.Timestamp"
     }
@@ -70,24 +73,25 @@ pub struct Any {
 }
 
 impl AnyAsProtoMessage of ProtoMessage<Any> {
-    fn encode_raw(self: @Any, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.type_url, ref output);
-        ProtoCodecImpl::encode_field(2, self.value, ref output);
+    fn encode_raw(self: @Any, ref context: EncodeContext) {
+        context.encode_field(1, self.type_url);
+        context.encode_field(2, self.value);
     }
 
-    fn decode_raw(ref value: Any, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.type_url, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.value, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for Any');
+    fn decode_raw(ref self: Any, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.type_url);
+        context.decode_field(2, ref self.value);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+
+impl AnyAsName of Name<Any> {
     fn type_url() -> ByteArray {
         "type.googleapis.com/google.protobuf.Any"
     }

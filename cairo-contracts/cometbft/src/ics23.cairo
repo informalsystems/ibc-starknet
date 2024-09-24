@@ -1,6 +1,9 @@
-use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
+use protobuf::types::message::{
+    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    DecodeContextImpl, Name
+};
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
-use protobuf::primitives::numeric::{NumberAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
+use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
@@ -112,32 +115,32 @@ pub struct InnerSpec {
 }
 
 impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
-    fn encode_raw(self: @InnerSpec, ref output: ByteArray) {
-        ProtoCodecImpl::encode_repeated_field(1, self.child_order, ref output);
-        ProtoCodecImpl::encode_field(2, self.child_size, ref output);
-        ProtoCodecImpl::encode_field(3, self.min_prefix_length, ref output);
-        ProtoCodecImpl::encode_field(4, self.max_prefix_length, ref output);
-        ProtoCodecImpl::encode_field(5, self.empty_child, ref output);
-        ProtoCodecImpl::encode_field(6, self.hash, ref output);
+    fn encode_raw(self: @InnerSpec, ref context: EncodeContext) {
+        context.encode_repeated_field(1, self.child_order);
+        context.encode_field(2, self.child_size);
+        context.encode_field(3, self.min_prefix_length);
+        context.encode_field(4, self.max_prefix_length);
+        context.encode_field(5, self.empty_child);
+        context.encode_field(6, self.hash);
     }
 
-    fn decode_raw(ref value: InnerSpec, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-        ProtoCodecImpl::decode_repeated_field(
-            1, ref value.child_order, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_field(2, ref value.child_size, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(3, ref value.min_prefix_length, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(4, ref value.max_prefix_length, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(5, ref value.empty_child, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(6, ref value.hash, serialized, ref index, bound);
-        assert(index == bound, 'invalid length for InnerSpec');
+    fn decode_raw(ref self: InnerSpec, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_repeated_field(1, ref self.child_order);
+        context.decode_field(2, ref self.child_size);
+        context.decode_field(3, ref self.min_prefix_length);
+        context.decode_field(4, ref self.max_prefix_length);
+        context.decode_field(5, ref self.empty_child);
+        context.decode_field(6, ref self.hash);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl InnerSpecAsName of Name<InnerSpec> {
     fn type_url() -> ByteArray {
         "InnerSpec"
     }
@@ -153,28 +156,30 @@ pub struct LeafOp {
 }
 
 impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
-    fn encode_raw(self: @LeafOp, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.hash, ref output);
-        ProtoCodecImpl::encode_field(2, self.prehash_key, ref output);
-        ProtoCodecImpl::encode_field(3, self.prehash_value, ref output);
-        ProtoCodecImpl::encode_field(4, self.length, ref output);
-        ProtoCodecImpl::encode_field(5, self.prefix, ref output);
+    fn encode_raw(self: @LeafOp, ref context: EncodeContext) {
+        context.encode_field(1, self.hash);
+        context.encode_field(2, self.prehash_key);
+        context.encode_field(3, self.prehash_value);
+        context.encode_field(4, self.length);
+        context.encode_field(5, self.prefix);
     }
 
-    fn decode_raw(ref value: LeafOp, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-        ProtoCodecImpl::decode_field(1, ref value.hash, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.prehash_key, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(3, ref value.prehash_value, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(4, ref value.length, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(5, ref value.prefix, serialized, ref index, bound);
-        assert(index == bound, 'invalid length for LeafOp');
+    fn decode_raw(ref self: LeafOp, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.hash);
+        context.decode_field(2, ref self.prehash_key);
+        context.decode_field(3, ref self.prehash_value);
+        context.decode_field(4, ref self.length);
+        context.decode_field(5, ref self.prefix);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl LeafOpAsName of Name<LeafOp> {
     fn type_url() -> ByteArray {
         "LeafOp"
     }
@@ -190,30 +195,30 @@ pub struct ProofSpec {
 }
 
 impl ProofSpecAsProtoMessage of ProtoMessage<ProofSpec> {
-    fn encode_raw(self: @ProofSpec, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.leaf_spec, ref output);
-        ProtoCodecImpl::encode_field(2, self.inner_spec, ref output);
-        ProtoCodecImpl::encode_field(3, self.max_depth, ref output);
-        ProtoCodecImpl::encode_field(4, self.min_depth, ref output);
-        ProtoCodecImpl::encode_field(5, self.prehash_key_before_comparison, ref output);
+    fn encode_raw(self: @ProofSpec, ref context: EncodeContext) {
+        context.encode_field(1, self.leaf_spec);
+        context.encode_field(2, self.inner_spec);
+        context.encode_field(3, self.max_depth);
+        context.encode_field(4, self.min_depth);
+        context.encode_field(5, self.prehash_key_before_comparison);
     }
 
-    fn decode_raw(ref value: ProofSpec, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-        ProtoCodecImpl::decode_field(1, ref value.leaf_spec, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.inner_spec, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(3, ref value.max_depth, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(4, ref value.min_depth, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(
-            5, ref value.prehash_key_before_comparison, serialized, ref index, bound
-        );
-        assert(index == bound, 'invalid length for ProofSpec');
+    fn decode_raw(ref self: ProofSpec, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.leaf_spec);
+        context.decode_field(2, ref self.inner_spec);
+        context.decode_field(3, ref self.max_depth);
+        context.decode_field(4, ref self.min_depth);
+        context.decode_field(5, ref self.prehash_key_before_comparison);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl ProofSpecAsName of Name<ProofSpec> {
     fn type_url() -> ByteArray {
         "ProofSpec"
     }

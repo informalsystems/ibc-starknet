@@ -1,4 +1,4 @@
-use protobuf::types::message::{ProtoCodecImpl};
+use protobuf::types::message::ProtoCodecImpl;
 use protobuf::base64::decode as base64_decode;
 use cometbft::types::{ValidatorSet, SignedHeader, Header as TmHeader, Commit, CommitSig, Consensus};
 use cometbft::ibc::Height;

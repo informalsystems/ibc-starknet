@@ -1,8 +1,11 @@
 use protobuf::types::wkt::Timestamp;
-use protobuf::types::message::{ProtoMessage, ProtoCodecImpl};
+use protobuf::types::message::{
+    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    DecodeContextImpl, Name
+};
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{
-    NumberAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, BoolAsProtoMessage
+    UnsignedAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, BoolAsProtoMessage
 };
 use protobuf::types::tag::WireType;
 
@@ -13,24 +16,24 @@ pub struct Consensus {
 }
 
 impl ConsensusAsProtoMessage of ProtoMessage<Consensus> {
-    fn encode_raw(self: @Consensus, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.block, ref output);
-        ProtoCodecImpl::encode_field(2, self.app, ref output);
+    fn encode_raw(self: @Consensus, ref context: EncodeContext) {
+        context.encode_field(1, self.block);
+        context.encode_field(2, self.app);
     }
 
-    fn decode_raw(ref value: Consensus, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.block, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.app, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for Consensus');
+    fn decode_raw(ref self: Consensus, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.block);
+        context.decode_field(2, ref self.app);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl ConsensusAsName of Name<Consensus> {
     fn type_url() -> ByteArray {
         "Consensus"
     }
@@ -43,26 +46,24 @@ pub struct PartSetHeader {
 }
 
 impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
-    fn encode_raw(self: @PartSetHeader, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.total, ref output);
-        ProtoCodecImpl::encode_field(2, self.hash, ref output);
+    fn encode_raw(self: @PartSetHeader, ref context: EncodeContext) {
+        context.encode_field(1, self.total);
+        context.encode_field(2, self.hash);
     }
 
-    fn decode_raw(
-        ref value: PartSetHeader, serialized: @ByteArray, ref index: usize, length: usize
-    ) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.total, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.hash, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for PSH');
+    fn decode_raw(ref self: PartSetHeader, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.total);
+        context.decode_field(2, ref self.hash);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl PartSetHeaderAsName of Name<PartSetHeader> {
     fn type_url() -> ByteArray {
         "PartSetHeader"
     }
@@ -75,24 +76,24 @@ pub struct BlockId {
 }
 
 impl BlockIdAsProtoMessage of ProtoMessage<BlockId> {
-    fn encode_raw(self: @BlockId, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.hash, ref output);
-        ProtoCodecImpl::encode_field(2, self.part_set_header, ref output);
+    fn encode_raw(self: @BlockId, ref context: EncodeContext) {
+        context.encode_field(1, self.hash);
+        context.encode_field(2, self.part_set_header);
     }
 
-    fn decode_raw(ref value: BlockId, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.hash, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.part_set_header, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for BlockId');
+    fn decode_raw(ref self: BlockId, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.hash);
+        context.decode_field(2, ref self.part_set_header);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl BlockIdAsName of Name<BlockId> {
     fn type_url() -> ByteArray {
         "BlockId"
     }
@@ -117,50 +118,48 @@ pub struct Header {
 }
 
 impl HeaderAsProtoMessage of ProtoMessage<Header> {
-    fn encode_raw(self: @Header, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.version, ref output);
-        ProtoCodecImpl::encode_field(2, self.chain_id, ref output);
-        ProtoCodecImpl::encode_field(3, self.height, ref output);
-        ProtoCodecImpl::encode_field(4, self.time, ref output);
-        ProtoCodecImpl::encode_field(5, self.last_block_id, ref output);
-        ProtoCodecImpl::encode_field(6, self.last_commit_hash, ref output);
-        ProtoCodecImpl::encode_field(7, self.data_hash, ref output);
-        ProtoCodecImpl::encode_field(8, self.validators_hash, ref output);
-        ProtoCodecImpl::encode_field(9, self.next_validators_hash, ref output);
-        ProtoCodecImpl::encode_field(10, self.consensus_hash, ref output);
-        ProtoCodecImpl::encode_field(11, self.app_hash, ref output);
-        ProtoCodecImpl::encode_field(12, self.last_results_hash, ref output);
-        ProtoCodecImpl::encode_field(13, self.evidence_hash, ref output);
-        ProtoCodecImpl::encode_field(14, self.proposer_address, ref output);
+    fn encode_raw(self: @Header, ref context: EncodeContext) {
+        context.encode_field(1, self.version);
+        context.encode_field(2, self.chain_id);
+        context.encode_field(3, self.height);
+        context.encode_field(4, self.time);
+        context.encode_field(5, self.last_block_id);
+        context.encode_field(6, self.last_commit_hash);
+        context.encode_field(7, self.data_hash);
+        context.encode_field(8, self.validators_hash);
+        context.encode_field(9, self.next_validators_hash);
+        context.encode_field(10, self.consensus_hash);
+        context.encode_field(11, self.app_hash);
+        context.encode_field(12, self.last_results_hash);
+        context.encode_field(13, self.evidence_hash);
+        context.encode_field(14, self.proposer_address);
     }
 
-    fn decode_raw(ref value: Header, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.version, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.chain_id, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(3, ref value.height, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(4, ref value.time, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(5, ref value.last_block_id, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(6, ref value.last_commit_hash, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(7, ref value.data_hash, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(8, ref value.validators_hash, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(
-            9, ref value.next_validators_hash, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_field(10, ref value.consensus_hash, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(11, ref value.app_hash, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(12, ref value.last_results_hash, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(13, ref value.evidence_hash, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(14, ref value.proposer_address, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for Header');
+    fn decode_raw(ref self: Header, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.version);
+        context.decode_field(2, ref self.chain_id);
+        context.decode_field(3, ref self.height);
+        context.decode_field(4, ref self.time);
+        context.decode_field(5, ref self.last_block_id);
+        context.decode_field(6, ref self.last_commit_hash);
+        context.decode_field(7, ref self.data_hash);
+        context.decode_field(8, ref self.validators_hash);
+        context.decode_field(9, ref self.next_validators_hash);
+        context.decode_field(10, ref self.consensus_hash);
+        context.decode_field(11, ref self.app_hash);
+        context.decode_field(12, ref self.last_results_hash);
+        context.decode_field(13, ref self.evidence_hash);
+        context.decode_field(14, ref self.proposer_address);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl HeaderAsName of Name<Header> {
     fn type_url() -> ByteArray {
         "Header"
     }
@@ -207,28 +206,28 @@ pub struct CommitSig {
 }
 
 impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
-    fn encode_raw(self: @CommitSig, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.block_id_flag, ref output);
-        ProtoCodecImpl::encode_field(2, self.validator_address, ref output);
-        ProtoCodecImpl::encode_field(3, self.timestamp, ref output);
-        ProtoCodecImpl::encode_field(4, self.signature, ref output);
+    fn encode_raw(self: @CommitSig, ref context: EncodeContext) {
+        context.encode_field(1, self.block_id_flag);
+        context.encode_field(2, self.validator_address);
+        context.encode_field(3, self.timestamp);
+        context.encode_field(4, self.signature);
     }
 
-    fn decode_raw(ref value: CommitSig, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.block_id_flag, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.validator_address, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(3, ref value.timestamp, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(4, ref value.signature, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for CommitSig');
+    fn decode_raw(ref self: CommitSig, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.block_id_flag);
+        context.decode_field(2, ref self.validator_address);
+        context.decode_field(3, ref self.timestamp);
+        context.decode_field(4, ref self.signature);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl CommitSigAsName of Name<CommitSig> {
     fn type_url() -> ByteArray {
         "CommitSig"
     }
@@ -243,30 +242,28 @@ pub struct Commit {
 }
 
 impl CommitAsProtoMessage of ProtoMessage<Commit> {
-    fn encode_raw(self: @Commit, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.height, ref output);
-        ProtoCodecImpl::encode_field(2, self.round, ref output);
-        ProtoCodecImpl::encode_field(3, self.block_id, ref output);
-        ProtoCodecImpl::encode_repeated_field(4, self.signatures, ref output);
+    fn encode_raw(self: @Commit, ref context: EncodeContext) {
+        context.encode_field(1, self.height);
+        context.encode_field(2, self.round);
+        context.encode_field(3, self.block_id);
+        context.encode_repeated_field(4, self.signatures);
     }
 
-    fn decode_raw(ref value: Commit, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.height, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.round, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(3, ref value.block_id, serialized, ref index, bound);
-        ProtoCodecImpl::decode_repeated_field(
-            4, ref value.signatures, serialized, ref index, bound
-        );
-
-        assert(index == bound, 'invalid length for Commit');
+    fn decode_raw(ref self: Commit, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.height);
+        context.decode_field(2, ref self.round);
+        context.decode_field(3, ref self.block_id);
+        context.decode_repeated_field(4, ref self.signatures);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl CommitAsName of Name<Commit> {
     fn type_url() -> ByteArray {
         "Commit"
     }
@@ -279,26 +276,24 @@ pub struct SignedHeader {
 }
 
 impl SignedHeaderAsProtoMessage of ProtoMessage<SignedHeader> {
-    fn encode_raw(self: @SignedHeader, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.header, ref output);
-        ProtoCodecImpl::encode_field(2, self.commit, ref output);
+    fn encode_raw(self: @SignedHeader, ref context: EncodeContext) {
+        context.encode_field(1, self.header);
+        context.encode_field(2, self.commit);
     }
 
-    fn decode_raw(
-        ref value: SignedHeader, serialized: @ByteArray, ref index: usize, length: usize
-    ) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.header, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.commit, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for SignedHeader');
+    fn decode_raw(ref self: SignedHeader, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.header);
+        context.decode_field(2, ref self.commit);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl SignedHeaderAsName of Name<SignedHeader> {
     fn type_url() -> ByteArray {
         "SignedHeader"
     }
@@ -312,24 +307,24 @@ pub struct PublicKey {
 }
 
 impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
-    fn encode_raw(self: @PublicKey, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.ed25519, ref output);
-        ProtoCodecImpl::encode_field(2, self.secp256k1, ref output);
+    fn encode_raw(self: @PublicKey, ref context: EncodeContext) {
+        context.encode_field(1, self.ed25519);
+        context.encode_field(2, self.secp256k1);
     }
 
-    fn decode_raw(ref value: PublicKey, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.ed25519, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.secp256k1, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for PublicKey');
+    fn decode_raw(ref self: PublicKey, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.ed25519);
+        context.decode_field(2, ref self.secp256k1);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl PublicKeyAsName of Name<PublicKey> {
     fn type_url() -> ByteArray {
         "PublicKey"
     }
@@ -344,28 +339,28 @@ pub struct Validator {
 }
 
 impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
-    fn encode_raw(self: @Validator, ref output: ByteArray) {
-        ProtoCodecImpl::encode_field(1, self.address, ref output);
-        ProtoCodecImpl::encode_field(2, self.pub_key, ref output);
-        ProtoCodecImpl::encode_field(3, self.voting_power, ref output);
-        ProtoCodecImpl::encode_field(4, self.proposer_priority, ref output);
+    fn encode_raw(self: @Validator, ref context: EncodeContext) {
+        context.encode_field(1, self.address);
+        context.encode_field(2, self.pub_key);
+        context.encode_field(3, self.voting_power);
+        context.encode_field(4, self.proposer_priority);
     }
 
-    fn decode_raw(ref value: Validator, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_field(1, ref value.address, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(2, ref value.pub_key, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(3, ref value.voting_power, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(4, ref value.proposer_priority, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for Validator');
+    fn decode_raw(ref self: Validator, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_field(1, ref self.address);
+        context.decode_field(2, ref self.pub_key);
+        context.decode_field(3, ref self.voting_power);
+        context.decode_field(4, ref self.proposer_priority);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl ValidatorAsName of Name<Validator> {
     fn type_url() -> ByteArray {
         "Validator"
     }
@@ -379,30 +374,26 @@ pub struct ValidatorSet {
 }
 
 impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
-    fn encode_raw(self: @ValidatorSet, ref output: ByteArray) {
-        ProtoCodecImpl::encode_repeated_field(1, self.validators, ref output);
-        ProtoCodecImpl::encode_field(2, self.proposer, ref output);
-        ProtoCodecImpl::encode_field(3, self.total_voting_power, ref output);
+    fn encode_raw(self: @ValidatorSet, ref context: EncodeContext) {
+        context.encode_repeated_field(1, self.validators);
+        context.encode_field(2, self.proposer);
+        context.encode_field(3, self.total_voting_power);
     }
 
-    fn decode_raw(
-        ref value: ValidatorSet, serialized: @ByteArray, ref index: usize, length: usize
-    ) {
-        let bound = index + length;
-
-        ProtoCodecImpl::decode_repeated_field(
-            1, ref value.validators, serialized, ref index, bound
-        );
-        ProtoCodecImpl::decode_field(2, ref value.proposer, serialized, ref index, bound);
-        ProtoCodecImpl::decode_field(3, ref value.total_voting_power, serialized, ref index, bound);
-
-        assert(index == bound, 'invalid length for ValidatorSet');
+    fn decode_raw(ref self: ValidatorSet, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
+        context.decode_repeated_field(1, ref self.validators);
+        context.decode_field(2, ref self.proposer);
+        context.decode_field(3, ref self.total_voting_power);
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
     }
+}
 
+impl ValidatorSetAsName of Name<ValidatorSet> {
     fn type_url() -> ByteArray {
         "ValidatorSet"
     }

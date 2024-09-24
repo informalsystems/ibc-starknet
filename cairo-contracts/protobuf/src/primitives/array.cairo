@@ -1,81 +1,75 @@
-use protobuf::types::message::ProtoMessage;
+use protobuf::types::message::{
+    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl, DecodeContextImpl
+};
 use protobuf::types::tag::WireType;
-use protobuf::primitives::numeric::NumberAsProtoMessage;
+use protobuf::primitives::numeric::UnsignedAsProtoMessage;
 
 pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
-    fn encode_raw(self: @ByteArray, ref output: ByteArray) {
-        output.append(self);
+    fn encode_raw(self: @ByteArray, ref context: EncodeContext) {
+        context.buffer.append(self);
     }
 
-    fn decode_raw(ref value: ByteArray, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
+    fn decode_raw(ref self: ByteArray, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
 
-        while index < bound {
-            value.append_byte(serialized[index]);
-            index += 1;
+        while context.can_read_branch() {
+            self.append_byte(context.buffer[context.index]);
+            context.index += 1;
         };
 
-        assert(index == bound, 'invalid length for byte array');
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
-    }
-
-    fn type_url() -> ByteArray {
-        ""
     }
 }
 
 
 // for packed repeated fields (default for scalars)
 pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of ProtoMessage<Array<T>> {
-    fn encode_raw(self: @Array<T>, ref output: ByteArray) {
+    fn encode_raw(self: @Array<T>, ref context: EncodeContext) {
         let mut i = 0;
         if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
             while i < self.len() {
-                let mut bytes = "";
-                ProtoMessage::<T>::encode_raw(self[i], ref bytes);
-                ProtoMessage::<usize>::encode_raw(@bytes.len(), ref output);
-                output.append(@bytes);
+                let mut context2 = EncodeContextImpl::new();
+                self[i].encode_raw(ref context2);
+                context2.buffer.len().encode_raw(ref context);
+                context.buffer.append(@context2.buffer);
                 i += 1;
             };
         } else {
             while i < self.len() {
-                ProtoMessage::<T>::encode_raw(self[i], ref output);
+                self[i].encode_raw(ref context);
                 i += 1;
             };
         }
     }
 
-    fn decode_raw(ref value: Array<T>, serialized: @ByteArray, ref index: usize, length: usize) {
-        let bound = index + length;
+    fn decode_raw(ref self: Array<T>, ref context: DecodeContext, length: usize) {
+        context.init_branch(length);
 
         if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
-            while index < bound {
+            while context.can_read_branch() {
                 let mut length = 0;
-                ProtoMessage::<usize>::decode_raw(ref length, serialized, ref index, 0);
+                length.decode_raw(ref context, 0);
                 let mut item = Default::<T>::default();
-                ProtoMessage::<T>::decode_raw(ref item, serialized, ref index, length);
-                value.append(item);
+                item.decode_raw(ref context, length);
+                self.append(item);
             }
         } else {
-            while index < bound {
+            while context.can_read_branch() {
                 let mut item = Default::<T>::default();
-                ProtoMessage::<T>::decode_raw(ref item, serialized, ref index, 0);
-                value.append(item);
+                item.decode_raw(ref context, 0);
+                self.append(item);
             }
         }
 
-        assert(index == bound, 'invalid length for array');
+        context.end_branch();
     }
 
     fn wire_type() -> WireType {
         WireType::LengthDelimited
-    }
-
-    fn type_url() -> ByteArray {
-        ""
     }
 }
 
