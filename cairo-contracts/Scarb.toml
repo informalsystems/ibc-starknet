@@ -5,7 +5,8 @@ members = [
   "packages/contracts",
   "packages/core",
   "packages/utils",
-  "protobuf",
+  "cairo-libs/protobuf",
+  "cairo-libs/cometbft",
   "cometbft",
 ]
 
