@@ -42,3 +42,13 @@ jobs:
         run: |
           nix develop -c \
             scarb test -w
+
+      - name: Cairo libraries
+        working-directory: ./cairo-libs
+        run: |
+          nix develop -c \
+            scarb check -w
+          nix develop -c \
+            scarb build -w
+          nix develop -c \
+            scarb test -w
