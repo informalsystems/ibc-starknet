@@ -1,13 +1,14 @@
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_cairo_encoding_components::types::either::Either;
-use hermes_cairo_encoding_components::{HList, Sum};
+use hermes_cairo_encoding_components::Sum;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
+use hermes_encoding_components::HList;
 use starknet::core::types::{Felt, U256};
 
 use crate::types::messages::ibc::denom::PrefixedDenom;
