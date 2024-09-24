@@ -5,9 +5,6 @@ members = [
   "packages/contracts",
   "packages/core",
   "packages/utils",
-  "cairo-libs/protobuf",
-  "cairo-libs/cometbft",
-  "cometbft",
 ]
 
 [workspace.package]
