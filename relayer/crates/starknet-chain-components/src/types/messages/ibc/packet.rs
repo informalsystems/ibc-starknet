@@ -9,7 +9,7 @@ use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
 use starknet::core::types::Felt;
 
-use crate::types::messages::ibc::height::Height;
+use crate::types::cosmos::height::Height;
 
 #[derive(HasField)]
 pub struct Packet {

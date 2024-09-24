@@ -8,7 +8,7 @@ use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
 
-#[derive(HasField)]
+#[derive(Debug, HasField)]
 pub struct Height {
     pub revision_number: u64,
     pub revision_height: u64,
