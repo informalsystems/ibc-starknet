@@ -1,0 +1,29 @@
+[workspace]
+members = [
+  "packages/protobuf",
+  "packages/cometbft",
+]
+
+[workspace.package]
+version       = "0.1.0"
+edition       = "2023_11"
+cairo-version = "2.8.0"
+scarb-version = "2.8.0"
+license       = "Apache-2.0"
+authors       = [ "Informal Systems <hello@informal.systems>" ]
+repository    = "https://github.com/informalsystems/ibc-starknet"
+Readme        = "README.md"
+keywords      = [ "protobuf", "cometbft", "ibc" ]
+description   = "Collection of Cairo libraries for IBC integration with Starknet"
+
+[workspace.scripts]
+test = "snforge test"
+
+[workspace.dependencies]
+# external dependencies
+cairo_test  = "2.8.0"
+starknet    = "2.8.0"
+snforge_std = { git = "https://github.com/foundry-rs/starknet-foundry", tag = "v0.27.0" }
+
+[workspace.tool.fmt]
+sort-module-level-items = true
