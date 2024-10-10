@@ -3,10 +3,9 @@ use std::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
-use hermes_encoding_components::traits::transform::Transformer;
+use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 
 use crate::impls::encode_mut::variant_from::EncodeVariantFrom;
-use crate::traits::transform::TransformerRef;
 use crate::types::either::Either;
 use crate::Sum;
 
@@ -25,9 +24,10 @@ pub struct TransformOption<T>(pub PhantomData<T>);
 
 impl<T> TransformerRef for TransformOption<T> {
     type From = Option<T>;
-    type To<'a> = Sum![&'a T, ()]
-        where Self: 'a
-    ;
+    type To<'a>
+        = Sum![&'a T, ()]
+    where
+        Self: 'a;
 
     fn transform<'a>(value: &'a Option<T>) -> Sum![&'a T, ()] {
         match value {
