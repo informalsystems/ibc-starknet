@@ -15,7 +15,7 @@ use starknet::core::types::{Felt, U256};
 use crate::types::cosmos::client_state::{
     ClientStatus, CometClientState, EncodeClientStatus, EncodeCometClientState,
 };
-use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsenussState};
+use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsensusState};
 use crate::types::cosmos::height::{EncodeHeight, Height};
 use crate::types::messages::erc20::deploy::{
     DeployErc20TokenMessage, EncodeDeployErc20TokenMessage,
@@ -78,6 +78,6 @@ delegate_components! {
         (ViaCairo, Packet): EncodePacket,
         (ViaCairo, ClientStatus): EncodeClientStatus,
         (ViaCairo, CometClientState): EncodeCometClientState,
-        (ViaCairo, CometConsensusState): EncodeCometConsenussState,
+        (ViaCairo, CometConsensusState): EncodeCometConsensusState,
     }
 }

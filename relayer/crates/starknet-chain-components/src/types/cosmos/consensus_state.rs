@@ -14,10 +14,10 @@ pub struct CometConsensusState {
     pub root: Felt,
 }
 
-pub struct EncodeCometConsenussState;
+pub struct EncodeCometConsensusState;
 
 delegate_components! {
-    EncodeCometConsenussState {
+    EncodeCometConsensusState {
         MutEncoderComponent: CombineEncoders<
             HList![
                 EncodeField<symbol!("timestamp"), WithContext>,
@@ -28,7 +28,7 @@ delegate_components! {
     }
 }
 
-impl Transformer for EncodeCometConsenussState {
+impl Transformer for EncodeCometConsensusState {
     type From = HList![u64, Felt];
     type To = CometConsensusState;
 
