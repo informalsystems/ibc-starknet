@@ -31,5 +31,5 @@ starknet             = { workspace = true }
 starknet_ibc_utils = { workspace = true }
 
 [dev-dependencies]
-cairo_test    = { workspace = true }
-snforge_std   = { workspace = true }
+cairo_test  = { workspace = true }
+snforge_std = { workspace = true }
