@@ -45,8 +45,8 @@ fn test_get_client_ok() {
     assert_eq!(client.address, CLIENT());
 }
 
-#[test]
 #[should_panic(expected: 'ICS02: client address is 0')]
+#[test]
 fn test_get_cleint_fail() {
     let state = setup();
     state.get_client(CLIENT_TYPE());
