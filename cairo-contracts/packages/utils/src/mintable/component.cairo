@@ -5,9 +5,12 @@ pub mod ERC20MintableComponent {
     use openzeppelin_token::erc20::erc20::ERC20Component::Transfer;
     use starknet::ContractAddress;
     use starknet::get_caller_address;
+    use starknet::storage::{
+        StoragePointerReadAccess, StorageMapReadAccess, StoragePointerWriteAccess,
+        StorageMapWriteAccess
+    };
     use starknet_ibc_utils::mintable::errors::MintableErrors;
     use starknet_ibc_utils::mintable::interface::IERC20Mintable;
-    use starknet::storage::{StoragePointerReadAccess, StorageMapReadAccess, StoragePointerWriteAccess, StorageMapWriteAccess};
 
     #[storage]
     pub struct Storage {

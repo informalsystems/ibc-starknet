@@ -1,8 +1,8 @@
 #[starknet::component]
 pub mod IBCGovernanceComponent {
+    use starknet::storage::StoragePointerWriteAccess;
     use starknet::{ContractAddress, get_caller_address};
     use starknet_ibc_utils::governance::IGovernance;
-    use starknet::storage::StoragePointerWriteAccess;
 
     #[storage]
     pub struct Storage {

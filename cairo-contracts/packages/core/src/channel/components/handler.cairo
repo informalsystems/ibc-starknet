@@ -1,11 +1,11 @@
 #[starknet::component]
 pub mod ChannelHandlerComponent {
     use ChannelEventEmitterComponent::ChannelEventEmitterTrait;
-    use starknet::storage::{StorageMapReadAccess, StorageMapWriteAccess};
     use ClientHandlerComponent::ClientInternalTrait;
     use RouterHandlerComponent::RouterInternalTrait;
     use core::num::traits::Zero;
     use starknet::storage::Map;
+    use starknet::storage::{StorageMapReadAccess, StorageMapWriteAccess};
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgRecvPacket, ChannelEnd,

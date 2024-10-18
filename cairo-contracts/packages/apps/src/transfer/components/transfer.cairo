@@ -9,7 +9,10 @@ pub mod TokenTransferComponent {
     use openzeppelin_access::ownable::interface::IOwnable;
     use starknet::ClassHash;
     use starknet::ContractAddress;
-    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess};
+    use starknet::storage::{
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess
+    };
     use starknet::{get_contract_address, get_caller_address};
     use starknet_ibc_apps::transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, Memo, TracePrefixTrait,
