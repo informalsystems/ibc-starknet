@@ -1,6 +1,7 @@
 #[starknet::component]
 pub mod ChannelHandlerComponent {
     use ChannelEventEmitterComponent::ChannelEventEmitterTrait;
+    use starknet::storage::{StorageMapReadAccess, StorageMapWriteAccess};
     use ClientHandlerComponent::ClientInternalTrait;
     use RouterHandlerComponent::RouterInternalTrait;
     use core::num::traits::Zero;
@@ -23,7 +24,7 @@ pub mod ChannelHandlerComponent {
     use starknet_ibc_utils::ValidateBasic;
 
     #[storage]
-    struct Storage {
+    pub struct Storage {
         pub channel_ends: Map<felt252, Option<ChannelEnd>>,
         pub packet_receipts: Map<felt252, Option<Receipt>>,
         pub packet_acks: Map<felt252, felt252>,

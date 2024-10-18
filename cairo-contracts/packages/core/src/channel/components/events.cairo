@@ -5,7 +5,7 @@ pub mod ChannelEventEmitterComponent {
     use starknet_ibc_core::host::{PortId, ChannelId, Sequence};
 
     #[storage]
-    struct Storage {}
+    pub struct Storage {}
 
     #[event]
     #[derive(Debug, Drop, starknet::Event)]

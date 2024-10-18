@@ -1,9 +1,10 @@
 #[starknet::component]
 pub mod TransferrableComponent {
+    use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
     use starknet_ibc_apps::transfer::{TransferErrors, ITransferrable};
 
     #[storage]
-    struct Storage {
+    pub struct Storage {
         send_capability: bool,
         receive_capability: bool,
     }

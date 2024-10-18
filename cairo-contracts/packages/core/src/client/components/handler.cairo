@@ -2,7 +2,6 @@
 pub mod ClientHandlerComponent {
     use core::num::traits::Zero;
     use starknet::ContractAddress;
-    use starknet::storage::Map;
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
     use starknet_ibc_core::client::ClientEventEmitterComponent;
     use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient};
@@ -11,9 +10,10 @@ pub mod ClientHandlerComponent {
         CreateResponse, UpdateResponse, ClientErrors, ClientContract, ClientContractHandlerTrait
     };
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
+    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
 
     #[storage]
-    struct Storage {
+    pub struct Storage {
         supported_clients: Map<felt252, ContractAddress>,
     }
 

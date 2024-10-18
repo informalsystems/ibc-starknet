@@ -7,9 +7,10 @@ pub mod ERC20MintableComponent {
     use starknet::get_caller_address;
     use starknet_ibc_utils::mintable::errors::MintableErrors;
     use starknet_ibc_utils::mintable::interface::IERC20Mintable;
+    use starknet::storage::{StoragePointerReadAccess, StorageMapReadAccess, StoragePointerWriteAccess, StorageMapWriteAccess};
 
     #[storage]
-    struct Storage {
+    pub struct Storage {
         permission: ContractAddress,
     }
 

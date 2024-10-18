@@ -1,11 +1,11 @@
 #[starknet::component]
 pub mod CometClientComponent {
-    use starknet::storage::Map;
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_clients::cometbft::{
         CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
         CometHeader, CometHeaderImpl, CometErrors
     };
+    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess};
     use starknet_ibc_core::client::{
         MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Timestamp,
         Status, StatusTrait, CreateResponse, CreateResponseImpl, UpdateResponse, IClientHandler,
@@ -15,7 +15,7 @@ pub mod CometClientComponent {
     use starknet_ibc_utils::ValidateBasic;
 
     #[storage]
-    struct Storage {
+    pub struct Storage {
         client_sequence: u64,
         client_states: Map<u64, CometClientState>,
         consensus_states: Map<(u64, Height), CometConsensusState>,
