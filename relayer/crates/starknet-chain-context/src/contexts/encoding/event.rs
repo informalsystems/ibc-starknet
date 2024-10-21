@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
-use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::component::UseDelegate;
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
@@ -42,7 +43,7 @@ with_starknet_event_encoding_components! {
 delegate_components! {
     StarknetEventEncodingContextComponents{
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
+        ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         [
             EncodingTypeComponent,
             EncodingGetterComponent,

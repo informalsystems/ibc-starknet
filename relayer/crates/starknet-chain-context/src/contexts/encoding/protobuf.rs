@@ -1,4 +1,5 @@
-use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::component::UseDelegate;
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::CanConvertBothWays;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
@@ -30,7 +31,7 @@ impl HasComponents for StarknetProtobufEncoding {
 delegate_components! {
     StarknetProtobufEncodingContextComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
+        ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
     }
 }
 

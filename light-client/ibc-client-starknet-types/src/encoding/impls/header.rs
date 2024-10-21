@@ -1,9 +1,9 @@
+use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cosmos_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::transform::Transformer;
 use hermes_encoding_components::HList;
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::DecodeRequiredProtoField;
@@ -21,18 +21,18 @@ delegate_components! {
             CombineEncoders<HList![
                 EncodeField<
                     symbol!("height"),
-                    EncodeLengthDelimitedProtoField<1, WithContext>,
+                    EncodeLengthDelimitedProtoField<1, UseContext>,
                 >,
                 EncodeField<
                     symbol!("consensus_state"),
-                    EncodeLengthDelimitedProtoField<2, WithContext>,
+                    EncodeLengthDelimitedProtoField<2, UseContext>,
                 >,
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
             CombineEncoders<HList![
-                DecodeRequiredProtoField<1, WithContext>,
-                DecodeRequiredProtoField<2, WithContext>,
+                DecodeRequiredProtoField<1, UseContext>,
+                DecodeRequiredProtoField<2, UseContext>,
             ]>
         >,
     }

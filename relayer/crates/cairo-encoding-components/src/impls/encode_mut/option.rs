@@ -25,9 +25,10 @@ pub struct TransformOption<T>(pub PhantomData<T>);
 
 impl<T> TransformerRef for TransformOption<T> {
     type From = Option<T>;
-    type To<'a> = Sum![&'a T, ()]
-        where Self: 'a
-    ;
+    type To<'a>
+        = Sum![&'a T, ()]
+    where
+        Self: 'a;
 
     fn transform<'a>(value: &'a Option<T>) -> Sum![&'a T, ()] {
         match value {
