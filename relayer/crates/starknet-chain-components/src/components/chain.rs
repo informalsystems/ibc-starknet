@@ -1,8 +1,10 @@
 use cgp::prelude::*;
 pub use hermes_cosmos_chain_components::components::client::{
-    ClientStateFieldsGetterComponent, CreateClientPayloadBuilderComponent,
+    ChannelIdTypeComponent, ClientIdTypeComponent, ClientStateFieldsGetterComponent,
+    ConnectionIdTypeComponent, CreateClientPayloadBuilderComponent,
     CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
-    IbcPacketTypesProviderComponent, PacketFieldsReaderComponent,
+    OutgoingPacketFieldsReaderComponent, OutgoingPacketTypeComponent, PortIdTypeComponent,
+    SequenceTypeComponent, TimeTypeComponent, TimeoutTypeComponent,
     UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
 };
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
@@ -16,10 +18,8 @@ pub use hermes_relayer_components::chain::traits::types::event::EventTypeCompone
 pub use hermes_relayer_components::chain::traits::types::height::{
     HeightFieldComponent, HeightTypeComponent,
 };
-pub use hermes_relayer_components::chain::traits::types::ibc::IbcChainTypesComponent;
 pub use hermes_relayer_components::chain::traits::types::message::MessageTypeComponent;
 pub use hermes_relayer_components::chain::traits::types::status::ChainStatusTypeComponent;
-pub use hermes_relayer_components::chain::traits::types::timestamp::TimestampTypeComponent;
 use hermes_relayer_components::error::impls::retry::ReturnRetryable;
 pub use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
 pub use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeoutGetterComponent;
@@ -60,7 +60,6 @@ use crate::impls::types::message::ProvideCallMessage;
 use crate::impls::types::method::ProvideFeltSelector;
 use crate::impls::types::payloads::ProvideStarknetPayloadTypes;
 use crate::impls::types::status::ProvideStarknetChainStatusType;
-use crate::impls::types::timestamp::ProvideStarknetTimestampType;
 use crate::impls::types::transaction::ProvideCallTransaction;
 use crate::impls::types::tx_hash::ProvideFeltTxHash;
 use crate::impls::types::tx_response::ProvideStarknetTxResponse;
@@ -88,8 +87,6 @@ define_components! {
             HeightFieldComponent,
         ]:
             ProvideStarknetHeight,
-        TimestampTypeComponent:
-            ProvideStarknetTimestampType,
         ChainStatusTypeComponent:
             ProvideStarknetChainStatusType,
         AddressTypeComponent:
@@ -118,8 +115,14 @@ define_components! {
         ]:
             ProvideStarknetContractTypes,
         [
-            IbcChainTypesComponent,
-            IbcPacketTypesProviderComponent,
+            ClientIdTypeComponent,
+            ConnectionIdTypeComponent,
+            ChannelIdTypeComponent,
+            PortIdTypeComponent,
+            SequenceTypeComponent,
+            OutgoingPacketTypeComponent,
+            TimeTypeComponent,
+            TimeoutTypeComponent,
         ]:
             ProvideCosmosChainTypes,
         [
@@ -134,7 +137,7 @@ define_components! {
             UpdateClientPayloadTypeComponent,
         ]:
             ProvideStarknetPayloadTypes,
-        PacketFieldsReaderComponent:
+        OutgoingPacketFieldsReaderComponent:
             CosmosPacketFieldReader,
         ChainStatusQuerierComponent:
             QueryStarknetChainStatus,

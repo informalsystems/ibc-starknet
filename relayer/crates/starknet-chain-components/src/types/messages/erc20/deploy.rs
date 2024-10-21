@@ -1,8 +1,8 @@
+use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_encoding_components::impls::with_context::WithContext;
 use starknet::core::types::{Felt, U256};
 
 #[derive(HasField)]
@@ -16,10 +16,10 @@ pub struct DeployErc20TokenMessage {
 
 pub type EncodeDeployErc20TokenMessage = CombineEncoders<
     HList![
-        EncodeField<symbol!("name"), WithContext>,
-        EncodeField<symbol!("symbol"), WithContext>,
-        EncodeField<symbol!("fixed_supply"), WithContext>,
-        EncodeField<symbol!("recipient"), WithContext>,
-        EncodeField<symbol!("owner"), WithContext>,
+        EncodeField<symbol!("name"), UseContext>,
+        EncodeField<symbol!("symbol"), UseContext>,
+        EncodeField<symbol!("fixed_supply"), UseContext>,
+        EncodeField<symbol!("recipient"), UseContext>,
+        EncodeField<symbol!("owner"), UseContext>,
     ],
 >;

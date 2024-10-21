@@ -1,10 +1,9 @@
+use cgp::core::component::{UseContext, UseDelegate};
 use cgp::prelude::*;
 pub use hermes_cosmos_encoding_components::components::{
     CosmosEncodingComponents, DecoderComponent, EncodedLengthGetterComponent, EncoderComponent,
     MutDecoderComponent, MutEncoderComponent,
 };
-use hermes_encoding_components::impls::delegate::DelegateEncoding;
-use hermes_encoding_components::impls::with_context::WithContext;
 pub use hermes_encoding_components::traits::convert::ConverterComponent;
 pub use hermes_encoding_components::traits::schema::SchemaGetterComponent;
 pub use hermes_protobuf_encoding_components::components::{
@@ -42,17 +41,17 @@ define_components! {
             EncoderComponent,
             DecoderComponent,
         ]:
-            DelegateEncoding<StarknetLightClientEncoderComponents>,
+            UseDelegate<StarknetLightClientEncoderComponents>,
         [
             MutEncoderComponent,
             MutDecoderComponent,
             EncodedLengthGetterComponent,
         ]:
-            DelegateEncoding<StarknetLightClientEncodeMutComponents>,
+            UseDelegate<StarknetLightClientEncodeMutComponents>,
         SchemaGetterComponent:
             StarknetLightClientTypeUrlSchemas,
         ConverterComponent:
-            DelegateEncoding<StarknetLightClientConverterComponents>,
+            UseDelegate<StarknetLightClientConverterComponents>,
     }
 }
 
@@ -108,13 +107,13 @@ delegate_components! {
             (StarknetClientState, Any),
             (StarknetConsensusState, Any),
             (StarknetHeader, Any),
-        ]: EncodeAsAnyProtobuf<ViaProtobuf, WithContext>,
+        ]: EncodeAsAnyProtobuf<ViaProtobuf, UseContext>,
 
         [
             (Any, StarknetClientState),
             (Any, StarknetConsensusState),
             (Any, StarknetHeader),
-        ]: DecodeAsAnyProtobuf<ViaProtobuf, WithContext>,
+        ]: DecodeAsAnyProtobuf<ViaProtobuf, UseContext>,
     }
 }
 

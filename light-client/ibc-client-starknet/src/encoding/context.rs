@@ -21,6 +21,7 @@ use ibc_client_starknet_types::{StarknetClientState, StarknetConsensusState};
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
+use ibc_core::host::types::error::DecodingError;
 use ibc_core::primitives::{Timestamp, TimestampError};
 use prost::DecodeError;
 
@@ -66,7 +67,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, DecodeError>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: DecodeError) -> ClientError {
-        ClientError::Other {
+        ClientError::ClientSpecific {
             description: e.to_string(),
         }
     }
@@ -76,7 +77,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, Utf8Error>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: Utf8Error) -> ClientError {
-        ClientError::Other {
+        ClientError::ClientSpecific {
             description: e.to_string(),
         }
     }
@@ -86,7 +87,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, ParseIntError>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: ParseIntError) -> ClientError {
-        ClientError::Other {
+        ClientError::ClientSpecific {
             description: e.to_string(),
         }
     }
@@ -96,7 +97,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, TryFromIntError>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: TryFromIntError) -> ClientError {
-        ClientError::Other {
+        ClientError::ClientSpecific {
             description: e.to_string(),
         }
     }
@@ -106,7 +107,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, TryFromSliceError>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: TryFromSliceError) -> ClientError {
-        ClientError::Other {
+        ClientError::ClientSpecific {
             description: e.to_string(),
         }
     }
@@ -116,7 +117,17 @@ impl ErrorRaiser<StarknetLightClientEncoding, TimestampError>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: TimestampError) -> ClientError {
-        ClientError::Other {
+        ClientError::ClientSpecific {
+            description: e.to_string(),
+        }
+    }
+}
+
+impl ErrorRaiser<StarknetLightClientEncoding, DecodingError>
+    for StarknetLightClientEncodingContextComponents
+{
+    fn raise_error(e: DecodingError) -> ClientError {
+        ClientError::ClientSpecific {
             description: e.to_string(),
         }
     }
@@ -126,7 +137,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, UnsupportedWireType>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: UnsupportedWireType) -> ClientError {
-        ClientError::Other {
+        ClientError::ClientSpecific {
             description: format!("{e:?}"),
         }
     }
@@ -136,7 +147,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, InvalidWireType>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: InvalidWireType) -> ClientError {
-        ClientError::Other {
+        ClientError::ClientSpecific {
             description: format!("{e:?}"),
         }
     }
@@ -146,7 +157,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, RequiredFieldTagNotFound>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: RequiredFieldTagNotFound) -> ClientError {
-        ClientError::Other {
+        ClientError::ClientSpecific {
             description: format!("{e:?}"),
         }
     }
@@ -156,7 +167,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, TypeUrlMismatchError>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: TypeUrlMismatchError) -> ClientError {
-        ClientError::Other {
+        ClientError::ClientSpecific {
             description: format!("{e:?}"),
         }
     }

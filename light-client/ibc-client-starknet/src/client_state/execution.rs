@@ -1,6 +1,6 @@
+use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::any::ConvertIbcAny;
 use hermes_encoding_components::impls::convert::ConvertVia;
-use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::convert::Converter;
 use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_client_starknet_types::StarknetClientState as ClientStateType;
@@ -50,7 +50,7 @@ where
         client_id: &ClientId,
         header: Any,
     ) -> Result<Vec<Height>, ClientError> {
-        let header: StarknetHeader = <ConvertVia<ProstAny, ConvertIbcAny, WithContext>>::convert(
+        let header: StarknetHeader = <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
             &StarknetLightClientEncoding,
             &header,
         )?;
@@ -135,7 +135,7 @@ fn update_client_and_consensus_state<E: ClientExecutionContext>(
     client_state: E::ClientStateRef,
     consensus_state: E::ConsensusStateRef,
 ) -> Result<(), ClientError> {
-    let timestamp = consensus_state.timestamp();
+    let timestamp = consensus_state.timestamp()?;
     ctx.store_consensus_state(
         ClientConsensusStatePath::new(
             client_id.clone(),

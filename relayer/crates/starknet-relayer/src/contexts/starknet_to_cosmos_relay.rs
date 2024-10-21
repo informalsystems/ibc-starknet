@@ -1,4 +1,5 @@
-use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::component::UseDelegate;
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::impls::ProvideHermesError;
@@ -22,7 +23,6 @@ use hermes_runtime_components::traits::runtime::{
     ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
 };
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use ibc_relayer_types::core::ics04_channel::packet::Packet;
 use ibc_relayer_types::core::ics24_host::identifier::ClientId;
 
 use crate::impls::error::HandleStarknetRelayError;
@@ -53,7 +53,7 @@ with_default_relay_components! {
 delegate_components! {
     StarknetToCosmosRelayComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetRelayError>,
+        ErrorRaiserComponent: UseDelegate<HandleStarknetRelayError>,
         [
             RuntimeTypeComponent,
             RuntimeGetterComponent,
@@ -74,8 +74,6 @@ impl ProvideRelayChains<StarknetToCosmosRelay> for StarknetToCosmosRelayComponen
     type SrcChain = StarknetChain;
 
     type DstChain = CosmosChain;
-
-    type Packet = Packet;
 
     fn src_chain(relay: &StarknetToCosmosRelay) -> &StarknetChain {
         &relay.src_chain

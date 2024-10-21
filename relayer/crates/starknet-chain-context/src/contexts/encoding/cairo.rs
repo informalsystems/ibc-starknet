@@ -1,14 +1,14 @@
 use core::iter::Peekable;
 use core::slice::Iter;
 
-use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::component::{UseContext, UseDelegate};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::pair::EncodeCons;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
-use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::decode_mut::CanPeekDecodeBuffer;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
@@ -49,7 +49,7 @@ impl HasComponents for StarknetCairoEncoding {
 delegate_components! {
     StarknetCairoEncodingContextComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
+        ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
     }
 }
 
@@ -124,4 +124,4 @@ pub trait CanUsePairEncoder:
 {
 }
 
-impl CanUsePairEncoder for EncodeCons<EncodeCons<WithContext>> {}
+impl CanUsePairEncoder for EncodeCons<EncodeCons<UseContext>> {}

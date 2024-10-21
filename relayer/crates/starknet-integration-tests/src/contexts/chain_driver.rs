@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 
-use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::component::UseDelegate;
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
 use hermes_error::impls::ProvideHermesError;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
@@ -31,7 +32,7 @@ impl HasComponents for StarknetChainDriver {
 delegate_components! {
     StarknetChainDriverComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
+        ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
     }
 }
 
