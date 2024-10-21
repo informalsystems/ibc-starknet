@@ -1,0 +1,59 @@
+name: Cairo Libs and Contracts
+on:
+  pull_request: {}
+  push:
+    tags:
+      - v[0-9]+.*
+    branches:
+      - "release/*"
+      - main
+
+jobs:
+  test-cairo:
+    name: Test Cairo libs and contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust nightly toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+
+      - name: Extract Scarb version
+        working-directory: ./cairo-contracts
+        run: |
+          SCARB_VERSION=$(grep 'scarb-version' Scarb.toml | sed 's/.*= "\(.*\)"/\1/')
+          echo "SCARB_VERSION=$SCARB_VERSION" >> "$GITHUB_ENV"
+
+      - name: Install Scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          scarb-version: ${{ env.SCARB_VERSION }}
+
+      - name: Install Universal Sierra Compiler
+        uses: software-mansion/setup-universal-sierra-compiler@v1
+
+      - name: Extract foundry version
+        working-directory: ./cairo-contracts
+        run: |
+          FOUNDRY_VERSION=$(grep 'snforge_std' Scarb.toml | sed 's/.*= "\(.*\)"/\1/')
+          echo "FOUNDRY_VERSION=$FOUNDRY_VERSION" >> "$GITHUB_ENV"
+
+      - name: Install Starknet Foundry
+        uses: foundry-rs/setup-snfoundry@v3
+        with:
+          starknet-foundry-version: ${{ env.FOUNDRY_VERSION }}
+
+      - name: Build and Test Cairo contracts
+        working-directory: ./cairo-contracts
+        run: |
+          scarb build
+          scarb build -p starknet_ibc_contracts
+          scarb test -w
+
+      - name: Build and Test Cairo libraries
+        working-directory: ./cairo-libs
+        run: |
+          scarb build -w
+          scarb test -w

@@ -9,7 +9,10 @@ pub mod TokenTransferComponent {
     use openzeppelin_access::ownable::interface::IOwnable;
     use starknet::ClassHash;
     use starknet::ContractAddress;
-    use starknet::storage::Map;
+    use starknet::storage::{
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess
+    };
     use starknet::{get_contract_address, get_caller_address};
     use starknet_ibc_apps::transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, Memo, TracePrefixTrait,
@@ -22,7 +25,7 @@ pub mod TokenTransferComponent {
     use starknet_ibc_utils::{ComputeKey, ValidateBasic};
 
     #[storage]
-    struct Storage {
+    pub struct Storage {
         erc20_class_hash: ClassHash,
         salt: felt252,
         ibc_token_key_to_address: Map<felt252, ContractAddress>,

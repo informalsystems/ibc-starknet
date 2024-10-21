@@ -2,13 +2,13 @@
 pub mod RouterHandlerComponent {
     use core::num::traits::Zero;
     use starknet::ContractAddress;
-    use starknet::storage::Map;
+    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
     use starknet_ibc_core::host::{PortId, PortIdImpl};
     use starknet_ibc_core::router::{RouterErrors, IRouter, ApplicationContract};
     use starknet_ibc_utils::ComputeKey;
 
     #[storage]
-    struct Storage {
+    pub struct Storage {
         pub port_id_to_app: Map<felt252, ContractAddress>,
     }
 
