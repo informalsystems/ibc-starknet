@@ -998,7 +998,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#10733c0432ce969279212a523c410cdf3016e9bb"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/proposal-debug#9977015ae87b7a9c9418c1bf9b6816d86739187d"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -1012,7 +1012,7 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#10733c0432ce969279212a523c410cdf3016e9bb"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/proposal-debug#9977015ae87b7a9c9418c1bf9b6816d86739187d"
 dependencies = [
  "cgp",
 ]
@@ -1020,7 +1020,7 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#10733c0432ce969279212a523c410cdf3016e9bb"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/proposal-debug#9977015ae87b7a9c9418c1bf9b6816d86739187d"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -1835,7 +1835,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e9552f850d5f0964a4e4d0bf306459ac29323ddfbae05e35a7c0d35cb0803cc5"
 dependencies = [
  "anyhow",
- "itertools 0.11.0",
+ "itertools 0.10.5",
  "proc-macro2",
  "quote",
  "syn 2.0.77",
