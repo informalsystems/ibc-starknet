@@ -177,8 +177,8 @@ fn test_proto_to_cairo_struct_absent_field() {
     assert_eq!(bytes, bytes2, "tmh encode wo field failed");
 }
 
-#[test]
 #[should_panic]
+#[test]
 fn test_proto_to_cairo_struct_non_canonical_order() {
     let hex = "2080ccb9ff0508f6ffffffffffffffff01";
     let bytes = hex_decode(@hex);
