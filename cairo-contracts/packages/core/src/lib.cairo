@@ -32,11 +32,13 @@ pub mod router {
     pub use interface::{IRouter, IRouterDispatcher, IRouterDispatcherTrait};
 }
 pub mod channel {
+    mod channel_call;
     mod errors;
     mod interface;
     mod msgs;
     mod types;
 
+    pub use channel_call::{ChannelContract, ChannelContractImpl, ChannelContractTrait};
     pub use components::events::ChannelEventEmitterComponent;
     pub use components::handler::ChannelHandlerComponent;
     pub use errors::ChannelErrors;
@@ -100,10 +102,12 @@ pub mod host {
         PortIdTrait, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd
     };
 
-    pub use keys::{channel_end_key, receipt_key, ack_key, next_sequence_recv_key};
+    pub use keys::{
+        channel_end_key, receipt_key, ack_key, next_sequence_recv_key, next_sequence_send_key
+    };
     pub use paths::{commitment_path};
     pub use prefixes::{
         CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX,
-        ACKS_PREFIX, RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX
+        ACKS_PREFIX, RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX
     };
 }

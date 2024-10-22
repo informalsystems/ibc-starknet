@@ -18,9 +18,15 @@ pub mod TokenTransferComponent {
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, Memo, TracePrefixTrait,
         PrefixedDenomTrait, Participant
     };
-    use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait, TransferErrors};
-    use starknet_ibc_apps::transfer::{ITransferrable, ISendTransfer, ITokenAddress};
-    use starknet_ibc_core::channel::{Packet, Acknowledgement, IAppCallback};
+    use starknet_ibc_apps::transfer::{
+        ITransferrable, ISendTransfer, ITokenAddress, ERC20Contract, ERC20ContractTrait,
+        TransferErrors
+    };
+    use starknet_ibc_core::channel::{
+        Packet, Acknowledgement, IAppCallback, ChannelContract, ChannelContractTrait,
+        ChannelEndTrait
+    };
+
     use starknet_ibc_core::host::{PortId, ChannelId};
     use starknet_ibc_utils::{ComputeKey, ValidateBasic};
 
@@ -102,9 +108,23 @@ pub mod TokenTransferComponent {
         TContractState,
         +HasComponent<TContractState>,
         +ITransferrable<TContractState>,
-        +Drop<TContractState>
+        +Drop<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of ISendTransfer<ComponentState<TContractState>> {
+        // NOTE: We first ensure the validity of the incoming message at the
+        // application level. Then, send it through the IBC core contract for
+        // validations related to the TAO layer. If everything checks out, the
+        // packet is first executed in the core contract, followed by execution
+        // at the application level.
         fn send_transfer(ref self: ComponentState<TContractState>, msg: MsgTransfer) {
+            self.send_validate(msg.clone());
+
+            let channel: ChannelContract = self.owner().into();
+
+            let packet = self.construct_send_packet(@channel, msg.clone());
+
+            channel.send_packet(packet);
+
             self.send_execute(msg);
         }
     }
@@ -208,8 +228,6 @@ pub mod TokenTransferComponent {
         }
 
         fn send_execute(ref self: ComponentState<TContractState>, msg: MsgTransfer) {
-            self.send_validate(msg.clone());
-
             let sender: Option<ContractAddress> = msg.packet_data.sender.clone().try_into();
 
             match @msg.packet_data.denom.base {
@@ -443,19 +461,22 @@ pub mod TokenTransferComponent {
     }
 
     // -----------------------------------------------------------
-    // Transfer Owner Assertion
+    // Transfer Owner
     // -----------------------------------------------------------
 
     #[generate_trait]
-    pub(crate) impl OwnerAssertionImpl<
+    pub(crate) impl TransferOwnerImpl<
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
         impl Ownable: OwnableComponent::HasComponent<TContractState>,
-    > of OwnerAssertionTrait<TContractState> {
+    > of TransferOwnerTrait<TContractState> {
+        fn owner(self: @ComponentState<TContractState>) -> ContractAddress {
+            get_dep_component!(self, Ownable).owner()
+        }
+
         fn assert_owner(self: @ComponentState<TContractState>) {
-            let ownable_comp = get_dep_component!(self, Ownable);
-            assert(ownable_comp.owner() == get_caller_address(), TransferErrors::INVALID_OWNER);
+            assert(self.owner() == get_caller_address(), TransferErrors::INVALID_OWNER);
         }
     }
 
@@ -467,6 +488,35 @@ pub mod TokenTransferComponent {
     pub(crate) impl TransferInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferInternalTrait<TContractState> {
+        fn construct_send_packet(
+            self: @ComponentState<TContractState>, channel: @ChannelContract, msg: MsgTransfer
+        ) -> Packet {
+            let chan_end_on_a = channel
+                .channel_end(msg.port_id_on_a.clone(), msg.chan_id_on_a.clone());
+
+            let port_id_on_b = chan_end_on_a.counterparty_port_id().clone();
+
+            let chan_id_on_b = chan_end_on_a.counterparty_channel_id().clone();
+
+            let seq_on_a = channel
+                .next_sequence_send(msg.port_id_on_a.clone(), msg.chan_id_on_a.clone());
+
+            let mut data: Array<felt252> = ArrayTrait::new();
+
+            msg.packet_data.serialize(ref data);
+
+            Packet {
+                seq_on_a,
+                port_id_on_a: msg.port_id_on_a,
+                chan_id_on_a: msg.chan_id_on_a,
+                port_id_on_b,
+                chan_id_on_b,
+                data,
+                timeout_height_on_b: msg.timeout_height_on_b,
+                timeout_timestamp_on_b: msg.timeout_timestamp_on_b
+            }
+        }
+
         fn get_token(self: @ComponentState<TContractState>, token_key: felt252) -> ERC20Contract {
             self.read_ibc_token_address(token_key).into()
         }

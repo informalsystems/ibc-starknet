@@ -51,6 +51,16 @@ pub struct ChannelEnd {
 
 #[generate_trait]
 pub impl ChannelEndImpl of ChannelEndTrait {
+    /// Returns port ID on the counterparty chain
+    fn counterparty_port_id(self: @ChannelEnd) -> @PortId {
+        self.remote.port_id
+    }
+
+    /// Returns channel ID on the counterparty chain
+    fn counterparty_channel_id(self: @ChannelEnd) -> @ChannelId {
+        self.remote.channel_id
+    }
+
     /// Returns true if the channel is in the open state.
     fn is_open(self: @ChannelEnd) -> bool {
         self.state == @ChannelState::Open

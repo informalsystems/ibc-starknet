@@ -4,8 +4,8 @@ use starknet_ibc_apps::tests::TransferEventSpyExt;
 use starknet_ibc_apps::tests::{
     TransferAppConfigTrait, NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET
 };
-use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_contracts::tests::{SetupImpl, ERC20Handle, AppHandle};
+use starknet_ibc_apps::transfer::{ERC20Contract, TRANSFER_PORT_ID};
+use starknet_ibc_contracts::tests::{SetupImpl, CoreHandle, ERC20Handle, AppHandle};
 use starknet_ibc_utils::ComputeKey;
 
 #[test]
@@ -16,16 +16,20 @@ fn test_escrow_unescrow_roundtrip() {
 
     let mut cfg = TransferAppConfigTrait::default();
 
-    let setup = SetupImpl::default();
+    let mut setup = SetupImpl::default();
+
+    let mut core = setup.deploy_core();
 
     let mut erc20 = setup.deploy_erc20();
 
     let mut ics20 = setup.deploy_trasnfer();
 
+    core.register_app(TRANSFER_PORT_ID(), ics20.address);
+
     cfg.set_native_denom(erc20.address);
 
     // Set the caller address to `OWNER`, as ICS-20 callbacks are permissioned.
-    start_cheat_caller_address(ics20.address, OWNER());
+    start_cheat_caller_address(ics20.address, core.address);
 
     let mut spy = spy_events();
 
@@ -36,7 +40,7 @@ fn test_escrow_unescrow_roundtrip() {
     // Owner approves the amount of allowance for the `TransferApp` contract.
     erc20.approve(OWNER(), ics20.address, cfg.amount);
 
-    let msg_transfer = cfg.dummy_msg_transder(cfg.native_denom.clone(), STARKNET(), COSMOS());
+    let msg_transfer = cfg.dummy_msg_transfer(cfg.native_denom.clone(), STARKNET(), COSMOS());
 
     // Submit a `MsgTransfer` to the `TransferApp` contract.
     ics20.send_transfer(msg_transfer);
@@ -83,12 +87,16 @@ fn test_mint_burn_roundtrip() {
 
     let mut cfg = TransferAppConfigTrait::default();
 
-    let setup = SetupImpl::default();
+    let mut setup = SetupImpl::default();
+
+    let mut core = setup.deploy_core();
 
     let mut ics20 = setup.deploy_trasnfer();
 
+    core.register_app(TRANSFER_PORT_ID(), ics20.address);
+
     // Set the caller address, as callbacks are permissioned.
-    start_cheat_caller_address(ics20.address, OWNER());
+    start_cheat_caller_address(ics20.address, core.address);
 
     let mut spy = spy_events();
 
@@ -140,7 +148,7 @@ fn test_mint_burn_roundtrip() {
 
     spy.drop_all_events();
 
-    let msg_transfer = cfg.dummy_msg_transder(prefixed_denom.clone(), STARKNET(), COSMOS());
+    let msg_transfer = cfg.dummy_msg_transfer(prefixed_denom.clone(), STARKNET(), COSMOS());
 
     // Owner approves the amount of allowance for the `TransferApp` contract.
     ics20.send_transfer(msg_transfer);

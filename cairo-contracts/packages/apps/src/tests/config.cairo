@@ -64,7 +64,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         hosted_denom
     }
 
-    fn dummy_msg_transder(
+    fn dummy_msg_transfer(
         self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> MsgTransfer {
         MsgTransfer {

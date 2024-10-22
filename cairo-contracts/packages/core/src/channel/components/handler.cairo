@@ -15,7 +15,7 @@ pub mod ChannelHandlerComponent {
     use starknet_ibc_core::client::{ClientHandlerComponent, ClientContract, ClientContractTrait};
     use starknet_ibc_core::host::{
         PortId, ChannelId, Sequence, SequenceImpl, SequencePartialOrd, channel_end_key, receipt_key,
-        ack_key, commitment_path, next_sequence_recv_key
+        ack_key, commitment_path, next_sequence_recv_key, next_sequence_send_key
     };
     use starknet_ibc_core::router::{
         RouterHandlerComponent, ApplicationContractTrait, ApplicationContract
@@ -28,6 +28,7 @@ pub mod ChannelHandlerComponent {
         pub channel_ends: Map<felt252, Option<ChannelEnd>>,
         pub packet_receipts: Map<felt252, Option<Receipt>>,
         pub packet_acks: Map<felt252, felt252>,
+        pub send_sequences: Map<felt252, Sequence>,
         pub recv_sequences: Map<felt252, Sequence>,
     }
 
@@ -44,10 +45,11 @@ pub mod ChannelHandlerComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ChannelInitializerTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>) {
-            // TODO: Initialize a temporary dummy `ChannelEnd` for testing the
+            // TODO: Initialize a temporary dummy `ChannelEnd`s for testing the
             // handlers. This should be removed once the channel handshake is
             // implemented.
-            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(0), CHANNEL_END());
+            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(0), CHANNEL_END(1));
+            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(1), CHANNEL_END(0));
             self.write_next_sequence_recv(@PORT_ID(), @CHANNEL_ID(0), SequenceImpl::zero());
         }
     }
@@ -65,9 +67,16 @@ pub mod ChannelHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
+        fn send_packet(ref self: ComponentState<TContractState>, packet: Packet) {
+            let chan_end_on_a = self.get_channel_end(@packet.port_id_on_a, @packet.chan_id_on_a);
+
+            self.send_packet_validate(packet.clone(), chan_end_on_a.clone());
+
+            self.send_packet_execute(packet, chan_end_on_a);
+        }
         fn recv_packet(ref self: ComponentState<TContractState>, msg: MsgRecvPacket) {
             let chan_end_on_b = self
-                .get_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b,);
+                .get_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b);
 
             self.recv_packet_validate(msg.clone(), chan_end_on_b.clone());
 
@@ -113,6 +122,12 @@ pub mod ChannelHandlerComponent {
             self.read_packet_ack(@port_id, @channel_id, @sequence)
         }
 
+        fn next_sequence_send(
+            self: @ComponentState<TContractState>, port_id: PortId, channel_id: ChannelId
+        ) -> Sequence {
+            self.read_next_sequence_send(@port_id, @channel_id)
+        }
+
         fn next_sequence_recv(
             self: @ComponentState<TContractState>, port_id: PortId, channel_id: ChannelId
         ) -> Sequence {
@@ -123,6 +138,19 @@ pub mod ChannelHandlerComponent {
     // -----------------------------------------------------------
     // Channel handler implementations
     // -----------------------------------------------------------
+
+    #[generate_trait]
+    pub(crate) impl SendPacketImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+    > of SendPacketTrait<TContractState> {
+        fn send_packet_validate(
+            self: @ComponentState<TContractState>, packet: Packet, chan_end_on_a: ChannelEnd
+        ) {}
+
+        fn send_packet_execute(
+            ref self: ComponentState<TContractState>, packet: Packet, chan_end_on_a: ChannelEnd
+        ) {}
+    }
 
     #[generate_trait]
     pub(crate) impl RecvPacketImpl<
@@ -349,6 +377,12 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence
         ) -> felt252 {
             self.packet_acks.read(ack_key(port_id, channel_id, sequence))
+        }
+
+        fn read_next_sequence_send(
+            self: @ComponentState<TContractState>, port_id: @PortId, channel_id: @ChannelId
+        ) -> Sequence {
+            self.send_sequences.read(next_sequence_send_key(port_id, channel_id))
         }
 
         fn read_next_sequence_recv(
