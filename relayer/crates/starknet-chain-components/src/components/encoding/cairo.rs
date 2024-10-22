@@ -1,3 +1,4 @@
+use cgp::core::component::{UseContext, UseDelegate};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::components::encode_mut::*;
 pub use hermes_cairo_encoding_components::components::encoding::*;
@@ -6,8 +7,6 @@ use hermes_cairo_encoding_components::impls::encode_mut::pair::EncoderPair;
 use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
 use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
-use hermes_encoding_components::impls::delegate::DelegateEncoding;
-use hermes_encoding_components::impls::with_context::WithContext;
 pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 pub use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use starknet::core::types::{Felt, U256};
@@ -43,7 +42,7 @@ define_components! {
             MutEncoderComponent,
             MutDecoderComponent,
         ]:
-            DelegateEncoding<StarknetEncodeMutComponents>
+            UseDelegate<StarknetEncodeMutComponents>
     }
 }
 
@@ -52,7 +51,7 @@ pub struct StarknetEncodeMutComponents;
 with_cairo_encode_mut_components! {
     delegate_components! {
         StarknetEncodeMutComponents {
-            @CairoEncodeMutComponents: DelegateEncoding<CairoEncodeMutComponents>,
+            @CairoEncodeMutComponents: UseDelegate<CairoEncodeMutComponents>,
         }
     }
 }
@@ -61,7 +60,7 @@ delegate_components! {
     StarknetEncodeMutComponents {
         <'a, V> (ViaCairo, &'a V): EncodeDeref,
         <V> (ViaCairo, Option<V>): EncodeOption<V>,
-        <A, B> (ViaCairo, (A, B)): EncoderPair<WithContext, WithContext>,
+        <A, B> (ViaCairo, (A, B)): EncoderPair<UseContext, UseContext>,
         (ViaCairo, TransferErc20TokenMessage): EncodeTransferErc20TokenMessage,
         (ViaCairo, DeployErc20TokenMessage): EncodeDeployErc20TokenMessage,
         (ViaCairo, Denom): EncodeDenom,

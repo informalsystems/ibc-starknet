@@ -47,7 +47,7 @@ impl ConsensusStateTrait for ConsensusState {
         &self.0.root
     }
 
-    fn timestamp(&self) -> Timestamp {
-        self.0.time
+    fn timestamp(&self) -> Result<Timestamp, ClientError> {
+        Ok(self.0.time)
     }
 }

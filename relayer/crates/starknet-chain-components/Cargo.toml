@@ -14,6 +14,8 @@ cgp                                 = { workspace = true }
 hermes-relayer-components           = { workspace = true }
 hermes-test-components              = { workspace = true }
 hermes-runtime-components           = { workspace = true }
+hermes-chain-components             = { workspace = true }
+hermes-chain-type-components        = { workspace = true }
 hermes-encoding-components          = { workspace = true }
 hermes-cosmos-chain-components      = { workspace = true }
 hermes-wasm-client-components       = { workspace = true }

@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
-use cgp::core::error::{DelegateErrorRaiser, ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::component::UseDelegate;
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
@@ -27,7 +28,7 @@ use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
-use hermes_relayer_components::chain::traits::types::packet::HasIbcPacketTypes;
+use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
@@ -87,7 +88,7 @@ impl HasComponents for StarknetChain {
 delegate_components! {
     StarknetChainContextComponents {
         ErrorTypeComponent: ProvideHermesError,
-        ErrorRaiserComponent: DelegateErrorRaiser<HandleStarknetChainError>,
+        ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         [
             RuntimeTypeComponent,
             RuntimeGetterComponent,
@@ -171,7 +172,7 @@ pub trait CanUseStarknetChain:
     + HasBlobType<Blob = Vec<Felt>>
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
-    + HasIbcPacketTypes<CosmosChain>
+    + HasOutgoingPacketType<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount
     + CanQueryChainStatus

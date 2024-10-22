@@ -1,4 +1,5 @@
 use cgp::prelude::CanRaiseError;
+use hermes_cosmos_chain_components::types::status::Time;
 use hermes_relayer_components::chain::traits::queries::chain_status::ChainStatusQuerier;
 use hermes_relayer_components::chain::traits::types::status::HasChainStatusType;
 use starknet::core::types::{BlockId, BlockTag, MaybePendingBlockWithTxHashes};
@@ -27,6 +28,7 @@ where
             MaybePendingBlockWithTxHashes::Block(block) => Ok(StarknetChainStatus {
                 height: block.block_number,
                 block_hash: block.block_hash,
+                time: Time::now(),
             }),
             MaybePendingBlockWithTxHashes::PendingBlock(_) => Err(Chain::raise_error(
                 "expected finalized block, but given pending block",
