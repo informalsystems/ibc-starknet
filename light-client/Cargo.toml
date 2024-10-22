@@ -77,6 +77,6 @@ cgp-error               = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-run                 = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-inner               = { git = "https://github.com/contextgeneric/cgp.git" }
 
-hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/proposal-debug" }
-hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/proposal-debug" }
-hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/proposal-debug" }
+hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git" }
