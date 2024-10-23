@@ -1,8 +1,9 @@
-use starknet_ibc_apps::tests::{MockTransferApp, CLASS_HASH};
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
     TransferInitializerImpl, TransferReaderImpl
 };
 use starknet_ibc_apps::transfer::TokenTransferComponent;
+use starknet_ibc_testkit::dummies::CLASS_HASH;
+use starknet_ibc_testkit::mocks::MockTransferApp;
 
 type ComponentState = TokenTransferComponent::ComponentState<MockTransferApp::ContractState>;
 

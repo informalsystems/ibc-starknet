@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod MockTransferApp {
+pub mod MockTransferApp {
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::ClassHash;
     use starknet::ContractAddress;

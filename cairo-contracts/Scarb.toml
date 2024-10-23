@@ -4,6 +4,7 @@ members = [
   "packages/clients",
   "packages/contracts",
   "packages/core",
+  "packages/testkit",
   "packages/utils",
 ]
 
@@ -37,6 +38,7 @@ starknet_ibc_apps      = { path = "packages/apps" }
 starknet_ibc_clients   = { path = "packages/clients" }
 starknet_ibc_contracts = { path = "packages/contracts" }
 starknet_ibc_core      = { path = "packages/core" }
+starknet_ibc_testkit   = { path = "packages/testkit" }
 starknet_ibc_utils     = { path = "packages/utils" }
 
 [workspace.tool.fmt]

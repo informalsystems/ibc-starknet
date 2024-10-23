@@ -1,3 +1,6 @@
+use starknet_ibc_core::channel::{ChannelEnd, ChannelState, ChannelOrdering, Counterparty};
+use starknet_ibc_core::host::{ClientId, PortId, ChannelId, SequencePartialOrd, SequenceZero};
+
 #[starknet::component]
 pub mod ChannelHandlerComponent {
     use ChannelEventEmitterComponent::ChannelEventEmitterTrait;
@@ -23,8 +26,8 @@ pub mod ChannelHandlerComponent {
     use starknet_ibc_core::router::{
         RouterHandlerComponent, ApplicationContractTrait, ApplicationContract
     };
-    use starknet_ibc_core::tests::{PORT_ID, CHANNEL_ID, CHANNEL_END};
     use starknet_ibc_utils::ValidateBasic;
+    use super::{PORT_ID, CHANNEL_ID, CHANNEL_END};
 
     #[storage]
     pub struct Storage {
@@ -578,5 +581,29 @@ pub mod ChannelHandlerComponent {
 
             event_emitter.emit_timeout_packet_event(packet, ordering);
         }
+    }
+}
+
+// ----------------- Temporary until handshakes are implemented ---------------
+pub(crate) fn CLIENT_ID() -> ClientId {
+    ClientId { client_type: '07-cometbft', sequence: 0 }
+}
+
+pub(crate) fn PORT_ID() -> PortId {
+    PortId { port_id: "transfer" }
+}
+
+pub(crate) fn CHANNEL_ID(sequence: u64) -> ChannelId {
+    ChannelId { channel_id: format!("channel-{sequence}") }
+}
+
+pub(crate) fn CHANNEL_END(counterparty_channel_sequence: u64) -> ChannelEnd {
+    ChannelEnd {
+        state: ChannelState::Open,
+        ordering: ChannelOrdering::Unordered,
+        remote: Counterparty {
+            port_id: PORT_ID(), channel_id: CHANNEL_ID(counterparty_channel_sequence),
+        },
+        client_id: CLIENT_ID(),
     }
 }

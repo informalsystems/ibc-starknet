@@ -1,9 +1,11 @@
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::spy_events;
-use starknet_ibc_clients::tests::CometClientConfigTrait;
-use starknet_ibc_contracts::tests::{CoreHandle, SetupImpl};
 use starknet_ibc_core::client::{UpdateResponse, StatusTrait, ClientContractTrait};
-use starknet_ibc_core::tests::{ClientEventSpyExt, HEIGHT, CLIENT_TYPE};
+use starknet_ibc_testkit::configs::CometClientConfigTrait;
+use starknet_ibc_testkit::dummies::{HEIGHT, CLIENT_TYPE};
+use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
+use starknet_ibc_testkit::handles::CoreHandle;
+use starknet_ibc_testkit::setup::SetupImpl;
 
 #[test]
 fn test_create_comet_client_ok() {
