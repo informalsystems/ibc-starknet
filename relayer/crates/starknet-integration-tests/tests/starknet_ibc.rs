@@ -2,11 +2,13 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use hermes_chain_components::traits::send_message::CanSendSingleMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
+use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::HList;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
+use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::cosmos::client_state::{
@@ -21,6 +23,7 @@ use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncod
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::accounts::Call;
+use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
 #[test]
@@ -143,7 +146,7 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
 
                 let raw_header = StarknetCairoEncoding.encode(&update_header)?;
 
-                let calldata = StarknetCairoEncoding.encode(&HList![client_id, raw_header,])?;
+                let calldata = StarknetCairoEncoding.encode(&(&client_id, raw_header))?;
 
                 Call {
                     to: comet_client_address,
@@ -155,6 +158,47 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             let events = chain.send_message(message).await?;
 
             println!("update client events: {:?}", events);
+        }
+
+        {
+            let output = chain
+                .call_contract(
+                    &comet_client_address,
+                    &selector!("client_state"),
+                    &StarknetCairoEncoding.encode(&client_id.sequence)?,
+                )
+                .await?;
+
+            let raw_client_state: Vec<Felt> = StarknetCairoEncoding.decode(&output)?;
+
+            let client_state: CometClientState = StarknetCairoEncoding.decode(&raw_client_state)?;
+
+            println!("queried client state: {client_state:?}");
+        }
+
+        {
+            let output = chain
+                .call_contract(
+                    &comet_client_address,
+                    &selector!("consensus_state"),
+                    &StarknetCairoEncoding.encode(&(
+                        client_id.sequence,
+                        Height {
+                            revision_number: 0,
+                            revision_height: 2,
+                        },
+                    ))?,
+                )
+                .await?;
+
+            let raw_consensus_state: Vec<Felt> = StarknetCairoEncoding.decode(&output)?;
+
+            let consensus_state: CometConsensusState =
+                StarknetCairoEncoding.decode(&raw_consensus_state)?;
+
+            println!("queried consensus state: {consensus_state:?}");
+
+            assert_eq!(consensus_state.root, vec![4, 5, 6]);
         }
 
         Ok(())
