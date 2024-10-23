@@ -65,6 +65,13 @@ pub struct Height {
     pub revision_height: u64,
 }
 
+#[generate_trait]
+pub impl HeightImpl of HeightTrait {
+    fn new(revision_number: u64, revision_height: u64) -> Height {
+        Height { revision_number, revision_height }
+    }
+}
+
 pub impl HeightZero of Zero<Height> {
     fn zero() -> Height {
         Height { revision_number: 0, revision_height: 0 }
@@ -115,7 +122,6 @@ pub impl HeightPartialOrd of PartialOrd<@Height> {
                 && lhs.revision_height > rhs.revision_height)
     }
 }
-
 
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct Timestamp {

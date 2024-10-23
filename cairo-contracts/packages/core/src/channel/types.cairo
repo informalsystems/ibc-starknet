@@ -24,15 +24,9 @@ pub impl PacketImpl of PacketTrait {
     }
 
     /// Checks if the packet is not timed out, and throws an error if it is.
-    fn check_timed_out(self: @Packet, current_height: @u64, current_timestamp: @u64) {
-        assert(
-            self.timeout_height_on_b.revision_height > current_height,
-            ChannelErrors::TIMED_OUT_PACKET
-        );
-        assert(
-            self.timeout_timestamp_on_b.timestamp > current_timestamp,
-            ChannelErrors::TIMED_OUT_PACKET
-        );
+    fn verify_not_timed_out(self: @Packet, current_height: @Height, current_timestamp: @Timestamp) {
+        assert(self.timeout_height_on_b > current_height, ChannelErrors::TIMED_OUT_PACKET);
+        assert(self.timeout_timestamp_on_b > current_timestamp, ChannelErrors::TIMED_OUT_PACKET);
     }
 
     fn compute_commitment(self: @Packet) -> Array<u8> {

@@ -1,7 +1,7 @@
 use starknet::ContractAddress;
 use starknet_ibc_core::client::{
     MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Status,
-    CreateResponse, UpdateResponse
+    CreateResponse, UpdateResponse, Timestamp
 };
 
 #[starknet::interface]
@@ -93,6 +93,8 @@ pub trait IClientQuery<TContractState> {
     fn client_type(self: @TContractState) -> felt252;
 
     fn latest_height(self: @TContractState, client_sequence: u64) -> Height;
+
+    fn latest_timestamp(self: @TContractState, client_sequence: u64) -> Timestamp;
 
     fn status(self: @TContractState, client_sequence: u64) -> Status;
 

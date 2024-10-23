@@ -38,7 +38,9 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
 
         let mut serialized_consensus_state: Array<felt252> = ArrayTrait::new();
 
-        let consensus_state = CometConsensusState { timestamp: *self.latest_timestamp, root: '1' };
+        let consensus_state = CometConsensusState {
+            timestamp: self.latest_timestamp.clone().into(), root: '1'
+        };
 
         Serde::serialize(@consensus_state, ref serialized_consensus_state);
 

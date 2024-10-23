@@ -12,7 +12,9 @@ pub mod ChannelHandlerComponent {
         ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt, AcknowledgementTrait,
         Packet, Acknowledgement
     };
-    use starknet_ibc_core::client::{ClientHandlerComponent, ClientContract, ClientContractTrait};
+    use starknet_ibc_core::client::{
+        ClientHandlerComponent, ClientContract, ClientContractTrait, HeightImpl
+    };
     use starknet_ibc_core::host::{
         PortId, ChannelId, Sequence, SequenceImpl, SequencePartialOrd, SequenceZero,
         channel_end_key, commitment_key, receipt_key, ack_key, commitment_path,
@@ -156,10 +158,6 @@ pub mod ChannelHandlerComponent {
         ) {
             packet.validate_basic();
 
-            assert(packet.is_timeout_set(), ChannelErrors::MISSING_PACKET_TIMEOUT);
-
-            self.verify_not_timed_out(@packet);
-
             self.verify_send_sequence_matches(@packet);
 
             chan_end_on_a.validate(@packet.port_id_on_b, @packet.chan_id_on_b);
@@ -168,7 +166,17 @@ pub mod ChannelHandlerComponent {
 
             let client = self.get_client(chan_end_on_a.client_id.client_type);
 
-            client.verify_is_active(chan_end_on_a.client_id.sequence);
+            let client_sequence = chan_end_on_a.client_id.sequence;
+
+            client.verify_is_active(client_sequence);
+
+            assert(packet.is_timeout_set(), ChannelErrors::MISSING_PACKET_TIMEOUT);
+
+            packet
+                .verify_not_timed_out(
+                    @client.latest_height(client_sequence),
+                    @client.latest_timestamp(client_sequence)
+                );
         }
 
         fn send_packet_execute(
@@ -196,6 +204,13 @@ pub mod ChannelHandlerComponent {
 
             self.emit_send_packet_event(packet, chan_end_on_a.ordering);
         }
+
+        fn verify_send_sequence_matches(self: @ComponentState<TContractState>, packet: @Packet) {
+            let expected_sequence = self
+                .read_next_sequence_send(packet.port_id_on_a, packet.chan_id_on_a);
+
+            assert(@expected_sequence == packet.seq_on_a, ChannelErrors::INVALID_PACKET_SEQUENCE)
+        }
     }
 
     #[generate_trait]
@@ -216,7 +231,11 @@ pub mod ChannelHandlerComponent {
 
             chan_end_on_b.validate(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
 
-            self.verify_not_timed_out(@msg.packet);
+            msg
+                .packet
+                .verify_not_timed_out(
+                    @HeightImpl::new(0, get_block_number()), @get_block_timestamp().into()
+                );
 
             let client = self.get_client(chan_end_on_b.client_id.client_type);
 
@@ -334,7 +353,6 @@ pub mod ChannelHandlerComponent {
                 );
         }
 
-
         fn verify_ack_not_exists(
             self: @ComponentState<TContractState>,
             port_id: @PortId,
@@ -344,30 +362,6 @@ pub mod ChannelHandlerComponent {
             let ack = self.read_packet_ack(port_id, channel_id, sequence);
 
             assert(ack.is_zero(), ChannelErrors::ACK_ALREADY_EXISTS);
-        }
-    }
-
-    // -----------------------------------------------------------
-    // Channel internal
-    // -----------------------------------------------------------
-
-    #[generate_trait]
-    pub(crate) impl ChannelInternalImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
-    > of ChannelInternalTrait<TContractState> {
-        fn verify_not_timed_out(self: @ComponentState<TContractState>, packet: @Packet) {
-            let host_height = get_block_number();
-
-            let host_timestamp = get_block_timestamp();
-
-            packet.check_timed_out(@host_height, @host_timestamp);
-        }
-
-        fn verify_send_sequence_matches(self: @ComponentState<TContractState>, packet: @Packet) {
-            let expected_sequence = self
-                .read_next_sequence_send(packet.port_id_on_a, packet.chan_id_on_a);
-
-            assert(@expected_sequence == packet.seq_on_a, ChannelErrors::INVALID_PACKET_SEQUENCE)
         }
     }
 
