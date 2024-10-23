@@ -1,15 +1,15 @@
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
-use hermes_cairo_encoding_components::HList;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
+use hermes_encoding_components::HList;
 use starknet::core::types::Felt;
 
-use crate::types::messages::ibc::height::Height;
+use crate::types::cosmos::height::Height;
 
 #[derive(HasField)]
 pub struct Packet {

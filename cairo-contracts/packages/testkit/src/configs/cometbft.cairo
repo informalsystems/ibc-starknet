@@ -38,7 +38,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         let mut serialized_consensus_state: Array<felt252> = ArrayTrait::new();
 
         let consensus_state = CometConsensusState {
-            timestamp: self.latest_timestamp.clone().into(), root: '1'
+            timestamp: self.latest_timestamp.clone().into(), root: "1"
         };
 
         Serde::serialize(@consensus_state, ref serialized_consensus_state);
@@ -56,7 +56,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         let mut serialized_header: Array<felt252> = ArrayTrait::new();
 
         let signed_header = SignedHeader {
-            height: latest_height, time: *self.latest_timestamp + 1, root: '1'
+            height: latest_height, time: *self.latest_timestamp + 1, root: "1"
         };
 
         let header = CometHeader { trusted_height, signed_header };

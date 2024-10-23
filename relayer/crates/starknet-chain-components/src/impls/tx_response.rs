@@ -26,7 +26,7 @@ where
     async fn query_tx_response(
         chain: &Chain,
         tx_hash: &Felt,
-    ) -> Result<Option<Chain::TxResponse>, Chain::Error> {
+    ) -> Result<Option<TxResponse>, Chain::Error> {
         let provider = chain.provider();
 
         let result = provider.get_transaction_receipt(tx_hash).await;

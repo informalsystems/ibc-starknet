@@ -162,4 +162,3 @@ pub impl U64IntoTimestamp of Into<u64, Timestamp> {
         Timestamp { timestamp: self }
     }
 }
-

@@ -13,6 +13,7 @@ use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_error::impls::ProvideHermesError;
 use hermes_starknet_chain_components::components::encoding::event::*;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
+use hermes_starknet_chain_components::types::events::create_client::CreateClientEvent;
 use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use starknet::core::types::Felt;
@@ -24,6 +25,7 @@ use crate::impls::error::HandleStarknetChainError;
 pub struct StarknetEventEncoding {
     pub erc20_hashes: HashSet<Felt>,
     pub ics20_hashes: HashSet<Felt>,
+    pub ibc_client_hashes: HashSet<Felt>,
 }
 
 pub struct StarknetEventEncodingContextComponents;
@@ -58,8 +60,10 @@ pub trait CanUseStarknetEventEncoding:
     + HasEncoding<AsFelt, Encoding = StarknetCairoEncoding>
     + CanDecode<ViaCairo, Erc20Event>
     + CanDecode<ViaCairo, IbcTransferEvent>
+    + CanDecode<ViaCairo, CreateClientEvent>
     + CanDecode<ViaCairo, Option<Erc20Event>>
     + CanDecode<ViaCairo, Option<IbcTransferEvent>>
+    + CanDecode<ViaCairo, Option<CreateClientEvent>>
 {
 }
 

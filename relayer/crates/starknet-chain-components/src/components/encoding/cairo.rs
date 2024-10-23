@@ -11,6 +11,13 @@ pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 pub use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use starknet::core::types::{Felt, U256};
 
+use crate::types::client_id::{ClientId, EncodeClientId};
+use crate::types::cosmos::client_state::{
+    ClientStatus, CometClientState, EncodeClientStatus, EncodeCometClientState,
+};
+use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsensusState};
+use crate::types::cosmos::height::{EncodeHeight, Height};
+use crate::types::cosmos::update::{CometUpdateHeader, EncodeCometUpdateHeader};
 use crate::types::messages::erc20::deploy::{
     DeployErc20TokenMessage, EncodeDeployErc20TokenMessage,
 };
@@ -20,7 +27,6 @@ use crate::types::messages::erc20::transfer::{
 use crate::types::messages::ibc::denom::{
     Denom, EncodeDenom, EncodePrefixedDenom, EncodeTracePrefix, PrefixedDenom, TracePrefix,
 };
-use crate::types::messages::ibc::height::{EncodeHeight, Height};
 use crate::types::messages::ibc::ibc_transfer::{
     EncodeIbcTransferMessage, EncodeParticipant, IbcTransferMessage, Participant,
 };
@@ -71,5 +77,10 @@ delegate_components! {
         (ViaCairo, IbcTransferMessage): EncodeIbcTransferMessage,
         (ViaCairo, Height): EncodeHeight,
         (ViaCairo, Packet): EncodePacket,
+        (ViaCairo, ClientStatus): EncodeClientStatus,
+        (ViaCairo, CometClientState): EncodeCometClientState,
+        (ViaCairo, CometConsensusState): EncodeCometConsensusState,
+        (ViaCairo, ClientId): EncodeClientId,
+        (ViaCairo, CometUpdateHeader): EncodeCometUpdateHeader,
     }
 }

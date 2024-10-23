@@ -10,9 +10,9 @@ use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEv
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
+use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, PrefixedDenom};
-use hermes_starknet_chain_components::types::messages::ibc::height::Height;
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
     IbcTransferMessage, Participant,
 };
@@ -80,6 +80,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let event_encoding = StarknetEventEncoding {
             erc20_hashes: [erc20_class_hash].into(),
             ics20_hashes: [ics20_class_hash].into(),
+            ibc_client_hashes: Default::default(),
         };
 
         let ics20_contract_address = {

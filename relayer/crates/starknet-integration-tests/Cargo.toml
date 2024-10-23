@@ -22,6 +22,7 @@ hermes-starknet-test-components  = { workspace = true }
 hermes-starknet-chain-context    = { workspace = true }
 hermes-starknet-relayer          = { workspace = true }
 hermes-cosmos-test-components    = { workspace = true }
+hermes-chain-components          = { workspace = true }
 hermes-cosmos-chain-components   = { workspace = true }
 hermes-cosmos-integration-tests  = { workspace = true }
 hermes-cosmos-relayer            = { workspace = true }
