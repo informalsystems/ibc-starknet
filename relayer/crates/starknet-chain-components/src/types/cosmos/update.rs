@@ -4,7 +4,6 @@ use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::HList;
 use hermes_wasm_encoding_components::components::MutEncoderComponent;
-use starknet::core::types::Felt;
 
 use crate::types::cosmos::height::Height;
 
@@ -13,7 +12,7 @@ pub struct CometUpdateHeader {
     pub trusted_height: Height,
     pub target_height: Height,
     pub time: u64,
-    pub root: Felt,
+    pub root: Vec<u8>,
 }
 
 pub struct EncodeCometUpdateHeader;

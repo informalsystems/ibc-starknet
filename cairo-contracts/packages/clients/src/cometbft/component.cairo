@@ -259,7 +259,7 @@ pub mod CometClientComponent {
             upgrade_consensus_state: Array<felt252>,
             proof_upgrade_client: Array<felt252>,
             proof_upgrade_consensus: Array<felt252>,
-            root: felt252
+            root: ByteArray
         ) {}
     }
 
@@ -350,7 +350,7 @@ pub mod CometClientComponent {
     pub(crate) impl ClientInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientInternalTrait<TContractState> {
-        fn _root(self: @ComponentState<TContractState>, client_sequence: u64) -> felt252 {
+        fn _root(self: @ComponentState<TContractState>, client_sequence: u64) -> ByteArray {
             let latest_height = self.latest_height(client_sequence);
 
             let latest_consensus_state = self.read_consensus_state(client_sequence, latest_height);

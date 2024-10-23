@@ -21,7 +21,7 @@ use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncod
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::accounts::Call;
-use starknet::macros::{felt, selector, short_string};
+use starknet::macros::{selector, short_string};
 
 #[test]
 fn test_starknet_comet_client_contract() -> Result<(), Error> {
@@ -92,7 +92,7 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
 
                 let consensus_state = CometConsensusState {
                     timestamp: SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() - 10,
-                    root: felt!("0x123"),
+                    root: vec![1, 2, 3],
                 };
 
                 let raw_client_state = StarknetCairoEncoding.encode(&client_state)?;
@@ -138,7 +138,7 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
                         revision_height: 2,
                     },
                     time: SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() - 10,
-                    root: felt!("0x456"),
+                    root: vec![4, 5, 6],
                 };
 
                 let raw_header = StarknetCairoEncoding.encode(&update_header)?;

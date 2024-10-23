@@ -52,7 +52,7 @@ pub trait IClientStateValidation<TContractState> {
         upgrade_consensus_state: Array<felt252>,
         proof_upgrade_client: Array<felt252>,
         proof_upgrade_consensus: Array<felt252>,
-        root: felt252,
+        root: ByteArray,
     );
 }
 
