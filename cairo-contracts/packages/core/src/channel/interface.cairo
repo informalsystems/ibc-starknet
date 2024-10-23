@@ -3,6 +3,7 @@ use starknet_ibc_core::host::{PortId, ChannelId, Sequence};
 
 #[starknet::interface]
 pub trait IChannelHandler<TContractState> {
+    fn send_packet(ref self: TContractState, packet: Packet);
     fn recv_packet(ref self: TContractState, msg: MsgRecvPacket);
 }
 
@@ -22,6 +23,9 @@ pub trait IChannelQuery<TContractState> {
     fn packet_acknowledgement(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
     ) -> felt252;
+    fn next_sequence_send(
+        self: @TContractState, port_id: PortId, channel_id: ChannelId
+    ) -> Sequence;
     fn next_sequence_recv(
         self: @TContractState, port_id: PortId, channel_id: ChannelId
     ) -> Sequence;

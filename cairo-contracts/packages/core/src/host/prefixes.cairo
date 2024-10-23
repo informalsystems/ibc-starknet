@@ -18,12 +18,16 @@ pub fn COMMITMENTS_PREFIX() -> ByteArray {
     "commitments"
 }
 
+pub fn RECEIPTS_PREFIX() -> ByteArray {
+    "receipts"
+}
+
 pub fn ACKS_PREFIX() -> ByteArray {
     "acks"
 }
 
-pub fn RECEIPTS_PREFIX() -> ByteArray {
-    "receipts"
+pub fn NEXT_SEQ_SEND_PREFIX() -> ByteArray {
+    "nextSequenceSend"
 }
 
 pub fn NEXT_SEQ_RECV_PREFIX() -> ByteArray {

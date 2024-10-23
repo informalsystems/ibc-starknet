@@ -4,7 +4,7 @@ use starknet_ibc_core::client::{
     IClientHandlerDispatcherTrait, IClientStateValidationDispatcher,
     IClientStateValidationDispatcherTrait, MsgCreateClient, MsgUpdateClient, MsgRecoverClient,
     MsgUpgradeClient, CreateResponse, UpdateResponse, Height, HeightPartialOrd, Status, StatusTrait,
-    ClientErrors
+    ClientErrors, Timestamp
 };
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -32,6 +32,10 @@ pub impl ClientContractImpl of ClientContractTrait {
 
     fn latest_height(self: @ClientContract, client_sequence: u64) -> Height {
         IClientQueryDispatcher { contract_address: *self.address }.latest_height(client_sequence)
+    }
+
+    fn latest_timestamp(self: @ClientContract, client_sequence: u64) -> Timestamp {
+        IClientQueryDispatcher { contract_address: *self.address }.latest_timestamp(client_sequence)
     }
 
     fn status(self: @ClientContract, client_sequence: u64) -> Status {
