@@ -1,8 +1,8 @@
+use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::transform::Transformer;
 use hermes_encoding_components::HList;
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
@@ -20,11 +20,11 @@ delegate_components! {
     EncodeCometConsensusState {
         MutEncoderComponent: CombineEncoders<
             HList![
-                EncodeField<symbol!("timestamp"), WithContext>,
-                EncodeField<symbol!("root"), WithContext>,
+                EncodeField<symbol!("timestamp"), UseContext>,
+                EncodeField<symbol!("root"), UseContext>,
             ],
         >,
-        MutDecoderComponent: DecodeFrom<Self, WithContext>,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
     }
 }
 

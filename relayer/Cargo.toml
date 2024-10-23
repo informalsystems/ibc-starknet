@@ -40,8 +40,8 @@ prost                       = { version = "0.13.1" }
 prost-types                 = { version = "0.13.1" }
 cairo-lang-starknet-classes = { version = "2.7.0" }
 
-ibc                       = { version = "0.54.0" }
-ibc-proto                 = { version = "0.47.0" }
+ibc                       = { version = "0.55.1" }
+ibc-proto                 = { version = "0.47.1" }
 ibc-relayer               = { version = "0.29.2" }
 ibc-relayer-types         = { version = "0.29.2" }
 ibc-client-starknet-types = { version = "0.1.0" }
@@ -49,6 +49,8 @@ ibc-client-starknet-types = { version = "0.1.0" }
 hermes-runtime-components           = { version = "0.1.0" }
 hermes-async-runtime-components     = { version = "0.1.0" }
 hermes-tokio-runtime-components     = { version = "0.1.0" }
+hermes-chain-components             = { version = "0.1.0" }
+hermes-chain-type-components        = { version = "0.1.0" }
 hermes-runtime                      = { version = "0.1.0" }
 hermes-error                        = { version = "0.1.0" }
 hermes-encoding-components          = { version = "0.1.0" }
@@ -97,6 +99,25 @@ ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types"
 # ibc-telemetry     = { git = "https://github.com/informalsystems/hermes.git" }
 # ibc-relayer-types = { git = "https://github.com/informalsystems/hermes.git" }
 
+
+cgp                     = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-core                = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-extra               = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-async               = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-async-macro         = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-component           = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-component-macro     = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-component-macro-lib = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-type                = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-field               = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-field-macro         = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-field-macro-lib     = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-error               = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-run                 = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-inner               = { git = "https://github.com/contextgeneric/cgp.git" }
+
+hermes-chain-components             = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-chain-type-components        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-relayer-components           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-relayer-components-extra     = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-runtime-components           = { git = "https://github.com/informalsystems/hermes-sdk.git" }

@@ -1,3 +1,4 @@
+use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_cairo_encoding_components::types::either::Either;
@@ -5,7 +6,6 @@ use hermes_cairo_encoding_components::Sum;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_encoding_components::HList;
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
@@ -25,12 +25,12 @@ delegate_components! {
     EncodeCometClientState {
         MutEncoderComponent: CombineEncoders<
             HList![
-                EncodeField<symbol!("latest_height"), WithContext>,
-                EncodeField<symbol!("trusting_period"), WithContext>,
-                EncodeField<symbol!("status"), WithContext>,
+                EncodeField<symbol!("latest_height"), UseContext>,
+                EncodeField<symbol!("trusting_period"), UseContext>,
+                EncodeField<symbol!("status"), UseContext>,
             ],
         >,
-        MutDecoderComponent: DecodeFrom<Self, WithContext>,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
     }
 }
 

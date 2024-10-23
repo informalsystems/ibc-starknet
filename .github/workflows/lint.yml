@@ -55,8 +55,14 @@ jobs:
           nix shell .#nixfmt -c \
             nixfmt --check .
 
-      - name: Format Cairo
+      - name: Format Cairo Contracts
         working-directory: ./cairo-contracts
+        run: |
+          nix shell ..#scarb -c \
+            scarb fmt -w --check
+
+      - name: Format Cairo Libraries
+        working-directory: ./cairo-libs
         run: |
           nix shell ..#scarb -c \
             scarb fmt -w --check

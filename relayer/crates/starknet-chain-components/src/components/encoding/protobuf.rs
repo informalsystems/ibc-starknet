@@ -1,11 +1,10 @@
+use cgp::core::component::{UseContext, UseDelegate};
 use cgp::prelude::*;
 pub use hermes_cosmos_chain_components::encoding::components::{
     DecodeBufferTypeComponent, EncodeBufferTypeComponent,
 };
-use hermes_encoding_components::impls::delegate::DelegateEncoding;
 use hermes_encoding_components::impls::types::encoded::ProvideEncodedBytes;
 use hermes_encoding_components::impls::types::schema::ProvideStringSchema;
-use hermes_encoding_components::impls::with_context::WithContext;
 pub use hermes_encoding_components::traits::convert::ConverterComponent;
 pub use hermes_encoding_components::traits::decode::DecoderComponent;
 pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
@@ -53,20 +52,20 @@ define_components! {
         DecodeBufferTypeComponent:
             ProvideProtoChunksDecodeBuffer,
         ConverterComponent:
-            DelegateEncoding<StarknetConverterComponents>,
+            UseDelegate<StarknetConverterComponents>,
         [
             EncoderComponent,
             DecoderComponent,
         ]:
-            DelegateEncoding<StarknetEncoderComponents>,
+            UseDelegate<StarknetEncoderComponents>,
         [
             MutEncoderComponent,
             MutDecoderComponent,
             EncodedLengthGetterComponent,
         ]:
-            DelegateEncoding<StarknetMutEncoderComponents>,
+            UseDelegate<StarknetMutEncoderComponents>,
         SchemaGetterComponent:
-            DelegateEncoding<StarknetTypeUrlSchemas>,
+            UseDelegate<StarknetTypeUrlSchemas>,
     }
 }
 
@@ -129,8 +128,8 @@ delegate_components! {
 
 delegate_components! {
     StarknetConverterComponents {
-        (ClientMessage, Any): EncodeAsAnyProtobuf<ViaProtobuf, WithContext>,
-        (Any, ClientMessage): DecodeAsAnyProtobuf<ViaProtobuf, WithContext>,
+        (ClientMessage, Any): EncodeAsAnyProtobuf<ViaProtobuf, UseContext>,
+        (Any, ClientMessage): DecodeAsAnyProtobuf<ViaProtobuf, UseContext>,
 
         (StarknetHeader, Any):
             EncodeViaClientMessage,

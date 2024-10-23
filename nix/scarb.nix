@@ -6,13 +6,13 @@
 let
   cairo = nixpkgs.rustPlatform.buildRustPackage {
     name = "scarb";
-    version = "2.8.0";
+    version = "2.8.4";
 
     doCheck = false;
 
     src = scarb-src;
 
-    cargoHash = "sha256-LodT2SCTrIrY8YGJWYbzgawIz3xJn9VH2rst07av2Bw=";
+    cargoHash = "sha256-CGMPFE31s1mwkrGCotqSHx8j5hD3J6twGvvG1Rmc63Q=";
 
     SCARB_CORELIB_LOCAL_PATH = cairo-src + "/corelib";
 

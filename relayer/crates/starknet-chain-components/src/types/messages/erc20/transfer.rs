@@ -1,9 +1,9 @@
+use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_encoding_components::impls::with_context::WithContext;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::HList;
@@ -31,8 +31,8 @@ pub struct TransferErc20TokenMessage {
 
 pub type EncodeTransferErc20TokenMessage = CombineEncoders<
     HList![
-        EncodeField<symbol!("recipient"), WithContext>,
-        EncodeField<symbol!("amount"), WithContext>
+        EncodeField<symbol!("recipient"), UseContext>,
+        EncodeField<symbol!("amount"), UseContext>
     ],
 >;
 

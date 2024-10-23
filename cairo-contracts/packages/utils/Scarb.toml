@@ -25,5 +25,7 @@ fmt = { workspace = true }
 [dependencies]
 # external dependencies
 openzeppelin_token = { workspace = true }
-snforge_std        = { workspace = true }
 starknet           = { workspace = true }
+
+[dev-dependencies]
+snforge_std = { workspace = true }

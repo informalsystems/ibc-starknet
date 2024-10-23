@@ -14,22 +14,17 @@
     };
 
     cairo-src = {
-      url = "github:starkware-libs/cairo/v2.8.0";
+      url = "github:starkware-libs/cairo/v2.8.4";
       flake = false;
     };
 
     scarb-src = {
-      url = "github:software-mansion/scarb/v2.8.0";
-      flake = false;
-    };
-
-    snforge-src = {
-      url = "github:foundry-rs/starknet-foundry/v0.27.0";
+      url = "github:software-mansion/scarb/v2.8.4";
       flake = false;
     };
 
     universal-sierra-compiler-src = {
-      url = "github:software-mansion/universal-sierra-compiler/v2.2.0";
+      url = "github:software-mansion/universal-sierra-compiler/v2.3.0";
       flake = false;
     };
   };
@@ -83,11 +78,6 @@
             inherit (inputs) scarb-src cairo-src;
           };
 
-          snforge = import ./nix/snforge.nix {
-            inherit nixpkgs;
-            inherit (inputs) snforge-src;
-          };
-
           universal-sierra-compiler = import ./nix/universal-sierra-compiler.nix {
             inherit nixpkgs;
             inherit (inputs) universal-sierra-compiler-src;
@@ -100,7 +90,6 @@
               starknet-devnet
               cairo
               scarb
-              snforge
               universal-sierra-compiler
               wasm-simapp
               ;
@@ -130,7 +119,6 @@
               starknet-devnet
               cairo
               scarb
-              snforge
               rust
               rust-nightly
               rust-wasm

@@ -4,7 +4,7 @@ pub mod ClientEventEmitterComponent {
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
 
     #[storage]
-    struct Storage {}
+    pub struct Storage {}
 
     #[event]
     #[derive(Debug, Drop, starknet::Event)]

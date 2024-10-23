@@ -1,7 +1,7 @@
+use cgp::core::component::UseDelegate;
 use cgp::prelude::*;
 pub use hermes_cairo_encoding_components::components::encoding::EncodedTypeComponent;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
-use hermes_encoding_components::impls::delegate::DelegateEncoding;
 pub use hermes_encoding_components::traits::decode::DecoderComponent;
 use hermes_encoding_components::traits::types::encoded::ProvideEncodedType;
 
@@ -15,7 +15,7 @@ use crate::types::events::ics20::{
 define_components! {
     StarknetEventEncodingComponents {
         EncodedTypeComponent: ProvideEncodedStarknetEventType,
-        DecoderComponent: DelegateEncoding<StarknetEventEncoderComponents>,
+        DecoderComponent: UseDelegate<StarknetEventEncoderComponents>,
     }
 }
 
