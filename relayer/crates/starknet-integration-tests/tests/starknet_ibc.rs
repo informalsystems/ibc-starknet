@@ -1,12 +1,22 @@
-use std::time::SystemTime;
+use std::time::{SystemTime, UNIX_EPOCH};
 
+use hermes_chain_components::traits::send_message::CanSendSingleMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
+use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
+use hermes_starknet_chain_components::types::cosmos::client_state::{
+    ClientStatus, CometClientState,
+};
+use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
+use hermes_starknet_chain_components::types::cosmos::height::Height;
+use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
+use starknet::accounts::Call;
+use starknet::macros::{felt, selector, short_string};
 
 #[test]
 fn test_starknet_comet_client_contract() -> Result<(), Error> {
@@ -53,6 +63,43 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             "deployed Comet client contract to address: {:?}",
             comet_client_address
         );
+
+        {
+            let message = {
+                let client_type = short_string!("07-cometbft");
+
+                let client_state = CometClientState {
+                    latest_height: Height {
+                        revision_number: 0,
+                        revision_height: 1,
+                    },
+                    trusting_period: 1024,
+                    status: ClientStatus::Active,
+                };
+
+                let consensus_state = CometConsensusState {
+                    timestamp: SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs(),
+                    root: felt!("0x123"),
+                };
+
+                let raw_client_state = StarknetCairoEncoding.encode(&client_state)?;
+                let raw_consensus_state = StarknetCairoEncoding.encode(&consensus_state)?;
+
+                let mut calldata = vec![client_type];
+                calldata.extend(StarknetCairoEncoding.encode(&raw_client_state)?);
+                calldata.extend(StarknetCairoEncoding.encode(&raw_consensus_state)?);
+
+                Call {
+                    to: comet_client_address,
+                    selector: selector!("create_client"),
+                    calldata,
+                }
+            };
+
+            let events = chain.send_message(message).await?;
+
+            println!("create client events: {:?}", events);
+        }
 
         Ok(())
     })
