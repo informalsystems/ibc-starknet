@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod MockCometClient {
+pub mod MockCometClient {
     use starknet_ibc_clients::cometbft::CometClientComponent;
 
     component!(path: CometClientComponent, storage: client, event: CometClientEvent);

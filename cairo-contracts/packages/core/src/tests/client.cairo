@@ -6,9 +6,9 @@ use starknet_ibc_core::client::ClientHandlerComponent::{
     ClientInternalImpl
 };
 use starknet_ibc_core::client::{ClientHandlerComponent, CreateResponse};
-use starknet_ibc_core::tests::{
-    CLIENT, CLIENT_TYPE, CLIENT_ID, HEIGHT, ClientEventSpyExt, MockClientHandler
-};
+use starknet_ibc_testkit::dummies::{CLIENT, CLIENT_TYPE, CLIENT_ID, HEIGHT};
+use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
+use starknet_ibc_testkit::mocks::MockClientHandler;
 
 type ComponentState = ClientHandlerComponent::ComponentState<MockClientHandler::ContractState>;
 

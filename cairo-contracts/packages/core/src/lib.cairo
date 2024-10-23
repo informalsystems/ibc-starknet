@@ -1,24 +1,7 @@
-pub mod tests {
-    mod dummy;
-    mod extend_spy;
-    #[cfg(test)]
-    mod test_channel;
-    #[cfg(test)]
-    mod test_client;
-    #[cfg(test)]
-    pub use mocks::mock_channel::MockChannelHandler;
-    #[cfg(test)]
-    pub use mocks::mock_client::MockClientHandler;
-
-    pub use dummy::{
-        HEIGHT, CLIENT, CLIENT_TYPE, CLIENT_ID, PORT_ID, CHANNEL_ID, SEQUENCE, CHANNEL_END
-    };
-    pub use extend_spy::ClientEventSpyExt;
-    #[cfg(test)]
-    pub mod mocks {
-        pub mod mock_channel;
-        pub mod mock_client;
-    }
+#[cfg(test)]
+mod tests {
+    mod channel;
+    mod client;
 }
 pub mod router {
     mod app_call;

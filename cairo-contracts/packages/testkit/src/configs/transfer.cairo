@@ -1,5 +1,4 @@
 use starknet::ContractAddress;
-use starknet_ibc_apps::tests::{PUBKEY, NAME, AMOUNT, EMPTY_MEMO};
 use starknet_ibc_apps::transfer::types::PrefixedDenomTrait;
 use starknet_ibc_apps::transfer::types::{
     MsgTransfer, PacketData, PrefixedDenom, Denom, TracePrefixTrait, Participant
@@ -7,7 +6,7 @@ use starknet_ibc_apps::transfer::types::{
 use starknet_ibc_core::channel::{Packet, MsgRecvPacket};
 use starknet_ibc_core::client::Timestamp;
 use starknet_ibc_core::host::{ChannelId, Sequence};
-use starknet_ibc_core::tests::{PORT_ID, CHANNEL_ID, HEIGHT};
+use starknet_ibc_testkit::dummies::{PUBKEY, NAME, AMOUNT, EMPTY_MEMO, PORT_ID, CHANNEL_ID, HEIGHT};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct TransferAppConfig {

@@ -1,12 +1,12 @@
 use snforge_std::spy_events;
-use starknet_ibc_apps::tests::TransferEventSpyExt;
-use starknet_ibc_apps::tests::{TransferAppConfigTrait, COSMOS, STARKNET, OWNER};
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::transfer::TRANSFER_PORT_ID;
-use starknet_ibc_clients::tests::CometClientConfigTrait;
-use starknet_ibc_contracts::tests::{SetupImpl, CoreHandle, AppHandle, ERC20Handle};
 use starknet_ibc_core::channel::ChannelEndTrait;
-use starknet_ibc_core::tests::CLIENT_TYPE;
+use starknet_ibc_testkit::configs::{TransferAppConfigTrait, CometClientConfigTrait};
+use starknet_ibc_testkit::dummies::{COSMOS, STARKNET, OWNER, CLIENT_TYPE};
+use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
+use starknet_ibc_testkit::handles::{CoreHandle, AppHandle, ERC20Handle};
+use starknet_ibc_testkit::setup::SetupImpl;
 use starknet_ibc_utils::ComputeKey;
 
 #[test]

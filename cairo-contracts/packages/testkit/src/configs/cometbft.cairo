@@ -1,10 +1,9 @@
 use starknet_ibc_clients::cometbft::{
     CometClientState, CometConsensusState, CometHeader, SignedHeader
 };
-
 use starknet_ibc_core::client::{MsgCreateClient, MsgUpdateClient, Height, Status};
 use starknet_ibc_core::host::ClientId;
-use starknet_ibc_core::tests::{HEIGHT, CLIENT_TYPE};
+use starknet_ibc_testkit::dummies::{HEIGHT, CLIENT_TYPE};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct CometClientConfig {

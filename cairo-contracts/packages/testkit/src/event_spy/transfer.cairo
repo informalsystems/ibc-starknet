@@ -1,11 +1,11 @@
 use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
 use snforge_std::EventSpy;
 use starknet::ContractAddress;
-use starknet_ibc_apps::tests::EMPTY_MEMO;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
     Event, SendEvent, RecvEvent, CreateTokenEvent
 };
 use starknet_ibc_apps::transfer::types::{Participant, PrefixedDenom};
+use starknet_ibc_testkit::dummies::EMPTY_MEMO;
 
 #[generate_trait]
 pub impl TransferEventSpyExtImpl of TransferEventSpyExt {

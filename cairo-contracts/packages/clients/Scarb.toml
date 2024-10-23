@@ -28,3 +28,6 @@ starknet = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_core = { workspace = true }
+
+[dev-dependencies]
+starknet_ibc_testkit = { workspace = true }

@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod MockClientHandler {
+pub mod MockClientHandler {
     use starknet_ibc_core::client::{ClientHandlerComponent, ClientEventEmitterComponent};
 
     component!(

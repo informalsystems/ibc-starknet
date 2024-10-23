@@ -1,5 +1,5 @@
 #[starknet::contract]
-pub(crate) mod MockChannelHandler {
+pub mod MockChannelHandler {
     use starknet_ibc_core::channel::{ChannelHandlerComponent, ChannelEventEmitterComponent};
 
     component!(

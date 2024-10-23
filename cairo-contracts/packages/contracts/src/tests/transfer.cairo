@@ -1,13 +1,11 @@
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::{start_cheat_caller_address, spy_events};
-use starknet_ibc_apps::tests::TransferEventSpyExt;
-use starknet_ibc_apps::tests::{
-    TransferAppConfigTrait, NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET
-};
 use starknet_ibc_apps::transfer::{ERC20Contract, TRANSFER_PORT_ID};
-use starknet_ibc_clients::tests::CometClientConfigTrait;
-use starknet_ibc_contracts::tests::{SetupImpl, CoreHandle, ERC20Handle, AppHandle};
-use starknet_ibc_core::tests::CLIENT_TYPE;
+use starknet_ibc_testkit::configs::{TransferAppConfigTrait, CometClientConfigTrait};
+use starknet_ibc_testkit::dummies::{NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET, CLIENT_TYPE};
+use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
+use starknet_ibc_testkit::handles::{CoreHandle, AppHandle, ERC20Handle};
+use starknet_ibc_testkit::setup::SetupImpl;
 use starknet_ibc_utils::ComputeKey;
 
 #[test]
