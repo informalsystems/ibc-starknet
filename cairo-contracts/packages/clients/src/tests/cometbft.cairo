@@ -3,9 +3,10 @@ use starknet_ibc_clients::cometbft::CometClientComponent::{
     CometClientHandler, CometClientQuery, ClientReaderImpl
 };
 use starknet_ibc_clients::cometbft::CometClientComponent;
-use starknet_ibc_clients::tests::{MockCometClient, CometClientConfigTrait};
 use starknet_ibc_core::client::StatusTrait;
-use starknet_ibc_core::tests::HEIGHT;
+use starknet_ibc_testkit::configs::CometClientConfigTrait;
+use starknet_ibc_testkit::dummies::HEIGHT;
+use starknet_ibc_testkit::mocks::MockCometClient;
 
 type ComponentState = CometClientComponent::ComponentState<MockCometClient::ContractState>;
 

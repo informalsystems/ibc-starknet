@@ -75,6 +75,16 @@ pub mod CometClientComponent {
             comet_client_state.latest_height
         }
 
+        fn latest_timestamp(
+            self: @ComponentState<TContractState>, client_sequence: u64
+        ) -> Timestamp {
+            let latest_height = self.latest_height(client_sequence);
+
+            let consensus_state = self.read_consensus_state(client_sequence, latest_height);
+
+            consensus_state.timestamp
+        }
+
         fn status(self: @ComponentState<TContractState>, client_sequence: u64) -> Status {
             let comet_client_state: CometClientState = self.read_client_state(client_sequence);
 

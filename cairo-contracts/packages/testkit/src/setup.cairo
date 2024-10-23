@@ -3,12 +3,12 @@ use snforge_std::{
     start_cheat_block_timestamp_global, start_cheat_block_number_global, ContractClass
 };
 use starknet::ContractAddress;
-use starknet_ibc_apps::tests::OWNER;
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_contracts::tests::{
-    AppContract, CoreContract, CoreHandle, ClientHandle, ERC20Handle, AppHandle
-};
 use starknet_ibc_core::client::ClientContract;
+use starknet_ibc_testkit::dummies::OWNER;
+use starknet_ibc_testkit::handles::{
+    AppContract, CoreContract, CoreHandle, AppHandle, ERC20Handle, ClientHandle
+};
 
 #[derive(Drop, Serde)]
 pub struct Setup {

@@ -1,24 +1,7 @@
-pub mod tests {
-    mod dummy;
-    mod extend_spy;
-    #[cfg(test)]
-    mod test_channel;
-    #[cfg(test)]
-    mod test_client;
-    #[cfg(test)]
-    pub use mocks::mock_channel::MockChannelHandler;
-    #[cfg(test)]
-    pub use mocks::mock_client::MockClientHandler;
-
-    pub use dummy::{
-        HEIGHT, CLIENT, CLIENT_TYPE, CLIENT_ID, PORT_ID, CHANNEL_ID, SEQUENCE, CHANNEL_END
-    };
-    pub use extend_spy::ClientEventSpyExt;
-    #[cfg(test)]
-    pub mod mocks {
-        pub mod mock_channel;
-        pub mod mock_client;
-    }
+#[cfg(test)]
+mod tests {
+    mod channel;
+    mod client;
 }
 pub mod router {
     mod app_call;
@@ -32,11 +15,13 @@ pub mod router {
     pub use interface::{IRouter, IRouterDispatcher, IRouterDispatcherTrait};
 }
 pub mod channel {
+    mod channel_call;
     mod errors;
     mod interface;
     mod msgs;
     mod types;
 
+    pub use channel_call::{ChannelContract, ChannelContractImpl, ChannelContractTrait};
     pub use components::events::ChannelEventEmitterComponent;
     pub use components::handler::ChannelHandlerComponent;
     pub use errors::ChannelErrors;
@@ -81,7 +66,8 @@ pub mod client {
     pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient};
     pub use types::{
         CreateResponse, CreateResponseImpl, UpdateResponse, Status, StatusImpl, StatusTrait, Height,
-        HeightPartialOrd, HeightsIntoUpdateResponse, Timestamp, TimestampPartialOrd
+        HeightImpl, HeightTrait, HeightZero, HeightPartialOrd, HeightsIntoUpdateResponse, Timestamp,
+        TimestampZero, TimestampPartialOrd, U64IntoTimestamp
     };
     mod components {
         pub mod events;
@@ -97,13 +83,16 @@ pub mod host {
     pub use errors::HostErrors;
     pub use identifiers::{
         ClientId, ClientIdImpl, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdImpl,
-        PortIdTrait, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd
+        PortIdTrait, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero
     };
 
-    pub use keys::{channel_end_key, receipt_key, ack_key, next_sequence_recv_key};
+    pub use keys::{
+        channel_end_key, commitment_key, receipt_key, ack_key, next_sequence_recv_key,
+        next_sequence_send_key
+    };
     pub use paths::{commitment_path};
     pub use prefixes::{
         CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX,
-        ACKS_PREFIX, RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX
+        ACKS_PREFIX, RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX
     };
 }

@@ -31,23 +31,8 @@ pub mod transfer {
         "transfer"
     }
 }
-pub mod tests {
-    mod config;
-    mod dummy;
-    mod extend_spy;
-    #[cfg(test)]
-    mod test_transfer;
-    #[cfg(test)]
-    pub use mocks::mock_transfer::MockTransferApp;
-    pub use config::{TransferAppConfig, TransferAppConfigImpl, TransferAppConfigTrait};
-    pub use dummy::{
-        NAME, SYMBOL, PUBKEY, AMOUNT, SUPPLY, OWNER, STARKNET, COSMOS, SALT, DECIMALS, CLASS_HASH,
-        EMPTY_MEMO
-    };
 
-    pub use extend_spy::{TransferEventSpyExtImpl, TransferEventSpyExt};
-    #[cfg(test)]
-    mod mocks {
-        pub mod mock_transfer;
-    }
+#[cfg(test)]
+mod tests {
+    mod transfer;
 }

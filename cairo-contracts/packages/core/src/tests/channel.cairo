@@ -4,8 +4,8 @@ use starknet_ibc_core::channel::ChannelHandlerComponent::{
     ChannelInitializerImpl, ChannelWriterTrait
 };
 use starknet_ibc_core::channel::ChannelHandlerComponent;
-use starknet_ibc_core::host::SequenceTrait;
-use starknet_ibc_core::tests::{CHANNEL_END, CHANNEL_ID, PORT_ID, SEQUENCE, MockChannelHandler};
+use starknet_ibc_testkit::dummies::{CHANNEL_END, CHANNEL_ID, PORT_ID, SEQUENCE};
+use starknet_ibc_testkit::mocks::MockChannelHandler;
 
 type ComponentState = ChannelHandlerComponent::ComponentState<MockChannelHandler::ContractState>;
 
@@ -25,7 +25,7 @@ fn test_intial_state() {
     let channel_end_resp = state.read_channel_end(@PORT_ID(), @CHANNEL_ID(0));
     assert!(channel_end_resp.is_some());
 
-    let channel_end_resp = state.read_channel_end(@PORT_ID(), @CHANNEL_ID(1));
+    let channel_end_resp = state.read_channel_end(@PORT_ID(), @CHANNEL_ID(10));
     assert!(channel_end_resp.is_none());
 
     let receipt_resp = state.read_packet_receipt(@PORT_ID(), @CHANNEL_ID(0), @SEQUENCE(0));
@@ -41,7 +41,7 @@ fn test_intial_state() {
 #[test]
 fn test_write_channel_end_ok() {
     let mut state = setup();
-    state.write_channel_end(@PORT_ID(), @CHANNEL_ID(1), CHANNEL_END());
+    state.write_channel_end(@PORT_ID(), @CHANNEL_ID(1), CHANNEL_END(10));
     let chan_end_res = state.read_channel_end(@PORT_ID(), @CHANNEL_ID(1));
-    assert_eq!(chan_end_res, Option::Some(CHANNEL_END()));
+    assert_eq!(chan_end_res, Option::Some(CHANNEL_END(10)));
 }

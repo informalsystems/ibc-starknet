@@ -1,4 +1,4 @@
-use core::num::traits::CheckedAdd;
+use core::num::traits::{CheckedAdd, Zero};
 use core::traits::PartialOrd;
 use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::host::ClientId;
@@ -65,6 +65,27 @@ pub struct Height {
     pub revision_height: u64,
 }
 
+#[generate_trait]
+pub impl HeightImpl of HeightTrait {
+    fn new(revision_number: u64, revision_height: u64) -> Height {
+        Height { revision_number, revision_height }
+    }
+}
+
+pub impl HeightZero of Zero<Height> {
+    fn zero() -> Height {
+        Height { revision_number: 0, revision_height: 0 }
+    }
+
+    fn is_zero(self: @Height) -> bool {
+        self.revision_number == @0 && self.revision_height == @0
+    }
+
+    fn is_non_zero(self: @Height) -> bool {
+        !self.is_zero()
+    }
+}
+
 pub impl HeightAdd of Add<Height> {
     fn add(lhs: Height, rhs: Height) -> Height {
         let revision_number = lhs.revision_number.checked_add(rhs.revision_number);
@@ -102,10 +123,23 @@ pub impl HeightPartialOrd of PartialOrd<@Height> {
     }
 }
 
-
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct Timestamp {
     pub timestamp: u64,
+}
+
+pub impl TimestampZero of Zero<Timestamp> {
+    fn zero() -> Timestamp {
+        Timestamp { timestamp: 0 }
+    }
+
+    fn is_zero(self: @Timestamp) -> bool {
+        self.timestamp == @0
+    }
+
+    fn is_non_zero(self: @Timestamp) -> bool {
+        !self.is_zero()
+    }
 }
 
 pub impl TimestampPartialOrd of PartialOrd<@Timestamp> {

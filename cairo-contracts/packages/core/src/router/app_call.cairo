@@ -8,7 +8,7 @@ pub struct ApplicationContract {
     pub address: ContractAddress,
 }
 
-impl ContractAddressIntoClientAddr of Into<ContractAddress, ApplicationContract> {
+impl ContractAddressIntoApplicationAddr of Into<ContractAddress, ApplicationContract> {
     fn into(self: ContractAddress) -> ApplicationContract {
         ApplicationContract { address: self }
     }
