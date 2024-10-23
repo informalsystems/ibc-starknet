@@ -11,7 +11,7 @@ Readme        = { workspace = true }
 keywords      = { workspace = true }
 
 description = """
-    Provides a set of common  used for testing different IBC packages.
+    Provides a set of common artifacts used for testing different IBC packages.
 """
 
 [lib]
