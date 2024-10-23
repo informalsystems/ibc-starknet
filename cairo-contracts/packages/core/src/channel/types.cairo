@@ -1,3 +1,4 @@
+use core::num::traits::Zero;
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
 use starknet_ibc_core::host::{ClientId, ChannelId, PortId, Sequence};
@@ -17,6 +18,11 @@ pub struct Packet {
 
 #[generate_trait]
 pub impl PacketImpl of PacketTrait {
+    /// Checks if the packet timeout is set.
+    fn is_timeout_set(self: @Packet) -> bool {
+        !(self.timeout_height_on_b.is_zero() && self.timeout_timestamp_on_b.is_zero())
+    }
+
     /// Checks if the packet is not timed out, and throws an error if it is.
     fn check_timed_out(self: @Packet, current_height: @u64, current_timestamp: @u64) {
         assert(
@@ -74,6 +80,8 @@ pub impl ChannelEndImpl of ChannelEndTrait {
             && self.remote.channel_id == counterparty_channel_id
     }
 
+    /// Validates the channel end be in the open state and the counterparty
+    /// parameters match with the expected one.
     fn validate(
         self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_chan_id: @ChannelId
     ) {

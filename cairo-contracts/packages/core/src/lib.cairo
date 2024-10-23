@@ -83,7 +83,8 @@ pub mod client {
     pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient};
     pub use types::{
         CreateResponse, CreateResponseImpl, UpdateResponse, Status, StatusImpl, StatusTrait, Height,
-        HeightPartialOrd, HeightsIntoUpdateResponse, Timestamp, TimestampPartialOrd
+        HeightZero, HeightPartialOrd, HeightsIntoUpdateResponse, Timestamp, TimestampZero,
+        TimestampPartialOrd
     };
     mod components {
         pub mod events;
@@ -99,11 +100,12 @@ pub mod host {
     pub use errors::HostErrors;
     pub use identifiers::{
         ClientId, ClientIdImpl, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdImpl,
-        PortIdTrait, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd
+        PortIdTrait, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero
     };
 
     pub use keys::{
-        channel_end_key, receipt_key, ack_key, next_sequence_recv_key, next_sequence_send_key
+        channel_end_key, commitment_key, receipt_key, ack_key, next_sequence_recv_key,
+        next_sequence_send_key
     };
     pub use paths::{commitment_path};
     pub use prefixes::{

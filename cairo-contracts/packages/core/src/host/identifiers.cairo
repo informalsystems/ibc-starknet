@@ -1,4 +1,5 @@
 use core::byte_array::ByteArrayTrait;
+use core::num::traits::CheckedAdd;
 use core::num::traits::Zero;
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
@@ -124,12 +125,27 @@ pub struct Sequence {
 
 #[generate_trait]
 pub impl SequenceImpl of SequenceTrait {
+    fn increment(ref self: Sequence) -> Sequence {
+        let maybe_next_sequence = self.sequence.checked_add(1);
+
+        match maybe_next_sequence {
+            Option::Some(sequence) => Sequence { sequence },
+            Option::None => panic!("{}", HostErrors::OVERFLOWED_SEQUENCE)
+        }
+    }
+}
+
+pub impl SequenceZero of Zero<Sequence> {
     fn zero() -> Sequence {
         Sequence { sequence: 0 }
     }
 
     fn is_zero(self: @Sequence) -> bool {
         self.sequence.is_zero()
+    }
+
+    fn is_non_zero(self: @Sequence) -> bool {
+        !self.is_zero()
     }
 }
 

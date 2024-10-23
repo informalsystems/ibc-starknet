@@ -4,7 +4,6 @@ use starknet_ibc_core::channel::ChannelHandlerComponent::{
     ChannelInitializerImpl, ChannelWriterTrait
 };
 use starknet_ibc_core::channel::ChannelHandlerComponent;
-use starknet_ibc_core::host::SequenceTrait;
 use starknet_ibc_core::tests::{CHANNEL_END, CHANNEL_ID, PORT_ID, SEQUENCE, MockChannelHandler};
 
 type ComponentState = ChannelHandlerComponent::ComponentState<MockChannelHandler::ContractState>;
