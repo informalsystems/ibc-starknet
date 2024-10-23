@@ -53,8 +53,10 @@ pub mod ChannelHandlerComponent {
             // handlers. This should be removed once the channel handshake is
             // implemented.
             self.write_channel_end(@PORT_ID(), @CHANNEL_ID(0), CHANNEL_END(1));
-            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(1), CHANNEL_END(0));
             self.write_next_sequence_recv(@PORT_ID(), @CHANNEL_ID(0), SequenceZero::zero());
+
+            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(1), CHANNEL_END(0));
+            self.write_next_sequence_send(@PORT_ID(), @CHANNEL_ID(1), SequenceZero::zero());
         }
     }
 
