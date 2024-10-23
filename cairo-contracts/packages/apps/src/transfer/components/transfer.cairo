@@ -253,6 +253,35 @@ pub mod TokenTransferComponent {
 
             self.emit_send_event(msg.packet_data);
         }
+
+        fn construct_send_packet(
+            self: @ComponentState<TContractState>, channel: @ChannelContract, msg: MsgTransfer
+        ) -> Packet {
+            let chan_end_on_a = channel
+                .channel_end(msg.port_id_on_a.clone(), msg.chan_id_on_a.clone());
+
+            let port_id_on_b = chan_end_on_a.counterparty_port_id().clone();
+
+            let chan_id_on_b = chan_end_on_a.counterparty_channel_id().clone();
+
+            let seq_on_a = channel
+                .next_sequence_send(msg.port_id_on_a.clone(), msg.chan_id_on_a.clone());
+
+            let mut data: Array<felt252> = ArrayTrait::new();
+
+            msg.packet_data.serialize(ref data);
+
+            Packet {
+                seq_on_a,
+                port_id_on_a: msg.port_id_on_a,
+                chan_id_on_a: msg.chan_id_on_a,
+                port_id_on_b,
+                chan_id_on_b,
+                data,
+                timeout_height_on_b: msg.timeout_height_on_b,
+                timeout_timestamp_on_b: msg.timeout_timestamp_on_b
+            }
+        }
     }
 
     #[generate_trait]
@@ -488,35 +517,6 @@ pub mod TokenTransferComponent {
     pub(crate) impl TransferInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferInternalTrait<TContractState> {
-        fn construct_send_packet(
-            self: @ComponentState<TContractState>, channel: @ChannelContract, msg: MsgTransfer
-        ) -> Packet {
-            let chan_end_on_a = channel
-                .channel_end(msg.port_id_on_a.clone(), msg.chan_id_on_a.clone());
-
-            let port_id_on_b = chan_end_on_a.counterparty_port_id().clone();
-
-            let chan_id_on_b = chan_end_on_a.counterparty_channel_id().clone();
-
-            let seq_on_a = channel
-                .next_sequence_send(msg.port_id_on_a.clone(), msg.chan_id_on_a.clone());
-
-            let mut data: Array<felt252> = ArrayTrait::new();
-
-            msg.packet_data.serialize(ref data);
-
-            Packet {
-                seq_on_a,
-                port_id_on_a: msg.port_id_on_a,
-                chan_id_on_a: msg.chan_id_on_a,
-                port_id_on_b,
-                chan_id_on_b,
-                data,
-                timeout_height_on_b: msg.timeout_height_on_b,
-                timeout_timestamp_on_b: msg.timeout_timestamp_on_b
-            }
-        }
-
         fn get_token(self: @ComponentState<TContractState>, token_key: felt252) -> ERC20Contract {
             self.read_ibc_token_address(token_key).into()
         }
