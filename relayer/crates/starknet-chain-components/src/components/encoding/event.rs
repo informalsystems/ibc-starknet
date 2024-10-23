@@ -48,5 +48,7 @@ delegate_components! {
             DecodeOptionalByClassHash<symbol!("erc20_hashes")>,
         (ViaCairo, Option<IbcTransferEvent>):
             DecodeOptionalByClassHash<symbol!("ics20_hashes")>,
+        (ViaCairo, Option<CreateClientEvent>):
+            DecodeOptionalByClassHash<symbol!("ibc_client_hashes")>,
     }
 }

@@ -5,6 +5,7 @@ use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
+use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::cosmos::client_state::{
@@ -12,7 +13,9 @@ use hermes_starknet_chain_components::types::cosmos::client_state::{
 };
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
+use hermes_starknet_chain_components::types::events::create_client::CreateClientEvent;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
+use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::accounts::Call;
@@ -64,7 +67,13 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             comet_client_address
         );
 
-        {
+        let event_encoding = StarknetEventEncoding {
+            erc20_hashes: Default::default(),
+            ics20_hashes: Default::default(),
+            ibc_client_hashes: [comet_client_class_hash].into(),
+        };
+
+        let _client_id = {
             let message = {
                 let client_type = short_string!("07-cometbft");
 
@@ -100,8 +109,20 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
 
             let events = chain.send_message(message).await?;
 
-            println!("create client events: {:?}", events);
-        }
+            println!("events: {:?}", events);
+
+            let create_client_event: CreateClientEvent = event_encoding
+                .filter_decode_events(&events)?
+                .into_iter()
+                .next()
+                .unwrap();
+
+            let client_id = create_client_event.client_id;
+
+            println!("created client on Starknet: {:?}", client_id);
+
+            client_id
+        };
 
         Ok(())
     })

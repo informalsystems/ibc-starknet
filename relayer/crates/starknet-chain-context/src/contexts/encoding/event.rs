@@ -25,6 +25,7 @@ use crate::impls::error::HandleStarknetChainError;
 pub struct StarknetEventEncoding {
     pub erc20_hashes: HashSet<Felt>,
     pub ics20_hashes: HashSet<Felt>,
+    pub ibc_client_hashes: HashSet<Felt>,
 }
 
 pub struct StarknetEventEncodingContextComponents;
@@ -62,6 +63,7 @@ pub trait CanUseStarknetEventEncoding:
     + CanDecode<ViaCairo, CreateClientEvent>
     + CanDecode<ViaCairo, Option<Erc20Event>>
     + CanDecode<ViaCairo, Option<IbcTransferEvent>>
+    + CanDecode<ViaCairo, Option<CreateClientEvent>>
 {
 }
 

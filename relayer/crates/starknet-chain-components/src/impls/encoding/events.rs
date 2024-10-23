@@ -18,7 +18,7 @@ where
         let mut events = Vec::new();
 
         for raw_event in raw_events {
-            if let Some(event) = self.decode(raw_event)? {
+            if let Ok(Some(event)) = self.decode(raw_event) {
                 events.push(event)
             }
         }

@@ -1,4 +1,4 @@
-use cgp::prelude::CanRaiseError;
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
@@ -12,6 +12,7 @@ use crate::types::client_id::ClientId;
 use crate::types::cosmos::height::Height;
 use crate::types::event::{StarknetEvent, UnknownEvent};
 
+#[derive(Debug, HasField)]
 pub struct CreateClientEvent {
     pub client_id: ClientId,
     pub height: Height,
@@ -25,10 +26,9 @@ where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseError<CairoEncoding::Error>
-        + for<'a> CanRaiseError<UnknownEvent<'a>>
-        ,
-    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, HList![ClientId, Height]>,
+        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+    CairoEncoding:
+        HasEncodedType<Encoded = Vec<Felt>> + CanDecode<ViaCairo, HList![ClientId, Height]>,
 {
     fn decode(
         encoding: &EventEncoding,
@@ -37,7 +37,7 @@ where
         let cairo_encoding = encoding.encoding();
 
         if event.selector != Some(selector!("result")) {
-            return Err(EventEncoding::raise_error(UnknownEvent { event }))
+            return Err(EventEncoding::raise_error(UnknownEvent { event }));
         }
 
         let HList![client_id, height] = cairo_encoding
