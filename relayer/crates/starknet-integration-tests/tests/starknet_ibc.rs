@@ -68,17 +68,19 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             let message = {
                 let client_type = short_string!("07-cometbft");
 
+                let height = Height {
+                    revision_number: 123,
+                    revision_height: 456,
+                };
+
                 let client_state = CometClientState {
-                    latest_height: Height {
-                        revision_number: 0,
-                        revision_height: 1,
-                    },
+                    latest_height: height,
                     trusting_period: 1024,
                     status: ClientStatus::Active,
                 };
 
                 let consensus_state = CometConsensusState {
-                    timestamp: SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs(),
+                    timestamp: SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() - 10,
                     root: felt!("0x123"),
                 };
 

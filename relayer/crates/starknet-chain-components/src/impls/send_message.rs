@@ -11,6 +11,7 @@ use starknet::accounts::Call;
 use starknet::core::types::{
     ExecuteInvocation, FunctionInvocation, RevertedInvocation, TransactionTrace,
 };
+use starknet::macros::selector;
 
 use crate::types::event::StarknetEvent;
 use crate::types::tx_response::TxResponse;
@@ -75,6 +76,19 @@ pub fn extract_events_from_function_invocation(
             )
         })
         .collect();
+
+    // We retrofit the result returned from a call as an event,
+    // so that we can make it work the same way as Cosmos messages.
+    // TODO: use a different type to differentiate result events
+    let result_event = StarknetEvent {
+        contract_address: invocation.contract_address,
+        class_hash: invocation.class_hash,
+        selector: Some(selector!("result")),
+        keys: Vec::new(),
+        data: invocation.result,
+    };
+
+    events.push(result_event);
 
     for inner in invocation.calls {
         let mut in_events = extract_events_from_function_invocation(inner);
