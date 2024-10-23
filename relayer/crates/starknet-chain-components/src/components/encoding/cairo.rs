@@ -11,6 +11,7 @@ pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 pub use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use starknet::core::types::{Felt, U256};
 
+use crate::types::client_id::{ClientId, EncodeClientId};
 use crate::types::cosmos::client_state::{
     ClientStatus, CometClientState, EncodeClientStatus, EncodeCometClientState,
 };
@@ -78,5 +79,6 @@ delegate_components! {
         (ViaCairo, ClientStatus): EncodeClientStatus,
         (ViaCairo, CometClientState): EncodeCometClientState,
         (ViaCairo, CometConsensusState): EncodeCometConsensusState,
+        (ViaCairo, ClientId): EncodeClientId,
     }
 }

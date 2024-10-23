@@ -1,4 +1,5 @@
 pub mod amount;
+pub mod client_id;
 pub mod client_state;
 pub mod consensus_state;
 pub mod cosmos;
