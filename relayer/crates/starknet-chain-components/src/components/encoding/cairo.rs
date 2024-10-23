@@ -17,6 +17,7 @@ use crate::types::cosmos::client_state::{
 };
 use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsensusState};
 use crate::types::cosmos::height::{EncodeHeight, Height};
+use crate::types::cosmos::update::{CometUpdateHeader, EncodeCometUpdateHeader};
 use crate::types::messages::erc20::deploy::{
     DeployErc20TokenMessage, EncodeDeployErc20TokenMessage,
 };
@@ -80,5 +81,6 @@ delegate_components! {
         (ViaCairo, CometClientState): EncodeCometClientState,
         (ViaCairo, CometConsensusState): EncodeCometConsensusState,
         (ViaCairo, ClientId): EncodeClientId,
+        (ViaCairo, CometUpdateHeader): EncodeCometUpdateHeader,
     }
 }

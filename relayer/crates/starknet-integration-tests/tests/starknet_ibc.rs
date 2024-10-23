@@ -3,6 +3,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use hermes_chain_components::traits::send_message::CanSendSingleMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
+use hermes_encoding_components::HList;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
@@ -13,6 +14,7 @@ use hermes_starknet_chain_components::types::cosmos::client_state::{
 };
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
+use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::events::create_client::CreateClientEvent;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
@@ -73,18 +75,18 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             ibc_client_hashes: [comet_client_class_hash].into(),
         };
 
-        let _client_id = {
+        let client_id = {
             let message = {
                 let client_type = short_string!("07-cometbft");
 
                 let height = Height {
-                    revision_number: 123,
-                    revision_height: 456,
+                    revision_number: 0,
+                    revision_height: 1,
                 };
 
                 let client_state = CometClientState {
                     latest_height: height,
-                    trusting_period: 1024,
+                    trusting_period: 3600,
                     status: ClientStatus::Active,
                 };
 
@@ -96,9 +98,11 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
                 let raw_client_state = StarknetCairoEncoding.encode(&client_state)?;
                 let raw_consensus_state = StarknetCairoEncoding.encode(&consensus_state)?;
 
-                let mut calldata = vec![client_type];
-                calldata.extend(StarknetCairoEncoding.encode(&raw_client_state)?);
-                calldata.extend(StarknetCairoEncoding.encode(&raw_consensus_state)?);
+                let calldata = StarknetCairoEncoding.encode(&HList![
+                    client_type,
+                    raw_client_state,
+                    raw_consensus_state
+                ])?;
 
                 Call {
                     to: comet_client_address,
@@ -108,8 +112,6 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             };
 
             let events = chain.send_message(message).await?;
-
-            println!("events: {:?}", events);
 
             let create_client_event: CreateClientEvent = event_encoding
                 .filter_decode_events(&events)?
@@ -123,6 +125,37 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
 
             client_id
         };
+
+        {
+            let message = {
+                let update_header = CometUpdateHeader {
+                    trusted_height: Height {
+                        revision_number: 0,
+                        revision_height: 1,
+                    },
+                    target_height: Height {
+                        revision_number: 0,
+                        revision_height: 2,
+                    },
+                    time: SystemTime::now().duration_since(UNIX_EPOCH)?.as_secs() - 10,
+                    root: felt!("0x456"),
+                };
+
+                let raw_header = StarknetCairoEncoding.encode(&update_header)?;
+
+                let calldata = StarknetCairoEncoding.encode(&HList![client_id, raw_header,])?;
+
+                Call {
+                    to: comet_client_address,
+                    selector: selector!("update_client"),
+                    calldata,
+                }
+            };
+
+            let events = chain.send_message(message).await?;
+
+            println!("update client events: {:?}", events);
+        }
 
         Ok(())
     })

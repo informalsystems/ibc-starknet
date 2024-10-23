@@ -27,6 +27,7 @@ use hermes_starknet_chain_components::types::cosmos::client_state::{
 };
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
+use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::erc20::transfer::TransferErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
@@ -121,6 +122,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, CometClientState>
     + CanEncodeAndDecode<ViaCairo, CometConsensusState>
     + CanEncodeAndDecode<ViaCairo, ClientId>
+    + CanEncode<ViaCairo, CometUpdateHeader>
 {
 }
 
