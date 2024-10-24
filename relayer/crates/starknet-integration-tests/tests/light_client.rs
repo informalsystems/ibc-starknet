@@ -30,6 +30,7 @@ use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::DestinationTarget;
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
 use hermes_runtime_components::traits::sleep::CanSleep;
+use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
@@ -44,6 +45,7 @@ use ibc_relayer::config::types::TrustThreshold;
 use ibc_relayer_types::core::ics04_channel::channel::Ordering;
 use ibc_relayer_types::Height;
 use sha2::{Digest, Sha256};
+use starknet::macros::short_string;
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {
@@ -114,7 +116,11 @@ fn test_starknet_light_client() -> Result<(), Error> {
             runtime: runtime.clone(),
             src_chain: starknet_chain.clone(),
             dst_chain: cosmos_chain.clone(),
-            src_client_id: client_id.clone(), // TODO: stub
+            // TODO: stub
+            src_client_id: StarknetClientId {
+                client_type: short_string!("cometbft"),
+                sequence: 1,
+            },
             dst_client_id: client_id.clone(),
         };
 

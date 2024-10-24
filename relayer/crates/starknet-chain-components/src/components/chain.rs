@@ -1,7 +1,9 @@
+use cgp::core::component::WithProvider;
+use cgp::core::types::impls::UseDelegatedType;
 use cgp::prelude::*;
 pub use hermes_cosmos_chain_components::components::client::{
     ChannelIdTypeComponent, ClientIdTypeComponent, ClientStateFieldsGetterComponent,
-    ConnectionIdTypeComponent, CreateClientPayloadBuilderComponent,
+    ClientStateQuerierComponent, ConnectionIdTypeComponent, CreateClientPayloadBuilderComponent,
     CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
     OutgoingPacketFieldsReaderComponent, OutgoingPacketTypeComponent, PortIdTypeComponent,
     SequenceTypeComponent, TimeTypeComponent, TimeoutTypeComponent,
@@ -34,6 +36,7 @@ pub use hermes_test_components::chain::traits::types::address::AddressTypeCompon
 pub use hermes_test_components::chain::traits::types::amount::AmountTypeComponent;
 pub use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
 
+use crate::components::types::StarknetChainTypes;
 use crate::impls::contract::call::CallStarknetContract;
 use crate::impls::contract::declare::DeclareSierraContract;
 use crate::impls::contract::deploy::DeployStarknetContract;
@@ -41,6 +44,7 @@ use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
+use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::send_message::SendCallMessages;
@@ -115,7 +119,6 @@ define_components! {
         ]:
             ProvideStarknetContractTypes,
         [
-            ClientIdTypeComponent,
             ConnectionIdTypeComponent,
             ChannelIdTypeComponent,
             PortIdTypeComponent,
@@ -125,6 +128,10 @@ define_components! {
             TimeoutTypeComponent,
         ]:
             ProvideCosmosChainTypes,
+        [
+            ClientIdTypeComponent,
+        ]:
+            WithProvider<UseDelegatedType<StarknetChainTypes>>,
         [
             ClientStateTypeComponent,
             ConsensusStateTypeComponent,
@@ -173,5 +180,7 @@ define_components! {
             BuildStarknetCreateClientPayload,
         UpdateClientPayloadBuilderComponent:
             BuildStarknetUpdateClientPayload,
+        ClientStateQuerierComponent:
+            QueryCometClientState,
     }
 }

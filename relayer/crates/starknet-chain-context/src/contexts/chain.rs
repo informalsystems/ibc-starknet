@@ -28,6 +28,7 @@ use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
+use hermes_relayer_components::chain::traits::types::ibc::HasClientIdType;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
@@ -56,6 +57,7 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
+use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
 use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
 use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
@@ -173,6 +175,7 @@ pub trait CanUseStarknetChain:
     + HasBlobType<Blob = Vec<Felt>>
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
+    + HasClientIdType<CosmosChain, ClientId = ClientId>
     + HasOutgoingPacketType<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount
@@ -190,6 +193,9 @@ pub trait CanUseStarknetChain:
     + HasRetryableError
     + CanBuildCreateClientPayload<CosmosChain>
     + CanBuildUpdateClientPayload<CosmosChain>
+    + CanQueryClientState<CosmosChain>
+where
+    CosmosChain: HasClientStateType<Self>,
 {
 }
 
