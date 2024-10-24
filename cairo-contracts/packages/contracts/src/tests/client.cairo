@@ -2,7 +2,7 @@ use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::spy_events;
 use starknet_ibc_core::client::{UpdateResponse, StatusTrait, ClientContractTrait};
 use starknet_ibc_testkit::configs::CometClientConfigTrait;
-use starknet_ibc_testkit::dummies::{HEIGHT, CLIENT_TYPE};
+use starknet_ibc_testkit::dummies::HEIGHT;
 use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
 use starknet_ibc_testkit::handles::CoreHandle;
 use starknet_ibc_testkit::setup::SetupImpl;
@@ -15,13 +15,7 @@ fn test_create_comet_client_ok() {
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let mut setup = SetupImpl::default();
-
-    let mut core = setup.deploy_core();
-
-    let mut comet = setup.deploy_cometbft();
-
-    core.register_client(CLIENT_TYPE(), comet.address);
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
 
     let mut spy = spy_events();
 
@@ -56,13 +50,7 @@ fn test_update_comet_client_ok() {
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let mut setup = SetupImpl::default();
-
-    let mut core = setup.deploy_core();
-
-    let comet = setup.deploy_cometbft();
-
-    core.register_client(CLIENT_TYPE(), comet.address);
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
 
     let mut spy = spy_events();
 

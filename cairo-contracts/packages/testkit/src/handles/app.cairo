@@ -17,13 +17,15 @@ pub struct AppContract {
 
 #[generate_trait]
 pub impl AppHandleImpl of AppHandle {
-    fn deploy_transfer(owner: ContractAddress, erc20_class: ContractClass) -> AppContract {
+    fn deploy_transfer(
+        contract_name: ByteArray, owner: ContractAddress, erc20_class: ContractClass
+    ) -> AppContract {
         let mut call_data = array![];
 
         call_data.append_serde(owner);
         call_data.append_serde(erc20_class.class_hash);
 
-        let address = declare_and_deploy("TransferApp", call_data);
+        let address = declare_and_deploy(contract_name, call_data);
 
         AppContract { address }
     }

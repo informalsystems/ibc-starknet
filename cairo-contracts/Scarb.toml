@@ -25,7 +25,6 @@ test = "snforge test"
 
 [workspace.dependencies]
 # external dependencies
-cairo_test           = "2.8.4"
 starknet             = "2.8.4"
 openzeppelin_access  = "0.18.0"
 openzeppelin_token   = "0.18.0"

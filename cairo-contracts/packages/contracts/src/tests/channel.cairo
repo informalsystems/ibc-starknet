@@ -1,13 +1,68 @@
 use snforge_std::spy_events;
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_apps::transfer::TRANSFER_PORT_ID;
-use starknet_ibc_core::channel::ChannelEndTrait;
+use starknet_ibc_core::channel::{ChannelEndTrait, ChannelOrdering};
+use starknet_ibc_core::host::SequenceImpl;
 use starknet_ibc_testkit::configs::{TransferAppConfigTrait, CometClientConfigTrait};
-use starknet_ibc_testkit::dummies::{COSMOS, STARKNET, OWNER, CLIENT_TYPE};
-use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
+use starknet_ibc_testkit::dummies::{COSMOS, STARKNET, OWNER};
+use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ChannelEventSpyExt};
 use starknet_ibc_testkit::handles::{CoreHandle, AppHandle, ERC20Handle};
 use starknet_ibc_testkit::setup::SetupImpl;
 use starknet_ibc_utils::ComputeKey;
+
+#[test]
+fn test_send_packet_ok() {
+    // -----------------------------------------------------------
+    // Setup Essentials
+    // -----------------------------------------------------------
+
+    let mut comet_cfg = CometClientConfigTrait::default();
+
+    let mut transfer_cfg = TransferAppConfigTrait::default();
+
+    let (core, _, _) = SetupImpl::setup_full("IBCCore", "CometClient", "TransferApp");
+
+    let mut spy = spy_events();
+
+    // -----------------------------------------------------------
+    // Create Client
+    // -----------------------------------------------------------
+
+    // Create a `MsgCreateClient` message.
+    let msg_create_client = comet_cfg.dummy_msg_create_client();
+
+    // Submit the message and create a client.
+    core.create_client(msg_create_client);
+
+    // -----------------------------------------------------------
+    // Send Packet (from Starknet to Cosmos)
+    // -----------------------------------------------------------
+
+    let mut packet = transfer_cfg
+        .dummy_packet(transfer_cfg.native_denom.clone(), STARKNET(), COSMOS());
+
+    core.send_packet(packet.clone());
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    spy.assert_send_packet_event(core.address, ChannelOrdering::Unordered, packet.clone());
+
+    let chan_end_on_a = core.channel_end(packet.port_id_on_a.clone(), packet.chan_id_on_a.clone());
+
+    assert!(chan_end_on_a.is_open());
+
+    let commitment = core
+        .packet_commitment(
+            packet.port_id_on_a.clone(), packet.chan_id_on_a.clone(), packet.seq_on_a.clone()
+        );
+
+    assert_eq!(commitment, '1');
+
+    let next_sequence_send = core.next_sequence_send(packet.port_id_on_a, packet.chan_id_on_a);
+
+    assert_eq!(next_sequence_send, packet.seq_on_a.increment());
+}
 
 #[test]
 fn test_recv_packet_ok() {
@@ -19,17 +74,7 @@ fn test_recv_packet_ok() {
 
     let mut transfer_cfg = TransferAppConfigTrait::default();
 
-    let mut setup = SetupImpl::default();
-
-    let mut core = setup.deploy_core();
-
-    let comet = setup.deploy_cometbft();
-
-    core.register_client(CLIENT_TYPE(), comet.address);
-
-    let ics20 = setup.deploy_trasnfer();
-
-    core.register_app(TRANSFER_PORT_ID(), ics20.address);
+    let (core, ics20, _) = SetupImpl::setup_full("IBCCore", "CometClient", "TransferApp");
 
     let mut spy = spy_events();
 
@@ -58,11 +103,14 @@ fn test_recv_packet_ok() {
 
     let prefixed_denom = transfer_cfg.prefix_hosted_denom();
 
-    // Assert the `RecvEvent` emitted.
+    // Assert the `RecvEvent` emitted by the ICS20 contract.
     spy
         .assert_recv_event(
             ics20.address, COSMOS(), STARKNET(), prefixed_denom.clone(), transfer_cfg.amount, true
         );
+
+    // Assert the `ReceivePacketEvent` emitted by the core contract.
+    spy.assert_recv_packet_event(core.address, ChannelOrdering::Unordered, msg.packet.clone());
 
     // Fetch the token address.
     let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();

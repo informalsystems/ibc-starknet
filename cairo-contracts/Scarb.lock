@@ -84,10 +84,9 @@ name = "starknet_ibc_apps"
 version = "0.1.0"
 dependencies = [
  "openzeppelin_access",
- "openzeppelin_testing",
  "openzeppelin_token",
  "openzeppelin_utils",
- "snforge_std",
+ "starknet_ibc_contracts",
  "starknet_ibc_core",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
@@ -106,6 +105,7 @@ name = "starknet_ibc_contracts"
 version = "0.1.0"
 dependencies = [
  "openzeppelin_access",
+ "openzeppelin_testing",
  "openzeppelin_token",
  "snforge_std",
  "starknet_ibc_apps",
@@ -132,6 +132,7 @@ dependencies = [
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_utils",
+ "snforge_std",
  "starknet_ibc_apps",
  "starknet_ibc_clients",
  "starknet_ibc_core",

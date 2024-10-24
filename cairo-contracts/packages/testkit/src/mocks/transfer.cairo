@@ -4,7 +4,7 @@ pub mod MockTransferApp {
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet_ibc_apps::transfer::ERC20Contract;
-    use starknet_ibc_apps::transfer::types::{PrefixedDenom, Memo};
+    use starknet_ibc_apps::transfer::types::{PrefixedDenom, Memo, MsgTransfer};
     use starknet_ibc_apps::transfer::{TokenTransferComponent, TransferrableComponent};
     use starknet_ibc_core::host::{PortId, ChannelId};
 
@@ -37,6 +37,7 @@ pub mod MockTransferApp {
     impl TransferValidationImpl = TokenTransferComponent::TransferValidationImpl<ContractState>;
     impl TransferExecutionImpl = TokenTransferComponent::TransferExecutionImpl<ContractState>;
     impl TransferInitializerImpl = TokenTransferComponent::TransferInitializerImpl<ContractState>;
+    impl SendTransferInternalImpl = TokenTransferComponent::SendTransferInternalImpl<ContractState>;
 
     #[storage]
     struct Storage {
@@ -64,6 +65,12 @@ pub mod MockTransferApp {
         self.ownable.initializer(owner);
         self.transferrable.initializer();
         self.transfer.initializer(erc20_class_hash);
+    }
+
+    #[external(v0)]
+    fn send_transfer_internal(ref self: ContractState, msg: MsgTransfer) {
+        self.transfer.send_validate(msg.clone());
+        self.transfer.send_execute(msg);
     }
 
     #[external(v0)]

@@ -34,9 +34,13 @@ starknet_ibc_core  = { workspace = true }
 starknet_ibc_utils = { workspace = true }
 
 [dev-dependencies]
-# external dependencies
-openzeppelin_testing = { workspace = true }
-snforge_std          = { workspace = true }
-
 # ibc dependencies
-starknet_ibc_testkit = { workspace = true }
+starknet_ibc_testkit   = { workspace = true }
+starknet_ibc_contracts = { workspace = true }
+
+[[test]]
+name = "starknet_ibc_apps_unittest"
+build-external-contracts = [
+  "starknet_ibc_contracts::erc20::ERC20Mintable",
+  "starknet_ibc_testkit::mocks::transfer::MockTransferApp",
+]
