@@ -21,7 +21,7 @@ pub struct Setup {
 pub impl SetupImpl of SetupTrait {
     /// Initializes the test setup with default values.
     fn default() -> Setup {
-        Setup { owner: OWNER(), erc20_contract_class: declare_class("ERC20Mintable"), }
+        Setup { owner: OWNER(), erc20_contract_class: declare_class("ERC20Mintable") }
     }
 
     /// Deploys an instance of IBC core contract, and sets the owner to the core
