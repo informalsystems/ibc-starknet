@@ -1,6 +1,7 @@
+use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cosmos_chain_components::components::client::{
-    ClientStateTypeComponent, ConsensusStateHeightsQuerierComponent,
+    ClientStateTypeComponent, ConsensusStateHeightsQuerierComponent, ConsensusStateTypeComponent,
     CreateClientMessageBuilderComponent, CreateClientMessageOptionsTypeComponent,
     UpdateClientMessageBuilderComponent,
 };
@@ -14,7 +15,8 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::{
 
 use crate::impls::starknet_to_cosmos::query_consensus_state_height::QueryStarknetConsensusStateHeightsFromGrpc;
 use crate::impls::starknet_to_cosmos::update_client_message::BuildStarknetUpdateClientMessage;
-use crate::types::cosmos::client_state::ProvideCometClientState;
+use crate::types::cosmos::client_state::CometClientState;
+use crate::types::cosmos::consensus_state::CometConsensusState;
 
 define_components! {
     StarknetToCosmosComponents {
@@ -28,7 +30,9 @@ define_components! {
         ]:
             CosmosToCosmosComponents,
         ClientStateTypeComponent:
-            ProvideCometClientState,
+            WithType<CometClientState>,
+        ConsensusStateTypeComponent:
+            WithType<CometConsensusState>,
         UpdateClientMessageBuilderComponent:
             BuildStarknetUpdateClientMessage,
         ConsensusStateHeightsQuerierComponent:

@@ -3,7 +3,6 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_cairo_encoding_components::types::either::Either;
 use hermes_cairo_encoding_components::Sum;
-use hermes_chain_components::traits::types::client_state::ProvideClientStateType;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
@@ -27,17 +26,9 @@ pub enum ClientStatus {
     Frozen(Height),
 }
 
-pub struct ProvideCometClientState;
-
 pub struct EncodeCometClientState;
 
 pub struct EncodeClientStatus;
-
-impl<Chain: Async, Counterparty> ProvideClientStateType<Chain, Counterparty>
-    for ProvideCometClientState
-{
-    type ClientState = CometClientState;
-}
 
 delegate_components! {
     EncodeCometClientState {
