@@ -53,6 +53,7 @@ use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContrac
 use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
+use hermes_starknet_chain_components::traits::queries::address::CanQueryContractAddress;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
@@ -80,6 +81,7 @@ pub struct StarknetChain {
     pub chain_id: Felt,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
+    pub ibc_client_contract_address: Option<Felt>,
 }
 
 pub struct StarknetChainContextComponents;
@@ -194,6 +196,7 @@ pub trait CanUseStarknetChain:
     + CanBuildCreateClientPayload<CosmosChain>
     + CanBuildUpdateClientPayload<CosmosChain>
     + CanQueryClientState<CosmosChain>
+    + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
 where
     CosmosChain: HasClientStateType<Self>,
 {

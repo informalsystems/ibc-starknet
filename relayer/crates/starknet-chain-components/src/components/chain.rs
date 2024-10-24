@@ -45,6 +45,7 @@ use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::client_state::QueryCometClientState;
+use crate::impls::queries::contract_address::GetContractAddressFromField;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::send_message::SendCallMessages;
@@ -73,6 +74,7 @@ pub use crate::traits::contract::deploy::ContractDeployerComponent;
 pub use crate::traits::contract::invoke::ContractInvokerComponent;
 pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
 pub use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
+pub use crate::traits::queries::address::ContractAddressQuerierComponent;
 pub use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
 pub use crate::traits::transfer::TokenTransferComponent;
 pub use crate::traits::types::blob::BlobTypeComponent;
@@ -182,5 +184,7 @@ define_components! {
             BuildStarknetUpdateClientPayload,
         ClientStateQuerierComponent:
             QueryCometClientState,
+        ContractAddressQuerierComponent:
+            GetContractAddressFromField,
     }
 }
