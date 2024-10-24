@@ -43,7 +43,7 @@ where
     async fn query_client_state(
         chain: &Chain,
         client_id: &Chain::ClientId,
-        _height: &Chain::Height,
+        _height: &Chain::Height, // TODO: figure whether we can perform height specific queries on Starknet
     ) -> Result<Counterparty::ClientState, Chain::Error> {
         let encoding = chain.encoding();
 

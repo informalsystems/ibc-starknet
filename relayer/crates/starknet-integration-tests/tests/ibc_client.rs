@@ -1,7 +1,9 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::send_message::CanSendSingleMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
+use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::HList;
@@ -18,6 +20,7 @@ use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConse
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::events::create_client::CreateClientEvent;
+use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
@@ -45,9 +48,9 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             chain_store_dir: format!("./test-data/{timestamp}").into(),
         };
 
-        let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
+        let mut chain_driver = bootstrap.bootstrap_chain("starknet").await?;
 
-        let chain = &chain_driver.chain;
+        let chain = &mut chain_driver.chain;
 
         let comet_client_class_hash = {
             let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
@@ -71,6 +74,8 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             "deployed Comet client contract to address: {:?}",
             comet_client_address
         );
+
+        chain.ibc_client_contract_address = Some(comet_client_address);
 
         let event_encoding = StarknetEventEncoding {
             erc20_hashes: Default::default(),
@@ -161,17 +166,12 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
         }
 
         {
-            let output = chain
-                .call_contract(
-                    &comet_client_address,
-                    &selector!("client_state"),
-                    &StarknetCairoEncoding.encode(&client_id.sequence)?,
-                )
-                .await?;
-
-            let raw_client_state: Vec<Felt> = StarknetCairoEncoding.decode(&output)?;
-
-            let client_state: CometClientState = StarknetCairoEncoding.decode(&raw_client_state)?;
+            let client_state = <StarknetChain as CanQueryClientStateWithLatestHeight<
+                CosmosChain,
+            >>::query_client_state_with_latest_height(
+                chain, &client_id
+            )
+            .await?;
 
             println!("queried client state: {client_state:?}");
         }
