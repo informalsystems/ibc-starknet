@@ -1,11 +1,13 @@
+use cgp::core::component::WithProvider;
+use cgp::core::types::impls::UseDelegatedType;
 use cgp::prelude::*;
 pub use hermes_cosmos_chain_components::components::client::{
     ChannelIdTypeComponent, ClientIdTypeComponent, ClientStateFieldsGetterComponent,
-    ConnectionIdTypeComponent, CreateClientPayloadBuilderComponent,
-    CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
-    OutgoingPacketFieldsReaderComponent, OutgoingPacketTypeComponent, PortIdTypeComponent,
-    SequenceTypeComponent, TimeTypeComponent, TimeoutTypeComponent,
-    UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
+    ClientStateQuerierComponent, ConnectionIdTypeComponent, ConsensusStateQuerierComponent,
+    CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent,
+    CreateClientPayloadTypeComponent, OutgoingPacketFieldsReaderComponent,
+    OutgoingPacketTypeComponent, PortIdTypeComponent, SequenceTypeComponent, TimeTypeComponent,
+    TimeoutTypeComponent, UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
 };
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
@@ -34,6 +36,7 @@ pub use hermes_test_components::chain::traits::types::address::AddressTypeCompon
 pub use hermes_test_components::chain::traits::types::amount::AmountTypeComponent;
 pub use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
 
+use crate::components::types::StarknetChainTypes;
 use crate::impls::contract::call::CallStarknetContract;
 use crate::impls::contract::declare::DeclareSierraContract;
 use crate::impls::contract::deploy::DeployStarknetContract;
@@ -41,6 +44,9 @@ use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
+use crate::impls::queries::client_state::QueryCometClientState;
+use crate::impls::queries::consensus_state::QueryCometConsensusState;
+use crate::impls::queries::contract_address::GetContractAddressFromField;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::send_message::SendCallMessages;
@@ -69,6 +75,7 @@ pub use crate::traits::contract::deploy::ContractDeployerComponent;
 pub use crate::traits::contract::invoke::ContractInvokerComponent;
 pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
 pub use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
+pub use crate::traits::queries::address::ContractAddressQuerierComponent;
 pub use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
 pub use crate::traits::transfer::TokenTransferComponent;
 pub use crate::traits::types::blob::BlobTypeComponent;
@@ -115,7 +122,6 @@ define_components! {
         ]:
             ProvideStarknetContractTypes,
         [
-            ClientIdTypeComponent,
             ConnectionIdTypeComponent,
             ChannelIdTypeComponent,
             PortIdTypeComponent,
@@ -125,6 +131,10 @@ define_components! {
             TimeoutTypeComponent,
         ]:
             ProvideCosmosChainTypes,
+        [
+            ClientIdTypeComponent,
+        ]:
+            WithProvider<UseDelegatedType<StarknetChainTypes>>,
         [
             ClientStateTypeComponent,
             ConsensusStateTypeComponent,
@@ -173,5 +183,11 @@ define_components! {
             BuildStarknetCreateClientPayload,
         UpdateClientPayloadBuilderComponent:
             BuildStarknetUpdateClientPayload,
+        ClientStateQuerierComponent:
+            QueryCometClientState,
+        ConsensusStateQuerierComponent:
+            QueryCometConsensusState,
+        ContractAddressQuerierComponent:
+            GetContractAddressFromField,
     }
 }

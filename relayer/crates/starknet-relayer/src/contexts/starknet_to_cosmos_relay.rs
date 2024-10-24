@@ -22,8 +22,9 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
 };
+use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use ibc_relayer_types::core::ics24_host::identifier::ClientId;
+use ibc_relayer_types::core::ics24_host::identifier::ClientId as CosmosClientId;
 
 use crate::impls::error::HandleStarknetRelayError;
 
@@ -32,8 +33,8 @@ pub struct StarknetToCosmosRelay {
     pub runtime: HermesRuntime,
     pub src_chain: StarknetChain,
     pub dst_chain: CosmosChain,
-    pub src_client_id: ClientId,
-    pub dst_client_id: ClientId,
+    pub src_client_id: StarknetClientId,
+    pub dst_client_id: CosmosClientId,
 }
 
 pub struct StarknetToCosmosRelayComponents;
@@ -83,11 +84,11 @@ impl ProvideRelayChains<StarknetToCosmosRelay> for StarknetToCosmosRelayComponen
         &relay.dst_chain
     }
 
-    fn src_client_id(relay: &StarknetToCosmosRelay) -> &ClientId {
+    fn src_client_id(relay: &StarknetToCosmosRelay) -> &StarknetClientId {
         &relay.src_client_id
     }
 
-    fn dst_client_id(relay: &StarknetToCosmosRelay) -> &ClientId {
+    fn dst_client_id(relay: &StarknetToCosmosRelay) -> &CosmosClientId {
         &relay.dst_client_id
     }
 }

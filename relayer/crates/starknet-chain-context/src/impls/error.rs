@@ -30,6 +30,7 @@ use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_starknet_chain_components::impls::error::account::RaiseAccountError;
 use hermes_starknet_chain_components::impls::error::provider::RaiseProviderError;
 use hermes_starknet_chain_components::impls::error::starknet::RaiseStarknetError;
+use hermes_starknet_chain_components::impls::queries::contract_address::ContractAddressNotFound;
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use hermes_starknet_chain_components::types::event::UnknownEvent;
 use ibc::core::client::types::error::ClientError;
@@ -82,6 +83,7 @@ delegate_components! {
             InvalidWireType,
             UnsupportedWireType,
             RequiredFieldTagNotFound,
+            ContractAddressNotFound,
             <'a> UnknownEvent<'a>,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
         ]:

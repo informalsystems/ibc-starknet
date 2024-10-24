@@ -1,14 +1,15 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
+use hermes_chain_components::traits::queries::consensus_state::CanQueryConsensusStateWithLatestHeight;
 use hermes_chain_components::traits::send_message::CanSendSingleMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
-use hermes_encoding_components::traits::decode::CanDecode;
+use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::HList;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
-use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::cosmos::client_state::{
@@ -18,12 +19,13 @@ use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConse
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::events::create_client::CreateClientEvent;
+use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
+use ibc_relayer_types::Height as RelayerHeight;
 use starknet::accounts::Call;
-use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
 #[test]
@@ -45,9 +47,9 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             chain_store_dir: format!("./test-data/{timestamp}").into(),
         };
 
-        let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
+        let mut chain_driver = bootstrap.bootstrap_chain("starknet").await?;
 
-        let chain = &chain_driver.chain;
+        let chain = &mut chain_driver.chain;
 
         let comet_client_class_hash = {
             let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
@@ -71,6 +73,8 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             "deployed Comet client contract to address: {:?}",
             comet_client_address
         );
+
+        chain.ibc_client_contract_address = Some(comet_client_address);
 
         let event_encoding = StarknetEventEncoding {
             erc20_hashes: Default::default(),
@@ -161,40 +165,25 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
         }
 
         {
-            let output = chain
-                .call_contract(
-                    &comet_client_address,
-                    &selector!("client_state"),
-                    &StarknetCairoEncoding.encode(&client_id.sequence)?,
-                )
-                .await?;
-
-            let raw_client_state: Vec<Felt> = StarknetCairoEncoding.decode(&output)?;
-
-            let client_state: CometClientState = StarknetCairoEncoding.decode(&raw_client_state)?;
+            let client_state = <StarknetChain as CanQueryClientStateWithLatestHeight<
+                CosmosChain,
+            >>::query_client_state_with_latest_height(
+                chain, &client_id
+            )
+            .await?;
 
             println!("queried client state: {client_state:?}");
         }
 
         {
-            let output = chain
-                .call_contract(
-                    &comet_client_address,
-                    &selector!("consensus_state"),
-                    &StarknetCairoEncoding.encode(&(
-                        client_id.sequence,
-                        Height {
-                            revision_number: 0,
-                            revision_height: 2,
-                        },
-                    ))?,
-                )
-                .await?;
-
-            let raw_consensus_state: Vec<Felt> = StarknetCairoEncoding.decode(&output)?;
-
-            let consensus_state: CometConsensusState =
-                StarknetCairoEncoding.decode(&raw_consensus_state)?;
+            let consensus_state = <StarknetChain as CanQueryConsensusStateWithLatestHeight<
+                CosmosChain,
+            >>::query_consensus_state_with_latest_height(
+                chain,
+                &client_id,
+                &RelayerHeight::new(0, 2)?,
+            )
+            .await?;
 
             println!("queried consensus state: {consensus_state:?}");
 

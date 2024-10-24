@@ -19,7 +19,16 @@ pub struct CometClientState {
     pub status: ClientStatus,
 }
 
+#[derive(Debug)]
+pub enum ClientStatus {
+    Active,
+    Expired,
+    Frozen(Height),
+}
+
 pub struct EncodeCometClientState;
+
+pub struct EncodeClientStatus;
 
 delegate_components! {
     EncodeCometClientState {
@@ -46,15 +55,6 @@ impl Transformer for EncodeCometClientState {
         }
     }
 }
-
-#[derive(Debug)]
-pub enum ClientStatus {
-    Active,
-    Expired,
-    Frozen(Height),
-}
-
-pub struct EncodeClientStatus;
 
 delegate_components! {
     EncodeClientStatus {
