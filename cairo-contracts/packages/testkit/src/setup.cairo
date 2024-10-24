@@ -55,8 +55,15 @@ pub impl SetupImpl of SetupTrait {
     }
 
     /// Deploys an instance of ICS-20 Token Transfer contract.
-    fn deploy_trasnfer(self: @Setup) -> AppContract {
-        AppHandle::deploy_transfer(self.owner.clone(), *self.erc20_contract_class)
+    fn deploy_transfer(self: @Setup) -> AppContract {
+        AppHandle::deploy_transfer("TransferApp", self.owner.clone(), *self.erc20_contract_class)
+    }
+
+    /// Deploys an instance of mock ICS-20 Token Transfer contract.
+    fn deploy_mock_transfer(self: @Setup) -> AppContract {
+        AppHandle::deploy_transfer(
+            "MockTransferApp", self.owner.clone(), *self.erc20_contract_class
+        )
     }
 }
 

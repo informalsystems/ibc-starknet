@@ -35,6 +35,7 @@ starknet_ibc_clients = { workspace = true }
 starknet_ibc_utils   = { workspace = true }
 
 [dev-dependencies]
+openzeppelin_testing = { workspace = true }
 snforge_std          = { workspace = true }
 starknet_ibc_testkit = { workspace = true }
 

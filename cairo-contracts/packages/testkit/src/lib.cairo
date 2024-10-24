@@ -1,4 +1,5 @@
 pub mod setup;
+pub mod utils;
 pub mod mocks {
     mod channel;
     mod client;

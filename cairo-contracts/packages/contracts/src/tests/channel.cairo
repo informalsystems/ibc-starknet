@@ -1,9 +1,8 @@
-use snforge_std::spy_events;
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_apps::transfer::TRANSFER_PORT_ID;
+use starknet_ibc_contracts::tests::setup_full;
 use starknet_ibc_core::channel::ChannelEndTrait;
 use starknet_ibc_testkit::configs::{TransferAppConfigTrait, CometClientConfigTrait};
-use starknet_ibc_testkit::dummies::{COSMOS, STARKNET, OWNER, CLIENT_TYPE};
+use starknet_ibc_testkit::dummies::{COSMOS, STARKNET, OWNER};
 use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
 use starknet_ibc_testkit::handles::{CoreHandle, AppHandle, ERC20Handle};
 use starknet_ibc_testkit::setup::SetupImpl;
@@ -15,23 +14,7 @@ fn test_recv_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let mut comet_cfg = CometClientConfigTrait::default();
-
-    let mut transfer_cfg = TransferAppConfigTrait::default();
-
-    let mut setup = SetupImpl::default();
-
-    let mut core = setup.deploy_core();
-
-    let comet = setup.deploy_cometbft();
-
-    core.register_client(CLIENT_TYPE(), comet.address);
-
-    let ics20 = setup.deploy_trasnfer();
-
-    core.register_app(TRANSFER_PORT_ID(), ics20.address);
-
-    let mut spy = spy_events();
+    let (core, ics20, _, mut comet_cfg, mut transfer_cfg, mut spy) = setup_full();
 
     // -----------------------------------------------------------
     // Create Client
