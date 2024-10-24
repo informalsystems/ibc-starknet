@@ -93,7 +93,7 @@ fn test_unescrow_ok() {
 
     let prefixed_denom = cfg.prefix_native_denom();
 
-    let recv_packet = cfg.dummy_recv_packet(prefixed_denom.clone(), COSMOS(), STARKNET());
+    let recv_packet = cfg.dummy_packet(prefixed_denom.clone(), COSMOS(), STARKNET());
 
     // Submit a `RecvPacket` to the `TransferApp` contract.
     ics20.on_recv_packet(recv_packet);
@@ -111,7 +111,7 @@ fn test_unescrow_ok() {
 fn test_mint_ok() {
     let (ics20, _, cfg, mut spy) = setup();
 
-    let recv_packet = cfg.dummy_recv_packet(cfg.hosted_denom.clone(), COSMOS(), STARKNET());
+    let recv_packet = cfg.dummy_packet(cfg.hosted_denom.clone(), COSMOS(), STARKNET());
 
     // Submit a `RecvPacket`, which will create a new ERC20 contract.
     ics20.on_recv_packet(recv_packet.clone());
@@ -153,7 +153,7 @@ fn test_mint_ok() {
 fn test_burn_ok() {
     let (ics20, _, cfg, mut spy) = setup();
 
-    let recv_packet = cfg.dummy_recv_packet(cfg.hosted_denom.clone(), COSMOS(), STARKNET());
+    let recv_packet = cfg.dummy_packet(cfg.hosted_denom.clone(), COSMOS(), STARKNET());
 
     // Submit a `RecvPacket`, which will create a new ERC20 contract.
     ics20.on_recv_packet(recv_packet);

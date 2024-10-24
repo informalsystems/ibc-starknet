@@ -112,6 +112,15 @@ pub mod ChannelHandlerComponent {
             maybe_chan_end.unwrap()
         }
 
+        fn packet_commitment(
+            self: @ComponentState<TContractState>,
+            port_id: PortId,
+            channel_id: ChannelId,
+            sequence: Sequence
+        ) -> felt252 {
+            self.read_packet_commitment(@port_id, @channel_id, @sequence)
+        }
+
         fn packet_receipt(
             self: @ComponentState<TContractState>,
             port_id: PortId,
@@ -203,7 +212,7 @@ pub mod ChannelHandlerComponent {
                 .write_packet_commitment(
                     @packet.port_id_on_a,
                     @packet.chan_id_on_a,
-                    @next_sequence_send,
+                    @packet.seq_on_a,
                     packet_commitment_on_a
                 );
 
@@ -487,7 +496,7 @@ pub mod ChannelHandlerComponent {
         ) {
             self
                 .packet_commitments
-                .write(commitment_key(port_id, channel_id, sequence), '0') // TODO
+                .write(commitment_key(port_id, channel_id, sequence), '1') // TODO
         }
 
         fn write_packet_receipt(

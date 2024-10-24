@@ -31,9 +31,11 @@ pub mod dummies {
     };
 }
 pub mod event_spy {
+    mod channel;
     mod client;
     mod transfer;
 
+    pub use channel::{ChannelEventSpyExtImpl, ChannelEventSpyExt};
     pub use client::ClientEventSpyExt;
     pub use transfer::{TransferEventSpyExtImpl, TransferEventSpyExt};
 }

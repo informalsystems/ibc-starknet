@@ -79,13 +79,13 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> MsgRecvPacket {
         MsgRecvPacket {
-            packet: self.dummy_recv_packet(denom, sender, receiver),
+            packet: self.dummy_packet(denom, sender, receiver),
             proof_commitment_on_a: array![0],
             proof_height_on_a: HEIGHT(10),
         }
     }
 
-    fn dummy_recv_packet(
+    fn dummy_packet(
         self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> Packet {
         let mut serialized_data = array![];
