@@ -197,9 +197,10 @@ pub trait CanUseStarknetChain:
     + CanBuildCreateClientPayload<CosmosChain>
     + CanBuildUpdateClientPayload<CosmosChain>
     + CanQueryClientState<CosmosChain>
+    + CanQueryConsensusState<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
 where
-    CosmosChain: HasClientStateType<Self>,
+    CosmosChain: HasClientStateType<Self> + HasConsensusStateType<Self>,
 {
 }
 

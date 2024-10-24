@@ -3,11 +3,11 @@ use cgp::core::types::impls::UseDelegatedType;
 use cgp::prelude::*;
 pub use hermes_cosmos_chain_components::components::client::{
     ChannelIdTypeComponent, ClientIdTypeComponent, ClientStateFieldsGetterComponent,
-    ClientStateQuerierComponent, ConnectionIdTypeComponent, CreateClientPayloadBuilderComponent,
-    CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
-    OutgoingPacketFieldsReaderComponent, OutgoingPacketTypeComponent, PortIdTypeComponent,
-    SequenceTypeComponent, TimeTypeComponent, TimeoutTypeComponent,
-    UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
+    ClientStateQuerierComponent, ConnectionIdTypeComponent, ConsensusStateQuerierComponent,
+    CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent,
+    CreateClientPayloadTypeComponent, OutgoingPacketFieldsReaderComponent,
+    OutgoingPacketTypeComponent, PortIdTypeComponent, SequenceTypeComponent, TimeTypeComponent,
+    TimeoutTypeComponent, UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
 };
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
@@ -45,6 +45,7 @@ use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::client_state::QueryCometClientState;
+use crate::impls::queries::consensus_state::QueryCometConsensusState;
 use crate::impls::queries::contract_address::GetContractAddressFromField;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
@@ -184,6 +185,8 @@ define_components! {
             BuildStarknetUpdateClientPayload,
         ClientStateQuerierComponent:
             QueryCometClientState,
+        ConsensusStateQuerierComponent:
+            QueryCometConsensusState,
         ContractAddressQuerierComponent:
             GetContractAddressFromField,
     }
