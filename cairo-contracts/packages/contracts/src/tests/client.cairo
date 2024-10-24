@@ -1,5 +1,5 @@
 use openzeppelin_testing::events::EventSpyExt;
-use starknet_ibc_contracts::tests::setup_client;
+use snforge_std::spy_events;
 use starknet_ibc_core::client::{UpdateResponse, StatusTrait, ClientContractTrait};
 use starknet_ibc_testkit::configs::CometClientConfigTrait;
 use starknet_ibc_testkit::dummies::HEIGHT;
@@ -13,7 +13,11 @@ fn test_create_comet_client_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (mut core, mut comet, mut cfg, mut spy) = setup_client();
+    let mut cfg = CometClientConfigTrait::default();
+
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+
+    let mut spy = spy_events();
 
     // -----------------------------------------------------------
     // Create Client
@@ -44,7 +48,11 @@ fn test_update_comet_client_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (mut core, mut comet, mut cfg, mut spy) = setup_client();
+    let mut cfg = CometClientConfigTrait::default();
+
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+
+    let mut spy = spy_events();
 
     // -----------------------------------------------------------
     // Create Client

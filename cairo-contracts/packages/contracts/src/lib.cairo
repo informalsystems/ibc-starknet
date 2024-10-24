@@ -12,8 +12,5 @@ pub mod clients {
 mod tests {
     mod channel;
     mod client;
-    mod setup;
     mod transfer;
-
-    pub(crate) use setup::{setup_full, setup_client};
 }

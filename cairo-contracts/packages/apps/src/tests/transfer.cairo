@@ -1,6 +1,6 @@
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::cheatcodes::events::EventSpy;
-use snforge_std::{start_cheat_caller_address, spy_events};
+use snforge_std::spy_events;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
     TransferInitializerImpl, TransferReaderImpl
@@ -31,16 +31,9 @@ fn setup_component() -> ComponentState {
 fn setup() -> (AppContract, ERC20Contract, TransferAppConfig, EventSpy) {
     let mut cfg = TransferAppConfigTrait::default();
 
-    let mut setup = SetupImpl::default();
-
-    let mut erc20 = setup.deploy_erc20();
-
-    let ics20 = setup.deploy_mock_transfer();
+    let (ics20, erc20) = SetupImpl::setup_transfer("MockTransferApp");
 
     cfg.set_native_denom(erc20.address);
-
-    // Set the caller address to `OWNER`, as ICS-20 callbacks are permissioned.
-    start_cheat_caller_address(ics20.address, OWNER());
 
     let mut spy = spy_events();
 

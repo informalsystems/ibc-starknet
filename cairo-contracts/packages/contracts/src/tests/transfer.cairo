@@ -1,10 +1,11 @@
 use openzeppelin_testing::events::EventSpyExt;
+use snforge_std::spy_events;
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_contracts::tests::setup_full;
 use starknet_ibc_testkit::configs::{TransferAppConfigTrait, CometClientConfigTrait};
 use starknet_ibc_testkit::dummies::{NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET};
 use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
 use starknet_ibc_testkit::handles::{AppHandle, CoreHandle, ERC20Handle};
+use starknet_ibc_testkit::setup::SetupImpl;
 use starknet_ibc_utils::ComputeKey;
 
 #[test]
@@ -13,7 +14,15 @@ fn test_escrow_unescrow_roundtrip() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, mut erc20, mut comet_cfg, mut transfer_cfg, mut spy) = setup_full();
+    let mut comet_cfg = CometClientConfigTrait::default();
+
+    let mut transfer_cfg = TransferAppConfigTrait::default();
+
+    let (core, ics20, mut erc20) = SetupImpl::setup_full("IBCCore", "CometClient", "TransferApp");
+
+    transfer_cfg.set_native_denom(erc20.address);
+
+    let mut spy = spy_events();
 
     // -----------------------------------------------------------
     // Create Client
@@ -85,7 +94,13 @@ fn test_mint_burn_roundtrip() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, _, mut comet_cfg, mut transfer_cfg, mut spy) = setup_full();
+    let mut comet_cfg = CometClientConfigTrait::default();
+
+    let mut transfer_cfg = TransferAppConfigTrait::default();
+
+    let (core, ics20, _) = SetupImpl::setup_full("IBCCore", "CometClient", "TransferApp");
+
+    let mut spy = spy_events();
 
     // -----------------------------------------------------------
     // Create Client

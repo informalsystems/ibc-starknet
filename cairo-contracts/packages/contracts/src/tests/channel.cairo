@@ -1,5 +1,5 @@
+use snforge_std::spy_events;
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_contracts::tests::setup_full;
 use starknet_ibc_core::channel::{ChannelEndTrait, ChannelOrdering};
 use starknet_ibc_core::host::SequenceImpl;
 use starknet_ibc_testkit::configs::{TransferAppConfigTrait, CometClientConfigTrait};
@@ -14,7 +14,14 @@ fn test_send_packet_ok() {
     // -----------------------------------------------------------
     // Setup Essentials
     // -----------------------------------------------------------
-    let (core, _, _, mut comet_cfg, mut transfer_cfg, mut spy) = setup_full();
+
+    let mut comet_cfg = CometClientConfigTrait::default();
+
+    let mut transfer_cfg = TransferAppConfigTrait::default();
+
+    let (core, _, _) = SetupImpl::setup_full("IBCCore", "CometClient", "TransferApp");
+
+    let mut spy = spy_events();
 
     // -----------------------------------------------------------
     // Create Client
@@ -63,7 +70,13 @@ fn test_recv_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, _, mut comet_cfg, mut transfer_cfg, mut spy) = setup_full();
+    let mut comet_cfg = CometClientConfigTrait::default();
+
+    let mut transfer_cfg = TransferAppConfigTrait::default();
+
+    let (core, ics20, _) = SetupImpl::setup_full("IBCCore", "CometClient", "TransferApp");
+
+    let mut spy = spy_events();
 
     // -----------------------------------------------------------
     // Create Client
