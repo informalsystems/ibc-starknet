@@ -58,6 +58,7 @@ use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
 use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
+use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
@@ -195,7 +196,8 @@ pub trait CanUseStarknetChain:
 impl CanUseStarknetChain for StarknetChain {}
 
 pub trait CanUseCosmosChainWithStarknet:
-    CanQueryClientState<StarknetChain>
+    HasClientStateType<StarknetChain, ClientState = CometClientState>
+    + CanQueryClientState<StarknetChain>
     + CanQueryConsensusState<StarknetChain>
     + CanBuildCreateClientMessage<StarknetChain>
     + CanBuildUpdateClientMessage<StarknetChain>
