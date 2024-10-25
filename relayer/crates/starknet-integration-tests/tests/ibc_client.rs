@@ -6,6 +6,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
 
+use hermes_chain_components::traits::message_builders::create_client::CanBuildCreateClientMessage;
 use hermes_chain_components::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::queries::consensus_state::CanQueryConsensusStateWithLatestHeight;
@@ -15,16 +16,11 @@ use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::HList;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::types::cosmos::client_state::{
-    ClientStatus, CometClientState,
-};
-use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::events::create_client::CreateClientEvent;
@@ -36,7 +32,7 @@ use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use ibc_relayer::chain::cosmos::client::Settings;
 use ibc_relayer::config::types::TrustThreshold;
 use starknet::accounts::Call;
-use starknet::macros::{selector, short_string};
+use starknet::macros::selector;
 
 #[test]
 fn test_starknet_comet_client_contract() -> Result<(), Error> {
@@ -125,43 +121,13 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
 
         let create_client_payload_1 = <CosmosChain as CanBuildCreateClientPayload<StarknetChain>>::build_create_client_payload(cosmos_chain, &create_client_settings).await?;
 
-        let height_1 = Height {
-            revision_number: create_client_payload_1.client_state.latest_height().revision_number(),
-            revision_height: create_client_payload_1.client_state.latest_height().revision_height(),
-        };
+        let height_1 = create_client_payload_1.client_state.latest_height();
 
-        let root_1 = create_client_payload_1.consensus_state.root.into_vec();
+        let root_1 = create_client_payload_1.consensus_state.root.clone().into_vec();
 
         let client_id = {
-            let message = {
-                let client_type = short_string!("07-cometbft");
-
-                let client_state = CometClientState {
-                    latest_height: height_1.clone(),
-                    trusting_period: create_client_payload_1.client_state.trusting_period.as_secs(),
-                    status: ClientStatus::Active,
-                };
-
-                let consensus_state = CometConsensusState {
-                    timestamp: create_client_payload_1.consensus_state.timestamp.unix_timestamp() as u64,
-                    root: root_1.clone(),
-                };
-
-                let raw_client_state = StarknetCairoEncoding.encode(&client_state)?;
-                let raw_consensus_state = StarknetCairoEncoding.encode(&consensus_state)?;
-
-                let calldata = StarknetCairoEncoding.encode(&HList![
-                    client_type,
-                    raw_client_state,
-                    raw_consensus_state
-                ])?;
-
-                Call {
-                    to: comet_client_address,
-                    selector: selector!("create_client"),
-                    calldata,
-                }
-            };
+            let message = <StarknetChain as CanBuildCreateClientMessage<CosmosChain>>
+                ::build_create_client_message(starknet_chain, &(), create_client_payload_1).await?;
 
             let events = starknet_chain.send_message(message).await?;
 
@@ -184,7 +150,7 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             >>::query_consensus_state_with_latest_height(
                 starknet_chain,
                 &client_id,
-                &create_client_payload_1.client_state.latest_height(),
+                &height_1,
             )
             .await?;
 
@@ -204,7 +170,10 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
                 };
 
                 let update_header = CometUpdateHeader {
-                    trusted_height: height_1,
+                    trusted_height: Height {
+                        revision_number: height_1.revision_number(),
+                        revision_height: height_1.revision_height(),
+                    },
                     target_height: height_2,
                     time: create_client_payload_2.consensus_state.timestamp.unix_timestamp() as u64,
                     root: root_2.clone(),
