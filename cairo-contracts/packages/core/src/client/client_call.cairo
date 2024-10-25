@@ -4,7 +4,7 @@ use starknet_ibc_core::client::{
     IClientHandlerDispatcherTrait, IClientStateValidationDispatcher,
     IClientStateValidationDispatcherTrait, MsgCreateClient, MsgUpdateClient, MsgRecoverClient,
     MsgUpgradeClient, CreateResponse, UpdateResponse, Height, HeightPartialOrd, Status, StatusTrait,
-    ClientErrors, Timestamp
+    ClientErrors, Timestamp, Proof
 };
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -57,14 +57,14 @@ pub impl ClientContractImpl of ClientContractTrait {
         client_sequence: u64,
         path: ByteArray,
         value: Array<u8>,
-        proof: Array<u8>
+        proof: Proof,
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
             .verify_membership(client_sequence, path, value, proof)
     }
 
     fn verify_non_membership(
-        self: @ClientContract, client_sequence: u64, path: ByteArray, proof: Array<u8>
+        self: @ClientContract, client_sequence: u64, path: ByteArray, proof: Proof
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
             .verify_non_membership(client_sequence, path, proof)

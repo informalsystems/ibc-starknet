@@ -34,7 +34,7 @@ pub mod channel {
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
         ChannelOrdering, Counterparty, Acknowledgement, AcknowledgementImpl, AcknowledgementTrait,
-        AckStatus, AckStatusImpl, AckStatusTrait, Receipt,
+        AckStatus, AckStatusImpl, AckStatusTrait, Receipt
     };
     mod components {
         pub mod events;
@@ -67,7 +67,7 @@ pub mod client {
     pub use types::{
         CreateResponse, CreateResponseImpl, UpdateResponse, Status, StatusImpl, StatusTrait, Height,
         HeightImpl, HeightTrait, HeightZero, HeightPartialOrd, HeightsIntoUpdateResponse, Timestamp,
-        TimestampZero, TimestampPartialOrd, U64IntoTimestamp
+        TimestampZero, TimestampPartialOrd, U64IntoTimestamp, Proof, ProofImpl, ProofTrait,
     };
     mod components {
         pub mod events;

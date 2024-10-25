@@ -80,7 +80,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     ) -> MsgRecvPacket {
         MsgRecvPacket {
             packet: self.dummy_packet(denom, sender, receiver),
-            proof_commitment_on_a: array![0],
+            proof_commitment_on_a: array![0].into(),
             proof_height_on_a: HEIGHT(10),
         }
     }
