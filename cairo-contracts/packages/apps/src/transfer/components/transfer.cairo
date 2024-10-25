@@ -89,7 +89,7 @@ pub mod TokenTransferComponent {
     #[derive(Debug, Drop, Serde, starknet::Event)]
     pub struct AckStatusEvent {
         #[key]
-        pub ack: AckStatus,
+        pub ack_status: AckStatus,
     }
 
     #[derive(Debug, Drop, Serde, starknet::Event)]
@@ -751,8 +751,8 @@ pub mod TokenTransferComponent {
                 );
         }
 
-        fn emit_ack_status_event(ref self: ComponentState<TContractState>, ack: AckStatus) {
-            self.emit(AckStatusEvent { ack });
+        fn emit_ack_status_event(ref self: ComponentState<TContractState>, ack_status: AckStatus) {
+            self.emit(AckStatusEvent { ack_status });
         }
 
         fn emit_create_token_event(

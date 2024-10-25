@@ -1,9 +1,8 @@
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::types::PrefixedDenomTrait;
 use starknet_ibc_apps::transfer::types::{
-    MsgTransfer, PacketData, PrefixedDenom, Denom, TracePrefixTrait, Participant
+    MsgTransfer, PacketData, PrefixedDenom, Denom, TracePrefixTrait, Participant, PrefixedDenomTrait
 };
-use starknet_ibc_core::channel::{Packet, MsgRecvPacket};
+use starknet_ibc_core::channel::{Packet, MsgRecvPacket, MsgAckPacket, Acknowledgement};
 use starknet_ibc_core::client::Timestamp;
 use starknet_ibc_core::host::{ChannelId, Sequence};
 use starknet_ibc_testkit::dummies::{PUBKEY, NAME, AMOUNT, EMPTY_MEMO, PORT_ID, CHANNEL_ID, HEIGHT};
@@ -81,6 +80,21 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         MsgRecvPacket {
             packet: self.dummy_packet(denom, sender, receiver),
             proof_commitment_on_a: array![0].into(),
+            proof_height_on_a: HEIGHT(10),
+        }
+    }
+
+    fn dummy_msg_ack_packet(
+        self: @TransferAppConfig,
+        denom: PrefixedDenom,
+        sender: Participant,
+        receiver: Participant,
+        acknowledgement: Acknowledgement
+    ) -> MsgAckPacket {
+        MsgAckPacket {
+            packet: self.dummy_packet(denom, sender, receiver),
+            acknowledgement,
+            proof_ack_on_a: array![0].into(),
             proof_height_on_a: HEIGHT(10),
         }
     }

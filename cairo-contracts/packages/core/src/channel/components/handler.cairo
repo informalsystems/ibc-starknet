@@ -482,8 +482,10 @@ pub mod ChannelHandlerComponent {
         fn verify_packet_commitment_matches(
             self: @ComponentState<TContractState>, packet: @Packet
         ) {
-            let _packet_commitment = self
+            let packet_commitment = self
                 .read_packet_commitment(packet.port_id_on_a, packet.chan_id_on_a, packet.seq_on_a);
+
+            assert(packet_commitment.is_non_zero(), ChannelErrors::PACKET_NOT_SENT);
 
             let _expected_packet_commitment = packet.compute_commitment();
             // assert(packet_commitment == expected_packet_commitment,
