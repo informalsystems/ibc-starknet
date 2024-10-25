@@ -8,12 +8,8 @@ use starknet_ibc_apps::transfer::{
     ISendTransferDispatcher, ITokenAddressDispatcher, ISendTransferDispatcherTrait,
     ITokenAddressDispatcherTrait,
 };
-use starknet_ibc_core::channel::{IAppCallbackDispatcher, IAppCallbackDispatcherTrait, Packet};
-
-#[derive(Drop, Serde)]
-pub struct AppContract {
-    pub address: ContractAddress,
-}
+use starknet_ibc_core::channel::IAppCallbackDispatcher;
+use starknet_ibc_core::router::AppContract;
 
 #[generate_trait]
 pub impl AppHandleImpl of AppHandle {
@@ -44,9 +40,5 @@ pub impl AppHandleImpl of AppHandle {
 
     fn send_transfer(self: @AppContract, msg: MsgTransfer) {
         self.send_dispatcher().send_transfer(msg);
-    }
-
-    fn on_recv_packet(self: @AppContract, packet: Packet) {
-        self.callback_dispatcher().on_recv_packet(packet);
     }
 }

@@ -39,6 +39,19 @@ pub struct PacketData {
     pub memo: Memo,
 }
 
+pub impl ArrayFelt252IntoPacketData of Into<Array<felt252>, PacketData> {
+    fn into(self: Array<felt252>) -> PacketData {
+        let mut pakcet_data_span = self.span();
+
+        let maybe_packet_data: Option<PacketData> = Serde::deserialize(ref pakcet_data_span);
+
+        match maybe_packet_data {
+            Option::Some(packet_data) => packet_data,
+            Option::None => panic!("{}", TransferErrors::INVALID_PACKET_DATA),
+        }
+    }
+}
+
 impl PacketDataValidateBasicImpl of ValidateBasic<PacketData> {
     fn validate_basic(self: @PacketData) {
         assert(self.sender.is_non_zero(), TransferErrors::INVALID_SENDER);

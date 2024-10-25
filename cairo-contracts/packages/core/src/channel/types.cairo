@@ -66,6 +66,11 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         self.state == @ChannelState::Open
     }
 
+    /// Returns true if the channel is of ordered kind.
+    fn is_ordered(self: @ChannelEnd) -> bool {
+        self.ordering == @ChannelOrdering::Ordered
+    }
+
     /// Returns true if the counterparty matches the given counterparty.
     fn counterparty_matches(
         self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_channel_id: @ChannelId
@@ -108,19 +113,76 @@ pub struct Counterparty {
     pub channel_id: ChannelId,
 }
 
-#[derive(Clone, Debug, Drop, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+pub enum Receipt {
+    Ok
+}
+
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct Acknowledgement {
-    pub ack: felt252,
+    pub ack: Array<u8>,
+}
+
+pub impl ArrayU8IntoAcknowledgement of Into<Array<u8>, Acknowledgement> {
+    fn into(self: Array<u8>) -> Acknowledgement {
+        Acknowledgement { ack: self }
+    }
 }
 
 #[generate_trait]
 pub impl AcknowledgementImpl of AcknowledgementTrait {
+    fn is_non_empty(self: @Acknowledgement) -> bool {
+        self.ack.len() > 0
+    }
+
     fn compute_commitment(self: @Acknowledgement) -> felt252 {
         ''
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
-pub enum Receipt {
-    Ok
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+pub enum AckStatus {
+    Success: Acknowledgement,
+    Error: Acknowledgement,
+}
+
+#[generate_trait]
+pub impl AckStatusImpl of AckStatusTrait {
+    /// Constructs a new `AckStatus`.
+    fn new(ack: Acknowledgement, expected_ack: @Acknowledgement) -> AckStatus {
+        if @ack == expected_ack {
+            AckStatus::Success(ack)
+        } else {
+            AckStatus::Error(ack)
+        }
+    }
+
+    /// Returns the acknowledgement.
+    fn ack(self: @AckStatus) -> @Acknowledgement {
+        match self {
+            AckStatus::Success(ack) => ack,
+            AckStatus::Error(ack) => ack,
+        }
+    }
+
+    /// Returns true if the acknowledgement is non-empty.
+    fn is_non_empty(self: @AckStatus) -> bool {
+        self.ack().is_non_empty()
+    }
+
+    /// Returns true if the status is success.
+    fn is_success(self: @AckStatus) -> bool {
+        match self {
+            AckStatus::Success(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns true if the status is error.
+    fn is_error(self: @AckStatus) -> bool {
+        match self {
+            AckStatus::Error(_) => true,
+            _ => false,
+        }
+    }
 }

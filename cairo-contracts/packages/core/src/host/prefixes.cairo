@@ -33,3 +33,7 @@ pub fn NEXT_SEQ_SEND_PREFIX() -> ByteArray {
 pub fn NEXT_SEQ_RECV_PREFIX() -> ByteArray {
     "nextSequenceRecv"
 }
+
+pub fn NEXT_SEQ_ACK_PREFIX() -> ByteArray {
+    "nextSequenceAck"
+}

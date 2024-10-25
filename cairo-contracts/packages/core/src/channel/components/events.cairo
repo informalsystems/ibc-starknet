@@ -92,7 +92,7 @@ pub mod ChannelEventEmitterComponent {
         #[key]
         pub timeout_timestamp_on_b: Timestamp,
         #[key]
-        channel_oredering: ChannelOrdering,
+        pub channel_oredering: ChannelOrdering,
     }
 
     #[derive(Debug, Drop, starknet::Event)]

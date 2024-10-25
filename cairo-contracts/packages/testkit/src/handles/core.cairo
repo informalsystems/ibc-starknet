@@ -1,7 +1,7 @@
 use openzeppelin_testing::declare_and_deploy;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
-    IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, MsgRecvPacket,
+    IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, MsgRecvPacket, MsgAckPacket,
     IChannelQueryDispatcher, IChannelQueryDispatcherTrait, ChannelEnd, Packet,
 };
 use starknet_ibc_core::client::{
@@ -71,6 +71,10 @@ pub impl CoreHandleImpl of CoreHandle {
         self.channel_handler_dispatcher().recv_packet(msg)
     }
 
+    fn ack_packet(self: @CoreContract, msg: MsgAckPacket) {
+        self.channel_handler_dispatcher().ack_packet(msg)
+    }
+
     fn channel_end(self: @CoreContract, port_id: PortId, channel_id: ChannelId) -> ChannelEnd {
         self.channel_query_dispatcher().channel_end(port_id, channel_id)
     }
@@ -85,6 +89,12 @@ pub impl CoreHandleImpl of CoreHandle {
         self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence
     ) -> bool {
         self.channel_query_dispatcher().packet_receipt(port_id, channel_id, sequence)
+    }
+
+    fn packet_acknowledgement(
+        self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence
+    ) -> felt252 {
+        self.channel_query_dispatcher().packet_acknowledgement(port_id, channel_id, sequence)
     }
 
     fn next_sequence_send(self: @CoreContract, port_id: PortId, channel_id: ChannelId) -> Sequence {
