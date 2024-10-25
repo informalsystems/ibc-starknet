@@ -1,6 +1,6 @@
 use starknet_ibc_core::host::{
     CHANNEL_ENDS_PREFIX, PORTS_PREFIX, CHANNELS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX,
-    RECEIPTS_PREFIX, ACKS_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX,
+    RECEIPTS_PREFIX, ACKS_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX, NEXT_SEQ_ACK_PREFIX
 };
 use starknet_ibc_core::host::{ChannelId, PortId, Sequence};
 use starknet_ibc_utils::LocalKeyBuilderTrait;
@@ -61,6 +61,15 @@ pub fn next_sequence_recv_key(port_id: @PortId, channel_id: @ChannelId) -> felt2
     append_serde_channel(ref key_builder, channel_id);
     key_builder.key()
 }
+
+pub fn next_sequence_ack_key(port_id: @PortId, channel_id: @ChannelId) -> felt252 {
+    let mut key_builder = LocalKeyBuilderImpl::init();
+    key_builder.append_serde(@NEXT_SEQ_ACK_PREFIX());
+    append_serde_port(ref key_builder, port_id);
+    append_serde_channel(ref key_builder, channel_id);
+    key_builder.key()
+}
+
 
 pub fn append_serde_port(ref key_builder: LocalKeyBuilder, port_id: @PortId) {
     key_builder.append_serde(@PORTS_PREFIX());

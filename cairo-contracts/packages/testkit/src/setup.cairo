@@ -6,10 +6,9 @@ use snforge_std::{
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::{ERC20Contract, TRANSFER_PORT_ID};
 use starknet_ibc_core::client::ClientContract;
+use starknet_ibc_core::router::AppContract;
 use starknet_ibc_testkit::dummies::{OWNER, CLIENT_TYPE};
-use starknet_ibc_testkit::handles::{
-    AppContract, CoreContract, CoreHandle, AppHandle, ERC20Handle, ClientHandle
-};
+use starknet_ibc_testkit::handles::{CoreContract, CoreHandle, AppHandle, ERC20Handle, ClientHandle};
 
 #[derive(Drop, Serde)]
 pub struct Setup {

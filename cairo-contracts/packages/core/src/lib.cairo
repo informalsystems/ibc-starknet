@@ -9,7 +9,7 @@ pub mod router {
     mod errors;
     mod interface;
 
-    pub use app_call::{ApplicationContract, ApplicationContractImpl, ApplicationContractTrait};
+    pub use app_call::{AppContract, AppContractImpl, AppContractTrait};
     pub use component::RouterHandlerComponent;
     pub use errors::RouterErrors;
     pub use interface::{IRouter, IRouterDispatcher, IRouterDispatcherTrait};
@@ -30,7 +30,7 @@ pub mod channel {
         IAppCallbackDispatcher, IAppCallbackDispatcherTrait, IChannelQuery, IChannelQueryDispatcher,
         IChannelQueryDispatcherTrait
     };
-    pub use msgs::MsgRecvPacket;
+    pub use msgs::{MsgRecvPacket, MsgAckPacket};
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
         ChannelOrdering, Counterparty, Acknowledgement, AcknowledgementImpl, AcknowledgementTrait,
@@ -88,11 +88,12 @@ pub mod host {
 
     pub use keys::{
         channel_end_key, commitment_key, receipt_key, ack_key, next_sequence_recv_key,
-        next_sequence_send_key
+        next_sequence_send_key, next_sequence_ack_key
     };
-    pub use paths::{commitment_path};
+    pub use paths::{commitment_path, ack_path};
     pub use prefixes::{
         CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX,
-        ACKS_PREFIX, RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX
+        ACKS_PREFIX, RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX,
+        NEXT_SEQ_ACK_PREFIX
     };
 }

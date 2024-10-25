@@ -6,11 +6,12 @@ use starknet_ibc_apps::transfer::TokenTransferComponent::{
     TransferInitializerImpl, TransferReaderImpl
 };
 use starknet_ibc_apps::transfer::TokenTransferComponent;
+use starknet_ibc_core::router::{AppContract, AppContractTrait};
 use starknet_ibc_testkit::configs::{TransferAppConfigTrait, TransferAppConfig};
 use starknet_ibc_testkit::dummies::CLASS_HASH;
 use starknet_ibc_testkit::dummies::{SUPPLY, OWNER, NAME, SYMBOL, COSMOS, STARKNET};
 use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
-use starknet_ibc_testkit::handles::{ERC20Handle, AppHandle, AppContract};
+use starknet_ibc_testkit::handles::{ERC20Handle, AppHandle};
 use starknet_ibc_testkit::mocks::MockTransferApp;
 use starknet_ibc_testkit::setup::SetupImpl;
 use starknet_ibc_testkit::utils::call_contract;

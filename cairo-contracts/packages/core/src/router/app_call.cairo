@@ -4,25 +4,29 @@ use starknet_ibc_core::channel::{
 };
 
 #[derive(Clone, Debug, Drop, Serde)]
-pub struct ApplicationContract {
+pub struct AppContract {
     pub address: ContractAddress,
 }
 
-impl ContractAddressIntoApplicationAddr of Into<ContractAddress, ApplicationContract> {
-    fn into(self: ContractAddress) -> ApplicationContract {
-        ApplicationContract { address: self }
+impl ContractAddressIntoAppAddr of Into<ContractAddress, AppContract> {
+    fn into(self: ContractAddress) -> AppContract {
+        AppContract { address: self }
     }
 }
 
-impl ApplicationContractIntoFelt252 of Into<ApplicationContract, felt252> {
-    fn into(self: ApplicationContract) -> felt252 {
+impl AppContractIntoFelt252 of Into<AppContract, felt252> {
+    fn into(self: AppContract) -> felt252 {
         self.address.into()
     }
 }
 
 #[generate_trait]
-pub impl ApplicationContractImpl of ApplicationContractTrait {
-    fn on_recv_packet(self: @ApplicationContract, packet: Packet) -> Acknowledgement {
+pub impl AppContractImpl of AppContractTrait {
+    fn on_recv_packet(self: @AppContract, packet: Packet) -> Acknowledgement {
         IAppCallbackDispatcher { contract_address: *self.address }.on_recv_packet(packet)
+    }
+
+    fn on_ack_packet(self: @AppContract, packet: Packet, ack: Acknowledgement) {
+        IAppCallbackDispatcher { contract_address: *self.address }.on_ack_packet(packet, ack)
     }
 }

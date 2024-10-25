@@ -4,7 +4,7 @@ pub mod RouterHandlerComponent {
     use starknet::ContractAddress;
     use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
     use starknet_ibc_core::host::{PortId, PortIdImpl};
-    use starknet_ibc_core::router::{RouterErrors, IRouter, ApplicationContract};
+    use starknet_ibc_core::router::{RouterErrors, IRouter, AppContract};
     use starknet_ibc_utils::ComputeKey;
 
     #[storage]
@@ -68,7 +68,7 @@ pub mod RouterHandlerComponent {
     pub(crate) impl RouterInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of RouterInternalTrait<TContractState> {
-        fn get_app(self: @ComponentState<TContractState>, port_id: @PortId) -> ApplicationContract {
+        fn get_app(self: @ComponentState<TContractState>, port_id: @PortId) -> AppContract {
             let maybe_app_address = self.read_app_address(port_id);
 
             assert(maybe_app_address.is_non_zero(), RouterErrors::UNSUPPORTED_PORT_ID);

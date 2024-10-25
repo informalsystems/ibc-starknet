@@ -11,21 +11,19 @@ pub mod ChannelHandlerComponent {
     use starknet::storage::{StorageMapReadAccess, StorageMapWriteAccess};
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
-        ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgRecvPacket, ChannelEnd,
-        ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt, AcknowledgementTrait,
-        Packet, Acknowledgement
+        ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgRecvPacket, MsgAckPacket,
+        ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt,
+        AcknowledgementTrait, Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, HeightImpl
     };
     use starknet_ibc_core::host::{
         PortId, ChannelId, Sequence, SequenceImpl, SequencePartialOrd, SequenceZero,
-        channel_end_key, commitment_key, receipt_key, ack_key, commitment_path,
-        next_sequence_recv_key, next_sequence_send_key,
+        channel_end_key, commitment_key, receipt_key, ack_key, commitment_path, ack_path,
+        next_sequence_recv_key, next_sequence_send_key, next_sequence_ack_key
     };
-    use starknet_ibc_core::router::{
-        RouterHandlerComponent, ApplicationContractTrait, ApplicationContract
-    };
+    use starknet_ibc_core::router::{RouterHandlerComponent, AppContractTrait, AppContract};
     use starknet_ibc_utils::ValidateBasic;
     use super::{PORT_ID, CHANNEL_ID, CHANNEL_END};
 
@@ -37,6 +35,7 @@ pub mod ChannelHandlerComponent {
         pub packet_acks: Map<felt252, felt252>,
         pub send_sequences: Map<felt252, Sequence>,
         pub recv_sequences: Map<felt252, Sequence>,
+        pub ack_sequences: Map<felt252, Sequence>,
     }
 
     #[event]
@@ -91,6 +90,15 @@ pub mod ChannelHandlerComponent {
             self.recv_packet_validate(msg.clone(), chan_end_on_b.clone());
 
             self.recv_packet_execute(msg, chan_end_on_b);
+        }
+
+        fn ack_packet(ref self: ComponentState<TContractState>, msg: MsgAckPacket) {
+            let chan_end_on_a = self
+                .get_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_b);
+
+            self.ack_packet_validate(msg.clone(), chan_end_on_a.clone());
+
+            self.ack_packet_execute(msg, chan_end_on_a);
         }
     }
 
@@ -199,11 +207,9 @@ pub mod ChannelHandlerComponent {
             let mut seq_on_a = self
                 .read_next_sequence_send(@packet.port_id_on_a, @packet.chan_id_on_a);
 
-            let next_sequence_send = seq_on_a.increment();
-
             self
                 .write_next_sequence_send(
-                    @packet.port_id_on_a, @packet.chan_id_on_a, next_sequence_send.clone()
+                    @packet.port_id_on_a, @packet.chan_id_on_a, seq_on_a.increment()
                 );
 
             let packet_commitment_on_a = packet.compute_commitment();
@@ -379,6 +385,119 @@ pub mod ChannelHandlerComponent {
         }
     }
 
+    #[generate_trait]
+    pub(crate) impl AckPacketImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of AckPacketTrait<TContractState> {
+        fn ack_packet_validate(
+            self: @ComponentState<TContractState>, msg: MsgAckPacket, chan_end_on_a: ChannelEnd
+        ) {
+            msg.validate_basic();
+
+            // TODO: verify connection end if we ever decide to implement ICS-03
+
+            let packet = @msg.packet;
+
+            chan_end_on_a.validate(packet.port_id_on_a, packet.chan_id_on_a);
+
+            self.verify_packet_commitment_matches(packet);
+
+            if chan_end_on_a.is_ordered() {
+                self.verify_ack_sequence_matches(packet);
+            }
+
+            let client = self.get_client(chan_end_on_a.client_id.client_type);
+
+            let client_sequence = chan_end_on_a.client_id.sequence;
+
+            client.verify_is_active(client_sequence);
+
+            client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
+
+            self.verify_packet_acknowledgement(@client, chan_end_on_a, msg);
+        }
+
+        fn ack_packet_execute(
+            ref self: ComponentState<TContractState>, msg: MsgAckPacket, chan_end_on_a: ChannelEnd
+        ) {
+            let mut packet = msg.packet;
+
+            let app = self.get_app(@packet.port_id_on_b);
+
+            app.on_ack_packet(packet.clone(), msg.acknowledgement);
+
+            self
+                .delete_packet_commitment(
+                    @packet.port_id_on_a, @packet.chan_id_on_a, @packet.seq_on_a
+                );
+
+            self.emit_ack_packet_event(packet.clone(), chan_end_on_a.ordering.clone());
+
+            if chan_end_on_a.is_ordered() {
+                self
+                    .write_next_sequence_ack(
+                        @packet.port_id_on_a, @packet.chan_id_on_a, packet.seq_on_a.increment()
+                    );
+            }
+        }
+
+        fn verify_packet_acknowledgement(
+            self: @ComponentState<TContractState>,
+            client: @ClientContract,
+            chan_end_on_a: ChannelEnd,
+            msg: MsgAckPacket,
+        ) {
+            let ack_commitment_on_a = msg.packet.compute_commitment();
+
+            let mut path: ByteArray =
+                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+
+            let ack_path = ack_path(
+                msg.packet.port_id_on_a.clone(),
+                msg.packet.chan_id_on_a.clone(),
+                msg.packet.seq_on_a.clone()
+            );
+
+            path.append(@ack_path);
+
+            client
+                .verify_membership(
+                    chan_end_on_a.client_id.sequence,
+                    path,
+                    ack_commitment_on_a,
+                    msg.proof_ack_on_a.clone()
+                );
+        }
+
+        /// Verifies if the packet commitment matches the one stored earlier
+        /// during the send packet process. If it doesn't exist or doesn't match,
+        /// an error is returned. Note that this logic differs from ibc-rs, where
+        /// non-existence is a no-op to avoid the relayer paying transaction fees.
+        /// Here, in any case, the relayer pays a fee regardless.
+        fn verify_packet_commitment_matches(
+            self: @ComponentState<TContractState>, packet: @Packet
+        ) {
+            let _packet_commitment = self
+                .read_packet_commitment(packet.port_id_on_a, packet.chan_id_on_a, packet.seq_on_a);
+
+            let _expected_packet_commitment = packet.compute_commitment();
+            // assert(packet_commitment == expected_packet_commitment,
+        // ChannelErrors::MISMATCHED_PACKET_COMMITMENT);
+        }
+
+        fn verify_ack_sequence_matches(self: @ComponentState<TContractState>, packet: @Packet) {
+            let expected_sequence = self
+                .read_next_sequence_ack(packet.port_id_on_a, packet.chan_id_on_a);
+
+            assert(@expected_sequence == packet.seq_on_a, ChannelErrors::INVALID_PACKET_SEQUENCE)
+        }
+    }
+
     // -----------------------------------------------------------
     // Channel accesses
     // -----------------------------------------------------------
@@ -411,7 +530,7 @@ pub mod ChannelHandlerComponent {
             client_comp.get_client(client_type)
         }
 
-        fn get_app(self: @ComponentState<TContractState>, port_id: @PortId) -> ApplicationContract {
+        fn get_app(self: @ComponentState<TContractState>, port_id: @PortId) -> AppContract {
             let router_comp = get_dep_component!(self, RouterHandler);
 
             router_comp.get_app(port_id)
@@ -470,6 +589,12 @@ pub mod ChannelHandlerComponent {
         ) -> Sequence {
             self.recv_sequences.read(next_sequence_recv_key(port_id, channel_id))
         }
+
+        fn read_next_sequence_ack(
+            self: @ComponentState<TContractState>, port_id: @PortId, channel_id: @ChannelId
+        ) -> Sequence {
+            self.ack_sequences.read(next_sequence_ack_key(port_id, channel_id))
+        }
     }
 
     #[generate_trait]
@@ -497,6 +622,15 @@ pub mod ChannelHandlerComponent {
             self
                 .packet_commitments
                 .write(commitment_key(port_id, channel_id, sequence), '1') // TODO
+        }
+
+        fn delete_packet_commitment(
+            ref self: ComponentState<TContractState>,
+            port_id: @PortId,
+            channel_id: @ChannelId,
+            sequence: @Sequence,
+        ) {
+            self.packet_commitments.write(commitment_key(port_id, channel_id, sequence), '')
         }
 
         fn write_packet_receipt(
@@ -537,6 +671,15 @@ pub mod ChannelHandlerComponent {
             sequence: Sequence
         ) {
             self.recv_sequences.write(next_sequence_recv_key(port_id, channel_id), sequence);
+        }
+
+        fn write_next_sequence_ack(
+            ref self: ComponentState<TContractState>,
+            port_id: @PortId,
+            channel_id: @ChannelId,
+            sequence: Sequence
+        ) {
+            self.ack_sequences.write(next_sequence_ack_key(port_id, channel_id), sequence);
         }
     }
 

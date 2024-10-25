@@ -45,7 +45,7 @@ pub mod handles {
     mod core;
     mod erc20;
 
-    pub use app::{AppContract, AppHandleImpl, AppHandle};
+    pub use app::{AppHandleImpl, AppHandle};
     pub use client::{ClientHandleImpl, ClientHandle};
     pub use core::{CoreContract, CoreHandleImpl, CoreHandle};
     pub use erc20::{ERC20HandleImpl, ERC20Handle};

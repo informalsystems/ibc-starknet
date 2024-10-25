@@ -43,6 +43,7 @@ pub mod TokenTransferComponent {
     pub enum Event {
         SendEvent: SendEvent,
         RecvEvent: RecvEvent,
+        AckEvent: AckEvent,
         CreateTokenEvent: CreateTokenEvent,
     }
 
@@ -69,6 +70,19 @@ pub mod TokenTransferComponent {
         pub amount: u256,
         pub memo: Memo,
         pub success: bool,
+    }
+
+    #[derive(Debug, Drop, Serde, starknet::Event)]
+    pub struct AckEvent {
+        #[key]
+        pub sender: Participant,
+        #[key]
+        pub receiver: Participant,
+        #[key]
+        pub denom: PrefixedDenom,
+        pub amount: u256,
+        pub memo: Memo,
+        pub ack: Acknowledgement,
     }
 
     #[derive(Debug, Drop, Serde, starknet::Event)]
@@ -151,10 +165,16 @@ pub mod TokenTransferComponent {
             Acknowledgement { ack: '0' }
         }
 
-        fn on_acknowledgement_packet(
+        fn on_ack_packet(
             ref self: ComponentState<TContractState>, packet: Packet, ack: Acknowledgement
         ) {
             self.assert_owner();
+
+            let packet_data = packet.data.into();
+
+            packet_data.validate_basic();
+
+            self.emit_ack_event(packet_data, ack);
         }
 
         fn on_timeout_packet(ref self: ComponentState<TContractState>, packet: Packet) {
@@ -294,13 +314,7 @@ pub mod TokenTransferComponent {
         fn recv_validate(self: @ComponentState<TContractState>, packet: Packet) -> PacketData {
             self.get_contract().can_receive();
 
-            let mut pakcet_data_span = packet.data.span();
-
-            let maybe_packet_data: Option<PacketData> = Serde::deserialize(ref pakcet_data_span);
-
-            assert(maybe_packet_data.is_some(), TransferErrors::INVALID_PACKET_DATA);
-
-            let packet_data = maybe_packet_data.unwrap();
+            let packet_data: PacketData = packet.data.into();
 
             packet_data.validate_basic();
 
@@ -678,6 +692,22 @@ pub mod TokenTransferComponent {
                         amount: packet_data.amount,
                         memo: packet_data.memo,
                         success,
+                    }
+                );
+        }
+
+        fn emit_ack_event(
+            ref self: ComponentState<TContractState>, packet_data: PacketData, ack: Acknowledgement,
+        ) {
+            self
+                .emit(
+                    AckEvent {
+                        sender: packet_data.sender,
+                        receiver: packet_data.receiver,
+                        denom: packet_data.denom,
+                        amount: packet_data.amount,
+                        memo: packet_data.memo,
+                        ack,
                     }
                 );
         }

@@ -66,6 +66,11 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         self.state == @ChannelState::Open
     }
 
+    /// Returns true if the channel is of ordered kind.
+    fn is_ordered(self: @ChannelEnd) -> bool {
+        self.ordering == @ChannelOrdering::Ordered
+    }
+
     /// Returns true if the counterparty matches the given counterparty.
     fn counterparty_matches(
         self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_channel_id: @ChannelId
@@ -108,6 +113,11 @@ pub struct Counterparty {
     pub channel_id: ChannelId,
 }
 
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+pub enum Receipt {
+    Ok
+}
+
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct Acknowledgement {
     pub ack: felt252,
@@ -115,12 +125,11 @@ pub struct Acknowledgement {
 
 #[generate_trait]
 pub impl AcknowledgementImpl of AcknowledgementTrait {
+    fn is_non_zero(self: @Acknowledgement) -> bool {
+        self.ack.is_non_zero()
+    }
+
     fn compute_commitment(self: @Acknowledgement) -> felt252 {
         ''
     }
-}
-
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
-pub enum Receipt {
-    Ok
 }
