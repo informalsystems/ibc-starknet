@@ -195,6 +195,7 @@ pub trait CanUseStarknetChain:
     + CanTransferToken
     + HasRetryableError
     + CanBuildCreateClientPayload<CosmosChain>
+    // + CanBuildCreateClientMessage<CosmosChain>
     + CanBuildUpdateClientPayload<CosmosChain>
     + CanQueryClientState<CosmosChain>
     + CanQueryConsensusState<CosmosChain>
