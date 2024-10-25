@@ -2,7 +2,7 @@ use cgp::core::component::WithProvider;
 use cgp::core::types::impls::UseDelegatedType;
 use cgp::prelude::*;
 pub use hermes_cosmos_chain_components::components::client::{
-    ChannelIdTypeComponent, ClientIdTypeComponent, ClientStateFieldsGetterComponent,
+    ChannelIdTypeComponent, ClientIdTypeComponent, ClientStateFieldsComponent,
     ClientStateQuerierComponent, ConnectionIdTypeComponent, ConsensusStateQuerierComponent,
     CreateClientMessageBuilderComponent, CreateClientMessageOptionsTypeComponent,
     CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent,
@@ -141,7 +141,7 @@ define_components! {
         [
             ClientStateTypeComponent,
             ConsensusStateTypeComponent,
-            ClientStateFieldsGetterComponent,
+            ClientStateFieldsComponent,
         ]:
             ProvideStarknetIbcClientTypes,
         [
