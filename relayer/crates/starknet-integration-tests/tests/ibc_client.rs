@@ -33,7 +33,7 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let chain_command_path = std::env::var("STARKNET_BIN")
+        let starknet_chain_command_path = std::env::var("STARKNET_BIN")
             .unwrap_or("starknet-devnet".into())
             .into();
 
@@ -41,15 +41,15 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
-        let bootstrap = StarknetBootstrap {
+        let starknet_bootstrap = StarknetBootstrap {
             runtime: runtime.clone(),
-            chain_command_path,
+            chain_command_path: starknet_chain_command_path,
             chain_store_dir: format!("./test-data/{timestamp}").into(),
         };
 
-        let mut chain_driver = bootstrap.bootstrap_chain("starknet").await?;
+        let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
 
-        let chain = &mut chain_driver.chain;
+        let starknet_chain = &mut starknet_chain_driver.chain;
 
         let comet_client_class_hash = {
             let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
@@ -58,14 +58,14 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
 
             let contract = serde_json::from_str(&contract_str)?;
 
-            let class_hash = chain.declare_contract(&contract).await?;
+            let class_hash = starknet_chain.declare_contract(&contract).await?;
 
             println!("declared class: {:?}", class_hash);
 
             class_hash
         };
 
-        let comet_client_address = chain
+        let comet_client_address = starknet_chain
             .deploy_contract(&comet_client_class_hash, false, &Vec::new())
             .await?;
 
@@ -74,7 +74,7 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             comet_client_address
         );
 
-        chain.ibc_client_contract_address = Some(comet_client_address);
+        starknet_chain.ibc_client_contract_address = Some(comet_client_address);
 
         let event_encoding = StarknetEventEncoding {
             erc20_hashes: Default::default(),
@@ -118,7 +118,7 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
                 }
             };
 
-            let events = chain.send_message(message).await?;
+            let events = starknet_chain.send_message(message).await?;
 
             let create_client_event: CreateClientEvent = event_encoding
                 .filter_decode_events(&events)?
@@ -159,7 +159,7 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
                 }
             };
 
-            let events = chain.send_message(message).await?;
+            let events = starknet_chain.send_message(message).await?;
 
             println!("update client events: {:?}", events);
         }
@@ -168,7 +168,7 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             let client_state = <StarknetChain as CanQueryClientStateWithLatestHeight<
                 CosmosChain,
             >>::query_client_state_with_latest_height(
-                chain, &client_id
+                starknet_chain, &client_id
             )
             .await?;
 
@@ -179,7 +179,7 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             let consensus_state = <StarknetChain as CanQueryConsensusStateWithLatestHeight<
                 CosmosChain,
             >>::query_consensus_state_with_latest_height(
-                chain,
+                starknet_chain,
                 &client_id,
                 &RelayerHeight::new(0, 2)?,
             )

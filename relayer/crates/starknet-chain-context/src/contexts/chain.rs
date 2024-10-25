@@ -214,6 +214,7 @@ pub trait CanUseCosmosChainWithStarknet:
     + CanBuildCreateClientMessage<StarknetChain>
     + CanBuildUpdateClientMessage<StarknetChain>
     + CanQueryConsensusStateHeight<StarknetChain>
+    + CanBuildCreateClientPayload<StarknetChain>
 {
 }
 
