@@ -42,6 +42,7 @@ where
 {
     async fn query_client_state(
         chain: &Chain,
+        _tag: PhantomData<Counterparty>,
         client_id: &Chain::ClientId,
         _height: &Chain::Height, // TODO: figure whether we can perform height specific queries on Starknet
     ) -> Result<Counterparty::ClientState, Chain::Error> {

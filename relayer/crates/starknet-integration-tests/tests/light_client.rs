@@ -1,5 +1,6 @@
 #![recursion_limit = "256"]
 
+use core::marker::PhantomData;
 use std::env::var;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -126,8 +127,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         {
             let client_state =
-                <CosmosChain as CanQueryClientState<StarknetChain>>::query_client_state(
-                    cosmos_chain,
+                cosmos_chain.query_client_state(
+                    PhantomData::<StarknetChain>,
                     &client_id,
                     &cosmos_chain.query_chain_height().await?,
                 )
@@ -136,8 +137,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
             let client_height = client_state.client_state.latest_height.revision_height();
 
             let consensus_state =
-                <CosmosChain as CanQueryConsensusState<StarknetChain>>::query_consensus_state(
-                    cosmos_chain,
+                cosmos_chain.query_consensus_state(
+                    PhantomData::<StarknetChain>,
                     &client_id,
                     &client_height,
                     &cosmos_chain.query_chain_height().await?,
@@ -167,8 +168,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .await?;
 
             let consensus_state =
-                <CosmosChain as CanQueryConsensusState<StarknetChain>>::query_consensus_state(
-                    cosmos_chain,
+                cosmos_chain.query_consensus_state(
+                    PhantomData::<StarknetChain>,
                     &client_id,
                     &starknet_status.height,
                     &cosmos_chain.query_chain_height().await?,

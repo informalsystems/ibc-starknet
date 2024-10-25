@@ -1,5 +1,6 @@
 #![recursion_limit = "256"]
 
+use core::marker::PhantomData;
 use core::time::Duration;
 use std::env::var;
 use std::path::PathBuf;
@@ -145,10 +146,8 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
         };
 
         {
-            let consensus_state = <StarknetChain as CanQueryConsensusStateWithLatestHeight<
-                CosmosChain,
-            >>::query_consensus_state_with_latest_height(
-                starknet_chain,
+            let consensus_state = starknet_chain.query_consensus_state_with_latest_height(
+                PhantomData::<CosmosChain>,
                 &client_id,
                 &height_1,
             )
@@ -196,10 +195,8 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
         }
 
         {
-            let client_state = <StarknetChain as CanQueryClientStateWithLatestHeight<
-                CosmosChain,
-            >>::query_client_state_with_latest_height(
-                starknet_chain, &client_id
+            let client_state = starknet_chain.query_client_state_with_latest_height(
+                PhantomData::<CosmosChain>, &client_id
             )
             .await?;
 
@@ -207,10 +204,8 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
         }
 
         {
-            let consensus_state = <StarknetChain as CanQueryConsensusStateWithLatestHeight<
-                CosmosChain,
-            >>::query_consensus_state_with_latest_height(
-                starknet_chain,
+            let consensus_state = starknet_chain.query_consensus_state_with_latest_height(
+                PhantomData::<CosmosChain>,
                 &client_id,
                 &create_client_payload_2.client_state.latest_height(),
             )
