@@ -1,5 +1,3 @@
-#![recursion_limit = "256"]
-
 use core::marker::PhantomData;
 use std::env::var;
 use std::path::PathBuf;
@@ -34,7 +32,6 @@ use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
@@ -47,6 +44,8 @@ use ibc_relayer_types::core::ics04_channel::channel::Ordering;
 use ibc_relayer_types::Height;
 use sha2::{Digest, Sha256};
 use starknet::macros::short_string;
+
+use crate::contexts::bootstrap::StarknetBootstrap;
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {

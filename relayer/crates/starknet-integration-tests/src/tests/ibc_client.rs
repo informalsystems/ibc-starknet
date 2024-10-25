@@ -1,5 +1,3 @@
-#![recursion_limit = "256"]
-
 use core::marker::PhantomData;
 use core::time::Duration;
 use std::env::var;
@@ -28,12 +26,13 @@ use hermes_starknet_chain_components::types::events::create_client::CreateClient
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
-use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use ibc_relayer::chain::cosmos::client::Settings;
 use ibc_relayer::config::types::TrustThreshold;
 use starknet::accounts::Call;
 use starknet::macros::selector;
+
+use crate::contexts::bootstrap::StarknetBootstrap;
 
 #[test]
 fn test_starknet_comet_client_contract() -> Result<(), Error> {
