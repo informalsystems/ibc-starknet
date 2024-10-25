@@ -157,6 +157,19 @@ pub impl AckStatusImpl of AckStatusTrait {
         }
     }
 
+    /// Returns the acknowledgement.
+    fn ack(self: @AckStatus) -> @Acknowledgement {
+        match self {
+            AckStatus::Success(ack) => ack,
+            AckStatus::Error(ack) => ack,
+        }
+    }
+
+    /// Returns true if the acknowledgement is non-empty.
+    fn is_non_empty(self: @AckStatus) -> bool {
+        self.ack().is_non_empty()
+    }
+
     /// Returns true if the status is success.
     fn is_success(self: @AckStatus) -> bool {
         match self {
