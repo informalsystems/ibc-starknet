@@ -1,7 +1,7 @@
 pub mod ChannelErrors {
-    pub const ZERO_ACK: felt252 = 'ICS04: zero ack';
     pub const ACK_ALREADY_EXISTS: felt252 = 'ICS04: ack already exists';
     pub const EMPTY_COMMITMENT_PROOF: felt252 = 'ICS04: empty commitment proof';
+    pub const EMPTY_ACK: felt252 = 'ICS04: empty acknowledgement';
     pub const EMPTY_ACK_PROOF: felt252 = 'ICS04: empty ack proof';
     pub const INVALID_CHANNEL_STATE: felt252 = 'ICS04: invalid channel state';
     pub const INVALID_COUNTERPARTY: felt252 = 'ICS04: invalid counterparty';

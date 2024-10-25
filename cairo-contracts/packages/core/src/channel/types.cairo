@@ -118,18 +118,58 @@ pub enum Receipt {
     Ok
 }
 
-#[derive(Clone, Debug, Drop, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct Acknowledgement {
-    pub ack: felt252,
+    pub ack: Array<u8>,
+}
+
+pub impl ArrayU8IntoAcknowledgement of Into<Array<u8>, Acknowledgement> {
+    fn into(self: Array<u8>) -> Acknowledgement {
+        Acknowledgement { ack: self }
+    }
 }
 
 #[generate_trait]
 pub impl AcknowledgementImpl of AcknowledgementTrait {
-    fn is_non_zero(self: @Acknowledgement) -> bool {
-        self.ack.is_non_zero()
+    fn is_non_empty(self: @Acknowledgement) -> bool {
+        self.ack.len() > 0
     }
 
     fn compute_commitment(self: @Acknowledgement) -> felt252 {
         ''
+    }
+}
+
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+pub enum AckStatus {
+    Success: Acknowledgement,
+    Error: Acknowledgement,
+}
+
+#[generate_trait]
+pub impl AckStatusImpl of AckStatusTrait {
+    /// Constructs a new `AckStatus`.
+    fn new(ack: Acknowledgement, expected_ack: @Acknowledgement) -> AckStatus {
+        if @ack == expected_ack {
+            AckStatus::Success(ack)
+        } else {
+            AckStatus::Error(ack)
+        }
+    }
+
+    /// Returns true if the status is success.
+    fn is_success(self: @AckStatus) -> bool {
+        match self {
+            AckStatus::Success(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns true if the status is error.
+    fn is_error(self: @AckStatus) -> bool {
+        match self {
+            AckStatus::Error(_) => true,
+            _ => false,
+        }
     }
 }

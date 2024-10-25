@@ -27,7 +27,7 @@ pub struct MsgAckPacket {
 impl MsgAcknowledgePacketValidateBasicImpl of ValidateBasic<MsgAckPacket> {
     fn validate_basic(self: @MsgAckPacket) {
         self.packet.validate_basic();
-        assert(self.acknowledgement.is_non_zero(), ChannelErrors::ZERO_ACK);
+        assert(self.acknowledgement.is_non_empty(), ChannelErrors::EMPTY_ACK);
         assert(!self.proof_ack_on_a.is_empty(), ChannelErrors::EMPTY_ACK_PROOF);
     }
 }

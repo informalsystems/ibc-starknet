@@ -20,11 +20,11 @@ pub mod TokenTransferComponent {
     };
     use starknet_ibc_apps::transfer::{
         ITransferrable, ISendTransfer, ITokenAddress, ERC20Contract, ERC20ContractTrait,
-        TransferErrors
+        TransferErrors, SUCCESS_ACK
     };
     use starknet_ibc_core::channel::{
-        Packet, Acknowledgement, IAppCallback, ChannelContract, ChannelContractTrait,
-        ChannelEndTrait
+        Packet, Acknowledgement, AckStatus, AckStatusImpl, IAppCallback, ChannelContract,
+        ChannelContractTrait, ChannelEndTrait
     };
 
     use starknet_ibc_core::host::{PortId, ChannelId};
@@ -44,6 +44,7 @@ pub mod TokenTransferComponent {
         SendEvent: SendEvent,
         RecvEvent: RecvEvent,
         AckEvent: AckEvent,
+        AckStatusEvent: AckStatusEvent,
         CreateTokenEvent: CreateTokenEvent,
     }
 
@@ -83,6 +84,12 @@ pub mod TokenTransferComponent {
         pub amount: u256,
         pub memo: Memo,
         pub ack: Acknowledgement,
+    }
+
+    #[derive(Debug, Drop, Serde, starknet::Event)]
+    pub struct AckStatusEvent {
+        #[key]
+        pub ack: AckStatus,
     }
 
     #[derive(Debug, Drop, Serde, starknet::Event)]
@@ -162,7 +169,7 @@ pub mod TokenTransferComponent {
 
             self.recv_execute(packet);
 
-            Acknowledgement { ack: '0' }
+            Acknowledgement { ack: array![1] }
         }
 
         fn on_ack_packet(
@@ -170,11 +177,19 @@ pub mod TokenTransferComponent {
         ) {
             self.assert_owner();
 
-            let packet_data = packet.data.into();
+            let packet_data = packet.data.clone().into();
 
             packet_data.validate_basic();
 
+            let ack_status = AckStatusImpl::new(ack.clone(), @SUCCESS_ACK());
+
+            if ack_status.is_error() {
+                self.refund_token(packet, packet_data.clone());
+            }
+
             self.emit_ack_event(packet_data, ack);
+
+            self.emit_ack_status_event(ack_status);
         }
 
         fn on_timeout_packet(ref self: ComponentState<TContractState>, packet: Packet) {
@@ -564,6 +579,30 @@ pub mod TokenTransferComponent {
             erc20_token.address
         }
 
+        fn refund_token(
+            ref self: ComponentState<TContractState>, packet: Packet, packet_data: PacketData
+        ) {
+            let sender: Option<ContractAddress> = packet_data.sender.try_into();
+
+            assert(sender.is_some(), TransferErrors::INVALID_SENDER);
+
+            match @packet_data.denom.base {
+                Denom::Native(erc20_token) => {
+                    self
+                        .unescrow_execute(
+                            sender.unwrap(),
+                            packet.port_id_on_a,
+                            packet.chan_id_on_a,
+                            erc20_token.clone(),
+                            packet_data.amount,
+                        )
+                },
+                Denom::Hosted(_) => {
+                    self.mint_execute(sender.unwrap(), packet_data.denom, packet_data.amount)
+                }
+            };
+        }
+
         fn record_ibc_token(
             ref self: ComponentState<TContractState>,
             denom: PrefixedDenom,
@@ -710,6 +749,10 @@ pub mod TokenTransferComponent {
                         ack,
                     }
                 );
+        }
+
+        fn emit_ack_status_event(ref self: ComponentState<TContractState>, ack: AckStatus) {
+            self.emit(AckStatusEvent { ack });
         }
 
         fn emit_create_token_event(

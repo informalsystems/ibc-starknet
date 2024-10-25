@@ -30,9 +30,18 @@ pub mod transfer {
     pub fn TRANSFER_PORT_ID() -> ByteArray {
         "transfer"
     }
+
+    /// Byte representation of the standard success acknowledgment JSON string
+    /// `{"result":"AQ=="}`. This serves as a workaround for the lack of JSON
+    /// serialization in Cairo, offering a more cost-effective way to confirm
+    /// successful packet transmission. Any other value indicates failure.
+    pub fn SUCCESS_ACK() -> starknet_ibc_core::channel::Acknowledgement {
+        array![123, 34, 114, 101, 115, 117, 108, 116, 34, 58, 34, 65, 81, 61, 61, 34, 125].into()
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    mod ack;
     mod transfer;
 }

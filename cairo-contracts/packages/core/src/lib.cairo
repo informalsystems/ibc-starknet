@@ -34,7 +34,7 @@ pub mod channel {
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
         ChannelOrdering, Counterparty, Acknowledgement, AcknowledgementImpl, AcknowledgementTrait,
-        Receipt,
+        AckStatus, AckStatusImpl, AckStatusTrait, Receipt,
     };
     mod components {
         pub mod events;
