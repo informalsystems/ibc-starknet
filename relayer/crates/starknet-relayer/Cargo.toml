@@ -10,17 +10,18 @@ rust-version = { workspace = true }
 readme       = "README.md"
 
 [dependencies]
-cgp                           = { workspace = true }
-ibc                           = { workspace = true }
-ibc-relayer-types             = { workspace = true }
-hermes-error                  = { workspace = true }
-hermes-runtime                = { workspace = true }
-hermes-runtime-components     = { workspace = true }
-hermes-logging-components     = { workspace = true }
-hermes-encoding-components    = { workspace = true }
-hermes-logger                 = { workspace = true }
-hermes-relayer-components     = { workspace = true }
-hermes-cosmos-relayer         = { workspace = true }
-hermes-starknet-chain-context = { workspace = true }
+cgp                              = { workspace = true }
+ibc                              = { workspace = true }
+ibc-relayer-types                = { workspace = true }
+hermes-error                     = { workspace = true }
+hermes-runtime                   = { workspace = true }
+hermes-runtime-components        = { workspace = true }
+hermes-logging-components        = { workspace = true }
+hermes-encoding-components       = { workspace = true }
+hermes-logger                    = { workspace = true }
+hermes-relayer-components        = { workspace = true }
+hermes-cosmos-relayer            = { workspace = true }
+hermes-starknet-chain-context    = { workspace = true }
+hermes-starknet-chain-components = { workspace = true }
 
 eyre = { workspace = true }

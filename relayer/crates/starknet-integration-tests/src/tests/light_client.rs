@@ -1,5 +1,4 @@
-#![recursion_limit = "256"]
-
+use core::marker::PhantomData;
 use std::env::var;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -30,9 +29,9 @@ use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::DestinationTarget;
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
 use hermes_runtime_components::traits::sleep::CanSleep;
+use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
@@ -44,6 +43,9 @@ use ibc_relayer::config::types::TrustThreshold;
 use ibc_relayer_types::core::ics04_channel::channel::Ordering;
 use ibc_relayer_types::Height;
 use sha2::{Digest, Sha256};
+use starknet::macros::short_string;
+
+use crate::contexts::bootstrap::StarknetBootstrap;
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {
@@ -114,14 +116,18 @@ fn test_starknet_light_client() -> Result<(), Error> {
             runtime: runtime.clone(),
             src_chain: starknet_chain.clone(),
             dst_chain: cosmos_chain.clone(),
-            src_client_id: client_id.clone(), // TODO: stub
+            // TODO: stub
+            src_client_id: StarknetClientId {
+                client_type: short_string!("cometbft"),
+                sequence: 1,
+            },
             dst_client_id: client_id.clone(),
         };
 
         {
             let client_state =
-                <CosmosChain as CanQueryClientState<StarknetChain>>::query_client_state(
-                    cosmos_chain,
+                cosmos_chain.query_client_state(
+                    PhantomData::<StarknetChain>,
                     &client_id,
                     &cosmos_chain.query_chain_height().await?,
                 )
@@ -130,8 +136,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
             let client_height = client_state.client_state.latest_height.revision_height();
 
             let consensus_state =
-                <CosmosChain as CanQueryConsensusState<StarknetChain>>::query_consensus_state(
-                    cosmos_chain,
+                cosmos_chain.query_consensus_state(
+                    PhantomData::<StarknetChain>,
                     &client_id,
                     &client_height,
                     &cosmos_chain.query_chain_height().await?,
@@ -161,8 +167,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .await?;
 
             let consensus_state =
-                <CosmosChain as CanQueryConsensusState<StarknetChain>>::query_consensus_state(
-                    cosmos_chain,
+                cosmos_chain.query_consensus_state(
+                    PhantomData::<StarknetChain>,
                     &client_id,
                     &starknet_status.height,
                     &cosmos_chain.query_chain_height().await?,

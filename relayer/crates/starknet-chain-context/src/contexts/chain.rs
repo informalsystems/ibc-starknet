@@ -28,6 +28,7 @@ use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
+use hermes_relayer_components::chain::traits::types::ibc::HasClientIdType;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
@@ -52,12 +53,16 @@ use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContrac
 use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
+use hermes_starknet_chain_components::traits::queries::address::CanQueryContractAddress;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
+use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
 use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
+use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
+use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
@@ -77,6 +82,7 @@ pub struct StarknetChain {
     pub chain_id: Felt,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
+    pub ibc_client_contract_address: Option<Felt>,
 }
 
 pub struct StarknetChainContextComponents;
@@ -172,6 +178,7 @@ pub trait CanUseStarknetChain:
     + HasBlobType<Blob = Vec<Felt>>
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
+    + HasClientIdType<CosmosChain, ClientId = ClientId>
     + HasOutgoingPacketType<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount
@@ -188,18 +195,27 @@ pub trait CanUseStarknetChain:
     + CanTransferToken
     + HasRetryableError
     + CanBuildCreateClientPayload<CosmosChain>
+    // + CanBuildCreateClientMessage<CosmosChain>
     + CanBuildUpdateClientPayload<CosmosChain>
+    + CanQueryClientState<CosmosChain>
+    + CanQueryConsensusState<CosmosChain>
+    + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+where
+    CosmosChain: HasClientStateType<Self> + HasConsensusStateType<Self>,
 {
 }
 
 impl CanUseStarknetChain for StarknetChain {}
 
 pub trait CanUseCosmosChainWithStarknet:
-    CanQueryClientState<StarknetChain>
+    HasClientStateType<StarknetChain, ClientState = CometClientState>
+    + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
+    + CanQueryClientState<StarknetChain>
     + CanQueryConsensusState<StarknetChain>
     + CanBuildCreateClientMessage<StarknetChain>
     + CanBuildUpdateClientMessage<StarknetChain>
     + CanQueryConsensusStateHeight<StarknetChain>
+    + CanBuildCreateClientPayload<StarknetChain>
 {
 }
 

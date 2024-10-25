@@ -19,10 +19,11 @@ use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
 use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
-use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::accounts::Call;
 use starknet::macros::selector;
+
+use crate::contexts::bootstrap::StarknetBootstrap;
 
 #[test]
 fn test_starknet_ics20_contract() -> Result<(), Error> {
