@@ -1,5 +1,6 @@
+use core::num::traits::Zero;
 use starknet_ibc_clients::cometbft::CometErrors;
-use starknet_ibc_core::client::{Height, HeightPartialOrd, Status};
+use starknet_ibc_core::client::{Height, HeightPartialOrd, Status, StatusTrait};
 
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct CometClientState {
@@ -10,6 +11,12 @@ pub struct CometClientState {
 
 #[generate_trait]
 pub impl CometClientStateImpl of CometClientStateTrait {
+    fn is_non_zero(self: @CometClientState) -> bool {
+        !(self.latest_height.is_zero()
+            && self.trusting_period.is_zero()
+            && self.status.is_expired())
+    }
+
     fn deserialize(client_state: Array<felt252>,) -> CometClientState {
         let mut client_state_span = client_state.span();
 
