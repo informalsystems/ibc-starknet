@@ -112,7 +112,7 @@ fn test_mint_ok() {
 
     let prefixed_denom = cfg.prefix_hosted_denom();
 
-    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
+    let token_address = ics20.ibc_token_address(prefixed_denom.key());
 
     // Assert the `CreateTokenEvent` emitted.
     spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), token_address, cfg.amount);
@@ -154,7 +154,7 @@ fn test_burn_ok() {
 
     let prefixed_denom = cfg.prefix_hosted_denom();
 
-    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
+    let token_address = ics20.ibc_token_address(prefixed_denom.key());
 
     let erc20: ERC20Contract = token_address.into();
 

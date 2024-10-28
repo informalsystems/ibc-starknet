@@ -116,7 +116,7 @@ pub mod TokenTransferComponent {
 
             self.write_erc20_class_hash(erc20_class_hash);
 
-            self.write_salt(0);
+            self.write_salt(1);
         }
     }
 
@@ -203,14 +203,12 @@ pub mod TokenTransferComponent {
     > of ITokenAddress<ComponentState<TContractState>> {
         fn ibc_token_address(
             self: @ComponentState<TContractState>, token_key: felt252
-        ) -> Option<ContractAddress> {
-            let token_address = self.read_ibc_token_address(token_key);
+        ) -> ContractAddress {
+            let address = self.read_ibc_token_address(token_key);
 
-            if token_address.is_non_zero() {
-                Option::Some(token_address)
-            } else {
-                Option::None
-            }
+            assert(address.is_some(), TransferErrors::ZERO_TOKEN_ADDRESS);
+
+            address.unwrap()
         }
     }
 
@@ -497,11 +495,15 @@ pub mod TokenTransferComponent {
             amount: u256,
             memo: Memo,
         ) {
-            let token = self.get_token(denom.key());
+            let maybe_token = self.get_token(denom.key());
 
-            let balance = token.balance_of(account);
+            assert(maybe_token.is_some(), TransferErrors::ZERO_TOKEN_ADDRESS);
 
-            assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
+            if let Option::Some(token) = maybe_token {
+                let balance = token.balance_of(account);
+
+                assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
+            }
         }
     }
 
@@ -536,9 +538,9 @@ pub mod TokenTransferComponent {
             denom: PrefixedDenom,
             amount: u256,
         ) {
-            let token = self.get_token(denom.key());
+            let maybe_token = self.get_token(denom.key());
 
-            if token.is_non_zero() {
+            if let Option::Some(token) = maybe_token {
                 token.mint(account, amount);
             } else {
                 let name = denom.base.hosted().unwrap();
@@ -556,9 +558,11 @@ pub mod TokenTransferComponent {
             amount: u256,
             memo: Memo,
         ) {
-            let token = self.get_token(denom.key());
+            let maybe_token = self.get_token(denom.key());
 
-            token.burn(account, amount);
+            if let Option::Some(token) = maybe_token {
+                token.burn(account, amount);
+            }
         }
     }
 
@@ -590,8 +594,16 @@ pub mod TokenTransferComponent {
     pub(crate) impl TransferInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferInternalTrait<TContractState> {
-        fn get_token(self: @ComponentState<TContractState>, token_key: felt252) -> ERC20Contract {
-            self.read_ibc_token_address(token_key).into()
+        fn get_token(
+            self: @ComponentState<TContractState>, token_key: felt252
+        ) -> Option<ERC20Contract> {
+            let maybe_address = self.read_ibc_token_address(token_key);
+
+            if maybe_address.is_some() {
+                Option::Some(maybe_address.unwrap().into())
+            } else {
+                Option::None
+            }
         }
 
         fn create_token(
@@ -665,9 +677,9 @@ pub mod TokenTransferComponent {
             port_id: PortId,
             channel_id: ChannelId,
         ) {
-            let token_key = self.read_ibc_token_key(denom.address);
+            let maybe_token_key = self.read_ibc_token_key(denom.address);
 
-            if token_key.is_non_zero() {
+            if maybe_token_key.is_some() {
                 let trace_prefix = TracePrefixTrait::new(port_id, channel_id);
 
                 let denom = PrefixedDenom {
@@ -677,7 +689,7 @@ pub mod TokenTransferComponent {
                 // Checks if the token is an IBC-created token. If so, it cannot
                 // be transferred back to the source by escrowing. A prefixed
                 // denom should be passed to burn instead.
-                assert(token_key == denom.key(), TransferErrors::INVALID_DENOM);
+                assert(maybe_token_key.unwrap() == denom.key(), TransferErrors::INVALID_DENOM);
             }
         }
     }
@@ -691,23 +703,48 @@ pub mod TokenTransferComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferReaderTrait<TContractState> {
         fn read_erc20_class_hash(self: @ComponentState<TContractState>) -> ClassHash {
-            self.erc20_class_hash.read()
+            let class_hash = self.erc20_class_hash.read();
+
+            assert(class_hash.is_non_zero(), TransferErrors::ZERO_ERC20_CLASS_HASH);
+
+            class_hash
         }
 
         fn read_salt(self: @ComponentState<TContractState>) -> felt252 {
-            self.salt.read()
+            let salt = self.salt.read();
+
+            assert(salt.is_non_zero(), TransferErrors::ZERO_SALT);
+
+            salt
         }
+
+        // NOTE: The `read_ibc_token_address` and `read_ibc_token_key` methods
+        // do not reject cases where the value might be zero (non-existent).
+        // They return an `Option` type, as these methods are also called
+        // internally where they operate on cases the value might be missing.
 
         fn read_ibc_token_address(
             self: @ComponentState<TContractState>, token_key: felt252
-        ) -> ContractAddress {
-            self.ibc_token_key_to_address.read(token_key)
+        ) -> Option<ContractAddress> {
+            let maybe_address = self.ibc_token_key_to_address.read(token_key);
+
+            if maybe_address.is_non_zero() {
+                Option::Some(maybe_address)
+            } else {
+                Option::None
+            }
         }
 
         fn read_ibc_token_key(
             self: @ComponentState<TContractState>, token_address: ContractAddress
-        ) -> felt252 {
-            self.ibc_token_address_to_key.read(token_address)
+        ) -> Option<felt252> {
+            let maybe_key = self.ibc_token_address_to_key.read(token_address);
+
+            if maybe_key.is_non_zero() {
+                Option::Some(maybe_key)
+            } else {
+                Option::None
+            }
         }
     }
 

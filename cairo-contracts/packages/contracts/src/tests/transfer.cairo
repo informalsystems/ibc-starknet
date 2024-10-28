@@ -124,7 +124,7 @@ fn test_mint_burn_roundtrip() {
     let prefixed_denom = transfer_cfg.prefix_hosted_denom();
 
     // Fetch the token address.
-    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
+    let token_address = ics20.ibc_token_address(prefixed_denom.key());
 
     // Assert the `CreateTokenEvent` emitted.
     spy

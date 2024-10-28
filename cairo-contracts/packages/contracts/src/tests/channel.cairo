@@ -115,7 +115,7 @@ fn test_recv_packet_ok() {
     spy.assert_recv_packet_event(core.address, ChannelOrdering::Unordered, msg.packet.clone());
 
     // Fetch the token address.
-    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
+    let token_address = ics20.ibc_token_address(prefixed_denom.key());
 
     let erc20: ERC20Contract = token_address.into();
 

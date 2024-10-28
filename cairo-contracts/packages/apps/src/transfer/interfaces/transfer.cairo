@@ -24,6 +24,6 @@ pub trait ITokenAddress<TContractState> {
     /// }
     /// ```
     /// Hashing the denom is delegated to the client as it is more cost-efficient.
-    fn ibc_token_address(self: @TContractState, token_key: felt252) -> Option<ContractAddress>;
+    fn ibc_token_address(self: @TContractState, token_key: felt252) -> ContractAddress;
 }
 
