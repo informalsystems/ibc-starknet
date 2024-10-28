@@ -4,11 +4,13 @@ use hermes_chain_type_components::traits::fields::message_response_events::Messa
 use hermes_chain_type_components::traits::types::message_response::{
     HasMessageResponseType, ProvideMessageResponseType,
 };
+use starknet::core::types::Felt;
 
 use crate::types::event::StarknetEvent;
 
 #[derive(Debug)]
 pub struct StarknetMessageResponse {
+    pub result: Vec<Felt>,
     pub events: Vec<StarknetEvent>,
 }
 

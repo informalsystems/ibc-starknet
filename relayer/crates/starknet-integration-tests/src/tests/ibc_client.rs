@@ -14,12 +14,14 @@ use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
+use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
+use hermes_encoding_components::HList;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
-use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
+use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::events::create_client::CreateClientEvent;
@@ -107,12 +109,6 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
 
         starknet_chain.ibc_client_contract_address = Some(comet_client_address);
 
-        let event_encoding = StarknetEventEncoding {
-            erc20_hashes: Default::default(),
-            ics20_hashes: Default::default(),
-            ibc_client_hashes: [comet_client_class_hash].into(),
-        };
-
         let create_client_settings = Settings {
             max_clock_drift: Duration::from_secs(40),
             trusting_period: Some(Duration::from_secs(60 * 60)),
@@ -131,13 +127,8 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
 
             let response = starknet_chain.send_message(message).await?;
 
-            let create_client_event: CreateClientEvent = event_encoding
-                .filter_decode_events(&response.events)?
-                .into_iter()
-                .next()
-                .unwrap();
-
-            let client_id = create_client_event.client_id;
+            let HList![client_id, _height]: HList!(ClientId, Height) = StarknetCairoEncoding
+                .decode(&response.result)?;
 
             println!("created client on Starknet: {:?}", client_id);
 
