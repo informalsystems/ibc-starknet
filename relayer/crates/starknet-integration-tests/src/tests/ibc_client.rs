@@ -16,18 +16,15 @@ use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::HList;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
-use hermes_starknet_chain_components::types::events::create_client::CreateClientEvent;
+use hermes_starknet_chain_components::types::message_responses::create_client::CreateClientResponse;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
-use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use ibc_relayer::chain::cosmos::client::Settings;
 use ibc_relayer::config::types::TrustThreshold;
@@ -127,8 +124,10 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
 
             let response = starknet_chain.send_message(message).await?;
 
-            let HList![client_id, _height]: HList!(ClientId, Height) = StarknetCairoEncoding
+            let create_client_response: CreateClientResponse = StarknetCairoEncoding
                 .decode(&response.result)?;
+
+            let client_id = create_client_response.client_id;
 
             println!("created client on Starknet: {:?}", client_id);
 

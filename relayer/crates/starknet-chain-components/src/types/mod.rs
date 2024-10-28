@@ -6,6 +6,7 @@ pub mod cosmos;
 pub mod event;
 pub mod events;
 pub mod message_response;
+pub mod message_responses;
 pub mod messages;
 pub mod payloads;
 pub mod status;
