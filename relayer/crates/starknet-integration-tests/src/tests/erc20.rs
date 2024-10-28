@@ -121,13 +121,14 @@ fn test_erc20_transfer() -> Result<(), Error> {
                 &StarknetAmount::new(transfer_amount, token_address),
             )?;
 
-            let events = chain.send_message(message).await?;
+            let response = chain.send_message(message).await?;
 
             println!("performed transfer of 100 tokens");
 
-            println!("raw events: {:?}", events);
+            println!("response: {:?}", response);
 
-            let erc20_events: Vec<Erc20Event> = event_encoding.filter_decode_events(&events)?;
+            let erc20_events: Vec<Erc20Event> =
+                event_encoding.filter_decode_events(&response.events)?;
 
             println!(
                 "events from sending transfer token message: {:?}",

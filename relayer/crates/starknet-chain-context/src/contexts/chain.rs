@@ -4,6 +4,7 @@ use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
@@ -28,6 +29,7 @@ use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
+use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::HasClientIdType;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
@@ -63,6 +65,8 @@ use hermes_starknet_chain_components::types::client_state::WasmStarknetClientSta
 use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
 use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
+use hermes_starknet_chain_components::types::event::StarknetEvent;
+use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
@@ -171,6 +175,8 @@ impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
 pub trait CanUseStarknetChain:
     HasRuntime
     + HasLogger
+    + HasEventType<Event = StarknetEvent>
+    + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
     + HasDefaultEncoding<AsBytes, Encoding = StarknetProtobufEncoding>
     + HasDefaultEncoding<AsFelt, Encoding = StarknetCairoEncoding>
     + HasAddressType<Address = Felt>

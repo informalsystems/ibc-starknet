@@ -14,7 +14,7 @@ where
         contract_address: &Chain::Address,
         entry_point_selector: &Chain::Selector,
         calldata: &Chain::Blob,
-    ) -> Result<Vec<Chain::Event>, Chain::Error> {
+    ) -> Result<Chain::MessageResponse, Chain::Error> {
         let message =
             chain.build_invoke_contract_message(contract_address, entry_point_selector, calldata);
 

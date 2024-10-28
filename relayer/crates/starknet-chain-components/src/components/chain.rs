@@ -6,9 +6,10 @@ pub use hermes_cosmos_chain_components::components::client::{
     ClientStateQuerierComponent, ConnectionIdTypeComponent, ConsensusStateQuerierComponent,
     CreateClientMessageBuilderComponent, CreateClientMessageOptionsTypeComponent,
     CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent,
-    CreateClientPayloadTypeComponent, OutgoingPacketFieldsReaderComponent,
-    OutgoingPacketTypeComponent, PortIdTypeComponent, SequenceTypeComponent, TimeTypeComponent,
-    TimeoutTypeComponent, UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
+    CreateClientPayloadTypeComponent, MessageResponseEventsGetterComponent,
+    MessageResponseTypeComponent, OutgoingPacketFieldsReaderComponent, OutgoingPacketTypeComponent,
+    PortIdTypeComponent, SequenceTypeComponent, TimeTypeComponent, TimeoutTypeComponent,
+    UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
 };
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
@@ -86,6 +87,7 @@ pub use crate::traits::types::contract_class::{
     ContractClassHashTypeComponent, ContractClassTypeComponent,
 };
 pub use crate::traits::types::method::SelectorTypeComponent;
+use crate::types::message_response::UseStarknetMessageResponse;
 use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
 
 define_components! {
@@ -107,6 +109,11 @@ define_components! {
             ProvideCallMessage,
         EventTypeComponent:
             ProvideStarknetEvent,
+        [
+            MessageResponseTypeComponent,
+            MessageResponseEventsGetterComponent,
+        ]:
+            UseStarknetMessageResponse,
         AmountTypeComponent:
             ProvideU256Amount,
         DenomTypeComponent:

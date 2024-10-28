@@ -1,8 +1,8 @@
 use core::fmt::Debug;
 
 use cgp::core::error::CanRaiseError;
+use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_relayer_components::chain::traits::send_message::MessageSender;
-use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
@@ -11,9 +11,9 @@ use starknet::accounts::Call;
 use starknet::core::types::{
     ExecuteInvocation, FunctionInvocation, RevertedInvocation, TransactionTrace,
 };
-use starknet::macros::selector;
 
 use crate::types::event::StarknetEvent;
+use crate::types::message_response::StarknetMessageResponse;
 use crate::types::tx_response::TxResponse;
 
 pub struct SendCallMessages;
@@ -27,7 +27,7 @@ where
     Chain: HasMessageType<Message = Call>
         + CanSubmitTx<Transaction = Vec<Call>>
         + HasTxResponseType<TxResponse = TxResponse>
-        + HasEventType<Event = StarknetEvent>
+        + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
         + CanPollTxResponse
         + CanRaiseError<RevertedInvocation>
         + CanRaiseError<UnexpectedTransactionTraceType>,
@@ -35,7 +35,7 @@ where
     async fn send_messages(
         chain: &Chain,
         messages: Vec<Call>,
-    ) -> Result<Vec<Vec<Chain::Event>>, Chain::Error> {
+    ) -> Result<Vec<StarknetMessageResponse>, Chain::Error> {
         let tx_hash = chain.submit_tx(&messages).await?;
 
         let tx_response = chain.poll_tx_response(&tx_hash).await?;
@@ -43,13 +43,13 @@ where
         match tx_response.trace {
             TransactionTrace::Invoke(trace) => match trace.execute_invocation {
                 ExecuteInvocation::Success(invocation) => {
-                    let events = invocation
+                    let message_responses = invocation
                         .calls
                         .into_iter()
                         .map(extract_events_from_function_invocation)
                         .collect();
 
-                    Ok(events)
+                    Ok(message_responses)
                 }
                 ExecuteInvocation::Reverted(trace) => Err(Chain::raise_error(trace)),
             },
@@ -64,7 +64,7 @@ where
 
 pub fn extract_events_from_function_invocation(
     invocation: FunctionInvocation,
-) -> Vec<StarknetEvent> {
+) -> StarknetMessageResponse {
     let mut events: Vec<StarknetEvent> = invocation
         .events
         .into_iter()
@@ -77,25 +77,15 @@ pub fn extract_events_from_function_invocation(
         })
         .collect();
 
-    // We retrofit the result returned from a call as an event,
-    // so that we can make it work the same way as Cosmos messages.
-    // TODO: use a different type to differentiate result events
-    let result_event = StarknetEvent {
-        contract_address: invocation.contract_address,
-        class_hash: invocation.class_hash,
-        selector: Some(selector!("result")),
-        keys: Vec::new(),
-        data: invocation.result,
-    };
-
-    events.push(result_event);
-
     for inner in invocation.calls {
-        let mut in_events = extract_events_from_function_invocation(inner);
-        events.append(&mut in_events);
+        let mut message_response = extract_events_from_function_invocation(inner);
+        events.append(&mut message_response.events);
     }
 
-    events
+    StarknetMessageResponse {
+        result: invocation.result,
+        events,
+    }
 }
 
 impl Debug for UnexpectedTransactionTraceType {
