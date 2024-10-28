@@ -1,8 +1,8 @@
 use core::fmt::Debug;
 
 use cgp::core::error::CanRaiseError;
+use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_relayer_components::chain::traits::send_message::MessageSender;
-use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
@@ -27,7 +27,7 @@ where
     Chain: HasMessageType<Message = Call>
         + CanSubmitTx<Transaction = Vec<Call>>
         + HasTxResponseType<TxResponse = TxResponse>
-        + HasEventType<Event = StarknetEvent>
+        + HasMessageResponseType<MessageResponse = Vec<StarknetEvent>>
         + CanPollTxResponse
         + CanRaiseError<RevertedInvocation>
         + CanRaiseError<UnexpectedTransactionTraceType>,
@@ -35,7 +35,7 @@ where
     async fn send_messages(
         chain: &Chain,
         messages: Vec<Call>,
-    ) -> Result<Vec<Vec<Chain::Event>>, Chain::Error> {
+    ) -> Result<Vec<Vec<StarknetEvent>>, Chain::Error> {
         let tx_hash = chain.submit_tx(&messages).await?;
 
         let tx_response = chain.poll_tx_response(&tx_hash).await?;

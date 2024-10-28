@@ -192,9 +192,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let events = cosmos_chain.send_message(open_init_message.to_cosmos_message()).await?;
 
-            let connection_id = events
-                .into_iter()
-                .find_map(<CosmosChain as HasConnectionOpenInitEvent<StarknetChain>>::try_extract_connection_open_init_event)
+            let connection_id = <CosmosChain as HasConnectionOpenInitEvent<StarknetChain>>::try_extract_connection_open_init_event(&events)
                 .unwrap()
                 .connection_id
             ;
@@ -255,10 +253,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let events = cosmos_chain.send_message(open_init_message.to_cosmos_message()).await?;
 
-
-            let channel_id = events
-                .into_iter()
-                .find_map(<CosmosChain as HasChannelOpenInitEvent<StarknetChain>>::try_extract_channel_open_init_event)
+            let channel_id = <CosmosChain as HasChannelOpenInitEvent<StarknetChain>>::try_extract_channel_open_init_event(&events)
                 .unwrap()
                 .channel_id
             ;

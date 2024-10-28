@@ -1,14 +1,16 @@
 use cgp::core::component::WithProvider;
 use cgp::core::types::impls::UseDelegatedType;
 use cgp::prelude::*;
+use hermes_chain_type_components::impls::types::message_response::UseEventsMessageResponse;
 pub use hermes_cosmos_chain_components::components::client::{
     ChannelIdTypeComponent, ClientIdTypeComponent, ClientStateFieldsComponent,
     ClientStateQuerierComponent, ConnectionIdTypeComponent, ConsensusStateQuerierComponent,
     CreateClientMessageBuilderComponent, CreateClientMessageOptionsTypeComponent,
     CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent,
-    CreateClientPayloadTypeComponent, OutgoingPacketFieldsReaderComponent,
-    OutgoingPacketTypeComponent, PortIdTypeComponent, SequenceTypeComponent, TimeTypeComponent,
-    TimeoutTypeComponent, UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
+    CreateClientPayloadTypeComponent, MessageResponseEventsGetterComponent,
+    MessageResponseTypeComponent, OutgoingPacketFieldsReaderComponent, OutgoingPacketTypeComponent,
+    PortIdTypeComponent, SequenceTypeComponent, TimeTypeComponent, TimeoutTypeComponent,
+    UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
 };
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
@@ -107,6 +109,11 @@ define_components! {
             ProvideCallMessage,
         EventTypeComponent:
             ProvideStarknetEvent,
+        [
+            MessageResponseTypeComponent,
+            MessageResponseEventsGetterComponent,
+        ]:
+            UseEventsMessageResponse,
         AmountTypeComponent:
             ProvideU256Amount,
         DenomTypeComponent:
