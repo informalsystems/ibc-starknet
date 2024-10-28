@@ -721,7 +721,7 @@ pub mod TokenTransferComponent {
         // NOTE: The `read_ibc_token_address` and `read_ibc_token_key` methods
         // do not reject cases where the value might be zero (non-existent).
         // They return an `Option` type, as these methods are also called
-        // internally where they operate on cases the value might be missing.
+        // internally where there is logic for handling non-existent cases.
 
         fn read_ibc_token_address(
             self: @ComponentState<TContractState>, token_key: felt252

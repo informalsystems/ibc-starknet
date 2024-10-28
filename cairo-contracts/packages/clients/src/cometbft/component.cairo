@@ -347,9 +347,7 @@ pub mod CometClientComponent {
         fn _root(self: @ComponentState<TContractState>, client_sequence: u64) -> ByteArray {
             let latest_height = self.latest_height(client_sequence);
 
-            let latest_consensus_state = self.read_consensus_state(client_sequence, latest_height);
-
-            latest_consensus_state.root
+            self.read_consensus_state(client_sequence, latest_height).root
         }
 
         fn _status(
