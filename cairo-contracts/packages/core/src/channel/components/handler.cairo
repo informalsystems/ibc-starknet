@@ -13,7 +13,7 @@ pub mod ChannelHandlerComponent {
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgRecvPacket, MsgAckPacket,
         ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt,
-        AcknowledgementTrait, Packet, Acknowledgement
+        ReceiptTrait, AcknowledgementTrait, Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, HeightImpl
@@ -29,9 +29,9 @@ pub mod ChannelHandlerComponent {
 
     #[storage]
     pub struct Storage {
-        pub channel_ends: Map<felt252, Option<ChannelEnd>>,
+        pub channel_ends: Map<felt252, ChannelEnd>,
         pub packet_commitments: Map<felt252, felt252>,
-        pub packet_receipts: Map<felt252, Option<Receipt>>,
+        pub packet_receipts: Map<felt252, Receipt>,
         pub packet_acks: Map<felt252, felt252>,
         pub send_sequences: Map<felt252, Sequence>,
         pub recv_sequences: Map<felt252, Sequence>,
@@ -76,7 +76,7 @@ pub mod ChannelHandlerComponent {
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
         fn send_packet(ref self: ComponentState<TContractState>, packet: Packet) {
-            let chan_end_on_a = self.get_channel_end(@packet.port_id_on_a, @packet.chan_id_on_a);
+            let chan_end_on_a = self.read_channel_end(@packet.port_id_on_a, @packet.chan_id_on_a);
 
             self.send_packet_validate(packet.clone(), chan_end_on_a.clone());
 
@@ -85,7 +85,7 @@ pub mod ChannelHandlerComponent {
 
         fn recv_packet(ref self: ComponentState<TContractState>, msg: MsgRecvPacket) {
             let chan_end_on_b = self
-                .get_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b);
+                .read_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b);
 
             self.recv_packet_validate(msg.clone(), chan_end_on_b.clone());
 
@@ -94,7 +94,7 @@ pub mod ChannelHandlerComponent {
 
         fn ack_packet(ref self: ComponentState<TContractState>, msg: MsgAckPacket) {
             let chan_end_on_a = self
-                .get_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_b);
+                .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_b);
 
             self.ack_packet_validate(msg.clone(), chan_end_on_a.clone());
 
@@ -113,11 +113,7 @@ pub mod ChannelHandlerComponent {
         fn channel_end(
             self: @ComponentState<TContractState>, port_id: PortId, channel_id: ChannelId
         ) -> ChannelEnd {
-            let maybe_chan_end = self.read_channel_end(@port_id, @channel_id);
-
-            assert(maybe_chan_end.is_some(), ChannelErrors::MISSING_CHANNEL_END);
-
-            maybe_chan_end.unwrap()
+            self.read_channel_end(@port_id, @channel_id)
         }
 
         fn packet_commitment(
@@ -135,9 +131,7 @@ pub mod ChannelHandlerComponent {
             channel_id: ChannelId,
             sequence: Sequence
         ) -> bool {
-            let receipt = self.read_packet_receipt(@port_id, @channel_id, @sequence);
-
-            receipt.is_some()
+            self.read_packet_receipt(@port_id, @channel_id, @sequence).is_ok()
         }
 
         fn packet_acknowledgement(
@@ -267,17 +261,19 @@ pub mod ChannelHandlerComponent {
 
             match @chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
-                    let reciept_resp = self
+                    let receipt = self
                         .read_packet_receipt(
                             @msg.packet.port_id_on_b, @msg.packet.chan_id_on_b, @msg.packet.seq_on_a
                         );
 
-                    assert(reciept_resp.is_none(), ChannelErrors::PACKET_ALREADY_RECEIVED);
+                    assert(receipt.is_none(), ChannelErrors::MISSING_PACKET_RECEIPT);
 
-                    self
-                        .verify_ack_not_exists(
+                    let ack_exists = self
+                        .packet_ack_exists(
                             @msg.packet.port_id_on_b, @msg.packet.chan_id_on_b, @msg.packet.seq_on_a
                         );
+
+                    assert(!ack_exists, ChannelErrors::ACK_ALREADY_EXISTS);
                 },
                 ChannelOrdering::Ordered => {
                     let next_sequence_recv = self
@@ -294,12 +290,14 @@ pub mod ChannelHandlerComponent {
                     // sequence, we check if the ack not exists. As the
                     // existance means the packet was already relayed.
                     if next_sequence_recv == msg.packet.seq_on_a {
-                        self
-                            .verify_ack_not_exists(
+                        let ack_exists = self
+                            .packet_ack_exists(
                                 @msg.packet.port_id_on_b,
                                 @msg.packet.chan_id_on_b,
                                 @msg.packet.seq_on_a
                             );
+
+                        assert(!ack_exists, ChannelErrors::ACK_ALREADY_EXISTS);
                     }
                 }
             };
@@ -371,17 +369,6 @@ pub mod ChannelHandlerComponent {
                     packet_commitment_on_a,
                     msg.proof_commitment_on_a.clone()
                 );
-        }
-
-        fn verify_ack_not_exists(
-            self: @ComponentState<TContractState>,
-            port_id: @PortId,
-            channel_id: @ChannelId,
-            sequence: @Sequence
-        ) {
-            let ack = self.read_packet_ack(port_id, channel_id, sequence);
-
-            assert(ack.is_zero(), ChannelErrors::ACK_ALREADY_EXISTS);
         }
     }
 
@@ -482,10 +469,8 @@ pub mod ChannelHandlerComponent {
         fn verify_packet_commitment_matches(
             self: @ComponentState<TContractState>, packet: @Packet
         ) {
-            let packet_commitment = self
+            let _packet_commitment = self
                 .read_packet_commitment(packet.port_id_on_a, packet.chan_id_on_a, packet.seq_on_a);
-
-            assert(packet_commitment.is_non_zero(), ChannelErrors::PACKET_NOT_SENT);
 
             let _expected_packet_commitment = packet.compute_commitment();
             // assert(packet_commitment == expected_packet_commitment,
@@ -512,18 +497,6 @@ pub mod ChannelHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChannelAccessTrait<TContractState> {
-        fn get_channel_end(
-            self: @ComponentState<TContractState>,
-            local_port_id: @PortId,
-            local_channel_id: @ChannelId,
-        ) -> ChannelEnd {
-            let maybe_chan_end = self.read_channel_end(local_port_id, local_channel_id);
-
-            assert(maybe_chan_end.is_some(), ChannelErrors::MISSING_CHANNEL_END);
-
-            maybe_chan_end.unwrap()
-        }
-
         fn get_client(
             self: @ComponentState<TContractState>, client_type: felt252
         ) -> ClientContract {
@@ -549,8 +522,12 @@ pub mod ChannelHandlerComponent {
     > of ChannelReaderTrait<TContractState> {
         fn read_channel_end(
             self: @ComponentState<TContractState>, port_id: @PortId, channel_id: @ChannelId
-        ) -> Option<ChannelEnd> {
-            self.channel_ends.read(channel_end_key(port_id, channel_id))
+        ) -> ChannelEnd {
+            let channel_end = self.channel_ends.read(channel_end_key(port_id, channel_id));
+
+            assert(!channel_end.is_zero(), ChannelErrors::MISSING_CHANNEL_END);
+
+            channel_end
         }
 
         fn read_packet_commitment(
@@ -559,7 +536,13 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: @Sequence
         ) -> felt252 {
-            self.packet_commitments.read(commitment_key(port_id, channel_id, sequence))
+            let commitment = self
+                .packet_commitments
+                .read(commitment_key(port_id, channel_id, sequence));
+
+            assert(commitment.is_non_zero(), ChannelErrors::MISSING_PACKET_COMMITMENT);
+
+            commitment
         }
 
         fn read_packet_receipt(
@@ -567,7 +550,7 @@ pub mod ChannelHandlerComponent {
             port_id: @PortId,
             channel_id: @ChannelId,
             sequence: @Sequence
-        ) -> Option<Receipt> {
+        ) -> Receipt {
             self.packet_receipts.read(receipt_key(port_id, channel_id, sequence))
         }
 
@@ -577,7 +560,20 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: @Sequence
         ) -> felt252 {
-            self.packet_acks.read(ack_key(port_id, channel_id, sequence))
+            let ack = self.packet_acks.read(ack_key(port_id, channel_id, sequence));
+
+            assert(ack.is_non_zero(), ChannelErrors::MISSING_PACKET_ACK);
+
+            ack
+        }
+
+        fn packet_ack_exists(
+            self: @ComponentState<TContractState>,
+            port_id: @PortId,
+            channel_id: @ChannelId,
+            sequence: @Sequence
+        ) -> bool {
+            self.packet_acks.read(ack_key(port_id, channel_id, sequence)).is_non_zero()
         }
 
         fn read_next_sequence_send(
@@ -609,9 +605,7 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             channel_end: ChannelEnd
         ) {
-            self
-                .channel_ends
-                .write(channel_end_key(port_id, channel_id), Option::Some(channel_end));
+            self.channel_ends.write(channel_end_key(port_id, channel_id), channel_end);
         }
 
         fn write_packet_commitment(
@@ -642,9 +636,7 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence,
             receipt: Receipt
         ) {
-            self
-                .packet_receipts
-                .write(receipt_key(port_id, channel_id, sequence), Option::Some(receipt));
+            self.packet_receipts.write(receipt_key(port_id, channel_id, sequence), receipt);
         }
 
         fn write_packet_ack(

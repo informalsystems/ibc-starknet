@@ -1,7 +1,9 @@
 use core::num::traits::Zero;
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
-use starknet_ibc_core::host::{ClientId, ChannelId, PortId, Sequence};
+use starknet_ibc_core::host::{
+    ClientId, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdTrait, Sequence
+};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -79,6 +81,14 @@ pub impl ChannelEndImpl of ChannelEndTrait {
             && self.remote.channel_id == counterparty_channel_id
     }
 
+    /// Returns true if all the fields are in the zero state.
+    fn is_zero(self: @ChannelEnd) -> bool {
+        self.state == @ChannelState::Uninitialized
+            && self.ordering == @ChannelOrdering::Unordered
+            && self.remote.is_zero()
+            && self.client_id.is_zero()
+    }
+
     /// Validates the channel end be in the open state and the counterparty
     /// parameters match with the expected one.
     fn validate(
@@ -94,6 +104,7 @@ pub impl ChannelEndImpl of ChannelEndTrait {
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub enum ChannelState {
+    #[default]
     Uninitialized,
     Init,
     TryOpen,
@@ -103,6 +114,7 @@ pub enum ChannelState {
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub enum ChannelOrdering {
+    #[default]
     Unordered,
     Ordered,
 }
@@ -113,9 +125,43 @@ pub struct Counterparty {
     pub channel_id: ChannelId,
 }
 
+#[generate_trait]
+pub impl CounterpartyImpl of CounterpartyTrait {
+    fn is_zero(self: @Counterparty) -> bool {
+        self.port_id.is_zero() && self.channel_id.is_zero()
+    }
+}
+
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub enum Receipt {
+    #[default]
+    None,
     Ok
+}
+
+#[generate_trait]
+pub impl ReceiptImpl of ReceiptTrait {
+    fn is_ok(self: @Receipt) -> bool {
+        self == @Receipt::Ok
+    }
+
+    fn is_none(self: @Receipt) -> bool {
+        self == @Receipt::None
+    }
+}
+
+pub impl ReceiptZero of Zero<Receipt> {
+    fn is_zero(self: @Receipt) -> bool {
+        self == @Receipt::None
+    }
+
+    fn is_non_zero(self: @Receipt) -> bool {
+        !self.is_zero()
+    }
+
+    fn zero() -> Receipt {
+        Receipt::None
+    }
 }
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]

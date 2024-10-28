@@ -1,9 +1,7 @@
-use ClientHandlerComponent::ClientReaderTrait;
-use core::num::traits::Zero;
 use snforge_std::{spy_events, test_address};
 use starknet_ibc_core::client::ClientHandlerComponent::{
     ClientInitializerImpl, CoreRegisterClientImpl, CoreClientHandlerImpl, EventEmitterImpl,
-    ClientInternalImpl
+    ClientInternalImpl, ClientReaderTrait
 };
 use starknet_ibc_core::client::{ClientHandlerComponent, CreateResponse};
 use starknet_ibc_testkit::dummies::{CLIENT, CLIENT_TYPE, CLIENT_ID, HEIGHT};
@@ -20,13 +18,6 @@ fn setup() -> ComponentState {
     let mut state = COMPONENT_STATE();
     state.initializer();
     state
-}
-
-#[test]
-fn test_intial_state() {
-    let state = setup();
-    let supported_client = state.read_supported_client(0);
-    assert!(supported_client.is_zero());
 }
 
 #[test]
