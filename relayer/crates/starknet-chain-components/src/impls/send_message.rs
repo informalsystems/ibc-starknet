@@ -14,6 +14,7 @@ use starknet::core::types::{
 use starknet::macros::selector;
 
 use crate::types::event::StarknetEvent;
+use crate::types::message_response::StarknetMessageResponse;
 use crate::types::tx_response::TxResponse;
 
 pub struct SendCallMessages;
@@ -27,7 +28,7 @@ where
     Chain: HasMessageType<Message = Call>
         + CanSubmitTx<Transaction = Vec<Call>>
         + HasTxResponseType<TxResponse = TxResponse>
-        + HasMessageResponseType<MessageResponse = Vec<StarknetEvent>>
+        + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
         + CanPollTxResponse
         + CanRaiseError<RevertedInvocation>
         + CanRaiseError<UnexpectedTransactionTraceType>,
@@ -35,7 +36,7 @@ where
     async fn send_messages(
         chain: &Chain,
         messages: Vec<Call>,
-    ) -> Result<Vec<Vec<StarknetEvent>>, Chain::Error> {
+    ) -> Result<Vec<StarknetMessageResponse>, Chain::Error> {
         let tx_hash = chain.submit_tx(&messages).await?;
 
         let tx_response = chain.poll_tx_response(&tx_hash).await?;
@@ -43,13 +44,13 @@ where
         match tx_response.trace {
             TransactionTrace::Invoke(trace) => match trace.execute_invocation {
                 ExecuteInvocation::Success(invocation) => {
-                    let events = invocation
+                    let message_responses = invocation
                         .calls
                         .into_iter()
                         .map(extract_events_from_function_invocation)
                         .collect();
 
-                    Ok(events)
+                    Ok(message_responses)
                 }
                 ExecuteInvocation::Reverted(trace) => Err(Chain::raise_error(trace)),
             },
@@ -64,7 +65,7 @@ where
 
 pub fn extract_events_from_function_invocation(
     invocation: FunctionInvocation,
-) -> Vec<StarknetEvent> {
+) -> StarknetMessageResponse {
     let mut events: Vec<StarknetEvent> = invocation
         .events
         .into_iter()
@@ -91,11 +92,11 @@ pub fn extract_events_from_function_invocation(
     events.push(result_event);
 
     for inner in invocation.calls {
-        let mut in_events = extract_events_from_function_invocation(inner);
-        events.append(&mut in_events);
+        let mut message_response = extract_events_from_function_invocation(inner);
+        events.append(&mut message_response.events);
     }
 
-    events
+    StarknetMessageResponse { events }
 }
 
 impl Debug for UnexpectedTransactionTraceType {

@@ -1,7 +1,6 @@
 use cgp::core::component::WithProvider;
 use cgp::core::types::impls::UseDelegatedType;
 use cgp::prelude::*;
-use hermes_chain_type_components::impls::types::message_response::UseEventsMessageResponse;
 pub use hermes_cosmos_chain_components::components::client::{
     ChannelIdTypeComponent, ClientIdTypeComponent, ClientStateFieldsComponent,
     ClientStateQuerierComponent, ConnectionIdTypeComponent, ConsensusStateQuerierComponent,
@@ -88,6 +87,7 @@ pub use crate::traits::types::contract_class::{
     ContractClassHashTypeComponent, ContractClassTypeComponent,
 };
 pub use crate::traits::types::method::SelectorTypeComponent;
+use crate::types::message_response::UseStarknetMessageResponse;
 use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
 
 define_components! {
@@ -113,7 +113,7 @@ define_components! {
             MessageResponseTypeComponent,
             MessageResponseEventsGetterComponent,
         ]:
-            UseEventsMessageResponse,
+            UseStarknetMessageResponse,
         AmountTypeComponent:
             ProvideU256Amount,
         DenomTypeComponent:

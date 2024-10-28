@@ -148,12 +148,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         };
 
         let token_address = {
-            let events = chain.send_message(message.clone()).await?;
+            let response = chain.send_message(message.clone()).await?;
 
-            println!("IBC transfer raw events: {:?}", events);
+            println!("IBC transfer response: {:?}", response);
 
             let ibc_transfer_events: Vec<IbcTransferEvent> =
-                event_encoding.filter_decode_events(&events)?;
+                event_encoding.filter_decode_events(&response.events)?;
 
             println!("IBC transfer events: {:?}", ibc_transfer_events);
 
@@ -217,10 +217,10 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         {
             // Send the same transfer message a second time
-            let events = chain.send_message(message.clone()).await?;
+            let response = chain.send_message(message.clone()).await?;
 
             let ibc_transfer_events_2: Vec<IbcTransferEvent> =
-                event_encoding.filter_decode_events(&events)?;
+                event_encoding.filter_decode_events(&response.events)?;
 
             println!("ibc_transfer_events 2: {:?}", ibc_transfer_events_2);
 

@@ -66,6 +66,7 @@ use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsen
 use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
+use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
@@ -175,7 +176,7 @@ pub trait CanUseStarknetChain:
     HasRuntime
     + HasLogger
     + HasEventType<Event = StarknetEvent>
-    + HasMessageResponseType<MessageResponse = Vec<StarknetEvent>>
+    + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
     + HasDefaultEncoding<AsBytes, Encoding = StarknetProtobufEncoding>
     + HasDefaultEncoding<AsFelt, Encoding = StarknetCairoEncoding>
     + HasAddressType<Address = Felt>

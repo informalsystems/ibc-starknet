@@ -5,6 +5,7 @@ pub mod consensus_state;
 pub mod cosmos;
 pub mod event;
 pub mod events;
+pub mod message_response;
 pub mod messages;
 pub mod payloads;
 pub mod status;

@@ -129,10 +129,10 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             let message = <StarknetChain as CanBuildCreateClientMessage<CosmosChain>>
                 ::build_create_client_message(starknet_chain, &(), create_client_payload_1).await?;
 
-            let events = starknet_chain.send_message(message).await?;
+            let response = starknet_chain.send_message(message).await?;
 
             let create_client_event: CreateClientEvent = event_encoding
-                .filter_decode_events(&events)?
+                .filter_decode_events(&response.events)?
                 .into_iter()
                 .next()
                 .unwrap();
