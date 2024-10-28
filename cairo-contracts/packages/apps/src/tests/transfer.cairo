@@ -1,15 +1,19 @@
+use TokenTransferComponent::TransferValidationTrait;
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::cheatcodes::events::EventSpy;
 use snforge_std::spy_events;
+use starknet::class_hash::class_hash_const;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
-    TransferInitializerImpl, TransferReaderImpl
+    TransferInitializerImpl, TransferReaderImpl, TransferWriterImpl, IBCTokenAddress
 };
 use starknet_ibc_apps::transfer::TokenTransferComponent;
 use starknet_ibc_core::router::{AppContract, AppContractTrait};
 use starknet_ibc_testkit::configs::{TransferAppConfigTrait, TransferAppConfig};
 use starknet_ibc_testkit::dummies::CLASS_HASH;
-use starknet_ibc_testkit::dummies::{SUPPLY, OWNER, NAME, SYMBOL, COSMOS, STARKNET};
+use starknet_ibc_testkit::dummies::{
+    AMOUNT, SUPPLY, OWNER, NAME, SYMBOL, COSMOS, STARKNET, HOSTED_DENOM, EMPTY_MEMO
+};
 use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
 use starknet_ibc_testkit::handles::{ERC20Handle, AppHandle};
 use starknet_ibc_testkit::mocks::MockTransferApp;
@@ -46,6 +50,29 @@ fn test_init_state() {
     let state = setup_component();
     let class_hash = state.read_erc20_class_hash();
     assert_eq!(class_hash, CLASS_HASH());
+}
+
+#[test]
+#[should_panic(expected: 'ICS20: erc20 class hash is 0')]
+fn test_missing_class_hash() {
+    let mut state = setup_component();
+    state.write_erc20_class_hash(class_hash_const::<0>());
+    state.read_erc20_class_hash();
+}
+
+#[test]
+#[should_panic(expected: 'ICS20: salt is 0')]
+fn test_missing_salt() {
+    let mut state = setup_component();
+    state.write_salt(0);
+    state.read_salt();
+}
+
+#[test]
+#[should_panic(expected: 'ICS20: missing token address')]
+fn test_missing_ibc_token_address() {
+    let state = setup_component();
+    state.ibc_token_address(0);
 }
 
 #[test]
@@ -175,4 +202,11 @@ fn test_burn_ok() {
 
     // Chekck the total supply of the ERC20 contract.
     erc20.assert_total_supply(0);
+}
+
+#[test]
+#[should_panic(expected: 'ICS20: missing token address')]
+fn test_burn_non_existence_ibc_token() {
+    let state = setup_component();
+    state.burn_validate(OWNER(), HOSTED_DENOM(), AMOUNT, EMPTY_MEMO());
 }
