@@ -495,15 +495,13 @@ pub mod TokenTransferComponent {
             amount: u256,
             memo: Memo,
         ) {
-            let maybe_token = self.get_token(denom.key());
+            let token = self.get_token(denom.key());
 
-            assert(maybe_token.is_some(), TransferErrors::ZERO_TOKEN_ADDRESS);
+            assert(token.is_non_zero(), TransferErrors::ZERO_TOKEN_ADDRESS);
 
-            if let Option::Some(token) = maybe_token {
-                let balance = token.balance_of(account);
+            let balance = token.balance_of(account);
 
-                assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
-            }
+            assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
         }
     }
 
@@ -538,9 +536,9 @@ pub mod TokenTransferComponent {
             denom: PrefixedDenom,
             amount: u256,
         ) {
-            let maybe_token = self.get_token(denom.key());
+            let token = self.get_token(denom.key());
 
-            if let Option::Some(token) = maybe_token {
+            if token.is_non_zero() {
                 token.mint(account, amount);
             } else {
                 let name = denom.base.hosted().unwrap();
@@ -558,11 +556,9 @@ pub mod TokenTransferComponent {
             amount: u256,
             memo: Memo,
         ) {
-            let maybe_token = self.get_token(denom.key());
+            let token = self.get_token(denom.key());
 
-            if let Option::Some(token) = maybe_token {
-                token.burn(account, amount);
-            }
+            token.burn(account, amount);
         }
     }
 
@@ -594,16 +590,8 @@ pub mod TokenTransferComponent {
     pub(crate) impl TransferInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferInternalTrait<TContractState> {
-        fn get_token(
-            self: @ComponentState<TContractState>, token_key: felt252
-        ) -> Option<ERC20Contract> {
-            let address = self.read_ibc_token_address(token_key);
-
-            if address.is_non_zero() {
-                Option::Some(address.into())
-            } else {
-                Option::None
-            }
+        fn get_token(self: @ComponentState<TContractState>, token_key: felt252) -> ERC20Contract {
+            self.read_ibc_token_address(token_key).into()
         }
 
         fn create_token(
