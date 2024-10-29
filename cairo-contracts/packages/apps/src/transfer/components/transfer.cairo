@@ -206,9 +206,9 @@ pub mod TokenTransferComponent {
         ) -> ContractAddress {
             let address = self.read_ibc_token_address(token_key);
 
-            assert(address.is_some(), TransferErrors::ZERO_TOKEN_ADDRESS);
+            assert(address.is_non_zero(), TransferErrors::ZERO_TOKEN_ADDRESS);
 
-            address.unwrap()
+            address
         }
     }
 
@@ -597,10 +597,10 @@ pub mod TokenTransferComponent {
         fn get_token(
             self: @ComponentState<TContractState>, token_key: felt252
         ) -> Option<ERC20Contract> {
-            let maybe_address = self.read_ibc_token_address(token_key);
+            let address = self.read_ibc_token_address(token_key);
 
-            if maybe_address.is_some() {
-                Option::Some(maybe_address.unwrap().into())
+            if address.is_non_zero() {
+                Option::Some(address.into())
             } else {
                 Option::None
             }
@@ -677,9 +677,9 @@ pub mod TokenTransferComponent {
             port_id: PortId,
             channel_id: ChannelId,
         ) {
-            let maybe_token_key = self.read_ibc_token_key(denom.address);
+            let token_key = self.read_ibc_token_key(denom.address);
 
-            if maybe_token_key.is_some() {
+            if token_key.is_non_zero() {
                 let trace_prefix = TracePrefixTrait::new(port_id, channel_id);
 
                 let denom = PrefixedDenom {
@@ -689,7 +689,7 @@ pub mod TokenTransferComponent {
                 // Checks if the token is an IBC-created token. If so, it cannot
                 // be transferred back to the source by escrowing. A prefixed
                 // denom should be passed to burn instead.
-                assert(maybe_token_key.unwrap() == denom.key(), TransferErrors::INVALID_DENOM);
+                assert(token_key == denom.key(), TransferErrors::INVALID_DENOM);
             }
         }
     }
@@ -719,32 +719,20 @@ pub mod TokenTransferComponent {
         }
 
         // NOTE: The `read_ibc_token_address` and `read_ibc_token_key` methods
-        // do not reject cases where the value might be zero (non-existent).
-        // They return an `Option` type, as these methods are also called
-        // internally where there is logic for handling non-existent cases.
+        // do not reject cases where the value might be zero (non-existent). As
+        // these methods are also called internally where there is logic for
+        // handling non-existent cases.
 
         fn read_ibc_token_address(
             self: @ComponentState<TContractState>, token_key: felt252
-        ) -> Option<ContractAddress> {
-            let maybe_address = self.ibc_token_key_to_address.read(token_key);
-
-            if maybe_address.is_non_zero() {
-                Option::Some(maybe_address)
-            } else {
-                Option::None
-            }
+        ) -> ContractAddress {
+            self.ibc_token_key_to_address.read(token_key)
         }
 
         fn read_ibc_token_key(
             self: @ComponentState<TContractState>, token_address: ContractAddress
-        ) -> Option<felt252> {
-            let maybe_key = self.ibc_token_address_to_key.read(token_address);
-
-            if maybe_key.is_non_zero() {
-                Option::Some(maybe_key)
-            } else {
-                Option::None
-            }
+        ) -> felt252 {
+            self.ibc_token_address_to_key.read(token_address)
         }
     }
 
