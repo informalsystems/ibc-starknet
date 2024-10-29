@@ -4,11 +4,13 @@ pub mod mocks {
     mod channel;
     mod client;
     mod cometbft;
+    mod router;
     mod transfer;
 
     pub use channel::MockChannelHandler;
     pub use client::MockClientHandler;
     pub use cometbft::MockCometClient;
+    pub use router::MockRouterHandler;
     pub use transfer::MockTransferApp;
 }
 pub mod configs {
@@ -26,8 +28,8 @@ pub mod dummies {
         HEIGHT, CLIENT, CLIENT_TYPE, CLIENT_ID, PORT_ID, CHANNEL_ID, SEQUENCE, CHANNEL_END
     };
     pub use transfer::{
-        NAME, SYMBOL, PUBKEY, AMOUNT, SUPPLY, OWNER, STARKNET, COSMOS, SALT, DECIMALS, CLASS_HASH,
-        EMPTY_MEMO
+        NAME, SYMBOL, PUBKEY, AMOUNT, SUPPLY, OWNER, STARKNET, COSMOS, NATIVE_DENOM, HOSTED_DENOM,
+        SALT, DECIMALS, CLASS_HASH, EMPTY_MEMO
     };
 }
 pub mod event_spy {

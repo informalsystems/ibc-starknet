@@ -18,6 +18,10 @@ pub impl ClientIdImpl of ClientIdTrait {
         ClientId { client_type, sequence }
     }
 
+    fn is_zero(self: @ClientId) -> bool {
+        self.sequence.is_zero() && self.client_type.is_zero()
+    }
+
     fn validate(self: @ClientId, client_id_hash: felt252) {}
 }
 
@@ -57,6 +61,10 @@ pub impl ChannelIdImpl of ChannelIdTrait {
         sequence.try_into().unwrap()
     }
 
+    fn is_zero(self: @ChannelId) -> bool {
+        self.channel_id.len() == 0
+    }
+
     fn validate(self: @ChannelId) {
         let channel_id_len = self.channel_id.len();
 
@@ -94,6 +102,10 @@ pub impl PortIdImpl of PortIdTrait {
         let port_id = PortId { port_id };
         port_id.validate_basic();
         port_id
+    }
+
+    fn is_zero(self: @PortId) -> bool {
+        self.port_id.len() == 0
     }
 
     fn validate(self: @PortId, port_id_hash: felt252) {

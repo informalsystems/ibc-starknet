@@ -116,11 +116,7 @@ pub mod ClientHandlerComponent {
         fn get_client(
             self: @ComponentState<TContractState>, client_type: felt252
         ) -> ClientContract {
-            let client_address = self.read_supported_client(client_type);
-
-            assert(client_address.is_non_zero(), ClientErrors::ZERO_CLIENT_ADDRESS);
-
-            client_address.into()
+            self.read_supported_client(client_type).into()
         }
     }
 
@@ -135,7 +131,11 @@ pub mod ClientHandlerComponent {
         fn read_supported_client(
             self: @ComponentState<TContractState>, client_type: felt252
         ) -> ContractAddress {
-            self.supported_clients.read(client_type)
+            let client_address = self.supported_clients.read(client_type);
+
+            assert(client_address.is_non_zero(), ClientErrors::ZERO_CLIENT_ADDRESS);
+
+            client_address
         }
     }
 

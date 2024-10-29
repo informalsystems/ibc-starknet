@@ -116,7 +116,7 @@ pub mod TokenTransferComponent {
 
             self.write_erc20_class_hash(erc20_class_hash);
 
-            self.write_salt(0);
+            self.write_salt(1);
         }
     }
 
@@ -203,14 +203,12 @@ pub mod TokenTransferComponent {
     > of ITokenAddress<ComponentState<TContractState>> {
         fn ibc_token_address(
             self: @ComponentState<TContractState>, token_key: felt252
-        ) -> Option<ContractAddress> {
-            let token_address = self.read_ibc_token_address(token_key);
+        ) -> ContractAddress {
+            let address = self.read_ibc_token_address(token_key);
 
-            if token_address.is_non_zero() {
-                Option::Some(token_address)
-            } else {
-                Option::None
-            }
+            assert(address.is_non_zero(), TransferErrors::ZERO_TOKEN_ADDRESS);
+
+            address
         }
     }
 
@@ -499,6 +497,8 @@ pub mod TokenTransferComponent {
         ) {
             let token = self.get_token(denom.key());
 
+            assert(token.is_non_zero(), TransferErrors::ZERO_TOKEN_ADDRESS);
+
             let balance = token.balance_of(account);
 
             assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
@@ -691,12 +691,25 @@ pub mod TokenTransferComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferReaderTrait<TContractState> {
         fn read_erc20_class_hash(self: @ComponentState<TContractState>) -> ClassHash {
-            self.erc20_class_hash.read()
+            let class_hash = self.erc20_class_hash.read();
+
+            assert(class_hash.is_non_zero(), TransferErrors::ZERO_ERC20_CLASS_HASH);
+
+            class_hash
         }
 
         fn read_salt(self: @ComponentState<TContractState>) -> felt252 {
-            self.salt.read()
+            let salt = self.salt.read();
+
+            assert(salt.is_non_zero(), TransferErrors::ZERO_SALT);
+
+            salt
         }
+
+        // NOTE: The `read_ibc_token_address` and `read_ibc_token_key` methods
+        // do not reject cases where the value might be zero (non-existent). As
+        // these methods are also called internally where there is logic for
+        // handling non-existent cases.
 
         fn read_ibc_token_address(
             self: @ComponentState<TContractState>, token_key: felt252

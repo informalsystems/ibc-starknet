@@ -60,3 +60,31 @@ fn test_update_client_ok() {
     assert_eq!(state.latest_height(0), updating_height);
     assert!(state.status(0).is_active());
 }
+
+#[test]
+#[should_panic(expected: 'ICS07: missing client state')]
+fn test_missing_client_state() {
+    let mut state = setup();
+    state.read_client_state(0);
+}
+
+#[test]
+#[should_panic(expected: 'ICS07: missing consensus state')]
+fn test_missing_consensus_state() {
+    let mut state = setup();
+    state.read_consensus_state(0, HEIGHT(5));
+}
+
+#[test]
+#[should_panic(expected: 'ICS07: missing processed time')]
+fn test_missing_client_processed_time() {
+    let mut state = setup();
+    state.read_client_processed_time(0, HEIGHT(5));
+}
+
+#[test]
+#[should_panic(expected: 'ICS07: missing processed height')]
+fn test_missing_client_processed_height() {
+    let mut state = setup();
+    state.read_client_processed_height(0, HEIGHT(5));
+}

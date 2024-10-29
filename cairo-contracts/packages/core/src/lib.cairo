@@ -2,6 +2,7 @@
 mod tests {
     mod channel;
     mod client;
+    mod router;
 }
 pub mod router {
     mod app_call;
@@ -34,7 +35,7 @@ pub mod channel {
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
         ChannelOrdering, Counterparty, Acknowledgement, AcknowledgementImpl, AcknowledgementTrait,
-        AckStatus, AckStatusImpl, AckStatusTrait, Receipt
+        AckStatus, AckStatusImpl, AckStatusTrait, Receipt, ReceiptImpl, ReceiptTrait
     };
     mod components {
         pub mod events;

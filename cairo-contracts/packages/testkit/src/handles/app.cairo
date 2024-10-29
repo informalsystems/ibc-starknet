@@ -34,7 +34,7 @@ pub impl AppHandleImpl of AppHandle {
         IAppCallbackDispatcher { contract_address: *self.address }
     }
 
-    fn ibc_token_address(self: @AppContract, token_key: felt252) -> Option<ContractAddress> {
+    fn ibc_token_address(self: @AppContract, token_key: felt252) -> ContractAddress {
         ITokenAddressDispatcher { contract_address: *self.address }.ibc_token_address(token_key)
     }
 

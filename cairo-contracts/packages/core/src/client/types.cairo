@@ -31,6 +31,8 @@ pub impl HeightsIntoUpdateResponse of Into<Array<Height>, UpdateResponse> {
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub enum Status {
     Active,
+    // The default for cases when a client state isn't found during a storage call.
+    #[default]
     Expired,
     Frozen: Height,
 }

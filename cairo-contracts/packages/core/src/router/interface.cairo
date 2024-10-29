@@ -2,7 +2,7 @@ use starknet::ContractAddress;
 
 #[starknet::interface]
 pub trait IRouter<TContractState> {
-    fn get_app_address(self: @TContractState, port_id: ByteArray) -> Option<ContractAddress>;
+    fn app_address(self: @TContractState, port_id: ByteArray) -> ContractAddress;
 
     fn bind_port_id(ref self: TContractState, port_id: ByteArray, app_address: ContractAddress);
 

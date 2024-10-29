@@ -10,8 +10,8 @@ pub struct CometConsensusState {
 
 #[generate_trait]
 pub impl CometConsensusStateImpl of CometConsensusStateTrait {
-    fn is_zero(self: @CometConsensusState) -> bool {
-        self.root.len() == 0 && self.timestamp.is_zero()
+    fn is_non_zero(self: @CometConsensusState) -> bool {
+        !(self.root.len() == 0 && self.timestamp.is_zero())
     }
 
     fn timestamp(self: @CometConsensusState) -> u64 {

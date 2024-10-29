@@ -1,4 +1,3 @@
-use core::num::traits::Zero;
 use snforge_std::{spy_events, EventSpy};
 use starknet_ibc_apps::transfer::{ERC20Contract, SUCCESS_ACK};
 use starknet_ibc_core::channel::{ChannelEndTrait, ChannelOrdering, AckStatus};
@@ -115,7 +114,7 @@ fn test_recv_packet_ok() {
     spy.assert_recv_packet_event(core.address, ChannelOrdering::Unordered, msg.packet.clone());
 
     // Fetch the token address.
-    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
+    let token_address = ics20.ibc_token_address(prefixed_denom.key());
 
     let erc20: ERC20Contract = token_address.into();
 
@@ -141,6 +140,7 @@ fn test_recv_packet_ok() {
 }
 
 #[test]
+#[should_panic(expected: 'ICS04: missing commitment')]
 fn test_successful_ack_packet_ok() {
     // -----------------------------------------------------------
     // Setup Essentials
@@ -209,18 +209,17 @@ fn test_successful_ack_packet_ok() {
 
     spy.assert_ack_packet_event(core.address, ChannelOrdering::Unordered, msg.packet.clone());
 
-    let commitment = core
+    // Check the balance of the sender.
+    erc20.assert_balance(OWNER(), SUPPLY - transfer_cfg.amount);
+
+    core
         .packet_commitment(
             msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a
         );
-
-    assert!(commitment.is_zero());
-
-    // Check the balance of the sender.
-    erc20.assert_balance(OWNER(), SUPPLY - transfer_cfg.amount);
 }
 
 #[test]
+#[should_panic(expected: 'ICS04: missing commitment')]
 fn test_failure_ack_packet_ok() {
     // -----------------------------------------------------------
     // Setup Essentials
@@ -291,19 +290,17 @@ fn test_failure_ack_packet_ok() {
 
     spy.assert_ack_packet_event(core.address, ChannelOrdering::Unordered, msg.packet.clone());
 
-    let commitment = core
+    // Check if the balance of the sender to ensure the refund.
+    erc20.assert_balance(OWNER(), SUPPLY);
+
+    core
         .packet_commitment(
             msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a
         );
-
-    assert!(commitment.is_zero());
-
-    // Check if the balance of the sender to ensure the refund.
-    erc20.assert_balance(OWNER(), SUPPLY);
 }
 
 #[test]
-#[should_panic(expected: 'ICS04: packet not sent')]
+#[should_panic(expected: 'ICS04: missing commitment')]
 fn test_ack_packet_for_never_sent_packet() {
     // -----------------------------------------------------------
     // Setup Essentials

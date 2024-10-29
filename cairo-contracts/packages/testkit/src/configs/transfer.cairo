@@ -5,7 +5,9 @@ use starknet_ibc_apps::transfer::types::{
 use starknet_ibc_core::channel::{Packet, MsgRecvPacket, MsgAckPacket, Acknowledgement};
 use starknet_ibc_core::client::Timestamp;
 use starknet_ibc_core::host::{ChannelId, Sequence};
-use starknet_ibc_testkit::dummies::{PUBKEY, NAME, AMOUNT, EMPTY_MEMO, PORT_ID, CHANNEL_ID, HEIGHT};
+use starknet_ibc_testkit::dummies::{
+    NATIVE_DENOM, HOSTED_DENOM, AMOUNT, EMPTY_MEMO, PORT_ID, CHANNEL_ID, HEIGHT
+};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct TransferAppConfig {
@@ -19,15 +21,9 @@ pub struct TransferAppConfig {
 #[generate_trait]
 pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     fn default() -> TransferAppConfig {
-        let native_denom = PrefixedDenom {
-            trace_path: array![], base: Denom::Native(PUBKEY().into())
-        };
-
-        let hosted_denom = PrefixedDenom { trace_path: array![], base: Denom::Hosted(NAME()) };
-
         TransferAppConfig {
-            native_denom,
-            hosted_denom,
+            native_denom: NATIVE_DENOM(),
+            hosted_denom: HOSTED_DENOM(),
             chan_id_on_a: CHANNEL_ID(1),
             chan_id_on_b: CHANNEL_ID(0),
             amount: AMOUNT,

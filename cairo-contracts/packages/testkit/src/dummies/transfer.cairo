@@ -2,7 +2,7 @@ use core::serde::Serde;
 use starknet::class_hash::class_hash_const;
 use starknet::contract_address_const;
 use starknet::{ContractAddress, ClassHash};
-use starknet_ibc_apps::transfer::types::{Participant, Memo};
+use starknet_ibc_apps::transfer::types::{Denom, Participant, PrefixedDenom, Memo};
 
 pub const SUPPLY: u256 = 2000;
 pub const DECIMALS: u8 = 18_u8;
@@ -38,6 +38,14 @@ pub fn COSMOS() -> Participant {
     let mut serialized_address: Array<felt252> = ArrayTrait::new();
     Serde::serialize(@bech32_address, ref serialized_address);
     serialized_address.into()
+}
+
+pub fn NATIVE_DENOM() -> PrefixedDenom {
+    PrefixedDenom { trace_path: array![], base: Denom::Native(PUBKEY().into()) }
+}
+
+pub fn HOSTED_DENOM() -> PrefixedDenom {
+    PrefixedDenom { trace_path: array![], base: Denom::Hosted(NAME()) }
 }
 
 pub fn EMPTY_MEMO() -> Memo {
