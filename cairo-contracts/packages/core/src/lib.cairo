@@ -17,11 +17,13 @@ pub mod router {
 }
 pub mod channel {
     mod channel_call;
+    mod commitment;
     mod errors;
     mod interface;
     mod msgs;
     mod types;
 
+    pub use commitment::u64IntoArrayU32;
     pub use channel_call::{ChannelContract, ChannelContractImpl, ChannelContractTrait};
     pub use components::events::ChannelEventEmitterComponent;
     pub use components::handler::ChannelHandlerComponent;

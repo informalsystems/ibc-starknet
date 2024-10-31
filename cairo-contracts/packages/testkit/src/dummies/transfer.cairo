@@ -1,4 +1,3 @@
-use core::serde::Serde;
 use starknet::class_hash::class_hash_const;
 use starknet::contract_address_const;
 use starknet::{ContractAddress, ClassHash};
@@ -35,9 +34,7 @@ pub fn STARKNET() -> Participant {
 
 pub fn COSMOS() -> Participant {
     let bech32_address: ByteArray = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng";
-    let mut serialized_address: Array<felt252> = ArrayTrait::new();
-    Serde::serialize(@bech32_address, ref serialized_address);
-    serialized_address.into()
+    bech32_address.into()
 }
 
 pub fn NATIVE_DENOM() -> PrefixedDenom {

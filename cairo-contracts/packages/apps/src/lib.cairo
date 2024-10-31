@@ -43,5 +43,6 @@ pub mod transfer {
 #[cfg(test)]
 mod tests {
     mod ack;
+    mod misc;
     mod transfer;
 }

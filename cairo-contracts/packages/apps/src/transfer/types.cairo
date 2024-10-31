@@ -1,5 +1,7 @@
 use core::array::ArrayTrait;
+use core::fmt::{Display, Error, Formatter};
 use core::num::traits::Zero;
+use serde_json::{Serialize, SerializerTrait};
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::{
     ERC20Contract, ERC20ContractTrait, TransferErrors, TRANSFER_PORT_ID_HASH
@@ -37,6 +39,17 @@ pub struct PacketData {
     pub sender: Participant,
     pub receiver: Participant,
     pub memo: Memo,
+}
+
+pub impl PacketDataJsonSerialize of Serialize<PacketData> {
+    fn serialize<S, +Drop<S>, +SerializerTrait<S>>(self: PacketData, ref serializer: S) {
+        serializer.serialize_field("denom", format!("{}", self.denom));
+        serializer.serialize_field("amount", format!("{}", self.amount));
+        serializer.serialize_field("sender", format!("{}", self.sender));
+        serializer.serialize_field("receiver", format!("{}", self.receiver));
+        serializer.serialize_field("memo", format!("{}", self.memo));
+        serializer.end();
+    }
 }
 
 pub impl ArrayFelt252IntoPacketData of Into<Array<felt252>, PacketData> {
@@ -95,6 +108,13 @@ pub impl PrefixedDenomImpl of PrefixedDenomTrait {
         };
         denom_prefix.append(@self.base.hosted().unwrap());
         denom_prefix
+    }
+}
+
+impl PrefixedDenomDisplay of Display<PrefixedDenom> {
+    fn fmt(self: @PrefixedDenom, ref f: Formatter) -> Result<(), Error> {
+        let byte_array = self.as_byte_array();
+        Display::fmt(@byte_array, ref f)
     }
 }
 
@@ -163,7 +183,7 @@ pub impl ContractAddressIntoDenom of Into<ContractAddress, Denom> {
 #[derive(Clone, Debug, Drop, Serde)]
 pub enum Participant {
     Native: ContractAddress,
-    External: Array<felt252>,
+    External: ByteArray,
 }
 
 #[generate_trait]
@@ -171,14 +191,22 @@ pub impl ParticipantImpl of ParticipantTrait {
     fn is_non_zero(self: @Participant) -> bool {
         match self {
             Participant::Native(contract_address) => contract_address.is_non_zero(),
-            Participant::External(array) => {
-                match array.len() {
-                    0 => false,
-                    1 => array[0].is_non_zero(),
-                    _ => true,
-                }
-            }
+            Participant::External(byte_array) => byte_array.len() > 0
         }
+    }
+
+    fn as_byte_array(self: @Participant) -> ByteArray {
+        match self {
+            Participant::Native(contract_address) => format!("{contract_address:?}"),
+            Participant::External(byte_array) => byte_array.clone()
+        }
+    }
+}
+
+pub impl ParticipantDisplay of Display<Participant> {
+    fn fmt(self: @Participant, ref f: Formatter) -> Result<(), Error> {
+        let byte_array = self.as_byte_array();
+        Display::fmt(@byte_array, ref f)
     }
 }
 
@@ -197,8 +225,8 @@ impl ContractAddressIntoParticipant of Into<ContractAddress, Participant> {
     }
 }
 
-impl ArrayFelt252IntoParticipant of Into<Array<felt252>, Participant> {
-    fn into(self: Array<felt252>) -> Participant {
+impl ByteArrayIntoParticipant of Into<ByteArray, Participant> {
+    fn into(self: ByteArray) -> Participant {
         Participant::External(self)
     }
 }
@@ -208,9 +236,38 @@ pub struct Memo {
     pub memo: ByteArray,
 }
 
+pub impl MemoDisplay of Display<Memo> {
+    fn fmt(self: @Memo, ref f: Formatter) -> Result<(), Error> {
+        Display::fmt(self.memo, ref f)
+    }
+}
+
 impl MemoValidateBasicImpl of ValidateBasic<Memo> {
     fn validate_basic(self: @Memo) {
         assert(self.memo.len() <= MAXIMUM_MEMO_LENGTH, TransferErrors::MAXIMUM_MEMO_LENGTH);
+    }
+}
+
+#[cfg(test)]
+pub mod tests {
+    use serde_json::to_byte_array;
+    use starknet_ibc_testkit::dummies::{AMOUNT, COSMOS, STARKNET, HOSTED_DENOM, EMPTY_MEMO};
+    use super::PacketData;
+
+    #[test]
+    fn test_json_serialized_packet_data() {
+        let packet_data = PacketData {
+            denom: HOSTED_DENOM(),
+            amount: AMOUNT,
+            sender: COSMOS(),
+            receiver: STARKNET(),
+            memo: EMPTY_MEMO()
+        };
+
+        let expected =
+            "{\"denom\":\"UATOM\",\"amount\":\"100\",\"sender\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"receiver\":\"@340767163730\",\"memo\":\"\"}";
+
+        assert_eq!(to_byte_array(packet_data), expected);
     }
 }
 

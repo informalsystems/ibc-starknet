@@ -25,12 +25,16 @@ test = "snforge test"
 
 [workspace.dependencies]
 # external dependencies
+assert_macros        = "2.8.4"
 starknet             = "2.8.4"
 openzeppelin_access  = "0.18.0"
 openzeppelin_token   = "0.18.0"
 openzeppelin_testing = "0.18.0"
 openzeppelin_utils   = "0.18.0"
 snforge_std          = "0.31.0"
+
+# internal dependencies
+serde_json = { path = "../cairo-libs/packages/serde_json" }
 
 # ibc dependencies
 starknet_ibc_apps      = { path = "packages/apps" }
