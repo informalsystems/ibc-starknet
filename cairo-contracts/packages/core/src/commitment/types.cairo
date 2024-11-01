@@ -4,7 +4,7 @@ use starknet::SyscallResult;
 use starknet::storage_access::{Store, StorageBaseAddress};
 use starknet_ibc_core::channel::Acknowledgement;
 use starknet_ibc_core::client::{Height, Timestamp};
-use starknet_ibc_utils::{U32CollectorImpl, array_u8_into_array_u32};
+use starknet_ibc_core::commitment::{U32CollectorImpl, IntoArrayU32};
 
 // -----------------------------------------------------------
 // Commitment Value
@@ -80,7 +80,8 @@ pub fn compute_packet_commtiment(
 }
 
 pub fn compute_ack_commitment(ack: Acknowledgement) -> CommitmentValue {
-    compute_sha256_u32_array(array_u8_into_array_u32(ack.ack), 0, 0).into()
+    let (array, last_word, last_word_len) = ack.into_array_u32();
+    compute_sha256_u32_array(array, last_word, last_word_len).into()
 }
 
 // -----------------------------------------------------------

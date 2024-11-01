@@ -1,10 +1,5 @@
-mod conv;
 mod errors;
 mod utils;
-pub use conv::{
-    BitShift, IntoU256, IntoDigest, IntoArrayU32, U64IntoArrayU32, U32Collector, U32CollectorImpl,
-    U32CollectorTrait, u64_into_array_u32, array_u32_into_u256, array_u8_into_array_u32
-};
 pub use errors::UtilErrors;
 pub use utils::{
     ValidateBasic, ComputeKey, LocalKeyBuilder, LocalKeyBuilderTrait, LocalKeyBuilderImpl,
@@ -25,8 +20,4 @@ pub mod mintable {
     pub use component::ERC20MintableComponent;
     pub use errors::MintableErrors;
     pub use interface::{IERC20Mintable, IERC20MintableDispatcher, IERC20MintableDispatcherTrait};
-}
-#[cfg(test)]
-mod tests {
-    mod conv;
 }

@@ -264,7 +264,7 @@ impl MemoValidateBasicImpl of ValidateBasic<Memo> {
 #[cfg(test)]
 pub mod tests {
     use serde_json::to_byte_array;
-    use starknet_ibc_testkit::dummies::{PACKET_DATA_FROM_SN, ERC20, PACKET_COMMITMENT_ON_SN};
+    use starknet_ibc_testkit::dummies::{PACKET_DATA_FROM_SN, ERC20};
 
     // Snapshot test to ensure serialization stays consistent.
     #[test]
@@ -273,24 +273,6 @@ pub mod tests {
         let expected: ByteArray =
             "{\"denom\":\"2087021424722619777119509474943472645767659996348769578120564519014510906823\",\"amount\":\"100\",\"sender\":\"340767163730\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"memo\":\"\"}";
         assert_eq!(json, expected);
-    }
-
-    // Snapshot test to ensure the computation of packet commitment stays
-    // consistent.
-    #[test]
-    fn test_compute_packet_commitment() {
-        let commitment = PACKET_COMMITMENT_ON_SN(ERC20());
-        let expected: [u32; 8] = [
-            921559061,
-            1448239305,
-            530172570,
-            2261752703,
-            2027737158,
-            303675019,
-            1363635866,
-            3548973031
-        ];
-        assert_eq!(commitment, expected.into());
     }
 }
 

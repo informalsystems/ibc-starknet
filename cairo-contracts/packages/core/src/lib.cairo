@@ -2,6 +2,7 @@
 mod tests {
     mod channel;
     mod client;
+    mod commitment;
     mod router;
 }
 pub mod router {
@@ -17,10 +18,15 @@ pub mod router {
 }
 pub mod commitment {
     mod types;
+    mod utils;
 
     pub use types::{
         CommitmentValue, CommitmentValueZero, CommitmentProof, CommitmentProofZero,
         compute_packet_commtiment, compute_ack_commitment
+    };
+    pub use utils::{
+        IntoArrayU32, U64IntoArrayU32, U32Collector, U32CollectorImpl, U32CollectorTrait,
+        u64_into_array_u32, array_u8_into_array_u32
     };
 }
 pub mod channel {

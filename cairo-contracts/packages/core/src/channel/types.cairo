@@ -1,6 +1,7 @@
 use core::num::traits::Zero;
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
+use starknet_ibc_core::commitment::{array_u8_into_array_u32, IntoArrayU32};
 use starknet_ibc_core::host::{
     ClientId, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdTrait, Sequence
 };
@@ -168,6 +169,12 @@ pub struct Acknowledgement {
 pub impl ArrayU8IntoAcknowledgement of Into<Array<u8>, Acknowledgement> {
     fn into(self: Array<u8>) -> Acknowledgement {
         Acknowledgement { ack: self }
+    }
+}
+
+pub impl AcknowledgementIntoArrayU32 of IntoArrayU32<Acknowledgement> {
+    fn into_array_u32(self: Acknowledgement) -> (Array<u32>, u32, u32) {
+        array_u8_into_array_u32(self.ack)
     }
 }
 
