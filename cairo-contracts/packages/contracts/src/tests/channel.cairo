@@ -6,7 +6,7 @@ use starknet_ibc_core::router::AppContract;
 use starknet_ibc_testkit::configs::{
     TransferAppConfig, TransferAppConfigTrait, CometClientConfig, CometClientConfigTrait
 };
-use starknet_ibc_testkit::dummies::{COSMOS, STARKNET, OWNER, SUPPLY};
+use starknet_ibc_testkit::dummies::{COSMOS, STARKNET, OWNER, SUPPLY, PACKET_COMMITMENT_ON_SN};
 use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ChannelEventSpyExt};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle, AppHandle, ERC20Handle};
 use starknet_ibc_testkit::setup::SetupImpl;
@@ -48,7 +48,7 @@ fn test_send_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, _, _, _, transfer_cfg, mut spy) = setup();
+    let (core, _, erc20, _, transfer_cfg, mut spy) = setup();
 
     // -----------------------------------------------------------
     // Send Packet (from Starknet to Cosmos)
@@ -74,7 +74,7 @@ fn test_send_packet_ok() {
             packet.port_id_on_a.clone(), packet.chan_id_on_a.clone(), packet.seq_on_a.clone()
         );
 
-    assert_eq!(commitment, '1');
+    assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
 
     let next_sequence_send = core.next_sequence_send(packet.port_id_on_a, packet.chan_id_on_a);
 
@@ -175,7 +175,7 @@ fn test_successful_ack_packet_ok() {
             msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a.clone()
         );
 
-    assert_eq!(commitment, '1');
+    assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
 
     // Check the balance of the sender.
     erc20.assert_balance(OWNER(), SUPPLY - transfer_cfg.amount);
@@ -254,7 +254,7 @@ fn test_failure_ack_packet_ok() {
             msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a.clone()
         );
 
-    assert_eq!(commitment, '1');
+    assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
 
     // Check the balance of the sender.
     erc20.assert_balance(OWNER(), SUPPLY - transfer_cfg.amount);

@@ -1,10 +1,18 @@
 use starknet::{contract_address_const, ContractAddress};
 use starknet_ibc_core::channel::{ChannelEnd, ChannelState, ChannelOrdering, Counterparty};
-use starknet_ibc_core::client::Height;
+use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{ClientId, PortId, ChannelId, Sequence};
 
 pub fn HEIGHT(revision_height: u64) -> Height {
     Height { revision_number: 0, revision_height }
+}
+
+pub fn TIMEOUT_HEIGHT() -> Height {
+    HEIGHT(1000)
+}
+
+pub fn TIMEOUT_TIMESTAMP() -> Timestamp {
+    Timestamp { timestamp: 1000 }
 }
 
 pub fn CLIENT() -> ContractAddress {

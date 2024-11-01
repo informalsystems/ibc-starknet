@@ -1,8 +1,9 @@
 use starknet::ContractAddress;
 use starknet_ibc_core::client::{
     MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Status,
-    CreateResponse, UpdateResponse, Timestamp, Proof
+    CreateResponse, UpdateResponse, Timestamp,
 };
+use starknet_ibc_core::commitment::{CommitmentProof, CommitmentValue};
 
 #[starknet::interface]
 pub trait IClientHandler<TContractState> {
@@ -25,11 +26,15 @@ pub trait IRegisterClient<TContractState> {
 #[starknet::interface]
 pub trait IClientStateValidation<TContractState> {
     fn verify_membership(
-        self: @TContractState, client_sequence: u64, path: ByteArray, value: Array<u8>, proof: Proof
+        self: @TContractState,
+        client_sequence: u64,
+        path: ByteArray,
+        value: CommitmentValue,
+        proof: CommitmentProof
     );
 
     fn verify_non_membership(
-        self: @TContractState, client_sequence: u64, path: ByteArray, proof: Proof
+        self: @TContractState, client_sequence: u64, path: ByteArray, proof: CommitmentProof
     );
 
     fn verify_client_message(

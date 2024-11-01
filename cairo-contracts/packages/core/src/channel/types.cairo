@@ -1,6 +1,7 @@
 use core::num::traits::Zero;
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
+use starknet_ibc_core::commitment::{array_u8_into_array_u32, IntoArrayU32};
 use starknet_ibc_core::host::{
     ClientId, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdTrait, Sequence
 };
@@ -29,10 +30,6 @@ pub impl PacketImpl of PacketTrait {
     fn verify_not_timed_out(self: @Packet, current_height: @Height, current_timestamp: @Timestamp) {
         assert(self.timeout_height_on_b > current_height, ChannelErrors::TIMED_OUT_PACKET);
         assert(self.timeout_timestamp_on_b > current_timestamp, ChannelErrors::TIMED_OUT_PACKET);
-    }
-
-    fn compute_commitment(self: @Packet) -> Array<u8> {
-        array![]
     }
 }
 
@@ -175,14 +172,23 @@ pub impl ArrayU8IntoAcknowledgement of Into<Array<u8>, Acknowledgement> {
     }
 }
 
-#[generate_trait]
-pub impl AcknowledgementImpl of AcknowledgementTrait {
-    fn is_non_empty(self: @Acknowledgement) -> bool {
-        self.ack.len() > 0
+pub impl AcknowledgementIntoArrayU32 of IntoArrayU32<Acknowledgement> {
+    fn into_array_u32(self: Acknowledgement) -> (Array<u32>, u32, u32) {
+        array_u8_into_array_u32(self.ack)
+    }
+}
+
+pub impl AcknowledegementZero of Zero<Acknowledgement> {
+    fn zero() -> Acknowledgement {
+        Acknowledgement { ack: ArrayTrait::new() }
     }
 
-    fn compute_commitment(self: @Acknowledgement) -> felt252 {
-        ''
+    fn is_zero(self: @Acknowledgement) -> bool {
+        self.ack.len() == 0
+    }
+
+    fn is_non_zero(self: @Acknowledgement) -> bool {
+        self.ack.len() > 0
     }
 }
 
@@ -213,7 +219,7 @@ pub impl AckStatusImpl of AckStatusTrait {
 
     /// Returns true if the acknowledgement is non-empty.
     fn is_non_empty(self: @AckStatus) -> bool {
-        self.ack().is_non_empty()
+        self.ack().is_non_zero()
     }
 
     /// Returns true if the status is success.
@@ -232,3 +238,4 @@ pub impl AckStatusImpl of AckStatusTrait {
         }
     }
 }
+

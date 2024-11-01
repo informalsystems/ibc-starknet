@@ -35,7 +35,7 @@ pub type EncodeIbcTransferMessage = CombineEncoders<
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Participant {
     Native(Felt),
-    External(Vec<Felt>),
+    External(String),
 }
 
 pub struct EncodeParticipant;
@@ -51,9 +51,9 @@ delegate_components! {
 
 impl TransformerRef for EncodeParticipant {
     type From = Participant;
-    type To<'a> = Sum![Felt, &'a Vec<Felt>];
+    type To<'a> = Sum![Felt, &'a String];
 
-    fn transform<'a>(from: &'a Participant) -> Sum![Felt, &'a Vec<Felt>] {
+    fn transform<'a>(from: &'a Participant) -> Sum![Felt, &'a String] {
         match from {
             Participant::Native(address) => Either::Left(*address),
             Participant::External(address) => Either::Right(Either::Left(address)),
@@ -62,10 +62,10 @@ impl TransformerRef for EncodeParticipant {
 }
 
 impl Transformer for EncodeParticipant {
-    type From = Sum![Felt, Vec<Felt>];
+    type From = Sum![Felt, String];
     type To = Participant;
 
-    fn transform(value: Sum![Felt, Vec<Felt>]) -> Participant {
+    fn transform(value: Sum![Felt, String]) -> Participant {
         match value {
             Either::Left(value) => Participant::Native(value),
             Either::Right(Either::Left(value)) => Participant::External(value),

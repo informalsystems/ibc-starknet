@@ -2,6 +2,7 @@
 mod tests {
     mod channel;
     mod client;
+    mod commitment;
     mod router;
 }
 pub mod router {
@@ -15,13 +16,25 @@ pub mod router {
     pub use errors::RouterErrors;
     pub use interface::{IRouter, IRouterDispatcher, IRouterDispatcherTrait};
 }
+pub mod commitment {
+    mod types;
+    mod utils;
+
+    pub use types::{
+        CommitmentValue, CommitmentValueZero, CommitmentProof, CommitmentProofZero,
+        compute_packet_commtiment, compute_ack_commitment
+    };
+    pub use utils::{
+        IntoArrayU32, U64IntoArrayU32, U32Collector, U32CollectorImpl, U32CollectorTrait,
+        u64_into_array_u32, array_u8_into_array_u32
+    };
+}
 pub mod channel {
     mod channel_call;
     mod errors;
     mod interface;
     mod msgs;
     mod types;
-
     pub use channel_call::{ChannelContract, ChannelContractImpl, ChannelContractTrait};
     pub use components::events::ChannelEventEmitterComponent;
     pub use components::handler::ChannelHandlerComponent;
@@ -34,8 +47,8 @@ pub mod channel {
     pub use msgs::{MsgRecvPacket, MsgAckPacket};
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
-        ChannelOrdering, Counterparty, Acknowledgement, AcknowledgementImpl, AcknowledgementTrait,
-        AckStatus, AckStatusImpl, AckStatusTrait, Receipt, ReceiptImpl, ReceiptTrait
+        ChannelOrdering, Counterparty, Acknowledgement, AckStatus, AckStatusImpl, AckStatusTrait,
+        Receipt, ReceiptImpl, ReceiptTrait
     };
     mod components {
         pub mod events;
@@ -68,7 +81,7 @@ pub mod client {
     pub use types::{
         CreateResponse, CreateResponseImpl, UpdateResponse, Status, StatusImpl, StatusTrait, Height,
         HeightImpl, HeightTrait, HeightZero, HeightPartialOrd, HeightsIntoUpdateResponse, Timestamp,
-        TimestampZero, TimestampPartialOrd, U64IntoTimestamp, Proof, ProofImpl, ProofTrait,
+        TimestampZero, TimestampPartialOrd, U64IntoTimestamp,
     };
     mod components {
         pub mod events;

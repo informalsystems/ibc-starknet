@@ -2,6 +2,7 @@
 members = [
   "packages/protobuf",
   "packages/cometbft",
+  "packages/serde_json",
 ]
 
 [workspace.package]
@@ -21,9 +22,10 @@ test = "snforge test"
 
 [workspace.dependencies]
 # external dependencies
-cairo_test  = "2.8.4"
-starknet    = "2.8.4"
-snforge_std = "0.31.0"
+assert_macros = "2.8.4"
+cairo_test    = "2.8.4"
+starknet      = "2.8.4"
+snforge_std   = "0.31.0"
 
 [workspace.tool.fmt]
 sort-module-level-items = true

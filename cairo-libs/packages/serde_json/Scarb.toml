@@ -1,5 +1,5 @@
 [package]
-name          = "starknet_ibc_utils"
+name          = "serde_json"
 version       = { workspace = true }
 edition       = { workspace = true }
 cairo-version = { workspace = true }
@@ -11,7 +11,7 @@ Readme        = { workspace = true }
 keywords      = { workspace = true }
 
 description = """
-    Provides a set of utility components used for integrating IBC protocol with Starknet.
+    Provides the implementation of JSON serialization.
 """
 
 [lib]
@@ -19,13 +19,7 @@ description = """
 [scripts]
 test = { workspace = true }
 
-[tool]
-fmt = { workspace = true }
-
 [dependencies]
-# external dependencies
-openzeppelin_token = { workspace = true }
-starknet           = { workspace = true }
 
 [dev-dependencies]
 assert_macros = { workspace = true }

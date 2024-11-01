@@ -6,7 +6,7 @@ use starknet::syscalls::deploy_syscall;
 use starknet::{ClassHash, ContractAddress};
 use starknet_ibc_utils::mintable::{IERC20MintableDispatcher, IERC20MintableDispatcherTrait};
 
-#[derive(Clone, Debug, Drop, Serde)]
+#[derive(Copy, Debug, Drop, Serde)]
 pub struct ERC20Contract {
     pub address: ContractAddress,
 }

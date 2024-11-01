@@ -54,6 +54,10 @@ source = "registry+https://scarbs.xyz/"
 checksum = "sha256:725b212839f3eddc32791408609099c5e808c167ca0cf331d8c1d778b07a4e21"
 
 [[package]]
+name = "serde_json"
+version = "0.1.0"
+
+[[package]]
 name = "snforge_scarb_plugin"
 version = "0.31.0"
 source = "registry+https://scarbs.xyz/"
@@ -86,6 +90,7 @@ dependencies = [
  "openzeppelin_access",
  "openzeppelin_token",
  "openzeppelin_utils",
+ "serde_json",
  "starknet_ibc_contracts",
  "starknet_ibc_core",
  "starknet_ibc_testkit",

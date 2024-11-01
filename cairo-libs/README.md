@@ -7,3 +7,4 @@ contracts in the `cairo-contracts`.
 
 - Protobuf decoding and encoding
 - CometBFT light client types
+- JSON serialization
