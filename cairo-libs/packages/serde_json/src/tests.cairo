@@ -12,15 +12,15 @@ struct User {
 
 #[generate_trait]
 pub impl UserImpl of UserTrait {
-    fn new(name: ByteArray, age: u8, email: Option<ByteArray>,  permission: Permission, is_active: bool, metadata: felt252) -> User {
-        User {
-            name,
-            age,
-            email,
-            permission,
-            is_active,
-            metadata,
-        }
+    fn new(
+        name: ByteArray,
+        age: u8,
+        email: Option<ByteArray>,
+        permission: Permission,
+        is_active: bool,
+        metadata: felt252
+    ) -> User {
+        User { name, age, email, permission, is_active, metadata, }
     }
 }
 
@@ -37,9 +37,7 @@ pub impl PermissionSerialize of Serialize<Permission> {
                 serializer.serialize_variant("admin", level);
                 serializer.end();
             },
-            Permission::Guest => {
-                serializer.serialize_string("guest");
-            }
+            Permission::Guest => { serializer.serialize_string("guest"); }
         }
     }
 }
@@ -69,28 +67,30 @@ pub impl AccountStatusSerialize of Serialize<AccountStatus> {
                 serializer.serialize_variant("active", user);
                 serializer.end();
             },
-            AccountStatus::InActive => {
-                serializer.serialize_string("inactive");
-            }
+            AccountStatus::InActive => { serializer.serialize_string("inactive"); }
         }
     }
 }
 
 pub fn DUMMY_USER() -> User {
-    UserImpl::new("john doe", 25, Option::Some("john.doe@example.com"), Permission::Admin(0), true, 100)
+    UserImpl::new(
+        "john doe", 25, Option::Some("john.doe@example.com"), Permission::Admin(0), true, 100
+    )
 }
 
 #[test]
 fn test_serialize_struct_ok() {
     let value = to_byte_array(DUMMY_USER());
-    let expected = "{\"name\":\"john doe\",\"age\":25,\"email\":\"john.doe@example.com\",\"permission\":{\"admin\":0},\"is_active\":true,\"metadata\":100}";
+    let expected =
+        "{\"name\":\"john doe\",\"age\":25,\"email\":\"john.doe@example.com\",\"permission\":{\"admin\":0},\"is_active\":true,\"metadata\":100}";
     assert_eq!(value, expected);
 }
 
 #[test]
 fn test_serialize_struct_zero_values() {
     let value = to_byte_array(UserImpl::new("", 0, Option::None, Permission::Guest, false, 0));
-    let expected = "{\"name\":\"\",\"age\":0,\"email\":null,\"permission\":\"guest\",\"is_active\":false,\"metadata\":0}";
+    let expected =
+        "{\"name\":\"\",\"age\":0,\"email\":null,\"permission\":\"guest\",\"is_active\":false,\"metadata\":0}";
     assert_eq!(value, expected);
 }
 
@@ -100,7 +100,8 @@ fn test_serialize_enum_ok() {
 
     let value = to_byte_array(enum_active);
 
-    let expected = "{\"active\":{\"name\":\"john doe\",\"age\":25,\"email\":\"john.doe@example.com\",\"permission\":{\"admin\":0},\"is_active\":true,\"metadata\":100}}";
+    let expected =
+        "{\"active\":{\"name\":\"john doe\",\"age\":25,\"email\":\"john.doe@example.com\",\"permission\":{\"admin\":0},\"is_active\":true,\"metadata\":100}}";
 
     assert_eq!(value, expected);
 

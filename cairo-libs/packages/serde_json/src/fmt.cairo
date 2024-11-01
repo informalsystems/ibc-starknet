@@ -10,7 +10,7 @@ pub trait FormatterTrait<F> {
     #[inline]
     fn end_object_key(self: @F, ref writer: ByteArray);
     #[inline]
-    fn end_object_value(self: @F,ref writer: ByteArray);
+    fn end_object_value(self: @F, ref writer: ByteArray);
     #[inline]
     fn write_null(self: @F, ref writer: ByteArray);
     #[inline]
@@ -57,7 +57,7 @@ pub impl FormatterImpl of FormatterTrait<CompactFormatter> {
         writer.append(@":");
     }
 
-    fn end_object_value(self: @CompactFormatter,ref writer: ByteArray) {
+    fn end_object_value(self: @CompactFormatter, ref writer: ByteArray) {
         writer.append(@",");
     }
 

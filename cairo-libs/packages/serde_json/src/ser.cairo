@@ -7,52 +7,34 @@ pub trait Serialize<T> {
 pub trait SerializerTrait<S> {
     fn end(ref self: S);
 
-    fn serialize_bool(
-        ref self: S, v: bool
-    );
+    fn serialize_bool(ref self: S, v: bool);
 
-    fn serialize_u8(
-        ref self: S, v: u8
-    );
+    fn serialize_u8(ref self: S, v: u8);
 
-    fn serialize_u32(
-        ref self: S, v: u32
-    );
+    fn serialize_u32(ref self: S, v: u32);
 
-    fn serialize_u64(
-        ref self: S, v: u64
-    );
+    fn serialize_u64(ref self: S, v: u64);
 
-    fn serialize_u128(
-        ref self: S, v: u128
-    );
+    fn serialize_u128(ref self: S, v: u128);
 
-    fn serialize_u256(
-        ref self: S, v: u256
-    );
+    fn serialize_u256(ref self: S, v: u256);
 
-    fn serialize_felt252(
-        ref self: S, v: felt252
-    );
+    fn serialize_felt252(ref self: S, v: felt252);
 
-    fn serialize_unit(
-        ref self: S
-    );
+    fn serialize_unit(ref self: S);
 
     fn serialize_some<V, +Drop<V>, +Serialize<V>>(ref self: S, v: V);
 
     fn serialize_none(ref self: S);
 
-    fn serialize_string(
-        ref self: S, v: ByteArray
+    fn serialize_string(ref self: S, v: ByteArray);
+
+    fn serialize_field<V, +Drop<V>, +Serialize<V>>(
+        ref self: S, field_name: ByteArray, field_value: V
     );
 
-    fn serialize_field<V, +Drop<V>, +Serialize<V>>(ref self: S,
-        field_name: ByteArray, field_value: V
-    );
-
-    fn serialize_variant<V, +Drop<V>, +Serialize<V>>(ref self: S,
-        variant_name: ByteArray, variant_value: V
+    fn serialize_variant<V, +Drop<V>, +Serialize<V>>(
+        ref self: S, variant_name: ByteArray, variant_value: V
     );
 }
 
@@ -69,51 +51,35 @@ pub impl SerializerImpl of SerializerTrait<DefaultSerializer> {
         self.formatter.end_object(ref self.writer);
     }
 
-    fn serialize_bool(
-        ref self: DefaultSerializer, v: bool
-    ) {
+    fn serialize_bool(ref self: DefaultSerializer, v: bool) {
         self.formatter.write_bool(ref self.writer, v);
     }
 
-    fn serialize_u8(
-        ref self: DefaultSerializer, v: u8
-    ) {
+    fn serialize_u8(ref self: DefaultSerializer, v: u8) {
         self.formatter.write_u8(ref self.writer, v);
     }
 
-    fn serialize_u32(
-        ref self: DefaultSerializer, v: u32
-    ) {
+    fn serialize_u32(ref self: DefaultSerializer, v: u32) {
         self.formatter.write_u32(ref self.writer, v);
     }
 
-    fn serialize_u64(
-        ref self: DefaultSerializer, v: u64
-    ) {
+    fn serialize_u64(ref self: DefaultSerializer, v: u64) {
         self.formatter.write_u64(ref self.writer, v);
     }
 
-    fn serialize_u128(
-        ref self: DefaultSerializer, v: u128
-    ) {
+    fn serialize_u128(ref self: DefaultSerializer, v: u128) {
         self.formatter.write_u128(ref self.writer, v);
     }
 
-    fn serialize_u256(
-        ref self: DefaultSerializer, v: u256
-    ) {
+    fn serialize_u256(ref self: DefaultSerializer, v: u256) {
         self.formatter.write_u256(ref self.writer, v);
     }
 
-    fn serialize_felt252(
-        ref self: DefaultSerializer, v: felt252
-    ) {
+    fn serialize_felt252(ref self: DefaultSerializer, v: felt252) {
         self.formatter.write_felt252(ref self.writer, v);
     }
 
-    fn serialize_unit(
-        ref self: DefaultSerializer
-    ) {
+    fn serialize_unit(ref self: DefaultSerializer) {
         self.formatter.write_null(ref self.writer);
     }
 
@@ -125,16 +91,14 @@ pub impl SerializerImpl of SerializerTrait<DefaultSerializer> {
         self.serialize_unit();
     }
 
-    fn serialize_string(
-        ref self: DefaultSerializer, v: ByteArray
-    ) {
+    fn serialize_string(ref self: DefaultSerializer, v: ByteArray) {
         self.formatter.begin_string(ref self.writer);
         self.formatter.write_string(ref self.writer, @v);
         self.formatter.end_string(ref self.writer);
     }
 
-    fn serialize_field<V, +Drop<V>, +Serialize<V>>(ref self: DefaultSerializer,
-        field_name: ByteArray, field_value: V
+    fn serialize_field<V, +Drop<V>, +Serialize<V>>(
+        ref self: DefaultSerializer, field_name: ByteArray, field_value: V
     ) {
         if self.writer.len() == 0 {
             self.formatter.begin_object(ref self.writer);
@@ -149,8 +113,8 @@ pub impl SerializerImpl of SerializerTrait<DefaultSerializer> {
         field_value.serialize(ref self);
     }
 
-    fn serialize_variant<V, +Drop<V>, +Serialize<V>>(ref self: DefaultSerializer,
-        variant_name: ByteArray, variant_value: V
+    fn serialize_variant<V, +Drop<V>, +Serialize<V>>(
+        ref self: DefaultSerializer, variant_name: ByteArray, variant_value: V
     ) {
         if self.writer.len() == 0 {
             self.formatter.begin_object(ref self.writer);
