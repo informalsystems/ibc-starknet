@@ -19,7 +19,7 @@ pub mod commitment {
     mod types;
 
     pub use types::{
-        CommitmentValue, CommitmentZero, CommitmentProof, CommitmentProofTrait,
+        CommitmentValue, CommitmentValueZero, CommitmentProof, CommitmentProofZero,
         compute_packet_commtiment, compute_ack_commitment
     };
 }
@@ -41,8 +41,8 @@ pub mod channel {
     pub use msgs::{MsgRecvPacket, MsgAckPacket};
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
-        ChannelOrdering, Counterparty, Acknowledgement, AcknowledgementImpl, AcknowledgementTrait,
-        AckStatus, AckStatusImpl, AckStatusTrait, Receipt, ReceiptImpl, ReceiptTrait
+        ChannelOrdering, Counterparty, Acknowledgement, AckStatus, AckStatusImpl, AckStatusTrait,
+        Receipt, ReceiptImpl, ReceiptTrait
     };
     mod components {
         pub mod events;

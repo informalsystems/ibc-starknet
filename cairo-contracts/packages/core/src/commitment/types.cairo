@@ -21,7 +21,7 @@ pub impl FixedU32ArrayIntoCommitmentValue of Into<[u32; 8], CommitmentValue> {
     }
 }
 
-pub impl CommitmentZero of Zero<CommitmentValue> {
+pub impl CommitmentValueZero of Zero<CommitmentValue> {
     fn zero() -> CommitmentValue {
         CommitmentValue { value: [0; 8] }
     }
@@ -101,10 +101,16 @@ pub impl ArrayU8IntoProof of Into<Array<u8>, CommitmentProof> {
     }
 }
 
-#[generate_trait]
-pub impl CommitmentProofImpl of CommitmentProofTrait {
-    /// Returns true if the proof is non-empty.
-    fn is_non_empty(self: @CommitmentProof) -> bool {
+pub impl CommitmentProofZero of Zero<CommitmentProof> {
+    fn zero() -> CommitmentProof {
+        CommitmentProof { proof: ArrayTrait::new() }
+    }
+
+    fn is_zero(self: @CommitmentProof) -> bool {
+        self.proof.len() == 0
+    }
+
+    fn is_non_zero(self: @CommitmentProof) -> bool {
         self.proof.len() > 0
     }
 }

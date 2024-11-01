@@ -13,13 +13,13 @@ pub mod ChannelHandlerComponent {
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgRecvPacket, MsgAckPacket,
         ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt,
-        ReceiptTrait, AcknowledgementTrait, Packet, Acknowledgement
+        ReceiptTrait, Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, HeightImpl
     };
     use starknet_ibc_core::commitment::{
-        CommitmentValue, CommitmentZero, compute_packet_commtiment, compute_ack_commitment
+        CommitmentValue, CommitmentValueZero, compute_packet_commtiment, compute_ack_commitment
     };
     use starknet_ibc_core::host::{
         PortId, ChannelId, Sequence, SequenceImpl, SequencePartialOrd, SequenceZero,
@@ -35,7 +35,7 @@ pub mod ChannelHandlerComponent {
         pub channel_ends: Map<felt252, ChannelEnd>,
         pub packet_commitments: Map<felt252, CommitmentValue>,
         pub packet_receipts: Map<felt252, Receipt>,
-        pub packet_acks: Map<felt252, felt252>,
+        pub packet_acks: Map<felt252, CommitmentValue>,
         pub send_sequences: Map<felt252, Sequence>,
         pub recv_sequences: Map<felt252, Sequence>,
         pub ack_sequences: Map<felt252, Sequence>,
@@ -142,7 +142,7 @@ pub mod ChannelHandlerComponent {
             port_id: PortId,
             channel_id: ChannelId,
             sequence: Sequence
-        ) -> felt252 {
+        ) -> CommitmentValue {
             self.read_packet_ack(@port_id, @channel_id, @sequence)
         }
 
@@ -353,7 +353,7 @@ pub mod ChannelHandlerComponent {
                     @msg.packet.port_id_on_b,
                     @msg.packet.chan_id_on_b,
                     @msg.packet.seq_on_a,
-                    ack.compute_commitment()
+                    compute_ack_commitment(ack.clone())
                 );
 
             self.emit_recv_packet_event(msg.packet.clone(), chan_end_on_b.ordering);
@@ -592,7 +592,7 @@ pub mod ChannelHandlerComponent {
             port_id: @PortId,
             channel_id: @ChannelId,
             sequence: @Sequence
-        ) -> felt252 {
+        ) -> CommitmentValue {
             let ack = self.packet_acks.read(ack_key(port_id, channel_id, sequence));
 
             assert(ack.is_non_zero(), ChannelErrors::MISSING_PACKET_ACK);
@@ -661,7 +661,7 @@ pub mod ChannelHandlerComponent {
         ) {
             self
                 .packet_commitments
-                .write(commitment_key(port_id, channel_id, sequence), CommitmentZero::zero());
+                .write(commitment_key(port_id, channel_id, sequence), CommitmentValueZero::zero());
         }
 
         fn write_packet_receipt(
@@ -679,9 +679,9 @@ pub mod ChannelHandlerComponent {
             port_id: @PortId,
             channel_id: @ChannelId,
             sequence: @Sequence,
-            ack: felt252
+            ack_commitment: CommitmentValue
         ) {
-            self.packet_acks.write(ack_key(port_id, channel_id, sequence), ack);
+            self.packet_acks.write(ack_key(port_id, channel_id, sequence), ack_commitment);
         }
 
         fn write_next_sequence_send(

@@ -171,14 +171,17 @@ pub impl ArrayU8IntoAcknowledgement of Into<Array<u8>, Acknowledgement> {
     }
 }
 
-#[generate_trait]
-pub impl AcknowledgementImpl of AcknowledgementTrait {
-    fn is_non_empty(self: @Acknowledgement) -> bool {
-        self.ack.len() > 0
+pub impl AcknowledegementZero of Zero<Acknowledgement> {
+    fn zero() -> Acknowledgement {
+        Acknowledgement { ack: ArrayTrait::new() }
     }
 
-    fn compute_commitment(self: @Acknowledgement) -> felt252 {
-        ''
+    fn is_zero(self: @Acknowledgement) -> bool {
+        self.ack.len() == 0
+    }
+
+    fn is_non_zero(self: @Acknowledgement) -> bool {
+        self.ack.len() > 0
     }
 }
 
@@ -209,7 +212,7 @@ pub impl AckStatusImpl of AckStatusTrait {
 
     /// Returns true if the acknowledgement is non-empty.
     fn is_non_empty(self: @AckStatus) -> bool {
-        self.ack().is_non_empty()
+        self.ack().is_non_zero()
     }
 
     /// Returns true if the status is success.

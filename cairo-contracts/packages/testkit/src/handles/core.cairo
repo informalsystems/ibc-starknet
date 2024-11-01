@@ -94,7 +94,7 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn packet_acknowledgement(
         self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence
-    ) -> felt252 {
+    ) -> CommitmentValue {
         self.channel_query_dispatcher().packet_acknowledgement(port_id, channel_id, sequence)
     }
 

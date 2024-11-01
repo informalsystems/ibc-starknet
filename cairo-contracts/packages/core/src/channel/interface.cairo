@@ -30,7 +30,7 @@ pub trait IChannelQuery<TContractState> {
     ) -> bool;
     fn packet_acknowledgement(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
-    ) -> felt252;
+    ) -> CommitmentValue;
     fn next_sequence_send(
         self: @TContractState, port_id: PortId, channel_id: ChannelId
     ) -> Sequence;
