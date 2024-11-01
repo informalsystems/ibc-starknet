@@ -103,8 +103,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         };
 
         // stub
-        let sender_address =
-            cairo_encoding.encode(&"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string())?;
+        let sender_address = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string();
 
         let recipient_address = chain_driver.user_wallet_a.account_address;
 
