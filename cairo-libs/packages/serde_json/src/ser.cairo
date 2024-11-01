@@ -237,9 +237,7 @@ pub impl SerializeOption<V, +Drop<V>, +Serialize<V>> of Serialize<Option<V>> {
 
 pub fn to_byte_array<T, +Drop<T>, +Serialize<T>>(value: T) -> ByteArray {
     let mut ser = Serializer { writer: "", formatter: CompactFormatter {} };
-
     value.serialize(ref ser);
-
     ser.writer
 }
 

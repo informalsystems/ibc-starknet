@@ -62,7 +62,7 @@ pub impl U32CollectorImpl of U32CollectorTrait {
         self.value.append_span(array.span());
     }
 
-    fn extend_from_slice(ref self: U32Collector, slice: [u32; 8]) {
+    fn extend_from_chunk(ref self: U32Collector, slice: [u32; 8]) {
         self.value.append_span(slice.span());
     }
 

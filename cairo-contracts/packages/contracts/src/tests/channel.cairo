@@ -74,7 +74,7 @@ fn test_send_packet_ok() {
             packet.port_id_on_a.clone(), packet.chan_id_on_a.clone(), packet.seq_on_a.clone()
         );
 
-    assert_eq!(commitment, '1');
+    assert_eq!(commitment, [0, 0, 0, 0, 0, 0, 0, 0]);
 
     let next_sequence_send = core.next_sequence_send(packet.port_id_on_a, packet.chan_id_on_a);
 
@@ -175,7 +175,7 @@ fn test_successful_ack_packet_ok() {
             msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a.clone()
         );
 
-    assert_eq!(commitment, '1');
+    assert_eq!(commitment, [0, 0, 0, 0, 0, 0, 0, 0]);
 
     // Check the balance of the sender.
     erc20.assert_balance(OWNER(), SUPPLY - transfer_cfg.amount);
@@ -254,7 +254,7 @@ fn test_failure_ack_packet_ok() {
             msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a.clone()
         );
 
-    assert_eq!(commitment, '1');
+    assert_eq!(commitment, [0, 0, 0, 0, 0, 0, 0, 0]);
 
     // Check the balance of the sender.
     erc20.assert_balance(OWNER(), SUPPLY - transfer_cfg.amount);

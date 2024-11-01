@@ -106,15 +106,14 @@ pub impl PrefixedDenomImpl of PrefixedDenomTrait {
             denom_prefix.append(path.channel_id.channel_id);
             denom_prefix.append(@"/");
         };
-        denom_prefix.append(@self.base.hosted().unwrap());
+        denom_prefix.append(@format!("{}", self.base));
         denom_prefix
     }
 }
 
 impl PrefixedDenomDisplay of Display<PrefixedDenom> {
     fn fmt(self: @PrefixedDenom, ref f: Formatter) -> Result<(), Error> {
-        let byte_array = self.as_byte_array();
-        Display::fmt(@byte_array, ref f)
+        Display::fmt(@self.as_byte_array(), ref f)
     }
 }
 
@@ -179,6 +178,18 @@ pub impl ContractAddressIntoDenom of Into<ContractAddress, Denom> {
     }
 }
 
+pub impl DenomDisplay of Display<Denom> {
+    fn fmt(self: @Denom, ref f: Formatter) -> Result<(), Error> {
+        match self {
+            Denom::Native(contract) => {
+                let address_as_felt: felt252 = (*contract.address).into();
+                Display::fmt(@format!("{address_as_felt}"), ref f)
+            },
+            Denom::Hosted(byte_array) => Display::fmt(@byte_array, ref f),
+       }
+    }
+}
+
 /// Represents a participant either sending or receiving a packet.
 #[derive(Clone, Debug, Drop, Serde)]
 pub enum Participant {
@@ -197,7 +208,11 @@ pub impl ParticipantImpl of ParticipantTrait {
 
     fn as_byte_array(self: @Participant) -> ByteArray {
         match self {
-            Participant::Native(contract_address) => format!("{contract_address:?}"),
+            Participant::Native(contract_address) =>
+            {
+                let address_as_felt: felt252 = (*contract_address).into();
+                format!("{address_as_felt}")
+            },
             Participant::External(byte_array) => byte_array.clone()
         }
     }
@@ -205,8 +220,7 @@ pub impl ParticipantImpl of ParticipantTrait {
 
 pub impl ParticipantDisplay of Display<Participant> {
     fn fmt(self: @Participant, ref f: Formatter) -> Result<(), Error> {
-        let byte_array = self.as_byte_array();
-        Display::fmt(@byte_array, ref f)
+        Display::fmt(@self.as_byte_array(), ref f)
     }
 }
 
@@ -265,7 +279,7 @@ pub mod tests {
         };
 
         let expected =
-            "{\"denom\":\"UATOM\",\"amount\":\"100\",\"sender\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"receiver\":\"@340767163730\",\"memo\":\"\"}";
+            "{\"denom\":\"UATOM\",\"amount\":\"100\",\"sender\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"receiver\":\"340767163730\",\"memo\":\"\"}";
 
         assert_eq!(to_byte_array(packet_data), expected);
     }

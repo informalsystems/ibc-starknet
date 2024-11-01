@@ -9,7 +9,7 @@ pub fn compute_packet_commtiment(
     let mut coll = U32CollectorImpl::init();
     coll.extend(timeout_timestamp);
     coll.extend(timeout_height);
-    coll.extend_from_slice(compute_sha256_byte_array(json_packet_data));
+    coll.extend_from_chunk(compute_sha256_byte_array(json_packet_data));
     compute_sha256_u32_array(coll.value(), 0, 0)
 }
 
