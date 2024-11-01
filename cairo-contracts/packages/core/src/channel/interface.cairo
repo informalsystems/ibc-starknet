@@ -13,6 +13,9 @@ pub trait IAppCallback<TContractState> {
     fn on_recv_packet(ref self: TContractState, packet: Packet) -> Acknowledgement;
     fn on_ack_packet(ref self: TContractState, packet: Packet, ack: Acknowledgement);
     fn on_timeout_packet(ref self: TContractState, packet: Packet);
+    /// Calls for the JSON representation of the packet data, typically used for
+    /// computing the packet commitment.
+    fn json_packet_data(self: @TContractState, raw_packet_data: Array<felt252>) -> ByteArray;
 }
 
 #[starknet::interface]
@@ -20,7 +23,9 @@ pub trait IChannelQuery<TContractState> {
     fn channel_end(self: @TContractState, port_id: PortId, channel_id: ChannelId) -> ChannelEnd;
     fn packet_commitment(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
-    ) -> felt252;
+        ) -> [
+        u32
+    ; 8];
     fn packet_receipt(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
     ) -> bool;

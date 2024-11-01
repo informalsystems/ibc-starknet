@@ -218,11 +218,9 @@ pub mod CometClientComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of IClientStateValidation<ComponentState<TContractState>> {
         fn verify_membership(
-            self: @ComponentState<TContractState>,
-            client_sequence: u64,
-            path: ByteArray,
-            value: Array<u8>,
-            proof: Proof,
+            self: @ComponentState<TContractState>, client_sequence: u64, path: ByteArray, value: [
+                u32
+            ; 8], proof: Proof,
         ) {}
 
         fn verify_non_membership(

@@ -5,7 +5,7 @@ use snforge_std::spy_events;
 use starknet::class_hash::class_hash_const;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
-    TransferInitializerImpl, TransferReaderImpl, TransferWriterImpl, IBCTokenAddress
+    TransferInitializerImpl, TransferReaderImpl, TransferWriterImpl, TokenTransferQuery
 };
 use starknet_ibc_apps::transfer::TokenTransferComponent;
 use starknet_ibc_core::router::{AppContract, AppContractTrait};

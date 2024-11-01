@@ -22,9 +22,8 @@ pub mod channel {
     mod interface;
     mod msgs;
     mod types;
-
-    pub use commitment::u64IntoArrayU32;
     pub use channel_call::{ChannelContract, ChannelContractImpl, ChannelContractTrait};
+    pub use commitment::{compute_packet_commtiment, compute_ack_commitment};
     pub use components::events::ChannelEventEmitterComponent;
     pub use components::handler::ChannelHandlerComponent;
     pub use errors::ChannelErrors;

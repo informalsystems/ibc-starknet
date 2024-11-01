@@ -56,7 +56,7 @@ pub impl ClientContractImpl of ClientContractTrait {
         self: @ClientContract,
         client_sequence: u64,
         path: ByteArray,
-        value: Array<u8>,
+        value: [u32; 8],
         proof: Proof,
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }

@@ -30,10 +30,6 @@ pub impl PacketImpl of PacketTrait {
         assert(self.timeout_height_on_b > current_height, ChannelErrors::TIMED_OUT_PACKET);
         assert(self.timeout_timestamp_on_b > current_timestamp, ChannelErrors::TIMED_OUT_PACKET);
     }
-
-    fn compute_commitment(self: @Packet) -> Array<u8> {
-        array![]
-    }
 }
 
 impl PacketValidateBasicImpl of ValidateBasic<Packet> {

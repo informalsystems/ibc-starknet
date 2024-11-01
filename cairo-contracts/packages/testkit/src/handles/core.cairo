@@ -81,7 +81,7 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn packet_commitment(
         self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence
-    ) -> felt252 {
+    ) -> [u32; 8] {
         self.channel_query_dispatcher().packet_commitment(port_id, channel_id, sequence)
     }
 

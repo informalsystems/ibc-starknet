@@ -2,6 +2,7 @@ use core::num::traits::{CheckedAdd, Zero};
 use core::traits::PartialOrd;
 use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::host::ClientId;
+use starknet_ibc_utils::{IntoArrayU32, U32CollectorImpl};
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct CreateResponse {
@@ -125,6 +126,15 @@ pub impl HeightPartialOrd of PartialOrd<@Height> {
     }
 }
 
+pub impl HeightIntoArrayU32 of IntoArrayU32<Height> {
+    fn into_array_u32(self: Height) -> Array<u32> {
+        let mut coll = U32CollectorImpl::init();
+        coll.extend(self.revision_number);
+        coll.extend(self.revision_height);
+        coll.value()
+    }
+}
+
 #[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct Timestamp {
     pub timestamp: u64,
@@ -162,6 +172,12 @@ pub impl TimestampPartialOrd of PartialOrd<@Timestamp> {
 pub impl U64IntoTimestamp of Into<u64, Timestamp> {
     fn into(self: u64) -> Timestamp {
         Timestamp { timestamp: self }
+    }
+}
+
+pub impl TimestampIntoArrayU32 of IntoArrayU32<Timestamp> {
+    fn into_array_u32(self: Timestamp) -> Array<u32> {
+        self.timestamp.into_array_u32()
     }
 }
 

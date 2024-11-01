@@ -29,4 +29,8 @@ pub impl AppContractImpl of AppContractTrait {
     fn on_ack_packet(self: @AppContract, packet: Packet, ack: Acknowledgement) {
         IAppCallbackDispatcher { contract_address: *self.address }.on_ack_packet(packet, ack)
     }
+
+    fn json_packet_data(self: @AppContract, raw_packet_data: Array<felt252>) -> ByteArray {
+        IAppCallbackDispatcher { contract_address: *self.address }.json_packet_data(raw_packet_data)
+    }
 }

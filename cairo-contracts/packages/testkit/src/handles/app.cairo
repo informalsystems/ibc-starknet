@@ -5,8 +5,8 @@ use snforge_std::ContractClass;
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::types::MsgTransfer;
 use starknet_ibc_apps::transfer::{
-    ISendTransferDispatcher, ITokenAddressDispatcher, ISendTransferDispatcherTrait,
-    ITokenAddressDispatcherTrait,
+    ISendTransferDispatcher, ITransferQueryDispatcher, ISendTransferDispatcherTrait,
+    ITransferQueryDispatcherTrait,
 };
 use starknet_ibc_core::channel::IAppCallbackDispatcher;
 use starknet_ibc_core::router::AppContract;
@@ -35,7 +35,7 @@ pub impl AppHandleImpl of AppHandle {
     }
 
     fn ibc_token_address(self: @AppContract, token_key: felt252) -> ContractAddress {
-        ITokenAddressDispatcher { contract_address: *self.address }.ibc_token_address(token_key)
+        ITransferQueryDispatcher { contract_address: *self.address }.ibc_token_address(token_key)
     }
 
     fn send_transfer(self: @AppContract, msg: MsgTransfer) {

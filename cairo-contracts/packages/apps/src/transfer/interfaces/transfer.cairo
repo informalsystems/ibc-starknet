@@ -7,7 +7,7 @@ pub trait ISendTransfer<TContractState> {
 }
 
 #[starknet::interface]
-pub trait ITokenAddress<TContractState> {
+pub trait ITransferQuery<TContractState> {
     /// Returns the contract address of an IBC token given its key.
     ///
     /// NOTE: The token key is the Poseidon hash of the token's name, with the

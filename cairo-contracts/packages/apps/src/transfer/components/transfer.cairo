@@ -19,7 +19,7 @@ pub mod TokenTransferComponent {
         PrefixedDenomTrait, Participant
     };
     use starknet_ibc_apps::transfer::{
-        ITransferrable, ISendTransfer, ITokenAddress, ERC20Contract, ERC20ContractTrait,
+        ITransferrable, ISendTransfer, ITransferQuery, ERC20Contract, ERC20ContractTrait,
         TransferErrors, SUCCESS_ACK
     };
     use starknet_ibc_core::channel::{
@@ -191,16 +191,24 @@ pub mod TokenTransferComponent {
         fn on_timeout_packet(ref self: ComponentState<TContractState>, packet: Packet) {
             self.assert_owner();
         }
+
+        fn json_packet_data(
+            self: @ComponentState<TContractState>, raw_packet_data: Array<felt252>
+        ) -> ByteArray {
+            let packet_data: PacketData = raw_packet_data.into();
+
+            serde_json::to_byte_array(packet_data)
+        }
     }
 
     // -----------------------------------------------------------
     // ITokenAddress
     // -----------------------------------------------------------
 
-    #[embeddable_as(IBCTokenAddress)]
-    impl ITokenAddressImpl<
+    #[embeddable_as(TokenTransferQuery)]
+    impl ITransferQueryImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
-    > of ITokenAddress<ComponentState<TContractState>> {
+    > of ITransferQuery<ComponentState<TContractState>> {
         fn ibc_token_address(
             self: @ComponentState<TContractState>, token_key: felt252
         ) -> ContractAddress {

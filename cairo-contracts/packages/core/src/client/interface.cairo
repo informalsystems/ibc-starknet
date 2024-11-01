@@ -25,7 +25,7 @@ pub trait IRegisterClient<TContractState> {
 #[starknet::interface]
 pub trait IClientStateValidation<TContractState> {
     fn verify_membership(
-        self: @TContractState, client_sequence: u64, path: ByteArray, value: Array<u8>, proof: Proof
+        self: @TContractState, client_sequence: u64, path: ByteArray, value: [u32; 8], proof: Proof
     );
 
     fn verify_non_membership(
