@@ -15,15 +15,21 @@ pub mod router {
     pub use errors::RouterErrors;
     pub use interface::{IRouter, IRouterDispatcher, IRouterDispatcherTrait};
 }
+pub mod commitment {
+    mod types;
+
+    pub use types::{
+        CommitmentValue, CommitmentZero, CommitmentProof, CommitmentProofTrait,
+        compute_packet_commtiment, compute_ack_commitment
+    };
+}
 pub mod channel {
     mod channel_call;
-    mod commitment;
     mod errors;
     mod interface;
     mod msgs;
     mod types;
     pub use channel_call::{ChannelContract, ChannelContractImpl, ChannelContractTrait};
-    pub use commitment::{compute_packet_commtiment, compute_ack_commitment};
     pub use components::events::ChannelEventEmitterComponent;
     pub use components::handler::ChannelHandlerComponent;
     pub use errors::ChannelErrors;
@@ -69,7 +75,7 @@ pub mod client {
     pub use types::{
         CreateResponse, CreateResponseImpl, UpdateResponse, Status, StatusImpl, StatusTrait, Height,
         HeightImpl, HeightTrait, HeightZero, HeightPartialOrd, HeightsIntoUpdateResponse, Timestamp,
-        TimestampZero, TimestampPartialOrd, U64IntoTimestamp, Proof, ProofImpl, ProofTrait,
+        TimestampZero, TimestampPartialOrd, U64IntoTimestamp,
     };
     mod components {
         pub mod events;

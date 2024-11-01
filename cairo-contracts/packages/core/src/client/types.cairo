@@ -181,24 +181,3 @@ pub impl TimestampIntoArrayU32 of IntoArrayU32<Timestamp> {
     }
 }
 
-/// Contains the commitment proof bytes serving to verify membership or
-/// non-membership for an element or set of elements, in conjunction with
-/// a known commitment root
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
-pub struct Proof {
-    pub proof: Array<u8>,
-}
-
-pub impl ArrayU8IntoProof of Into<Array<u8>, Proof> {
-    fn into(self: Array<u8>) -> Proof {
-        Proof { proof: self }
-    }
-}
-
-#[generate_trait]
-pub impl ProofImpl of ProofTrait {
-    /// Returns true if the proof is non-empty.
-    fn is_non_empty(self: @Proof) -> bool {
-        self.proof.len() > 0
-    }
-}

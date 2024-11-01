@@ -186,7 +186,7 @@ pub impl DenomDisplay of Display<Denom> {
                 Display::fmt(@format!("{address_as_felt}"), ref f)
             },
             Denom::Hosted(byte_array) => Display::fmt(@byte_array, ref f),
-       }
+        }
     }
 }
 
@@ -208,8 +208,7 @@ pub impl ParticipantImpl of ParticipantTrait {
 
     fn as_byte_array(self: @Participant) -> ByteArray {
         match self {
-            Participant::Native(contract_address) =>
-            {
+            Participant::Native(contract_address) => {
                 let address_as_felt: felt252 = (*contract_address).into();
                 format!("{address_as_felt}")
             },
@@ -265,23 +264,15 @@ impl MemoValidateBasicImpl of ValidateBasic<Memo> {
 #[cfg(test)]
 pub mod tests {
     use serde_json::to_byte_array;
-    use starknet_ibc_testkit::dummies::{AMOUNT, COSMOS, STARKNET, HOSTED_DENOM, EMPTY_MEMO};
-    use super::PacketData;
+    use starknet_ibc_testkit::dummies::{PACKET_DATA_FROM_SN, PUBKEY};
 
+    // Snapshot test to ensure serialization stays consistent.
     #[test]
     fn test_json_serialized_packet_data() {
-        let packet_data = PacketData {
-            denom: HOSTED_DENOM(),
-            amount: AMOUNT,
-            sender: COSMOS(),
-            receiver: STARKNET(),
-            memo: EMPTY_MEMO()
-        };
-
         let expected =
-            "{\"denom\":\"UATOM\",\"amount\":\"100\",\"sender\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"receiver\":\"340767163730\",\"memo\":\"\"}";
+            "{\"denom\":\"2087021424722619777119509474943472645767659996348769578120564519014510906823\",\"amount\":\"100\",\"sender\":\"340767163730\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"memo\":\"\"}";
 
-        assert_eq!(to_byte_array(packet_data), expected);
+        assert_eq!(to_byte_array(PACKET_DATA_FROM_SN(PUBKEY().into())), expected);
     }
 }
 

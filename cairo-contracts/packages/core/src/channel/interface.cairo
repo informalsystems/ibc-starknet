@@ -1,4 +1,5 @@
 use starknet_ibc_core::channel::{Packet, MsgRecvPacket, MsgAckPacket, Acknowledgement, ChannelEnd};
+use starknet_ibc_core::commitment::CommitmentValue;
 use starknet_ibc_core::host::{PortId, ChannelId, Sequence};
 
 #[starknet::interface]
@@ -23,9 +24,7 @@ pub trait IChannelQuery<TContractState> {
     fn channel_end(self: @TContractState, port_id: PortId, channel_id: ChannelId) -> ChannelEnd;
     fn packet_commitment(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
-        ) -> [
-        u32
-    ; 8];
+    ) -> CommitmentValue;
     fn packet_receipt(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
     ) -> bool;

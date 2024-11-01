@@ -9,6 +9,7 @@ use starknet_ibc_core::client::{
     IRegisterClientDispatcherTrait, MsgCreateClient, MsgUpdateClient, CreateResponse,
     UpdateResponse,
 };
+use starknet_ibc_core::commitment::CommitmentValue;
 use starknet_ibc_core::host::{ChannelId, PortId, Sequence};
 use starknet_ibc_core::router::{IRouterDispatcher, IRouterDispatcherTrait};
 
@@ -81,7 +82,7 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn packet_commitment(
         self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence
-    ) -> [u32; 8] {
+    ) -> CommitmentValue {
         self.channel_query_dispatcher().packet_commitment(port_id, channel_id, sequence)
     }
 

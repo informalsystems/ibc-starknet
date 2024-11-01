@@ -4,8 +4,9 @@ use starknet_ibc_core::client::{
     IClientHandlerDispatcherTrait, IClientStateValidationDispatcher,
     IClientStateValidationDispatcherTrait, MsgCreateClient, MsgUpdateClient, MsgRecoverClient,
     MsgUpgradeClient, CreateResponse, UpdateResponse, Height, HeightPartialOrd, Status, StatusTrait,
-    ClientErrors, Timestamp, Proof
+    ClientErrors, Timestamp,
 };
+use starknet_ibc_core::commitment::{CommitmentValue, CommitmentProof};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct ClientContract {
@@ -56,15 +57,15 @@ pub impl ClientContractImpl of ClientContractTrait {
         self: @ClientContract,
         client_sequence: u64,
         path: ByteArray,
-        value: [u32; 8],
-        proof: Proof,
+        value: CommitmentValue,
+        proof: CommitmentProof,
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
             .verify_membership(client_sequence, path, value, proof)
     }
 
     fn verify_non_membership(
-        self: @ClientContract, client_sequence: u64, path: ByteArray, proof: Proof
+        self: @ClientContract, client_sequence: u64, path: ByteArray, proof: CommitmentProof
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
             .verify_non_membership(client_sequence, path, proof)

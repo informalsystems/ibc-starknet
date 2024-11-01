@@ -13,11 +13,13 @@ pub mod ChannelHandlerComponent {
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgRecvPacket, MsgAckPacket,
         ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt,
-        ReceiptTrait, AcknowledgementTrait, Packet, Acknowledgement, compute_packet_commtiment,
-        compute_ack_commitment,
+        ReceiptTrait, AcknowledgementTrait, Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, HeightImpl
+    };
+    use starknet_ibc_core::commitment::{
+        CommitmentValue, CommitmentZero, compute_packet_commtiment, compute_ack_commitment
     };
     use starknet_ibc_core::host::{
         PortId, ChannelId, Sequence, SequenceImpl, SequencePartialOrd, SequenceZero,
@@ -26,13 +28,12 @@ pub mod ChannelHandlerComponent {
     };
     use starknet_ibc_core::router::{RouterHandlerComponent, AppContractTrait, AppContract};
     use starknet_ibc_utils::ValidateBasic;
-    use starknet_ibc_utils::{IntoU256, IntoDigest};
     use super::{PORT_ID, CHANNEL_ID, CHANNEL_END};
 
     #[storage]
     pub struct Storage {
         pub channel_ends: Map<felt252, ChannelEnd>,
-        pub packet_commitments: Map<felt252, u256>,
+        pub packet_commitments: Map<felt252, CommitmentValue>,
         pub packet_receipts: Map<felt252, Receipt>,
         pub packet_acks: Map<felt252, felt252>,
         pub send_sequences: Map<felt252, Sequence>,
@@ -123,10 +124,8 @@ pub mod ChannelHandlerComponent {
             port_id: PortId,
             channel_id: ChannelId,
             sequence: Sequence
-            ) -> [
-            u32
-        ; 8] {
-            self.read_packet_commitment(@port_id, @channel_id, @sequence).into_digest()
+        ) -> CommitmentValue {
+            self.read_packet_commitment(@port_id, @channel_id, @sequence)
         }
 
         fn packet_receipt(
@@ -506,7 +505,7 @@ pub mod ChannelHandlerComponent {
                 packet.timeout_timestamp_on_b.clone()
             );
             assert(
-                packet_commitment == expected_packet_commitment.into_u256(),
+                packet_commitment == expected_packet_commitment,
                 ChannelErrors::MISMATCHED_PACKET_COMMITMENT
             );
         }
@@ -569,7 +568,7 @@ pub mod ChannelHandlerComponent {
             port_id: @PortId,
             channel_id: @ChannelId,
             sequence: @Sequence
-        ) -> u256 {
+        ) -> CommitmentValue {
             let commitment = self
                 .packet_commitments
                 .read(commitment_key(port_id, channel_id, sequence));
@@ -647,15 +646,11 @@ pub mod ChannelHandlerComponent {
             port_id: @PortId,
             channel_id: @ChannelId,
             sequence: @Sequence,
-            commitment: [
-                u32
-            ; 8]
+            commitment: CommitmentValue
         ) {
             self
                 .packet_commitments
-                .write(
-                    commitment_key(port_id, channel_id, sequence), commitment.into_u256()
-                ) // TODO
+                .write(commitment_key(port_id, channel_id, sequence), commitment);
         }
 
         fn delete_packet_commitment(
@@ -664,7 +659,9 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: @Sequence,
         ) {
-            self.packet_commitments.write(commitment_key(port_id, channel_id, sequence), '')
+            self
+                .packet_commitments
+                .write(commitment_key(port_id, channel_id, sequence), CommitmentZero::zero());
         }
 
         fn write_packet_receipt(
