@@ -19,16 +19,17 @@ pub fn SYMBOL() -> ByteArray {
     "IBC/UATOM"
 }
 
-pub fn PUBKEY() -> ContractAddress {
-    contract_address_const::<0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7>()
-}
-
 pub fn OWNER() -> ContractAddress {
     contract_address_const::<'OWNER'>()
 }
 
 pub fn CLASS_HASH() -> ClassHash {
     class_hash_const::<'ERC20Mintable'>()
+}
+
+pub fn ERC20() -> ERC20Contract {
+    contract_address_const::<0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7>()
+        .into()
 }
 
 pub fn STARKNET() -> Participant {
@@ -41,7 +42,7 @@ pub fn COSMOS() -> Participant {
 }
 
 pub fn NATIVE_DENOM() -> PrefixedDenom {
-    PrefixedDenom { trace_path: array![], base: Denom::Native(PUBKEY().into()) }
+    PrefixedDenom { trace_path: array![], base: Denom::Native(ERC20()) }
 }
 
 pub fn HOSTED_DENOM() -> PrefixedDenom {

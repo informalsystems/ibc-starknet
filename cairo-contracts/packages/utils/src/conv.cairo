@@ -42,7 +42,7 @@ pub fn pow<T, +Copy<T>, +Drop<T>, +Mul<T>, +Div<T>, +Rem<T>, +PartialEq<T>, +Int
     }
 }
 
-#[derive(Drop)]
+#[derive(Drop, Clone)]
 pub struct U32Collector {
     pub value: Array<u32>,
 }
