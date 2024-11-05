@@ -92,6 +92,5 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
             }
         );
         self.assert_emitted_single(contract_address, expected);
-
     }
 }

@@ -45,6 +45,7 @@ pub mod TokenTransferComponent {
         RecvEvent: RecvEvent,
         AckEvent: AckEvent,
         AckStatusEvent: AckStatusEvent,
+        TimoutEvent: TimeoutEvent,
         CreateTokenEvent: CreateTokenEvent,
     }
 
@@ -90,6 +91,16 @@ pub mod TokenTransferComponent {
     pub struct AckStatusEvent {
         #[key]
         pub ack_status: AckStatus,
+    }
+
+    #[derive(Debug, Drop, Serde, starknet::Event)]
+    pub struct TimeoutEvent {
+        #[key]
+        pub receiver: Participant,
+        #[key]
+        pub denom: PrefixedDenom,
+        pub amount: u256,
+        pub memo: Memo,
     }
 
     #[derive(Debug, Drop, Serde, starknet::Event)]
@@ -190,6 +201,12 @@ pub mod TokenTransferComponent {
 
         fn on_timeout_packet(ref self: ComponentState<TContractState>, packet: Packet) {
             self.assert_owner();
+
+            let packet_data = packet.data.clone().into();
+
+            self.timeout_validate(@packet, @packet_data);
+
+            self.timeout_execute(packet, packet_data);
         }
 
         fn json_packet_data(
@@ -429,6 +446,10 @@ pub mod TokenTransferComponent {
             packet_data.validate_basic();
 
             assert(ack_status.is_non_empty(), TransferErrors::EMPTY_ACK_STATUS);
+
+            if ack_status.is_error() {
+                self.refund_validate(packet.clone(), packet_data.clone());
+            }
         }
 
         fn ack_execute(
@@ -438,12 +459,38 @@ pub mod TokenTransferComponent {
             ack_status: AckStatus,
         ) {
             if ack_status.is_error() {
-                self.refund_token(packet, packet_data.clone());
+                self.refund_execute(packet, packet_data.clone());
             }
 
             self.emit_ack_event(packet_data, ack_status.ack().clone());
 
             self.emit_ack_status_event(ack_status);
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl TimeoutPacketInternalImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +ITransferrable<TContractState>,
+        +Drop<TContractState>
+    > of TimeoutPacketInternalTrait<TContractState> {
+        fn timeout_validate(
+            self: @ComponentState<TContractState>, packet: @Packet, packet_data: @PacketData,
+        ) {
+            packet.validate_basic();
+
+            packet_data.validate_basic();
+
+            self.refund_validate(packet.clone(), packet_data.clone());
+        }
+
+        fn timeout_execute(
+            ref self: ComponentState<TContractState>, packet: Packet, packet_data: PacketData,
+        ) {
+            self.refund_execute(packet, packet_data.clone());
+
+            self.emit_timeout_event(packet_data);
         }
     }
 
@@ -511,6 +558,30 @@ pub mod TokenTransferComponent {
 
             assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
         }
+
+        fn refund_validate(
+            self: @ComponentState<TContractState>, packet: Packet, packet_data: PacketData
+        ) {
+            let sender: Option<ContractAddress> = packet_data.sender.try_into();
+
+            assert(sender.is_some(), TransferErrors::INVALID_SENDER);
+
+            match @packet_data.denom.base {
+                Denom::Native(erc20_token) => {
+                    self
+                        .unescrow_validate(
+                            sender.unwrap(),
+                            packet.port_id_on_a,
+                            packet.chan_id_on_a,
+                            erc20_token.clone(),
+                            packet_data.amount,
+                        )
+                },
+                Denom::Hosted(_) => {
+                    self.mint_validate(sender.unwrap(), packet_data.denom, packet_data.amount)
+                }
+            };
+        }
     }
 
     #[generate_trait]
@@ -567,6 +638,28 @@ pub mod TokenTransferComponent {
             let token = self.get_token(denom.key());
 
             token.burn(account, amount);
+        }
+
+        fn refund_execute(
+            ref self: ComponentState<TContractState>, packet: Packet, packet_data: PacketData
+        ) {
+            let sender: Option<ContractAddress> = packet_data.sender.try_into();
+
+            match @packet_data.denom.base {
+                Denom::Native(erc20_token) => {
+                    self
+                        .unescrow_execute(
+                            sender.unwrap(),
+                            packet.port_id_on_a,
+                            packet.chan_id_on_a,
+                            erc20_token.clone(),
+                            packet_data.amount,
+                        )
+                },
+                Denom::Hosted(_) => {
+                    self.mint_execute(sender.unwrap(), packet_data.denom, packet_data.amount)
+                }
+            };
         }
     }
 
@@ -629,30 +722,6 @@ pub mod TokenTransferComponent {
             self.emit_create_token_event(name, symbol, erc20_token.address, amount);
 
             erc20_token.address
-        }
-
-        fn refund_token(
-            ref self: ComponentState<TContractState>, packet: Packet, packet_data: PacketData
-        ) {
-            let sender: Option<ContractAddress> = packet_data.sender.try_into();
-
-            assert(sender.is_some(), TransferErrors::INVALID_SENDER);
-
-            match @packet_data.denom.base {
-                Denom::Native(erc20_token) => {
-                    self
-                        .unescrow_execute(
-                            sender.unwrap(),
-                            packet.port_id_on_a,
-                            packet.chan_id_on_a,
-                            erc20_token.clone(),
-                            packet_data.amount,
-                        )
-                },
-                Denom::Hosted(_) => {
-                    self.mint_execute(sender.unwrap(), packet_data.denom, packet_data.amount)
-                }
-            };
         }
 
         fn record_ibc_token(
@@ -818,6 +887,18 @@ pub mod TokenTransferComponent {
 
         fn emit_ack_status_event(ref self: ComponentState<TContractState>, ack_status: AckStatus) {
             self.emit(AckStatusEvent { ack_status });
+        }
+
+        fn emit_timeout_event(ref self: ComponentState<TContractState>, packet_data: PacketData,) {
+            self
+                .emit(
+                    TimeoutEvent {
+                        receiver: packet_data.receiver,
+                        denom: packet_data.denom,
+                        amount: packet_data.amount,
+                        memo: packet_data.memo,
+                    }
+                );
         }
 
         fn emit_create_token_event(

@@ -652,6 +652,7 @@ pub mod ChannelHandlerComponent {
                 packet.timeout_height_on_b.clone(),
                 packet.timeout_timestamp_on_b.clone()
             );
+
             assert(
                 packet_commitment == expected_packet_commitment,
                 ChannelErrors::MISMATCHED_PACKET_COMMITMENT
