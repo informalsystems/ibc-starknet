@@ -12,8 +12,8 @@ pub mod ChannelHandlerComponent {
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgRecvPacket, MsgAckPacket,
-        ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering, Receipt,
-        ReceiptTrait, Packet, Acknowledgement
+        MsgTimeoutPacket, ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering,
+        Receipt, ReceiptTrait, Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, HeightImpl
@@ -23,7 +23,7 @@ pub mod ChannelHandlerComponent {
     };
     use starknet_ibc_core::host::{
         PortId, ChannelId, Sequence, SequenceImpl, SequencePartialOrd, SequenceZero,
-        channel_end_key, commitment_key, receipt_key, ack_key, commitment_path, ack_path,
+        channel_end_key, commitment_key, receipt_key, ack_key, commitment_path, ack_path, receipt_path, next_sequence_recv_path,
         next_sequence_recv_key, next_sequence_send_key, next_sequence_ack_key
     };
     use starknet_ibc_core::router::{RouterHandlerComponent, AppContractTrait, AppContract};
@@ -102,6 +102,15 @@ pub mod ChannelHandlerComponent {
             self.ack_packet_validate(msg.clone(), chan_end_on_a.clone());
 
             self.ack_packet_execute(msg, chan_end_on_a);
+        }
+
+        fn timeout_packet(ref self: ComponentState<TContractState>, msg: MsgTimeoutPacket) {
+            let chan_end_on_a = self
+                .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
+
+            self.timeout_packet_validate(msg.clone(), chan_end_on_a.clone());
+
+            self.timeout_packet_execute(msg, chan_end_on_a);
         }
     }
 
@@ -191,11 +200,14 @@ pub mod ChannelHandlerComponent {
 
             assert(packet.is_timeout_set(), ChannelErrors::MISSING_PACKET_TIMEOUT);
 
-            packet
-                .verify_not_timed_out(
-                    @client.latest_height(client_sequence),
-                    @client.latest_timestamp(client_sequence)
-                );
+            assert(
+                !packet
+                    .is_timed_out(
+                        @client.latest_height(client_sequence),
+                        @client.latest_timestamp(client_sequence)
+                    ),
+                ChannelErrors::TIMED_OUT_PACKET
+            );
         }
 
         fn send_packet_execute(
@@ -256,11 +268,14 @@ pub mod ChannelHandlerComponent {
 
             chan_end_on_b.validate(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
 
-            msg
-                .packet
-                .verify_not_timed_out(
-                    @HeightImpl::new(0, get_block_number()), @get_block_timestamp().into()
-                );
+            assert(
+                !msg
+                    .packet
+                    .is_timed_out(
+                        @HeightImpl::new(0, get_block_number()), @get_block_timestamp().into()
+                    ),
+                ChannelErrors::TIMED_OUT_PACKET
+            );
 
             let client = self.get_client(chan_end_on_b.client_id.client_type);
 
@@ -431,7 +446,7 @@ pub mod ChannelHandlerComponent {
 
             client.verify_is_active(client_sequence);
 
-            client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
+            client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
             self.verify_packet_acknowledgement(@client, chan_end_on_a, msg);
         }
@@ -484,10 +499,140 @@ pub mod ChannelHandlerComponent {
                     chan_end_on_a.client_id.sequence,
                     path,
                     ack_commitment_on_a,
-                    msg.proof_ack_on_a.clone()
+                    msg.proof_ack_on_b.clone()
                 );
         }
 
+        fn verify_ack_sequence_matches(self: @ComponentState<TContractState>, packet: @Packet) {
+            let expected_sequence = self
+                .read_next_sequence_ack(packet.port_id_on_a, packet.chan_id_on_a);
+
+            assert(@expected_sequence == packet.seq_on_a, ChannelErrors::INVALID_PACKET_SEQUENCE)
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl TimeoutPacketImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of TimeoutPacketTrait<TContractState> {
+        fn timeout_packet_validate(
+            ref self: ComponentState<TContractState>,
+            msg: MsgTimeoutPacket,
+            chan_end_on_a: ChannelEnd
+        ) {
+            let packet = msg.packet;
+
+            chan_end_on_a.validate(@packet.port_id_on_b, @packet.chan_id_on_b);
+
+            // TODO: verify connection end if we ever decide to implement ICS-03
+
+            let app = self.get_app(@packet.port_id_on_a);
+
+            let json_packet_data = app.json_packet_data(packet.data.clone());
+
+            self.verify_packet_commitment_matches(@packet, @json_packet_data);
+
+            let client = self.get_client(chan_end_on_a.client_id.client_type);
+
+            let client_sequence = chan_end_on_a.client_id.sequence;
+
+            client.verify_is_active(client_sequence);
+
+            client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
+
+            assert(
+                packet
+                    .is_timed_out(
+                        @client.latest_height(client_sequence),
+                        @client.latest_timestamp(client_sequence).into()
+                    ),
+                ChannelErrors::PENDING_PACKET
+            );
+
+            let mut path: ByteArray =
+            "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+
+            match chan_end_on_a.ordering {
+                ChannelOrdering::Unordered => {
+                   let seq_recv_path_on_b = next_sequence_recv_path(
+                        packet.port_id_on_b.clone(),
+                        packet.chan_id_on_b.clone()
+                    );
+
+                    path.append(@seq_recv_path_on_b);
+
+                    // client
+                    //     .verify_membership(
+                    //         chan_end_on_a.client_id.sequence,
+                    //         path,
+                    //         packet.seq_on_a,
+                    //         msg.proof_unreceived_on_b,
+                    //     );
+                },
+                ChannelOrdering::Ordered => {
+                    let receipt_path_on_b = receipt_path(
+                        packet.port_id_on_b.clone(),
+                        packet.chan_id_on_b.clone(),
+                        packet.seq_on_a.clone()
+                    );
+
+                    path.append(@receipt_path_on_b);
+
+                    client
+                        .verify_non_membership(
+                            chan_end_on_a.client_id.sequence,
+                            path,
+                            msg.proof_unreceived_on_b,
+                        );
+                },
+            };
+        }
+
+        fn timeout_packet_execute(
+            ref self: ComponentState<TContractState>,
+            msg: MsgTimeoutPacket,
+            chan_end_on_a: ChannelEnd
+        ) {
+            let mut packet = msg.packet;
+
+            let app = self.get_app(@packet.port_id_on_b);
+
+            app.on_timeout_packet(packet.clone());
+
+            self
+                .delete_packet_commitment(
+                    @packet.port_id_on_a, @packet.chan_id_on_a, @packet.seq_on_a
+                );
+
+            self.emit_timeout_packet_event(packet.clone(), chan_end_on_a.ordering.clone());
+
+            if chan_end_on_a.is_ordered() {
+                self
+                    .write_channel_end(
+                        @packet.port_id_on_a, @packet.chan_id_on_a, chan_end_on_a.close()
+                    );
+                // TODO: emit channel closed event once channel handshake is implemented.
+            }
+        }
+    }
+
+    // -----------------------------------------------------------
+    // Channel internals
+    // -----------------------------------------------------------
+
+    #[generate_trait]
+    pub(crate) impl ChannelInternalImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of ChannelInternalTrait<TContractState> {
         /// Verifies if the packet commitment matches the one stored earlier
         /// during the send packet process. If it doesn't exist or doesn't match,
         /// an error is returned. Note that this logic differs from ibc-rs, where
@@ -508,13 +653,6 @@ pub mod ChannelHandlerComponent {
                 packet_commitment == expected_packet_commitment,
                 ChannelErrors::MISMATCHED_PACKET_COMMITMENT
             );
-        }
-
-        fn verify_ack_sequence_matches(self: @ComponentState<TContractState>, packet: @Packet) {
-            let expected_sequence = self
-                .read_next_sequence_ack(packet.port_id_on_a, packet.chan_id_on_a);
-
-            assert(@expected_sequence == packet.seq_on_a, ChannelErrors::INVALID_PACKET_SEQUENCE)
         }
     }
 

@@ -62,7 +62,6 @@ fn test_compute_packet_commitment() {
 fn test_compute_ack_commitment() {
     let ack = array![123, 34, 114, 101, 115, 117, 108, 116, 34, 58, 34, 65, 81, 61, 61, 34, 125];
     let commitment = compute_ack_commitment(ack.into());
-    println!("{:?}", commitment);
     let expected: [u32; 8] = [
         150427006, 3575129854, 416826642, 3206868085, 2022319, 555983991, 3748831401, 4083419772
     ];

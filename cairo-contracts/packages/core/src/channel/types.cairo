@@ -26,10 +26,10 @@ pub impl PacketImpl of PacketTrait {
         !(self.timeout_height_on_b.is_zero() && self.timeout_timestamp_on_b.is_zero())
     }
 
-    /// Checks if the packet is not timed out, and throws an error if it is.
-    fn verify_not_timed_out(self: @Packet, current_height: @Height, current_timestamp: @Timestamp) {
-        assert(self.timeout_height_on_b > current_height, ChannelErrors::TIMED_OUT_PACKET);
-        assert(self.timeout_timestamp_on_b > current_timestamp, ChannelErrors::TIMED_OUT_PACKET);
+    /// Checks if the packet is timed out.
+    fn is_timed_out(self: @Packet, latest_height: @Height, latest_timestamp: @Timestamp) -> bool {
+        !(self.timeout_height_on_b > latest_height
+            && self.timeout_timestamp_on_b > latest_timestamp)
     }
 }
 
@@ -96,6 +96,17 @@ pub impl ChannelEndImpl of ChannelEndTrait {
             self.counterparty_matches(counterparty_port_id, counterparty_chan_id),
             ChannelErrors::INVALID_COUNTERPARTY
         );
+    }
+
+    /// Consumes the channel end and returns a new channel end with the state
+    /// set to closed.
+    fn close(self: ChannelEnd) -> ChannelEnd {
+        ChannelEnd {
+            state: ChannelState::Closed,
+            ordering: self.ordering,
+            remote: self.remote,
+            client_id: self.client_id,
+        }
     }
 }
 

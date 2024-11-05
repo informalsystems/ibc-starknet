@@ -154,6 +154,16 @@ pub impl TimestampZero of Zero<Timestamp> {
     }
 }
 
+pub impl TimestampAdd of Add<Timestamp> {
+    fn add(lhs: Timestamp, rhs: Timestamp) -> Timestamp {
+        let timestamp = lhs.timestamp.checked_add(rhs.timestamp);
+
+        assert(timestamp.is_some(), ClientErrors::OVERFLOWED_TIMESTAMP);
+
+        Timestamp { timestamp: timestamp.unwrap() }
+    }
+}
+
 pub impl TimestampPartialOrd of PartialOrd<@Timestamp> {
     fn le(lhs: @Timestamp, rhs: @Timestamp) -> bool {
         lhs.timestamp <= rhs.timestamp

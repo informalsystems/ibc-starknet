@@ -6,7 +6,10 @@ use starknet_ibc_core::router::AppContract;
 use starknet_ibc_testkit::configs::{
     TransferAppConfig, TransferAppConfigTrait, CometClientConfig, CometClientConfigTrait
 };
-use starknet_ibc_testkit::dummies::{COSMOS, STARKNET, OWNER, SUPPLY, PACKET_COMMITMENT_ON_SN};
+use starknet_ibc_testkit::dummies::{
+    HEIGHT, COSMOS, STARKNET, OWNER, CLIENT_ID, SUPPLY, PACKET_COMMITMENT_ON_SN, TIMEOUT_HEIGHT,
+    TIMEOUT_TIMESTAMP
+};
 use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ChannelEventSpyExt};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle, AppHandle, ERC20Handle};
 use starknet_ibc_testkit::setup::SetupImpl;
@@ -318,4 +321,61 @@ fn test_ack_packet_for_never_sent_packet() {
         );
 
     core.ack_packet(msg);
+}
+
+#[test]
+fn test_timeout_packet_with_height() {
+    // -----------------------------------------------------------
+    // Setup Essentials
+    // -----------------------------------------------------------
+
+    let (core, _, _, comet_cfg, transfer_cfg, _) = setup();
+
+    let timeout_height = TIMEOUT_HEIGHT(11);
+
+    let timeout_timestamp = TIMEOUT_TIMESTAMP(1000);
+
+    // -----------------------------------------------------------
+    // Send Packet (from Starknet to Cosmos)
+    // -----------------------------------------------------------
+
+    let mut packet = transfer_cfg
+        .dummy_packet_with_timeout(
+            transfer_cfg.native_denom.clone(),
+            STARKNET(),
+            COSMOS(),
+            timeout_height.clone(),
+            timeout_timestamp.clone()
+        );
+
+    core.send_packet(packet.clone());
+
+    // -----------------------------------------------------------
+    // Update Client
+    // -----------------------------------------------------------
+
+    let updating_height = comet_cfg.latest_height.clone() + HEIGHT(1);
+
+    let msg = comet_cfg
+        .dummy_msg_update_client(
+            CLIENT_ID(), comet_cfg.latest_height, updating_height.clone(), 11,
+        );
+
+    core.update_client(msg.clone());
+
+    // -----------------------------------------------------------
+    // Timeout Packet
+    // -----------------------------------------------------------
+
+    let mut packet = transfer_cfg
+        .dummy_msg_timeout_packet(
+            transfer_cfg.native_denom.clone(),
+            STARKNET(),
+            COSMOS(),
+            updating_height,
+            timeout_height,
+            timeout_timestamp
+        );
+
+    core.timeout_packet(packet.clone());
 }

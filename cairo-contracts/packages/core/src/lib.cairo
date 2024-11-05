@@ -44,7 +44,7 @@ pub mod channel {
         IAppCallbackDispatcher, IAppCallbackDispatcherTrait, IChannelQuery, IChannelQueryDispatcher,
         IChannelQueryDispatcherTrait
     };
-    pub use msgs::{MsgRecvPacket, MsgAckPacket};
+    pub use msgs::{MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket};
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
         ChannelOrdering, Counterparty, Acknowledgement, AckStatus, AckStatusImpl, AckStatusTrait,
@@ -104,7 +104,7 @@ pub mod host {
         channel_end_key, commitment_key, receipt_key, ack_key, next_sequence_recv_key,
         next_sequence_send_key, next_sequence_ack_key
     };
-    pub use paths::{commitment_path, ack_path};
+    pub use paths::{commitment_path, receipt_path, ack_path, next_sequence_recv_path};
     pub use prefixes::{
         CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX,
         ACKS_PREFIX, RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX,

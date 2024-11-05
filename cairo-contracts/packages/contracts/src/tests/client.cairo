@@ -69,13 +69,17 @@ fn test_update_comet_client_ok() {
 
     spy.drop_all_events();
 
-    // Update the client to a new height.
-    let updating_height = cfg.latest_height.clone() + HEIGHT(5);
+    // Update the client to a new height and time.
+    let updating_height = cfg.latest_height.clone() + HEIGHT(1);
+    let updating_time = cfg.latest_timestamp.clone() + 1;
 
     // Create a `MsgUpdateClient` message.
     let msg = cfg
         .dummy_msg_update_client(
-            create_resp.client_id, create_resp.height, updating_height.clone()
+            create_resp.client_id,
+            create_resp.height,
+            updating_height.clone(),
+            updating_time.clone()
         );
 
     // Submit a `MsgUpdateClient` to the IBC core contract.

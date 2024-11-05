@@ -20,7 +20,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
             client_type: CLIENT_TYPE(),
             latest_height: HEIGHT(10),
             latest_timestamp: 10,
-            trusting_period: 10,
+            trusting_period: 100,
         }
     }
 
@@ -51,12 +51,16 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
     }
 
     fn dummy_msg_update_client(
-        self: @CometClientConfig, client_id: ClientId, trusted_height: Height, latest_height: Height
+        self: @CometClientConfig,
+        client_id: ClientId,
+        trusted_height: Height,
+        latest_height: Height,
+        latest_timestamp: u64,
     ) -> MsgUpdateClient {
         let mut serialized_header: Array<felt252> = ArrayTrait::new();
 
         let signed_header = SignedHeader {
-            height: latest_height, time: *self.latest_timestamp + 1, root: "1"
+            height: latest_height, time: latest_timestamp, root: "1"
         };
 
         let header = CometHeader { trusted_height, signed_header };

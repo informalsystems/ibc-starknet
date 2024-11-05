@@ -8,4 +8,5 @@ pub mod ClientErrors {
     pub const INVALID_PROOF_HEIGHT: felt252 = 'ICS04: invalid proof height';
     pub const INVALID_SUBSTITUTE_CLIENT_ID: felt252 = 'ICS02: invalid subs client id';
     pub const OVERFLOWED_HEIGHT: felt252 = 'ICS02: overflowed height';
+    pub const OVERFLOWED_TIMESTAMP: felt252 = 'ICS02: overflowed timestamp';
 }

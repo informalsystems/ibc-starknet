@@ -1,4 +1,6 @@
-use starknet_ibc_core::channel::{Packet, MsgRecvPacket, MsgAckPacket, Acknowledgement, ChannelEnd};
+use starknet_ibc_core::channel::{
+    Packet, MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket, Acknowledgement, ChannelEnd
+};
 use starknet_ibc_core::commitment::CommitmentValue;
 use starknet_ibc_core::host::{PortId, ChannelId, Sequence};
 
@@ -7,6 +9,7 @@ pub trait IChannelHandler<TContractState> {
     fn send_packet(ref self: TContractState, packet: Packet);
     fn recv_packet(ref self: TContractState, msg: MsgRecvPacket);
     fn ack_packet(ref self: TContractState, msg: MsgAckPacket);
+    fn timeout_packet(ref self: TContractState, msg: MsgTimeoutPacket);
 }
 
 #[starknet::interface]
