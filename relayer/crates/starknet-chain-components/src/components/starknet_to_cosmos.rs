@@ -1,9 +1,7 @@
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cosmos_chain_components::components::client::{
-    ClientStateTypeComponent, ConsensusStateHeightsQuerierComponent, ConsensusStateTypeComponent,
-    CreateClientMessageBuilderComponent, CreateClientMessageOptionsTypeComponent,
-    UpdateClientMessageBuilderComponent,
+    ClientStateTypeComponent, ConsensusStateHeightsQuerierComponent, ConsensusStateTypeComponent, CreateClientMessageBuilderComponent, CreateClientMessageOptionsTypeComponent, CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent, UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent
 };
 use hermes_cosmos_chain_components::components::cosmos_to_cosmos::CosmosToCosmosComponents;
 use hermes_relayer_components::chain::traits::queries::client_state::{
@@ -25,8 +23,13 @@ define_components! {
             ClientStateWithProofsQuerierComponent,
             ConsensusStateQuerierComponent,
             ConsensusStateWithProofsQuerierComponent,
+            CreateClientPayloadTypeComponent,
+            UpdateClientPayloadTypeComponent,
             CreateClientMessageOptionsTypeComponent,
+            CreateClientPayloadOptionsTypeComponent,
             CreateClientMessageBuilderComponent,
+            CreateClientPayloadBuilderComponent,
+            UpdateClientPayloadBuilderComponent,
         ]:
             CosmosToCosmosComponents,
         ClientStateTypeComponent:
