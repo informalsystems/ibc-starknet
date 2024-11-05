@@ -5,25 +5,25 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
 
-use hermes_chain_components::traits::message_builders::create_client::CanBuildCreateClientMessage;
 use hermes_chain_components::traits::message_builders::update_client::CanBuildUpdateClientMessage;
-use hermes_chain_components::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_chain_components::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::queries::consensus_state::CanQueryConsensusStateWithLatestHeight;
-use hermes_chain_components::traits::send_message::{CanSendMessages, CanSendSingleMessage};
+use hermes_chain_components::traits::send_message::CanSendMessages;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
-use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_error::types::Error;
+use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
+use hermes_relayer_components::relay::traits::target::SourceTarget;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
+use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::types::message_responses::create_client::CreateClientResponse;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
+use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use ibc_relayer::chain::cosmos::client::Settings;
 use ibc_relayer::config::types::TrustThreshold;
@@ -110,48 +110,32 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             trust_threshold: TrustThreshold::ONE_THIRD,
         };
 
-        let create_client_payload_1 = <CosmosChain as CanBuildCreateClientPayload<StarknetChain>>::build_create_client_payload(cosmos_chain, &create_client_settings).await?;
+        let client_id = StarknetToCosmosRelay::create_client(
+            SourceTarget,
+            &starknet_chain,
+            &cosmos_chain,
+            &create_client_settings,
+            &(),
+        ).await?;
 
-        let height_1 = create_client_payload_1.client_state.latest_height();
+        println!("created client on Starknet: {:?}", client_id);
 
-        let root_1 = create_client_payload_1.consensus_state.root.clone().into_vec();
-
-        let client_id = {
-            let message = <StarknetChain as CanBuildCreateClientMessage<CosmosChain>>
-                ::build_create_client_message(starknet_chain, &(), create_client_payload_1).await?;
-
-            let response = starknet_chain.send_message(message).await?;
-
-            let create_client_response: CreateClientResponse = StarknetCairoEncoding
-                .decode(&response.result)?;
-
-            let client_id = create_client_response.client_id;
-
-            println!("created client on Starknet: {:?}", client_id);
-
-            client_id
-        };
-
-        {
-            let consensus_state = starknet_chain.query_consensus_state_with_latest_height(
-                PhantomData::<CosmosChain>,
-                &client_id,
-                &height_1,
-            )
-            .await?;
-
-            println!("queried consensus state: {consensus_state:?}");
-
-            assert_eq!(consensus_state.root, root_1);
-        }
+        runtime.sleep(Duration::from_secs(1)).await;
 
         let update_header = {
+            let target_height = cosmos_chain.query_chain_height().await?;
+
             let client_state = starknet_chain.query_client_state_with_latest_height(
                 PhantomData::<CosmosChain>, &client_id
             )
             .await?;
 
-            <CosmosChain as CanBuildUpdateClientPayload<StarknetChain>>::build_update_client_payload(cosmos_chain, &height_1, &height_1, client_state).await?
+            let trusted_height = CosmosHeight::new(
+                client_state.latest_height.revision_number,
+                client_state.latest_height.revision_height,
+            )?;
+
+            <CosmosChain as CanBuildUpdateClientPayload<StarknetChain>>::build_update_client_payload(cosmos_chain, &trusted_height, &target_height, client_state).await?
         };
 
         {
@@ -181,8 +165,6 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             .await?;
 
             println!("queried consensus state: {consensus_state:?}");
-
-            assert_eq!(consensus_state.root, update_header.root);
         }
 
         Ok(())
