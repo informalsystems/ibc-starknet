@@ -13,6 +13,7 @@ pub mod ChannelErrors {
     pub const MISSING_PACKET_ACK: felt252 = 'ICS04: missing packet ack';
     pub const MISSING_PACKET_TIMEOUT: felt252 = 'ICS04: missing packet timeout';
     pub const MISMATCHED_PACKET_COMMITMENT: felt252 = 'ICS04: mismatched commitment';
+    pub const MISMATCHED_PACKET_SEQUENCE: felt252 = 'ICS04: mismatched sequence';
     pub const PACKET_ALREADY_RECEIVED: felt252 = 'ICS04: packet already received';
     pub const PENDING_PACKET: felt252 = 'ICS04: packet not timed out';
     pub const TIMED_OUT_PACKET: felt252 = 'ICS04: packet timed out';

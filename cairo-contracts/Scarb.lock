@@ -2,6 +2,43 @@
 version = 1
 
 [[package]]
+name = "alexandria_data_structures"
+version = "0.1.0"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:906bf52e0bb87bbcd169f5757883f1552115f18f90080b8ce356f59c7e50f9b8"
+dependencies = [
+ "alexandria_encoding",
+]
+
+[[package]]
+name = "alexandria_encoding"
+version = "0.1.0"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:01c8de70af7c9c9753128f65e3d4fefa8cd2d6f9c1e65330717e83bbceb1f8eb"
+dependencies = [
+ "alexandria_math",
+ "alexandria_numeric",
+]
+
+[[package]]
+name = "alexandria_math"
+version = "0.1.0"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:45d8d6d732eac737488ae5883556827bf9fe7d5b566d31560220d1c3ed6b71df"
+dependencies = [
+ "alexandria_data_structures",
+]
+
+[[package]]
+name = "alexandria_numeric"
+version = "0.1.0"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:8df67e3e26d240ed164f279ffb3afa88441fa2eeb7894bfe918ea9c63336f3d9"
+dependencies = [
+ "alexandria_math",
+]
+
+[[package]]
 name = "openzeppelin_access"
 version = "0.18.0"
 source = "registry+https://scarbs.xyz/"
@@ -124,6 +161,7 @@ dependencies = [
 name = "starknet_ibc_core"
 version = "0.1.0"
 dependencies = [
+ "alexandria_numeric",
  "openzeppelin_testing",
  "snforge_std",
  "starknet_ibc_testkit",

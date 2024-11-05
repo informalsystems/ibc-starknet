@@ -1,14 +1,14 @@
 use core::num::traits::Zero;
 use starknet_ibc_core::channel::{Acknowledgement, Packet, ChannelErrors};
 use starknet_ibc_core::client::{Height, HeightPartialOrd};
-use starknet_ibc_core::commitment::CommitmentProof;
+use starknet_ibc_core::commitment::StateProof;
 use starknet_ibc_core::host::Sequence;
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct MsgRecvPacket {
     pub packet: Packet,
-    pub proof_commitment_on_a: CommitmentProof,
+    pub proof_commitment_on_a: StateProof,
     pub proof_height_on_a: Height,
 }
 
@@ -23,7 +23,7 @@ impl MsgRecvPacketValidateBasicImpl of ValidateBasic<MsgRecvPacket> {
 pub struct MsgAckPacket {
     pub packet: Packet,
     pub acknowledgement: Acknowledgement,
-    pub proof_ack_on_b: CommitmentProof,
+    pub proof_ack_on_b: StateProof,
     pub proof_height_on_b: Height
 }
 
@@ -39,7 +39,7 @@ impl MsgAcknowledgePacketValidateBasicImpl of ValidateBasic<MsgAckPacket> {
 pub struct MsgTimeoutPacket {
     pub packet: Packet,
     pub next_seq_recv_on_b: Sequence,
-    pub proof_unreceived_on_b: CommitmentProof,
+    pub proof_unreceived_on_b: StateProof,
     pub proof_height_on_b: Height,
 }
 

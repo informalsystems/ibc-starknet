@@ -1,6 +1,6 @@
 use starknet_ibc_core::host::{
-    COMMITMENTS_PREFIX, RECEIPTS_PREFIX, ACKS_PREFIX, NEXT_SEQ_RECV_PREFIX, PORTS_PREFIX, CHANNELS_PREFIX,
-    SEQUENCES_PREFIX
+    COMMITMENTS_PREFIX, RECEIPTS_PREFIX, ACKS_PREFIX, NEXT_SEQ_RECV_PREFIX, PORTS_PREFIX,
+    CHANNELS_PREFIX, SEQUENCES_PREFIX
 };
 use starknet_ibc_core::host::{ChannelId, PortId, Sequence};
 use starknet_ibc_utils::{RemotePathBuilder, RemotePathBuilderImpl};

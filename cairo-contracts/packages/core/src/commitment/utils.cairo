@@ -1,3 +1,5 @@
+use alexandria_numeric::integers::UIntBytes;
+
 #[derive(Drop, Clone)]
 pub struct U32Collector {
     pub value: Array<u32>,
@@ -83,4 +85,19 @@ pub fn array_u8_into_array_u32(input: Array<u8>) -> (Array<u32>, u32, u32) {
     };
 
     (result, last_word, last_word_len)
+}
+
+pub fn array_u32_into_array_u8(input: Array<u32>) -> Array<u8> {
+    let mut result: Array<u8> = ArrayTrait::new();
+    for i in input {
+        let a = i.to_bytes();
+        result.append_span(a);
+    };
+    result
+}
+
+pub impl ArrayU32IntoArrayU8 of Into<Array<u32>, Array<u8>> {
+    fn into(self: Array<u32>) -> Array<u8> {
+        array_u32_into_array_u8(self)
+    }
 }

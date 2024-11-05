@@ -3,6 +3,7 @@ use core::num::traits::CheckedAdd;
 use core::num::traits::Zero;
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
+use starknet_ibc_core::commitment::{ArrayU32IntoArrayU8, StateValue, u64_into_array_u32};
 use starknet_ibc_core::host::errors::HostErrors;
 use starknet_ibc_utils::{ValidateBasic, ComputeKey, poseidon_hash};
 
@@ -144,6 +145,16 @@ pub impl SequenceImpl of SequenceTrait {
             Option::Some(sequence) => Sequence { sequence },
             Option::None => panic!("{}", HostErrors::OVERFLOWED_SEQUENCE)
         }
+    }
+
+    fn to_array_u8(self: Sequence) -> Array<u8> {
+        u64_into_array_u32(self.sequence).into()
+    }
+}
+
+pub impl SequenceIntoArrayU8 of Into<Sequence, StateValue> {
+    fn into(self: Sequence) -> StateValue {
+        self.to_array_u8().into()
     }
 }
 
