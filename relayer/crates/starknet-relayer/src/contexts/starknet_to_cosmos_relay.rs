@@ -10,7 +10,6 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::components::default::relay::*;
 use hermes_relayer_components::error::impls::retry::ReturnMaxRetry;
 use hermes_relayer_components::error::traits::retry::MaxErrorRetryGetterComponent;
-use hermes_relayer_components::relay::impls::update_client::build::BuildUpdateClientMessages;
 use hermes_relayer_components::relay::traits::chains::{
     CanRaiseRelayChainErrors, HasRelayChains, ProvideRelayChains,
 };
@@ -18,7 +17,6 @@ use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::relay::traits::update_client_message_builder::{
     CanBuildTargetUpdateClientMessage, CanSendTargetUpdateClientMessage,
-    TargetUpdateClientMessageBuilder,
 };
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
@@ -108,9 +106,9 @@ pub trait CanUseStarknetToCosmosRelay:
 
 impl CanUseStarknetToCosmosRelay for StarknetToCosmosRelay {}
 
-pub trait CanBuildUpdateClientMessage:
-    TargetUpdateClientMessageBuilder<StarknetToCosmosRelay, SourceTarget>
-{
-}
+// pub trait CanBuildUpdateClientMessage:
+//     TargetUpdateClientMessageBuilder<StarknetToCosmosRelay, SourceTarget>
+// {
+// }
 
 // impl CanBuildUpdateClientMessage for BuildUpdateClientMessages {}
