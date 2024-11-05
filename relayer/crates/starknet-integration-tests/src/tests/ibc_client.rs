@@ -112,8 +112,8 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
 
         let client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
-            &cosmos_chain,
+            starknet_chain,
+            cosmos_chain,
             &create_client_settings,
             &(),
         ).await?;
