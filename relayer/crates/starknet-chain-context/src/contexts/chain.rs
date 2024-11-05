@@ -27,7 +27,9 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::CanQuery
 use hermes_relayer_components::chain::traits::queries::consensus_state_height::CanQueryConsensusStateHeight;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
-use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
+use hermes_relayer_components::chain::traits::types::client_state::{
+    HasClientStateFields, HasClientStateType,
+};
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
 use hermes_relayer_components::chain::traits::types::create_client::{
     HasCreateClientEvent, HasCreateClientPayloadType,
@@ -227,6 +229,7 @@ pub trait CanUseCosmosChainWithStarknet:
     HasClientStateType<StarknetChain, ClientState = CometClientState>
     + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
     + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CometUpdateHeader>
+    + HasClientStateFields<StarknetChain>
     + CanQueryClientState<StarknetChain>
     + CanQueryConsensusState<StarknetChain>
     + CanBuildCreateClientMessage<StarknetChain>
