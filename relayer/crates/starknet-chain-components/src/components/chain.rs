@@ -9,7 +9,8 @@ pub use hermes_cosmos_chain_components::components::client::{
     CreateClientPayloadTypeComponent, MessageResponseEventsGetterComponent,
     MessageResponseTypeComponent, OutgoingPacketFieldsReaderComponent, OutgoingPacketTypeComponent,
     PortIdTypeComponent, SequenceTypeComponent, TimeTypeComponent, TimeoutTypeComponent,
-    UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
+    UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
+    UpdateClientPayloadTypeComponent,
 };
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
@@ -46,6 +47,7 @@ use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
+use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::client_state::QueryCometClientState;
@@ -193,6 +195,8 @@ define_components! {
             ProvideNoCreateClientMessageOptionsType,
         CreateClientPayloadBuilderComponent:
             BuildStarknetCreateClientPayload,
+        UpdateClientMessageBuilderComponent:
+            BuildUpdateCometClientMessage,
         CreateClientMessageBuilderComponent:
             BuildCreateCometClientMessage,
         UpdateClientPayloadBuilderComponent:

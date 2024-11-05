@@ -4,11 +4,18 @@ use cgp::prelude::HasErrorType;
 use hermes_chain_components::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_chain_components::traits::payload_builders::update_client::UpdateClientPayloadBuilder;
 use hermes_chain_components::traits::types::client_state::HasClientStateType;
-use hermes_chain_components::traits::types::create_client::HasCreateClientPayloadOptionsType;
+use hermes_chain_components::traits::types::create_client::{
+    HasCreateClientPayloadOptionsType, HasCreateClientPayloadType,
+};
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::update_client::HasUpdateClientPayloadType;
+use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientPayload;
 use ibc_relayer::chain::cosmos::client::Settings;
 use ibc_relayer::config::types::TrustThreshold;
+use ibc_relayer_types::core::ics02_client::height::Height as CosmosHeight;
+
+use crate::types::cosmos::height::Height;
+use crate::types::cosmos::update::CometUpdateHeader;
 
 pub struct BuildUpdateCometClientPayload;
 
@@ -17,17 +24,18 @@ impl<Chain, Counterparty> UpdateClientPayloadBuilder<Chain, Counterparty>
 where
     Chain: CanBuildCreateClientPayload<Counterparty>
         + HasCreateClientPayloadOptionsType<Counterparty, CreateClientPayloadOptions = Settings>
-        + HasUpdateClientPayloadType<Counterparty, UpdateClientPayload = Chain::CreateClientPayload>
+        + HasCreateClientPayloadType<Counterparty, CreateClientPayload = CosmosCreateClientPayload>
+        + HasUpdateClientPayloadType<Counterparty, UpdateClientPayload = CometUpdateHeader>
         + HasClientStateType<Counterparty>
-        + HasHeightType
+        + HasHeightType<Height = CosmosHeight>
         + HasErrorType,
 {
     async fn build_update_client_payload(
         chain: &Chain,
-        _trusted_height: &Chain::Height,
-        _target_height: &Chain::Height,
+        trusted_height: &CosmosHeight,
+        _target_height: &CosmosHeight,
         _client_state: Chain::ClientState,
-    ) -> Result<Chain::UpdateClientPayload, Chain::Error> {
+    ) -> Result<CometUpdateHeader, Chain::Error> {
         let create_client_settings = Settings {
             max_clock_drift: Duration::from_secs(40),
             trusting_period: Some(Duration::from_secs(60 * 60)),
@@ -38,6 +46,21 @@ where
             .build_create_client_payload(&create_client_settings)
             .await?;
 
-        Ok(payload)
+        let height_2 = Height {
+            revision_number: payload.client_state.latest_height().revision_number(),
+            revision_height: payload.client_state.latest_height().revision_height(),
+        };
+
+        let update_header = CometUpdateHeader {
+            trusted_height: Height {
+                revision_number: trusted_height.revision_number(),
+                revision_height: trusted_height.revision_height(),
+            },
+            target_height: height_2,
+            time: payload.consensus_state.timestamp.unix_timestamp() as u64,
+            root: payload.consensus_state.root.into_vec(),
+        };
+
+        Ok(update_header)
     }
 }
