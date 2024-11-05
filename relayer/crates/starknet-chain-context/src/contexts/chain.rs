@@ -6,6 +6,7 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
+use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientPayload;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
 use hermes_encoding_components::traits::has_encoding::{
@@ -32,6 +33,7 @@ use hermes_relayer_components::chain::traits::types::consensus_state::HasConsens
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::HasClientIdType;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
+use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
@@ -216,9 +218,11 @@ impl CanUseStarknetChain for StarknetChain {}
 pub trait CanUseCosmosChainWithStarknet:
     HasClientStateType<StarknetChain, ClientState = CometClientState>
     + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
+    + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CosmosCreateClientPayload>
     + CanQueryClientState<StarknetChain>
     + CanQueryConsensusState<StarknetChain>
     + CanBuildCreateClientMessage<StarknetChain>
+    + CanBuildUpdateClientPayload<StarknetChain>
     + CanBuildUpdateClientMessage<StarknetChain>
     + CanQueryConsensusStateHeight<StarknetChain>
     + CanBuildCreateClientPayload<StarknetChain>
