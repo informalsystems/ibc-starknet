@@ -27,11 +27,17 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::CanQuery
 use hermes_relayer_components::chain::traits::queries::consensus_state_height::CanQueryConsensusStateHeight;
 use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
-use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
+use hermes_relayer_components::chain::traits::types::client_state::{
+    HasClientStateFields, HasClientStateType,
+};
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
+use hermes_relayer_components::chain::traits::types::create_client::{
+    HasCreateClientEvent, HasCreateClientPayloadType,
+};
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::HasClientIdType;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
+use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
@@ -65,6 +71,7 @@ use hermes_starknet_chain_components::types::client_state::WasmStarknetClientSta
 use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
 use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
+use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
 use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
@@ -200,14 +207,19 @@ pub trait CanUseStarknetChain:
     + CanQueryTokenBalance
     + CanTransferToken
     + HasRetryableError
+    + HasCreateClientEvent<CosmosChain>
     + CanBuildCreateClientPayload<CosmosChain>
-    // + CanBuildCreateClientMessage<CosmosChain>
+    + CanBuildCreateClientMessage<CosmosChain>
     + CanBuildUpdateClientPayload<CosmosChain>
+    + CanBuildUpdateClientMessage<CosmosChain>
     + CanQueryClientState<CosmosChain>
     + CanQueryConsensusState<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
 where
-    CosmosChain: HasClientStateType<Self> + HasConsensusStateType<Self>,
+    CosmosChain: HasClientStateType<Self>
+        + HasConsensusStateType<Self>
+        + HasCreateClientPayloadType<Self>
+        + HasUpdateClientPayloadType<Self>,
 {
 }
 
@@ -216,12 +228,16 @@ impl CanUseStarknetChain for StarknetChain {}
 pub trait CanUseCosmosChainWithStarknet:
     HasClientStateType<StarknetChain, ClientState = CometClientState>
     + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
+    + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CometUpdateHeader>
+    + HasClientStateFields<StarknetChain>
     + CanQueryClientState<StarknetChain>
     + CanQueryConsensusState<StarknetChain>
     + CanBuildCreateClientMessage<StarknetChain>
+    + CanBuildUpdateClientPayload<StarknetChain>
     + CanBuildUpdateClientMessage<StarknetChain>
     + CanQueryConsensusStateHeight<StarknetChain>
     + CanBuildCreateClientPayload<StarknetChain>
+    + CanBuildUpdateClientPayload<StarknetChain>
 {
 }
 

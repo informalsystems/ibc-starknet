@@ -7,7 +7,7 @@ use hermes_wasm_encoding_components::components::MutEncoderComponent;
 
 use crate::types::cosmos::height::Height;
 
-#[derive(Debug, HasField)]
+#[derive(Debug, Clone, HasField)]
 pub struct CometUpdateHeader {
     pub trusted_height: Height,
     pub target_height: Height,

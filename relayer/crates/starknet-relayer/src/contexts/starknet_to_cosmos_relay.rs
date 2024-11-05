@@ -14,7 +14,7 @@ use hermes_relayer_components::relay::traits::chains::{
     CanRaiseRelayChainErrors, HasRelayChains, ProvideRelayChains,
 };
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
-use hermes_relayer_components::relay::traits::target::DestinationTarget;
+use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::relay::traits::update_client_message_builder::{
     CanBuildTargetUpdateClientMessage, CanSendTargetUpdateClientMessage,
 };
@@ -96,6 +96,8 @@ impl ProvideRelayChains<StarknetToCosmosRelay> for StarknetToCosmosRelayComponen
 pub trait CanUseStarknetToCosmosRelay:
     HasRelayChains<SrcChain = StarknetChain, DstChain = CosmosChain>
     + CanCreateClient<DestinationTarget>
+    + CanCreateClient<SourceTarget>
+    // + CanSendTargetUpdateClientMessage<SourceTarget>
     + CanRaiseRelayChainErrors
     + CanBuildTargetUpdateClientMessage<DestinationTarget>
     + CanSendTargetUpdateClientMessage<DestinationTarget>
@@ -103,3 +105,10 @@ pub trait CanUseStarknetToCosmosRelay:
 }
 
 impl CanUseStarknetToCosmosRelay for StarknetToCosmosRelay {}
+
+// pub trait CanBuildUpdateClientMessage:
+//     TargetUpdateClientMessageBuilder<StarknetToCosmosRelay, SourceTarget>
+// {
+// }
+
+// impl CanBuildUpdateClientMessage for BuildUpdateClientMessages {}
