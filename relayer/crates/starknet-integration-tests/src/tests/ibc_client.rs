@@ -6,30 +6,28 @@ use std::sync::Arc;
 use std::time::SystemTime;
 
 use hermes_chain_components::traits::message_builders::create_client::CanBuildCreateClientMessage;
+use hermes_chain_components::traits::message_builders::update_client::CanBuildUpdateClientMessage;
 use hermes_chain_components::traits::payload_builders::create_client::CanBuildCreateClientPayload;
+use hermes_chain_components::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::queries::consensus_state::CanQueryConsensusStateWithLatestHeight;
-use hermes_chain_components::traits::send_message::CanSendSingleMessage;
+use hermes_chain_components::traits::send_message::{CanSendMessages, CanSendSingleMessage};
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::types::cosmos::height::Height;
-use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::message_responses::create_client::CreateClientResponse;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use ibc_relayer::chain::cosmos::client::Settings;
 use ibc_relayer::config::types::TrustThreshold;
-use starknet::accounts::Call;
-use starknet::macros::selector;
+use ibc_relayer_types::Height as CosmosHeight;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
 
@@ -147,38 +145,20 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             assert_eq!(consensus_state.root, root_1);
         }
 
-        let create_client_payload_2 = <CosmosChain as CanBuildCreateClientPayload<StarknetChain>>::build_create_client_payload(cosmos_chain, &create_client_settings).await?;
-        let root_2 = create_client_payload_2.consensus_state.root.into_vec();
+        let update_header = {
+            let client_state = starknet_chain.query_client_state_with_latest_height(
+                PhantomData::<CosmosChain>, &client_id
+            )
+            .await?;
+
+            <CosmosChain as CanBuildUpdateClientPayload<StarknetChain>>::build_update_client_payload(cosmos_chain, &height_1, &height_1, client_state).await?
+        };
 
         {
-            let message = {
-                let height_2 = Height {
-                    revision_number: create_client_payload_2.client_state.latest_height().revision_number(),
-                    revision_height: create_client_payload_2.client_state.latest_height().revision_height(),
-                };
+            let message = <StarknetChain as CanBuildUpdateClientMessage<CosmosChain>>::build_update_client_message(
+                starknet_chain, &client_id, update_header.clone()).await?;
 
-                let update_header = CometUpdateHeader {
-                    trusted_height: Height {
-                        revision_number: height_1.revision_number(),
-                        revision_height: height_1.revision_height(),
-                    },
-                    target_height: height_2,
-                    time: create_client_payload_2.consensus_state.timestamp.unix_timestamp() as u64,
-                    root: root_2.clone(),
-                };
-
-                let raw_header = StarknetCairoEncoding.encode(&update_header)?;
-
-                let calldata = StarknetCairoEncoding.encode(&(&client_id, raw_header))?;
-
-                Call {
-                    to: comet_client_address,
-                    selector: selector!("update_client"),
-                    calldata,
-                }
-            };
-
-            let events = starknet_chain.send_message(message).await?;
+            let events = starknet_chain.send_messages(message).await?;
 
             println!("update client events: {:?}", events);
         }
@@ -196,13 +176,13 @@ fn test_starknet_comet_client_contract() -> Result<(), Error> {
             let consensus_state = starknet_chain.query_consensus_state_with_latest_height(
                 PhantomData::<CosmosChain>,
                 &client_id,
-                &create_client_payload_2.client_state.latest_height(),
+                &CosmosHeight::new(update_header.target_height.revision_number, update_header.target_height.revision_height)?,
             )
             .await?;
 
             println!("queried consensus state: {consensus_state:?}");
 
-            assert_eq!(consensus_state.root, root_2);
+            assert_eq!(consensus_state.root, update_header.root);
         }
 
         Ok(())
