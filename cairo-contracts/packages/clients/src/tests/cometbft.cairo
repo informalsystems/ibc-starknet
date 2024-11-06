@@ -1,3 +1,4 @@
+use CometClientComponent::ClientWriterTrait;
 use snforge_std::start_cheat_block_timestamp_global;
 use starknet_ibc_clients::cometbft::CometClientComponent::{
     CometClientHandler, CometClientQuery, ClientReaderImpl
@@ -88,4 +89,45 @@ fn test_missing_client_processed_time() {
 fn test_missing_client_processed_height() {
     let mut state = setup();
     state.read_client_processed_height(0, HEIGHT(5));
+}
+
+#[test]
+fn test_empty_update_heights() {
+    let mut state = setup();
+    state.read_update_heights(0);
+}
+
+#[test]
+fn test_update_heights() {
+    let mut state = setup();
+    let heights = state.read_update_heights(0);
+    assert!(heights.len() == 0);
+
+    state.write_update_height(0, HEIGHT(1));
+    state.write_update_height(0, HEIGHT(2));
+    let heights = state.read_update_heights(0);
+    assert_eq!(heights, array![HEIGHT(2), HEIGHT(1)]);
+}
+
+#[test]
+fn test_update_height_before() {
+    let mut state = setup();
+    state.write_update_height(0, HEIGHT(1));
+    let height = state.update_height_before(0, HEIGHT(2));
+    assert_eq!(height, HEIGHT(1));
+
+    state.write_update_height(0, HEIGHT(2));
+    let height = state.update_height_before(0, HEIGHT(2));
+    assert_eq!(height, HEIGHT(2));
+
+    state.write_update_height(0, HEIGHT(4));
+    let height = state.update_height_before(0, HEIGHT(3));
+    assert_eq!(height, HEIGHT(2));
+}
+
+#[test]
+#[should_panic(expected: 'ICS07: zero update heights')]
+fn test_update_height_before_empty() {
+    let mut state = setup();
+    state.update_height_before(0, HEIGHT(3));
 }
