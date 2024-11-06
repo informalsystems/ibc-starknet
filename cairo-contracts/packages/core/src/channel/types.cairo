@@ -128,6 +128,25 @@ pub enum ChannelOrdering {
 }
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+pub struct ChannelVersion {
+    pub version: ByteArray,
+}
+
+pub impl ChannelVersionZero of Zero<ChannelVersion> {
+    fn zero() -> ChannelVersion {
+        ChannelVersion { version: "" }
+    }
+
+    fn is_zero(self: @ChannelVersion) -> bool {
+        self.version.len() == 0
+    }
+
+    fn is_non_zero(self: @ChannelVersion) -> bool {
+        !self.is_zero()
+    }
+}
+
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Counterparty {
     pub port_id: PortId,
     pub channel_id: ChannelId,

@@ -1,5 +1,7 @@
 use core::num::traits::Zero;
-use starknet_ibc_core::channel::{Acknowledgement, Packet, ChannelErrors, ChannelOrdering};
+use starknet_ibc_core::channel::{
+    Acknowledgement, Packet, ChannelErrors, ChannelOrdering, ChannelVersion
+};
 use starknet_ibc_core::client::{Height, HeightPartialOrd};
 use starknet_ibc_core::commitment::StateProof;
 use starknet_ibc_core::host::Sequence;
@@ -10,7 +12,7 @@ use starknet_ibc_utils::ValidateBasic;
 pub struct MsgChanOpenInit {
     pub port_id_on_a: PortId,
     pub connection_hops_on_a: Array<ConnectionId>,
-    pub version_on_a: ByteArray,
+    pub version_on_a: ChannelVersion,
     pub port_id_on_b: PortId,
     pub ordering: ChannelOrdering,
 }
@@ -29,7 +31,7 @@ pub struct MsgChanOpenTry {
     pub connection_hops_on_b: Array<ConnectionId>,
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
-    pub version_on_a: ByteArray,
+    pub version_on_a: ChannelVersion,
     pub proof_chan_end_on_a: StateProof,
     pub proof_height_on_a: Height,
     pub ordering: ChannelOrdering
@@ -41,7 +43,7 @@ pub impl MsgChanOpenTryValidateBasic of ValidateBasic<MsgChanOpenTry> {
         assert(self.connection_hops_on_b.len() > 0, ChannelErrors::MISSING_CONNECTION_ID);
         assert(!self.port_id_on_a.is_zero(), ChannelErrors::MISSING_PORT_ID);
         assert(!self.chan_id_on_a.is_zero(), ChannelErrors::MISSING_CHANNEL_ID);
-        assert(self.version_on_a.len() > 0, ChannelErrors::MISSING_CHANNEL_VERSION);
+        assert(self.version_on_a.is_non_zero(), ChannelErrors::MISSING_CHANNEL_VERSION);
         assert(self.proof_chan_end_on_a.is_non_zero(), ChannelErrors::EMPTY_CHAN_END_PROOF);
         assert(self.proof_height_on_a.is_non_zero(), ChannelErrors::ZERO_PROOF_HEIGHT);
     }
@@ -52,7 +54,7 @@ pub struct MsgChanOpenAck {
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
     pub chan_id_on_b: ChannelId,
-    pub version_on_b: ByteArray,
+    pub version_on_b: ChannelVersion,
     pub proof_chan_end_on_b: StateProof,
     pub proof_height_on_b: Height
 }
@@ -62,7 +64,7 @@ pub impl MsgChanOpenAckValidateBasic of ValidateBasic<MsgChanOpenAck> {
         assert(!self.port_id_on_a.is_zero(), ChannelErrors::MISSING_PORT_ID);
         assert(!self.chan_id_on_a.is_zero(), ChannelErrors::MISSING_CHANNEL_ID);
         assert(!self.chan_id_on_b.is_zero(), ChannelErrors::MISSING_CHANNEL_ID);
-        assert(self.version_on_b.len() > 0, ChannelErrors::MISSING_CHANNEL_VERSION);
+        assert(self.version_on_b.is_non_zero(), ChannelErrors::MISSING_CHANNEL_VERSION);
         assert(self.proof_chan_end_on_b.is_non_zero(), ChannelErrors::EMPTY_CHAN_END_PROOF);
         assert(self.proof_height_on_b.is_non_zero(), ChannelErrors::ZERO_PROOF_HEIGHT);
     }

@@ -24,10 +24,10 @@ pub mod TokenTransferComponent {
     };
     use starknet_ibc_core::channel::{
         Packet, Acknowledgement, AckStatus, AckStatusImpl, IAppCallback, ChannelContract,
-        ChannelContractTrait, ChannelEndTrait
+        ChannelContractTrait, ChannelEndTrait, ChannelOrdering, ChannelVersion
     };
 
-    use starknet_ibc_core::host::{PortId, ChannelId};
+    use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId};
     use starknet_ibc_utils::{ComputeKey, ValidateBasic};
 
     #[storage]
@@ -173,6 +173,37 @@ pub mod TokenTransferComponent {
         +Drop<TContractState>,
         impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of IAppCallback<ComponentState<TContractState>> {
+        fn on_chan_open_init(
+            ref self: ComponentState<TContractState>,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            connection_hops_on_a: Array<ConnectionId>,
+            version_on_a: ChannelVersion,
+            port_id_on_b: PortId,
+            ordering: ChannelOrdering
+        ) {}
+
+        fn on_chan_open_try(
+            ref self: ComponentState<TContractState>,
+            port_id_on_b: PortId,
+            chan_id_on_b: ChannelId,
+            connection_hops_on_b: Array<ConnectionId>,
+            port_id_on_a: PortId,
+            version_on_a: ChannelVersion,
+            ordering: ChannelOrdering
+        ) {}
+
+        fn on_chan_open_ack(
+            ref self: ComponentState<TContractState>,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            version_on_b: ChannelVersion
+        ) {}
+
+        fn on_chan_open_confirm(
+            ref self: ComponentState<TContractState>, port_id_on_b: PortId, chan_id_on_b: ChannelId
+        ) {}
+
         fn on_recv_packet(
             ref self: ComponentState<TContractState>, packet: Packet
         ) -> Acknowledgement {

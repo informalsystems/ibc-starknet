@@ -11,7 +11,8 @@ pub mod ChannelHandlerComponent {
     use starknet::storage::{StorageMapReadAccess, StorageMapWriteAccess};
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
-        ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgRecvPacket, MsgAckPacket,
+        ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgChanOpenInit,
+        MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket, MsgAckPacket,
         MsgTimeoutPacket, ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering,
         Receipt, ReceiptTrait, Packet, Acknowledgement
     };
@@ -79,6 +80,10 @@ pub mod ChannelHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
+        fn chan_open_init(ref self: ComponentState<TContractState>, msg: MsgChanOpenInit) {}
+        fn chan_open_try(ref self: ComponentState<TContractState>, msg: MsgChanOpenTry) {}
+        fn chan_open_ack(ref self: ComponentState<TContractState>, msg: MsgChanOpenAck) {}
+        fn chan_open_confirm(ref self: ComponentState<TContractState>, msg: MsgChanOpenConfirm) {}
         fn send_packet(ref self: ComponentState<TContractState>, packet: Packet) {
             let chan_end_on_a = self.read_channel_end(@packet.port_id_on_a, @packet.chan_id_on_a);
 

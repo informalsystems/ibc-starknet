@@ -50,8 +50,8 @@ pub mod channel {
     };
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
-        ChannelOrdering, Counterparty, Acknowledgement, AckStatus, AckStatusImpl, AckStatusTrait,
-        Receipt, ReceiptImpl, ReceiptTrait
+        ChannelOrdering, ChannelVersion, ChannelVersionZero, Counterparty, Acknowledgement,
+        AckStatus, AckStatusImpl, AckStatusTrait, Receipt, ReceiptImpl, ReceiptTrait
     };
     mod components {
         pub mod events;

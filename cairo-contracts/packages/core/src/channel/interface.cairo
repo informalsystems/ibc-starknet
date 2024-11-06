@@ -1,11 +1,17 @@
 use starknet_ibc_core::channel::{
-    Packet, MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket, Acknowledgement, ChannelEnd
+    ChannelEnd, MsgChanOpenInit, MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket,
+    MsgAckPacket, MsgTimeoutPacket, Packet, Acknowledgement
 };
+use starknet_ibc_core::channel::{ChannelOrdering, ChannelVersion};
 use starknet_ibc_core::commitment::Commitment;
-use starknet_ibc_core::host::{PortId, ChannelId, Sequence};
+use starknet_ibc_core::host::{ConnectionId, PortId, ChannelId, Sequence};
 
 #[starknet::interface]
 pub trait IChannelHandler<TContractState> {
+    fn chan_open_init(ref self: TContractState, msg: MsgChanOpenInit);
+    fn chan_open_try(ref self: TContractState, msg: MsgChanOpenTry);
+    fn chan_open_ack(ref self: TContractState, msg: MsgChanOpenAck);
+    fn chan_open_confirm(ref self: TContractState, msg: MsgChanOpenConfirm);
     fn send_packet(ref self: TContractState, packet: Packet);
     fn recv_packet(ref self: TContractState, msg: MsgRecvPacket);
     fn ack_packet(ref self: TContractState, msg: MsgAckPacket);
@@ -14,6 +20,33 @@ pub trait IChannelHandler<TContractState> {
 
 #[starknet::interface]
 pub trait IAppCallback<TContractState> {
+    fn on_chan_open_init(
+        ref self: TContractState,
+        port_id_on_a: PortId,
+        chan_id_on_a: ChannelId,
+        connection_hops_on_a: Array<ConnectionId>,
+        version_on_a: ChannelVersion,
+        port_id_on_b: PortId,
+        ordering: ChannelOrdering
+    );
+    fn on_chan_open_try(
+        ref self: TContractState,
+        port_id_on_b: PortId,
+        chan_id_on_b: ChannelId,
+        connection_hops_on_b: Array<ConnectionId>,
+        port_id_on_a: PortId,
+        version_on_a: ChannelVersion,
+        ordering: ChannelOrdering
+    );
+    fn on_chan_open_ack(
+        ref self: TContractState,
+        port_id_on_a: PortId,
+        chan_id_on_a: ChannelId,
+        version_on_b: ChannelVersion
+    );
+    fn on_chan_open_confirm(
+        ref self: TContractState, port_id_on_b: PortId, chan_id_on_b: ChannelId
+    );
     fn on_recv_packet(ref self: TContractState, packet: Packet) -> Acknowledgement;
     fn on_ack_packet(ref self: TContractState, packet: Packet, ack: Acknowledgement);
     fn on_timeout_packet(ref self: TContractState, packet: Packet);
