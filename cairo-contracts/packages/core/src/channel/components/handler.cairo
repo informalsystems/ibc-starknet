@@ -242,13 +242,6 @@ pub mod ChannelHandlerComponent {
 
             self.emit_send_packet_event(packet, chan_end_on_a.ordering);
         }
-
-        fn verify_send_sequence_matches(self: @ComponentState<TContractState>, packet: @Packet) {
-            let expected_sequence = self
-                .read_next_sequence_send(packet.port_id_on_a, packet.chan_id_on_a);
-
-            assert(@expected_sequence == packet.seq_on_a, ChannelErrors::INVALID_PACKET_SEQUENCE)
-        }
     }
 
     #[generate_trait]
@@ -280,18 +273,17 @@ pub mod ChannelHandlerComponent {
 
             let client = self.get_client(chan_end_on_b.client_id.client_type);
 
-            client.verify_is_active(chan_end_on_b.client_id.sequence);
+            let client_sequence = chan_end_on_b.client_id.sequence;
 
-            client.verify_proof_height(@msg.proof_height_on_a, chan_end_on_b.client_id.sequence);
+            client.verify_is_active(client_sequence);
+
+            client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
 
             let app = self.get_app(@msg.packet.port_id_on_a);
 
             let json_packet_data = app.json_packet_data(msg.packet.data.clone());
 
-            self
-                .verify_packet_commitment(
-                    @client, chan_end_on_b.clone(), msg.clone(), json_packet_data
-                );
+            self.verify_packet_commitment(@client, client_sequence, msg.clone(), json_packet_data);
 
             match @chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
@@ -376,39 +368,6 @@ pub mod ChannelHandlerComponent {
 
             self.emit_write_ack_event(msg.packet, ack);
         }
-
-        fn verify_packet_commitment(
-            self: @ComponentState<TContractState>,
-            client: @ClientContract,
-            chan_end_on_b: ChannelEnd,
-            msg: MsgRecvPacket,
-            json_packet_data: ByteArray
-        ) {
-            let packet_commitment_on_a = compute_packet_commtiment(
-                @json_packet_data,
-                msg.packet.timeout_height_on_b.clone(),
-                msg.packet.timeout_timestamp_on_b.clone()
-            );
-
-            let mut path: ByteArray =
-                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
-
-            let commitment_path = commitment_path(
-                msg.packet.port_id_on_a.clone(),
-                msg.packet.chan_id_on_a.clone(),
-                msg.packet.seq_on_a.clone()
-            );
-
-            path.append(@commitment_path);
-
-            client
-                .verify_membership(
-                    chan_end_on_b.client_id.sequence,
-                    path,
-                    packet_commitment_on_a.into(),
-                    msg.proof_commitment_on_a.clone()
-                );
-        }
     }
 
     #[generate_trait]
@@ -449,7 +408,7 @@ pub mod ChannelHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
-            self.verify_packet_acknowledgement(@client, chan_end_on_a, msg);
+            self.verify_packet_acknowledgement(@client, client_sequence, msg);
         }
 
         fn ack_packet_execute(
@@ -475,41 +434,6 @@ pub mod ChannelHandlerComponent {
                     );
             }
         }
-
-        fn verify_packet_acknowledgement(
-            self: @ComponentState<TContractState>,
-            client: @ClientContract,
-            chan_end_on_a: ChannelEnd,
-            msg: MsgAckPacket,
-        ) {
-            let ack_commitment_on_a = compute_ack_commitment(msg.acknowledgement.clone());
-
-            let mut path: ByteArray =
-                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
-
-            let ack_path = ack_path(
-                msg.packet.port_id_on_a.clone(),
-                msg.packet.chan_id_on_a.clone(),
-                msg.packet.seq_on_a.clone()
-            );
-
-            path.append(@ack_path);
-
-            client
-                .verify_membership(
-                    chan_end_on_a.client_id.sequence,
-                    path,
-                    ack_commitment_on_a.into(),
-                    msg.proof_ack_on_b.clone()
-                );
-        }
-
-        fn verify_ack_sequence_matches(self: @ComponentState<TContractState>, packet: @Packet) {
-            let expected_sequence = self
-                .read_next_sequence_ack(packet.port_id_on_a, packet.chan_id_on_a);
-
-            assert(@expected_sequence == packet.seq_on_a, ChannelErrors::INVALID_PACKET_SEQUENCE)
-        }
     }
 
     #[generate_trait]
@@ -526,7 +450,7 @@ pub mod ChannelHandlerComponent {
             msg: MsgTimeoutPacket,
             chan_end_on_a: ChannelEnd
         ) {
-            let packet = msg.packet;
+            let packet = msg.packet.clone();
 
             chan_end_on_a.validate(@packet.port_id_on_b, @packet.chan_id_on_b);
 
@@ -544,7 +468,7 @@ pub mod ChannelHandlerComponent {
 
             client.verify_is_active(client_sequence);
 
-            client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
+            client.verify_proof_height(@msg.proof_height_on_b.clone(), client_sequence);
 
             assert(
                 packet
@@ -555,23 +479,9 @@ pub mod ChannelHandlerComponent {
                 ChannelErrors::PENDING_PACKET
             );
 
-            let mut path: ByteArray =
-                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
-
             match chan_end_on_a.ordering {
                 ChannelOrdering::Unordered => {
-                    let receipt_path_on_b = receipt_path(
-                        packet.port_id_on_b.clone(),
-                        packet.chan_id_on_b.clone(),
-                        packet.seq_on_a.clone()
-                    );
-
-                    path.append(@receipt_path_on_b);
-
-                    client
-                        .verify_non_membership(
-                            chan_end_on_a.client_id.sequence, path, msg.proof_unreceived_on_b,
-                        );
+                    self.verify_receipt_not_exists(@client, client_sequence, msg.clone());
                 },
                 ChannelOrdering::Ordered => {
                     assert(
@@ -579,19 +489,7 @@ pub mod ChannelHandlerComponent {
                         ChannelErrors::MISMATCHED_PACKET_SEQUENCE
                     );
 
-                    let seq_recv_path_on_b = next_sequence_recv_path(
-                        packet.port_id_on_b.clone(), packet.chan_id_on_b.clone()
-                    );
-
-                    path.append(@seq_recv_path_on_b);
-
-                    client
-                        .verify_membership(
-                            chan_end_on_a.client_id.sequence,
-                            path,
-                            packet.seq_on_a.clone().into(),
-                            msg.proof_unreceived_on_b,
-                        );
+                    self.verify_next_sequence_recv(@client, client_sequence, msg);
                 },
             };
         }
@@ -657,6 +555,122 @@ pub mod ChannelHandlerComponent {
                 packet_commitment == expected_packet_commitment,
                 ChannelErrors::MISMATCHED_PACKET_COMMITMENT
             );
+        }
+
+        fn verify_send_sequence_matches(self: @ComponentState<TContractState>, packet: @Packet) {
+            let expected_sequence = self
+                .read_next_sequence_send(packet.port_id_on_a, packet.chan_id_on_a);
+
+            assert(@expected_sequence == packet.seq_on_a, ChannelErrors::INVALID_PACKET_SEQUENCE)
+        }
+
+        fn verify_ack_sequence_matches(self: @ComponentState<TContractState>, packet: @Packet) {
+            let expected_sequence = self
+                .read_next_sequence_ack(packet.port_id_on_a, packet.chan_id_on_a);
+
+            assert(@expected_sequence == packet.seq_on_a, ChannelErrors::INVALID_PACKET_SEQUENCE)
+        }
+
+        fn verify_packet_commitment(
+            self: @ComponentState<TContractState>,
+            client: @ClientContract,
+            client_sequence: u64,
+            msg: MsgRecvPacket,
+            json_packet_data: ByteArray
+        ) {
+            let packet_commitment_on_a = compute_packet_commtiment(
+                @json_packet_data,
+                msg.packet.timeout_height_on_b.clone(),
+                msg.packet.timeout_timestamp_on_b.clone()
+            );
+
+            let mut path: ByteArray =
+                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+
+            let commitment_path = commitment_path(
+                msg.packet.port_id_on_a.clone(),
+                msg.packet.chan_id_on_a.clone(),
+                msg.packet.seq_on_a.clone()
+            );
+
+            path.append(@commitment_path);
+
+            client
+                .verify_membership(
+                    client_sequence,
+                    path,
+                    packet_commitment_on_a.into(),
+                    msg.proof_commitment_on_a.clone()
+                );
+        }
+
+        fn verify_packet_acknowledgement(
+            self: @ComponentState<TContractState>,
+            client: @ClientContract,
+            client_sequence: u64,
+            msg: MsgAckPacket,
+        ) {
+            let ack_commitment_on_a = compute_ack_commitment(msg.acknowledgement.clone());
+
+            let mut path: ByteArray =
+                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+
+            let ack_path = ack_path(
+                msg.packet.port_id_on_a.clone(),
+                msg.packet.chan_id_on_a.clone(),
+                msg.packet.seq_on_a.clone()
+            );
+
+            path.append(@ack_path);
+
+            client
+                .verify_membership(
+                    client_sequence, path, ack_commitment_on_a.into(), msg.proof_ack_on_b.clone()
+                );
+        }
+
+        fn verify_receipt_not_exists(
+            self: @ComponentState<TContractState>,
+            client: @ClientContract,
+            client_sequence: u64,
+            msg: MsgTimeoutPacket,
+        ) {
+            let mut path: ByteArray =
+                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+
+            let receipt_path_on_b = receipt_path(
+                msg.packet.port_id_on_b.clone(),
+                msg.packet.chan_id_on_b.clone(),
+                msg.packet.seq_on_a.clone()
+            );
+
+            path.append(@receipt_path_on_b);
+
+            client.verify_non_membership(client_sequence, path, msg.proof_unreceived_on_b,);
+        }
+
+        fn verify_next_sequence_recv(
+            self: @ComponentState<TContractState>,
+            client: @ClientContract,
+            client_sequence: u64,
+            msg: MsgTimeoutPacket,
+        ) {
+            let mut path: ByteArray =
+                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+
+            let seq_recv_path_on_b = next_sequence_recv_path(
+                msg.packet.port_id_on_b.clone(), msg.packet.chan_id_on_b.clone()
+            );
+
+            path.append(@seq_recv_path_on_b);
+
+            client
+                .verify_membership(
+                    client_sequence,
+                    path,
+                    msg.packet.seq_on_a.clone().into(),
+                    msg.proof_unreceived_on_b,
+                );
         }
     }
 
