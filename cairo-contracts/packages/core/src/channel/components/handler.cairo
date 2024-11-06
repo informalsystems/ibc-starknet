@@ -80,10 +80,26 @@ pub mod ChannelHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
-        fn chan_open_init(ref self: ComponentState<TContractState>, msg: MsgChanOpenInit) {}
-        fn chan_open_try(ref self: ComponentState<TContractState>, msg: MsgChanOpenTry) {}
-        fn chan_open_ack(ref self: ComponentState<TContractState>, msg: MsgChanOpenAck) {}
-        fn chan_open_confirm(ref self: ComponentState<TContractState>, msg: MsgChanOpenConfirm) {}
+        fn chan_open_init(ref self: ComponentState<TContractState>, msg: MsgChanOpenInit) {
+            self.chan_open_init_validate(msg.clone());
+            self.chan_open_init_execute(msg);
+        }
+
+        fn chan_open_try(ref self: ComponentState<TContractState>, msg: MsgChanOpenTry) {
+            self.chan_open_try_validate(msg.clone());
+            self.chan_open_try_execute(msg);
+        }
+
+        fn chan_open_ack(ref self: ComponentState<TContractState>, msg: MsgChanOpenAck) {
+            self.chan_open_ack_validate(msg.clone());
+            self.chan_open_ack_execute(msg);
+        }
+
+        fn chan_open_confirm(ref self: ComponentState<TContractState>, msg: MsgChanOpenConfirm) {
+            self.chan_open_confirm_validate(msg.clone());
+            self.chan_open_confirm_execute(msg);
+        }
+
         fn send_packet(ref self: ComponentState<TContractState>, packet: Packet) {
             let chan_end_on_a = self.read_channel_end(@packet.port_id_on_a, @packet.chan_id_on_a);
 
@@ -177,6 +193,67 @@ pub mod ChannelHandlerComponent {
     // -----------------------------------------------------------
     // Channel handler implementations
     // -----------------------------------------------------------
+
+    #[generate_trait]
+    pub(crate) impl ChanOpenInitImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of ChanOpenInitTrait<TContractState> {
+        fn chan_open_init_validate(self: @ComponentState<TContractState>, msg: MsgChanOpenInit) {}
+
+
+        fn chan_open_init_execute(ref self: ComponentState<TContractState>, msg: MsgChanOpenInit) {}
+    }
+
+    #[generate_trait]
+    pub(crate) impl ChanOpenTryImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of ChanOpenTryTrait<TContractState> {
+        fn chan_open_try_validate(self: @ComponentState<TContractState>, msg: MsgChanOpenTry) {}
+
+        fn chan_open_try_execute(ref self: ComponentState<TContractState>, msg: MsgChanOpenTry) {}
+    }
+
+    #[generate_trait]
+    pub(crate) impl ChanOpenAckImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of ChanOpenAckTrait<TContractState> {
+        fn chan_open_ack_validate(self: @ComponentState<TContractState>, msg: MsgChanOpenAck) {}
+
+        fn chan_open_ack_execute(ref self: ComponentState<TContractState>, msg: MsgChanOpenAck) {}
+    }
+
+    #[generate_trait]
+    pub(crate) impl ChanOpenConfirmImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of ChanOpenConfirmTrait<TContractState> {
+        fn chan_open_confirm_validate(
+            self: @ComponentState<TContractState>, msg: MsgChanOpenConfirm
+        ) {}
+
+        fn chan_open_confirm_execute(
+            ref self: ComponentState<TContractState>, msg: MsgChanOpenConfirm
+        ) {}
+    }
 
     #[generate_trait]
     pub(crate) impl SendPacketImpl<
