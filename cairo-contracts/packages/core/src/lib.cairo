@@ -21,12 +21,12 @@ pub mod commitment {
     mod utils;
 
     pub use types::{
-        CommitmentValue, CommitmentValueZero, CommitmentProof, CommitmentProofZero,
-        compute_packet_commtiment, compute_ack_commitment
+        Commitment, CommitmentZero, StateValue, StateProof, StateProofZero,
+        compute_packet_commtiment, compute_ack_commitment,
     };
     pub use utils::{
         IntoArrayU32, U64IntoArrayU32, U32Collector, U32CollectorImpl, U32CollectorTrait,
-        u64_into_array_u32, array_u8_into_array_u32
+        u64_into_array_u32, array_u8_into_array_u32, array_u32_into_array_u8, ArrayU32IntoArrayU8
     };
 }
 pub mod channel {
@@ -44,7 +44,7 @@ pub mod channel {
         IAppCallbackDispatcher, IAppCallbackDispatcherTrait, IChannelQuery, IChannelQueryDispatcher,
         IChannelQueryDispatcherTrait
     };
-    pub use msgs::{MsgRecvPacket, MsgAckPacket};
+    pub use msgs::{MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket};
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
         ChannelOrdering, Counterparty, Acknowledgement, AckStatus, AckStatusImpl, AckStatusTrait,
@@ -104,7 +104,7 @@ pub mod host {
         channel_end_key, commitment_key, receipt_key, ack_key, next_sequence_recv_key,
         next_sequence_send_key, next_sequence_ack_key
     };
-    pub use paths::{commitment_path, ack_path};
+    pub use paths::{commitment_path, receipt_path, ack_path, next_sequence_recv_path};
     pub use prefixes::{
         CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX,
         ACKS_PREFIX, RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX,

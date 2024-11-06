@@ -4,62 +4,77 @@ use starknet::SyscallResult;
 use starknet::storage_access::{Store, StorageBaseAddress};
 use starknet_ibc_core::channel::Acknowledgement;
 use starknet_ibc_core::client::{Height, Timestamp};
-use starknet_ibc_core::commitment::{U32CollectorImpl, IntoArrayU32};
+use starknet_ibc_core::commitment::{U32CollectorImpl, IntoArrayU32, array_u32_into_array_u8};
 
 // -----------------------------------------------------------
 // Commitment Value
 // -----------------------------------------------------------
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
-pub struct CommitmentValue {
+pub struct Commitment {
     pub value: [u32; 8],
 }
 
-pub impl FixedU32ArrayIntoCommitmentValue of Into<[u32; 8], CommitmentValue> {
-    fn into(self: [u32; 8]) -> CommitmentValue {
-        CommitmentValue { value: self }
+pub impl FixedU32ArrayIntoCommitment of Into<[u32; 8], Commitment> {
+    fn into(self: [u32; 8]) -> Commitment {
+        Commitment { value: self }
     }
 }
 
-pub impl CommitmentValueZero of Zero<CommitmentValue> {
-    fn zero() -> CommitmentValue {
-        CommitmentValue { value: [0; 8] }
+pub impl CommitmentIntoArrayU32 of Into<Commitment, Array<u32>> {
+    fn into(self: Commitment) -> Array<u32> {
+        let mut value: Array<u32> = ArrayTrait::new();
+        value.append_span(self.value.span());
+        value
+    }
+}
+
+pub impl CommitmentZero of Zero<Commitment> {
+    fn zero() -> Commitment {
+        Commitment { value: [0; 8] }
     }
 
-    fn is_zero(self: @CommitmentValue) -> bool {
+    fn is_zero(self: @Commitment) -> bool {
         self.value == @[0; 8]
     }
 
-    fn is_non_zero(self: @CommitmentValue) -> bool {
+    fn is_non_zero(self: @Commitment) -> bool {
         !self.is_zero()
     }
 }
 
-pub impl DigestStore of Store<CommitmentValue> {
-    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<CommitmentValue> {
+pub impl CommitmentIntoStateValue of Into<Commitment, StateValue> {
+    fn into(self: Commitment) -> StateValue {
+        let value = array_u32_into_array_u8(self.into());
+        StateValue { value }
+    }
+}
+
+pub impl DigestStore of Store<Commitment> {
+    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Commitment> {
         match Store::<[u32; 8]>::read(address_domain, base) {
-            Result::Ok(value) => Result::Ok(CommitmentValue { value }),
+            Result::Ok(value) => Result::Ok(Commitment { value }),
             Result::Err(err) => Result::Err(err),
         }
     }
 
     fn write(
-        address_domain: u32, base: StorageBaseAddress, value: CommitmentValue
+        address_domain: u32, base: StorageBaseAddress, value: Commitment
     ) -> SyscallResult<()> {
         Store::<[u32; 8]>::write(address_domain, base, value.value)
     }
 
     fn read_at_offset(
         address_domain: u32, base: StorageBaseAddress, offset: u8
-    ) -> SyscallResult<CommitmentValue> {
+    ) -> SyscallResult<Commitment> {
         match Store::<[u32; 8]>::read_at_offset(address_domain, base, offset) {
-            Result::Ok(value) => Result::Ok(CommitmentValue { value }),
+            Result::Ok(value) => Result::Ok(Commitment { value }),
             Result::Err(err) => Result::Err(err),
         }
     }
 
     fn write_at_offset(
-        address_domain: u32, base: StorageBaseAddress, offset: u8, value: CommitmentValue
+        address_domain: u32, base: StorageBaseAddress, offset: u8, value: Commitment
     ) -> SyscallResult<()> {
         Store::<[u32; 8]>::write_at_offset(address_domain, base, offset, value.value)
     }
@@ -71,7 +86,7 @@ pub impl DigestStore of Store<CommitmentValue> {
 
 pub fn compute_packet_commtiment(
     json_packet_data: @ByteArray, timeout_height: Height, timeout_timestamp: Timestamp
-) -> CommitmentValue {
+) -> Commitment {
     let mut coll = U32CollectorImpl::init();
     coll.extend(timeout_timestamp);
     coll.extend(timeout_height);
@@ -79,39 +94,68 @@ pub fn compute_packet_commtiment(
     compute_sha256_u32_array(coll.value(), 0, 0).into()
 }
 
-pub fn compute_ack_commitment(ack: Acknowledgement) -> CommitmentValue {
+pub fn compute_ack_commitment(ack: Acknowledgement) -> Commitment {
     let (array, last_word, last_word_len) = ack.into_array_u32();
     compute_sha256_u32_array(array, last_word, last_word_len).into()
 }
 
 // -----------------------------------------------------------
-// Commitment Proof
+// State Value
+// -----------------------------------------------------------
+
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+pub struct StateValue {
+    pub value: Array<u8>,
+}
+
+pub impl ArrayU8IntoStateValue of Into<Array<u8>, StateValue> {
+    fn into(self: Array<u8>) -> StateValue {
+        StateValue { value: self }
+    }
+}
+
+pub impl StateValueZero of Zero<StateValue> {
+    fn zero() -> StateValue {
+        StateValue { value: ArrayTrait::new() }
+    }
+
+    fn is_zero(self: @StateValue) -> bool {
+        self.value.len() == 0
+    }
+
+    fn is_non_zero(self: @StateValue) -> bool {
+        self.value.len() > 0
+    }
+}
+
+// -----------------------------------------------------------
+// State Proof
 // -----------------------------------------------------------
 
 /// Contains the commitment proof bytes serving to verify membership or
 /// non-membership for an element or set of elements, in conjunction with
 /// a known commitment root
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
-pub struct CommitmentProof {
+pub struct StateProof {
     pub proof: Array<u8>,
 }
 
-pub impl ArrayU8IntoProof of Into<Array<u8>, CommitmentProof> {
-    fn into(self: Array<u8>) -> CommitmentProof {
-        CommitmentProof { proof: self }
+pub impl ArrayU8IntoProof of Into<Array<u8>, StateProof> {
+    fn into(self: Array<u8>) -> StateProof {
+        StateProof { proof: self }
     }
 }
 
-pub impl CommitmentProofZero of Zero<CommitmentProof> {
-    fn zero() -> CommitmentProof {
-        CommitmentProof { proof: ArrayTrait::new() }
+pub impl StateProofZero of Zero<StateProof> {
+    fn zero() -> StateProof {
+        StateProof { proof: ArrayTrait::new() }
     }
 
-    fn is_zero(self: @CommitmentProof) -> bool {
+    fn is_zero(self: @StateProof) -> bool {
         self.proof.len() == 0
     }
 
-    fn is_non_zero(self: @CommitmentProof) -> bool {
+    fn is_non_zero(self: @StateProof) -> bool {
         self.proof.len() > 0
     }
 }

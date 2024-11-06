@@ -56,8 +56,8 @@ pub impl SetupImpl of SetupTrait {
         // Set the block number and timestamp higher than the counterparty's block
         // height and timestamp (typically set to 10 in tests) to avoid timeouts in
         // happy path scenarios.
-        start_cheat_block_timestamp_global(15);
-        start_cheat_block_number_global(15);
+        start_cheat_block_timestamp_global(20);
+        start_cheat_block_number_global(20);
 
         let mut core = setup.deploy_core(core_contract_name);
 
@@ -95,8 +95,8 @@ pub impl SetupImpl of SetupTrait {
         // Set the block number and timestamp higher than the counterparty's block
         // height and timestamp (typically set to 10 in tests) to avoid timeouts in
         // happy path scenarios.
-        start_cheat_block_timestamp_global(15);
-        start_cheat_block_number_global(15);
+        start_cheat_block_timestamp_global(20);
+        start_cheat_block_number_global(20);
 
         let mut core = setup.deploy_core(core_contract_name);
 

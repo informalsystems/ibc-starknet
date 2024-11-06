@@ -1,12 +1,15 @@
 use snforge_std::{spy_events, EventSpy};
 use starknet_ibc_apps::transfer::{ERC20Contract, SUCCESS_ACK};
 use starknet_ibc_core::channel::{ChannelEndTrait, ChannelOrdering, AckStatus};
+use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{SequenceImpl, Sequence};
 use starknet_ibc_core::router::AppContract;
 use starknet_ibc_testkit::configs::{
     TransferAppConfig, TransferAppConfigTrait, CometClientConfig, CometClientConfigTrait
 };
-use starknet_ibc_testkit::dummies::{COSMOS, STARKNET, OWNER, SUPPLY, PACKET_COMMITMENT_ON_SN};
+use starknet_ibc_testkit::dummies::{
+    HEIGHT, TIMESTAMP, COSMOS, STARKNET, OWNER, CLIENT_ID, SUPPLY, PACKET_COMMITMENT_ON_SN,
+};
 use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ChannelEventSpyExt};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle, AppHandle, ERC20Handle};
 use starknet_ibc_testkit::setup::SetupImpl;
@@ -318,4 +321,87 @@ fn test_ack_packet_for_never_sent_packet() {
         );
 
     core.ack_packet(msg);
+}
+
+fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
+    // -----------------------------------------------------------
+    // Setup Essentials
+    // -----------------------------------------------------------
+
+    let (core, ics20, mut erc20, comet_cfg, mut transfer_cfg, mut spy) = setup();
+
+    let updating_height = HEIGHT(11); // Set to 11 as client is created at height 10.
+
+    let updating_timestamp: u64 = 11; // Set to 11 as client is created at timestamp 10.
+
+    transfer_cfg.set_timeout_height(timeout_height);
+
+    transfer_cfg.set_timeout_timestamp(timeout_timestamp);
+
+    // -----------------------------------------------------------
+    // Send Packet (from Starknet to Cosmos)
+    // -----------------------------------------------------------
+
+    erc20.approve(OWNER(), ics20.address, transfer_cfg.amount);
+
+    let msg_transfer = transfer_cfg
+        .dummy_msg_transfer(transfer_cfg.native_denom.clone(), STARKNET(), COSMOS());
+
+    ics20.send_transfer(msg_transfer.clone());
+
+    // -----------------------------------------------------------
+    // Update Client
+    // -----------------------------------------------------------
+
+    let msg = comet_cfg
+        .dummy_msg_update_client(
+            CLIENT_ID(), comet_cfg.latest_height, updating_height.clone(), updating_timestamp,
+        );
+
+    core.update_client(msg.clone());
+
+    // -----------------------------------------------------------
+    // Timeout Packet
+    // -----------------------------------------------------------
+
+    let mut msg = transfer_cfg
+        .dummy_msg_timeout_packet(
+            transfer_cfg.native_denom.clone(), STARKNET(), COSMOS(), updating_height,
+        );
+
+    core.timeout_packet(msg.clone());
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    let packet = msg.packet;
+
+    spy.assert_timeout_packet_event(core.address, ChannelOrdering::Unordered, packet.clone());
+
+    // Check if the balance of the sender to ensure the refund.
+    erc20.assert_balance(OWNER(), SUPPLY);
+
+    core
+        .packet_commitment(
+            packet.port_id_on_a.clone(), packet.chan_id_on_a.clone(), packet.seq_on_a
+        );
+}
+
+#[test]
+#[should_panic(expected: 'ICS04: missing commitment')]
+fn test_timeout_packet_with_height() {
+    try_timeout_packet(HEIGHT(11), TIMESTAMP(1000));
+}
+
+#[test]
+#[should_panic(expected: 'ICS04: missing commitment')]
+fn test_timeout_packet_with_timestamp() {
+    try_timeout_packet(HEIGHT(1000), TIMESTAMP(11));
+}
+
+#[test]
+#[should_panic(expected: 'ICS04: packet not timed out')]
+fn test_timeout_pending_packet() {
+    try_timeout_packet(HEIGHT(1000), TIMESTAMP(1000));
 }

@@ -15,7 +15,7 @@ pub mod CometClientComponent {
         Status, StatusTrait, CreateResponse, CreateResponseImpl, UpdateResponse, IClientHandler,
         IClientQuery, IClientStateValidation, IClientStateExecution,
     };
-    use starknet_ibc_core::commitment::{CommitmentProof, CommitmentValue};
+    use starknet_ibc_core::commitment::{StateProof, StateValue};
     use starknet_ibc_core::host::ClientIdImpl;
     use starknet_ibc_utils::ValidateBasic;
 
@@ -222,15 +222,15 @@ pub mod CometClientComponent {
             self: @ComponentState<TContractState>,
             client_sequence: u64,
             path: ByteArray,
-            value: CommitmentValue,
-            proof: CommitmentProof,
+            value: StateValue,
+            proof: StateProof,
         ) {}
 
         fn verify_non_membership(
             self: @ComponentState<TContractState>,
             client_sequence: u64,
             path: ByteArray,
-            proof: CommitmentProof,
+            proof: StateProof,
         ) {}
 
         fn verify_client_message(

@@ -7,12 +7,16 @@ pub fn HEIGHT(revision_height: u64) -> Height {
     Height { revision_number: 0, revision_height }
 }
 
-pub fn TIMEOUT_HEIGHT() -> Height {
-    HEIGHT(1000)
+pub fn TIMESTAMP(timestamp: u64) -> Timestamp {
+    Timestamp { timestamp }
 }
 
-pub fn TIMEOUT_TIMESTAMP() -> Timestamp {
-    Timestamp { timestamp: 1000 }
+pub fn TIMEOUT_HEIGHT(height: u64) -> Height {
+    HEIGHT(height)
+}
+
+pub fn TIMEOUT_TIMESTAMP(timestamp: u64) -> Timestamp {
+    TIMESTAMP(timestamp)
 }
 
 pub fn CLIENT() -> ContractAddress {

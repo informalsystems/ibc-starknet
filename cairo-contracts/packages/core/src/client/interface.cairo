@@ -3,7 +3,7 @@ use starknet_ibc_core::client::{
     MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Status,
     CreateResponse, UpdateResponse, Timestamp,
 };
-use starknet_ibc_core::commitment::{CommitmentProof, CommitmentValue};
+use starknet_ibc_core::commitment::{StateProof, StateValue};
 
 #[starknet::interface]
 pub trait IClientHandler<TContractState> {
@@ -29,12 +29,12 @@ pub trait IClientStateValidation<TContractState> {
         self: @TContractState,
         client_sequence: u64,
         path: ByteArray,
-        value: CommitmentValue,
-        proof: CommitmentProof
+        value: StateValue,
+        proof: StateProof
     );
 
     fn verify_non_membership(
-        self: @TContractState, client_sequence: u64, path: ByteArray, proof: CommitmentProof
+        self: @TContractState, client_sequence: u64, path: ByteArray, proof: StateProof
     );
 
     fn verify_client_message(

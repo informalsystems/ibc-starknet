@@ -34,7 +34,7 @@ pub mod ChannelEventEmitterComponent {
         #[key]
         pub timeout_timestamp_on_b: Timestamp,
         #[key]
-        pub channel_oredering: ChannelOrdering,
+        pub channel_ordering: ChannelOrdering,
         pub packet_data: Array<felt252>,
     }
 
@@ -55,7 +55,7 @@ pub mod ChannelEventEmitterComponent {
         #[key]
         pub timeout_timestamp_on_b: Timestamp,
         #[key]
-        pub channel_oredering: ChannelOrdering,
+        pub channel_ordering: ChannelOrdering,
         pub packet_data: Array<felt252>,
     }
 
@@ -92,7 +92,7 @@ pub mod ChannelEventEmitterComponent {
         #[key]
         pub timeout_timestamp_on_b: Timestamp,
         #[key]
-        pub channel_oredering: ChannelOrdering,
+        pub channel_ordering: ChannelOrdering,
     }
 
     #[derive(Debug, Drop, starknet::Event)]
@@ -112,7 +112,7 @@ pub mod ChannelEventEmitterComponent {
         #[key]
         pub timeout_timestamp_on_b: Timestamp,
         #[key]
-        channel_oredering: ChannelOrdering,
+        pub channel_ordering: ChannelOrdering,
     }
 
     #[generate_trait]
@@ -132,7 +132,7 @@ pub mod ChannelEventEmitterComponent {
                         channel_id_on_b: packet.chan_id_on_b,
                         timeout_height_on_b: packet.timeout_height_on_b,
                         timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
-                        channel_oredering: ordering,
+                        channel_ordering: ordering,
                         packet_data: packet.data,
                     }
                 );
@@ -151,7 +151,7 @@ pub mod ChannelEventEmitterComponent {
                         channel_id_on_b: packet.chan_id_on_b,
                         timeout_height_on_b: packet.timeout_height_on_b,
                         timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
-                        channel_oredering: ordering,
+                        channel_ordering: ordering,
                         packet_data: packet.data,
                     }
                 );
@@ -189,7 +189,7 @@ pub mod ChannelEventEmitterComponent {
                         channel_id_on_b: packet.chan_id_on_b,
                         timeout_height_on_b: packet.timeout_height_on_b,
                         timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
-                        channel_oredering: ordering,
+                        channel_ordering: ordering,
                     }
                 );
         }
@@ -207,7 +207,7 @@ pub mod ChannelEventEmitterComponent {
                         channel_id_on_b: packet.chan_id_on_b,
                         timeout_height_on_b: packet.timeout_height_on_b,
                         timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
-                        channel_oredering: ordering,
+                        channel_ordering: ordering,
                     }
                 );
         }

@@ -6,7 +6,7 @@ use starknet_ibc_core::client::{
     MsgUpgradeClient, CreateResponse, UpdateResponse, Height, HeightPartialOrd, Status, StatusTrait,
     ClientErrors, Timestamp,
 };
-use starknet_ibc_core::commitment::{CommitmentValue, CommitmentProof};
+use starknet_ibc_core::commitment::{StateValue, StateProof};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct ClientContract {
@@ -57,15 +57,15 @@ pub impl ClientContractImpl of ClientContractTrait {
         self: @ClientContract,
         client_sequence: u64,
         path: ByteArray,
-        value: CommitmentValue,
-        proof: CommitmentProof,
+        value: StateValue,
+        proof: StateProof,
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
             .verify_membership(client_sequence, path, value, proof)
     }
 
     fn verify_non_membership(
-        self: @ClientContract, client_sequence: u64, path: ByteArray, proof: CommitmentProof
+        self: @ClientContract, client_sequence: u64, path: ByteArray, proof: StateProof
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
             .verify_non_membership(client_sequence, path, proof)

@@ -2,14 +2,14 @@ use openzeppelin_testing::declare_and_deploy;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
     IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, MsgRecvPacket, MsgAckPacket,
-    IChannelQueryDispatcher, IChannelQueryDispatcherTrait, ChannelEnd, Packet,
+    MsgTimeoutPacket, IChannelQueryDispatcher, IChannelQueryDispatcherTrait, ChannelEnd, Packet,
 };
 use starknet_ibc_core::client::{
     IClientHandlerDispatcher, IClientHandlerDispatcherTrait, IRegisterClientDispatcher,
     IRegisterClientDispatcherTrait, MsgCreateClient, MsgUpdateClient, CreateResponse,
     UpdateResponse,
 };
-use starknet_ibc_core::commitment::CommitmentValue;
+use starknet_ibc_core::commitment::Commitment;
 use starknet_ibc_core::host::{ChannelId, PortId, Sequence};
 use starknet_ibc_core::router::{IRouterDispatcher, IRouterDispatcherTrait};
 
@@ -76,13 +76,17 @@ pub impl CoreHandleImpl of CoreHandle {
         self.channel_handler_dispatcher().ack_packet(msg)
     }
 
+    fn timeout_packet(self: @CoreContract, msg: MsgTimeoutPacket) {
+        self.channel_handler_dispatcher().timeout_packet(msg)
+    }
+
     fn channel_end(self: @CoreContract, port_id: PortId, channel_id: ChannelId) -> ChannelEnd {
         self.channel_query_dispatcher().channel_end(port_id, channel_id)
     }
 
     fn packet_commitment(
         self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence
-    ) -> CommitmentValue {
+    ) -> Commitment {
         self.channel_query_dispatcher().packet_commitment(port_id, channel_id, sequence)
     }
 
@@ -94,7 +98,7 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn packet_acknowledgement(
         self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence
-    ) -> CommitmentValue {
+    ) -> Commitment {
         self.channel_query_dispatcher().packet_acknowledgement(port_id, channel_id, sequence)
     }
 

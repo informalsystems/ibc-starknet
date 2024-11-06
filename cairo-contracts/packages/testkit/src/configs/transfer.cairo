@@ -2,7 +2,10 @@ use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::types::{
     MsgTransfer, PacketData, PrefixedDenom, Denom, TracePrefixTrait, Participant, PrefixedDenomTrait
 };
-use starknet_ibc_core::channel::{Packet, MsgRecvPacket, MsgAckPacket, Acknowledgement};
+use starknet_ibc_core::channel::{
+    Packet, MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket, Acknowledgement
+};
+use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{ChannelId, Sequence};
 use starknet_ibc_testkit::dummies::{
     NATIVE_DENOM, HOSTED_DENOM, AMOUNT, EMPTY_MEMO, PORT_ID, CHANNEL_ID, HEIGHT, TIMEOUT_HEIGHT,
@@ -16,6 +19,8 @@ pub struct TransferAppConfig {
     pub chan_id_on_a: ChannelId,
     pub chan_id_on_b: ChannelId,
     pub amount: u256,
+    pub timeout_height: Height,
+    pub timeout_timestamp: Timestamp,
 }
 
 #[generate_trait]
@@ -27,6 +32,8 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
             chan_id_on_a: CHANNEL_ID(1),
             chan_id_on_b: CHANNEL_ID(0),
             amount: AMOUNT,
+            timeout_height: TIMEOUT_HEIGHT(1000),
+            timeout_timestamp: TIMEOUT_TIMESTAMP(1000),
         }
     }
 
@@ -58,6 +65,14 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         hosted_denom
     }
 
+    fn set_timeout_height(ref self: TransferAppConfig, timeout_height: Height) {
+        self.timeout_height = timeout_height;
+    }
+
+    fn set_timeout_timestamp(ref self: TransferAppConfig, timeout_timestamp: Timestamp) {
+        self.timeout_timestamp = timeout_timestamp;
+    }
+
     fn dummy_msg_transfer(
         self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> MsgTransfer {
@@ -65,8 +80,8 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
             port_id_on_a: PORT_ID(),
             chan_id_on_a: self.chan_id_on_a.clone(),
             packet_data: self.dummy_packet_data(denom, sender, receiver),
-            timeout_height_on_b: TIMEOUT_HEIGHT(),
-            timeout_timestamp_on_b: TIMEOUT_TIMESTAMP(),
+            timeout_height_on_b: self.timeout_height.clone(),
+            timeout_timestamp_on_b: self.timeout_timestamp.clone(),
         }
     }
 
@@ -90,8 +105,23 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         MsgAckPacket {
             packet: self.dummy_packet(denom, sender, receiver),
             acknowledgement,
-            proof_ack_on_a: array![0].into(),
-            proof_height_on_a: HEIGHT(10),
+            proof_ack_on_b: array![0].into(),
+            proof_height_on_b: HEIGHT(10),
+        }
+    }
+
+    fn dummy_msg_timeout_packet(
+        self: @TransferAppConfig,
+        denom: PrefixedDenom,
+        sender: Participant,
+        receiver: Participant,
+        proof_height: Height,
+    ) -> MsgTimeoutPacket {
+        MsgTimeoutPacket {
+            packet: self.dummy_packet(denom, sender, receiver),
+            next_seq_recv_on_b: Sequence { sequence: 1 },
+            proof_unreceived_on_b: array![0].into(),
+            proof_height_on_b: proof_height,
         }
     }
 
@@ -108,8 +138,8 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
             port_id_on_b: PORT_ID(),
             chan_id_on_b: self.chan_id_on_b.clone(),
             data: serialized_data,
-            timeout_height_on_b: TIMEOUT_HEIGHT(),
-            timeout_timestamp_on_b: TIMEOUT_TIMESTAMP(),
+            timeout_height_on_b: self.timeout_height.clone(),
+            timeout_timestamp_on_b: self.timeout_timestamp.clone(),
         }
     }
 
