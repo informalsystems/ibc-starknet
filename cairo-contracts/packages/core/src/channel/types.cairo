@@ -33,7 +33,7 @@ pub impl PacketImpl of PacketTrait {
     }
 }
 
-impl PacketValidateBasicImpl of ValidateBasic<Packet> {
+impl PacketValidateBasic of ValidateBasic<Packet> {
     fn validate_basic(self: @Packet) {}
 }
 

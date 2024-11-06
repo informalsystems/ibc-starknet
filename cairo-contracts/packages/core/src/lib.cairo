@@ -44,7 +44,10 @@ pub mod channel {
         IAppCallbackDispatcher, IAppCallbackDispatcherTrait, IChannelQuery, IChannelQueryDispatcher,
         IChannelQueryDispatcherTrait
     };
-    pub use msgs::{MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket};
+    pub use msgs::{
+        MsgChanOpenInit, MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket,
+        MsgAckPacket, MsgTimeoutPacket
+    };
     pub use types::{
         Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
         ChannelOrdering, Counterparty, Acknowledgement, AckStatus, AckStatusImpl, AckStatusTrait,
@@ -96,8 +99,9 @@ pub mod host {
     mod prefixes;
     pub use errors::HostErrors;
     pub use identifiers::{
-        ClientId, ClientIdImpl, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdImpl,
-        PortIdTrait, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero
+        ClientId, ClientIdImpl, ClientIdTrait, ConnectionId, ConnectionIdTrait, ChannelId,
+        ChannelIdTrait, PortId, PortIdImpl, PortIdTrait, Sequence, SequenceImpl, SequenceTrait,
+        SequencePartialOrd, SequenceZero
     };
 
     pub use keys::{
