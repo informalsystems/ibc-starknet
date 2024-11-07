@@ -1,9 +1,10 @@
 #[starknet::component]
 pub mod CometClientComponent {
+    use alexandria_sorting::MergeSort;
     use core::num::traits::Zero;
     use starknet::storage::{
-        Vec, MutableVecTrait, VecTrait, StoragePathEntry, Map, StorageMapReadAccess,
-        StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess,
+        StoragePathEntry, Map, StorageMapReadAccess, StorageMapWriteAccess,
+        StoragePointerReadAccess, StoragePointerWriteAccess,
     };
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_clients::cometbft::{
@@ -11,9 +12,10 @@ pub mod CometClientComponent {
         CometHeader, CometHeaderImpl, CometErrors
     };
     use starknet_ibc_core::client::{
-        MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, HeightImpl,
-        HeightPartialOrd, Timestamp, Status, StatusTrait, CreateResponse, CreateResponseImpl,
-        UpdateResponse, IClientHandler, IClientQuery, IClientStateValidation, IClientStateExecution,
+        MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, HeightZero,
+        HeightImpl, StoreHeightArray, HeightPartialOrd, Timestamp, Status, StatusTrait,
+        CreateResponse, CreateResponseImpl, UpdateResponse, IClientHandler, IClientQuery,
+        IClientStateValidation, IClientStateExecution,
     };
     use starknet_ibc_core::commitment::{StateProof, StateValue};
     use starknet_ibc_core::host::ClientIdImpl;
@@ -22,7 +24,7 @@ pub mod CometClientComponent {
     #[storage]
     pub struct Storage {
         client_sequence: u64,
-        update_heights: Map<u64, Vec<Height>>,
+        update_heights: Map<u64, Array<Height>>,
         client_states: Map<u64, CometClientState>,
         consensus_states: Map<(u64, Height), CometConsensusState>,
         client_processed_times: Map<(u64, Height), u64>,
@@ -83,23 +85,26 @@ pub mod CometClientComponent {
         ) -> Height {
             let update_heights = self.read_update_heights(client_sequence);
 
-            let len = update_heights.len();
+            let mut len = update_heights.len();
 
             assert(len > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
 
-            let mut i = 0;
+            let mut height = HeightZero::zero();
 
-            while i < len {
-                let height = update_heights.at(i);
-
-                if @target_height >= height {
+            while len > 0 {
+                let update_height = update_heights.at(len - 1);
+                if @target_height >= update_height {
+                    height = *update_height;
                     break;
                 }
-
-                i += 1;
+                if len == 1 && height.is_zero() {
+                    height = target_height;
+                    break;
+                }
+                len -= 1;
             };
 
-            update_heights.at(i).clone()
+            height
         }
 
         fn latest_timestamp(
@@ -408,6 +413,8 @@ pub mod CometClientComponent {
 
             let latest_height = client_state.latest_height;
 
+            self.write_update_height(client_sequence, latest_height.clone());
+
             self
                 .write_consensus_state(
                     client_sequence, latest_height.clone(), consensus_state.clone()
@@ -438,26 +445,6 @@ pub mod CometClientComponent {
     > of ClientReaderTrait<TContractState> {
         fn read_client_sequence(self: @ComponentState<TContractState>) -> u64 {
             self.client_sequence.read()
-        }
-
-        /// Returns the heights at which the client has been updated in
-        /// descending order.
-        fn read_update_heights(
-            self: @ComponentState<TContractState>, client_sequence: u64
-        ) -> Array<Height> {
-            let mut heights: Array<Height> = ArrayTrait::new();
-
-            let entry = self.update_heights.entry(client_sequence);
-
-            let mut index = entry.len();
-
-            while index > 0 {
-                let height = entry.at(index - 1).read();
-                heights.append(height);
-                index -= 1;
-            };
-
-            heights
         }
 
         fn read_client_state(
@@ -505,6 +492,12 @@ pub mod CometClientComponent {
 
             processed_height
         }
+
+        fn read_update_heights(
+            self: @ComponentState<TContractState>, client_sequence: u64
+        ) -> Array<Height> {
+            self.update_heights.entry(client_sequence).read()
+        }
     }
 
     #[generate_trait]
@@ -518,7 +511,19 @@ pub mod CometClientComponent {
         fn write_update_height(
             ref self: ComponentState<TContractState>, client_sequence: u64, update_height: Height
         ) {
-            self.update_heights.entry(client_sequence).append().write(update_height)
+            let mut update_heights = self.update_heights.read(client_sequence);
+
+            if update_heights.len() == 255 {
+                update_heights.pop_front().unwrap();
+            }
+
+            update_heights.append(update_height);
+
+            let mut update_heights_span = update_heights.span();
+
+            let sorted_update_heights = MergeSort::sort(update_heights_span);
+
+            self.update_heights.write(client_sequence, sorted_update_heights);
         }
 
         fn write_client_state(

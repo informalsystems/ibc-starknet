@@ -1,7 +1,5 @@
 use core::num::traits::Zero;
 use core::sha256::{compute_sha256_byte_array, compute_sha256_u32_array};
-use starknet::SyscallResult;
-use starknet::storage_access::{Store, StorageBaseAddress};
 use starknet_ibc_core::channel::Acknowledgement;
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::commitment::{U32CollectorImpl, IntoArrayU32, array_u32_into_array_u8};
@@ -10,7 +8,7 @@ use starknet_ibc_core::commitment::{U32CollectorImpl, IntoArrayU32, array_u32_in
 // Commitment Value
 // -----------------------------------------------------------
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Commitment {
     pub value: [u32; 8],
 }
@@ -47,40 +45,6 @@ pub impl CommitmentIntoStateValue of Into<Commitment, StateValue> {
     fn into(self: Commitment) -> StateValue {
         let value = array_u32_into_array_u8(self.into());
         StateValue { value }
-    }
-}
-
-pub impl DigestStore of Store<Commitment> {
-    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Commitment> {
-        match Store::<[u32; 8]>::read(address_domain, base) {
-            Result::Ok(value) => Result::Ok(Commitment { value }),
-            Result::Err(err) => Result::Err(err),
-        }
-    }
-
-    fn write(
-        address_domain: u32, base: StorageBaseAddress, value: Commitment
-    ) -> SyscallResult<()> {
-        Store::<[u32; 8]>::write(address_domain, base, value.value)
-    }
-
-    fn read_at_offset(
-        address_domain: u32, base: StorageBaseAddress, offset: u8
-    ) -> SyscallResult<Commitment> {
-        match Store::<[u32; 8]>::read_at_offset(address_domain, base, offset) {
-            Result::Ok(value) => Result::Ok(Commitment { value }),
-            Result::Err(err) => Result::Err(err),
-        }
-    }
-
-    fn write_at_offset(
-        address_domain: u32, base: StorageBaseAddress, offset: u8, value: Commitment
-    ) -> SyscallResult<()> {
-        Store::<[u32; 8]>::write_at_offset(address_domain, base, offset, value.value)
-    }
-
-    fn size() -> u8 {
-        Store::<[u32; 8]>::size()
     }
 }
 

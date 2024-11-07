@@ -1,5 +1,7 @@
 use core::num::traits::{CheckedAdd, Zero};
 use core::traits::PartialOrd;
+use starknet::SyscallResult;
+use starknet::storage_access::{Store, StorageBaseAddress};
 use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::commitment::{IntoArrayU32, U32CollectorImpl};
 use starknet_ibc_core::host::ClientId;
@@ -62,7 +64,7 @@ pub impl StatusImpl of StatusTrait {
     }
 }
 
-#[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
+#[derive(Copy, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct Height {
     pub revision_number: u64,
     pub revision_height: u64,
@@ -103,23 +105,23 @@ pub impl HeightAdd of Add<Height> {
     }
 }
 
-pub impl HeightPartialOrd of PartialOrd<@Height> {
-    fn le(lhs: @Height, rhs: @Height) -> bool {
+pub impl HeightPartialOrd of PartialOrd<Height> {
+    fn le(lhs: Height, rhs: Height) -> bool {
         lhs.revision_number < rhs.revision_number
             || (lhs.revision_number == rhs.revision_number
                 && lhs.revision_height <= rhs.revision_height)
     }
-    fn ge(lhs: @Height, rhs: @Height) -> bool {
+    fn ge(lhs: Height, rhs: Height) -> bool {
         lhs.revision_number > rhs.revision_number
             || (lhs.revision_number == rhs.revision_number
                 && lhs.revision_height >= rhs.revision_height)
     }
-    fn lt(lhs: @Height, rhs: @Height) -> bool {
+    fn lt(lhs: Height, rhs: Height) -> bool {
         lhs.revision_number < rhs.revision_number
             || (lhs.revision_number == rhs.revision_number
                 && lhs.revision_height < rhs.revision_height)
     }
-    fn gt(lhs: @Height, rhs: @Height) -> bool {
+    fn gt(lhs: Height, rhs: Height) -> bool {
         lhs.revision_number > rhs.revision_number
             || (lhs.revision_number == rhs.revision_number
                 && lhs.revision_height > rhs.revision_height)
@@ -132,6 +134,60 @@ pub impl HeightIntoArrayU32 of IntoArrayU32<Height> {
         coll.extend(self.revision_number);
         coll.extend(self.revision_height);
         (coll.value(), 0, 0)
+    }
+}
+
+pub impl StoreHeightArray of Store<Array<Height>> {
+    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Array<Height>> {
+        Self::read_at_offset(address_domain, base, 0)
+    }
+
+    fn write(
+        address_domain: u32, base: StorageBaseAddress, value: Array<Height>
+    ) -> SyscallResult<()> {
+        Self::write_at_offset(address_domain, base, 0, value)
+    }
+
+    fn read_at_offset(
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8
+    ) -> SyscallResult<Array<Height>> {
+        let mut arr: Array<Height> = array![];
+
+        let len: u8 = Store::<u8>::read_at_offset(address_domain, base, offset)
+            .expect('Storage Span too large');
+        offset += 1;
+
+        let exit = 2 * len + offset;
+        loop {
+            if offset >= exit {
+                break;
+            }
+
+            let value = Store::<Height>::read_at_offset(address_domain, base, offset).unwrap();
+            arr.append(value);
+            offset += Store::<Height>::size();
+        };
+
+        Result::Ok(arr)
+    }
+
+    fn write_at_offset(
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<Height>
+    ) -> SyscallResult<()> {
+        let len: u8 = value.len().try_into().expect('Storage - Span too large');
+        Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();
+        offset += 1;
+
+        while let Option::Some(element) = value.pop_front() {
+            Store::<Height>::write_at_offset(address_domain, base, offset, element).unwrap();
+            offset += Store::<Height>::size();
+        };
+
+        Result::Ok(())
+    }
+
+    fn size() -> u8 {
+        255 * Store::<Height>::size()
     }
 }
 
