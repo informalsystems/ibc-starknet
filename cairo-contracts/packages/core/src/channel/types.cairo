@@ -2,9 +2,7 @@ use core::num::traits::Zero;
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
 use starknet_ibc_core::commitment::{array_u8_into_array_u32, IntoArrayU32};
-use starknet_ibc_core::host::{
-    ClientId, ClientIdTrait, ChannelId, ChannelIdTrait, PortId, PortIdTrait, Sequence
-};
+use starknet_ibc_core::host::{ClientId, ClientIdTrait, ChannelId, PortId, PortIdTrait, Sequence};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -50,6 +48,21 @@ pub struct ChannelEnd {
 
 #[generate_trait]
 pub impl ChannelEndImpl of ChannelEndTrait {
+    fn new(
+        state: ChannelState,
+        ordering: ChannelOrdering,
+        counterparty_port_id: PortId,
+        counterparty_channel_id: ChannelId,
+        client_id: ClientId,
+    ) -> ChannelEnd {
+        ChannelEnd {
+            state,
+            ordering,
+            remote: CounterpartyImpl::new(counterparty_port_id, counterparty_channel_id),
+            client_id,
+        }
+    }
+
     /// Returns port ID on the counterparty chain
     fn counterparty_port_id(self: @ChannelEnd) -> @PortId {
         self.remote.port_id
@@ -154,6 +167,10 @@ pub struct Counterparty {
 
 #[generate_trait]
 pub impl CounterpartyImpl of CounterpartyTrait {
+    fn new(port_id: PortId, channel_id: ChannelId) -> Counterparty {
+        Counterparty { port_id, channel_id, }
+    }
+
     fn is_zero(self: @Counterparty) -> bool {
         self.port_id.is_zero() && self.channel_id.is_zero()
     }

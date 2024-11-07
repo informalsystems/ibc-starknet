@@ -24,7 +24,7 @@ pub trait IAppCallback<TContractState> {
         ref self: TContractState,
         port_id_on_a: PortId,
         chan_id_on_a: ChannelId,
-        connection_hops_on_a: Array<ConnectionId>,
+        conn_id_on_a: ConnectionId,
         version_on_a: ChannelVersion,
         port_id_on_b: PortId,
         ordering: ChannelOrdering
@@ -33,7 +33,7 @@ pub trait IAppCallback<TContractState> {
         ref self: TContractState,
         port_id_on_b: PortId,
         chan_id_on_b: ChannelId,
-        connection_hops_on_b: Array<ConnectionId>,
+        conn_id_on_b: ConnectionId,
         port_id_on_a: PortId,
         version_on_a: ChannelVersion,
         ordering: ChannelOrdering

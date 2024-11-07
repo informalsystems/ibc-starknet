@@ -8,13 +8,16 @@ pub mod ChannelHandlerComponent {
     use RouterHandlerComponent::RouterInternalTrait;
     use core::num::traits::Zero;
     use starknet::storage::Map;
-    use starknet::storage::{StorageMapReadAccess, StorageMapWriteAccess};
+    use starknet::storage::{
+        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess
+    };
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgChanOpenInit,
         MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket, MsgAckPacket,
-        MsgTimeoutPacket, ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering,
-        Receipt, ReceiptTrait, Packet, Acknowledgement
+        MsgTimeoutPacket, ChannelEnd, ChannelEndTrait, ChannelState, ChannelErrors, PacketTrait,
+        ChannelOrdering, ChannelVersion, Receipt, ReceiptTrait, Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, HeightImpl
@@ -23,9 +26,10 @@ pub mod ChannelHandlerComponent {
         Commitment, CommitmentZero, compute_packet_commtiment, compute_ack_commitment
     };
     use starknet_ibc_core::host::{
-        PortId, ChannelId, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero,
-        channel_end_key, commitment_key, receipt_key, ack_key, commitment_path, ack_path,
-        receipt_path, next_sequence_recv_path, next_sequence_recv_key, next_sequence_send_key,
+        ClientIdImpl, ConnectionId, ChannelId, ChannelIdImpl, ChannelIdZero, PortId, Sequence,
+        SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero, channel_end_key,
+        commitment_key, receipt_key, ack_key, commitment_path, ack_path, receipt_path,
+        next_sequence_recv_path, next_sequence_recv_key, next_sequence_send_key,
         next_sequence_ack_key
     };
     use starknet_ibc_core::router::{RouterHandlerComponent, AppContractTrait, AppContract};
@@ -34,6 +38,7 @@ pub mod ChannelHandlerComponent {
 
     #[storage]
     pub struct Storage {
+        pub next_channel_sequence: u64,
         pub channel_ends: Map<felt252, ChannelEnd>,
         pub packet_commitments: Map<felt252, Commitment>,
         pub packet_receipts: Map<felt252, Receipt>,
@@ -81,8 +86,9 @@ pub mod ChannelHandlerComponent {
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
         fn chan_open_init(ref self: ComponentState<TContractState>, msg: MsgChanOpenInit) {
-            self.chan_open_init_validate(msg.clone());
-            self.chan_open_init_execute(msg);
+            let channel_sequence = self.read_next_channel_sequence();
+            self.chan_open_init_validate(channel_sequence.clone(), msg.clone());
+            self.chan_open_init_execute(channel_sequence, msg);
         }
 
         fn chan_open_try(ref self: ComponentState<TContractState>, msg: MsgChanOpenTry) {
@@ -203,10 +209,58 @@ pub mod ChannelHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChanOpenInitTrait<TContractState> {
-        fn chan_open_init_validate(self: @ComponentState<TContractState>, msg: MsgChanOpenInit) {}
+        fn chan_open_init_validate(
+            self: @ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenInit
+        ) {
+            msg.validate_basic();
+        }
 
+        fn chan_open_init_execute(
+            ref self: ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenInit
+        ) {
+            let chan_id_on_a = ChannelIdImpl::new(channel_sequence.clone());
 
-        fn chan_open_init_execute(ref self: ComponentState<TContractState>, msg: MsgChanOpenInit) {}
+            let app = self.get_app(@msg.port_id_on_a);
+
+            app
+                .on_chan_open_init(
+                    msg.port_id_on_a.clone(),
+                    chan_id_on_a.clone(),
+                    msg.conn_id_on_a.clone(),
+                    msg.version_on_a.clone(),
+                    msg.port_id_on_b.clone(),
+                    msg.ordering.clone()
+                );
+
+            let chan_end_on_a = ChannelEndTrait::new(
+                ChannelState::Init,
+                msg.ordering,
+                msg.port_id_on_b.clone(),
+                ChannelIdZero::zero(),
+                ClientIdImpl::new(
+                    '07-cometbft', 0
+                ), // TODO: replace with connection id once connection handshake is implemented.
+            );
+
+            self.write_channel_end(@msg.port_id_on_a, @chan_id_on_a, chan_end_on_a);
+
+            self.write_next_channel_sequence(channel_sequence + 1);
+
+            self.write_next_sequence_send(@msg.port_id_on_a, @chan_id_on_a, SequenceImpl::one());
+
+            self.write_next_sequence_recv(@msg.port_id_on_a, @chan_id_on_a, SequenceImpl::one());
+
+            self.write_next_sequence_ack(@msg.port_id_on_a, @chan_id_on_a, SequenceImpl::one());
+
+            self
+                .emit_chan_open_init_event(
+                    msg.port_id_on_a.clone(),
+                    chan_id_on_a.clone(),
+                    msg.port_id_on_b.clone(),
+                    msg.conn_id_on_a.clone(),
+                    msg.version_on_a
+                );
+        }
     }
 
     #[generate_trait]
@@ -791,6 +845,10 @@ pub mod ChannelHandlerComponent {
     pub(crate) impl ChannelReaderImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ChannelReaderTrait<TContractState> {
+        fn read_next_channel_sequence(self: @ComponentState<TContractState>) -> u64 {
+            self.next_channel_sequence.read()
+        }
+
         fn read_channel_end(
             self: @ComponentState<TContractState>, port_id: @PortId, channel_id: @ChannelId
         ) -> ChannelEnd {
@@ -870,6 +928,12 @@ pub mod ChannelHandlerComponent {
     pub(crate) impl ChannelWriterImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ChannelWriterTrait<TContractState> {
+        fn write_next_channel_sequence(
+            ref self: ComponentState<TContractState>, channel_sequence: u64
+        ) {
+            self.next_channel_sequence.write(channel_sequence + 1);
+        }
+
         fn write_channel_end(
             ref self: ComponentState<TContractState>,
             port_id: @PortId,
@@ -961,6 +1025,22 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>
     > of EventEmitterTrait<TContractState> {
+        fn emit_chan_open_init_event(
+            ref self: ComponentState<TContractState>,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            port_id_on_b: PortId,
+            connection_id_on_a: ConnectionId,
+            version_on_a: ChannelVersion
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_chan_open_init_event(
+                    port_id_on_a, chan_id_on_a, port_id_on_b, connection_id_on_a, version_on_a
+                );
+        }
+
         fn emit_send_packet_event(
             ref self: ComponentState<TContractState>, packet: Packet, ordering: ChannelOrdering
         ) {

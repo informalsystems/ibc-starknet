@@ -5,13 +5,13 @@ use starknet_ibc_core::channel::{
 use starknet_ibc_core::client::{Height, HeightPartialOrd};
 use starknet_ibc_core::commitment::StateProof;
 use starknet_ibc_core::host::Sequence;
-use starknet_ibc_core::host::{ConnectionId, ChannelId, ChannelIdTrait, PortId, PortIdTrait};
+use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId, PortIdTrait};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct MsgChanOpenInit {
     pub port_id_on_a: PortId,
-    pub connection_hops_on_a: Array<ConnectionId>,
+    pub conn_id_on_a: ConnectionId,
     pub version_on_a: ChannelVersion,
     pub port_id_on_b: PortId,
     pub ordering: ChannelOrdering,
@@ -20,7 +20,7 @@ pub struct MsgChanOpenInit {
 pub impl MsgChanOpenInitValidateBasic of ValidateBasic<MsgChanOpenInit> {
     fn validate_basic(self: @MsgChanOpenInit) {
         assert(!self.port_id_on_a.is_zero(), ChannelErrors::MISSING_PORT_ID);
-        assert(self.connection_hops_on_a.len() > 0, ChannelErrors::MISSING_CONNECTION_ID);
+        assert(self.conn_id_on_a.is_non_zero(), ChannelErrors::MISSING_CONNECTION_ID);
         assert(!self.port_id_on_b.is_zero(), ChannelErrors::MISSING_PORT_ID);
     }
 }
@@ -28,7 +28,7 @@ pub impl MsgChanOpenInitValidateBasic of ValidateBasic<MsgChanOpenInit> {
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct MsgChanOpenTry {
     pub port_id_on_b: PortId,
-    pub connection_hops_on_b: Array<ConnectionId>,
+    pub conn_id_on_a: ConnectionId,
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
     pub version_on_a: ChannelVersion,
@@ -40,7 +40,7 @@ pub struct MsgChanOpenTry {
 pub impl MsgChanOpenTryValidateBasic of ValidateBasic<MsgChanOpenTry> {
     fn validate_basic(self: @MsgChanOpenTry) {
         assert(!self.port_id_on_b.is_zero(), ChannelErrors::MISSING_PORT_ID);
-        assert(self.connection_hops_on_b.len() > 0, ChannelErrors::MISSING_CONNECTION_ID);
+        assert(self.conn_id_on_a.is_non_zero(), ChannelErrors::MISSING_CONNECTION_ID);
         assert(!self.port_id_on_a.is_zero(), ChannelErrors::MISSING_PORT_ID);
         assert(!self.chan_id_on_a.is_zero(), ChannelErrors::MISSING_CHANNEL_ID);
         assert(self.version_on_a.is_non_zero(), ChannelErrors::MISSING_CHANNEL_VERSION);

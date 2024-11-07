@@ -100,8 +100,8 @@ pub mod host {
     pub use errors::HostErrors;
     pub use identifiers::{
         ClientId, ClientIdImpl, ClientIdTrait, ConnectionId, ConnectionIdTrait, ChannelId,
-        ChannelIdTrait, PortId, PortIdImpl, PortIdTrait, Sequence, SequenceImpl, SequenceTrait,
-        SequencePartialOrd, SequenceZero
+        ChannelIdImpl, ChannelIdTrait, ChannelIdZero, PortId, PortIdImpl, PortIdTrait, Sequence,
+        SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero
     };
 
     pub use keys::{

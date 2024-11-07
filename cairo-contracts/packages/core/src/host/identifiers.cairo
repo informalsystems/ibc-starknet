@@ -80,6 +80,20 @@ pub impl ConnectionIdImpl of ConnectionIdTrait {
     }
 }
 
+pub impl ConnectionIdZero of Zero<ConnectionId> {
+    fn zero() -> ConnectionId {
+        ConnectionId { connection_id: "" }
+    }
+
+    fn is_zero(self: @ConnectionId) -> bool {
+        self.connection_id.len() == 0
+    }
+
+    fn is_non_zero(self: @ConnectionId) -> bool {
+        !self.is_zero()
+    }
+}
+
 pub impl ConnectionIdIntoByteArray of Into<ConnectionId, ByteArray> {
     fn into(self: ConnectionId) -> ByteArray {
         self.connection_id
@@ -122,10 +136,6 @@ pub impl ChannelIdImpl of ChannelIdTrait {
         sequence.try_into().unwrap()
     }
 
-    fn is_zero(self: @ChannelId) -> bool {
-        self.channel_id.len() == 0
-    }
-
     fn validate(self: @ChannelId) {
         let channel_id_len = self.channel_id.len();
 
@@ -141,6 +151,20 @@ pub impl ChannelIdImpl of ChannelIdTrait {
         let expected_hash = poseidon_hash(@expected_channel_id);
 
         assert(self_hash == expected_hash, HostErrors::INVALID_CHANNEL_ID);
+    }
+}
+
+pub impl ChannelIdZero of Zero<ChannelId> {
+    fn zero() -> ChannelId {
+        ChannelId { channel_id: "" }
+    }
+
+    fn is_zero(self: @ChannelId) -> bool {
+        self.channel_id.len() == 0
+    }
+
+    fn is_non_zero(self: @ChannelId) -> bool {
+        !self.is_zero()
     }
 }
 
@@ -198,6 +222,10 @@ pub struct Sequence {
 
 #[generate_trait]
 pub impl SequenceImpl of SequenceTrait {
+    fn one() -> Sequence {
+        Sequence { sequence: 1 }
+    }
+
     fn increment(ref self: Sequence) -> Sequence {
         let maybe_next_sequence = self.sequence.checked_add(1);
 
