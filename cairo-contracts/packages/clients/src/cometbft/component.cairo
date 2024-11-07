@@ -496,7 +496,7 @@ pub mod CometClientComponent {
         fn read_update_heights(
             self: @ComponentState<TContractState>, client_sequence: u64
         ) -> Array<Height> {
-            self.update_heights.entry(client_sequence).read()
+            self.update_heights.read(client_sequence)
         }
     }
 
