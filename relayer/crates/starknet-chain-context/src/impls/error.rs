@@ -11,6 +11,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::bool::DecodeBoolError;
 use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::variant::VariantIndexOutOfBound;
+use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_error::handlers::debug::DebugError;
 use hermes_error::handlers::display::DisplayError;
 use hermes_error::handlers::identity::ReturnError;
@@ -24,7 +25,9 @@ use hermes_protobuf_encoding_components::impls::encode_mut::chunk::{
     InvalidWireType, UnsupportedWireType,
 };
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::RequiredFieldTagNotFound;
+use hermes_relayer_components::chain::impls::queries::consensus_state_height::NoConsensusStateAtLessThanHeight;
 use hermes_relayer_components::chain::traits::send_message::EmptyMessageResponse;
+use hermes_relayer_components::chain::traits::types::ibc::HasClientIdType;
 use hermes_relayer_components::transaction::impls::poll_tx_response::TxNoResponseError;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_runtime::types::error::TokioRuntimeError;
@@ -88,6 +91,8 @@ delegate_components! {
             EmptyMessageResponse,
             <'a> UnknownEvent<'a>,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
+            <'a, Chain: HasClientIdType<Counterparty>, Counterparty: HasHeightType>
+                NoConsensusStateAtLessThanHeight<'a, Chain, Counterparty>,
         ]:
             DebugError,
         [
