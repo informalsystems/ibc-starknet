@@ -22,6 +22,12 @@ use crate::types::client_id::ClientId;
 use crate::types::cosmos::consensus_state::CometConsensusState;
 use crate::types::cosmos::height::Height;
 
+#[derive(Debug)]
+pub struct ConsensusStateNotFound {
+    pub client_id: ClientId,
+    pub height: Height,
+}
+
 pub struct QueryCometConsensusState;
 
 impl<Chain, Counterparty, Encoding> ConsensusStateQuerier<Chain, Counterparty>
@@ -34,6 +40,7 @@ where
         + HasBlobType<Blob = Vec<Felt>>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+        + CanRaiseError<ConsensusStateNotFound>
         + CanRaiseError<Encoding::Error>,
     Counterparty:
         HasConsensusStateType<Chain, ConsensusState = CometConsensusState> + HasHeightFields,
@@ -45,7 +52,7 @@ where
     async fn query_consensus_state(
         chain: &Chain,
         _tag: PhantomData<Counterparty>,
-        client_id: &Chain::ClientId,
+        client_id: &ClientId,
         consensus_height: &Counterparty::Height,
         _query_height: &Chain::Height, // TODO: figure whether we can perform height specific queries on Starknet
     ) -> Result<Counterparty::ConsensusState, Chain::Error> {
@@ -53,14 +60,13 @@ where
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
 
+        let height = Height {
+            revision_number: Counterparty::revision_number(consensus_height),
+            revision_height: Counterparty::revision_height(consensus_height),
+        };
+
         let calldata = encoding
-            .encode(&(
-                client_id.sequence,
-                Height {
-                    revision_number: Counterparty::revision_number(consensus_height),
-                    revision_height: Counterparty::revision_height(consensus_height),
-                },
-            ))
+            .encode(&(client_id.sequence, height.clone()))
             .map_err(Chain::raise_error)?;
 
         let output = chain
@@ -73,6 +79,15 @@ where
         let consensus_state: CometConsensusState = encoding
             .decode(&raw_consensus_state)
             .map_err(Chain::raise_error)?;
+
+        // FIXME: Temporary workaround, as the current Cairo contract returns
+        // default value when the entry is not found.
+        if consensus_state.root.is_empty() {
+            return Err(Chain::raise_error(ConsensusStateNotFound {
+                client_id: client_id.clone(),
+                height,
+            }));
+        }
 
         Ok(consensus_state)
     }

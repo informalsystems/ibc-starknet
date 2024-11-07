@@ -97,18 +97,12 @@ pub trait CanUseStarknetToCosmosRelay:
     HasRelayChains<SrcChain = StarknetChain, DstChain = CosmosChain>
     + CanCreateClient<DestinationTarget>
     + CanCreateClient<SourceTarget>
-    // + CanSendTargetUpdateClientMessage<SourceTarget>
     + CanRaiseRelayChainErrors
+    + CanBuildTargetUpdateClientMessage<SourceTarget>
     + CanBuildTargetUpdateClientMessage<DestinationTarget>
+    + CanSendTargetUpdateClientMessage<SourceTarget>
     + CanSendTargetUpdateClientMessage<DestinationTarget>
 {
 }
 
 impl CanUseStarknetToCosmosRelay for StarknetToCosmosRelay {}
-
-// pub trait CanBuildUpdateClientMessage:
-//     TargetUpdateClientMessageBuilder<StarknetToCosmosRelay, SourceTarget>
-// {
-// }
-
-// impl CanBuildUpdateClientMessage for BuildUpdateClientMessages {}

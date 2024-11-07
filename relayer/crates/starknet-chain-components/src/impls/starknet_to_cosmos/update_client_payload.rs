@@ -19,6 +19,14 @@ use crate::types::cosmos::update::CometUpdateHeader;
 
 pub struct BuildUpdateCometClientPayload;
 
+/*
+   Stub implementation of UpdateClient payload builder from Cosmos to Starknet.
+   We basically build a `CosmosCreateClientPayload`, and then use the state root
+   of the consensus state to build a dummy update header.
+
+   TODO: refactor Cosmos UpdateClient header so that they are more easily
+   be converted into the Cairo encoding for the Starknet Comet contract.
+*/
 impl<Chain, Counterparty> UpdateClientPayloadBuilder<Chain, Counterparty>
     for BuildUpdateCometClientPayload
 where
@@ -33,6 +41,7 @@ where
     async fn build_update_client_payload(
         chain: &Chain,
         trusted_height: &CosmosHeight,
+        // Ignore the target height for the dummy implementation
         _target_height: &CosmosHeight,
         _client_state: Chain::ClientState,
     ) -> Result<CometUpdateHeader, Chain::Error> {
