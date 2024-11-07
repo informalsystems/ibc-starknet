@@ -34,6 +34,7 @@ use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_starknet_chain_components::impls::error::account::RaiseAccountError;
 use hermes_starknet_chain_components::impls::error::provider::RaiseProviderError;
 use hermes_starknet_chain_components::impls::error::starknet::RaiseStarknetError;
+use hermes_starknet_chain_components::impls::queries::consensus_state::ConsensusStateNotFound;
 use hermes_starknet_chain_components::impls::queries::contract_address::ContractAddressNotFound;
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use hermes_starknet_chain_components::types::event::UnknownEvent;
@@ -89,6 +90,7 @@ delegate_components! {
             RequiredFieldTagNotFound,
             ContractAddressNotFound,
             EmptyMessageResponse,
+            ConsensusStateNotFound,
             <'a> UnknownEvent<'a>,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
             <'a, Chain: HasClientIdType<Counterparty>, Counterparty: HasHeightType>
