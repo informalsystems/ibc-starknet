@@ -3,8 +3,8 @@ pub mod CometClientComponent {
     use alexandria_sorting::MergeSort;
     use core::num::traits::Zero;
     use starknet::storage::{
-        StoragePathEntry, Map, StorageMapReadAccess, StorageMapWriteAccess,
-        StoragePointerReadAccess, StoragePointerWriteAccess,
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess,
     };
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_clients::cometbft::{

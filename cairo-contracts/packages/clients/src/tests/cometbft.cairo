@@ -94,19 +94,19 @@ fn test_missing_client_processed_height() {
 #[test]
 fn test_empty_update_heights() {
     let mut state = setup();
-    state.read_update_heights(0);
+    let heights = state.read_update_heights(0);
+    assert!(heights.len() == 0);
 }
 
 #[test]
-fn test_update_heights() {
+fn test_update_heights_sort() {
     let mut state = setup();
-    let heights = state.read_update_heights(0);
-    assert!(heights.len() == 0);
-
     state.write_update_height(0, HEIGHT(1));
+    state.write_update_height(0, HEIGHT(4));
     state.write_update_height(0, HEIGHT(2));
+    state.write_update_height(0, HEIGHT(3));
     let heights = state.read_update_heights(0);
-    assert_eq!(heights, array![HEIGHT(2), HEIGHT(1)]);
+    assert_eq!(heights, array![HEIGHT(1), HEIGHT(2), HEIGHT(3), HEIGHT(4)]);
 }
 
 #[test]
