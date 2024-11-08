@@ -18,4 +18,4 @@ hermes-cosmos-test-components    = { workspace = true }
 hermes-starknet-chain-components = { workspace = true }
 
 starknet = { workspace = true }
-serde   = { workspace = true }
+serde    = { workspace = true }

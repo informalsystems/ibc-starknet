@@ -14,7 +14,9 @@ use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfi
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
 use hermes_starknet_test_components::types::wallet::StarknetWallet;
 use hermes_test_components::chain_driver::traits::chain_process::ChainProcessTaker;
-use hermes_test_components::chain_driver::traits::types::chain::ProvideChainType;
+use hermes_test_components::chain_driver::traits::types::chain::{
+    ChainGetter, HasChain, ProvideChainType,
+};
 use tokio::process::Child;
 
 #[derive(HasField)]
@@ -52,8 +54,18 @@ impl ProvideChainType<StarknetChainDriver> for StarknetChainDriverComponents {
     type Chain = StarknetChain;
 }
 
+impl ChainGetter<StarknetChainDriver> for StarknetChainDriverComponents {
+    fn chain(driver: &StarknetChainDriver) -> &StarknetChain {
+        &driver.chain
+    }
+}
+
 impl ChainProcessTaker<StarknetChainDriver> for StarknetChainDriverComponents {
     fn take_chain_process(chain_driver: &mut StarknetChainDriver) -> Option<Child> {
         chain_driver.chain_process.take()
     }
 }
+
+pub trait CanUseStarknetChainDriver: HasChain<Chain = StarknetChain> {}
+
+impl CanUseStarknetChainDriver for StarknetChainDriver {}

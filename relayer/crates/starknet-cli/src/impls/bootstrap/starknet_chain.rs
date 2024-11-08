@@ -6,6 +6,9 @@ use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 
 #[derive(Debug, clap::Parser, HasField)]
 pub struct BootstrapStarknetChainArgs {
+    #[clap(long = "chain-id", required = true)]
+    pub chain_id: String,
+
     #[clap(long = "chain-store-dir", required = true)]
     pub chain_store_dir: String,
 

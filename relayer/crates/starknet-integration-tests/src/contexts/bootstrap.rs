@@ -29,7 +29,9 @@ use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetN
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
 use hermes_starknet_test_components::types::wallet::StarknetWallet;
-use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
+use hermes_test_components::bootstrap::traits::chain::{
+    CanBootstrapChain, ChainBootstrapperComponent,
+};
 use hermes_test_components::chain_driver::traits::types::chain::ProvideChainType;
 use hermes_test_components::driver::traits::types::chain_driver::ProvideChainDriverType;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
@@ -160,7 +162,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
 }
 
 pub trait CanUseStarknetBootstrap:
-    HasRuntime<Runtime = HermesRuntime> + CanStartChainFullNode
+    HasRuntime<Runtime = HermesRuntime> + CanStartChainFullNode + CanBootstrapChain
 {
 }
 

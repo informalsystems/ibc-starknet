@@ -1,39 +1,47 @@
 [package]
 name = "hermes-starknet-cli"
-version      = { workspace = true }
-edition      = { workspace = true }
-license      = { workspace = true }
-keywords     = { workspace = true }
-repository   = { workspace = true }
-authors      = { workspace = true }
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+keywords = { workspace = true }
+repository = { workspace = true }
+authors = { workspace = true }
 rust-version = { workspace = true }
-description  = """
+description = """
     Hermes: IBC Relayer in Rust
 """
 
+[[bin]]
+name = "hermes-starknet"
+path = "bin/hermes_starknet.rs"
+
 [dependencies]
-cgp                             = { workspace = true }
-cgp-error-eyre                  = { workspace = true }
-hermes-any-counterparty         = { workspace = true }
-hermes-cli-components           = { workspace = true }
-hermes-error                    = { workspace = true }
-hermes-runtime                  = { workspace = true }
-hermes-runtime-components       = { workspace = true }
-hermes-logging-components       = { workspace = true }
-hermes-logger                   = { workspace = true }
-hermes-relayer-components       = { workspace = true }
-hermes-cosmos-relayer           = { workspace = true }
-hermes-cosmos-integration-tests = { workspace = true }
-hermes-cosmos-chain-components  = { workspace = true }
-hermes-starknet-test-components  = { workspace = true }
-hermes-test-components           = { workspace = true }
-hermes-starknet-integration-tests  = { workspace = true }
+cgp                               = { workspace = true }
+cgp-error-eyre                    = { workspace = true }
+hermes-any-counterparty           = { workspace = true }
+hermes-cli-components             = { workspace = true }
+hermes-error                      = { workspace = true }
+hermes-runtime                    = { workspace = true }
+hermes-runtime-components         = { workspace = true }
+hermes-logging-components         = { workspace = true }
+hermes-logger                     = { workspace = true }
+hermes-relayer-components         = { workspace = true }
+hermes-cosmos-relayer             = { workspace = true }
+hermes-cosmos-integration-tests   = { workspace = true }
+hermes-cosmos-chain-components    = { workspace = true }
+hermes-starknet-test-components   = { workspace = true }
+hermes-test-components            = { workspace = true }
+hermes-starknet-integration-tests = { workspace = true }
 
-ibc                             = { workspace = true }
-ibc-relayer                     = { workspace = true }
-ibc-relayer-types               = { workspace = true }
+ibc               = { workspace = true }
+ibc-relayer       = { workspace = true }
+ibc-relayer-types = { workspace = true }
 
-serde                        = { workspace = true, features = ["derive"] }
-clap                        = { workspace = true, features = ["derive"] }
-eyre                        = { workspace = true }
-toml                        = { workspace = true }
+serde              = { workspace = true, features = [ "derive" ] }
+clap               = { workspace = true, features = [ "derive" ] }
+eyre               = { workspace = true }
+toml               = { workspace = true }
+tokio              = { workspace = true }
+tracing            = { workspace = true }
+tracing-subscriber = { workspace = true }
+stable-eyre        = { workspace = true }

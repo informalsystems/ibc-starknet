@@ -1,25 +1,36 @@
 use std::path::PathBuf;
 
-use cgp::core::component::{UseContext, UseDelegate};
+use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
 use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField;
+use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
+use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
 use hermes_cli_components::traits::bootstrap::{
     BootstrapLoaderComponent, BootstrapTypeComponent, CanLoadBootstrap,
 };
-use hermes_cli_components::traits::command::CommandRunnerComponent;
-use hermes_cli_components::traits::config::config_path::ConfigPathGetterComponent;
+use hermes_cli_components::traits::command::{CanRunCommand, CommandRunnerComponent};
+use hermes_cli_components::traits::config::config_path::{
+    ConfigPathGetterComponent, HasConfigPath,
+};
+use hermes_cli_components::traits::config::load_config::{CanLoadConfig, ConfigLoaderComponent};
+use hermes_cli_components::traits::config::write_config::{CanWriteConfig, ConfigWriterComponent};
+use hermes_cli_components::traits::output::{
+    CanProduceOutput, OutputProducer, OutputTypeComponent,
+};
+use hermes_cli_components::traits::types::config::ConfigTypeComponent;
+use hermes_error::traits::wrap::CanWrapError;
 use hermes_error::types::HermesError;
 use hermes_logger::ProvideHermesLogger;
 use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeComponent,
+    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
 };
 use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
-    ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
+    HasRuntime, ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
 };
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
@@ -29,6 +40,7 @@ use toml::to_string_pretty;
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
 use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::impls::error::ProvideCliError;
+use crate::impls::subcommand::{AllSubCommands, RunAllSubCommand};
 use crate::types::config::{StarknetChainConfig, StarknetRelayerConfig};
 
 #[derive(HasField)]
@@ -68,12 +80,20 @@ delegate_components! {
             GlobalLoggerGetterComponent,
         ]:
             ProvideHermesLogger,
+        ConfigTypeComponent:
+            WithType<StarknetRelayerConfig>,
         BootstrapTypeComponent:
             WithType<StarknetBootstrap>,
+        OutputTypeComponent:
+            WithType<()>,
         BootstrapLoaderComponent:
             LoadStarknetBootstrap,
         ConfigPathGetterComponent:
             GetDefaultConfigField,
+        ConfigLoaderComponent:
+            LoadTomlConfig,
+        ConfigWriterComponent:
+            WriteTomlConfig,
         CommandRunnerComponent:
             UseDelegate<StarknetCommandRunnerComponents>,
     }
@@ -81,9 +101,14 @@ delegate_components! {
 
 delegate_components! {
     StarknetCommandRunnerComponents {
+        AllSubCommands: RunAllSubCommand,
         BootstrapSubCommand: RunBootstrapSubCommand,
-        BootstrapStarknetChainArgs: RunBootstrapChainCommand<UseContext>,
+        BootstrapStarknetChainArgs: RunBootstrapChainCommand<UpdateStarknetConfig>,
     }
+}
+
+impl<Value> OutputProducer<StarknetApp, Value> for StarknetAppComponents {
+    fn produce_output(_app: &StarknetApp, _value: Value) {}
 }
 
 impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarknetConfig {
@@ -116,6 +141,19 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
     }
 }
 
-pub trait CanUseStarknetApp: CanLoadBootstrap<BootstrapStarknetChainArgs> {}
+pub trait CanUseStarknetApp:
+    HasRuntime
+    + HasLogger
+    + HasConfigPath
+    + CanLoadConfig
+    + CanWriteConfig
+    + CanWrapError<&'static str>
+    + CanProduceOutput<()>
+    + CanLoadBootstrap<BootstrapStarknetChainArgs>
+    + CanRunCommand<AllSubCommands>
+    + CanRunCommand<BootstrapSubCommand>
+    + CanRunCommand<BootstrapStarknetChainArgs>
+{
+}
 
 impl CanUseStarknetApp for StarknetApp {}
