@@ -1,11 +1,16 @@
 use std::path::PathBuf;
 
+use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
+use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
+use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField;
 use hermes_cli_components::traits::bootstrap::{
     BootstrapLoaderComponent, BootstrapTypeComponent, CanLoadBootstrap,
 };
+use hermes_cli_components::traits::command::CommandRunnerComponent;
+use hermes_cli_components::traits::config::config_path::ConfigPathGetterComponent;
 use hermes_logger::ProvideHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeComponent,
@@ -18,6 +23,7 @@ use hermes_runtime_components::traits::runtime::{
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
+use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::impls::error::ProvideCliError;
 
 #[derive(HasField)]
@@ -59,6 +65,17 @@ delegate_components! {
             WithType<StarknetBootstrap>,
         BootstrapLoaderComponent:
             LoadStarknetBootstrap,
+        ConfigPathGetterComponent:
+            GetDefaultConfigField,
+        CommandRunnerComponent:
+            UseDelegate<StarknetCommandRunnerComponents>,
+    }
+}
+
+delegate_components! {
+    StarknetCommandRunnerComponents {
+        BootstrapSubCommand: RunBootstrapSubCommand,
+        BootstrapStarknetChainArgs: RunBootstrapChainCommand,
     }
 }
 

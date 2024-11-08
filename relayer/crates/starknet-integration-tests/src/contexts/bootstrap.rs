@@ -102,6 +102,8 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
         wallets: BTreeMap<String, StarknetWallet>,
         chain_process: Child,
     ) -> Result<StarknetChainDriver, HermesError> {
+        let runtime = bootstrap.runtime.clone();
+
         let relayer_wallet = wallets
             .get("relayer")
             .ok_or_else(|| StarknetBootstrap::raise_error("expect relayer wallet to be present"))?
@@ -134,7 +136,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
         );
 
         let chain = StarknetChain {
-            runtime: bootstrap.runtime.clone(),
+            runtime: runtime.clone(),
             chain_id,
             rpc_client,
             account,
@@ -142,11 +144,12 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
         };
 
         let chain_driver = StarknetChainDriver {
+            runtime,
             chain,
             genesis_config,
             node_config,
             wallets,
-            chain_process,
+            chain_process: Some(chain_process),
             relayer_wallet,
             user_wallet_a,
             user_wallet_b,
