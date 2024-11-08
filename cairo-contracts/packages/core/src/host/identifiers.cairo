@@ -46,7 +46,7 @@ pub impl ConnectionIdImpl of ConnectionIdTrait {
         let mut multiplier: u256 = 1;
 
         loop {
-            if i == 9 {
+            if i == 11 {
                 break;
             }
             let char_byte = self.connection_id.at(i - 1).unwrap();
@@ -65,7 +65,7 @@ pub impl ConnectionIdImpl of ConnectionIdTrait {
     fn validate(self: @ConnectionId) {
         let connection_id_len = self.connection_id.len();
 
-        assert(connection_id_len > 9, HostErrors::INVALID_IDENTIFIER_LENGTH);
+        assert(connection_id_len > 10, HostErrors::INVALID_IDENTIFIER_LENGTH);
         assert(connection_id_len <= 64, HostErrors::INVALID_IDENTIFIER_LENGTH);
 
         let mut expected_connection_id: ByteArray = "connection-";

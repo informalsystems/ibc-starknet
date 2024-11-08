@@ -73,6 +73,11 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         self.remote.channel_id
     }
 
+    /// Returns the state of the channel end.
+    fn state(self: @ChannelEnd) -> @ChannelState {
+        self.state
+    }
+
     /// Returns true if the channel is in the open state.
     fn is_open(self: @ChannelEnd) -> bool {
         self.state == @ChannelState::Open

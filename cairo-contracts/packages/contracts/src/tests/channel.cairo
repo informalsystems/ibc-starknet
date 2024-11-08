@@ -1,14 +1,16 @@
 use snforge_std::{spy_events, EventSpy};
 use starknet_ibc_apps::transfer::{ERC20Contract, SUCCESS_ACK};
-use starknet_ibc_core::channel::{ChannelEndTrait, ChannelOrdering, AckStatus};
+use starknet_ibc_core::channel::{ChannelEndTrait, ChannelOrdering, AckStatus, ChannelState};
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{SequenceImpl, Sequence};
 use starknet_ibc_core::router::AppContract;
 use starknet_ibc_testkit::configs::{
-    TransferAppConfig, TransferAppConfigTrait, CometClientConfig, CometClientConfigTrait
+    TransferAppConfig, TransferAppConfigTrait, CoreConfig, CoreConfigTrait, CometClientConfig,
+    CometClientConfigTrait
 };
 use starknet_ibc_testkit::dummies::{
-    HEIGHT, TIMESTAMP, COSMOS, STARKNET, OWNER, CLIENT_ID, SUPPLY, PACKET_COMMITMENT_ON_SN,
+    OWNER, HEIGHT, TIMESTAMP, COSMOS, STARKNET, CLIENT_ID, CHANNEL_ID, SUPPLY,
+    PACKET_COMMITMENT_ON_SN,
 };
 use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ChannelEventSpyExt};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle, AppHandle, ERC20Handle};
@@ -16,11 +18,19 @@ use starknet_ibc_testkit::setup::SetupImpl;
 use starknet_ibc_utils::ComputeKey;
 
 fn setup() -> (
-    CoreContract, AppContract, ERC20Contract, CometClientConfig, TransferAppConfig, EventSpy
+    CoreContract,
+    AppContract,
+    ERC20Contract,
+    CoreConfig,
+    CometClientConfig,
+    TransferAppConfig,
+    EventSpy
 ) {
     // -----------------------------------------------------------
     // Setup Contracts
     // -----------------------------------------------------------
+
+    let core_cfg = CoreConfigTrait::default();
 
     let mut comet_cfg = CometClientConfigTrait::default();
 
@@ -36,13 +46,38 @@ fn setup() -> (
     // Create Client
     // -----------------------------------------------------------
 
-    // Create a `MsgCreateClient` message.
     let msg_create_client = comet_cfg.dummy_msg_create_client();
 
-    // Submit the message and create a client.
     core.create_client(msg_create_client);
 
-    (core, ics20, erc20, comet_cfg, transfer_cfg, spy)
+    (core, ics20, erc20, core_cfg, comet_cfg, transfer_cfg, spy)
+}
+
+#[test]
+fn test_chan_open_init_ok() {
+    // -----------------------------------------------------------
+    // Setup Essentials
+    // -----------------------------------------------------------
+
+    let (core, _, _, core_cfg, _, _, mut spy) = setup();
+
+    // -----------------------------------------------------------
+    // Channel Open Init
+    // -----------------------------------------------------------
+
+    let msg = core_cfg.dummy_msg_chan_open_init();
+
+    core.chan_open_init(msg.clone());
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    spy.assert_chan_open_init_event(core.address, CHANNEL_ID(0), msg.clone());
+
+    let chan_end_on_a = core.channel_end(msg.port_id_on_a, CHANNEL_ID(0));
+
+    assert_eq!(chan_end_on_a.state(), @ChannelState::Init);
 }
 
 #[test]
@@ -51,7 +86,7 @@ fn test_send_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, _, erc20, _, transfer_cfg, mut spy) = setup();
+    let (core, _, erc20, _, _, transfer_cfg, mut spy) = setup();
 
     // -----------------------------------------------------------
     // Send Packet (from Starknet to Cosmos)
@@ -90,7 +125,7 @@ fn test_recv_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, _, _, transfer_cfg, mut spy) = setup();
+    let (core, ics20, _, _, _, transfer_cfg, mut spy) = setup();
 
     // -----------------------------------------------------------
     // Receive Packet (from Cosmos to Starknet)
@@ -149,7 +184,7 @@ fn test_successful_ack_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, mut erc20, _, transfer_cfg, mut spy) = setup();
+    let (core, ics20, mut erc20, _, _, transfer_cfg, mut spy) = setup();
 
     // -----------------------------------------------------------
     // Send Packet (from Starknet to Cosmos)
@@ -228,7 +263,7 @@ fn test_failure_ack_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, mut erc20, _, transfer_cfg, mut spy) = setup();
+    let (core, ics20, mut erc20, _, _, transfer_cfg, mut spy) = setup();
 
     // -----------------------------------------------------------
     // Send Packet (from Starknet to Cosmos)
@@ -309,7 +344,7 @@ fn test_ack_packet_for_never_sent_packet() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, _, _, _, transfer_cfg, _) = setup();
+    let (core, _, _, _, _, transfer_cfg, _) = setup();
 
     // -----------------------------------------------------------
     // Acknowledge Packet (on Starknet)
@@ -328,7 +363,7 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, mut erc20, comet_cfg, mut transfer_cfg, mut spy) = setup();
+    let (core, ics20, mut erc20, _, comet_cfg, mut transfer_cfg, mut spy) = setup();
 
     let updating_height = HEIGHT(11); // Set to 11 as client is created at height 10.
 
