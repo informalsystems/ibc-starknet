@@ -194,6 +194,7 @@ pub mod TokenTransferComponent {
             version_on_a: AppVersion,
             ordering: ChannelOrdering
         ) -> AppVersion {
+            assert(version_on_a == VERSION(), TransferErrors::INVALID_APP_VERSION);
             VERSION()
         }
 
@@ -202,7 +203,9 @@ pub mod TokenTransferComponent {
             port_id_on_a: PortId,
             chan_id_on_a: ChannelId,
             version_on_b: AppVersion
-        ) {}
+        ) {
+            assert(version_on_b == VERSION(), TransferErrors::INVALID_APP_VERSION);
+        }
 
         fn on_chan_open_confirm(
             ref self: ComponentState<TContractState>, port_id_on_b: PortId, chan_id_on_b: ChannelId
@@ -432,8 +435,6 @@ pub mod TokenTransferComponent {
 
             match @packet_data.denom.base {
                 Denom::Native(erc20_token) => {
-                    packet_data.denom.remove_prefix(@trace_prefix);
-
                     self
                         .unescrow_execute(
                             receiver,

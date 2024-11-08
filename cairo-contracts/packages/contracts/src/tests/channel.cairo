@@ -172,7 +172,7 @@ fn test_chan_open_confirm_ok() {
 
     spy
         .assert_chan_open_confirm_event(
-            core.address, PORT_ID(), CHANNEL_ID(1), CONNECTION_ID(0), msg.clone()
+            core.address, PORT_ID(), CHANNEL_ID(0), CONNECTION_ID(0), msg.clone()
         );
 
     let chan_end_on_b = core.channel_end(msg.port_id_on_b, msg.chan_id_on_b);
@@ -186,7 +186,9 @@ fn test_send_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, _, erc20, _, _, transfer_cfg, mut spy) = setup();
+    let (core, _, erc20, mut core_cfg, _, transfer_cfg, mut spy) = setup();
+
+    core_cfg.create_channel(@core);
 
     // -----------------------------------------------------------
     // Send Packet (from Starknet to Cosmos)
@@ -225,7 +227,9 @@ fn test_recv_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, _, _, _, transfer_cfg, mut spy) = setup();
+    let (core, ics20, _, mut core_cfg, _, transfer_cfg, mut spy) = setup();
+
+    core_cfg.create_channel(@core);
 
     // -----------------------------------------------------------
     // Receive Packet (from Cosmos to Starknet)
@@ -284,7 +288,9 @@ fn test_successful_ack_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, mut erc20, _, _, transfer_cfg, mut spy) = setup();
+    let (core, ics20, mut erc20, mut core_cfg, _, transfer_cfg, mut spy) = setup();
+
+    core_cfg.create_channel(@core);
 
     // -----------------------------------------------------------
     // Send Packet (from Starknet to Cosmos)
@@ -363,7 +369,9 @@ fn test_failure_ack_packet_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, mut erc20, _, _, transfer_cfg, mut spy) = setup();
+    let (core, ics20, mut erc20, mut core_cfg, _, transfer_cfg, mut spy) = setup();
+
+    core_cfg.create_channel(@core);
 
     // -----------------------------------------------------------
     // Send Packet (from Starknet to Cosmos)
@@ -444,7 +452,9 @@ fn test_ack_packet_for_never_sent_packet() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, _, _, _, _, transfer_cfg, _) = setup();
+    let (core, _, _, mut core_cfg, _, transfer_cfg, _) = setup();
+
+    core_cfg.create_channel(@core);
 
     // -----------------------------------------------------------
     // Acknowledge Packet (on Starknet)
@@ -463,7 +473,7 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, ics20, mut erc20, _, comet_cfg, mut transfer_cfg, mut spy) = setup();
+    let (core, ics20, mut erc20, mut core_cfg, comet_cfg, mut transfer_cfg, mut spy) = setup();
 
     let updating_height = HEIGHT(11); // Set to 11 as client is created at height 10.
 
@@ -472,6 +482,8 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
     transfer_cfg.set_timeout_height(timeout_height);
 
     transfer_cfg.set_timeout_timestamp(timeout_timestamp);
+
+    core_cfg.create_channel(@core);
 
     // -----------------------------------------------------------
     // Send Packet (from Starknet to Cosmos)

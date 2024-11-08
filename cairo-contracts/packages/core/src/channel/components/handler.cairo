@@ -1,7 +1,4 @@
-use starknet_ibc_core::channel::{
-    ChannelEnd, ChannelState, ChannelOrdering, Counterparty, AppVersion
-};
-use starknet_ibc_core::host::{ClientId, PortId, ChannelId, SequencePartialOrd, SequenceZero};
+use starknet_ibc_core::host::{SequencePartialOrd, SequenceZero};
 
 #[starknet::component]
 pub mod ChannelHandlerComponent {
@@ -36,7 +33,6 @@ pub mod ChannelHandlerComponent {
     };
     use starknet_ibc_core::router::{RouterHandlerComponent, AppContractTrait, AppContract};
     use starknet_ibc_utils::ValidateBasic;
-    use super::{PORT_ID, CHANNEL_ID, CHANNEL_END};
 
     #[storage]
     pub struct Storage {
@@ -53,26 +49,6 @@ pub mod ChannelHandlerComponent {
     #[event]
     #[derive(Debug, Drop, starknet::Event)]
     pub enum Event {}
-
-    // -----------------------------------------------------------
-    // Channel Initializer
-    // -----------------------------------------------------------
-
-    #[generate_trait]
-    pub impl ChannelInitializerImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
-    > of ChannelInitializerTrait<TContractState> {
-        fn initializer(ref self: ComponentState<TContractState>) {
-            // TODO: Initialize a temporary dummy `ChannelEnd`s for testing the
-            // handlers. This should be removed once the channel handshake is
-            // implemented.
-            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(0), CHANNEL_END(1));
-            self.write_next_sequence_recv(@PORT_ID(), @CHANNEL_ID(0), SequenceZero::zero());
-
-            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(1), CHANNEL_END(0));
-            self.write_next_sequence_send(@PORT_ID(), @CHANNEL_ID(1), SequenceZero::zero());
-        }
-    }
 
     // -----------------------------------------------------------
     // IChannelHandler
@@ -303,6 +279,8 @@ pub mod ChannelHandlerComponent {
             );
 
             self.write_channel_end(@msg.port_id_on_b, @chan_id_on_b, chan_end_on_b);
+
+            self.write_next_channel_sequence(channel_sequence + 1);
 
             self.write_next_sequence_send(@msg.port_id_on_b, @chan_id_on_b, SequenceImpl::one());
 
@@ -1034,7 +1012,7 @@ pub mod ChannelHandlerComponent {
         fn write_next_channel_sequence(
             ref self: ComponentState<TContractState>, channel_sequence: u64
         ) {
-            self.next_channel_sequence.write(channel_sequence + 1);
+            self.next_channel_sequence.write(channel_sequence);
         }
 
         fn write_channel_end(
@@ -1239,27 +1217,3 @@ pub mod ChannelHandlerComponent {
     }
 }
 
-// ----------------- Temporary until handshakes are implemented ---------------
-pub(crate) fn CLIENT_ID() -> ClientId {
-    ClientId { client_type: '07-cometbft', sequence: 0 }
-}
-
-pub(crate) fn PORT_ID() -> PortId {
-    PortId { port_id: "transfer" }
-}
-
-pub(crate) fn CHANNEL_ID(sequence: u64) -> ChannelId {
-    ChannelId { channel_id: format!("channel-{sequence}") }
-}
-
-pub(crate) fn CHANNEL_END(counterparty_channel_sequence: u64) -> ChannelEnd {
-    ChannelEnd {
-        state: ChannelState::Open,
-        ordering: ChannelOrdering::Unordered,
-        remote: Counterparty {
-            port_id: PORT_ID(), channel_id: CHANNEL_ID(counterparty_channel_sequence),
-        },
-        client_id: CLIENT_ID(),
-        version: AppVersion { version: "" },
-    }
-}

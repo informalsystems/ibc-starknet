@@ -2,8 +2,8 @@ use openzeppelin_testing::declare_and_deploy;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
     IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, MsgChanOpenInit, MsgChanOpenTry,
-    MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket, IChannelQueryDispatcher,
-    IChannelQueryDispatcherTrait, ChannelEnd, Packet,
+    MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket,
+    IChannelQueryDispatcher, IChannelQueryDispatcherTrait, ChannelEnd, Packet,
 };
 use starknet_ibc_core::client::{
     IClientHandlerDispatcher, IClientHandlerDispatcherTrait, IRegisterClientDispatcher,

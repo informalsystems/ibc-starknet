@@ -29,7 +29,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         TransferAppConfig {
             native_denom: NATIVE_DENOM(),
             hosted_denom: HOSTED_DENOM(),
-            chan_id_on_a: CHANNEL_ID(1),
+            chan_id_on_a: CHANNEL_ID(0),
             chan_id_on_b: CHANNEL_ID(0),
             amount: AMOUNT,
             timeout_height: TIMEOUT_HEIGHT(1000),
@@ -119,7 +119,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     ) -> MsgTimeoutPacket {
         MsgTimeoutPacket {
             packet: self.dummy_packet(denom, sender, receiver),
-            next_seq_recv_on_b: Sequence { sequence: 1 },
+            next_seq_recv_on_b: Sequence { sequence: 2 },
             proof_unreceived_on_b: STATE_PROOF(),
             proof_height_on_b: proof_height,
         }
@@ -132,7 +132,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         Serde::serialize(@self.dummy_packet_data(denom, sender, receiver), ref serialized_data);
 
         Packet {
-            seq_on_a: Sequence { sequence: 0 },
+            seq_on_a: Sequence { sequence: 1 },
             port_id_on_a: PORT_ID(),
             chan_id_on_a: self.chan_id_on_a.clone(),
             port_id_on_b: PORT_ID(),
