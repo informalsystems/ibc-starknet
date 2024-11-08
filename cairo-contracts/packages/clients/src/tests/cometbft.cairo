@@ -99,6 +99,15 @@ fn test_empty_update_heights() {
 }
 
 #[test]
+fn test_write_duplicate_update_height() {
+    let mut state = setup();
+    state.write_update_height(0, HEIGHT(5));
+    state.write_update_height(0, HEIGHT(5));
+    let heights = state.read_update_heights(0);
+    assert_eq!(heights, array![HEIGHT(5)]);
+}
+
+#[test]
 fn test_update_heights_sort() {
     let mut state = setup();
     state.write_update_height(0, HEIGHT(1));

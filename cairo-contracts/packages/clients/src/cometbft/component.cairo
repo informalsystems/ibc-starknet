@@ -1,5 +1,6 @@
 #[starknet::component]
 pub mod CometClientComponent {
+    use alexandria_data_structures::array_ext::ArrayTraitExt;
     use alexandria_sorting::MergeSort;
     use core::num::traits::Zero;
     use starknet::storage::{
@@ -512,6 +513,10 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>, client_sequence: u64, update_height: Height
         ) {
             let mut update_heights = self.update_heights.read(client_sequence);
+
+            if update_heights.contains(@update_height) {
+                return;
+            }
 
             if update_heights.len() == 255 {
                 update_heights.pop_front().unwrap();
