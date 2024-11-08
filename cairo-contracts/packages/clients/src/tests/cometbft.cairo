@@ -139,6 +139,19 @@ fn test_update_height_before() {
 }
 
 #[test]
+fn test_update_heights_max_size() {
+    let mut state = setup();
+    let mut i = 0;
+    while i < 101 {
+        state.write_update_height(0, HEIGHT(i));
+        i += 1;
+    };
+    let heights = state.read_update_heights(0);
+    assert_eq!(heights.len(), 100);
+    assert_eq!(heights.at(99), @HEIGHT(100));
+}
+
+#[test]
 #[should_panic(expected: 'ICS07: zero update heights')]
 fn test_update_height_before_empty() {
     let mut state = setup();

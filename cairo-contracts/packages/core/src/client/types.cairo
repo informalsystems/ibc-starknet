@@ -187,7 +187,7 @@ pub impl StoreHeightArray of Store<Array<Height>> {
     }
 
     fn size() -> u8 {
-        255 * Store::<Height>::size()
+        100 * Store::<Height>::size()
     }
 }
 

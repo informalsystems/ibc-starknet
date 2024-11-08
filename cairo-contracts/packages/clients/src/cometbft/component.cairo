@@ -520,7 +520,7 @@ pub mod CometClientComponent {
 
             let len = update_heights.len();
 
-            if len == 255 {
+            if len == 100 {
                 update_heights.pop_front().unwrap();
             }
 
