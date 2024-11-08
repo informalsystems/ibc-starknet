@@ -95,6 +95,12 @@ pub trait IClientQuery<TContractState> {
 
     fn latest_height(self: @TContractState, client_sequence: u64) -> Height;
 
+    /// Returns the latest update height that is less than or equal to the
+    /// target height.
+    fn update_height_before(
+        self: @TContractState, client_sequence: u64, target_height: Height
+    ) -> Height;
+
     fn latest_timestamp(self: @TContractState, client_sequence: u64) -> Timestamp;
 
     fn status(self: @TContractState, client_sequence: u64) -> Status;

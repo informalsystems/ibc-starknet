@@ -23,6 +23,8 @@ test = { workspace = true }
 fmt = { workspace = true }
 
 [dependencies]
+alexandria_sorting = { workspace = true }
+
 # external dependencies
 starknet = { workspace = true }
 
