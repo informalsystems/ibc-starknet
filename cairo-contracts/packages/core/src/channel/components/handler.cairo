@@ -106,42 +106,35 @@ pub mod ChannelHandlerComponent {
         }
 
         fn chan_open_confirm(ref self: ComponentState<TContractState>, msg: MsgChanOpenConfirm) {
-            self.chan_open_confirm_validate(msg.clone());
-            self.chan_open_confirm_execute(msg);
+            let chan_end_on_b = self.read_channel_end(@msg.port_id_on_b, @msg.chan_id_on_b);
+            self.chan_open_confirm_validate(chan_end_on_b.clone(), msg.clone());
+            self.chan_open_confirm_execute(chan_end_on_b, msg);
         }
 
         fn send_packet(ref self: ComponentState<TContractState>, packet: Packet) {
             let chan_end_on_a = self.read_channel_end(@packet.port_id_on_a, @packet.chan_id_on_a);
-
             self.send_packet_validate(packet.clone(), chan_end_on_a.clone());
-
             self.send_packet_execute(packet, chan_end_on_a);
         }
 
         fn recv_packet(ref self: ComponentState<TContractState>, msg: MsgRecvPacket) {
             let chan_end_on_b = self
                 .read_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b);
-
             self.recv_packet_validate(msg.clone(), chan_end_on_b.clone());
-
             self.recv_packet_execute(msg, chan_end_on_b);
         }
 
         fn ack_packet(ref self: ComponentState<TContractState>, msg: MsgAckPacket) {
             let chan_end_on_a = self
                 .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_b);
-
             self.ack_packet_validate(msg.clone(), chan_end_on_a.clone());
-
             self.ack_packet_execute(msg, chan_end_on_a);
         }
 
         fn timeout_packet(ref self: ComponentState<TContractState>, msg: MsgTimeoutPacket) {
             let chan_end_on_a = self
                 .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
-
             self.timeout_packet_validate(msg.clone(), chan_end_on_a.clone());
-
             self.timeout_packet_execute(msg, chan_end_on_a);
         }
     }
@@ -304,7 +297,7 @@ pub mod ChannelHandlerComponent {
                 ChannelState::TryOpen,
                 msg.ordering,
                 msg.port_id_on_a.clone(),
-                ChannelIdZero::zero(),
+                msg.chan_id_on_a.clone(),
                 ClientIdImpl::new('07-cometbft', 0),
                 msg.version_on_a.clone()
             );
@@ -360,7 +353,9 @@ pub mod ChannelHandlerComponent {
                 .write_channel_end(
                     @msg.port_id_on_a,
                     @msg.chan_id_on_a,
-                    chan_end_on_a.clone().open(msg.chan_id_on_b.clone(), msg.version_on_b.clone())
+                    chan_end_on_a
+                        .clone()
+                        .open_with_params(msg.chan_id_on_b.clone(), msg.version_on_b.clone())
                 );
 
             self
@@ -384,12 +379,37 @@ pub mod ChannelHandlerComponent {
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChanOpenConfirmTrait<TContractState> {
         fn chan_open_confirm_validate(
-            self: @ComponentState<TContractState>, msg: MsgChanOpenConfirm
-        ) {}
+            self: @ComponentState<TContractState>,
+            chan_end_on_b: ChannelEnd,
+            msg: MsgChanOpenConfirm
+        ) {
+            msg.validate_basic();
+
+            assert(chan_end_on_b.is_try_open(), ChannelErrors::INVALID_CHANNEL_STATE);
+        }
 
         fn chan_open_confirm_execute(
-            ref self: ComponentState<TContractState>, msg: MsgChanOpenConfirm
-        ) {}
+            ref self: ComponentState<TContractState>,
+            chan_end_on_b: ChannelEnd,
+            msg: MsgChanOpenConfirm
+        ) {
+            let app = self.get_app(@msg.port_id_on_b);
+
+            app.on_chan_open_confirm(msg.port_id_on_b.clone(), msg.chan_id_on_b.clone());
+
+            self
+                .write_channel_end(
+                    @msg.port_id_on_b, @msg.chan_id_on_b, chan_end_on_b.clone().open()
+                );
+
+            self
+                .emit_chan_open_confirm_event(
+                    chan_end_on_b.counterparty_port_id().clone(),
+                    chan_end_on_b.counterparty_channel_id().clone(),
+                    ConnectionId { connection_id: "connection-0" },
+                    msg
+                );
+        }
     }
 
     #[generate_trait]
@@ -1159,6 +1179,21 @@ pub mod ChannelHandlerComponent {
             event_emitter
                 .emit_chan_open_ack_event(
                     port_id_on_a, chan_id_on_a, port_id_on_b, chan_id_on_b, conn_id_on_a
+                );
+        }
+
+        fn emit_chan_open_confirm_event(
+            ref self: ComponentState<TContractState>,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            conn_id_on_b: ConnectionId,
+            msg: MsgChanOpenConfirm
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_chan_open_confirm_event(
+                    msg.port_id_on_b, msg.chan_id_on_b, port_id_on_a, chan_id_on_a, conn_id_on_b
                 );
         }
 

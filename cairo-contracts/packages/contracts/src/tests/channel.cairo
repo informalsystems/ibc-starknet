@@ -137,9 +137,47 @@ fn test_chan_open_ack_ok() {
 
     spy.assert_chan_open_ack_event(core.address, PORT_ID(), CONNECTION_ID(0), msg.clone());
 
-    let chan_end_on_a = core.channel_end(msg.port_id_on_a, CHANNEL_ID(0));
+    let chan_end_on_a = core.channel_end(msg.port_id_on_a, msg.chan_id_on_a);
 
     assert_eq!(chan_end_on_a.state(), @ChannelState::Open);
+}
+
+#[test]
+fn test_chan_open_confirm_ok() {
+    // -----------------------------------------------------------
+    // Setup Essentials
+    // -----------------------------------------------------------
+
+    let (core, _, _, core_cfg, _, _, mut spy) = setup();
+
+    // -----------------------------------------------------------
+    // Channel Open Try
+    // -----------------------------------------------------------
+
+    let msg = core_cfg.dummy_msg_chan_open_try();
+
+    core.chan_open_try(msg.clone());
+
+    // -----------------------------------------------------------
+    // Channel Open Confirm
+    // -----------------------------------------------------------
+
+    let msg = core_cfg.dummy_msg_chan_open_confirm();
+
+    core.chan_open_confirm(msg.clone());
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    spy
+        .assert_chan_open_confirm_event(
+            core.address, PORT_ID(), CHANNEL_ID(1), CONNECTION_ID(0), msg.clone()
+        );
+
+    let chan_end_on_b = core.channel_end(msg.port_id_on_b, msg.chan_id_on_b);
+
+    assert_eq!(chan_end_on_b.state(), @ChannelState::Open);
 }
 
 #[test]

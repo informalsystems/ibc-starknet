@@ -66,14 +66,12 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         }
     }
 
-    /// Returns port ID on the counterparty chain
-    fn counterparty_port_id(self: @ChannelEnd) -> @PortId {
-        self.remote.port_id
-    }
-
-    /// Returns channel ID on the counterparty chain
-    fn counterparty_channel_id(self: @ChannelEnd) -> @ChannelId {
-        self.remote.channel_id
+    /// Returns true if all the fields are in the zero state.
+    fn is_zero(self: @ChannelEnd) -> bool {
+        self.state == @ChannelState::Uninitialized
+            && self.ordering == @ChannelOrdering::Unordered
+            && self.remote.is_zero()
+            && self.client_id.is_zero()
     }
 
     /// Returns the state of the channel end.
@@ -86,6 +84,11 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         self.state == @ChannelState::Init
     }
 
+    /// Returns true if the channel is in the try open state.
+    fn is_try_open(self: @ChannelEnd) -> bool {
+        self.state == @ChannelState::TryOpen
+    }
+
     /// Returns true if the channel is in the open state.
     fn is_open(self: @ChannelEnd) -> bool {
         self.state == @ChannelState::Open
@@ -96,20 +99,22 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         self.ordering == @ChannelOrdering::Ordered
     }
 
+    /// Returns port ID on the counterparty chain
+    fn counterparty_port_id(self: @ChannelEnd) -> @PortId {
+        self.remote.port_id
+    }
+
+    /// Returns channel ID on the counterparty chain
+    fn counterparty_channel_id(self: @ChannelEnd) -> @ChannelId {
+        self.remote.channel_id
+    }
+
     /// Returns true if the counterparty matches the given counterparty.
     fn counterparty_matches(
         self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_channel_id: @ChannelId
     ) -> bool {
         self.remote.port_id == counterparty_port_id
             && self.remote.channel_id == counterparty_channel_id
-    }
-
-    /// Returns true if all the fields are in the zero state.
-    fn is_zero(self: @ChannelEnd) -> bool {
-        self.state == @ChannelState::Uninitialized
-            && self.ordering == @ChannelOrdering::Unordered
-            && self.remote.is_zero()
-            && self.client_id.is_zero()
     }
 
     /// Validates the channel end be in the open state and the counterparty
@@ -124,8 +129,21 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         );
     }
 
+    /// Consumes the channel end and returns a new channel end with the state set to open.
+    fn open(self: ChannelEnd) -> ChannelEnd {
+        ChannelEnd {
+            state: ChannelState::Open,
+            ordering: self.ordering,
+            remote: self.remote,
+            client_id: self.client_id,
+            version: self.version,
+        }
+    }
+
     /// Opens the channel end with the given counterparty channel ID and version.
-    fn open(self: ChannelEnd, couterparty_chan_id: ChannelId, version: AppVersion) -> ChannelEnd {
+    fn open_with_params(
+        self: ChannelEnd, couterparty_chan_id: ChannelId, version: AppVersion
+    ) -> ChannelEnd {
         ChannelEnd {
             state: ChannelState::Open,
             ordering: self.ordering,
