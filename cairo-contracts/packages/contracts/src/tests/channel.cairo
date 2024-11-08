@@ -9,8 +9,8 @@ use starknet_ibc_testkit::configs::{
     CometClientConfigTrait
 };
 use starknet_ibc_testkit::dummies::{
-    OWNER, HEIGHT, TIMESTAMP, COSMOS, STARKNET, CLIENT_ID, CHANNEL_ID, SUPPLY,
-    PACKET_COMMITMENT_ON_SN,
+    OWNER, HEIGHT, TIMESTAMP, COSMOS, STARKNET, CLIENT_ID, CONNECTION_ID, CHANNEL_ID, PORT_ID,
+    SUPPLY, PACKET_COMMITMENT_ON_SN,
 };
 use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ChannelEventSpyExt};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle, AppHandle, ERC20Handle};
@@ -105,6 +105,41 @@ fn test_chan_open_try_ok() {
     let chan_end_on_b = core.channel_end(msg.port_id_on_a, CHANNEL_ID(0));
 
     assert_eq!(chan_end_on_b.state(), @ChannelState::TryOpen);
+}
+
+#[test]
+fn test_chan_open_ack_ok() {
+    // -----------------------------------------------------------
+    // Setup Essentials
+    // -----------------------------------------------------------
+
+    let (core, _, _, core_cfg, _, _, mut spy) = setup();
+
+    // -----------------------------------------------------------
+    // Channel Open Init
+    // -----------------------------------------------------------
+
+    let msg = core_cfg.dummy_msg_chan_open_init();
+
+    core.chan_open_init(msg);
+
+    // -----------------------------------------------------------
+    // Channel Open Ack
+    // -----------------------------------------------------------
+
+    let msg = core_cfg.dummy_msg_chan_open_ack();
+
+    core.chan_open_ack(msg.clone());
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    spy.assert_chan_open_ack_event(core.address, PORT_ID(), CONNECTION_ID(0), msg.clone());
+
+    let chan_end_on_a = core.channel_end(msg.port_id_on_a, CHANNEL_ID(0));
+
+    assert_eq!(chan_end_on_a.state(), @ChannelState::Open);
 }
 
 #[test]

@@ -35,7 +35,7 @@ pub fn CLIENT_ID() -> ClientId {
 }
 
 pub fn CONNECTION_ID(sequence: u64) -> ConnectionId {
-    ConnectionId { connection_id: format!("connection- {sequence}") }
+    ConnectionId { connection_id: format!("connection-{sequence}") }
 }
 
 pub fn PORT_ID() -> PortId {
@@ -58,6 +58,7 @@ pub fn CHANNEL_END(counterparty_channel_sequence: u64) -> ChannelEnd {
             port_id: PORT_ID(), channel_id: CHANNEL_ID(counterparty_channel_sequence),
         },
         client_id: CLIENT_ID(),
+        version: VERSION_PROPOSAL(),
     }
 }
 

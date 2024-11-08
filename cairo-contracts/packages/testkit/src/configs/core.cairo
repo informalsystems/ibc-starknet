@@ -1,5 +1,5 @@
 use starknet_ibc_apps::transfer::VERSION;
-use starknet_ibc_core::channel::{ChannelOrdering, MsgChanOpenInit, MsgChanOpenTry};
+use starknet_ibc_core::channel::{ChannelOrdering, MsgChanOpenInit, MsgChanOpenTry, MsgChanOpenAck};
 use starknet_ibc_testkit::dummies::{
     HEIGHT, CONNECTION_ID, CHANNEL_ID, PORT_ID, VERSION_PROPOSAL, STATE_PROOF
 };
@@ -35,6 +35,17 @@ pub impl CoreConfigImpl of CoreConfigTrait {
             proof_chan_end_on_a: STATE_PROOF(),
             proof_height_on_a: HEIGHT(10),
             ordering: *self.channel_ordering,
+        }
+    }
+
+    fn dummy_msg_chan_open_ack(self: @CoreConfig) -> MsgChanOpenAck {
+        MsgChanOpenAck {
+            port_id_on_a: PORT_ID(),
+            chan_id_on_a: CHANNEL_ID(0),
+            chan_id_on_b: CHANNEL_ID(1),
+            version_on_b: VERSION(),
+            proof_chan_end_on_b: STATE_PROOF(),
+            proof_height_on_b: HEIGHT(10),
         }
     }
 }

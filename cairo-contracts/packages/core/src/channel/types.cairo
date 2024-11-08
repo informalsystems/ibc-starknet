@@ -44,6 +44,7 @@ pub struct ChannelEnd {
     // we decided which IBC protocol to go with, either the current specs,
     // Eureka or something else, this part should be updated.
     pub client_id: ClientId,
+    pub version: AppVersion,
 }
 
 #[generate_trait]
@@ -54,12 +55,14 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         counterparty_port_id: PortId,
         counterparty_channel_id: ChannelId,
         client_id: ClientId,
+        version: AppVersion,
     ) -> ChannelEnd {
         ChannelEnd {
             state,
             ordering,
             remote: CounterpartyImpl::new(counterparty_port_id, counterparty_channel_id),
             client_id,
+            version,
         }
     }
 
@@ -76,6 +79,11 @@ pub impl ChannelEndImpl of ChannelEndTrait {
     /// Returns the state of the channel end.
     fn state(self: @ChannelEnd) -> @ChannelState {
         self.state
+    }
+
+    /// Returns true if the channel is in the init state.
+    fn is_init(self: @ChannelEnd) -> bool {
+        self.state == @ChannelState::Init
     }
 
     /// Returns true if the channel is in the open state.
@@ -116,6 +124,17 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         );
     }
 
+    /// Opens the channel end with the given counterparty channel ID and version.
+    fn open(self: ChannelEnd, couterparty_chan_id: ChannelId, version: AppVersion) -> ChannelEnd {
+        ChannelEnd {
+            state: ChannelState::Open,
+            ordering: self.ordering,
+            remote: CounterpartyImpl::new(self.remote.port_id, couterparty_chan_id),
+            client_id: self.client_id,
+            version: self.version,
+        }
+    }
+
     /// Consumes the channel end and returns a new channel end with the state
     /// set to closed.
     fn close(self: ChannelEnd) -> ChannelEnd {
@@ -124,6 +143,7 @@ pub impl ChannelEndImpl of ChannelEndTrait {
             ordering: self.ordering,
             remote: self.remote,
             client_id: self.client_id,
+            version: self.version,
         }
     }
 }

@@ -12,6 +12,7 @@ pub mod ChannelEventEmitterComponent {
     pub enum Event {
         ChanOpenInitEvent: ChanOpenInitEvent,
         ChanOpenTryEvent: ChanOpenTryEvent,
+        ChanOpenAckEvent: ChanOpenAckEvent,
         SendPacketEvent: SendPacketEvent,
         ReceivePacketEvent: ReceivePacketEvent,
         WriteAcknowledgementEvent: WriteAcknowledgementEvent,
@@ -47,6 +48,20 @@ pub mod ChannelEventEmitterComponent {
         pub connection_id_on_b: ConnectionId,
         #[key]
         pub version_on_b: AppVersion,
+    }
+
+    #[derive(Debug, Drop, starknet::Event)]
+    pub struct ChanOpenAckEvent {
+        #[key]
+        pub port_id_on_a: PortId,
+        #[key]
+        pub channel_id_on_a: ChannelId,
+        #[key]
+        pub port_id_on_b: PortId,
+        #[key]
+        pub channel_id_on_b: ChannelId,
+        #[key]
+        pub connection_id_on_a: ConnectionId,
     }
 
     #[derive(Debug, Drop, starknet::Event)]
@@ -189,6 +204,26 @@ pub mod ChannelEventEmitterComponent {
                         channel_id_on_a,
                         connection_id_on_b,
                         version_on_b,
+                    }
+                );
+        }
+
+        fn emit_chan_open_ack_event(
+            ref self: ComponentState<TContractState>,
+            port_id_on_a: PortId,
+            channel_id_on_a: ChannelId,
+            port_id_on_b: PortId,
+            channel_id_on_b: ChannelId,
+            connection_id_on_a: ConnectionId,
+        ) {
+            self
+                .emit(
+                    ChanOpenAckEvent {
+                        port_id_on_a,
+                        channel_id_on_a,
+                        port_id_on_b,
+                        channel_id_on_b,
+                        connection_id_on_a,
                     }
                 );
         }

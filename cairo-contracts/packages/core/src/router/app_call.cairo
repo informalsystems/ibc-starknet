@@ -54,6 +54,13 @@ pub impl AppContractImpl of AppContractTrait {
             )
     }
 
+    fn on_chan_open_ack(
+        self: @AppContract, port_id_on_a: PortId, chan_id_on_a: ChannelId, version_on_b: AppVersion,
+    ) {
+        IAppCallbackDispatcher { contract_address: *self.address }
+            .on_chan_open_ack(port_id_on_a, chan_id_on_a, version_on_b)
+    }
+
     fn on_recv_packet(self: @AppContract, packet: Packet) -> Acknowledgement {
         IAppCallbackDispatcher { contract_address: *self.address }.on_recv_packet(packet)
     }
