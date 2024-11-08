@@ -518,17 +518,22 @@ pub mod CometClientComponent {
                 return;
             }
 
-            if update_heights.len() == 255 {
+            let len = update_heights.len();
+
+            if len == 255 {
                 update_heights.pop_front().unwrap();
             }
 
             update_heights.append(update_height);
 
-            let mut update_heights_span = update_heights.span();
+            let new_update_heights = if len.is_non_zero()
+                && update_heights.at(len - 1) > @update_height {
+                MergeSort::sort(update_heights.span())
+            } else {
+                update_heights
+            };
 
-            let sorted_update_heights = MergeSort::sort(update_heights_span);
-
-            self.update_heights.write(client_sequence, sorted_update_heights);
+            self.update_heights.write(client_sequence, new_update_heights);
         }
 
         fn write_client_state(
