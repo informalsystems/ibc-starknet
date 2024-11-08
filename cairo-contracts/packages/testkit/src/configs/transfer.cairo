@@ -9,7 +9,7 @@ use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{ChannelId, Sequence};
 use starknet_ibc_testkit::dummies::{
     NATIVE_DENOM, HOSTED_DENOM, AMOUNT, EMPTY_MEMO, PORT_ID, CHANNEL_ID, HEIGHT, TIMEOUT_HEIGHT,
-    TIMEOUT_TIMESTAMP
+    TIMEOUT_TIMESTAMP, STATE_PROOF
 };
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -90,7 +90,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     ) -> MsgRecvPacket {
         MsgRecvPacket {
             packet: self.dummy_packet(denom, sender, receiver),
-            proof_commitment_on_a: array![0].into(),
+            proof_commitment_on_a: STATE_PROOF(),
             proof_height_on_a: HEIGHT(10),
         }
     }
@@ -105,7 +105,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         MsgAckPacket {
             packet: self.dummy_packet(denom, sender, receiver),
             acknowledgement,
-            proof_ack_on_b: array![0].into(),
+            proof_ack_on_b: STATE_PROOF(),
             proof_height_on_b: HEIGHT(10),
         }
     }
@@ -120,7 +120,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         MsgTimeoutPacket {
             packet: self.dummy_packet(denom, sender, receiver),
             next_seq_recv_on_b: Sequence { sequence: 1 },
-            proof_unreceived_on_b: array![0].into(),
+            proof_unreceived_on_b: STATE_PROOF(),
             proof_height_on_b: proof_height,
         }
     }

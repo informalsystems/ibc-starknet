@@ -230,7 +230,7 @@ pub mod ChannelHandlerComponent {
                     msg.conn_id_on_a.clone(),
                     msg.port_id_on_b.clone(),
                     msg.version_proposal.clone(),
-                    msg.ordering.clone()
+                    msg.ordering
                 );
 
             let chan_end_on_a = ChannelEndTrait::new(
@@ -293,7 +293,7 @@ pub mod ChannelHandlerComponent {
                     msg.conn_id_on_b.clone(),
                     msg.port_id_on_a.clone(),
                     msg.version_on_a.clone(),
-                    msg.ordering.clone()
+                    msg.ordering
                 );
 
             let chan_end_on_b = ChannelEndTrait::new(
@@ -608,7 +608,7 @@ pub mod ChannelHandlerComponent {
                     @packet.port_id_on_a, @packet.chan_id_on_a, @packet.seq_on_a
                 );
 
-            self.emit_ack_packet_event(packet.clone(), chan_end_on_a.ordering.clone());
+            self.emit_ack_packet_event(packet.clone(), chan_end_on_a.ordering);
 
             if chan_end_on_a.is_ordered() {
                 self
@@ -693,7 +693,7 @@ pub mod ChannelHandlerComponent {
                     @packet.port_id_on_a, @packet.chan_id_on_a, @packet.seq_on_a
                 );
 
-            self.emit_timeout_packet_event(packet.clone(), chan_end_on_a.ordering.clone());
+            self.emit_timeout_packet_event(packet.clone(), chan_end_on_a.ordering);
 
             if chan_end_on_a.is_ordered() {
                 self

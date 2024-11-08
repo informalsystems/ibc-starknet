@@ -2,10 +2,12 @@ use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
 use snforge_std::EventSpy;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::ChannelEventEmitterComponent::{
-    Event, ChanOpenInitEvent, SendPacketEvent, ReceivePacketEvent, AcknowledgePacketEvent,
-    TimeoutPacketEvent
+    Event, ChanOpenInitEvent, ChanOpenTryEvent, SendPacketEvent, ReceivePacketEvent,
+    AcknowledgePacketEvent, TimeoutPacketEvent
 };
-use starknet_ibc_core::channel::{MsgChanOpenInit, Packet, ChannelOrdering, AppVersion};
+use starknet_ibc_core::channel::{
+    MsgChanOpenInit, MsgChanOpenTry, Packet, ChannelOrdering, AppVersion
+};
 use starknet_ibc_core::host::ChannelId;
 
 #[generate_trait]
@@ -29,6 +31,25 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
         self.assert_emitted_single(contract_address, expected);
     }
 
+    fn assert_chan_open_try_event(
+        ref self: EventSpy,
+        contract_address: ContractAddress,
+        channel_id_on_b: ChannelId,
+        version_on_b: AppVersion,
+        msg: MsgChanOpenTry
+    ) {
+        let expected = Event::ChanOpenTryEvent(
+            ChanOpenTryEvent {
+                port_id_on_b: msg.port_id_on_b,
+                channel_id_on_b,
+                port_id_on_a: msg.port_id_on_a,
+                channel_id_on_a: msg.chan_id_on_a,
+                connection_id_on_b: msg.conn_id_on_b,
+                version_on_b,
+            }
+        );
+        self.assert_emitted_single(contract_address, expected);
+    }
     fn assert_send_packet_event(
         ref self: EventSpy,
         contract_address: ContractAddress,

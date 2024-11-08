@@ -138,7 +138,7 @@ pub enum ChannelState {
     Closed,
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Copy, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub enum ChannelOrdering {
     #[default]
     Unordered,

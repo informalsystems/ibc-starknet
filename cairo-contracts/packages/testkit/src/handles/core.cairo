@@ -1,9 +1,9 @@
 use openzeppelin_testing::declare_and_deploy;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
-    IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, MsgChanOpenInit, MsgRecvPacket,
-    MsgAckPacket, MsgTimeoutPacket, IChannelQueryDispatcher, IChannelQueryDispatcherTrait,
-    ChannelEnd, Packet,
+    IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, MsgChanOpenInit, MsgChanOpenTry,
+    MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket, IChannelQueryDispatcher,
+    IChannelQueryDispatcherTrait, ChannelEnd, Packet,
 };
 use starknet_ibc_core::client::{
     IClientHandlerDispatcher, IClientHandlerDispatcherTrait, IRegisterClientDispatcher,
@@ -67,6 +67,10 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn chan_open_init(self: @CoreContract, msg: MsgChanOpenInit) {
         self.channel_handler_dispatcher().chan_open_init(msg)
+    }
+
+    fn chan_open_try(self: @CoreContract, msg: MsgChanOpenTry) {
+        self.channel_handler_dispatcher().chan_open_try(msg)
     }
 
     fn send_packet(self: @CoreContract, packet: Packet) {

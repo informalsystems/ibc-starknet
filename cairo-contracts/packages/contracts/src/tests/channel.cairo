@@ -81,6 +81,33 @@ fn test_chan_open_init_ok() {
 }
 
 #[test]
+fn test_chan_open_try_ok() {
+    // -----------------------------------------------------------
+    // Setup Essentials
+    // -----------------------------------------------------------
+
+    let (core, _, _, core_cfg, _, _, mut spy) = setup();
+
+    // -----------------------------------------------------------
+    // Channel Open Init
+    // -----------------------------------------------------------
+
+    let msg = core_cfg.dummy_msg_chan_open_try();
+
+    core.chan_open_try(msg.clone());
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    spy.assert_chan_open_try_event(core.address, CHANNEL_ID(0), VERSION(), msg.clone());
+
+    let chan_end_on_b = core.channel_end(msg.port_id_on_a, CHANNEL_ID(0));
+
+    assert_eq!(chan_end_on_b.state(), @ChannelState::TryOpen);
+}
+
+#[test]
 fn test_send_packet_ok() {
     // -----------------------------------------------------------
     // Setup Essentials
