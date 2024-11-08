@@ -1,5 +1,5 @@
 use snforge_std::{spy_events, EventSpy};
-use starknet_ibc_apps::transfer::{ERC20Contract, SUCCESS_ACK};
+use starknet_ibc_apps::transfer::{ERC20Contract, SUCCESS_ACK, VERSION};
 use starknet_ibc_core::channel::{ChannelEndTrait, ChannelOrdering, AckStatus, ChannelState};
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{SequenceImpl, Sequence};
@@ -73,7 +73,7 @@ fn test_chan_open_init_ok() {
     // Check Results
     // -----------------------------------------------------------
 
-    spy.assert_chan_open_init_event(core.address, CHANNEL_ID(0), msg.clone());
+    spy.assert_chan_open_init_event(core.address, CHANNEL_ID(0), VERSION(), msg.clone());
 
     let chan_end_on_a = core.channel_end(msg.port_id_on_a, CHANNEL_ID(0));
 

@@ -31,6 +31,10 @@ pub mod transfer {
         "transfer"
     }
 
+    pub fn VERSION() -> starknet_ibc_core::channel::AppVersion {
+        starknet_ibc_core::channel::AppVersion { version: "ics20-1" }
+    }
+
     /// Byte representation of the standard success acknowledgment JSON string
     /// `{"result":"AQ=="}`. This serves as a workaround for the lack of JSON
     /// serialization in Cairo, offering a more cost-effective way to confirm

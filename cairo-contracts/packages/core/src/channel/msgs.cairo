@@ -1,6 +1,6 @@
 use core::num::traits::Zero;
 use starknet_ibc_core::channel::{
-    Acknowledgement, Packet, ChannelErrors, ChannelOrdering, ChannelVersion
+    Acknowledgement, Packet, ChannelErrors, ChannelOrdering, AppVersion
 };
 use starknet_ibc_core::client::{Height, HeightPartialOrd};
 use starknet_ibc_core::commitment::StateProof;
@@ -12,8 +12,8 @@ use starknet_ibc_utils::ValidateBasic;
 pub struct MsgChanOpenInit {
     pub port_id_on_a: PortId,
     pub conn_id_on_a: ConnectionId,
-    pub version_on_a: ChannelVersion,
     pub port_id_on_b: PortId,
+    pub version_proposal: AppVersion,
     pub ordering: ChannelOrdering,
 }
 
@@ -28,10 +28,10 @@ pub impl MsgChanOpenInitValidateBasic of ValidateBasic<MsgChanOpenInit> {
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct MsgChanOpenTry {
     pub port_id_on_b: PortId,
-    pub conn_id_on_a: ConnectionId,
+    pub conn_id_on_b: ConnectionId,
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
-    pub version_on_a: ChannelVersion,
+    pub version_on_a: AppVersion,
     pub proof_chan_end_on_a: StateProof,
     pub proof_height_on_a: Height,
     pub ordering: ChannelOrdering
@@ -40,7 +40,7 @@ pub struct MsgChanOpenTry {
 pub impl MsgChanOpenTryValidateBasic of ValidateBasic<MsgChanOpenTry> {
     fn validate_basic(self: @MsgChanOpenTry) {
         assert(!self.port_id_on_b.is_zero(), ChannelErrors::MISSING_PORT_ID);
-        assert(self.conn_id_on_a.is_non_zero(), ChannelErrors::MISSING_CONNECTION_ID);
+        assert(self.conn_id_on_b.is_non_zero(), ChannelErrors::MISSING_CONNECTION_ID);
         assert(!self.port_id_on_a.is_zero(), ChannelErrors::MISSING_PORT_ID);
         assert(!self.chan_id_on_a.is_zero(), ChannelErrors::MISSING_CHANNEL_ID);
         assert(self.version_on_a.is_non_zero(), ChannelErrors::MISSING_CHANNEL_VERSION);
@@ -54,7 +54,7 @@ pub struct MsgChanOpenAck {
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
     pub chan_id_on_b: ChannelId,
-    pub version_on_b: ChannelVersion,
+    pub version_on_b: AppVersion,
     pub proof_chan_end_on_b: StateProof,
     pub proof_height_on_b: Height
 }

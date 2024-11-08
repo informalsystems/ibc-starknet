@@ -17,7 +17,7 @@ pub mod ChannelHandlerComponent {
         ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgChanOpenInit,
         MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket, MsgAckPacket,
         MsgTimeoutPacket, ChannelEnd, ChannelEndTrait, ChannelState, ChannelErrors, PacketTrait,
-        ChannelOrdering, ChannelVersion, Receipt, ReceiptTrait, Packet, Acknowledgement
+        ChannelOrdering, AppVersion, Receipt, ReceiptTrait, Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, HeightImpl
@@ -87,13 +87,14 @@ pub mod ChannelHandlerComponent {
     > of IChannelHandler<ComponentState<TContractState>> {
         fn chan_open_init(ref self: ComponentState<TContractState>, msg: MsgChanOpenInit) {
             let channel_sequence = self.read_next_channel_sequence();
-            self.chan_open_init_validate(channel_sequence.clone(), msg.clone());
+            self.chan_open_init_validate(channel_sequence, msg.clone());
             self.chan_open_init_execute(channel_sequence, msg);
         }
 
         fn chan_open_try(ref self: ComponentState<TContractState>, msg: MsgChanOpenTry) {
-            self.chan_open_try_validate(msg.clone());
-            self.chan_open_try_execute(msg);
+            let channel_sequence = self.read_next_channel_sequence();
+            self.chan_open_try_validate(channel_sequence, msg.clone());
+            self.chan_open_try_execute(channel_sequence, msg);
         }
 
         fn chan_open_ack(ref self: ComponentState<TContractState>, msg: MsgChanOpenAck) {
@@ -222,13 +223,13 @@ pub mod ChannelHandlerComponent {
 
             let app = self.get_app(@msg.port_id_on_a);
 
-            app
+            let version_on_a = app
                 .on_chan_open_init(
                     msg.port_id_on_a.clone(),
                     chan_id_on_a.clone(),
                     msg.conn_id_on_a.clone(),
-                    msg.version_on_a.clone(),
                     msg.port_id_on_b.clone(),
+                    msg.version_proposal.clone(),
                     msg.ordering.clone()
                 );
 
@@ -258,7 +259,7 @@ pub mod ChannelHandlerComponent {
                     chan_id_on_a.clone(),
                     msg.port_id_on_b.clone(),
                     msg.conn_id_on_a.clone(),
-                    msg.version_on_a
+                    version_on_a
                 );
         }
     }
@@ -272,9 +273,55 @@ pub mod ChannelHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChanOpenTryTrait<TContractState> {
-        fn chan_open_try_validate(self: @ComponentState<TContractState>, msg: MsgChanOpenTry) {}
+        fn chan_open_try_validate(
+            self: @ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenTry
+        ) {
+            msg.validate_basic();
+        }
 
-        fn chan_open_try_execute(ref self: ComponentState<TContractState>, msg: MsgChanOpenTry) {}
+        fn chan_open_try_execute(
+            ref self: ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenTry
+        ) {
+            let chan_id_on_b = ChannelIdImpl::new(channel_sequence.clone());
+
+            let app = self.get_app(@msg.port_id_on_b);
+
+            let version_on_b = app
+                .on_chan_open_try(
+                    msg.port_id_on_b.clone(),
+                    chan_id_on_b.clone(),
+                    msg.conn_id_on_b.clone(),
+                    msg.port_id_on_a.clone(),
+                    msg.version_on_a.clone(),
+                    msg.ordering.clone()
+                );
+
+            let chan_end_on_b = ChannelEndTrait::new(
+                ChannelState::TryOpen,
+                msg.ordering,
+                msg.port_id_on_a.clone(),
+                ChannelIdZero::zero(),
+                ClientIdImpl::new('07-cometbft', 0),
+            );
+
+            self.write_channel_end(@msg.port_id_on_b, @chan_id_on_b, chan_end_on_b);
+
+            self.write_next_sequence_send(@msg.port_id_on_b, @chan_id_on_b, SequenceImpl::one());
+
+            self.write_next_sequence_recv(@msg.port_id_on_b, @chan_id_on_b, SequenceImpl::one());
+
+            self.write_next_sequence_ack(@msg.port_id_on_b, @chan_id_on_b, SequenceImpl::one());
+
+            self
+                .emit_chan_open_try_event(
+                    msg.port_id_on_b.clone(),
+                    chan_id_on_b.clone(),
+                    msg.port_id_on_a.clone(),
+                    msg.chan_id_on_a.clone(),
+                    msg.conn_id_on_b.clone(),
+                    version_on_b
+                );
+        }
     }
 
     #[generate_trait]
@@ -1031,13 +1078,35 @@ pub mod ChannelHandlerComponent {
             chan_id_on_a: ChannelId,
             port_id_on_b: PortId,
             connection_id_on_a: ConnectionId,
-            version_on_a: ChannelVersion
+            version_on_a: AppVersion
         ) {
             let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
 
             event_emitter
                 .emit_chan_open_init_event(
                     port_id_on_a, chan_id_on_a, port_id_on_b, connection_id_on_a, version_on_a
+                );
+        }
+
+        fn emit_chan_open_try_event(
+            ref self: ComponentState<TContractState>,
+            port_id_on_b: PortId,
+            chan_id_on_b: ChannelId,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            connection_id_on_b: ConnectionId,
+            version_on_b: AppVersion
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_chan_open_try_event(
+                    port_id_on_b,
+                    chan_id_on_b,
+                    port_id_on_a,
+                    chan_id_on_a,
+                    connection_id_on_b,
+                    version_on_b
                 );
         }
 

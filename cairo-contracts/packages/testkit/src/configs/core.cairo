@@ -1,5 +1,5 @@
 use starknet_ibc_core::channel::{ChannelOrdering, MsgChanOpenInit};
-use starknet_ibc_testkit::dummies::{CONNECTION_ID, PORT_ID, CHANNEL_VERSION};
+use starknet_ibc_testkit::dummies::{CONNECTION_ID, PORT_ID, VERSION_PROPOSAL};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct CoreConfig {}
@@ -14,8 +14,8 @@ pub impl CoreConfigImpl of CoreConfigTrait {
         MsgChanOpenInit {
             port_id_on_a: PORT_ID(),
             conn_id_on_a: CONNECTION_ID(0),
-            version_on_a: CHANNEL_VERSION(),
             port_id_on_b: PORT_ID(),
+            version_proposal: VERSION_PROPOSAL(),
             ordering: ChannelOrdering::Unordered,
         }
     }

@@ -146,20 +146,20 @@ pub enum ChannelOrdering {
 }
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
-pub struct ChannelVersion {
+pub struct AppVersion {
     pub version: ByteArray,
 }
 
-pub impl ChannelVersionZero of Zero<ChannelVersion> {
-    fn zero() -> ChannelVersion {
-        ChannelVersion { version: "" }
+pub impl AppVersionZero of Zero<AppVersion> {
+    fn zero() -> AppVersion {
+        AppVersion { version: "" }
     }
 
-    fn is_zero(self: @ChannelVersion) -> bool {
+    fn is_zero(self: @AppVersion) -> bool {
         self.version.len() == 0
     }
 
-    fn is_non_zero(self: @ChannelVersion) -> bool {
+    fn is_non_zero(self: @AppVersion) -> bool {
         !self.is_zero()
     }
 }

@@ -5,7 +5,7 @@ use starknet_ibc_core::channel::ChannelEventEmitterComponent::{
     Event, ChanOpenInitEvent, SendPacketEvent, ReceivePacketEvent, AcknowledgePacketEvent,
     TimeoutPacketEvent
 };
-use starknet_ibc_core::channel::{MsgChanOpenInit, Packet, ChannelOrdering};
+use starknet_ibc_core::channel::{MsgChanOpenInit, Packet, ChannelOrdering, AppVersion};
 use starknet_ibc_core::host::ChannelId;
 
 #[generate_trait]
@@ -14,6 +14,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
         ref self: EventSpy,
         contract_address: ContractAddress,
         channel_id_on_a: ChannelId,
+        version_on_a: AppVersion,
         msg: MsgChanOpenInit
     ) {
         let expected = Event::ChanOpenInitEvent(
@@ -22,7 +23,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
                 channel_id_on_a,
                 port_id_on_b: msg.port_id_on_b,
                 connection_id_on_a: msg.conn_id_on_a,
-                version_on_a: msg.version_on_a,
+                version_on_a,
             }
         );
         self.assert_emitted_single(contract_address, expected);

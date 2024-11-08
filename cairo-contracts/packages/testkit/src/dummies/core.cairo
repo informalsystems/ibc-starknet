@@ -1,6 +1,6 @@
 use starknet::{contract_address_const, ContractAddress};
 use starknet_ibc_core::channel::{
-    ChannelEnd, ChannelState, ChannelOrdering, Counterparty, ChannelVersion
+    ChannelEnd, ChannelState, ChannelOrdering, Counterparty, AppVersion
 };
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{ClientId, ConnectionId, PortId, ChannelId, Sequence};
@@ -60,6 +60,6 @@ pub fn CHANNEL_END(counterparty_channel_sequence: u64) -> ChannelEnd {
     }
 }
 
-pub fn CHANNEL_VERSION() -> ChannelVersion {
-    ChannelVersion { version: "" }
+pub fn VERSION_PROPOSAL() -> AppVersion {
+    AppVersion { version: "" }
 }

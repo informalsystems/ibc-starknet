@@ -20,11 +20,11 @@ pub mod TokenTransferComponent {
     };
     use starknet_ibc_apps::transfer::{
         ITransferrable, ISendTransfer, ITransferQuery, ERC20Contract, ERC20ContractTrait,
-        TransferErrors, SUCCESS_ACK
+        TransferErrors, VERSION, SUCCESS_ACK
     };
     use starknet_ibc_core::channel::{
         Packet, Acknowledgement, AckStatus, AckStatusImpl, IAppCallback, ChannelContract,
-        ChannelContractTrait, ChannelEndTrait, ChannelOrdering, ChannelVersion
+        ChannelContractTrait, ChannelEndTrait, ChannelOrdering, AppVersion
     };
 
     use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId};
@@ -178,10 +178,12 @@ pub mod TokenTransferComponent {
             port_id_on_a: PortId,
             chan_id_on_a: ChannelId,
             conn_id_on_a: ConnectionId,
-            version_on_a: ChannelVersion,
             port_id_on_b: PortId,
+            version_proposal: AppVersion,
             ordering: ChannelOrdering
-        ) {}
+        ) -> AppVersion {
+            VERSION()
+        }
 
         fn on_chan_open_try(
             ref self: ComponentState<TContractState>,
@@ -189,15 +191,17 @@ pub mod TokenTransferComponent {
             chan_id_on_b: ChannelId,
             conn_id_on_b: ConnectionId,
             port_id_on_a: PortId,
-            version_on_a: ChannelVersion,
+            version_on_a: AppVersion,
             ordering: ChannelOrdering
-        ) {}
+        ) -> AppVersion {
+            VERSION()
+        }
 
         fn on_chan_open_ack(
             ref self: ComponentState<TContractState>,
             port_id_on_a: PortId,
             chan_id_on_a: ChannelId,
-            version_on_b: ChannelVersion
+            version_on_b: AppVersion
         ) {}
 
         fn on_chan_open_confirm(
