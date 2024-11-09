@@ -27,8 +27,8 @@ pub mod transfer {
     pub const TRANSFER_PORT_ID_HASH: felt252 =
         506076466176013583354797631368330115868609515147080483618120063858966368900;
 
-    pub fn TRANSFER_PORT_ID() -> ByteArray {
-        "transfer"
+    pub fn TRANSFER_PORT_ID() -> starknet_ibc_core::host::PortId {
+        starknet_ibc_core::host::PortId { port_id: "transfer" }
     }
 
     pub fn VERSION() -> starknet_ibc_core::channel::AppVersion {

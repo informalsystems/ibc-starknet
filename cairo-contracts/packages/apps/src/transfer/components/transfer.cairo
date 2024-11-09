@@ -20,7 +20,7 @@ pub mod TokenTransferComponent {
     };
     use starknet_ibc_apps::transfer::{
         ITransferrable, ISendTransfer, ITransferQuery, ERC20Contract, ERC20ContractTrait,
-        TransferErrors, VERSION, SUCCESS_ACK
+        TransferErrors, TRANSFER_PORT_ID, VERSION, SUCCESS_ACK
     };
     use starknet_ibc_core::channel::{
         Packet, Acknowledgement, AckStatus, AckStatusImpl, IAppCallback, ChannelContract,
@@ -182,6 +182,14 @@ pub mod TokenTransferComponent {
             version_proposal: AppVersion,
             ordering: ChannelOrdering
         ) -> AppVersion {
+            assert(port_id_on_a == TRANSFER_PORT_ID(), TransferErrors::INVALID_PORT_ID);
+
+            if version_proposal.is_non_zero() {
+                assert(version_proposal == VERSION(), TransferErrors::INVALID_APP_VERSION);
+            }
+
+            assert(ordering == ChannelOrdering::Unordered, TransferErrors::UNSUPPORTED_ORDERING);
+
             VERSION()
         }
 
