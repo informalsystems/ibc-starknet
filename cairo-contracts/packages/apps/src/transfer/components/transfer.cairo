@@ -20,14 +20,14 @@ pub mod TokenTransferComponent {
     };
     use starknet_ibc_apps::transfer::{
         ITransferrable, ISendTransfer, ITransferQuery, ERC20Contract, ERC20ContractTrait,
-        TransferErrors, SUCCESS_ACK
+        TransferErrors, TRANSFER_PORT_ID, VERSION, SUCCESS_ACK
     };
     use starknet_ibc_core::channel::{
         Packet, Acknowledgement, AckStatus, AckStatusImpl, IAppCallback, ChannelContract,
-        ChannelContractTrait, ChannelEndTrait
+        ChannelContractTrait, ChannelEndTrait, ChannelOrdering, AppVersion
     };
 
-    use starknet_ibc_core::host::{PortId, ChannelId};
+    use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId};
     use starknet_ibc_utils::{ComputeKey, ValidateBasic};
 
     #[storage]
@@ -173,6 +173,53 @@ pub mod TokenTransferComponent {
         +Drop<TContractState>,
         impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of IAppCallback<ComponentState<TContractState>> {
+        fn on_chan_open_init(
+            ref self: ComponentState<TContractState>,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            conn_id_on_a: ConnectionId,
+            port_id_on_b: PortId,
+            version_proposal: AppVersion,
+            ordering: ChannelOrdering
+        ) -> AppVersion {
+            assert(port_id_on_a == TRANSFER_PORT_ID(), TransferErrors::INVALID_PORT_ID);
+
+            if version_proposal.is_non_zero() {
+                assert(version_proposal == VERSION(), TransferErrors::INVALID_APP_VERSION);
+            }
+
+            assert(ordering == ChannelOrdering::Unordered, TransferErrors::UNSUPPORTED_ORDERING);
+
+            VERSION()
+        }
+
+        fn on_chan_open_try(
+            ref self: ComponentState<TContractState>,
+            port_id_on_b: PortId,
+            chan_id_on_b: ChannelId,
+            conn_id_on_b: ConnectionId,
+            port_id_on_a: PortId,
+            version_on_a: AppVersion,
+            ordering: ChannelOrdering
+        ) -> AppVersion {
+            assert(version_on_a == VERSION(), TransferErrors::INVALID_APP_VERSION);
+
+            VERSION()
+        }
+
+        fn on_chan_open_ack(
+            ref self: ComponentState<TContractState>,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            version_on_b: AppVersion
+        ) {
+            assert(version_on_b == VERSION(), TransferErrors::INVALID_APP_VERSION);
+        }
+
+        fn on_chan_open_confirm(
+            ref self: ComponentState<TContractState>, port_id_on_b: PortId, chan_id_on_b: ChannelId
+        ) {}
+
         fn on_recv_packet(
             ref self: ComponentState<TContractState>, packet: Packet
         ) -> Acknowledgement {
@@ -397,8 +444,6 @@ pub mod TokenTransferComponent {
 
             match @packet_data.denom.base {
                 Denom::Native(erc20_token) => {
-                    packet_data.denom.remove_prefix(@trace_prefix);
-
                     self
                         .unescrow_execute(
                             receiver,

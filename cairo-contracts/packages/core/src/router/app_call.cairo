@@ -1,7 +1,9 @@
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
-    IAppCallbackDispatcher, IAppCallbackDispatcherTrait, Packet, Acknowledgement
+    IAppCallbackDispatcher, IAppCallbackDispatcherTrait, Packet, Acknowledgement, ChannelOrdering,
+    AppVersion
 };
+use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct AppContract {
@@ -22,6 +24,48 @@ impl AppContractIntoFelt252 of Into<AppContract, felt252> {
 
 #[generate_trait]
 pub impl AppContractImpl of AppContractTrait {
+    fn on_chan_open_init(
+        self: @AppContract,
+        port_id_on_a: PortId,
+        chan_id_on_a: ChannelId,
+        conn_id_on_a: ConnectionId,
+        port_id_on_b: PortId,
+        version_proposal: AppVersion,
+        ordering: ChannelOrdering
+    ) -> AppVersion {
+        IAppCallbackDispatcher { contract_address: *self.address }
+            .on_chan_open_init(
+                port_id_on_a, chan_id_on_a, conn_id_on_a, port_id_on_b, version_proposal, ordering
+            )
+    }
+
+    fn on_chan_open_try(
+        self: @AppContract,
+        port_id_on_b: PortId,
+        chan_id_on_b: ChannelId,
+        conn_id_on_b: ConnectionId,
+        port_id_on_a: PortId,
+        version_on_a: AppVersion,
+        ordering: ChannelOrdering
+    ) -> AppVersion {
+        IAppCallbackDispatcher { contract_address: *self.address }
+            .on_chan_open_try(
+                port_id_on_b, chan_id_on_b, conn_id_on_b, port_id_on_a, version_on_a, ordering
+            )
+    }
+
+    fn on_chan_open_ack(
+        self: @AppContract, port_id_on_a: PortId, chan_id_on_a: ChannelId, version_on_b: AppVersion,
+    ) {
+        IAppCallbackDispatcher { contract_address: *self.address }
+            .on_chan_open_ack(port_id_on_a, chan_id_on_a, version_on_b)
+    }
+
+    fn on_chan_open_confirm(self: @AppContract, port_id_on_b: PortId, chan_id_on_b: ChannelId) {
+        IAppCallbackDispatcher { contract_address: *self.address }
+            .on_chan_open_confirm(port_id_on_b, chan_id_on_b)
+    }
+
     fn on_recv_packet(self: @AppContract, packet: Packet) -> Acknowledgement {
         IAppCallbackDispatcher { contract_address: *self.address }.on_recv_packet(packet)
     }

@@ -1,7 +1,9 @@
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::spy_events;
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_testkit::configs::{TransferAppConfigTrait, CometClientConfigTrait};
+use starknet_ibc_testkit::configs::{
+    CoreConfigTrait, TransferAppConfigTrait, CometClientConfigTrait
+};
 use starknet_ibc_testkit::dummies::{NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET};
 use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
 use starknet_ibc_testkit::handles::{AppHandle, CoreHandle, ERC20Handle};
@@ -13,6 +15,8 @@ fn test_escrow_unescrow_roundtrip() {
     // -----------------------------------------------------------
     // Setup Essentials
     // -----------------------------------------------------------
+
+    let mut core_cfg = CoreConfigTrait::default();
 
     let mut comet_cfg = CometClientConfigTrait::default();
 
@@ -33,6 +37,12 @@ fn test_escrow_unescrow_roundtrip() {
 
     // Submit the message and create a client.
     core.create_client(msg_create_client);
+
+    // -----------------------------------------------------------
+    // Create Channel
+    // -----------------------------------------------------------
+
+    core_cfg.create_channel(@core);
 
     // -----------------------------------------------------------
     // Escrow
@@ -94,6 +104,8 @@ fn test_mint_burn_roundtrip() {
     // Setup Essentials
     // -----------------------------------------------------------
 
+    let mut core_cfg = CoreConfigTrait::default();
+
     let mut comet_cfg = CometClientConfigTrait::default();
 
     let mut transfer_cfg = TransferAppConfigTrait::default();
@@ -111,6 +123,12 @@ fn test_mint_burn_roundtrip() {
 
     // Submit the message and create a client.
     core.create_client(msg_create_client);
+
+    // -----------------------------------------------------------
+    // Create Channel
+    // -----------------------------------------------------------
+
+    core_cfg.create_channel(@core);
 
     // -----------------------------------------------------------
     // Mint

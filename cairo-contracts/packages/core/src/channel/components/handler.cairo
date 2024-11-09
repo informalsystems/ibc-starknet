@@ -1,5 +1,4 @@
-use starknet_ibc_core::channel::{ChannelEnd, ChannelState, ChannelOrdering, Counterparty};
-use starknet_ibc_core::host::{ClientId, PortId, ChannelId, SequencePartialOrd, SequenceZero};
+use starknet_ibc_core::host::{SequencePartialOrd, SequenceZero};
 
 #[starknet::component]
 pub mod ChannelHandlerComponent {
@@ -8,12 +7,16 @@ pub mod ChannelHandlerComponent {
     use RouterHandlerComponent::RouterInternalTrait;
     use core::num::traits::Zero;
     use starknet::storage::Map;
-    use starknet::storage::{StorageMapReadAccess, StorageMapWriteAccess};
+    use starknet::storage::{
+        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess
+    };
     use starknet::{get_block_timestamp, get_block_number};
     use starknet_ibc_core::channel::{
-        ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgRecvPacket, MsgAckPacket,
-        MsgTimeoutPacket, ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering,
-        Receipt, ReceiptTrait, Packet, Acknowledgement
+        ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgChanOpenInit,
+        MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket, MsgAckPacket,
+        MsgTimeoutPacket, ChannelEnd, ChannelEndTrait, ChannelState, ChannelErrors, PacketTrait,
+        ChannelOrdering, AppVersion, Receipt, ReceiptTrait, Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{
         ClientHandlerComponent, ClientContract, ClientContractTrait, HeightImpl
@@ -22,17 +25,18 @@ pub mod ChannelHandlerComponent {
         Commitment, CommitmentZero, compute_packet_commtiment, compute_ack_commitment
     };
     use starknet_ibc_core::host::{
-        PortId, ChannelId, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero,
-        channel_end_key, commitment_key, receipt_key, ack_key, commitment_path, ack_path,
-        receipt_path, next_sequence_recv_path, next_sequence_recv_key, next_sequence_send_key,
+        ClientIdImpl, ConnectionId, ChannelId, ChannelIdImpl, ChannelIdZero, PortId, Sequence,
+        SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero, channel_end_key,
+        commitment_key, receipt_key, ack_key, commitment_path, ack_path, receipt_path,
+        next_sequence_recv_path, next_sequence_recv_key, next_sequence_send_key,
         next_sequence_ack_key
     };
     use starknet_ibc_core::router::{RouterHandlerComponent, AppContractTrait, AppContract};
     use starknet_ibc_utils::ValidateBasic;
-    use super::{PORT_ID, CHANNEL_ID, CHANNEL_END};
 
     #[storage]
     pub struct Storage {
+        pub next_channel_sequence: u64,
         pub channel_ends: Map<felt252, ChannelEnd>,
         pub packet_commitments: Map<felt252, Commitment>,
         pub packet_receipts: Map<felt252, Receipt>,
@@ -47,26 +51,6 @@ pub mod ChannelHandlerComponent {
     pub enum Event {}
 
     // -----------------------------------------------------------
-    // Channel Initializer
-    // -----------------------------------------------------------
-
-    #[generate_trait]
-    pub impl ChannelInitializerImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
-    > of ChannelInitializerTrait<TContractState> {
-        fn initializer(ref self: ComponentState<TContractState>) {
-            // TODO: Initialize a temporary dummy `ChannelEnd`s for testing the
-            // handlers. This should be removed once the channel handshake is
-            // implemented.
-            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(0), CHANNEL_END(1));
-            self.write_next_sequence_recv(@PORT_ID(), @CHANNEL_ID(0), SequenceZero::zero());
-
-            self.write_channel_end(@PORT_ID(), @CHANNEL_ID(1), CHANNEL_END(0));
-            self.write_next_sequence_send(@PORT_ID(), @CHANNEL_ID(1), SequenceZero::zero());
-        }
-    }
-
-    // -----------------------------------------------------------
     // IChannelHandler
     // -----------------------------------------------------------
 
@@ -79,38 +63,54 @@ pub mod ChannelHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
+        fn chan_open_init(ref self: ComponentState<TContractState>, msg: MsgChanOpenInit) {
+            let channel_sequence = self.read_next_channel_sequence();
+            self.chan_open_init_validate(channel_sequence, msg.clone());
+            self.chan_open_init_execute(channel_sequence, msg);
+        }
+
+        fn chan_open_try(ref self: ComponentState<TContractState>, msg: MsgChanOpenTry) {
+            let channel_sequence = self.read_next_channel_sequence();
+            self.chan_open_try_validate(channel_sequence, msg.clone());
+            self.chan_open_try_execute(channel_sequence, msg);
+        }
+
+        fn chan_open_ack(ref self: ComponentState<TContractState>, msg: MsgChanOpenAck) {
+            let chan_end_on_a = self.read_channel_end(@msg.port_id_on_a, @msg.chan_id_on_a);
+            self.chan_open_ack_validate(chan_end_on_a.clone(), msg.clone());
+            self.chan_open_ack_execute(chan_end_on_a, msg);
+        }
+
+        fn chan_open_confirm(ref self: ComponentState<TContractState>, msg: MsgChanOpenConfirm) {
+            let chan_end_on_b = self.read_channel_end(@msg.port_id_on_b, @msg.chan_id_on_b);
+            self.chan_open_confirm_validate(chan_end_on_b.clone(), msg.clone());
+            self.chan_open_confirm_execute(chan_end_on_b, msg);
+        }
+
         fn send_packet(ref self: ComponentState<TContractState>, packet: Packet) {
             let chan_end_on_a = self.read_channel_end(@packet.port_id_on_a, @packet.chan_id_on_a);
-
             self.send_packet_validate(packet.clone(), chan_end_on_a.clone());
-
             self.send_packet_execute(packet, chan_end_on_a);
         }
 
         fn recv_packet(ref self: ComponentState<TContractState>, msg: MsgRecvPacket) {
             let chan_end_on_b = self
                 .read_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b);
-
             self.recv_packet_validate(msg.clone(), chan_end_on_b.clone());
-
             self.recv_packet_execute(msg, chan_end_on_b);
         }
 
         fn ack_packet(ref self: ComponentState<TContractState>, msg: MsgAckPacket) {
             let chan_end_on_a = self
                 .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_b);
-
             self.ack_packet_validate(msg.clone(), chan_end_on_a.clone());
-
             self.ack_packet_execute(msg, chan_end_on_a);
         }
 
         fn timeout_packet(ref self: ComponentState<TContractState>, msg: MsgTimeoutPacket) {
             let chan_end_on_a = self
                 .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
-
             self.timeout_packet_validate(msg.clone(), chan_end_on_a.clone());
-
             self.timeout_packet_execute(msg, chan_end_on_a);
         }
     }
@@ -172,6 +172,223 @@ pub mod ChannelHandlerComponent {
     // -----------------------------------------------------------
     // Channel handler implementations
     // -----------------------------------------------------------
+
+    #[generate_trait]
+    pub(crate) impl ChanOpenInitImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of ChanOpenInitTrait<TContractState> {
+        fn chan_open_init_validate(
+            self: @ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenInit
+        ) {
+            msg.validate_basic();
+        }
+
+        fn chan_open_init_execute(
+            ref self: ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenInit
+        ) {
+            let chan_id_on_a = ChannelIdImpl::new(channel_sequence.clone());
+
+            let app = self.get_app(@msg.port_id_on_a);
+
+            let version_on_a = app
+                .on_chan_open_init(
+                    msg.port_id_on_a.clone(),
+                    chan_id_on_a.clone(),
+                    msg.conn_id_on_a.clone(),
+                    msg.port_id_on_b.clone(),
+                    msg.version_proposal.clone(),
+                    msg.ordering
+                );
+
+            let chan_end_on_a = ChannelEndTrait::new(
+                ChannelState::Init,
+                msg.ordering,
+                msg.port_id_on_b.clone(),
+                ChannelIdZero::zero(),
+                ClientIdImpl::new(
+                    '07-cometbft', 0
+                ), // TODO: replace with connection id once connection handshake is implemented.
+                msg.version_proposal.clone()
+            );
+
+            self.write_channel_end(@msg.port_id_on_a, @chan_id_on_a, chan_end_on_a);
+
+            self.write_next_channel_sequence(channel_sequence + 1);
+
+            self.write_next_sequence_send(@msg.port_id_on_a, @chan_id_on_a, SequenceImpl::one());
+
+            self.write_next_sequence_recv(@msg.port_id_on_a, @chan_id_on_a, SequenceImpl::one());
+
+            self.write_next_sequence_ack(@msg.port_id_on_a, @chan_id_on_a, SequenceImpl::one());
+
+            self
+                .emit_chan_open_init_event(
+                    msg.port_id_on_a.clone(),
+                    chan_id_on_a.clone(),
+                    msg.port_id_on_b.clone(),
+                    msg.conn_id_on_a.clone(),
+                    version_on_a
+                );
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl ChanOpenTryImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of ChanOpenTryTrait<TContractState> {
+        fn chan_open_try_validate(
+            self: @ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenTry
+        ) {
+            msg.validate_basic();
+        }
+
+        fn chan_open_try_execute(
+            ref self: ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenTry
+        ) {
+            let chan_id_on_b = ChannelIdImpl::new(channel_sequence.clone());
+
+            let app = self.get_app(@msg.port_id_on_b);
+
+            let version_on_b = app
+                .on_chan_open_try(
+                    msg.port_id_on_b.clone(),
+                    chan_id_on_b.clone(),
+                    msg.conn_id_on_b.clone(),
+                    msg.port_id_on_a.clone(),
+                    msg.version_on_a.clone(),
+                    msg.ordering
+                );
+
+            let chan_end_on_b = ChannelEndTrait::new(
+                ChannelState::TryOpen,
+                msg.ordering,
+                msg.port_id_on_a.clone(),
+                msg.chan_id_on_a.clone(),
+                ClientIdImpl::new('07-cometbft', 0),
+                msg.version_on_a.clone()
+            );
+
+            self.write_channel_end(@msg.port_id_on_b, @chan_id_on_b, chan_end_on_b);
+
+            self.write_next_channel_sequence(channel_sequence + 1);
+
+            self.write_next_sequence_send(@msg.port_id_on_b, @chan_id_on_b, SequenceImpl::one());
+
+            self.write_next_sequence_recv(@msg.port_id_on_b, @chan_id_on_b, SequenceImpl::one());
+
+            self.write_next_sequence_ack(@msg.port_id_on_b, @chan_id_on_b, SequenceImpl::one());
+
+            self
+                .emit_chan_open_try_event(
+                    msg.port_id_on_b.clone(),
+                    chan_id_on_b.clone(),
+                    msg.port_id_on_a.clone(),
+                    msg.chan_id_on_a.clone(),
+                    msg.conn_id_on_b.clone(),
+                    version_on_b
+                );
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl ChanOpenAckImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of ChanOpenAckTrait<TContractState> {
+        fn chan_open_ack_validate(
+            self: @ComponentState<TContractState>, chan_en_on_a: ChannelEnd, msg: MsgChanOpenAck
+        ) {
+            msg.validate_basic();
+
+            assert(chan_en_on_a.is_init(), ChannelErrors::INVALID_CHANNEL_STATE);
+        }
+
+        fn chan_open_ack_execute(
+            ref self: ComponentState<TContractState>, chan_end_on_a: ChannelEnd, msg: MsgChanOpenAck
+        ) {
+            let app = self.get_app(@msg.port_id_on_a);
+
+            app
+                .on_chan_open_ack(
+                    msg.port_id_on_a.clone(), msg.chan_id_on_a.clone(), msg.version_on_b.clone()
+                );
+
+            self
+                .write_channel_end(
+                    @msg.port_id_on_a,
+                    @msg.chan_id_on_a,
+                    chan_end_on_a
+                        .clone()
+                        .open_with_params(msg.chan_id_on_b.clone(), msg.version_on_b.clone())
+                );
+
+            self
+                .emit_chan_open_ack_event(
+                    msg.port_id_on_a,
+                    msg.chan_id_on_a,
+                    chan_end_on_a.counterparty_port_id().clone(),
+                    msg.chan_id_on_b,
+                    ConnectionId { connection_id: "connection-0" }
+                );
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl ChanOpenConfirmImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
+    > of ChanOpenConfirmTrait<TContractState> {
+        fn chan_open_confirm_validate(
+            self: @ComponentState<TContractState>,
+            chan_end_on_b: ChannelEnd,
+            msg: MsgChanOpenConfirm
+        ) {
+            msg.validate_basic();
+
+            assert(chan_end_on_b.is_try_open(), ChannelErrors::INVALID_CHANNEL_STATE);
+        }
+
+        fn chan_open_confirm_execute(
+            ref self: ComponentState<TContractState>,
+            chan_end_on_b: ChannelEnd,
+            msg: MsgChanOpenConfirm
+        ) {
+            let app = self.get_app(@msg.port_id_on_b);
+
+            app.on_chan_open_confirm(msg.port_id_on_b.clone(), msg.chan_id_on_b.clone());
+
+            self
+                .write_channel_end(
+                    @msg.port_id_on_b, @msg.chan_id_on_b, chan_end_on_b.clone().open()
+                );
+
+            self
+                .emit_chan_open_confirm_event(
+                    chan_end_on_b.counterparty_port_id().clone(),
+                    chan_end_on_b.counterparty_channel_id().clone(),
+                    ConnectionId { connection_id: "connection-0" },
+                    msg
+                );
+        }
+    }
 
     #[generate_trait]
     pub(crate) impl SendPacketImpl<
@@ -425,7 +642,7 @@ pub mod ChannelHandlerComponent {
                     @packet.port_id_on_a, @packet.chan_id_on_a, @packet.seq_on_a
                 );
 
-            self.emit_ack_packet_event(packet.clone(), chan_end_on_a.ordering.clone());
+            self.emit_ack_packet_event(packet.clone(), chan_end_on_a.ordering);
 
             if chan_end_on_a.is_ordered() {
                 self
@@ -510,7 +727,7 @@ pub mod ChannelHandlerComponent {
                     @packet.port_id_on_a, @packet.chan_id_on_a, @packet.seq_on_a
                 );
 
-            self.emit_timeout_packet_event(packet.clone(), chan_end_on_a.ordering.clone());
+            self.emit_timeout_packet_event(packet.clone(), chan_end_on_a.ordering);
 
             if chan_end_on_a.is_ordered() {
                 self
@@ -709,6 +926,10 @@ pub mod ChannelHandlerComponent {
     pub(crate) impl ChannelReaderImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ChannelReaderTrait<TContractState> {
+        fn read_next_channel_sequence(self: @ComponentState<TContractState>) -> u64 {
+            self.next_channel_sequence.read()
+        }
+
         fn read_channel_end(
             self: @ComponentState<TContractState>, port_id: @PortId, channel_id: @ChannelId
         ) -> ChannelEnd {
@@ -788,6 +1009,12 @@ pub mod ChannelHandlerComponent {
     pub(crate) impl ChannelWriterImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ChannelWriterTrait<TContractState> {
+        fn write_next_channel_sequence(
+            ref self: ComponentState<TContractState>, channel_sequence: u64
+        ) {
+            self.next_channel_sequence.write(channel_sequence);
+        }
+
         fn write_channel_end(
             ref self: ComponentState<TContractState>,
             port_id: @PortId,
@@ -879,6 +1106,75 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>
     > of EventEmitterTrait<TContractState> {
+        fn emit_chan_open_init_event(
+            ref self: ComponentState<TContractState>,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            port_id_on_b: PortId,
+            connection_id_on_a: ConnectionId,
+            version_on_a: AppVersion
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_chan_open_init_event(
+                    port_id_on_a, chan_id_on_a, port_id_on_b, connection_id_on_a, version_on_a
+                );
+        }
+
+        fn emit_chan_open_try_event(
+            ref self: ComponentState<TContractState>,
+            port_id_on_b: PortId,
+            chan_id_on_b: ChannelId,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            connection_id_on_b: ConnectionId,
+            version_on_b: AppVersion
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_chan_open_try_event(
+                    port_id_on_b,
+                    chan_id_on_b,
+                    port_id_on_a,
+                    chan_id_on_a,
+                    connection_id_on_b,
+                    version_on_b
+                );
+        }
+
+        fn emit_chan_open_ack_event(
+            ref self: ComponentState<TContractState>,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            port_id_on_b: PortId,
+            chan_id_on_b: ChannelId,
+            conn_id_on_a: ConnectionId,
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_chan_open_ack_event(
+                    port_id_on_a, chan_id_on_a, port_id_on_b, chan_id_on_b, conn_id_on_a
+                );
+        }
+
+        fn emit_chan_open_confirm_event(
+            ref self: ComponentState<TContractState>,
+            port_id_on_a: PortId,
+            chan_id_on_a: ChannelId,
+            conn_id_on_b: ConnectionId,
+            msg: MsgChanOpenConfirm
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_chan_open_confirm_event(
+                    msg.port_id_on_b, msg.chan_id_on_b, port_id_on_a, chan_id_on_a, conn_id_on_b
+                );
+        }
+
         fn emit_send_packet_event(
             ref self: ComponentState<TContractState>, packet: Packet, ordering: ChannelOrdering
         ) {
@@ -921,26 +1217,3 @@ pub mod ChannelHandlerComponent {
     }
 }
 
-// ----------------- Temporary until handshakes are implemented ---------------
-pub(crate) fn CLIENT_ID() -> ClientId {
-    ClientId { client_type: '07-cometbft', sequence: 0 }
-}
-
-pub(crate) fn PORT_ID() -> PortId {
-    PortId { port_id: "transfer" }
-}
-
-pub(crate) fn CHANNEL_ID(sequence: u64) -> ChannelId {
-    ChannelId { channel_id: format!("channel-{sequence}") }
-}
-
-pub(crate) fn CHANNEL_END(counterparty_channel_sequence: u64) -> ChannelEnd {
-    ChannelEnd {
-        state: ChannelState::Open,
-        ordering: ChannelOrdering::Unordered,
-        remote: Counterparty {
-            port_id: PORT_ID(), channel_id: CHANNEL_ID(counterparty_channel_sequence),
-        },
-        client_id: CLIENT_ID(),
-    }
-}

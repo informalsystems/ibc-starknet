@@ -35,22 +35,18 @@ pub mod RouterHandlerComponent {
     impl CoreRouterHandlerImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of IRouter<ComponentState<TContractState>> {
-        fn app_address(
-            self: @ComponentState<TContractState>, port_id: ByteArray
-        ) -> ContractAddress {
-            self.read_app_address(@PortIdImpl::new(port_id))
+        fn app_address(self: @ComponentState<TContractState>, port_id: PortId) -> ContractAddress {
+            self.read_app_address(@port_id)
         }
 
         fn bind_port_id(
-            ref self: ComponentState<TContractState>,
-            port_id: ByteArray,
-            app_address: ContractAddress
+            ref self: ComponentState<TContractState>, port_id: PortId, app_address: ContractAddress
         ) {
-            self.write_app_address(PortIdImpl::new(port_id), app_address)
+            self.write_app_address(port_id, app_address)
         }
 
-        fn release_port_id(ref self: ComponentState<TContractState>, port_id: ByteArray) {
-            self.remove_app_address(PortIdImpl::new(port_id))
+        fn release_port_id(ref self: ComponentState<TContractState>, port_id: PortId) {
+            self.remove_app_address(port_id)
         }
     }
 

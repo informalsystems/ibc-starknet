@@ -15,9 +15,10 @@ pub mod mocks {
 }
 pub mod configs {
     mod cometbft;
+    mod core;
     mod transfer;
-
     pub use cometbft::{CometClientConfig, CometClientConfigImpl, CometClientConfigTrait};
+    pub use core::{CoreConfig, CoreConfigImpl, CoreConfigTrait};
     pub use transfer::{TransferAppConfig, TransferAppConfigImpl, TransferAppConfigTrait};
 }
 pub mod dummies {
@@ -25,8 +26,8 @@ pub mod dummies {
     mod transfer;
 
     pub use core::{
-        HEIGHT, TIMESTAMP, CLIENT, CLIENT_TYPE, CLIENT_ID, PORT_ID, CHANNEL_ID, SEQUENCE,
-        CHANNEL_END, TIMEOUT_HEIGHT, TIMEOUT_TIMESTAMP
+        HEIGHT, TIMESTAMP, CLIENT, CLIENT_TYPE, CLIENT_ID, CONNECTION_ID, PORT_ID, CHANNEL_ID,
+        SEQUENCE, CHANNEL_END, VERSION_PROPOSAL, TIMEOUT_HEIGHT, TIMEOUT_TIMESTAMP, STATE_PROOF
     };
     pub use transfer::{
         NAME, SYMBOL, ERC20, AMOUNT, SUPPLY, OWNER, STARKNET, COSMOS, NATIVE_DENOM, HOSTED_DENOM,

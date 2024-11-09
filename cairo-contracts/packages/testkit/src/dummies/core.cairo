@@ -1,7 +1,10 @@
 use starknet::{contract_address_const, ContractAddress};
-use starknet_ibc_core::channel::{ChannelEnd, ChannelState, ChannelOrdering, Counterparty};
+use starknet_ibc_core::channel::{
+    ChannelEnd, ChannelState, ChannelOrdering, Counterparty, AppVersion
+};
 use starknet_ibc_core::client::{Height, Timestamp};
-use starknet_ibc_core::host::{ClientId, PortId, ChannelId, Sequence};
+use starknet_ibc_core::commitment::StateProof;
+use starknet_ibc_core::host::{ClientId, ConnectionId, PortId, ChannelId, Sequence};
 
 pub fn HEIGHT(revision_height: u64) -> Height {
     Height { revision_number: 0, revision_height }
@@ -31,6 +34,10 @@ pub fn CLIENT_ID() -> ClientId {
     ClientId { client_type: CLIENT_TYPE(), sequence: 0 }
 }
 
+pub fn CONNECTION_ID(sequence: u64) -> ConnectionId {
+    ConnectionId { connection_id: format!("connection-{sequence}") }
+}
+
 pub fn PORT_ID() -> PortId {
     PortId { port_id: "transfer" }
 }
@@ -51,5 +58,14 @@ pub fn CHANNEL_END(counterparty_channel_sequence: u64) -> ChannelEnd {
             port_id: PORT_ID(), channel_id: CHANNEL_ID(counterparty_channel_sequence),
         },
         client_id: CLIENT_ID(),
+        version: VERSION_PROPOSAL(),
     }
+}
+
+pub fn VERSION_PROPOSAL() -> AppVersion {
+    AppVersion { version: "" }
+}
+
+pub fn STATE_PROOF() -> StateProof {
+    StateProof { proof: array![1] }
 }

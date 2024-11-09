@@ -1,11 +1,7 @@
 use ChannelHandlerComponent::ChannelReaderTrait;
 use core::num::traits::Zero;
-use starknet_ibc_core::channel::ChannelHandlerComponent::{
-    ChannelInitializerImpl, ChannelWriterTrait
-};
-use starknet_ibc_core::channel::{
-    ChannelHandlerComponent, ChannelState, ChannelOrdering, Receipt, ReceiptTrait
-};
+use starknet_ibc_core::channel::ChannelHandlerComponent::ChannelWriterTrait;
+use starknet_ibc_core::channel::{ChannelHandlerComponent, Receipt, ReceiptTrait};
 use starknet_ibc_testkit::dummies::{CHANNEL_END, CHANNEL_ID, PORT_ID, SEQUENCE};
 use starknet_ibc_testkit::mocks::MockChannelHandler;
 
@@ -17,22 +13,23 @@ fn COMPONENT_STATE() -> ComponentState {
 
 fn setup() -> ComponentState {
     let mut state = COMPONENT_STATE();
-    state.initializer();
     state
 }
 
 #[test]
 fn test_intial_state() {
     let state = setup();
-    let channel_end = state.read_channel_end(@PORT_ID(), @CHANNEL_ID(0));
-    assert_eq!(channel_end.state, ChannelState::Open);
-    assert_eq!(channel_end.ordering, ChannelOrdering::Unordered);
+    let next_channel_sequence = state.read_next_channel_sequence();
+    assert!(next_channel_sequence.is_zero());
+
+    let next_sequence_send = state.read_next_sequence_send(@PORT_ID(), @CHANNEL_ID(0));
+    assert!(next_sequence_send.is_zero());
 
     let next_sequence_recv = state.read_next_sequence_recv(@PORT_ID(), @CHANNEL_ID(0));
     assert!(next_sequence_recv.is_zero());
 
-    let next_sequence_send = state.read_next_sequence_send(@PORT_ID(), @CHANNEL_ID(1));
-    assert!(next_sequence_send.is_zero());
+    let next_sequence_ack = state.read_next_sequence_ack(@PORT_ID(), @CHANNEL_ID(0));
+    assert!(next_sequence_ack.is_zero());
 }
 
 #[test]

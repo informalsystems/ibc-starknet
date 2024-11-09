@@ -24,7 +24,7 @@ pub struct MsgTransfer {
     pub timeout_timestamp_on_b: Timestamp,
 }
 
-impl MsgTransferValidateBasicImpl of ValidateBasic<MsgTransfer> {
+impl MsgTransferValidateBasic of ValidateBasic<MsgTransfer> {
     fn validate_basic(self: @MsgTransfer) {
         self.port_id_on_a.validate(TRANSFER_PORT_ID_HASH);
         self.chan_id_on_a.validate();
@@ -65,7 +65,7 @@ pub impl ArrayFelt252IntoPacketData of Into<Array<felt252>, PacketData> {
     }
 }
 
-impl PacketDataValidateBasicImpl of ValidateBasic<PacketData> {
+impl PacketDataValidateBasic of ValidateBasic<PacketData> {
     fn validate_basic(self: @PacketData) {
         assert(self.sender.is_non_zero(), TransferErrors::INVALID_SENDER);
         assert(self.receiver.is_non_zero(), TransferErrors::INVALID_RECEIVER);
@@ -255,7 +255,7 @@ pub impl MemoDisplay of Display<Memo> {
     }
 }
 
-impl MemoValidateBasicImpl of ValidateBasic<Memo> {
+impl MemoValidateBasic of ValidateBasic<Memo> {
     fn validate_basic(self: @Memo) {
         assert(self.memo.len() <= MAXIMUM_MEMO_LENGTH, TransferErrors::MAXIMUM_MEMO_LENGTH);
     }

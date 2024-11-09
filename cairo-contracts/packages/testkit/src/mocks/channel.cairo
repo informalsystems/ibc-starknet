@@ -9,8 +9,6 @@ pub mod MockChannelHandler {
     );
     component!(path: ChannelHandlerComponent, storage: channel_handler, event: ChannelHandlerEvent);
 
-    impl ChannelInitializerImpl = ChannelHandlerComponent::ChannelInitializerImpl<ContractState>;
-
     #[storage]
     struct Storage {
         #[substorage(v0)]
@@ -29,7 +27,5 @@ pub mod MockChannelHandler {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState) {
-        self.channel_handler.initializer();
-    }
+    fn constructor(ref self: ContractState) {}
 }

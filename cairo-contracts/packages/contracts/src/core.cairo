@@ -40,7 +40,6 @@ pub mod IBCCore {
     #[abi(embed_v0)]
     impl CoreChannelQueryImpl =
         ChannelHandlerComponent::CoreChannelQuery<ContractState>;
-    impl ChannelInitializerImpl = ChannelHandlerComponent::ChannelInitializerImpl<ContractState>;
 
     // -----------------------------------------------------------
     // Setup Router Components
@@ -86,7 +85,6 @@ pub mod IBCCore {
     #[constructor]
     fn constructor(ref self: ContractState) {
         self.client_handler.initializer();
-        self.channel_handler.initializer();
         self.router_handler.initializer();
     }
 }
