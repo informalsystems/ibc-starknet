@@ -203,6 +203,7 @@ pub mod TokenTransferComponent {
             ordering: ChannelOrdering
         ) -> AppVersion {
             assert(version_on_a == VERSION(), TransferErrors::INVALID_APP_VERSION);
+
             VERSION()
         }
 

@@ -18,7 +18,6 @@ pub mod configs {
     mod core;
     mod transfer;
     pub use cometbft::{CometClientConfig, CometClientConfigImpl, CometClientConfigTrait};
-
     pub use core::{CoreConfig, CoreConfigImpl, CoreConfigTrait};
     pub use transfer::{TransferAppConfig, TransferAppConfigImpl, TransferAppConfigTrait};
 }

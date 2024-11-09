@@ -61,7 +61,7 @@ pub impl CoreHandleImpl of CoreHandle {
         self.register_client_dispatcher().register_client(client_type, client_address)
     }
 
-    fn register_app(self: @CoreContract, port_id: PortId , app_address: ContractAddress) {
+    fn register_app(self: @CoreContract, port_id: PortId, app_address: ContractAddress) {
         self.router_dispatcher().bind_port_id(port_id, app_address)
     }
 
