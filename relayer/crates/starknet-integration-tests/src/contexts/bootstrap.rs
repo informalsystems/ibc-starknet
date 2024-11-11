@@ -29,7 +29,9 @@ use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetN
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
 use hermes_starknet_test_components::types::wallet::StarknetWallet;
-use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
+use hermes_test_components::bootstrap::traits::chain::{
+    CanBootstrapChain, ChainBootstrapperComponent,
+};
 use hermes_test_components::chain_driver::traits::types::chain::ProvideChainType;
 use hermes_test_components::driver::traits::types::chain_driver::ProvideChainDriverType;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
@@ -102,6 +104,8 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
         wallets: BTreeMap<String, StarknetWallet>,
         chain_process: Child,
     ) -> Result<StarknetChainDriver, HermesError> {
+        let runtime = bootstrap.runtime.clone();
+
         let relayer_wallet = wallets
             .get("relayer")
             .ok_or_else(|| StarknetBootstrap::raise_error("expect relayer wallet to be present"))?
@@ -134,7 +138,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
         );
 
         let chain = StarknetChain {
-            runtime: bootstrap.runtime.clone(),
+            runtime: runtime.clone(),
             chain_id,
             rpc_client,
             account,
@@ -142,11 +146,12 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
         };
 
         let chain_driver = StarknetChainDriver {
+            runtime,
             chain,
             genesis_config,
             node_config,
             wallets,
-            chain_process,
+            chain_process: Some(chain_process),
             relayer_wallet,
             user_wallet_a,
             user_wallet_b,
@@ -157,7 +162,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
 }
 
 pub trait CanUseStarknetBootstrap:
-    HasRuntime<Runtime = HermesRuntime> + CanStartChainFullNode
+    HasRuntime<Runtime = HermesRuntime> + CanStartChainFullNode + CanBootstrapChain
 {
 }
 

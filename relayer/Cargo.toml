@@ -9,6 +9,7 @@ members = [
   "crates/starknet-relayer",
   "crates/starknet-test-components",
   "crates/starknet-integration-tests",
+  "crates/starknet-cli",
 ]
 
 [workspace.package]
@@ -40,6 +41,12 @@ tonic                       = { version = "0.12" }
 prost                       = { version = "0.13.1" }
 prost-types                 = { version = "0.13.1" }
 cairo-lang-starknet-classes = { version = "2.8.4" }
+clap                        = { version = "4.5.20" }
+toml                        = { version = "0.8.15" }
+oneline-eyre                = { version = "0.1.0" }
+stable-eyre                 = { version = "0.2.2" }
+tracing                     = { version = "0.1.40" }
+tracing-subscriber          = { version = "0.3.18" }
 
 ibc                       = { version = "0.55.1" }
 ibc-proto                 = { version = "0.47.1" }
@@ -76,13 +83,16 @@ hermes-starknet-chain-components    = { version = "0.1.0" }
 hermes-starknet-test-components     = { version = "0.1.0" }
 hermes-starknet-chain-context       = { version = "0.1.0" }
 hermes-starknet-relayer             = { version = "0.1.0" }
+hermes-starknet-integration-tests   = { version = "0.1.0" }
 
 [patch.crates-io]
-hermes-cairo-encoding-components = { path = "./crates/cairo-encoding-components" }
-hermes-starknet-chain-components = { path = "./crates/starknet-chain-components" }
-hermes-starknet-test-components  = { path = "./crates/starknet-test-components" }
-hermes-starknet-chain-context    = { path = "./crates/starknet-chain-context" }
-hermes-starknet-relayer          = { path = "./crates/starknet-relayer" }
+hermes-cairo-encoding-components  = { path = "./crates/cairo-encoding-components" }
+hermes-starknet-chain-components  = { path = "./crates/starknet-chain-components" }
+hermes-starknet-test-components   = { path = "./crates/starknet-test-components" }
+hermes-starknet-chain-context     = { path = "./crates/starknet-chain-context" }
+hermes-starknet-relayer           = { path = "./crates/starknet-relayer" }
+hermes-starknet-cli               = { path = "./crates/starknet-cli" }
+hermes-starknet-integration-tests = { path = "./crates/starknet-integration-tests" }
 
 ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types" }
 
@@ -99,7 +109,6 @@ ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types"
 ibc-relayer       = { git = "https://github.com/informalsystems/hermes.git" }
 ibc-telemetry     = { git = "https://github.com/informalsystems/hermes.git" }
 ibc-relayer-types = { git = "https://github.com/informalsystems/hermes.git" }
-
 
 cgp                     = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-core                = { git = "https://github.com/contextgeneric/cgp.git" }
@@ -143,3 +152,4 @@ hermes-cosmos-integration-tests     = { git = "https://github.com/informalsystem
 hermes-wasm-test-components         = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-wasm-client-components       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-wasm-encoding-components     = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cli-components               = { git = "https://github.com/informalsystems/hermes-sdk.git" }
