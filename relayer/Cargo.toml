@@ -75,6 +75,7 @@ hermes-cosmos-test-components       = { version = "0.1.0" }
 hermes-cosmos-integration-tests     = { version = "0.1.0" }
 hermes-any-counterparty             = { version = "0.1.0" }
 hermes-wasm-client-components       = { version = "0.1.0" }
+hermes-wasm-test-components         = { version = "0.1.0" }
 hermes-wasm-encoding-components     = { version = "0.1.0" }
 hermes-cli-components               = { version = "0.1.0" }
 hermes-test-components              = { version = "0.1.0" }

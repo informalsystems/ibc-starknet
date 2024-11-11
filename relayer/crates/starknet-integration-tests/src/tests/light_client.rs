@@ -16,7 +16,6 @@ use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_relayer::contexts::encoding::CosmosEncoding;
-use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
@@ -50,6 +49,7 @@ use starknet::macros::short_string;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
+use crate::contexts::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {
@@ -91,12 +91,12 @@ fn test_starknet_light_client() -> Result<(), Error> {
             builder: cosmos_builder,
             should_randomize_identifiers: true,
             chain_store_dir: store_dir.join("chains"),
-            chain_command_path: "simd".into(),
-            account_prefix: "cosmos".into(),
+            chain_command_path: "osmosisd".into(),
+            account_prefix: "osmo".into(),
             staking_denom: "stake".into(),
             transfer_denom: "coin".into(),
             wasm_client_byte_code: wasm_client_byte_code_gzip,
-            governance_proposal_authority: "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn".into(), // TODO: don't hard code this
+            governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
         });
 
         let starknet_bootstrap = StarknetBootstrap {
