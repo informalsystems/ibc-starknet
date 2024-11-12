@@ -11,7 +11,7 @@ on:
 jobs:
   test-cairo:
     name: Test Cairo libs and contracts
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-arm64
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
