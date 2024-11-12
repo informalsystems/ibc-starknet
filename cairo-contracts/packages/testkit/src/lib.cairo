@@ -39,10 +39,12 @@ pub mod dummies {
 pub mod event_spy {
     mod channel;
     mod client;
+    mod connection;
     mod transfer;
 
     pub use channel::{ChannelEventSpyExtImpl, ChannelEventSpyExt};
     pub use client::ClientEventSpyExt;
+    pub use connection::{ConnectionEventSpyExtImpl, ConnectionEventSpyExt};
     pub use transfer::{TransferEventSpyExtImpl, TransferEventSpyExt};
 }
 pub mod handles {

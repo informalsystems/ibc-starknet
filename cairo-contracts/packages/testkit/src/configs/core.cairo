@@ -3,10 +3,11 @@ use starknet_ibc_core::channel::{
     ChannelOrdering, MsgChanOpenInit, MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm
 };
 use starknet_ibc_core::connection::{
-    MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm
+    MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm, Counterparty, VersionImpl
 };
+use starknet_ibc_core::host::PathPrefix;
 use starknet_ibc_testkit::dummies::{
-    HEIGHT, CONNECTION_ID, CHANNEL_ID, PORT_ID, VERSION_PROPOSAL, STATE_PROOF
+    HEIGHT, CONNECTION_ID, CHANNEL_ID, PORT_ID, VERSION_PROPOSAL, STATE_PROOF, CLIENT_ID
 };
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
 
@@ -32,7 +33,16 @@ pub impl CoreConfigImpl of CoreConfigTrait {
     }
 
     fn dummy_msg_conn_open_init(self: @CoreConfig) -> MsgConnOpenInit {
-        MsgConnOpenInit {}
+        MsgConnOpenInit {
+            client_id_on_a: CLIENT_ID(),
+            counterparty: Counterparty {
+                client_id: CLIENT_ID(),
+                connection_id: CONNECTION_ID(0),
+                prefix: PathPrefix { prefix: "" }
+            },
+            version: VersionImpl::supported(),
+            delay_period: 0,
+        }
     }
 
     fn dummy_msg_conn_open_try(self: @CoreConfig) -> MsgConnOpenTry {

@@ -13,9 +13,10 @@ use starknet_ibc_core::client::{
 use starknet_ibc_core::commitment::Commitment;
 use starknet_ibc_core::connection::{
     MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm,
-    IConnectionHandlerDispatcher, IConnectionHandlerDispatcherTrait,
+    IConnectionHandlerDispatcher, IConnectionHandlerDispatcherTrait, IConnectionQueryDispatcher,
+    IConnectionQueryDispatcherTrait, ConnectionEnd,
 };
-use starknet_ibc_core::host::{ChannelId, PortId, Sequence};
+use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId, Sequence};
 use starknet_ibc_core::router::{IRouterDispatcher, IRouterDispatcherTrait};
 
 #[derive(Copy, Drop, Serde)]
@@ -39,6 +40,10 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn connecion_handler_dispatcher(self: @CoreContract) -> IConnectionHandlerDispatcher {
         IConnectionHandlerDispatcher { contract_address: *self.address }
+    }
+
+    fn connection_query_dispatcher(self: @CoreContract) -> IConnectionQueryDispatcher {
+        IConnectionQueryDispatcher { contract_address: *self.address }
     }
 
     fn channel_handler_dispatcher(self: @CoreContract) -> IChannelHandlerDispatcher {
@@ -87,6 +92,10 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn conn_open_confirm(self: @CoreContract, msg: MsgConnOpenConfirm) {
         self.connecion_handler_dispatcher().conn_open_confirm(msg)
+    }
+
+    fn connection_end(self: @CoreContract, connection_id: ConnectionId) -> ConnectionEnd {
+        self.connection_query_dispatcher().connection_end(connection_id)
     }
 
     fn chan_open_init(self: @CoreContract, msg: MsgChanOpenInit) {

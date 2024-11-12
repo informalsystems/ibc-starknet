@@ -1,5 +1,8 @@
 use starknet_ibc_contracts::tests::channel::setup;
+use starknet_ibc_core::connection::{ConnectionState, ConnectionEndTrait};
 use starknet_ibc_testkit::configs::CoreConfigTrait;
+use starknet_ibc_testkit::dummies::CONNECTION_ID;
+use starknet_ibc_testkit::event_spy::ConnectionEventSpyExt;
 use starknet_ibc_testkit::handles::CoreHandle;
 
 #[test]
@@ -8,7 +11,7 @@ fn test_conn_open_init_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, _, _, core_cfg, _, _, _) = setup();
+    let (core, _, _, core_cfg, _, _, mut spy) = setup();
 
     // -----------------------------------------------------------
     // Connection Open Init
@@ -17,6 +20,23 @@ fn test_conn_open_init_ok() {
     let msg = core_cfg.dummy_msg_conn_open_init();
 
     core.conn_open_init(msg.clone());
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    spy
+        .assert_conn_open_init_event(
+            core.address,
+            msg.client_id_on_a,
+            CONNECTION_ID(0),
+            msg.counterparty.client_id,
+            msg.counterparty.connection_id,
+        );
+
+    let conn_id_on_a = core.connection_end(CONNECTION_ID(0));
+
+    assert_eq!(conn_id_on_a.state(), @ConnectionState::Init);
 }
 
 #[test]
