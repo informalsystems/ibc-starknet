@@ -4,7 +4,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use tracing::info;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_init::CosmosChannelOpenInitMessage;
@@ -45,6 +44,7 @@ use ibc_relayer_types::core::ics04_channel::channel::Ordering;
 use ibc_relayer_types::Height;
 use sha2::{Digest, Sha256};
 use starknet::macros::short_string;
+use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
 

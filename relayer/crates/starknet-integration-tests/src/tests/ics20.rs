@@ -1,6 +1,5 @@
 use std::time::SystemTime;
 
-use tracing::info;
 use eyre::eyre;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -23,6 +22,7 @@ use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncod
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::accounts::Call;
 use starknet::macros::selector;
+use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
 

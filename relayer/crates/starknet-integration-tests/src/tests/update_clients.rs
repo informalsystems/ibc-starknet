@@ -5,7 +5,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
 
-use tracing::info;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::queries::consensus_state::CanQueryConsensusStateWithLatestHeight;
@@ -29,6 +28,7 @@ use ibc_relayer::chain::cosmos::client::Settings;
 use ibc_relayer::config::types::TrustThreshold;
 use ibc_relayer_types::Height as CosmosHeight;
 use sha2::{Digest, Sha256};
+use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
 
@@ -211,9 +211,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
                     )
                     .await?;
 
-                info!(
-                    "Cosmos consensus state on Starknet after UpdateClient: {consensus_state:?}"
-                );
+                info!("Cosmos consensus state on Starknet after UpdateClient: {consensus_state:?}");
             }
         }
 
