@@ -44,6 +44,7 @@ use ibc_relayer_types::core::ics04_channel::channel::Ordering;
 use ibc_relayer_types::Height;
 use sha2::{Digest, Sha256};
 use starknet::macros::short_string;
+use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
 
@@ -110,7 +111,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         )
         .await?;
 
-        println!("created client id: {:?}", client_id);
+        info!("created client id: {:?}", client_id);
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay {
             runtime: runtime.clone(),
@@ -144,7 +145,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 )
                 .await?;
 
-            println!(
+            info!(
                 "initial consensus state height {} and root: {:?}",
                 client_height,
                 consensus_state.consensus_state.root.into_vec()
@@ -156,7 +157,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let starknet_status = starknet_chain.query_chain_status().await?;
 
-            println!(
+            info!(
                 "updating Starknet client to Cosmos to height {} and root: {:?}",
                 starknet_status.height,
                 starknet_status.block_hash.to_bytes_be()
@@ -197,7 +198,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .connection_id
             ;
 
-            println!("initialized connection on Cosmos: {connection_id}");
+            info!("initialized connection on Cosmos: {connection_id}");
 
             connection_id
         };
@@ -258,7 +259,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .channel_id
             ;
 
-            println!("initialized channel on Cosmos: {channel_id}");
+            info!("initialized channel on Cosmos: {channel_id}");
 
             channel_id
         };

@@ -16,6 +16,7 @@ use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc2
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
+use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
 
@@ -52,7 +53,7 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             let class_hash = chain.declare_contract(&contract).await?;
 
-            println!("declared class: {:?}", class_hash);
+            info!("declared class: {:?}", class_hash);
 
             class_hash
         };
@@ -74,13 +75,13 @@ fn test_erc20_transfer() -> Result<(), Error> {
                 .deploy_contract(&erc20_class_hash, false, &calldata)
                 .await?;
 
-            println!("deployed ERC20 contract to address: {:?}", token_address);
+            info!("deployed ERC20 contract to address: {:?}", token_address);
 
             let balance = chain
                 .query_token_balance(&token_address, &relayer_address)
                 .await?;
 
-            println!("initial balance: {}", balance);
+            info!("initial balance: {}", balance);
 
             assert_eq!(balance.quantity, 1000u32.into());
 
@@ -99,20 +100,20 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             let recipient_address = chain_driver.user_wallet_a.account_address;
 
-            println!("sender address: {:?}", account_address);
-            println!("recipient address: {:?}", recipient_address);
+            info!("sender address: {:?}", account_address);
+            info!("recipient address: {:?}", recipient_address);
 
             let sender_balance_a = chain
                 .query_token_balance(&token_address, &account_address)
                 .await?;
 
-            println!("sender balance before: {}", sender_balance_a);
+            info!("sender balance before: {}", sender_balance_a);
 
             let recipient_balance_a = chain
                 .query_token_balance(&token_address, &recipient_address)
                 .await?;
 
-            println!("recipient balance before: {}", recipient_balance_a);
+            info!("recipient balance before: {}", recipient_balance_a);
 
             let transfer_amount = 100u32.into();
 
@@ -123,14 +124,14 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             let response = chain.send_message(message).await?;
 
-            println!("performed transfer of 100 tokens");
+            info!("performed transfer of 100 tokens");
 
-            println!("response: {:?}", response);
+            info!("response: {:?}", response);
 
             let erc20_events: Vec<Erc20Event> =
                 event_encoding.filter_decode_events(&response.events)?;
 
-            println!(
+            info!(
                 "events from sending transfer token message: {:?}",
                 erc20_events
             );
@@ -150,13 +151,13 @@ fn test_erc20_transfer() -> Result<(), Error> {
                 .query_token_balance(&token_address, &account_address)
                 .await?;
 
-            println!("sender balance after transfer: {}", sender_balance_b);
+            info!("sender balance after transfer: {}", sender_balance_b);
 
             let recipient_balance_b = chain
                 .query_token_balance(&token_address, &recipient_address)
                 .await?;
 
-            println!("recipient balance transfer: {}", recipient_balance_b);
+            info!("recipient balance transfer: {}", recipient_balance_b);
 
             assert_eq!(
                 sender_balance_b.quantity,
