@@ -12,7 +12,9 @@ concurrency:
 jobs:
   starknet-integration-tests:
     name: Run Starknet Integration Tests
-    runs-on: ubuntu-20.04
+    runs-on:
+      - ubuntu-20.04
+      - ubuntu-arm64
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
