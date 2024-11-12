@@ -10,7 +10,8 @@ pub mod clients {
 }
 #[cfg(test)]
 mod tests {
-    mod channel;
-    mod client;
-    mod transfer;
+    pub(crate) mod channel;
+    pub(crate) mod client;
+    pub(crate) mod connection;
+    pub(crate) mod transfer;
 }

@@ -4,6 +4,8 @@ pub mod IBCCore {
     use starknet_ibc_core::channel::ChannelHandlerComponent;
     use starknet_ibc_core::client::ClientEventEmitterComponent;
     use starknet_ibc_core::client::ClientHandlerComponent;
+    use starknet_ibc_core::connection::ConnectionEventEmitterComponent;
+    use starknet_ibc_core::connection::ConnectionHandlerComponent;
     use starknet_ibc_core::router::RouterHandlerComponent;
 
     // -----------------------------------------------------------
@@ -22,6 +24,23 @@ pub mod IBCCore {
     impl CoreRegisterClientImpl =
         ClientHandlerComponent::CoreRegisterClient<ContractState>;
     impl ClientInitializerImpl = ClientHandlerComponent::ClientInitializerImpl<ContractState>;
+
+    // -----------------------------------------------------------
+    // Setup Connection Components
+    // -----------------------------------------------------------
+
+    component!(
+        path: ConnectionEventEmitterComponent,
+        storage: connection_emitter,
+        event: ConnectionEventEmitterEvent
+    );
+    component!(
+        path: ConnectionHandlerComponent, storage: connection_handler, event: ConnectionHandlerEvent
+    );
+
+    #[abi(embed_v0)]
+    impl CoreConnectionHandlerImpl =
+        ConnectionHandlerComponent::CoreConnectionHandler<ContractState>;
 
     // -----------------------------------------------------------
     // Setup Channel Components
@@ -60,6 +79,10 @@ pub mod IBCCore {
         #[substorage(v0)]
         client_handler: ClientHandlerComponent::Storage,
         #[substorage(v0)]
+        connection_emitter: ConnectionEventEmitterComponent::Storage,
+        #[substorage(v0)]
+        connection_handler: ConnectionHandlerComponent::Storage,
+        #[substorage(v0)]
         channel_emitter: ChannelEventEmitterComponent::Storage,
         #[substorage(v0)]
         channel_handler: ChannelHandlerComponent::Storage,
@@ -74,6 +97,10 @@ pub mod IBCCore {
         ClientEventEmitterEvent: ClientEventEmitterComponent::Event,
         #[flat]
         ClientHandlerEvent: ClientHandlerComponent::Event,
+        #[flat]
+        ConnectionEventEmitterEvent: ConnectionEventEmitterComponent::Event,
+        #[flat]
+        ConnectionHandlerEvent: ConnectionHandlerComponent::Event,
         #[flat]
         ChannelEventEmitterEvent: ChannelEventEmitterComponent::Event,
         #[flat]

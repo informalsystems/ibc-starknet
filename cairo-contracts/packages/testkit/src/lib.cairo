@@ -4,12 +4,14 @@ pub mod mocks {
     mod channel;
     mod client;
     mod cometbft;
+    mod connection;
     mod router;
     mod transfer;
 
     pub use channel::MockChannelHandler;
     pub use client::MockClientHandler;
     pub use cometbft::MockCometClient;
+    pub use connection::MockConnectionHandler;
     pub use router::MockRouterHandler;
     pub use transfer::MockTransferApp;
 }
