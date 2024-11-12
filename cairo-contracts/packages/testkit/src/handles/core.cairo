@@ -11,6 +11,10 @@ use starknet_ibc_core::client::{
     UpdateResponse,
 };
 use starknet_ibc_core::commitment::Commitment;
+use starknet_ibc_core::connection::{
+    MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm,
+    IConnectionHandlerDispatcher, IConnectionHandlerDispatcherTrait,
+};
 use starknet_ibc_core::host::{ChannelId, PortId, Sequence};
 use starknet_ibc_core::router::{IRouterDispatcher, IRouterDispatcherTrait};
 
@@ -31,6 +35,10 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn client_handler_dispatcher(self: @CoreContract) -> IClientHandlerDispatcher {
         IClientHandlerDispatcher { contract_address: *self.address }
+    }
+
+    fn connecion_handler_dispatcher(self: @CoreContract) -> IConnectionHandlerDispatcher {
+        IConnectionHandlerDispatcher { contract_address: *self.address }
     }
 
     fn channel_handler_dispatcher(self: @CoreContract) -> IChannelHandlerDispatcher {
@@ -63,6 +71,22 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn register_app(self: @CoreContract, port_id: PortId, app_address: ContractAddress) {
         self.router_dispatcher().bind_port_id(port_id, app_address)
+    }
+
+    fn conn_open_init(self: @CoreContract, msg: MsgConnOpenInit) {
+        self.connecion_handler_dispatcher().conn_open_init(msg)
+    }
+
+    fn conn_open_try(self: @CoreContract, msg: MsgConnOpenTry) {
+        self.connecion_handler_dispatcher().conn_open_try(msg)
+    }
+
+    fn conn_open_ack(self: @CoreContract, msg: MsgConnOpenAck) {
+        self.connecion_handler_dispatcher().conn_open_ack(msg)
+    }
+
+    fn conn_open_confirm(self: @CoreContract, msg: MsgConnOpenConfirm) {
+        self.connecion_handler_dispatcher().conn_open_confirm(msg)
     }
 
     fn chan_open_init(self: @CoreContract, msg: MsgChanOpenInit) {

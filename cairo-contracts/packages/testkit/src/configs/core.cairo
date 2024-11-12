@@ -2,6 +2,9 @@ use starknet_ibc_apps::transfer::VERSION;
 use starknet_ibc_core::channel::{
     ChannelOrdering, MsgChanOpenInit, MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm
 };
+use starknet_ibc_core::connection::{
+    MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm
+};
 use starknet_ibc_testkit::dummies::{
     HEIGHT, CONNECTION_ID, CHANNEL_ID, PORT_ID, VERSION_PROPOSAL, STATE_PROOF
 };
@@ -26,6 +29,22 @@ pub impl CoreConfigImpl of CoreConfigTrait {
 
     fn set_chan_sequence_on_b(ref self: CoreConfig, sequence: u64) {
         self.chan_sequence_on_b = sequence;
+    }
+
+    fn dummy_msg_conn_open_init(self: @CoreConfig) -> MsgConnOpenInit {
+        MsgConnOpenInit {}
+    }
+
+    fn dummy_msg_conn_open_try(self: @CoreConfig) -> MsgConnOpenTry {
+        MsgConnOpenTry {}
+    }
+
+    fn dummy_msg_conn_open_ack(self: @CoreConfig) -> MsgConnOpenAck {
+        MsgConnOpenAck {}
+    }
+
+    fn dummy_msg_conn_open_confirm(self: @CoreConfig) -> MsgConnOpenConfirm {
+        MsgConnOpenConfirm {}
     }
 
     fn dummy_msg_chan_open_init(self: @CoreConfig) -> MsgChanOpenInit {

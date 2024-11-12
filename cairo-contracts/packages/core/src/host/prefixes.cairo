@@ -1,3 +1,8 @@
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+pub struct PathPrefix {
+    pub prefix: ByteArray,
+}
+
 pub fn CHANNELS_PREFIX() -> ByteArray {
     "channels"
 }

@@ -17,7 +17,7 @@ use starknet_ibc_testkit::handles::{CoreContract, CoreHandle, AppHandle, ERC20Ha
 use starknet_ibc_testkit::setup::SetupImpl;
 use starknet_ibc_utils::ComputeKey;
 
-fn setup() -> (
+pub fn setup() -> (
     CoreContract,
     AppContract,
     ERC20Contract,
