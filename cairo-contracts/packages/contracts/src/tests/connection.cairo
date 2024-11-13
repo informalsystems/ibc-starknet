@@ -45,7 +45,7 @@ fn test_conn_open_try_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, _, _, core_cfg, _, _, _) = setup();
+    let (core, _, _, core_cfg, _, _, mut spy) = setup();
 
     // -----------------------------------------------------------
     // Connection Open Try
@@ -54,6 +54,23 @@ fn test_conn_open_try_ok() {
     let msg = core_cfg.dummy_msg_conn_open_try();
 
     core.conn_open_try(msg.clone());
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    spy
+        .assert_conn_open_try_event(
+            core.address,
+            msg.client_id_on_b,
+            CONNECTION_ID(0),
+            msg.counterparty.client_id,
+            msg.counterparty.connection_id,
+        );
+
+    let conn_id_on_b = core.connection_end(CONNECTION_ID(0));
+
+    assert_eq!(conn_id_on_b.state(), @ConnectionState::TryOpen);
 }
 
 #[test]

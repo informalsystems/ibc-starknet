@@ -86,3 +86,7 @@ pub fn VERSION_PROPOSAL() -> AppVersion {
 pub fn STATE_PROOF() -> StateProof {
     StateProof { proof: array![1] }
 }
+
+pub fn IBC_PREFIX() -> PathPrefix {
+    PathPrefix { prefix: "Ibc/" }
+}
