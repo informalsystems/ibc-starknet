@@ -1,9 +1,16 @@
 use starknet_ibc_core::host::{
-    COMMITMENTS_PREFIX, RECEIPTS_PREFIX, ACKS_PREFIX, NEXT_SEQ_RECV_PREFIX, PORTS_PREFIX,
-    CHANNELS_PREFIX, SEQUENCES_PREFIX
+    CONNECTIONS_PREFIX, COMMITMENTS_PREFIX, RECEIPTS_PREFIX, ACKS_PREFIX, NEXT_SEQ_RECV_PREFIX,
+    PORTS_PREFIX, CHANNELS_PREFIX, SEQUENCES_PREFIX
 };
-use starknet_ibc_core::host::{ChannelId, PortId, Sequence};
+use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId, Sequence};
 use starknet_ibc_utils::{RemotePathBuilder, RemotePathBuilderImpl};
+
+pub fn connection_path(connection_id: ConnectionId) -> ByteArray {
+    let mut builder = RemotePathBuilderImpl::init();
+    append_prefix(ref builder, CONNECTIONS_PREFIX());
+    builder.append(connection_id);
+    builder.path()
+}
 
 /// Constructs the commitment path of the counterparty chain for the given port
 /// ID, channel ID, and sequence.

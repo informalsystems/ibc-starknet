@@ -8,14 +8,15 @@ pub mod ConnectionHandlerComponent {
         StoragePointerWriteAccess,
     };
     use starknet::storage::{Map, Vec, VecTrait, MutableVecTrait};
-    use starknet_ibc_core::client::{ClientHandlerComponent, ClientContract, ClientContractTrait,};
+    use starknet_ibc_core::client::{ClientHandlerComponent, ClientContract, ClientContractTrait};
     use starknet_ibc_core::connection::{
         ConnectionEventEmitterComponent, IConnectionHandler, IConnectionQuery, MsgConnOpenAck,
-        MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenInitTrait, MsgConnOpenTry, ConnectionEnd,
-        ConnectionEndTrait, ConnectionErrors
+        MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenInitTrait, MsgConnOpenTry,
+        MsgConnOpenTryTrait, ConnectionEnd, ConnectionEndTrait, ConnectionErrors
     };
     use starknet_ibc_core::host::{
-        ClientId, ConnectionId, ConnectionIdImpl, client_connection_key, connection_end_key
+        ClientId, ConnectionId, ConnectionIdImpl, connection_path, client_connection_key,
+        connection_end_key
     };
     use starknet_ibc_utils::ValidateBasic;
 
@@ -48,7 +49,11 @@ pub mod ConnectionHandlerComponent {
             self.conn_open_init_execute(connection_sequence, msg);
         }
 
-        fn conn_open_try(ref self: ComponentState<TContractState>, msg: MsgConnOpenTry) {}
+        fn conn_open_try(ref self: ComponentState<TContractState>, msg: MsgConnOpenTry) {
+            let connection_sequence = self.read_next_connection_sequence();
+            self.conn_open_try_validate(connection_sequence, msg.clone());
+            self.conn_open_try_execute(connection_sequence, msg);
+        }
 
         fn conn_open_ack(ref self: ComponentState<TContractState>, msg: MsgConnOpenAck) {}
 
@@ -116,6 +121,72 @@ pub mod ConnectionHandlerComponent {
                 .emit_conn_open_init_event(
                     msg.client_id_on_a.clone(),
                     conn_id_on_a.clone(),
+                    msg.counterparty_client_id().clone(),
+                    msg.counterparty_connection_id().clone()
+                );
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl ConnOpenTryImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ConnectionEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+    > of ConnOpenTryTrait<TContractState> {
+        fn conn_open_try_validate(
+            self: @ComponentState<TContractState>, connection_sequence: u64, msg: MsgConnOpenTry
+        ) {
+            msg.validate_basic();
+
+            let client = self.get_client(*msg.client_type_on_b());
+
+            let client_sequence = msg.client_id_on_b.sequence;
+
+            client.verify_is_active(client_sequence);
+
+            client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
+
+            let expected_conn_end_on_a = ConnectionEndTrait::init(
+                msg.counterparty_client_id().clone(),
+                msg.client_id_on_b.clone(),
+                msg.counterparty_prefix().clone(),
+                msg.delay_period
+            );
+
+            let path = msg.counterparty_prefix().clone().prefix
+                + connection_path(msg.counterparty_connection_id().clone());
+
+            client
+                .verify_membership(
+                    client_sequence, path, expected_conn_end_on_a.into(), msg.proof_conn_end_on_a
+                );
+        }
+
+        fn conn_open_try_execute(
+            ref self: ComponentState<TContractState>, connection_sequence: u64, msg: MsgConnOpenTry
+        ) {
+            let chan_end_on_b = ConnectionEndTrait::try_open(
+                msg.client_id_on_b.clone(),
+                msg.counterparty_client_id().clone(),
+                msg.counterparty_connection_id().clone(),
+                msg.counterparty_prefix().clone(),
+                msg.delay_period
+            );
+
+            let conn_id_on_b = ConnectionIdImpl::new(connection_sequence);
+
+            self.write_connection_end(@conn_id_on_b, chan_end_on_b);
+
+            self.write_client_to_connections(@msg.client_id_on_b, conn_id_on_b.clone());
+
+            self.write_next_connection_sequence(connection_sequence + 1);
+
+            self
+                .emit_conn_open_try_event(
+                    msg.client_id_on_b.clone(),
+                    conn_id_on_b.clone(),
                     msg.counterparty_client_id().clone(),
                     msg.counterparty_connection_id().clone()
                 );
@@ -247,6 +318,21 @@ pub mod ConnectionHandlerComponent {
             event_emitter
                 .emit_conn_open_init_event(
                     client_id_on_a, connection_id_on_a, client_id_on_b, connection_id_on_b
+                );
+        }
+
+        fn emit_conn_open_try_event(
+            ref self: ComponentState<TContractState>,
+            client_id_on_b: ClientId,
+            connection_id_on_b: ConnectionId,
+            client_id_on_a: ClientId,
+            connection_id_on_a: ConnectionId,
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_conn_open_try_event(
+                    client_id_on_b, connection_id_on_b, client_id_on_a, connection_id_on_a
                 );
         }
     }

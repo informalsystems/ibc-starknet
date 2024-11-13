@@ -1,5 +1,6 @@
 use alexandria_data_structures::span_ext::SpanTraitExt;
 use core::num::traits::Zero;
+use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::host::{ClientId, ConnectionId, ConnectionIdZero, PathPrefix};
 use starknet_ibc_utils::ValidateBasic;
 
@@ -53,12 +54,37 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         )
     }
 
+    fn try_open(
+        client_id: ClientId,
+        counterparty_client_id: ClientId,
+        counterparty_connection_id: ConnectionId,
+        counterparty_prefix: PathPrefix,
+        delay_period: u64,
+    ) -> ConnectionEnd {
+        Self::new(
+            ConnectionState::TryOpen,
+            client_id,
+            counterparty_client_id,
+            counterparty_connection_id,
+            counterparty_prefix,
+            VersionImpl::supported(),
+            delay_period,
+        )
+    }
+
     fn state(self: @ConnectionEnd) -> @ConnectionState {
         self.state
     }
 
     fn is_zero(self: @ConnectionEnd) -> bool {
         self.state == @ConnectionState::Uninitialized
+    }
+}
+
+pub impl ConnectionEndIntoStateValue of Into<ConnectionEnd, StateValue> {
+    fn into(self: ConnectionEnd) -> StateValue {
+        // TODO: Implement once membership proof verification is implemented.
+        StateValueZero::zero()
     }
 }
 

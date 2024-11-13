@@ -5,9 +5,8 @@ use starknet_ibc_core::channel::{
 use starknet_ibc_core::connection::{
     MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm, Counterparty, VersionImpl
 };
-use starknet_ibc_core::host::PathPrefix;
 use starknet_ibc_testkit::dummies::{
-    HEIGHT, CONNECTION_ID, CHANNEL_ID, PORT_ID, VERSION_PROPOSAL, STATE_PROOF, CLIENT_ID
+    HEIGHT, CONNECTION_ID, CHANNEL_ID, PORT_ID, VERSION_PROPOSAL, STATE_PROOF, CLIENT_ID, IBC_PREFIX
 };
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
 
@@ -36,9 +35,7 @@ pub impl CoreConfigImpl of CoreConfigTrait {
         MsgConnOpenInit {
             client_id_on_a: CLIENT_ID(),
             counterparty: Counterparty {
-                client_id: CLIENT_ID(),
-                connection_id: CONNECTION_ID(0),
-                prefix: PathPrefix { prefix: "" }
+                client_id: CLIENT_ID(), connection_id: CONNECTION_ID(0), prefix: IBC_PREFIX(),
             },
             version: VersionImpl::supported(),
             delay_period: 0,
@@ -46,7 +43,16 @@ pub impl CoreConfigImpl of CoreConfigTrait {
     }
 
     fn dummy_msg_conn_open_try(self: @CoreConfig) -> MsgConnOpenTry {
-        MsgConnOpenTry {}
+        MsgConnOpenTry {
+            client_id_on_b: CLIENT_ID(),
+            counterparty: Counterparty {
+                client_id: CLIENT_ID(), connection_id: CONNECTION_ID(0), prefix: IBC_PREFIX(),
+            },
+            version_on_a: VersionImpl::supported(),
+            proof_conn_end_on_a: STATE_PROOF(),
+            proof_height_on_a: HEIGHT(10),
+            delay_period: 0,
+        }
     }
 
     fn dummy_msg_conn_open_ack(self: @CoreConfig) -> MsgConnOpenAck {

@@ -22,7 +22,7 @@ pub mod commitment {
     mod utils;
 
     pub use types::{
-        Commitment, CommitmentZero, StateValue, StateProof, StateProofZero,
+        Commitment, CommitmentZero, StateValue, StateValueZero, StateProof, StateProofZero,
         compute_packet_commtiment, compute_ack_commitment,
     };
     pub use utils::{
@@ -44,8 +44,8 @@ pub mod connection {
         IConnectionQuery, IConnectionQueryDispatcher, IConnectionQueryDispatcherTrait
     };
     pub use msgs::{
-        MsgConnOpenInit, MsgConnOpenInitImpl, MsgConnOpenInitTrait, MsgConnOpenTry, MsgConnOpenAck,
-        MsgConnOpenConfirm
+        MsgConnOpenInit, MsgConnOpenInitImpl, MsgConnOpenInitTrait, MsgConnOpenTry,
+        MsgConnOpenTryImpl, MsgConnOpenTryTrait, MsgConnOpenAck, MsgConnOpenConfirm
     };
     pub use types::{
         ConnectionEnd, ConnectionEndImpl, ConnectionEndTrait, ConnectionState, Counterparty,
@@ -137,7 +137,9 @@ pub mod host {
         client_connection_key, connection_end_key, channel_end_key, commitment_key, receipt_key,
         ack_key, next_sequence_recv_key, next_sequence_send_key, next_sequence_ack_key
     };
-    pub use paths::{commitment_path, receipt_path, ack_path, next_sequence_recv_path};
+    pub use paths::{
+        connection_path, commitment_path, receipt_path, ack_path, next_sequence_recv_path
+    };
     pub use prefixes::{
         PathPrefix, CLIENTS_PREFIX, CONNECTIONS_PREFIX, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX,
         PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX, ACKS_PREFIX, RECEIPTS_PREFIX,
