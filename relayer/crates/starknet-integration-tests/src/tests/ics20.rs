@@ -22,6 +22,7 @@ use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncod
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::accounts::Call;
 use starknet::macros::selector;
+use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
 
@@ -57,7 +58,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let class_hash = chain.declare_contract(&contract).await?;
 
-            println!("declared ERC20 class: {:?}", class_hash);
+            info!("declared ERC20 class: {:?}", class_hash);
 
             class_hash
         };
@@ -71,7 +72,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let class_hash = chain.declare_contract(&contract).await?;
 
-            println!("declared ICS20 class: {:?}", class_hash);
+            info!("declared ICS20 class: {:?}", class_hash);
 
             class_hash
         };
@@ -97,7 +98,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 )
                 .await?;
 
-            println!("deployed ICS20 contract to address: {:?}", contract_address);
+            info!("deployed ICS20 contract to address: {:?}", contract_address);
 
             contract_address
         };
@@ -149,12 +150,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let token_address = {
             let response = chain.send_message(message.clone()).await?;
 
-            println!("IBC transfer response: {:?}", response);
+            info!("IBC transfer response: {:?}", response);
 
             let ibc_transfer_events: Vec<IbcTransferEvent> =
                 event_encoding.filter_decode_events(&response.events)?;
 
-            println!("IBC transfer events: {:?}", ibc_transfer_events);
+            info!("IBC transfer events: {:?}", ibc_transfer_events);
 
             {
                 let receive_transfer_event = ibc_transfer_events
@@ -196,7 +197,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
                 let token_address = create_token_event.address;
 
-                println!("created token address: {:?}", token_address);
+                info!("created token address: {:?}", token_address);
 
                 token_address
             };
@@ -206,7 +207,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                     .query_token_balance(&token_address, &recipient_address)
                     .await?;
 
-                println!("recipient balance after transfer: {}", recipient_balance);
+                info!("recipient balance after transfer: {}", recipient_balance);
 
                 assert_eq!(recipient_balance.quantity, amount.into());
             }
@@ -221,14 +222,14 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let ibc_transfer_events_2: Vec<IbcTransferEvent> =
                 event_encoding.filter_decode_events(&response.events)?;
 
-            println!("ibc_transfer_events 2: {:?}", ibc_transfer_events_2);
+            info!("ibc_transfer_events 2: {:?}", ibc_transfer_events_2);
 
             {
                 let recipient_balance = chain
                     .query_token_balance(&token_address, &recipient_address)
                     .await?;
 
-                println!("recipient balance after transfer: {}", recipient_balance);
+                info!("recipient balance after transfer: {}", recipient_balance);
 
                 assert_eq!(recipient_balance.quantity, (amount * 2).into(),);
             }

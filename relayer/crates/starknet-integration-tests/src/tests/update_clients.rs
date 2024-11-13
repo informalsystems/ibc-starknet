@@ -28,6 +28,7 @@ use ibc_relayer::chain::cosmos::client::Settings;
 use ibc_relayer::config::types::TrustThreshold;
 use ibc_relayer_types::Height as CosmosHeight;
 use sha2::{Digest, Sha256};
+use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
 
@@ -95,7 +96,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
 
             let class_hash = starknet_chain.declare_contract(&contract).await?;
 
-            println!("declared class: {:?}", class_hash);
+            info!("declared class: {:?}", class_hash);
 
             class_hash
         };
@@ -104,7 +105,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
             .deploy_contract(&comet_client_class_hash, false, &Vec::new())
             .await?;
 
-        println!(
+        info!(
             "deployed Comet client contract to address: {:?}",
             comet_client_address
         );
@@ -126,7 +127,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
         )
         .await?;
 
-        println!("created client on Starknet: {:?}", starknet_client_id);
+        info!("created client on Starknet: {:?}", starknet_client_id);
 
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
@@ -137,7 +138,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
         )
         .await?;
 
-        println!("created client on Cosmos: {:?}", cosmos_client_id);
+        info!("created client on Cosmos: {:?}", cosmos_client_id);
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay {
             runtime: runtime.clone(),
@@ -148,7 +149,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
         };
 
         {
-            println!("test relaying UpdateClient from Cosmos to Starknet");
+            info!("test relaying UpdateClient from Cosmos to Starknet");
 
             {
                 let client_state = starknet_chain
@@ -158,7 +159,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
                     )
                     .await?;
 
-                println!("Cosmos client state on Starknet: {client_state:?}");
+                info!("Cosmos client state on Starknet: {client_state:?}");
 
                 let consensus_state = starknet_chain
                     .query_consensus_state_with_latest_height(
@@ -171,14 +172,14 @@ fn test_relay_update_clients() -> Result<(), Error> {
                     )
                     .await?;
 
-                println!("Cosmos consensus state on Starknet: {consensus_state:?}");
+                info!("Cosmos consensus state on Starknet: {consensus_state:?}");
             }
 
             runtime.sleep(Duration::from_secs(1)).await;
 
             let target_height = cosmos_chain.query_chain_height().await?;
 
-            println!(
+            info!(
                 "updating Cosmos client on Starknet to height {}",
                 target_height
             );
@@ -187,7 +188,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
                 .send_target_update_client_messages(SourceTarget, &target_height)
                 .await?;
 
-            println!("sent update client message from Cosmos to Starknet");
+            info!("sent update client message from Cosmos to Starknet");
 
             {
                 let client_state = starknet_chain
@@ -197,7 +198,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
                     )
                     .await?;
 
-                println!("Cosmos client state on Starknet after UpdateClient: {client_state:?}");
+                info!("Cosmos client state on Starknet after UpdateClient: {client_state:?}");
 
                 let consensus_state = starknet_chain
                     .query_consensus_state_with_latest_height(
@@ -210,14 +211,12 @@ fn test_relay_update_clients() -> Result<(), Error> {
                     )
                     .await?;
 
-                println!(
-                    "Cosmos consensus state on Starknet after UpdateClient: {consensus_state:?}"
-                );
+                info!("Cosmos consensus state on Starknet after UpdateClient: {consensus_state:?}");
             }
         }
 
         {
-            println!("test relaying UpdateClient from Cosmos to Starknet");
+            info!("test relaying UpdateClient from Cosmos to Starknet");
 
             {
                 let client_state = cosmos_chain
@@ -227,7 +226,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
                     )
                     .await?;
 
-                println!("Starknet client state on Cosmos: {client_state:?}");
+                info!("Starknet client state on Cosmos: {client_state:?}");
 
                 let consensus_state = cosmos_chain
                     .query_consensus_state_with_latest_height(
@@ -237,12 +236,12 @@ fn test_relay_update_clients() -> Result<(), Error> {
                     )
                     .await?;
 
-                println!("Starknet consensus state on Cosmos: {consensus_state:?}");
+                info!("Starknet consensus state on Cosmos: {consensus_state:?}");
             }
 
             let target_height = starknet_chain.query_chain_height().await?;
 
-            println!(
+            info!(
                 "updating Starknet client on Cosmos to height {}",
                 target_height
             );
@@ -259,7 +258,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
                     )
                     .await?;
 
-                println!("Starknet client state on Cosmos after update: {client_state:?}");
+                info!("Starknet client state on Cosmos after update: {client_state:?}");
 
                 let consensus_state = cosmos_chain
                     .query_consensus_state_with_latest_height(
@@ -269,7 +268,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
                     )
                     .await?;
 
-                println!("Starknet consensus state on Cosmos after update: {consensus_state:?}");
+                info!("Starknet consensus state on Cosmos after update: {consensus_state:?}");
             }
         }
 
