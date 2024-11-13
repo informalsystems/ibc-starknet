@@ -103,9 +103,10 @@ fn test_conn_open_ack_ok() {
     // Check Results
     // -----------------------------------------------------------
 
-    let conn_id_on_a = core.connection_end(CONNECTION_ID(0));
+    let conn_id_on_a = core.connection_end(msg.conn_id_on_a.clone());
 
     assert_eq!(conn_id_on_a.state(), @ConnectionState::Open);
+    assert_eq!(conn_id_on_a.counterparty.connection_id.clone(), msg.conn_id_on_b.clone());
     assert_eq!(msg.version, conn_id_on_a.version);
 
     spy
