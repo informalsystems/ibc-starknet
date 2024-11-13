@@ -81,7 +81,7 @@ pub mod ConnectionHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ConnectionEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
-    > of ChanOpenInitTrait<TContractState> {
+    > of ConnOpenInitTrait<TContractState> {
         fn conn_open_init_validate(
             self: @ComponentState<TContractState>, connection_sequence: u64, msg: MsgConnOpenInit
         ) {
@@ -132,7 +132,7 @@ pub mod ConnectionHandlerComponent {
     > of ConnectionInternalTrait<TContractState> {}
 
     // -----------------------------------------------------------
-    // Connection access
+    // Connection Access
     // -----------------------------------------------------------
 
     #[generate_trait]
