@@ -66,7 +66,7 @@ pub mod ConnectionHandlerComponent {
         fn connection_end(
             ref self: ComponentState<TContractState>, connection_id: ConnectionId
         ) -> ConnectionEnd {
-            self.read_connection_end(connection_id)
+            self.read_connection_end(@connection_id)
         }
     }
 
@@ -106,9 +106,9 @@ pub mod ConnectionHandlerComponent {
 
             let conn_id_on_a = ConnectionIdImpl::new(connection_sequence);
 
-            self.write_connection_end(conn_id_on_a.clone(), conn_end_on_a);
+            self.write_connection_end(@conn_id_on_a, conn_end_on_a);
 
-            self.write_client_to_connections(msg.client_id_on_a.clone(), conn_id_on_a.clone());
+            self.write_client_to_connections(@msg.client_id_on_a, conn_id_on_a.clone());
 
             self.write_next_connection_sequence(connection_sequence + 1);
 
@@ -164,11 +164,13 @@ pub mod ConnectionHandlerComponent {
         }
 
         fn read_client_to_connections(
-            self: @ComponentState<TContractState>, client_id: ClientId
+            self: @ComponentState<TContractState>, client_id: @ClientId
         ) -> Array<ConnectionId> {
             let mut conn_ids: Array<ConnectionId> = ArrayTrait::new();
 
-            let entry = self.client_to_connections.entry(client_connection_key(@client_id));
+            let entry = self.client_to_connections.entry(client_connection_key(client_id));
+
+            assert(entry.len() > 0, ConnectionErrors::ZERO_CONNECTIONS);
 
             let mut i = 0;
 
@@ -181,9 +183,9 @@ pub mod ConnectionHandlerComponent {
         }
 
         fn read_connection_end(
-            self: @ComponentState<TContractState>, connection_id: ConnectionId
+            self: @ComponentState<TContractState>, connection_id: @ConnectionId
         ) -> ConnectionEnd {
-            let connection_end = self.connection_ends.read(connection_end_key(@connection_id));
+            let connection_end = self.connection_ends.read(connection_end_key(connection_id));
 
             assert(!connection_end.is_zero(), ConnectionErrors::MISSING_CONNECTION_END);
 
@@ -203,22 +205,22 @@ pub mod ConnectionHandlerComponent {
 
         fn write_client_to_connections(
             ref self: ComponentState<TContractState>,
-            client_id: ClientId,
+            client_id: @ClientId,
             connection_id: ConnectionId
         ) {
             self
                 .client_to_connections
-                .entry(client_connection_key(@client_id))
+                .entry(client_connection_key(client_id))
                 .append()
                 .write(connection_id);
         }
 
         fn write_connection_end(
             ref self: ComponentState<TContractState>,
-            connection_id: ConnectionId,
+            connection_id: @ConnectionId,
             connection_end: ConnectionEnd
         ) {
-            self.connection_ends.write(connection_end_key(@connection_id), connection_end)
+            self.connection_ends.write(connection_end_key(connection_id), connection_end)
         }
     }
 

@@ -1,10 +1,13 @@
 use starknet::{contract_address_const, ContractAddress};
 use starknet_ibc_core::channel::{
-    ChannelEnd, ChannelState, ChannelOrdering, Counterparty, AppVersion
+    ChannelEnd, ChannelState, ChannelOrdering, Counterparty as ChanCounterparty, AppVersion
 };
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::commitment::StateProof;
-use starknet_ibc_core::host::{ClientId, ConnectionId, PortId, ChannelId, Sequence};
+use starknet_ibc_core::connection::{
+    ConnectionEnd, ConnectionState, Counterparty as ConnCounterparty, VersionImpl
+};
+use starknet_ibc_core::host::{PathPrefix, ClientId, ConnectionId, PortId, ChannelId, Sequence};
 
 pub fn HEIGHT(revision_height: u64) -> Height {
     Height { revision_number: 0, revision_height }
@@ -38,6 +41,20 @@ pub fn CONNECTION_ID(sequence: u64) -> ConnectionId {
     ConnectionId { connection_id: format!("connection-{sequence}") }
 }
 
+pub fn CONNECTION_END(counterparty_connection_sequence: u64) -> ConnectionEnd {
+    ConnectionEnd {
+        state: ConnectionState::Open,
+        client_id: CLIENT_ID(),
+        counterparty: ConnCounterparty {
+            client_id: CLIENT_ID(),
+            connection_id: CONNECTION_ID(counterparty_connection_sequence),
+            prefix: PathPrefix { prefix: "" },
+        },
+        version: VersionImpl::supported(),
+        delay_period: 0,
+    }
+}
+
 pub fn PORT_ID() -> PortId {
     PortId { port_id: "transfer" }
 }
@@ -54,7 +71,7 @@ pub fn CHANNEL_END(counterparty_channel_sequence: u64) -> ChannelEnd {
     ChannelEnd {
         state: ChannelState::Open,
         ordering: ChannelOrdering::Unordered,
-        remote: Counterparty {
+        remote: ChanCounterparty {
             port_id: PORT_ID(), channel_id: CHANNEL_ID(counterparty_channel_sequence),
         },
         client_id: CLIENT_ID(),
