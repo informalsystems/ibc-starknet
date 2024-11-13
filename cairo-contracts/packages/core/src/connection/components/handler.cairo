@@ -10,9 +10,9 @@ pub mod ConnectionHandlerComponent {
     use starknet::storage::{Map, Vec, VecTrait, MutableVecTrait};
     use starknet_ibc_core::client::{ClientHandlerComponent, ClientContract, ClientContractTrait};
     use starknet_ibc_core::connection::{
-        ConnectionEventEmitterComponent, IConnectionHandler, IConnectionQuery, MsgConnOpenAck,
-        MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenInitTrait, MsgConnOpenTry,
-        MsgConnOpenTryTrait, ConnectionEnd, ConnectionEndTrait, ConnectionErrors
+        ConnectionEventEmitterComponent, IConnectionHandler, IConnectionQuery, MsgConnOpenConfirm,
+        MsgConnOpenInit, MsgConnOpenInitTrait, MsgConnOpenTry, MsgConnOpenTryTrait, MsgConnOpenAck,
+        ConnectionEnd, ConnectionEndTrait, ConnectionErrors
     };
     use starknet_ibc_core::host::{
         ClientId, ConnectionId, ConnectionIdImpl, connection_path, client_connection_key,
@@ -55,7 +55,11 @@ pub mod ConnectionHandlerComponent {
             self.conn_open_try_execute(connection_sequence, msg);
         }
 
-        fn conn_open_ack(ref self: ComponentState<TContractState>, msg: MsgConnOpenAck) {}
+        fn conn_open_ack(ref self: ComponentState<TContractState>, msg: MsgConnOpenAck) {
+            let conn_end_on_a = self.read_connection_end(@msg.conn_id_on_a);
+            self.conn_open_ack_validate(conn_end_on_a.clone(), msg.clone());
+            self.conn_open_ack_execute(conn_end_on_a, msg);
+        }
 
         fn conn_open_confirm(ref self: ComponentState<TContractState>, msg: MsgConnOpenConfirm) {}
     }
@@ -104,8 +108,8 @@ pub mod ConnectionHandlerComponent {
         ) {
             let conn_end_on_a = ConnectionEndTrait::init(
                 msg.client_id_on_a.clone(),
-                msg.counterparty_client_id().clone(),
-                msg.counterparty_prefix().clone(),
+                msg.client_id_on_b.clone(),
+                msg.prefix_on_b.clone(),
                 msg.delay_period
             );
 
@@ -119,10 +123,7 @@ pub mod ConnectionHandlerComponent {
 
             self
                 .emit_conn_open_init_event(
-                    msg.client_id_on_a.clone(),
-                    conn_id_on_a.clone(),
-                    msg.counterparty_client_id().clone(),
-                    msg.counterparty_connection_id().clone()
+                    msg.client_id_on_a.clone(), conn_id_on_a.clone(), msg.client_id_on_b,
                 );
         }
     }
@@ -149,14 +150,13 @@ pub mod ConnectionHandlerComponent {
             client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
 
             let expected_conn_end_on_a = ConnectionEndTrait::init(
-                msg.counterparty_client_id().clone(),
+                msg.client_id_on_a.clone(),
                 msg.client_id_on_b.clone(),
-                msg.counterparty_prefix().clone(),
+                msg.prefix_on_a.clone(),
                 msg.delay_period
             );
 
-            let path = msg.counterparty_prefix().clone().prefix
-                + connection_path(msg.counterparty_connection_id().clone());
+            let path = msg.prefix_on_a.prefix.clone() + connection_path(msg.conn_id_on_a.clone());
 
             client
                 .verify_membership(
@@ -169,9 +169,9 @@ pub mod ConnectionHandlerComponent {
         ) {
             let chan_end_on_b = ConnectionEndTrait::try_open(
                 msg.client_id_on_b.clone(),
-                msg.counterparty_client_id().clone(),
-                msg.counterparty_connection_id().clone(),
-                msg.counterparty_prefix().clone(),
+                msg.client_id_on_a.clone(),
+                msg.conn_id_on_a.clone(),
+                msg.prefix_on_a.clone(),
                 msg.delay_period
             );
 
@@ -187,8 +187,69 @@ pub mod ConnectionHandlerComponent {
                 .emit_conn_open_try_event(
                     msg.client_id_on_b.clone(),
                     conn_id_on_b.clone(),
-                    msg.counterparty_client_id().clone(),
-                    msg.counterparty_connection_id().clone()
+                    msg.client_id_on_a.clone(),
+                    msg.conn_id_on_a
+                );
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl ConnOpenAckImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ConnectionEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+    > of ConnOpenAckTrait<TContractState> {
+        fn conn_open_ack_validate(
+            self: @ComponentState<TContractState>, conn_end_on_a: ConnectionEnd, msg: MsgConnOpenAck
+        ) {
+            msg.validate_basic();
+
+            assert(conn_end_on_a.is_init(), ConnectionErrors::INVALID_CONNECTION_STATE);
+
+            let client = self.get_client(conn_end_on_a.client_id.client_type);
+
+            let client_sequence = conn_end_on_a.client_id.sequence;
+
+            client.verify_is_active(client_sequence);
+
+            client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
+
+            let expected_conn_end_on_b = ConnectionEndTrait::try_open(
+                conn_end_on_a.client_id.clone(),
+                conn_end_on_a.counterparty.client_id.clone(),
+                conn_end_on_a.counterparty.connection_id.clone(),
+                conn_end_on_a.counterparty.prefix.clone(),
+                conn_end_on_a.delay_period
+            );
+
+            let path = conn_end_on_a.counterparty.prefix.prefix.clone()
+                + connection_path(conn_end_on_a.counterparty.connection_id.clone());
+
+            client
+                .verify_membership(
+                    client_sequence, path, expected_conn_end_on_b.into(), msg.proof_conn_end_on_b
+                );
+        }
+
+        fn conn_open_ack_execute(
+            ref self: ComponentState<TContractState>,
+            conn_end_on_a: ConnectionEnd,
+            msg: MsgConnOpenAck
+        ) {
+            self
+                .write_connection_end(
+                    @msg.conn_id_on_a,
+                    conn_end_on_a.clone().open_with_params(msg.conn_id_on_b.clone(), msg.version)
+                );
+
+            self
+                .emit_conn_open_ack_event(
+                    conn_end_on_a.client_id.clone(),
+                    msg.conn_id_on_a.clone(),
+                    conn_end_on_a.counterparty.client_id.clone(),
+                    msg.conn_id_on_b
                 );
         }
     }
@@ -311,14 +372,11 @@ pub mod ConnectionHandlerComponent {
             client_id_on_a: ClientId,
             connection_id_on_a: ConnectionId,
             client_id_on_b: ClientId,
-            connection_id_on_b: ConnectionId,
         ) {
             let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
 
             event_emitter
-                .emit_conn_open_init_event(
-                    client_id_on_a, connection_id_on_a, client_id_on_b, connection_id_on_b
-                );
+                .emit_conn_open_init_event(client_id_on_a, connection_id_on_a, client_id_on_b);
         }
 
         fn emit_conn_open_try_event(
@@ -333,6 +391,21 @@ pub mod ConnectionHandlerComponent {
             event_emitter
                 .emit_conn_open_try_event(
                     client_id_on_b, connection_id_on_b, client_id_on_a, connection_id_on_a
+                );
+        }
+
+        fn emit_conn_open_ack_event(
+            ref self: ComponentState<TContractState>,
+            client_id_on_a: ClientId,
+            connection_id_on_a: ConnectionId,
+            client_id_on_b: ClientId,
+            connection_id_on_b: ConnectionId,
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_conn_open_ack_event(
+                    client_id_on_a, connection_id_on_a, client_id_on_b, connection_id_on_b
                 );
         }
     }
