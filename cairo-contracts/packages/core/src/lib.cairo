@@ -43,8 +43,14 @@ pub mod connection {
         IConnectionHandler, IConnectionHandlerDispatcher, IConnectionHandlerDispatcherTrait,
         IConnectionQuery, IConnectionQueryDispatcher, IConnectionQueryDispatcherTrait
     };
-    pub use msgs::{MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm};
-    pub use types::{Counterparty, Version};
+    pub use msgs::{
+        MsgConnOpenInit, MsgConnOpenInitImpl, MsgConnOpenInitTrait, MsgConnOpenTry, MsgConnOpenAck,
+        MsgConnOpenConfirm
+    };
+    pub use types::{
+        ConnectionEnd, ConnectionEndImpl, ConnectionEndTrait, ConnectionState, Counterparty,
+        Version, VersionImpl, VersionTrait
+    };
     mod components {
         pub mod events;
         pub mod handler;
@@ -122,18 +128,19 @@ pub mod host {
 
     pub use errors::HostErrors;
     pub use identifiers::{
-        ClientId, ClientIdImpl, ClientIdTrait, ConnectionId, ConnectionIdTrait, ChannelId,
-        ChannelIdImpl, ChannelIdTrait, ChannelIdZero, PortId, PortIdImpl, PortIdTrait, Sequence,
-        SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero
+        ClientId, ClientIdImpl, ClientIdTrait, ConnectionId, ConnectionIdImpl, ConnectionIdTrait,
+        ConnectionIdZero, ChannelId, ChannelIdImpl, ChannelIdTrait, ChannelIdZero, PortId,
+        PortIdImpl, PortIdTrait, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd,
+        SequenceZero
     };
     pub use keys::{
-        channel_end_key, commitment_key, receipt_key, ack_key, next_sequence_recv_key,
-        next_sequence_send_key, next_sequence_ack_key
+        client_connection_key, connection_end_key, channel_end_key, commitment_key, receipt_key,
+        ack_key, next_sequence_recv_key, next_sequence_send_key, next_sequence_ack_key
     };
     pub use paths::{commitment_path, receipt_path, ack_path, next_sequence_recv_path};
     pub use prefixes::{
-        PathPrefix, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, PORTS_PREFIX, SEQUENCES_PREFIX,
-        COMMITMENTS_PREFIX, ACKS_PREFIX, RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX,
-        NEXT_SEQ_SEND_PREFIX, NEXT_SEQ_ACK_PREFIX
+        PathPrefix, CLIENTS_PREFIX, CONNECTIONS_PREFIX, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX,
+        PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX, ACKS_PREFIX, RECEIPTS_PREFIX,
+        NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX, NEXT_SEQ_ACK_PREFIX
     };
 }

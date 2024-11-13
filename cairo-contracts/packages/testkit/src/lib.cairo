@@ -28,8 +28,9 @@ pub mod dummies {
     mod transfer;
 
     pub use core::{
-        HEIGHT, TIMESTAMP, CLIENT, CLIENT_TYPE, CLIENT_ID, CONNECTION_ID, PORT_ID, CHANNEL_ID,
-        SEQUENCE, CHANNEL_END, VERSION_PROPOSAL, TIMEOUT_HEIGHT, TIMEOUT_TIMESTAMP, STATE_PROOF
+        HEIGHT, TIMESTAMP, CLIENT, CLIENT_TYPE, CLIENT_ID, CONNECTION_ID, CONNECTION_END, PORT_ID,
+        CHANNEL_ID, SEQUENCE, CHANNEL_END, VERSION_PROPOSAL, TIMEOUT_HEIGHT, TIMEOUT_TIMESTAMP,
+        STATE_PROOF
     };
     pub use transfer::{
         NAME, SYMBOL, ERC20, AMOUNT, SUPPLY, OWNER, STARKNET, COSMOS, NATIVE_DENOM, HOSTED_DENOM,
@@ -39,10 +40,12 @@ pub mod dummies {
 pub mod event_spy {
     mod channel;
     mod client;
+    mod connection;
     mod transfer;
 
     pub use channel::{ChannelEventSpyExtImpl, ChannelEventSpyExt};
     pub use client::ClientEventSpyExt;
+    pub use connection::{ConnectionEventSpyExtImpl, ConnectionEventSpyExt};
     pub use transfer::{TransferEventSpyExtImpl, TransferEventSpyExt};
 }
 pub mod handles {

@@ -1,6 +1,5 @@
-use ChannelHandlerComponent::ChannelReaderTrait;
 use core::num::traits::Zero;
-use starknet_ibc_core::channel::ChannelHandlerComponent::ChannelWriterTrait;
+use starknet_ibc_core::channel::ChannelHandlerComponent::{ChannelWriterTrait, ChannelReaderTrait};
 use starknet_ibc_core::channel::{ChannelHandlerComponent, Receipt, ReceiptTrait};
 use starknet_ibc_testkit::dummies::{CHANNEL_END, CHANNEL_ID, PORT_ID, SEQUENCE};
 use starknet_ibc_testkit::mocks::MockChannelHandler;

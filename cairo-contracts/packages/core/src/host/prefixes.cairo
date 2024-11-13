@@ -1,6 +1,14 @@
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct PathPrefix {
     pub prefix: ByteArray,
+}
+
+pub fn CLIENTS_PREFIX() -> ByteArray {
+    "clients"
+}
+
+pub fn CONNECTIONS_PREFIX() -> ByteArray {
+    "connections"
 }
 
 pub fn CHANNELS_PREFIX() -> ByteArray {

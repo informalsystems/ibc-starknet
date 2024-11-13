@@ -41,6 +41,9 @@ pub mod IBCCore {
     #[abi(embed_v0)]
     impl CoreConnectionHandlerImpl =
         ConnectionHandlerComponent::CoreConnectionHandler<ContractState>;
+    #[abi(embed_v0)]
+    impl CoreConnectionQueryImpl =
+        ConnectionHandlerComponent::CoreConnectionQuery<ContractState>;
 
     // -----------------------------------------------------------
     // Setup Channel Components

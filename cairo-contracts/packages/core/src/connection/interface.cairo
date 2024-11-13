@@ -1,6 +1,7 @@
 use starknet_ibc_core::connection::{
-    MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry
+    MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry, ConnectionEnd,
 };
+use starknet_ibc_core::host::ConnectionId;
 
 #[starknet::interface]
 pub trait IConnectionHandler<TContractState> {
@@ -14,4 +15,6 @@ pub trait IConnectionHandler<TContractState> {
 }
 
 #[starknet::interface]
-pub trait IConnectionQuery<TContractState> {}
+pub trait IConnectionQuery<TContractState> {
+    fn connection_end(ref self: TContractState, connection_id: ConnectionId) -> ConnectionEnd;
+}
