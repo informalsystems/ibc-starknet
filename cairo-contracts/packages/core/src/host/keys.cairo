@@ -7,6 +7,7 @@ use starknet_ibc_core::host::{ClientId, ConnectionId, ChannelId, PortId, Sequenc
 use starknet_ibc_utils::LocalKeyBuilderTrait;
 use starknet_ibc_utils::{LocalKeyBuilderImpl, LocalKeyBuilder};
 
+/// Constructs the client to connections local key for the given client ID.
 pub fn client_connection_key(client_id: @ClientId) -> felt252 {
     let mut key_builder = LocalKeyBuilderImpl::init();
     key_builder.append_serde(@CLIENTS_PREFIX());
