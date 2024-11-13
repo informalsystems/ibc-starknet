@@ -22,8 +22,6 @@ pub mod ConnectionEventEmitterComponent {
         pub connection_id_on_a: ConnectionId,
         #[key]
         pub client_id_on_b: ClientId,
-        #[key]
-        pub connection_id_on_b: ConnectionId,
     }
 
     #[derive(Debug, Drop, starknet::Event)]
@@ -39,7 +37,16 @@ pub mod ConnectionEventEmitterComponent {
     }
 
     #[derive(Debug, Drop, starknet::Event)]
-    pub struct ConnOpenAckEvent {}
+    pub struct ConnOpenAckEvent {
+        #[key]
+        pub client_id_on_a: ClientId,
+        #[key]
+        pub connection_id_on_a: ConnectionId,
+        #[key]
+        pub client_id_on_b: ClientId,
+        #[key]
+        pub connection_id_on_b: ConnectionId,
+    }
 
     #[derive(Debug, Drop, starknet::Event)]
     pub struct ConnOpenConfirmEvent {}
@@ -53,14 +60,8 @@ pub mod ConnectionEventEmitterComponent {
             client_id_on_a: ClientId,
             connection_id_on_a: ConnectionId,
             client_id_on_b: ClientId,
-            connection_id_on_b: ConnectionId,
         ) {
-            self
-                .emit(
-                    ConnOpenInitEvent {
-                        client_id_on_a, connection_id_on_a, client_id_on_b, connection_id_on_b,
-                    }
-                );
+            self.emit(ConnOpenInitEvent { client_id_on_a, connection_id_on_a, client_id_on_b });
         }
 
         fn emit_conn_open_try_event(
@@ -74,6 +75,21 @@ pub mod ConnectionEventEmitterComponent {
                 .emit(
                     ConnOpenTryEvent {
                         client_id_on_b, connection_id_on_b, client_id_on_a, connection_id_on_a,
+                    }
+                );
+        }
+
+        fn emit_conn_open_ack_event(
+            ref self: ComponentState<TContractState>,
+            client_id_on_a: ClientId,
+            connection_id_on_a: ConnectionId,
+            client_id_on_b: ClientId,
+            connection_id_on_b: ConnectionId,
+        ) {
+            self
+                .emit(
+                    ConnOpenAckEvent {
+                        client_id_on_a, connection_id_on_a, client_id_on_b, connection_id_on_b,
                     }
                 );
         }

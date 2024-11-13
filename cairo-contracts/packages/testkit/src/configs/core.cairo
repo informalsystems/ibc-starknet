@@ -3,7 +3,7 @@ use starknet_ibc_core::channel::{
     ChannelOrdering, MsgChanOpenInit, MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm
 };
 use starknet_ibc_core::connection::{
-    MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm, Counterparty, VersionImpl
+    MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm, VersionImpl
 };
 use starknet_ibc_testkit::dummies::{
     HEIGHT, CONNECTION_ID, CHANNEL_ID, PORT_ID, VERSION_PROPOSAL, STATE_PROOF, CLIENT_ID, IBC_PREFIX
@@ -34,9 +34,8 @@ pub impl CoreConfigImpl of CoreConfigTrait {
     fn dummy_msg_conn_open_init(self: @CoreConfig) -> MsgConnOpenInit {
         MsgConnOpenInit {
             client_id_on_a: CLIENT_ID(),
-            counterparty: Counterparty {
-                client_id: CLIENT_ID(), connection_id: CONNECTION_ID(0), prefix: IBC_PREFIX(),
-            },
+            client_id_on_b: CLIENT_ID(),
+            prefix_on_b: IBC_PREFIX(),
             version: VersionImpl::supported(),
             delay_period: 0,
         }
@@ -45,9 +44,9 @@ pub impl CoreConfigImpl of CoreConfigTrait {
     fn dummy_msg_conn_open_try(self: @CoreConfig) -> MsgConnOpenTry {
         MsgConnOpenTry {
             client_id_on_b: CLIENT_ID(),
-            counterparty: Counterparty {
-                client_id: CLIENT_ID(), connection_id: CONNECTION_ID(0), prefix: IBC_PREFIX(),
-            },
+            client_id_on_a: CLIENT_ID(),
+            conn_id_on_a: CONNECTION_ID(0),
+            prefix_on_a: IBC_PREFIX(),
             version_on_a: VersionImpl::supported(),
             proof_conn_end_on_a: STATE_PROOF(),
             proof_height_on_a: HEIGHT(10),
@@ -56,7 +55,13 @@ pub impl CoreConfigImpl of CoreConfigTrait {
     }
 
     fn dummy_msg_conn_open_ack(self: @CoreConfig) -> MsgConnOpenAck {
-        MsgConnOpenAck {}
+        MsgConnOpenAck {
+            conn_id_on_a: CONNECTION_ID(0),
+            conn_id_on_b: CONNECTION_ID(0),
+            proof_conn_end_on_b: STATE_PROOF(),
+            proof_height_on_b: HEIGHT(10),
+            version: VersionImpl::supported(),
+        }
     }
 
     fn dummy_msg_conn_open_confirm(self: @CoreConfig) -> MsgConnOpenConfirm {

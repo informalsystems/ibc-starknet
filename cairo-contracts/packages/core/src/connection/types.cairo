@@ -72,8 +72,28 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         )
     }
 
+    fn open_with_params(
+        self: ConnectionEnd, counterparty_connection_id: ConnectionId, version: Version,
+    ) -> ConnectionEnd {
+        ConnectionEnd {
+            state: ConnectionState::Open,
+            client_id: self.client_id,
+            counterparty: Counterparty {
+                client_id: self.counterparty.client_id,
+                connection_id: counterparty_connection_id,
+                prefix: self.counterparty.prefix,
+            },
+            version,
+            delay_period: self.delay_period,
+        }
+    }
+
     fn state(self: @ConnectionEnd) -> @ConnectionState {
         self.state
+    }
+
+    fn is_init(self: @ConnectionEnd) -> bool {
+        self.state == @ConnectionState::Init
     }
 
     fn is_zero(self: @ConnectionEnd) -> bool {
