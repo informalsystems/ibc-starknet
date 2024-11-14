@@ -65,7 +65,11 @@ pub impl CoreConfigImpl of CoreConfigTrait {
     }
 
     fn dummy_msg_conn_open_confirm(self: @CoreConfig) -> MsgConnOpenConfirm {
-        MsgConnOpenConfirm {}
+        MsgConnOpenConfirm {
+            conn_id_on_b: CONNECTION_ID(0),
+            proof_conn_end_on_a: STATE_PROOF(),
+            proof_height_on_a: HEIGHT(10),
+        }
     }
 
     fn dummy_msg_chan_open_init(self: @CoreConfig) -> MsgChanOpenInit {

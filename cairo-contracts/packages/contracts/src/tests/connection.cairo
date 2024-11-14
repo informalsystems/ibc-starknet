@@ -113,7 +113,7 @@ fn test_conn_open_ack_ok() {
         .assert_conn_open_ack_event(
             core.address,
             conn_id_on_a.client_id,
-            CONNECTION_ID(0),
+            msg.conn_id_on_a,
             conn_id_on_a.counterparty.client_id,
             conn_id_on_a.counterparty.connection_id,
         );
@@ -125,7 +125,15 @@ fn test_conn_open_confirm_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let (core, _, _, core_cfg, _, _, _) = setup();
+    let (core, _, _, core_cfg, _, _, mut spy) = setup();
+
+    // -----------------------------------------------------------
+    // Connection Open Try
+    // -----------------------------------------------------------
+
+    let msg = core_cfg.dummy_msg_conn_open_try();
+
+    core.conn_open_try(msg);
 
     // -----------------------------------------------------------
     // Connection Open Confirm
@@ -134,4 +142,21 @@ fn test_conn_open_confirm_ok() {
     let msg = core_cfg.dummy_msg_conn_open_confirm();
 
     core.conn_open_confirm(msg.clone());
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    let conn_id_on_b = core.connection_end(msg.conn_id_on_b.clone());
+
+    assert_eq!(conn_id_on_b.state(), @ConnectionState::Open);
+
+    spy
+        .assert_conn_open_confirm_event(
+            core.address,
+            conn_id_on_b.client_id,
+            msg.conn_id_on_b,
+            conn_id_on_b.counterparty.client_id,
+            conn_id_on_b.counterparty.connection_id,
+        );
 }

@@ -1,6 +1,22 @@
+use core::num::traits::Zero;
+
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct PathPrefix {
     pub prefix: ByteArray,
+}
+
+pub impl PathPrefixZero of Zero<PathPrefix> {
+    fn zero() -> PathPrefix {
+        PathPrefix { prefix: "" }
+    }
+
+    fn is_zero(self: @PathPrefix) -> bool {
+        self.prefix.len() == 0
+    }
+
+    fn is_non_zero(self: @PathPrefix) -> bool {
+        !self.is_zero()
+    }
 }
 
 pub fn CLIENTS_PREFIX() -> ByteArray {

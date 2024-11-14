@@ -85,8 +85,16 @@ pub impl MsgConnOpenAckValidateBasic of ValidateBasic<MsgConnOpenAck> {
 }
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
-pub struct MsgConnOpenConfirm {}
+pub struct MsgConnOpenConfirm {
+    pub conn_id_on_b: ConnectionId,
+    pub proof_conn_end_on_a: StateProof,
+    pub proof_height_on_a: Height,
+}
 
 impl MsgConnOpenConfirmValidateBasic of ValidateBasic<MsgConnOpenConfirm> {
-    fn validate_basic(self: @MsgConnOpenConfirm) {}
+    fn validate_basic(self: @MsgConnOpenConfirm) {
+        assert(!self.conn_id_on_b.is_zero(), ConnectionErrors::MISSING_CONNECTION_ID);
+        assert(self.proof_conn_end_on_a.is_non_zero(), ConnectionErrors::EMPTY_CONN_END_PROOF);
+        assert(self.proof_height_on_a.is_non_zero(), ConnectionErrors::ZERO_PROOF_HEIGHT);
+    }
 }

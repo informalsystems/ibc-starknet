@@ -49,7 +49,16 @@ pub mod ConnectionEventEmitterComponent {
     }
 
     #[derive(Debug, Drop, starknet::Event)]
-    pub struct ConnOpenConfirmEvent {}
+    pub struct ConnOpenConfirmEvent {
+        #[key]
+        pub client_id_on_b: ClientId,
+        #[key]
+        pub connection_id_on_b: ConnectionId,
+        #[key]
+        pub client_id_on_a: ClientId,
+        #[key]
+        pub connection_id_on_a: ConnectionId,
+    }
 
     #[generate_trait]
     pub impl ConnectionEventEmitterImpl<
@@ -90,6 +99,21 @@ pub mod ConnectionEventEmitterComponent {
                 .emit(
                     ConnOpenAckEvent {
                         client_id_on_a, connection_id_on_a, client_id_on_b, connection_id_on_b,
+                    }
+                );
+        }
+
+        fn emit_conn_open_confirm_event(
+            ref self: ComponentState<TContractState>,
+            client_id_on_b: ClientId,
+            connection_id_on_b: ConnectionId,
+            client_id_on_a: ClientId,
+            connection_id_on_a: ConnectionId,
+        ) {
+            self
+                .emit(
+                    ConnOpenConfirmEvent {
+                        client_id_on_b, connection_id_on_b, client_id_on_a, connection_id_on_a,
                     }
                 );
         }

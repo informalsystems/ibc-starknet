@@ -1,7 +1,10 @@
 use alexandria_data_structures::span_ext::SpanTraitExt;
 use core::num::traits::Zero;
 use starknet_ibc_core::commitment::{StateValue, StateValueZero};
-use starknet_ibc_core::host::{ClientId, ConnectionId, ConnectionIdZero, PathPrefix};
+use starknet_ibc_core::connection::ConnectionErrors;
+use starknet_ibc_core::host::{
+    ClientId, ClientIdImpl, ClientIdZero, ConnectionId, ConnectionIdZero, PathPrefix, PathPrefixZero
+};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
@@ -37,6 +40,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         }
     }
 
+    /// Initializes a new connection end.
     fn init(
         client_id: ClientId,
         counterparty_client_id: ClientId,
@@ -54,6 +58,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         )
     }
 
+    /// Creates a new connection end in the try open state.
     fn try_open(
         client_id: ClientId,
         counterparty_client_id: ClientId,
@@ -72,7 +77,39 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         )
     }
 
-    fn open_with_params(
+    /// Creates a new connection end in the open state.
+    fn open(
+        client_id: ClientId,
+        counterparty_client_id: ClientId,
+        counterparty_connection_id: ConnectionId,
+        counterparty_prefix: PathPrefix,
+        version: Version,
+        delay_period: u64,
+    ) -> ConnectionEnd {
+        Self::new(
+            ConnectionState::Open,
+            client_id,
+            counterparty_client_id,
+            counterparty_connection_id,
+            counterparty_prefix,
+            version,
+            delay_period,
+        )
+    }
+
+    /// Consumes the connection end and returns a new connection end in the open state.
+    fn to_open(self: ConnectionEnd) -> ConnectionEnd {
+        ConnectionEnd {
+            state: ConnectionState::Open,
+            client_id: self.client_id,
+            counterparty: self.counterparty,
+            version: self.version,
+            delay_period: self.delay_period,
+        }
+    }
+
+    /// Opens the connection with the given counterparty connection ID and version.
+    fn to_open_with_params(
         self: ConnectionEnd, counterparty_connection_id: ConnectionId, version: Version,
     ) -> ConnectionEnd {
         ConnectionEnd {
@@ -88,16 +125,28 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         }
     }
 
+    /// Returns the state of the connection end.
     fn state(self: @ConnectionEnd) -> @ConnectionState {
         self.state
     }
 
+    /// Returns true if the connection is in the init state.
     fn is_init(self: @ConnectionEnd) -> bool {
         self.state == @ConnectionState::Init
     }
 
+    /// Returns true if the connection is in the try open state.
+    fn is_try_open(self: @ConnectionEnd) -> bool {
+        self.state == @ConnectionState::TryOpen
+    }
+
+    /// Returns true if all the fields are in the zero state.
     fn is_zero(self: @ConnectionEnd) -> bool {
         self.state == @ConnectionState::Uninitialized
+            && self.client_id.is_zero()
+            && self.counterparty.is_zero()
+            && self.version.is_zero()
+            && self.delay_period == @0
     }
 }
 
@@ -125,8 +174,30 @@ pub struct Counterparty {
 }
 
 pub impl CounterpartyValidateBasic of ValidateBasic<Counterparty> {
-    fn validate_basic(self: @Counterparty) {}
+    fn validate_basic(self: @Counterparty) {
+        assert(!self.client_id.is_zero(), ConnectionErrors::MISSING_CLIENT_ID);
+        assert(self.connection_id.is_non_zero(), ConnectionErrors::MISSING_CONNECTION_ID);
+    }
 }
+
+pub impl CounterpartyZero of Zero<Counterparty> {
+    fn zero() -> Counterparty {
+        Counterparty {
+            client_id: ClientIdZero::zero(),
+            connection_id: ConnectionIdZero::zero(),
+            prefix: PathPrefixZero::zero(),
+        }
+    }
+
+    fn is_zero(self: @Counterparty) -> bool {
+        self.client_id.is_zero() && self.connection_id.is_zero() && self.prefix.is_zero()
+    }
+
+    fn is_non_zero(self: @Counterparty) -> bool {
+        !self.is_zero()
+    }
+}
+
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Version {
     pub identifier: ByteArray,

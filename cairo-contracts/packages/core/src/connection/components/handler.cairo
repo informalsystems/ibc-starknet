@@ -10,13 +10,13 @@ pub mod ConnectionHandlerComponent {
     use starknet::storage::{Map, Vec, VecTrait, MutableVecTrait};
     use starknet_ibc_core::client::{ClientHandlerComponent, ClientContract, ClientContractTrait};
     use starknet_ibc_core::connection::{
-        ConnectionEventEmitterComponent, IConnectionHandler, IConnectionQuery, MsgConnOpenConfirm,
-        MsgConnOpenInit, MsgConnOpenInitTrait, MsgConnOpenTry, MsgConnOpenTryTrait, MsgConnOpenAck,
-        ConnectionEnd, ConnectionEndTrait, ConnectionErrors
+        ConnectionEventEmitterComponent, IConnectionHandler, IConnectionQuery, MsgConnOpenInit,
+        MsgConnOpenInitTrait, MsgConnOpenTry, MsgConnOpenTryTrait, MsgConnOpenAck,
+        MsgConnOpenConfirm, ConnectionEnd, ConnectionEndTrait, ConnectionErrors
     };
     use starknet_ibc_core::host::{
-        ClientId, ConnectionId, ConnectionIdImpl, connection_path, client_connection_key,
-        connection_end_key
+        ClientId, ConnectionId, ConnectionIdImpl, PathPrefixZero, connection_path,
+        client_connection_key, connection_end_key
     };
     use starknet_ibc_utils::ValidateBasic;
 
@@ -61,7 +61,11 @@ pub mod ConnectionHandlerComponent {
             self.conn_open_ack_execute(conn_end_on_a, msg);
         }
 
-        fn conn_open_confirm(ref self: ComponentState<TContractState>, msg: MsgConnOpenConfirm) {}
+        fn conn_open_confirm(ref self: ComponentState<TContractState>, msg: MsgConnOpenConfirm) {
+            let conn_end_on_b = self.read_connection_end(@msg.conn_id_on_b);
+            self.conn_open_confirm_validate(conn_end_on_b.clone(), msg.clone());
+            self.conn_open_confirm_execute(conn_end_on_b, msg);
+        }
     }
 
     // -----------------------------------------------------------
@@ -241,7 +245,7 @@ pub mod ConnectionHandlerComponent {
             self
                 .write_connection_end(
                     @msg.conn_id_on_a,
-                    conn_end_on_a.clone().open_with_params(msg.conn_id_on_b.clone(), msg.version)
+                    conn_end_on_a.clone().to_open_with_params(msg.conn_id_on_b.clone(), msg.version)
                 );
 
             self
@@ -249,6 +253,66 @@ pub mod ConnectionHandlerComponent {
                     conn_end_on_a.client_id.clone(),
                     msg.conn_id_on_a.clone(),
                     conn_end_on_a.counterparty.client_id.clone(),
+                    msg.conn_id_on_b
+                );
+        }
+    }
+
+    #[generate_trait]
+    pub(crate) impl ConnOpenConfirmImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ConnectionEventEmitterComponent::HasComponent<TContractState>,
+        impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+    > of ConnOpenConfitmTrait<TContractState> {
+        fn conn_open_confirm_validate(
+            self: @ComponentState<TContractState>,
+            conn_end_on_b: ConnectionEnd,
+            msg: MsgConnOpenConfirm
+        ) {
+            msg.validate_basic();
+
+            assert(conn_end_on_b.is_try_open(), ConnectionErrors::INVALID_CONNECTION_STATE);
+
+            let client = self.get_client(conn_end_on_b.client_id.client_type);
+
+            let client_sequence = conn_end_on_b.client_id.sequence;
+
+            client.verify_is_active(client_sequence);
+
+            client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
+
+            let expected_conn_end_on_a = ConnectionEndTrait::open(
+                conn_end_on_b.counterparty.client_id.clone(),
+                conn_end_on_b.client_id.clone(),
+                msg.conn_id_on_b.clone(),
+                PathPrefixZero::zero(),
+                conn_end_on_b.version.clone(),
+                conn_end_on_b.delay_period
+            );
+
+            let path = conn_end_on_b.counterparty.prefix.prefix.clone()
+                + connection_path(conn_end_on_b.counterparty.connection_id.clone());
+
+            client
+                .verify_membership(
+                    client_sequence, path, expected_conn_end_on_a.into(), msg.proof_conn_end_on_a
+                );
+        }
+
+        fn conn_open_confirm_execute(
+            ref self: ComponentState<TContractState>,
+            conn_end_on_b: ConnectionEnd,
+            msg: MsgConnOpenConfirm
+        ) {
+            self.write_connection_end(@msg.conn_id_on_b, conn_end_on_b.clone().to_open(),);
+
+            self
+                .emit_conn_open_confirm_event(
+                    conn_end_on_b.client_id.clone(),
+                    msg.conn_id_on_b.clone(),
+                    conn_end_on_b.counterparty.client_id.clone(),
                     msg.conn_id_on_b
                 );
         }
@@ -406,6 +470,21 @@ pub mod ConnectionHandlerComponent {
             event_emitter
                 .emit_conn_open_ack_event(
                     client_id_on_a, connection_id_on_a, client_id_on_b, connection_id_on_b
+                );
+        }
+
+        fn emit_conn_open_confirm_event(
+            ref self: ComponentState<TContractState>,
+            client_id_on_b: ClientId,
+            connection_id_on_b: ConnectionId,
+            client_id_on_a: ClientId,
+            connection_id_on_a: ConnectionId,
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_conn_open_confirm_event(
+                    client_id_on_b, connection_id_on_b, client_id_on_a, connection_id_on_a
                 );
         }
     }

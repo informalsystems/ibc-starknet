@@ -2,7 +2,7 @@ use core::num::traits::Zero;
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
 use starknet_ibc_core::commitment::{array_u8_into_array_u32, IntoArrayU32};
-use starknet_ibc_core::host::{ClientId, ClientIdTrait, ChannelId, PortId, PortIdTrait, Sequence};
+use starknet_ibc_core::host::{ClientId, ChannelId, PortId, PortIdTrait, Sequence};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -130,7 +130,7 @@ pub impl ChannelEndImpl of ChannelEndTrait {
     }
 
     /// Consumes the channel end and returns a new channel end with the state set to open.
-    fn open(self: ChannelEnd) -> ChannelEnd {
+    fn to_open(self: ChannelEnd) -> ChannelEnd {
         ChannelEnd {
             state: ChannelState::Open,
             ordering: self.ordering,
@@ -141,7 +141,7 @@ pub impl ChannelEndImpl of ChannelEndTrait {
     }
 
     /// Opens the channel end with the given counterparty channel ID and version.
-    fn open_with_params(
+    fn to_open_with_params(
         self: ChannelEnd, couterparty_chan_id: ChannelId, version: AppVersion
     ) -> ChannelEnd {
         ChannelEnd {

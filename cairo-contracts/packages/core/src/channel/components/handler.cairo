@@ -333,7 +333,7 @@ pub mod ChannelHandlerComponent {
                     @msg.chan_id_on_a,
                     chan_end_on_a
                         .clone()
-                        .open_with_params(msg.chan_id_on_b.clone(), msg.version_on_b.clone())
+                        .to_open_with_params(msg.chan_id_on_b.clone(), msg.version_on_b.clone())
                 );
 
             self
@@ -377,7 +377,7 @@ pub mod ChannelHandlerComponent {
 
             self
                 .write_channel_end(
-                    @msg.port_id_on_b, @msg.chan_id_on_b, chan_end_on_b.clone().open()
+                    @msg.port_id_on_b, @msg.chan_id_on_b, chan_end_on_b.clone().to_open()
                 );
 
             self

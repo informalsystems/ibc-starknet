@@ -19,11 +19,21 @@ pub impl ClientIdImpl of ClientIdTrait {
         ClientId { client_type, sequence }
     }
 
+    fn validate(self: @ClientId, client_id_hash: felt252) {}
+}
+
+pub impl ClientIdZero of Zero<ClientId> {
+    fn zero() -> ClientId {
+        ClientId { client_type: 0, sequence: 0 }
+    }
+
     fn is_zero(self: @ClientId) -> bool {
         self.sequence.is_zero() && self.client_type.is_zero()
     }
 
-    fn validate(self: @ClientId, client_id_hash: felt252) {}
+    fn is_non_zero(self: @ClientId) -> bool {
+        !self.is_zero()
+    }
 }
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
