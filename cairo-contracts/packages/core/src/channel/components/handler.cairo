@@ -863,17 +863,10 @@ pub mod ChannelHandlerComponent {
                 counterparty_channel_id
             );
 
-            let root = client
-                .consensus_state_root(client_sequence, proof_height.clone());
+            let root = client.consensus_state_root(client_sequence, proof_height.clone());
 
             client
-                .verify_membership(
-                    client_sequence,
-                    path,
-                    expected_channel_end.into(),
-                    proof,
-                    root
-                );
+                .verify_membership(client_sequence, path, expected_channel_end.into(), proof, root);
         }
 
         /// Verifies if the packet commitment matches the one stored earlier
