@@ -128,10 +128,10 @@ pub mod host {
 
     pub use errors::HostErrors;
     pub use identifiers::{
-        ClientId, ClientIdImpl, ClientIdTrait, ConnectionId, ConnectionIdImpl, ConnectionIdTrait,
-        ConnectionIdZero, ChannelId, ChannelIdImpl, ChannelIdTrait, ChannelIdZero, PortId,
-        PortIdImpl, PortIdTrait, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd,
-        SequenceZero
+        ClientId, ClientIdImpl, ClientIdTrait, ClientIdZero, ConnectionId, ConnectionIdImpl,
+        ConnectionIdTrait, ConnectionIdZero, ChannelId, ChannelIdImpl, ChannelIdTrait,
+        ChannelIdZero, PortId, PortIdImpl, PortIdTrait, Sequence, SequenceImpl, SequenceTrait,
+        SequencePartialOrd, SequenceZero
     };
     pub use keys::{
         client_connection_key, connection_end_key, channel_end_key, commitment_key, receipt_key,
@@ -141,8 +141,8 @@ pub mod host {
         connection_path, commitment_path, receipt_path, ack_path, next_sequence_recv_path
     };
     pub use prefixes::{
-        PathPrefix, CLIENTS_PREFIX, CONNECTIONS_PREFIX, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX,
-        PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX, ACKS_PREFIX, RECEIPTS_PREFIX,
-        NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX, NEXT_SEQ_ACK_PREFIX
+        PathPrefix, PathPrefixZero, CLIENTS_PREFIX, CONNECTIONS_PREFIX, CHANNELS_PREFIX,
+        CHANNEL_ENDS_PREFIX, PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX, ACKS_PREFIX,
+        RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX, NEXT_SEQ_ACK_PREFIX
     };
 }
