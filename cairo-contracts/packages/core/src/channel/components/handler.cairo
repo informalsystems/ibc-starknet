@@ -854,12 +854,6 @@ pub mod ChannelHandlerComponent {
             msg: MsgRecvPacket,
             json_packet_data: ByteArray
         ) {
-            let packet_commitment_on_a = compute_packet_commtiment(
-                @json_packet_data,
-                msg.packet.timeout_height_on_b.clone(),
-                msg.packet.timeout_timestamp_on_b.clone()
-            );
-
             let mut path: ByteArray =
                 "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
 
@@ -871,12 +865,22 @@ pub mod ChannelHandlerComponent {
 
             path.append(@commitment_path);
 
+            let packet_commitment_on_a = compute_packet_commtiment(
+                @json_packet_data,
+                msg.packet.timeout_height_on_b.clone(),
+                msg.packet.timeout_timestamp_on_b.clone()
+            );
+
+            let root_on_a = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_a.clone());
+
             client
                 .verify_membership(
                     client_sequence,
                     path,
                     packet_commitment_on_a.into(),
-                    msg.proof_commitment_on_a.clone()
+                    msg.proof_commitment_on_a.clone(),
+                    root_on_a
                 );
         }
 
@@ -886,8 +890,6 @@ pub mod ChannelHandlerComponent {
             client_sequence: u64,
             msg: MsgAckPacket,
         ) {
-            let ack_commitment_on_a = compute_ack_commitment(msg.acknowledgement.clone());
-
             let mut path: ByteArray =
                 "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
 
@@ -899,9 +901,18 @@ pub mod ChannelHandlerComponent {
 
             path.append(@ack_path);
 
+            let ack_commitment_on_a = compute_ack_commitment(msg.acknowledgement.clone());
+
+            let root_on_b = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
+
             client
                 .verify_membership(
-                    client_sequence, path, ack_commitment_on_a.into(), msg.proof_ack_on_b.clone()
+                    client_sequence,
+                    path,
+                    ack_commitment_on_a.into(),
+                    msg.proof_ack_on_b.clone(),
+                    root_on_b
                 );
         }
 
@@ -922,7 +933,11 @@ pub mod ChannelHandlerComponent {
 
             path.append(@receipt_path_on_b);
 
-            client.verify_non_membership(client_sequence, path, msg.proof_unreceived_on_b,);
+            let root_on_b = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
+
+            client
+                .verify_non_membership(client_sequence, path, msg.proof_unreceived_on_b, root_on_b);
         }
 
         fn verify_next_sequence_recv(
@@ -940,12 +955,16 @@ pub mod ChannelHandlerComponent {
 
             path.append(@seq_recv_path_on_b);
 
+            let root_on_b = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
+
             client
                 .verify_membership(
                     client_sequence,
                     path,
                     msg.packet.seq_on_a.clone().into(),
                     msg.proof_unreceived_on_b,
+                    root_on_b
                 );
         }
     }

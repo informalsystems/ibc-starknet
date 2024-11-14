@@ -153,18 +153,25 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
 
+            let path = msg.prefix_on_a.prefix.clone() + connection_path(msg.conn_id_on_a.clone());
+
             let expected_conn_end_on_a = ConnectionEndTrait::init(
                 msg.client_id_on_a.clone(),
                 msg.client_id_on_b.clone(),
                 msg.prefix_on_a.clone(),
-                msg.delay_period
+                msg.delay_period.clone()
             );
 
-            let path = msg.prefix_on_a.prefix.clone() + connection_path(msg.conn_id_on_a.clone());
+            let root_on_b = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_a.clone());
 
             client
                 .verify_membership(
-                    client_sequence, path, expected_conn_end_on_a.into(), msg.proof_conn_end_on_a
+                    client_sequence,
+                    path,
+                    expected_conn_end_on_a.into(),
+                    msg.proof_conn_end_on_a,
+                    root_on_b
                 );
         }
 
@@ -220,6 +227,9 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
+            let path = conn_end_on_a.counterparty.prefix.prefix.clone()
+                + connection_path(conn_end_on_a.counterparty.connection_id.clone());
+
             let expected_conn_end_on_b = ConnectionEndTrait::try_open(
                 conn_end_on_a.client_id.clone(),
                 conn_end_on_a.counterparty.client_id.clone(),
@@ -228,12 +238,16 @@ pub mod ConnectionHandlerComponent {
                 conn_end_on_a.delay_period
             );
 
-            let path = conn_end_on_a.counterparty.prefix.prefix.clone()
-                + connection_path(conn_end_on_a.counterparty.connection_id.clone());
+            let root_on_a = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
 
             client
                 .verify_membership(
-                    client_sequence, path, expected_conn_end_on_b.into(), msg.proof_conn_end_on_b
+                    client_sequence,
+                    path,
+                    expected_conn_end_on_b.into(),
+                    msg.proof_conn_end_on_b,
+                    root_on_a
                 );
         }
 
@@ -283,6 +297,9 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
 
+            let path = conn_end_on_b.counterparty.prefix.prefix.clone()
+                + connection_path(conn_end_on_b.counterparty.connection_id.clone());
+
             let expected_conn_end_on_a = ConnectionEndTrait::open(
                 conn_end_on_b.counterparty.client_id.clone(),
                 conn_end_on_b.client_id.clone(),
@@ -292,12 +309,16 @@ pub mod ConnectionHandlerComponent {
                 conn_end_on_b.delay_period
             );
 
-            let path = conn_end_on_b.counterparty.prefix.prefix.clone()
-                + connection_path(conn_end_on_b.counterparty.connection_id.clone());
+            let root_on_b = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_a.clone());
 
             client
                 .verify_membership(
-                    client_sequence, path, expected_conn_end_on_a.into(), msg.proof_conn_end_on_a
+                    client_sequence,
+                    path,
+                    expected_conn_end_on_a.into(),
+                    msg.proof_conn_end_on_a,
+                    root_on_b
                 );
         }
 

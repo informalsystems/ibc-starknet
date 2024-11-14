@@ -3,7 +3,7 @@ use starknet_ibc_core::channel::{
     ChannelEnd, ChannelState, ChannelOrdering, Counterparty as ChanCounterparty, AppVersion
 };
 use starknet_ibc_core::client::{Height, Timestamp};
-use starknet_ibc_core::commitment::StateProof;
+use starknet_ibc_core::commitment::{StateProof, StateRoot};
 use starknet_ibc_core::connection::{
     ConnectionEnd, ConnectionState, Counterparty as ConnCounterparty, VersionImpl
 };
@@ -85,6 +85,10 @@ pub fn VERSION_PROPOSAL() -> AppVersion {
 
 pub fn STATE_PROOF() -> StateProof {
     StateProof { proof: array![1] }
+}
+
+pub fn STATE_ROOT() -> StateRoot {
+    StateRoot { root: array![1] }
 }
 
 pub fn IBC_PREFIX() -> PathPrefix {

@@ -1,5 +1,7 @@
 use core::num::traits::Zero;
 use core::sha256::{compute_sha256_byte_array, compute_sha256_u32_array};
+use starknet::SyscallResult;
+use starknet::storage_access::{Store, StorageBaseAddress};
 use starknet_ibc_core::channel::Acknowledgement;
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::commitment::{U32CollectorImpl, IntoArrayU32, array_u32_into_array_u8};
@@ -124,3 +126,86 @@ pub impl StateProofZero of Zero<StateProof> {
     }
 }
 
+// -----------------------------------------------------------
+// State Root
+// -----------------------------------------------------------
+
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
+pub struct StateRoot {
+    pub root: Array<u8>,
+}
+
+pub impl ArrayU8IntoRoot of Into<Array<u8>, StateRoot> {
+    fn into(self: Array<u8>) -> StateRoot {
+        StateRoot { root: self }
+    }
+}
+
+pub impl StateRootZero of Zero<StateRoot> {
+    fn zero() -> StateRoot {
+        StateRoot { root: ArrayTrait::new() }
+    }
+
+    fn is_zero(self: @StateRoot) -> bool {
+        self.root.len() == 0
+    }
+
+    fn is_non_zero(self: @StateRoot) -> bool {
+        self.root.len() > 0
+    }
+}
+
+pub impl StoreStateRoot of Store<StateRoot> {
+    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<StateRoot> {
+        Self::read_at_offset(address_domain, base, 0)
+    }
+
+    fn write(address_domain: u32, base: StorageBaseAddress, value: StateRoot) -> SyscallResult<()> {
+        Self::write_at_offset(address_domain, base, 0, value)
+    }
+
+    fn read_at_offset(
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8
+    ) -> SyscallResult<StateRoot> {
+        let mut arr: Array<u8> = array![];
+
+        let len: u8 = Store::<u8>::read_at_offset(address_domain, base, offset)
+            .expect('Storage Span too large');
+        offset += 1;
+
+        let exit = len + offset;
+        loop {
+            if offset >= exit {
+                break;
+            }
+
+            let value = Store::<u8>::read_at_offset(address_domain, base, offset).unwrap();
+            arr.append(value);
+            offset += Store::<u8>::size();
+        };
+
+        Result::Ok(arr.into())
+    }
+
+    fn write_at_offset(
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: StateRoot
+    ) -> SyscallResult<()> {
+        let len: u8 = value.root.len().try_into().expect('Storage - Span too large');
+        Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();
+        offset += 1;
+
+        while let Option::Some(element) = value.root.pop_front() {
+            Store::<u8>::write_at_offset(address_domain, base, offset, element).unwrap();
+            offset += Store::<u8>::size();
+        };
+
+        Result::Ok(())
+    }
+
+    fn size() -> u8 {
+        32
+            * Store::<
+                u8
+            >::size() // TODO: Keeping it at 32 for now, but should be determined once the membership proof verification is implemented
+    }
+}

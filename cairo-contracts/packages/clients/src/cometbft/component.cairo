@@ -18,7 +18,7 @@ pub mod CometClientComponent {
         CreateResponse, CreateResponseImpl, UpdateResponse, IClientHandler, IClientQuery,
         IClientStateValidation, IClientStateExecution,
     };
-    use starknet_ibc_core::commitment::{StateProof, StateValue};
+    use starknet_ibc_core::commitment::{StateProof, StateValue, StateRoot};
     use starknet_ibc_core::host::ClientIdImpl;
     use starknet_ibc_utils::ValidateBasic;
 
@@ -146,6 +146,12 @@ pub mod CometClientComponent {
 
             consensus_state
         }
+
+        fn consensus_state_root(
+            self: @ComponentState<TContractState>, client_sequence: u64, height: Height
+        ) -> StateRoot {
+            self.read_consensus_state(client_sequence, height).root
+        }
     }
 
     // -----------------------------------------------------------
@@ -255,6 +261,7 @@ pub mod CometClientComponent {
             path: ByteArray,
             value: StateValue,
             proof: StateProof,
+            root: StateRoot,
         ) {}
 
         fn verify_non_membership(
@@ -262,6 +269,7 @@ pub mod CometClientComponent {
             client_sequence: u64,
             path: ByteArray,
             proof: StateProof,
+            root: StateRoot,
         ) {}
 
         fn verify_client_message(
@@ -376,12 +384,6 @@ pub mod CometClientComponent {
     pub(crate) impl ClientInternalImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientInternalTrait<TContractState> {
-        fn _root(self: @ComponentState<TContractState>, client_sequence: u64) -> ByteArray {
-            let latest_height = self.latest_height(client_sequence);
-
-            self.read_consensus_state(client_sequence, latest_height).root
-        }
-
         fn _status(
             self: @ComponentState<TContractState>,
             client_state: CometClientState,
