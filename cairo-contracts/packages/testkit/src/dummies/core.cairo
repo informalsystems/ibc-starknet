@@ -88,7 +88,7 @@ pub fn STATE_PROOF() -> StateProof {
 }
 
 pub fn STATE_ROOT() -> StateRoot {
-    StateRoot { root: array![1] }
+    StateRoot { root: "1" }
 }
 
 pub fn IBC_PREFIX() -> BasePrefix {
