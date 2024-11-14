@@ -30,7 +30,7 @@ pub fn setup() -> (
     // Setup Contracts
     // -----------------------------------------------------------
 
-    let core_cfg = CoreConfigTrait::default();
+    let mut core_cfg = CoreConfigTrait::default();
 
     let mut comet_cfg = CometClientConfigTrait::default();
 
@@ -49,6 +49,12 @@ pub fn setup() -> (
     let msg_create_client = comet_cfg.dummy_msg_create_client();
 
     core.create_client(msg_create_client);
+
+    // -----------------------------------------------------------
+    // Create Connection
+    // -----------------------------------------------------------
+
+    core_cfg.create_connection(@core);
 
     (core, ics20, erc20, core_cfg, comet_cfg, transfer_cfg, spy)
 }

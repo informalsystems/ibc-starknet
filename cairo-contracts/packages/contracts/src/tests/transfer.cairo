@@ -39,6 +39,12 @@ fn test_escrow_unescrow_roundtrip() {
     core.create_client(msg_create_client);
 
     // -----------------------------------------------------------
+    // Create Connection
+    // -----------------------------------------------------------
+
+    core_cfg.create_connection(@core);
+
+    // -----------------------------------------------------------
     // Create Channel
     // -----------------------------------------------------------
 
@@ -123,6 +129,12 @@ fn test_mint_burn_roundtrip() {
 
     // Submit the message and create a client.
     core.create_client(msg_create_client);
+
+    // -----------------------------------------------------------
+    // Create Connection
+    // -----------------------------------------------------------
+
+    core_cfg.create_connection(@core);
 
     // -----------------------------------------------------------
     // Create Channel

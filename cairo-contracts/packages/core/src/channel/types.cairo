@@ -2,7 +2,7 @@ use core::num::traits::Zero;
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
 use starknet_ibc_core::commitment::{array_u8_into_array_u32, IntoArrayU32};
-use starknet_ibc_core::host::{ClientId, ChannelId, PortId, PortIdTrait, Sequence};
+use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId, PortIdTrait, Sequence};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -40,10 +40,7 @@ pub struct ChannelEnd {
     pub state: ChannelState,
     pub ordering: ChannelOrdering,
     pub remote: Counterparty,
-    // TODO: we currently peer each channel end with a client ID, but later once
-    // we decided which IBC protocol to go with, either the current specs,
-    // Eureka or something else, this part should be updated.
-    pub client_id: ClientId,
+    pub connection_id: ConnectionId,
     pub version: AppVersion,
 }
 
@@ -54,14 +51,14 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         ordering: ChannelOrdering,
         counterparty_port_id: PortId,
         counterparty_channel_id: ChannelId,
-        client_id: ClientId,
+        connection_id: ConnectionId,
         version: AppVersion,
     ) -> ChannelEnd {
         ChannelEnd {
             state,
             ordering,
             remote: CounterpartyImpl::new(counterparty_port_id, counterparty_channel_id),
-            client_id,
+            connection_id,
             version,
         }
     }
@@ -71,7 +68,7 @@ pub impl ChannelEndImpl of ChannelEndTrait {
         self.state == @ChannelState::Uninitialized
             && self.ordering == @ChannelOrdering::Unordered
             && self.remote.is_zero()
-            && self.client_id.is_zero()
+            && self.connection_id.is_zero()
     }
 
     /// Returns the state of the channel end.
@@ -135,7 +132,7 @@ pub impl ChannelEndImpl of ChannelEndTrait {
             state: ChannelState::Open,
             ordering: self.ordering,
             remote: self.remote,
-            client_id: self.client_id,
+            connection_id: self.connection_id,
             version: self.version,
         }
     }
@@ -148,7 +145,7 @@ pub impl ChannelEndImpl of ChannelEndTrait {
             state: ChannelState::Open,
             ordering: self.ordering,
             remote: CounterpartyImpl::new(self.remote.port_id, couterparty_chan_id),
-            client_id: self.client_id,
+            connection_id: self.connection_id,
             version: self.version,
         }
     }
@@ -160,7 +157,7 @@ pub impl ChannelEndImpl of ChannelEndTrait {
             state: ChannelState::Closed,
             ordering: self.ordering,
             remote: self.remote,
-            client_id: self.client_id,
+            connection_id: self.connection_id,
             version: self.version,
         }
     }
@@ -181,6 +178,15 @@ pub enum ChannelOrdering {
     #[default]
     Unordered,
     Ordered,
+}
+
+pub impl ChannelOrderingIntoByteArray of Into<ChannelOrdering, ByteArray> {
+    fn into(self: ChannelOrdering) -> ByteArray {
+        match self {
+            ChannelOrdering::Unordered => "ORDER_UNORDERED",
+            ChannelOrdering::Ordered => "ORDER_ORDERED",
+        }
+    }
 }
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]

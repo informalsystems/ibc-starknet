@@ -77,7 +77,7 @@ pub mod ConnectionHandlerComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of IConnectionQuery<ComponentState<TContractState>> {
         fn connection_end(
-            ref self: ComponentState<TContractState>, connection_id: ConnectionId
+            self: @ComponentState<TContractState>, connection_id: ConnectionId
         ) -> ConnectionEnd {
             self.read_connection_end(@connection_id)
         }

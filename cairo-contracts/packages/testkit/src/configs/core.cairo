@@ -12,6 +12,8 @@ use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct CoreConfig {
+    conn_sequence_on_a: u64,
+    conn_sequence_on_b: u64,
     chan_sequence_on_a: u64,
     chan_sequence_on_b: u64,
     channel_ordering: ChannelOrdering,
@@ -21,6 +23,8 @@ pub struct CoreConfig {
 pub impl CoreConfigImpl of CoreConfigTrait {
     fn default() -> CoreConfig {
         CoreConfig {
+            conn_sequence_on_a: 0,
+            conn_sequence_on_b: 0,
             chan_sequence_on_a: 0,
             chan_sequence_on_b: 0,
             channel_ordering: ChannelOrdering::Unordered
@@ -45,7 +49,7 @@ pub impl CoreConfigImpl of CoreConfigTrait {
         MsgConnOpenTry {
             client_id_on_b: CLIENT_ID(),
             client_id_on_a: CLIENT_ID(),
-            conn_id_on_a: CONNECTION_ID(0),
+            conn_id_on_a: CONNECTION_ID(*self.conn_sequence_on_a),
             prefix_on_a: IBC_PREFIX(),
             version_on_a: VersionImpl::supported(),
             proof_conn_end_on_a: STATE_PROOF(),
@@ -56,8 +60,8 @@ pub impl CoreConfigImpl of CoreConfigTrait {
 
     fn dummy_msg_conn_open_ack(self: @CoreConfig) -> MsgConnOpenAck {
         MsgConnOpenAck {
-            conn_id_on_a: CONNECTION_ID(0),
-            conn_id_on_b: CONNECTION_ID(0),
+            conn_id_on_a: CONNECTION_ID(*self.conn_sequence_on_a),
+            conn_id_on_b: CONNECTION_ID(*self.conn_sequence_on_b),
             proof_conn_end_on_b: STATE_PROOF(),
             proof_height_on_b: HEIGHT(10),
             version: VersionImpl::supported(),
@@ -66,7 +70,7 @@ pub impl CoreConfigImpl of CoreConfigTrait {
 
     fn dummy_msg_conn_open_confirm(self: @CoreConfig) -> MsgConnOpenConfirm {
         MsgConnOpenConfirm {
-            conn_id_on_b: CONNECTION_ID(0),
+            conn_id_on_b: CONNECTION_ID(*self.conn_sequence_on_b),
             proof_conn_end_on_a: STATE_PROOF(),
             proof_height_on_a: HEIGHT(10),
         }
@@ -113,6 +117,14 @@ pub impl CoreConfigImpl of CoreConfigTrait {
             proof_chan_end_on_a: STATE_PROOF(),
             proof_height_on_a: HEIGHT(10),
         }
+    }
+
+    fn create_connection(ref self: CoreConfig, core: @CoreContract) {
+        core.conn_open_init(self.dummy_msg_conn_open_init());
+
+        core.conn_open_ack(self.dummy_msg_conn_open_ack());
+
+        self.conn_sequence_on_a += 1;
     }
 
     fn create_channel(ref self: CoreConfig, core: @CoreContract) {

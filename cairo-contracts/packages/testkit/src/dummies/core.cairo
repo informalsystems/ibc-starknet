@@ -74,7 +74,7 @@ pub fn CHANNEL_END(counterparty_channel_sequence: u64) -> ChannelEnd {
         remote: ChanCounterparty {
             port_id: PORT_ID(), channel_id: CHANNEL_ID(counterparty_channel_sequence),
         },
-        client_id: CLIENT_ID(),
+        connection_id: CONNECTION_ID(0),
         version: VERSION_PROPOSAL(),
     }
 }

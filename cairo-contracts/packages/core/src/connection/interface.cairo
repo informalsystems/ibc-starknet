@@ -16,5 +16,5 @@ pub trait IConnectionHandler<TContractState> {
 
 #[starknet::interface]
 pub trait IConnectionQuery<TContractState> {
-    fn connection_end(ref self: TContractState, connection_id: ConnectionId) -> ConnectionEnd;
+    fn connection_end(self: @TContractState, connection_id: ConnectionId) -> ConnectionEnd;
 }

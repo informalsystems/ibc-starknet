@@ -140,6 +140,11 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         self.state == @ConnectionState::TryOpen
     }
 
+    /// Returns true if the connection is in the open state.
+    fn is_open(self: @ConnectionEnd) -> bool {
+        self.state == @ConnectionState::Open
+    }
+
     /// Returns true if all the fields are in the zero state.
     fn is_zero(self: @ConnectionEnd) -> bool {
         self.state == @ConnectionState::Uninitialized
@@ -215,6 +220,10 @@ pub impl VersionImpl of VersionTrait {
         self.identifier == @"1"
             && features_span.contains(@"ORDER_ORDERED")
             && features_span.contains(@"ORDER_UNORDERED")
+    }
+
+    fn is_feature_supported(self: @Version, feature: @ByteArray) -> bool {
+        self.features.span().contains(feature)
     }
 }
 
