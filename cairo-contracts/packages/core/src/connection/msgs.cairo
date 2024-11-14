@@ -3,7 +3,7 @@ use starknet_ibc_core::client::Height;
 use starknet_ibc_core::commitment::StateProof;
 use starknet_ibc_core::connection::ConnectionErrors;
 use starknet_ibc_core::connection::Version;
-use starknet_ibc_core::host::{ClientId, ClientIdImpl, ConnectionId, PathPrefix};
+use starknet_ibc_core::host::{ClientId, ClientIdImpl, ConnectionId, BasePrefix};
 use starknet_ibc_utils::ValidateBasic;
 use super::VersionTrait;
 
@@ -11,7 +11,7 @@ use super::VersionTrait;
 pub struct MsgConnOpenInit {
     pub client_id_on_a: ClientId,
     pub client_id_on_b: ClientId,
-    pub prefix_on_b: PathPrefix,
+    pub prefix_on_b: BasePrefix,
     pub version: Version,
     pub delay_period: u64,
 }
@@ -38,7 +38,7 @@ pub struct MsgConnOpenTry {
     pub client_id_on_b: ClientId,
     pub client_id_on_a: ClientId,
     pub conn_id_on_a: ConnectionId,
-    pub prefix_on_a: PathPrefix,
+    pub prefix_on_a: BasePrefix,
     pub version_on_a: Version,
     pub proof_conn_end_on_a: StateProof,
     pub proof_height_on_a: Height,

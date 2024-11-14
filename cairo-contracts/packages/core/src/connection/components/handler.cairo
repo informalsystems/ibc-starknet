@@ -15,7 +15,7 @@ pub mod ConnectionHandlerComponent {
         MsgConnOpenConfirm, ConnectionEnd, ConnectionEndTrait, ConnectionErrors
     };
     use starknet_ibc_core::host::{
-        ClientId, ConnectionId, ConnectionIdImpl, PathPrefixZero, connection_path,
+        ClientId, ConnectionId, ConnectionIdImpl, BasePrefixZero, connection_path,
         client_connection_key, connection_end_key
     };
     use starknet_ibc_utils::ValidateBasic;
@@ -153,7 +153,7 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
 
-            let path = msg.prefix_on_a.prefix.clone() + connection_path(msg.conn_id_on_a.clone());
+            let path = connection_path(msg.prefix_on_a.clone(), msg.conn_id_on_a.clone());
 
             let expected_conn_end_on_a = ConnectionEndTrait::init(
                 msg.client_id_on_a.clone(),
@@ -227,8 +227,10 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
-            let path = conn_end_on_a.counterparty.prefix.prefix.clone()
-                + connection_path(conn_end_on_a.counterparty.connection_id.clone());
+            let path = connection_path(
+                conn_end_on_a.counterparty.prefix.clone(),
+                conn_end_on_a.counterparty.connection_id.clone()
+            );
 
             let expected_conn_end_on_b = ConnectionEndTrait::try_open(
                 conn_end_on_a.client_id.clone(),
@@ -297,14 +299,15 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
 
-            let path = conn_end_on_b.counterparty.prefix.prefix.clone()
-                + connection_path(conn_end_on_b.counterparty.connection_id.clone());
+            let path = connection_path(
+                conn_end_on_b.counterparty.prefix, conn_end_on_b.counterparty.connection_id.clone()
+            );
 
             let expected_conn_end_on_a = ConnectionEndTrait::open(
                 conn_end_on_b.counterparty.client_id.clone(),
                 conn_end_on_b.client_id.clone(),
                 msg.conn_id_on_b.clone(),
-                PathPrefixZero::zero(),
+                BasePrefixZero::zero(),
                 conn_end_on_b.version.clone(),
                 conn_end_on_b.delay_period
             );

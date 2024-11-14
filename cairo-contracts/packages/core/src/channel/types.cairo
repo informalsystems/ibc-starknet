@@ -1,8 +1,12 @@
 use core::num::traits::Zero;
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
-use starknet_ibc_core::commitment::{array_u8_into_array_u32, IntoArrayU32};
-use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId, PortIdTrait, Sequence};
+use starknet_ibc_core::commitment::{
+    array_u8_into_array_u32, IntoArrayU32, StateValueZero, StateValue
+};
+use starknet_ibc_core::host::{
+    ConnectionId, ChannelId, ChannelIdZero, PortId, PortIdTrait, Sequence
+};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -56,6 +60,53 @@ pub impl ChannelEndImpl of ChannelEndTrait {
     ) -> ChannelEnd {
         ChannelEnd {
             state,
+            ordering,
+            remote: CounterpartyImpl::new(counterparty_port_id, counterparty_channel_id),
+            connection_id,
+            version,
+        }
+    }
+
+    fn init(
+        ordering: ChannelOrdering,
+        counterparty_port_id: PortId,
+        connection_id: ConnectionId,
+        version: AppVersion,
+    ) -> ChannelEnd {
+        ChannelEnd {
+            state: ChannelState::Init,
+            ordering,
+            remote: CounterpartyImpl::new(counterparty_port_id, ChannelIdZero::zero()),
+            connection_id,
+            version,
+        }
+    }
+
+    fn try_open(
+        ordering: ChannelOrdering,
+        counterparty_port_id: PortId,
+        counterparty_channel_id: ChannelId,
+        connection_id: ConnectionId,
+        version: AppVersion,
+    ) -> ChannelEnd {
+        ChannelEnd {
+            state: ChannelState::TryOpen,
+            ordering,
+            remote: CounterpartyImpl::new(counterparty_port_id, counterparty_channel_id),
+            connection_id,
+            version,
+        }
+    }
+
+    fn open(
+        ordering: ChannelOrdering,
+        counterparty_port_id: PortId,
+        counterparty_channel_id: ChannelId,
+        connection_id: ConnectionId,
+        version: AppVersion,
+    ) -> ChannelEnd {
+        ChannelEnd {
+            state: ChannelState::Open,
             ordering,
             remote: CounterpartyImpl::new(counterparty_port_id, counterparty_channel_id),
             connection_id,
@@ -160,6 +211,13 @@ pub impl ChannelEndImpl of ChannelEndTrait {
             connection_id: self.connection_id,
             version: self.version,
         }
+    }
+}
+
+pub impl ChannelEndIntoStateValue of Into<ChannelEnd, StateValue> {
+    fn into(self: ChannelEnd) -> StateValue {
+        // TODO: Implement once membership proof verification is implemented.
+        StateValueZero::zero()
     }
 }
 

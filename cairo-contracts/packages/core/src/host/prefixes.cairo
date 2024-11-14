@@ -1,21 +1,27 @@
 use core::num::traits::Zero;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
-pub struct PathPrefix {
+pub struct BasePrefix {
     pub prefix: ByteArray,
 }
 
-pub impl PathPrefixZero of Zero<PathPrefix> {
-    fn zero() -> PathPrefix {
-        PathPrefix { prefix: "" }
+pub impl BasePrefixZero of Zero<BasePrefix> {
+    fn zero() -> BasePrefix {
+        BasePrefix { prefix: "" }
     }
 
-    fn is_zero(self: @PathPrefix) -> bool {
+    fn is_zero(self: @BasePrefix) -> bool {
         self.prefix.len() == 0
     }
 
-    fn is_non_zero(self: @PathPrefix) -> bool {
+    fn is_non_zero(self: @BasePrefix) -> bool {
         !self.is_zero()
+    }
+}
+
+pub impl BasePrefixIntoByteArray of Into<BasePrefix, ByteArray> {
+    fn into(self: BasePrefix) -> ByteArray {
+        self.prefix
     }
 }
 
