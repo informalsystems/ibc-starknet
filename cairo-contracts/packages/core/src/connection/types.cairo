@@ -77,6 +77,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         )
     }
 
+    /// Creates a new connection end in the open state.
     fn open(
         client_id: ClientId,
         counterparty_client_id: ClientId,
