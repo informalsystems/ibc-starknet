@@ -1,13 +1,9 @@
-use openzeppelin_testing::events::EventSpyExt;
-use snforge_std::spy_events;
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_testkit::configs::{
-    CoreConfigTrait, TransferAppConfigTrait, CometClientConfigTrait
-};
+use starknet_ibc_testkit::configs::TransferAppConfigTrait;
 use starknet_ibc_testkit::dummies::{NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET};
 use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
 use starknet_ibc_testkit::handles::{AppHandle, CoreHandle, ERC20Handle};
-use starknet_ibc_testkit::setup::SetupImpl;
+use starknet_ibc_testkit::setup::{setup, Mode};
 use starknet_ibc_utils::ComputeKey;
 
 #[test]
@@ -16,39 +12,7 @@ fn test_escrow_unescrow_roundtrip() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let mut core_cfg = CoreConfigTrait::default();
-
-    let mut comet_cfg = CometClientConfigTrait::default();
-
-    let mut transfer_cfg = TransferAppConfigTrait::default();
-
-    let (core, ics20, mut erc20) = SetupImpl::setup_full("IBCCore", "CometClient", "TransferApp");
-
-    transfer_cfg.set_native_denom(erc20.address);
-
-    let mut spy = spy_events();
-
-    // -----------------------------------------------------------
-    // Create Client
-    // -----------------------------------------------------------
-
-    // Create a `MsgCreateClient` message.
-    let msg_create_client = comet_cfg.dummy_msg_create_client();
-
-    // Submit the message and create a client.
-    core.create_client(msg_create_client);
-
-    // -----------------------------------------------------------
-    // Create Connection
-    // -----------------------------------------------------------
-
-    core_cfg.create_connection(@core);
-
-    // -----------------------------------------------------------
-    // Create Channel
-    // -----------------------------------------------------------
-
-    core_cfg.create_channel(@core);
+    let (core, ics20, mut erc20, _, _, transfer_cfg, mut spy) = setup(Mode::WithChannel);
 
     // -----------------------------------------------------------
     // Escrow
@@ -83,8 +47,6 @@ fn test_escrow_unescrow_roundtrip() {
     // Unescrow
     // -----------------------------------------------------------
 
-    spy.drop_all_events();
-
     let prefixed_denom = transfer_cfg.prefix_native_denom();
 
     let msg_recv_packet = transfer_cfg
@@ -110,37 +72,7 @@ fn test_mint_burn_roundtrip() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let mut core_cfg = CoreConfigTrait::default();
-
-    let mut comet_cfg = CometClientConfigTrait::default();
-
-    let mut transfer_cfg = TransferAppConfigTrait::default();
-
-    let (core, ics20, _) = SetupImpl::setup_full("IBCCore", "CometClient", "TransferApp");
-
-    let mut spy = spy_events();
-
-    // -----------------------------------------------------------
-    // Create Client
-    // -----------------------------------------------------------
-
-    // Create a `MsgCreateClient` message.
-    let msg_create_client = comet_cfg.dummy_msg_create_client();
-
-    // Submit the message and create a client.
-    core.create_client(msg_create_client);
-
-    // -----------------------------------------------------------
-    // Create Connection
-    // -----------------------------------------------------------
-
-    core_cfg.create_connection(@core);
-
-    // -----------------------------------------------------------
-    // Create Channel
-    // -----------------------------------------------------------
-
-    core_cfg.create_channel(@core);
+    let (core, ics20, _, _, _, transfer_cfg, mut spy) = setup(Mode::WithChannel);
 
     // -----------------------------------------------------------
     // Mint
@@ -179,8 +111,6 @@ fn test_mint_burn_roundtrip() {
     // -----------------------------------------------------------
     // Burn
     // -----------------------------------------------------------
-
-    spy.drop_all_events();
 
     let msg_transfer = transfer_cfg
         .dummy_msg_transfer(prefixed_denom.clone(), STARKNET(), COSMOS());

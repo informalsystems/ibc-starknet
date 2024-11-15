@@ -3,10 +3,15 @@ use snforge_std::{
     start_cheat_caller_address, start_cheat_block_timestamp_global, start_cheat_block_number_global,
     ContractClass
 };
+use snforge_std::{spy_events, EventSpy};
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::{ERC20Contract, TRANSFER_PORT_ID};
 use starknet_ibc_core::client::ClientContract;
 use starknet_ibc_core::router::AppContract;
+use starknet_ibc_testkit::configs::{
+    TransferAppConfig, TransferAppConfigTrait, CoreConfig, CoreConfigTrait, CometClientConfig,
+    CometClientConfigTrait
+};
 use starknet_ibc_testkit::dummies::{OWNER, CLIENT_TYPE};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle, AppHandle, ERC20Handle, ClientHandle};
 
@@ -112,4 +117,52 @@ pub impl SetupImpl of SetupTrait {
 
         (core, ics20, erc20)
     }
+}
+
+#[derive(Drop)]
+pub enum Mode {
+    NoClient,
+    WithClient,
+    WithConnection,
+    WithChannel,
+}
+
+pub fn setup(
+    kind: Mode
+) -> (
+    CoreContract,
+    AppContract,
+    ERC20Contract,
+    CoreConfig,
+    CometClientConfig,
+    TransferAppConfig,
+    EventSpy
+) {
+    let mut core_cfg = CoreConfigTrait::default();
+
+    let comet_cfg = CometClientConfigTrait::default();
+
+    let mut transfer_cfg = TransferAppConfigTrait::default();
+
+    let (core, ics20, erc20) = SetupImpl::setup_full("IBCCore", "CometClient", "TransferApp");
+
+    transfer_cfg.set_native_denom(erc20.address);
+
+    let spy = spy_events();
+
+    match kind {
+        Mode::NoClient => {},
+        Mode::WithClient => { comet_cfg.create_client(@core); },
+        Mode::WithConnection => {
+            comet_cfg.create_client(@core);
+            core_cfg.create_connection(@core);
+        },
+        Mode::WithChannel => {
+            comet_cfg.create_client(@core);
+            core_cfg.create_connection(@core);
+            core_cfg.create_channel(@core);
+        }
+    }
+
+    (core, ics20, erc20, core_cfg, comet_cfg, transfer_cfg, spy)
 }
