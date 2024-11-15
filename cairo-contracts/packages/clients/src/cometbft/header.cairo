@@ -1,5 +1,6 @@
 use starknet_ibc_clients::cometbft::{CometErrors, CometConsensusState};
 use starknet_ibc_core::client::{Height, U64IntoTimestamp};
+use starknet_ibc_core::commitment::StateRoot;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct CometHeader {
@@ -24,7 +25,7 @@ pub impl CometHeaderImpl of CometHeaderTrait {
 pub struct SignedHeader {
     pub height: Height,
     pub time: u64,
-    pub root: ByteArray,
+    pub root: StateRoot,
 }
 
 pub impl CometHeaderIntoConsensusState of Into<CometHeader, CometConsensusState> {

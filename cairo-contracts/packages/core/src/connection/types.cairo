@@ -3,7 +3,7 @@ use core::num::traits::Zero;
 use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::connection::ConnectionErrors;
 use starknet_ibc_core::host::{
-    ClientId, ClientIdImpl, ClientIdZero, ConnectionId, ConnectionIdZero, PathPrefix, PathPrefixZero
+    ClientId, ClientIdImpl, ClientIdZero, ConnectionId, ConnectionIdZero, BasePrefix, BasePrefixZero
 };
 use starknet_ibc_utils::ValidateBasic;
 
@@ -23,7 +23,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         client_id: ClientId,
         counterparty_client_id: ClientId,
         counterparty_connection_id: ConnectionId,
-        counterparty_prefix: PathPrefix,
+        counterparty_prefix: BasePrefix,
         version: Version,
         delay_period: u64,
     ) -> ConnectionEnd {
@@ -44,7 +44,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
     fn init(
         client_id: ClientId,
         counterparty_client_id: ClientId,
-        counterparty_prefix: PathPrefix,
+        counterparty_prefix: BasePrefix,
         delay_period: u64,
     ) -> ConnectionEnd {
         Self::new(
@@ -63,7 +63,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         client_id: ClientId,
         counterparty_client_id: ClientId,
         counterparty_connection_id: ConnectionId,
-        counterparty_prefix: PathPrefix,
+        counterparty_prefix: BasePrefix,
         delay_period: u64,
     ) -> ConnectionEnd {
         Self::new(
@@ -82,7 +82,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         client_id: ClientId,
         counterparty_client_id: ClientId,
         counterparty_connection_id: ConnectionId,
-        counterparty_prefix: PathPrefix,
+        counterparty_prefix: BasePrefix,
         version: Version,
         delay_period: u64,
     ) -> ConnectionEnd {
@@ -140,6 +140,11 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         self.state == @ConnectionState::TryOpen
     }
 
+    /// Returns true if the connection is in the open state.
+    fn is_open(self: @ConnectionEnd) -> bool {
+        self.state == @ConnectionState::Open
+    }
+
     /// Returns true if all the fields are in the zero state.
     fn is_zero(self: @ConnectionEnd) -> bool {
         self.state == @ConnectionState::Uninitialized
@@ -170,7 +175,7 @@ pub enum ConnectionState {
 pub struct Counterparty {
     pub client_id: ClientId,
     pub connection_id: ConnectionId,
-    pub prefix: PathPrefix,
+    pub prefix: BasePrefix,
 }
 
 pub impl CounterpartyValidateBasic of ValidateBasic<Counterparty> {
@@ -185,7 +190,7 @@ pub impl CounterpartyZero of Zero<Counterparty> {
         Counterparty {
             client_id: ClientIdZero::zero(),
             connection_id: ConnectionIdZero::zero(),
-            prefix: PathPrefixZero::zero(),
+            prefix: BasePrefixZero::zero(),
         }
     }
 
@@ -215,6 +220,10 @@ pub impl VersionImpl of VersionTrait {
         self.identifier == @"1"
             && features_span.contains(@"ORDER_ORDERED")
             && features_span.contains(@"ORDER_UNORDERED")
+    }
+
+    fn is_feature_supported(self: @Version, feature: @ByteArray) -> bool {
+        self.features.span().contains(feature)
     }
 }
 

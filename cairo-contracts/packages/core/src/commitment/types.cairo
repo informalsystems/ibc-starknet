@@ -124,3 +124,31 @@ pub impl StateProofZero of Zero<StateProof> {
     }
 }
 
+// -----------------------------------------------------------
+// State Root
+// -----------------------------------------------------------
+
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+pub struct StateRoot {
+    pub root: ByteArray, // TODO: Determine the correct type (ByteArray or Array<u8>) once implemented membership proof verification.
+}
+
+pub impl ByteArrayIntoRoot of Into<ByteArray, StateRoot> {
+    fn into(self: ByteArray) -> StateRoot {
+        StateRoot { root: self }
+    }
+}
+
+pub impl StateRootZero of Zero<StateRoot> {
+    fn zero() -> StateRoot {
+        StateRoot { root: "" }
+    }
+
+    fn is_zero(self: @StateRoot) -> bool {
+        self.root.len() == 0
+    }
+
+    fn is_non_zero(self: @StateRoot) -> bool {
+        self.root.len() > 0
+    }
+}

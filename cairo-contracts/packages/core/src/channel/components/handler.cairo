@@ -1,9 +1,8 @@
-use starknet_ibc_core::host::{SequencePartialOrd, SequenceZero};
-
 #[starknet::component]
 pub mod ChannelHandlerComponent {
     use ChannelEventEmitterComponent::ChannelEventEmitterTrait;
     use ClientHandlerComponent::ClientInternalTrait;
+    use ConnectionHandlerComponent::CoreConnectionQuery;
     use RouterHandlerComponent::RouterInternalTrait;
     use core::num::traits::Zero;
     use starknet::storage::Map;
@@ -15,21 +14,25 @@ pub mod ChannelHandlerComponent {
     use starknet_ibc_core::channel::{
         ChannelEventEmitterComponent, IChannelHandler, IChannelQuery, MsgChanOpenInit,
         MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket, MsgAckPacket,
-        MsgTimeoutPacket, ChannelEnd, ChannelEndTrait, ChannelState, ChannelErrors, PacketTrait,
-        ChannelOrdering, AppVersion, Receipt, ReceiptTrait, Packet, Acknowledgement
+        MsgTimeoutPacket, ChannelEnd, ChannelEndTrait, ChannelErrors, PacketTrait, ChannelOrdering,
+        AppVersion, Receipt, ReceiptTrait, Packet, Acknowledgement
     };
     use starknet_ibc_core::client::{
-        ClientHandlerComponent, ClientContract, ClientContractTrait, HeightImpl
+        ClientHandlerComponent, ClientContract, ClientContractTrait, Height, HeightImpl
     };
     use starknet_ibc_core::commitment::{
-        Commitment, CommitmentZero, compute_packet_commtiment, compute_ack_commitment
+        StateProof, Commitment, CommitmentZero, compute_packet_commtiment, compute_ack_commitment
+    };
+    use starknet_ibc_core::connection::{
+        ConnectionHandlerComponent, ConnectionEnd, ConnectionEndTrait, VersionTrait,
+        ConnectionErrors
     };
     use starknet_ibc_core::host::{
-        ClientIdImpl, ConnectionId, ChannelId, ChannelIdImpl, ChannelIdZero, PortId, Sequence,
-        SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero, channel_end_key,
-        commitment_key, receipt_key, ack_key, commitment_path, ack_path, receipt_path,
-        next_sequence_recv_path, next_sequence_recv_key, next_sequence_send_key,
-        next_sequence_ack_key
+        ClientIdImpl, ConnectionId, ConnectionIdZero, ChannelId, ChannelIdImpl, ChannelIdZero,
+        PortId, Sequence, SequenceImpl, SequenceTrait, SequencePartialOrd, SequenceZero,
+        channel_end_key, commitment_key, receipt_key, ack_key, channel_end_path, commitment_path,
+        ack_path, receipt_path, next_sequence_recv_path, next_sequence_recv_key,
+        next_sequence_send_key, next_sequence_ack_key
     };
     use starknet_ibc_core::router::{RouterHandlerComponent, AppContractTrait, AppContract};
     use starknet_ibc_utils::ValidateBasic;
@@ -61,6 +64,7 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
         fn chan_open_init(ref self: ComponentState<TContractState>, msg: MsgChanOpenInit) {
@@ -180,12 +184,27 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChanOpenInitTrait<TContractState> {
         fn chan_open_init_validate(
             self: @ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenInit
         ) {
             msg.validate_basic();
+
+            let conn_end_on_a = self.get_connection(msg.conn_id_on_a);
+
+            // NOTE: Not needed check if the connection end is OPEN. Optimistic
+            // channel handshake is allowed.
+
+            assert(
+                conn_end_on_a.version.is_feature_supported(@msg.ordering.into()),
+                ChannelErrors::UNSUPPORTED_ORDERING
+            );
+
+            let client = self.get_client(conn_end_on_a.client_id.client_type);
+
+            client.verify_is_active(conn_end_on_a.client_id.sequence);
         }
 
         fn chan_open_init_execute(
@@ -205,14 +224,10 @@ pub mod ChannelHandlerComponent {
                     msg.ordering
                 );
 
-            let chan_end_on_a = ChannelEndTrait::new(
-                ChannelState::Init,
+            let chan_end_on_a = ChannelEndTrait::init(
                 msg.ordering,
                 msg.port_id_on_b.clone(),
-                ChannelIdZero::zero(),
-                ClientIdImpl::new(
-                    '07-cometbft', 0
-                ), // TODO: replace with connection id once connection handshake is implemented.
+                msg.conn_id_on_a.clone(),
                 msg.version_proposal.clone()
             );
 
@@ -244,12 +259,43 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChanOpenTryTrait<TContractState> {
         fn chan_open_try_validate(
             self: @ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenTry
         ) {
             msg.validate_basic();
+
+            let conn_end_on_b = self.get_connection(msg.conn_id_on_b);
+
+            assert(conn_end_on_b.is_open(), ConnectionErrors::INVALID_CONNECTION_STATE);
+
+            assert(
+                conn_end_on_b.version.is_feature_supported(@msg.ordering.into()),
+                ChannelErrors::UNSUPPORTED_ORDERING
+            );
+
+            let client = self.get_client(conn_end_on_b.client_id.client_type);
+
+            client.verify_is_active(conn_end_on_b.client_id.sequence);
+
+            let expected_chan_end_on_a = ChannelEndTrait::init(
+                msg.ordering,
+                msg.port_id_on_b.clone(),
+                conn_end_on_b.counterparty.connection_id.clone(),
+                msg.version_on_a.clone()
+            );
+
+            self
+                .verify_channel_end(
+                    @client,
+                    conn_end_on_b,
+                    msg.chan_id_on_a.clone(),
+                    expected_chan_end_on_a,
+                    msg.proof_chan_end_on_a,
+                    msg.proof_height_on_a
+                );
         }
 
         fn chan_open_try_execute(
@@ -269,12 +315,11 @@ pub mod ChannelHandlerComponent {
                     msg.ordering
                 );
 
-            let chan_end_on_b = ChannelEndTrait::new(
-                ChannelState::TryOpen,
+            let chan_end_on_b = ChannelEndTrait::try_open(
                 msg.ordering,
                 msg.port_id_on_a.clone(),
                 msg.chan_id_on_a.clone(),
-                ClientIdImpl::new('07-cometbft', 0),
+                msg.conn_id_on_b.clone(),
                 msg.version_on_a.clone()
             );
 
@@ -307,6 +352,7 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChanOpenAckTrait<TContractState> {
         fn chan_open_ack_validate(
@@ -315,6 +361,32 @@ pub mod ChannelHandlerComponent {
             msg.validate_basic();
 
             assert(chan_en_on_a.is_init(), ChannelErrors::INVALID_CHANNEL_STATE);
+
+            let conn_end_on_a = self.get_connection(chan_en_on_a.connection_id);
+
+            assert(conn_end_on_a.is_open(), ConnectionErrors::INVALID_CONNECTION_STATE);
+
+            let client = self.get_client(conn_end_on_a.client_id.client_type);
+
+            client.verify_is_active(conn_end_on_a.client_id.sequence);
+
+            let expected_chan_end_on_b = ChannelEndTrait::try_open(
+                chan_en_on_a.ordering.clone(),
+                msg.port_id_on_a.clone(),
+                msg.chan_id_on_a.clone(),
+                conn_end_on_a.counterparty.connection_id.clone(),
+                msg.version_on_b.clone()
+            );
+
+            self
+                .verify_channel_end(
+                    @client,
+                    conn_end_on_a,
+                    msg.chan_id_on_b.clone(),
+                    expected_chan_end_on_b,
+                    msg.proof_chan_end_on_b,
+                    msg.proof_height_on_b
+                );
         }
 
         fn chan_open_ack_execute(
@@ -342,7 +414,7 @@ pub mod ChannelHandlerComponent {
                     msg.chan_id_on_a,
                     chan_end_on_a.counterparty_port_id().clone(),
                     msg.chan_id_on_b,
-                    ConnectionId { connection_id: "connection-0" }
+                    chan_end_on_a.connection_id,
                 );
         }
     }
@@ -354,6 +426,7 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChanOpenConfirmTrait<TContractState> {
         fn chan_open_confirm_validate(
@@ -364,6 +437,32 @@ pub mod ChannelHandlerComponent {
             msg.validate_basic();
 
             assert(chan_end_on_b.is_try_open(), ChannelErrors::INVALID_CHANNEL_STATE);
+
+            let conn_end_on_b = self.get_connection(chan_end_on_b.connection_id.clone());
+
+            assert(conn_end_on_b.is_open(), ConnectionErrors::INVALID_CONNECTION_STATE);
+
+            let client = self.get_client(conn_end_on_b.client_id.client_type);
+
+            client.verify_is_active(conn_end_on_b.client_id.sequence);
+
+            let expected_chan_end_on_a = ChannelEndTrait::open(
+                chan_end_on_b.ordering.clone(),
+                msg.port_id_on_b.clone(),
+                msg.chan_id_on_b.clone(),
+                conn_end_on_b.counterparty.connection_id.clone(),
+                chan_end_on_b.version.clone()
+            );
+
+            self
+                .verify_channel_end(
+                    @client,
+                    conn_end_on_b.clone(),
+                    chan_end_on_b.counterparty_channel_id().clone(),
+                    expected_chan_end_on_a,
+                    msg.proof_chan_end_on_a,
+                    msg.proof_height_on_a
+                );
         }
 
         fn chan_open_confirm_execute(
@@ -384,7 +483,7 @@ pub mod ChannelHandlerComponent {
                 .emit_chan_open_confirm_event(
                     chan_end_on_b.counterparty_port_id().clone(),
                     chan_end_on_b.counterparty_channel_id().clone(),
-                    ConnectionId { connection_id: "connection-0" },
+                    chan_end_on_b.connection_id,
                     msg
                 );
         }
@@ -397,6 +496,7 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of SendPacketTrait<TContractState> {
         fn send_packet_validate(
@@ -408,11 +508,11 @@ pub mod ChannelHandlerComponent {
 
             chan_end_on_a.validate(@packet.port_id_on_b, @packet.chan_id_on_b);
 
-            // TODO: verify connection end if we ever decide to implement ICS-03
+            let conn_end_on_a = self.get_connection(chan_end_on_a.connection_id);
 
-            let client = self.get_client(chan_end_on_a.client_id.client_type);
+            let client = self.get_client(conn_end_on_a.client_id.client_type);
 
-            let client_sequence = chan_end_on_a.client_id.sequence;
+            let client_sequence = conn_end_on_a.client_id.sequence;
 
             client.verify_is_active(client_sequence);
 
@@ -468,14 +568,13 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of RecvPacketTrait<TContractState> {
         fn recv_packet_validate(
             self: @ComponentState<TContractState>, msg: MsgRecvPacket, chan_end_on_b: ChannelEnd
         ) {
             msg.validate_basic();
-
-            // TODO: verify connection end if we ever decide to implement ICS-03
 
             chan_end_on_b.validate(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
 
@@ -488,19 +587,17 @@ pub mod ChannelHandlerComponent {
                 ChannelErrors::TIMED_OUT_PACKET
             );
 
-            let client = self.get_client(chan_end_on_b.client_id.client_type);
+            let conn_end_on_a = self.get_connection(chan_end_on_b.connection_id);
 
-            let client_sequence = chan_end_on_b.client_id.sequence;
+            let client = self.get_client(conn_end_on_a.client_id.client_type);
 
-            client.verify_is_active(client_sequence);
-
-            client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
+            client.verify_is_active(conn_end_on_a.client_id.sequence);
 
             let app = self.get_app(@msg.packet.port_id_on_a);
 
             let json_packet_data = app.json_packet_data(msg.packet.data.clone());
 
-            self.verify_packet_commitment(@client, client_sequence, msg.clone(), json_packet_data);
+            self.verify_packet_commitment(@client, conn_end_on_a, msg.clone(), json_packet_data);
 
             match @chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
@@ -594,6 +691,7 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of AckPacketTrait<TContractState> {
         fn ack_packet_validate(
@@ -601,11 +699,15 @@ pub mod ChannelHandlerComponent {
         ) {
             msg.validate_basic();
 
-            // TODO: verify connection end if we ever decide to implement ICS-03
-
             let packet = @msg.packet;
 
             chan_end_on_a.validate(packet.port_id_on_a, packet.chan_id_on_a);
+
+            let conn_end_on_a = self.get_connection(chan_end_on_a.connection_id.clone());
+
+            let client = self.get_client(conn_end_on_a.client_id.client_type);
+
+            client.verify_is_active(conn_end_on_a.client_id.sequence);
 
             let app = self.get_app(packet.port_id_on_a);
 
@@ -617,15 +719,7 @@ pub mod ChannelHandlerComponent {
                 self.verify_ack_sequence_matches(packet);
             }
 
-            let client = self.get_client(chan_end_on_a.client_id.client_type);
-
-            let client_sequence = chan_end_on_a.client_id.sequence;
-
-            client.verify_is_active(client_sequence);
-
-            client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
-
-            self.verify_packet_acknowledgement(@client, client_sequence, msg);
+            self.verify_packet_acknowledgement(@client, conn_end_on_a, msg);
         }
 
         fn ack_packet_execute(
@@ -660,6 +754,7 @@ pub mod ChannelHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ChannelEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of TimeoutPacketTrait<TContractState> {
         fn timeout_packet_validate(
@@ -671,21 +766,19 @@ pub mod ChannelHandlerComponent {
 
             chan_end_on_a.validate(@packet.port_id_on_b, @packet.chan_id_on_b);
 
-            // TODO: verify connection end if we ever decide to implement ICS-03
+            let conn_end_on_a = self.get_connection(chan_end_on_a.connection_id);
+
+            let client = self.get_client(conn_end_on_a.client_id.client_type);
+
+            let client_sequence = conn_end_on_a.client_id.sequence;
+
+            client.verify_is_active(client_sequence);
 
             let app = self.get_app(@packet.port_id_on_a);
 
             let json_packet_data = app.json_packet_data(packet.data.clone());
 
             self.verify_packet_commitment_matches(@packet, @json_packet_data);
-
-            let client = self.get_client(chan_end_on_a.client_id.client_type);
-
-            let client_sequence = chan_end_on_a.client_id.sequence;
-
-            client.verify_is_active(client_sequence);
-
-            client.verify_proof_height(@msg.proof_height_on_b.clone(), client_sequence);
 
             assert(
                 packet
@@ -698,7 +791,7 @@ pub mod ChannelHandlerComponent {
 
             match chan_end_on_a.ordering {
                 ChannelOrdering::Unordered => {
-                    self.verify_receipt_not_exists(@client, client_sequence, msg.clone());
+                    self.verify_receipt_not_exists(@client, conn_end_on_a, msg.clone());
                 },
                 ChannelOrdering::Ordered => {
                     assert(
@@ -706,7 +799,7 @@ pub mod ChannelHandlerComponent {
                         ChannelErrors::MISMATCHED_PACKET_SEQUENCE
                     );
 
-                    self.verify_next_sequence_recv(@client, client_sequence, msg);
+                    self.verify_next_sequence_recv(@client, conn_end_on_a, msg);
                 },
             };
         }
@@ -751,6 +844,31 @@ pub mod ChannelHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChannelInternalTrait<TContractState> {
+        fn verify_channel_end(
+            self: @ComponentState<TContractState>,
+            client: @ClientContract,
+            connection_end: ConnectionEnd,
+            counterparty_channel_id: ChannelId,
+            expected_channel_end: ChannelEnd,
+            proof: StateProof,
+            proof_height: Height,
+        ) {
+            let client_sequence = connection_end.client_id.sequence;
+
+            client.verify_proof_height(@proof_height, client_sequence);
+
+            let path = channel_end_path(
+                connection_end.counterparty.prefix.clone(),
+                expected_channel_end.remote.port_id.clone(),
+                counterparty_channel_id
+            );
+
+            let root = client.consensus_state_root(client_sequence, proof_height.clone());
+
+            client
+                .verify_membership(client_sequence, path, expected_channel_end.into(), proof, root);
+        }
+
         /// Verifies if the packet commitment matches the one stored earlier
         /// during the send packet process. If it doesn't exist or doesn't match,
         /// an error is returned. Note that this logic differs from ibc-rs, where
@@ -791,95 +909,114 @@ pub mod ChannelHandlerComponent {
         fn verify_packet_commitment(
             self: @ComponentState<TContractState>,
             client: @ClientContract,
-            client_sequence: u64,
+            connection_end: ConnectionEnd,
             msg: MsgRecvPacket,
-            json_packet_data: ByteArray
+            json_packet_data: ByteArray,
         ) {
+            let client_sequence = connection_end.client_id.sequence;
+
+            client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
+
+            let path = commitment_path(
+                connection_end.counterparty.prefix.clone(),
+                msg.packet.port_id_on_a.clone(),
+                msg.packet.chan_id_on_a.clone(),
+                msg.packet.seq_on_a.clone()
+            );
+
             let packet_commitment_on_a = compute_packet_commtiment(
                 @json_packet_data,
                 msg.packet.timeout_height_on_b.clone(),
                 msg.packet.timeout_timestamp_on_b.clone()
             );
 
-            let mut path: ByteArray =
-                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
-
-            let commitment_path = commitment_path(
-                msg.packet.port_id_on_a.clone(),
-                msg.packet.chan_id_on_a.clone(),
-                msg.packet.seq_on_a.clone()
-            );
-
-            path.append(@commitment_path);
+            let root_on_a = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_a.clone());
 
             client
                 .verify_membership(
                     client_sequence,
                     path,
                     packet_commitment_on_a.into(),
-                    msg.proof_commitment_on_a.clone()
+                    msg.proof_commitment_on_a.clone(),
+                    root_on_a
                 );
         }
 
         fn verify_packet_acknowledgement(
             self: @ComponentState<TContractState>,
             client: @ClientContract,
-            client_sequence: u64,
+            connection_end: ConnectionEnd,
             msg: MsgAckPacket,
         ) {
-            let ack_commitment_on_a = compute_ack_commitment(msg.acknowledgement.clone());
+            let client_sequence = connection_end.client_id.sequence;
 
-            let mut path: ByteArray =
-                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+            client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
-            let ack_path = ack_path(
+            let path = ack_path(
+                connection_end.counterparty.prefix.clone(),
                 msg.packet.port_id_on_a.clone(),
                 msg.packet.chan_id_on_a.clone(),
                 msg.packet.seq_on_a.clone()
             );
 
-            path.append(@ack_path);
+            let ack_commitment_on_a = compute_ack_commitment(msg.acknowledgement.clone());
+
+            let root_on_b = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
 
             client
                 .verify_membership(
-                    client_sequence, path, ack_commitment_on_a.into(), msg.proof_ack_on_b.clone()
+                    client_sequence,
+                    path,
+                    ack_commitment_on_a.into(),
+                    msg.proof_ack_on_b.clone(),
+                    root_on_b
                 );
         }
 
         fn verify_receipt_not_exists(
             self: @ComponentState<TContractState>,
             client: @ClientContract,
-            client_sequence: u64,
+            connection_end: ConnectionEnd,
             msg: MsgTimeoutPacket,
         ) {
-            let mut path: ByteArray =
-                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+            let client_sequence = connection_end.client_id.sequence;
 
-            let receipt_path_on_b = receipt_path(
+            client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
+
+            let path = receipt_path(
+                connection_end.counterparty.prefix.clone(),
                 msg.packet.port_id_on_b.clone(),
                 msg.packet.chan_id_on_b.clone(),
                 msg.packet.seq_on_a.clone()
             );
 
-            path.append(@receipt_path_on_b);
+            let root_on_b = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
 
-            client.verify_non_membership(client_sequence, path, msg.proof_unreceived_on_b,);
+            client
+                .verify_non_membership(client_sequence, path, msg.proof_unreceived_on_b, root_on_b);
         }
 
         fn verify_next_sequence_recv(
             self: @ComponentState<TContractState>,
             client: @ClientContract,
-            client_sequence: u64,
+            connection_end: ConnectionEnd,
             msg: MsgTimeoutPacket,
         ) {
-            let mut path: ByteArray =
-                "Ibc/"; // Setting prefix manually for now. This should come from the connection layer once implemented.
+            let client_sequence = connection_end.client_id.sequence;
 
-            let seq_recv_path_on_b = next_sequence_recv_path(
-                msg.packet.port_id_on_b.clone(), msg.packet.chan_id_on_b.clone()
+            client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
+
+            let path = next_sequence_recv_path(
+                connection_end.counterparty.prefix.clone(),
+                msg.packet.port_id_on_b.clone(),
+                msg.packet.chan_id_on_b.clone()
             );
 
-            path.append(@seq_recv_path_on_b);
+            let root_on_b = client
+                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
 
             client
                 .verify_membership(
@@ -887,6 +1024,7 @@ pub mod ChannelHandlerComponent {
                     path,
                     msg.packet.seq_on_a.clone().into(),
                     msg.proof_unreceived_on_b,
+                    root_on_b
                 );
         }
     }
@@ -901,6 +1039,7 @@ pub mod ChannelHandlerComponent {
         +HasComponent<TContractState>,
         +Drop<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
+        impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of ChannelAccessTrait<TContractState> {
         fn get_client(
@@ -909,6 +1048,14 @@ pub mod ChannelHandlerComponent {
             let client_comp = get_dep_component!(self, ClientHandler);
 
             client_comp.get_client(client_type)
+        }
+
+        fn get_connection(
+            self: @ComponentState<TContractState>, connection_id: ConnectionId
+        ) -> ConnectionEnd {
+            let connection_comp = get_dep_component!(self, ConnectionHandler);
+
+            connection_comp.connection_end(connection_id)
         }
 
         fn get_app(self: @ComponentState<TContractState>, port_id: @PortId) -> AppContract {

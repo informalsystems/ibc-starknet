@@ -3,11 +3,11 @@ use starknet_ibc_core::channel::{
     ChannelEnd, ChannelState, ChannelOrdering, Counterparty as ChanCounterparty, AppVersion
 };
 use starknet_ibc_core::client::{Height, Timestamp};
-use starknet_ibc_core::commitment::StateProof;
+use starknet_ibc_core::commitment::{StateProof, StateRoot};
 use starknet_ibc_core::connection::{
     ConnectionEnd, ConnectionState, Counterparty as ConnCounterparty, VersionImpl
 };
-use starknet_ibc_core::host::{PathPrefix, ClientId, ConnectionId, PortId, ChannelId, Sequence};
+use starknet_ibc_core::host::{BasePrefix, ClientId, ConnectionId, PortId, ChannelId, Sequence};
 
 pub fn HEIGHT(revision_height: u64) -> Height {
     Height { revision_number: 0, revision_height }
@@ -48,7 +48,7 @@ pub fn CONNECTION_END(counterparty_connection_sequence: u64) -> ConnectionEnd {
         counterparty: ConnCounterparty {
             client_id: CLIENT_ID(),
             connection_id: CONNECTION_ID(counterparty_connection_sequence),
-            prefix: PathPrefix { prefix: "" },
+            prefix: BasePrefix { prefix: "" },
         },
         version: VersionImpl::supported(),
         delay_period: 0,
@@ -74,7 +74,7 @@ pub fn CHANNEL_END(counterparty_channel_sequence: u64) -> ChannelEnd {
         remote: ChanCounterparty {
             port_id: PORT_ID(), channel_id: CHANNEL_ID(counterparty_channel_sequence),
         },
-        client_id: CLIENT_ID(),
+        connection_id: CONNECTION_ID(0),
         version: VERSION_PROPOSAL(),
     }
 }
@@ -87,6 +87,10 @@ pub fn STATE_PROOF() -> StateProof {
     StateProof { proof: array![1] }
 }
 
-pub fn IBC_PREFIX() -> PathPrefix {
-    PathPrefix { prefix: "Ibc/" }
+pub fn STATE_ROOT() -> StateRoot {
+    StateRoot { root: "1" }
+}
+
+pub fn IBC_PREFIX() -> BasePrefix {
+    BasePrefix { prefix: "Ibc" }
 }

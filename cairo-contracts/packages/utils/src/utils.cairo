@@ -37,15 +37,15 @@ pub impl LocalKeyBuilderImpl of LocalKeyBuilderTrait {
     }
 }
 
-#[derive(Drop, Serde)]
+#[derive(Drop, Default, Serde)]
 pub struct RemotePathBuilder {
     pub path: ByteArray,
 }
 
 #[generate_trait]
 pub impl RemotePathBuilderImpl of RemotePathBuilderTrait {
-    fn init() -> RemotePathBuilder {
-        RemotePathBuilder { path: "" }
+    fn init<T, +Into<T, ByteArray>, +Drop<T>>(base: T) -> RemotePathBuilder {
+        RemotePathBuilder { path: base.into() }
     }
 
     fn append<T, +Into<T, ByteArray>, +Drop<T>>(ref self: RemotePathBuilder, value: T) {

@@ -3,7 +3,7 @@ use starknet_ibc_core::client::{
     MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Status,
     CreateResponse, UpdateResponse, Timestamp,
 };
-use starknet_ibc_core::commitment::{StateProof, StateValue};
+use starknet_ibc_core::commitment::{StateProof, StateValue, StateRoot};
 
 #[starknet::interface]
 pub trait IClientHandler<TContractState> {
@@ -30,11 +30,16 @@ pub trait IClientStateValidation<TContractState> {
         client_sequence: u64,
         path: ByteArray,
         value: StateValue,
-        proof: StateProof
+        proof: StateProof,
+        root: StateRoot,
     );
 
     fn verify_non_membership(
-        self: @TContractState, client_sequence: u64, path: ByteArray, proof: StateProof
+        self: @TContractState,
+        client_sequence: u64,
+        path: ByteArray,
+        proof: StateProof,
+        root: StateRoot,
     );
 
     fn verify_client_message(
@@ -110,4 +115,8 @@ pub trait IClientQuery<TContractState> {
     fn consensus_state(
         self: @TContractState, client_sequence: u64, height: Height
     ) -> Array<felt252>;
+
+    fn consensus_state_root(
+        self: @TContractState, client_sequence: u64, height: Height
+    ) -> StateRoot;
 }

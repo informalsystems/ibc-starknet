@@ -1,17 +1,18 @@
 use core::num::traits::Zero;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Status, Timestamp};
+use starknet_ibc_core::commitment::StateRoot;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct CometConsensusState {
     pub timestamp: Timestamp,
-    pub root: ByteArray,
+    pub root: StateRoot,
 }
 
 #[generate_trait]
 pub impl CometConsensusStateImpl of CometConsensusStateTrait {
     fn is_non_zero(self: @CometConsensusState) -> bool {
-        !(self.root.len() == 0 && self.timestamp.is_zero())
+        !(self.root.is_zero() && self.timestamp.is_zero())
     }
 
     fn timestamp(self: @CometConsensusState) -> u64 {
@@ -25,7 +26,7 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
             CometConsensusState
         >::deserialize(ref consensus_state_span);
 
-        assert(maybe_consensus_state.is_some(), CometErrors::INVALID_CLIENT_STATE);
+        assert(maybe_consensus_state.is_some(), CometErrors::INVALID_CONSENSUS_STATE);
 
         maybe_consensus_state.unwrap()
     }

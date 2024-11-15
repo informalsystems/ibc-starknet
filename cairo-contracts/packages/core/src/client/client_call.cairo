@@ -6,7 +6,7 @@ use starknet_ibc_core::client::{
     MsgUpgradeClient, CreateResponse, UpdateResponse, Height, HeightPartialOrd, Status, StatusTrait,
     ClientErrors, Timestamp,
 };
-use starknet_ibc_core::commitment::{StateValue, StateProof};
+use starknet_ibc_core::commitment::{StateValue, StateProof, StateRoot};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct ClientContract {
@@ -43,6 +43,13 @@ pub impl ClientContractImpl of ClientContractTrait {
         IClientQueryDispatcher { contract_address: *self.address }.status(client_sequence)
     }
 
+    fn consensus_state_root(
+        self: @ClientContract, client_sequence: u64, height: Height
+    ) -> StateRoot {
+        IClientQueryDispatcher { contract_address: *self.address }
+            .consensus_state_root(client_sequence, height)
+    }
+
     fn verify_is_active(self: @ClientContract, client_sequence: u64) {
         let client_status = self.status(client_sequence);
         assert(client_status.is_active(), ClientErrors::INACTIVE_CLIENT);
@@ -59,16 +66,21 @@ pub impl ClientContractImpl of ClientContractTrait {
         path: ByteArray,
         value: StateValue,
         proof: StateProof,
+        root: StateRoot,
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
-            .verify_membership(client_sequence, path, value, proof)
+            .verify_membership(client_sequence, path, value, proof, root)
     }
 
     fn verify_non_membership(
-        self: @ClientContract, client_sequence: u64, path: ByteArray, proof: StateProof
+        self: @ClientContract,
+        client_sequence: u64,
+        path: ByteArray,
+        proof: StateProof,
+        root: StateRoot,
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
-            .verify_non_membership(client_sequence, path, proof)
+            .verify_non_membership(client_sequence, path, proof, root)
     }
 }
 
