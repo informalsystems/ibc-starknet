@@ -1,4 +1,3 @@
-use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::spy_events;
 use starknet_ibc_core::client::{UpdateResponse, StatusTrait, ClientContractTrait};
 use starknet_ibc_testkit::configs::CometClientConfigTrait;
@@ -23,23 +22,18 @@ fn test_create_comet_client_ok() {
     // Create Client
     // -----------------------------------------------------------
 
-    let msg = cfg.dummy_msg_create_client();
-
-    // Submit a `MsgCreateClient` to the IBC core contract.
-    let resp = core.create_client(msg);
+    let resp = cfg.create_client(@core);
 
     // -----------------------------------------------------------
     // Check Results
     // -----------------------------------------------------------
 
+    assert_eq!(comet.client_type(), cfg.client_type);
+    assert_eq!(comet.latest_height(0), cfg.latest_height);
+    assert!(comet.status(0).is_active());
+
     // Assert the `CreateClientEvent` emitted.
     spy.assert_create_client_event(core.address, resp.client_id, resp.height);
-
-    assert_eq!(comet.client_type(), cfg.client_type);
-
-    assert_eq!(comet.latest_height(0), cfg.latest_height);
-
-    assert!(comet.status(0).is_active());
 }
 
 #[test]
@@ -58,16 +52,11 @@ fn test_update_comet_client_ok() {
     // Create Client
     // -----------------------------------------------------------
 
-    let msg_create_client = cfg.dummy_msg_create_client();
-
-    // Submit a `MsgCreateClient` to the IBC core contract.
-    let create_resp = core.create_client(msg_create_client);
+    let create_resp = cfg.create_client(@core);
 
     // -----------------------------------------------------------
     // Update Client
     // -----------------------------------------------------------
-
-    spy.drop_all_events();
 
     // Update the client to a new height and time.
     let updating_height = cfg.latest_height.clone() + HEIGHT(1);
@@ -89,16 +78,14 @@ fn test_update_comet_client_ok() {
     // Check Results
     // -----------------------------------------------------------
 
+    assert_eq!(comet.client_type(), cfg.client_type);
+    assert_eq!(comet.latest_height(0), updating_height);
+    assert!(comet.status(0).is_active());
+
     if let UpdateResponse::Success(heights) = update_resp {
         // Assert the `UpdateClientEvent` emitted.
         spy.assert_update_client_event(core.address, msg.client_id, heights, msg.client_message);
     } else {
         panic!("update client failed");
     }
-
-    assert_eq!(comet.client_type(), cfg.client_type);
-
-    assert_eq!(comet.latest_height(0), updating_height);
-
-    assert!(comet.status(0).is_active());
 }

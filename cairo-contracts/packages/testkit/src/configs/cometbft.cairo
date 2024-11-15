@@ -1,9 +1,11 @@
 use starknet_ibc_clients::cometbft::{
     CometClientState, CometConsensusState, CometHeader, SignedHeader
 };
+use starknet_ibc_core::client::CreateResponse;
 use starknet_ibc_core::client::{MsgCreateClient, MsgUpdateClient, Height, Status};
 use starknet_ibc_core::host::ClientId;
 use starknet_ibc_testkit::dummies::{HEIGHT, CLIENT_TYPE, STATE_ROOT};
+use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct CometClientConfig {
@@ -68,5 +70,9 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         Serde::serialize(@header, ref serialized_header);
 
         MsgUpdateClient { client_id, client_message: serialized_header }
+    }
+
+    fn create_client(self: @CometClientConfig, core: @CoreContract) -> CreateResponse {
+        core.create_client(self.dummy_msg_create_client())
     }
 }

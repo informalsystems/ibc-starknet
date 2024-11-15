@@ -41,7 +41,7 @@ fn test_client_sequence_ok() {
     let msg = cfg.dummy_msg_create_client();
     state.create_client(msg.clone());
     state.create_client(msg);
-    assert_eq!(state.read_client_sequence(), 2);
+    assert_eq!(state.read_next_client_sequence(), 2);
 }
 
 #[test]
