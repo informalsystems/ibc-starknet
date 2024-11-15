@@ -128,7 +128,7 @@ pub enum Mode {
 }
 
 pub fn setup(
-    kind: Mode
+    mode: Mode
 ) -> (
     CoreContract,
     AppContract,
@@ -150,7 +150,7 @@ pub fn setup(
 
     let spy = spy_events();
 
-    match kind {
+    match mode {
         Mode::NoClient => {},
         Mode::WithClient => { comet_cfg.create_client(@core); },
         Mode::WithConnection => {
