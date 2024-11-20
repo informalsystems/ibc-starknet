@@ -22,7 +22,7 @@ env:
 jobs:
   build-cw-contract:
     name: Build CosmWasm Light Client Contract
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-arm64
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
