@@ -4,7 +4,7 @@ install-tools:
 	cargo install typos-cli taplo-cli
 
 build-cw-contract:
-  cd ./light-client && cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
+  cd ./light-client && cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown --release
 
 # Builds the Cairo contracts
 build-cairo-contracts:
