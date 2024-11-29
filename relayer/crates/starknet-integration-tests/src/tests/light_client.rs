@@ -1,9 +1,12 @@
 use core::marker::PhantomData;
 use std::env::var;
+use std::io::Write;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use flate2::write::GzEncoder;
+use flate2::Compression;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_init::CosmosChannelOpenInitMessage;
@@ -75,6 +78,14 @@ fn test_starknet_light_client() -> Result<(), Error> {
             hasher.finalize().into()
         };
 
+        let wasm_client_byte_code_gzip = {
+            let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+            encoder.write_all(&wasm_client_byte_code)?;
+            encoder.finish()?
+        };
+
+        info!("Reduced wasm client code size from {} to {} bytes", wasm_client_byte_code.len(), wasm_client_byte_code_gzip.len());
+
         let cosmos_bootstrap = Arc::new(CosmosWithWasmClientBootstrap {
             runtime: runtime.clone(),
             builder: cosmos_builder,
@@ -84,7 +95,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             account_prefix: "cosmos".into(),
             staking_denom: "stake".into(),
             transfer_denom: "coin".into(),
-            wasm_client_byte_code,
+            wasm_client_byte_code: wasm_client_byte_code_gzip,
             governance_proposal_authority: "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn".into(), // TODO: don't hard code this
         });
 
