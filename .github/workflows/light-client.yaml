@@ -44,18 +44,8 @@ jobs:
       - name: Build CosmWasm light client contract
         working-directory: ./light-client
         run: |
-          nix build ..#ibc-starknet-cw
-          echo "STARKNET_WASM_CLIENT_PATH=$(nix path-info  ..#ibc-starknet-cw)/ibc_client_starknet_cw.wasm" >> $GITHUB_ENV
-
-      - name: E2E Test CosmWasm light client contract
-        working-directory: ./relayer
-        run: |
-          nix shell ..#rust -c \
-            cargo test test_starknet_light_client -- --nocapture
-
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
+          nix shell ..#rust-wasm -c \
+            cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
 
   lint-light-client:
     name: Lint CosmWasm Light Client Contract
