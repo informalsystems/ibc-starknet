@@ -47,6 +47,13 @@ jobs:
           nix shell ..#rust-wasm -c \
             cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
 
+      - name: E2E Test CosmWasm light client contract
+        working-directory: ./light-client
+        run: |
+          STARKNET_WASM_CLIENT_PATH=$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm
+          nix shell ..#ibc-starknet-cw -c \
+            cargo test -p ibc-client-starknet-cw --target wasm32-unknown-unknown
+
   lint-light-client:
     name: Lint CosmWasm Light Client Contract
     runs-on: ubuntu-latest
