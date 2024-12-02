@@ -55,6 +55,10 @@ jobs:
           nix shell ..#ibc-starknet-cw -c \
             cargo test -p ibc-client-starknet-cw --target wasm32-unknown-unknown
 
+      - name: Setup tmate session
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+
   lint-light-client:
     name: Lint CosmWasm Light Client Contract
     runs-on: ubuntu-latest
