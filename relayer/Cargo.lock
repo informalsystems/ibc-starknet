@@ -2342,6 +2342,7 @@ version = "0.1.0"
 dependencies = [
  "cgp",
  "eyre",
+ "flate2",
  "hermes-chain-components",
  "hermes-cosmos-chain-components",
  "hermes-cosmos-integration-tests",

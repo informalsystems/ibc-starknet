@@ -47,6 +47,7 @@ oneline-eyre                = { version = "0.1.0" }
 stable-eyre                 = { version = "0.2.2" }
 tracing                     = { version = "0.1.40" }
 tracing-subscriber          = { version = "0.3.18" }
+flate2                      = { version = "1.0" }
 
 ibc                       = { version = "0.55.1" }
 ibc-proto                 = { version = "0.47.1" }
