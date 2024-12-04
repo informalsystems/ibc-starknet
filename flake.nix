@@ -61,6 +61,8 @@
 
           wasm-simapp = cosmos-nix.ibc-go-v8-wasm-simapp;
 
+          osmosis = cosmos-nix.osmosis;
+
           starknet-devnet = import ./nix/starknet-devnet.nix {
             inherit nixpkgs;
             inherit (inputs) starknet-devnet-src;
@@ -92,6 +94,7 @@
               scarb
               universal-sierra-compiler
               wasm-simapp
+              osmosis
               ;
           };
 
