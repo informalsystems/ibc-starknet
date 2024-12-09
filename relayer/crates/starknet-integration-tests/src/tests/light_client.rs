@@ -44,12 +44,20 @@ use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::channel::types::channel::State;
 use ibc::core::client::types::Height;
 use ibc::core::connection::types::version::Version;
+use ibc::core::host::types::identifiers::ClientId;
 use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
 use sha2::{Digest, Sha256};
+use starknet::core::types::Felt;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
+
+fn felt_to_trimmed_string(v: &Felt) -> String {
+    String::from_utf8_lossy(&v.to_bytes_be())
+        .trim_start_matches('\0')
+        .to_string()
+}
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {
@@ -153,17 +161,11 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         starknet_chain.ibc_client_contract_address = Some(comet_client_address);
 
-        let create_client_settings = Settings {
-            max_clock_drift: Duration::from_secs(40),
-            trusting_period: Some(Duration::from_secs(60 * 60)),
-            trust_threshold: TrustThreshold::ONE_THIRD,
-        };
-
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
             starknet_chain,
             cosmos_chain,
-            &create_client_settings,
+            &Default::default(),
             &(),
         )
         .await?;
@@ -302,7 +304,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         let cosmos_connection_id = {
             let open_init_message = CosmosConnectionOpenInitMessage {
                 client_id: cosmos_client_id.clone(),
-                counterparty_client_id: cosmos_client_id.clone(), // TODO: stub
+                counterparty_client_id: ClientId::new(&felt_to_trimmed_string(&starknet_client_id.client_type), starknet_client_id.sequence)?,
                 counterparty_commitment_prefix: "ibc".into(),
                 version: Version::compatibles().pop().unwrap(),
                 delay_period: Duration::from_secs(0),
