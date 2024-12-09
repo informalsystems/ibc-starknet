@@ -264,6 +264,41 @@ fn test_starknet_light_client() -> Result<(), Error> {
             );
         }
 
+        {
+            runtime.sleep(Duration::from_secs(2)).await;
+
+            let cosmos_status= cosmos_chain.query_chain_status().await?;
+
+            info!(
+                "updating Cosmos client to Starknet to height {}",
+                cosmos_status.height,
+            );
+
+            // TODO(rano): how do I query cosmos block root
+
+            starknet_to_cosmos_relay
+                .send_target_update_client_messages(SourceTarget, &cosmos_status.height)
+                .await?;
+
+            let consensus_state =
+                starknet_chain.query_consensus_state(
+                    PhantomData::<CosmosChain>,
+                    &starknet_client_id,
+                    &cosmos_status.height,
+                    &starknet_chain.query_chain_height().await?,
+                )
+                .await?;
+
+
+            // TODO(rano): add assert
+
+            info!(
+                "updated Cosmos client to Starknet to height {} and root: {:?}",
+                cosmos_status.height,
+                consensus_state.root
+            );
+        }
+
         let connection_id = {
             let open_init_message = CosmosConnectionOpenInitMessage {
                 client_id: cosmos_client_id.clone(),
