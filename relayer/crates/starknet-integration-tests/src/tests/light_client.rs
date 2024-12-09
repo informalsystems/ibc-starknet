@@ -8,6 +8,8 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use flate2::write::GzEncoder;
 use flate2::Compression;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
+use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
+use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_init::CosmosChannelOpenInitMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
@@ -16,7 +18,6 @@ use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_relayer::contexts::encoding::CosmosEncoding;
-use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
@@ -47,6 +48,7 @@ use starknet::macros::short_string;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
+use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {
@@ -81,20 +83,23 @@ fn test_starknet_light_client() -> Result<(), Error> {
             encoder.finish()?
         };
 
-        info!("Reduced wasm client code size from {} to {} bytes", wasm_client_byte_code.len(), wasm_client_byte_code_gzip.len());
-
-        let cosmos_bootstrap = Arc::new(CosmosWithWasmClientBootstrap {
+        let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
             runtime: runtime.clone(),
             cosmos_builder,
             should_randomize_identifiers: true,
             chain_store_dir: store_dir.join("chains"),
-            chain_command_path: "simd".into(),
-            account_prefix: "cosmos".into(),
+            chain_command_path: "osmosisd".into(),
+            account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
             wasm_client_byte_code: wasm_client_byte_code_gzip,
-            governance_proposal_authority: "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn".into(), // TODO: don't hard code this
-            dynamic_gas: None,
+            governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
+            dynamic_gas: Some(DynamicGasConfig {
+                multiplier: 1.1,
+                max: 1.6,
+                eip_query_type: EipQueryType::Osmosis,
+                denom: "stake".to_owned(),
+            }),
         });
 
         let starknet_bootstrap = StarknetBootstrap {

@@ -53,6 +53,7 @@ http                        = { version = "1.0.0" }
 ibc                       = { version = "0.56.0" }
 ibc-proto                 = { version = "0.51.1" }
 ibc-client-starknet-types = { version = "0.1.0" }
+tendermint-rpc            = { version = "0.40" }
 
 hermes-runtime-components           = { version = "0.1.0" }
 hermes-async-runtime-components     = { version = "0.1.0" }
@@ -74,6 +75,7 @@ hermes-cosmos-test-components       = { version = "0.1.0" }
 hermes-cosmos-integration-tests     = { version = "0.1.0" }
 hermes-any-counterparty             = { version = "0.1.0" }
 hermes-wasm-client-components       = { version = "0.1.0" }
+hermes-wasm-test-components         = { version = "0.1.0" }
 hermes-wasm-encoding-components     = { version = "0.1.0" }
 hermes-cli-components               = { version = "0.1.0" }
 hermes-test-components              = { version = "0.1.0" }
