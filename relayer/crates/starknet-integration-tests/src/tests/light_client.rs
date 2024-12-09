@@ -94,7 +94,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             transfer_denom_prefix: "coin".into(),
             wasm_client_byte_code: wasm_client_byte_code_gzip,
             governance_proposal_authority: "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn".into(), // TODO: don't hard code this
-            dynamic_gas: Some(Default::default()),
+            dynamic_gas: None,
         });
 
         let starknet_bootstrap = StarknetBootstrap {
