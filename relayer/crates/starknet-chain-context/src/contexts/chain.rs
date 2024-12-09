@@ -98,6 +98,7 @@ pub struct StarknetChain {
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
     pub ibc_client_contract_address: Option<Felt>,
+    pub ibc_core_contract_address: Option<Felt>,
 }
 
 pub struct StarknetChainContextComponents;
@@ -220,6 +221,7 @@ pub trait CanUseStarknetChain:
     + CanQueryConsensusStateHeights<CosmosChain>
     + CanQueryConsensusStateHeight<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+    + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
 where
     CosmosChain: HasClientStateType<Self>
         + HasConsensusStateType<Self>

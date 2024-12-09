@@ -31,6 +31,7 @@ where
         + HasClientIdType<Counterparty, ClientId = ClientId>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseError<Encoding::Error>,
     Counterparty: HasUpdateClientPayloadType<Chain, UpdateClientPayload = CometUpdateHeader>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>

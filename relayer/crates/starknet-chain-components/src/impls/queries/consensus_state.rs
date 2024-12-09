@@ -40,6 +40,7 @@ where
         + HasBlobType<Blob = Vec<Felt>>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseError<ConsensusStateNotFound>
         + CanRaiseError<Encoding::Error>,
     Counterparty:
