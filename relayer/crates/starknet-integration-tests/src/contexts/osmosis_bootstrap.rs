@@ -75,7 +75,7 @@ impl HasComponents for OsmosisBootstrap {
 
 impl<Name> DelegateComponent<Name> for OsmosisBootstrapComponents
 where
-    Self: IsLegacyCosmosSdkBootstrapComponents<Name>
+    Self: IsLegacyCosmosSdkBootstrapComponents<Name>,
 {
     type Delegate = LegacyCosmosSdkBootstrapComponents;
 }
