@@ -9,10 +9,10 @@ use hermes_chain_components::traits::types::create_client::{
 };
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::update_client::HasUpdateClientPayloadType;
-use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientPayload;
+use hermes_cosmos_chain_components::types::payloads::client::{
+    CosmosCreateClientOptions, CosmosCreateClientPayload,
+};
 use ibc::core::client::types::Height as CosmosHeight;
-use ibc_relayer::chain::cosmos::client::Settings;
-use ibc_relayer::config::types::TrustThreshold;
 
 use crate::types::cosmos::height::Height;
 use crate::types::cosmos::update::CometUpdateHeader;
@@ -31,8 +31,10 @@ impl<Chain, Counterparty> UpdateClientPayloadBuilder<Chain, Counterparty>
     for BuildUpdateCometClientPayload
 where
     Chain: CanBuildCreateClientPayload<Counterparty>
-        + HasCreateClientPayloadOptionsType<Counterparty, CreateClientPayloadOptions = Settings>
-        + HasCreateClientPayloadType<Counterparty, CreateClientPayload = CosmosCreateClientPayload>
+        + HasCreateClientPayloadOptionsType<
+            Counterparty,
+            CreateClientPayloadOptions = CosmosCreateClientOptions,
+        > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = CosmosCreateClientPayload>
         + HasUpdateClientPayloadType<Counterparty, UpdateClientPayload = CometUpdateHeader>
         + HasClientStateType<Counterparty>
         + HasHeightType<Height = CosmosHeight>
@@ -45,14 +47,8 @@ where
         _target_height: &CosmosHeight,
         _client_state: Chain::ClientState,
     ) -> Result<CometUpdateHeader, Chain::Error> {
-        let create_client_settings = Settings {
-            max_clock_drift: Duration::from_secs(40),
-            trusting_period: Some(Duration::from_secs(60 * 60)),
-            trust_threshold: TrustThreshold::ONE_THIRD,
-        };
-
         let payload = chain
-            .build_create_client_payload(&create_client_settings)
+            .build_create_client_payload(&Default::default())
             .await?;
 
         let height_2 = Height {

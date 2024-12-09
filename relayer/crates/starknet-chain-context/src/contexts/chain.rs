@@ -232,17 +232,17 @@ impl CanUseStarknetChain for StarknetChain {}
 
 pub trait CanUseCosmosChainWithStarknet:
     HasClientStateType<StarknetChain, ClientState = CometClientState>
-// + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
-// + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CometUpdateHeader>
-// + HasClientStateFields<StarknetChain>
-// + CanQueryClientState<StarknetChain>
-// + CanQueryConsensusState<StarknetChain>
-// + CanBuildCreateClientMessage<StarknetChain>
-// + CanBuildUpdateClientPayload<StarknetChain>
-// + CanBuildUpdateClientMessage<StarknetChain>
-// + CanQueryConsensusStateHeight<StarknetChain>
-// + CanBuildCreateClientPayload<StarknetChain>
-// + CanBuildUpdateClientPayload<StarknetChain>
+    + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
+    + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CometUpdateHeader>
+    + HasClientStateFields<StarknetChain>
+    + CanQueryClientState<StarknetChain>
+    + CanQueryConsensusState<StarknetChain>
+    + CanBuildCreateClientMessage<StarknetChain>
+    + CanBuildUpdateClientPayload<StarknetChain>
+    + CanBuildUpdateClientMessage<StarknetChain>
+    + CanQueryConsensusStateHeight<StarknetChain>
+    + CanBuildCreateClientPayload<StarknetChain>
+    + CanBuildUpdateClientPayload<StarknetChain>
 {
 }
 
