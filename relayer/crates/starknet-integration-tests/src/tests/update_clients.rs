@@ -124,7 +124,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
 
             let class_hash = starknet_chain.declare_contract(&contract).await?;
 
-            info!("declared class: {:?}", class_hash);
+            info!("declared class for cometbft: {:?}", class_hash);
 
             class_hash
         };
@@ -138,6 +138,28 @@ fn test_relay_update_clients() -> Result<(), Error> {
             comet_client_address
         );
 
+        let cairo_encoding = StarknetCairoEncoding;
+
+        {
+            // register comet client contract with ibc-core
+
+            let calldata = cairo_encoding.encode(&product![
+                short_string!("07-cometbft"),
+                comet_client_address
+            ])?;
+
+            let call = Call {
+                to: ibc_core_address,
+                selector: selector!("register_client"),
+                calldata,
+            };
+
+            let response = starknet_chain.send_message(call).await?;
+
+            info!("IBC register client response: {:?}", response);
+        }
+
+        starknet_chain.ibc_core_contract_address = Some(ibc_core_address);
         starknet_chain.ibc_client_contract_address = Some(comet_client_address);
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
