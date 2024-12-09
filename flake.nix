@@ -102,7 +102,7 @@
               taplo
               just
               openssl
-              pkgconfig
+              pkg-config
               ;
 
             nixfmt = nixpkgs.nixfmt-rfc-style;
@@ -130,7 +130,10 @@
           devShells = {
             default = nixpkgs.mkShell { buildInputs = shell-deps; };
 
-            rust = nixpkgs.mkShell { buildInputs = [ rust ] ++ shell-deps; };
+            rust = nixpkgs.mkShell {
+              PKG_CONFIG_PATH = "${nixpkgs.openssl.dev}/lib/pkgconfig";
+              buildInputs = [ rust ] ++ shell-deps;
+            };
 
             rust-nightly = nixpkgs.mkShell { buildInputs = [ rust-nightly ] ++ shell-deps; };
 
