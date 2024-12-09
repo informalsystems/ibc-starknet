@@ -116,7 +116,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let starknet_chain = &starknet_chain_driver.chain;
 
-        let client_id = StarknetToCosmosRelay::create_client(
+        let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
             starknet_chain,
@@ -125,7 +125,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         )
         .await?;
 
-        info!("created client id: {:?}", client_id);
+        info!("created client id on Cosmos: {:?}", cosmos_client_id);
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay {
             runtime: runtime.clone(),
@@ -136,14 +136,14 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 client_type: short_string!("cometbft"),
                 sequence: 1,
             },
-            dst_client_id: client_id.clone(),
+            dst_client_id: cosmos_client_id.clone(),
         };
 
         {
             let client_state =
                 cosmos_chain.query_client_state(
                     PhantomData::<StarknetChain>,
-                    &client_id,
+                    &cosmos_client_id,
                     &cosmos_chain.query_chain_height().await?,
                 )
                 .await?;
@@ -153,7 +153,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             let consensus_state =
                 cosmos_chain.query_consensus_state(
                     PhantomData::<StarknetChain>,
-                    &client_id,
+                    &cosmos_client_id,
                     &client_height,
                     &cosmos_chain.query_chain_height().await?,
                 )
@@ -184,7 +184,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             let consensus_state =
                 cosmos_chain.query_consensus_state(
                     PhantomData::<StarknetChain>,
-                    &client_id,
+                    &cosmos_client_id,
                     &starknet_status.height,
                     &cosmos_chain.query_chain_height().await?,
                 )
@@ -198,8 +198,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let connection_id = {
             let open_init_message = CosmosConnectionOpenInitMessage {
-                client_id: client_id.clone(),
-                counterparty_client_id: client_id.clone(), // TODO: stub
+                client_id: cosmos_client_id.clone(),
+                counterparty_client_id: cosmos_client_id.clone(), // TODO: stub
                 counterparty_commitment_prefix: "ibc".into(),
                 version: Version::compatibles().pop().unwrap(),
                 delay_period: Duration::from_secs(0),
