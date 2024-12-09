@@ -30,10 +30,9 @@ use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage
 use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenInitEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenInitEvent;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
-use hermes_relayer_components::relay::traits::target::DestinationTarget;
+use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
 use hermes_runtime_components::traits::sleep::CanSleep;
-use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
@@ -44,7 +43,6 @@ use ibc::core::client::types::Height;
 use ibc::core::connection::types::version::Version;
 use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
 use sha2::{Digest, Sha256};
-use starknet::macros::short_string;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
@@ -127,15 +125,29 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         info!("created client id on Cosmos: {:?}", cosmos_client_id);
 
+        let create_client_settings = Settings {
+            max_clock_drift: Duration::from_secs(40),
+            trusting_period: Some(Duration::from_secs(60 * 60)),
+            trust_threshold: TrustThreshold::ONE_THIRD,
+        };
+
+        let starknet_client_id = StarknetToCosmosRelay::create_client(
+            SourceTarget,
+            starknet_chain,
+            cosmos_chain,
+            &create_client_settings,
+            &(),
+        )
+        .await?;
+
+        info!("created client on Starknet: {:?}", starknet_client_id);
+
         let starknet_to_cosmos_relay = StarknetToCosmosRelay {
             runtime: runtime.clone(),
             src_chain: starknet_chain.clone(),
             dst_chain: cosmos_chain.clone(),
             // TODO: stub
-            src_client_id: StarknetClientId {
-                client_type: short_string!("cometbft"),
-                sequence: 1,
-            },
+            src_client_id: starknet_client_id.clone(),
             dst_client_id: cosmos_client_id.clone(),
         };
 
