@@ -101,6 +101,8 @@
               cargo-nextest
               taplo
               just
+              openssl
+              pkgconfig
               ;
 
             nixfmt = nixpkgs.nixfmt-rfc-style;
