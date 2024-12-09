@@ -3,7 +3,7 @@ use hermes_cosmos_chain_components::components::client::ClientIdTypeComponent;
 
 use crate::types::client_id::ClientId;
 
-define_components! {
+cgp_preset! {
     StarknetChainTypes {
         ClientIdTypeComponent: ClientId,
     }

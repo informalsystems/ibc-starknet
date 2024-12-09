@@ -28,7 +28,7 @@ use crate::{
     STARKNET_CONSENSUS_STATE_TYPE_URL,
 };
 
-define_components! {
+cgp_preset! {
     StarknetLightClientEncodingComponents {
         [
             EncodedTypeComponent,

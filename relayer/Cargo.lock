@@ -418,10 +418,10 @@ checksum = "6c85783c2fe40083ea54a33aa2f0ba58831d90fcd190f5bdc47e74e84d2a96ae"
 dependencies = [
  "bech32 0.10.0-beta",
  "bitcoin-internals",
- "bitcoin_hashes",
+ "bitcoin_hashes 0.13.0",
  "hex-conservative",
  "hex_lit",
- "secp256k1",
+ "secp256k1 0.28.2",
  "serde",
 ]
 
@@ -432,6 +432,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9425c3bf7089c983facbae04de54513cce73b41c7f9ff8c845b54e7bc64ebbfb"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "bitcoin-private"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73290177011694f38ec25e165d0387ab7ea749a4b81cd4c80dae5988229f7a57"
+
+[[package]]
+name = "bitcoin_hashes"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d7066118b13d4b20b23645932dfb3a81ce7e29f95726c2036fa33cd7b092501"
+dependencies = [
+ "bitcoin-private",
 ]
 
 [[package]]
@@ -754,25 +769,30 @@ checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 
 [[package]]
 name = "cgp"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5adf76ce3579324bc8804a03da7e05a5012e4096e295d7ce16073dd0f55e923e"
 dependencies = [
+ "cgp-async",
  "cgp-core",
  "cgp-extra",
 ]
 
 [[package]]
 name = "cgp-async"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0623cc42c39044ad4223a60b58d427fdece736913fa70e0c0b7787b207545886"
 dependencies = [
  "cgp-async-macro",
+ "cgp-sync",
 ]
 
 [[package]]
 name = "cgp-async-macro"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b22933d3a1fb401cc0208e4f8ef16f4c80579701a47b81d2f23ee5b0b697a7b0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -781,17 +801,18 @@ dependencies = [
 
 [[package]]
 name = "cgp-component"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "82a567833f055c865fb46258f7c6a511b22a1da6bc22f58b47a5e5e3da7a2dd2"
 dependencies = [
- "cgp-async",
  "cgp-component-macro",
 ]
 
 [[package]]
 name = "cgp-component-macro"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1c4c375220b569b618d6b4ec8793c61bbdd24925786aeb4ea1eac5010916c262"
 dependencies = [
  "cgp-component-macro-lib",
  "proc-macro2",
@@ -799,8 +820,9 @@ dependencies = [
 
 [[package]]
 name = "cgp-component-macro-lib"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7e9fa127625afac0527a2f1595ba365142d8d875ff04f155cb248aee456d2c0"
 dependencies = [
  "itertools 0.11.0",
  "prettyplease",
@@ -811,8 +833,9 @@ dependencies = [
 
 [[package]]
 name = "cgp-core"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39951e4828fb216d51bfa42121095654f2adb0e4abbc9d03b011c5b47372a4c1"
 dependencies = [
  "cgp-async",
  "cgp-component",
@@ -824,8 +847,9 @@ dependencies = [
 
 [[package]]
 name = "cgp-error"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f3866da7384b88d3260e781e60bc9da3a68d5552c33eea56e6780fea8c97d000"
 dependencies = [
  "cgp-async",
  "cgp-component",
@@ -834,9 +858,9 @@ dependencies = [
 
 [[package]]
 name = "cgp-error-eyre"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a85dc1bbf5991df1f72742ab8b4496b62c7b2ab4eac54f35856634de0aa9d69"
+checksum = "89d8f2acb1bd034ba0fe99eb6ab80356aa8a9b39b1be8e320f317e576e9414f1"
 dependencies = [
  "cgp-core",
  "eyre",
@@ -844,16 +868,18 @@ dependencies = [
 
 [[package]]
 name = "cgp-extra"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f79c15ed0088b1ca06ad58a8f124c1d63f4a554073ed372ff2b488a3fbf6fb9"
 dependencies = [
  "cgp-run",
 ]
 
 [[package]]
 name = "cgp-field"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6956ca07b849e38106ee5b3c71c7e396088619115fe60934fd2598b873a9efac"
 dependencies = [
  "cgp-component",
  "cgp-field-macro",
@@ -862,8 +888,9 @@ dependencies = [
 
 [[package]]
 name = "cgp-field-macro"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2286ec0bd3a48571ee3644e80a52ba029f10c2edd6bc3da4f4ef9279583798d5"
 dependencies = [
  "cgp-field-macro-lib",
  "proc-macro2",
@@ -871,8 +898,9 @@ dependencies = [
 
 [[package]]
 name = "cgp-field-macro-lib"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e05fc04f941c797c28db9dd9685d779b76784f29bdbe2eb368329abfca14d9a"
 dependencies = [
  "itertools 0.11.0",
  "prettyplease",
@@ -883,17 +911,18 @@ dependencies = [
 
 [[package]]
 name = "cgp-inner"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0cd062e3bef5a8353acdcdae3e04c0012de0b19e9bd02acbccfce09e895814cf"
 dependencies = [
- "cgp-async",
  "cgp-component",
 ]
 
 [[package]]
 name = "cgp-run"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2bf13ddcb395e915d314abf917d86dc7fa461bd73a3da2724b4698d45eaa283e"
 dependencies = [
  "cgp-async",
  "cgp-component",
@@ -901,9 +930,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "cgp-sync"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a1c0e460bcccd3e2e39ded6a2078f012d3c00b523caafc05b5bdace9205b0cf"
+dependencies = [
+ "cgp-async-macro",
+]
+
+[[package]]
 name = "cgp-type"
-version = "0.1.0"
-source = "git+https://github.com/contextgeneric/cgp.git#4e2821ebf61358b381f3e1e0f84df56cad7b6145"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d3c9a9059625de770e4acddff6d5e56c5defd959b010b9643cfcb81832f5bed"
 dependencies = [
  "cgp-component",
 ]
@@ -1045,6 +1084,19 @@ name = "core-foundation-sys"
 version = "0.8.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
+
+[[package]]
+name = "cosmos-sdk-proto"
+version = "0.26.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "462e1f6a8e005acc8835d32d60cbd7973ed65ea2a8d8473830e675f050956427"
+dependencies = [
+ "informalsystems-pbjson",
+ "prost",
+ "serde",
+ "tendermint-proto",
+ "tonic",
+]
 
 [[package]]
 name = "cpufeatures"
@@ -1297,6 +1349,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.87",
+ "unicode-xid",
 ]
 
 [[package]]
@@ -1473,6 +1526,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
+name = "errno"
+version = "0.3.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33d852cb9b869c2a9b3df2f71a3074817f01e1844f839a144f5fcef059a4eb5d"
+dependencies = [
+ "libc",
+ "windows-sys 0.59.0",
+]
+
+[[package]]
 name = "eth-keystore"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1503,7 +1566,7 @@ dependencies = [
  "crunchy",
  "fixed-hash",
  "impl-rlp",
- "impl-serde",
+ "impl-serde 0.4.0",
  "tiny-keccak",
 ]
 
@@ -1516,9 +1579,9 @@ dependencies = [
  "ethbloom",
  "fixed-hash",
  "impl-rlp",
- "impl-serde",
- "primitive-types",
- "uint",
+ "impl-serde 0.4.0",
+ "primitive-types 0.12.2",
+ "uint 0.9.5",
 ]
 
 [[package]]
@@ -1551,6 +1614,12 @@ dependencies = [
  "indenter",
  "once_cell",
 ]
+
+[[package]]
+name = "fastrand"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
 
 [[package]]
 name = "ff"
@@ -1611,6 +1680,21 @@ name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
+
+[[package]]
+name = "foreign-types"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6f339eb8adc052cd2ca78910fda869aefa38d22d5cb648e6485e4d3fc06f3b1"
+dependencies = [
+ "foreign-types-shared",
+]
+
+[[package]]
+name = "foreign-types-shared"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
 
 [[package]]
 name = "form_urlencoded"
@@ -1858,16 +1942,16 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 [[package]]
 name = "hermes-any-counterparty"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
- "cgp-error-eyre",
  "hermes-cosmos-chain-components",
  "hermes-encoding-components",
+ "hermes-error",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
+ "ibc",
  "ibc-proto",
- "ibc-relayer-types",
  "serde",
  "tendermint-proto",
 ]
@@ -1875,7 +1959,7 @@ dependencies = [
 [[package]]
 name = "hermes-async-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "async-trait",
  "cgp",
@@ -1898,7 +1982,7 @@ dependencies = [
 [[package]]
 name = "hermes-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -1909,7 +1993,7 @@ dependencies = [
 [[package]]
 name = "hermes-chain-type-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
 ]
@@ -1917,7 +2001,7 @@ dependencies = [
 [[package]]
 name = "hermes-cli-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "clap",
@@ -1927,36 +2011,70 @@ dependencies = [
  "hermes-relayer-components",
  "hermes-runtime-components",
  "hermes-test-components",
+ "http 1.1.0",
  "serde",
  "toml",
 ]
 
 [[package]]
+name = "hermes-comet-light-client-components"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
+dependencies = [
+ "cgp",
+ "hermes-chain-type-components",
+]
+
+[[package]]
+name = "hermes-comet-light-client-context"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
+dependencies = [
+ "cgp",
+ "eyre",
+ "hermes-chain-components",
+ "hermes-chain-type-components",
+ "hermes-comet-light-client-components",
+ "hermes-error",
+ "tendermint",
+ "tendermint-light-client-verifier",
+ "tendermint-rpc",
+]
+
+[[package]]
 name = "hermes-cosmos-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "bech32 0.9.1",
  "cgp",
  "eyre",
  "futures",
  "hermes-chain-type-components",
+ "hermes-comet-light-client-components",
+ "hermes-comet-light-client-context",
  "hermes-cosmos-encoding-components",
  "hermes-encoding-components",
+ "hermes-error",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
  "hermes-relayer-components-extra",
  "http 1.1.0",
  "ibc",
+ "ibc-client-tendermint",
  "ibc-proto",
  "ibc-relayer",
- "ibc-relayer-types",
  "ics23",
  "itertools 0.13.0",
  "prost",
  "prost-types",
+ "reqwest 0.12.9",
+ "serde",
  "serde_json",
+ "subtle-encoding",
  "tendermint",
+ "tendermint-light-client",
+ "tendermint-light-client-verifier",
  "tendermint-proto",
  "tendermint-rpc",
  "time",
@@ -1968,7 +2086,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -1982,7 +2100,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-integration-tests"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "eyre",
@@ -2000,9 +2118,9 @@ dependencies = [
  "hermes-runtime-components",
  "hermes-test-components",
  "hermes-wasm-test-components",
+ "ibc",
  "ibc-proto",
  "ibc-relayer",
- "ibc-relayer-types",
  "prost",
  "serde_json",
  "stable-eyre",
@@ -2016,9 +2134,10 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
+ "dirs-next",
  "eyre",
  "futures",
  "hermes-any-counterparty",
@@ -2043,15 +2162,18 @@ dependencies = [
  "ibc",
  "ibc-proto",
  "ibc-relayer",
- "ibc-relayer-types",
  "ibc-telemetry",
  "itertools 0.13.0",
  "moka",
  "opentelemetry 0.17.0",
  "prost",
  "prost-types",
+ "reqwest 0.12.9",
+ "secp256k1 0.27.0",
  "serde",
  "serde_derive",
+ "serde_json",
+ "subtle-encoding",
  "tendermint",
  "tendermint-proto",
  "tendermint-rpc",
@@ -2063,7 +2185,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hdpath",
@@ -2072,15 +2194,17 @@ dependencies = [
  "hermes-runtime",
  "hermes-runtime-components",
  "hermes-test-components",
+ "http 1.1.0",
+ "ibc",
  "ibc-proto",
  "ibc-relayer",
- "ibc-relayer-types",
  "itertools 0.13.0",
  "prost",
  "serde",
  "serde_json",
  "sha2 0.10.8",
  "subtle-encoding",
+ "time",
  "toml",
  "tonic",
 ]
@@ -2088,7 +2212,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-wasm-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "eyre",
@@ -2117,7 +2241,6 @@ dependencies = [
  "ibc",
  "ibc-proto",
  "ibc-relayer",
- "ibc-relayer-types",
  "ibc-telemetry",
  "itertools 0.13.0",
  "moka",
@@ -2140,7 +2263,7 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
 ]
@@ -2148,7 +2271,7 @@ dependencies = [
 [[package]]
 name = "hermes-error"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "eyre",
@@ -2158,7 +2281,7 @@ dependencies = [
 [[package]]
 name = "hermes-ibc-test-suite"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-logging-components",
@@ -2169,7 +2292,7 @@ dependencies = [
 [[package]]
 name = "hermes-logger"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-logging-components",
@@ -2181,7 +2304,7 @@ dependencies = [
 [[package]]
 name = "hermes-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
 ]
@@ -2189,7 +2312,7 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -2200,7 +2323,7 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-chain-components",
@@ -2213,7 +2336,7 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components-extra"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -2225,7 +2348,7 @@ dependencies = [
 [[package]]
 name = "hermes-runtime"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-async-runtime-components",
@@ -2237,7 +2360,7 @@ dependencies = [
 [[package]]
 name = "hermes-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
 ]
@@ -2260,11 +2383,10 @@ dependencies = [
  "hermes-test-components",
  "hermes-wasm-client-components",
  "hermes-wasm-encoding-components",
+ "http 1.1.0",
  "ibc",
  "ibc-client-starknet-types",
  "ibc-proto",
- "ibc-relayer",
- "ibc-relayer-types",
  "prost-types",
  "serde_json",
  "starknet",
@@ -2326,8 +2448,6 @@ dependencies = [
  "hermes-starknet-test-components",
  "hermes-test-components",
  "ibc",
- "ibc-relayer",
- "ibc-relayer-types",
  "serde",
  "stable-eyre",
  "tokio",
@@ -2361,8 +2481,6 @@ dependencies = [
  "hermes-test-components",
  "ibc",
  "ibc-proto",
- "ibc-relayer",
- "ibc-relayer-types",
  "prost",
  "prost-types",
  "rand",
@@ -2391,7 +2509,6 @@ dependencies = [
  "hermes-starknet-chain-components",
  "hermes-starknet-chain-context",
  "ibc",
- "ibc-relayer-types",
 ]
 
 [[package]]
@@ -2411,7 +2528,7 @@ dependencies = [
 [[package]]
 name = "hermes-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -2423,7 +2540,7 @@ dependencies = [
 [[package]]
 name = "hermes-tokio-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "futures",
@@ -2437,7 +2554,7 @@ dependencies = [
 [[package]]
 name = "hermes-tracing-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-logging-components",
@@ -2449,19 +2566,18 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
- "cgp-error-eyre",
  "hermes-cosmos-chain-components",
  "hermes-cosmos-encoding-components",
  "hermes-encoding-components",
+ "hermes-error",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
  "hermes-wasm-encoding-components",
  "ibc",
  "ibc-proto",
- "ibc-relayer-types",
  "prost",
  "tendermint-proto",
 ]
@@ -2469,7 +2585,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
  "hermes-cosmos-encoding-components",
@@ -2483,18 +2599,17 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#806d625d47de249e99ebc0359365d4b8c85512b8"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
 dependencies = [
  "cgp",
- "cgp-error-eyre",
  "hermes-chain-type-components",
  "hermes-cosmos-chain-components",
  "hermes-cosmos-test-components",
  "hermes-relayer-components",
  "hermes-runtime-components",
  "hermes-test-components",
+ "ibc",
  "ibc-proto",
- "ibc-relayer-types",
  "prost",
  "serde_json",
  "toml",
@@ -2677,6 +2792,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "hyper-rustls"
+version = "0.27.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08afdbb5c31130e3034af566421053ab03787c640246a446327f550d11bcb333"
+dependencies = [
+ "futures-util",
+ "http 1.1.0",
+ "hyper 1.5.0",
+ "hyper-util",
+ "rustls 0.23.16",
+ "rustls-pki-types",
+ "tokio",
+ "tokio-rustls 0.26.0",
+ "tower-service",
+]
+
+[[package]]
 name = "hyper-timeout"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2686,6 +2818,22 @@ dependencies = [
  "hyper-util",
  "pin-project-lite",
  "tokio",
+ "tower-service",
+]
+
+[[package]]
+name = "hyper-tls"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70206fc6890eaca9fde8a0bf71caa2ddfc9fe045ac9e5c70df101a7dbde866e0"
+dependencies = [
+ "bytes",
+ "http-body-util",
+ "hyper 1.5.0",
+ "hyper-util",
+ "native-tls",
+ "tokio",
+ "tokio-native-tls",
  "tower-service",
 ]
 
@@ -2733,9 +2881,9 @@ dependencies = [
 
 [[package]]
 name = "ibc"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f23fb1f784adbd3aff42ab469c1c946cf9f8b9b4dd259e62e8f7ac78eec07f85"
+checksum = "6e841f00c9cffe4d33e958f52d1c6acb80b54098bae89977f3f9c0646f416dbe"
 dependencies = [
  "ibc-apps",
  "ibc-clients",
@@ -2747,9 +2895,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-app-nft-transfer"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "413b5e7a94325af5205cf1e88a1a380abca95c12fbb71a327828b3c041c9cd59"
+checksum = "387a3784dcc32d20744ed21a0d986d28e35c9fb81c5a8c4d7b58075872f39b7d"
 dependencies = [
  "ibc-app-nft-transfer-types",
  "ibc-core",
@@ -2758,13 +2906,13 @@ dependencies = [
 
 [[package]]
 name = "ibc-app-nft-transfer-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d0a0ca6ae399fa8bf6b2d041ec5a9048406d9ff816b73a3b107ea0a44670925f"
+checksum = "6f59d8c245dafa63584c5dede89d2df8bef2aebd2b2be7372f2f3273e1ae9ddf"
 dependencies = [
  "base64 0.22.1",
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "http 1.1.0",
  "ibc-app-transfer-types",
@@ -2780,9 +2928,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-app-transfer"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fab6c96311fab692b6793804a4ccd3833014474bee3d1239886ccb7b62399834"
+checksum = "75531659e169d3ebb19989db2cd1947ef3fa7edfe72f428019581f01e40292ef"
 dependencies = [
  "ibc-app-transfer-types",
  "ibc-core",
@@ -2791,28 +2939,28 @@ dependencies = [
 
 [[package]]
 name = "ibc-app-transfer-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf0ed447a6ac79dcd445d5417c78a971c0590011c130ce6c3aa151d3b06f0941"
+checksum = "ae830456d370da1adecb2a403d5bd3cdbefd4b6530617b86a908080d296e2041"
 dependencies = [
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-core",
  "ibc-proto",
  "parity-scale-codec",
- "primitive-types",
+ "primitive-types 0.13.1",
  "scale-info",
  "schemars",
  "serde",
- "uint",
+ "uint 0.10.0",
 ]
 
 [[package]]
 name = "ibc-apps"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b8ed1144363ca1176d672b90612ba55d9eea87fa13792b738df04f23c945ef1"
+checksum = "4c8fe3f724b57a830833c36449403b7bd3420075ce9bf6b39ed58690724a8e83"
 dependencies = [
  "ibc-app-nft-transfer",
  "ibc-app-transfer",
@@ -2835,11 +2983,11 @@ dependencies = [
 
 [[package]]
 name = "ibc-client-tendermint"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6de9070707bf6334d3b4910e946c54aac96e792c6e6c85f5e81d701faa6367b"
+checksum = "d5b02fb5248a9fdf1b8242792fbd5528f2d51aded7cb1a7a9c016b4e9df49610"
 dependencies = [
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "ibc-client-tendermint-types",
  "ibc-core-client",
  "ibc-core-commitment-types",
@@ -2853,9 +3001,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-client-tendermint-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ac46b736dc0ffde0873741185a4bbaf1c0e41e9c07ef1df87c3bc57cc0ca6f5"
+checksum = "f095aeba9bc93be2346151a9bdb616498939ae1dd43eb361be9d2fa04eaf308d"
 dependencies = [
  "borsh",
  "displaydoc",
@@ -2872,9 +3020,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-client-wasm-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1fb4ad72cd0981a7bb3a17860c0465c482cd4de6f97493edec4d2cee24b7af08"
+checksum = "39bd8f0ed74bbccce9e322bf337a886b028c2db4f4c484a8e245040a9605e5a7"
 dependencies = [
  "base64 0.22.1",
  "displaydoc",
@@ -2888,9 +3036,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-clients"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1ed39dbc7e830a9b23219fb35dcbe08765acfc286bd800b732a187d7f723c1fe"
+checksum = "21ba4feffe97a8ff8ac465e618a9fa29700fa8c17db13419c05f4282e607a900"
 dependencies = [
  "ibc-client-tendermint",
  "ibc-client-wasm-types",
@@ -2898,9 +3046,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-core"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f488fa4c3d808b0a3efbf882ec5579d4a40c55b61061e9871182417a540deb8"
+checksum = "6aebe44c654b28872c5578601d0c1b934f58272ab439603a13d66ac98ba59b3d"
 dependencies = [
  "ibc-core-channel",
  "ibc-core-client",
@@ -2915,9 +3063,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-channel"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea88ab6c9b3efa38fdd03cf81bdcc62d735bdc9b2f3b91ca11db40970aae34c3"
+checksum = "015c77b37581ee4448ade586ca5a7531e5285577306feb1b268555e964770a5d"
 dependencies = [
  "ibc-core-channel-types",
  "ibc-core-client",
@@ -2931,12 +3079,12 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-channel-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce4a38ac9e8693c75eee6f82dc9cba488589463b7d7fd48ec5d9fea056f4262e"
+checksum = "2cd8a7707fad74232cc5a306382a2c60a43346ea13bf6acc08b6b5289508b0c8"
 dependencies = [
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-core-client-types",
  "ibc-core-commitment-types",
@@ -2955,9 +3103,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-client"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87c10ee61fec3009856483e2ae54c878c578262f580a7d45202886f350ed1f68"
+checksum = "5397f176e100ea3023734d9deb2ae1cc9e19b4561bf1aba2ae38a4d49272c6ad"
 dependencies = [
  "ibc-core-client-context",
  "ibc-core-client-types",
@@ -2969,11 +3117,11 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-client-context"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "962445d764988cbc257e3422272721605a60de8dbbc04eb6b74c3d4355f0128e"
+checksum = "46639dacb4915502a5f22417ed2b5759919ea52b24906d139903d557555ca2c6"
 dependencies = [
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-core-client-types",
  "ibc-core-commitment-types",
@@ -2986,12 +3134,12 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-client-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "300499a36eb03db0d5070821a9c1a90d09ddc2617ab8f0dd8e4007c8a583bddc"
+checksum = "a8b656b53813af821488f12af135efe9e1e51727a9588601021af3f6113576b5"
 dependencies = [
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-core-commitment-types",
  "ibc-core-host-types",
@@ -3007,12 +3155,12 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-commitment-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a283aa05126b3987ac43d46f1044f53da88e9852d6a8854517fcacc4194fadf"
+checksum = "6287fd1458abd2ba03d8aaad8aa37fdf0d7a678d2dd94a2d0ec587abe689a33c"
 dependencies = [
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-core-host-types",
  "ibc-primitives",
@@ -3027,9 +3175,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-connection"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "897f60ed80cec48a6081bf3ff81a4dfee15013eecaa3038bb45f8c750b9d69b2"
+checksum = "783a2a7719608cd2c3ca6dccd7d8f56f3706c31e45ac261462ba064a0c0b27f4"
 dependencies = [
  "ibc-client-wasm-types",
  "ibc-core-client",
@@ -3042,12 +3190,12 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-connection-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "387277b973191c6b9f64aef51dc50d01d01fbe54f0189b678c7ad63379d89a33"
+checksum = "f851d007b1c269eb849208e080a8790a2a5b37546b3e741d835316a739483492"
 dependencies = [
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-core-client-types",
  "ibc-core-commitment-types",
@@ -3064,9 +3212,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-handler"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ca347addeca0e3f326f0409ea53ee7cd377af1394120e98458a534d3ca249f2"
+checksum = "c783b32affbcf3298a656e9ba3fc5c46d53a57c808b21870387925c0c8406f00"
 dependencies = [
  "ibc-core-channel",
  "ibc-core-client",
@@ -3080,12 +3228,12 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-handler-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79f744f2f6a135be02c0f960aaaeb40ab67475baf1fc453002d5c4aec9751e8e"
+checksum = "f69ac81e331c0740b0ee47ef9cbbf5f6f5c9cbbe4ca620d156224b653e63ac21"
 dependencies = [
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-core-channel-types",
  "ibc-core-client-types",
@@ -3105,11 +3253,11 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-host"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "880ef7dfafd37bb6b8d738d682816ca2f6f2334916cf04bc72d3584a885b9dfe"
+checksum = "a48b932c262deb91616535a690f5c9e31182d32f1d8d0cf1caf01b1a7d370277"
 dependencies = [
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-core-channel-types",
  "ibc-core-client-context",
@@ -3124,12 +3272,12 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-host-cosmos"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17454001c2248669ac811d03c647889322e8b119fa5e5d64560102d6d707ab99"
+checksum = "4d6ce9f8b6f4ace0df28f82d8872bd65eb5fc117e32629c26663ee5e859716bd"
 dependencies = [
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-app-transfer-types",
  "ibc-client-tendermint",
@@ -3149,13 +3297,13 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-host-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd0c7fba11984c56687f43cfea873aaf6832ccd24c82cf4468fc02725783effe"
+checksum = "b7bbb8e65d5cafa6ab46f202344e34d9727717a1479dd8ad8fde03410ad235cc"
 dependencies = [
  "base64 0.22.1",
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-primitives",
  "parity-scale-codec",
@@ -3167,11 +3315,11 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-router"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b87238534a46bebd330584b198788d3d138d609bcc3f3b1d28a975ed050f076b"
+checksum = "f202f536a5acb839743be8b4af646c7a41b10d7f8315c971f8c3479ac12df131"
 dependencies = [
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-core-channel-types",
  "ibc-core-host-types",
@@ -3182,12 +3330,12 @@ dependencies = [
 
 [[package]]
 name = "ibc-core-router-types"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "872ea68d6b22e0f63344a8cc6622ac2b2845b062bcd76b0291f56f265bb667c1"
+checksum = "d6e4fe4d5f146a06ba7fe9de72643edb92140297cbe639b457fe6a6863c9763c"
 dependencies = [
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-core-host-types",
  "ibc-primitives",
@@ -3202,9 +3350,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-derive"
-version = "0.9.0"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f803c37274f3b60676305182a86c285c858c3c916c1c4530b812d9dacf455961"
+checksum = "7b2bbdb8c5306e4b53545026d6ecbdbf6f9fc5a6459749c60017b99cf895fed4"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3213,12 +3361,12 @@ dependencies = [
 
 [[package]]
 name = "ibc-primitives"
-version = "0.55.1"
+version = "0.56.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44e50ac39c6692d836dfb8047a2081a23a452ee9e2d371ff159fa6ba2abce1cc"
+checksum = "bca1c435942806567a4bec4fa6a936f32cc5333e8118d91fb7e001d9d75001c3"
 dependencies = [
  "borsh",
- "derive_more 0.99.18",
+ "derive_more 1.0.0",
  "displaydoc",
  "ibc-proto",
  "parity-scale-codec",
@@ -3231,19 +3379,17 @@ dependencies = [
 
 [[package]]
 name = "ibc-proto"
-version = "0.47.1"
+version = "0.51.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c852d22b782d2d793f4a646f968de419be635e02bc8798d5d74a6e44eef27733"
+checksum = "9b70f517162e74e2d35875b8b94bf4d1e45f2c69ef3de452dc855944455d33ca"
 dependencies = [
  "base64 0.22.1",
- "borsh",
  "bytes",
+ "cosmos-sdk-proto",
  "flex-error",
  "ics23",
  "informalsystems-pbjson",
- "parity-scale-codec",
  "prost",
- "scale-info",
  "schemars",
  "serde",
  "subtle-encoding",
@@ -3253,8 +3399,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-relayer"
-version = "0.29.3"
-source = "git+https://github.com/informalsystems/hermes.git#42531c5da766a4c7d55d3354102b543dbbde8fef"
+version = "0.29.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cef30a6f00e21d77ad61b6809de404f59cd3b6d9b31699f0ebd238539a33da46"
 dependencies = [
  "anyhow",
  "async-stream",
@@ -3287,10 +3434,10 @@ dependencies = [
  "once_cell",
  "prost",
  "regex",
- "reqwest",
+ "reqwest 0.11.27",
  "retry",
  "ripemd",
- "secp256k1",
+ "secp256k1 0.28.2",
  "semver",
  "serde",
  "serde_derive",
@@ -3319,8 +3466,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-relayer-types"
-version = "0.29.3"
-source = "git+https://github.com/informalsystems/hermes.git#42531c5da766a4c7d55d3354102b543dbbde8fef"
+version = "0.29.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3bcdf481e452b36076f2bc2899b21a6e58fb8c5ab773ef0631fb4df2ac2e4de0"
 dependencies = [
  "bytes",
  "derive_more 0.99.18",
@@ -3329,7 +3477,7 @@ dependencies = [
  "ics23",
  "itertools 0.13.0",
  "num-rational",
- "primitive-types",
+ "primitive-types 0.12.2",
  "prost",
  "regex",
  "serde",
@@ -3341,13 +3489,14 @@ dependencies = [
  "tendermint-proto",
  "time",
  "tracing",
- "uint",
+ "uint 0.9.5",
 ]
 
 [[package]]
 name = "ibc-telemetry"
-version = "0.29.3"
-source = "git+https://github.com/informalsystems/hermes.git#42531c5da766a4c7d55d3354102b543dbbde8fef"
+version = "0.29.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "136f35f27cc543fc7e2cd83481abe59bae92e82e496074bb01e8c0efbcccb22e"
 dependencies = [
  "axum 0.6.20",
  "dashmap 5.5.3",
@@ -3538,6 +3687,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "impl-codec"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b67aa010c1e3da95bf151bd8b4c059b2ed7e75387cdb969b4f8f2723a43f9941"
+dependencies = [
+ "parity-scale-codec",
+]
+
+[[package]]
 name = "impl-rlp"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3551,6 +3709,15 @@ name = "impl-serde"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebc88fc67028ae3db0c853baa36269d398d5f45b6982f95549ff5def78c935cd"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "impl-serde"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a143eada6a1ec4aefa5049037a26a6d597bfd64f8c026d07b77133e02b7dd0b"
 dependencies = [
  "serde",
 ]
@@ -3770,6 +3937,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "linux-raw-sys"
+version = "0.4.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "78b3ae25bc7c8c38cec158d1f2757ee79e9b3740fbc7ccf0e59e4b08d793fa89"
+
+[[package]]
 name = "litemap"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3890,6 +4063,23 @@ dependencies = [
  "thiserror",
  "triomphe",
  "uuid 1.11.0",
+]
+
+[[package]]
+name = "native-tls"
+version = "0.2.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a8614eb2c83d59d1c8cc974dd3f920198647674a0a035e1af1fa58707e317466"
+dependencies = [
+ "libc",
+ "log",
+ "openssl",
+ "openssl-probe",
+ "openssl-sys",
+ "schannel",
+ "security-framework",
+ "security-framework-sys",
+ "tempfile",
 ]
 
 [[package]]
@@ -4017,10 +4207,48 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08d65885ee38876c4f86fa503fb49d7b507c2b62552df7c70b2fce627e06381"
 
 [[package]]
+name = "openssl"
+version = "0.10.68"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6174bc48f102d208783c2c84bf931bb75927a617866870de8a4ea85597f871f5"
+dependencies = [
+ "bitflags 2.6.0",
+ "cfg-if",
+ "foreign-types",
+ "libc",
+ "once_cell",
+ "openssl-macros",
+ "openssl-sys",
+]
+
+[[package]]
+name = "openssl-macros"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a948666b637a0f465e8564c73e89d4dde00d72d4d473cc972f390fc3dcee7d9c"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.87",
+]
+
+[[package]]
 name = "openssl-probe"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff011a302c396a5197692431fc1948019154afc178baf7d8e37367442a4601cf"
+
+[[package]]
+name = "openssl-sys"
+version = "0.9.104"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "45abf306cbf99debc8195b66b7346498d7b10c210de50418b5ccd7ceba08c741"
+dependencies = [
+ "cc",
+ "libc",
+ "pkg-config",
+ "vcpkg",
+]
 
 [[package]]
 name = "opentelemetry"
@@ -4277,6 +4505,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "pkg-config"
+version = "0.3.31"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "953ec861398dccce10c670dfeaf3ec4911ca479e9c02154b3a215178c5f566f2"
+
+[[package]]
 name = "portable-atomic"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4329,10 +4563,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b34d9fd68ae0b74a41b21c03c2f62847aa0ffea044eee893b4c140b37e244e2"
 dependencies = [
  "fixed-hash",
- "impl-codec",
+ "impl-codec 0.6.0",
  "impl-rlp",
- "impl-serde",
- "uint",
+ "impl-serde 0.4.0",
+ "uint 0.9.5",
+]
+
+[[package]]
+name = "primitive-types"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d15600a7d856470b7d278b3fe0e311fe28c2526348549f8ef2ff7db3299c87f5"
+dependencies = [
+ "fixed-hash",
+ "impl-codec 0.7.0",
+ "impl-serde 0.5.0",
+ "uint 0.10.0",
 ]
 
 [[package]]
@@ -4583,7 +4829,7 @@ dependencies = [
  "http 0.2.12",
  "http-body 0.4.6",
  "hyper 0.14.31",
- "hyper-rustls",
+ "hyper-rustls 0.24.2",
  "ipnet",
  "js-sys",
  "log",
@@ -4598,7 +4844,7 @@ dependencies = [
  "serde_json",
  "serde_urlencoded",
  "sync_wrapper 0.1.2",
- "system-configuration",
+ "system-configuration 0.5.1",
  "tokio",
  "tokio-rustls 0.24.1",
  "tower-service",
@@ -4608,6 +4854,49 @@ dependencies = [
  "web-sys",
  "webpki-roots",
  "winreg",
+]
+
+[[package]]
+name = "reqwest"
+version = "0.12.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a77c62af46e79de0a562e1a9849205ffcb7fc1238876e9bd743357570e04046f"
+dependencies = [
+ "base64 0.22.1",
+ "bytes",
+ "encoding_rs",
+ "futures-core",
+ "futures-util",
+ "h2 0.4.6",
+ "http 1.1.0",
+ "http-body 1.0.1",
+ "http-body-util",
+ "hyper 1.5.0",
+ "hyper-rustls 0.27.3",
+ "hyper-tls",
+ "hyper-util",
+ "ipnet",
+ "js-sys",
+ "log",
+ "mime",
+ "native-tls",
+ "once_cell",
+ "percent-encoding",
+ "pin-project-lite",
+ "rustls-pemfile 2.2.0",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sync_wrapper 1.0.1",
+ "system-configuration 0.6.1",
+ "tokio",
+ "tokio-native-tls",
+ "tower-service",
+ "url",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "windows-registry",
 ]
 
 [[package]]
@@ -4714,6 +5003,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cfcb3a22ef46e85b45de6ee7e79d063319ebb6594faafcf1c225ea92ab6e9b92"
 dependencies = [
  "semver",
+]
+
+[[package]]
+name = "rustix"
+version = "0.38.42"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f93dc38ecbab2eb790ff964bb77fa94faf256fd3e73285fd7ba0903b76bedb85"
+dependencies = [
+ "bitflags 2.6.0",
+ "errno",
+ "libc",
+ "linux-raw-sys",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -4972,14 +5274,34 @@ dependencies = [
 
 [[package]]
 name = "secp256k1"
+version = "0.27.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25996b82292a7a57ed3508f052cfff8640d38d32018784acd714758b43da9c8f"
+dependencies = [
+ "bitcoin_hashes 0.12.0",
+ "rand",
+ "secp256k1-sys 0.8.1",
+]
+
+[[package]]
+name = "secp256k1"
 version = "0.28.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d24b59d129cdadea20aea4fb2352fa053712e5d713eee47d700cd4b2bc002f10"
 dependencies = [
- "bitcoin_hashes",
+ "bitcoin_hashes 0.13.0",
  "rand",
- "secp256k1-sys",
+ "secp256k1-sys 0.9.2",
  "serde",
+]
+
+[[package]]
+name = "secp256k1-sys"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "70a129b9e9efbfb223753b9163c4ab3b13cff7fd9c7f010fbac25ab4099fa07e"
+dependencies = [
+ "cc",
 ]
 
 [[package]]
@@ -5497,7 +5819,7 @@ dependencies = [
  "flate2",
  "getrandom",
  "log",
- "reqwest",
+ "reqwest 0.11.27",
  "serde",
  "serde_json",
  "serde_with 2.3.3",
@@ -5651,6 +5973,9 @@ name = "sync_wrapper"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a7065abeca94b6a8a577f9bd45aa0867a2238b74e8eb67cf10d492bc39351394"
+dependencies = [
+ "futures-core",
+]
 
 [[package]]
 name = "synstructure"
@@ -5671,7 +5996,18 @@ checksum = "ba3a3adc5c275d719af8cb4272ea1c4a6d668a777f37e115f6d11ddbc1c8e0e7"
 dependencies = [
  "bitflags 1.3.2",
  "core-foundation",
- "system-configuration-sys",
+ "system-configuration-sys 0.5.0",
+]
+
+[[package]]
+name = "system-configuration"
+version = "0.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c879d448e9d986b661742763247d3693ed13609438cf3d006f51f5368a5ba6b"
+dependencies = [
+ "bitflags 2.6.0",
+ "core-foundation",
+ "system-configuration-sys 0.6.0",
 ]
 
 [[package]]
@@ -5679,6 +6015,16 @@ name = "system-configuration-sys"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a75fb188eb626b924683e3b95e3a48e63551fcfb51949de2f06a9d91dbee93c9"
+dependencies = [
+ "core-foundation-sys",
+ "libc",
+]
+
+[[package]]
+name = "system-configuration-sys"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e1d1b10ced5ca923a1fcb8d03e96b8d3268065d724548c0211415ff6ac6bac4"
 dependencies = [
  "core-foundation-sys",
  "libc",
@@ -5697,10 +6043,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
-name = "tendermint"
-version = "0.38.1"
+name = "tempfile"
+version = "3.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "505d9d6ffeb83b1de47c307c6e0d2dff56c6256989299010ad03cd80a8491e97"
+checksum = "28cce251fcbc87fac86a866eeb0d6c2d536fc16d06f184bb61aeae11aa4cee0c"
+dependencies = [
+ "cfg-if",
+ "fastrand",
+ "once_cell",
+ "rustix",
+ "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "tendermint"
+version = "0.40.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37d513ce7f9e41c67ab2dd3d554ef65f36fbcc61745af1e1f93eafdeefa1ce37"
 dependencies = [
  "bytes",
  "digest 0.10.7",
@@ -5712,7 +6071,6 @@ dependencies = [
  "num-traits",
  "once_cell",
  "prost",
- "prost-types",
  "ripemd",
  "serde",
  "serde_bytes",
@@ -5729,9 +6087,9 @@ dependencies = [
 
 [[package]]
 name = "tendermint-config"
-version = "0.38.1"
+version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9de111ea653b2adaef627ac2452b463c77aa615c256eaaddf279ec5a1cf9775f"
+checksum = "4de4e66e78c6bfb768993e69c4fc5333dbc863f6d54ebd7a5d08d91556768087"
 dependencies = [
  "flex-error",
  "serde",
@@ -5743,9 +6101,9 @@ dependencies = [
 
 [[package]]
 name = "tendermint-light-client"
-version = "0.38.1"
+version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d91e5abb448c65e8abdfe0e17a3a189e005a71b4169b89f36aaa2053ff239577"
+checksum = "3e88c08a112db05101396a79f71c017d7dbf548dc21614f82251f17ecbe5d5e8"
 dependencies = [
  "contracts",
  "crossbeam-channel",
@@ -5768,9 +6126,9 @@ dependencies = [
 
 [[package]]
 name = "tendermint-light-client-detector"
-version = "0.38.1"
+version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb1ac1607eb7a3393313558b339c36eebeba15aa7f2d101d1d47299e65825152"
+checksum = "d48a431ea923182c37ca9f3cc8333490ac6746a64520d1c4a3dd18c08b0806ac"
 dependencies = [
  "crossbeam-channel",
  "derive_more 0.99.18",
@@ -5791,9 +6149,9 @@ dependencies = [
 
 [[package]]
 name = "tendermint-light-client-verifier"
-version = "0.38.1"
+version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a2674adbf0dc51aa0c8eaf8462c7d6692ec79502713e50ed5432a442002be90"
+checksum = "7affc5fffe9df158185e15bce3e47fc3a0c901e6708f3b7d33f0867d7aef8ce1"
 dependencies = [
  "derive_more 0.99.18",
  "flex-error",
@@ -5804,14 +6162,17 @@ dependencies = [
 
 [[package]]
 name = "tendermint-proto"
-version = "0.38.1"
+version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ed14abe3b0502a3afe21ca74ca5cdd6c7e8d326d982c26f98a394445eb31d6e"
+checksum = "c81ba1b023ec00763c3bc4f4376c67c0047f185cccf95c416c7a2f16272c4cbb"
 dependencies = [
+ "borsh",
  "bytes",
  "flex-error",
+ "parity-scale-codec",
  "prost",
- "prost-types",
+ "scale-info",
+ "schemars",
  "serde",
  "serde_bytes",
  "subtle-encoding",
@@ -5820,9 +6181,9 @@ dependencies = [
 
 [[package]]
 name = "tendermint-rpc"
-version = "0.38.1"
+version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02f96a2b8a0d3d0b59e4024b1a6bdc1589efc6af4709d08a480a20cc4ba90f63"
+checksum = "4d3ec9d6a266cb079a44272189b5a033227d058ab28659722557c1f7fed6b83c"
 dependencies = [
  "async-trait",
  "async-tungstenite",
@@ -5833,7 +6194,7 @@ dependencies = [
  "peg",
  "pin-project",
  "rand",
- "reqwest",
+ "reqwest 0.11.27",
  "semver",
  "serde",
  "serde_bytes",
@@ -5865,18 +6226,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.68"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "02dd99dc800bbb97186339685293e1cc5d9df1f8fae2d0aecd9ff1c77efea892"
+checksum = "b6aaf5339b578ea85b50e080feb250a3e8ae8cfcdff9a461c9ec2904bc923f52"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.68"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7c61ec9a6f64d2793d8a45faba21efbe3ced62a886d44c36a009b2b519b4c7e"
+checksum = "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -6004,6 +6365,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.87",
+]
+
+[[package]]
+name = "tokio-native-tls"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbae76ab933c85776efabc971569dd6119c580d8f5d448769dec1764bf796ef2"
+dependencies = [
+ "native-tls",
+ "tokio",
 ]
 
 [[package]]
@@ -6306,6 +6677,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "uint"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "909988d098b2f738727b161a106cfc7cab00c539c2687a8836f8e565976fb53e"
+dependencies = [
+ "byteorder",
+ "crunchy",
+ "hex",
+ "static_assertions",
+]
+
+[[package]]
 name = "unicode-ident"
 version = "1.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6409,6 +6792,12 @@ name = "valuable"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "830b7e5d4d90034032940e4ace0d9a9a057e7a45cd94e6c007832e39edb82f6d"
+
+[[package]]
+name = "vcpkg"
+version = "0.2.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426"
 
 [[package]]
 name = "version_check"
@@ -6561,6 +6950,36 @@ version = "0.52.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33ab640c8d7e35bf8ba19b884ba838ceb4fba93a4e8c65a9059d08afcfc683d9"
 dependencies = [
+ "windows-targets 0.52.6",
+]
+
+[[package]]
+name = "windows-registry"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e400001bb720a623c1c69032f8e3e4cf09984deec740f007dd2b03ec864804b0"
+dependencies = [
+ "windows-result",
+ "windows-strings",
+ "windows-targets 0.52.6",
+]
+
+[[package]]
+name = "windows-result"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d1043d8214f791817bab27572aaa8af63732e11bf84aa21a45a78d6c317ae0e"
+dependencies = [
+ "windows-targets 0.52.6",
+]
+
+[[package]]
+name = "windows-strings"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4cd9b125c486025df0eabcb585e62173c6c9eddcec5d117d3b6e8c30e2ee4d10"
+dependencies = [
+ "windows-result",
  "windows-targets 0.52.6",
 ]
 

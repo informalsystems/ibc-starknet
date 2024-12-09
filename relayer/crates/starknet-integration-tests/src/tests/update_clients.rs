@@ -24,9 +24,7 @@ use hermes_starknet_chain_components::types::payloads::client::StarknetCreateCli
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
-use ibc_relayer::chain::cosmos::client::Settings;
-use ibc_relayer::config::types::TrustThreshold;
-use ibc_relayer_types::Height as CosmosHeight;
+use ibc::core::client::types::Height as CosmosHeight;
 use sha2::{Digest, Sha256};
 use tracing::info;
 
@@ -64,19 +62,20 @@ fn test_relay_update_clients() -> Result<(), Error> {
             hasher.finalize().into()
         };
 
-        let cosmos_builder = Arc::new(CosmosBuilder::new_with_default(runtime.clone()));
+        let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
 
         let cosmos_bootstrap = Arc::new(CosmosWithWasmClientBootstrap {
             runtime: runtime.clone(),
-            builder: cosmos_builder,
+            cosmos_builder,
             should_randomize_identifiers: true,
             chain_store_dir: format!("./test-data/{timestamp}/cosmos").into(),
             chain_command_path: "simd".into(),
             account_prefix: "cosmos".into(),
-            staking_denom: "stake".into(),
-            transfer_denom: "coin".into(),
+            staking_denom_prefix: "stake".into(),
+            transfer_denom_prefix: "coin".into(),
             wasm_client_byte_code,
             governance_proposal_authority: "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn".into(), // TODO: don't hard code this
+            dynamic_gas: None,
         });
 
         let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
@@ -112,17 +111,11 @@ fn test_relay_update_clients() -> Result<(), Error> {
 
         starknet_chain.ibc_client_contract_address = Some(comet_client_address);
 
-        let create_client_settings = Settings {
-            max_clock_drift: Duration::from_secs(40),
-            trusting_period: Some(Duration::from_secs(60 * 60)),
-            trust_threshold: TrustThreshold::ONE_THIRD,
-        };
-
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
             starknet_chain,
             cosmos_chain,
-            &create_client_settings,
+            &Default::default(),
             &(),
         )
         .await?;

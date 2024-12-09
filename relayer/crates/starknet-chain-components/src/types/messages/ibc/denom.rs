@@ -9,7 +9,6 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
-use hermes_encoding_components::HList;
 use starknet::core::types::Felt;
 
 #[derive(Debug)]
@@ -35,7 +34,7 @@ pub struct EncodePrefixedDenom;
 delegate_components! {
     EncodePrefixedDenom {
         MutEncoderComponent: CombineEncoders<
-            HList![
+            Product![
                 EncodeField<symbol!("trace_path"), UseContext>,
                 EncodeField<symbol!("base"), UseContext>,
             ],
@@ -58,7 +57,7 @@ pub struct EncodeTracePrefix;
 delegate_components! {
     EncodeTracePrefix {
         MutEncoderComponent: CombineEncoders<
-            HList![
+            Product![
                 EncodeField<symbol!("port_id"), UseContext>,
                 EncodeField<symbol!("channel_id"), UseContext>,
             ],

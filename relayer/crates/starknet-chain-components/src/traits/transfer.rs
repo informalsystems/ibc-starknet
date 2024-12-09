@@ -2,7 +2,11 @@ use cgp::prelude::*;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
 
-#[derive_component(TokenTransferComponent, TokenTransferer<Chain>)]
+#[cgp_component {
+  name: TokenTransferComponent,
+  provider: TokenTransferer,
+  context: Chain,
+}]
 #[async_trait]
 pub trait CanTransferToken: HasAddressType + HasAmountType + HasErrorType {
     async fn transfer_token(

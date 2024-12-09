@@ -41,7 +41,7 @@ use crate::types::consensus_state::{
     ConvertWasmStarknetConsensusState, StarknetConsensusState, WasmStarknetConsensusState,
 };
 
-define_components! {
+cgp_preset! {
     StarknetProtobufEncodingComponents {
         EncodedTypeComponent:
             ProvideEncodedBytes,

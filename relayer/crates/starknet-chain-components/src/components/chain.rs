@@ -85,7 +85,7 @@ pub use crate::traits::types::method::SelectorTypeComponent;
 use crate::types::message_response::UseStarknetMessageResponse;
 use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
 
-define_components! {
+cgp_preset! {
     StarknetChainComponents {
         ChainIdTypeComponent:
             ProvideFeltChainId,

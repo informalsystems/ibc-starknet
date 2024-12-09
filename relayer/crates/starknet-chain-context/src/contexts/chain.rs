@@ -2,6 +2,8 @@ use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::field::impls::use_field::WithField;
+use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
@@ -46,7 +48,7 @@ use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryT
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
-    HasRuntime, ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
+    HasRuntime, RuntimeGetterComponent, RuntimeTypeComponent,
 };
 use hermes_starknet_chain_components::components::chain::*;
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
@@ -108,11 +110,8 @@ delegate_components! {
     StarknetChainContextComponents {
         ErrorTypeComponent: ProvideHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
-        [
-            RuntimeTypeComponent,
-            RuntimeGetterComponent,
-        ]:
-            ProvideDefaultRuntimeField,
+        RuntimeTypeComponent: WithType<HermesRuntime>,
+        RuntimeGetterComponent: WithField<symbol!("runtime")>,
         [
             LoggerTypeComponent,
             LoggerGetterComponent,
@@ -136,9 +135,11 @@ delegate_components! {
 }
 
 with_starknet_chain_components! {
-    delegate_components! {
-        StarknetChainContextComponents {
-            @StarknetChainComponents: StarknetChainComponents,
+    | Components | {
+        delegate_components! {
+            StarknetChainContextComponents {
+                Components: StarknetChainComponents,
+            }
         }
     }
 }

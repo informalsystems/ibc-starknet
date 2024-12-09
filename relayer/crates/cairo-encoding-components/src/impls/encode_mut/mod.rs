@@ -1,6 +1,7 @@
 pub mod array;
 pub mod bool;
 pub mod byte_array;
+pub mod cons;
 pub mod end;
 pub mod felt;
 pub mod from_felt;

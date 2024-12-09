@@ -2,7 +2,11 @@ use cgp::prelude::*;
 
 use crate::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
 
-#[derive_component(ContractDeclarerComponent, ContractDeclarer<Chain>)]
+#[cgp_component {
+  name: ContractDeclarerComponent,
+  provider: ContractDeclarer,
+  context: Chain,
+}]
 #[async_trait]
 pub trait CanDeclareContract:
     HasContractClassType + HasContractClassHashType + HasErrorType

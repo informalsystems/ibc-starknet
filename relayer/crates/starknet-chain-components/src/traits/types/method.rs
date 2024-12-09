@@ -1,6 +1,10 @@
 use cgp::prelude::*;
 
-#[derive_component(SelectorTypeComponent, ProvideSelectorType<Chain>)]
+#[cgp_component {
+  name: SelectorTypeComponent,
+  provider: ProvideSelectorType,
+  context: Chain,
+}]
 pub trait HasSelectorType: Async {
     type Selector: Async;
 }

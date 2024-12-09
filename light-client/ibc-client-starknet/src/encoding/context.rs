@@ -34,9 +34,11 @@ impl HasComponents for StarknetLightClientEncoding {
 }
 
 with_starknet_light_client_encoding_components! {
-    delegate_components! {
-        StarknetLightClientEncodingContextComponents {
-            @StarknetLightClientEncodingComponents: StarknetLightClientEncodingComponents
+    | Components | {
+        delegate_components! {
+            StarknetLightClientEncodingContextComponents {
+                Components: StarknetLightClientEncodingComponents
+            }
         }
     }
 }
@@ -174,7 +176,8 @@ impl ErrorRaiser<StarknetLightClientEncoding, TypeUrlMismatchError>
 }
 
 pub trait CanUseStarknetLightClientEncoding:
-    CanEncodeAndDecode<ViaProtobuf, Any>
+    Async
+    + CanEncodeAndDecode<ViaProtobuf, Any>
     + CanEncodeAndDecode<ViaProtobuf, Height>
     + CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
     + CanEncodeAndDecode<ViaProtobuf, StarknetConsensusState>
