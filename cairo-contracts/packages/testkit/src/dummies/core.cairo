@@ -30,7 +30,7 @@ pub fn CLIENT() -> ContractAddress {
 }
 
 pub fn CLIENT_TYPE() -> felt252 {
-    '07-cometbft'
+    '07-tendermint'
 }
 
 pub fn CLIENT_ID() -> ClientId {
