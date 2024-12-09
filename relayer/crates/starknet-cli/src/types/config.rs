@@ -1,5 +1,5 @@
+use hermes_cosmos_chain_components::impls::types::config::CosmosChainConfig;
 use hermes_starknet_test_components::types::wallet::StarknetWallet;
-use ibc_relayer::config::ChainConfig as CosmosChainConfig;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]

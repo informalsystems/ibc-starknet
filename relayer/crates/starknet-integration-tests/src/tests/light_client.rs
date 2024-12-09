@@ -39,12 +39,9 @@ use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmo
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::channel::types::channel::State;
+use ibc::core::client::types::Height;
 use ibc::core::connection::types::version::Version;
 use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
-use ibc_relayer::chain::cosmos::client::Settings;
-use ibc_relayer::config::types::TrustThreshold;
-use ibc_relayer_types::core::ics04_channel::channel::Ordering;
-use ibc_relayer_types::Height;
 use sha2::{Digest, Sha256};
 use starknet::macros::short_string;
 use tracing::info;
@@ -67,7 +64,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         var("STARKNET_WASM_CLIENT_PATH").expect("Wasm blob for Starknet light client is required"),
     );
 
-    let cosmos_builder = Arc::new(CosmosBuilder::new_with_default(runtime.clone()));
+    let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
 
     runtime.runtime.clone().block_on(async move {
         let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
@@ -88,15 +85,16 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let cosmos_bootstrap = Arc::new(CosmosWithWasmClientBootstrap {
             runtime: runtime.clone(),
-            builder: cosmos_builder,
+            cosmos_builder,
             should_randomize_identifiers: true,
             chain_store_dir: store_dir.join("chains"),
             chain_command_path: "simd".into(),
             account_prefix: "cosmos".into(),
-            staking_denom: "stake".into(),
-            transfer_denom: "coin".into(),
+            staking_denom_prefix: "stake".into(),
+            transfer_denom_prefix: "coin".into(),
             wasm_client_byte_code: wasm_client_byte_code_gzip,
             governance_proposal_authority: "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn".into(), // TODO: don't hard code this
+            dynamic_gas: Some(Default::default()),
         });
 
         let starknet_bootstrap = StarknetBootstrap {
@@ -217,13 +215,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         {
             // Pretend that we have relayed ConnectionOpenTry to Starknet, and then send ConnectionOpenAck.
 
-            let create_client_settings = Settings {
-                max_clock_drift: Duration::from_secs(40),
-                trusting_period: None,
-                trust_threshold: TrustThreshold::ONE_THIRD,
-            };
-
-            let payload = <CosmosChain as CanBuildCreateClientPayload<CosmosChain>>::build_create_client_payload(cosmos_chain, &create_client_settings,
+            let payload = <CosmosChain as CanBuildCreateClientPayload<CosmosChain>>::build_create_client_payload(cosmos_chain, &Default::default(),
             ).await?;
 
             let client_state = CosmosEncoding.convert(&payload.client_state)?;
@@ -248,7 +240,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         let channel_id = {
             let channel = Channel {
                 state: State::Init as i32,
-                ordering: Ordering::Unordered as i32,
+                ordering: 1,
                 counterparty: Some(Counterparty {
                     port_id: "11b7f9bfa43d3facae74efa5dfe0030df98273271278291d67c16a4e6cd5f7c".to_string(), // stub application contract on Starknet as port ID
                     channel_id: "".to_string(),

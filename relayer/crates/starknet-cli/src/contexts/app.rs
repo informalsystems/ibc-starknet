@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::field::impls::use_field::WithField;
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
@@ -30,7 +31,7 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
-    HasRuntime, ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
+    HasRuntime, RuntimeGetterComponent, RuntimeTypeComponent,
 };
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
@@ -69,11 +70,8 @@ delegate_components! {
             RetryableErrorComponent,
         ]:
             ProvideCliError,
-        [
-            RuntimeTypeComponent,
-            RuntimeGetterComponent,
-        ]:
-            ProvideDefaultRuntimeField,
+        RuntimeTypeComponent: WithType<HermesRuntime>,
+        RuntimeGetterComponent: WithField<symbol!("runtime")>,
         [
             LoggerTypeComponent,
             LoggerGetterComponent,

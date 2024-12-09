@@ -13,7 +13,7 @@ use hermes_relayer_components::components::default::relay::*;
 use hermes_relayer_components::error::impls::retry::ReturnMaxRetry;
 use hermes_relayer_components::error::traits::retry::MaxErrorRetryGetterComponent;
 use hermes_relayer_components::multi::traits::chain_at::{
-    ChainGetterAtComponent, ChainTypeAtComponent, HasChainTypeAt,
+    ChainGetterAtComponent, ChainTypeAtComponent,
 };
 use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
 use hermes_relayer_components::multi::types::tags::{Dst, Src};
@@ -87,8 +87,6 @@ delegate_components! {
 
 pub trait CanUseCosmosToStarknetRelay:
     Async
-    + HasChainTypeAt<Src, Chain = CosmosChain>
-    + HasChainTypeAt<Dst, Chain = StarknetChain>
     + CanRaiseRelayChainErrors
     + HasTargetClientIds<SourceTarget>
     + HasTargetClientIds<DestinationTarget>

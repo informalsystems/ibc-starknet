@@ -1,5 +1,3 @@
-use core::time::Duration;
-
 use cgp::prelude::HasErrorType;
 use hermes_chain_components::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_chain_components::traits::payload_builders::update_client::UpdateClientPayloadBuilder;

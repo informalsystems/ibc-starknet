@@ -2387,7 +2387,6 @@ dependencies = [
  "ibc",
  "ibc-client-starknet-types",
  "ibc-proto",
- "ibc-relayer",
  "prost-types",
  "serde_json",
  "starknet",
@@ -2449,8 +2448,6 @@ dependencies = [
  "hermes-starknet-test-components",
  "hermes-test-components",
  "ibc",
- "ibc-relayer",
- "ibc-relayer-types",
  "serde",
  "stable-eyre",
  "tokio",
@@ -2484,8 +2481,6 @@ dependencies = [
  "hermes-test-components",
  "ibc",
  "ibc-proto",
- "ibc-relayer",
- "ibc-relayer-types",
  "prost",
  "prost-types",
  "rand",
@@ -3404,8 +3399,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-relayer"
-version = "0.29.3"
-source = "git+https://github.com/informalsystems/hermes.git?rev=282b943d#282b943dab7d6142719f8a9dd0f4e40f45131721"
+version = "0.29.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cef30a6f00e21d77ad61b6809de404f59cd3b6d9b31699f0ebd238539a33da46"
 dependencies = [
  "anyhow",
  "async-stream",
@@ -3470,8 +3466,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-relayer-types"
-version = "0.29.3"
-source = "git+https://github.com/informalsystems/hermes.git?rev=282b943d#282b943dab7d6142719f8a9dd0f4e40f45131721"
+version = "0.29.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3bcdf481e452b36076f2bc2899b21a6e58fb8c5ab773ef0631fb4df2ac2e4de0"
 dependencies = [
  "bytes",
  "derive_more 0.99.18",
@@ -3497,8 +3494,9 @@ dependencies = [
 
 [[package]]
 name = "ibc-telemetry"
-version = "0.29.3"
-source = "git+https://github.com/informalsystems/hermes.git?rev=282b943d#282b943dab7d6142719f8a9dd0f4e40f45131721"
+version = "0.29.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "136f35f27cc543fc7e2cd83481abe59bae92e82e496074bb01e8c0efbcccb22e"
 dependencies = [
  "axum 0.6.20",
  "dashmap 5.5.3",

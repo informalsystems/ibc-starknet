@@ -26,7 +26,6 @@ hermes-wasm-encoding-components     = { workspace = true }
 
 ibc               = { workspace = true }
 ibc-proto         = { workspace = true }
-ibc-relayer       = { workspace = true }
 
 starknet                    = { workspace = true }
 serde_json                  = { workspace = true }
