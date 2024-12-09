@@ -1,5 +1,6 @@
 use std::time::SystemTime;
 
+use cgp::prelude::*;
 use eyre::eyre;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -77,6 +78,29 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             class_hash
         };
 
+        let ibc_core_class_hash = {
+            let contract_path = std::env::var("IBC_CORE_CONTRACT")?;
+
+            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+
+            let contract = serde_json::from_str(&contract_str)?;
+
+            let class_hash = chain.declare_contract(&contract).await?;
+
+            info!("declared IBC core class: {:?}", class_hash);
+
+            class_hash
+        };
+
+        let ibc_core_address = chain
+            .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
+            .await?;
+
+        info!(
+            "deployed IBC core contract to address: {:?}",
+            ibc_core_address
+        );
+
         let cairo_encoding = StarknetCairoEncoding;
 
         let event_encoding = StarknetEventEncoding {
@@ -88,6 +112,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let ics20_contract_address = {
             let owner_call_data =
                 cairo_encoding.encode(&chain_driver.relayer_wallet.account_address)?;
+            // // TODO(rano): when we are using ibc-core handler, ibc-core is the owner
+            // let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
             let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
 
             let contract_address = chain
@@ -102,6 +128,23 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             contract_address
         };
+
+        {
+            // register the ICS20 contract with the IBC core contract
+
+            let register_call_data =
+                cairo_encoding.encode(&product![b"transfer".to_vec(), ics20_contract_address])?;
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("bind_port_id"),
+                calldata: register_call_data,
+            };
+
+            let response = chain.send_message(message).await?;
+
+            info!("register ics20 response: {:?}", response);
+        }
 
         // stub
         let sender_address = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string();
@@ -145,6 +188,26 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 selector: selector!("on_recv_packet"),
                 calldata,
             }
+
+            // // TODO(rano): when ibc-core can create channels, this will be the correct message
+
+            // let msg_recv_packet = MsgRecvPacket {
+            //     packet,
+            //     proof_commitment_on_a: StateProof { proof: Vec::new() }, // stub
+            //     proof_height_on_a: Height {
+            //         // stub
+            //         revision_number: 0,
+            //         revision_height: 0,
+            //     },
+            // };
+
+            // let calldata = cairo_encoding.encode(&msg_recv_packet)?;
+
+            // Call {
+            //     to: ibc_core_address,
+            //     selector: selector!("recv_packet"),
+            //     calldata,
+            // }
         };
 
         let token_address = {
