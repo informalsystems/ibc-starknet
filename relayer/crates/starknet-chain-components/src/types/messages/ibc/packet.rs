@@ -71,3 +71,67 @@ impl Transformer for EncodePacket {
         }
     }
 }
+
+#[derive(HasField)]
+pub struct StateProof {
+    pub proof: Vec<Felt>,
+}
+
+pub struct EncodeStateProof;
+
+delegate_components! {
+    EncodeStateProof {
+        MutEncoderComponent: CombineEncoders<
+            Product![
+                EncodeField<symbol!("proof"), UseContext>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeStateProof {
+    type From = Product![Vec<Felt>];
+    type To = StateProof;
+
+    fn transform(product![proof]: Self::From) -> StateProof {
+        StateProof { proof }
+    }
+}
+
+#[derive(HasField)]
+pub struct MsgRecvPacket {
+    pub packet: Packet,
+    pub proof_commitment_on_a: StateProof,
+    pub proof_height_on_a: Height,
+}
+
+pub struct EncodeMsgRecvPacket;
+
+delegate_components! {
+    EncodeMsgRecvPacket {
+        MutEncoderComponent: CombineEncoders<
+            Product![
+                EncodeField<symbol!("packet"), UseContext>,
+                EncodeField<symbol!("proof_commitment_on_a"), UseContext>,
+                EncodeField<symbol!("proof_height_on_a"), UseContext>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeMsgRecvPacket {
+    type From = Product![Packet, StateProof, Height];
+    type To = MsgRecvPacket;
+
+    fn transform(
+        product![packet, proof_commitment_on_a, proof_height_on_a]: Self::From,
+    ) -> MsgRecvPacket {
+        MsgRecvPacket {
+            packet,
+            proof_commitment_on_a,
+            proof_height_on_a,
+        }
+    }
+}
