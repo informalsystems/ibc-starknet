@@ -4,7 +4,6 @@ use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::transform::Transformer;
-use hermes_encoding_components::HList;
 use hermes_protobuf_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::DecodeRequiredProtoField;
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::encode::EncodeLengthDelimitedProtoField;
@@ -18,7 +17,7 @@ pub struct EncodeStarknetConsensusState;
 delegate_components! {
     EncodeStarknetConsensusState {
         MutEncoderComponent:
-            CombineEncoders<HList![
+            CombineEncoders<Product![
                 EncodeField<
                     symbol!("root"),
                     EncodeLengthDelimitedProtoField<1, UseContext>,
@@ -30,7 +29,7 @@ delegate_components! {
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
-            CombineEncoders<HList![
+            CombineEncoders<Product![
                 DecodeRequiredProtoField<1, UseContext>,
                 DecodeRequiredProtoField<2, UseContext>,
             ]>
@@ -39,11 +38,11 @@ delegate_components! {
 }
 
 impl Transformer for EncodeStarknetConsensusState {
-    type From = HList![CommitmentRoot, Timestamp];
+    type From = Product![CommitmentRoot, Timestamp];
 
     type To = StarknetConsensusState;
 
-    fn transform(HList![root, time]: Self::From) -> Self::To {
+    fn transform(product![root, time]: Self::From) -> Self::To {
         StarknetConsensusState { root, time }
     }
 }

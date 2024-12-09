@@ -15,7 +15,7 @@ use crate::impls::types::decode_buffer::ProvideVecIterDecodeBuffer;
 use crate::impls::types::encode_buffer::ProvideVecEncodeBuffer;
 use crate::impls::types::encoded::ProvideVecFeltEncodedType;
 
-define_components! {
+cgp_preset! {
     CairoEncodingComponents {
         EncodedTypeComponent:
             ProvideVecFeltEncodedType,

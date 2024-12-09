@@ -13,14 +13,14 @@ impl<Chain, Tag> ProvideStarknetProviderType<Chain> for GetStarknetProviderField
 where
     Chain: Async + HasField<Tag>,
     Tag: Async,
-    Chain::Field: Async + Provider,
+    Chain::Value: Async + Provider,
 {
-    type Provider = Chain::Field;
+    type Provider = Chain::Value;
 }
 
 impl<Chain, Tag> StarknetProviderGetter<Chain> for GetStarknetProviderField<Tag>
 where
-    Chain: Async + HasStarknetProviderType + HasField<Tag, Field = Chain::Provider>,
+    Chain: Async + HasStarknetProviderType + HasField<Tag, Value = Chain::Provider>,
     Tag: Async,
 {
     fn provider(chain: &Chain) -> &Chain::Provider {

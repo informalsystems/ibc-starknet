@@ -13,14 +13,14 @@ impl<Chain, Tag> ProvideStarknetAccountType<Chain> for GetStarknetAccountField<T
 where
     Chain: Async + HasField<Tag>,
     Tag: Async,
-    Chain::Field: Async + ConnectedAccount,
+    Chain::Value: Async + ConnectedAccount,
 {
-    type Account = Chain::Field;
+    type Account = Chain::Value;
 }
 
 impl<Chain, Tag> StarknetAccountGetter<Chain> for GetStarknetAccountField<Tag>
 where
-    Chain: Async + HasStarknetAccountType + HasField<Tag, Field = Chain::Account>,
+    Chain: Async + HasStarknetAccountType + HasField<Tag, Value = Chain::Account>,
     Tag: Async,
 {
     fn account(chain: &Chain) -> &Chain::Account {

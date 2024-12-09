@@ -6,7 +6,6 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
-use hermes_encoding_components::HList;
 
 #[derive(Debug, Clone, HasField)]
 pub struct Height {
@@ -19,7 +18,7 @@ pub struct EncodeHeight;
 delegate_components! {
     EncodeHeight {
         MutEncoderComponent: CombineEncoders<
-            HList![
+            Product![
                 EncodeField<symbol!("revision_number"), UseContext>,
                 EncodeField<symbol!("revision_height"), UseContext>,
             ],

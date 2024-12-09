@@ -13,7 +13,6 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientP
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_encoding_components::HList;
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
@@ -39,7 +38,7 @@ where
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanEncode<ViaCairo, CometClientState>
         + CanEncode<ViaCairo, CometConsensusState>
-        + CanEncode<ViaCairo, HList![Felt, Vec<Felt>, Vec<Felt>]>,
+        + CanEncode<ViaCairo, Product![Felt, Vec<Felt>, Vec<Felt>]>,
 {
     async fn build_create_client_message(
         chain: &Chain,
@@ -51,8 +50,8 @@ where
         let contract_address = chain.query_contract_address(PhantomData).await?;
 
         let height = Height {
-            revision_number: payload.client_state.latest_height().revision_number(),
-            revision_height: payload.client_state.latest_height().revision_height(),
+            revision_number: payload.client_state.latest_height.revision_number(),
+            revision_height: payload.client_state.latest_height.revision_height(),
         };
 
         let root = payload.consensus_state.root.into_vec();
@@ -76,7 +75,11 @@ where
             .map_err(Chain::raise_error)?;
 
         let calldata = encoding
-            .encode(&HList![client_type, raw_client_state, raw_consensus_state])
+            .encode(&product![
+                client_type,
+                raw_client_state,
+                raw_consensus_state
+            ])
             .map_err(Chain::raise_error)?;
 
         let call = Call {

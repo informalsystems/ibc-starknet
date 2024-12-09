@@ -12,7 +12,7 @@ use crate::types::events::ics20::{
     CreateIbcTokenEvent, DecodeIbcTransferEvents, IbcTransferEvent, ReceiveIbcTransferEvent,
 };
 
-define_components! {
+cgp_preset! {
     StarknetEventEncodingComponents {
         EncodedTypeComponent: ProvideEncodedStarknetEventType,
         DecoderComponent: UseDelegate<StarknetEventEncoderComponents>,

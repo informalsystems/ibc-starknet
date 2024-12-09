@@ -4,6 +4,8 @@ use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::field::impls::use_field::WithField;
+use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cosmos_test_components::bootstrap::components::cosmos_sdk::{
     ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent,
@@ -18,7 +20,7 @@ use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
-    HasRuntime, ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
+    HasRuntime, RuntimeGetterComponent, RuntimeTypeComponent,
 };
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
@@ -60,11 +62,8 @@ delegate_components! {
     StarknetBootstrapComponents {
         ErrorTypeComponent: ProvideHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
-        [
-            RuntimeTypeComponent,
-            RuntimeGetterComponent,
-        ]:
-            ProvideDefaultRuntimeField,
+        RuntimeTypeComponent: WithType<HermesRuntime>,
+        RuntimeGetterComponent: WithField<symbol!("runtime")>,
         ChainNodeConfigTypeComponent:
             ProvideStarknetNodeConfigType,
         ChainGenesisConfigTypeComponent:

@@ -1,10 +1,9 @@
-use cgp::core::error::CanRaiseError;
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_encoding_components::HList;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
@@ -70,8 +69,8 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, HList![Participant, Participant, PrefixedDenom]>
-        + CanDecode<ViaCairo, HList![U256, String, bool]>,
+        + CanDecode<ViaCairo, Product![Participant, Participant, PrefixedDenom]>
+        + CanDecode<ViaCairo, Product![U256, String, bool]>,
 {
     fn decode(
         event_encoding: &EventEncoding,
@@ -79,11 +78,11 @@ where
     ) -> Result<ReceiveIbcTransferEvent, EventEncoding::Error> {
         let cairo_encoding = event_encoding.encoding();
 
-        let (sender, (receiver, (denom, ()))) = cairo_encoding
+        let product![sender, receiver, denom] = cairo_encoding
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
-        let (amount, (memo, (success, ()))) = cairo_encoding
+        let product![amount, memo, success] = cairo_encoding
             .decode(&event.data)
             .map_err(EventEncoding::raise_error)?;
 
@@ -105,8 +104,8 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, HList![String, String, Felt]>
-        + CanDecode<ViaCairo, HList![U256]>,
+        + CanDecode<ViaCairo, Product![String, String, Felt]>
+        + CanDecode<ViaCairo, Product![U256]>,
 {
     fn decode(
         event_encoding: &EventEncoding,
@@ -114,11 +113,11 @@ where
     ) -> Result<CreateIbcTokenEvent, EventEncoding::Error> {
         let cairo_encoding = event_encoding.encoding();
 
-        let (name, (symbol, (address, ()))) = cairo_encoding
+        let product![name, symbol, address] = cairo_encoding
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
-        let (initial_supply, ()) = cairo_encoding
+        let product![initial_supply] = cairo_encoding
             .decode(&event.data)
             .map_err(EventEncoding::raise_error)?;
 
