@@ -299,7 +299,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             );
         }
 
-        let connection_id = {
+        let cosmos_connection_id = {
             let open_init_message = CosmosConnectionOpenInitMessage {
                 client_id: cosmos_client_id.clone(),
                 counterparty_client_id: cosmos_client_id.clone(), // TODO: stub
@@ -331,8 +331,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
             runtime.sleep(Duration::from_secs(1)).await;
 
             let open_ack_message = CosmosConnectionOpenAckMessage {
-                connection_id: connection_id.clone(),
-                counterparty_connection_id: connection_id.clone(), // TODO: stub
+                connection_id: cosmos_connection_id.clone(),
+                counterparty_connection_id: cosmos_connection_id.clone(), // TODO: stub
                 version: Version::compatibles().pop().unwrap(),
                 client_state,
                 update_height: Height::new(0, 1).unwrap(),
@@ -353,7 +353,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                     port_id: "11b7f9bfa43d3facae74efa5dfe0030df98273271278291d67c16a4e6cd5f7c".to_string(), // stub application contract on Starknet as port ID
                     channel_id: "".to_string(),
                 }),
-                connection_hops: vec![connection_id.to_string()],
+                connection_hops: vec![cosmos_connection_id.to_string()],
                 version: "ics20-1".into(),
                 upgrade_sequence: 0,
             };
