@@ -12,7 +12,7 @@ use hermes_cosmos_integration_tests::impls::bootstrap::relayer_chain_config::Bui
 use hermes_cosmos_integration_tests::impls::bootstrap::types::ProvideCosmosBootstrapChainTypes;
 use hermes_cosmos_integration_tests::traits::bootstrap::build_chain::ChainBuilderWithNodeConfigComponent;
 use hermes_cosmos_integration_tests::traits::bootstrap::compat_mode::{
-    CompatModeGetterComponent, UseCompatMode37,
+    CompatModeGetterComponent, UseCompatMode34,
 };
 use hermes_cosmos_integration_tests::traits::bootstrap::cosmos_builder::CosmosBuilderGetterComponent;
 use hermes_cosmos_integration_tests::traits::bootstrap::relayer_chain_config::RelayerChainConfigBuilderComponent;
@@ -108,7 +108,7 @@ delegate_components! {
         ]:
             UseContext,
         CompatModeGetterComponent:
-            UseCompatMode37,
+            UseCompatMode34,
         CosmosSdkConfigModifierComponent:
             NoModifyCosmosSdkConfig,
         RelayerChainConfigBuilderComponent:
@@ -117,7 +117,6 @@ delegate_components! {
             BuildCosmosChainWithNodeConfig,
         ChainDriverBuilderComponent:
             BuildChainDriverAndInitWasmClient<BuildAndWaitChainDriver<BuildCosmosChainDriver>>,
-            // BuildChainDriverAndInitWasmClient<BuildChainDriverAndPause<BuildCosmosChainDriver>>,
         CosmosGenesisConfigModifierComponent:
             ModifyWasmGenesisConfig<NoModifyGenesisConfig>,
         CometConfigModifierComponent:
