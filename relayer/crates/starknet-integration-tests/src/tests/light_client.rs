@@ -32,7 +32,10 @@ use hermes_relayer_components::chain::traits::types::ibc_events::connection::Has
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
+use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::sleep::CanSleep;
+use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
+use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
@@ -108,11 +111,11 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
 
-        let starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
+        let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
 
         let cosmos_chain = cosmos_chain_driver.chain();
 
-        let starknet_chain = &starknet_chain_driver.chain;
+        let starknet_chain = &mut starknet_chain_driver.chain;
 
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
@@ -124,6 +127,31 @@ fn test_starknet_light_client() -> Result<(), Error> {
         .await?;
 
         info!("created client id on Cosmos: {:?}", cosmos_client_id);
+
+        let comet_client_class_hash = {
+            let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
+
+            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+
+            let contract = serde_json::from_str(&contract_str)?;
+
+            let class_hash = starknet_chain.declare_contract(&contract).await?;
+
+            info!("declared class: {:?}", class_hash);
+
+            class_hash
+        };
+
+        let comet_client_address = starknet_chain
+            .deploy_contract(&comet_client_class_hash, false, &Vec::new())
+            .await?;
+
+        info!(
+            "deployed Comet client contract to address: {:?}",
+            comet_client_address
+        );
+
+        starknet_chain.ibc_client_contract_address = Some(comet_client_address);
 
         let create_client_settings = Settings {
             max_clock_drift: Duration::from_secs(40),
