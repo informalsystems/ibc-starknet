@@ -8,6 +8,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use flate2::write::GzEncoder;
 use flate2::Compression;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
+use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_init::CosmosChannelOpenInitMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
@@ -43,6 +44,7 @@ use ibc::core::connection::types::version::Version;
 use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
 use sha2::{Digest, Sha256};
 use starknet::macros::short_string;
+use tendermint_rpc::client::CompatMode;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
@@ -81,8 +83,6 @@ fn test_starknet_light_client() -> Result<(), Error> {
             encoder.finish()?
         };
 
-        info!("Reduced wasm client code size from {} to {} bytes", wasm_client_byte_code.len(), wasm_client_byte_code_gzip.len());
-
         let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
             runtime: runtime.clone(),
             cosmos_builder,
@@ -95,7 +95,17 @@ fn test_starknet_light_client() -> Result<(), Error> {
             wasm_client_byte_code: wasm_client_byte_code_gzip,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
             dynamic_gas: None,
+            compat_mode: Some(CompatMode::V0_37),
         });
+
+        // let cosmos_bootstrap = Arc::new(build_osmosis_bootstrap(
+        //     runtime.clone(),
+        //     true,
+        //     "./test-data",
+        //     "coin".into(),
+        //     |_| Ok(()),
+        //     |_| Ok(()),
+        // ));
 
         let starknet_bootstrap = StarknetBootstrap {
             runtime: runtime.clone(),

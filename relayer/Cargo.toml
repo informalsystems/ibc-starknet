@@ -53,6 +53,7 @@ http                        = { version = "1.0.0" }
 ibc                       = { version = "0.56.0" }
 ibc-proto                 = { version = "0.51.1" }
 ibc-client-starknet-types = { version = "0.1.0" }
+tendermint-rpc            = { version = "0.40" }
 
 hermes-runtime-components           = { version = "0.1.0" }
 hermes-async-runtime-components     = { version = "0.1.0" }
@@ -141,7 +142,7 @@ hermes-protobuf-encoding-components  = { git = "https://github.com/informalsyste
 hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-logger                        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/fix-osmosis-bootstrap" }
 hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git" }

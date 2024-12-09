@@ -31,6 +31,7 @@ hermes-cosmos-wasm-relayer       = { workspace = true }
 
 ibc       = { workspace = true }
 ibc-proto = { workspace = true }
+tendermint-rpc = { workspace = true }
 
 starknet    = { workspace = true }
 url         = { workspace = true }

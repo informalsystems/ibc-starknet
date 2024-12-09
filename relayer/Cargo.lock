@@ -2488,6 +2488,7 @@ dependencies = [
  "serde_json",
  "sha2 0.10.8",
  "starknet",
+ "tendermint-rpc",
  "tokio",
  "toml",
  "tracing",
@@ -2530,7 +2531,7 @@ dependencies = [
 [[package]]
 name = "hermes-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#e7bbfad66cf3bcd10f204c705b206252f7f10e2e"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/fix-osmosis-bootstrap#fd4d2ceadd55b215d8bc22f670486ae94d979288"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
