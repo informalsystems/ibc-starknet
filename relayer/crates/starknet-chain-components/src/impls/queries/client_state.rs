@@ -49,7 +49,9 @@ where
     ) -> Result<Counterparty::ClientState, Chain::Error> {
         let encoding = chain.encoding();
 
-        let contract_address = chain.query_contract_address(PhantomData).await?;
+        let contract_address = chain
+            .query_contract_address(PhantomData::<symbol!("ibc_client_contract_address")>)
+            .await?;
 
         let calldata = encoding
             .encode(&client_id.sequence)

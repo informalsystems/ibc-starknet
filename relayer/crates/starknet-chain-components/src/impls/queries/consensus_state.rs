@@ -59,7 +59,9 @@ where
     ) -> Result<Counterparty::ConsensusState, Chain::Error> {
         let encoding = chain.encoding();
 
-        let contract_address = chain.query_contract_address(PhantomData).await?;
+        let contract_address = chain
+            .query_contract_address(PhantomData::<symbol!("ibc_client_contract_address")>)
+            .await?;
 
         let height = Height {
             revision_number: Counterparty::revision_number(consensus_height),
