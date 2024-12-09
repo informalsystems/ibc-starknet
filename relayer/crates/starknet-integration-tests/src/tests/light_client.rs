@@ -9,6 +9,7 @@ use flate2::write::GzEncoder;
 use flate2::Compression;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
+use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_init::CosmosChannelOpenInitMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
@@ -44,7 +45,6 @@ use ibc::core::connection::types::version::Version;
 use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
 use sha2::{Digest, Sha256};
 use starknet::macros::short_string;
-use tendermint_rpc::client::CompatMode;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
@@ -94,18 +94,13 @@ fn test_starknet_light_client() -> Result<(), Error> {
             transfer_denom_prefix: "coin".into(),
             wasm_client_byte_code: wasm_client_byte_code_gzip,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
-            dynamic_gas: None,
-            compat_mode: Some(CompatMode::V0_37),
+            dynamic_gas: Some(DynamicGasConfig {
+                multiplier: 1.1,
+                max: 1.6,
+                eip_query_type: EipQueryType::Osmosis,
+                denom: "stake".to_owned(),
+            }),
         });
-
-        // let cosmos_bootstrap = Arc::new(build_osmosis_bootstrap(
-        //     runtime.clone(),
-        //     true,
-        //     "./test-data",
-        //     "coin".into(),
-        //     |_| Ok(()),
-        //     |_| Ok(()),
-        // ));
 
         let starknet_bootstrap = StarknetBootstrap {
             runtime: runtime.clone(),

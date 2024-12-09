@@ -11,7 +11,9 @@ use hermes_cosmos_integration_tests::impls::bootstrap::build_cosmos_chain_driver
 use hermes_cosmos_integration_tests::impls::bootstrap::relayer_chain_config::BuildRelayerChainConfig;
 use hermes_cosmos_integration_tests::impls::bootstrap::types::ProvideCosmosBootstrapChainTypes;
 use hermes_cosmos_integration_tests::traits::bootstrap::build_chain::ChainBuilderWithNodeConfigComponent;
-use hermes_cosmos_integration_tests::traits::bootstrap::compat_mode::CompatModeGetterComponent;
+use hermes_cosmos_integration_tests::traits::bootstrap::compat_mode::{
+    CompatModeGetterComponent, UseCompatMode37,
+};
 use hermes_cosmos_integration_tests::traits::bootstrap::cosmos_builder::CosmosBuilderGetterComponent;
 use hermes_cosmos_integration_tests::traits::bootstrap::relayer_chain_config::RelayerChainConfigBuilderComponent;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
@@ -43,7 +45,6 @@ use hermes_wasm_test_components::impls::bootstrap::genesis_config::ModifyWasmGen
 use hermes_wasm_test_components::impls::bootstrap::node_config::ModifyWasmNodeConfig;
 use hermes_wasm_test_components::traits::bootstrap::client_byte_code::WasmClientByteCodeGetterComponent;
 use hermes_wasm_test_components::traits::bootstrap::gov_authority::GovernanceProposalAuthorityGetterComponent;
-use tendermint_rpc::client::CompatMode;
 
 /**
    A bootstrap context for bootstrapping a new Cosmos chain, and builds
@@ -62,7 +63,6 @@ pub struct OsmosisBootstrap {
     pub wasm_client_byte_code: Vec<u8>,
     pub governance_proposal_authority: String,
     pub dynamic_gas: Option<DynamicGasConfig>,
-    pub compat_mode: Option<CompatMode>,
 }
 
 impl CanUseLegacyCosmosSdkChainBootstrapper for OsmosisBootstrap {}
@@ -105,7 +105,6 @@ delegate_components! {
             WasmClientByteCodeGetterComponent,
             GovernanceProposalAuthorityGetterComponent,
             CosmosBuilderGetterComponent,
-            CompatModeGetterComponent,
         ]:
             UseContext,
         CosmosSdkConfigModifierComponent:
@@ -120,5 +119,6 @@ delegate_components! {
             ModifyWasmGenesisConfig<NoModifyGenesisConfig>,
         CometConfigModifierComponent:
             ModifyWasmNodeConfig<NoModifyCometConfig>,
+        CompatModeGetterComponent: UseCompatMode37,
     }
 }
