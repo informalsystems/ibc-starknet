@@ -2,20 +2,24 @@ use alloc::sync::Arc;
 use std::path::PathBuf;
 
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::field::impls::use_field::WithField;
+use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cosmos_integration_tests::impls::bootstrap::build_cosmos_chain::BuildCosmosChainWithNodeConfig;
 use hermes_cosmos_integration_tests::impls::bootstrap::build_cosmos_chain_driver::BuildCosmosChainDriver;
 use hermes_cosmos_integration_tests::impls::bootstrap::relayer_chain_config::BuildRelayerChainConfig;
 use hermes_cosmos_integration_tests::impls::bootstrap::types::ProvideCosmosBootstrapChainTypes;
 use hermes_cosmos_integration_tests::traits::bootstrap::build_chain::ChainBuilderWithNodeConfigComponent;
-use hermes_cosmos_integration_tests::traits::bootstrap::compat_mode::CompatModeGetter;
+use hermes_cosmos_integration_tests::traits::bootstrap::compat_mode::{
+    CompatModeGetter, CompatModeGetterComponent, UseCompatMode37,
+};
 use hermes_cosmos_integration_tests::traits::bootstrap::cosmos_builder::CosmosBuilderGetter;
-use hermes_cosmos_integration_tests::traits::bootstrap::gas_denom::GasDenomGetter;
 use hermes_cosmos_integration_tests::traits::bootstrap::relayer_chain_config::RelayerChainConfigBuilderComponent;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_test_components::bootstrap::components::cosmos_sdk_legacy::*;
 use hermes_cosmos_test_components::bootstrap::impls::generator::wallet_config::GenerateStandardWalletConfig;
 use hermes_cosmos_test_components::bootstrap::impls::modifiers::no_modify_comet_config::NoModifyCometConfig;
+use hermes_cosmos_test_components::bootstrap::impls::modifiers::no_modify_cosmos_sdk_config::NoModifyCosmosSdkConfig;
 use hermes_cosmos_test_components::bootstrap::impls::modifiers::no_modify_genesis_config::NoModifyGenesisConfig;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::ChainDriverBuilderComponent;
 use hermes_cosmos_test_components::bootstrap::traits::fields::account_prefix::AccountPrefixGetter;
@@ -24,18 +28,18 @@ use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::C
 use hermes_cosmos_test_components::bootstrap::traits::fields::denom::{
     DenomForStaking, DenomForTransfer, DenomPrefixGetter,
 };
+use hermes_cosmos_test_components::bootstrap::traits::fields::dynamic_gas_fee::DynamicGasGetterComponent;
 use hermes_cosmos_test_components::bootstrap::traits::fields::random_id::RandomIdFlagGetter;
 use hermes_cosmos_test_components::bootstrap::traits::generator::generate_wallet_config::WalletConfigGeneratorComponent;
 use hermes_cosmos_test_components::bootstrap::traits::modifiers::modify_comet_config::{
     CometConfigModifier, CometConfigModifierComponent,
 };
+use hermes_cosmos_test_components::bootstrap::traits::modifiers::modify_cosmos_sdk_config::CosmosSdkConfigModifierComponent;
 use hermes_cosmos_test_components::bootstrap::traits::modifiers::modify_genesis_config::CosmosGenesisConfigModifierComponent;
 use hermes_error::handlers::debug::DebugError;
 use hermes_error::impls::ProvideHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::{
-    ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
-};
+use hermes_runtime_components::traits::runtime::{RuntimeGetterComponent, RuntimeTypeComponent};
 use hermes_test_components::chain_driver::traits::types::chain::ChainTypeComponent;
 use hermes_test_components::driver::traits::types::chain_driver::ChainDriverTypeComponent;
 use hermes_wasm_test_components::impls::bootstrap::build_chain_driver::BuildChainDriverAndInitWasmClient;
@@ -43,8 +47,9 @@ use hermes_wasm_test_components::impls::bootstrap::genesis_config::ModifyWasmGen
 use hermes_wasm_test_components::impls::bootstrap::node_config::ModifyWasmNodeConfig;
 use hermes_wasm_test_components::traits::bootstrap::client_byte_code::WasmClientByteCodeGetter;
 use hermes_wasm_test_components::traits::bootstrap::gov_authority::GovernanceProposalAuthorityGetter;
-use ibc_relayer::config::compat_mode::CompatMode;
 use toml::Value;
+
+use crate::impls::dynamic_gas::NoDynamicGas;
 
 /**
    A bootstrap context for bootstrapping a new Cosmos chain, and builds
@@ -73,9 +78,11 @@ impl HasComponents for CosmosWithWasmClientBootstrap {
 }
 
 with_legacy_cosmos_sdk_bootstrap_components! {
-    delegate_components! {
-        CosmosWithWasmClientBootstrapComponents {
-            @LegacyCosmosSdkBootstrapComponents: LegacyCosmosSdkBootstrapComponents,
+    | Components | {
+        delegate_components! {
+            CosmosWithWasmClientBootstrapComponents {
+                Components: LegacyCosmosSdkBootstrapComponents,
+            }
         }
     }
 }
@@ -84,11 +91,8 @@ delegate_components! {
     CosmosWithWasmClientBootstrapComponents {
         ErrorTypeComponent: ProvideHermesError,
         ErrorRaiserComponent: DebugError,
-        [
-            RuntimeTypeComponent,
-            RuntimeGetterComponent,
-        ]:
-            ProvideDefaultRuntimeField,
+        RuntimeTypeComponent: WithType<HermesRuntime>,
+        RuntimeGetterComponent: WithField<symbol!("runtime")>,
         WalletConfigGeneratorComponent: GenerateStandardWalletConfig,
         [
             ChainTypeComponent,
@@ -105,6 +109,12 @@ delegate_components! {
             ModifyWasmGenesisConfig<NoModifyGenesisConfig>,
         CometConfigModifierComponent:
             ModifyWasmNodeConfig<NoModifyCometConfig>,
+        CosmosSdkConfigModifierComponent:
+            NoModifyCosmosSdkConfig,
+        CompatModeGetterComponent:
+            UseCompatMode37,
+        DynamicGasGetterComponent:
+            NoDynamicGas,
     }
 }
 
@@ -165,14 +175,6 @@ impl AccountPrefixGetter<CosmosWithWasmClientBootstrap>
 {
     fn account_prefix(bootstrap: &CosmosWithWasmClientBootstrap) -> &str {
         &bootstrap.account_prefix
-    }
-}
-
-impl CompatModeGetter<CosmosWithWasmClientBootstrap> for CosmosWithWasmClientBootstrapComponents {
-    fn compat_mode(_bootstrap: &CosmosWithWasmClientBootstrap) -> Option<&CompatMode> {
-        const COMPAT_MODE: CompatMode = CompatMode::V0_37;
-
-        Some(&COMPAT_MODE)
     }
 }
 
