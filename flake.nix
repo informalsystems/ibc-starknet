@@ -87,6 +87,12 @@
             rust = rust-1_79;
           };
 
+          ibc-starknet-cw = import ./nix/ibc-starknet-cw.nix {
+            inherit nixpkgs;
+
+            rust = rust-wasm;
+          };
+
           starknet-pkgs = {
             inherit
               starknet-devnet
@@ -127,6 +133,7 @@
               rust
               rust-nightly
               rust-wasm
+              ibc-starknet-cw
               ;
           } // tools // starknet-pkgs;
 
