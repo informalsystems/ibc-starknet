@@ -209,7 +209,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
         }
 
         {
-            info!("test relaying UpdateClient from Cosmos to Starknet");
+            info!("test relaying UpdateClient from Starknet to Cosmos");
 
             {
                 let client_state = cosmos_chain
