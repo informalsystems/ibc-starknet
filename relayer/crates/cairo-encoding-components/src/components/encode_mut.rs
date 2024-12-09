@@ -12,7 +12,7 @@ use crate::impls::encode_mut::unit::EncodeNothing;
 use crate::impls::encode_mut::vec::EncodeList;
 use crate::strategy::ViaCairo;
 
-define_components! {
+cgp_preset! {
     CairoEncodeMutComponents {
         (ViaCairo, Felt): EncodeFelt,
         (ViaCairo, u128): EncodeU128,
@@ -24,5 +24,6 @@ define_components! {
         (ViaCairo, usize): EncodeFromU128,
         (ViaCairo, String): EncodeUtf8String,
         (ViaCairo, ()): EncodeNothing,
+        (ViaCairo, Nil): EncodeNothing,
     }
 }

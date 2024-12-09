@@ -1,10 +1,9 @@
-use cgp::core::error::CanRaiseError;
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_encoding_components::HList;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
@@ -61,7 +60,7 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, HList![Felt, Felt]>
+        + CanDecode<ViaCairo, Product![Felt, Felt]>
         + CanDecode<ViaCairo, U256>,
 {
     fn decode(
@@ -70,7 +69,7 @@ where
     ) -> Result<TransferEvent, EventEncoding::Error> {
         let cairo_encoding = encoding.encoding();
 
-        let (from, (to, ())) = cairo_encoding
+        let product![from, to] = cairo_encoding
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
@@ -89,7 +88,7 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, HList![Felt, Felt]>
+        + CanDecode<ViaCairo, Product![Felt, Felt]>
         + CanDecode<ViaCairo, U256>,
 {
     fn decode(
@@ -98,7 +97,7 @@ where
     ) -> Result<ApprovalEvent, EventEncoding::Error> {
         let cairo_encoding = encoding.encoding();
 
-        let (owner, (spender, ())) = cairo_encoding
+        let product![owner, spender] = cairo_encoding
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 

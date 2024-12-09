@@ -15,9 +15,8 @@ use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
-use hermes_encoding_components::HList;
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
-use ibc_relayer_types::Height as CosmosHeight;
+use ibc::core::client::types::Height as CosmosHeight;
 
 use crate::types::cosmos::height::Height;
 
@@ -73,7 +72,7 @@ where
 delegate_components! {
     EncodeCometClientState {
         MutEncoderComponent: CombineEncoders<
-            HList![
+            Product![
                 EncodeField<symbol!("latest_height"), UseContext>,
                 EncodeField<symbol!("trusting_period"), UseContext>,
                 EncodeField<symbol!("status"), UseContext>,
@@ -84,10 +83,10 @@ delegate_components! {
 }
 
 impl Transformer for EncodeCometClientState {
-    type From = HList![Height, u64, ClientStatus];
+    type From = Product![Height, u64, ClientStatus];
     type To = CometClientState;
 
-    fn transform(HList![latest_height, trusting_period, status]: Self::From) -> CometClientState {
+    fn transform(product![latest_height, trusting_period, status]: Self::From) -> CometClientState {
         CometClientState {
             latest_height,
             trusting_period,

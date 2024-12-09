@@ -1,12 +1,20 @@
 use cgp::prelude::*;
 use starknet::providers::Provider;
 
-#[derive_component(StarknetProviderTypeComponent, ProvideStarknetProviderType<Chain>)]
+#[cgp_component {
+  name: StarknetProviderTypeComponent,
+  provider: ProvideStarknetProviderType,
+  context: Chain,
+}]
 pub trait HasStarknetProviderType: Async {
     type Provider: Async + Provider;
 }
 
-#[derive_component(StarknetProviderGetterComponent, StarknetProviderGetter<Chain>)]
+#[cgp_component {
+  name: StarknetProviderGetterComponent,
+  provider: StarknetProviderGetter,
+  context: Chain,
+}]
 pub trait HasStarknetProvider: HasStarknetProviderType {
     fn provider(&self) -> &Self::Provider;
 }

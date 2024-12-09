@@ -1,12 +1,20 @@
 use cgp::prelude::*;
 use starknet::accounts::{Account, AccountError, ConnectedAccount};
 
-#[derive_component(StarknetAccountTypeComponent, ProvideStarknetAccountType<Chain>)]
+#[cgp_component {
+  name: StarknetAccountTypeComponent,
+  provider: ProvideStarknetAccountType,
+  context: Chain,
+}]
 pub trait HasStarknetAccountType: Async {
     type Account: Async + ConnectedAccount;
 }
 
-#[derive_component(StarknetAccountGetterComponent, StarknetAccountGetter<Chain>)]
+#[cgp_component {
+  name: StarknetAccountGetterComponent,
+  provider: StarknetAccountGetter,
+  context: Chain,
+}]
 pub trait HasStarknetAccount: HasStarknetAccountType {
     fn account(&self) -> &Self::Account;
 }

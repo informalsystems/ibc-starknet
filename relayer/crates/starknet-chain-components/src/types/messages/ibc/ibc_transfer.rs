@@ -8,7 +8,6 @@ use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
-use hermes_encoding_components::HList;
 use starknet::core::types::{Felt, U256};
 
 use crate::types::messages::ibc::denom::PrefixedDenom;
@@ -23,7 +22,7 @@ pub struct IbcTransferMessage {
 }
 
 pub type EncodeIbcTransferMessage = CombineEncoders<
-    HList![
+    Product![
         EncodeField<symbol!("denom"), UseContext>,
         EncodeField<symbol!("amount"), UseContext>,
         EncodeField<symbol!("sender"), UseContext>,

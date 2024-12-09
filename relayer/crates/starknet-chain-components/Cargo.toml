@@ -27,11 +27,11 @@ hermes-wasm-encoding-components     = { workspace = true }
 ibc               = { workspace = true }
 ibc-proto         = { workspace = true }
 ibc-relayer       = { workspace = true }
-ibc-relayer-types = { workspace = true }
 
 starknet                    = { workspace = true }
 serde_json                  = { workspace = true }
 cairo-lang-starknet-classes = { workspace = true }
 ibc-client-starknet-types   = { workspace = true }
+http                        = { workspace = true }
 tonic                       = { workspace = true }
 prost-types                 = { workspace = true }

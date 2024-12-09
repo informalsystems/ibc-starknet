@@ -34,9 +34,11 @@ impl HasComponents for StarknetEventEncoding {
 }
 
 with_starknet_event_encoding_components! {
-    delegate_components! {
-        StarknetEventEncodingContextComponents{
-            @StarknetEventEncodingComponents: StarknetEventEncodingComponents,
+    | Components | {
+        delegate_components! {
+            StarknetEventEncodingContextComponents{
+                Components: StarknetEventEncodingComponents,
+            }
         }
     }
 }

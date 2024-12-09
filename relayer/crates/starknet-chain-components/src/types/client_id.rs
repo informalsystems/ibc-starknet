@@ -4,7 +4,6 @@ use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::transform::Transformer;
-use hermes_encoding_components::HList;
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use starknet::core::types::Felt;
 
@@ -18,7 +17,7 @@ pub struct EncodeClientId;
 
 delegate_components! {
     EncodeClientId {
-        MutEncoderComponent: CombineEncoders<HList![
+        MutEncoderComponent: CombineEncoders<Product![
             EncodeField<symbol!("client_type"), UseContext>,
             EncodeField<symbol!("sequence"), UseContext>,
         ]>,

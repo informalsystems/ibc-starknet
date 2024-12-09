@@ -3,7 +3,11 @@ use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
 
-#[derive_component(TransferTokenMessageBuilderComponent, TransferTokenMessageBuilder<Chain>)]
+#[cgp_component {
+  name: TransferTokenMessageBuilderComponent,
+  provider: TransferTokenMessageBuilder,
+  context: Chain,
+}]
 pub trait CanBuildTransferTokenMessage:
     HasAddressType + HasAmountType + HasMessageType + HasErrorType
 {

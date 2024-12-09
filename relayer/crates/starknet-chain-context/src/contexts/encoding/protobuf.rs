@@ -36,9 +36,11 @@ delegate_components! {
 }
 
 with_starknet_protobuf_encoding_components! {
-    delegate_components! {
-        StarknetProtobufEncodingContextComponents{
-            @StarknetProtobufEncodingComponents: StarknetProtobufEncodingComponents,
+    | Components | {
+        delegate_components! {
+            StarknetProtobufEncodingContextComponents{
+                Components: StarknetProtobufEncodingComponents,
+            }
         }
     }
 }

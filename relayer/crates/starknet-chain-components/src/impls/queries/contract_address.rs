@@ -14,7 +14,7 @@ impl<Chain, Tag> ContractAddressQuerier<Chain, Tag> for GetContractAddressFromFi
 where
     Chain: HasAddressType<Address: Clone>
         + CanRaiseError<ContractAddressNotFound>
-        + HasField<Tag, Field = Option<Chain::Address>>,
+        + HasField<Tag, Value = Option<Chain::Address>>,
     Tag: Async,
 {
     async fn query_contract_address(

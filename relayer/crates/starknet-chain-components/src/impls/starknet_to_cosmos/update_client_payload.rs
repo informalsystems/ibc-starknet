@@ -10,9 +10,9 @@ use hermes_chain_components::traits::types::create_client::{
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientPayload;
+use ibc::core::client::types::Height as CosmosHeight;
 use ibc_relayer::chain::cosmos::client::Settings;
 use ibc_relayer::config::types::TrustThreshold;
-use ibc_relayer_types::core::ics02_client::height::Height as CosmosHeight;
 
 use crate::types::cosmos::height::Height;
 use crate::types::cosmos::update::CometUpdateHeader;
@@ -56,8 +56,8 @@ where
             .await?;
 
         let height_2 = Height {
-            revision_number: payload.client_state.latest_height().revision_number(),
-            revision_height: payload.client_state.latest_height().revision_height(),
+            revision_number: payload.client_state.latest_height.revision_number(),
+            revision_height: payload.client_state.latest_height.revision_height(),
         };
 
         let update_header = CometUpdateHeader {

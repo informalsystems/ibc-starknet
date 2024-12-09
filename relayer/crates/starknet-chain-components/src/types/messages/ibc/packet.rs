@@ -6,7 +6,6 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
-use hermes_encoding_components::HList;
 use starknet::core::types::Felt;
 
 use crate::types::cosmos::height::Height;
@@ -28,7 +27,7 @@ pub struct EncodePacket;
 delegate_components! {
     EncodePacket {
         MutEncoderComponent: CombineEncoders<
-            HList![
+            Product![
                 EncodeField<symbol!("sequence"), UseContext>,
                 EncodeField<symbol!("src_port_id"), UseContext>,
                 EncodeField<symbol!("src_channel_id"), UseContext>,
@@ -44,24 +43,21 @@ delegate_components! {
 }
 
 impl Transformer for EncodePacket {
-    type From = HList![u64, String, String, String, String, Vec<Felt>, Height, u64,];
+    type From = Product![u64, String, String, String, String, Vec<Felt>, Height, u64];
 
     type To = Packet;
 
     fn transform(
-        (
+        product![
             sequence,
-            (
-                src_port_id,
-                (
-                    src_channel_id,
-                    (
-                        dst_port_id,
-                        (dst_channel_id, (data, (timeout_height, (timeout_timestamp, ())))),
-                    ),
-                ),
-            ),
-        ): Self::From,
+            src_port_id,
+            src_channel_id,
+            dst_port_id,
+            dst_channel_id,
+            data,
+            timeout_height,
+            timeout_timestamp
+        ]: Self::From,
     ) -> Packet {
         Packet {
             sequence,

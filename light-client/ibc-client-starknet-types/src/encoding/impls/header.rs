@@ -5,7 +5,6 @@ use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::transform::Transformer;
-use hermes_encoding_components::HList;
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::DecodeRequiredProtoField;
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::encode::EncodeLengthDelimitedProtoField;
 use ibc_core::client::types::Height;
@@ -18,7 +17,7 @@ pub struct EncodeStarknetHeader;
 delegate_components! {
     EncodeStarknetHeader {
         MutEncoderComponent:
-            CombineEncoders<HList![
+            CombineEncoders<Product![
                 EncodeField<
                     symbol!("height"),
                     EncodeLengthDelimitedProtoField<1, UseContext>,
@@ -30,7 +29,7 @@ delegate_components! {
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
-            CombineEncoders<HList![
+            CombineEncoders<Product![
                 DecodeRequiredProtoField<1, UseContext>,
                 DecodeRequiredProtoField<2, UseContext>,
             ]>
@@ -39,11 +38,11 @@ delegate_components! {
 }
 
 impl Transformer for EncodeStarknetHeader {
-    type From = HList![Height, StarknetConsensusState];
+    type From = Product![Height, StarknetConsensusState];
 
     type To = StarknetHeader;
 
-    fn transform(HList![height, consensus_state]: Self::From) -> Self::To {
+    fn transform(product![height, consensus_state]: Self::From) -> Self::To {
         StarknetHeader {
             height,
             consensus_state,

@@ -10,18 +10,14 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::components::default::relay::*;
 use hermes_relayer_components::error::impls::retry::ReturnMaxRetry;
 use hermes_relayer_components::error::traits::retry::MaxErrorRetryGetterComponent;
-use hermes_relayer_components::relay::traits::chains::{
-    CanRaiseRelayChainErrors, HasRelayChains, ProvideRelayChains,
-};
+use hermes_relayer_components::relay::traits::chains::{CanRaiseRelayChainErrors, HasRelayChains};
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::relay::traits::update_client_message_builder::{
     CanBuildTargetUpdateClientMessage, CanSendTargetUpdateClientMessage,
 };
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::{
-    ProvideDefaultRuntimeField, RuntimeGetterComponent, RuntimeTypeComponent,
-};
+use hermes_runtime_components::traits::runtime::{RuntimeGetterComponent, RuntimeTypeComponent};
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use ibc_relayer_types::core::ics24_host::identifier::ClientId as CosmosClientId;

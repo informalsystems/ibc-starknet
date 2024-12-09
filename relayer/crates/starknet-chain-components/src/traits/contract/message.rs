@@ -5,7 +5,11 @@ use hermes_test_components::chain::traits::types::address::HasAddressType;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 
-#[derive_component(InvokeContractMessageBuilderComponent, InvokeContractMessageBuilder<Chain>)]
+#[cgp_component {
+  name: InvokeContractMessageBuilderComponent,
+  provider: InvokeContractMessageBuilder,
+  context: Chain,
+}]
 pub trait CanBuildInvokeContractMessage:
     HasAddressType + HasSelectorType + HasBlobType + HasMessageType
 {
