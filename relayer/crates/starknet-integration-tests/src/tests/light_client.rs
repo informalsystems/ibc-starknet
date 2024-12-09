@@ -46,7 +46,7 @@ use starknet::macros::short_string;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
-use crate::contexts::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
+use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {
@@ -83,17 +83,18 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         info!("Reduced wasm client code size from {} to {} bytes", wasm_client_byte_code.len(), wasm_client_byte_code_gzip.len());
 
-        let cosmos_bootstrap = Arc::new(CosmosWithWasmClientBootstrap {
+        let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
             runtime: runtime.clone(),
             cosmos_builder,
             should_randomize_identifiers: true,
             chain_store_dir: store_dir.join("chains"),
             chain_command_path: "osmosisd".into(),
             account_prefix: "osmo".into(),
-            staking_denom: "stake".into(),
-            transfer_denom: "coin".into(),
+            staking_denom_prefix: "stake".into(),
+            transfer_denom_prefix: "coin".into(),
             wasm_client_byte_code: wasm_client_byte_code_gzip,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
+            dynamic_gas: None,
         });
 
         let starknet_bootstrap = StarknetBootstrap {
