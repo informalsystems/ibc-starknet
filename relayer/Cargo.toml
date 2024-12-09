@@ -142,7 +142,7 @@ hermes-protobuf-encoding-components  = { git = "https://github.com/informalsyste
 hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-logger                        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/fix-osmosis-bootstrap" }
+hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
