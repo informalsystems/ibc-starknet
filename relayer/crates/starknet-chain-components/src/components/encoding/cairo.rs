@@ -34,7 +34,9 @@ use crate::types::messages::ibc::denom::{
 use crate::types::messages::ibc::ibc_transfer::{
     EncodeIbcTransferMessage, EncodeParticipant, IbcTransferMessage, Participant,
 };
-use crate::types::messages::ibc::packet::{EncodePacket, Packet};
+use crate::types::messages::ibc::packet::{
+    EncodeMsgRecvPacket, EncodePacket, EncodeStateProof, MsgRecvPacket, Packet, StateProof,
+};
 
 cgp_preset! {
     StarknetCairoEncodingComponents {
@@ -84,6 +86,8 @@ delegate_components! {
         (ViaCairo, IbcTransferMessage): EncodeIbcTransferMessage,
         (ViaCairo, Height): EncodeHeight,
         (ViaCairo, Packet): EncodePacket,
+        (ViaCairo, StateProof): EncodeStateProof,
+        (ViaCairo, MsgRecvPacket): EncodeMsgRecvPacket,
         (ViaCairo, ClientStatus): EncodeClientStatus,
         (ViaCairo, CometClientState): EncodeCometClientState,
         (ViaCairo, CometConsensusState): EncodeCometConsensusState,

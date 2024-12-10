@@ -142,6 +142,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             rpc_client,
             account,
             ibc_client_contract_address: None,
+            ibc_core_contract_address: None,
         };
 
         let chain_driver = StarknetChainDriver {
