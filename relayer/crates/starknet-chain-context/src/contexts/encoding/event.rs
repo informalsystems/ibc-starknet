@@ -13,6 +13,7 @@ use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_error::impls::ProvideHermesError;
 use hermes_starknet_chain_components::components::encoding::event::*;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
+use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
 use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use starknet::core::types::Felt;
@@ -63,6 +64,8 @@ pub trait CanUseStarknetEventEncoding:
     + CanDecode<ViaCairo, IbcTransferEvent>
     + CanDecode<ViaCairo, Option<Erc20Event>>
     + CanDecode<ViaCairo, Option<IbcTransferEvent>>
+    + CanDecode<ViaCairo, ConnectionHandshakeEvents>
+    + CanDecode<ViaCairo, Option<ConnectionHandshakeEvents>>
 {
 }
 
