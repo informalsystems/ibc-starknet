@@ -19,6 +19,7 @@ use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContrac
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
+use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::messages::ibc::connection::{
     BasePrefix, ConnectionVersion, MsgConnOpenInit,
@@ -269,21 +270,20 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             info!("register ics20 response: {:?}", response);
         }
 
-        {
-            // TODO(rano): connection open init
+        let _starknet_connection_id = {
             let cosmos_client_id_str = cosmos_client_id.to_string();
             let (client_type, sequence_str) = cosmos_client_id_str
                 .rsplit_once('-')
                 .ok_or_else(|| eyre!("malformatted client id"))?;
 
-            let cosmos_client_id_as_starknet = ClientId {
+            let cosmos_client_id_as_cairo = ClientId {
                 client_type: Felt::from_bytes_be_slice(client_type.as_bytes()),
                 sequence: sequence_str.parse()?,
             };
 
             let conn_open_init_msg = MsgConnOpenInit {
-                client_id_on_a: starknet_client_id,
-                client_id_on_b: cosmos_client_id_as_starknet,
+                client_id_on_a: starknet_client_id.clone(),
+                client_id_on_b: cosmos_client_id_as_cairo.clone(),
                 prefix_on_b: BasePrefix {
                     prefix: "ibc".into(),
                 },
@@ -305,7 +305,21 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let response = starknet_chain.send_message(message).await?;
 
             info!("conn_open_init response: {:?}", response);
-        }
+
+            let connection_handshake_events: Vec<ConnectionHandshakeEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            let [ConnectionHandshakeEvents::Init(conn_init_event)] = connection_handshake_events
+                .try_into()
+                .map_err(|_| eyre!("expected a single event from conn_open_init"))?;
+
+            info!("conn_init_event: {:?}", conn_init_event);
+
+            assert_eq!(conn_init_event.client_id_on_a, starknet_client_id);
+            assert_eq!(conn_init_event.client_id_on_b, cosmos_client_id_as_cairo);
+
+            conn_init_event.connection_id_on_a.clone()
+        };
 
         // TODO(rano): connection open ack
 
