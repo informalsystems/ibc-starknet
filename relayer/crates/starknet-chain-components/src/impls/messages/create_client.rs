@@ -31,7 +31,6 @@ where
         + HasMessageType<Message = Call>
         + HasAddressType<Address = Felt>
         + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseError<Encoding::Error>,
     Counterparty:
@@ -48,9 +47,7 @@ where
     ) -> Result<Chain::Message, Chain::Error> {
         let encoding = chain.encoding();
 
-        let contract_address = chain
-            .query_contract_address(PhantomData::<symbol!("ibc_core_contract_address")>)
-            .await?;
+        let contract_address = chain.query_contract_address(PhantomData).await?;
 
         let height = Height {
             revision_number: payload.client_state.latest_height.revision_number(),

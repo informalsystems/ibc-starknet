@@ -33,7 +33,6 @@ where
         + HasBlobType<Blob = Vec<Felt>>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
-        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseError<Encoding::Error>,
     Counterparty: HasClientStateType<Chain, ClientState = CometClientState>,
     Encoding: CanEncode<ViaCairo, u64>
@@ -49,9 +48,7 @@ where
     ) -> Result<Counterparty::ClientState, Chain::Error> {
         let encoding = chain.encoding();
 
-        let contract_address = chain
-            .query_contract_address(PhantomData::<symbol!("ibc_client_contract_address")>)
-            .await?;
+        let contract_address = chain.query_contract_address(PhantomData).await?;
 
         let calldata = encoding
             .encode(&client_id.sequence)

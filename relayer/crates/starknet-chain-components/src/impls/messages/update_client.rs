@@ -30,7 +30,6 @@ where
         + HasAddressType<Address = Felt>
         + HasClientIdType<Counterparty, ClientId = ClientId>
         + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseError<Encoding::Error>,
     Counterparty: HasUpdateClientPayloadType<Chain, UpdateClientPayload = CometUpdateHeader>,
@@ -45,9 +44,7 @@ where
     ) -> Result<Vec<Chain::Message>, Chain::Error> {
         let encoding = chain.encoding();
 
-        let contract_address = chain
-            .query_contract_address(PhantomData::<symbol!("ibc_core_contract_address")>)
-            .await?;
+        let contract_address = chain.query_contract_address(PhantomData).await?;
 
         let raw_header = encoding
             .encode(&update_header)
