@@ -1,11 +1,15 @@
 use alloc::sync::Arc;
+use core::marker::PhantomData;
 use std::path::PathBuf;
 use std::time::SystemTime;
 
 use cgp::prelude::*;
 use eyre::eyre;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
+use hermes_chain_components::traits::queries::client_state::CanQueryClientState;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
+use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
@@ -18,17 +22,18 @@ use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContr
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::client_id::ClientId;
+use hermes_starknet_chain_components::types::connection_id::ConnectionId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::messages::ibc::connection::{
-    BasePrefix, ConnectionVersion, MsgConnOpenInit,
+    BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenInit,
 };
 use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, PrefixedDenom};
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
     IbcTransferMessage, Participant,
 };
-use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
+use hermes_starknet_chain_components::types::messages::ibc::packet::{Packet, StateProof};
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
@@ -225,6 +230,16 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         info!("created client on Cosmos: {:?}", cosmos_client_id);
 
+        let starknet_client_state = {
+            starknet_chain
+                .query_client_state(
+                    PhantomData::<CosmosChain>,
+                    &starknet_client_id,
+                    &starknet_chain.query_chain_height().await?,
+                )
+                .await?
+        };
+
         let _starknet_to_cosmos_relay = StarknetToCosmosRelay {
             runtime: runtime.clone(),
             src_chain: starknet_chain.clone(),
@@ -270,27 +285,31 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             info!("register ics20 response: {:?}", response);
         }
 
-        let _starknet_connection_id = {
+        let cosmos_client_id_as_cairo = {
             let cosmos_client_id_str = cosmos_client_id.to_string();
             let (client_type, sequence_str) = cosmos_client_id_str
                 .rsplit_once('-')
                 .ok_or_else(|| eyre!("malformatted client id"))?;
 
-            let cosmos_client_id_as_cairo = ClientId {
+            ClientId {
                 client_type: Felt::from_bytes_be_slice(client_type.as_bytes()),
                 sequence: sequence_str.parse()?,
-            };
+            }
+        };
 
+        let connection_version = ConnectionVersion {
+            identifier: "1".into(),
+            features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
+        };
+
+        let starknet_connection_id = {
             let conn_open_init_msg = MsgConnOpenInit {
                 client_id_on_a: starknet_client_id.clone(),
                 client_id_on_b: cosmos_client_id_as_cairo.clone(),
                 prefix_on_b: BasePrefix {
                     prefix: "ibc".into(),
                 },
-                version: ConnectionVersion {
-                    identifier: "1".into(),
-                    features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
-                },
+                version: connection_version.clone(),
                 delay_period: 0,
             };
 
@@ -306,12 +325,14 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("conn_open_init response: {:?}", response);
 
-            let connection_handshake_events: Vec<ConnectionHandshakeEvents> =
+            let events: Vec<ConnectionHandshakeEvents> =
                 event_encoding.filter_decode_events(&response.events)?;
 
-            let [ConnectionHandshakeEvents::Init(conn_init_event)] = connection_handshake_events
-                .try_into()
-                .map_err(|_| eyre!("expected a single event from conn_open_init"))?;
+            assert_eq!(events.len(), 1);
+
+            let ConnectionHandshakeEvents::Init(ref conn_init_event) = events[0] else {
+                panic!("expected a init event from conn_open_init");
+            };
 
             info!("conn_init_event: {:?}", conn_init_event);
 
@@ -321,7 +342,51 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             conn_init_event.connection_id_on_a.clone()
         };
 
-        // TODO(rano): connection open ack
+        // dummy connection id at cosmos; as if conn_open_try is executed at cosmos
+        let cosmos_connection_id = ConnectionId {
+            connection_id: "connection-0".into(),
+        };
+
+        {
+            // TODO(rano): connection open ack
+
+            let conn_open_ack_msg = MsgConnOpenAck {
+                conn_id_on_a: starknet_connection_id.clone(),
+                conn_id_on_b: cosmos_connection_id.clone(),
+                // empty proofs are not accepted
+                proof_conn_end_on_b: StateProof {
+                    proof: vec![Felt::ONE],
+                },
+                proof_height_on_b: starknet_client_state.latest_height.clone(),
+                version: connection_version.clone(),
+            };
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("conn_open_ack"),
+                calldata: cairo_encoding.encode(&conn_open_ack_msg)?,
+            };
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("conn_open_ack response: {:?}", response);
+
+            let events: Vec<ConnectionHandshakeEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            assert_eq!(events.len(), 1);
+
+            let ConnectionHandshakeEvents::Ack(ref conn_ack_event) = events[0] else {
+                panic!("expected a ack event from conn_open_ack");
+            };
+
+            info!("conn_ack_event: {:?}", conn_ack_event);
+
+            assert_eq!(conn_ack_event.client_id_on_a, starknet_client_id);
+            assert_eq!(conn_ack_event.client_id_on_b, cosmos_client_id_as_cairo);
+            assert_eq!(conn_ack_event.connection_id_on_a, starknet_connection_id);
+            assert_eq!(conn_ack_event.connection_id_on_b, cosmos_connection_id);
+        }
 
         // TODO(rano): channel open init
 
