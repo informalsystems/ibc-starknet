@@ -11,7 +11,7 @@ use starknet::core::types::Felt;
 
 use crate::types::connection_id::ConnectionId;
 
-#[derive(Debug)]
+#[derive(HasField, Debug)]
 pub struct PortId {
     pub port_id: String,
 }
@@ -36,7 +36,7 @@ impl Transformer for EncodePortId {
     }
 }
 
-#[derive(Debug)]
+#[derive(HasField, Debug)]
 pub struct AppVersion {
     pub version: String,
 }

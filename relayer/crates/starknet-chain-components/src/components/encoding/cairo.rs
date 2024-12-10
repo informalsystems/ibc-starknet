@@ -30,6 +30,10 @@ use crate::types::messages::erc20::deploy::{
 use crate::types::messages::erc20::transfer::{
     EncodeTransferErc20TokenMessage, TransferErc20TokenMessage,
 };
+use crate::types::messages::ibc::channel::{
+    AppVersion, ChannelOrdering, EncodeAppVersion, EncodeChannelOrdering, EncodeMsgChanOpenInit,
+    EncodePortId, MsgChanOpenInit, PortId,
+};
 use crate::types::messages::ibc::connection::{
     BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion, EncodeMsgConnOpenAck,
     EncodeMsgConnOpenInit, MsgConnOpenAck, MsgConnOpenInit,
@@ -106,5 +110,9 @@ delegate_components! {
         (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
         (ViaCairo, MsgConnOpenInit): EncodeMsgConnOpenInit,
         (ViaCairo, MsgConnOpenAck): EncodeMsgConnOpenAck,
+        (ViaCairo, PortId): EncodePortId,
+        (ViaCairo, AppVersion): EncodeAppVersion,
+        (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
+        (ViaCairo, MsgChanOpenInit): EncodeMsgChanOpenInit,
     }
 }
