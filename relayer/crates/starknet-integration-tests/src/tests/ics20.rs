@@ -263,6 +263,14 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             info!("register ics20 response: {:?}", response);
         }
 
+        // TODO(rano): connection open init
+
+        // TODO(rano): connection open ack
+
+        // TODO(rano): channel open init
+
+        // TODO(rano): channel open ack
+
         // stub
         let sender_address = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string();
 
