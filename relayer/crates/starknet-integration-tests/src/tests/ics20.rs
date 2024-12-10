@@ -17,8 +17,12 @@ use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEv
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
+use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
+use hermes_starknet_chain_components::types::messages::ibc::connection::{
+    BasePrefix, ConnectionVersion, MsgConnOpenInit,
+};
 use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, PrefixedDenom};
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
     IbcTransferMessage, Participant,
@@ -31,6 +35,7 @@ use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmo
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
+use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 use tracing::info;
 
@@ -263,7 +268,43 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             info!("register ics20 response: {:?}", response);
         }
 
-        // TODO(rano): connection open init
+        {
+            // TODO(rano): connection open init
+            let cosmos_client_id_str = cosmos_client_id.to_string();
+            let (client_type, sequence_str) = cosmos_client_id_str
+                .rsplit_once('-')
+                .ok_or_else(|| eyre!("malformatted client id"))?;
+
+            let cosmos_client_id_as_starknet = ClientId {
+                client_type: Felt::from_bytes_be_slice(client_type.as_bytes()),
+                sequence: sequence_str.parse()?,
+            };
+
+            let conn_open_init_msg = MsgConnOpenInit {
+                client_id_on_a: starknet_client_id,
+                client_id_on_b: cosmos_client_id_as_starknet,
+                prefix_on_b: BasePrefix {
+                    prefix: "ibc".into(),
+                },
+                version: ConnectionVersion {
+                    identifier: "1".into(),
+                    features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
+                },
+                delay_period: 0,
+            };
+
+            info!("selector: {:?}", selector!("conn_open_init"));
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("conn_open_init"),
+                calldata: cairo_encoding.encode(&conn_open_init_msg)?,
+            };
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("conn_open_init response: {:?}", response);
+        }
 
         // TODO(rano): connection open ack
 
