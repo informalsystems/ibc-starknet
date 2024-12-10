@@ -40,15 +40,15 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
-        let bootstrap = StarknetBootstrap {
+        let starknet_bootstrap = StarknetBootstrap {
             runtime: runtime.clone(),
             chain_command_path,
             chain_store_dir: format!("./test-data/{timestamp}").into(),
         };
 
-        let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
+        let starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
 
-        let chain = &chain_driver.chain;
+        let starknet_chain = &starknet_chain_driver.chain;
 
         let erc20_class_hash = {
             let contract_path = std::env::var("ERC20_CONTRACT")?;
@@ -57,7 +57,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let contract = serde_json::from_str(&contract_str)?;
 
-            let class_hash = chain.declare_contract(&contract).await?;
+            let class_hash = starknet_chain.declare_contract(&contract).await?;
 
             info!("declared ERC20 class: {:?}", class_hash);
 
@@ -71,7 +71,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let contract = serde_json::from_str(&contract_str)?;
 
-            let class_hash = chain.declare_contract(&contract).await?;
+            let class_hash = starknet_chain.declare_contract(&contract).await?;
 
             info!("declared ICS20 class: {:?}", class_hash);
 
@@ -85,14 +85,14 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let contract = serde_json::from_str(&contract_str)?;
 
-            let class_hash = chain.declare_contract(&contract).await?;
+            let class_hash = starknet_chain.declare_contract(&contract).await?;
 
             info!("declared IBC core class: {:?}", class_hash);
 
             class_hash
         };
 
-        let ibc_core_address = chain
+        let ibc_core_address = starknet_chain
             .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
             .await?;
 
@@ -111,12 +111,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let ics20_contract_address = {
             let owner_call_data =
-                cairo_encoding.encode(&chain_driver.relayer_wallet.account_address)?;
+                cairo_encoding.encode(&starknet_chain_driver.relayer_wallet.account_address)?;
             // // TODO(rano): when we are using ibc-core handler, ibc-core is the owner
             // let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
             let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
 
-            let contract_address = chain
+            let contract_address = starknet_chain
                 .deploy_contract(
                     &ics20_class_hash,
                     false,
@@ -141,7 +141,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: register_call_data,
             };
 
-            let response = chain.send_message(message).await?;
+            let response = starknet_chain.send_message(message).await?;
 
             info!("register ics20 response: {:?}", response);
         }
@@ -149,7 +149,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         // stub
         let sender_address = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string();
 
-        let recipient_address = chain_driver.user_wallet_a.account_address;
+        let recipient_address = starknet_chain_driver.user_wallet_a.account_address;
 
         let amount = 99u32;
 
@@ -211,7 +211,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         };
 
         let token_address = {
-            let response = chain.send_message(message.clone()).await?;
+            let response = starknet_chain.send_message(message.clone()).await?;
 
             info!("IBC transfer response: {:?}", response);
 
@@ -266,7 +266,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             };
 
             {
-                let recipient_balance = chain
+                let recipient_balance = starknet_chain
                     .query_token_balance(&token_address, &recipient_address)
                     .await?;
 
@@ -280,7 +280,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         {
             // Send the same transfer message a second time
-            let response = chain.send_message(message.clone()).await?;
+            let response = starknet_chain.send_message(message.clone()).await?;
 
             let ibc_transfer_events_2: Vec<IbcTransferEvent> =
                 event_encoding.filter_decode_events(&response.events)?;
@@ -288,7 +288,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             info!("ibc_transfer_events 2: {:?}", ibc_transfer_events_2);
 
             {
-                let recipient_balance = chain
+                let recipient_balance = starknet_chain
                     .query_token_balance(&token_address, &recipient_address)
                     .await?;
 
