@@ -181,7 +181,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             // register comet client contract with ibc-core
 
             let calldata = cairo_encoding.encode(&product![
-                short_string!("07-cometbft"),
+                short_string!("07-tendermint"),
                 comet_client_address
             ])?;
 
