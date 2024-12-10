@@ -7,6 +7,7 @@ use hermes_encoding_components::traits::types::encoded::ProvideEncodedType;
 
 use crate::impls::encoding::option::DecodeOptionalByClassHash;
 use crate::types::event::StarknetEvent;
+use crate::types::events::channel::{ChanOpenInitEvent, ChannelHandshakeEvents};
 use crate::types::events::connection::{
     ConnOpenAckEvent, ConnOpenInitEvent, ConnectionHandshakeEvents, DecodeConnectionHandshakeEvents,
 };
@@ -50,11 +51,18 @@ delegate_components! {
             (ViaCairo, ConnOpenAckEvent),
         ]:
             DecodeConnectionHandshakeEvents,
+        [
+            (ViaCairo, ChannelHandshakeEvents),
+            (ViaCairo, ChanOpenInitEvent),
+        ]:
+            DecodeConnectionHandshakeEvents,
         (ViaCairo, Option<Erc20Event>):
             DecodeOptionalByClassHash<symbol!("erc20_hashes")>,
         (ViaCairo, Option<IbcTransferEvent>):
             DecodeOptionalByClassHash<symbol!("ics20_hashes")>,
         (ViaCairo, Option<ConnectionHandshakeEvents>):
+            DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
+        (ViaCairo, Option<ChannelHandshakeEvents>):
             DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
     }
 }
