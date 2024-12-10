@@ -24,8 +24,12 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::connection_id::ConnectionId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
+use hermes_starknet_chain_components::types::events::channel::ChannelHandshakeEvents;
 use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
+use hermes_starknet_chain_components::types::messages::ibc::channel::{
+    AppVersion, ChannelOrdering, MsgChanOpenInit, PortId,
+};
 use hermes_starknet_chain_components::types::messages::ibc::connection::{
     BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenInit,
 };
@@ -348,8 +352,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         };
 
         {
-            // TODO(rano): connection open ack
-
             let conn_open_ack_msg = MsgConnOpenAck {
                 conn_id_on_a: starknet_connection_id.clone(),
                 conn_id_on_b: cosmos_connection_id.clone(),
@@ -389,6 +391,45 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         }
 
         // TODO(rano): channel open init
+
+        {
+            let chan_open_init_msg = MsgChanOpenInit {
+                port_id_on_a: PortId {
+                    port_id: "transfer".into(),
+                },
+                conn_id_on_a: starknet_connection_id.clone(),
+                port_id_on_b: PortId {
+                    port_id: "transfer".into(),
+                },
+                version_proposal: AppVersion {
+                    version: "ics20-1".into(),
+                },
+                ordering: ChannelOrdering::Unordered,
+            };
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("chan_open_init"),
+                calldata: cairo_encoding.encode(&chan_open_init_msg)?,
+            };
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("chan_open_init response: {:?}", response);
+
+            let events: Vec<ChannelHandshakeEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            assert_eq!(events.len(), 1);
+
+            let ChannelHandshakeEvents::Init(ref chan_init_event) = events[0] else {
+                panic!("expected a init event from chan_open_init");
+            };
+
+            info!("chan_init_event: {:?}", chan_init_event);
+
+            assert_eq!(chan_init_event.connection_id_on_a, starknet_connection_id);
+        }
 
         // TODO(rano): channel open ack
 
