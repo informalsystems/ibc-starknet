@@ -13,12 +13,12 @@ use crate::types::event::{StarknetEvent, UnknownEvent};
 
 #[derive(Debug)]
 pub enum ConnectionHandshakeEvents {
-    Init(InitConnectionEvent),
+    Init(ConnOpenInitEvent),
     Ack(ConnOpenAckEvent),
 }
 
 #[derive(Debug)]
-pub struct InitConnectionEvent {
+pub struct ConnOpenInitEvent {
     pub client_id_on_a: ClientId,
     pub connection_id_on_a: ConnectionId,
     pub client_id_on_b: ClientId,
@@ -38,7 +38,7 @@ impl<Encoding, Strategy> Decoder<Encoding, Strategy, ConnectionHandshakeEvents>
     for DecodeConnectionHandshakeEvents
 where
     Encoding: HasEncodedType<Encoded = StarknetEvent>
-        + CanDecode<Strategy, InitConnectionEvent>
+        + CanDecode<Strategy, ConnOpenInitEvent>
         + CanDecode<Strategy, ConnOpenAckEvent>
         + for<'a> CanRaiseError<UnknownEvent<'a>>,
 {
@@ -60,7 +60,7 @@ where
     }
 }
 
-impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, InitConnectionEvent>
+impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, ConnOpenInitEvent>
     for DecodeConnectionHandshakeEvents
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
@@ -73,7 +73,7 @@ where
     fn decode(
         event_encoding: &EventEncoding,
         event: &StarknetEvent,
-    ) -> Result<InitConnectionEvent, EventEncoding::Error> {
+    ) -> Result<ConnOpenInitEvent, EventEncoding::Error> {
         let cairo_encoding = event_encoding.encoding();
 
         let product![client_id_on_a, connection_id_on_a, client_id_on_b] = cairo_encoding
@@ -84,7 +84,7 @@ where
             return Err(EventEncoding::raise_error(UnknownEvent { event }));
         }
 
-        Ok(InitConnectionEvent {
+        Ok(ConnOpenInitEvent {
             client_id_on_a,
             connection_id_on_a,
             client_id_on_b,
