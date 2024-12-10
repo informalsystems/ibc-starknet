@@ -7,7 +7,7 @@ use hermes_encoding_components::traits::transform::Transformer;
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use starknet::core::types::Felt;
 
-#[derive(Debug, Clone, HasField)]
+#[derive(Debug, PartialEq, Clone, HasField)]
 pub struct ClientId {
     pub client_type: Felt,
     pub sequence: u64,
