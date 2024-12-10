@@ -7,9 +7,12 @@ use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
 
+use super::packet::StateProof;
 use crate::types::client_id::ClientId;
+use crate::types::connection_id::ConnectionId;
+use crate::types::cosmos::height::Height;
 
-#[derive(HasField)]
+#[derive(HasField, Clone)]
 pub struct ConnectionVersion {
     pub identifier: String,
     pub features: [String; 2],
@@ -107,6 +110,59 @@ impl Transformer for EncodeMsgConnOpenInit {
             prefix_on_b,
             version,
             delay_period,
+        }
+    }
+}
+
+#[derive(HasField)]
+pub struct MsgConnOpenAck {
+    pub conn_id_on_a: ConnectionId,
+    pub conn_id_on_b: ConnectionId,
+    pub proof_conn_end_on_b: StateProof,
+    pub proof_height_on_b: Height,
+    pub version: ConnectionVersion,
+}
+
+pub struct EncodeMsgConnOpenAck;
+
+delegate_components! {
+    EncodeMsgConnOpenAck {
+        MutEncoderComponent: CombineEncoders<Product![
+            EncodeField<symbol!("conn_id_on_a"), UseContext>,
+            EncodeField<symbol!("conn_id_on_b"), UseContext>,
+            EncodeField<symbol!("proof_conn_end_on_b"), UseContext>,
+            EncodeField<symbol!("proof_height_on_b"), UseContext>,
+            EncodeField<symbol!("version"), UseContext>,
+        ]>,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeMsgConnOpenAck {
+    type From = Product![
+        ConnectionId,
+        ConnectionId,
+        StateProof,
+        Height,
+        ConnectionVersion
+    ];
+    type To = MsgConnOpenAck;
+
+    fn transform(
+        product![
+            conn_id_on_a,
+            conn_id_on_b,
+            proof_conn_end_on_b,
+            proof_height_on_b,
+            version
+        ]: Self::From,
+    ) -> MsgConnOpenAck {
+        MsgConnOpenAck {
+            conn_id_on_a,
+            conn_id_on_b,
+            proof_conn_end_on_b,
+            proof_height_on_b,
+            version,
         }
     }
 }

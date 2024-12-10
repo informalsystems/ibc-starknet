@@ -30,8 +30,8 @@ use crate::types::messages::erc20::transfer::{
     EncodeTransferErc20TokenMessage, TransferErc20TokenMessage,
 };
 use crate::types::messages::ibc::connection::{
-    BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion,
-    EncodeMsgConnOpenInit, MsgConnOpenInit,
+    BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion, EncodeMsgConnOpenAck,
+    EncodeMsgConnOpenInit, MsgConnOpenAck, MsgConnOpenInit,
 };
 use crate::types::messages::ibc::denom::{
     Denom, EncodeDenom, EncodePrefixedDenom, EncodeTracePrefix, PrefixedDenom, TracePrefix,
@@ -103,5 +103,6 @@ delegate_components! {
         (ViaCairo, BasePrefix): EncodeBasePrefix,
         (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
         (ViaCairo, MsgConnOpenInit): EncodeMsgConnOpenInit,
+        (ViaCairo, MsgConnOpenAck): EncodeMsgConnOpenAck,
     }
 }
