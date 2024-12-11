@@ -7,6 +7,12 @@ use hermes_encoding_components::traits::types::encoded::ProvideEncodedType;
 
 use crate::impls::encoding::option::DecodeOptionalByClassHash;
 use crate::types::event::StarknetEvent;
+use crate::types::events::channel::{
+    ChanOpenAckEvent, ChanOpenInitEvent, ChannelHandshakeEvents, DecodeChannelHandshakeEvents,
+};
+use crate::types::events::connection::{
+    ConnOpenAckEvent, ConnOpenInitEvent, ConnectionHandshakeEvents, DecodeConnectionHandshakeEvents,
+};
 use crate::types::events::erc20::{ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent};
 use crate::types::events::ics20::{
     CreateIbcTokenEvent, DecodeIbcTransferEvents, IbcTransferEvent, ReceiveIbcTransferEvent,
@@ -41,9 +47,25 @@ delegate_components! {
             (ViaCairo, CreateIbcTokenEvent),
         ]:
             DecodeIbcTransferEvents,
+        [
+            (ViaCairo, ConnectionHandshakeEvents),
+            (ViaCairo, ConnOpenInitEvent),
+            (ViaCairo, ConnOpenAckEvent),
+        ]:
+            DecodeConnectionHandshakeEvents,
+        [
+            (ViaCairo, ChannelHandshakeEvents),
+            (ViaCairo, ChanOpenInitEvent),
+            (ViaCairo, ChanOpenAckEvent),
+        ]:
+            DecodeChannelHandshakeEvents,
         (ViaCairo, Option<Erc20Event>):
             DecodeOptionalByClassHash<symbol!("erc20_hashes")>,
         (ViaCairo, Option<IbcTransferEvent>):
             DecodeOptionalByClassHash<symbol!("ics20_hashes")>,
+        (ViaCairo, Option<ConnectionHandshakeEvents>):
+            DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
+        (ViaCairo, Option<ChannelHandshakeEvents>):
+            DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
     }
 }

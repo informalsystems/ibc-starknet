@@ -12,7 +12,9 @@ pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 pub use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use starknet::core::types::{Felt, U256};
 
+use crate::types::channel_id::{ChannelId, EncodeChannelId};
 use crate::types::client_id::{ClientId, EncodeClientId};
+use crate::types::connection_id::{ConnectionId, EncodeConnectionId};
 use crate::types::cosmos::client_state::{
     ClientStatus, CometClientState, EncodeClientStatus, EncodeCometClientState,
 };
@@ -28,6 +30,14 @@ use crate::types::messages::erc20::deploy::{
 use crate::types::messages::erc20::transfer::{
     EncodeTransferErc20TokenMessage, TransferErc20TokenMessage,
 };
+use crate::types::messages::ibc::channel::{
+    AppVersion, ChannelOrdering, EncodeAppVersion, EncodeChannelOrdering, EncodeMsgChanOpenAck,
+    EncodeMsgChanOpenInit, EncodePortId, MsgChanOpenAck, MsgChanOpenInit, PortId,
+};
+use crate::types::messages::ibc::connection::{
+    BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion, EncodeMsgConnOpenAck,
+    EncodeMsgConnOpenInit, MsgConnOpenAck, MsgConnOpenInit,
+};
 use crate::types::messages::ibc::denom::{
     Denom, EncodeDenom, EncodePrefixedDenom, EncodeTracePrefix, PrefixedDenom, TracePrefix,
 };
@@ -36,6 +46,9 @@ use crate::types::messages::ibc::ibc_transfer::{
 };
 use crate::types::messages::ibc::packet::{
     EncodeMsgRecvPacket, EncodePacket, EncodeStateProof, MsgRecvPacket, Packet, StateProof,
+};
+use crate::types::register::{
+    EncodeRegisterApp, EncodeRegisterClient, MsgRegisterApp, MsgRegisterClient,
 };
 
 cgp_preset! {
@@ -92,7 +105,20 @@ delegate_components! {
         (ViaCairo, CometClientState): EncodeCometClientState,
         (ViaCairo, CometConsensusState): EncodeCometConsensusState,
         (ViaCairo, ClientId): EncodeClientId,
+        (ViaCairo, ConnectionId): EncodeConnectionId,
+        (ViaCairo, ChannelId): EncodeChannelId,
         (ViaCairo, CometUpdateHeader): EncodeCometUpdateHeader,
         (ViaCairo, CreateClientResponse): DecodeCreateClientResponse,
+        (ViaCairo, MsgRegisterClient): EncodeRegisterClient,
+        (ViaCairo, MsgRegisterApp): EncodeRegisterApp,
+        (ViaCairo, BasePrefix): EncodeBasePrefix,
+        (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
+        (ViaCairo, MsgConnOpenInit): EncodeMsgConnOpenInit,
+        (ViaCairo, MsgConnOpenAck): EncodeMsgConnOpenAck,
+        (ViaCairo, PortId): EncodePortId,
+        (ViaCairo, AppVersion): EncodeAppVersion,
+        (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
+        (ViaCairo, MsgChanOpenInit): EncodeMsgChanOpenInit,
+        (ViaCairo, MsgChanOpenAck): EncodeMsgChanOpenAck,
     }
 }

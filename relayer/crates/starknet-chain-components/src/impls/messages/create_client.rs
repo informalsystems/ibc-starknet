@@ -56,7 +56,7 @@ where
 
         let root = payload.consensus_state.root.into_vec();
 
-        let client_type = short_string!("07-cometbft");
+        let client_type = short_string!("07-tendermint");
 
         let client_state = CometClientState {
             latest_height: height,

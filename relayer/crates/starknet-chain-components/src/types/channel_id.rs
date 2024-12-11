@@ -5,34 +5,28 @@ use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::transform::Transformer;
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
-use starknet::core::types::Felt;
 
 #[derive(Debug, PartialEq, Clone, HasField)]
-pub struct ClientId {
-    pub client_type: Felt,
-    pub sequence: u64,
+pub struct ChannelId {
+    pub channel_id: String,
 }
 
-pub struct EncodeClientId;
+pub struct EncodeChannelId;
 
 delegate_components! {
-    EncodeClientId {
+    EncodeChannelId {
         MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("client_type"), UseContext>,
-            EncodeField<symbol!("sequence"), UseContext>,
+            EncodeField<symbol!("channel_id"), UseContext>,
         ]>,
         MutDecoderComponent: DecodeFrom<Self, UseContext>,
     }
 }
 
-impl Transformer for EncodeClientId {
-    type From = (Felt, u64);
-    type To = ClientId;
+impl Transformer for EncodeChannelId {
+    type From = String;
+    type To = ChannelId;
 
-    fn transform((client_type, sequence): Self::From) -> ClientId {
-        ClientId {
-            client_type,
-            sequence,
-        }
+    fn transform(channel_id: Self::From) -> ChannelId {
+        ChannelId { channel_id }
     }
 }

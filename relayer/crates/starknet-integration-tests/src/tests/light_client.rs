@@ -19,6 +19,7 @@ use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_relayer::contexts::encoding::CosmosEncoding;
 use hermes_encoding_components::traits::convert::CanConvert;
+use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
@@ -30,25 +31,38 @@ use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage
 use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenInitEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenInitEvent;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
-use hermes_relayer_components::relay::traits::target::DestinationTarget;
+use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
+use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::sleep::CanSleep;
-use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
+use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
+use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_components::types::register::MsgRegisterClient;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::channel::types::channel::State;
 use ibc::core::client::types::Height;
 use ibc::core::connection::types::version::Version;
+use ibc::core::host::types::identifiers::ClientId;
 use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
 use sha2::{Digest, Sha256};
-use starknet::macros::short_string;
+use starknet::accounts::Call;
+use starknet::core::types::Felt;
+use starknet::macros::{selector, short_string};
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
+
+fn felt_to_trimmed_string(v: &Felt) -> String {
+    String::from_utf8_lossy(&v.to_bytes_be())
+        .trim_start_matches('\0')
+        .to_string()
+}
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {
@@ -110,13 +124,13 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
 
-        let starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
+        let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
 
         let cosmos_chain = cosmos_chain_driver.chain();
 
-        let starknet_chain = &starknet_chain_driver.chain;
+        let starknet_chain = &mut starknet_chain_driver.chain;
 
-        let client_id = StarknetToCosmosRelay::create_client(
+        let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
             starknet_chain,
@@ -125,25 +139,105 @@ fn test_starknet_light_client() -> Result<(), Error> {
         )
         .await?;
 
-        info!("created client id: {:?}", client_id);
+        info!("created client id on Cosmos: {:?}", cosmos_client_id);
+
+        let ibc_core_class_hash = {
+            let contract_path = std::env::var("IBC_CORE_CONTRACT")?;
+
+            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+
+            let contract = serde_json::from_str(&contract_str)?;
+
+            let class_hash = starknet_chain.declare_contract(&contract).await?;
+
+            info!("declared IBC core class: {:?}", class_hash);
+
+            class_hash
+        };
+
+        let ibc_core_address = starknet_chain
+            .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
+            .await?;
+
+        info!(
+            "deployed IBC core contract to address: {:?}",
+            ibc_core_address
+        );
+
+        let comet_client_class_hash = {
+            let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
+
+            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+
+            let contract = serde_json::from_str(&contract_str)?;
+
+            let class_hash = starknet_chain.declare_contract(&contract).await?;
+
+            info!("declared class: {:?}", class_hash);
+
+            class_hash
+        };
+
+        let comet_client_address = starknet_chain
+            .deploy_contract(&comet_client_class_hash, false, &Vec::new())
+            .await?;
+
+        info!(
+            "deployed Comet client contract to address: {:?}",
+            comet_client_address
+        );
+
+        starknet_chain.ibc_core_contract_address = Some(ibc_core_address);
+        starknet_chain.ibc_client_contract_address = Some(comet_client_address);
+
+        let cairo_encoding = StarknetCairoEncoding;
+
+        {
+            // register comet client contract with ibc-core
+
+            let register_client = MsgRegisterClient {
+                client_type: short_string!("07-tendermint"),
+                contract_address: comet_client_address,
+            };
+
+            let calldata = cairo_encoding.encode(&register_client)?;
+
+            let call = Call {
+                to: ibc_core_address,
+                selector: selector!("register_client"),
+                calldata,
+            };
+
+            let response = starknet_chain.send_message(call).await?;
+
+            info!("IBC register client response: {:?}", response);
+        }
+
+        let starknet_client_id = StarknetToCosmosRelay::create_client(
+            SourceTarget,
+            starknet_chain,
+            cosmos_chain,
+            &Default::default(),
+            &(),
+        )
+        .await?;
+
+        info!("created client on Starknet: {:?}", starknet_client_id);
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay {
             runtime: runtime.clone(),
             src_chain: starknet_chain.clone(),
             dst_chain: cosmos_chain.clone(),
             // TODO: stub
-            src_client_id: StarknetClientId {
-                client_type: short_string!("cometbft"),
-                sequence: 1,
-            },
-            dst_client_id: client_id.clone(),
+            src_client_id: starknet_client_id.clone(),
+            dst_client_id: cosmos_client_id.clone(),
         };
 
         {
             let client_state =
                 cosmos_chain.query_client_state(
                     PhantomData::<StarknetChain>,
-                    &client_id,
+                    &cosmos_client_id,
                     &cosmos_chain.query_chain_height().await?,
                 )
                 .await?;
@@ -153,16 +247,44 @@ fn test_starknet_light_client() -> Result<(), Error> {
             let consensus_state =
                 cosmos_chain.query_consensus_state(
                     PhantomData::<StarknetChain>,
-                    &client_id,
+                    &cosmos_client_id,
                     &client_height,
                     &cosmos_chain.query_chain_height().await?,
                 )
                 .await?;
 
             info!(
-                "initial consensus state height {} and root: {:?}",
+                "initial Starknet consensus state height {} and root: {:?} on Cosmos",
                 client_height,
                 consensus_state.consensus_state.root.into_vec()
+            );
+        }
+
+        {
+            let client_state =
+                starknet_chain.query_client_state(
+                    PhantomData::<CosmosChain>,
+                    &starknet_client_id,
+                    &starknet_chain.query_chain_height().await?,
+                )
+                .await?;
+
+            let consensus_state =
+                starknet_chain.query_consensus_state(
+                    PhantomData::<CosmosChain>,
+                    &starknet_client_id,
+                    &Height::new(
+                        client_state.latest_height.revision_number,
+                        client_state.latest_height.revision_height,
+                    )?,
+                    &starknet_chain.query_chain_height().await?,
+                )
+                .await?;
+
+            info!(
+                "initial Cosmos consensus state height {} and root: {:?} on Starknet",
+                client_state.latest_height.revision_height,
+                consensus_state.root
             );
         }
 
@@ -184,7 +306,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             let consensus_state =
                 cosmos_chain.query_consensus_state(
                     PhantomData::<StarknetChain>,
-                    &client_id,
+                    &cosmos_client_id,
                     &starknet_status.height,
                     &cosmos_chain.query_chain_height().await?,
                 )
@@ -196,10 +318,45 @@ fn test_starknet_light_client() -> Result<(), Error> {
             );
         }
 
-        let connection_id = {
+        {
+            runtime.sleep(Duration::from_secs(2)).await;
+
+            let cosmos_status= cosmos_chain.query_chain_status().await?;
+
+            info!(
+                "updating Cosmos client to Starknet to height {}",
+                cosmos_status.height,
+            );
+
+            // TODO(rano): how do I query cosmos block root
+
+            starknet_to_cosmos_relay
+                .send_target_update_client_messages(SourceTarget, &cosmos_status.height)
+                .await?;
+
+            let consensus_state =
+                starknet_chain.query_consensus_state(
+                    PhantomData::<CosmosChain>,
+                    &starknet_client_id,
+                    &cosmos_status.height,
+                    &starknet_chain.query_chain_height().await?,
+                )
+                .await?;
+
+
+            // TODO(rano): add assert
+
+            info!(
+                "updated Cosmos client to Starknet to height {} and root: {:?}",
+                cosmos_status.height,
+                consensus_state.root
+            );
+        }
+
+        let cosmos_connection_id = {
             let open_init_message = CosmosConnectionOpenInitMessage {
-                client_id: client_id.clone(),
-                counterparty_client_id: client_id.clone(), // TODO: stub
+                client_id: cosmos_client_id.clone(),
+                counterparty_client_id: ClientId::new(&felt_to_trimmed_string(&starknet_client_id.client_type), starknet_client_id.sequence)?,
                 counterparty_commitment_prefix: "ibc".into(),
                 version: Version::compatibles().pop().unwrap(),
                 delay_period: Duration::from_secs(0),
@@ -228,8 +385,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
             runtime.sleep(Duration::from_secs(1)).await;
 
             let open_ack_message = CosmosConnectionOpenAckMessage {
-                connection_id: connection_id.clone(),
-                counterparty_connection_id: connection_id.clone(), // TODO: stub
+                connection_id: cosmos_connection_id.clone(),
+                counterparty_connection_id: cosmos_connection_id.clone(), // TODO: stub
                 version: Version::compatibles().pop().unwrap(),
                 client_state,
                 update_height: Height::new(0, 1).unwrap(),
@@ -250,7 +407,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                     port_id: "11b7f9bfa43d3facae74efa5dfe0030df98273271278291d67c16a4e6cd5f7c".to_string(), // stub application contract on Starknet as port ID
                     channel_id: "".to_string(),
                 }),
-                connection_hops: vec![connection_id.to_string()],
+                connection_hops: vec![cosmos_connection_id.to_string()],
                 version: "ics20-1".into(),
                 upgrade_sequence: 0,
             };

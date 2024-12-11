@@ -30,6 +30,12 @@ use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::message_responses::create_client::CreateClientResponse;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::erc20::transfer::TransferErc20TokenMessage;
+use hermes_starknet_chain_components::types::messages::ibc::channel::{
+    MsgChanOpenAck, MsgChanOpenInit,
+};
+use hermes_starknet_chain_components::types::messages::ibc::connection::{
+    MsgConnOpenAck, MsgConnOpenInit,
+};
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
 };
@@ -37,6 +43,7 @@ use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
     IbcTransferMessage, Participant,
 };
 use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
+use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use starknet::core::types::{Felt, U256};
 
 use crate::impls::error::HandleStarknetChainError;
@@ -125,6 +132,12 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, CometClientState>
     + CanEncodeAndDecode<ViaCairo, CometConsensusState>
     + CanEncodeAndDecode<ViaCairo, ClientId>
+    + CanEncodeAndDecode<ViaCairo, MsgRegisterClient>
+    + CanEncodeAndDecode<ViaCairo, MsgRegisterApp>
+    + CanEncodeAndDecode<ViaCairo, MsgConnOpenInit>
+    + CanEncodeAndDecode<ViaCairo, MsgConnOpenAck>
+    + CanEncodeAndDecode<ViaCairo, MsgChanOpenInit>
+    + CanEncodeAndDecode<ViaCairo, MsgChanOpenAck>
     + CanEncode<ViaCairo, CometUpdateHeader>
     + CanDecode<ViaCairo, CreateClientResponse>
 {

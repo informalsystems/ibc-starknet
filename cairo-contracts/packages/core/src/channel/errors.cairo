@@ -1,5 +1,6 @@
 pub mod ChannelErrors {
-    pub const ACK_ALREADY_EXISTS: felt252 = 'ICS04: ack already exists';
+    pub const PACKET_RECEIPT_ALREADY_EXISTS: felt252 = 'ICS04: receipt already exists';
+    pub const PACKET_ACK_ALREADY_EXISTS: felt252 = 'ICS04: ack already exists';
     pub const EMPTY_CHAN_END_PROOF: felt252 = 'ICS04: empty channel end proof';
     pub const EMPTY_COMMITMENT_PROOF: felt252 = 'ICS04: empty commitment proof';
     pub const EMPTY_ACK: felt252 = 'ICS04: empty acknowledgement';
