@@ -64,8 +64,8 @@ impl Transformer for EncodeAppVersion {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ChannelOrdering {
-    Ordered,
     Unordered,
+    Ordered,
 }
 
 pub struct EncodeChannelOrdering;
@@ -85,8 +85,8 @@ impl TransformerRef for EncodeChannelOrdering {
 
     fn transform<'a>(value: &'a Self::From) -> Self::To<'a> {
         match value {
-            ChannelOrdering::Ordered => Either::Left(()),
-            ChannelOrdering::Unordered => Either::Right(Either::Left(())),
+            ChannelOrdering::Unordered => Either::Left(()),
+            ChannelOrdering::Ordered => Either::Right(Either::Left(())),
         }
     }
 }
@@ -97,8 +97,8 @@ impl Transformer for EncodeChannelOrdering {
 
     fn transform(value: Self::From) -> Self::To {
         match value {
-            Either::Left(()) => ChannelOrdering::Ordered,
-            Either::Right(Either::Left(())) => ChannelOrdering::Unordered,
+            Either::Left(()) => ChannelOrdering::Unordered,
+            Either::Right(Either::Left(())) => ChannelOrdering::Ordered,
             Either::Right(Either::Right(value)) => match value {},
         }
     }
