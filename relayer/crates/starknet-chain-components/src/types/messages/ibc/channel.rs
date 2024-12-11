@@ -7,6 +7,7 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
+use hermes_encoding_components::traits::transform::TransformerRef;
 use starknet::core::types::Felt;
 
 use crate::types::connection_id::ConnectionId;
@@ -61,6 +62,7 @@ impl Transformer for EncodeAppVersion {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ChannelOrdering {
     Ordered,
     Unordered,
@@ -77,17 +79,27 @@ delegate_components! {
     }
 }
 
+impl TransformerRef for EncodeChannelOrdering {
+    type From = ChannelOrdering;
+    type To<'a> = Sum![(), ()];
+
+    fn transform<'a>(value: &'a Self::From) -> Self::To<'a> {
+        match value {
+            ChannelOrdering::Ordered => Either::Left(()),
+            ChannelOrdering::Unordered => Either::Right(Either::Left(())),
+        }
+    }
+}
+
 impl Transformer for EncodeChannelOrdering {
-    type From = Felt;
+    type From = Sum![(), ()];
     type To = ChannelOrdering;
 
-    fn transform(ordering: Self::From) -> Self::To {
-        if ordering == Felt::ZERO {
-            ChannelOrdering::Ordered
-        } else if ordering == Felt::ONE {
-            return ChannelOrdering::Unordered;
-        } else {
-            panic!("Invalid channel ordering");
+    fn transform(value: Self::From) -> Self::To {
+        match value {
+            Either::Left(()) => ChannelOrdering::Ordered,
+            Either::Right(Either::Left(())) => ChannelOrdering::Unordered,
+            Either::Right(Either::Right(value)) => match value {},
         }
     }
 }
