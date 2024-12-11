@@ -606,14 +606,14 @@ pub mod ChannelHandlerComponent {
                             @msg.packet.port_id_on_b, @msg.packet.chan_id_on_b, @msg.packet.seq_on_a
                         );
 
-                    assert(receipt.is_none(), ChannelErrors::MISSING_PACKET_RECEIPT);
+                    assert(receipt.is_none(), ChannelErrors::PACKET_RECEIPT_ALREADY_EXISTS);
 
                     let ack_exists = self
                         .packet_ack_exists(
                             @msg.packet.port_id_on_b, @msg.packet.chan_id_on_b, @msg.packet.seq_on_a
                         );
 
-                    assert(!ack_exists, ChannelErrors::ACK_ALREADY_EXISTS);
+                    assert(!ack_exists, ChannelErrors::PACKET_ACK_ALREADY_EXISTS);
                 },
                 ChannelOrdering::Ordered => {
                     let next_sequence_recv = self
@@ -637,7 +637,7 @@ pub mod ChannelHandlerComponent {
                                 @msg.packet.seq_on_a
                             );
 
-                        assert(!ack_exists, ChannelErrors::ACK_ALREADY_EXISTS);
+                        assert(!ack_exists, ChannelErrors::PACKET_ACK_ALREADY_EXISTS);
                     }
                 }
             };

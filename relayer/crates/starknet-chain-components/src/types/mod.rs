@@ -1,6 +1,8 @@
 pub mod amount;
+pub mod channel_id;
 pub mod client_id;
 pub mod client_state;
+pub mod connection_id;
 pub mod consensus_state;
 pub mod cosmos;
 pub mod event;
@@ -9,5 +11,6 @@ pub mod message_response;
 pub mod message_responses;
 pub mod messages;
 pub mod payloads;
+pub mod register;
 pub mod status;
 pub mod tx_response;
