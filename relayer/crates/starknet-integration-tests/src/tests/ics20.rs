@@ -21,6 +21,7 @@ use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEv
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
+use hermes_starknet_chain_components::types::channel_id::ChannelId;
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::connection_id::ConnectionId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
@@ -390,18 +391,24 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             assert_eq!(conn_ack_event.connection_id_on_b, cosmos_connection_id);
         }
 
-        {
+        let _starknet_channel_id = {
+            let port_id_on_starknet = PortId {
+                port_id: "transfer".into(),
+            };
+
+            let port_id_on_cosmos = PortId {
+                port_id: "transfer".into(),
+            };
+
+            let app_version = AppVersion {
+                version: "ics20-1".into(),
+            };
+
             let chan_open_init_msg = MsgChanOpenInit {
-                port_id_on_a: PortId {
-                    port_id: "transfer".into(),
-                },
+                port_id_on_a: port_id_on_cosmos.clone(),
                 conn_id_on_a: starknet_connection_id.clone(),
-                port_id_on_b: PortId {
-                    port_id: "transfer".into(),
-                },
-                version_proposal: AppVersion {
-                    version: "ics20-1".into(),
-                },
+                port_id_on_b: port_id_on_starknet.clone(),
+                version_proposal: app_version.clone(),
                 ordering: ChannelOrdering::Unordered,
             };
 
@@ -424,8 +431,18 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("chan_init_event: {:?}", chan_init_event);
 
+            assert_eq!(chan_init_event.port_id_on_a, port_id_on_starknet);
+            assert_eq!(chan_init_event.port_id_on_b, port_id_on_cosmos);
             assert_eq!(chan_init_event.connection_id_on_a, starknet_connection_id);
-        }
+            assert_eq!(chan_init_event.version_on_a, app_version);
+
+            chan_init_event.channel_id_on_a.clone()
+        };
+
+        // dummy channel id at cosmos; as if chan_open_try is executed at cosmos
+        let _cosmos_channel_id = ChannelId {
+            channel_id: "channel-0".into(),
+        };
 
         // TODO(rano): channel open ack
 
