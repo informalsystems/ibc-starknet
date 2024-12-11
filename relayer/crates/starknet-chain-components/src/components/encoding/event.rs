@@ -11,7 +11,8 @@ use crate::types::events::channel::{
     ChanOpenAckEvent, ChanOpenInitEvent, ChannelHandshakeEvents, DecodeChannelHandshakeEvents,
 };
 use crate::types::events::connection::{
-    ConnOpenAckEvent, ConnOpenInitEvent, ConnectionHandshakeEvents, DecodeConnectionHandshakeEvents,
+    ConnOpenAckEvent, ConnOpenInitEvent, ConnOpenTryEvent, ConnectionHandshakeEvents,
+    DecodeConnectionHandshakeEvents,
 };
 use crate::types::events::erc20::{ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent};
 use crate::types::events::ics20::{
@@ -50,6 +51,7 @@ delegate_components! {
         [
             (ViaCairo, ConnectionHandshakeEvents),
             (ViaCairo, ConnOpenInitEvent),
+            (ViaCairo, ConnOpenTryEvent),
             (ViaCairo, ConnOpenAckEvent),
         ]:
             DecodeConnectionHandshakeEvents,
