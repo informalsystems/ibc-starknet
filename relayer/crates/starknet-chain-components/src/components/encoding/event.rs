@@ -8,8 +8,8 @@ use hermes_encoding_components::traits::types::encoded::ProvideEncodedType;
 use crate::impls::encoding::option::DecodeOptionalByClassHash;
 use crate::types::event::StarknetEvent;
 use crate::types::events::channel::{
-    ChanOpenAckEvent, ChanOpenInitEvent, ChanOpenTryEvent, ChannelHandshakeEvents,
-    DecodeChannelHandshakeEvents,
+    ChanOpenAckEvent, ChanOpenConfirmEvent, ChanOpenInitEvent, ChanOpenTryEvent,
+    ChannelHandshakeEvents, DecodeChannelHandshakeEvents,
 };
 use crate::types::events::connection::{
     ConnOpenAckEvent, ConnOpenConfirmEvent, ConnOpenInitEvent, ConnOpenTryEvent,
@@ -62,6 +62,7 @@ delegate_components! {
             (ViaCairo, ChanOpenInitEvent),
             (ViaCairo, ChanOpenTryEvent),
             (ViaCairo, ChanOpenAckEvent),
+            (ViaCairo, ChanOpenConfirmEvent),
         ]:
             DecodeChannelHandshakeEvents,
         (ViaCairo, Option<Erc20Event>):
