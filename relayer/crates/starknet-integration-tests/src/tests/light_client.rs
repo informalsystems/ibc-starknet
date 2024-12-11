@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use cgp::prelude::*;
 use flate2::write::GzEncoder;
 use flate2::Compression;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
@@ -19,6 +20,7 @@ use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_relayer::contexts::encoding::CosmosEncoding;
 use hermes_encoding_components::traits::convert::CanConvert;
+use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
@@ -38,6 +40,7 @@ use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContr
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
@@ -47,7 +50,9 @@ use ibc::core::connection::types::version::Version;
 use ibc::core::host::types::identifiers::ClientId;
 use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
 use sha2::{Digest, Sha256};
+use starknet::accounts::Call;
 use starknet::core::types::Felt;
+use starknet::macros::{selector, short_string};
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
@@ -136,6 +141,29 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         info!("created client id on Cosmos: {:?}", cosmos_client_id);
 
+        let ibc_core_class_hash = {
+            let contract_path = std::env::var("IBC_CORE_CONTRACT")?;
+
+            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+
+            let contract = serde_json::from_str(&contract_str)?;
+
+            let class_hash = starknet_chain.declare_contract(&contract).await?;
+
+            info!("declared IBC core class: {:?}", class_hash);
+
+            class_hash
+        };
+
+        let ibc_core_address = starknet_chain
+            .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
+            .await?;
+
+        info!(
+            "deployed IBC core contract to address: {:?}",
+            ibc_core_address
+        );
+
         let comet_client_class_hash = {
             let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
 
@@ -159,7 +187,29 @@ fn test_starknet_light_client() -> Result<(), Error> {
             comet_client_address
         );
 
+        starknet_chain.ibc_core_contract_address = Some(ibc_core_address);
         starknet_chain.ibc_client_contract_address = Some(comet_client_address);
+
+        let cairo_encoding = StarknetCairoEncoding;
+
+        {
+            // register comet client contract with ibc-core
+
+            let calldata = cairo_encoding.encode(&product![
+                short_string!("07-tendermint"),
+                comet_client_address
+            ])?;
+
+            let call = Call {
+                to: ibc_core_address,
+                selector: selector!("register_client"),
+                calldata,
+            };
+
+            let response = starknet_chain.send_message(call).await?;
+
+            info!("IBC register client response: {:?}", response);
+        }
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
