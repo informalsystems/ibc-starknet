@@ -32,7 +32,8 @@ use crate::types::messages::erc20::transfer::{
 };
 use crate::types::messages::ibc::channel::{
     AppVersion, ChannelOrdering, EncodeAppVersion, EncodeChannelOrdering, EncodeMsgChanOpenAck,
-    EncodeMsgChanOpenInit, EncodePortId, MsgChanOpenAck, MsgChanOpenInit, PortId,
+    EncodeMsgChanOpenInit, EncodeMsgChanOpenTry, EncodePortId, MsgChanOpenAck, MsgChanOpenInit,
+    MsgChanOpenTry, PortId,
 };
 use crate::types::messages::ibc::connection::{
     BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion, EncodeMsgConnOpenAck,
@@ -122,6 +123,7 @@ delegate_components! {
         (ViaCairo, AppVersion): EncodeAppVersion,
         (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
         (ViaCairo, MsgChanOpenInit): EncodeMsgChanOpenInit,
+        (ViaCairo, MsgChanOpenTry): EncodeMsgChanOpenTry,
         (ViaCairo, MsgChanOpenAck): EncodeMsgChanOpenAck,
     }
 }

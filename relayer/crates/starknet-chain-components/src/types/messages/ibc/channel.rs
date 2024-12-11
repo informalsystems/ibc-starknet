@@ -161,6 +161,74 @@ impl Transformer for EncodeMsgChanOpenInit {
 }
 
 #[derive(HasField)]
+pub struct MsgChanOpenTry {
+    pub port_id_on_b: PortId,
+    pub conn_id_on_b: ConnectionId,
+    pub port_id_on_a: PortId,
+    pub chan_id_on_a: ChannelId,
+    pub version_on_a: AppVersion,
+    pub proof_chan_end_on_a: StateProof,
+    pub proof_height_on_a: Height,
+    pub ordering: ChannelOrdering,
+}
+
+pub struct EncodeMsgChanOpenTry;
+
+delegate_components! {
+    EncodeMsgChanOpenTry {
+        MutEncoderComponent: CombineEncoders<Product![
+            EncodeField<symbol!("port_id_on_b"), UseContext>,
+            EncodeField<symbol!("conn_id_on_b"), UseContext>,
+            EncodeField<symbol!("port_id_on_a"), UseContext>,
+            EncodeField<symbol!("chan_id_on_a"), UseContext>,
+            EncodeField<symbol!("version_on_a"), UseContext>,
+            EncodeField<symbol!("proof_chan_end_on_a"), UseContext>,
+            EncodeField<symbol!("proof_height_on_a"), UseContext>,
+            EncodeField<symbol!("ordering"), UseContext>,
+        ]>,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeMsgChanOpenTry {
+    type From = Product![
+        PortId,
+        ConnectionId,
+        PortId,
+        ChannelId,
+        AppVersion,
+        StateProof,
+        Height,
+        ChannelOrdering
+    ];
+    type To = MsgChanOpenTry;
+
+    fn transform(
+        product![
+            port_id_on_b,
+            conn_id_on_b,
+            port_id_on_a,
+            chan_id_on_a,
+            version_on_a,
+            proof_chan_end_on_a,
+            proof_height_on_a,
+            ordering
+        ]: Self::From,
+    ) -> MsgChanOpenTry {
+        MsgChanOpenTry {
+            port_id_on_b,
+            conn_id_on_b,
+            port_id_on_a,
+            chan_id_on_a,
+            version_on_a,
+            proof_chan_end_on_a,
+            proof_height_on_a,
+            ordering,
+        }
+    }
+}
+
+#[derive(HasField)]
 pub struct MsgChanOpenAck {
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
