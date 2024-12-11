@@ -20,14 +20,14 @@ use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEv
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
-use hermes_starknet_chain_components::types::channel_id::ChannelId;
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::events::channel::ChannelHandshakeEvents;
 use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::messages::ibc::channel::{
-    AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenInit, PortId,
+    AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
+    MsgChanOpenTry, PortId,
 };
 use hermes_starknet_chain_components::types::messages::ibc::connection::{
     BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit,
@@ -531,16 +531,54 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             chan_init_event.channel_id_on_a.clone()
         };
 
-        // dummy channel id at cosmos; as if chan_open_try is executed at cosmos
-        let cosmos_channel_id = ChannelId {
-            channel_id: "channel-0".into(),
+        let starknet_channel_id_2 = {
+            let chan_open_try_msg = MsgChanOpenTry {
+                port_id_on_b: port_id_on_cosmos.clone(),
+                conn_id_on_b: starknet_connection_id_2.clone(),
+                port_id_on_a: port_id_on_starknet.clone(),
+                chan_id_on_a: starknet_channel_id_1.clone(),
+                version_on_a: app_version.clone(),
+                proof_chan_end_on_a: StateProof {
+                    proof: vec![Felt::ONE],
+                },
+                proof_height_on_a: starknet_client_state.latest_height.clone(),
+                ordering: ChannelOrdering::Unordered,
+            };
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("chan_open_try"),
+                calldata: cairo_encoding.encode(&chan_open_try_msg)?,
+            };
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("chan_open_try response: {:?}", response);
+
+            let events: Vec<ChannelHandshakeEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            assert_eq!(events.len(), 1);
+
+            let ChannelHandshakeEvents::Try(ref chan_try_event) = events[0] else {
+                panic!("expected a try event from chan_open_try");
+            };
+
+            info!("chan_try_event: {:?}", chan_try_event);
+
+            assert_eq!(chan_try_event.port_id_on_a, port_id_on_starknet);
+            assert_eq!(chan_try_event.channel_id_on_a, starknet_channel_id_1);
+            assert_eq!(chan_try_event.port_id_on_b, port_id_on_cosmos);
+            assert_eq!(chan_try_event.connection_id_on_b, starknet_connection_id_2);
+
+            chan_try_event.channel_id_on_b.clone()
         };
 
         {
             let chan_open_ack_msg = MsgChanOpenAck {
                 port_id_on_a: port_id_on_starknet.clone(),
                 chan_id_on_a: starknet_channel_id_1.clone(),
-                chan_id_on_b: cosmos_channel_id.clone(),
+                chan_id_on_b: starknet_channel_id_2.clone(),
                 version_on_b: app_version.clone(),
                 proof_chan_end_on_b: StateProof {
                     proof: vec![Felt::ONE],
@@ -572,8 +610,49 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             assert_eq!(chan_ack_event.port_id_on_a, port_id_on_starknet);
             assert_eq!(chan_ack_event.port_id_on_b, port_id_on_cosmos);
             assert_eq!(chan_ack_event.channel_id_on_a, starknet_channel_id_1);
-            assert_eq!(chan_ack_event.channel_id_on_b, cosmos_channel_id);
+            assert_eq!(chan_ack_event.channel_id_on_b, starknet_channel_id_2);
             assert_eq!(chan_ack_event.connection_id_on_a, starknet_connection_id_1);
+        }
+
+        {
+            let chan_open_confirm_msg = MsgChanOpenConfirm {
+                port_id_on_b: port_id_on_cosmos.clone(),
+                chan_id_on_b: starknet_channel_id_2.clone(),
+                proof_chan_end_on_a: StateProof {
+                    proof: vec![Felt::ONE],
+                },
+                proof_height_on_a: starknet_client_state.latest_height.clone(),
+            };
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("chan_open_confirm"),
+                calldata: cairo_encoding.encode(&chan_open_confirm_msg)?,
+            };
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("chan_open_confirm response: {:?}", response);
+
+            let events: Vec<ChannelHandshakeEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            assert_eq!(events.len(), 1);
+
+            let ChannelHandshakeEvents::Confirm(ref chan_confirm_event) = events[0] else {
+                panic!("expected a confirm event from chan_open_confirm");
+            };
+
+            info!("chan_confirm_event: {:?}", chan_confirm_event);
+
+            assert_eq!(chan_confirm_event.port_id_on_a, port_id_on_starknet);
+            assert_eq!(chan_confirm_event.port_id_on_b, port_id_on_cosmos);
+            assert_eq!(chan_confirm_event.channel_id_on_a, starknet_channel_id_1);
+            assert_eq!(chan_confirm_event.channel_id_on_b, starknet_channel_id_2);
+            assert_eq!(
+                chan_confirm_event.connection_id_on_b,
+                starknet_connection_id_2
+            );
         }
 
         // stub
@@ -605,7 +684,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let packet = Packet {
                 sequence: 1,
                 src_port_id: port_id_on_cosmos.port_id.clone(),
-                src_channel_id: cosmos_channel_id.channel_id.clone(),
+                src_channel_id: starknet_channel_id_2.channel_id.clone(),
                 dst_port_id: port_id_on_starknet.port_id.clone(),
                 dst_channel_id: starknet_channel_id_1.channel_id.clone(),
                 data: packet_data,
