@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 
 use cgp::core::error::{CanRaiseError, HasErrorType};
+use cgp::prelude::*;
 use hermes_encoding_components::traits::decode_mut::{
     CanDecodeMut, CanPeekDecodeBuffer, MutDecoder,
 };
@@ -10,7 +11,6 @@ use starknet::core::types::Felt;
 
 use crate::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use crate::impls::encode_mut::u128::felt_to_u128;
-use crate::types::either::{Either, Void};
 use crate::types::nat::{Nat, S, Z};
 
 pub type EncodeVariants<N> = SumEncoders<Z, N>;
