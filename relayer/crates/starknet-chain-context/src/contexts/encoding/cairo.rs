@@ -30,7 +30,9 @@ use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::message_responses::create_client::CreateClientResponse;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::erc20::transfer::TransferErc20TokenMessage;
-use hermes_starknet_chain_components::types::messages::ibc::channel::MsgChanOpenInit;
+use hermes_starknet_chain_components::types::messages::ibc::channel::{
+    MsgChanOpenAck, MsgChanOpenInit,
+};
 use hermes_starknet_chain_components::types::messages::ibc::connection::{
     MsgConnOpenAck, MsgConnOpenInit,
 };
@@ -132,6 +134,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, MsgConnOpenInit>
     + CanEncodeAndDecode<ViaCairo, MsgConnOpenAck>
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenInit>
+    + CanEncodeAndDecode<ViaCairo, MsgChanOpenAck>
     + CanEncode<ViaCairo, CometUpdateHeader>
     + CanDecode<ViaCairo, CreateClientResponse>
 {

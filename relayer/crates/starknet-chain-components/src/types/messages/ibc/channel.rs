@@ -10,7 +10,10 @@ use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 
+use super::packet::StateProof;
+use crate::types::channel_id::ChannelId;
 use crate::types::connection_id::ConnectionId;
+use crate::types::cosmos::height::Height;
 
 #[derive(HasField, Debug, PartialEq, Clone)]
 pub struct PortId {
@@ -153,6 +156,65 @@ impl Transformer for EncodeMsgChanOpenInit {
                 version: version_proposal,
             },
             ordering,
+        }
+    }
+}
+
+#[derive(HasField)]
+pub struct MsgChanOpenAck {
+    pub port_id_on_a: PortId,
+    pub chan_id_on_a: ChannelId,
+    pub chan_id_on_b: ChannelId,
+    pub version_on_b: AppVersion,
+    pub proof_chan_end_on_b: StateProof,
+    pub proof_height_on_b: Height,
+}
+
+pub struct EncodeMsgChanOpenAck;
+
+delegate_components! {
+    EncodeMsgChanOpenAck {
+        MutEncoderComponent: CombineEncoders<Product![
+            EncodeField<symbol!("port_id_on_a"), UseContext>,
+            EncodeField<symbol!("chan_id_on_a"), UseContext>,
+            EncodeField<symbol!("chan_id_on_b"), UseContext>,
+            EncodeField<symbol!("version_on_b"), UseContext>,
+            EncodeField<symbol!("proof_chan_end_on_b"), UseContext>,
+            EncodeField<symbol!("proof_height_on_b"), UseContext>,
+        ]>,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeMsgChanOpenAck {
+    type From = Product![String, String, String, String, StateProof, Height];
+    type To = MsgChanOpenAck;
+
+    fn transform(
+        product![
+            port_id_on_a,
+            chan_id_on_a,
+            chan_id_on_b,
+            version_on_b,
+            proof_chan_end_on_b,
+            proof_height_on_b
+        ]: Self::From,
+    ) -> MsgChanOpenAck {
+        MsgChanOpenAck {
+            port_id_on_a: PortId {
+                port_id: port_id_on_a,
+            },
+            chan_id_on_a: ChannelId {
+                channel_id: chan_id_on_a,
+            },
+            chan_id_on_b: ChannelId {
+                channel_id: chan_id_on_b,
+            },
+            version_on_b: AppVersion {
+                version: version_on_b,
+            },
+            proof_chan_end_on_b,
+            proof_height_on_b,
         }
     }
 }
