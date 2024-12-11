@@ -291,7 +291,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
         };
 
-        let starknet_connection_id = {
+        let starknet_connection_id_1 = {
             let conn_open_init_msg = MsgConnOpenInit {
                 client_id_on_a: starknet_client_id.clone(),
                 client_id_on_b: cosmos_client_id_as_cairo.clone(),
@@ -338,7 +338,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         {
             let conn_open_ack_msg = MsgConnOpenAck {
-                conn_id_on_a: starknet_connection_id.clone(),
+                conn_id_on_a: starknet_connection_id_1.clone(),
                 conn_id_on_b: cosmos_connection_id.clone(),
                 // empty proofs are not accepted
                 proof_conn_end_on_b: StateProof {
@@ -371,7 +371,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             assert_eq!(conn_ack_event.client_id_on_a, starknet_client_id);
             assert_eq!(conn_ack_event.client_id_on_b, cosmos_client_id_as_cairo);
-            assert_eq!(conn_ack_event.connection_id_on_a, starknet_connection_id);
+            assert_eq!(conn_ack_event.connection_id_on_a, starknet_connection_id_1);
             assert_eq!(conn_ack_event.connection_id_on_b, cosmos_connection_id);
         }
 
@@ -408,10 +408,10 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             info!("register ics20 response: {:?}", response);
         }
 
-        let starknet_channel_id = {
+        let starknet_channel_id_1 = {
             let chan_open_init_msg = MsgChanOpenInit {
                 port_id_on_a: port_id_on_cosmos.clone(),
-                conn_id_on_a: starknet_connection_id.clone(),
+                conn_id_on_a: starknet_connection_id_1.clone(),
                 port_id_on_b: port_id_on_starknet.clone(),
                 version_proposal: app_version.clone(),
                 ordering: ChannelOrdering::Unordered,
@@ -440,7 +440,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             assert_eq!(chan_init_event.port_id_on_a, port_id_on_starknet);
             assert_eq!(chan_init_event.port_id_on_b, port_id_on_cosmos);
-            assert_eq!(chan_init_event.connection_id_on_a, starknet_connection_id);
+            assert_eq!(chan_init_event.connection_id_on_a, starknet_connection_id_1);
             assert_eq!(chan_init_event.version_on_a, app_version);
 
             chan_init_event.channel_id_on_a.clone()
@@ -454,7 +454,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         {
             let chan_open_ack_msg = MsgChanOpenAck {
                 port_id_on_a: port_id_on_starknet.clone(),
-                chan_id_on_a: starknet_channel_id.clone(),
+                chan_id_on_a: starknet_channel_id_1.clone(),
                 chan_id_on_b: cosmos_channel_id.clone(),
                 version_on_b: app_version.clone(),
                 proof_chan_end_on_b: StateProof {
@@ -486,9 +486,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             assert_eq!(chan_ack_event.port_id_on_a, port_id_on_starknet);
             assert_eq!(chan_ack_event.port_id_on_b, port_id_on_cosmos);
-            assert_eq!(chan_ack_event.channel_id_on_a, starknet_channel_id);
+            assert_eq!(chan_ack_event.channel_id_on_a, starknet_channel_id_1);
             assert_eq!(chan_ack_event.channel_id_on_b, cosmos_channel_id);
-            assert_eq!(chan_ack_event.connection_id_on_a, starknet_connection_id);
+            assert_eq!(chan_ack_event.connection_id_on_a, starknet_connection_id_1);
         }
 
         // stub
@@ -522,7 +522,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 src_port_id: port_id_on_cosmos.port_id.clone(),
                 src_channel_id: cosmos_channel_id.channel_id.clone(),
                 dst_port_id: port_id_on_starknet.port_id.clone(),
-                dst_channel_id: starknet_channel_id.channel_id.clone(),
+                dst_channel_id: starknet_channel_id_1.channel_id.clone(),
                 data: packet_data,
                 // both timeout height and timestamp are checked
                 timeout_height: Height {
