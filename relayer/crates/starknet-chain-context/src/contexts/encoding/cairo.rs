@@ -34,7 +34,7 @@ use hermes_starknet_chain_components::types::messages::ibc::channel::{
     MsgChanOpenAck, MsgChanOpenInit,
 };
 use hermes_starknet_chain_components::types::messages::ibc::connection::{
-    MsgConnOpenAck, MsgConnOpenInit, MsgConnOpenTry,
+    MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
 };
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
@@ -137,6 +137,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, MsgConnOpenInit>
     + CanEncodeAndDecode<ViaCairo, MsgConnOpenTry>
     + CanEncodeAndDecode<ViaCairo, MsgConnOpenAck>
+    + CanEncodeAndDecode<ViaCairo, MsgConnOpenConfirm>
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenInit>
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenAck>
     + CanEncode<ViaCairo, CometUpdateHeader>

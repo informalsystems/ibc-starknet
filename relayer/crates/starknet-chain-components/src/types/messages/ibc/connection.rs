@@ -234,3 +234,38 @@ impl Transformer for EncodeMsgConnOpenTry {
         }
     }
 }
+
+#[derive(HasField)]
+pub struct MsgConnOpenConfirm {
+    pub conn_id_on_b: ConnectionId,
+    pub proof_conn_end_on_a: StateProof,
+    pub proof_height_on_a: Height,
+}
+
+pub struct EncodeMsgConnOpenConfirm;
+
+delegate_components! {
+    EncodeMsgConnOpenConfirm {
+        MutEncoderComponent: CombineEncoders<Product![
+            EncodeField<symbol!("conn_id_on_b"), UseContext>,
+            EncodeField<symbol!("proof_conn_end_on_a"), UseContext>,
+            EncodeField<symbol!("proof_height_on_a"), UseContext>,
+        ]>,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeMsgConnOpenConfirm {
+    type From = Product![ConnectionId, StateProof, Height];
+    type To = MsgConnOpenConfirm;
+
+    fn transform(
+        product![conn_id_on_b, proof_conn_end_on_a, proof_height_on_a]: Self::From,
+    ) -> MsgConnOpenConfirm {
+        MsgConnOpenConfirm {
+            conn_id_on_b,
+            proof_conn_end_on_a,
+            proof_height_on_a,
+        }
+    }
+}
