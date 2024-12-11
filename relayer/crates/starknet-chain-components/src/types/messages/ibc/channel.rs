@@ -286,3 +286,46 @@ impl Transformer for EncodeMsgChanOpenAck {
         }
     }
 }
+
+#[derive(HasField)]
+pub struct MsgChanOpenConfirm {
+    pub port_id_on_b: PortId,
+    pub chan_id_on_b: ChannelId,
+    pub proof_chan_end_on_a: StateProof,
+    pub proof_height_on_a: Height,
+}
+
+pub struct EncodeMsgChanOpenConfirm;
+
+delegate_components! {
+    EncodeMsgChanOpenConfirm {
+        MutEncoderComponent: CombineEncoders<Product![
+            EncodeField<symbol!("port_id_on_b"), UseContext>,
+            EncodeField<symbol!("chan_id_on_b"), UseContext>,
+            EncodeField<symbol!("proof_chan_end_on_a"), UseContext>,
+            EncodeField<symbol!("proof_height_on_a"), UseContext>,
+        ]>,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeMsgChanOpenConfirm {
+    type From = Product![PortId, ChannelId, StateProof, Height];
+    type To = MsgChanOpenConfirm;
+
+    fn transform(
+        product![
+            port_id_on_b,
+            chan_id_on_b,
+            proof_chan_end_on_a,
+            proof_height_on_a
+        ]: Self::From,
+    ) -> MsgChanOpenConfirm {
+        MsgChanOpenConfirm {
+            port_id_on_b,
+            chan_id_on_b,
+            proof_chan_end_on_a,
+            proof_height_on_a,
+        }
+    }
+}

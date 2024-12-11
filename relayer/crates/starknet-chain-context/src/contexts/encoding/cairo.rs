@@ -31,7 +31,7 @@ use hermes_starknet_chain_components::types::message_responses::create_client::C
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::erc20::transfer::TransferErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::ibc::channel::{
-    MsgChanOpenAck, MsgChanOpenInit, MsgChanOpenTry,
+    MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry,
 };
 use hermes_starknet_chain_components::types::messages::ibc::connection::{
     MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
@@ -141,6 +141,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenInit>
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenTry>
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenAck>
+    + CanEncodeAndDecode<ViaCairo, MsgChanOpenConfirm>
     + CanEncode<ViaCairo, CometUpdateHeader>
     + CanDecode<ViaCairo, CreateClientResponse>
 {
