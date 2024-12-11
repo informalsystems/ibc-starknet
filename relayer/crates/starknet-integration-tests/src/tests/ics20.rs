@@ -22,7 +22,6 @@ use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContrac
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::channel_id::ChannelId;
 use hermes_starknet_chain_components::types::client_id::ClientId;
-use hermes_starknet_chain_components::types::connection_id::ConnectionId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::events::channel::ChannelHandshakeEvents;
 use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
@@ -31,7 +30,8 @@ use hermes_starknet_chain_components::types::messages::ibc::channel::{
     AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenInit, PortId,
 };
 use hermes_starknet_chain_components::types::messages::ibc::connection::{
-    BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenInit,
+    BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit,
+    MsgConnOpenTry,
 };
 use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, PrefixedDenom};
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
@@ -286,6 +286,10 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             }
         };
 
+        let base_prefix = BasePrefix {
+            prefix: "ibc".into(),
+        };
+
         let connection_version = ConnectionVersion {
             identifier: "1".into(),
             features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
@@ -295,9 +299,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let conn_open_init_msg = MsgConnOpenInit {
                 client_id_on_a: starknet_client_id.clone(),
                 client_id_on_b: cosmos_client_id_as_cairo.clone(),
-                prefix_on_b: BasePrefix {
-                    prefix: "ibc".into(),
-                },
+                prefix_on_b: base_prefix.clone(),
                 version: connection_version.clone(),
                 delay_period: 0,
             };
@@ -331,15 +333,54 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             conn_init_event.connection_id_on_a.clone()
         };
 
-        // dummy connection id at cosmos; as if conn_open_try is executed at cosmos
-        let cosmos_connection_id = ConnectionId {
-            connection_id: "connection-0".into(),
+        let starknet_connection_id_2 = {
+            // conn_open_try at starknet; to check the connection handshake
+
+            let conn_open_try_msg = MsgConnOpenTry {
+                client_id_on_b: cosmos_client_id_as_cairo.clone(),
+                client_id_on_a: starknet_client_id.clone(),
+                conn_id_on_a: starknet_connection_id_1.clone(),
+                prefix_on_a: base_prefix.clone(),
+                version_on_a: connection_version.clone(),
+                proof_conn_end_on_a: StateProof {
+                    proof: vec![Felt::ONE],
+                },
+                proof_height_on_a: starknet_client_state.latest_height.clone(),
+                delay_period: 0,
+            };
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("conn_open_try"),
+                calldata: cairo_encoding.encode(&conn_open_try_msg)?,
+            };
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("conn_open_try response: {:?}", response);
+
+            let events: Vec<ConnectionHandshakeEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            assert_eq!(events.len(), 1);
+
+            let ConnectionHandshakeEvents::Try(ref conn_try_event) = events[0] else {
+                panic!("expected a try event from conn_open_try");
+            };
+
+            info!("conn_try_event: {:?}", conn_try_event);
+
+            assert_eq!(conn_try_event.client_id_on_a, starknet_client_id);
+            assert_eq!(conn_try_event.connection_id_on_a, starknet_connection_id_1);
+            assert_eq!(conn_try_event.client_id_on_b, cosmos_client_id_as_cairo);
+
+            conn_try_event.connection_id_on_b.clone()
         };
 
         {
             let conn_open_ack_msg = MsgConnOpenAck {
                 conn_id_on_a: starknet_connection_id_1.clone(),
-                conn_id_on_b: cosmos_connection_id.clone(),
+                conn_id_on_b: starknet_connection_id_2.clone(),
                 // empty proofs are not accepted
                 proof_conn_end_on_b: StateProof {
                     proof: vec![Felt::ONE],
@@ -372,7 +413,51 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             assert_eq!(conn_ack_event.client_id_on_a, starknet_client_id);
             assert_eq!(conn_ack_event.client_id_on_b, cosmos_client_id_as_cairo);
             assert_eq!(conn_ack_event.connection_id_on_a, starknet_connection_id_1);
-            assert_eq!(conn_ack_event.connection_id_on_b, cosmos_connection_id);
+            assert_eq!(conn_ack_event.connection_id_on_b, starknet_connection_id_2);
+        }
+
+        {
+            // conn_open_confirm at starknet; to check the connection handshake
+
+            let conn_open_confirm_msg = MsgConnOpenConfirm {
+                conn_id_on_b: starknet_connection_id_2.clone(),
+                proof_conn_end_on_a: StateProof {
+                    proof: vec![Felt::ONE],
+                },
+                proof_height_on_a: starknet_client_state.latest_height.clone(),
+            };
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("conn_open_confirm"),
+                calldata: cairo_encoding.encode(&conn_open_confirm_msg)?,
+            };
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("conn_open_confirm response: {:?}", response);
+
+            let events: Vec<ConnectionHandshakeEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            assert_eq!(events.len(), 1);
+
+            let ConnectionHandshakeEvents::Confirm(ref conn_confirm_event) = events[0] else {
+                panic!("expected a confirm event from conn_open_confirm");
+            };
+
+            info!("conn_confirm_event: {:?}", conn_confirm_event);
+
+            assert_eq!(conn_confirm_event.client_id_on_a, starknet_client_id);
+            assert_eq!(conn_confirm_event.client_id_on_b, cosmos_client_id_as_cairo);
+            assert_eq!(
+                conn_confirm_event.connection_id_on_a,
+                starknet_connection_id_1
+            );
+            assert_eq!(
+                conn_confirm_event.connection_id_on_b,
+                starknet_connection_id_2
+            );
         }
 
         let port_id_on_starknet = PortId {

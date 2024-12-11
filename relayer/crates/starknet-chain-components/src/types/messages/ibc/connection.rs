@@ -42,7 +42,7 @@ impl Transformer for EncodeConnectionVersion {
     }
 }
 
-#[derive(HasField)]
+#[derive(HasField, Clone)]
 pub struct BasePrefix {
     pub prefix: String,
 }
