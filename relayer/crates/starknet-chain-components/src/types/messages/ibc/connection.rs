@@ -166,3 +166,71 @@ impl Transformer for EncodeMsgConnOpenAck {
         }
     }
 }
+
+#[derive(HasField)]
+pub struct MsgConnOpenTry {
+    pub client_id_on_b: ClientId,
+    pub client_id_on_a: ClientId,
+    pub conn_id_on_a: ConnectionId,
+    pub prefix_on_a: BasePrefix,
+    pub version_on_a: ConnectionVersion,
+    pub proof_conn_end_on_a: StateProof,
+    pub proof_height_on_a: Height,
+    pub delay_period: u64,
+}
+
+pub struct EncodeMsgConnOpenTry;
+
+delegate_components! {
+    EncodeMsgConnOpenTry {
+        MutEncoderComponent: CombineEncoders<Product![
+            EncodeField<symbol!("client_id_on_b"), UseContext>,
+            EncodeField<symbol!("client_id_on_a"), UseContext>,
+            EncodeField<symbol!("conn_id_on_a"), UseContext>,
+            EncodeField<symbol!("prefix_on_a"), UseContext>,
+            EncodeField<symbol!("version_on_a"), UseContext>,
+            EncodeField<symbol!("proof_conn_end_on_a"), UseContext>,
+            EncodeField<symbol!("proof_height_on_a"), UseContext>,
+            EncodeField<symbol!("delay_period"), UseContext>,
+        ]>,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeMsgConnOpenTry {
+    type From = Product![
+        ClientId,
+        ClientId,
+        ConnectionId,
+        BasePrefix,
+        ConnectionVersion,
+        StateProof,
+        Height,
+        u64
+    ];
+    type To = MsgConnOpenTry;
+
+    fn transform(
+        product![
+            client_id_on_b,
+            client_id_on_a,
+            conn_id_on_a,
+            prefix_on_a,
+            version_on_a,
+            proof_conn_end_on_a,
+            proof_height_on_a,
+            delay_period
+        ]: Self::From,
+    ) -> MsgConnOpenTry {
+        MsgConnOpenTry {
+            client_id_on_b,
+            client_id_on_a,
+            conn_id_on_a,
+            prefix_on_a,
+            version_on_a,
+            proof_conn_end_on_a,
+            proof_height_on_a,
+            delay_period,
+        }
+    }
+}

@@ -36,7 +36,7 @@ use crate::types::messages::ibc::channel::{
 };
 use crate::types::messages::ibc::connection::{
     BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion, EncodeMsgConnOpenAck,
-    EncodeMsgConnOpenInit, MsgConnOpenAck, MsgConnOpenInit,
+    EncodeMsgConnOpenInit, EncodeMsgConnOpenTry, MsgConnOpenAck, MsgConnOpenInit, MsgConnOpenTry,
 };
 use crate::types::messages::ibc::denom::{
     Denom, EncodeDenom, EncodePrefixedDenom, EncodeTracePrefix, PrefixedDenom, TracePrefix,
@@ -114,6 +114,7 @@ delegate_components! {
         (ViaCairo, BasePrefix): EncodeBasePrefix,
         (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
         (ViaCairo, MsgConnOpenInit): EncodeMsgConnOpenInit,
+        (ViaCairo, MsgConnOpenTry): EncodeMsgConnOpenTry,
         (ViaCairo, MsgConnOpenAck): EncodeMsgConnOpenAck,
         (ViaCairo, PortId): EncodePortId,
         (ViaCairo, AppVersion): EncodeAppVersion,
