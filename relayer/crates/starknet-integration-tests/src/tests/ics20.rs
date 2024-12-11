@@ -334,11 +334,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         };
 
         let starknet_connection_id_2 = {
-            // conn_open_try at starknet; to check the connection handshake
+            // conn_open_try at starknet; as if conn_init was done at cosmos
+            // to check the connection handshake
 
             let conn_open_try_msg = MsgConnOpenTry {
-                client_id_on_b: cosmos_client_id_as_cairo.clone(),
-                client_id_on_a: starknet_client_id.clone(),
+                client_id_on_b: starknet_client_id.clone(),
+                client_id_on_a: cosmos_client_id_as_cairo.clone(),
                 conn_id_on_a: starknet_connection_id_1.clone(),
                 prefix_on_a: base_prefix.clone(),
                 version_on_a: connection_version.clone(),
@@ -370,9 +371,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("conn_try_event: {:?}", conn_try_event);
 
-            assert_eq!(conn_try_event.client_id_on_a, starknet_client_id);
+            assert_eq!(conn_try_event.client_id_on_a, cosmos_client_id_as_cairo);
             assert_eq!(conn_try_event.connection_id_on_a, starknet_connection_id_1);
-            assert_eq!(conn_try_event.client_id_on_b, cosmos_client_id_as_cairo);
+            assert_eq!(conn_try_event.client_id_on_b, starknet_client_id);
 
             conn_try_event.connection_id_on_b.clone()
         };
@@ -417,7 +418,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         }
 
         {
-            // conn_open_confirm at starknet; to check the connection handshake
+            // conn_open_confirm at starknet; as if conn_ack was done at cosmos
 
             let conn_open_confirm_msg = MsgConnOpenConfirm {
                 conn_id_on_b: starknet_connection_id_2.clone(),
@@ -448,8 +449,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("conn_confirm_event: {:?}", conn_confirm_event);
 
-            assert_eq!(conn_confirm_event.client_id_on_a, starknet_client_id);
-            assert_eq!(conn_confirm_event.client_id_on_b, cosmos_client_id_as_cairo);
+            assert_eq!(conn_confirm_event.client_id_on_a, cosmos_client_id_as_cairo);
+            assert_eq!(conn_confirm_event.client_id_on_b, starknet_client_id);
             assert_eq!(
                 conn_confirm_event.connection_id_on_a,
                 starknet_connection_id_1
@@ -532,6 +533,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         };
 
         let starknet_channel_id_2 = {
+            // chan_open_try at starknet; as if chan_init was done at cosmos
+            // to check the channel handshake
+
             let chan_open_try_msg = MsgChanOpenTry {
                 port_id_on_b: port_id_on_cosmos.clone(),
                 conn_id_on_b: starknet_connection_id_2.clone(),
@@ -615,6 +619,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         }
 
         {
+            // chan_open_confirm at starknet; as if chan_ack was done at cosmos
+
             let chan_open_confirm_msg = MsgChanOpenConfirm {
                 port_id_on_b: port_id_on_cosmos.clone(),
                 chan_id_on_b: starknet_channel_id_2.clone(),
