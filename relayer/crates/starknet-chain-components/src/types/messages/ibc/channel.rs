@@ -12,7 +12,7 @@ use hermes_encoding_components::traits::transform::{Transformer, TransformerRef}
 
 use crate::types::connection_id::ConnectionId;
 
-#[derive(HasField, Debug)]
+#[derive(HasField, Debug, PartialEq, Clone)]
 pub struct PortId {
     pub port_id: String,
 }
@@ -37,7 +37,7 @@ impl Transformer for EncodePortId {
     }
 }
 
-#[derive(HasField, Debug)]
+#[derive(HasField, Debug, PartialEq, Clone)]
 pub struct AppVersion {
     pub version: String,
 }
@@ -62,7 +62,7 @@ impl Transformer for EncodeAppVersion {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ChannelOrdering {
     Unordered,
     Ordered,
