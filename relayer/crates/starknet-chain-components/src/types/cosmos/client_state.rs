@@ -4,8 +4,6 @@ use cgp::core::component::UseContext;
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
-use hermes_cairo_encoding_components::types::either::Either;
-use hermes_cairo_encoding_components::Sum;
 use hermes_chain_components::traits::types::client_state::{
     ClientStateFieldsGetter, HasClientStateType,
 };
