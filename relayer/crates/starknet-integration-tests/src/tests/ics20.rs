@@ -38,7 +38,9 @@ use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, Prefi
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
     IbcTransferMessage, Participant,
 };
-use hermes_starknet_chain_components::types::messages::ibc::packet::{Packet, StateProof};
+use hermes_starknet_chain_components::types::messages::ibc::packet::{
+    MsgRecvPacket, Packet, StateProof,
+};
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
@@ -254,10 +256,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         };
 
         let ics20_contract_address = {
-            let owner_call_data =
-                cairo_encoding.encode(&starknet_chain_driver.relayer_wallet.account_address)?;
-            // // TODO(rano): when we are using ibc-core handler, ibc-core is the owner
-            // let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
+            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
             let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
 
             let contract_address = starknet_chain
@@ -493,7 +492,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let amount = 99u32;
 
-        let message = {
+        let mut msg_recv_packet = {
             let transfer_message = IbcTransferMessage {
                 denom: PrefixedDenom {
                     trace_path: Vec::new(),
@@ -507,50 +506,44 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let packet_data = cairo_encoding.encode(&transfer_message)?;
 
+            let current_starknet_height = starknet_chain.query_chain_height().await?;
+            let current_starknet_time = SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)?
+                .as_secs();
+
             let packet = Packet {
                 sequence: 1,
-                src_port_id: "transfer".into(),
-                src_channel_id: "channel-1".into(),
-                dst_port_id: "transfer".into(),
-                dst_channel_id: "channel-2".into(),
+                src_port_id: port_id_on_cosmos.port_id.clone(),
+                src_channel_id: cosmos_channel_id.channel_id.clone(),
+                dst_port_id: port_id_on_starknet.port_id.clone(),
+                dst_channel_id: starknet_channel_id.channel_id.clone(),
                 data: packet_data,
+                // both timeout height and timestamp are checked
                 timeout_height: Height {
                     revision_number: 0,
-                    revision_height: 100,
+                    revision_height: current_starknet_height + 100,
                 },
-                timeout_timestamp: 0,
+                timeout_timestamp: current_starknet_time + 100,
             };
 
-            let calldata = cairo_encoding.encode(&packet)?;
-
-            Call {
-                to: ics20_contract_address,
-                selector: selector!("on_recv_packet"),
-                calldata,
+            MsgRecvPacket {
+                packet,
+                proof_commitment_on_a: StateProof {
+                    proof: vec![Felt::ONE],
+                }, // stub
+                proof_height_on_a: starknet_client_state.latest_height.clone(),
             }
-
-            // // TODO(rano): when ibc-core can create channels, this will be the correct message
-
-            // let msg_recv_packet = MsgRecvPacket {
-            //     packet,
-            //     proof_commitment_on_a: StateProof { proof: Vec::new() }, // stub
-            //     proof_height_on_a: Height {
-            //         // stub
-            //         revision_number: 0,
-            //         revision_height: 0,
-            //     },
-            // };
-
-            // let calldata = cairo_encoding.encode(&msg_recv_packet)?;
-
-            // Call {
-            //     to: ibc_core_address,
-            //     selector: selector!("recv_packet"),
-            //     calldata,
-            // }
         };
 
         let token_address = {
+            let calldata = cairo_encoding.encode(&msg_recv_packet)?;
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("recv_packet"),
+                calldata,
+            };
+
             let response = starknet_chain.send_message(message.clone()).await?;
 
             info!("IBC transfer response: {:?}", response);
@@ -620,6 +613,17 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         {
             // Send the same transfer message a second time
+            // but increase the packet sequence number
+            msg_recv_packet.packet.sequence += 1;
+
+            let calldata = cairo_encoding.encode(&msg_recv_packet)?;
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("recv_packet"),
+                calldata,
+            };
+
             let response = starknet_chain.send_message(message.clone()).await?;
 
             let ibc_transfer_events_2: Vec<IbcTransferEvent> =
