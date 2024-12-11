@@ -427,7 +427,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             assert_eq!(events.len(), 1);
 
-            let ChannelHandshakeEvents::Init(ref chan_init_event) = events[0];
+            let ChannelHandshakeEvents::Init(ref chan_init_event) = events[0] else {
+                panic!("expected a init event from chan_open_init");
+            };
 
             info!("chan_init_event: {:?}", chan_init_event);
 
