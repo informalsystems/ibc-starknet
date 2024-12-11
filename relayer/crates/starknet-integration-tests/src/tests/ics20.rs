@@ -390,8 +390,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             assert_eq!(conn_ack_event.connection_id_on_b, cosmos_connection_id);
         }
 
-        // TODO(rano): channel open init
-
         {
             let chan_open_init_msg = MsgChanOpenInit {
                 port_id_on_a: PortId {
@@ -422,9 +420,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             assert_eq!(events.len(), 1);
 
-            let ChannelHandshakeEvents::Init(ref chan_init_event) = events[0] else {
-                panic!("expected a init event from chan_open_init");
-            };
+            let ChannelHandshakeEvents::Init(ref chan_init_event) = events[0];
 
             info!("chan_init_event: {:?}", chan_init_event);
 
