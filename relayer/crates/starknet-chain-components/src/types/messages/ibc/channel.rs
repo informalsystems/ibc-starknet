@@ -132,7 +132,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeMsgChanOpenInit {
-    type From = Product![String, ConnectionId, String, String, ChannelOrdering];
+    type From = Product![PortId, ConnectionId, PortId, AppVersion, ChannelOrdering];
     type To = MsgChanOpenInit;
 
     fn transform(
@@ -145,16 +145,10 @@ impl Transformer for EncodeMsgChanOpenInit {
         ]: Self::From,
     ) -> MsgChanOpenInit {
         MsgChanOpenInit {
-            port_id_on_a: PortId {
-                port_id: port_id_on_a,
-            },
+            port_id_on_a,
             conn_id_on_a,
-            port_id_on_b: PortId {
-                port_id: port_id_on_b,
-            },
-            version_proposal: AppVersion {
-                version: version_proposal,
-            },
+            port_id_on_b,
+            version_proposal,
             ordering,
         }
     }
@@ -255,7 +249,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeMsgChanOpenAck {
-    type From = Product![String, String, String, String, StateProof, Height];
+    type From = Product![PortId, ChannelId, ChannelId, AppVersion, StateProof, Height];
     type To = MsgChanOpenAck;
 
     fn transform(
@@ -269,18 +263,10 @@ impl Transformer for EncodeMsgChanOpenAck {
         ]: Self::From,
     ) -> MsgChanOpenAck {
         MsgChanOpenAck {
-            port_id_on_a: PortId {
-                port_id: port_id_on_a,
-            },
-            chan_id_on_a: ChannelId {
-                channel_id: chan_id_on_a,
-            },
-            chan_id_on_b: ChannelId {
-                channel_id: chan_id_on_b,
-            },
-            version_on_b: AppVersion {
-                version: version_on_b,
-            },
+            port_id_on_a,
+            chan_id_on_a,
+            chan_id_on_b,
+            version_on_b,
             proof_chan_end_on_b,
             proof_height_on_b,
         }
