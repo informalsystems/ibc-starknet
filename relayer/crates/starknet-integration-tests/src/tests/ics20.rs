@@ -453,8 +453,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             assert_eq!(conn_confirm_event.client_id_on_b, starknet_client_id);
             assert_eq!(
                 conn_confirm_event.connection_id_on_a,
-                // TODO(rano): this should be starknet_connection_id_1; but there is a bug in the contract
-                starknet_connection_id_2
+                starknet_connection_id_1
             );
             assert_eq!(
                 conn_confirm_event.connection_id_on_b,
