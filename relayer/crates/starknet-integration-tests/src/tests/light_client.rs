@@ -5,7 +5,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-use cgp::prelude::*;
 use flate2::write::GzEncoder;
 use flate2::Compression;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
@@ -39,6 +38,7 @@ use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_components::types::register::MsgRegisterClient;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
@@ -195,10 +195,12 @@ fn test_starknet_light_client() -> Result<(), Error> {
         {
             // register comet client contract with ibc-core
 
-            let calldata = cairo_encoding.encode(&product![
-                short_string!("07-tendermint"),
-                comet_client_address
-            ])?;
+            let register_client = MsgRegisterClient {
+                client_type: short_string!("07-tendermint"),
+                contract_address: comet_client_address,
+            };
+
+            let calldata = cairo_encoding.encode(&register_client)?;
 
             let call = Call {
                 to: ibc_core_address,

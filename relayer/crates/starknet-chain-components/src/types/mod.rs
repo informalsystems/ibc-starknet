@@ -11,5 +11,6 @@ pub mod message_response;
 pub mod message_responses;
 pub mod messages;
 pub mod payloads;
+pub mod register;
 pub mod status;
 pub mod tx_response;

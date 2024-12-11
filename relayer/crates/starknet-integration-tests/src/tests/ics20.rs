@@ -3,7 +3,6 @@ use core::marker::PhantomData;
 use std::path::PathBuf;
 use std::time::SystemTime;
 
-use cgp::prelude::*;
 use eyre::eyre;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientState;
@@ -42,6 +41,7 @@ use hermes_starknet_chain_components::types::messages::ibc::packet::{
     MsgRecvPacket, Packet, StateProof,
 };
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
@@ -199,10 +199,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         {
             // register comet client contract with ibc-core
 
-            let calldata = cairo_encoding.encode(&product![
-                short_string!("07-tendermint"),
-                comet_client_address
-            ])?;
+            let register_client = MsgRegisterClient {
+                client_type: short_string!("07-tendermint"),
+                contract_address: comet_client_address,
+            };
+
+            let calldata = cairo_encoding.encode(&register_client)?;
 
             let call = Call {
                 to: ibc_core_address,
@@ -271,23 +273,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             contract_address
         };
-
-        {
-            // register the ICS20 contract with the IBC core contract
-
-            let register_call_data =
-                cairo_encoding.encode(&product![b"transfer".to_vec(), ics20_contract_address])?;
-
-            let message = Call {
-                to: ibc_core_address,
-                selector: selector!("bind_port_id"),
-                calldata: register_call_data,
-            };
-
-            let response = starknet_chain.send_message(message).await?;
-
-            info!("register ics20 response: {:?}", response);
-        }
 
         let cosmos_client_id_as_cairo = {
             let cosmos_client_id_str = cosmos_client_id.to_string();
@@ -401,6 +386,27 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let app_version = AppVersion {
             version: "ics20-1".into(),
         };
+
+        {
+            // register the ICS20 contract with the IBC core contract
+
+            let register_app = MsgRegisterApp {
+                port_id: port_id_on_starknet.clone(),
+                contract_address: ics20_contract_address,
+            };
+
+            let register_call_data = cairo_encoding.encode(&register_app)?;
+
+            let message = Call {
+                to: ibc_core_address,
+                selector: selector!("bind_port_id"),
+                calldata: register_call_data,
+            };
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("register ics20 response: {:?}", response);
+        }
 
         let starknet_channel_id = {
             let chan_open_init_msg = MsgChanOpenInit {

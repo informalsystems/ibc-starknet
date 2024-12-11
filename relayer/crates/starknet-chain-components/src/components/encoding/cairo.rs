@@ -47,6 +47,9 @@ use crate::types::messages::ibc::ibc_transfer::{
 use crate::types::messages::ibc::packet::{
     EncodeMsgRecvPacket, EncodePacket, EncodeStateProof, MsgRecvPacket, Packet, StateProof,
 };
+use crate::types::register::{
+    EncodeRegisterApp, EncodeRegisterClient, MsgRegisterApp, MsgRegisterClient,
+};
 
 cgp_preset! {
     StarknetCairoEncodingComponents {
@@ -106,6 +109,8 @@ delegate_components! {
         (ViaCairo, ChannelId): EncodeChannelId,
         (ViaCairo, CometUpdateHeader): EncodeCometUpdateHeader,
         (ViaCairo, CreateClientResponse): DecodeCreateClientResponse,
+        (ViaCairo, MsgRegisterClient): EncodeRegisterClient,
+        (ViaCairo, MsgRegisterApp): EncodeRegisterApp,
         (ViaCairo, BasePrefix): EncodeBasePrefix,
         (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
         (ViaCairo, MsgConnOpenInit): EncodeMsgConnOpenInit,

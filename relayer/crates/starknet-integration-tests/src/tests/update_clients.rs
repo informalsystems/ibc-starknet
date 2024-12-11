@@ -5,7 +5,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
 
-use cgp::prelude::*;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::queries::consensus_state::CanQueryConsensusStateWithLatestHeight;
@@ -24,6 +23,7 @@ use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_components::types::register::MsgRegisterClient;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
@@ -143,10 +143,12 @@ fn test_relay_update_clients() -> Result<(), Error> {
         {
             // register comet client contract with ibc-core
 
-            let calldata = cairo_encoding.encode(&product![
-                short_string!("07-tendermint"),
-                comet_client_address
-            ])?;
+            let register_client = MsgRegisterClient {
+                client_type: short_string!("07-tendermint"),
+                contract_address: comet_client_address,
+            };
+
+            let calldata = cairo_encoding.encode(&register_client)?;
 
             let call = Call {
                 to: ibc_core_address,
