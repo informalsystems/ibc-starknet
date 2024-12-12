@@ -224,14 +224,13 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         info!("created client on Starknet: {:?}", starknet_client_id);
 
-        let starknet_to_cosmos_relay = StarknetToCosmosRelay {
-            runtime: runtime.clone(),
-            src_chain: starknet_chain.clone(),
-            dst_chain: cosmos_chain.clone(),
-            // TODO: stub
-            src_client_id: starknet_client_id.clone(),
-            dst_client_id: cosmos_client_id.clone(),
-        };
+        let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
+            runtime.clone(),
+            starknet_chain.clone(),
+            cosmos_chain.clone(),
+            starknet_client_id.clone(),
+            cosmos_client_id.clone(),
+        );
 
         {
             let client_state =
