@@ -1,6 +1,7 @@
 use cgp::prelude::*;
 pub use starknet::core::types::{Felt, U256};
 
+use crate::impls::encode_mut::array::EncodeArray;
 use crate::impls::encode_mut::bool::EncodeBool;
 use crate::impls::encode_mut::byte_array::EncodeByteArray;
 use crate::impls::encode_mut::felt::EncodeFelt;
@@ -12,7 +13,7 @@ use crate::impls::encode_mut::unit::EncodeNothing;
 use crate::impls::encode_mut::vec::EncodeList;
 use crate::strategy::ViaCairo;
 
-define_components! {
+cgp_preset! {
     CairoEncodeMutComponents {
         (ViaCairo, Felt): EncodeFelt,
         (ViaCairo, u128): EncodeU128,
@@ -24,5 +25,9 @@ define_components! {
         (ViaCairo, usize): EncodeFromU128,
         (ViaCairo, String): EncodeUtf8String,
         (ViaCairo, ()): EncodeNothing,
+        (ViaCairo, Nil): EncodeNothing,
+        (ViaCairo, Vec<String>): EncodeList,
+        // TODO(rano): use <const N: usize>
+        (ViaCairo, [String; 2]): EncodeArray,
     }
 }

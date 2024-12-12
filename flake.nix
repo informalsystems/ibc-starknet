@@ -61,6 +61,8 @@
 
           wasm-simapp = cosmos-nix.ibc-go-v8-wasm-simapp;
 
+          osmosis = cosmos-nix.osmosis;
+
           starknet-devnet = import ./nix/starknet-devnet.nix {
             inherit nixpkgs;
             inherit (inputs) starknet-devnet-src;
@@ -98,6 +100,7 @@
               scarb
               universal-sierra-compiler
               wasm-simapp
+              osmosis
               ;
           };
 
@@ -107,6 +110,8 @@
               cargo-nextest
               taplo
               just
+              openssl
+              pkg-config
               ;
 
             nixfmt = nixpkgs.nixfmt-rfc-style;
@@ -135,7 +140,10 @@
           devShells = {
             default = nixpkgs.mkShell { buildInputs = shell-deps; };
 
-            rust = nixpkgs.mkShell { buildInputs = [ rust ] ++ shell-deps; };
+            rust = nixpkgs.mkShell {
+              PKG_CONFIG_PATH = "${nixpkgs.openssl.dev}/lib/pkgconfig";
+              buildInputs = [ rust ] ++ shell-deps;
+            };
 
             rust-nightly = nixpkgs.mkShell { buildInputs = [ rust-nightly ] ++ shell-deps; };
 

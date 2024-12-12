@@ -6,8 +6,6 @@ use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 
 use crate::impls::encode_mut::variant_from::EncodeVariantFrom;
-use crate::types::either::Either;
-use crate::Sum;
 
 pub struct EncodeOption<T>(pub PhantomData<T>);
 

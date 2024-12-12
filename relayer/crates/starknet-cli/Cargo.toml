@@ -33,9 +33,7 @@ hermes-starknet-test-components   = { workspace = true }
 hermes-test-components            = { workspace = true }
 hermes-starknet-integration-tests = { workspace = true }
 
-ibc               = { workspace = true }
-ibc-relayer       = { workspace = true }
-ibc-relayer-types = { workspace = true }
+ibc = { workspace = true }
 
 serde              = { workspace = true, features = [ "derive" ] }
 clap               = { workspace = true, features = [ "derive" ] }

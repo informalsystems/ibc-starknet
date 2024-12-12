@@ -1,10 +1,9 @@
 use core::iter::Peekable;
 use core::slice::Iter;
 
-use cgp::core::component::{UseContext, UseDelegate};
+use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
-use hermes_cairo_encoding_components::impls::encode_mut::pair::EncodeCons;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
@@ -12,7 +11,6 @@ use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::decode_mut::CanPeekDecodeBuffer;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
-use hermes_encoding_components::traits::encode_and_decode_mut::MutEncoderAndDecoder;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, EncodingGetterComponent, HasEncodingType, ProvideEncodingType,
 };
@@ -32,6 +30,12 @@ use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::message_responses::create_client::CreateClientResponse;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::erc20::transfer::TransferErc20TokenMessage;
+use hermes_starknet_chain_components::types::messages::ibc::channel::{
+    MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry,
+};
+use hermes_starknet_chain_components::types::messages::ibc::connection::{
+    MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
+};
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
 };
@@ -39,6 +43,7 @@ use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
     IbcTransferMessage, Participant,
 };
 use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
+use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use starknet::core::types::{Felt, U256};
 
 use crate::impls::error::HandleStarknetChainError;
@@ -60,10 +65,12 @@ delegate_components! {
     }
 }
 
-hermes_starknet_chain_components::with_starknet_cairo_encoding_components! {
-    delegate_components! {
-        StarknetCairoEncodingContextComponents {
-            @StarknetCairoEncodingComponents: StarknetCairoEncodingComponents,
+with_starknet_cairo_encoding_components! {
+    | Components | {
+        delegate_components! {
+            StarknetCairoEncodingContextComponents {
+                Components: StarknetCairoEncodingComponents,
+            }
         }
     }
 }
@@ -99,6 +106,7 @@ pub trait CanUseCairoEncoding:
     + for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Peekable<Iter<'a, Felt>>>
     + CanPeekDecodeBuffer<Felt>
     + CanEncodeAndDecode<ViaCairo, ()>
+    + CanEncodeAndDecode<ViaCairo, Nil>
     + CanEncodeAndDecode<ViaCairo, Felt>
     + CanEncodeAndDecode<ViaCairo, Felt>
     + CanEncodeAndDecode<ViaCairo, u128>
@@ -124,16 +132,19 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, CometClientState>
     + CanEncodeAndDecode<ViaCairo, CometConsensusState>
     + CanEncodeAndDecode<ViaCairo, ClientId>
+    + CanEncodeAndDecode<ViaCairo, MsgRegisterClient>
+    + CanEncodeAndDecode<ViaCairo, MsgRegisterApp>
+    + CanEncodeAndDecode<ViaCairo, MsgConnOpenInit>
+    + CanEncodeAndDecode<ViaCairo, MsgConnOpenTry>
+    + CanEncodeAndDecode<ViaCairo, MsgConnOpenAck>
+    + CanEncodeAndDecode<ViaCairo, MsgConnOpenConfirm>
+    + CanEncodeAndDecode<ViaCairo, MsgChanOpenInit>
+    + CanEncodeAndDecode<ViaCairo, MsgChanOpenTry>
+    + CanEncodeAndDecode<ViaCairo, MsgChanOpenAck>
+    + CanEncodeAndDecode<ViaCairo, MsgChanOpenConfirm>
     + CanEncode<ViaCairo, CometUpdateHeader>
     + CanDecode<ViaCairo, CreateClientResponse>
 {
 }
 
 impl CanUseCairoEncoding for StarknetCairoEncoding {}
-
-pub trait CanUsePairEncoder:
-    MutEncoderAndDecoder<StarknetCairoEncoding, ViaCairo, (u128, (Vec<u8>, U256))>
-{
-}
-
-impl CanUsePairEncoder for EncodeCons<EncodeCons<UseContext>> {}

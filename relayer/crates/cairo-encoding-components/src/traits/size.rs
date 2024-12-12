@@ -1,4 +1,5 @@
-use crate::types::either::{Either, Void};
+use cgp::prelude::{Either, Void};
+
 use crate::types::nat::{S, Z};
 
 pub trait HasSize {

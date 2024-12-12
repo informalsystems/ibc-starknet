@@ -2,7 +2,11 @@ use cgp::prelude::*;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
 
-#[derive_component(TokenBalanceQuerierComponent, TokenBalanceQuerier<Chain>)]
+#[cgp_component {
+  name: TokenBalanceQuerierComponent,
+  provider: TokenBalanceQuerier,
+  context: Chain,
+}]
 #[async_trait]
 pub trait CanQueryTokenBalance: HasAddressType + HasAmountType + HasErrorType {
     async fn query_token_balance(

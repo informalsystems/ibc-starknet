@@ -13,7 +13,7 @@ impl<Encoding, Strategy, Value, Tag> Decoder<Encoding, Strategy, Option<Value>>
     for DecodeOptionalByClassHash<Tag>
 where
     Encoding:
-        CanDecode<Strategy, Value, Encoded = StarknetEvent> + HasField<Tag, Field = HashSet<Felt>>,
+        CanDecode<Strategy, Value, Encoded = StarknetEvent> + HasField<Tag, Value = HashSet<Felt>>,
 {
     fn decode(
         encoding: &Encoding,

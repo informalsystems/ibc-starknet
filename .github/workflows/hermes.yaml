@@ -50,6 +50,7 @@ jobs:
           export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json"
           export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_CometClient.contract_class.json"
           export STARKNET_WASM_CLIENT_PATH="$(nix path-info ..#ibc-starknet-cw)/ibc_client_starknet_cw.wasm"
+          export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json"
 
           nix develop ..#rust -c \
             cargo nextest run --test-threads=2

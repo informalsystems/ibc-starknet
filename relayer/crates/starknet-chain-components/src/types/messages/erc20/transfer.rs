@@ -6,7 +6,6 @@ use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::HList;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
@@ -30,7 +29,7 @@ pub struct TransferErc20TokenMessage {
 }
 
 pub type EncodeTransferErc20TokenMessage = CombineEncoders<
-    HList![
+    Product![
         EncodeField<symbol!("recipient"), UseContext>,
         EncodeField<symbol!("amount"), UseContext>
     ],

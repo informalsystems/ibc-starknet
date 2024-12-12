@@ -7,12 +7,20 @@ use hermes_encoding_components::traits::types::encoded::ProvideEncodedType;
 
 use crate::impls::encoding::option::DecodeOptionalByClassHash;
 use crate::types::event::StarknetEvent;
+use crate::types::events::channel::{
+    ChanOpenAckEvent, ChanOpenConfirmEvent, ChanOpenInitEvent, ChanOpenTryEvent,
+    ChannelHandshakeEvents, DecodeChannelHandshakeEvents,
+};
+use crate::types::events::connection::{
+    ConnOpenAckEvent, ConnOpenConfirmEvent, ConnOpenInitEvent, ConnOpenTryEvent,
+    ConnectionHandshakeEvents, DecodeConnectionHandshakeEvents,
+};
 use crate::types::events::erc20::{ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent};
 use crate::types::events::ics20::{
     CreateIbcTokenEvent, DecodeIbcTransferEvents, IbcTransferEvent, ReceiveIbcTransferEvent,
 };
 
-define_components! {
+cgp_preset! {
     StarknetEventEncodingComponents {
         EncodedTypeComponent: ProvideEncodedStarknetEventType,
         DecoderComponent: UseDelegate<StarknetEventEncoderComponents>,
@@ -41,9 +49,29 @@ delegate_components! {
             (ViaCairo, CreateIbcTokenEvent),
         ]:
             DecodeIbcTransferEvents,
+        [
+            (ViaCairo, ConnectionHandshakeEvents),
+            (ViaCairo, ConnOpenInitEvent),
+            (ViaCairo, ConnOpenTryEvent),
+            (ViaCairo, ConnOpenAckEvent),
+            (ViaCairo, ConnOpenConfirmEvent),
+        ]:
+            DecodeConnectionHandshakeEvents,
+        [
+            (ViaCairo, ChannelHandshakeEvents),
+            (ViaCairo, ChanOpenInitEvent),
+            (ViaCairo, ChanOpenTryEvent),
+            (ViaCairo, ChanOpenAckEvent),
+            (ViaCairo, ChanOpenConfirmEvent),
+        ]:
+            DecodeChannelHandshakeEvents,
         (ViaCairo, Option<Erc20Event>):
             DecodeOptionalByClassHash<symbol!("erc20_hashes")>,
         (ViaCairo, Option<IbcTransferEvent>):
             DecodeOptionalByClassHash<symbol!("ics20_hashes")>,
+        (ViaCairo, Option<ConnectionHandshakeEvents>):
+            DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
+        (ViaCairo, Option<ChannelHandshakeEvents>):
+            DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
     }
 }

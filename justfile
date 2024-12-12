@@ -4,7 +4,11 @@ install-tools:
 	cargo install typos-cli taplo-cli
 
 build-cw-contract:
-  cd ./light-client && cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
+  cd ./light-client && cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown --release
+
+build-optimized-cw-contract:
+  cd ./light-client && docker run --rm -v "$(pwd)":/code cosmwasm/optimizer:0.16.1 ./ibc-client-starknet-cw
+  sudo chown -R $(id -u):$(id -g) ./light-client/artifacts
 
 # Builds the Cairo contracts
 build-cairo-contracts:

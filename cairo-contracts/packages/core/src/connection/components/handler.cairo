@@ -337,7 +337,7 @@ pub mod ConnectionHandlerComponent {
                     conn_end_on_b.client_id.clone(),
                     msg.conn_id_on_b.clone(),
                     conn_end_on_b.counterparty.client_id.clone(),
-                    msg.conn_id_on_b
+                    conn_end_on_b.counterparty.connection_id.clone(),
                 );
         }
     }

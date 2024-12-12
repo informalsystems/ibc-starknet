@@ -23,7 +23,7 @@ use crate::types::cosmos::client_state::UseCometClientState;
 use crate::types::cosmos::consensus_state::CometConsensusState;
 use crate::types::cosmos::update::CometUpdateHeader;
 
-define_components! {
+cgp_preset! {
     StarknetToCosmosComponents {
         [
             ClientStateQuerierComponent,
