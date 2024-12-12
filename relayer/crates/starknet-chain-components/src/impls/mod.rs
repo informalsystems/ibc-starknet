@@ -1,5 +1,6 @@
 pub mod account;
 pub mod contract;
+pub mod counterparty_message_height;
 pub mod encoding;
 pub mod error;
 pub mod events;

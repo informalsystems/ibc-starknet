@@ -44,7 +44,9 @@ use hermes_relayer_components::chain::traits::types::create_client::{
     HasCreateClientEvent, HasCreateClientPayloadType,
 };
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
-use hermes_relayer_components::chain::traits::types::ibc::{HasClientIdType, HasConnectionIdType};
+use hermes_relayer_components::chain::traits::types::ibc::{
+    HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
+};
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
@@ -227,6 +229,7 @@ pub trait CanUseStarknetChain:
     + CanQueryConsensusState<CosmosChain>
     + CanQueryConsensusStateHeights<CosmosChain>
     + CanQueryConsensusStateHeight<CosmosChain>
+    + HasCounterpartyMessageHeight<CosmosChain>
     + HasInitConnectionOptionsType<CosmosChain>
     + CanBuildConnectionOpenTryMessage<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>

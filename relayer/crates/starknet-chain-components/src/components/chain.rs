@@ -39,6 +39,7 @@ use crate::impls::contract::declare::DeclareSierraContract;
 use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
+use crate::impls::counterparty_message_height::GetCounterpartyCosmosHeightFromStarknetMessage;
 use crate::impls::events::connection_id::UseStarknetConnectionHandshakeEvents;
 use crate::impls::events::create_client::UseStarknetCreateClientEvent;
 use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
@@ -212,6 +213,8 @@ cgp_preset! {
             QueryLatestConsensusStateHeightAsHeights,
         ContractAddressQuerierComponent:
             GetContractAddressFromField,
+        CounterpartyMessageHeightGetterComponent:
+            GetCounterpartyCosmosHeightFromStarknetMessage,
         InitConnectionOptionsTypeComponent:
             ProvideCosmosInitConnectionOptionsType,
         [

@@ -3,15 +3,19 @@ use std::sync::Arc;
 
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
+use hermes_relayer_components::components::default::relay::MainSink;
 use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeAtComponent,
 };
 use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
 use hermes_relayer_components::multi::types::tags::{Dst, Src};
 use hermes_relayer_components::relay::impls::selector::SelectRelayAToB;
-use hermes_relayer_components::relay::traits::chains::{CanRaiseRelayChainErrors, HasRelayChains};
+use hermes_relayer_components::relay::traits::chains::{
+    CanRaiseRelayChainErrors, HasRelayChains, HasRelayClientIds,
+};
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
-use hermes_relayer_components::relay::traits::connection::open_init::CanInitConnection;
+use hermes_relayer_components::relay::traits::connection::open_try::CanRelayConnectionOpenTry;
+use hermes_relayer_components::relay::traits::ibc_message_sender::CanSendIbcMessages;
 use hermes_relayer_components::relay::traits::target::{
     DestinationTarget, HasDestinationTargetChainTypes, HasSourceTargetChainTypes,
     HasTargetClientIds, SourceTarget,
@@ -108,6 +112,7 @@ delegate_components! {
 pub trait CanUseCosmosToStarknetRelay:
     Async
     + HasRelayChains<SrcChain = CosmosChain, DstChain = StarknetChain>
+    + HasRelayClientIds
     + CanRaiseRelayChainErrors
     + HasSourceTargetChainTypes
     + HasDestinationTargetChainTypes
@@ -118,7 +123,9 @@ pub trait CanUseCosmosToStarknetRelay:
     + CanBuildTargetUpdateClientMessage<SourceTarget>
     + CanBuildTargetUpdateClientMessage<DestinationTarget>
     + CanSendTargetUpdateClientMessage<SourceTarget>
-    + CanSendTargetUpdateClientMessage<DestinationTarget> // + CanInitConnection
+    + CanSendTargetUpdateClientMessage<DestinationTarget>
+    + CanSendIbcMessages<MainSink, DestinationTarget>
+    + CanRelayConnectionOpenTry
 {
 }
 
