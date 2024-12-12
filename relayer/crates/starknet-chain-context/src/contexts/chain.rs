@@ -19,6 +19,7 @@ use hermes_logging_components::contexts::no_logger::ProvideNoLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
 };
+use hermes_relayer_components::chain::traits::message_builders::connection_handshake::CanBuildConnectionOpenTryMessage;
 use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
 use hermes_relayer_components::chain::traits::message_builders::update_client::CanBuildUpdateClientMessage;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
@@ -33,6 +34,9 @@ use hermes_relayer_components::chain::traits::send_message::CanSendMessages;
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::client_state::{
     HasClientStateFields, HasClientStateType,
+};
+use hermes_relayer_components::chain::traits::types::connection::{
+    HasConnectionEndType, HasConnectionOpenTryPayloadType, HasInitConnectionOptionsType,
 };
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
 use hermes_relayer_components::chain::traits::types::create_client::{
@@ -50,7 +54,9 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeComponent,
 };
-use hermes_starknet_chain_components::components::chain::*;
+use hermes_starknet_chain_components::components::chain::{
+    IsStarknetChainComponents, StarknetChainComponents,
+};
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
@@ -135,14 +141,11 @@ delegate_components! {
     }
 }
 
-with_starknet_chain_components! {
-    | Components | {
-        delegate_components! {
-            StarknetChainContextComponents {
-                Components: StarknetChainComponents,
-            }
-        }
-    }
+impl<Name> DelegateComponent<Name> for StarknetChainContextComponents
+where
+    Self: IsStarknetChainComponents<Name>,
+{
+    type Delegate = StarknetChainComponents;
 }
 
 delegate_components! {
@@ -220,6 +223,8 @@ pub trait CanUseStarknetChain:
     + CanQueryConsensusState<CosmosChain>
     + CanQueryConsensusStateHeights<CosmosChain>
     + CanQueryConsensusStateHeight<CosmosChain>
+    + HasInitConnectionOptionsType<CosmosChain>
+    + CanBuildConnectionOpenTryMessage<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
 where
@@ -245,6 +250,8 @@ pub trait CanUseCosmosChainWithStarknet:
     + CanQueryConsensusStateHeight<StarknetChain>
     + CanBuildCreateClientPayload<StarknetChain>
     + CanBuildUpdateClientPayload<StarknetChain>
+    + HasConnectionOpenTryPayloadType<StarknetChain>
+    + HasConnectionEndType<StarknetChain>
 {
 }
 

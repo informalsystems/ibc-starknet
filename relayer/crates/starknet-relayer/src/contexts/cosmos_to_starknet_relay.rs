@@ -11,6 +11,7 @@ use hermes_relayer_components::multi::types::tags::{Dst, Src};
 use hermes_relayer_components::relay::impls::selector::SelectRelayAToB;
 use hermes_relayer_components::relay::traits::chains::{CanRaiseRelayChainErrors, HasRelayChains};
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
+use hermes_relayer_components::relay::traits::connection::open_init::CanInitConnection;
 use hermes_relayer_components::relay::traits::target::{
     DestinationTarget, HasDestinationTargetChainTypes, HasSourceTargetChainTypes,
     HasTargetClientIds, SourceTarget,
@@ -117,7 +118,7 @@ pub trait CanUseCosmosToStarknetRelay:
     + CanBuildTargetUpdateClientMessage<SourceTarget>
     + CanBuildTargetUpdateClientMessage<DestinationTarget>
     + CanSendTargetUpdateClientMessage<SourceTarget>
-    + CanSendTargetUpdateClientMessage<DestinationTarget>
+    + CanSendTargetUpdateClientMessage<DestinationTarget> // + CanInitConnection
 {
 }
 

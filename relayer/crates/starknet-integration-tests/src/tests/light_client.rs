@@ -7,6 +7,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use flate2::write::GzEncoder;
 use flate2::Compression;
+use hermes_cosmos_chain_components::impls::connection::connection_handshake_message::default_connection_version;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
 use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
@@ -46,7 +47,6 @@ use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::channel::types::channel::State;
 use ibc::core::client::types::Height;
-use ibc::core::connection::types::version::Version;
 use ibc::core::host::types::identifiers::ClientId;
 use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
 use sha2::{Digest, Sha256};
@@ -357,7 +357,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 client_id: cosmos_client_id.clone(),
                 counterparty_client_id: ClientId::new(&felt_to_trimmed_string(&starknet_client_id.client_type), starknet_client_id.sequence)?,
                 counterparty_commitment_prefix: "ibc".into(),
-                version: Version::compatibles().pop().unwrap(),
+                version: default_connection_version(),
                 delay_period: Duration::from_secs(0),
             };
 
@@ -386,7 +386,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             let open_ack_message = CosmosConnectionOpenAckMessage {
                 connection_id: cosmos_connection_id.clone(),
                 counterparty_connection_id: cosmos_connection_id.clone(), // TODO: stub
-                version: Version::compatibles().pop().unwrap(),
+                version: default_connection_version(),
                 client_state,
                 update_height: Height::new(0, 1).unwrap(),
                 proof_try: [0; 32].into(), // dummy proofs

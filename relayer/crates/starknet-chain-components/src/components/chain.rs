@@ -4,6 +4,7 @@ use cgp::prelude::*;
 use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
 use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
 pub use hermes_cosmos_chain_components::components::client::*;
+use hermes_cosmos_chain_components::impls::connection::init_connection_options::ProvideCosmosInitConnectionOptionsType;
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
 use hermes_cosmos_chain_components::impls::types::create_client_options::ProvideNoCreateClientMessageOptionsType;
@@ -39,6 +40,7 @@ use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::events::create_client::UseStarknetCreateClientEvent;
+use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
 use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
@@ -206,5 +208,11 @@ cgp_preset! {
             QueryLatestConsensusStateHeightAsHeights,
         ContractAddressQuerierComponent:
             GetContractAddressFromField,
+        InitConnectionOptionsTypeComponent:
+            ProvideCosmosInitConnectionOptionsType,
+        [
+            ConnectionOpenTryMessageBuilderComponent,
+        ]:
+            BuildStarknetConnectionHandshakeMessages,
     }
 }
