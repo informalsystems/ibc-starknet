@@ -1,3 +1,6 @@
+use core::ops::Deref;
+use std::sync::Arc;
+
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::core::field::impls::use_field::{UseField, WithField};
@@ -9,7 +12,9 @@ use hermes_logger::ProvideHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeComponent,
 };
-use hermes_relayer_components::components::default::relay::{DefaultRelayPreset, IsDefaultRelayPreset};
+use hermes_relayer_components::components::default::relay::{
+    DefaultRelayPreset, IsDefaultRelayPreset,
+};
 use hermes_relayer_components::error::impls::retry::ReturnMaxRetry;
 use hermes_relayer_components::error::traits::retry::MaxErrorRetryGetterComponent;
 use hermes_relayer_components::multi::traits::chain_at::{
@@ -33,13 +38,36 @@ use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
 
 use crate::impls::error::HandleStarknetRelayError;
 
-#[derive(Clone, HasField)]
+#[derive(Clone)]
 pub struct CosmosToStarknetRelay {
+    pub fields: Arc<dyn HasCosmosToStarknetRelayFields>,
+}
+
+#[derive(HasField)]
+pub struct CosmosToStarknetRelayFields {
     pub runtime: HermesRuntime,
     pub src_chain: CosmosChain,
     pub dst_chain: StarknetChain,
     pub src_client_id: CosmosClientId,
     pub dst_client_id: StarknetClientId,
+}
+
+pub trait HasCosmosToStarknetRelayFields: Async {
+    fn fields(&self) -> &CosmosToStarknetRelayFields;
+}
+
+impl HasCosmosToStarknetRelayFields for CosmosToStarknetRelayFields {
+    fn fields(&self) -> &CosmosToStarknetRelayFields {
+        self
+    }
+}
+
+impl Deref for CosmosToStarknetRelay {
+    type Target = CosmosToStarknetRelayFields;
+
+    fn deref(&self) -> &Self::Target {
+        &self.fields.fields()
+    }
 }
 
 pub struct CosmosToStarknetRelayComponents;

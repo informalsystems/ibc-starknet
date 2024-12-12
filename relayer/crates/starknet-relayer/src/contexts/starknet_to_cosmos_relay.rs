@@ -9,7 +9,9 @@ use hermes_logger::ProvideHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeComponent,
 };
-use hermes_relayer_components::components::default::relay::{DefaultRelayPreset, IsDefaultRelayPreset};
+use hermes_relayer_components::components::default::relay::{
+    DefaultRelayPreset, IsDefaultRelayPreset,
+};
 use hermes_relayer_components::error::impls::retry::ReturnMaxRetry;
 use hermes_relayer_components::error::traits::retry::MaxErrorRetryGetterComponent;
 use hermes_relayer_components::multi::traits::chain_at::{
