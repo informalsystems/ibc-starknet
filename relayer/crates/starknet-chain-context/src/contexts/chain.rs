@@ -44,7 +44,7 @@ use hermes_relayer_components::chain::traits::types::create_client::{
     HasCreateClientEvent, HasCreateClientPayloadType,
 };
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
-use hermes_relayer_components::chain::traits::types::ibc::HasClientIdType;
+use hermes_relayer_components::chain::traits::types::ibc::{HasClientIdType, HasConnectionIdType};
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
@@ -80,6 +80,7 @@ use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
+use hermes_starknet_chain_components::types::connection_id::ConnectionId;
 use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
 use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
@@ -201,6 +202,7 @@ pub trait CanUseStarknetChain:
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
     + HasClientIdType<CosmosChain, ClientId = ClientId>
+    + HasConnectionIdType<CosmosChain, ConnectionId = ConnectionId>
     + HasOutgoingPacketType<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount

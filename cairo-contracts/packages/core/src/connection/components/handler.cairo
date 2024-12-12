@@ -43,16 +43,16 @@ pub mod ConnectionHandlerComponent {
         impl EventEmitter: ConnectionEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>
     > of IConnectionHandler<ComponentState<TContractState>> {
-        fn conn_open_init(ref self: ComponentState<TContractState>, msg: MsgConnOpenInit) {
+        fn conn_open_init(ref self: ComponentState<TContractState>, msg: MsgConnOpenInit) -> ConnectionId {
             let connection_sequence = self.read_next_connection_sequence();
             self.conn_open_init_validate(connection_sequence, msg.clone());
-            self.conn_open_init_execute(connection_sequence, msg);
+            self.conn_open_init_execute(connection_sequence, msg)
         }
 
-        fn conn_open_try(ref self: ComponentState<TContractState>, msg: MsgConnOpenTry) {
+        fn conn_open_try(ref self: ComponentState<TContractState>, msg: MsgConnOpenTry) -> ConnectionId {
             let connection_sequence = self.read_next_connection_sequence();
             self.conn_open_try_validate(connection_sequence, msg.clone());
-            self.conn_open_try_execute(connection_sequence, msg);
+            self.conn_open_try_execute(connection_sequence, msg)
         }
 
         fn conn_open_ack(ref self: ComponentState<TContractState>, msg: MsgConnOpenAck) {
@@ -109,7 +109,7 @@ pub mod ConnectionHandlerComponent {
 
         fn conn_open_init_execute(
             ref self: ComponentState<TContractState>, connection_sequence: u64, msg: MsgConnOpenInit
-        ) {
+        ) -> ConnectionId {
             let conn_end_on_a = ConnectionEndTrait::init(
                 msg.client_id_on_a.clone(),
                 msg.client_id_on_b.clone(),
@@ -177,7 +177,7 @@ pub mod ConnectionHandlerComponent {
 
         fn conn_open_try_execute(
             ref self: ComponentState<TContractState>, connection_sequence: u64, msg: MsgConnOpenTry
-        ) {
+        ) -> ConnectionId {
             let chan_end_on_b = ConnectionEndTrait::try_open(
                 msg.client_id_on_b.clone(),
                 msg.client_id_on_a.clone(),
@@ -201,6 +201,8 @@ pub mod ConnectionHandlerComponent {
                     msg.client_id_on_a.clone(),
                     msg.conn_id_on_a
                 );
+
+            conn_id_on_b
         }
     }
 
@@ -513,4 +515,3 @@ pub mod ConnectionHandlerComponent {
         }
     }
 }
-

@@ -19,6 +19,10 @@ let
     buildInputs = nixpkgs.lib.optionals nixpkgs.stdenv.isDarwin [
       nixpkgs.darwin.apple_sdk.frameworks.SystemConfiguration
     ];
+
+    buildPhase = ''
+      cargo build -j1 --release --lib --locked
+    '';
   };
 in
 cairo

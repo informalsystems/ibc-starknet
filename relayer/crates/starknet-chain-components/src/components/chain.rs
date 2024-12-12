@@ -1,5 +1,5 @@
 use cgp::core::component::WithProvider;
-use cgp::core::types::impls::UseDelegatedType;
+use cgp::core::types::impls::{UseDelegatedType, WithType};
 use cgp::prelude::*;
 use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
 use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
@@ -85,6 +85,7 @@ pub use crate::traits::types::contract_class::{
     ContractClassHashTypeComponent, ContractClassTypeComponent,
 };
 pub use crate::traits::types::method::SelectorTypeComponent;
+use crate::types::connection_id::ConnectionId;
 use crate::types::message_response::UseStarknetMessageResponse;
 use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
 
@@ -129,8 +130,8 @@ cgp_preset! {
             ContractClassHashTypeComponent,
         ]:
             ProvideStarknetContractTypes,
+        ConnectionIdTypeComponent: WithType<ConnectionId>,
         [
-            ConnectionIdTypeComponent,
             ChannelIdTypeComponent,
             PortIdTypeComponent,
             SequenceTypeComponent,

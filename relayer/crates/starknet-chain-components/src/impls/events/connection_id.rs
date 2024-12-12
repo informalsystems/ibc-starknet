@@ -24,9 +24,9 @@ where
     type ConnectionOpenTryEvent = ConnectionId;
 
     fn try_extract_connection_open_try_event(
-        chain: &Chain,
+        _chain: &Chain,
         response: &StarknetMessageResponse,
-    ) -> ConnectionId {
+    ) -> Option<ConnectionId> {
         Chain::default_encoding().decode(&response.result).ok()
     }
 
