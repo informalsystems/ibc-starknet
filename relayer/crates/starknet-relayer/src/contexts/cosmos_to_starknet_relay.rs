@@ -57,6 +57,26 @@ impl Deref for CosmosToStarknetRelay {
     }
 }
 
+impl CosmosToStarknetRelay {
+    pub fn new(
+        runtime: HermesRuntime,
+        src_chain: CosmosChain,
+        dst_chain: StarknetChain,
+        src_client_id: CosmosClientId,
+        dst_client_id: StarknetClientId,
+    ) -> Self {
+        Self {
+            fields: Arc::new(CosmosToStarknetRelayFields {
+                runtime,
+                chain_a: src_chain,
+                chain_b: dst_chain,
+                client_id_a: src_client_id,
+                client_id_b: dst_client_id,
+            }),
+        }
+    }
+}
+
 pub struct CosmosToStarknetRelayComponents;
 
 impl HasComponents for CosmosToStarknetRelay {

@@ -18,7 +18,10 @@ use hermes_relayer_components::relay::traits::target::{
 use hermes_relayer_components::relay::traits::update_client_message_builder::{
     CanBuildTargetUpdateClientMessage, CanSendTargetUpdateClientMessage,
 };
+use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
 
 use crate::contexts::cosmos_to_starknet_relay::{
     CosmosToStarknetRelayFields, HasCosmosToStarknetRelayFields,
@@ -35,6 +38,26 @@ impl Deref for StarknetToCosmosRelay {
 
     fn deref(&self) -> &Self::Target {
         &self.fields.fields()
+    }
+}
+
+impl StarknetToCosmosRelay {
+    pub fn new(
+        runtime: HermesRuntime,
+        src_chain: StarknetChain,
+        dst_chain: CosmosChain,
+        src_client_id: StarknetClientId,
+        dst_client_id: CosmosClientId,
+    ) -> Self {
+        Self {
+            fields: Arc::new(CosmosToStarknetRelayFields {
+                runtime,
+                chain_a: dst_chain,
+                chain_b: src_chain,
+                client_id_a: dst_client_id,
+                client_id_b: src_client_id,
+            }),
+        }
     }
 }
 

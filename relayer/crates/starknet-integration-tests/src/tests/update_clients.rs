@@ -186,13 +186,13 @@ fn test_relay_update_clients() -> Result<(), Error> {
 
         info!("created client on Cosmos: {:?}", cosmos_client_id);
 
-        let starknet_to_cosmos_relay = StarknetToCosmosRelay {
-            runtime: runtime.clone(),
-            src_chain: starknet_chain.clone(),
-            dst_chain: cosmos_chain.clone(),
-            src_client_id: starknet_client_id.clone(),
-            dst_client_id: cosmos_client_id.clone(),
-        };
+        let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
+            runtime.clone(),
+            starknet_chain.clone(),
+            cosmos_chain.clone(),
+            starknet_client_id.clone(),
+            cosmos_client_id.clone(),
+        );
 
         {
             info!("test relaying UpdateClient from Cosmos to Starknet");

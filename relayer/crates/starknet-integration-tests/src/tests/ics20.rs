@@ -249,14 +249,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 .await?
         };
 
-        let _starknet_to_cosmos_relay = StarknetToCosmosRelay {
-            runtime: runtime.clone(),
-            src_chain: starknet_chain.clone(),
-            dst_chain: cosmos_chain.clone(),
-            src_client_id: starknet_client_id.clone(),
-            dst_client_id: cosmos_client_id.clone(),
-        };
-
         let ics20_contract_address = {
             let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
             let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
