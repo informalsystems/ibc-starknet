@@ -20,14 +20,21 @@ use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use ibc::core::host::types::identifiers::{ClientId as CosmosClientId, ConnectionId};
+use ibc::core::client::types::Height;
+use ibc::core::connection::types::ConnectionEnd;
+use ibc::core::host::types::identifiers::{
+    ClientId as CosmosClientId, ConnectionId as CosmosConnectionId,
+};
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::client_id::ClientId as StarknetClientId;
-use crate::types::messages::ibc::connection::{BasePrefix, ConnectionVersion, MsgConnOpenInit};
+use crate::types::connection_id::ConnectionId as StarknetConnectionId;
+use crate::types::cosmos::height::Height as CairoHeight;
+use crate::types::messages::ibc::connection::{BasePrefix, ConnectionVersion, MsgConnOpenTry};
+use crate::types::messages::ibc::packet::StateProof;
 
 pub struct BuildStarknetConnectionHandshakeMessages;
 
@@ -45,25 +52,26 @@ where
         + CanRaiseError<Utf8Error>
         + CanRaiseError<Encoding::Error>
         + CanRaiseError<&'static str>,
-    Counterparty: HasHeightType
+    Counterparty: HasHeightType<Height = Height>
         + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType
         + HasClientIdType<Chain, ClientId = CosmosClientId>
-        + HasConnectionIdType<Chain, ConnectionId = ConnectionId>
-        + HasConnectionEndType<Chain>
+        + HasConnectionIdType<Chain, ConnectionId = CosmosConnectionId>
+        + HasConnectionEndType<Chain, ConnectionEnd = ConnectionEnd>
         + HasConnectionOpenTryPayloadType<
             Chain,
             ConnectionOpenTryPayload = ConnectionOpenTryPayload<Counterparty, Chain>,
         >,
-    Encoding: CanEncode<ViaCairo, MsgConnOpenInit> + HasEncodedType<Encoded = Vec<Felt>>,
+    Encoding: CanEncode<ViaCairo, MsgConnOpenTry> + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_connection_open_try_message(
         chain: &Chain,
         client_id: &StarknetClientId,
         counterparty_client_id: &CosmosClientId,
-        _counterparty_connection_id: &ConnectionId,
-        counterparty_payload: ConnectionOpenTryPayload<Counterparty, Chain>,
+        counterparty_connection_id: &CosmosConnectionId,
+        payload: ConnectionOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
+        // FIXME: Cairo IBC should accept counterparty client ID as string value
         let cosmos_client_id_as_cairo = {
             let cosmos_client_id_str = counterparty_client_id.to_string();
             let (client_type, sequence_str) = cosmos_client_id_str
@@ -76,21 +84,36 @@ where
             }
         };
 
+        // FIXME: Cairo IBC should use bytes for commitment prefix
         let commitment_prefix =
-            from_utf8(&counterparty_payload.commitment_prefix).map_err(Chain::raise_error)?;
+            from_utf8(&payload.commitment_prefix).map_err(Chain::raise_error)?;
 
+        // FIXME: Use the connection version from the payload
         let connection_version = ConnectionVersion {
             identifier: "1".into(),
             features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
         };
 
-        let conn_open_init_msg = MsgConnOpenInit {
+        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
+        let commitment_proof = StateProof { proof: vec![] };
+
+        let proof_height = CairoHeight {
+            revision_number: payload.update_height.revision_number(),
+            revision_height: payload.update_height.revision_height(),
+        };
+
+        let conn_open_init_msg: MsgConnOpenTry = MsgConnOpenTry {
             client_id_on_a: client_id.clone(),
             client_id_on_b: cosmos_client_id_as_cairo.clone(),
-            prefix_on_b: BasePrefix {
+            conn_id_on_a: StarknetConnectionId {
+                connection_id: counterparty_connection_id.to_string(),
+            },
+            prefix_on_a: BasePrefix {
                 prefix: commitment_prefix.into(),
             },
-            version: connection_version,
+            version_on_a: connection_version,
+            proof_conn_end_on_a: commitment_proof,
+            proof_height_on_a: proof_height,
             delay_period: 0,
         };
 
