@@ -129,6 +129,8 @@ pub mod ConnectionHandlerComponent {
                 .emit_conn_open_init_event(
                     msg.client_id_on_a.clone(), conn_id_on_a.clone(), msg.client_id_on_b,
                 );
+
+            conn_id_on_a
         }
     }
 

@@ -78,11 +78,11 @@ pub impl CoreHandleImpl of CoreHandle {
         self.router_dispatcher().bind_port_id(port_id, app_address)
     }
 
-    fn conn_open_init(self: @CoreContract, msg: MsgConnOpenInit) {
+    fn conn_open_init(self: @CoreContract, msg: MsgConnOpenInit) -> ConnectionId {
         self.connecion_handler_dispatcher().conn_open_init(msg)
     }
 
-    fn conn_open_try(self: @CoreContract, msg: MsgConnOpenTry) {
+    fn conn_open_try(self: @CoreContract, msg: MsgConnOpenTry) -> ConnectionId {
         self.connecion_handler_dispatcher().conn_open_try(msg)
     }
 
