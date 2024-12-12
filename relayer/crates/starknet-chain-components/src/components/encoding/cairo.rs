@@ -32,11 +32,13 @@ use crate::types::messages::erc20::transfer::{
 };
 use crate::types::messages::ibc::channel::{
     AppVersion, ChannelOrdering, EncodeAppVersion, EncodeChannelOrdering, EncodeMsgChanOpenAck,
-    EncodeMsgChanOpenInit, EncodePortId, MsgChanOpenAck, MsgChanOpenInit, PortId,
+    EncodeMsgChanOpenConfirm, EncodeMsgChanOpenInit, EncodeMsgChanOpenTry, EncodePortId,
+    MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry, PortId,
 };
 use crate::types::messages::ibc::connection::{
     BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion, EncodeMsgConnOpenAck,
-    EncodeMsgConnOpenInit, MsgConnOpenAck, MsgConnOpenInit,
+    EncodeMsgConnOpenConfirm, EncodeMsgConnOpenInit, EncodeMsgConnOpenTry, MsgConnOpenAck,
+    MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
 };
 use crate::types::messages::ibc::denom::{
     Denom, EncodeDenom, EncodePrefixedDenom, EncodeTracePrefix, PrefixedDenom, TracePrefix,
@@ -114,11 +116,15 @@ delegate_components! {
         (ViaCairo, BasePrefix): EncodeBasePrefix,
         (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
         (ViaCairo, MsgConnOpenInit): EncodeMsgConnOpenInit,
+        (ViaCairo, MsgConnOpenTry): EncodeMsgConnOpenTry,
         (ViaCairo, MsgConnOpenAck): EncodeMsgConnOpenAck,
+        (ViaCairo, MsgConnOpenConfirm): EncodeMsgConnOpenConfirm,
         (ViaCairo, PortId): EncodePortId,
         (ViaCairo, AppVersion): EncodeAppVersion,
         (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
         (ViaCairo, MsgChanOpenInit): EncodeMsgChanOpenInit,
+        (ViaCairo, MsgChanOpenTry): EncodeMsgChanOpenTry,
         (ViaCairo, MsgChanOpenAck): EncodeMsgChanOpenAck,
+        (ViaCairo, MsgChanOpenConfirm): EncodeMsgChanOpenConfirm,
     }
 }

@@ -31,10 +31,10 @@ use hermes_starknet_chain_components::types::message_responses::create_client::C
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::erc20::transfer::TransferErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::ibc::channel::{
-    MsgChanOpenAck, MsgChanOpenInit,
+    MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry,
 };
 use hermes_starknet_chain_components::types::messages::ibc::connection::{
-    MsgConnOpenAck, MsgConnOpenInit,
+    MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
 };
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
@@ -135,9 +135,13 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, MsgRegisterClient>
     + CanEncodeAndDecode<ViaCairo, MsgRegisterApp>
     + CanEncodeAndDecode<ViaCairo, MsgConnOpenInit>
+    + CanEncodeAndDecode<ViaCairo, MsgConnOpenTry>
     + CanEncodeAndDecode<ViaCairo, MsgConnOpenAck>
+    + CanEncodeAndDecode<ViaCairo, MsgConnOpenConfirm>
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenInit>
+    + CanEncodeAndDecode<ViaCairo, MsgChanOpenTry>
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenAck>
+    + CanEncodeAndDecode<ViaCairo, MsgChanOpenConfirm>
     + CanEncode<ViaCairo, CometUpdateHeader>
     + CanDecode<ViaCairo, CreateClientResponse>
 {

@@ -15,7 +15,9 @@ use crate::types::messages::ibc::channel::{AppVersion, PortId};
 #[derive(Debug)]
 pub enum ChannelHandshakeEvents {
     Init(ChanOpenInitEvent),
+    Try(ChanOpenTryEvent),
     Ack(ChanOpenAckEvent),
+    Confirm(ChanOpenConfirmEvent),
 }
 
 #[derive(Debug)]
@@ -28,12 +30,31 @@ pub struct ChanOpenInitEvent {
 }
 
 #[derive(Debug)]
+pub struct ChanOpenTryEvent {
+    pub port_id_on_b: PortId,
+    pub channel_id_on_b: ChannelId,
+    pub port_id_on_a: PortId,
+    pub channel_id_on_a: ChannelId,
+    pub connection_id_on_b: ConnectionId,
+    pub version_on_b: AppVersion,
+}
+
+#[derive(Debug)]
 pub struct ChanOpenAckEvent {
     pub port_id_on_a: PortId,
     pub channel_id_on_a: ChannelId,
     pub port_id_on_b: PortId,
     pub channel_id_on_b: ChannelId,
     pub connection_id_on_a: ConnectionId,
+}
+
+#[derive(Debug)]
+pub struct ChanOpenConfirmEvent {
+    pub port_id_on_b: PortId,
+    pub channel_id_on_b: ChannelId,
+    pub port_id_on_a: PortId,
+    pub channel_id_on_a: ChannelId,
+    pub connection_id_on_b: ConnectionId,
 }
 
 pub struct DecodeChannelHandshakeEvents;
@@ -43,7 +64,9 @@ impl<Encoding, Strategy> Decoder<Encoding, Strategy, ChannelHandshakeEvents>
 where
     Encoding: HasEncodedType<Encoded = StarknetEvent>
         + CanDecode<Strategy, ChanOpenInitEvent>
+        + CanDecode<Strategy, ChanOpenTryEvent>
         + CanDecode<Strategy, ChanOpenAckEvent>
+        + CanDecode<Strategy, ChanOpenConfirmEvent>
         + for<'a> CanRaiseError<UnknownEvent<'a>>,
 {
     fn decode(
@@ -56,8 +79,12 @@ where
 
         if selector == selector!("ChanOpenInitEvent") {
             Ok(ChannelHandshakeEvents::Init(encoding.decode(event)?))
+        } else if selector == selector!("ChanOpenTryEvent") {
+            Ok(ChannelHandshakeEvents::Try(encoding.decode(event)?))
         } else if selector == selector!("ChanOpenAckEvent") {
             Ok(ChannelHandshakeEvents::Ack(encoding.decode(event)?))
+        } else if selector == selector!("ChanOpenConfirmEvent") {
+            Ok(ChannelHandshakeEvents::Confirm(encoding.decode(event)?))
         } else {
             Err(Encoding::raise_error(UnknownEvent { event }))
         }
@@ -104,6 +131,58 @@ where
     }
 }
 
+impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, ChanOpenTryEvent>
+    for DecodeChannelHandshakeEvents
+where
+    EventEncoding: HasEncodedType<Encoded = StarknetEvent>
+        + HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + CanRaiseError<CairoEncoding::Error>
+        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<
+            ViaCairo,
+            Product![
+                PortId,
+                ChannelId,
+                PortId,
+                ChannelId,
+                ConnectionId,
+                AppVersion
+            ],
+        >,
+{
+    fn decode(
+        event_encoding: &EventEncoding,
+        event: &StarknetEvent,
+    ) -> Result<ChanOpenTryEvent, EventEncoding::Error> {
+        let cairo_encoding = event_encoding.encoding();
+
+        let product![
+            port_id_on_b,
+            channel_id_on_b,
+            port_id_on_a,
+            channel_id_on_a,
+            connection_id_on_b,
+            version_on_b
+        ] = cairo_encoding
+            .decode(&event.keys)
+            .map_err(EventEncoding::raise_error)?;
+
+        if !event.data.is_empty() {
+            return Err(EventEncoding::raise_error(UnknownEvent { event }));
+        }
+
+        Ok(ChanOpenTryEvent {
+            port_id_on_b,
+            channel_id_on_b,
+            port_id_on_a,
+            channel_id_on_a,
+            connection_id_on_b,
+            version_on_b,
+        })
+    }
+}
+
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, ChanOpenAckEvent>
     for DecodeChannelHandshakeEvents
 where
@@ -140,6 +219,46 @@ where
             port_id_on_b,
             channel_id_on_b,
             connection_id_on_a,
+        })
+    }
+}
+
+impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, ChanOpenConfirmEvent>
+    for DecodeChannelHandshakeEvents
+where
+    EventEncoding: HasEncodedType<Encoded = StarknetEvent>
+        + HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + CanRaiseError<CairoEncoding::Error>
+        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, Product![PortId, ChannelId, PortId, ChannelId, ConnectionId]>,
+{
+    fn decode(
+        event_encoding: &EventEncoding,
+        event: &StarknetEvent,
+    ) -> Result<ChanOpenConfirmEvent, EventEncoding::Error> {
+        let cairo_encoding = event_encoding.encoding();
+
+        let product![
+            port_id_on_b,
+            channel_id_on_b,
+            port_id_on_a,
+            channel_id_on_a,
+            connection_id_on_b
+        ] = cairo_encoding
+            .decode(&event.keys)
+            .map_err(EventEncoding::raise_error)?;
+
+        if !event.data.is_empty() {
+            return Err(EventEncoding::raise_error(UnknownEvent { event }));
+        }
+
+        Ok(ChanOpenConfirmEvent {
+            port_id_on_b,
+            channel_id_on_b,
+            port_id_on_a,
+            channel_id_on_a,
+            connection_id_on_b,
         })
     }
 }
