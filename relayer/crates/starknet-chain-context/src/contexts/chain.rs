@@ -227,7 +227,7 @@ pub trait CanUseStarknetChain:
     + CanQueryConsensusStateHeight<CosmosChain>
     + HasInitConnectionOptionsType<CosmosChain>
     + CanBuildConnectionOpenTryMessage<CosmosChain>
-    // + HasConnectionOpenTryEvent<CosmosChain>
+    + HasConnectionOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
 where

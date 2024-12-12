@@ -39,6 +39,7 @@ use crate::impls::contract::declare::DeclareSierraContract;
 use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
+use crate::impls::events::connection_id::UseStarknetConnectionHandshakeEvents;
 use crate::impls::events::create_client::UseStarknetCreateClientEvent;
 use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
@@ -188,6 +189,8 @@ cgp_preset! {
             QueryErc20TokenBalance,
         CreateClientEventComponent:
             UseStarknetCreateClientEvent,
+        ConnectionOpenTryEventComponent:
+            UseStarknetConnectionHandshakeEvents,
         CreateClientMessageOptionsTypeComponent:
             ProvideNoCreateClientMessageOptionsType,
         CreateClientPayloadBuilderComponent:
