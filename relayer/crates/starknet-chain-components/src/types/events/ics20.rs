@@ -13,8 +13,18 @@ use crate::types::messages::ibc::ibc_transfer::Participant;
 
 #[derive(Debug)]
 pub enum IbcTransferEvent {
+    Send(SendIbcTransferEvent),
     Receive(ReceiveIbcTransferEvent),
     CreateToken(CreateIbcTokenEvent),
+}
+
+#[derive(Debug)]
+pub struct SendIbcTransferEvent {
+    pub sender: Participant,
+    pub receiver: Participant,
+    pub denom: PrefixedDenom,
+    pub amount: U256,
+    pub memo: String,
 }
 
 #[derive(Debug)]
@@ -40,6 +50,7 @@ pub struct DecodeIbcTransferEvents;
 impl<Encoding, Strategy> Decoder<Encoding, Strategy, IbcTransferEvent> for DecodeIbcTransferEvents
 where
     Encoding: HasEncodedType<Encoded = StarknetEvent>
+        + CanDecode<Strategy, SendIbcTransferEvent>
         + CanDecode<Strategy, ReceiveIbcTransferEvent>
         + CanDecode<Strategy, CreateIbcTokenEvent>
         + for<'a> CanRaiseError<UnknownEvent<'a>>,
@@ -52,13 +63,49 @@ where
             .selector
             .ok_or_else(|| Encoding::raise_error(UnknownEvent { event }))?;
 
-        if selector == selector!("RecvEvent") {
+        if selector == selector!("SendEvent") {
+            Ok(IbcTransferEvent::Send(encoding.decode(event)?))
+        } else if selector == selector!("RecvEvent") {
             Ok(IbcTransferEvent::Receive(encoding.decode(event)?))
         } else if selector == selector!("CreateTokenEvent") {
             Ok(IbcTransferEvent::CreateToken(encoding.decode(event)?))
         } else {
             Err(Encoding::raise_error(UnknownEvent { event }))
         }
+    }
+}
+
+impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, SendIbcTransferEvent>
+    for DecodeIbcTransferEvents
+where
+    EventEncoding: HasEncodedType<Encoded = StarknetEvent>
+        + HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + CanRaiseError<CairoEncoding::Error>,
+    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, Product![Participant, Participant, PrefixedDenom]>
+        + CanDecode<ViaCairo, Product![U256, String]>,
+{
+    fn decode(
+        event_encoding: &EventEncoding,
+        event: &StarknetEvent,
+    ) -> Result<SendIbcTransferEvent, EventEncoding::Error> {
+        let cairo_encoding = event_encoding.encoding();
+
+        let product![sender, receiver, denom] = cairo_encoding
+            .decode(&event.keys)
+            .map_err(EventEncoding::raise_error)?;
+
+        let product![amount, memo] = cairo_encoding
+            .decode(&event.data)
+            .map_err(EventEncoding::raise_error)?;
+
+        Ok(SendIbcTransferEvent {
+            sender,
+            receiver,
+            denom,
+            amount,
+            memo,
+        })
     }
 }
 

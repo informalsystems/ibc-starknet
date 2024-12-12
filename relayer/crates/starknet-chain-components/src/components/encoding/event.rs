@@ -18,6 +18,7 @@ use crate::types::events::connection::{
 use crate::types::events::erc20::{ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent};
 use crate::types::events::ics20::{
     CreateIbcTokenEvent, DecodeIbcTransferEvents, IbcTransferEvent, ReceiveIbcTransferEvent,
+    SendIbcTransferEvent,
 };
 
 cgp_preset! {
@@ -45,6 +46,7 @@ delegate_components! {
             DecodeErc20Events,
         [
             (ViaCairo, IbcTransferEvent),
+            (ViaCairo, SendIbcTransferEvent),
             (ViaCairo, ReceiveIbcTransferEvent),
             (ViaCairo, CreateIbcTokenEvent),
         ]:
