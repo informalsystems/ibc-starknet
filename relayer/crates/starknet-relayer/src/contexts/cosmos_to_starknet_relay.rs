@@ -15,8 +15,6 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::components::default::relay::{
     DefaultRelayPreset, IsDefaultRelayPreset,
 };
-use hermes_relayer_components::error::impls::retry::ReturnMaxRetry;
-use hermes_relayer_components::error::traits::retry::MaxErrorRetryGetterComponent;
 use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeAtComponent,
 };
@@ -98,23 +96,23 @@ delegate_components! {
             GlobalLoggerGetterComponent,
         ]:
             ProvideHermesLogger,
-        MaxErrorRetryGetterComponent:
-            ReturnMaxRetry<3>,
         ChainTypeAtComponent<Index<0>>: WithType<CosmosChain>,
         ChainTypeAtComponent<Index<1>>: WithType<StarknetChain>,
         ChainGetterAtComponent<Index<0>>:
             UseField<symbol!("chain_a")>,
         ChainGetterAtComponent<Index<1>>:
             UseField<symbol!("chain_b")>,
-        ClientIdAtGetterComponent<Src, Dst>:
+        ClientIdAtGetterComponent<Index<0>, Index<1>>:
             UseField<symbol!("client_id_a")>,
-        ClientIdAtGetterComponent<Dst, Src>:
+        ClientIdAtGetterComponent<Index<1>, Index<0>>:
             UseField<symbol!("client_id_b")>,
         [
             ChainTypeAtComponent<Src>,
             ChainTypeAtComponent<Dst>,
             ChainGetterAtComponent<Src>,
             ChainGetterAtComponent<Dst>,
+            ClientIdAtGetterComponent<Src, Dst>,
+            ClientIdAtGetterComponent<Dst, Src>,
         ]:
             SelectRelayAToB,
     }
