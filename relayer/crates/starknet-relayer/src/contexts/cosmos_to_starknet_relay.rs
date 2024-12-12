@@ -9,7 +9,7 @@ use hermes_logger::ProvideHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeComponent,
 };
-use hermes_relayer_components::components::default::relay::*;
+use hermes_relayer_components::components::default::relay::{DefaultRelayPreset, IsDefaultRelayPreset};
 use hermes_relayer_components::error::impls::retry::ReturnMaxRetry;
 use hermes_relayer_components::error::traits::retry::MaxErrorRetryGetterComponent;
 use hermes_relayer_components::multi::traits::chain_at::{
@@ -48,14 +48,11 @@ impl HasComponents for CosmosToStarknetRelay {
     type Components = CosmosToStarknetRelayComponents;
 }
 
-with_default_relay_components! {
-    | Components | {
-        delegate_components! {
-            CosmosToStarknetRelayComponents {
-                Components: DefaultRelayComponents,
-            }
-        }
-    }
+impl<Name> DelegateComponent<Name> for CosmosToStarknetRelayComponents
+where
+    Self: IsDefaultRelayPreset<Name>,
+{
+    type Delegate = DefaultRelayPreset;
 }
 
 delegate_components! {
