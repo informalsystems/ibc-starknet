@@ -53,7 +53,7 @@ impl Deref for CosmosToStarknetRelay {
     type Target = CosmosToStarknetRelayFields;
 
     fn deref(&self) -> &Self::Target {
-        &self.fields.fields()
+        self.fields.fields()
     }
 }
 
