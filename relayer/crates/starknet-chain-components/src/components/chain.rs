@@ -208,7 +208,10 @@ cgp_preset! {
             QueryErc20TokenBalance,
         CreateClientEventComponent:
             UseStarknetCreateClientEvent,
-        ConnectionOpenTryEventComponent:
+        [
+            ConnectionOpenInitEventComponent,
+            ConnectionOpenTryEventComponent,
+        ]:
             UseStarknetConnectionHandshakeEvents,
         CreateClientMessageOptionsTypeComponent:
             ProvideNoCreateClientMessageOptionsType,
