@@ -37,7 +37,9 @@ use hermes_relayer_components::chain::traits::payload_builders::connection_hands
 };
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_relayer_components::chain::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
-use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_relayer_components::chain::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
+};
 use hermes_relayer_components::chain::traits::queries::client_state::{
     CanQueryClientState, CanQueryClientStateWithProofs,
 };
@@ -240,6 +242,7 @@ pub trait CanUseStarknetChain:
     + HasStarknetProvider
     + HasStarknetAccount
     + CanQueryChainStatus
+    + CanQueryChainHeight
     + CanSendMessages
     + CanSubmitTx
     + CanQueryTxResponse
@@ -303,10 +306,15 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildUpdateClientPayload<StarknetChain>
     + CanBuildConnectionOpenTryPayload<StarknetChain>
     + HasConnectionEndType<StarknetChain>
+    + CanBuildConnectionOpenInitPayload<StarknetChain>
+    + CanBuildConnectionOpenTryPayload<StarknetChain>
+    + CanBuildConnectionOpenAckPayload<StarknetChain>
+    + CanBuildConnectionOpenConfirmPayload<StarknetChain>
     + CanBuildConnectionOpenInitMessage<StarknetChain>
     + CanBuildConnectionOpenTryMessage<StarknetChain>
     + CanBuildConnectionOpenAckMessage<StarknetChain>
     + CanBuildConnectionOpenConfirmMessage<StarknetChain>
+    + HasCounterpartyMessageHeight<StarknetChain>
 {
 }
 

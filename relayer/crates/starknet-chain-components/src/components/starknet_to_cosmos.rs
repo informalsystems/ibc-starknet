@@ -1,5 +1,6 @@
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
+use hermes_chain_components::traits::types::ibc::CounterpartyMessageHeightGetterComponent;
 use hermes_cosmos_chain_components::components::client::{
     ClientStateFieldsComponent, ClientStateTypeComponent, ConnectionOpenAckMessageBuilderComponent,
     ConnectionOpenConfirmMessageBuilderComponent, ConnectionOpenInitMessageBuilderComponent,
@@ -19,6 +20,7 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::{
 };
 
 use crate::impls::starknet_to_cosmos::connection_message::BuildStarknetToCosmosConnectionHandshake;
+use crate::impls::starknet_to_cosmos::counterparty_message_height::GetCosmosCounterpartyMessageStarknetHeight;
 use crate::impls::starknet_to_cosmos::query_consensus_state_height::QueryStarknetConsensusStateHeightsFromGrpc;
 use crate::impls::starknet_to_cosmos::update_client_message::BuildStarknetUpdateClientMessage;
 use crate::impls::starknet_to_cosmos::update_client_payload::BuildUpdateCometClientPayload;
@@ -55,6 +57,8 @@ cgp_preset! {
             BuildStarknetUpdateClientMessage,
         ConsensusStateHeightsQuerierComponent:
             QueryStarknetConsensusStateHeightsFromGrpc,
+        CounterpartyMessageHeightGetterComponent:
+            GetCosmosCounterpartyMessageStarknetHeight,
         [
             ConnectionOpenInitMessageBuilderComponent,
             ConnectionOpenTryMessageBuilderComponent,
