@@ -20,6 +20,7 @@ use crate::types::cosmos::client_state::{
 };
 use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsensusState};
 use crate::types::cosmos::height::{EncodeHeight, Height};
+use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
 use crate::types::cosmos::update::{CometUpdateHeader, EncodeCometUpdateHeader};
 use crate::types::message_responses::create_client::{
     CreateClientResponse, DecodeCreateClientResponse,
@@ -102,6 +103,7 @@ delegate_components! {
         (ViaCairo, Participant): EncodeParticipant,
         (ViaCairo, IbcTransferMessage): EncodeIbcTransferMessage,
         (ViaCairo, Height): EncodeHeight,
+        (ViaCairo, Timestamp): EncodeTimestamp,
         (ViaCairo, Packet): EncodePacket,
         (ViaCairo, StateProof): EncodeStateProof,
         (ViaCairo, MsgRecvPacket): EncodeMsgRecvPacket,
