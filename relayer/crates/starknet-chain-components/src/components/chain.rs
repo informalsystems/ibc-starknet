@@ -255,7 +255,10 @@ cgp_preset! {
         ]:
             BuildConnectionHandshakePayload,
         [
+            ConnectionOpenInitMessageBuilderComponent,
             ConnectionOpenTryMessageBuilderComponent,
+            ConnectionOpenAckMessageBuilderComponent,
+            ConnectionOpenConfirmMessageBuilderComponent,
         ]:
             BuildStarknetConnectionHandshakeMessages,
         [

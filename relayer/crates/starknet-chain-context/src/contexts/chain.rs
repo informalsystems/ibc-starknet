@@ -25,10 +25,14 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
-use hermes_relayer_components::chain::traits::message_builders::connection_handshake::CanBuildConnectionOpenTryMessage;
+use hermes_relayer_components::chain::traits::message_builders::connection_handshake::{
+    CanBuildConnectionOpenAckMessage, CanBuildConnectionOpenConfirmMessage,
+    CanBuildConnectionOpenInitMessage, CanBuildConnectionOpenTryMessage,
+};
 use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
 use hermes_relayer_components::chain::traits::message_builders::update_client::CanBuildUpdateClientMessage;
 use hermes_relayer_components::chain::traits::payload_builders::connection_handshake::{
+    CanBuildConnectionOpenAckPayload, CanBuildConnectionOpenConfirmPayload,
     CanBuildConnectionOpenInitPayload, CanBuildConnectionOpenTryPayload,
 };
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
@@ -265,7 +269,12 @@ pub trait CanUseStarknetChain:
     + HasInitConnectionOptionsType<CosmosChain>
     + CanBuildConnectionOpenInitPayload<CosmosChain>
     + CanBuildConnectionOpenTryPayload<CosmosChain>
+    + CanBuildConnectionOpenAckPayload<CosmosChain>
+    + CanBuildConnectionOpenConfirmPayload<CosmosChain>
+    + CanBuildConnectionOpenInitMessage<CosmosChain>
     + CanBuildConnectionOpenTryMessage<CosmosChain>
+    + CanBuildConnectionOpenAckMessage<CosmosChain>
+    + CanBuildConnectionOpenConfirmMessage<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
