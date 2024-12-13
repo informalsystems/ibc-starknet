@@ -17,6 +17,7 @@ pub enum IbcTransferEvent {
     Send(SendIbcTransferEvent),
     Receive(ReceiveIbcTransferEvent),
     Ack(AckIbcTransferEvent),
+    Timeout(TimeoutIbcTransferEvent),
     CreateToken(CreateIbcTokenEvent),
 }
 
@@ -51,6 +52,15 @@ pub struct AckIbcTransferEvent {
 }
 
 #[derive(Debug)]
+pub struct TimeoutIbcTransferEvent {
+    pub receiver: Participant,
+    pub denom: PrefixedDenom,
+
+    pub amount: U256,
+    pub memo: String,
+}
+
+#[derive(Debug)]
 pub struct CreateIbcTokenEvent {
     pub name: String,
     pub symbol: String,
@@ -66,6 +76,7 @@ where
         + CanDecode<Strategy, SendIbcTransferEvent>
         + CanDecode<Strategy, ReceiveIbcTransferEvent>
         + CanDecode<Strategy, AckIbcTransferEvent>
+        + CanDecode<Strategy, TimeoutIbcTransferEvent>
         + CanDecode<Strategy, CreateIbcTokenEvent>
         + for<'a> CanRaiseError<UnknownEvent<'a>>,
 {
@@ -83,6 +94,8 @@ where
             Ok(IbcTransferEvent::Receive(encoding.decode(event)?))
         } else if selector == selector!("AckEvent") {
             Ok(IbcTransferEvent::Ack(encoding.decode(event)?))
+        } else if selector == selector!("TimeoutEvent") {
+            Ok(IbcTransferEvent::Timeout(encoding.decode(event)?))
         } else if selector == selector!("CreateTokenEvent") {
             Ok(IbcTransferEvent::CreateToken(encoding.decode(event)?))
         } else {
@@ -191,6 +204,39 @@ where
             amount,
             memo,
             ack,
+        })
+    }
+}
+
+impl<EventEncoding, CairoEncoding, Strategy>
+    Decoder<EventEncoding, Strategy, TimeoutIbcTransferEvent> for DecodeIbcTransferEvents
+where
+    EventEncoding: HasEncodedType<Encoded = StarknetEvent>
+        + HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + CanRaiseError<CairoEncoding::Error>,
+    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, Product![Participant, PrefixedDenom]>
+        + CanDecode<ViaCairo, Product![U256, String]>,
+{
+    fn decode(
+        event_encoding: &EventEncoding,
+        event: &StarknetEvent,
+    ) -> Result<TimeoutIbcTransferEvent, EventEncoding::Error> {
+        let cairo_encoding = event_encoding.encoding();
+
+        let product![receiver, denom] = cairo_encoding
+            .decode(&event.keys)
+            .map_err(EventEncoding::raise_error)?;
+
+        let product![amount, memo] = cairo_encoding
+            .decode(&event.data)
+            .map_err(EventEncoding::raise_error)?;
+
+        Ok(TimeoutIbcTransferEvent {
+            receiver,
+            denom,
+            amount,
+            memo,
         })
     }
 }
