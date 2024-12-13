@@ -1,6 +1,7 @@
 use cgp::core::component::WithProvider;
 use cgp::core::types::impls::UseDelegatedType;
 use cgp::prelude::*;
+use hermes_chain_components::impls::payload_builders::connection::BuildConnectionHandshakePayload;
 use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
 use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
 use hermes_chain_components::impls::types::commitment_prefix::ProvideCommitmentPrefixBytes;
@@ -215,7 +216,10 @@ cgp_preset! {
             BuildStarknetUpdateClientPayload,
         ClientStateQuerierComponent:
             QueryCometClientState,
-        ConsensusStateQuerierComponent:
+        [
+            ConsensusStateQuerierComponent,
+            ConsensusStateWithProofsQuerierComponent,
+        ]:
             QueryCometConsensusState,
         ConsensusStateHeightQuerierComponent:
             QueryConsensusStateHeightsAndFindHeightBefore,
@@ -235,10 +239,20 @@ cgp_preset! {
         ]:
             ProvideConnectionPayloadTypes,
         [
+            ConnectionOpenInitPayloadBuilderComponent,
+            ConnectionOpenTryPayloadBuilderComponent,
+            ConnectionOpenAckPayloadBuilderComponent,
+            ConnectionOpenConfirmPayloadBuilderComponent,
+        ]:
+            BuildConnectionHandshakePayload,
+        [
             ConnectionOpenTryMessageBuilderComponent,
         ]:
             BuildStarknetConnectionHandshakeMessages,
-        ConnectionEndQuerierComponent:
+        [
+            ConnectionEndQuerierComponent,
+            ConnectionEndWithProofsQuerierComponent,
+        ]:
             QueryConnectionEndFromStarknet,
     }
 }

@@ -3,10 +3,13 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::queries::consensus_state::ConsensusStateQuerier;
+use hermes_chain_components::traits::queries::consensus_state::{
+    CanQueryConsensusState, ConsensusStateQuerier, ConsensusStateWithProofsQuerier,
+};
 use hermes_chain_components::traits::types::consensus_state::HasConsensusStateType;
 use hermes_chain_components::traits::types::height::{HasHeightFields, HasHeightType};
 use hermes_chain_components::traits::types::ibc::HasClientIdType;
+use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -90,5 +93,32 @@ where
         }
 
         Ok(consensus_state)
+    }
+}
+
+impl<Chain, Counterparty> ConsensusStateWithProofsQuerier<Chain, Counterparty>
+    for QueryCometConsensusState
+where
+    Chain: HasClientIdType<Counterparty>
+        + HasHeightType
+        + HasCommitmentProofType
+        + CanQueryConsensusState<Counterparty>
+        + HasErrorType,
+    Counterparty: HasConsensusStateType<Chain> + HasHeightType,
+    Chain::CommitmentProof: Default,
+{
+    async fn query_consensus_state_with_proofs(
+        chain: &Chain,
+        tag: PhantomData<Counterparty>,
+        client_id: &Chain::ClientId,
+        consensus_height: &Counterparty::Height,
+        query_height: &Chain::Height,
+    ) -> Result<(Counterparty::ConsensusState, Chain::CommitmentProof), Chain::Error> {
+        // FIXME: properly fetch consensus state with proofs
+        let consensus_state = chain
+            .query_consensus_state(tag, client_id, consensus_height, query_height)
+            .await?;
+
+        Ok((consensus_state, Default::default()))
     }
 }

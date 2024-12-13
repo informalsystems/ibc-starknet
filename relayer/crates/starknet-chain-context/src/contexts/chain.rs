@@ -27,13 +27,19 @@ use hermes_relayer_components::chain::traits::commitment_prefix::{
 use hermes_relayer_components::chain::traits::message_builders::connection_handshake::CanBuildConnectionOpenTryMessage;
 use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
 use hermes_relayer_components::chain::traits::message_builders::update_client::CanBuildUpdateClientMessage;
-use hermes_relayer_components::chain::traits::payload_builders::connection_handshake::CanBuildConnectionOpenTryPayload;
+use hermes_relayer_components::chain::traits::payload_builders::connection_handshake::{
+    CanBuildConnectionOpenInitPayload, CanBuildConnectionOpenTryPayload,
+};
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_relayer_components::chain::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
-use hermes_relayer_components::chain::traits::queries::connection_end::CanQueryConnectionEnd;
-use hermes_relayer_components::chain::traits::queries::consensus_state::CanQueryConsensusState;
+use hermes_relayer_components::chain::traits::queries::connection_end::{
+    CanQueryConnectionEnd, CanQueryConnectionEndWithProofs,
+};
+use hermes_relayer_components::chain::traits::queries::consensus_state::{
+    CanQueryConsensusState, CanQueryConsensusStateWithProofs,
+};
 use hermes_relayer_components::chain::traits::queries::consensus_state_height::{
     CanQueryConsensusStateHeight, CanQueryConsensusStateHeights,
 };
@@ -43,7 +49,8 @@ use hermes_relayer_components::chain::traits::types::client_state::{
     HasClientStateFields, HasClientStateType,
 };
 use hermes_relayer_components::chain::traits::types::connection::{
-    HasConnectionEndType, HasConnectionOpenInitPayloadType, HasConnectionOpenTryPayloadType,
+    HasConnectionEndType, HasConnectionOpenAckPayloadType, HasConnectionOpenConfirmPayloadType,
+    HasConnectionOpenInitPayloadType, HasConnectionOpenTryPayloadType,
     HasInitConnectionOptionsType,
 };
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
@@ -217,6 +224,8 @@ pub trait CanUseStarknetChain:
     + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
     + HasConnectionOpenInitPayloadType<CosmosChain>
     + HasConnectionOpenTryPayloadType<CosmosChain>
+    + HasConnectionOpenAckPayloadType<CosmosChain>
+    + HasConnectionOpenConfirmPayloadType<CosmosChain>
     + HasOutgoingPacketType<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount
@@ -240,11 +249,15 @@ pub trait CanUseStarknetChain:
     + CanBuildUpdateClientMessage<CosmosChain>
     + CanQueryClientState<CosmosChain>
     + CanQueryConsensusState<CosmosChain>
+    + CanQueryConsensusStateWithProofs<CosmosChain>
     + CanQueryConsensusStateHeights<CosmosChain>
     + CanQueryConsensusStateHeight<CosmosChain>
     + CanQueryConnectionEnd<CosmosChain>
+    + CanQueryConnectionEndWithProofs<CosmosChain>
     + HasCounterpartyMessageHeight<CosmosChain>
     + HasInitConnectionOptionsType<CosmosChain>
+    + CanBuildConnectionOpenInitPayload<CosmosChain>
+    // + CanBuildConnectionOpenTryPayload<CosmosChain>
     + CanBuildConnectionOpenTryMessage<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
