@@ -303,6 +303,10 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildUpdateClientPayload<StarknetChain>
     + CanBuildConnectionOpenTryPayload<StarknetChain>
     + HasConnectionEndType<StarknetChain>
+    + CanBuildConnectionOpenInitMessage<StarknetChain>
+    + CanBuildConnectionOpenTryMessage<StarknetChain>
+    + CanBuildConnectionOpenAckMessage<StarknetChain>
+    + CanBuildConnectionOpenConfirmMessage<StarknetChain>
 {
 }
 
