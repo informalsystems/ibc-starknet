@@ -22,7 +22,7 @@ use crate::types::events::ics20::{
 };
 use crate::types::events::packet::{
     AcknowledgePacketEvent, DecodePacketRelayEvents, PacketRelayEvents, ReceivePacketEvent,
-    SendPacketEvent, WriteAcknowledgementEvent,
+    SendPacketEvent, TimeoutPacketEvent, WriteAcknowledgementEvent,
 };
 
 cgp_preset! {
@@ -77,6 +77,7 @@ delegate_components! {
             (ViaCairo, ReceivePacketEvent),
             (ViaCairo, WriteAcknowledgementEvent),
             (ViaCairo, AcknowledgePacketEvent),
+            (ViaCairo, TimeoutPacketEvent),
         ]:
             DecodePacketRelayEvents,
         (ViaCairo, Option<Erc20Event>):

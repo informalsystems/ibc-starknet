@@ -72,6 +72,18 @@ pub struct AcknowledgePacketEvent {
     pub channel_ordering: ChannelOrdering,
 }
 
+#[derive(Debug)]
+pub struct TimeoutPacketEvent {
+    pub sequence_on_a: Sequence,
+    pub port_id_on_a: PortId,
+    pub channel_id_on_a: ChannelId,
+    pub port_id_on_b: PortId,
+    pub channel_id_on_b: ChannelId,
+    pub timeout_height_on_b: Height,
+    pub timeout_timestamp_on_b: Timestamp,
+    pub channel_ordering: ChannelOrdering,
+}
+
 pub struct DecodePacketRelayEvents;
 
 impl<Encoding, Strategy> Decoder<Encoding, Strategy, PacketRelayEvents> for DecodePacketRelayEvents
@@ -81,6 +93,7 @@ where
         + CanDecode<Strategy, ReceivePacketEvent>
         + CanDecode<Strategy, WriteAcknowledgementEvent>
         + CanDecode<Strategy, AcknowledgePacketEvent>
+        + CanDecode<Strategy, TimeoutPacketEvent>
         + for<'a> CanRaiseError<UnknownEvent<'a>>,
 {
     fn decode(
@@ -98,6 +111,8 @@ where
         } else if selector == selector!("WriteAcknowledgementEvent") {
             Ok(PacketRelayEvents::Send(encoding.decode(event)?))
         } else if selector == selector!("AcknowledgePacketEvent") {
+            Ok(PacketRelayEvents::Send(encoding.decode(event)?))
+        } else if selector == selector!("TimeoutPacketEvent") {
             Ok(PacketRelayEvents::Send(encoding.decode(event)?))
         } else {
             Err(Encoding::raise_error(UnknownEvent { event }))
@@ -312,6 +327,64 @@ where
         }
 
         Ok(AcknowledgePacketEvent {
+            sequence_on_a,
+            port_id_on_a,
+            channel_id_on_a,
+            port_id_on_b,
+            channel_id_on_b,
+            timeout_height_on_b,
+            timeout_timestamp_on_b,
+            channel_ordering,
+        })
+    }
+}
+
+impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, TimeoutPacketEvent>
+    for DecodePacketRelayEvents
+where
+    EventEncoding: HasEncodedType<Encoded = StarknetEvent>
+        + HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + CanRaiseError<CairoEncoding::Error>
+        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<
+            ViaCairo,
+            Product![
+                Sequence,
+                PortId,
+                ChannelId,
+                PortId,
+                ChannelId,
+                Height,
+                Timestamp,
+                ChannelOrdering
+            ],
+        >,
+{
+    fn decode(
+        event_encoding: &EventEncoding,
+        event: &StarknetEvent,
+    ) -> Result<TimeoutPacketEvent, EventEncoding::Error> {
+        let cairo_encoding = event_encoding.encoding();
+
+        let product![
+            sequence_on_a,
+            port_id_on_a,
+            channel_id_on_a,
+            port_id_on_b,
+            channel_id_on_b,
+            timeout_height_on_b,
+            timeout_timestamp_on_b,
+            channel_ordering,
+        ] = cairo_encoding
+            .decode(&event.keys)
+            .map_err(EventEncoding::raise_error)?;
+
+        if !event.data.is_empty() {
+            return Err(EventEncoding::raise_error(UnknownEvent { event }));
+        }
+
+        Ok(TimeoutPacketEvent {
             sequence_on_a,
             port_id_on_a,
             channel_id_on_a,
