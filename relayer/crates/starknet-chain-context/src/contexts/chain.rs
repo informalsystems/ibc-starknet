@@ -19,8 +19,10 @@ use hermes_logging_components::contexts::no_logger::ProvideNoLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
 };
+use hermes_relayer_components::chain::traits::message_builders::connection_handshake::CanBuildConnectionOpenTryMessage;
 use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
 use hermes_relayer_components::chain::traits::message_builders::update_client::CanBuildUpdateClientMessage;
+use hermes_relayer_components::chain::traits::payload_builders::connection_handshake::CanBuildConnectionOpenTryPayload;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_relayer_components::chain::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
@@ -34,12 +36,18 @@ use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::client_state::{
     HasClientStateFields, HasClientStateType,
 };
+use hermes_relayer_components::chain::traits::types::connection::{
+    HasConnectionEndType, HasInitConnectionOptionsType,
+};
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
 use hermes_relayer_components::chain::traits::types::create_client::{
     HasCreateClientEvent, HasCreateClientPayloadType,
 };
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
-use hermes_relayer_components::chain::traits::types::ibc::HasClientIdType;
+use hermes_relayer_components::chain::traits::types::ibc::{
+    HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
+};
+use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
@@ -50,7 +58,9 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeComponent,
 };
-use hermes_starknet_chain_components::components::chain::*;
+use hermes_starknet_chain_components::components::chain::{
+    IsStarknetChainComponents, StarknetChainComponents,
+};
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
@@ -72,6 +82,7 @@ use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
+use hermes_starknet_chain_components::types::connection_id::ConnectionId;
 use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
 use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
@@ -135,14 +146,11 @@ delegate_components! {
     }
 }
 
-with_starknet_chain_components! {
-    | Components | {
-        delegate_components! {
-            StarknetChainContextComponents {
-                Components: StarknetChainComponents,
-            }
-        }
-    }
+impl<Name> DelegateComponent<Name> for StarknetChainContextComponents
+where
+    Self: IsStarknetChainComponents<Name>,
+{
+    type Delegate = StarknetChainComponents;
 }
 
 delegate_components! {
@@ -196,6 +204,7 @@ pub trait CanUseStarknetChain:
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
     + HasClientIdType<CosmosChain, ClientId = ClientId>
+    + HasConnectionIdType<CosmosChain, ConnectionId = ConnectionId>
     + HasOutgoingPacketType<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount
@@ -220,6 +229,10 @@ pub trait CanUseStarknetChain:
     + CanQueryConsensusState<CosmosChain>
     + CanQueryConsensusStateHeights<CosmosChain>
     + CanQueryConsensusStateHeight<CosmosChain>
+    + HasCounterpartyMessageHeight<CosmosChain>
+    + HasInitConnectionOptionsType<CosmosChain>
+    + CanBuildConnectionOpenTryMessage<CosmosChain>
+    + HasConnectionOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
 where
@@ -245,6 +258,8 @@ pub trait CanUseCosmosChainWithStarknet:
     + CanQueryConsensusStateHeight<StarknetChain>
     + CanBuildCreateClientPayload<StarknetChain>
     + CanBuildUpdateClientPayload<StarknetChain>
+    + CanBuildConnectionOpenTryPayload<StarknetChain>
+    + HasConnectionEndType<StarknetChain>
 {
 }
 

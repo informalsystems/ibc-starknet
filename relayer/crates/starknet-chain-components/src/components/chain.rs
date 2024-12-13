@@ -1,9 +1,10 @@
 use cgp::core::component::WithProvider;
-use cgp::core::types::impls::UseDelegatedType;
+use cgp::core::types::impls::{UseDelegatedType, WithType};
 use cgp::prelude::*;
 use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
 use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
 pub use hermes_cosmos_chain_components::components::client::*;
+use hermes_cosmos_chain_components::impls::connection::init_connection_options::ProvideCosmosInitConnectionOptionsType;
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
 use hermes_cosmos_chain_components::impls::types::create_client_options::ProvideNoCreateClientMessageOptionsType;
@@ -38,7 +39,10 @@ use crate::impls::contract::declare::DeclareSierraContract;
 use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
+use crate::impls::counterparty_message_height::GetCounterpartyCosmosHeightFromStarknetMessage;
+use crate::impls::events::connection_id::UseStarknetConnectionHandshakeEvents;
 use crate::impls::events::create_client::UseStarknetCreateClientEvent;
+use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
 use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
@@ -82,6 +86,7 @@ pub use crate::traits::types::contract_class::{
     ContractClassHashTypeComponent, ContractClassTypeComponent,
 };
 pub use crate::traits::types::method::SelectorTypeComponent;
+use crate::types::connection_id::ConnectionId;
 use crate::types::message_response::UseStarknetMessageResponse;
 use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
 
@@ -126,8 +131,8 @@ cgp_preset! {
             ContractClassHashTypeComponent,
         ]:
             ProvideStarknetContractTypes,
+        ConnectionIdTypeComponent: WithType<ConnectionId>,
         [
-            ConnectionIdTypeComponent,
             ChannelIdTypeComponent,
             PortIdTypeComponent,
             SequenceTypeComponent,
@@ -186,6 +191,8 @@ cgp_preset! {
             QueryErc20TokenBalance,
         CreateClientEventComponent:
             UseStarknetCreateClientEvent,
+        ConnectionOpenTryEventComponent:
+            UseStarknetConnectionHandshakeEvents,
         CreateClientMessageOptionsTypeComponent:
             ProvideNoCreateClientMessageOptionsType,
         CreateClientPayloadBuilderComponent:
@@ -206,5 +213,13 @@ cgp_preset! {
             QueryLatestConsensusStateHeightAsHeights,
         ContractAddressQuerierComponent:
             GetContractAddressFromField,
+        CounterpartyMessageHeightGetterComponent:
+            GetCounterpartyCosmosHeightFromStarknetMessage,
+        InitConnectionOptionsTypeComponent:
+            ProvideCosmosInitConnectionOptionsType,
+        [
+            ConnectionOpenTryMessageBuilderComponent,
+        ]:
+            BuildStarknetConnectionHandshakeMessages,
     }
 }

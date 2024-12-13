@@ -21,6 +21,7 @@ use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
 use hermes_starknet_chain_components::components::encoding::cairo::*;
 use hermes_starknet_chain_components::types::client_id::ClientId;
+use hermes_starknet_chain_components::types::connection_id::ConnectionId;
 use hermes_starknet_chain_components::types::cosmos::client_state::{
     ClientStatus, CometClientState,
 };
@@ -132,6 +133,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, CometClientState>
     + CanEncodeAndDecode<ViaCairo, CometConsensusState>
     + CanEncodeAndDecode<ViaCairo, ClientId>
+    + CanEncodeAndDecode<ViaCairo, ConnectionId>
     + CanEncodeAndDecode<ViaCairo, MsgRegisterClient>
     + CanEncodeAndDecode<ViaCairo, MsgRegisterApp>
     + CanEncodeAndDecode<ViaCairo, MsgConnOpenInit>

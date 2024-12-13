@@ -1,3 +1,5 @@
+use core::fmt::{Display, Formatter};
+
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
@@ -28,5 +30,11 @@ impl Transformer for EncodeConnectionId {
 
     fn transform(connection_id: Self::From) -> ConnectionId {
         ConnectionId { connection_id }
+    }
+}
+
+impl Display for ConnectionId {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        self.connection_id.fmt(f)
     }
 }
