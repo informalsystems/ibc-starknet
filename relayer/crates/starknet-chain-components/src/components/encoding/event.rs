@@ -17,7 +17,12 @@ use crate::types::events::connection::{
 };
 use crate::types::events::erc20::{ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent};
 use crate::types::events::ics20::{
-    CreateIbcTokenEvent, DecodeIbcTransferEvents, IbcTransferEvent, ReceiveIbcTransferEvent,
+    AckIbcTransferEvent, AckStatusIbcTransferEvent, CreateIbcTokenEvent, DecodeIbcTransferEvents,
+    IbcTransferEvent, ReceiveIbcTransferEvent, SendIbcTransferEvent, TimeoutIbcTransferEvent,
+};
+use crate::types::events::packet::{
+    AcknowledgePacketEvent, DecodePacketRelayEvents, PacketRelayEvents, ReceivePacketEvent,
+    SendPacketEvent, TimeoutPacketEvent, WriteAcknowledgementEvent,
 };
 
 cgp_preset! {
@@ -45,7 +50,11 @@ delegate_components! {
             DecodeErc20Events,
         [
             (ViaCairo, IbcTransferEvent),
+            (ViaCairo, SendIbcTransferEvent),
             (ViaCairo, ReceiveIbcTransferEvent),
+            (ViaCairo, AckIbcTransferEvent),
+            (ViaCairo, AckStatusIbcTransferEvent),
+            (ViaCairo, TimeoutIbcTransferEvent),
             (ViaCairo, CreateIbcTokenEvent),
         ]:
             DecodeIbcTransferEvents,
@@ -65,6 +74,15 @@ delegate_components! {
             (ViaCairo, ChanOpenConfirmEvent),
         ]:
             DecodeChannelHandshakeEvents,
+        [
+            (ViaCairo, PacketRelayEvents),
+            (ViaCairo, SendPacketEvent),
+            (ViaCairo, ReceivePacketEvent),
+            (ViaCairo, WriteAcknowledgementEvent),
+            (ViaCairo, AcknowledgePacketEvent),
+            (ViaCairo, TimeoutPacketEvent),
+        ]:
+            DecodePacketRelayEvents,
         (ViaCairo, Option<Erc20Event>):
             DecodeOptionalByClassHash<symbol!("erc20_hashes")>,
         (ViaCairo, Option<IbcTransferEvent>):
@@ -72,6 +90,8 @@ delegate_components! {
         (ViaCairo, Option<ConnectionHandshakeEvents>):
             DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
         (ViaCairo, Option<ChannelHandshakeEvents>):
+            DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
+        (ViaCairo, Option<PacketRelayEvents>):
             DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
     }
 }

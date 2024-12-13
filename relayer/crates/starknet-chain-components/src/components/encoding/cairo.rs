@@ -20,6 +20,7 @@ use crate::types::cosmos::client_state::{
 };
 use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsensusState};
 use crate::types::cosmos::height::{EncodeHeight, Height};
+use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
 use crate::types::cosmos::update::{CometUpdateHeader, EncodeCometUpdateHeader};
 use crate::types::message_responses::create_client::{
     CreateClientResponse, DecodeCreateClientResponse,
@@ -47,7 +48,9 @@ use crate::types::messages::ibc::ibc_transfer::{
     EncodeIbcTransferMessage, EncodeParticipant, IbcTransferMessage, Participant,
 };
 use crate::types::messages::ibc::packet::{
-    EncodeMsgRecvPacket, EncodePacket, EncodeStateProof, MsgRecvPacket, Packet, StateProof,
+    AckStatus, Acknowledgement, EncodeAckStatus, EncodeAcknowledgement, EncodeMsgAckPacket,
+    EncodeMsgRecvPacket, EncodeMsgTimeoutPacket, EncodePacket, EncodeSequence, EncodeStateProof,
+    MsgAckPacket, MsgRecvPacket, MsgTimeoutPacket, Packet, Sequence, StateProof,
 };
 use crate::types::register::{
     EncodeRegisterApp, EncodeRegisterClient, MsgRegisterApp, MsgRegisterClient,
@@ -100,9 +103,15 @@ delegate_components! {
         (ViaCairo, Participant): EncodeParticipant,
         (ViaCairo, IbcTransferMessage): EncodeIbcTransferMessage,
         (ViaCairo, Height): EncodeHeight,
+        (ViaCairo, Timestamp): EncodeTimestamp,
         (ViaCairo, Packet): EncodePacket,
         (ViaCairo, StateProof): EncodeStateProof,
         (ViaCairo, MsgRecvPacket): EncodeMsgRecvPacket,
+        (ViaCairo, Acknowledgement): EncodeAcknowledgement,
+        (ViaCairo, MsgAckPacket): EncodeMsgAckPacket,
+        (ViaCairo, AckStatus): EncodeAckStatus,
+        (ViaCairo, Sequence): EncodeSequence,
+        (ViaCairo, MsgTimeoutPacket): EncodeMsgTimeoutPacket,
         (ViaCairo, ClientStatus): EncodeClientStatus,
         (ViaCairo, CometClientState): EncodeCometClientState,
         (ViaCairo, CometConsensusState): EncodeCometConsensusState,
