@@ -25,6 +25,7 @@ use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::events::channel::ChannelHandshakeEvents;
 use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
+use hermes_starknet_chain_components::types::events::packet::PacketRelayEvents;
 use hermes_starknet_chain_components::types::messages::ibc::channel::{
     AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
     MsgChanOpenTry, PortId,
@@ -716,6 +717,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("IBC transfer response: {:?}", response);
 
+            let ibc_packet_events: Vec<PacketRelayEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            info!("IBC packet events: {:?}", ibc_packet_events);
+
             let ibc_transfer_events: Vec<IbcTransferEvent> =
                 event_encoding.filter_decode_events(&response.events)?;
 
@@ -793,6 +799,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             };
 
             let response = starknet_chain.send_message(message.clone()).await?;
+
+            let ibc_packet_events_2: Vec<PacketRelayEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            info!("ibc_packet_events 2: {:?}", ibc_packet_events_2);
 
             let ibc_transfer_events_2: Vec<IbcTransferEvent> =
                 event_encoding.filter_decode_events(&response.events)?;
