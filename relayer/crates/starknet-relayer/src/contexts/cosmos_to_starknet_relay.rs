@@ -14,6 +14,7 @@ use hermes_relayer_components::relay::traits::chains::{
     CanRaiseRelayChainErrors, HasRelayChains, HasRelayClientIds,
 };
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
+use hermes_relayer_components::relay::traits::connection::open_init::CanInitConnection;
 use hermes_relayer_components::relay::traits::connection::open_try::CanRelayConnectionOpenTry;
 use hermes_relayer_components::relay::traits::ibc_message_sender::CanSendIbcMessages;
 use hermes_relayer_components::relay::traits::target::{
@@ -125,6 +126,7 @@ pub trait CanUseCosmosToStarknetRelay:
     + CanSendTargetUpdateClientMessage<SourceTarget>
     + CanSendTargetUpdateClientMessage<DestinationTarget>
     + CanSendIbcMessages<MainSink, DestinationTarget>
+    // + CanInitConnection
     + CanRelayConnectionOpenTry
 {
 }

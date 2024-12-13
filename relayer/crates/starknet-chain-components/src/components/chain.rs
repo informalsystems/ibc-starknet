@@ -3,6 +3,9 @@ use cgp::core::types::impls::{UseDelegatedType, WithType};
 use cgp::prelude::*;
 use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
 use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
+use hermes_chain_components::impls::types::commitment_prefix::ProvideCommitmentPrefixBytes;
+use hermes_chain_components::impls::types::payloads::connection::ProvideConnectionPayloadTypes;
+use hermes_chain_components::traits::commitment_prefix::IbcCommitmentPrefixGetterComponent;
 pub use hermes_cosmos_chain_components::components::client::*;
 use hermes_cosmos_chain_components::impls::connection::init_connection_options::ProvideCosmosInitConnectionOptionsType;
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
@@ -34,6 +37,7 @@ pub use hermes_test_components::chain::traits::types::amount::AmountTypeComponen
 pub use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
 
 use crate::components::types::StarknetChainTypes;
+use crate::impls::commitment_prefix::GetStarknetCommitmentPrefix;
 use crate::impls::contract::call::CallStarknetContract;
 use crate::impls::contract::declare::DeclareSierraContract;
 use crate::impls::contract::deploy::DeployStarknetContract;
@@ -131,7 +135,6 @@ cgp_preset! {
             ContractClassHashTypeComponent,
         ]:
             ProvideStarknetContractTypes,
-        ConnectionIdTypeComponent: WithType<ConnectionId>,
         [
             ChannelIdTypeComponent,
             PortIdTypeComponent,
@@ -143,6 +146,8 @@ cgp_preset! {
             ProvideCosmosChainTypes,
         [
             ClientIdTypeComponent,
+            ConnectionIdTypeComponent,
+            CommitmentProofTypeComponent,
         ]:
             WithProvider<UseDelegatedType<StarknetChainTypes>>,
         [
@@ -157,6 +162,8 @@ cgp_preset! {
             UpdateClientPayloadTypeComponent,
         ]:
             ProvideStarknetPayloadTypes,
+        CommitmentPrefixTypeComponent:
+            ProvideCommitmentPrefixBytes,
         OutgoingPacketFieldsReaderComponent:
             CosmosPacketFieldReader,
         ChainStatusQuerierComponent:
@@ -181,6 +188,8 @@ cgp_preset! {
             DeployStarknetContract,
         InvokeContractMessageBuilderComponent:
             BuildInvokeContractCall,
+        IbcCommitmentPrefixGetterComponent:
+            GetStarknetCommitmentPrefix,
         RetryableErrorComponent:
             ReturnRetryable<false>,
         TransferTokenMessageBuilderComponent:
@@ -217,6 +226,13 @@ cgp_preset! {
             GetCounterpartyCosmosHeightFromStarknetMessage,
         InitConnectionOptionsTypeComponent:
             ProvideCosmosInitConnectionOptionsType,
+        [
+            ConnectionOpenInitPayloadTypeComponent,
+            ConnectionOpenTryPayloadTypeComponent,
+            ConnectionOpenAckPayloadTypeComponent,
+            ConnectionOpenConfirmPayloadTypeComponent,
+        ]:
+            ProvideConnectionPayloadTypes,
         [
             ConnectionOpenTryMessageBuilderComponent,
         ]:

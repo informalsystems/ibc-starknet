@@ -6,8 +6,10 @@ use cgp::core::field::impls::use_field::WithField;
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_chain_type_components::traits::types::commitment_proof::HasCommitmentProofType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
+use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
 use hermes_encoding_components::traits::has_encoding::{
@@ -18,6 +20,9 @@ use hermes_error::impls::ProvideHermesError;
 use hermes_logging_components::contexts::no_logger::ProvideNoLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
+};
+use hermes_relayer_components::chain::traits::commitment_prefix::{
+    HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
 use hermes_relayer_components::chain::traits::message_builders::connection_handshake::CanBuildConnectionOpenTryMessage;
 use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
@@ -37,7 +42,8 @@ use hermes_relayer_components::chain::traits::types::client_state::{
     HasClientStateFields, HasClientStateType,
 };
 use hermes_relayer_components::chain::traits::types::connection::{
-    HasConnectionEndType, HasInitConnectionOptionsType,
+    HasConnectionEndType, HasConnectionOpenInitPayloadType, HasConnectionOpenTryPayloadType,
+    HasInitConnectionOptionsType,
 };
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
 use hermes_relayer_components::chain::traits::types::create_client::{
@@ -201,10 +207,15 @@ pub trait CanUseStarknetChain:
     + HasAddressType<Address = Felt>
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
+    + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
+    + HasCommitmentProofType
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
     + HasClientIdType<CosmosChain, ClientId = ClientId>
     + HasConnectionIdType<CosmosChain, ConnectionId = ConnectionId>
+    + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
+    + HasConnectionOpenInitPayloadType<CosmosChain>
+    // + HasConnectionOpenTryPayloadType<CosmosChain>
     + HasOutgoingPacketType<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount
@@ -219,6 +230,7 @@ pub trait CanUseStarknetChain:
     + CanDeployContract
     + CanQueryTokenBalance
     + CanTransferToken
+    + HasIbcCommitmentPrefix
     + HasRetryableError
     + HasCreateClientEvent<CosmosChain>
     + CanBuildCreateClientPayload<CosmosChain>
@@ -245,10 +257,10 @@ where
 
 impl CanUseStarknetChain for StarknetChain {}
 
-pub trait CanUseCosmosChainWithStarknet:
-    HasClientStateType<StarknetChain, ClientState = CometClientState>
+pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, ClientState = CometClientState>
     + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
     + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CometUpdateHeader>
+    + HasInitConnectionOptionsType<StarknetChain, InitConnectionOptions = CosmosInitConnectionOptions>
     + HasClientStateFields<StarknetChain>
     + CanQueryClientState<StarknetChain>
     + CanQueryConsensusState<StarknetChain>
