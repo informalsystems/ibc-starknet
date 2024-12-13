@@ -203,7 +203,7 @@ impl Transformer for EncodeMsgAckPacket {
     }
 }
 
-#[derive(HasField)]
+#[derive(HasField, Debug)]
 pub struct Sequence {
     pub sequence: u64,
 }

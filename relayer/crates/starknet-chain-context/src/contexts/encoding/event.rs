@@ -17,6 +17,7 @@ use hermes_starknet_chain_components::types::events::channel::ChannelHandshakeEv
 use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
 use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
+use hermes_starknet_chain_components::types::events::packet::PacketRelayEvents;
 use starknet::core::types::Felt;
 
 use crate::contexts::encoding::cairo::{ProvideCairoEncoding, StarknetCairoEncoding};
@@ -70,6 +71,8 @@ pub trait CanUseStarknetEventEncoding:
     + CanDecode<ViaCairo, Option<ConnectionHandshakeEvents>>
     + CanDecode<ViaCairo, ChannelHandshakeEvents>
     + CanDecode<ViaCairo, Option<ChannelHandshakeEvents>>
+    + CanDecode<ViaCairo, PacketRelayEvents>
+    + CanDecode<ViaCairo, Option<PacketRelayEvents>>
 {
 }
 
