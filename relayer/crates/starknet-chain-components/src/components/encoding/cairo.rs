@@ -48,9 +48,9 @@ use crate::types::messages::ibc::ibc_transfer::{
     EncodeIbcTransferMessage, EncodeParticipant, IbcTransferMessage, Participant,
 };
 use crate::types::messages::ibc::packet::{
-    Acknowledgement, EncodeAcknowledgement, EncodeMsgAckPacket, EncodeMsgRecvPacket,
-    EncodeMsgTimeoutPacket, EncodePacket, EncodeSequence, EncodeStateProof, MsgAckPacket,
-    MsgRecvPacket, MsgTimeoutPacket, Packet, Sequence, StateProof,
+    AckStatus, Acknowledgement, EncodeAckStatus, EncodeAcknowledgement, EncodeMsgAckPacket,
+    EncodeMsgRecvPacket, EncodeMsgTimeoutPacket, EncodePacket, EncodeSequence, EncodeStateProof,
+    MsgAckPacket, MsgRecvPacket, MsgTimeoutPacket, Packet, Sequence, StateProof,
 };
 use crate::types::register::{
     EncodeRegisterApp, EncodeRegisterClient, MsgRegisterApp, MsgRegisterClient,
