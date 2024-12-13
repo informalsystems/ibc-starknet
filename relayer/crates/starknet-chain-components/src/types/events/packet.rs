@@ -11,7 +11,7 @@ use crate::types::channel_id::ChannelId;
 use crate::types::cosmos::height::Height;
 use crate::types::event::{StarknetEvent, UnknownEvent};
 use crate::types::messages::ibc::channel::{ChannelOrdering, PortId};
-use crate::types::messages::ibc::packet::Sequence;
+use crate::types::messages::ibc::packet::{Acknowledgement, Sequence};
 
 #[derive(Debug)]
 pub enum PacketRelayEvents {
@@ -47,6 +47,18 @@ pub struct ReceivePacketEvent {
     pub packet_data: Vec<Felt>,
 }
 
+#[derive(Debug)]
+pub struct WriteAcknowledgementEvent {
+    pub sequence_on_a: Sequence,
+    pub port_id_on_a: PortId,
+    pub channel_id_on_a: ChannelId,
+    pub port_id_on_b: PortId,
+    pub channel_id_on_b: ChannelId,
+
+    pub packet_data: Vec<Felt>,
+    pub acknowledgement: Acknowledgement,
+}
+
 pub struct DecodePacketRelayEvents;
 
 impl<Encoding, Strategy> Decoder<Encoding, Strategy, PacketRelayEvents> for DecodePacketRelayEvents
@@ -54,6 +66,7 @@ where
     Encoding: HasEncodedType<Encoded = StarknetEvent>
         + CanDecode<Strategy, SendPacketEvent>
         + CanDecode<Strategy, ReceivePacketEvent>
+        + CanDecode<Strategy, WriteAcknowledgementEvent>
         + for<'a> CanRaiseError<UnknownEvent<'a>>,
 {
     fn decode(
@@ -67,6 +80,8 @@ where
         if selector == selector!("SendPacketEvent") {
             Ok(PacketRelayEvents::Send(encoding.decode(event)?))
         } else if selector == selector!("ReceivePacketEvent") {
+            Ok(PacketRelayEvents::Send(encoding.decode(event)?))
+        } else if selector == selector!("WriteAcknowledgementEvent") {
             Ok(PacketRelayEvents::Send(encoding.decode(event)?))
         } else {
             Err(Encoding::raise_error(UnknownEvent { event }))
@@ -188,6 +203,49 @@ where
             timeout_timestamp_on_b,
             channel_ordering,
             packet_data,
+        })
+    }
+}
+
+impl<EventEncoding, CairoEncoding, Strategy>
+    Decoder<EventEncoding, Strategy, WriteAcknowledgementEvent> for DecodePacketRelayEvents
+where
+    EventEncoding: HasEncodedType<Encoded = StarknetEvent>
+        + HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + CanRaiseError<CairoEncoding::Error>
+        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, Product![Sequence, PortId, ChannelId, PortId, ChannelId]>
+        + CanDecode<ViaCairo, Product![Vec<Felt>, Acknowledgement]>,
+{
+    fn decode(
+        event_encoding: &EventEncoding,
+        event: &StarknetEvent,
+    ) -> Result<WriteAcknowledgementEvent, EventEncoding::Error> {
+        let cairo_encoding = event_encoding.encoding();
+
+        let product![
+            sequence_on_a,
+            port_id_on_a,
+            channel_id_on_a,
+            port_id_on_b,
+            channel_id_on_b,
+        ] = cairo_encoding
+            .decode(&event.keys)
+            .map_err(EventEncoding::raise_error)?;
+
+        let product![packet_data, acknowledgement,] = cairo_encoding
+            .decode(&event.data)
+            .map_err(EventEncoding::raise_error)?;
+
+        Ok(WriteAcknowledgementEvent {
+            sequence_on_a,
+            port_id_on_a,
+            channel_id_on_a,
+            port_id_on_b,
+            channel_id_on_b,
+            packet_data,
+            acknowledgement,
         })
     }
 }

@@ -136,7 +136,7 @@ impl Transformer for EncodeMsgRecvPacket {
     }
 }
 
-#[derive(HasField)]
+#[derive(HasField, Debug)]
 pub struct Acknowledgement {
     pub ack: Vec<u8>,
 }
