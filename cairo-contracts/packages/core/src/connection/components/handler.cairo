@@ -43,13 +43,17 @@ pub mod ConnectionHandlerComponent {
         impl EventEmitter: ConnectionEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>
     > of IConnectionHandler<ComponentState<TContractState>> {
-        fn conn_open_init(ref self: ComponentState<TContractState>, msg: MsgConnOpenInit) -> ConnectionId {
+        fn conn_open_init(
+            ref self: ComponentState<TContractState>, msg: MsgConnOpenInit
+        ) -> ConnectionId {
             let connection_sequence = self.read_next_connection_sequence();
             self.conn_open_init_validate(connection_sequence, msg.clone());
             self.conn_open_init_execute(connection_sequence, msg)
         }
 
-        fn conn_open_try(ref self: ComponentState<TContractState>, msg: MsgConnOpenTry) -> ConnectionId {
+        fn conn_open_try(
+            ref self: ComponentState<TContractState>, msg: MsgConnOpenTry
+        ) -> ConnectionId {
             let connection_sequence = self.read_next_connection_sequence();
             self.conn_open_try_validate(connection_sequence, msg.clone());
             self.conn_open_try_execute(connection_sequence, msg)
