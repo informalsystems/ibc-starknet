@@ -18,6 +18,9 @@ use crate::types::messages::ibc::packet::{Acknowledgement, Sequence};
 pub enum PacketRelayEvents {
     Send(SendPacketEvent),
     Receive(ReceivePacketEvent),
+    WriteAcknowledgement(WriteAcknowledgementEvent),
+    Acknowledge(AcknowledgePacketEvent),
+    Timeout(TimeoutPacketEvent),
 }
 
 #[derive(Debug)]
@@ -107,13 +110,15 @@ where
         if selector == selector!("SendPacketEvent") {
             Ok(PacketRelayEvents::Send(encoding.decode(event)?))
         } else if selector == selector!("ReceivePacketEvent") {
-            Ok(PacketRelayEvents::Send(encoding.decode(event)?))
+            Ok(PacketRelayEvents::Receive(encoding.decode(event)?))
         } else if selector == selector!("WriteAcknowledgementEvent") {
-            Ok(PacketRelayEvents::Send(encoding.decode(event)?))
+            Ok(PacketRelayEvents::WriteAcknowledgement(
+                encoding.decode(event)?,
+            ))
         } else if selector == selector!("AcknowledgePacketEvent") {
-            Ok(PacketRelayEvents::Send(encoding.decode(event)?))
+            Ok(PacketRelayEvents::Acknowledge(encoding.decode(event)?))
         } else if selector == selector!("TimeoutPacketEvent") {
-            Ok(PacketRelayEvents::Send(encoding.decode(event)?))
+            Ok(PacketRelayEvents::Timeout(encoding.decode(event)?))
         } else {
             Err(Encoding::raise_error(UnknownEvent { event }))
         }
