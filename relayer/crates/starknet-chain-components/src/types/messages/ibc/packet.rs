@@ -1,11 +1,12 @@
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
+use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
-use hermes_encoding_components::traits::transform::Transformer;
+use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use starknet::core::types::Felt;
 
 use crate::types::cosmos::height::Height;
@@ -136,7 +137,7 @@ impl Transformer for EncodeMsgRecvPacket {
     }
 }
 
-#[derive(HasField, Debug)]
+#[derive(HasField, Debug, Clone)]
 pub struct Acknowledgement {
     pub ack: Vec<u8>,
 }
@@ -271,6 +272,48 @@ impl Transformer for EncodeMsgTimeoutPacket {
             next_seq_recv_on_b,
             proof_unreceived_on_b,
             proof_height_on_b,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum AckStatus {
+    Success(Acknowledgement),
+    Error(Acknowledgement),
+}
+
+pub struct EncodeAckStatus;
+
+delegate_components! {
+    EncodeAckStatus {
+        [
+            MutEncoderComponent,
+            MutDecoderComponent,
+        ]: EncodeVariantFrom<EncodeAckStatus>,
+    }
+}
+
+impl TransformerRef for EncodeAckStatus {
+    type From = AckStatus;
+    type To<'a> = Sum![Acknowledgement, Acknowledgement];
+
+    fn transform<'a>(value: &'a Self::From) -> Self::To<'a> {
+        match value {
+            AckStatus::Success(ack) => Either::Left(ack.clone()),
+            AckStatus::Error(ack) => Either::Right(Either::Left(ack.clone())),
+        }
+    }
+}
+
+impl Transformer for EncodeAckStatus {
+    type From = Sum![Acknowledgement, Acknowledgement];
+    type To = AckStatus;
+
+    fn transform(value: Self::From) -> Self::To {
+        match value {
+            Either::Left(ack) => AckStatus::Success(ack),
+            Either::Right(Either::Left(ack)) => AckStatus::Error(ack),
+            Either::Right(Either::Right(value)) => match value {},
         }
     }
 }

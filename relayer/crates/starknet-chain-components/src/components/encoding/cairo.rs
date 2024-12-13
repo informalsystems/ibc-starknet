@@ -109,6 +109,7 @@ delegate_components! {
         (ViaCairo, MsgRecvPacket): EncodeMsgRecvPacket,
         (ViaCairo, Acknowledgement): EncodeAcknowledgement,
         (ViaCairo, MsgAckPacket): EncodeMsgAckPacket,
+        (ViaCairo, AckStatus): EncodeAckStatus,
         (ViaCairo, Sequence): EncodeSequence,
         (ViaCairo, MsgTimeoutPacket): EncodeMsgTimeoutPacket,
         (ViaCairo, ClientStatus): EncodeClientStatus,
