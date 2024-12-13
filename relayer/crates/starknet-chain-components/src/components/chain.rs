@@ -67,6 +67,7 @@ use crate::impls::types::amount::ProvideU256Amount;
 use crate::impls::types::blob::ProvideFeltBlobType;
 use crate::impls::types::chain_id::ProvideFeltChainId;
 use crate::impls::types::client::ProvideStarknetIbcClientTypes;
+use crate::impls::types::commitment_proof::UseStarknetCommitmentProof;
 use crate::impls::types::contract::ProvideStarknetContractTypes;
 use crate::impls::types::denom::ProvideTokenAddressDenom;
 use crate::impls::types::event::ProvideStarknetEvent;
@@ -148,7 +149,6 @@ cgp_preset! {
         [
             ClientIdTypeComponent,
             ConnectionIdTypeComponent,
-            CommitmentProofTypeComponent,
             ConnectionEndTypeComponent,
         ]:
             WithProvider<UseDelegatedType<StarknetChainTypes>>,
@@ -164,6 +164,12 @@ cgp_preset! {
             UpdateClientPayloadTypeComponent,
         ]:
             ProvideStarknetPayloadTypes,
+        [
+            CommitmentProofTypeComponent,
+            CommitmentProofHeightGetterComponent,
+            CommitmentProofBytesGetterComponent,
+        ]:
+            UseStarknetCommitmentProof,
         CommitmentPrefixTypeComponent:
             ProvideCommitmentPrefixBytes,
         OutgoingPacketFieldsReaderComponent:
@@ -214,7 +220,10 @@ cgp_preset! {
             BuildCreateCometClientMessage,
         UpdateClientPayloadBuilderComponent:
             BuildStarknetUpdateClientPayload,
-        ClientStateQuerierComponent:
+        [
+            ClientStateQuerierComponent,
+            ClientStateWithProofsQuerierComponent,
+        ]:
             QueryCometClientState,
         [
             ConsensusStateQuerierComponent,

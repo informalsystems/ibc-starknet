@@ -1,7 +1,6 @@
 use cgp::prelude::*;
 use hermes_cosmos_chain_components::components::client::{
-    ClientIdTypeComponent, CommitmentProofTypeComponent, ConnectionEndTypeComponent,
-    ConnectionIdTypeComponent,
+    ClientIdTypeComponent, ConnectionEndTypeComponent, ConnectionIdTypeComponent,
 };
 use ibc::core::connection::types::ConnectionEnd;
 
@@ -12,8 +11,6 @@ cgp_preset! {
     StarknetChainTypes {
         ClientIdTypeComponent: ClientId,
         ConnectionIdTypeComponent: ConnectionId,
-        // FIXME: design proper commitment proof
-        CommitmentProofTypeComponent: (),
         ConnectionEndTypeComponent: ConnectionEnd,
     }
 }

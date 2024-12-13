@@ -22,6 +22,7 @@ use crate::traits::queries::address::CanQueryContractAddress;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::client_id::ClientId;
+use crate::types::commitment_proof::StarknetCommitmentProof;
 use crate::types::cosmos::consensus_state::CometConsensusState;
 use crate::types::cosmos::height::Height;
 
@@ -100,12 +101,11 @@ impl<Chain, Counterparty> ConsensusStateWithProofsQuerier<Chain, Counterparty>
     for QueryCometConsensusState
 where
     Chain: HasClientIdType<Counterparty>
-        + HasHeightType
-        + HasCommitmentProofType
+        + HasHeightType<Height = u64>
+        + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryConsensusState<Counterparty>
         + HasErrorType,
     Counterparty: HasConsensusStateType<Chain> + HasHeightType,
-    Chain::CommitmentProof: Default,
 {
     async fn query_consensus_state_with_proofs(
         chain: &Chain,
@@ -119,6 +119,11 @@ where
             .query_consensus_state(tag, client_id, consensus_height, query_height)
             .await?;
 
-        Ok((consensus_state, Default::default()))
+        let proof = StarknetCommitmentProof {
+            proof_height: *query_height,
+            proof_bytes: Vec::new(),
+        };
+
+        Ok((consensus_state, proof))
     }
 }

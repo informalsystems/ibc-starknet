@@ -7,6 +7,7 @@ use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_type_components::traits::types::commitment_proof::HasCommitmentProofType;
+use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
@@ -33,7 +34,9 @@ use hermes_relayer_components::chain::traits::payload_builders::connection_hands
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_relayer_components::chain::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
-use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
+use hermes_relayer_components::chain::traits::queries::client_state::{
+    CanQueryClientState, CanQueryClientStateWithProofs,
+};
 use hermes_relayer_components::chain::traits::queries::connection_end::{
     CanQueryConnectionEnd, CanQueryConnectionEndWithProofs,
 };
@@ -96,6 +99,7 @@ use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
+use hermes_starknet_chain_components::types::commitment_proof::StarknetCommitmentProof;
 use hermes_starknet_chain_components::types::connection_id::ConnectionId;
 use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
 use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
@@ -208,10 +212,12 @@ impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
 pub trait CanUseStarknetChain:
     HasRuntime
     + HasLogger
+    + HasHeightType<Height = u64>
     + HasEventType<Event = StarknetEvent>
     + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
     + HasDefaultEncoding<AsBytes, Encoding = StarknetProtobufEncoding>
     + HasDefaultEncoding<AsFelt, Encoding = StarknetCairoEncoding>
+    + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
     + HasAddressType<Address = Felt>
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
@@ -248,6 +254,7 @@ pub trait CanUseStarknetChain:
     + CanBuildUpdateClientPayload<CosmosChain>
     + CanBuildUpdateClientMessage<CosmosChain>
     + CanQueryClientState<CosmosChain>
+    + CanQueryClientStateWithProofs<CosmosChain>
     + CanQueryConsensusState<CosmosChain>
     + CanQueryConsensusStateWithProofs<CosmosChain>
     + CanQueryConsensusStateHeights<CosmosChain>
@@ -257,7 +264,7 @@ pub trait CanUseStarknetChain:
     + HasCounterpartyMessageHeight<CosmosChain>
     + HasInitConnectionOptionsType<CosmosChain>
     + CanBuildConnectionOpenInitPayload<CosmosChain>
-    // + CanBuildConnectionOpenTryPayload<CosmosChain>
+    + CanBuildConnectionOpenTryPayload<CosmosChain>
     + CanBuildConnectionOpenTryMessage<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
