@@ -202,3 +202,75 @@ impl Transformer for EncodeMsgAckPacket {
         }
     }
 }
+
+#[derive(HasField)]
+pub struct Sequence {
+    pub sequence: u64,
+}
+
+pub struct EncodeSequence;
+
+delegate_components! {
+    EncodeSequence {
+        MutEncoderComponent: CombineEncoders<
+            Product![
+                EncodeField<symbol!("sequence"), UseContext>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeSequence {
+    type From = Product![u64];
+    type To = Sequence;
+
+    fn transform(product![sequence]: Self::From) -> Sequence {
+        Sequence { sequence }
+    }
+}
+
+#[derive(HasField)]
+pub struct MsgTimeoutPacket {
+    pub packet: Packet,
+    pub next_seq_recv_on_b: Sequence,
+    pub proof_unreceived_on_b: StateProof,
+    pub proof_height_on_b: Height,
+}
+
+pub struct EncodeMsgTimeoutPacket;
+
+delegate_components! {
+    EncodeMsgTimeoutPacket {
+        MutEncoderComponent: CombineEncoders<
+            Product![
+                EncodeField<symbol!("packet"), UseContext>,
+                EncodeField<symbol!("next_seq_recv_on_b"), UseContext>,
+                EncodeField<symbol!("proof_unreceived_on_b"), UseContext>,
+                EncodeField<symbol!("proof_height_on_b"), UseContext>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeMsgTimeoutPacket {
+    type From = Product![Packet, Sequence, StateProof, Height];
+    type To = MsgTimeoutPacket;
+
+    fn transform(
+        product![
+            packet,
+            next_seq_recv_on_b,
+            proof_unreceived_on_b,
+            proof_height_on_b
+        ]: Self::From,
+    ) -> MsgTimeoutPacket {
+        MsgTimeoutPacket {
+            packet,
+            next_seq_recv_on_b,
+            proof_unreceived_on_b,
+            proof_height_on_b,
+        }
+    }
+}
