@@ -20,7 +20,9 @@ use crate::types::events::ics20::{
     CreateIbcTokenEvent, DecodeIbcTransferEvents, IbcTransferEvent, ReceiveIbcTransferEvent,
     SendIbcTransferEvent,
 };
-use crate::types::events::packet::{DecodePacketRelayEvents, PacketRelayEvents, SendPacketEvent};
+use crate::types::events::packet::{
+    DecodePacketRelayEvents, PacketRelayEvents, ReceivePacketEvent, SendPacketEvent,
+};
 
 cgp_preset! {
     StarknetEventEncodingComponents {
@@ -71,6 +73,7 @@ delegate_components! {
         [
             (ViaCairo, PacketRelayEvents),
             (ViaCairo, SendPacketEvent),
+            (ViaCairo, ReceivePacketEvent),
         ]:
             DecodePacketRelayEvents,
         (ViaCairo, Option<Erc20Event>):
