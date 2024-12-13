@@ -20,7 +20,7 @@ license      = "Apache-2.0"
 keywords     = [ "blockchain", "consensus", "cosmos", "ibc", "tendermint" ]
 repository   = "https://github.com/informalsystems/hermes-sdk"
 authors      = [ "Informal Systems <hello@informal.systems>" ]
-rust-version = "1.79"
+rust-version = "1.81"
 
 [profile.release]
 overflow-checks = true
