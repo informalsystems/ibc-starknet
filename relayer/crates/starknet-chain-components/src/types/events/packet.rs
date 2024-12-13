@@ -9,6 +9,7 @@ use starknet::macros::selector;
 
 use crate::types::channel_id::ChannelId;
 use crate::types::cosmos::height::Height;
+use crate::types::cosmos::timestamp::Timestamp;
 use crate::types::event::{StarknetEvent, UnknownEvent};
 use crate::types::messages::ibc::channel::{ChannelOrdering, PortId};
 use crate::types::messages::ibc::packet::{Acknowledgement, Sequence};
@@ -27,7 +28,7 @@ pub struct SendPacketEvent {
     pub port_id_on_b: PortId,
     pub channel_id_on_b: ChannelId,
     pub timeout_height_on_b: Height,
-    pub timeout_timestamp_on_b: u64,
+    pub timeout_timestamp_on_b: Timestamp,
     pub channel_ordering: ChannelOrdering,
 
     pub packet_data: Vec<Felt>,
@@ -41,7 +42,7 @@ pub struct ReceivePacketEvent {
     pub port_id_on_b: PortId,
     pub channel_id_on_b: ChannelId,
     pub timeout_height_on_b: Height,
-    pub timeout_timestamp_on_b: u64,
+    pub timeout_timestamp_on_b: Timestamp,
     pub channel_ordering: ChannelOrdering,
 
     pub packet_data: Vec<Felt>,
@@ -106,7 +107,7 @@ where
                 PortId,
                 ChannelId,
                 Height,
-                u64,
+                Timestamp,
                 ChannelOrdering
             ],
         > + CanDecode<ViaCairo, Vec<Felt>>,
@@ -165,7 +166,7 @@ where
                 PortId,
                 ChannelId,
                 Height,
-                u64,
+                Timestamp,
                 ChannelOrdering
             ],
         > + CanDecode<ViaCairo, Vec<Felt>>,
