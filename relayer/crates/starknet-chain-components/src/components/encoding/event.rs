@@ -17,8 +17,8 @@ use crate::types::events::connection::{
 };
 use crate::types::events::erc20::{ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent};
 use crate::types::events::ics20::{
-    CreateIbcTokenEvent, DecodeIbcTransferEvents, IbcTransferEvent, ReceiveIbcTransferEvent,
-    SendIbcTransferEvent,
+    AckIbcTransferEvent, CreateIbcTokenEvent, DecodeIbcTransferEvents, IbcTransferEvent,
+    ReceiveIbcTransferEvent, SendIbcTransferEvent,
 };
 use crate::types::events::packet::{
     AcknowledgePacketEvent, DecodePacketRelayEvents, PacketRelayEvents, ReceivePacketEvent,
@@ -52,6 +52,7 @@ delegate_components! {
             (ViaCairo, IbcTransferEvent),
             (ViaCairo, SendIbcTransferEvent),
             (ViaCairo, ReceiveIbcTransferEvent),
+            (ViaCairo, AckIbcTransferEvent),
             (ViaCairo, CreateIbcTokenEvent),
         ]:
             DecodeIbcTransferEvents,
