@@ -1,4 +1,5 @@
 pub mod account;
+pub mod commitment_prefix;
 pub mod contract;
 pub mod counterparty_message_height;
 pub mod encoding;

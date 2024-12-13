@@ -14,6 +14,7 @@ use hermes_error::traits::wrap::WrapError;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::EmptyMessageResponse;
 use hermes_relayer_components::chain::traits::types::chain_id::HasChainIdType;
+use hermes_relayer_components::relay::impls::connection::open_init::MissingConnectionInitEventError;
 use hermes_relayer_components::relay::impls::connection::open_try::MissingConnectionTryEventError;
 use hermes_relayer_components::relay::impls::create_client::MissingCreateClientEventError;
 use hermes_relayer_components::relay::traits::chains::HasRelayChains;
@@ -40,6 +41,8 @@ delegate_components! {
             EmptyMessageResponse,
             <'a, Chain: HasChainIdType, Counterparty: HasChainIdType>
                 MissingCreateClientEventError<'a, Chain, Counterparty>,
+            <'a, Relay>
+                MissingConnectionInitEventError<'a, Relay>,
             <'a, Relay: HasRelayChains>
                 MissingConnectionTryEventError<'a, Relay>,
         ]:

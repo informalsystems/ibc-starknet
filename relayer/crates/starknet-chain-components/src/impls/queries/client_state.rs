@@ -3,10 +3,13 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::queries::client_state::ClientStateQuerier;
+use hermes_chain_components::traits::queries::client_state::{
+    CanQueryClientState, ClientStateQuerier, ClientStateWithProofsQuerier,
+};
 use hermes_chain_components::traits::types::client_state::HasClientStateType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::HasClientIdType;
+use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -19,6 +22,7 @@ use crate::traits::queries::address::CanQueryContractAddress;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::client_id::ClientId;
+use crate::types::commitment_proof::StarknetCommitmentProof;
 use crate::types::cosmos::client_state::CometClientState;
 
 pub struct QueryCometClientState;
@@ -65,5 +69,35 @@ where
             .map_err(Chain::raise_error)?;
 
         Ok(client_state)
+    }
+}
+
+impl<Chain, Counterparty> ClientStateWithProofsQuerier<Chain, Counterparty>
+    for QueryCometClientState
+where
+    Chain: HasClientIdType<Counterparty>
+        + HasHeightType<Height = u64>
+        + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
+        + CanQueryClientState<Counterparty>
+        + HasErrorType,
+    Counterparty: HasClientStateType<Chain> + HasHeightType,
+{
+    async fn query_client_state_with_proofs(
+        chain: &Chain,
+        tag: PhantomData<Counterparty>,
+        client_id: &Chain::ClientId,
+        query_height: &Chain::Height,
+    ) -> Result<(Counterparty::ClientState, Chain::CommitmentProof), Chain::Error> {
+        // FIXME: properly fetch consensus state with proofs
+        let client_state = chain
+            .query_client_state(tag, client_id, query_height)
+            .await?;
+
+        let proof = StarknetCommitmentProof {
+            proof_height: *query_height,
+            proof_bytes: Vec::new(),
+        };
+
+        Ok((client_state, proof))
     }
 }
