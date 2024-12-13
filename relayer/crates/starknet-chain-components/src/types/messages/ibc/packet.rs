@@ -135,3 +135,70 @@ impl Transformer for EncodeMsgRecvPacket {
         }
     }
 }
+
+#[derive(HasField)]
+pub struct Acknowledgement {
+    pub ack: Vec<u8>,
+}
+
+pub struct EncodeAcknowledgement;
+
+delegate_components! {
+    EncodeAcknowledgement {
+        MutEncoderComponent: CombineEncoders<
+            Product![
+                EncodeField<symbol!("ack"), UseContext>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeAcknowledgement {
+    type From = Product![Vec<u8>];
+    type To = Acknowledgement;
+
+    fn transform(product![ack]: Self::From) -> Acknowledgement {
+        Acknowledgement { ack }
+    }
+}
+
+#[derive(HasField)]
+pub struct MsgAckPacket {
+    pub packet: Packet,
+    pub acknowledgement: Acknowledgement,
+    pub proof_ack_on_b: StateProof,
+    pub proof_height_on_b: Height,
+}
+
+pub struct EncodeMsgAckPacket;
+
+delegate_components! {
+    EncodeMsgAckPacket {
+        MutEncoderComponent: CombineEncoders<
+            Product![
+                EncodeField<symbol!("packet"), UseContext>,
+                EncodeField<symbol!("acknowledgement"), UseContext>,
+                EncodeField<symbol!("proof_ack_on_b"), UseContext>,
+                EncodeField<symbol!("proof_height_on_b"), UseContext>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeMsgAckPacket {
+    type From = Product![Packet, Acknowledgement, StateProof, Height];
+    type To = MsgAckPacket;
+
+    fn transform(
+        product![packet, acknowledgement, proof_ack_on_b, proof_height_on_b]: Self::From,
+    ) -> MsgAckPacket {
+        MsgAckPacket {
+            packet,
+            acknowledgement,
+            proof_ack_on_b,
+            proof_height_on_b,
+        }
+    }
+}

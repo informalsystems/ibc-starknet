@@ -47,7 +47,8 @@ use crate::types::messages::ibc::ibc_transfer::{
     EncodeIbcTransferMessage, EncodeParticipant, IbcTransferMessage, Participant,
 };
 use crate::types::messages::ibc::packet::{
-    EncodeMsgRecvPacket, EncodePacket, EncodeStateProof, MsgRecvPacket, Packet, StateProof,
+    Acknowledgement, EncodeAcknowledgement, EncodeMsgAckPacket, EncodeMsgRecvPacket, EncodePacket,
+    EncodeStateProof, MsgAckPacket, MsgRecvPacket, Packet, StateProof,
 };
 use crate::types::register::{
     EncodeRegisterApp, EncodeRegisterClient, MsgRegisterApp, MsgRegisterClient,
@@ -103,6 +104,8 @@ delegate_components! {
         (ViaCairo, Packet): EncodePacket,
         (ViaCairo, StateProof): EncodeStateProof,
         (ViaCairo, MsgRecvPacket): EncodeMsgRecvPacket,
+        (ViaCairo, Acknowledgement): EncodeAcknowledgement,
+        (ViaCairo, MsgAckPacket): EncodeMsgAckPacket,
         (ViaCairo, ClientStatus): EncodeClientStatus,
         (ViaCairo, CometClientState): EncodeCometClientState,
         (ViaCairo, CometConsensusState): EncodeCometConsensusState,
