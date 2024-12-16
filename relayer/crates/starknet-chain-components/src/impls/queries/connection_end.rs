@@ -59,7 +59,7 @@ where
             .call_contract(&contract_address, &selector!("connection_end"), &calldata)
             .await?;
 
-        Ok(encoding.decode(&output).map_err(Chain::raise_error)?)
+        encoding.decode(&output).map_err(Chain::raise_error)
     }
 }
 
