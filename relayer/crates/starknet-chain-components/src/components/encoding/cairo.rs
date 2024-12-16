@@ -14,7 +14,10 @@ use starknet::core::types::{Felt, U256};
 
 use crate::types::channel_id::{ChannelId, EncodeChannelId};
 use crate::types::client_id::{ClientId, EncodeClientId};
-use crate::types::connection_id::{ConnectionId, EncodeConnectionId};
+use crate::types::connection_id::{
+    ConnectionCounterparty, ConnectionEnd, ConnectionId, ConnectionState,
+    EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionId, EncodeConnectionState,
+};
 use crate::types::cosmos::client_state::{
     ClientStatus, CometClientState, EncodeClientStatus, EncodeCometClientState,
 };
@@ -117,6 +120,9 @@ delegate_components! {
         (ViaCairo, CometConsensusState): EncodeCometConsensusState,
         (ViaCairo, ClientId): EncodeClientId,
         (ViaCairo, ConnectionId): EncodeConnectionId,
+        (ViaCairo, ConnectionCounterparty): EncodeConnectionCounterparty,
+        (ViaCairo, ConnectionState): EncodeConnectionState,
+        (ViaCairo, ConnectionEnd): EncodeConnectionEnd,
         (ViaCairo, ChannelId): EncodeChannelId,
         (ViaCairo, CometUpdateHeader): EncodeCometUpdateHeader,
         (ViaCairo, CreateClientResponse): DecodeCreateClientResponse,
