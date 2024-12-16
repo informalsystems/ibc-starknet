@@ -2,10 +2,9 @@ use cgp::prelude::*;
 use hermes_cosmos_chain_components::components::client::{
     ClientIdTypeComponent, ConnectionEndTypeComponent, ConnectionIdTypeComponent,
 };
-use ibc::core::connection::types::ConnectionEnd;
 
 use crate::types::client_id::ClientId;
-use crate::types::connection_id::ConnectionId;
+use crate::types::connection_id::{ConnectionEnd, ConnectionId};
 
 cgp_preset! {
     StarknetChainTypes {
