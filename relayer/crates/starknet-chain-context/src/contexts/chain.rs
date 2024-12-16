@@ -108,7 +108,7 @@ use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
 use hermes_starknet_chain_components::types::commitment_proof::StarknetCommitmentProof;
-use hermes_starknet_chain_components::types::connection_id::ConnectionId;
+use hermes_starknet_chain_components::types::connection_id::{ConnectionEnd, ConnectionId};
 use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
 use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
@@ -235,6 +235,7 @@ pub trait CanUseStarknetChain:
     + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
     + HasClientIdType<CosmosChain, ClientId = ClientId>
     + HasConnectionIdType<CosmosChain, ConnectionId = ConnectionId>
+    + HasConnectionEndType<CosmosChain, ConnectionEnd = ConnectionEnd>
     + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
     + HasConnectionOpenInitPayloadType<CosmosChain>
     + HasConnectionOpenTryPayloadType<CosmosChain>
