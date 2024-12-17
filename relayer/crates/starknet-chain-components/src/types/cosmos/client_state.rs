@@ -4,6 +4,7 @@ use cgp::core::component::UseContext;
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
+use hermes_chain_components::traits::types::chain_id::HasChainIdType;
 use hermes_chain_components::traits::types::client_state::{
     ClientStateFieldsGetter, HasClientStateType,
 };
@@ -15,6 +16,7 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use ibc::core::client::types::Height as CosmosHeight;
+use ibc::core::host::types::identifiers::ChainId;
 
 use crate::types::cosmos::height::Height;
 
@@ -48,7 +50,8 @@ delegate_components! {
 impl<Chain, Counterparty> ClientStateFieldsGetter<Chain, Counterparty> for UseCometClientState
 where
     Chain: HasClientStateType<Counterparty, ClientState = CometClientState>
-        + HasHeightType<Height = CosmosHeight>,
+        + HasHeightType<Height = CosmosHeight>
+        + HasChainIdType<ChainId = ChainId>,
 {
     fn client_state_latest_height(client_state: &CometClientState) -> CosmosHeight {
         CosmosHeight::new(
@@ -64,6 +67,11 @@ where
 
     fn client_state_has_expired(_client_state: &CometClientState, _elapsed: Duration) -> bool {
         false // todo
+    }
+
+    fn client_state_chain_id(_client_state: &CometClientState) -> ChainId {
+        // FIXME: Store Cosmos chain ID in CometClientState and return it here
+        ChainId::new("cosmos").unwrap()
     }
 }
 
