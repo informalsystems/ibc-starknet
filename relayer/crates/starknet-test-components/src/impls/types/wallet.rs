@@ -1,8 +1,7 @@
+use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::ProvideWalletType;
 use starknet::core::types::Felt;
-
-use crate::types::wallet::StarknetWallet;
 
 pub struct ProvideStarknetWalletType;
 
