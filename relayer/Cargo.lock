@@ -2453,6 +2453,7 @@ dependencies = [
  "ibc",
  "serde",
  "stable-eyre",
+ "starknet",
  "tokio",
  "toml",
  "tracing",

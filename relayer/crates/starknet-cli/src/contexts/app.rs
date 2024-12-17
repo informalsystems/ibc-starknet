@@ -12,6 +12,7 @@ use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
 use hermes_cli_components::traits::bootstrap::{
     BootstrapLoaderComponent, BootstrapTypeComponent, CanLoadBootstrap,
 };
+use hermes_cli_components::traits::build::BuilderLoaderComponent;
 use hermes_cli_components::traits::command::{CanRunCommand, CommandRunnerComponent};
 use hermes_cli_components::traits::config::config_path::{
     ConfigPathGetterComponent, HasConfigPath,
@@ -43,6 +44,7 @@ use toml::to_string_pretty;
 
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
 use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
+use crate::impls::build::LoadStarknetBuilder;
 use crate::impls::error::ProvideCliError;
 use crate::impls::subcommand::{AllSubCommands, RunAllSubCommand};
 
@@ -96,6 +98,8 @@ delegate_components! {
             WriteTomlConfig,
         CommandRunnerComponent:
             UseDelegate<StarknetCommandRunnerComponents>,
+        BuilderLoaderComponent:
+            LoadStarknetBuilder,
     }
 }
 
