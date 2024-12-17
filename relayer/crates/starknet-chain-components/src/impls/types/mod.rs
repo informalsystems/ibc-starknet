@@ -4,6 +4,7 @@ pub mod blob;
 pub mod chain_id;
 pub mod client;
 pub mod commitment_proof;
+pub mod config;
 pub mod contract;
 pub mod denom;
 pub mod event;

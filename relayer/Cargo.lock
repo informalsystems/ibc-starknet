@@ -2388,6 +2388,7 @@ dependencies = [
  "ibc-client-starknet-types",
  "ibc-proto",
  "prost-types",
+ "serde",
  "serde_json",
  "starknet",
  "tonic",
@@ -2444,7 +2445,9 @@ dependencies = [
  "hermes-relayer-components",
  "hermes-runtime",
  "hermes-runtime-components",
+ "hermes-starknet-chain-components",
  "hermes-starknet-integration-tests",
+ "hermes-starknet-relayer",
  "hermes-starknet-test-components",
  "hermes-test-components",
  "ibc",
@@ -2501,6 +2504,7 @@ version = "0.1.0"
 dependencies = [
  "cgp",
  "eyre",
+ "hermes-cosmos-chain-components",
  "hermes-cosmos-relayer",
  "hermes-encoding-components",
  "hermes-error",
@@ -2512,6 +2516,9 @@ dependencies = [
  "hermes-starknet-chain-components",
  "hermes-starknet-chain-context",
  "ibc",
+ "serde",
+ "starknet",
+ "url",
 ]
 
 [[package]]

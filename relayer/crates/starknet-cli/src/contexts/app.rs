@@ -33,6 +33,9 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeComponent,
 };
+use hermes_starknet_chain_components::impls::types::config::{
+    StarknetChainConfig, StarknetRelayerConfig,
+};
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_test_components::chain_driver::traits::config::ConfigUpdater;
@@ -42,7 +45,6 @@ use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadSt
 use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::impls::error::ProvideCliError;
 use crate::impls::subcommand::{AllSubCommands, RunAllSubCommand};
-use crate::types::config::{StarknetChainConfig, StarknetRelayerConfig};
 
 #[derive(HasField)]
 pub struct StarknetApp {

@@ -8,11 +8,11 @@ use cgp::prelude::*;
 use hermes_error::impls::ProvideHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{RuntimeGetterComponent, RuntimeTypeComponent};
+use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
-use hermes_starknet_test_components::types::wallet::StarknetWallet;
 use hermes_test_components::chain_driver::traits::chain_process::ChainProcessTaker;
 use hermes_test_components::chain_driver::traits::types::chain::{
     ChainGetter, HasChain, ProvideChainType,
