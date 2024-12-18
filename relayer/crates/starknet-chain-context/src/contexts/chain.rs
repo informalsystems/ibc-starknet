@@ -75,9 +75,7 @@ use hermes_relayer_components::chain::traits::types::connection::{
     HasInitConnectionOptionsType,
 };
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
-use hermes_relayer_components::chain::traits::types::create_client::{
-    HasCreateClientEvent, HasCreateClientPayloadType,
-};
+use hermes_relayer_components::chain::traits::types::create_client::HasCreateClientEvent;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::{
     HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
@@ -301,11 +299,6 @@ pub trait CanUseStarknetChain:
     + HasConnectionOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-where
-    CosmosChain: HasClientStateType<Self>
-        + HasConsensusStateType<Self>
-        + HasCreateClientPayloadType<Self>
-        + HasUpdateClientPayloadType<Self>,
 {
 }
 
