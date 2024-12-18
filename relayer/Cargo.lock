@@ -2298,6 +2298,8 @@ dependencies = [
  "ibc",
  "serde",
  "stable-eyre",
+ "starknet",
+ "starknet-types-core",
  "tokio",
  "toml",
  "tracing",
