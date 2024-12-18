@@ -44,6 +44,9 @@ use hermes_relayer_components::chain::traits::payload_builders::update_client::C
 use hermes_relayer_components::chain::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
 };
+use hermes_relayer_components::chain::traits::queries::channel_end::{
+    CanQueryChannelEnd, CanQueryChannelEndWithProofs,
+};
 use hermes_relayer_components::chain::traits::queries::client_state::{
     CanQueryClientState, CanQueryClientStateWithLatestHeight, CanQueryClientStateWithProofs,
 };
@@ -278,6 +281,8 @@ pub trait CanUseStarknetChain:
     + CanQueryConsensusStateHeight<CosmosChain>
     + CanQueryConnectionEnd<CosmosChain>
     + CanQueryConnectionEndWithProofs<CosmosChain>
+    + CanQueryChannelEnd<CosmosChain>
+    + CanQueryChannelEndWithProofs<CosmosChain>
     + HasCounterpartyMessageHeight<CosmosChain>
     + HasInitConnectionOptionsType<CosmosChain>
     + CanBuildConnectionOpenInitPayload<CosmosChain>

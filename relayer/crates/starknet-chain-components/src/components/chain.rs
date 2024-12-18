@@ -53,6 +53,7 @@ use crate::impls::messages::create_client::BuildCreateCometClientMessage;
 use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
+use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
 use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
 use crate::impls::queries::consensus_state::QueryCometConsensusState;
@@ -277,5 +278,10 @@ cgp_preset! {
             ConnectionEndWithProofsQuerierComponent,
         ]:
             QueryConnectionEndFromStarknet,
+        [
+            ChannelEndQuerierComponent,
+            ChannelEndWithProofsQuerierComponent,
+        ]:
+            QueryChannelEndFromStarknet,
     }
 }
