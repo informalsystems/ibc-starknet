@@ -30,6 +30,7 @@ cgp            = { version = "0.2.0" }
 cgp-error-eyre = { version = "0.2.0" }
 
 starknet                    = { version = "0.11.0" }
+starknet-types-core         = { version = "0.1.7" }
 url                         = { version = "2.4.0" }
 eyre                        = { version = "0.6.12" }
 tokio                       = { version = "1.38" }
