@@ -1,13 +1,16 @@
 use cgp::core::component::WithProvider;
 use cgp::core::types::impls::UseDelegatedType;
 use cgp::prelude::*;
+use hermes_chain_components::impls::payload_builders::channel::BuildChannelHandshakePayload;
 use hermes_chain_components::impls::payload_builders::connection::BuildConnectionHandshakePayload;
 use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
 use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
 use hermes_chain_components::impls::types::commitment_prefix::ProvideCommitmentPrefixBytes;
+use hermes_chain_components::impls::types::payloads::channel::ProvideChannelPayloadTypes;
 use hermes_chain_components::impls::types::payloads::connection::ProvideConnectionPayloadTypes;
 use hermes_chain_components::traits::commitment_prefix::IbcCommitmentPrefixGetterComponent;
 pub use hermes_cosmos_chain_components::components::client::*;
+use hermes_cosmos_chain_components::impls::channel::init_channel_options::ProvideCosmosInitChannelOptionsType;
 use hermes_cosmos_chain_components::impls::connection::init_connection_options::ProvideCosmosInitConnectionOptionsType;
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
@@ -45,13 +48,16 @@ use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::counterparty_message_height::GetCounterpartyCosmosHeightFromStarknetMessage;
-use crate::impls::events::connection_id::UseStarknetConnectionHandshakeEvents;
+use crate::impls::events::channel::UseStarknetChannelEvents;
+use crate::impls::events::connection_id::UseStarknetConnectionEvents;
 use crate::impls::events::create_client::UseStarknetCreateClientEvent;
+use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
 use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
 use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
+use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
 use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
 use crate::impls::queries::consensus_state::QueryCometConsensusState;
@@ -137,8 +143,9 @@ cgp_preset! {
             ContractClassHashTypeComponent,
         ]:
             ProvideStarknetContractTypes,
+        // FIXME: we may have to define our own chain types,
+        // or implement Cairo encoding for the Cosmos types
         [
-            ChannelIdTypeComponent,
             PortIdTypeComponent,
             SequenceTypeComponent,
             OutgoingPacketTypeComponent,
@@ -149,7 +156,9 @@ cgp_preset! {
         [
             ClientIdTypeComponent,
             ConnectionIdTypeComponent,
+            ChannelIdTypeComponent,
             ConnectionEndTypeComponent,
+            ChannelEndTypeComponent,
         ]:
             WithProvider<UseDelegatedType<StarknetChainTypes>>,
         [
@@ -164,6 +173,9 @@ cgp_preset! {
             UpdateClientPayloadTypeComponent,
         ]:
             ProvideStarknetPayloadTypes,
+        // FIXME: define our own Starknet init channel options type
+        InitChannelOptionsTypeComponent:
+            ProvideCosmosInitChannelOptionsType,
         [
             CommitmentProofTypeComponent,
             CommitmentProofHeightGetterComponent,
@@ -212,7 +224,12 @@ cgp_preset! {
             ConnectionOpenInitEventComponent,
             ConnectionOpenTryEventComponent,
         ]:
-            UseStarknetConnectionHandshakeEvents,
+            UseStarknetConnectionEvents,
+        [
+            ChannelOpenInitEventComponent,
+            ChannelOpenTryEventComponent,
+        ]:
+            UseStarknetChannelEvents,
         CreateClientMessageOptionsTypeComponent:
             ProvideNoCreateClientMessageOptionsType,
         CreateClientPayloadBuilderComponent:
@@ -251,12 +268,24 @@ cgp_preset! {
         ]:
             ProvideConnectionPayloadTypes,
         [
+            ChannelOpenTryPayloadTypeComponent,
+            ChannelOpenAckPayloadTypeComponent,
+            ChannelOpenConfirmPayloadTypeComponent,
+        ]:
+            ProvideChannelPayloadTypes,
+        [
             ConnectionOpenInitPayloadBuilderComponent,
             ConnectionOpenTryPayloadBuilderComponent,
             ConnectionOpenAckPayloadBuilderComponent,
             ConnectionOpenConfirmPayloadBuilderComponent,
         ]:
             BuildConnectionHandshakePayload,
+        [
+            ChannelOpenTryPayloadBuilderComponent,
+            ChannelOpenAckPayloadBuilderComponent,
+            ChannelOpenConfirmPayloadBuilderComponent,
+        ]:
+            BuildChannelHandshakePayload,
         [
             ConnectionOpenInitMessageBuilderComponent,
             ConnectionOpenTryMessageBuilderComponent,
@@ -265,9 +294,21 @@ cgp_preset! {
         ]:
             BuildStarknetConnectionHandshakeMessages,
         [
+            ChannelOpenInitMessageBuilderComponent,
+            ChannelOpenTryMessageBuilderComponent,
+            ChannelOpenAckMessageBuilderComponent,
+            ChannelOpenConfirmMessageBuilderComponent,
+        ]:
+            BuildStarknetChannelHandshakeMessages,
+        [
             ConnectionEndQuerierComponent,
             ConnectionEndWithProofsQuerierComponent,
         ]:
             QueryConnectionEndFromStarknet,
+        [
+            ChannelEndQuerierComponent,
+            ChannelEndWithProofsQuerierComponent,
+        ]:
+            QueryChannelEndFromStarknet,
     }
 }
