@@ -3,7 +3,7 @@ use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
 
 #[derive(Debug, clap::Subcommand)]
 pub enum QuerySubCommand {
-    Query(QueryClientStateArgs),
+    ClientState(QueryClientStateArgs),
 }
 
 pub struct RunQuerySubCommand;
@@ -17,7 +17,7 @@ where
         subcommand: &QuerySubCommand,
     ) -> Result<App::Output, App::Error> {
         match subcommand {
-            QuerySubCommand::Query(args) => app.run_command(args).await,
+            QuerySubCommand::ClientState(args) => app.run_command(args).await,
         }
     }
 }
