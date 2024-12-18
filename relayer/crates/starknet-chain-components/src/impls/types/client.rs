@@ -1,11 +1,13 @@
 use core::time::Duration;
 
 use cgp::core::Async;
+use hermes_chain_components::traits::types::chain_id::HasChainIdType;
 use hermes_relayer_components::chain::traits::types::client_state::{
     ClientStateFieldsGetter, HasClientStateType, ProvideClientStateType,
 };
 use hermes_relayer_components::chain::traits::types::consensus_state::ProvideConsensusStateType;
 use hermes_relayer_components::chain::traits::types::height::HasHeightType;
+use starknet::core::types::Felt;
 
 use crate::types::client_state::WasmStarknetClientState;
 use crate::types::consensus_state::WasmStarknetConsensusState;
@@ -28,7 +30,8 @@ impl<Chain, Counterparty> ClientStateFieldsGetter<Chain, Counterparty>
     for ProvideStarknetIbcClientTypes
 where
     Chain: HasHeightType<Height = u64>
-        + HasClientStateType<Counterparty, ClientState = WasmStarknetClientState>,
+        + HasClientStateType<Counterparty, ClientState = WasmStarknetClientState>
+        + HasChainIdType<ChainId = Felt>,
 {
     fn client_state_latest_height(client_state: &WasmStarknetClientState) -> u64 {
         client_state.client_state.latest_height.revision_height()
@@ -40,5 +43,10 @@ where
 
     fn client_state_has_expired(_client_state: &Chain::ClientState, _elapsed: Duration) -> bool {
         false
+    }
+
+    fn client_state_chain_id(_client_state: &WasmStarknetClientState) -> Chain::ChainId {
+        // FIXME: Return actual Starknet chain ID
+        Felt::ZERO
     }
 }
