@@ -35,6 +35,9 @@ use hermes_relayer_components::chain::traits::message_builders::connection_hands
 };
 use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
 use hermes_relayer_components::chain::traits::message_builders::update_client::CanBuildUpdateClientMessage;
+use hermes_relayer_components::chain::traits::payload_builders::channel_handshake::{
+    CanBuildChannelOpenAckPayload, CanBuildChannelOpenConfirmPayload, CanBuildChannelOpenTryPayload,
+};
 use hermes_relayer_components::chain::traits::payload_builders::connection_handshake::{
     CanBuildConnectionOpenAckPayload, CanBuildConnectionOpenConfirmPayload,
     CanBuildConnectionOpenInitPayload, CanBuildConnectionOpenTryPayload,
@@ -63,7 +66,6 @@ use hermes_relayer_components::chain::traits::send_message::{
     CanSendMessages, CanSendSingleMessage,
 };
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
-use hermes_relayer_components::chain::traits::types::channel::HasChannelOpenTryPayloadType;
 use hermes_relayer_components::chain::traits::types::client_state::{
     HasClientStateFields, HasClientStateType,
 };
@@ -293,7 +295,9 @@ pub trait CanUseStarknetChain:
     + CanBuildConnectionOpenTryMessage<CosmosChain>
     + CanBuildConnectionOpenAckMessage<CosmosChain>
     + CanBuildConnectionOpenConfirmMessage<CosmosChain>
-    + HasChannelOpenTryPayloadType<CosmosChain>
+    + CanBuildChannelOpenTryPayload<CosmosChain>
+    + CanBuildChannelOpenAckPayload<CosmosChain>
+    + CanBuildChannelOpenConfirmPayload<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>

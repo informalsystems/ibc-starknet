@@ -1,6 +1,7 @@
 use cgp::core::component::WithProvider;
 use cgp::core::types::impls::UseDelegatedType;
 use cgp::prelude::*;
+use hermes_chain_components::impls::payload_builders::channel::BuildChannelHandshakePayload;
 use hermes_chain_components::impls::payload_builders::connection::BuildConnectionHandshakePayload;
 use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
 use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
@@ -266,6 +267,12 @@ cgp_preset! {
             ConnectionOpenConfirmPayloadBuilderComponent,
         ]:
             BuildConnectionHandshakePayload,
+        [
+            ChannelOpenTryPayloadBuilderComponent,
+            ChannelOpenAckPayloadBuilderComponent,
+            ChannelOpenConfirmPayloadBuilderComponent,
+        ]:
+            BuildChannelHandshakePayload,
         [
             ConnectionOpenInitMessageBuilderComponent,
             ConnectionOpenTryMessageBuilderComponent,
