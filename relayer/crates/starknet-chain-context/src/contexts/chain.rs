@@ -296,6 +296,10 @@ pub trait CanUseStarknetChain:
     + CanBuildChannelOpenTryPayload<CosmosChain>
     + CanBuildChannelOpenAckPayload<CosmosChain>
     + CanBuildChannelOpenConfirmPayload<CosmosChain>
+    + CanBuildChannelOpenInitMessage<CosmosChain>
+    + CanBuildChannelOpenTryMessage<CosmosChain>
+    + CanBuildChannelOpenAckMessage<CosmosChain>
+    + CanBuildChannelOpenConfirmMessage<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>

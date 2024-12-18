@@ -10,6 +10,7 @@ use hermes_chain_components::impls::types::payloads::channel::ProvideChannelPayl
 use hermes_chain_components::impls::types::payloads::connection::ProvideConnectionPayloadTypes;
 use hermes_chain_components::traits::commitment_prefix::IbcCommitmentPrefixGetterComponent;
 pub use hermes_cosmos_chain_components::components::client::*;
+use hermes_cosmos_chain_components::impls::channel::init_channel_options::ProvideCosmosInitChannelOptionsType;
 use hermes_cosmos_chain_components::impls::connection::init_connection_options::ProvideCosmosInitConnectionOptionsType;
 use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_cosmos_chain_components::impls::types::chain::ProvideCosmosChainTypes;
@@ -49,6 +50,7 @@ use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::counterparty_message_height::GetCounterpartyCosmosHeightFromStarknetMessage;
 use crate::impls::events::connection_id::UseStarknetConnectionHandshakeEvents;
 use crate::impls::events::create_client::UseStarknetCreateClientEvent;
+use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
 use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
 use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
@@ -168,6 +170,9 @@ cgp_preset! {
             UpdateClientPayloadTypeComponent,
         ]:
             ProvideStarknetPayloadTypes,
+        // FIXME: define our own Starknet init channel options type
+        InitChannelOptionsTypeComponent:
+            ProvideCosmosInitChannelOptionsType,
         [
             CommitmentProofTypeComponent,
             CommitmentProofHeightGetterComponent,
@@ -280,6 +285,13 @@ cgp_preset! {
             ConnectionOpenConfirmMessageBuilderComponent,
         ]:
             BuildStarknetConnectionHandshakeMessages,
+        [
+            ChannelOpenInitMessageBuilderComponent,
+            ChannelOpenTryMessageBuilderComponent,
+            ChannelOpenAckMessageBuilderComponent,
+            ChannelOpenConfirmMessageBuilderComponent,
+        ]:
+            BuildStarknetChannelHandshakeMessages,
         [
             ConnectionEndQuerierComponent,
             ConnectionEndWithProofsQuerierComponent,
