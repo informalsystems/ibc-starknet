@@ -1,11 +1,13 @@
+use cgp::prelude::CanRaiseError;
 use hermes_cli_components::traits::build::{BuilderLoader, HasBuilderType};
 use hermes_cli_components::traits::config::load_config::CanLoadConfig;
 use hermes_cli_components::traits::types::config::HasConfigType;
-use hermes_cosmos_chain_components::impls::types::config::CosmosChainConfig;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::HasRuntime;
-use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
+use hermes_starknet_chain_components::impls::types::config::{
+    StarknetChainConfig, StarknetRelayerConfig,
+};
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use starknet::macros::felt;
@@ -15,17 +17,21 @@ pub struct LoadStarknetBuilder;
 impl<App> BuilderLoader<App> for LoadStarknetBuilder
 where
     App: HasBuilderType<Builder = StarknetBuilder>
-        + HasConfigType<Config = Vec<CosmosChainConfig>>
+        + HasConfigType<Config = StarknetRelayerConfig>
         + HasRuntime<Runtime = HermesRuntime>
-        + CanLoadConfig,
+        + CanLoadConfig
+        + CanRaiseError<&'static str>,
 {
     async fn load_builder(app: &App) -> Result<App::Builder, App::Error> {
         let runtime = app.runtime().clone();
-        let cosmos_chains_config = app.load_config().await?;
-        let rpc_addr = cosmos_chains_config.get(1).unwrap().rpc_addr.to_string();
+        let config = app.load_config().await?;
+        let cosmos_chain_config = config.cosmos_chain_config.ok_or_else(|| {
+            App::raise_error("missing Cosmos chain config in Starknet relayer config")
+        })?;
+        let rpc_addr = cosmos_chain_config.rpc_addr.to_string();
 
         let cosmos_builder = CosmosBuilder::new(
-            cosmos_chains_config,
+            vec![cosmos_chain_config],
             runtime.clone(),
             Default::default(),
             Default::default(),

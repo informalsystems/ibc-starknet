@@ -6,13 +6,20 @@ use cgp::core::field::impls::use_field::WithField;
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
+use hermes_cli_components::impls::commands::queries::client_state::{
+    QueryClientStateArgs, RunQueryClientStateCommand,
+};
 use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField;
 use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
 use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
+use hermes_cli_components::impls::parse::string::{ParseFromOptionalString, ParseFromString};
+use hermes_cli_components::traits::any_counterparty::ProvideAnyCounterparty;
 use hermes_cli_components::traits::bootstrap::{
     BootstrapLoaderComponent, BootstrapTypeComponent, CanLoadBootstrap,
 };
-use hermes_cli_components::traits::build::BuilderLoaderComponent;
+use hermes_cli_components::traits::build::{
+    BuilderLoaderComponent, BuilderTypeComponent, CanLoadBuilder,
+};
 use hermes_cli_components::traits::command::{CanRunCommand, CommandRunnerComponent};
 use hermes_cli_components::traits::config::config_path::{
     ConfigPathGetterComponent, HasConfigPath,
@@ -22,7 +29,9 @@ use hermes_cli_components::traits::config::write_config::{CanWriteConfig, Config
 use hermes_cli_components::traits::output::{
     CanProduceOutput, OutputProducer, OutputTypeComponent,
 };
+use hermes_cli_components::traits::parse::ArgParserComponent;
 use hermes_cli_components::traits::types::config::ConfigTypeComponent;
+use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::traits::wrap::CanWrapError;
 use hermes_error::types::HermesError;
 use hermes_logger::ProvideHermesLogger;
@@ -37,11 +46,15 @@ use hermes_runtime_components::traits::runtime::{
 use hermes_starknet_chain_components::impls::types::config::{
     StarknetChainConfig, StarknetRelayerConfig,
 };
+use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
+use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::ConfigUpdater;
+use starknet::core::types::Felt;
 use toml::to_string_pretty;
 
+use crate::commands::query::subcommand::{QuerySubCommand, RunQuerySubCommand};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
 use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::impls::build::LoadStarknetBuilder;
@@ -100,6 +113,18 @@ delegate_components! {
             UseDelegate<StarknetCommandRunnerComponents>,
         BuilderLoaderComponent:
             LoadStarknetBuilder,
+        BuilderTypeComponent:
+            WithType<StarknetBuilder>,
+        ArgParserComponent:
+            UseDelegate<StarknetParserComponents>,
+    }
+}
+
+delegate_components! {
+    StarknetParserComponents {
+        (QueryClientStateArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryClientStateArgs, symbol!("client_id")): ParseFromString<ClientId>,
+        (QueryClientStateArgs, symbol!("height")): ParseFromOptionalString<u64>,
     }
 }
 
@@ -107,8 +132,19 @@ delegate_components! {
     StarknetCommandRunnerComponents {
         AllSubCommands: RunAllSubCommand,
         BootstrapSubCommand: RunBootstrapSubCommand,
+
+        QuerySubCommand: RunQuerySubCommand,
+        QueryClientStateArgs: RunQueryClientStateCommand,
+
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<UpdateStarknetConfig>,
     }
+}
+
+impl<App> ProvideAnyCounterparty<App> for StarknetAppComponents
+where
+    App: Async,
+{
+    type AnyCounterparty = CosmosChain;
 }
 
 impl<Value> OutputProducer<StarknetApp, Value> for StarknetAppComponents {
@@ -157,6 +193,9 @@ pub trait CanUseStarknetApp:
     + CanRunCommand<AllSubCommands>
     + CanRunCommand<BootstrapSubCommand>
     + CanRunCommand<BootstrapStarknetChainArgs>
+    + CanLoadBuilder
+    + CanRunCommand<QuerySubCommand>
+    + CanRunCommand<QueryClientStateArgs>
 {
 }
 
