@@ -80,6 +80,7 @@ use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::{
     HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
 };
+use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
@@ -301,6 +302,7 @@ pub trait CanUseStarknetChain:
     + CanBuildChannelOpenAckMessage<CosmosChain>
     + CanBuildChannelOpenConfirmMessage<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>
+    + HasChannelOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
 {
