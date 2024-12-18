@@ -25,6 +25,7 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
+use hermes_relayer_components::chain::traits::message_builders::channel_handshake::CanBuildChannelOpenInitMessage;
 use hermes_relayer_components::chain::traits::message_builders::connection_handshake::{
     CanBuildConnectionOpenAckMessage, CanBuildConnectionOpenConfirmMessage,
     CanBuildConnectionOpenInitMessage, CanBuildConnectionOpenTryMessage,
@@ -319,6 +320,7 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildConnectionOpenTryMessage<StarknetChain>
     + CanBuildConnectionOpenAckMessage<StarknetChain>
     + CanBuildConnectionOpenConfirmMessage<StarknetChain>
+    + CanBuildChannelOpenInitMessage<StarknetChain>
     + HasCounterpartyMessageHeight<StarknetChain>
 {
 }

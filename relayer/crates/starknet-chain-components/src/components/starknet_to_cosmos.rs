@@ -2,6 +2,8 @@ use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_chain_components::traits::types::ibc::CounterpartyMessageHeightGetterComponent;
 use hermes_cosmos_chain_components::components::client::{
+    ChannelOpenAckMessageBuilderComponent, ChannelOpenConfirmMessageBuilderComponent,
+    ChannelOpenInitMessageBuilderComponent, ChannelOpenTryMessageBuilderComponent,
     ClientStateFieldsComponent, ClientStateTypeComponent, ConnectionOpenAckMessageBuilderComponent,
     ConnectionOpenConfirmMessageBuilderComponent, ConnectionOpenInitMessageBuilderComponent,
     ConnectionOpenTryMessageBuilderComponent, ConsensusStateHeightsQuerierComponent,
@@ -40,6 +42,10 @@ cgp_preset! {
             CreateClientPayloadOptionsTypeComponent,
             CreateClientMessageBuilderComponent,
             CreateClientPayloadBuilderComponent,
+            ChannelOpenInitMessageBuilderComponent,
+            ChannelOpenTryMessageBuilderComponent,
+            ChannelOpenAckMessageBuilderComponent,
+            ChannelOpenConfirmMessageBuilderComponent,
         ]:
             CosmosToCosmosComponents,
         [
