@@ -5,6 +5,7 @@ use hermes_chain_components::impls::payload_builders::connection::BuildConnectio
 use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
 use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
 use hermes_chain_components::impls::types::commitment_prefix::ProvideCommitmentPrefixBytes;
+use hermes_chain_components::impls::types::payloads::channel::ProvideChannelPayloadTypes;
 use hermes_chain_components::impls::types::payloads::connection::ProvideConnectionPayloadTypes;
 use hermes_chain_components::traits::commitment_prefix::IbcCommitmentPrefixGetterComponent;
 pub use hermes_cosmos_chain_components::components::client::*;
@@ -150,6 +151,7 @@ cgp_preset! {
             ClientIdTypeComponent,
             ConnectionIdTypeComponent,
             ConnectionEndTypeComponent,
+            ChannelEndTypeComponent,
         ]:
             WithProvider<UseDelegatedType<StarknetChainTypes>>,
         [
@@ -250,6 +252,12 @@ cgp_preset! {
             ConnectionOpenConfirmPayloadTypeComponent,
         ]:
             ProvideConnectionPayloadTypes,
+        [
+            ChannelOpenTryPayloadTypeComponent,
+            ChannelOpenAckPayloadTypeComponent,
+            ChannelOpenConfirmPayloadTypeComponent,
+        ]:
+            ProvideChannelPayloadTypes,
         [
             ConnectionOpenInitPayloadBuilderComponent,
             ConnectionOpenTryPayloadBuilderComponent,

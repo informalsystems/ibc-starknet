@@ -25,7 +25,10 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
-use hermes_relayer_components::chain::traits::message_builders::channel_handshake::CanBuildChannelOpenInitMessage;
+use hermes_relayer_components::chain::traits::message_builders::channel_handshake::{
+    CanBuildChannelOpenAckMessage, CanBuildChannelOpenConfirmMessage,
+    CanBuildChannelOpenInitMessage, CanBuildChannelOpenTryMessage,
+};
 use hermes_relayer_components::chain::traits::message_builders::connection_handshake::{
     CanBuildConnectionOpenAckMessage, CanBuildConnectionOpenConfirmMessage,
     CanBuildConnectionOpenInitMessage, CanBuildConnectionOpenTryMessage,
@@ -57,6 +60,7 @@ use hermes_relayer_components::chain::traits::send_message::{
     CanSendMessages, CanSendSingleMessage,
 };
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
+use hermes_relayer_components::chain::traits::types::channel::HasChannelOpenTryPayloadType;
 use hermes_relayer_components::chain::traits::types::client_state::{
     HasClientStateFields, HasClientStateType,
 };
@@ -284,6 +288,7 @@ pub trait CanUseStarknetChain:
     + CanBuildConnectionOpenTryMessage<CosmosChain>
     + CanBuildConnectionOpenAckMessage<CosmosChain>
     + CanBuildConnectionOpenConfirmMessage<CosmosChain>
+    + HasChannelOpenTryPayloadType<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
@@ -321,6 +326,9 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildConnectionOpenAckMessage<StarknetChain>
     + CanBuildConnectionOpenConfirmMessage<StarknetChain>
     + CanBuildChannelOpenInitMessage<StarknetChain>
+    + CanBuildChannelOpenTryMessage<StarknetChain>
+    + CanBuildChannelOpenAckMessage<StarknetChain>
+    + CanBuildChannelOpenConfirmMessage<StarknetChain>
     + HasCounterpartyMessageHeight<StarknetChain>
 {
 }
