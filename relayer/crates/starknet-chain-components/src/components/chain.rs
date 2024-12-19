@@ -53,6 +53,7 @@ use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::counterparty_message_height::GetCounterpartyCosmosHeightFromStarknetMessage;
+use crate::impls::events::ack::UseStarknetWriteAckEvent;
 use crate::impls::events::channel::UseStarknetChannelEvents;
 use crate::impls::events::connection_id::UseStarknetConnectionEvents;
 use crate::impls::events::create_client::UseStarknetCreateClientEvent;
@@ -258,6 +259,8 @@ cgp_preset! {
             ChannelOpenTryEventComponent,
         ]:
             UseStarknetChannelEvents,
+        WriteAckEventComponent:
+            UseStarknetWriteAckEvent,
         CreateClientMessageOptionsTypeComponent:
             ProvideNoCreateClientMessageOptionsType,
         CreateClientPayloadBuilderComponent:
