@@ -314,6 +314,7 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
     + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CometUpdateHeader>
     + HasInitConnectionOptionsType<StarknetChain, InitConnectionOptions = CosmosInitConnectionOptions>
+    + HasCounterpartyMessageHeight<StarknetChain>
     + HasClientStateFields<StarknetChain>
     + CanQueryClientState<StarknetChain>
     + CanQueryConsensusState<StarknetChain>
@@ -337,7 +338,6 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildChannelOpenTryMessage<StarknetChain>
     + CanBuildChannelOpenAckMessage<StarknetChain>
     + CanBuildChannelOpenConfirmMessage<StarknetChain>
-    + HasCounterpartyMessageHeight<StarknetChain>
 {
 }
 

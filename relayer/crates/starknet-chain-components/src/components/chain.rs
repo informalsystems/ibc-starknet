@@ -184,7 +184,15 @@ cgp_preset! {
             UseStarknetCommitmentProof,
         CommitmentPrefixTypeComponent:
             ProvideCommitmentPrefixBytes,
-        OutgoingPacketFieldsReaderComponent:
+        [
+            PacketSrcChannelIdGetterComponent,
+            PacketSrcPortIdGetterComponent,
+            PacketDstChannelIdGetterComponent,
+            PacketDstPortIdGetterComponent,
+            PacketSequenceGetterComponent,
+            PacketTimeoutHeightGetterComponent,
+            PacketTimeoutTimestampGetterComponent,
+        ]:
             CosmosPacketFieldReader,
         ChainStatusQuerierComponent:
             QueryStarknetChainStatus,

@@ -10,10 +10,14 @@ use hermes_cosmos_chain_components::components::client::{
     ConsensusStateTypeComponent, CreateClientMessageBuilderComponent,
     CreateClientMessageOptionsTypeComponent, CreateClientPayloadBuilderComponent,
     CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
-    UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
-    UpdateClientPayloadTypeComponent,
+    PacketDstChannelIdGetterComponent, PacketDstPortIdGetterComponent,
+    PacketSequenceGetterComponent, PacketSrcChannelIdGetterComponent,
+    PacketSrcPortIdGetterComponent, PacketTimeoutHeightGetterComponent,
+    PacketTimeoutTimestampGetterComponent, UpdateClientMessageBuilderComponent,
+    UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
 };
 use hermes_cosmos_chain_components::components::cosmos_to_cosmos::CosmosToCosmosComponents;
+use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_relayer_components::chain::traits::queries::client_state::{
     ClientStateQuerierComponent, ClientStateWithProofsQuerierComponent,
 };
@@ -75,7 +79,17 @@ cgp_preset! {
             ChannelOpenAckMessageBuilderComponent,
             ChannelOpenConfirmMessageBuilderComponent,
         ]:
-            BuildStarknetToCosmosChannelHandshakeMessage
+            BuildStarknetToCosmosChannelHandshakeMessage,
+        [
+            PacketSrcChannelIdGetterComponent,
+            PacketSrcPortIdGetterComponent,
+            PacketDstChannelIdGetterComponent,
+            PacketDstPortIdGetterComponent,
+            PacketSequenceGetterComponent,
+            PacketTimeoutHeightGetterComponent,
+            PacketTimeoutTimestampGetterComponent,
+        ]:
+            CosmosPacketFieldReader,
 
     }
 }
