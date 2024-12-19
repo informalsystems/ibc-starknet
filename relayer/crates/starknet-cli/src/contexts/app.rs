@@ -9,6 +9,9 @@ use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainC
 use hermes_cli_components::impls::commands::queries::client_state::{
     QueryClientStateArgs, RunQueryClientStateCommand,
 };
+use hermes_cli_components::impls::commands::queries::consensus_state::{
+    QueryConsensusStateArgs, RunQueryConsensusStateCommand,
+};
 use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField;
 use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
 use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
@@ -51,6 +54,7 @@ use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::ConfigUpdater;
+use ibc::core::client::types::Height;
 use starknet::core::types::Felt;
 use toml::to_string_pretty;
 
@@ -125,6 +129,11 @@ delegate_components! {
         (QueryClientStateArgs, symbol!("chain_id")): ParseFromString<Felt>,
         (QueryClientStateArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (QueryClientStateArgs, symbol!("height")): ParseFromOptionalString<u64>,
+
+        (QueryConsensusStateArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryConsensusStateArgs, symbol!("client_id")): ParseFromString<ClientId>,
+        (QueryConsensusStateArgs, symbol!("query_height")): ParseFromOptionalString<u64>,
+        (QueryConsensusStateArgs, symbol!("consensus_height")): ParseFromOptionalString<Height>,
     }
 }
 
@@ -135,6 +144,7 @@ delegate_components! {
 
         QuerySubCommand: RunQuerySubCommand,
         QueryClientStateArgs: RunQueryClientStateCommand,
+        QueryConsensusStateArgs: RunQueryConsensusStateCommand,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<UpdateStarknetConfig>,
     }
@@ -196,6 +206,7 @@ pub trait CanUseStarknetApp:
     + CanLoadBuilder
     + CanRunCommand<QuerySubCommand>
     + CanRunCommand<QueryClientStateArgs>
+    + CanRunCommand<QueryConsensusStateArgs>
 {
 }
 
