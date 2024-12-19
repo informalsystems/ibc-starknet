@@ -28,6 +28,7 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::{
 use crate::impls::starknet_to_cosmos::channel_message::BuildStarknetToCosmosChannelHandshakeMessage;
 use crate::impls::starknet_to_cosmos::connection_message::BuildStarknetToCosmosConnectionHandshake;
 use crate::impls::starknet_to_cosmos::counterparty_message_height::GetCosmosCounterpartyMessageStarknetHeight;
+use crate::impls::starknet_to_cosmos::packet_fields::ReadPacketDstStarknetFields;
 use crate::impls::starknet_to_cosmos::query_consensus_state_height::QueryStarknetConsensusStateHeightsFromGrpc;
 use crate::impls::starknet_to_cosmos::update_client_message::BuildStarknetUpdateClientMessage;
 use crate::impls::starknet_to_cosmos::update_client_payload::BuildUpdateCometClientPayload;
@@ -83,13 +84,16 @@ cgp_preset! {
         [
             PacketSrcChannelIdGetterComponent,
             PacketSrcPortIdGetterComponent,
-            PacketDstChannelIdGetterComponent,
             PacketDstPortIdGetterComponent,
             PacketSequenceGetterComponent,
-            PacketTimeoutHeightGetterComponent,
             PacketTimeoutTimestampGetterComponent,
         ]:
             CosmosPacketFieldReader,
+        [
+            PacketTimeoutHeightGetterComponent,
+            PacketDstChannelIdGetterComponent,
+        ]:
+            ReadPacketDstStarknetFields,
 
     }
 }
