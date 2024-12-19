@@ -42,6 +42,9 @@ use hermes_relayer_components::chain::traits::packet::fields::{
     HasPacketDstChannelId, HasPacketDstPortId, HasPacketSequence, HasPacketSrcChannelId,
     HasPacketSrcPortId, HasPacketTimeoutHeight, HasPacketTimeoutTimestamp,
 };
+use hermes_relayer_components::chain::traits::packet::filter::{
+    CanFilterIncomingPacket, CanFilterOutgoingPacket,
+};
 use hermes_relayer_components::chain::traits::payload_builders::ack_packet::CanBuildAckPacketPayload;
 use hermes_relayer_components::chain::traits::payload_builders::channel_handshake::{
     CanBuildChannelOpenAckPayload, CanBuildChannelOpenConfirmPayload, CanBuildChannelOpenTryPayload,
@@ -337,6 +340,8 @@ pub trait CanUseStarknetChain:
     + CanBuildAckPacketMessage<CosmosChain>
     + CanBuildTimeoutUnorderedPacketMessage<CosmosChain>
     + HasWriteAckEvent<CosmosChain>
+    + CanFilterOutgoingPacket<CosmosChain>
+    + CanFilterIncomingPacket<CosmosChain>
 {
 }
 
@@ -383,6 +388,8 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildReceivePacketMessage<StarknetChain>
     + CanBuildAckPacketMessage<StarknetChain>
     + CanBuildTimeoutUnorderedPacketMessage<StarknetChain>
+    + CanFilterOutgoingPacket<StarknetChain>
+    + CanFilterIncomingPacket<StarknetChain>
 {
 }
 

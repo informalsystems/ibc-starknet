@@ -63,6 +63,7 @@ use crate::impls::messages::create_client::BuildCreateCometClientMessage;
 use crate::impls::messages::packet::BuildStarknetPacketMessages;
 use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
 use crate::impls::packet_fields::ReadPacketSrcStarknetFields;
+use crate::impls::packet_filter::FilterStarknetPackets;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
@@ -365,5 +366,10 @@ cgp_preset! {
             QueryStarknetAckCommitment,
         PacketReceiptQuerierComponent:
             QueryStarknetPacketReceipt,
+        [
+            OutgoingPacketFilterComponent,
+            IncomingPacketFilterComponent,
+        ]:
+            FilterStarknetPackets,
     }
 }
