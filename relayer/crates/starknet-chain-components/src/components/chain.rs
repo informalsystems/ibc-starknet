@@ -62,12 +62,14 @@ use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
 use crate::impls::packet_fields::ReadPacketSrcStarknetFields;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
+use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
 use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
 use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
 use crate::impls::queries::consensus_state::QueryCometConsensusState;
 use crate::impls::queries::contract_address::GetContractAddressFromField;
 use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
+use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::send_message::SendCallMessages;
@@ -341,5 +343,9 @@ cgp_preset! {
             QueryChannelEndFromStarknet,
         PacketCommitmentQuerierComponent:
             QueryStarknetPacketCommitment,
+        PacketAcknowledgementQuerierComponent:
+            QueryStarknetAckCommitment,
+        PacketReceiptQuerierComponent:
+            QueryStarknetPacketReceipt,
     }
 }
