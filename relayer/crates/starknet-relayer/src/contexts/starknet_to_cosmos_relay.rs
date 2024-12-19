@@ -25,6 +25,7 @@ use hermes_relayer_components::relay::traits::connection::open_try::CanRelayConn
 use hermes_relayer_components::relay::traits::ibc_message_sender::{
     CanSendIbcMessages, CanSendSingleIbcMessage,
 };
+use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::target::{
     DestinationTarget, HasDestinationTargetChainTypes, HasSourceTargetChainTypes,
     HasTargetClientIds, SourceTarget,
@@ -144,6 +145,7 @@ pub trait CanUseStarknetToCosmosRelay:
     + CanRelayConnectionOpenAck
     + CanRelayConnectionOpenConfirm
     + CanBootstrapConnection
+    + CanRelayPacket
 {
 }
 

@@ -152,7 +152,8 @@ pub trait CanUseCosmosToStarknetRelay:
     + CanRelayChannelOpenTry
     + CanRelayChannelOpenAck
     + CanRelayChannelOpenConfirm
-    + CanBootstrapChannel // + CanRelayPacket
+    + CanBootstrapChannel
+    + CanRelayPacket
 {
 }
 

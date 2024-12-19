@@ -74,6 +74,7 @@ use crate::impls::queries::consensus_state::QueryCometConsensusState;
 use crate::impls::queries::contract_address::GetContractAddressFromField;
 use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
 use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
+use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::send_message::SendCallMessages;
@@ -371,5 +372,7 @@ cgp_preset! {
             IncomingPacketFilterComponent,
         ]:
             FilterStarknetPackets,
+        ReceivedPacketQuerierComponent:
+            QueryPacketIsReceivedOnStarknet,
     }
 }

@@ -77,6 +77,7 @@ use hermes_relayer_components::chain::traits::queries::consensus_state_height::{
 };
 use hermes_relayer_components::chain::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
 use hermes_relayer_components::chain::traits::queries::packet_commitment::CanQueryPacketCommitment;
+use hermes_relayer_components::chain::traits::queries::packet_is_received::CanQueryPacketIsReceived;
 use hermes_relayer_components::chain::traits::queries::packet_receipt::CanQueryPacketReceipt;
 use hermes_relayer_components::chain::traits::send_message::{
     CanSendMessages, CanSendSingleMessage,
@@ -342,6 +343,7 @@ pub trait CanUseStarknetChain:
     + HasWriteAckEvent<CosmosChain>
     + CanFilterOutgoingPacket<CosmosChain>
     + CanFilterIncomingPacket<CosmosChain>
+    + CanQueryPacketIsReceived<CosmosChain>
 {
 }
 
