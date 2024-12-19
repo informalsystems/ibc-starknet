@@ -47,7 +47,7 @@ where
     async fn query_channel_end(
         chain: &Chain,
         channel_id: &ChannelId,
-        _port_id: &Chain::PortId,
+        port_id: &Chain::PortId,
         _height: &Chain::Height,
     ) -> Result<Chain::ChannelEnd, Chain::Error> {
         // TODO(rano): how to query at a specific height?
@@ -56,9 +56,8 @@ where
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
 
-        // TODO(rano): dummy port_id
         let port_id = PortId {
-            port_id: "transfer".to_string(),
+            port_id: port_id.to_string(),
         };
 
         let calldata = encoding
@@ -94,7 +93,7 @@ where
     async fn query_channel_end_with_proofs(
         chain: &Chain,
         channel_id: &ChannelId,
-        _port_id: &Chain::PortId,
+        port_id: &Chain::PortId,
         _height: &Chain::Height,
     ) -> Result<(Chain::ChannelEnd, Chain::CommitmentProof), Chain::Error> {
         // TODO(rano): how to query at a specific height?
@@ -103,9 +102,8 @@ where
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
 
-        // TODO(rano): dummy port_id
         let port_id = PortId {
-            port_id: "transfer".to_string(),
+            port_id: port_id.to_string(),
         };
 
         let calldata = encoding
