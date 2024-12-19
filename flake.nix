@@ -51,7 +51,7 @@
 
           cosmos-nix = inputs.cosmos-nix.packages.${system};
 
-          rust = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+          rust = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-stable.toml;
 
           rust-wasm = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-wasm.toml;
 
