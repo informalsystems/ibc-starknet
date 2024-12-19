@@ -55,6 +55,7 @@ use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
 use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
 use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
+use crate::impls::packet_fields::ReadPacketSrcStarknetFields;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
@@ -185,7 +186,6 @@ cgp_preset! {
         CommitmentPrefixTypeComponent:
             ProvideCommitmentPrefixBytes,
         [
-            PacketSrcChannelIdGetterComponent,
             PacketSrcPortIdGetterComponent,
             PacketDstChannelIdGetterComponent,
             PacketDstPortIdGetterComponent,
@@ -194,6 +194,10 @@ cgp_preset! {
             PacketTimeoutTimestampGetterComponent,
         ]:
             CosmosPacketFieldReader,
+        [
+            PacketSrcChannelIdGetterComponent,
+        ]:
+            ReadPacketSrcStarknetFields,
         ChainStatusQuerierComponent:
             QueryStarknetChainStatus,
         MessageSenderComponent:

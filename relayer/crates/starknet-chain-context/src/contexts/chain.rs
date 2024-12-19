@@ -35,7 +35,10 @@ use hermes_relayer_components::chain::traits::message_builders::connection_hands
 };
 use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
 use hermes_relayer_components::chain::traits::message_builders::update_client::CanBuildUpdateClientMessage;
-use hermes_relayer_components::chain::traits::packet::fields::{HasPacketDstChannelId, HasPacketDstPortId, HasPacketSequence, HasPacketSrcChannelId, HasPacketSrcPortId, HasPacketTimeoutHeight, HasPacketTimeoutTimestamp};
+use hermes_relayer_components::chain::traits::packet::fields::{
+    HasPacketDstChannelId, HasPacketDstPortId, HasPacketSequence, HasPacketSrcChannelId,
+    HasPacketSrcPortId, HasPacketTimeoutHeight, HasPacketTimeoutTimestamp,
+};
 use hermes_relayer_components::chain::traits::payload_builders::channel_handshake::{
     CanBuildChannelOpenAckPayload, CanBuildChannelOpenConfirmPayload, CanBuildChannelOpenTryPayload,
 };
@@ -128,6 +131,7 @@ use hermes_starknet_chain_components::types::message_response::StarknetMessageRe
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
+use ibc::core::channel::types::packet::Packet;
 use starknet::accounts::SingleOwnerAccount;
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
@@ -251,7 +255,14 @@ pub trait CanUseStarknetChain:
     + HasConnectionOpenTryPayloadType<CosmosChain>
     + HasConnectionOpenAckPayloadType<CosmosChain>
     + HasConnectionOpenConfirmPayloadType<CosmosChain>
-    + HasOutgoingPacketType<CosmosChain>
+    + HasOutgoingPacketType<CosmosChain, OutgoingPacket = Packet>
+    + HasPacketSrcChannelId<CosmosChain>
+    + HasPacketSrcPortId<CosmosChain>
+    + HasPacketDstChannelId<CosmosChain>
+    + HasPacketDstPortId<CosmosChain>
+    + HasPacketSequence<CosmosChain>
+    + HasPacketTimeoutHeight<CosmosChain>
+    + HasPacketTimeoutTimestamp<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount
     + CanQueryChainStatus
@@ -269,6 +280,8 @@ pub trait CanUseStarknetChain:
     + CanTransferToken
     + HasIbcCommitmentPrefix
     + HasRetryableError
+    + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+    + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
     + HasCreateClientEvent<CosmosChain>
     + CanBuildCreateClientPayload<CosmosChain>
     + CanBuildCreateClientMessage<CosmosChain>
@@ -304,8 +317,6 @@ pub trait CanUseStarknetChain:
     + CanBuildChannelOpenConfirmMessage<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>
     + HasChannelOpenTryEvent<CosmosChain>
-    + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
-    + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
 {
 }
 
