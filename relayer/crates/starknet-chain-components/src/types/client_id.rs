@@ -49,22 +49,6 @@ impl Display for ClientId {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use starknet::macros::short_string;
-
-    use super::*;
-
-    #[test]
-    fn test_client_id_display() {
-        let client_id = ClientId {
-            client_type: short_string!("07-tendermint"),
-            sequence: 1,
-        };
-        assert_eq!(client_id.to_string(), "07-tendermint-1");
-    }
-}
-
 impl FromStr for ClientId {
     type Err = String;
 
@@ -82,5 +66,21 @@ impl FromStr for ClientId {
             client_type,
             sequence,
         })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use starknet::macros::short_string;
+
+    use super::*;
+
+    #[test]
+    fn test_client_id_display() {
+        let client_id = ClientId {
+            client_type: short_string!("07-tendermint"),
+            sequence: 1,
+        };
+        assert_eq!(client_id.to_string(), "07-tendermint-1");
     }
 }
