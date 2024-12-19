@@ -1,3 +1,4 @@
+pub mod ack_commitment;
 pub mod channel_end;
 pub mod client_state;
 pub mod connection_end;
