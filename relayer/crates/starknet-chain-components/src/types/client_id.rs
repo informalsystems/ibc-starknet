@@ -43,7 +43,9 @@ impl Transformer for EncodeClientId {
 impl Display for ClientId {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         // TODO: Verify that the Display is correct
-        write!(f, "{}-{}", self.client_type, self.sequence)
+        let trimmed_client_type =
+            String::from_utf8_lossy(&self.client_type.to_bytes_be()).trim_start_matches('\0');
+        write!(f, "{}-{}", trimmed_client_type, self.sequence)
     }
 }
 
