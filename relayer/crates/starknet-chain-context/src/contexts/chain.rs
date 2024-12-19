@@ -326,6 +326,9 @@ pub trait CanUseStarknetChain:
     + CanQueryPacketCommitment<CosmosChain>
     + CanQueryPacketAcknowledgement<CosmosChain>
     + CanQueryPacketReceipt<CosmosChain>
+    + CanBuildReceivePacketPayload<CosmosChain>
+    + CanBuildAckPacketPayload<CosmosChain>
+    + CanBuildTimeoutUnorderedPacketPayload<CosmosChain>
 {
 }
 

@@ -11,6 +11,7 @@ use hermes_chain_components::impls::types::commitment::ProvideBytesPacketCommitm
 use hermes_chain_components::impls::types::commitment_prefix::ProvideCommitmentPrefixBytes;
 use hermes_chain_components::impls::types::payloads::channel::ProvideChannelPayloadTypes;
 use hermes_chain_components::impls::types::payloads::connection::ProvideConnectionPayloadTypes;
+use hermes_chain_components::impls::types::payloads::packet::ProvidePacketPayloadTypes;
 use hermes_chain_components::impls::types::receipt::ProvideBytesPacketReceipt;
 use hermes_chain_components::traits::commitment_prefix::IbcCommitmentPrefixGetterComponent;
 pub use hermes_cosmos_chain_components::components::client::*;
@@ -117,6 +118,7 @@ cgp_preset! {
         [
             HeightTypeComponent,
             HeightFieldComponent,
+            HeightIncrementerComponent,
         ]:
             ProvideStarknetHeight,
         ChainStatusTypeComponent:
@@ -298,6 +300,12 @@ cgp_preset! {
             ChannelOpenConfirmPayloadTypeComponent,
         ]:
             ProvideChannelPayloadTypes,
+        [
+            ReceivePacketPayloadTypeComponent,
+            AckPacketPayloadTypeComponent,
+            TimeoutUnorderedPacketPayloadTypeComponent,
+        ]:
+            ProvidePacketPayloadTypes,
         [
             ConnectionOpenInitPayloadBuilderComponent,
             ConnectionOpenTryPayloadBuilderComponent,
