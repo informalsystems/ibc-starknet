@@ -17,11 +17,13 @@ use hermes_chain_components::traits::types::ibc::{HasClientIdType, HasConnection
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::connection::{
-    ConnectionOpenAckPayload, ConnectionOpenInitPayload, ConnectionOpenTryPayload,
+    ConnectionOpenAckPayload, ConnectionOpenConfirmPayload, ConnectionOpenInitPayload,
+    ConnectionOpenTryPayload,
 };
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
+use hermes_cosmos_chain_components::types::messages::connection::open_confirm::CosmosConnectionOpenConfirmMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_init::CosmosConnectionOpenInitMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_try::CosmosConnectionOpenTryMessage;
 use ibc::core::client::types::error::ClientError;
@@ -216,14 +218,29 @@ where
 impl<Chain, Counterparty> ConnectionOpenConfirmMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosConnectionHandshake
 where
-    Chain: HasMessageType + HasConnectionIdType<Counterparty> + HasErrorType,
-    Counterparty: HasConnectionOpenConfirmPayloadType<Chain>,
+    Chain: HasMessageType<Message = CosmosMessage>
+        + HasConnectionIdType<Counterparty, ConnectionId = CosmosConnectionId>
+        + CanRaiseError<ClientError>,
+    Counterparty: HasConnectionOpenConfirmPayloadType<
+            Chain,
+            ConnectionOpenConfirmPayload = ConnectionOpenConfirmPayload<Counterparty>,
+        > + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
+        + HasHeightType<Height = u64>,
 {
     async fn build_connection_open_confirm_message(
         _chain: &Chain,
-        _connection_id: &Chain::ConnectionId,
-        _counterparty_payload: Counterparty::ConnectionOpenConfirmPayload,
+        connection_id: &CosmosConnectionId,
+        counterparty_payload: ConnectionOpenConfirmPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        todo!()
+        let update_height =
+            CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
+
+        let message = CosmosConnectionOpenConfirmMessage {
+            connection_id: connection_id.clone(),
+            update_height,
+            proof_ack: counterparty_payload.proof_ack.proof_bytes,
+        };
+
+        Ok(message.to_cosmos_message())
     }
 }
