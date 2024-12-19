@@ -21,7 +21,7 @@ use hermes_chain_components::traits::types::ibc::{HasClientIdType, HasConnection
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::connection::{
-    ConnectionOpenInitPayload, ConnectionOpenTryPayload,
+    ConnectionOpenAckPayload, ConnectionOpenInitPayload, ConnectionOpenTryPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
@@ -42,7 +42,7 @@ use crate::types::client_id::ClientId as StarknetClientId;
 use crate::types::connection_id::ConnectionId as StarknetConnectionId;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::connection::{
-    BasePrefix, ConnectionVersion, MsgConnOpenInit, MsgConnOpenTry,
+    BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenInit, MsgConnOpenTry,
 };
 use crate::types::messages::ibc::packet::StateProof;
 
@@ -254,19 +254,75 @@ where
     }
 }
 
-impl<Chain, Counterparty> ConnectionOpenAckMessageBuilder<Chain, Counterparty>
+impl<Chain, Counterparty, Encoding> ConnectionOpenAckMessageBuilder<Chain, Counterparty>
     for BuildStarknetConnectionHandshakeMessages
 where
-    Chain: HasMessageType + HasConnectionIdType<Counterparty> + HasErrorType,
-    Counterparty: HasConnectionOpenAckPayloadType<Chain> + HasConnectionIdType<Chain>,
+    Chain: HasHeightType
+        + HasClientStateType<Counterparty>
+        + HasConnectionIdType<Counterparty, ConnectionId = StarknetConnectionId>
+        + HasAddressType<Address = Felt>
+        + HasMessageType<Message = Call>
+        + HasEncoding<AsFelt, Encoding = Encoding>
+        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + CanRaiseError<Encoding::Error>,
+    Counterparty: HasHeightType<Height = Height>
+        + HasCommitmentProofType
+        + HasConnectionIdType<Chain, ConnectionId = CosmosConnectionId>
+        + HasConnectionEndType<Chain, ConnectionEnd = ConnectionEnd>
+        + HasConnectionOpenAckPayloadType<
+            Chain,
+            ConnectionOpenAckPayload = ConnectionOpenAckPayload<Counterparty, Chain>,
+        >,
+    Encoding: CanEncode<ViaCairo, MsgConnOpenAck> + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_connection_open_ack_message(
-        _chain: &Chain,
-        _connection_id: &Chain::ConnectionId,
-        _counterparty_connection_id: &Counterparty::ConnectionId,
-        _counterparty_payload: Counterparty::ConnectionOpenAckPayload,
+        chain: &Chain,
+        connection_id: &StarknetConnectionId,
+        counterparty_connection_id: &CosmosConnectionId,
+        counterparty_payload: ConnectionOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        todo!()
+        let counterparty_connection_id_as_cairo = StarknetConnectionId {
+            connection_id: counterparty_connection_id.to_string(),
+        };
+
+        // TODO(rano): use the connection version from the payload
+        let connection_version = ConnectionVersion {
+            identifier: "1".into(),
+            features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
+        };
+
+        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
+        // TODO(rano): submitting dummy proofs
+        // proof can't be empty
+        let commitment_proof = StateProof { proof: vec![] };
+
+        let proof_height = CairoHeight {
+            revision_number: counterparty_payload.update_height.revision_number(),
+            revision_height: counterparty_payload.update_height.revision_height(),
+        };
+
+        let conn_open_ack_msg = MsgConnOpenAck {
+            conn_id_on_a: connection_id.clone(),
+            conn_id_on_b: counterparty_connection_id_as_cairo,
+            proof_conn_end_on_b: commitment_proof,
+            proof_height_on_b: proof_height,
+            version: connection_version,
+        };
+
+        let ibc_core_address = chain.query_contract_address(PhantomData).await?;
+
+        let calldata = chain
+            .encoding()
+            .encode(&conn_open_ack_msg)
+            .map_err(Chain::raise_error)?;
+
+        let message = Call {
+            to: ibc_core_address,
+            selector: selector!("conn_open_ack"),
+            calldata,
+        };
+
+        Ok(message)
     }
 }
 
