@@ -217,7 +217,9 @@ where
         };
 
         // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
-        let commitment_proof = StateProof { proof: vec![] };
+        let commitment_proof = StateProof {
+            proof: vec![Felt::ONE],
+        };
 
         let proof_height = CairoHeight {
             revision_number: payload.update_height.revision_number(),
@@ -296,7 +298,9 @@ where
         // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         // TODO(rano): submitting dummy proofs
         // proof can't be empty
-        let commitment_proof = StateProof { proof: vec![] };
+        let commitment_proof = StateProof {
+            proof: vec![Felt::ONE],
+        };
 
         let proof_height = CairoHeight {
             revision_number: counterparty_payload.update_height.revision_number(),
@@ -353,7 +357,9 @@ where
         // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         // TODO(rano): submitting dummy proofs
         // proof can't be empty
-        let commitment_proof = StateProof { proof: vec![] };
+        let commitment_proof = StateProof {
+            proof: vec![Felt::ONE],
+        };
 
         let proof_height = CairoHeight {
             revision_number: counterparty_payload.update_height.revision_number(),
