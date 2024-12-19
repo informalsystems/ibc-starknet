@@ -1,7 +1,9 @@
+use alloc::collections::BTreeSet;
+use alloc::sync::Arc;
 use core::ops::Deref;
-use std::sync::Arc;
 
 use cgp::prelude::*;
+use futures::lock::Mutex;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_relayer_components::components::default::relay::MainSink;
 use hermes_relayer_components::multi::traits::chain_at::{
@@ -11,6 +13,7 @@ use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetterComp
 use hermes_relayer_components::multi::types::tags::{Dst, Src};
 use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapChannel;
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
+use hermes_relayer_components::relay::impls::packet_lock::PacketMutexOf;
 use hermes_relayer_components::relay::impls::selector::SelectRelayAToB;
 use hermes_relayer_components::relay::traits::chains::{
     CanRaiseRelayChainErrors, HasRelayChains, HasRelayClientIds,
@@ -53,9 +56,10 @@ pub struct CosmosToStarknetRelayFields {
     pub chain_b: StarknetChain,
     pub client_id_a: CosmosClientId,
     pub client_id_b: StarknetClientId,
+    pub packet_lock_mutex: PacketMutexOf<CosmosToStarknetRelay>,
 }
 
-pub trait HasCosmosToStarknetRelayFields: Async {
+pub trait HasCosmosToStarknetRelayFields: Send + Sync + 'static {
     fn fields(&self) -> &CosmosToStarknetRelayFields;
 }
 
@@ -88,6 +92,7 @@ impl CosmosToStarknetRelay {
                 chain_b: dst_chain,
                 client_id_a: src_client_id,
                 client_id_b: dst_client_id,
+                packet_lock_mutex: Arc::new(Mutex::new(BTreeSet::new())),
             }),
         }
     }
