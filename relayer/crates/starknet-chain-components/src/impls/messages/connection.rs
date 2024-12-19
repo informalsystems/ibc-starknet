@@ -21,7 +21,8 @@ use hermes_chain_components::traits::types::ibc::{HasClientIdType, HasConnection
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::connection::{
-    ConnectionOpenAckPayload, ConnectionOpenInitPayload, ConnectionOpenTryPayload,
+    ConnectionOpenAckPayload, ConnectionOpenConfirmPayload, ConnectionOpenInitPayload,
+    ConnectionOpenTryPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
@@ -42,7 +43,8 @@ use crate::types::client_id::ClientId as StarknetClientId;
 use crate::types::connection_id::ConnectionId as StarknetConnectionId;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::connection::{
-    BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenInit, MsgConnOpenTry,
+    BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit,
+    MsgConnOpenTry,
 };
 use crate::types::messages::ibc::packet::StateProof;
 
@@ -326,17 +328,57 @@ where
     }
 }
 
-impl<Chain, Counterparty> ConnectionOpenConfirmMessageBuilder<Chain, Counterparty>
+impl<Chain, Counterparty, Encoding> ConnectionOpenConfirmMessageBuilder<Chain, Counterparty>
     for BuildStarknetConnectionHandshakeMessages
 where
-    Chain: HasMessageType + HasConnectionIdType<Counterparty> + HasErrorType,
-    Counterparty: HasConnectionOpenConfirmPayloadType<Chain>,
+    Chain: HasConnectionIdType<Counterparty, ConnectionId = StarknetConnectionId>
+        + HasAddressType<Address = Felt>
+        + HasMessageType<Message = Call>
+        + HasEncoding<AsFelt, Encoding = Encoding>
+        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + CanRaiseError<Encoding::Error>,
+    Counterparty: HasHeightType<Height = Height>
+        + HasCommitmentProofType
+        + HasConnectionOpenConfirmPayloadType<
+            Chain,
+            ConnectionOpenConfirmPayload = ConnectionOpenConfirmPayload<Counterparty>,
+        >,
+    Encoding: CanEncode<ViaCairo, MsgConnOpenConfirm> + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_connection_open_confirm_message(
-        _chain: &Chain,
-        _connection_id: &Chain::ConnectionId,
-        _counterparty_payload: Counterparty::ConnectionOpenConfirmPayload,
+        chain: &Chain,
+        connection_id: &StarknetConnectionId,
+        counterparty_payload: ConnectionOpenConfirmPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        todo!()
+        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
+        // TODO(rano): submitting dummy proofs
+        // proof can't be empty
+        let commitment_proof = StateProof { proof: vec![] };
+
+        let proof_height = CairoHeight {
+            revision_number: counterparty_payload.update_height.revision_number(),
+            revision_height: counterparty_payload.update_height.revision_height(),
+        };
+
+        let conn_open_confirm_msg = MsgConnOpenConfirm {
+            conn_id_on_b: connection_id.clone(),
+            proof_conn_end_on_a: commitment_proof,
+            proof_height_on_a: proof_height,
+        };
+
+        let ibc_core_address = chain.query_contract_address(PhantomData).await?;
+
+        let calldata = chain
+            .encoding()
+            .encode(&conn_open_confirm_msg)
+            .map_err(Chain::raise_error)?;
+
+        let message = Call {
+            to: ibc_core_address,
+            selector: selector!("conn_open_confirm"),
+            calldata,
+        };
+
+        Ok(message)
     }
 }
