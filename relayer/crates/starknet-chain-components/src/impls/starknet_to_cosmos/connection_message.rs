@@ -29,7 +29,6 @@ use hermes_cosmos_chain_components::types::messages::connection::open_try::Cosmo
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::connection::types::version::Version as CosmosConnectionVersion;
-use ibc::core::host::types::error::IdentifierError;
 use ibc::core::host::types::identifiers::{
     ClientId as CosmosClientId, ConnectionId as CosmosConnectionId,
 };
@@ -49,7 +48,7 @@ where
             InitConnectionOptions = CosmosInitConnectionOptions,
         > + HasClientIdType<Counterparty, ClientId = CosmosClientId>
         + HasMessageType<Message = CosmosMessage>
-        + CanRaiseError<IdentifierError>,
+        + HasErrorType,
     Counterparty: HasClientIdType<Chain, ClientId = StarknetClientId>
         + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
         + HasConnectionOpenInitPayloadType<
@@ -64,16 +63,9 @@ where
         init_connection_options: &CosmosInitConnectionOptions,
         counterparty_payload: ConnectionOpenInitPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let counterparty_client_id_as_cosmos = CosmosClientId::new(
-            String::from_utf8_lossy(&counterparty_client_id.client_type.to_bytes_be())
-                .trim_start_matches('\0'),
-            counterparty_client_id.sequence,
-        )
-        .map_err(Chain::raise_error)?;
-
         let message = CosmosConnectionOpenInitMessage {
-            client_id: client_id.clone(),
-            counterparty_client_id: counterparty_client_id_as_cosmos,
+            client_id: client_id.to_string(),
+            counterparty_client_id: counterparty_client_id.to_string(),
             counterparty_commitment_prefix: counterparty_payload.commitment_prefix,
             version: init_connection_options.connection_version.clone().into(),
             delay_period: init_connection_options.delay_period,
@@ -89,7 +81,6 @@ where
     Chain: HasMessageType<Message = CosmosMessage>
         + HasHeightType<Height = CosmosHeight>
         + HasClientIdType<Counterparty, ClientId = CosmosClientId>
-        + CanRaiseError<IdentifierError>
         + CanRaiseError<ClientError>
         + HasClientStateType<Counterparty, ClientState = CometClientState>,
     Counterparty: HasConnectionOpenTryPayloadType<
@@ -109,19 +100,6 @@ where
         counterparty_connection_id: &StarknetConnectionId,
         counterparty_payload: ConnectionOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let counterparty_client_id_as_cosmos = CosmosClientId::new(
-            String::from_utf8_lossy(&counterparty_client_id.client_type.to_bytes_be())
-                .trim_start_matches('\0'),
-            counterparty_client_id.sequence,
-        )
-        .map_err(Chain::raise_error)?;
-
-        let counterparty_connection_id_as_cosmos = counterparty_connection_id
-            .connection_id
-            .as_str()
-            .parse()
-            .map_err(Chain::raise_error)?;
-
         // TODO(rano): dummy client state.
         // we need to replace CometClientState with real tendermint ClientState
         let client_state_any = Any {
@@ -139,9 +117,9 @@ where
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
         let message = CosmosConnectionOpenTryMessage {
-            client_id: client_id.clone(),
-            counterparty_client_id: counterparty_client_id_as_cosmos,
-            counterparty_connection_id: counterparty_connection_id_as_cosmos,
+            client_id: client_id.to_string(),
+            counterparty_client_id: counterparty_client_id.to_string(),
+            counterparty_connection_id: counterparty_connection_id.to_string(),
             counterparty_commitment_prefix: counterparty_payload.commitment_prefix,
             counterparty_versions,
             client_state: client_state_any,
@@ -164,8 +142,7 @@ where
         + HasConnectionIdType<Counterparty, ConnectionId = CosmosConnectionId>
         + HasClientStateType<Counterparty, ClientState = CometClientState>
         + HasHeightType<Height = CosmosHeight>
-        + CanRaiseError<ClientError>
-        + CanRaiseError<IdentifierError>,
+        + CanRaiseError<ClientError>,
     Counterparty: HasConnectionOpenAckPayloadType<
             Chain,
             ConnectionOpenAckPayload = ConnectionOpenAckPayload<Counterparty, Chain>,
@@ -180,12 +157,6 @@ where
         counterparty_connection_id: &StarknetConnectionId,
         counterparty_payload: ConnectionOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let counterparty_connection_id_as_cosmos = counterparty_connection_id
-            .connection_id
-            .as_str()
-            .parse()
-            .map_err(Chain::raise_error)?;
-
         // TODO(rano): dummy client state.
         // we need to replace CometClientState with real tendermint ClientState
         let client_state_any = Any {
@@ -200,8 +171,8 @@ where
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
         let message = CosmosConnectionOpenAckMessage {
-            connection_id: connection_id.clone(),
-            counterparty_connection_id: counterparty_connection_id_as_cosmos,
+            connection_id: connection_id.to_string(),
+            counterparty_connection_id: counterparty_connection_id.to_string(),
             version: counterparty_versions[0].clone().into(),
             client_state: client_state_any,
             update_height,
@@ -236,7 +207,7 @@ where
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
         let message = CosmosConnectionOpenConfirmMessage {
-            connection_id: connection_id.clone(),
+            connection_id: connection_id.to_string(),
             update_height,
             proof_ack: counterparty_payload.proof_ack.proof_bytes,
         };
