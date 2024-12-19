@@ -25,12 +25,19 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
+use hermes_relayer_components::chain::traits::message_builders::channel_handshake::{
+    CanBuildChannelOpenAckMessage, CanBuildChannelOpenConfirmMessage,
+    CanBuildChannelOpenInitMessage, CanBuildChannelOpenTryMessage,
+};
 use hermes_relayer_components::chain::traits::message_builders::connection_handshake::{
     CanBuildConnectionOpenAckMessage, CanBuildConnectionOpenConfirmMessage,
     CanBuildConnectionOpenInitMessage, CanBuildConnectionOpenTryMessage,
 };
 use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
 use hermes_relayer_components::chain::traits::message_builders::update_client::CanBuildUpdateClientMessage;
+use hermes_relayer_components::chain::traits::payload_builders::channel_handshake::{
+    CanBuildChannelOpenAckPayload, CanBuildChannelOpenConfirmPayload, CanBuildChannelOpenTryPayload,
+};
 use hermes_relayer_components::chain::traits::payload_builders::connection_handshake::{
     CanBuildConnectionOpenAckPayload, CanBuildConnectionOpenConfirmPayload,
     CanBuildConnectionOpenInitPayload, CanBuildConnectionOpenTryPayload,
@@ -39,6 +46,9 @@ use hermes_relayer_components::chain::traits::payload_builders::create_client::C
 use hermes_relayer_components::chain::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
+};
+use hermes_relayer_components::chain::traits::queries::channel_end::{
+    CanQueryChannelEnd, CanQueryChannelEndWithProofs,
 };
 use hermes_relayer_components::chain::traits::queries::client_state::{
     CanQueryClientState, CanQueryClientStateWithLatestHeight, CanQueryClientStateWithProofs,
@@ -65,13 +75,12 @@ use hermes_relayer_components::chain::traits::types::connection::{
     HasInitConnectionOptionsType,
 };
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
-use hermes_relayer_components::chain::traits::types::create_client::{
-    HasCreateClientEvent, HasCreateClientPayloadType,
-};
+use hermes_relayer_components::chain::traits::types::create_client::HasCreateClientEvent;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::{
     HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
 };
+use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
@@ -273,6 +282,8 @@ pub trait CanUseStarknetChain:
     + CanQueryConsensusStateHeight<CosmosChain>
     + CanQueryConnectionEnd<CosmosChain>
     + CanQueryConnectionEndWithProofs<CosmosChain>
+    + CanQueryChannelEnd<CosmosChain>
+    + CanQueryChannelEndWithProofs<CosmosChain>
     + HasCounterpartyMessageHeight<CosmosChain>
     + HasInitConnectionOptionsType<CosmosChain>
     + CanBuildConnectionOpenInitPayload<CosmosChain>
@@ -283,14 +294,17 @@ pub trait CanUseStarknetChain:
     + CanBuildConnectionOpenTryMessage<CosmosChain>
     + CanBuildConnectionOpenAckMessage<CosmosChain>
     + CanBuildConnectionOpenConfirmMessage<CosmosChain>
+    + CanBuildChannelOpenTryPayload<CosmosChain>
+    + CanBuildChannelOpenAckPayload<CosmosChain>
+    + CanBuildChannelOpenConfirmPayload<CosmosChain>
+    + CanBuildChannelOpenInitMessage<CosmosChain>
+    + CanBuildChannelOpenTryMessage<CosmosChain>
+    + CanBuildChannelOpenAckMessage<CosmosChain>
+    + CanBuildChannelOpenConfirmMessage<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>
+    + HasChannelOpenTryEvent<CosmosChain>
     + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-where
-    CosmosChain: HasClientStateType<Self>
-        + HasConsensusStateType<Self>
-        + HasCreateClientPayloadType<Self>
-        + HasUpdateClientPayloadType<Self>,
 {
 }
 
@@ -319,6 +333,10 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildConnectionOpenTryMessage<StarknetChain>
     + CanBuildConnectionOpenAckMessage<StarknetChain>
     + CanBuildConnectionOpenConfirmMessage<StarknetChain>
+    + CanBuildChannelOpenInitMessage<StarknetChain>
+    + CanBuildChannelOpenTryMessage<StarknetChain>
+    + CanBuildChannelOpenAckMessage<StarknetChain>
+    + CanBuildChannelOpenConfirmMessage<StarknetChain>
     + HasCounterpartyMessageHeight<StarknetChain>
 {
 }

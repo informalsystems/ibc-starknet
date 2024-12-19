@@ -354,8 +354,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let cosmos_connection_id = {
             let open_init_message = CosmosConnectionOpenInitMessage {
-                client_id: cosmos_client_id.clone(),
-                counterparty_client_id: ClientId::new(&felt_to_trimmed_string(&starknet_client_id.client_type), starknet_client_id.sequence)?,
+                client_id: cosmos_client_id.to_string(),
+                counterparty_client_id: ClientId::new(&felt_to_trimmed_string(&starknet_client_id.client_type), starknet_client_id.sequence)?.to_string(),
                 counterparty_commitment_prefix: "ibc".into(),
                 version: default_connection_version(),
                 delay_period: Duration::from_secs(0),
@@ -384,8 +384,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
             runtime.sleep(Duration::from_secs(1)).await;
 
             let open_ack_message = CosmosConnectionOpenAckMessage {
-                connection_id: cosmos_connection_id.clone(),
-                counterparty_connection_id: cosmos_connection_id.clone(), // TODO: stub
+                connection_id: cosmos_connection_id.to_string(),
+                counterparty_connection_id: cosmos_connection_id.to_string(), // TODO: stub
                 version: default_connection_version(),
                 client_state,
                 update_height: Height::new(0, 1).unwrap(),

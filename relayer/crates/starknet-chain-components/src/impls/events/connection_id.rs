@@ -13,10 +13,10 @@ use starknet::core::types::Felt;
 use crate::types::connection_id::ConnectionId;
 use crate::types::message_response::StarknetMessageResponse;
 
-pub struct UseStarknetConnectionHandshakeEvents;
+pub struct UseStarknetConnectionEvents;
 
 impl<Chain, Counterparty, Encoding> ProvideConnectionOpenInitEvent<Chain, Counterparty>
-    for UseStarknetConnectionHandshakeEvents
+    for UseStarknetConnectionEvents
 where
     Chain: HasMessageResponseType<MessageResponse = StarknetMessageResponse>
         + HasConnectionIdType<Counterparty, ConnectionId = ConnectionId>
@@ -37,7 +37,7 @@ where
 }
 
 impl<Chain, Counterparty, Encoding> ProvideConnectionOpenTryEvent<Chain, Counterparty>
-    for UseStarknetConnectionHandshakeEvents
+    for UseStarknetConnectionEvents
 where
     Chain: HasMessageResponseType<MessageResponse = StarknetMessageResponse>
         + HasConnectionIdType<Counterparty, ConnectionId = ConnectionId>
