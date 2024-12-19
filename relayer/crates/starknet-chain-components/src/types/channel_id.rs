@@ -6,7 +6,7 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::transform::Transformer;
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 
-#[derive(Debug, PartialEq, Clone, HasField)]
+#[derive(Debug, PartialEq, Clone, HasField, Eq, Ord, PartialOrd)]
 pub struct ChannelId {
     pub channel_id: String,
 }

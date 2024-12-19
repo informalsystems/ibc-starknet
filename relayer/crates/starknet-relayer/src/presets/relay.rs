@@ -15,6 +15,7 @@ pub use hermes_relayer_components::multi::traits::chain_at::{
 };
 pub use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
 use hermes_relayer_components::multi::types::index::Index;
+use hermes_relayer_components::relay::impls::packet_lock::PacketMutexGetterComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 pub use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeComponent,
@@ -47,6 +48,8 @@ with_default_relay_preset! {
                     UseField<symbol!("client_id_a")>,
                 ClientIdAtGetterComponent<Index<1>, Index<0>>:
                     UseField<symbol!("client_id_b")>,
+                PacketMutexGetterComponent:
+                    UseField<symbol!("packet_lock_mutex")>,
                 Components: DefaultRelayPreset,
             }
         }

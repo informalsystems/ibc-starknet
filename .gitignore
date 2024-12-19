@@ -13,3 +13,6 @@ target/
 .vscode/
 
 result*
+
+rust-toolchain.toml
+rustc-ice-*.txt
