@@ -66,6 +66,7 @@ use hermes_relayer_components::chain::traits::send_message::{
     CanSendMessages, CanSendSingleMessage,
 };
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
+use hermes_relayer_components::chain::traits::types::channel::HasChannelEndType;
 use hermes_relayer_components::chain::traits::types::client_state::{
     HasClientStateFields, HasClientStateType,
 };
@@ -78,7 +79,7 @@ use hermes_relayer_components::chain::traits::types::consensus_state::HasConsens
 use hermes_relayer_components::chain::traits::types::create_client::HasCreateClientEvent;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::{
-    HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
+    HasChannelIdType, HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
 };
 use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
@@ -114,6 +115,7 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
+use hermes_starknet_chain_components::types::channel_id::{ChannelEnd, ChannelId};
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
 use hermes_starknet_chain_components::types::commitment_proof::StarknetCommitmentProof;
@@ -245,6 +247,10 @@ pub trait CanUseStarknetChain:
     + HasClientIdType<CosmosChain, ClientId = ClientId>
     + HasConnectionIdType<CosmosChain, ConnectionId = ConnectionId>
     + HasConnectionEndType<CosmosChain, ConnectionEnd = ConnectionEnd>
+    + HasChannelIdType<CosmosChain, ChannelId = ChannelId>
+    + HasChannelEndType<CosmosChain, ChannelEnd = ChannelEnd>
+    // // FIXME: cannot use native PortId. PortIdTypeComponent needs to be wired for StarknetChainTypes
+    // + HasPortIdType<CosmosChain, PortId = PortId>
     + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
     + HasConnectionOpenInitPayloadType<CosmosChain>
     + HasConnectionOpenTryPayloadType<CosmosChain>
