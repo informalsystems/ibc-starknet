@@ -25,6 +25,7 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
+use hermes_relayer_components::chain::traits::message_builders::ack_packet::CanBuildAckPacketMessage;
 use hermes_relayer_components::chain::traits::message_builders::channel_handshake::{
     CanBuildChannelOpenAckMessage, CanBuildChannelOpenConfirmMessage,
     CanBuildChannelOpenInitMessage, CanBuildChannelOpenTryMessage,
@@ -34,6 +35,8 @@ use hermes_relayer_components::chain::traits::message_builders::connection_hands
     CanBuildConnectionOpenInitMessage, CanBuildConnectionOpenTryMessage,
 };
 use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
+use hermes_relayer_components::chain::traits::message_builders::receive_packet::CanBuildReceivePacketMessage;
+use hermes_relayer_components::chain::traits::message_builders::timeout_unordered_packet::CanBuildTimeoutUnorderedPacketMessage;
 use hermes_relayer_components::chain::traits::message_builders::update_client::CanBuildUpdateClientMessage;
 use hermes_relayer_components::chain::traits::packet::fields::{
     HasPacketDstChannelId, HasPacketDstPortId, HasPacketSequence, HasPacketSrcChannelId,
@@ -329,6 +332,9 @@ pub trait CanUseStarknetChain:
     + CanBuildReceivePacketPayload<CosmosChain>
     + CanBuildAckPacketPayload<CosmosChain>
     + CanBuildTimeoutUnorderedPacketPayload<CosmosChain>
+    + CanBuildReceivePacketMessage<CosmosChain>
+    + CanBuildAckPacketMessage<CosmosChain>
+    + CanBuildTimeoutUnorderedPacketMessage<CosmosChain>
 {
 }
 
@@ -372,6 +378,9 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildReceivePacketPayload<StarknetChain>
     + CanBuildAckPacketPayload<StarknetChain>
     + CanBuildTimeoutUnorderedPacketPayload<StarknetChain>
+    + CanBuildReceivePacketMessage<StarknetChain>
+    + CanBuildAckPacketMessage<StarknetChain>
+    + CanBuildTimeoutUnorderedPacketMessage<StarknetChain>
 {
 }
 

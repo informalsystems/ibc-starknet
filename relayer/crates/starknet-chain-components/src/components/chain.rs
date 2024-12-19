@@ -59,6 +59,7 @@ use crate::impls::events::create_client::UseStarknetCreateClientEvent;
 use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
 use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
+use crate::impls::messages::packet::BuildStarknetPacketMessages;
 use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
 use crate::impls::packet_fields::ReadPacketSrcStarknetFields;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
@@ -333,6 +334,12 @@ cgp_preset! {
             ChannelOpenConfirmMessageBuilderComponent,
         ]:
             BuildStarknetChannelHandshakeMessages,
+        [
+            ReceivePacketMessageBuilderComponent,
+            AckPacketMessageBuilderComponent,
+            TimeoutUnorderedPacketMessageBuilderComponent,
+        ]:
+            BuildStarknetPacketMessages,
         [
             ReceivePacketPayloadBuilderComponent,
             AckPacketPayloadBuilderComponent,
