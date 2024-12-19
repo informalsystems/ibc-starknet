@@ -20,6 +20,7 @@ use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
 use hermes_starknet_chain_components::components::encoding::cairo::*;
+use hermes_starknet_chain_components::types::channel_id::{ChannelEnd, ChannelId};
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::connection_id::{ConnectionEnd, ConnectionId};
 use hermes_starknet_chain_components::types::cosmos::client_state::{
@@ -134,6 +135,9 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, CometConsensusState>
     + CanEncodeAndDecode<ViaCairo, ClientId>
     + CanEncodeAndDecode<ViaCairo, ConnectionId>
+    + CanEncodeAndDecode<ViaCairo, ConnectionEnd>
+    + CanEncodeAndDecode<ViaCairo, ChannelId>
+    + CanEncodeAndDecode<ViaCairo, ChannelEnd>
     + CanEncodeAndDecode<ViaCairo, MsgRegisterClient>
     + CanEncodeAndDecode<ViaCairo, MsgRegisterApp>
     + CanEncodeAndDecode<ViaCairo, MsgConnOpenInit>
@@ -146,7 +150,6 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenConfirm>
     + CanEncode<ViaCairo, CometUpdateHeader>
     + CanDecode<ViaCairo, CreateClientResponse>
-    + CanEncodeAndDecode<ViaCairo, ConnectionEnd>
 {
 }
 

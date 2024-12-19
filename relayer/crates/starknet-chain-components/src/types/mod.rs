@@ -1,5 +1,4 @@
 pub mod amount;
-pub mod channel_end;
 pub mod channel_id;
 pub mod client_id;
 pub mod client_state;
