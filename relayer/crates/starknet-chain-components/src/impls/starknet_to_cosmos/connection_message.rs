@@ -17,17 +17,20 @@ use hermes_chain_components::traits::types::ibc::{HasClientIdType, HasConnection
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::connection::{
-    ConnectionOpenInitPayload, ConnectionOpenTryPayload,
+    ConnectionOpenAckPayload, ConnectionOpenInitPayload, ConnectionOpenTryPayload,
 };
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
+use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_init::CosmosConnectionOpenInitMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_try::CosmosConnectionOpenTryMessage;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::connection::types::version::Version as CosmosConnectionVersion;
 use ibc::core::host::types::error::IdentifierError;
-use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
+use ibc::core::host::types::identifiers::{
+    ClientId as CosmosClientId, ConnectionId as CosmosConnectionId,
+};
 use prost_types::Any;
 
 use crate::types::client_id::ClientId as StarknetClientId;
@@ -155,16 +158,58 @@ where
 impl<Chain, Counterparty> ConnectionOpenAckMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosConnectionHandshake
 where
-    Chain: HasMessageType + HasConnectionIdType<Counterparty> + HasErrorType,
-    Counterparty: HasConnectionOpenAckPayloadType<Chain> + HasConnectionIdType<Chain>,
+    Chain: HasMessageType<Message = CosmosMessage>
+        + HasConnectionIdType<Counterparty, ConnectionId = CosmosConnectionId>
+        + HasClientStateType<Counterparty, ClientState = CometClientState>
+        + HasHeightType<Height = CosmosHeight>
+        + CanRaiseError<ClientError>
+        + CanRaiseError<IdentifierError>,
+    Counterparty: HasConnectionOpenAckPayloadType<
+            Chain,
+            ConnectionOpenAckPayload = ConnectionOpenAckPayload<Counterparty, Chain>,
+        > + HasConnectionIdType<Chain, ConnectionId = StarknetConnectionId>
+        + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
+        + HasHeightType<Height = u64>
+        + HasConnectionEndType<Chain>,
 {
     async fn build_connection_open_ack_message(
         _chain: &Chain,
-        _connection_id: &Chain::ConnectionId,
-        _counterparty_connection_id: &Counterparty::ConnectionId,
-        _counterparty_payload: Counterparty::ConnectionOpenAckPayload,
+        connection_id: &CosmosConnectionId,
+        counterparty_connection_id: &StarknetConnectionId,
+        counterparty_payload: ConnectionOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        todo!()
+        let counterparty_connection_id_as_cosmos = counterparty_connection_id
+            .connection_id
+            .as_str()
+            .parse()
+            .map_err(Chain::raise_error)?;
+
+        // TODO(rano): dummy client state.
+        // we need to replace CometClientState with real tendermint ClientState
+        let client_state_any = Any {
+            type_url: "".to_string(),
+            value: vec![],
+        };
+
+        // TODO(rano): dummy connection version
+        let counterparty_versions = CosmosConnectionVersion::compatibles();
+
+        let update_height =
+            CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
+
+        let message = CosmosConnectionOpenAckMessage {
+            connection_id: connection_id.clone(),
+            counterparty_connection_id: counterparty_connection_id_as_cosmos,
+            version: counterparty_versions[0].clone().into(),
+            client_state: client_state_any,
+            update_height,
+            proof_try: counterparty_payload.proof_try.proof_bytes,
+            proof_client: counterparty_payload.proof_client.proof_bytes,
+            proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
+            proof_consensus_height: counterparty_payload.proof_consensus_height,
+        };
+
+        Ok(message.to_cosmos_message())
     }
 }
 
