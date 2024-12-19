@@ -39,6 +39,7 @@ use hermes_relayer_components::chain::traits::packet::fields::{
     HasPacketDstChannelId, HasPacketDstPortId, HasPacketSequence, HasPacketSrcChannelId,
     HasPacketSrcPortId, HasPacketTimeoutHeight, HasPacketTimeoutTimestamp,
 };
+use hermes_relayer_components::chain::traits::payload_builders::ack_packet::CanBuildAckPacketPayload;
 use hermes_relayer_components::chain::traits::payload_builders::channel_handshake::{
     CanBuildChannelOpenAckPayload, CanBuildChannelOpenConfirmPayload, CanBuildChannelOpenTryPayload,
 };
@@ -47,6 +48,8 @@ use hermes_relayer_components::chain::traits::payload_builders::connection_hands
     CanBuildConnectionOpenInitPayload, CanBuildConnectionOpenTryPayload,
 };
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
+use hermes_relayer_components::chain::traits::payload_builders::receive_packet::CanBuildReceivePacketPayload;
+use hermes_relayer_components::chain::traits::payload_builders::timeout_unordered_packet::CanBuildTimeoutUnorderedPacketPayload;
 use hermes_relayer_components::chain::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
@@ -357,6 +360,9 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + HasPacketSequence<StarknetChain>
     + HasPacketTimeoutHeight<StarknetChain>
     + HasPacketTimeoutTimestamp<StarknetChain>
+    + CanBuildReceivePacketPayload<StarknetChain>
+    + CanBuildAckPacketPayload<StarknetChain>
+    + CanBuildTimeoutUnorderedPacketPayload<StarknetChain>
 {
 }
 
