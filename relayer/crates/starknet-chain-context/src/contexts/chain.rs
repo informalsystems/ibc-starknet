@@ -25,6 +25,7 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
+use hermes_relayer_components::chain::traits::message_builders::ack_packet::CanBuildAckPacketMessage;
 use hermes_relayer_components::chain::traits::message_builders::channel_handshake::{
     CanBuildChannelOpenAckMessage, CanBuildChannelOpenConfirmMessage,
     CanBuildChannelOpenInitMessage, CanBuildChannelOpenTryMessage,
@@ -34,7 +35,17 @@ use hermes_relayer_components::chain::traits::message_builders::connection_hands
     CanBuildConnectionOpenInitMessage, CanBuildConnectionOpenTryMessage,
 };
 use hermes_relayer_components::chain::traits::message_builders::create_client::CanBuildCreateClientMessage;
+use hermes_relayer_components::chain::traits::message_builders::receive_packet::CanBuildReceivePacketMessage;
+use hermes_relayer_components::chain::traits::message_builders::timeout_unordered_packet::CanBuildTimeoutUnorderedPacketMessage;
 use hermes_relayer_components::chain::traits::message_builders::update_client::CanBuildUpdateClientMessage;
+use hermes_relayer_components::chain::traits::packet::fields::{
+    HasPacketDstChannelId, HasPacketDstPortId, HasPacketSequence, HasPacketSrcChannelId,
+    HasPacketSrcPortId, HasPacketTimeoutHeight, HasPacketTimeoutTimestamp,
+};
+use hermes_relayer_components::chain::traits::packet::filter::{
+    CanFilterIncomingPacket, CanFilterOutgoingPacket,
+};
+use hermes_relayer_components::chain::traits::payload_builders::ack_packet::CanBuildAckPacketPayload;
 use hermes_relayer_components::chain::traits::payload_builders::channel_handshake::{
     CanBuildChannelOpenAckPayload, CanBuildChannelOpenConfirmPayload, CanBuildChannelOpenTryPayload,
 };
@@ -43,6 +54,8 @@ use hermes_relayer_components::chain::traits::payload_builders::connection_hands
     CanBuildConnectionOpenInitPayload, CanBuildConnectionOpenTryPayload,
 };
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
+use hermes_relayer_components::chain::traits::payload_builders::receive_packet::CanBuildReceivePacketPayload;
+use hermes_relayer_components::chain::traits::payload_builders::timeout_unordered_packet::CanBuildTimeoutUnorderedPacketPayload;
 use hermes_relayer_components::chain::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
@@ -62,10 +75,15 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::{
 use hermes_relayer_components::chain::traits::queries::consensus_state_height::{
     CanQueryConsensusStateHeight, CanQueryConsensusStateHeights,
 };
+use hermes_relayer_components::chain::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
+use hermes_relayer_components::chain::traits::queries::packet_commitment::CanQueryPacketCommitment;
+use hermes_relayer_components::chain::traits::queries::packet_is_received::CanQueryPacketIsReceived;
+use hermes_relayer_components::chain::traits::queries::packet_receipt::CanQueryPacketReceipt;
 use hermes_relayer_components::chain::traits::send_message::{
     CanSendMessages, CanSendSingleMessage,
 };
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
+use hermes_relayer_components::chain::traits::types::channel::HasChannelEndType;
 use hermes_relayer_components::chain::traits::types::client_state::{
     HasClientStateFields, HasClientStateType,
 };
@@ -78,10 +96,11 @@ use hermes_relayer_components::chain::traits::types::consensus_state::HasConsens
 use hermes_relayer_components::chain::traits::types::create_client::HasCreateClientEvent;
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::{
-    HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
+    HasChannelIdType, HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
 };
 use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
+use hermes_relayer_components::chain::traits::types::ibc_events::write_ack::HasWriteAckEvent;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
@@ -114,6 +133,7 @@ use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTo
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
+use hermes_starknet_chain_components::types::channel_id::{ChannelEnd, ChannelId};
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
 use hermes_starknet_chain_components::types::commitment_proof::StarknetCommitmentProof;
@@ -127,6 +147,7 @@ use hermes_starknet_chain_components::types::message_response::StarknetMessageRe
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
+use ibc::core::channel::types::packet::Packet;
 use starknet::accounts::SingleOwnerAccount;
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
@@ -245,12 +266,23 @@ pub trait CanUseStarknetChain:
     + HasClientIdType<CosmosChain, ClientId = ClientId>
     + HasConnectionIdType<CosmosChain, ConnectionId = ConnectionId>
     + HasConnectionEndType<CosmosChain, ConnectionEnd = ConnectionEnd>
+    + HasChannelIdType<CosmosChain, ChannelId = ChannelId>
+    + HasChannelEndType<CosmosChain, ChannelEnd = ChannelEnd>
+    // // FIXME: cannot use native PortId. PortIdTypeComponent needs to be wired for StarknetChainTypes
+    // + HasPortIdType<CosmosChain, PortId = PortId>
     + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
     + HasConnectionOpenInitPayloadType<CosmosChain>
     + HasConnectionOpenTryPayloadType<CosmosChain>
     + HasConnectionOpenAckPayloadType<CosmosChain>
     + HasConnectionOpenConfirmPayloadType<CosmosChain>
-    + HasOutgoingPacketType<CosmosChain>
+    + HasOutgoingPacketType<CosmosChain, OutgoingPacket = Packet>
+    + HasPacketSrcChannelId<CosmosChain>
+    + HasPacketSrcPortId<CosmosChain>
+    + HasPacketDstChannelId<CosmosChain>
+    + HasPacketDstPortId<CosmosChain>
+    + HasPacketSequence<CosmosChain>
+    + HasPacketTimeoutHeight<CosmosChain>
+    + HasPacketTimeoutTimestamp<CosmosChain>
     + HasStarknetProvider
     + HasStarknetAccount
     + CanQueryChainStatus
@@ -268,6 +300,8 @@ pub trait CanUseStarknetChain:
     + CanTransferToken
     + HasIbcCommitmentPrefix
     + HasRetryableError
+    + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+    + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
     + HasCreateClientEvent<CosmosChain>
     + CanBuildCreateClientPayload<CosmosChain>
     + CanBuildCreateClientMessage<CosmosChain>
@@ -303,8 +337,19 @@ pub trait CanUseStarknetChain:
     + CanBuildChannelOpenConfirmMessage<CosmosChain>
     + HasConnectionOpenTryEvent<CosmosChain>
     + HasChannelOpenTryEvent<CosmosChain>
-    + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
-    + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+    + CanQueryPacketCommitment<CosmosChain>
+    + CanQueryPacketAcknowledgement<CosmosChain>
+    + CanQueryPacketReceipt<CosmosChain>
+    + CanBuildReceivePacketPayload<CosmosChain>
+    + CanBuildAckPacketPayload<CosmosChain>
+    + CanBuildTimeoutUnorderedPacketPayload<CosmosChain>
+    + CanBuildReceivePacketMessage<CosmosChain>
+    + CanBuildAckPacketMessage<CosmosChain>
+    + CanBuildTimeoutUnorderedPacketMessage<CosmosChain>
+    + HasWriteAckEvent<CosmosChain>
+    + CanFilterOutgoingPacket<CosmosChain>
+    + CanFilterIncomingPacket<CosmosChain>
+    + CanQueryPacketIsReceived<CosmosChain>
 {
 }
 
@@ -314,6 +359,7 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
     + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CometUpdateHeader>
     + HasInitConnectionOptionsType<StarknetChain, InitConnectionOptions = CosmosInitConnectionOptions>
+    + HasCounterpartyMessageHeight<StarknetChain>
     + HasClientStateFields<StarknetChain>
     + CanQueryClientState<StarknetChain>
     + CanQueryConsensusState<StarknetChain>
@@ -337,7 +383,21 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildChannelOpenTryMessage<StarknetChain>
     + CanBuildChannelOpenAckMessage<StarknetChain>
     + CanBuildChannelOpenConfirmMessage<StarknetChain>
-    + HasCounterpartyMessageHeight<StarknetChain>
+    + HasPacketSrcChannelId<StarknetChain>
+    + HasPacketSrcPortId<StarknetChain>
+    + HasPacketDstChannelId<StarknetChain>
+    + HasPacketDstPortId<StarknetChain>
+    + HasPacketSequence<StarknetChain>
+    + HasPacketTimeoutHeight<StarknetChain>
+    + HasPacketTimeoutTimestamp<StarknetChain>
+    + CanBuildReceivePacketPayload<StarknetChain>
+    + CanBuildAckPacketPayload<StarknetChain>
+    + CanBuildTimeoutUnorderedPacketPayload<StarknetChain>
+    + CanBuildReceivePacketMessage<StarknetChain>
+    + CanBuildAckPacketMessage<StarknetChain>
+    + CanBuildTimeoutUnorderedPacketMessage<StarknetChain>
+    + CanFilterOutgoingPacket<StarknetChain>
+    + CanFilterIncomingPacket<StarknetChain>
 {
 }
 

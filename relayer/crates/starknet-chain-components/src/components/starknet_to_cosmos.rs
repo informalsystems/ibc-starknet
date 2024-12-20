@@ -10,10 +10,14 @@ use hermes_cosmos_chain_components::components::client::{
     ConsensusStateTypeComponent, CreateClientMessageBuilderComponent,
     CreateClientMessageOptionsTypeComponent, CreateClientPayloadBuilderComponent,
     CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
-    UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
-    UpdateClientPayloadTypeComponent,
+    PacketDstChannelIdGetterComponent, PacketDstPortIdGetterComponent,
+    PacketSequenceGetterComponent, PacketSrcChannelIdGetterComponent,
+    PacketSrcPortIdGetterComponent, PacketTimeoutHeightGetterComponent,
+    PacketTimeoutTimestampGetterComponent, UpdateClientMessageBuilderComponent,
+    UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
 };
 use hermes_cosmos_chain_components::components::cosmos_to_cosmos::CosmosToCosmosComponents;
+use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
 use hermes_relayer_components::chain::traits::queries::client_state::{
     ClientStateQuerierComponent, ClientStateWithProofsQuerierComponent,
 };
@@ -24,6 +28,7 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::{
 use crate::impls::starknet_to_cosmos::channel_message::BuildStarknetToCosmosChannelHandshakeMessage;
 use crate::impls::starknet_to_cosmos::connection_message::BuildStarknetToCosmosConnectionHandshake;
 use crate::impls::starknet_to_cosmos::counterparty_message_height::GetCosmosCounterpartyMessageStarknetHeight;
+use crate::impls::starknet_to_cosmos::packet_fields::ReadPacketDstStarknetFields;
 use crate::impls::starknet_to_cosmos::query_consensus_state_height::QueryStarknetConsensusStateHeightsFromGrpc;
 use crate::impls::starknet_to_cosmos::update_client_message::BuildStarknetUpdateClientMessage;
 use crate::impls::starknet_to_cosmos::update_client_payload::BuildUpdateCometClientPayload;
@@ -75,7 +80,20 @@ cgp_preset! {
             ChannelOpenAckMessageBuilderComponent,
             ChannelOpenConfirmMessageBuilderComponent,
         ]:
-            BuildStarknetToCosmosChannelHandshakeMessage
+            BuildStarknetToCosmosChannelHandshakeMessage,
+        [
+            PacketSrcChannelIdGetterComponent,
+            PacketSrcPortIdGetterComponent,
+            PacketDstPortIdGetterComponent,
+            PacketSequenceGetterComponent,
+            PacketTimeoutTimestampGetterComponent,
+        ]:
+            CosmosPacketFieldReader,
+        [
+            PacketTimeoutHeightGetterComponent,
+            PacketDstChannelIdGetterComponent,
+        ]:
+            ReadPacketDstStarknetFields,
 
     }
 }

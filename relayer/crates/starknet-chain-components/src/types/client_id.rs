@@ -42,8 +42,10 @@ impl Transformer for EncodeClientId {
 
 impl Display for ClientId {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        // TODO: Verify that the Display is correct
-        write!(f, "{}-{}", self.client_type, self.sequence)
+        let felt_as_be_bytes = self.client_type.to_bytes_be();
+        let felt_as_string = String::from_utf8_lossy(&felt_as_be_bytes);
+        let trimmed_client_type = felt_as_string.trim_start_matches('\0');
+        write!(f, "{}-{}", trimmed_client_type, self.sequence)
     }
 }
 
@@ -64,5 +66,21 @@ impl FromStr for ClientId {
             client_type,
             sequence,
         })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use starknet::macros::short_string;
+
+    use super::*;
+
+    #[test]
+    fn test_client_id_display() {
+        let client_id = ClientId {
+            client_type: short_string!("07-tendermint"),
+            sequence: 1,
+        };
+        assert_eq!(client_id.to_string(), "07-tendermint-1");
     }
 }
