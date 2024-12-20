@@ -12,7 +12,10 @@ pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 pub use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use starknet::core::types::{Felt, U256};
 
-use crate::types::channel_id::{ChannelId, EncodeChannelId};
+use crate::types::channel_id::{
+    ChannelCounterparty, ChannelEnd, ChannelId, ChannelState, EncodeChannelCounterparty,
+    EncodeChannelEnd, EncodeChannelId, EncodeChannelState,
+};
 use crate::types::client_id::{ClientId, EncodeClientId};
 use crate::types::connection_id::{
     ConnectionCounterparty, ConnectionEnd, ConnectionId, ConnectionState,
@@ -124,6 +127,9 @@ delegate_components! {
         (ViaCairo, ConnectionState): EncodeConnectionState,
         (ViaCairo, ConnectionEnd): EncodeConnectionEnd,
         (ViaCairo, ChannelId): EncodeChannelId,
+        (ViaCairo, ChannelState): EncodeChannelState,
+        (ViaCairo, ChannelCounterparty): EncodeChannelCounterparty,
+        (ViaCairo, ChannelEnd): EncodeChannelEnd,
         (ViaCairo, CometUpdateHeader): EncodeCometUpdateHeader,
         (ViaCairo, CreateClientResponse): DecodeCreateClientResponse,
         (ViaCairo, MsgRegisterClient): EncodeRegisterClient,

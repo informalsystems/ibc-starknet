@@ -4,8 +4,7 @@ use hermes_cosmos_chain_components::components::client::{
     ConnectionEndTypeComponent, ConnectionIdTypeComponent,
 };
 
-use crate::types::channel_end::ChannelEnd;
-use crate::types::channel_id::ChannelId;
+use crate::types::channel_id::{ChannelEnd, ChannelId};
 use crate::types::client_id::ClientId;
 use crate::types::connection_id::{ConnectionEnd, ConnectionId};
 
