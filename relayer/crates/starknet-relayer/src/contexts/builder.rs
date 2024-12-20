@@ -16,19 +16,24 @@ use hermes_relayer_components::build::traits::builders::chain_builder::{
     CanBuildChain, ChainBuilder,
 };
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
+use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
 use hermes_relayer_components::multi::types::index::Index;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{RuntimeGetterComponent, RuntimeTypeComponent};
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
+use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
-use ibc::core::host::types::identifiers::ChainId;
+use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
 use starknet::signers::{LocalWallet, SigningKey};
 use url::Url;
+
+use super::cosmos_to_starknet_relay::CosmosToStarknetRelay;
+use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 
 #[derive(Clone)]
 pub struct StarknetBuilder {
@@ -76,6 +81,7 @@ delegate_components! {
         ChainTypeAtComponent<Index<1>>: WithType<CosmosChain>,
         RuntimeTypeComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
+        RelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
     }
 }
 
@@ -145,6 +151,38 @@ impl StarknetBuilder {
         };
 
         Ok(context)
+    }
+
+    pub fn build_starknet_to_cosmos_relay(
+        &self,
+        src_chain: StarknetChain,
+        dst_chain: CosmosChain,
+        src_client_id: &StarknetClientId,
+        dst_client_id: &CosmosClientId,
+    ) -> StarknetToCosmosRelay {
+        StarknetToCosmosRelay::new(
+            self.runtime.clone(),
+            src_chain,
+            dst_chain,
+            src_client_id.clone(),
+            dst_client_id.clone(),
+        )
+    }
+
+    pub fn build_cosmos_to_starknet_relay(
+        &self,
+        src_chain: CosmosChain,
+        dst_chain: StarknetChain,
+        src_client_id: &CosmosClientId,
+        dst_client_id: &StarknetClientId,
+    ) -> CosmosToStarknetRelay {
+        CosmosToStarknetRelay::new(
+            self.runtime.clone(),
+            src_chain,
+            dst_chain,
+            src_client_id.clone(),
+            dst_client_id.clone(),
+        )
     }
 }
 
