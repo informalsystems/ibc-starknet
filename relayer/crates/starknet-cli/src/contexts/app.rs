@@ -6,6 +6,9 @@ use cgp::core::field::impls::use_field::WithField;
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
+use hermes_cli_components::impls::commands::client::update::{
+    RunUpdateClientCommand, UpdateClientArgs,
+};
 use hermes_cli_components::impls::commands::queries::client_state::{
     QueryClientStateArgs, RunQueryClientStateCommand,
 };
@@ -55,9 +58,11 @@ use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriv
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::ConfigUpdater;
 use ibc::core::client::types::Height;
+use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
 use starknet::core::types::Felt;
 use toml::to_string_pretty;
 
+use crate::commands::client::subcommand::{ClientSubCommand, RunClientSubCommand};
 use crate::commands::query::subcommand::{QuerySubCommand, RunQuerySubCommand};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
 use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
@@ -134,6 +139,11 @@ delegate_components! {
         (QueryConsensusStateArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (QueryConsensusStateArgs, symbol!("query_height")): ParseFromOptionalString<u64>,
         (QueryConsensusStateArgs, symbol!("consensus_height")): ParseFromOptionalString<Height>,
+
+        (UpdateClientArgs, symbol!("host_chain_id")): ParseFromString<Felt>,
+        (UpdateClientArgs, symbol!("client_id")): ParseFromString<ClientId>,
+        (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
+        (UpdateClientArgs, symbol!("target_height")): ParseFromOptionalString<Height>,
     }
 }
 
@@ -145,6 +155,9 @@ delegate_components! {
         QuerySubCommand: RunQuerySubCommand,
         QueryClientStateArgs: RunQueryClientStateCommand,
         QueryConsensusStateArgs: RunQueryConsensusStateCommand,
+
+        ClientSubCommand: RunClientSubCommand,
+        UpdateClientArgs: RunUpdateClientCommand,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<UpdateStarknetConfig>,
     }
@@ -203,10 +216,12 @@ pub trait CanUseStarknetApp:
     + CanRunCommand<AllSubCommands>
     + CanRunCommand<BootstrapSubCommand>
     + CanRunCommand<BootstrapStarknetChainArgs>
-    + CanLoadBuilder
+    + CanLoadBuilder<Builder = StarknetBuilder>
     + CanRunCommand<QuerySubCommand>
     + CanRunCommand<QueryClientStateArgs>
     + CanRunCommand<QueryConsensusStateArgs>
+    + CanRunCommand<ClientSubCommand>
+    + CanRunCommand<UpdateClientArgs>
 {
 }
 
