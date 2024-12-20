@@ -10,7 +10,7 @@ use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncode
 use super::connection_id::ConnectionId;
 use super::messages::ibc::channel::{AppVersion, ChannelOrdering, PortId};
 
-#[derive(Debug, PartialEq, Clone, HasField)]
+#[derive(Debug, PartialEq, Clone, HasField, Eq, Ord, PartialOrd)]
 pub struct ChannelId {
     pub channel_id: String,
 }

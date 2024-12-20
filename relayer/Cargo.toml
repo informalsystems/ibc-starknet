@@ -50,6 +50,7 @@ tracing                     = { version = "0.1.40" }
 tracing-subscriber          = { version = "0.3.18" }
 flate2                      = { version = "1.0" }
 http                        = { version = "1.0.0" }
+futures                     = { version = "0.3.30", default-features = false }
 
 ibc                       = { version = "0.56.0" }
 ibc-proto                 = { version = "0.51.1" }
