@@ -15,7 +15,9 @@ use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_chain_components::types::payloads::channel::ChannelOpenTryPayload;
+use hermes_chain_components::types::payloads::channel::{
+    ChannelOpenAckPayload, ChannelOpenTryPayload,
+};
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -33,7 +35,8 @@ use crate::types::channel_id::ChannelId as StarknetChannelId;
 use crate::types::connection_id::ConnectionId as StarknetConnectionId;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::channel::{
-    AppVersion, ChannelOrdering, MsgChanOpenInit, MsgChanOpenTry, PortId as StarknetPortId,
+    AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenInit, MsgChanOpenTry,
+    PortId as StarknetPortId,
 };
 use crate::types::messages::ibc::packet::StateProof;
 pub struct BuildStarknetChannelHandshakeMessages;
@@ -212,24 +215,77 @@ where
     }
 }
 
-impl<Chain, Counterparty> ChannelOpenAckMessageBuilder<Chain, Counterparty>
+impl<Chain, Counterparty, Encoding> ChannelOpenAckMessageBuilder<Chain, Counterparty>
     for BuildStarknetChannelHandshakeMessages
 where
-    Chain: HasMessageType
-        + HasPortIdType<Counterparty>
-        + HasChannelIdType<Counterparty>
-        + HasErrorType,
-    Counterparty:
-        HasChannelIdType<Chain> + HasPortIdType<Chain> + HasChannelOpenAckPayloadType<Chain>,
+    Chain: HasChannelIdType<Counterparty, ChannelId = StarknetChannelId>
+        + HasMessageType<Message = Call>
+        + HasAddressType<Address = Felt>
+        + HasEncoding<AsFelt, Encoding = Encoding>
+        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasPortIdType<Counterparty, PortId = IbcPortId>
+        + CanRaiseError<Encoding::Error>,
+    Counterparty: HasChannelOpenAckPayloadType<
+            Chain,
+            ChannelOpenAckPayload = ChannelOpenAckPayload<Counterparty, Chain>,
+        > + HasChannelIdType<Chain, ChannelId = ChannelId>
+        + HasHeightType<Height = Height>
+        + HasPortIdType<Chain, PortId = IbcPortId>
+        + HasCommitmentProofType
+        + HasChannelEndType<Chain, ChannelEnd = ChannelEnd>,
+    Encoding: CanEncode<ViaCairo, MsgChanOpenAck> + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_channel_open_ack_message(
-        _chain: &Chain,
-        _port_id: &Chain::PortId,
-        _channel_id: &Chain::ChannelId,
-        _counterparty_channel_id: &Counterparty::ChannelId,
-        _counterparty_payload: Counterparty::ChannelOpenAckPayload,
+        chain: &Chain,
+        port_id: &IbcPortId,
+        channel_id: &StarknetChannelId,
+        counterparty_channel_id: &ChannelId,
+        counterparty_payload: ChannelOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        todo!()
+        let port_id_on_a = StarknetPortId {
+            port_id: port_id.to_string(),
+        };
+
+        let chan_id_on_b = StarknetChannelId {
+            channel_id: counterparty_channel_id.to_string(),
+        };
+
+        let version_on_b = AppVersion {
+            version: counterparty_payload.channel_end.version.to_string(),
+        };
+
+        let proof_chan_end_on_b = StateProof {
+            proof: vec![Felt::ONE],
+        };
+
+        let proof_height_on_b = CairoHeight {
+            revision_number: counterparty_payload.update_height.revision_number(),
+            revision_height: counterparty_payload.update_height.revision_height(),
+        };
+
+        let chan_open_ack_msg = MsgChanOpenAck {
+            port_id_on_a,
+            chan_id_on_a: channel_id.clone(),
+            chan_id_on_b,
+            version_on_b,
+            proof_chan_end_on_b,
+            proof_height_on_b,
+        };
+
+        let ibc_core_address = chain.query_contract_address(PhantomData).await?;
+
+        let calldata = chain
+            .encoding()
+            .encode(&chan_open_ack_msg)
+            .map_err(Chain::raise_error)?;
+
+        let message = Call {
+            to: ibc_core_address,
+            selector: selector!("chan_open_ack"),
+            calldata,
+        };
+
+        Ok(message)
     }
 }
 
