@@ -9,6 +9,9 @@ use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainC
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
 };
+use hermes_cli_components::impls::commands::queries::chain_status::{
+    QueryChainStatusArgs, RunQueryChainStatusCommand,
+};
 use hermes_cli_components::impls::commands::queries::client_state::{
     QueryClientStateArgs, RunQueryClientStateCommand,
 };
@@ -140,6 +143,8 @@ delegate_components! {
         (QueryConsensusStateArgs, symbol!("query_height")): ParseFromOptionalString<u64>,
         (QueryConsensusStateArgs, symbol!("consensus_height")): ParseFromOptionalString<Height>,
 
+        (QueryChainStatusArgs, symbol!("chain_id")): ParseFromString<Felt>,
+
         (UpdateClientArgs, symbol!("host_chain_id")): ParseFromString<Felt>,
         (UpdateClientArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
@@ -155,6 +160,7 @@ delegate_components! {
         QuerySubCommand: RunQuerySubCommand,
         QueryClientStateArgs: RunQueryClientStateCommand,
         QueryConsensusStateArgs: RunQueryConsensusStateCommand,
+        QueryChainStatusArgs: RunQueryChainStatusCommand,
 
         ClientSubCommand: RunClientSubCommand,
         UpdateClientArgs: RunUpdateClientCommand,
