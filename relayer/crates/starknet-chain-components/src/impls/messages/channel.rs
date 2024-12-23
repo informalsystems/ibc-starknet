@@ -16,7 +16,7 @@ use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdTyp
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::channel::{
-    ChannelOpenAckPayload, ChannelOpenTryPayload,
+    ChannelOpenAckPayload, ChannelOpenConfirmPayload, ChannelOpenTryPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
@@ -35,8 +35,8 @@ use crate::types::channel_id::ChannelId as StarknetChannelId;
 use crate::types::connection_id::ConnectionId as StarknetConnectionId;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::channel::{
-    AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenInit, MsgChanOpenTry,
-    PortId as StarknetPortId,
+    AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
+    MsgChanOpenTry, PortId as StarknetPortId,
 };
 use crate::types::messages::ibc::packet::StateProof;
 pub struct BuildStarknetChannelHandshakeMessages;
@@ -289,21 +289,63 @@ where
     }
 }
 
-impl<Chain, Counterparty> ChannelOpenConfirmMessageBuilder<Chain, Counterparty>
+impl<Chain, Counterparty, Encoding> ChannelOpenConfirmMessageBuilder<Chain, Counterparty>
     for BuildStarknetChannelHandshakeMessages
 where
-    Chain: HasMessageType
-        + HasPortIdType<Counterparty>
-        + HasChannelIdType<Counterparty>
-        + HasErrorType,
-    Counterparty: HasChannelOpenConfirmPayloadType<Chain>,
+    Chain: HasPortIdType<Counterparty, PortId = IbcPortId>
+        + HasChannelIdType<Counterparty, ChannelId = StarknetChannelId>
+        + HasMessageType<Message = Call>
+        + HasAddressType<Address = Felt>
+        + HasEncoding<AsFelt, Encoding = Encoding>
+        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + CanRaiseError<Encoding::Error>,
+    Counterparty: HasHeightType<Height = Height>
+        + HasCommitmentProofType
+        + HasChannelOpenConfirmPayloadType<
+            Chain,
+            ChannelOpenConfirmPayload = ChannelOpenConfirmPayload<Counterparty>,
+        > + HasChannelEndType<Chain, ChannelEnd = ChannelEnd>,
+    Encoding: CanEncode<ViaCairo, MsgChanOpenConfirm> + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_channel_open_confirm_message(
-        _chain: &Chain,
-        _port_id: &Chain::PortId,
-        _channel_id: &Chain::ChannelId,
-        _counterparty_payload: Counterparty::ChannelOpenConfirmPayload,
+        chain: &Chain,
+        port_id: &IbcPortId,
+        channel_id: &StarknetChannelId,
+        counterparty_payload: ChannelOpenConfirmPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        todo!()
+        let port_id_on_b = StarknetPortId {
+            port_id: port_id.to_string(),
+        };
+
+        let proof_chan_end_on_a = StateProof {
+            proof: vec![Felt::ONE],
+        };
+
+        let proof_height_on_a = CairoHeight {
+            revision_number: counterparty_payload.update_height.revision_number(),
+            revision_height: counterparty_payload.update_height.revision_height(),
+        };
+
+        let chan_open_confirm_msg = MsgChanOpenConfirm {
+            port_id_on_b,
+            chan_id_on_b: channel_id.clone(),
+            proof_chan_end_on_a,
+            proof_height_on_a,
+        };
+
+        let ibc_core_address = chain.query_contract_address(PhantomData).await?;
+
+        let calldata = chain
+            .encoding()
+            .encode(&chan_open_confirm_msg)
+            .map_err(Chain::raise_error)?;
+
+        let message = Call {
+            to: ibc_core_address,
+            selector: selector!("chan_open_confirm"),
+            calldata,
+        };
+
+        Ok(message)
     }
 }
