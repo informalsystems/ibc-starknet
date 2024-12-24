@@ -9,6 +9,9 @@ use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainC
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
 };
+use hermes_cli_components::impls::commands::queries::balance::{
+    QueryBalanceArgs, RunQueryBalanceCommand,
+};
 use hermes_cli_components::impls::commands::queries::chain_status::{
     QueryChainStatusArgs, RunQueryChainStatusCommand,
 };
@@ -145,6 +148,10 @@ delegate_components! {
 
         (QueryChainStatusArgs, symbol!("chain_id")): ParseFromString<Felt>,
 
+        (QueryBalanceArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryBalanceArgs, symbol!("address")): ParseFromString<Felt>,
+        (QueryBalanceArgs, symbol!("denom")): ParseFromString<Felt>,
+
         (UpdateClientArgs, symbol!("host_chain_id")): ParseFromString<Felt>,
         (UpdateClientArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
@@ -161,6 +168,7 @@ delegate_components! {
         QueryClientStateArgs: RunQueryClientStateCommand,
         QueryConsensusStateArgs: RunQueryConsensusStateCommand,
         QueryChainStatusArgs: RunQueryChainStatusCommand,
+        QueryBalanceArgs: RunQueryBalanceCommand,
 
         ClientSubCommand: RunClientSubCommand,
         UpdateClientArgs: RunUpdateClientCommand,
@@ -226,6 +234,7 @@ pub trait CanUseStarknetApp:
     + CanRunCommand<QuerySubCommand>
     + CanRunCommand<QueryClientStateArgs>
     + CanRunCommand<QueryConsensusStateArgs>
+    + CanRunCommand<QueryBalanceArgs>
     + CanRunCommand<ClientSubCommand>
     + CanRunCommand<UpdateClientArgs>
 {
