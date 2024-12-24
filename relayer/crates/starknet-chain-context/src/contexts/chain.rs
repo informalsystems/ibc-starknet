@@ -97,6 +97,7 @@ use hermes_relayer_components::chain::traits::types::create_client::HasCreateCli
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::{
     HasChannelIdType, HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
+    HasPortIdType,
 };
 use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
@@ -148,6 +149,7 @@ use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWallet
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
 use ibc::core::channel::types::packet::Packet;
+use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use starknet::accounts::SingleOwnerAccount;
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
@@ -270,6 +272,7 @@ pub trait CanUseStarknetChain:
     + HasChannelEndType<CosmosChain, ChannelEnd = ChannelEnd>
     // // FIXME: cannot use native PortId. PortIdTypeComponent needs to be wired for StarknetChainTypes
     // + HasPortIdType<CosmosChain, PortId = PortId>
+    + HasPortIdType<CosmosChain, PortId = IbcPortId>
     + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
     + HasConnectionOpenInitPayloadType<CosmosChain>
     + HasConnectionOpenTryPayloadType<CosmosChain>
