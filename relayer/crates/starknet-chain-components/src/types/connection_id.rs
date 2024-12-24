@@ -47,7 +47,7 @@ impl Display for ConnectionId {
 pub struct ConnectionEnd {
     pub state: ConnectionState,
     pub client_id: ClientId,
-    pub counterparty: ConnectionState,
+    pub counterparty: ConnectionCounterparty,
     pub version: ConnectionVersion,
     pub delay_period: u64,
 }
@@ -71,7 +71,7 @@ impl Transformer for EncodeConnectionEnd {
     type From = Product![
         ConnectionState,
         ClientId,
-        ConnectionState,
+        ConnectionCounterparty,
         ConnectionVersion,
         u64
     ];

@@ -194,9 +194,9 @@ where
         payload: ConnectionOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
         // FIXME: Cairo IBC should accept counterparty client ID as string value
-        let cosmos_client_id_as_cairo = {
-            let cosmos_client_id_str = counterparty_client_id.to_string();
-            let (client_type, sequence_str) = cosmos_client_id_str
+        let counterparty_client_id_as_cairo = {
+            let counterparty_client_id_str = counterparty_client_id.to_string();
+            let (client_type, sequence_str) = counterparty_client_id_str
                 .rsplit_once('-')
                 .ok_or_else(|| Chain::raise_error("malformatted client id"))?;
 
@@ -227,8 +227,8 @@ where
         };
 
         let conn_open_init_msg: MsgConnOpenTry = MsgConnOpenTry {
-            client_id_on_a: client_id.clone(),
-            client_id_on_b: cosmos_client_id_as_cairo.clone(),
+            client_id_on_a: counterparty_client_id_as_cairo.clone(),
+            client_id_on_b: client_id.clone(),
             conn_id_on_a: StarknetConnectionId {
                 connection_id: counterparty_connection_id.to_string(),
             },

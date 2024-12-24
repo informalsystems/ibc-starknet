@@ -113,8 +113,10 @@ where
         // TODO(rano): delay period
         let delay_period = Duration::from_secs(0);
 
+        // TODO(rano): apparently update height is set to zero
         let update_height =
-            CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
+            CosmosHeight::new(0, core::cmp::max(1, counterparty_payload.update_height))
+                .map_err(Chain::raise_error)?;
 
         let message = CosmosConnectionOpenTryMessage {
             client_id: client_id.to_string(),
