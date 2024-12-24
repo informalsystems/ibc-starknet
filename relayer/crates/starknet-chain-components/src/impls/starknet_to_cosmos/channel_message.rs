@@ -12,8 +12,11 @@ use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_chain_components::types::payloads::channel::ChannelOpenTryPayload;
+use hermes_chain_components::types::payloads::channel::{
+    ChannelOpenAckPayload, ChannelOpenTryPayload,
+};
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
+use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_try::CosmosChannelOpenTryMessage;
 use ibc::core::channel::types::channel::{
     ChannelEnd as IbcChannelEnd, Counterparty as IbcChannelCounterparty, Order as IbcChannelOrder,
@@ -22,7 +25,7 @@ use ibc::core::channel::types::channel::{
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::host::types::error::IdentifierError;
-use ibc::core::host::types::identifiers::PortId as IbcPortId;
+use ibc::core::host::types::identifiers::{ChannelId as IbcChannelId, PortId as IbcPortId};
 
 use crate::types::channel_id::{
     ChannelEnd as StarknetChannelEnd, ChannelId as StarknetChannelId,
@@ -129,21 +132,42 @@ where
 impl<Chain, Counterparty> ChannelOpenAckMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosChannelHandshakeMessage
 where
-    Chain: HasMessageType
-        + HasPortIdType<Counterparty>
-        + HasChannelIdType<Counterparty>
-        + HasErrorType,
-    Counterparty:
-        HasChannelIdType<Chain> + HasPortIdType<Chain> + HasChannelOpenAckPayloadType<Chain>,
+    Chain: HasMessageType<Message = CosmosMessage>
+        + HasPortIdType<Counterparty, PortId = IbcPortId>
+        + HasChannelIdType<Counterparty, ChannelId = IbcChannelId>
+        + CanRaiseError<ClientError>,
+    Counterparty: HasChannelIdType<Chain, ChannelId = StarknetChannelId>
+        + HasPortIdType<Chain, PortId = IbcPortId>
+        + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
+        + HasHeightType<Height = u64>
+        + HasChannelEndType<Chain, ChannelEnd = StarknetChannelEnd>
+        + HasChannelOpenAckPayloadType<
+            Chain,
+            ChannelOpenAckPayload = ChannelOpenAckPayload<Counterparty, Chain>,
+        >,
 {
     async fn build_channel_open_ack_message(
         _chain: &Chain,
-        _port_id: &Chain::PortId,
-        _channel_id: &Chain::ChannelId,
-        _counterparty_channel_id: &Counterparty::ChannelId,
-        _counterparty_payload: Counterparty::ChannelOpenAckPayload,
+        port_id: &IbcPortId,
+        channel_id: &IbcChannelId,
+        counterparty_channel_id: &StarknetChannelId,
+        counterparty_payload: ChannelOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        todo!()
+        let update_height =
+            CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
+
+        let proof_try = counterparty_payload.proof_try.proof_bytes;
+
+        let message = CosmosChannelOpenAckMessage {
+            port_id: port_id.to_string(),
+            channel_id: channel_id.to_string(),
+            counterparty_channel_id: counterparty_channel_id.channel_id.clone(),
+            counterparty_version: counterparty_payload.channel_end.version.version,
+            update_height,
+            proof_try,
+        };
+
+        Ok(message.to_cosmos_message())
     }
 }
 
