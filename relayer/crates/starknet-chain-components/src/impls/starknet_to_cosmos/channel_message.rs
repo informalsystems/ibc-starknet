@@ -13,10 +13,11 @@ use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdTyp
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::channel::{
-    ChannelOpenAckPayload, ChannelOpenTryPayload,
+    ChannelOpenAckPayload, ChannelOpenConfirmPayload, ChannelOpenTryPayload,
 };
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
+use hermes_cosmos_chain_components::types::messages::channel::open_confirm::CosmosChannelOpenConfirmMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_try::CosmosChannelOpenTryMessage;
 use ibc::core::channel::types::channel::{
     ChannelEnd as IbcChannelEnd, Counterparty as IbcChannelCounterparty, Order as IbcChannelOrder,
@@ -174,18 +175,33 @@ where
 impl<Chain, Counterparty> ChannelOpenConfirmMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosChannelHandshakeMessage
 where
-    Chain: HasMessageType
-        + HasPortIdType<Counterparty>
-        + HasChannelIdType<Counterparty>
-        + HasErrorType,
-    Counterparty: HasChannelOpenConfirmPayloadType<Chain>,
+    Chain: HasMessageType<Message = CosmosMessage>
+        + HasPortIdType<Counterparty, PortId = IbcPortId>
+        + HasChannelIdType<Counterparty, ChannelId = IbcChannelId>
+        + CanRaiseError<ClientError>,
+    Counterparty: HasHeightType<Height = u64>
+        + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
+        + HasChannelOpenConfirmPayloadType<
+            Chain,
+            ChannelOpenConfirmPayload = ChannelOpenConfirmPayload<Counterparty>,
+        >,
 {
     async fn build_channel_open_confirm_message(
         _chain: &Chain,
-        _port_id: &Chain::PortId,
-        _channel_id: &Chain::ChannelId,
-        _counterparty_payload: Counterparty::ChannelOpenConfirmPayload,
+        port_id: &IbcPortId,
+        channel_id: &IbcChannelId,
+        counterparty_payload: Counterparty::ChannelOpenConfirmPayload,
     ) -> Result<Chain::Message, Chain::Error> {
-        todo!()
+        let update_height =
+            CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
+
+        let message = CosmosChannelOpenConfirmMessage {
+            port_id: port_id.to_string(),
+            channel_id: channel_id.to_string(),
+            update_height,
+            proof_ack: counterparty_payload.proof_ack.proof_bytes,
+        };
+
+        Ok(message.to_cosmos_message())
     }
 }
