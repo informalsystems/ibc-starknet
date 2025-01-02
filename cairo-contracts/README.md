@@ -2,21 +2,36 @@
     <h1>Starknet-IBC Cairo Contracts</h1>
 </div>
 
-This directory contains the Cairo contracts that implement the IBC protocol for
-Starknet. Currently, the ICS-20 Token Transfer application is implemented, which
-operates alongside a custom ERC20 contract. This custom contract offers a
-flexible supply through permissioned minting and burning capabilities, unlike
-the traditional ERC20 contract with a fixed supply.
+This directory contains the implementation of Cairo contracts designed to
+integrate the IBC protocol with Starknet. In the current architecture, the
+transport, authentication, and ordering (TAO) layer of IBC is implemented as a
+standalone Cairo contract, referred to as the IBC core contract. This core
+contract serves as the central handler for any registered IBC light clients and
+applications. Therefore building on the IBC core contract, two groups of
+contracts can live:
 
-You can find the preset implementations of these contracts in the
-`cairo-contracts/contracts` directory. The directory includes:
+1. **IBC Light Clients**: These contracts enable the verification of a target
+   (counterparty) consensus protocol on Starknet. Currently, this repository
+   includes the implementation of the CometBFT (AKA Tendermint) light client.
 
-- `erc20.cairo` - The ERC20 mintable contract implementation.
-- `transfer.cairo` - The ICS-20 transfer contract implementation.
+2. **IBC Applications**: These contracts support for various IBC business logic.
+   At present, this project includes an implementation of the ICS-20 token
+   transfer application, alongside a custom ERC20 contract. This custom contract
+   features permissioned minting and burning capabilities, enabling a flexible
+   token supply, unlike the traditional ERC20 contract, which typically enforces
+   a fixed supply.
+
+The implementations of these contracts live in the `cairo-contracts/contracts`
+directory that includes:
+
+- `core.cairo` - The IBC core contract.
+- `erc20.cairo` - The ERC20 mintable contract.
+- `apps/transfer.cairo` - The ICS-20 token transfer application.
+- `clients/cometbft.cairo` - The CometBFT light client.
 
 ## How to build
 
-Install `scarb v2.7.0` with the instruction provided in the [Scarb
+Install `scarb v2.8.4` with the instruction provided in the [Scarb
 Documentation](https://docs.swmansion.com/scarb/download.html). Then, to build
 the contracts, you simply need to run the following command:
 
@@ -29,8 +44,10 @@ The command will compile the contracts and output the compiled contracts as JSON
 files in the `cairo-contracts/target/dev` directory, which you can then deploy
 to Starknet.
 
-- ERC20 Mintable contract: `starknet_ibc_ERC20.contract_class.json`
-- Token Transfer contract: `starknet_ibc_transfer.contract_class.json`
+- IBC Core contract: `starknet_ibc_contracts_IBCCore.contract_class.json`
+- CometBFT client contract: `starknet_ibc_contracts_CometClient.contract_class.json`
+- ERC20 Mintable contract: `starknet_ibc_contracts_ERC20Mintable.contract_class.json`
+- Token Transfer contract: `starknet_ibc_contracts_TransferApp.contract_class.json`
 
 ## How to deploy
 
@@ -78,12 +95,14 @@ Next, create an `.env` file in the root directory of the project. You can use
 the `.env.example` file as a template, which contains the following content:
 
 ```bash
+CORE_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json}
+COMET_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_contracts_CometClient.contract_class.json}
 ERC20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json}
 ICS20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json}
 RPC_URL=https://starknet-sepolia.public.blastapi.io/rpc/v0_7
 ACCOUNT_SRC="${HOME}/.starkli-wallets/deployer/account.json"
 KEYSTORE_SRC="${HOME}/.starkli-wallets/deployer/keystore.json"
-COMPILER_VERSION=2.6.2
+COMPILER_VERSION=2.7.1
 KEYSTORE_PASS=<KEYSTORE_PASSWORD>
 ERC20_CLASS_HASH=""
 ICS20_CLASS_HASH=""
@@ -124,7 +143,7 @@ To interact with the deployed contracts, you can run the following command:
 ./scripts/invoke.sh
 ```
 
-Currently, the script only invokes the `ibc_token_transfer` interface to confirm
-that the contract is working as expected. To interact with other interfaces,
-which require passing more complex and lengthy arguments, it is recommended to
-use the client-side Rust or Typescript implementation.
+Currently, the script only invokes the `ibc_token_address` interface to confirm
+that the contract responses as expected. To interact with other interfaces,
+which require passing lengthy encoded arguments, it is recommended to use a
+client-side Rust or Typescript implementation.
