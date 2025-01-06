@@ -1,4 +1,5 @@
-use std::convert::Infallible;
+use core::convert::Infallible;
+use core::num::ParseIntError;
 
 use cgp::prelude::*;
 use hermes_chain_components::traits::message_builders::channel_handshake::{
@@ -44,6 +45,8 @@ where
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + CanRaiseError<Infallible>
         + CanRaiseError<ClientError>
+        + CanRaiseError<&'static str>
+        + CanRaiseError<ParseIntError>
         + CanRaiseError<IdentifierError>,
     Counterparty: HasChannelIdType<Chain, ChannelId = StarknetChannelId>
         + HasPortIdType<Chain, PortId = IbcPortId>
@@ -58,8 +61,8 @@ where
     async fn build_channel_open_try_message(
         _chain: &Chain,
         port_id: &IbcPortId,
-        _counterparty_port_id: &IbcPortId,
-        _counterparty_channel_id: &StarknetChannelId,
+        counterparty_port_id: &IbcPortId,
+        counterparty_channel_id: &StarknetChannelId,
         counterparty_payload: ChannelOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
         let update_height =
@@ -67,34 +70,27 @@ where
 
         let starknet_channel_end = counterparty_payload.channel_end;
 
-        let state = match starknet_channel_end.state {
-            StarknetChannelState::Uninitialized => IbcChannelState::Uninitialized,
-            StarknetChannelState::Init => IbcChannelState::Init,
-            StarknetChannelState::TryOpen => IbcChannelState::TryOpen,
-            StarknetChannelState::Open => IbcChannelState::Open,
-            StarknetChannelState::Closed => IbcChannelState::Closed,
-        };
-
         let ordering = match starknet_channel_end.ordering {
             StarknetChannelOrdering::Ordered => IbcChannelOrder::Ordered,
             StarknetChannelOrdering::Unordered => IbcChannelOrder::Unordered,
         };
 
+        if !starknet_channel_end.remote.channel_id.channel_id.is_empty() {
+            return Err(Chain::raise_error(
+                "ChannelEnd has non-empty channel_id after chan_open_init",
+            ));
+        }
+
+        let cosmos_channel_seq = counterparty_channel_id
+            .channel_id
+            .strip_prefix("channel-")
+            .ok_or_else(|| Chain::raise_error("ChannelId does not have the expected prefix"))?
+            .parse::<u64>()
+            .map_err(Chain::raise_error)?;
+
         let remote = IbcChannelCounterparty {
-            port_id: starknet_channel_end
-                .remote
-                .port_id
-                .port_id
-                .parse()
-                .map_err(Chain::raise_error)?,
-            channel_id: Some(
-                starknet_channel_end
-                    .remote
-                    .channel_id
-                    .channel_id
-                    .parse()
-                    .map_err(Chain::raise_error)?,
-            ),
+            port_id: counterparty_port_id.clone(),
+            channel_id: Some(IbcChannelId::new(cosmos_channel_seq)),
         };
 
         let connection_id = starknet_channel_end
@@ -111,7 +107,7 @@ where
 
         // TODO(rano): how to get channel end here ?
         let channel_end = IbcChannelEnd {
-            state,
+            state: IbcChannelState::TryOpen,
             ordering,
             remote,
             connection_hops: vec![connection_id],
