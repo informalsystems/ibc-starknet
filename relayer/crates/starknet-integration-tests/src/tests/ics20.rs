@@ -239,16 +239,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         info!("created client on Cosmos: {:?}", cosmos_client_id);
 
-        let starknet_client_state = {
-            starknet_chain
-                .query_client_state(
-                    PhantomData::<CosmosChain>,
-                    &starknet_client_id,
-                    &starknet_chain.query_chain_height().await?,
-                )
-                .await?
-        };
-
         let ics20_contract_address = {
             let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
             let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
@@ -270,7 +260,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             runtime.clone(),
             starknet_chain.clone(),
             cosmos_chain.clone(),
-            starknet_client_id,
+            starknet_client_id.clone(),
             cosmos_client_id,
         );
 
@@ -339,12 +329,24 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         info!("starknet_channel_id: {:?}", starknet_channel_id);
         info!("cosmos_channel_id: {:?}", cosmos_channel_id);
 
+        // submit dummy PacketRecv message to IBC core contract
+
         // stub
         let sender_address = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string();
 
         let recipient_address = starknet_chain_driver.user_wallet_a.account_address;
 
         let amount = 99u32;
+
+        let starknet_client_state = {
+            starknet_chain
+                .query_client_state(
+                    PhantomData::<CosmosChain>,
+                    &starknet_client_id,
+                    &starknet_chain.query_chain_height().await?,
+                )
+                .await?
+        };
 
         let mut msg_recv_packet = {
             let transfer_message = IbcTransferMessage {
