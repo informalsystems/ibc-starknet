@@ -1,6 +1,8 @@
-use crate::contexts::bootstrap::StarknetBootstrap;
 use alloc::sync::Arc;
 use core::marker::PhantomData;
+use std::path::PathBuf;
+use std::time::{Duration, SystemTime};
+
 use eyre::eyre;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientState;
@@ -54,9 +56,9 @@ use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
-use std::path::PathBuf;
-use std::time::{Duration, SystemTime};
 use tracing::info;
+
+use crate::contexts::bootstrap::StarknetBootstrap;
 
 #[test]
 fn test_starknet_ics20_contract() -> Result<(), Error> {
