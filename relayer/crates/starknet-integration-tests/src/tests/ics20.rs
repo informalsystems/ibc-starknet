@@ -17,6 +17,7 @@ use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
+use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
@@ -213,7 +214,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata,
             };
 
-            let response = starknet_chain.send_message(call).await?;
+            let message = StarknetMessage::new(call);
+
+            let response = starknet_chain.send_message(message).await?;
 
             info!("IBC register client response: {:?}", response);
         }
@@ -299,11 +302,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("selector: {:?}", selector!("conn_open_init"));
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("conn_open_init"),
                 calldata: cairo_encoding.encode(&conn_open_init_msg)?,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -343,11 +348,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 delay_period: 0,
             };
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("conn_open_try"),
                 calldata: cairo_encoding.encode(&conn_open_try_msg)?,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -383,11 +390,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 version: connection_version.clone(),
             };
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("conn_open_ack"),
                 calldata: cairo_encoding.encode(&conn_open_ack_msg)?,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -421,11 +430,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 proof_height_on_a: starknet_client_state.latest_height.clone(),
             };
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("conn_open_confirm"),
                 calldata: cairo_encoding.encode(&conn_open_confirm_msg)?,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -476,11 +487,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let register_call_data = cairo_encoding.encode(&register_app)?;
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("bind_port_id"),
                 calldata: register_call_data,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -496,11 +509,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 ordering: ChannelOrdering::Unordered,
             };
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("chan_open_init"),
                 calldata: cairo_encoding.encode(&chan_open_init_msg)?,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -542,11 +557,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 ordering: ChannelOrdering::Unordered,
             };
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("chan_open_try"),
                 calldata: cairo_encoding.encode(&chan_open_try_msg)?,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -583,11 +600,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 proof_height_on_b: starknet_client_state.latest_height.clone(),
             };
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("chan_open_ack"),
                 calldata: cairo_encoding.encode(&chan_open_ack_msg)?,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -623,11 +642,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 proof_height_on_a: starknet_client_state.latest_height.clone(),
             };
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("chan_open_confirm"),
                 calldata: cairo_encoding.encode(&chan_open_confirm_msg)?,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -707,11 +728,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let token_address = {
             let calldata = cairo_encoding.encode(&msg_recv_packet)?;
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("recv_packet"),
                 calldata,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message.clone()).await?;
 
@@ -792,11 +815,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let calldata = cairo_encoding.encode(&msg_recv_packet)?;
 
-            let message = Call {
+            let call = Call {
                 to: ibc_core_address,
                 selector: selector!("recv_packet"),
                 calldata,
             };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message.clone()).await?;
 
