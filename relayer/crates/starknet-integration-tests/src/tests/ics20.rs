@@ -20,26 +20,15 @@ use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrap
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
-use hermes_starknet_chain_components::components::starknet_to_cosmos;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
-use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
-use hermes_starknet_chain_components::types::events::channel::ChannelHandshakeEvents;
-use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::events::packet::PacketRelayEvents;
-use hermes_starknet_chain_components::types::messages::ibc::channel::{
-    AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
-    MsgChanOpenTry, PortId,
-};
-use hermes_starknet_chain_components::types::messages::ibc::connection::{
-    BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit,
-    MsgConnOpenTry,
-};
+use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, PrefixedDenom};
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
     IbcTransferMessage, Participant,
@@ -53,8 +42,6 @@ use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncod
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
-use ibc::core::channel::types::channel::Order;
-use ibc::core::channel::types::Version;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
 use sha2::{Digest, Sha256};
@@ -277,18 +264,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             info!("deployed ICS20 contract to address: {:?}", contract_address);
 
             contract_address
-        };
-
-        let cosmos_client_id_as_cairo = {
-            let cosmos_client_id_str = cosmos_client_id.to_string();
-            let (client_type, sequence_str) = cosmos_client_id_str
-                .rsplit_once('-')
-                .ok_or_else(|| eyre!("malformatted client id"))?;
-
-            ClientId {
-                client_type: Felt::from_bytes_be_slice(client_type.as_bytes()),
-                sequence: sequence_str.parse()?,
-            }
         };
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(

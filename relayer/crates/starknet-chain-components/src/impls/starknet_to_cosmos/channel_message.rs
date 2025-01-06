@@ -29,10 +29,7 @@ use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::host::types::error::IdentifierError;
 use ibc::core::host::types::identifiers::{ChannelId as IbcChannelId, PortId as IbcPortId};
 
-use crate::types::channel_id::{
-    ChannelEnd as StarknetChannelEnd, ChannelId as StarknetChannelId,
-    ChannelState as StarknetChannelState,
-};
+use crate::types::channel_id::{ChannelEnd as StarknetChannelEnd, ChannelId as StarknetChannelId};
 use crate::types::commitment_proof::StarknetCommitmentProof;
 use crate::types::messages::ibc::channel::ChannelOrdering as StarknetChannelOrdering;
 
