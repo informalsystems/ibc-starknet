@@ -3,6 +3,7 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::connection_end::{
     ConnectionEndQuerier, ConnectionEndWithProofsQuerier,
 };
@@ -66,7 +67,8 @@ where
 impl<Chain, Counterparty, Encoding> ConnectionEndWithProofsQuerier<Chain, Counterparty>
     for QueryConnectionEndFromStarknet
 where
-    Chain: HasHeightType
+    Chain: HasHeightType<Height = u64>
+        + CanQueryChainHeight
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + HasConnectionIdType<Counterparty, ConnectionId = ConnectionId>
         + HasConnectionEndType<Counterparty, ConnectionEnd = ConnectionEnd>
@@ -99,7 +101,7 @@ where
 
         // TODO(rano): how to get the proof?
         let dummy_proof = StarknetCommitmentProof {
-            proof_height: 0,
+            proof_height: chain.query_chain_height().await?,
             proof_bytes: vec![0x1],
         };
 

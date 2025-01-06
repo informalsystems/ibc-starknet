@@ -3,6 +3,7 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::channel_end::{
     ChannelEndQuerier, ChannelEndWithProofsQuerier,
 };
@@ -75,7 +76,8 @@ where
 impl<Chain, Counterparty, Encoding> ChannelEndWithProofsQuerier<Chain, Counterparty>
     for QueryChannelEndFromStarknet
 where
-    Chain: HasHeightType
+    Chain: HasHeightType<Height = u64>
+        + CanQueryChainHeight
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
         + HasPortIdType<Counterparty>
         + HasChannelEndType<Counterparty, ChannelEnd = ChannelEnd>
@@ -116,7 +118,7 @@ where
 
         // TODO(rano): how to get the proof?
         let dummy_proof = StarknetCommitmentProof {
-            proof_height: 0,
+            proof_height: chain.query_chain_height().await?,
             proof_bytes: vec![0x1],
         };
 
