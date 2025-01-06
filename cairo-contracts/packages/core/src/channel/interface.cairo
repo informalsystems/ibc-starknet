@@ -8,8 +8,8 @@ use starknet_ibc_core::host::{ConnectionId, PortId, ChannelId, Sequence};
 
 #[starknet::interface]
 pub trait IChannelHandler<TContractState> {
-    fn chan_open_init(ref self: TContractState, msg: MsgChanOpenInit);
-    fn chan_open_try(ref self: TContractState, msg: MsgChanOpenTry);
+    fn chan_open_init(ref self: TContractState, msg: MsgChanOpenInit) -> ChannelId;
+    fn chan_open_try(ref self: TContractState, msg: MsgChanOpenTry) -> ChannelId;
     fn chan_open_ack(ref self: TContractState, msg: MsgChanOpenAck);
     fn chan_open_confirm(ref self: TContractState, msg: MsgChanOpenConfirm);
     fn send_packet(ref self: TContractState, packet: Packet);

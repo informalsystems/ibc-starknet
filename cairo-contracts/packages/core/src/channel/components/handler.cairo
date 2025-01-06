@@ -67,16 +67,20 @@ pub mod ChannelHandlerComponent {
         impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>
     > of IChannelHandler<ComponentState<TContractState>> {
-        fn chan_open_init(ref self: ComponentState<TContractState>, msg: MsgChanOpenInit) {
+        fn chan_open_init(
+            ref self: ComponentState<TContractState>, msg: MsgChanOpenInit
+        ) -> ChannelId {
             let channel_sequence = self.read_next_channel_sequence();
             self.chan_open_init_validate(channel_sequence, msg.clone());
-            self.chan_open_init_execute(channel_sequence, msg);
+            self.chan_open_init_execute(channel_sequence, msg)
         }
 
-        fn chan_open_try(ref self: ComponentState<TContractState>, msg: MsgChanOpenTry) {
+        fn chan_open_try(
+            ref self: ComponentState<TContractState>, msg: MsgChanOpenTry
+        ) -> ChannelId {
             let channel_sequence = self.read_next_channel_sequence();
             self.chan_open_try_validate(channel_sequence, msg.clone());
-            self.chan_open_try_execute(channel_sequence, msg);
+            self.chan_open_try_execute(channel_sequence, msg)
         }
 
         fn chan_open_ack(ref self: ComponentState<TContractState>, msg: MsgChanOpenAck) {
@@ -209,7 +213,7 @@ pub mod ChannelHandlerComponent {
 
         fn chan_open_init_execute(
             ref self: ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenInit
-        ) {
+        ) -> ChannelId {
             let chan_id_on_a = ChannelIdImpl::new(channel_sequence.clone());
 
             let app = self.get_app(@msg.port_id_on_a);
@@ -249,6 +253,8 @@ pub mod ChannelHandlerComponent {
                     msg.conn_id_on_a.clone(),
                     version_on_a
                 );
+
+            chan_id_on_a
         }
     }
 
@@ -300,7 +306,7 @@ pub mod ChannelHandlerComponent {
 
         fn chan_open_try_execute(
             ref self: ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenTry
-        ) {
+        ) -> ChannelId {
             let chan_id_on_b = ChannelIdImpl::new(channel_sequence.clone());
 
             let app = self.get_app(@msg.port_id_on_b);
@@ -342,6 +348,8 @@ pub mod ChannelHandlerComponent {
                     msg.conn_id_on_b.clone(),
                     version_on_b
                 );
+
+            chan_id_on_b
         }
     }
 
