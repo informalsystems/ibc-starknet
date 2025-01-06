@@ -6,6 +6,7 @@ use std::time::{Duration, SystemTime};
 use eyre::eyre;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientState;
+use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
@@ -52,7 +53,10 @@ use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncod
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
+use ibc::core::channel::types::channel::Order;
+use ibc::core::channel::types::Version;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
+use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
@@ -287,8 +291,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             }
         };
 
-        // TODO(rano): connection handshake
-
         let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
             runtime.clone(),
             starknet_chain.clone(),
@@ -296,6 +298,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             starknet_client_id,
             cosmos_client_id,
         );
+
+        // connection handshake
 
         let conn_init_option = CosmosInitConnectionOptions {
             delay_period: Duration::from_secs(0),
@@ -309,398 +313,56 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         info!("starknet_connection_id: {:?}", starknet_connection_id);
         info!("cosmos_connection_id: {:?}", cosmos_connection_id);
 
-        // TODO(rano): channel handshake
-        //
-        // let (starknet_channel_id, cosmos_channel_id) = starknet_to_cosmos_relay
-        //     .bootstrap_channel(&starknet_connection_id, &cosmos_connection_id)
-        //     .await?;
+        // channel handshake
 
-        // info!("starknet_channel_id: {:?}", starknet_channel_id);
-        // info!("cosmos_channel_id: {:?}", cosmos_channel_id);
+        let ics20_port = IbcPortId::transfer();
 
-        // let starknet_connection_id_1 = {
-        //     let conn_open_init_msg = MsgConnOpenInit {
-        //         client_id_on_a: starknet_client_id.clone(),
-        //         client_id_on_b: cosmos_client_id_as_cairo.clone(),
-        //         prefix_on_b: base_prefix.clone(),
-        //         version: connection_version.clone(),
-        //         delay_period: 0,
-        //     };
+        {
+            // register the ICS20 contract with the IBC core contract
 
-        //     info!("selector: {:?}", selector!("conn_open_init"));
+            let port_id_on_starknet = PortId {
+                port_id: ics20_port.to_string(),
+            };
 
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("conn_open_init"),
-        //         calldata: cairo_encoding.encode(&conn_open_init_msg)?,
-        //     };
+            let register_app = MsgRegisterApp {
+                port_id: port_id_on_starknet.clone(),
+                contract_address: ics20_contract_address,
+            };
 
-        //     let message = StarknetMessage::new(call);
+            let register_call_data = cairo_encoding.encode(&register_app)?;
 
-        //     let response = starknet_chain.send_message(message).await?;
+            let call = Call {
+                to: ibc_core_address,
+                selector: selector!("bind_port_id"),
+                calldata: register_call_data,
+            };
 
-        //     info!("conn_open_init response: {:?}", response);
+            let message = StarknetMessage::new(call);
 
-        //     let events: Vec<ConnectionHandshakeEvents> =
-        //         event_encoding.filter_decode_events(&response.events)?;
+            let response = starknet_chain.send_message(message).await?;
 
-        //     assert_eq!(events.len(), 1);
+            info!("register ics20 response: {:?}", response);
+        }
 
-        //     let ConnectionHandshakeEvents::Init(ref conn_init_event) = events[0] else {
-        //         panic!("expected a init event from conn_open_init");
-        //     };
+        let starknet_connection_id_seq = starknet_connection_id
+            .connection_id
+            .strip_prefix("connection-")
+            .unwrap()
+            .parse::<u64>()?;
 
-        //     info!("conn_init_event: {:?}", conn_init_event);
+        let init_channel_options =
+            CosmosInitChannelOptions::new(ConnectionId::new(starknet_connection_id_seq));
 
-        //     assert_eq!(conn_init_event.client_id_on_a, starknet_client_id);
-        //     assert_eq!(conn_init_event.client_id_on_b, cosmos_client_id_as_cairo);
+        let (starknet_channel_id, cosmos_channel_id) = starknet_to_cosmos_relay
+            .bootstrap_channel(
+                &ics20_port.clone(),
+                &ics20_port.clone(),
+                &init_channel_options,
+            )
+            .await?;
 
-        //     conn_init_event.connection_id_on_a.clone()
-        // };
-
-        // let starknet_connection_id_2 = {
-        //     // conn_open_try at starknet; as if conn_init was done at cosmos
-        //     // to check the connection handshake
-
-        //     let conn_open_try_msg = MsgConnOpenTry {
-        //         client_id_on_b: starknet_client_id.clone(),
-        //         client_id_on_a: cosmos_client_id_as_cairo.clone(),
-        //         conn_id_on_a: starknet_connection_id_1.clone(),
-        //         prefix_on_a: base_prefix.clone(),
-        //         version_on_a: connection_version.clone(),
-        //         proof_conn_end_on_a: StateProof {
-        //             proof: vec![Felt::ONE],
-        //         },
-        //         proof_height_on_a: starknet_client_state.latest_height.clone(),
-        //         delay_period: 0,
-        //     };
-
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("conn_open_try"),
-        //         calldata: cairo_encoding.encode(&conn_open_try_msg)?,
-        //     };
-
-        //     let message = StarknetMessage::new(call);
-
-        //     let response = starknet_chain.send_message(message).await?;
-
-        //     info!("conn_open_try response: {:?}", response);
-
-        //     let events: Vec<ConnectionHandshakeEvents> =
-        //         event_encoding.filter_decode_events(&response.events)?;
-
-        //     assert_eq!(events.len(), 1);
-
-        //     let ConnectionHandshakeEvents::Try(ref conn_try_event) = events[0] else {
-        //         panic!("expected a try event from conn_open_try");
-        //     };
-
-        //     info!("conn_try_event: {:?}", conn_try_event);
-
-        //     assert_eq!(conn_try_event.client_id_on_a, cosmos_client_id_as_cairo);
-        //     assert_eq!(conn_try_event.connection_id_on_a, starknet_connection_id_1);
-        //     assert_eq!(conn_try_event.client_id_on_b, starknet_client_id);
-
-        //     conn_try_event.connection_id_on_b.clone()
-        // };
-
-        // {
-        //     let conn_open_ack_msg = MsgConnOpenAck {
-        //         conn_id_on_a: starknet_connection_id_1.clone(),
-        //         conn_id_on_b: starknet_connection_id_2.clone(),
-        //         // empty proofs are not accepted
-        //         proof_conn_end_on_b: StateProof {
-        //             proof: vec![Felt::ONE],
-        //         },
-        //         proof_height_on_b: starknet_client_state.latest_height.clone(),
-        //         version: connection_version.clone(),
-        //     };
-
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("conn_open_ack"),
-        //         calldata: cairo_encoding.encode(&conn_open_ack_msg)?,
-        //     };
-
-        //     let message = StarknetMessage::new(call);
-
-        //     let response = starknet_chain.send_message(message).await?;
-
-        //     info!("conn_open_ack response: {:?}", response);
-
-        //     let events: Vec<ConnectionHandshakeEvents> =
-        //         event_encoding.filter_decode_events(&response.events)?;
-
-        //     assert_eq!(events.len(), 1);
-
-        //     let ConnectionHandshakeEvents::Ack(ref conn_ack_event) = events[0] else {
-        //         panic!("expected a ack event from conn_open_ack");
-        //     };
-
-        //     info!("conn_ack_event: {:?}", conn_ack_event);
-
-        //     assert_eq!(conn_ack_event.client_id_on_a, starknet_client_id);
-        //     assert_eq!(conn_ack_event.client_id_on_b, cosmos_client_id_as_cairo);
-        //     assert_eq!(conn_ack_event.connection_id_on_a, starknet_connection_id_1);
-        //     assert_eq!(conn_ack_event.connection_id_on_b, starknet_connection_id_2);
-        // }
-
-        // {
-        //     // conn_open_confirm at starknet; as if conn_ack was done at cosmos
-
-        //     let conn_open_confirm_msg = MsgConnOpenConfirm {
-        //         conn_id_on_b: starknet_connection_id_2.clone(),
-        //         proof_conn_end_on_a: StateProof {
-        //             proof: vec![Felt::ONE],
-        //         },
-        //         proof_height_on_a: starknet_client_state.latest_height.clone(),
-        //     };
-
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("conn_open_confirm"),
-        //         calldata: cairo_encoding.encode(&conn_open_confirm_msg)?,
-        //     };
-
-        //     let message = StarknetMessage::new(call);
-
-        //     let response = starknet_chain.send_message(message).await?;
-
-        //     info!("conn_open_confirm response: {:?}", response);
-
-        //     let events: Vec<ConnectionHandshakeEvents> =
-        //         event_encoding.filter_decode_events(&response.events)?;
-
-        //     assert_eq!(events.len(), 1);
-
-        //     let ConnectionHandshakeEvents::Confirm(ref conn_confirm_event) = events[0] else {
-        //         panic!("expected a confirm event from conn_open_confirm");
-        //     };
-
-        //     info!("conn_confirm_event: {:?}", conn_confirm_event);
-
-        //     assert_eq!(conn_confirm_event.client_id_on_a, cosmos_client_id_as_cairo);
-        //     assert_eq!(conn_confirm_event.client_id_on_b, starknet_client_id);
-        //     assert_eq!(
-        //         conn_confirm_event.connection_id_on_a,
-        //         starknet_connection_id_1
-        //     );
-        //     assert_eq!(
-        //         conn_confirm_event.connection_id_on_b,
-        //         starknet_connection_id_2
-        //     );
-        // }
-
-        // let port_id_on_starknet = PortId {
-        //     port_id: "transfer".into(),
-        // };
-
-        // let port_id_on_cosmos = PortId {
-        //     port_id: "transfer".into(),
-        // };
-
-        // let app_version = AppVersion {
-        //     version: "ics20-1".into(),
-        // };
-
-        // {
-        //     // register the ICS20 contract with the IBC core contract
-
-        //     let register_app = MsgRegisterApp {
-        //         port_id: port_id_on_starknet.clone(),
-        //         contract_address: ics20_contract_address,
-        //     };
-
-        //     let register_call_data = cairo_encoding.encode(&register_app)?;
-
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("bind_port_id"),
-        //         calldata: register_call_data,
-        //     };
-
-        //     let message = StarknetMessage::new(call);
-
-        //     let response = starknet_chain.send_message(message).await?;
-
-        //     info!("register ics20 response: {:?}", response);
-        // }
-
-        // let starknet_channel_id_1 = {
-        //     let chan_open_init_msg = MsgChanOpenInit {
-        //         port_id_on_a: port_id_on_cosmos.clone(),
-        //         conn_id_on_a: starknet_connection_id_1.clone(),
-        //         port_id_on_b: port_id_on_starknet.clone(),
-        //         version_proposal: app_version.clone(),
-        //         ordering: ChannelOrdering::Unordered,
-        //     };
-
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("chan_open_init"),
-        //         calldata: cairo_encoding.encode(&chan_open_init_msg)?,
-        //     };
-
-        //     let message = StarknetMessage::new(call);
-
-        //     let response = starknet_chain.send_message(message).await?;
-
-        //     info!("chan_open_init response: {:?}", response);
-
-        //     let events: Vec<ChannelHandshakeEvents> =
-        //         event_encoding.filter_decode_events(&response.events)?;
-
-        //     assert_eq!(events.len(), 1);
-
-        //     let ChannelHandshakeEvents::Init(ref chan_init_event) = events[0] else {
-        //         panic!("expected a init event from chan_open_init");
-        //     };
-
-        //     info!("chan_init_event: {:?}", chan_init_event);
-
-        //     assert_eq!(chan_init_event.port_id_on_a, port_id_on_starknet);
-        //     assert_eq!(chan_init_event.port_id_on_b, port_id_on_cosmos);
-        //     assert_eq!(chan_init_event.connection_id_on_a, starknet_connection_id_1);
-        //     assert_eq!(chan_init_event.version_on_a, app_version);
-
-        //     chan_init_event.channel_id_on_a.clone()
-        // };
-
-        // let starknet_channel_id_2 = {
-        //     // chan_open_try at starknet; as if chan_init was done at cosmos
-        //     // to check the channel handshake
-
-        //     let chan_open_try_msg = MsgChanOpenTry {
-        //         port_id_on_b: port_id_on_cosmos.clone(),
-        //         conn_id_on_b: starknet_connection_id_2.clone(),
-        //         port_id_on_a: port_id_on_starknet.clone(),
-        //         chan_id_on_a: starknet_channel_id_1.clone(),
-        //         version_on_a: app_version.clone(),
-        //         proof_chan_end_on_a: StateProof {
-        //             proof: vec![Felt::ONE],
-        //         },
-        //         proof_height_on_a: starknet_client_state.latest_height.clone(),
-        //         ordering: ChannelOrdering::Unordered,
-        //     };
-
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("chan_open_try"),
-        //         calldata: cairo_encoding.encode(&chan_open_try_msg)?,
-        //     };
-
-        //     let message = StarknetMessage::new(call);
-
-        //     let response = starknet_chain.send_message(message).await?;
-
-        //     info!("chan_open_try response: {:?}", response);
-
-        //     let events: Vec<ChannelHandshakeEvents> =
-        //         event_encoding.filter_decode_events(&response.events)?;
-
-        //     assert_eq!(events.len(), 1);
-
-        //     let ChannelHandshakeEvents::Try(ref chan_try_event) = events[0] else {
-        //         panic!("expected a try event from chan_open_try");
-        //     };
-
-        //     info!("chan_try_event: {:?}", chan_try_event);
-
-        //     assert_eq!(chan_try_event.port_id_on_a, port_id_on_starknet);
-        //     assert_eq!(chan_try_event.channel_id_on_a, starknet_channel_id_1);
-        //     assert_eq!(chan_try_event.port_id_on_b, port_id_on_cosmos);
-        //     assert_eq!(chan_try_event.connection_id_on_b, starknet_connection_id_2);
-
-        //     chan_try_event.channel_id_on_b.clone()
-        // };
-
-        // {
-        //     let chan_open_ack_msg = MsgChanOpenAck {
-        //         port_id_on_a: port_id_on_starknet.clone(),
-        //         chan_id_on_a: starknet_channel_id_1.clone(),
-        //         chan_id_on_b: starknet_channel_id_2.clone(),
-        //         version_on_b: app_version.clone(),
-        //         proof_chan_end_on_b: StateProof {
-        //             proof: vec![Felt::ONE],
-        //         },
-        //         proof_height_on_b: starknet_client_state.latest_height.clone(),
-        //     };
-
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("chan_open_ack"),
-        //         calldata: cairo_encoding.encode(&chan_open_ack_msg)?,
-        //     };
-
-        //     let message = StarknetMessage::new(call);
-
-        //     let response = starknet_chain.send_message(message).await?;
-
-        //     info!("chan_open_ack response: {:?}", response);
-
-        //     let events: Vec<ChannelHandshakeEvents> =
-        //         event_encoding.filter_decode_events(&response.events)?;
-
-        //     assert_eq!(events.len(), 1);
-
-        //     let ChannelHandshakeEvents::Ack(ref chan_ack_event) = events[0] else {
-        //         panic!("expected a ack event from chan_open_ack");
-        //     };
-
-        //     info!("chan_ack_event: {:?}", chan_ack_event);
-
-        //     assert_eq!(chan_ack_event.port_id_on_a, port_id_on_starknet);
-        //     assert_eq!(chan_ack_event.port_id_on_b, port_id_on_cosmos);
-        //     assert_eq!(chan_ack_event.channel_id_on_a, starknet_channel_id_1);
-        //     assert_eq!(chan_ack_event.channel_id_on_b, starknet_channel_id_2);
-        //     assert_eq!(chan_ack_event.connection_id_on_a, starknet_connection_id_1);
-        // }
-
-        // {
-        //     // chan_open_confirm at starknet; as if chan_ack was done at cosmos
-
-        //     let chan_open_confirm_msg = MsgChanOpenConfirm {
-        //         port_id_on_b: port_id_on_cosmos.clone(),
-        //         chan_id_on_b: starknet_channel_id_2.clone(),
-        //         proof_chan_end_on_a: StateProof {
-        //             proof: vec![Felt::ONE],
-        //         },
-        //         proof_height_on_a: starknet_client_state.latest_height.clone(),
-        //     };
-
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("chan_open_confirm"),
-        //         calldata: cairo_encoding.encode(&chan_open_confirm_msg)?,
-        //     };
-
-        //     let message = StarknetMessage::new(call);
-
-        //     let response = starknet_chain.send_message(message).await?;
-
-        //     info!("chan_open_confirm response: {:?}", response);
-
-        //     let events: Vec<ChannelHandshakeEvents> =
-        //         event_encoding.filter_decode_events(&response.events)?;
-
-        //     assert_eq!(events.len(), 1);
-
-        //     let ChannelHandshakeEvents::Confirm(ref chan_confirm_event) = events[0] else {
-        //         panic!("expected a confirm event from chan_open_confirm");
-        //     };
-
-        //     info!("chan_confirm_event: {:?}", chan_confirm_event);
-
-        //     assert_eq!(chan_confirm_event.port_id_on_a, port_id_on_starknet);
-        //     assert_eq!(chan_confirm_event.port_id_on_b, port_id_on_cosmos);
-        //     assert_eq!(chan_confirm_event.channel_id_on_a, starknet_channel_id_1);
-        //     assert_eq!(chan_confirm_event.channel_id_on_b, starknet_channel_id_2);
-        //     assert_eq!(
-        //         chan_confirm_event.connection_id_on_b,
-        //         starknet_connection_id_2
-        //     );
-        // }
+        info!("starknet_channel_id: {:?}", starknet_channel_id);
+        info!("cosmos_channel_id: {:?}", cosmos_channel_id);
 
         // // stub
         // let sender_address = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string();
