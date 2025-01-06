@@ -1,7 +1,8 @@
 use alloc::sync::Arc;
 use core::marker::PhantomData;
+use core::time::Duration;
 use std::path::PathBuf;
-use std::time::{Duration, SystemTime};
+use std::time::SystemTime;
 
 use eyre::eyre;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;

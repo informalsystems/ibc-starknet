@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 use cgp::prelude::*;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
