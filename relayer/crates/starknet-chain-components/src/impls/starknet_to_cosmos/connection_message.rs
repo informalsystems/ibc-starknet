@@ -127,8 +127,11 @@ where
             delay_period,
             update_height,
             proof_init: counterparty_payload.proof_init.proof_bytes,
-            proof_client: counterparty_payload.proof_client.proof_bytes,
-            proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
+            // TODO(rano): counterparty_payload has empty proofs?
+            // proof_client: counterparty_payload.proof_client.proof_bytes,
+            proof_client: vec![0x1],
+            // proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
+            proof_consensus: vec![0x1],
             proof_consensus_height: counterparty_payload.proof_consensus_height,
         };
 
@@ -176,8 +179,11 @@ where
             },
             update_height,
             proof_try: counterparty_payload.proof_try.proof_bytes,
-            proof_client: counterparty_payload.proof_client.proof_bytes,
-            proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
+            // TODO(rano): counterparty_payload has empty proofs?
+            // proof_client: counterparty_payload.proof_client.proof_bytes,
+            proof_client: vec![0x1],
+            // proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
+            proof_consensus: vec![0x1],
             proof_consensus_height: counterparty_payload.proof_consensus_height,
         };
 

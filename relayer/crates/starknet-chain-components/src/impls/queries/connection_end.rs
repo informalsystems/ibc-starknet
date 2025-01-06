@@ -100,7 +100,7 @@ where
         // TODO(rano): how to get the proof?
         let dummy_proof = StarknetCommitmentProof {
             proof_height: 0,
-            proof_bytes: vec![],
+            proof_bytes: vec![0x1],
         };
 
         Ok((
