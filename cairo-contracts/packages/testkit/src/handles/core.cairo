@@ -98,11 +98,11 @@ pub impl CoreHandleImpl of CoreHandle {
         self.connection_query_dispatcher().connection_end(connection_id)
     }
 
-    fn chan_open_init(self: @CoreContract, msg: MsgChanOpenInit) {
+    fn chan_open_init(self: @CoreContract, msg: MsgChanOpenInit) -> ChannelId {
         self.channel_handler_dispatcher().chan_open_init(msg)
     }
 
-    fn chan_open_try(self: @CoreContract, msg: MsgChanOpenTry) {
+    fn chan_open_try(self: @CoreContract, msg: MsgChanOpenTry) -> ChannelId {
         self.channel_handler_dispatcher().chan_open_try(msg)
     }
 
