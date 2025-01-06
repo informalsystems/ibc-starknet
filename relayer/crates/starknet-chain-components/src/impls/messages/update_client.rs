@@ -16,6 +16,7 @@ use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
+use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::client_id::ClientId;
 use crate::types::cosmos::update::CometUpdateHeader;
@@ -26,7 +27,7 @@ impl<Chain, Counterparty, Encoding> UpdateClientMessageBuilder<Chain, Counterpar
     for BuildUpdateCometClientMessage
 where
     Chain: HasCreateClientMessageOptionsType<Counterparty>
-        + HasMessageType<Message = Call>
+        + HasMessageType<Message = StarknetMessage>
         + HasAddressType<Address = Felt>
         + HasClientIdType<Counterparty, ClientId = ClientId>
         + HasEncoding<AsFelt, Encoding = Encoding>
@@ -60,6 +61,11 @@ where
             calldata,
         };
 
-        Ok(vec![call])
+        let message = StarknetMessage {
+            call,
+            counterparty_height: None, // TODO: Get ibc core Height
+        };
+
+        Ok(vec![message])
     }
 }

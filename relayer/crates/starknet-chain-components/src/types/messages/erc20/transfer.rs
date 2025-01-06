@@ -13,6 +13,7 @@ use starknet::accounts::Call;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
+use crate::impls::types::message::StarknetMessage;
 use crate::traits::messages::transfer::TransferTokenMessageBuilder;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
@@ -41,7 +42,7 @@ where
         + HasAmountType<Amount = StarknetAmount>
         + HasBlobType<Blob = Vec<Felt>>
         + HasSelectorType<Selector = Felt>
-        + HasMessageType<Message = Call>
+        + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseError<Encoding::Error>,
     Encoding: CanEncode<ViaCairo, TransferErc20TokenMessage, Encoded = Vec<Felt>>,
@@ -50,7 +51,7 @@ where
         chain: &Chain,
         recipient: &Felt,
         amount: &StarknetAmount,
-    ) -> Result<Call, Chain::Error> {
+    ) -> Result<StarknetMessage, Chain::Error> {
         let message = TransferErc20TokenMessage {
             recipient: *recipient,
             amount: amount.quantity,
@@ -67,6 +68,11 @@ where
             calldata,
         };
 
-        Ok(call)
+        let message = StarknetMessage {
+            call,
+            counterparty_height: None,
+        };
+
+        Ok(message)
     }
 }

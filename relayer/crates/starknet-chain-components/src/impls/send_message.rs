@@ -12,6 +12,7 @@ use starknet::core::types::{
     ExecuteInvocation, FunctionInvocation, RevertedInvocation, TransactionTrace,
 };
 
+use crate::impls::types::message::StarknetMessage;
 use crate::types::event::StarknetEvent;
 use crate::types::message_response::StarknetMessageResponse;
 use crate::types::tx_response::TxResponse;
@@ -24,7 +25,7 @@ pub struct UnexpectedTransactionTraceType {
 
 impl<Chain> MessageSender<Chain> for SendCallMessages
 where
-    Chain: HasMessageType<Message = Call>
+    Chain: HasMessageType<Message = StarknetMessage>
         + CanSubmitTx<Transaction = Vec<Call>>
         + HasTxResponseType<TxResponse = TxResponse>
         + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
@@ -34,9 +35,13 @@ where
 {
     async fn send_messages(
         chain: &Chain,
-        messages: Vec<Call>,
+        messages: Vec<StarknetMessage>,
     ) -> Result<Vec<StarknetMessageResponse>, Chain::Error> {
-        let tx_hash = chain.submit_tx(&messages).await?;
+        let calls: Vec<Call> = messages
+            .iter()
+            .map(|message| message.call.clone())
+            .collect();
+        let tx_hash = chain.submit_tx(&calls).await?;
 
         let tx_response = chain.poll_tx_response(&tx_hash).await?;
 
