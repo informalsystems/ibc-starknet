@@ -194,7 +194,7 @@ where
         client_id: &StarknetClientId,
         counterparty_client_id: &CosmosClientId,
         counterparty_connection_id: &CosmosConnectionId,
-        payload: ConnectionOpenTryPayload<Counterparty, Chain>,
+        counterparty_payload: ConnectionOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
         // FIXME: Cairo IBC should accept counterparty client ID as string value
         let cosmos_client_id_as_cairo = {
@@ -211,7 +211,7 @@ where
 
         // FIXME: Cairo IBC should use bytes for commitment prefix
         let commitment_prefix =
-            from_utf8(&payload.commitment_prefix).map_err(Chain::raise_error)?;
+            from_utf8(&counterparty_payload.commitment_prefix).map_err(Chain::raise_error)?;
 
         // FIXME: Use the connection version from the payload
         let connection_version = ConnectionVersion {
@@ -225,8 +225,8 @@ where
         };
 
         let proof_height = CairoHeight {
-            revision_number: payload.update_height.revision_number(),
-            revision_height: payload.update_height.revision_height(),
+            revision_number: counterparty_payload.update_height.revision_number(),
+            revision_height: counterparty_payload.update_height.revision_height(),
         };
 
         let conn_open_init_msg: MsgConnOpenTry = MsgConnOpenTry {
