@@ -29,9 +29,6 @@ where
             calldata: calldata.clone(),
         };
 
-        StarknetMessage {
-            call,
-            counterparty_height: None,
-        }
+        StarknetMessage::new(call)
     }
 }

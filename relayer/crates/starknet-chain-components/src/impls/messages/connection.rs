@@ -157,10 +157,7 @@ where
             calldata,
         };
 
-        let message = StarknetMessage {
-            call,
-            counterparty_height: None,
-        };
+        let message = StarknetMessage::new(call);
 
         Ok(message)
     }
@@ -260,10 +257,8 @@ where
             calldata,
         };
 
-        let message = StarknetMessage {
-            call,
-            counterparty_height: Some(payload.update_height),
-        };
+        let message =
+            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }
@@ -339,10 +334,8 @@ where
             calldata,
         };
 
-        let message = StarknetMessage {
-            call,
-            counterparty_height: Some(counterparty_payload.update_height),
-        };
+        let message =
+            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }
@@ -401,10 +394,8 @@ where
             calldata,
         };
 
-        let message = StarknetMessage {
-            call,
-            counterparty_height: Some(counterparty_payload.update_height),
-        };
+        let message =
+            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }

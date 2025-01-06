@@ -159,10 +159,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
 
             let cosmos_chain_height = cosmos_chain.query_chain_height().await?;
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: Some(cosmos_chain_height),
-            };
+            let message = StarknetMessage::new(call).with_counterparty_height(cosmos_chain_height);
 
             let response = starknet_chain.send_message(message).await?;
 

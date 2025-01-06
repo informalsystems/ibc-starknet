@@ -214,10 +214,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -311,10 +308,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: cairo_encoding.encode(&conn_open_init_msg)?,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -360,10 +354,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: cairo_encoding.encode(&conn_open_try_msg)?,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -405,10 +396,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: cairo_encoding.encode(&conn_open_ack_msg)?,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -448,10 +436,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: cairo_encoding.encode(&conn_open_confirm_msg)?,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -508,10 +493,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: register_call_data,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -533,10 +515,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: cairo_encoding.encode(&chan_open_init_msg)?,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -584,10 +563,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: cairo_encoding.encode(&chan_open_try_msg)?,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -630,10 +606,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: cairo_encoding.encode(&chan_open_ack_msg)?,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -675,10 +648,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: cairo_encoding.encode(&chan_open_confirm_msg)?,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
@@ -764,10 +734,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message.clone()).await?;
 
@@ -854,10 +821,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata,
             };
 
-            let message = StarknetMessage {
-                call,
-                counterparty_height: None,
-            };
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message.clone()).await?;
 
