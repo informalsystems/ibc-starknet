@@ -146,6 +146,7 @@ use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
 use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
+use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
 use ibc::core::channel::types::packet::Packet;
@@ -353,6 +354,7 @@ pub trait CanUseStarknetChain:
     + CanFilterOutgoingPacket<CosmosChain>
     + CanFilterIncomingPacket<CosmosChain>
     + CanQueryPacketIsReceived<CosmosChain>
+    + CanQueryBalance
 {
 }
 

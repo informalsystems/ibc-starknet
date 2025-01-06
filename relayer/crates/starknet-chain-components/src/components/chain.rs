@@ -41,6 +41,7 @@ pub use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterCo
 pub use hermes_relayer_components::transaction::traits::types::transaction::TransactionTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
+use hermes_test_components::chain::traits::queries::balance::BalanceQuerierComponent;
 pub use hermes_test_components::chain::traits::types::address::AddressTypeComponent;
 pub use hermes_test_components::chain::traits::types::amount::AmountTypeComponent;
 pub use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
@@ -67,6 +68,7 @@ use crate::impls::packet_filter::FilterStarknetPackets;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
+use crate::impls::queries::balance::QueryStarknetWalletBalance;
 use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
 use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
@@ -249,6 +251,8 @@ cgp_preset! {
             TransferErc20Token,
         TokenBalanceQuerierComponent:
             QueryErc20TokenBalance,
+        BalanceQuerierComponent:
+            QueryStarknetWalletBalance,
         CreateClientEventComponent:
             UseStarknetCreateClientEvent,
         [
