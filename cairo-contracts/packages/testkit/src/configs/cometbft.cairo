@@ -13,6 +13,7 @@ pub struct CometClientConfig {
     pub latest_height: Height,
     pub latest_timestamp: u64,
     pub trusting_period: u64,
+    pub unbonding_period: u64,
 }
 
 #[generate_trait]
@@ -23,6 +24,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
             latest_height: HEIGHT(10),
             latest_timestamp: 10,
             trusting_period: 100,
+            unbonding_period: 200,
         }
     }
 
@@ -32,6 +34,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         let client_state = CometClientState {
             latest_height: self.latest_height.clone(),
             trusting_period: *self.trusting_period,
+            unbonding_period: *self.unbonding_period,
             status: Status::Active,
         };
 
