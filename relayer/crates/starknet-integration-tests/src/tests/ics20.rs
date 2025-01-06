@@ -339,176 +339,176 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         info!("starknet_channel_id: {:?}", starknet_channel_id);
         info!("cosmos_channel_id: {:?}", cosmos_channel_id);
 
-        // // stub
-        // let sender_address = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string();
+        // stub
+        let sender_address = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng".to_string();
 
-        // let recipient_address = starknet_chain_driver.user_wallet_a.account_address;
+        let recipient_address = starknet_chain_driver.user_wallet_a.account_address;
 
-        // let amount = 99u32;
+        let amount = 99u32;
 
-        // let mut msg_recv_packet = {
-        //     let transfer_message = IbcTransferMessage {
-        //         denom: PrefixedDenom {
-        //             trace_path: Vec::new(),
-        //             base: Denom::Hosted("uatom".into()),
-        //         },
-        //         amount: amount.into(),
-        //         sender: Participant::External(sender_address.clone()),
-        //         receiver: Participant::Native(recipient_address),
-        //         memo: "".into(),
-        //     };
+        let mut msg_recv_packet = {
+            let transfer_message = IbcTransferMessage {
+                denom: PrefixedDenom {
+                    trace_path: Vec::new(),
+                    base: Denom::Hosted("uatom".into()),
+                },
+                amount: amount.into(),
+                sender: Participant::External(sender_address.clone()),
+                receiver: Participant::Native(recipient_address),
+                memo: "".into(),
+            };
 
-        //     let packet_data = cairo_encoding.encode(&transfer_message)?;
+            let packet_data = cairo_encoding.encode(&transfer_message)?;
 
-        //     let current_starknet_height = starknet_chain.query_chain_height().await?;
-        //     let current_starknet_time = SystemTime::now()
-        //         .duration_since(SystemTime::UNIX_EPOCH)?
-        //         .as_secs();
+            let current_starknet_height = starknet_chain.query_chain_height().await?;
+            let current_starknet_time = SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)?
+                .as_secs();
 
-        //     let packet = Packet {
-        //         sequence: 1,
-        //         src_port_id: port_id_on_cosmos.port_id.clone(),
-        //         src_channel_id: starknet_channel_id_2.channel_id.clone(),
-        //         dst_port_id: port_id_on_starknet.port_id.clone(),
-        //         dst_channel_id: starknet_channel_id_1.channel_id.clone(),
-        //         data: packet_data,
-        //         // both timeout height and timestamp are checked
-        //         timeout_height: Height {
-        //             revision_number: 0,
-        //             revision_height: current_starknet_height + 100,
-        //         },
-        //         timeout_timestamp: current_starknet_time + 100,
-        //     };
+            let packet = Packet {
+                sequence: 1,
+                src_port_id: IbcPortId::transfer().to_string(),
+                src_channel_id: cosmos_channel_id.to_string(),
+                dst_port_id: IbcPortId::transfer().to_string(),
+                dst_channel_id: starknet_channel_id.channel_id,
+                data: packet_data,
+                // both timeout height and timestamp are checked
+                timeout_height: Height {
+                    revision_number: 0,
+                    revision_height: current_starknet_height + 100,
+                },
+                timeout_timestamp: current_starknet_time + 100,
+            };
 
-        //     MsgRecvPacket {
-        //         packet,
-        //         proof_commitment_on_a: StateProof {
-        //             proof: vec![Felt::ONE],
-        //         }, // stub
-        //         proof_height_on_a: starknet_client_state.latest_height.clone(),
-        //     }
-        // };
+            MsgRecvPacket {
+                packet,
+                proof_commitment_on_a: StateProof {
+                    proof: vec![Felt::ONE],
+                }, // stub
+                proof_height_on_a: starknet_client_state.latest_height.clone(),
+            }
+        };
 
-        // let token_address = {
-        //     let calldata = cairo_encoding.encode(&msg_recv_packet)?;
+        let token_address = {
+            let calldata = cairo_encoding.encode(&msg_recv_packet)?;
 
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("recv_packet"),
-        //         calldata,
-        //     };
+            let call = Call {
+                to: ibc_core_address,
+                selector: selector!("recv_packet"),
+                calldata,
+            };
 
-        //     let message = StarknetMessage::new(call);
+            let message = StarknetMessage::new(call);
 
-        //     let response = starknet_chain.send_message(message.clone()).await?;
+            let response = starknet_chain.send_message(message.clone()).await?;
 
-        //     info!("IBC transfer response: {:?}", response);
+            info!("IBC transfer response: {:?}", response);
 
-        //     let ibc_packet_events: Vec<PacketRelayEvents> =
-        //         event_encoding.filter_decode_events(&response.events)?;
+            let ibc_packet_events: Vec<PacketRelayEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
 
-        //     info!("IBC packet events: {:?}", ibc_packet_events);
+            info!("IBC packet events: {:?}", ibc_packet_events);
 
-        //     let ibc_transfer_events: Vec<IbcTransferEvent> =
-        //         event_encoding.filter_decode_events(&response.events)?;
+            let ibc_transfer_events: Vec<IbcTransferEvent> =
+                event_encoding.filter_decode_events(&response.events)?;
 
-        //     info!("IBC transfer events: {:?}", ibc_transfer_events);
+            info!("IBC transfer events: {:?}", ibc_transfer_events);
 
-        //     {
-        //         let receive_transfer_event = ibc_transfer_events
-        //             .iter()
-        //             .find_map(|event| {
-        //                 if let IbcTransferEvent::Receive(event) = event {
-        //                     Some(event)
-        //                 } else {
-        //                     None
-        //                 }
-        //             })
-        //             .ok_or_else(|| eyre!("expect create token event"))?;
+            {
+                let receive_transfer_event = ibc_transfer_events
+                    .iter()
+                    .find_map(|event| {
+                        if let IbcTransferEvent::Receive(event) = event {
+                            Some(event)
+                        } else {
+                            None
+                        }
+                    })
+                    .ok_or_else(|| eyre!("expect create token event"))?;
 
-        //         assert_eq!(receive_transfer_event.amount, amount.into());
+                assert_eq!(receive_transfer_event.amount, amount.into());
 
-        //         assert_eq!(
-        //             receive_transfer_event.sender,
-        //             Participant::External(sender_address)
-        //         );
-        //         assert_eq!(
-        //             receive_transfer_event.receiver,
-        //             Participant::Native(recipient_address)
-        //         );
-        //     }
+                assert_eq!(
+                    receive_transfer_event.sender,
+                    Participant::External(sender_address)
+                );
+                assert_eq!(
+                    receive_transfer_event.receiver,
+                    Participant::Native(recipient_address)
+                );
+            }
 
-        //     let token_address = {
-        //         let create_token_event = ibc_transfer_events
-        //             .iter()
-        //             .find_map(|event| {
-        //                 if let IbcTransferEvent::CreateToken(event) = event {
-        //                     Some(event)
-        //                 } else {
-        //                     None
-        //                 }
-        //             })
-        //             .ok_or_else(|| eyre!("expect create token event"))?;
+            let token_address = {
+                let create_token_event = ibc_transfer_events
+                    .iter()
+                    .find_map(|event| {
+                        if let IbcTransferEvent::CreateToken(event) = event {
+                            Some(event)
+                        } else {
+                            None
+                        }
+                    })
+                    .ok_or_else(|| eyre!("expect create token event"))?;
 
-        //         assert_eq!(create_token_event.initial_supply, amount.into());
+                assert_eq!(create_token_event.initial_supply, amount.into());
 
-        //         let token_address = create_token_event.address;
+                let token_address = create_token_event.address;
 
-        //         info!("created token address: {:?}", token_address);
+                info!("created token address: {:?}", token_address);
 
-        //         token_address
-        //     };
+                token_address
+            };
 
-        //     {
-        //         let recipient_balance = starknet_chain
-        //             .query_token_balance(&token_address, &recipient_address)
-        //             .await?;
+            {
+                let recipient_balance = starknet_chain
+                    .query_token_balance(&token_address, &recipient_address)
+                    .await?;
 
-        //         info!("recipient balance after transfer: {}", recipient_balance);
+                info!("recipient balance after transfer: {}", recipient_balance);
 
-        //         assert_eq!(recipient_balance.quantity, amount.into());
-        //     }
+                assert_eq!(recipient_balance.quantity, amount.into());
+            }
 
-        //     token_address
-        // };
+            token_address
+        };
 
-        // {
-        //     // Send the same transfer message a second time
-        //     // but increase the packet sequence number
-        //     msg_recv_packet.packet.sequence += 1;
+        {
+            // Send the same transfer message a second time
+            // but increase the packet sequence number
+            msg_recv_packet.packet.sequence += 1;
 
-        //     let calldata = cairo_encoding.encode(&msg_recv_packet)?;
+            let calldata = cairo_encoding.encode(&msg_recv_packet)?;
 
-        //     let call = Call {
-        //         to: ibc_core_address,
-        //         selector: selector!("recv_packet"),
-        //         calldata,
-        //     };
+            let call = Call {
+                to: ibc_core_address,
+                selector: selector!("recv_packet"),
+                calldata,
+            };
 
-        //     let message = StarknetMessage::new(call);
+            let message = StarknetMessage::new(call);
 
-        //     let response = starknet_chain.send_message(message.clone()).await?;
+            let response = starknet_chain.send_message(message.clone()).await?;
 
-        //     let ibc_packet_events_2: Vec<PacketRelayEvents> =
-        //         event_encoding.filter_decode_events(&response.events)?;
+            let ibc_packet_events_2: Vec<PacketRelayEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
 
-        //     info!("ibc_packet_events 2: {:?}", ibc_packet_events_2);
+            info!("ibc_packet_events 2: {:?}", ibc_packet_events_2);
 
-        //     let ibc_transfer_events_2: Vec<IbcTransferEvent> =
-        //         event_encoding.filter_decode_events(&response.events)?;
+            let ibc_transfer_events_2: Vec<IbcTransferEvent> =
+                event_encoding.filter_decode_events(&response.events)?;
 
-        //     info!("ibc_transfer_events 2: {:?}", ibc_transfer_events_2);
+            info!("ibc_transfer_events 2: {:?}", ibc_transfer_events_2);
 
-        //     {
-        //         let recipient_balance = starknet_chain
-        //             .query_token_balance(&token_address, &recipient_address)
-        //             .await?;
+            {
+                let recipient_balance = starknet_chain
+                    .query_token_balance(&token_address, &recipient_address)
+                    .await?;
 
-        //         info!("recipient balance after transfer: {}", recipient_balance);
+                info!("recipient balance after transfer: {}", recipient_balance);
 
-        //         assert_eq!(recipient_balance.quantity, (amount * 2).into(),);
-        //     }
-        // }
+                assert_eq!(recipient_balance.quantity, (amount * 2).into(),);
+            }
+        }
 
         Ok(())
     })
