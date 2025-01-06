@@ -157,8 +157,6 @@ fn test_relay_update_clients() -> Result<(), Error> {
                 calldata,
             };
 
-            let cosmos_chain_height = cosmos_chain.query_chain_height().await?;
-
             let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
