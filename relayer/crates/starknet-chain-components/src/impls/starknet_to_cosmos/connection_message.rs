@@ -32,6 +32,7 @@ use ibc::core::connection::types::version::Version as CosmosConnectionVersion;
 use ibc::core::host::types::identifiers::{
     ClientId as CosmosClientId, ConnectionId as CosmosConnectionId,
 };
+use ibc::primitives::proto::Any as IbcProtoAny;
 use prost_types::Any;
 
 use crate::types::client_id::ClientId as StarknetClientId;
@@ -100,12 +101,7 @@ where
         counterparty_connection_id: &StarknetConnectionId,
         counterparty_payload: ConnectionOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // TODO(rano): dummy client state.
-        // we need to replace CometClientState with real tendermint ClientState
-        let client_state_any = Any {
-            type_url: "".to_string(),
-            value: vec![],
-        };
+        let ibc_client_state_any = IbcProtoAny::from(counterparty_payload.client_state);
 
         // TODO(rano): dummy connection version
         let counterparty_versions = CosmosConnectionVersion::compatibles();
@@ -124,7 +120,10 @@ where
             counterparty_connection_id: counterparty_connection_id.to_string(),
             counterparty_commitment_prefix: counterparty_payload.commitment_prefix,
             counterparty_versions,
-            client_state: client_state_any,
+            client_state: Any {
+                type_url: ibc_client_state_any.type_url,
+                value: ibc_client_state_any.value,
+            },
             delay_period,
             update_height,
             proof_init: counterparty_payload.proof_init.proof_bytes,
@@ -159,12 +158,7 @@ where
         counterparty_connection_id: &StarknetConnectionId,
         counterparty_payload: ConnectionOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // TODO(rano): dummy client state.
-        // we need to replace CometClientState with real tendermint ClientState
-        let client_state_any = Any {
-            type_url: "".to_string(),
-            value: vec![],
-        };
+        let client_state_any = IbcProtoAny::from(counterparty_payload.client_state);
 
         // TODO(rano): dummy connection version
         let counterparty_versions = CosmosConnectionVersion::compatibles();
@@ -176,7 +170,10 @@ where
             connection_id: connection_id.to_string(),
             counterparty_connection_id: counterparty_connection_id.to_string(),
             version: counterparty_versions[0].clone().into(),
-            client_state: client_state_any,
+            client_state: Any {
+                type_url: client_state_any.type_url,
+                value: client_state_any.value,
+            },
             update_height,
             proof_try: counterparty_payload.proof_try.proof_bytes,
             proof_client: counterparty_payload.proof_client.proof_bytes,
