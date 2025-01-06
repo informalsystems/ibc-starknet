@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 use cgp::core::error::HasErrorType;
 use cgp::prelude::Cons;

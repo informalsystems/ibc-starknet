@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 use cgp::core::error::HasErrorType;
 use hermes_encoding_components::traits::decode_mut::MutDecoder;

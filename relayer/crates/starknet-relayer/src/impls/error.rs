@@ -1,5 +1,5 @@
+use core::convert::Infallible;
 use core::num::TryFromIntError;
-use std::convert::Infallible;
 use std::string::FromUtf8Error;
 
 use cgp::prelude::*;

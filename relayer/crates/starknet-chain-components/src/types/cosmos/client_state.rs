@@ -15,8 +15,13 @@ use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
+use ibc::clients::tendermint::types::{
+    AllowUpdate, ClientState as IbcCometClientState, TrustThreshold,
+};
 use ibc::core::client::types::Height as CosmosHeight;
+use ibc::core::commitment_types::specs::ProofSpecs;
 use ibc::core::host::types::identifiers::ChainId;
+use ibc::primitives::proto::Any;
 
 use crate::types::cosmos::height::Height;
 
@@ -24,6 +29,7 @@ use crate::types::cosmos::height::Height;
 pub struct CometClientState {
     pub latest_height: Height,
     pub trusting_period: u64,
+    pub unbonding_period: u64,
     pub status: ClientStatus,
 }
 
@@ -81,6 +87,7 @@ delegate_components! {
             Product![
                 EncodeField<symbol!("latest_height"), UseContext>,
                 EncodeField<symbol!("trusting_period"), UseContext>,
+                EncodeField<symbol!("unbonding_period"), UseContext>,
                 EncodeField<symbol!("status"), UseContext>,
             ],
         >,
@@ -89,13 +96,16 @@ delegate_components! {
 }
 
 impl Transformer for EncodeCometClientState {
-    type From = Product![Height, u64, ClientStatus];
+    type From = Product![Height, u64, u64, ClientStatus];
     type To = CometClientState;
 
-    fn transform(product![latest_height, trusting_period, status]: Self::From) -> CometClientState {
+    fn transform(
+        product![latest_height, trusting_period, unbonding_period, status]: Self::From,
+    ) -> CometClientState {
         CometClientState {
             latest_height,
             trusting_period,
+            unbonding_period,
             status,
         }
     }
@@ -134,5 +144,32 @@ impl Transformer for EncodeClientStatus {
             Either::Right(Either::Right(Either::Left(height))) => ClientStatus::Frozen(height),
             Either::Right(Either::Right(Either::Right(v))) => match v {},
         }
+    }
+}
+
+impl From<CometClientState> for Any {
+    fn from(client_state: CometClientState) -> Self {
+        let chain_revision_number = client_state.latest_height.revision_number;
+
+        IbcCometClientState::new(
+            ChainId::new(&format!("cosmos-{}", chain_revision_number)).expect("no error"),
+            TrustThreshold::ONE_THIRD,
+            Duration::from_secs(client_state.trusting_period),
+            Duration::from_secs(client_state.unbonding_period),
+            Duration::from_secs(3),
+            CosmosHeight::new(
+                client_state.latest_height.revision_number,
+                client_state.latest_height.revision_height,
+            )
+            .expect("no error"),
+            ProofSpecs::cosmos(),
+            Vec::new(),
+            AllowUpdate {
+                after_expiry: false,
+                after_misbehaviour: false,
+            },
+        )
+        .expect("no error")
+        .into()
     }
 }

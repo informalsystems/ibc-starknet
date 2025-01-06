@@ -62,6 +62,7 @@ where
         let client_state = CometClientState {
             latest_height: height,
             trusting_period: payload.client_state.trusting_period.as_secs(),
+            unbonding_period: payload.client_state.unbonding_period.as_secs(),
             status: ClientStatus::Active,
         };
 

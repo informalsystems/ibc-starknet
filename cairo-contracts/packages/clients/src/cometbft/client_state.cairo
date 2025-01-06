@@ -6,6 +6,7 @@ use starknet_ibc_core::client::{Height, HeightPartialOrd, Status, StatusTrait};
 pub struct CometClientState {
     pub latest_height: Height,
     pub trusting_period: u64,
+    pub unbonding_period: u64,
     pub status: Status,
 }
 

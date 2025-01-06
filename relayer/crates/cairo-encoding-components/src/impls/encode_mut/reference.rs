@@ -1,4 +1,4 @@
-use std::ops::Deref;
+use core::ops::Deref;
 
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 
