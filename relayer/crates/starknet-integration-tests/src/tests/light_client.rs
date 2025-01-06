@@ -211,7 +211,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let cosmos_chain_height = cosmos_chain.query_chain_height().await?;
 
-            let message = StarknetMessage::new(call).with_counterparty_height(cosmos_chain_height);
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 

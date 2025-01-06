@@ -61,10 +61,7 @@ where
             calldata,
         };
 
-        let message = StarknetMessage {
-            call,
-            counterparty_height: None, // TODO: Get ibc core Height
-        };
+        let message = StarknetMessage::new(call);
 
         Ok(vec![message])
     }

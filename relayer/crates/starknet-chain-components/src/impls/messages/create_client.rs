@@ -89,10 +89,7 @@ where
             calldata,
         };
 
-        let message = StarknetMessage {
-            call,
-            counterparty_height: Some(payload.client_state.latest_height),
-        };
+        let message = StarknetMessage::new(call);
 
         Ok(message)
     }
