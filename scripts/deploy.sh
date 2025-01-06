@@ -55,12 +55,12 @@ declare() {
 
 # deploy the contract
 deploy() {
-    IC20_CLASS_HASH=$1
+    ICS20_CLASS_HASH=$1
     ERC20_CLASS_HASH=$2
 
     output=$(
         starkli deploy --not-unique \
-        --watch $IC20_CLASS_HASH '1' $ERC20_CLASS_HASH \
+        --watch $ICS20_CLASS_HASH '1' $ERC20_CLASS_HASH \
         --rpc $RPC_URL \
         --account $ACCOUNT_SRC \
         --keystore $KEYSTORE_SRC \

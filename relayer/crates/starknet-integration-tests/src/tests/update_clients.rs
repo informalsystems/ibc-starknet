@@ -20,6 +20,7 @@ use hermes_relayer_components::relay::traits::target::{DestinationTarget, Source
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::sleep::CanSleep;
+use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
@@ -156,7 +157,9 @@ fn test_relay_update_clients() -> Result<(), Error> {
                 calldata,
             };
 
-            let response = starknet_chain.send_message(call).await?;
+            let message = StarknetMessage::new(call);
+
+            let response = starknet_chain.send_message(message).await?;
 
             info!("IBC register client response: {:?}", response);
         }

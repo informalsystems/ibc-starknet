@@ -38,6 +38,7 @@ use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
+use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::client_id::ClientId as StarknetClientId;
 use crate::types::connection_id::ConnectionId as StarknetConnectionId;
@@ -58,7 +59,7 @@ where
             InitConnectionOptions = CosmosInitConnectionOptions,
         > + HasClientIdType<Counterparty, ClientId = StarknetClientId>
         + HasAddressType<Address = Felt>
-        + HasMessageType<Message = Call>
+        + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseError<&'static str>
@@ -150,11 +151,13 @@ where
             .encode(&conn_open_init_msg)
             .map_err(Chain::raise_error)?;
 
-        let message = Call {
+        let call = Call {
             to: ibc_core_address,
             selector: selector!("conn_open_init"),
             calldata,
         };
+
+        let message = StarknetMessage::new(call);
 
         Ok(message)
     }
@@ -164,7 +167,7 @@ impl<Chain, Counterparty, Encoding> ConnectionOpenTryMessageBuilder<Chain, Count
     for BuildStarknetConnectionHandshakeMessages
 where
     Chain: HasHeightType
-        + HasMessageType<Message = Call>
+        + HasMessageType<Message = StarknetMessage>
         + HasClientIdType<Counterparty, ClientId = StarknetClientId>
         + HasClientStateType<Counterparty>
         + HasAddressType<Address = Felt>
@@ -191,7 +194,7 @@ where
         client_id: &StarknetClientId,
         counterparty_client_id: &CosmosClientId,
         counterparty_connection_id: &CosmosConnectionId,
-        payload: ConnectionOpenTryPayload<Counterparty, Chain>,
+        counterparty_payload: ConnectionOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
         // FIXME: Cairo IBC should accept counterparty client ID as string value
         let counterparty_client_id_as_cairo = {
@@ -208,7 +211,7 @@ where
 
         // FIXME: Cairo IBC should use bytes for commitment prefix
         let commitment_prefix =
-            from_utf8(&payload.commitment_prefix).map_err(Chain::raise_error)?;
+            from_utf8(&counterparty_payload.commitment_prefix).map_err(Chain::raise_error)?;
 
         // FIXME: Use the connection version from the payload
         let connection_version = ConnectionVersion {
@@ -222,8 +225,8 @@ where
         };
 
         let proof_height = CairoHeight {
-            revision_number: payload.update_height.revision_number(),
-            revision_height: payload.update_height.revision_height(),
+            revision_number: counterparty_payload.update_height.revision_number(),
+            revision_height: counterparty_payload.update_height.revision_height(),
         };
 
         let conn_open_init_msg: MsgConnOpenTry = MsgConnOpenTry {
@@ -248,11 +251,14 @@ where
             .encode(&conn_open_init_msg)
             .map_err(Chain::raise_error)?;
 
-        let message = Call {
+        let call = Call {
             to: ibc_core_address,
             selector: selector!("conn_open_init"),
             calldata,
         };
+
+        let message =
+            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }
@@ -265,7 +271,7 @@ where
         + HasClientStateType<Counterparty>
         + HasConnectionIdType<Counterparty, ConnectionId = StarknetConnectionId>
         + HasAddressType<Address = Felt>
-        + HasMessageType<Message = Call>
+        + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseError<Encoding::Error>,
@@ -322,11 +328,14 @@ where
             .encode(&conn_open_ack_msg)
             .map_err(Chain::raise_error)?;
 
-        let message = Call {
+        let call = Call {
             to: ibc_core_address,
             selector: selector!("conn_open_ack"),
             calldata,
         };
+
+        let message =
+            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }
@@ -337,7 +346,7 @@ impl<Chain, Counterparty, Encoding> ConnectionOpenConfirmMessageBuilder<Chain, C
 where
     Chain: HasConnectionIdType<Counterparty, ConnectionId = StarknetConnectionId>
         + HasAddressType<Address = Felt>
-        + HasMessageType<Message = Call>
+        + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseError<Encoding::Error>,
@@ -379,11 +388,14 @@ where
             .encode(&conn_open_confirm_msg)
             .map_err(Chain::raise_error)?;
 
-        let message = Call {
+        let call = Call {
             to: ibc_core_address,
             selector: selector!("conn_open_confirm"),
             calldata,
         };
+
+        let message =
+            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }

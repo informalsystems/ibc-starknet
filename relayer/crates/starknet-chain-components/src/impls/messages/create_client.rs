@@ -17,6 +17,7 @@ use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
+use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::cosmos::client_state::{ClientStatus, CometClientState};
 use crate::types::cosmos::consensus_state::CometConsensusState;
@@ -28,7 +29,7 @@ impl<Chain, Counterparty, Encoding> CreateClientMessageBuilder<Chain, Counterpar
     for BuildCreateCometClientMessage
 where
     Chain: HasCreateClientMessageOptionsType<Counterparty>
-        + HasMessageType<Message = Call>
+        + HasMessageType<Message = StarknetMessage>
         + HasAddressType<Address = Felt>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
@@ -89,6 +90,8 @@ where
             calldata,
         };
 
-        Ok(call)
+        let message = StarknetMessage::new(call);
+
+        Ok(message)
     }
 }
