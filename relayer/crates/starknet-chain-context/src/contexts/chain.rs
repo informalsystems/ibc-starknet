@@ -103,6 +103,7 @@ use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasCha
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::write_ack::HasWriteAckEvent;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
+use hermes_relayer_components::chain::traits::types::packets::ack::HasAcknowledgementType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
@@ -403,6 +404,7 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildTimeoutUnorderedPacketMessage<StarknetChain>
     + CanFilterOutgoingPacket<StarknetChain>
     + CanFilterIncomingPacket<StarknetChain>
+    + HasAcknowledgementType<StarknetChain, Acknowledgement = Vec<u8>>
 {
 }
 
