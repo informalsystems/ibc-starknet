@@ -45,7 +45,8 @@ where
         + HasAddressType<Address = Felt>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseError<Encoding::Error>
+        + CanRaiseError<&'static str>,
     Counterparty: HasOutgoingPacketType<Chain, OutgoingPacket = IbcPacket>
         + HasHeightType<Height = Height>
         + HasCommitmentProofType
@@ -71,7 +72,7 @@ where
         };
 
         let receive_packet_msg = MsgRecvPacket {
-            packet: CairoPacket::from(packet.clone()),
+            packet: CairoPacket::try_from(packet.clone()).map_err(Chain::raise_error)?,
             proof_commitment_on_a,
             proof_height_on_a,
         };
@@ -104,6 +105,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseError<Encoding::Error>
+        + CanRaiseError<&'static str>
         + HasOutgoingPacketType<Counterparty, OutgoingPacket = IbcPacket>
         + HasErrorType,
     Counterparty: HasAckPacketPayloadType<Chain, AckPacketPayload = AckPacketPayload<Counterparty, Chain>>
@@ -128,7 +130,7 @@ where
         };
 
         let ack_packet_msg = MsgAckPacket {
-            packet: CairoPacket::from(packet.clone()),
+            packet: CairoPacket::try_from(packet.clone()).map_err(Chain::raise_error)?,
             acknowledgement: CairoAck {
                 // TODO(rano): cairo accepts Vec<Felt>, but Cosmos sends Vec<u8>
                 ack: vec![Felt::ONE],
@@ -165,6 +167,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseError<Encoding::Error>
+        + CanRaiseError<&'static str>
         + HasOutgoingPacketType<Counterparty, OutgoingPacket = IbcPacket>
         + HasErrorType,
     Counterparty: HasHeightType<Height = Height>
@@ -191,7 +194,7 @@ where
         };
 
         let timeout_packet_msg = MsgTimeoutPacket {
-            packet: CairoPacket::from(packet.clone()),
+            packet: CairoPacket::try_from(packet.clone()).map_err(Chain::raise_error)?,
             // Cairo only accepts unordered packets.
             // So, this sequence is ignored.
             next_seq_recv_on_b: Sequence { sequence: 1 },
