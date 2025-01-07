@@ -90,6 +90,7 @@ where
 
         let ack_bytes = ack
             .into_iter()
+            // TODO(rano): cairo uses [u32; 8], but in cosmos it's Vec<u8>
             .flat_map(|felt| felt.to_be_bytes())
             .collect::<Vec<_>>();
 
