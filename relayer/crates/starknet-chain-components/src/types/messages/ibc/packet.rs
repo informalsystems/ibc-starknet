@@ -7,11 +7,12 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
+use ibc::core::channel::types::packet::Packet as IbcPacket;
 use starknet::core::types::Felt;
 
 use crate::types::cosmos::height::Height;
 
-#[derive(HasField)]
+#[derive(HasField, Clone)]
 pub struct Packet {
     pub sequence: u64,
     pub src_port_id: String,
@@ -21,6 +22,12 @@ pub struct Packet {
     pub data: Vec<Felt>,
     pub timeout_height: Height,
     pub timeout_timestamp: u64,
+}
+
+impl From<IbcPacket> for Packet {
+    fn from(_packet: IbcPacket) -> Self {
+        todo!()
+    }
 }
 
 pub struct EncodePacket;
