@@ -15,7 +15,9 @@ use hermes_chain_components::traits::types::packets::ack::{
 use hermes_chain_components::traits::types::packets::receive::HasReceivePacketPayloadType;
 use hermes_chain_components::traits::types::packets::timeout::HasTimeoutUnorderedPacketPayloadType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_chain_components::types::payloads::packet::{AckPacketPayload, ReceivePacketPayload};
+use hermes_chain_components::types::payloads::packet::{
+    AckPacketPayload, ReceivePacketPayload, TimeoutUnorderedPacketPayload,
+};
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -30,7 +32,8 @@ use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::packet::{
-    Acknowledgement as CairoAck, MsgAckPacket, MsgRecvPacket, Packet as CairoPacket, StateProof,
+    Acknowledgement as CairoAck, MsgAckPacket, MsgRecvPacket, MsgTimeoutPacket,
+    Packet as CairoPacket, Sequence, StateProof,
 };
 
 pub struct BuildStarknetPacketMessages;
@@ -154,17 +157,64 @@ where
     }
 }
 
-impl<Chain, Counterparty> TimeoutUnorderedPacketMessageBuilder<Chain, Counterparty>
+impl<Chain, Counterparty, Encoding> TimeoutUnorderedPacketMessageBuilder<Chain, Counterparty>
     for BuildStarknetPacketMessages
 where
-    Chain: HasMessageType + HasOutgoingPacketType<Counterparty> + HasErrorType,
-    Counterparty: HasTimeoutUnorderedPacketPayloadType<Chain>,
+    Chain: HasMessageType<Message = StarknetMessage>
+        + HasAddressType<Address = Felt>
+        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasEncoding<AsFelt, Encoding = Encoding>
+        + CanRaiseError<Encoding::Error>
+        + HasOutgoingPacketType<Counterparty, OutgoingPacket = IbcPacket>
+        + HasErrorType,
+    Counterparty: HasHeightType<Height = Height>
+        + HasCommitmentProofType
+        + HasTimeoutUnorderedPacketPayloadType<
+            Chain,
+            TimeoutUnorderedPacketPayload = TimeoutUnorderedPacketPayload<Counterparty>,
+        >,
+    Encoding: CanEncode<ViaCairo, MsgTimeoutPacket> + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_timeout_unordered_packet_message(
-        _chain: &Chain,
-        _packet: &Chain::OutgoingPacket,
-        _payload: Counterparty::TimeoutUnorderedPacketPayload,
+        chain: &Chain,
+        packet: &IbcPacket,
+        counterparty_payload: TimeoutUnorderedPacketPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        todo!()
+        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
+        let proof_unreceived_on_b = StateProof {
+            proof: vec![Felt::ONE],
+        };
+
+        let proof_height_on_b = CairoHeight {
+            revision_number: counterparty_payload.update_height.revision_number(),
+            revision_height: counterparty_payload.update_height.revision_height(),
+        };
+
+        let timeout_packet_msg = MsgTimeoutPacket {
+            packet: CairoPacket::from(packet.clone()),
+            // Cairo only accepts unordered packets.
+            // So, this sequence is ignored.
+            next_seq_recv_on_b: Sequence { sequence: 1 },
+            proof_unreceived_on_b,
+            proof_height_on_b,
+        };
+
+        let ibc_core_address = chain.query_contract_address(PhantomData).await?;
+
+        let calldata = chain
+            .encoding()
+            .encode(&timeout_packet_msg)
+            .map_err(Chain::raise_error)?;
+
+        let call = Call {
+            to: ibc_core_address,
+            selector: selector!("timeout_packet"),
+            calldata,
+        };
+
+        let message =
+            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+
+        Ok(message)
     }
 }
