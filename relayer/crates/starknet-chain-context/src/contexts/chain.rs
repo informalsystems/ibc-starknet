@@ -411,6 +411,7 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanFilterOutgoingPacket<StarknetChain>
     + CanFilterIncomingPacket<StarknetChain>
     + HasAcknowledgementType<StarknetChain, Acknowledgement = Vec<u8>>
+    + HasSequenceType<StarknetChain, Sequence = Sequence>
 {
 }
 
