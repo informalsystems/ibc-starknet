@@ -164,6 +164,16 @@ pub mod ChannelHandlerComponent {
             self.read_packet_ack(@port_id, @channel_id, @sequence)
         }
 
+
+        fn is_packet_received(
+            self: @ComponentState<TContractState>,
+            port_id: PortId,
+            channel_id: ChannelId,
+            sequence: Sequence
+        ) -> bool {
+            self.packet_ack_exists(@port_id, @channel_id, @sequence)
+        }
+
         fn next_sequence_send(
             self: @ComponentState<TContractState>, port_id: PortId, channel_id: ChannelId
         ) -> Sequence {
