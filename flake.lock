@@ -216,6 +216,7 @@
         "ibc-go-v8-src": "ibc-go-v8-src",
         "ibc-go-v8-wasm-src": "ibc-go-v8-wasm-src",
         "ibc-go-v9-src": "ibc-go-v9-src",
+        "ibc-go-v9-wasm-src": "ibc-go-v9-wasm-src",
         "ibc-rs-src": "ibc-rs-src",
         "ica-src": "ica-src",
         "ignite-cli-src": "ignite-cli-src",
@@ -262,18 +263,20 @@
         "wasmvm_2_0_3-src": "wasmvm_2_0_3-src",
         "wasmvm_2_1_0-src": "wasmvm_2_1_0-src",
         "wasmvm_2_1_2-src": "wasmvm_2_1_2-src",
-        "wasmvm_2_1_3-src": "wasmvm_2_1_3-src"
+        "wasmvm_2_1_3-src": "wasmvm_2_1_3-src",
+        "wasmvm_2_1_4-src": "wasmvm_2_1_4-src"
       },
       "locked": {
-        "lastModified": 1733317488,
-        "narHash": "sha256-Kr/h0A92hdsnFGAX4ujwLrwlk1voYJkkBp7pHwa4/ag=",
+        "lastModified": 1736327683,
+        "narHash": "sha256-4B1divgZCXyiMGqL5KRcJp9xDEulHAE2zb7hpbbkXxM=",
         "owner": "informalsystems",
         "repo": "cosmos.nix",
-        "rev": "a615496057a069e03674f804e2b089ac67aac925",
+        "rev": "6917e8f21bec733671eb2b0c006136a418951c39",
         "type": "github"
       },
       "original": {
         "owner": "informalsystems",
+        "ref": "luca_joss/add-ibc-go-v9-with-wasm",
         "repo": "cosmos.nix",
         "type": "github"
       }
@@ -1134,6 +1137,23 @@
       "original": {
         "owner": "cosmos",
         "ref": "v9.0.0-rc.0",
+        "repo": "ibc-go",
+        "type": "github"
+      }
+    },
+    "ibc-go-v9-wasm-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1734690421,
+        "narHash": "sha256-E0LxbmwuGAM3c9OvncRpfvxeQHYbJS2PADGTuI0w38Y=",
+        "owner": "cosmos",
+        "repo": "ibc-go",
+        "rev": "ae2bfabb6df53c000c1212ae41b7d0a0743b851a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cosmos",
+        "ref": "08-wasm/release/v0.5.x%2Bibc-go-v9.0.x-wasmvm-v2.1.x",
         "repo": "ibc-go",
         "type": "github"
       }
@@ -2321,6 +2341,23 @@
       "original": {
         "owner": "CosmWasm",
         "ref": "v2.1.3",
+        "repo": "wasmvm",
+        "type": "github"
+      }
+    },
+    "wasmvm_2_1_4-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1733824920,
+        "narHash": "sha256-Bkrp8ocQftzfAAgZ8D8Gifi4qQJl32Urazf4ZAcCnpI=",
+        "owner": "CosmWasm",
+        "repo": "wasmvm",
+        "rev": "1ddd563a80546192e10a9cf38060b5ee5262808e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "CosmWasm",
+        "ref": "v2.1.4",
         "repo": "wasmvm",
         "type": "github"
       }
