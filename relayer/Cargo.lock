@@ -2216,6 +2216,7 @@ version = "0.1.0"
 dependencies = [
  "cairo-lang-starknet-classes",
  "cgp",
+ "crypto-bigint",
  "hermes-cairo-encoding-components",
  "hermes-chain-components",
  "hermes-chain-type-components",
