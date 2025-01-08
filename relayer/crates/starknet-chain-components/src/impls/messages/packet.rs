@@ -45,8 +45,7 @@ where
         + HasAddressType<Address = Felt>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanRaiseError<Encoding::Error>
-        + CanRaiseError<&'static str>,
+        + CanRaiseError<Encoding::Error>,
     Counterparty: HasOutgoingPacketType<Chain, OutgoingPacket = IbcPacket>
         + HasHeightType<Height = Height>
         + HasCommitmentProofType
@@ -58,7 +57,7 @@ where
 {
     async fn build_receive_packet_message(
         chain: &Chain,
-        packet: &Counterparty::OutgoingPacket,
+        packet: &IbcPacket,
         counterparty_payload: ReceivePacketPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
         // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
@@ -72,7 +71,7 @@ where
         };
 
         let receive_packet_msg = MsgRecvPacket {
-            packet: CairoPacket::try_from(packet.clone()).map_err(Chain::raise_error)?,
+            packet: CairoPacket::from(packet.clone()),
             proof_commitment_on_a,
             proof_height_on_a,
         };
@@ -105,7 +104,6 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseError<Encoding::Error>
-        + CanRaiseError<&'static str>
         + HasOutgoingPacketType<Counterparty, OutgoingPacket = IbcPacket>
         + HasErrorType,
     Counterparty: HasAckPacketPayloadType<Chain, AckPacketPayload = AckPacketPayload<Counterparty, Chain>>
@@ -130,7 +128,7 @@ where
         };
 
         let ack_packet_msg = MsgAckPacket {
-            packet: CairoPacket::try_from(packet.clone()).map_err(Chain::raise_error)?,
+            packet: CairoPacket::from(packet.clone()),
             acknowledgement: CairoAck {
                 ack: counterparty_payload.ack,
             },
@@ -166,7 +164,6 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseError<Encoding::Error>
-        + CanRaiseError<&'static str>
         + HasOutgoingPacketType<Counterparty, OutgoingPacket = IbcPacket>
         + HasErrorType,
     Counterparty: HasHeightType<Height = Height>
@@ -193,7 +190,7 @@ where
         };
 
         let timeout_packet_msg = MsgTimeoutPacket {
-            packet: CairoPacket::try_from(packet.clone()).map_err(Chain::raise_error)?,
+            packet: CairoPacket::from(packet.clone()),
             // Cairo only accepts unordered packets.
             // So, this sequence is ignored.
             next_seq_recv_on_b: Sequence { sequence: 1 },

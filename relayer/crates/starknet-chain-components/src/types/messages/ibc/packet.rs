@@ -25,10 +25,8 @@ pub struct Packet {
     pub timeout_timestamp: u64,
 }
 
-impl TryFrom<IbcPacket> for Packet {
-    type Error = &'static str;
-
-    fn try_from(packet: IbcPacket) -> Result<Self, Self::Error> {
+impl From<IbcPacket> for Packet {
+    fn from(packet: IbcPacket) -> Self {
         let sequence = packet.seq_on_a.value();
         let src_port_id = packet.port_id_on_a.to_string();
         let src_channel_id = packet.chan_id_on_a.to_string();
@@ -39,20 +37,23 @@ impl TryFrom<IbcPacket> for Packet {
         // let _data_bytes = packet.data;
         let data_felt = vec![Felt::ONE];
 
-        let TimeoutHeight::At(timeout_height) = packet.timeout_height_on_b else {
-            return Err("timeout_height_on_b is unset");
+        let timeout_height = match packet.timeout_height_on_b {
+            TimeoutHeight::Never => Height {
+                revision_number: 0,
+                revision_height: 0,
+            },
+            TimeoutHeight::At(height) => Height {
+                revision_number: height.revision_number(),
+                revision_height: height.revision_height(),
+            },
         };
 
-        let timeout_height = Height {
-            revision_number: timeout_height.revision_number(),
-            revision_height: timeout_height.revision_height(),
+        let timeout_timestamp = match packet.timeout_timestamp_on_b {
+            TimeoutTimestamp::Never => 0,
+            TimeoutTimestamp::At(timeout_timestamp) => timeout_timestamp.nanoseconds() / 1_000_000,
         };
 
-        let TimeoutTimestamp::At(timeout_timestamp) = packet.timeout_timestamp_on_b else {
-            return Err("timeout_timestamp_on_b is unset");
-        };
-
-        Ok(Self {
+        Self {
             sequence,
             src_port_id,
             src_channel_id,
@@ -60,8 +61,8 @@ impl TryFrom<IbcPacket> for Packet {
             dst_channel_id,
             data: data_felt,
             timeout_height,
-            timeout_timestamp: timeout_timestamp.nanoseconds() / 1_000_000,
-        })
+            timeout_timestamp,
+        }
     }
 }
 
