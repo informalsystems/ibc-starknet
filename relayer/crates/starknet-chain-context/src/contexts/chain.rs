@@ -151,6 +151,7 @@ use hermes_starknet_chain_components::types::message_response::StarknetMessageRe
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
+use hermes_test_components::chain::traits::types::memo::HasMemoType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence};
@@ -362,6 +363,9 @@ pub trait CanUseStarknetChain:
     + HasPacketReceiptType<CosmosChain, PacketReceipt = Vec<u8>>
     + HasSequenceType<CosmosChain, Sequence = Sequence>
     + CanQueryBalance
+    + HasMemoType
+    // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
+    // + CanIbcTransferToken<CosmosChain>
 {
 }
 
