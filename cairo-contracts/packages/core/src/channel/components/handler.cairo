@@ -21,7 +21,7 @@ pub mod ChannelHandlerComponent {
         ClientHandlerComponent, ClientContract, ClientContractTrait, Height, HeightImpl
     };
     use starknet_ibc_core::commitment::{
-        StateProof, Commitment, CommitmentZero, compute_packet_commtiment, compute_ack_commitment
+        StateProof, Commitment, CommitmentZero, compute_packet_commitment, compute_ack_commitment
     };
     use starknet_ibc_core::connection::{
         ConnectionHandlerComponent, ConnectionEnd, ConnectionEndTrait, VersionTrait,
@@ -561,7 +561,7 @@ pub mod ChannelHandlerComponent {
 
             let json_packet_data = app.json_packet_data(packet.data.clone());
 
-            let packet_commitment_on_a = compute_packet_commtiment(
+            let packet_commitment_on_a = compute_packet_commitment(
                 @json_packet_data,
                 packet.timeout_height_on_b.clone(),
                 packet.timeout_timestamp_on_b.clone()
@@ -898,7 +898,7 @@ pub mod ChannelHandlerComponent {
             let packet_commitment = self
                 .read_packet_commitment(packet.port_id_on_a, packet.chan_id_on_a, packet.seq_on_a);
 
-            let expected_packet_commitment = compute_packet_commtiment(
+            let expected_packet_commitment = compute_packet_commitment(
                 json_packet_data,
                 packet.timeout_height_on_b.clone(),
                 packet.timeout_timestamp_on_b.clone()
@@ -942,7 +942,7 @@ pub mod ChannelHandlerComponent {
                 msg.packet.seq_on_a.clone()
             );
 
-            let packet_commitment_on_a = compute_packet_commtiment(
+            let packet_commitment_on_a = compute_packet_commitment(
                 @json_packet_data,
                 msg.packet.timeout_height_on_b.clone(),
                 msg.packet.timeout_timestamp_on_b.clone()
