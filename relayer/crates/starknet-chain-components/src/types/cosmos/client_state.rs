@@ -31,6 +31,7 @@ pub struct CometClientState {
     pub trusting_period: u64,
     pub unbonding_period: u64,
     pub status: ClientStatus,
+    pub chain_id: ChainId,
 }
 
 #[derive(Debug)]
@@ -75,9 +76,8 @@ where
         false // todo
     }
 
-    fn client_state_chain_id(_client_state: &CometClientState) -> ChainId {
-        // FIXME: Store Cosmos chain ID in CometClientState and return it here
-        ChainId::new("cosmos").unwrap()
+    fn client_state_chain_id(client_state: &CometClientState) -> ChainId {
+        client_state.chain_id.clone()
     }
 }
 
@@ -89,6 +89,7 @@ delegate_components! {
                 EncodeField<symbol!("trusting_period"), UseContext>,
                 EncodeField<symbol!("unbonding_period"), UseContext>,
                 EncodeField<symbol!("status"), UseContext>,
+                EncodeField<symbol!("chain_id"), UseContext>,
             ],
         >,
         MutDecoderComponent: DecodeFrom<Self, UseContext>,
@@ -96,17 +97,24 @@ delegate_components! {
 }
 
 impl Transformer for EncodeCometClientState {
-    type From = Product![Height, u64, u64, ClientStatus];
+    type From = Product![Height, u64, u64, ClientStatus, ChainId];
     type To = CometClientState;
 
     fn transform(
-        product![latest_height, trusting_period, unbonding_period, status]: Self::From,
+        product![
+            latest_height,
+            trusting_period,
+            unbonding_period,
+            status,
+            chain_id
+        ]: Self::From,
     ) -> CometClientState {
         CometClientState {
             latest_height,
             trusting_period,
             unbonding_period,
             status,
+            chain_id,
         }
     }
 }
@@ -149,10 +157,8 @@ impl Transformer for EncodeClientStatus {
 
 impl From<CometClientState> for Any {
     fn from(client_state: CometClientState) -> Self {
-        let chain_revision_number = client_state.latest_height.revision_number;
-
         IbcCometClientState::new(
-            ChainId::new(&format!("cosmos-{}", chain_revision_number)).expect("no error"),
+            client_state.chain_id,
             TrustThreshold::ONE_THIRD,
             Duration::from_secs(client_state.trusting_period),
             Duration::from_secs(client_state.unbonding_period),
@@ -171,5 +177,35 @@ impl From<CometClientState> for Any {
         )
         .expect("no error")
         .into()
+    }
+}
+
+pub struct EncodeChainId;
+
+delegate_components! {
+    EncodeChainId {
+        [
+            MutEncoderComponent,
+            MutDecoderComponent,
+        ]: EncodeVariantFrom<EncodeChainId>,
+    }
+}
+
+impl TransformerRef for EncodeChainId {
+    type From = ChainId;
+    type To<'a> = (String, u64);
+
+    fn transform<'a>(value: &'a Self::From) -> Self::To<'a> {
+        (value.as_str().to_string(), value.revision_number())
+    }
+}
+
+impl Transformer for EncodeChainId {
+    type From = (String, u64);
+    type To = ChainId;
+
+    fn transform((id, revision_number): Self::From) -> Self::To {
+        let chain_id_str = format!("{id}-{revision_number}");
+        ChainId::new(&chain_id_str).unwrap()
     }
 }

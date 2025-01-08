@@ -46,6 +46,7 @@ use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
 };
 use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
+use ibc::core::host::types::identifiers::ChainId;
 use starknet::core::types::{Felt, U256};
 
 use crate::impls::error::HandleStarknetChainError;
@@ -131,7 +132,10 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, Height>
     + CanEncodeAndDecode<ViaCairo, Packet>
     + CanEncodeAndDecode<ViaCairo, ClientStatus>
-    + CanEncodeAndDecode<ViaCairo, CometClientState>
+    //+ CanEncodeAndDecode<ViaCairo, CometClientState>
+    + CanEncode<ViaCairo, ChainId>
+    //+ CanEncode<ViaCairo, CometClientState>
+    //+ CanDecode<ViaCairo, CometClientState>
     + CanEncodeAndDecode<ViaCairo, CometConsensusState>
     + CanEncodeAndDecode<ViaCairo, ClientId>
     + CanEncodeAndDecode<ViaCairo, ConnectionId>
