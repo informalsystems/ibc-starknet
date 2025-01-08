@@ -12,6 +12,7 @@ use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_test_components::chain::types::amount::Amount;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
+use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
@@ -22,6 +23,7 @@ use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
+use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
@@ -39,6 +41,7 @@ use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
+use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 use tracing::info;
 
@@ -387,7 +390,37 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_cosmos_a_step_1.quantity + transfer_quantity
         );
 
-        // TODO(rano): query the balance of the ics20 token on starknet
+        // TODO(rano): we should use the poseidon hash of the ibc denom to get the token address
+
+        let ics20_token_address = {
+            let output = starknet_chain
+                .call_contract(
+                    &ics20_contract_address,
+                    &selector!("ibc_token_addresses"),
+                    &vec![],
+                )
+                .await?;
+
+            let addresses: Vec<Felt> = cairo_encoding.decode(&output)?;
+
+            assert_eq!(addresses.len(), 1);
+
+            addresses[0]
+        };
+
+        info!("ics20 token address: {:?}", ics20_token_address);
+
+        let balance_starknet_b_step_1 = starknet_chain
+            .query_balance(address_starknet_b, &ics20_token_address)
+            .await?;
+
+        info!(
+            "starknet balance after transfer: {:?}",
+            balance_starknet_b_step_1
+        );
+
+        assert_eq!(balance_starknet_b_step_1.quantity, transfer_quantity.into());
+
         // TODO(rano): send back the ics20 token to cosmos
 
         Ok(())
