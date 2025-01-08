@@ -7,8 +7,6 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
-use ibc::core::channel::types::packet::Packet as IbcPacket;
-use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
 use starknet::core::types::Felt;
 
 use crate::types::cosmos::height::Height;
@@ -23,47 +21,6 @@ pub struct Packet {
     pub data: Vec<Felt>,
     pub timeout_height: Height,
     pub timeout_timestamp: u64,
-}
-
-impl From<IbcPacket> for Packet {
-    fn from(packet: IbcPacket) -> Self {
-        let sequence = packet.seq_on_a.value();
-        let src_port_id = packet.port_id_on_a.to_string();
-        let src_channel_id = packet.chan_id_on_a.to_string();
-        let dst_port_id = packet.port_id_on_b.to_string();
-        let dst_channel_id = packet.chan_id_on_b.to_string();
-
-        // TODO(rano): implement conversion from felt to bytes
-        // let _data_bytes = packet.data;
-        let data_felt = vec![Felt::ONE];
-
-        let timeout_height = match packet.timeout_height_on_b {
-            TimeoutHeight::Never => Height {
-                revision_number: 0,
-                revision_height: 0,
-            },
-            TimeoutHeight::At(height) => Height {
-                revision_number: height.revision_number(),
-                revision_height: height.revision_height(),
-            },
-        };
-
-        let timeout_timestamp = match packet.timeout_timestamp_on_b {
-            TimeoutTimestamp::Never => 0,
-            TimeoutTimestamp::At(timeout_timestamp) => timeout_timestamp.nanoseconds() / 1_000_000,
-        };
-
-        Self {
-            sequence,
-            src_port_id,
-            src_channel_id,
-            dst_port_id,
-            dst_channel_id,
-            data: data_felt,
-            timeout_height,
-            timeout_timestamp,
-        }
-    }
 }
 
 pub struct EncodePacket;

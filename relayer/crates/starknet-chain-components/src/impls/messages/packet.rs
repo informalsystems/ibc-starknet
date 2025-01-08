@@ -22,7 +22,9 @@ use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use ibc::apps::transfer::types::packet::PacketData as IbcIcs20PacketData;
 use ibc::core::channel::types::packet::Packet as IbcPacket;
+use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
 use ibc::core::client::types::Height;
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
@@ -31,6 +33,10 @@ use starknet::macros::selector;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::cosmos::height::Height as CairoHeight;
+use crate::types::messages::ibc::denom::{Denom, PrefixedDenom};
+use crate::types::messages::ibc::ibc_transfer::{
+    IbcTransferMessage as CairoIbcTransferMessage, Participant,
+};
 use crate::types::messages::ibc::packet::{
     Acknowledgement as CairoAck, MsgAckPacket, MsgRecvPacket, MsgTimeoutPacket,
     Packet as CairoPacket, Sequence, StateProof,
@@ -53,7 +59,9 @@ where
             Chain,
             ReceivePacketPayload = ReceivePacketPayload<Counterparty>,
         >,
-    Encoding: CanEncode<ViaCairo, MsgRecvPacket> + HasEncodedType<Encoded = Vec<Felt>>,
+    Encoding: CanEncode<ViaCairo, MsgRecvPacket>
+        + CanEncode<ViaCairo, CairoIbcTransferMessage>
+        + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_receive_packet_message(
         chain: &Chain,
@@ -71,7 +79,7 @@ where
         };
 
         let receive_packet_msg = MsgRecvPacket {
-            packet: CairoPacket::from(packet.clone()),
+            packet: from_cosmos_to_cairo_packet(packet, chain.encoding()),
             proof_commitment_on_a,
             proof_height_on_a,
         };
@@ -110,7 +118,9 @@ where
         + HasHeightType<Height = Height>
         + HasCommitmentProofType
         + HasAcknowledgementType<Chain, Acknowledgement = Vec<u8>>,
-    Encoding: CanEncode<ViaCairo, MsgAckPacket> + HasEncodedType<Encoded = Vec<Felt>>,
+    Encoding: CanEncode<ViaCairo, MsgAckPacket>
+        + CanEncode<ViaCairo, CairoIbcTransferMessage>
+        + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_ack_packet_message(
         chain: &Chain,
@@ -128,7 +138,7 @@ where
         };
 
         let ack_packet_msg = MsgAckPacket {
-            packet: CairoPacket::from(packet.clone()),
+            packet: from_cosmos_to_cairo_packet(packet, chain.encoding()),
             acknowledgement: CairoAck {
                 ack: counterparty_payload.ack,
             },
@@ -172,7 +182,9 @@ where
             Chain,
             TimeoutUnorderedPacketPayload = TimeoutUnorderedPacketPayload<Counterparty>,
         >,
-    Encoding: CanEncode<ViaCairo, MsgTimeoutPacket> + HasEncodedType<Encoded = Vec<Felt>>,
+    Encoding: CanEncode<ViaCairo, MsgTimeoutPacket>
+        + CanEncode<ViaCairo, CairoIbcTransferMessage>
+        + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_timeout_unordered_packet_message(
         chain: &Chain,
@@ -190,7 +202,7 @@ where
         };
 
         let timeout_packet_msg = MsgTimeoutPacket {
-            packet: CairoPacket::from(packet.clone()),
+            packet: from_cosmos_to_cairo_packet(packet, chain.encoding()),
             // Cairo only accepts unordered packets.
             // So, this sequence is ignored.
             next_seq_recv_on_b: Sequence { sequence: 1 },
@@ -215,5 +227,96 @@ where
             StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
+    }
+}
+
+fn from_cosmos_to_cairo_packet<Encoding>(packet: &IbcPacket, encoding: &Encoding) -> CairoPacket
+where
+    Encoding: CanEncode<ViaCairo, CairoIbcTransferMessage> + HasEncodedType<Encoded = Vec<Felt>>,
+{
+    let sequence = packet.seq_on_a.value();
+    let src_port_id = packet.port_id_on_a.to_string();
+    let src_channel_id = packet.chan_id_on_a.to_string();
+    let dst_port_id = packet.port_id_on_b.to_string();
+    let dst_channel_id = packet.chan_id_on_b.to_string();
+
+    // TODO(rano): the packet data needs to serialized to Vec<felt>.
+    // to do that, we assume PacketData struct (i.e. ICS20) and construct it.
+    // ideally, Cairo contract should accept the serialized data directly.
+
+    // deserialize to ibc ics20 packet message
+
+    let ibc_ics20_packet_data: IbcIcs20PacketData = serde_json::from_slice(&packet.data).unwrap();
+
+    // convert to cairo packet message
+
+    let denom = PrefixedDenom {
+        // TODO(rano): can't iter. need fix at ibc-rs side
+        // trace_path: ibc_ics20_packet_data
+        //     .token
+        //     .denom
+        //     .trace_path
+        //     .iter()
+        //     .map(|x| /* logic */ ())
+        //     .collect(),
+        trace_path: vec![],
+        base: Denom::Hosted(
+            ibc_ics20_packet_data
+                .token
+                .denom
+                .base_denom
+                .as_str()
+                .to_string(),
+        ),
+    };
+
+    let amount = {
+        let bytes = ibc_ics20_packet_data.token.amount.as_ref().0;
+        crypto_bigint::U256::from(bytes).into()
+    };
+
+    let sender = Participant::External(ibc_ics20_packet_data.sender.as_ref().to_string());
+
+    let receiver = Participant::Native(ibc_ics20_packet_data.receiver.as_ref().parse().unwrap());
+
+    let memo = ibc_ics20_packet_data.memo.as_ref().to_string();
+
+    let cairo_ics20_packet_data = CairoIbcTransferMessage {
+        denom,
+        amount,
+        sender,
+        receiver,
+        memo,
+    };
+
+    // serialize to vec<felt>
+
+    let data_felt = encoding.encode(&cairo_ics20_packet_data).unwrap();
+
+    let timeout_height = match packet.timeout_height_on_b {
+        TimeoutHeight::Never => CairoHeight {
+            revision_number: 0,
+            revision_height: 0,
+        },
+        TimeoutHeight::At(height) => CairoHeight {
+            revision_number: height.revision_number(),
+            revision_height: height.revision_height(),
+        },
+    };
+
+    let timeout_timestamp = match packet.timeout_timestamp_on_b {
+        TimeoutTimestamp::Never => 0,
+        TimeoutTimestamp::At(timeout_timestamp) => timeout_timestamp.nanoseconds() / 1_000_000,
+    };
+
+    CairoPacket {
+        sequence,
+        src_port_id,
+        src_channel_id,
+        dst_port_id,
+        dst_channel_id,
+        data: data_felt,
+        timeout_height,
+        timeout_timestamp,
     }
 }
