@@ -132,8 +132,7 @@ where
         let ack_packet_msg = MsgAckPacket {
             packet: CairoPacket::try_from(packet.clone()).map_err(Chain::raise_error)?,
             acknowledgement: CairoAck {
-                // TODO(rano): cairo accepts Vec<Felt>, but Cosmos sends Vec<u8>
-                ack: vec![Felt::ONE],
+                ack: counterparty_payload.ack,
             },
             proof_ack_on_b,
             proof_height_on_b,

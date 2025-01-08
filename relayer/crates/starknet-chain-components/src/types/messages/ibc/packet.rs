@@ -181,7 +181,7 @@ impl Transformer for EncodeMsgRecvPacket {
 
 #[derive(HasField, Debug, Clone)]
 pub struct Acknowledgement {
-    pub ack: Vec<Felt>,
+    pub ack: Vec<u8>,
 }
 
 pub struct EncodeAcknowledgement;
@@ -198,7 +198,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeAcknowledgement {
-    type From = Product![Vec<Felt>];
+    type From = Product![Vec<u8>];
     type To = Acknowledgement;
 
     fn transform(product![ack]: Self::From) -> Acknowledgement {
