@@ -22,6 +22,7 @@ cgp_preset! {
         (ViaCairo, Vec<Felt>): EncodeList,
         (ViaCairo, bool): EncodeBool,
         (ViaCairo, u64): EncodeFromU128,
+        (ViaCairo, u32): EncodeFromU128,
         (ViaCairo, usize): EncodeFromU128,
         (ViaCairo, String): EncodeUtf8String,
         (ViaCairo, ()): EncodeNothing,
@@ -29,5 +30,6 @@ cgp_preset! {
         (ViaCairo, Vec<String>): EncodeList,
         // TODO(rano): use <const N: usize>
         (ViaCairo, [String; 2]): EncodeArray,
+        (ViaCairo, [u32; 8]): EncodeArray,
     }
 }

@@ -7,11 +7,13 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
+use ibc::core::channel::types::packet::Packet as IbcPacket;
+use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
 use starknet::core::types::Felt;
 
 use crate::types::cosmos::height::Height;
 
-#[derive(HasField)]
+#[derive(HasField, Clone)]
 pub struct Packet {
     pub sequence: u64,
     pub src_port_id: String,
@@ -21,6 +23,46 @@ pub struct Packet {
     pub data: Vec<Felt>,
     pub timeout_height: Height,
     pub timeout_timestamp: u64,
+}
+
+impl TryFrom<IbcPacket> for Packet {
+    type Error = &'static str;
+
+    fn try_from(packet: IbcPacket) -> Result<Self, Self::Error> {
+        let sequence = packet.seq_on_a.value();
+        let src_port_id = packet.port_id_on_a.to_string();
+        let src_channel_id = packet.chan_id_on_a.to_string();
+        let dst_port_id = packet.port_id_on_b.to_string();
+        let dst_channel_id = packet.chan_id_on_b.to_string();
+
+        // TODO(rano): implement conversion from felt to bytes
+        // let _data_bytes = packet.data;
+        let data_felt = vec![Felt::ONE];
+
+        let TimeoutHeight::At(timeout_height) = packet.timeout_height_on_b else {
+            return Err("timeout_height_on_b is unset");
+        };
+
+        let timeout_height = Height {
+            revision_number: timeout_height.revision_number(),
+            revision_height: timeout_height.revision_height(),
+        };
+
+        let TimeoutTimestamp::At(timeout_timestamp) = packet.timeout_timestamp_on_b else {
+            return Err("timeout_timestamp_on_b is unset");
+        };
+
+        Ok(Self {
+            sequence,
+            src_port_id,
+            src_channel_id,
+            dst_port_id,
+            dst_channel_id,
+            data: data_felt,
+            timeout_height,
+            timeout_timestamp: timeout_timestamp.nanoseconds() / 1_000_000,
+        })
+    }
 }
 
 pub struct EncodePacket;

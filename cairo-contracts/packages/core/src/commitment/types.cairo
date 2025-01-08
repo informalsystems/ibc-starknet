@@ -48,7 +48,7 @@ pub impl CommitmentIntoStateValue of Into<Commitment, StateValue> {
     }
 }
 
-pub fn compute_packet_commtiment(
+pub fn compute_packet_commitment(
     json_packet_data: @ByteArray, timeout_height: Height, timeout_timestamp: Timestamp
 ) -> Commitment {
     let mut coll = U32CollectorImpl::init();

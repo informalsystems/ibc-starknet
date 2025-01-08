@@ -97,12 +97,15 @@ use hermes_relayer_components::chain::traits::types::create_client::HasCreateCli
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::{
     HasChannelIdType, HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
-    HasPortIdType,
+    HasPortIdType, HasSequenceType,
 };
 use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::write_ack::HasWriteAckEvent;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
+use hermes_relayer_components::chain::traits::types::packets::ack::HasAcknowledgementType;
+use hermes_relayer_components::chain::traits::types::packets::receive::HasPacketCommitmentType;
+use hermes_relayer_components::chain::traits::types::packets::timeout::HasPacketReceiptType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
@@ -150,7 +153,7 @@ use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
 use ibc::core::channel::types::packet::Packet;
-use ibc::core::host::types::identifiers::PortId as IbcPortId;
+use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence};
 use starknet::accounts::SingleOwnerAccount;
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
@@ -354,6 +357,10 @@ pub trait CanUseStarknetChain:
     + CanFilterOutgoingPacket<CosmosChain>
     + CanFilterIncomingPacket<CosmosChain>
     + CanQueryPacketIsReceived<CosmosChain>
+    + HasPacketCommitmentType<CosmosChain, PacketCommitment = Vec<u8>>
+    + HasAcknowledgementType<CosmosChain, Acknowledgement = Vec<u8>>
+    + HasPacketReceiptType<CosmosChain, PacketReceipt = Vec<u8>>
+    + HasSequenceType<CosmosChain, Sequence = Sequence>
     + CanQueryBalance
 {
 }
@@ -403,6 +410,8 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildTimeoutUnorderedPacketMessage<StarknetChain>
     + CanFilterOutgoingPacket<StarknetChain>
     + CanFilterIncomingPacket<StarknetChain>
+    + HasAcknowledgementType<StarknetChain, Acknowledgement = Vec<u8>>
+    + HasSequenceType<StarknetChain, Sequence = Sequence>
 {
 }
 

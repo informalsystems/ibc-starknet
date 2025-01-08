@@ -23,7 +23,7 @@ pub mod commitment {
 
     pub use types::{
         Commitment, CommitmentZero, StateValue, StateValueZero, StateProof, StateProofZero,
-        StateRoot, StateRootZero, compute_packet_commtiment, compute_ack_commitment,
+        StateRoot, StateRootZero, compute_packet_commitment, compute_ack_commitment,
     };
     pub use utils::{
         IntoArrayU32, U64IntoArrayU32, U32Collector, U32CollectorImpl, U32CollectorTrait,
