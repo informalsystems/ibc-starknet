@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
@@ -15,10 +17,31 @@ pub enum Denom {
     Hosted(String),
 }
 
+impl Display for Denom {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Denom::Native(denom) => write!(f, "{}", denom),
+            Denom::Hosted(denom) => write!(f, "{}", denom),
+        }
+    }
+}
+
 #[derive(Debug, HasField)]
 pub struct PrefixedDenom {
     pub trace_path: Vec<TracePrefix>,
     pub base: Denom,
+}
+
+impl Display for PrefixedDenom {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for prefix in self.trace_path.iter().rev() {
+            write!(f, "{}/{}/", prefix.port_id, prefix.channel_id)?;
+        }
+
+        write!(f, "{}", self.base)?;
+
+        Ok(())
+    }
 }
 
 #[derive(Debug, HasField)]

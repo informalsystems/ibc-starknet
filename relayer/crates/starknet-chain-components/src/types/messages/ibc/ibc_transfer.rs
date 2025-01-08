@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
@@ -62,6 +64,15 @@ delegate_components! {
 pub enum Participant {
     Native(Felt),
     External(String),
+}
+
+impl Display for Participant {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Participant::Native(address) => write!(f, "{}", address),
+            Participant::External(address) => write!(f, "{}", address),
+        }
+    }
 }
 
 pub struct EncodeParticipant;
