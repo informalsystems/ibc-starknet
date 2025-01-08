@@ -8,6 +8,10 @@ use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use starknet::core::types::{Felt, U256};
 
+use super::channel::PortId;
+use crate::types::channel_id::ChannelId;
+use crate::types::cosmos::height::Height;
+use crate::types::cosmos::timestamp::Timestamp;
 use crate::types::messages::ibc::denom::PrefixedDenom;
 
 #[derive(HasField)]
@@ -28,6 +32,31 @@ pub type EncodeIbcTransferMessage = CombineEncoders<
         EncodeField<symbol!("memo"), UseContext>,
     ],
 >;
+
+#[derive(HasField)]
+pub struct IbcTransferSendMessage {
+    pub port_id_on_a: PortId,
+    pub chan_id_on_a: ChannelId,
+    pub packet_data: IbcTransferMessage,
+    pub timeout_height_on_b: Height,
+    pub timeout_timestamp_on_b: Timestamp,
+}
+
+pub struct EncodeIbcTransferSendMessage;
+
+delegate_components! {
+    EncodeIbcTransferSendMessage {
+        MutEncoderComponent: CombineEncoders<
+            Product![
+                EncodeField<symbol!("port_id_on_a"), UseContext>,
+                EncodeField<symbol!("chan_id_on_a"), UseContext>,
+                EncodeField<symbol!("packet_data"), UseContext>,
+                EncodeField<symbol!("timeout_height_on_b"), UseContext>,
+                EncodeField<symbol!("timeout_timestamp_on_b"), UseContext>,
+            ],
+        >,
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Participant {
