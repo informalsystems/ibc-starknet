@@ -30,8 +30,9 @@ pub impl PacketImpl of PacketTrait {
 
     /// Checks if the packet is timed out.
     fn is_timed_out(self: @Packet, latest_height: @Height, latest_timestamp: @Timestamp) -> bool {
-        !(self.timeout_height_on_b > latest_height
-            && self.timeout_timestamp_on_b > latest_timestamp)
+        !((self.timeout_height_on_b.is_zero() || self.timeout_height_on_b > latest_height)
+            && (self.timeout_timestamp_on_b.is_zero()
+                || self.timeout_timestamp_on_b > latest_timestamp))
     }
 }
 
