@@ -13,6 +13,8 @@ use hermes_cosmos_chain_components::components::client::ClientStateTypeComponent
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use ibc::clients::tendermint::types::{
@@ -182,30 +184,30 @@ impl From<CometClientState> for Any {
 
 pub struct EncodeChainId;
 
-delegate_components! {
-    EncodeChainId {
-        [
-            MutEncoderComponent,
-            MutDecoderComponent,
-        ]: EncodeVariantFrom<EncodeChainId>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChainId> for EncodeChainId
+where
+    Encoding: CanEncodeMut<Strategy, String>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        chain_id: &ChainId,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        let chain_id_str = chain_id.as_str().to_string();
+        encoding.encode_mut(&chain_id_str, buffer)?;
+        Ok(())
     }
 }
 
-impl TransformerRef for EncodeChainId {
-    type From = ChainId;
-    type To<'a> = (String, u64);
-
-    fn transform<'a>(value: &'a Self::From) -> Self::To<'a> {
-        (value.as_str().to_string(), value.revision_number())
-    }
-}
-
-impl Transformer for EncodeChainId {
-    type From = (String, u64);
-    type To = ChainId;
-
-    fn transform((id, revision_number): Self::From) -> Self::To {
-        let chain_id_str = format!("{id}-{revision_number}");
-        ChainId::new(&chain_id_str).unwrap()
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChainId> for EncodeChainId
+where
+    Encoding: CanDecodeMut<Strategy, String> + CanRaiseError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ChainId, Encoding::Error> {
+        let chain_id_str = encoding.decode_mut(buffer)?;
+        ChainId::new(&chain_id_str).map_err(|_| Encoding::raise_error("invalid chain id"))
     }
 }
