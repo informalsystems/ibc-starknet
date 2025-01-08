@@ -267,16 +267,15 @@
         "wasmvm_2_1_4-src": "wasmvm_2_1_4-src"
       },
       "locked": {
-        "lastModified": 1736327683,
+        "lastModified": 1736331154,
         "narHash": "sha256-4B1divgZCXyiMGqL5KRcJp9xDEulHAE2zb7hpbbkXxM=",
         "owner": "informalsystems",
         "repo": "cosmos.nix",
-        "rev": "6917e8f21bec733671eb2b0c006136a418951c39",
+        "rev": "662d2ec410e5d0a0a069aafe41458b2a2ace654d",
         "type": "github"
       },
       "original": {
         "owner": "informalsystems",
-        "ref": "luca_joss/add-ibc-go-v9-with-wasm",
         "repo": "cosmos.nix",
         "type": "github"
       }

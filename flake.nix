@@ -6,7 +6,7 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url = "github:numtide/flake-utils";
     cairo-nix.url = "github:cairo-nix/cairo-nix";
-    cosmos-nix.url = "github:informalsystems/cosmos.nix/luca_joss/add-ibc-go-v9-with-wasm";
+    cosmos-nix.url = "github:informalsystems/cosmos.nix";
 
     starknet-devnet-src = {
       url = "github:0xSpaceShard/starknet-devnet-rs";
