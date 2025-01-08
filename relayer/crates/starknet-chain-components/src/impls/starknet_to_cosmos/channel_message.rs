@@ -102,7 +102,6 @@ where
             .parse()
             .map_err(Chain::raise_error)?;
 
-        // TODO(rano): how to get channel end here ?
         let channel_end = IbcChannelEnd {
             state: IbcChannelState::TryOpen,
             ordering,
