@@ -30,6 +30,7 @@ use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegis
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
+use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
@@ -264,7 +265,15 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             starknet_chain.clone(),
             cosmos_chain.clone(),
             starknet_client_id.clone(),
-            cosmos_client_id,
+            cosmos_client_id.clone(),
+        );
+
+        let cosmos_to_starknet_relay = CosmosToStarknetRelay::new(
+            runtime.clone(),
+            cosmos_chain.clone(),
+            starknet_chain.clone(),
+            cosmos_client_id.clone(),
+            starknet_client_id.clone(),
         );
 
         // connection handshake
@@ -359,7 +368,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         .await?;
 
         // TODO(rano): how do I get the ics20 token contract address from starknet events
-        starknet_to_cosmos_relay.relay_packet(&packet).await?;
+        cosmos_to_starknet_relay.relay_packet(&packet).await?;
 
         let balance_cosmos_a = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)
