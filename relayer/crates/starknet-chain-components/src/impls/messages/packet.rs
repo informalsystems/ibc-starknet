@@ -275,9 +275,31 @@ where
         crypto_bigint::U256::from(bytes).into()
     };
 
-    let sender = Participant::External(ibc_ics20_packet_data.sender.as_ref().to_string());
+    let sender_string = ibc_ics20_packet_data.sender.as_ref().to_string();
+    let receiver_string = ibc_ics20_packet_data.receiver.as_ref().to_string();
 
-    let receiver = Participant::Native(ibc_ics20_packet_data.receiver.as_ref().parse().unwrap());
+    // TODO(rano): the following is a hack
+    // do we really need Participant variants?
+
+    let sender = sender_string
+        .parse()
+        .map(Participant::Native)
+        .unwrap_or_else(|_| Participant::External(sender_string));
+
+    let receiver = receiver_string
+        .parse()
+        .map(Participant::Native)
+        .unwrap_or_else(|_| Participant::External(receiver_string));
+
+    match (&sender, &receiver) {
+        (Participant::Native(_), Participant::Native(_)) => {
+            panic!("Native to Native transfer is not supported")
+        }
+        (Participant::External(_), Participant::External(_)) => {
+            panic!("External to External transfer is not supported")
+        }
+        _ => {}
+    }
 
     let memo = ibc_ics20_packet_data.memo.as_ref().to_string();
 
