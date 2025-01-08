@@ -347,14 +347,17 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let address_cosmos_a = &wallet_cosmos_a.address;
         let wallet_starknet_b = &starknet_chain_driver.user_wallet_b;
         let address_starknet_b = &wallet_starknet_b.account_address;
-        let amount = 99;
+        let transfer_quantity = 1000;
         let denom_cosmos = &cosmos_chain_driver.genesis_config.transfer_denom;
 
-        let balance_cosmos_a = cosmos_chain
+        let balance_cosmos_a_step_0 = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)
             .await?;
 
-        info!("cosmos balance before transfer: {:?}", balance_cosmos_a);
+        info!(
+            "cosmos balance before transfer: {:?}",
+            balance_cosmos_a_step_0
+        );
 
         let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
             cosmos_chain,
@@ -362,7 +365,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             &IbcPortId::transfer(),
             wallet_cosmos_a,
             address_starknet_b,
-            &Amount::new(amount, denom_cosmos.clone()),
+            &Amount::new(transfer_quantity, denom_cosmos.clone()),
             &None,
         )
         .await?;
@@ -370,11 +373,22 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         // TODO(rano): how do I get the ics20 token contract address from starknet events
         cosmos_to_starknet_relay.relay_packet(&packet).await?;
 
-        let balance_cosmos_a = cosmos_chain
+        let balance_cosmos_a_step_1 = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)
             .await?;
 
-        info!("cosmos balance after transfer: {:?}", balance_cosmos_a);
+        info!(
+            "cosmos balance after transfer: {:?}",
+            balance_cosmos_a_step_1
+        );
+
+        assert_eq!(
+            balance_cosmos_a_step_0.quantity,
+            balance_cosmos_a_step_1.quantity + transfer_quantity
+        );
+
+        // TODO(rano): query the balance of the ics20 token on starknet
+        // TODO(rano): send back the ics20 token to cosmos
 
         Ok(())
     })
