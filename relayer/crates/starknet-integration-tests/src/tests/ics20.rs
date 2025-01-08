@@ -1,8 +1,10 @@
 use alloc::sync::Arc;
+use core::marker::PhantomData;
 use core::time::Duration;
 use std::path::PathBuf;
 use std::time::SystemTime;
 
+use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
@@ -227,6 +229,18 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         .await?;
 
         info!("created client on Cosmos: {:?}", cosmos_client_id);
+
+        let client_state_on_starknet = starknet_chain
+            .query_client_state_with_latest_height(PhantomData::<CosmosChain>, &starknet_client_id)
+            .await?;
+
+        info!("client state on Starknet: {:?}", client_state_on_starknet);
+
+        let client_state_on_cosmos = cosmos_chain
+            .query_client_state_with_latest_height(PhantomData::<StarknetChain>, &cosmos_client_id)
+            .await?;
+
+        info!("client state on Cosmos: {:?}", client_state_on_cosmos);
 
         let ics20_contract_address = {
             let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
