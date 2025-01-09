@@ -33,7 +33,7 @@ use starknet::macros::selector;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::cosmos::height::Height as CairoHeight;
-use crate::types::messages::ibc::denom::{Denom, PrefixedDenom};
+use crate::types::messages::ibc::denom::{Denom, PrefixedDenom, TracePrefix};
 use crate::types::messages::ibc::ibc_transfer::{
     IbcTransferMessage as CairoIbcTransferMessage, Participant,
 };
@@ -250,16 +250,32 @@ where
 
     // convert to cairo packet message
 
+    // TODO(rano): can't iter. need fix at ibc-rs side
+    // for now, using json hack
+    let trace_path_json =
+        serde_json::to_string(&ibc_ics20_packet_data.token.denom.trace_path).unwrap();
+
+    #[derive(serde::Deserialize)]
+    struct DummyTracePath {
+        pub port_id: String,
+        pub channel_id: String,
+    }
+
+    let trace_path: Vec<DummyTracePath> = serde_json::from_str(&trace_path_json).unwrap();
+
     let denom = PrefixedDenom {
-        // TODO(rano): can't iter. need fix at ibc-rs side
-        // trace_path: ibc_ics20_packet_data
-        //     .token
-        //     .denom
-        //     .trace_path
-        //     .iter()
-        //     .map(|x| /* logic */ ())
-        //     .collect(),
-        trace_path: vec![],
+        trace_path: trace_path
+            .into_iter()
+            .map(
+                |DummyTracePath {
+                     port_id,
+                     channel_id,
+                 }| TracePrefix {
+                    port_id,
+                    channel_id,
+                },
+            )
+            .collect(),
         base: Denom::Hosted(
             ibc_ics20_packet_data
                 .token
