@@ -140,7 +140,11 @@ where
         let ack_packet_msg = MsgAckPacket {
             packet: from_cosmos_to_cairo_packet(packet, chain.encoding()),
             acknowledgement: CairoAck {
-                ack: counterparty_payload.ack,
+                ack: counterparty_payload
+                    .ack
+                    .into_iter()
+                    .map(Felt::from)
+                    .collect(),
             },
             proof_ack_on_b,
             proof_height_on_b,

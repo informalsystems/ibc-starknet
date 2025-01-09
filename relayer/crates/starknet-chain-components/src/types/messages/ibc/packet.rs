@@ -75,6 +75,8 @@ impl Transformer for EncodePacket {
 
 #[derive(HasField)]
 pub struct StateProof {
+    // TODO(rano): Array<u8> in Cairo
+    // Currently, Vec<u8> is serialized for ByteArray
     pub proof: Vec<Felt>,
 }
 
@@ -139,7 +141,9 @@ impl Transformer for EncodeMsgRecvPacket {
 
 #[derive(HasField, Debug, Clone)]
 pub struct Acknowledgement {
-    pub ack: Vec<u8>,
+    // TODO(rano): Array<u8> in Cairo
+    // Currently, Vec<u8> is serialized for ByteArray
+    pub ack: Vec<Felt>,
 }
 
 pub struct EncodeAcknowledgement;
@@ -156,7 +160,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeAcknowledgement {
-    type From = Product![Vec<u8>];
+    type From = Product![Vec<Felt>];
     type To = Acknowledgement;
 
     fn transform(product![ack]: Self::From) -> Acknowledgement {

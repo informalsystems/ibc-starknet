@@ -57,6 +57,10 @@ where
     }
 
     fn write_acknowledgement(ack: &WriteAcknowledgementEvent) -> impl AsRef<Vec<u8>> + Send {
-        ack.acknowledgement.ack.clone()
+        ack.acknowledgement
+            .ack
+            .iter()
+            .map(|&felt| felt.try_into().unwrap())
+            .collect::<Vec<_>>()
     }
 }
