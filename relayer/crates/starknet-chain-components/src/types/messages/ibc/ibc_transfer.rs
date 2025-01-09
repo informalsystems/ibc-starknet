@@ -17,7 +17,7 @@ use crate::types::cosmos::timestamp::Timestamp;
 use crate::types::messages::ibc::denom::PrefixedDenom;
 
 #[derive(HasField)]
-pub struct IbcTransferMessage {
+pub struct TransferPacketData {
     pub denom: PrefixedDenom,
     pub amount: U256,
     pub sender: Participant,
@@ -25,7 +25,7 @@ pub struct IbcTransferMessage {
     pub memo: String,
 }
 
-pub type EncodeIbcTransferMessage = CombineEncoders<
+pub type EncodeTransferPacketData = CombineEncoders<
     Product![
         EncodeField<symbol!("denom"), UseContext>,
         EncodeField<symbol!("amount"), UseContext>,
@@ -36,18 +36,18 @@ pub type EncodeIbcTransferMessage = CombineEncoders<
 >;
 
 #[derive(HasField)]
-pub struct IbcTransferSendMessage {
+pub struct MsgTransfer {
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
-    pub packet_data: IbcTransferMessage,
+    pub packet_data: TransferPacketData,
     pub timeout_height_on_b: Height,
     pub timeout_timestamp_on_b: Timestamp,
 }
 
-pub struct EncodeIbcTransferSendMessage;
+pub struct EncodeMsgTransfer;
 
 delegate_components! {
-    EncodeIbcTransferSendMessage {
+    EncodeMsgTransfer {
         MutEncoderComponent: CombineEncoders<
             Product![
                 EncodeField<symbol!("port_id_on_a"), UseContext>,

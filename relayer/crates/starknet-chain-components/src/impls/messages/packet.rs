@@ -35,7 +35,7 @@ use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::denom::{Denom, PrefixedDenom, TracePrefix};
 use crate::types::messages::ibc::ibc_transfer::{
-    IbcTransferMessage as CairoIbcTransferMessage, Participant,
+    Participant, TransferPacketData as CairoTransferPacketData,
 };
 use crate::types::messages::ibc::packet::{
     Acknowledgement as CairoAck, MsgAckPacket, MsgRecvPacket, MsgTimeoutPacket,
@@ -60,7 +60,7 @@ where
             ReceivePacketPayload = ReceivePacketPayload<Counterparty>,
         >,
     Encoding: CanEncode<ViaCairo, MsgRecvPacket>
-        + CanEncode<ViaCairo, CairoIbcTransferMessage>
+        + CanEncode<ViaCairo, CairoTransferPacketData>
         + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_receive_packet_message(
@@ -119,7 +119,7 @@ where
         + HasCommitmentProofType
         + HasAcknowledgementType<Chain, Acknowledgement = Vec<u8>>,
     Encoding: CanEncode<ViaCairo, MsgAckPacket>
-        + CanEncode<ViaCairo, CairoIbcTransferMessage>
+        + CanEncode<ViaCairo, CairoTransferPacketData>
         + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_ack_packet_message(
@@ -187,7 +187,7 @@ where
             TimeoutUnorderedPacketPayload = TimeoutUnorderedPacketPayload<Counterparty>,
         >,
     Encoding: CanEncode<ViaCairo, MsgTimeoutPacket>
-        + CanEncode<ViaCairo, CairoIbcTransferMessage>
+        + CanEncode<ViaCairo, CairoTransferPacketData>
         + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn build_timeout_unordered_packet_message(
@@ -236,7 +236,7 @@ where
 
 fn from_cosmos_to_cairo_packet<Encoding>(packet: &IbcPacket, encoding: &Encoding) -> CairoPacket
 where
-    Encoding: CanEncode<ViaCairo, CairoIbcTransferMessage> + HasEncodedType<Encoded = Vec<Felt>>,
+    Encoding: CanEncode<ViaCairo, CairoTransferPacketData> + HasEncodedType<Encoded = Vec<Felt>>,
 {
     let sequence = packet.seq_on_a.value();
     let src_port_id = packet.port_id_on_a.to_string();
@@ -323,7 +323,7 @@ where
 
     let memo = ibc_ics20_packet_data.memo.as_ref().to_string();
 
-    let cairo_ics20_packet_data = CairoIbcTransferMessage {
+    let cairo_ics20_packet_data = CairoTransferPacketData {
         denom,
         amount,
         sender,

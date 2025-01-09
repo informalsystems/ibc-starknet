@@ -36,7 +36,7 @@ use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
 };
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
-    IbcTransferMessage, IbcTransferSendMessage, Participant,
+    MsgTransfer, Participant, TransferPacketData,
 };
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
@@ -458,7 +458,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let memo = String::new();
 
-            IbcTransferMessage {
+            TransferPacketData {
                 denom,
                 amount,
                 sender,
@@ -474,7 +474,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 .duration_since(SystemTime::UNIX_EPOCH)?
                 .as_secs();
 
-            IbcTransferSendMessage {
+            MsgTransfer {
                 port_id_on_a: PortId {
                     port_id: ics20_port.to_string(),
                 },

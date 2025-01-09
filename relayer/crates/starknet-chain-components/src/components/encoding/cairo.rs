@@ -51,8 +51,8 @@ use crate::types::messages::ibc::denom::{
     Denom, EncodeDenom, EncodePrefixedDenom, EncodeTracePrefix, PrefixedDenom, TracePrefix,
 };
 use crate::types::messages::ibc::ibc_transfer::{
-    EncodeIbcTransferMessage, EncodeIbcTransferSendMessage, EncodeParticipant, IbcTransferMessage,
-    IbcTransferSendMessage, Participant,
+    EncodeMsgTransfer, EncodeParticipant, EncodeTransferPacketData, MsgTransfer, Participant,
+    TransferPacketData,
 };
 use crate::types::messages::ibc::packet::{
     AckStatus, Acknowledgement, EncodeAckStatus, EncodeAcknowledgement, EncodeMsgAckPacket,
@@ -108,8 +108,8 @@ delegate_components! {
         (ViaCairo, Vec<TracePrefix>): EncodeList,
         (ViaCairo, PrefixedDenom): EncodePrefixedDenom,
         (ViaCairo, Participant): EncodeParticipant,
-        (ViaCairo, IbcTransferMessage): EncodeIbcTransferMessage,
-        (ViaCairo, IbcTransferSendMessage): EncodeIbcTransferSendMessage,
+        (ViaCairo, TransferPacketData): EncodeTransferPacketData,
+        (ViaCairo, MsgTransfer): EncodeMsgTransfer,
         (ViaCairo, Height): EncodeHeight,
         (ViaCairo, Timestamp): EncodeTimestamp,
         (ViaCairo, Packet): EncodePacket,
