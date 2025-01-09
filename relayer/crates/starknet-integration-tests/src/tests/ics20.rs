@@ -533,7 +533,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         // create ibc packet
 
-        let startnet_ibc_packet = {
+        let starknet_ibc_packet = {
             let timeout_height_on_b = IbcHeight::new(
                 send_packet_event.timeout_height_on_b.revision_number,
                 send_packet_event.timeout_height_on_b.revision_height,
@@ -571,7 +571,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         // relay the packet via starknet to cosmos relay
 
         starknet_to_cosmos_relay
-            .relay_packet(&startnet_ibc_packet)
+            .relay_packet(&starknet_ibc_packet)
             .await?;
 
         let balance_cosmos_a_step_2 = cosmos_chain
