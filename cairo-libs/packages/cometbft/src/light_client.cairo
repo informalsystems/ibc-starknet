@@ -1,5 +1,5 @@
 use cometbft::ibc::{Height, MerkleRoot};
-use cometbft::ics23::ProofSpec;
+use ics23::ProofSpec;
 use protobuf::types::wkt::{Timestamp, Duration};
 use cometbft::utils::Fraction;
 use cometbft::types::{SignedHeader, ValidatorSet};

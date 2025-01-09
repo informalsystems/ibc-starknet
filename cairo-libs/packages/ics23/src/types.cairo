@@ -6,6 +6,145 @@ use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
 
+#[derive(Default, Debug, Drop, PartialEq, Serde)]
+pub struct MerkleProof {
+    pub proofs: Array<Proof>,
+}
+
+#[generate_trait]
+pub impl MerkleProofImpl of MerkleProofTrait {
+    fn verify_membership(
+        self: @MerkleProof,
+        spec: ProofSpec,
+        root: RootBytes,
+        keys: Array<ByteArray>,
+        value: Array<u8>
+    ) {}
+
+    fn verify_non_membership(
+        self: @MerkleProof, spec: ProofSpec, root: RootBytes, keys: Array<ByteArray>
+    ) {}
+}
+
+/// Contains nested proof types within a commitment proof. It currently supports
+/// existence and non-existence proofs to meet the core requirements of IBC. Batch
+/// and compressed proofs can be added in the future if necessary.
+#[derive(Default, Debug, Drop, PartialEq, Serde)]
+pub enum Proof {
+    #[default]
+    Exist: ExistenceProof,
+    NonExist: NonExistenceProof,
+}
+
+#[derive(Default, Debug, Drop, PartialEq, Serde)]
+pub struct ExistenceProof {
+    pub key: Array<u8>,
+    pub value: Array<u8>,
+    pub leaf: Array<u8>,
+    pub path: Array<InnerOp>,
+}
+
+#[generate_trait]
+pub impl ExistenceProofImpl of ExistenceProofTrait {
+    fn calculate_existence_root(self: @ExistenceProof) -> RootBytes {
+        self.calculate_existence_root_for_spec(Option::None)
+    }
+
+    fn calculate_existence_root_for_spec(
+        self: @ExistenceProof, spec: Option<ProofSpec>
+    ) -> RootBytes {
+        [0; 8]
+    }
+}
+
+impl ExistenceProofAsProtoMessage of ProtoMessage<ExistenceProof> {
+    fn encode_raw(self: @ExistenceProof, ref context: EncodeContext) {
+        context.encode_repeated_field(1, self.key);
+        context.encode_repeated_field(2, self.value);
+        context.encode_repeated_field(3, self.leaf);
+        context.encode_repeated_field(4, self.path);
+    }
+
+    fn decode_raw(ref self: ExistenceProof, ref context: DecodeContext) {
+        context.decode_repeated_field(1, ref self.key);
+        context.decode_repeated_field(2, ref self.value);
+        context.decode_repeated_field(3, ref self.leaf);
+        context.decode_repeated_field(4, ref self.path);
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl ExistenceProofAsProtoName of ProtoName<InnerOp> {
+    fn type_url() -> ByteArray {
+        "ExistenceProof"
+    }
+}
+
+#[derive(Default, Debug, Drop, PartialEq, Serde)]
+pub struct NonExistenceProof {
+    pub key: Array<u8>,
+    pub left: ExistenceProof,
+    pub right: ExistenceProof,
+}
+
+impl NonExistenceProofAsProtoMessage of ProtoMessage<NonExistenceProof> {
+    fn encode_raw(self: @NonExistenceProof, ref context: EncodeContext) {
+        context.encode_repeated_field(1, self.key);
+        context.encode_field(2, self.left);
+        context.encode_field(3, self.right);
+    }
+
+    fn decode_raw(ref self: NonExistenceProof, ref context: DecodeContext) {
+        context.decode_repeated_field(1, ref self.key);
+        context.decode_field(2, ref self.left);
+        context.decode_field(3, ref self.right);
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl NonExistenceProofAsProtoName of ProtoName<InnerOp> {
+    fn type_url() -> ByteArray {
+        "NonExistenceProof"
+    }
+}
+
+#[derive(Default, Debug, Drop, PartialEq, Serde)]
+pub struct InnerOp {
+    pub hash: HashOp,
+    pub prefix: Array<u8>,
+    pub suffix: Array<u8>,
+}
+
+impl InnerOpAsProtoMessage of ProtoMessage<InnerOp> {
+    fn encode_raw(self: @InnerOp, ref context: EncodeContext) {
+        context.encode_field(1, self.hash);
+        context.encode_repeated_field(2, self.prefix);
+        context.encode_repeated_field(3, self.suffix);
+    }
+
+    fn decode_raw(ref self: InnerOp, ref context: DecodeContext) {
+        context.decode_field(1, ref self.hash);
+        context.decode_repeated_field(2, ref self.prefix);
+        context.decode_repeated_field(3, ref self.suffix);
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl InnerOpAsProtoName of ProtoName<InnerOp> {
+    fn type_url() -> ByteArray {
+        "InnerOp"
+    }
+}
+
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub enum HashOp {
     #[default]
@@ -55,7 +194,6 @@ impl U64IntoHashOp of Into<u64, HashOp> {
         }
     }
 }
-
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub enum LengthOp {
@@ -217,3 +355,5 @@ impl ProofSpecAsProtoName of ProtoName<ProofSpec> {
         "ProofSpec"
     }
 }
+
+pub type RootBytes = [u32; 8];

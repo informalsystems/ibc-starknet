@@ -3,6 +3,7 @@ members = [
   "packages/protobuf",
   "packages/cometbft",
   "packages/serde_json",
+  "packages/ics23",
 ]
 
 [workspace.package]
@@ -26,6 +27,10 @@ assert_macros = "2.8.4"
 cairo_test    = "2.8.4"
 starknet      = "2.8.4"
 snforge_std   = "0.31.0"
+
+# internal dependencies
+protobuf = { path = "packages/protobuf" }
+ics23    = { path = "packages/ics23" }
 
 [workspace.tool.fmt]
 sort-module-level-items = true

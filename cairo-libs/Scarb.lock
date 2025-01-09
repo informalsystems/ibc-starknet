@@ -5,6 +5,15 @@ version = 1
 name = "cometbft"
 version = "0.1.0"
 dependencies = [
+ "ics23",
+ "protobuf",
+ "snforge_std",
+]
+
+[[package]]
+name = "ics23"
+version = "0.1.0"
+dependencies = [
  "protobuf",
  "snforge_std",
 ]

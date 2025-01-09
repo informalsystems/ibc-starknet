@@ -1,0 +1,27 @@
+[package]
+name          = "ics23"
+version       = { workspace = true }
+edition       = { workspace = true }
+cairo-version = { workspace = true }
+scarb-version = { workspace = true }
+authors       = { workspace = true }
+repository    = { workspace = true }
+license       = { workspace = true }
+Readme        = { workspace = true }
+keywords      = { workspace = true }
+
+description = """
+    Contains the implementation of ICS-23 vector commitments in Cairo.
+"""
+
+[lib]
+
+[scripts]
+test = { workspace = true }
+
+[dependencies]
+protobuf = { workspace = true }
+
+[dev-dependencies]
+cairo_test  = { workspace = true }
+snforge_std = { workspace = true }

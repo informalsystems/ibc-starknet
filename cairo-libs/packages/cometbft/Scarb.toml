@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = { workspace = true }
 
 [dependencies]
-protobuf = { path = "../protobuf" }
+protobuf = { workspace = true }
+ics23    = { workspace = true }
 
 [dev-dependencies]
 cairo_test  = { workspace = true }
