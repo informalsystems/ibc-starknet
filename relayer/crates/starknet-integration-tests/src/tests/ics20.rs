@@ -583,6 +583,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_cosmos_a_step_2
         );
 
+        assert_eq!(
+            balance_cosmos_a_step_0.quantity,
+            balance_cosmos_a_step_2.quantity
+        );
+
         let balance_starknet_b_step_2 = starknet_chain
             .query_balance(address_starknet_b, &ics20_token_address)
             .await?;
@@ -592,7 +597,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_starknet_b_step_2
         );
 
-        // assert_eq!(balance_starknet_b_step_2.quantity, 0u128.into());
+        assert_eq!(balance_starknet_b_step_2.quantity, 0u64.into());
 
         Ok(())
     })
