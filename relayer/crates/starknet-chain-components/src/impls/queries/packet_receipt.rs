@@ -84,7 +84,14 @@ where
         let receipt_status = encoding.decode(&output).map_err(Chain::raise_error)?;
 
         // TODO(rano): are these bytes correct?
-        let receipt_bytes = if receipt_status { vec![0x1] } else { vec![0x0] };
+        let receipt_bytes = if receipt_status {
+            // 0x01 -> "AQ=="
+            br#"{"result":"AQ=="}"#
+        } else {
+            // 0x00 -> "AA=="
+            br#"{"result":"AA=="}"#
+        }
+        .to_vec();
 
         Ok((receipt_bytes, dummy_proof))
     }
