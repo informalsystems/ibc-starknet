@@ -344,7 +344,7 @@ where
 
     let timeout_timestamp = match packet.timeout_timestamp_on_b {
         TimeoutTimestamp::Never => 0,
-        TimeoutTimestamp::At(timeout_timestamp) => timeout_timestamp.nanoseconds() / 1_000_000,
+        TimeoutTimestamp::At(timeout_timestamp) => timeout_timestamp.nanoseconds() / 1_000_000_000,
     };
 
     CairoPacket {

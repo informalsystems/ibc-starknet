@@ -544,7 +544,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let timeout_timestamp_on_b = (send_packet_event.timeout_timestamp_on_b.timestamp > 0)
                 .then(|| {
                     TimeoutTimestamp::At(IbcTimestamp::from_nanoseconds(
-                        send_packet_event.timeout_timestamp_on_b.timestamp * 1_000_000,
+                        send_packet_event.timeout_timestamp_on_b.timestamp * 1_000_000_000,
                     ))
                 })
                 .unwrap_or(TimeoutTimestamp::Never);
