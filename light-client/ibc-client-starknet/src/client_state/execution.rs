@@ -1,5 +1,3 @@
-use core::str::FromStr;
-
 use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::any::ConvertIbcAny;
 use hermes_encoding_components::impls::convert::ConvertVia;
@@ -15,7 +13,6 @@ use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::host::types::path::{ClientConsensusStatePath, ClientStatePath};
 use ibc_core::primitives::proto::Any;
 use prost_types::Any as ProstAny;
-use starknet::core::types::Felt;
 
 use super::ClientState;
 use crate::encoding::context::StarknetLightClientEncoding;
@@ -64,7 +61,7 @@ where
 
         let new_client_state = ClientStateType {
             latest_height: header.height,
-            chain_id: Felt::from_str("dummy").unwrap(), // TODO: fill with correct info
+            chain_id: "dummy".to_string(), // TODO: fill with correct info
         }
         .into();
 

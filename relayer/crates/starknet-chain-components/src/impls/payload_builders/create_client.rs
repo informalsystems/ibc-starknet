@@ -8,7 +8,6 @@ use hermes_relayer_components::chain::traits::types::create_client::{
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height;
 use ibc::primitives::Timestamp;
-use starknet::core::types::Felt;
 
 use crate::types::client_state::{StarknetClientState, WasmStarknetClientState};
 use crate::types::consensus_state::{StarknetConsensusState, WasmStarknetConsensusState};
@@ -27,7 +26,7 @@ where
             CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
-        + HasChainId<ChainId = Felt>
+        + HasChainId<ChainId = String>
         + CanRaiseError<ClientError>,
 {
     async fn build_create_client_payload(
@@ -38,13 +37,11 @@ where
 
         let root = Vec::from(chain_status.block_hash.to_bytes_be());
 
-        let chain_id = chain.chain_id();
-
         let client_state = WasmStarknetClientState {
             wasm_code_hash: create_client_options.wasm_code_hash.into(),
             client_state: StarknetClientState {
                 latest_height: Height::new(0, 1).map_err(Chain::raise_error)?,
-                chain_id: chain_id.clone(),
+                chain_id: chain.chain_id().to_string(),
             },
         };
 

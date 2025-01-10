@@ -18,7 +18,6 @@ use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use ibc_core::client::types::Height;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
 use ibc_core::primitives::Timestamp;
-use starknet::core::types::Felt;
 
 use crate::encoding::impls::client_state::EncodeStarknetClientState;
 use crate::encoding::impls::consensus_state::EncodeStarknetConsensusState;
@@ -28,7 +27,6 @@ use crate::{
     StarknetClientState, StarknetConsensusState, STARKNET_CLIENT_STATE_TYPE_URL,
     STARKNET_CONSENSUS_STATE_TYPE_URL,
 };
-use crate::encoding::impls::felt::EncodeFelt;
 
 cgp_preset! {
     StarknetLightClientEncodingComponents {
@@ -70,7 +68,6 @@ delegate_components! {
         [
             (ViaProtobuf, Any),
             (ViaProtobuf, Height),
-            (ViaProtobuf, Felt),
             (ViaProtobuf, StarknetClientState),
             (ViaProtobuf, StarknetConsensusState),
             (ViaProtobuf, StarknetHeader),
@@ -95,9 +92,6 @@ delegate_components! {
 
         (ViaProtobuf, StarknetClientState):
             EncodeStarknetClientState,
-
-        (ViaProtobuf, Felt):
-            EncodeFelt,
 
         (ViaProtobuf, StarknetConsensusState):
             EncodeStarknetConsensusState,

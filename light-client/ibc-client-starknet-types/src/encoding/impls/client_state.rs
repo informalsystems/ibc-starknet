@@ -43,6 +43,6 @@ impl Transformer for EncodeStarknetClientState {
     type To = StarknetClientState;
 
     fn transform(product![latest_height, chain_id]: Self::From) -> Self::To {
-        StarknetClientState { latest_height, chain_id }
+        StarknetClientState { latest_height, chain_id: chain_id.to_string() }
     }
 }

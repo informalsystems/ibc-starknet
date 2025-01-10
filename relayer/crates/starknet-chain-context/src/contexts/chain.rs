@@ -167,7 +167,7 @@ use crate::impls::error::HandleStarknetChainError;
 #[derive(HasField, Clone)]
 pub struct StarknetChain {
     pub runtime: HermesRuntime,
-    pub chain_id: Felt,
+    pub chain_id: String,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
     pub ibc_client_contract_address: Option<Felt>,
@@ -248,7 +248,7 @@ impl JsonRpcClientGetter<StarknetChain> for StarknetChainContextComponents {
 }
 
 impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
-    fn chain_id(chain: &StarknetChain) -> &Felt {
+    fn chain_id(chain: &StarknetChain) -> &String {
         &chain.chain_id
     }
 }
