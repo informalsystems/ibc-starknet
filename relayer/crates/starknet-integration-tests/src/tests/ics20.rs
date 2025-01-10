@@ -711,7 +711,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         // create ibc transfer message
 
-        let _starknet_ics20_send_message = {
+        let starknet_ics20_send_message = {
             let current_starknet_time = SystemTime::now()
                 .duration_since(SystemTime::UNIX_EPOCH)?
                 .as_secs();
@@ -730,6 +730,47 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                     timestamp: current_starknet_time + 1800,
                 },
             }
+        };
+
+        // submit to ics20 contract
+
+        let (_send_packet_event, _send_ics20_event) = {
+            let call_data = cairo_encoding.encode(&starknet_ics20_send_message)?;
+
+            let call = Call {
+                to: ics20_contract_address,
+                selector: selector!("send_transfer"),
+                calldata: call_data,
+            };
+
+            let message = StarknetMessage::new(call);
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("ICS20 send packet response: {:?}", response);
+
+            let mut ibc_packet_events: Vec<PacketRelayEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            info!("IBC packet events: {:?}", ibc_packet_events);
+
+            let mut ibc_transfer_events: Vec<IbcTransferEvent> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            info!("IBC transfer events: {:?}", ibc_transfer_events);
+
+            assert_eq!(ibc_packet_events.len(), 1);
+            assert_eq!(ibc_transfer_events.len(), 1);
+
+            let Some(PacketRelayEvents::Send(send_packet_event)) = ibc_packet_events.pop() else {
+                panic!("expected send packet event");
+            };
+
+            let Some(IbcTransferEvent::Send(send_ics20_event)) = ibc_transfer_events.pop() else {
+                panic!("expected send ics20 event");
+            };
+
+            (send_packet_event, send_ics20_event)
         };
 
         Ok(())
