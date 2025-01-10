@@ -684,6 +684,31 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             info!("ERC20 approve response: {:?}", response);
         }
 
+        // submit ics20 transfer from Starknet to Cosmos
+
+        let _starknet_ic20_packet_data = {
+            let denom = PrefixedDenom {
+                trace_path: vec![],
+                base: Denom::Native(erc20_token_address),
+            };
+
+            let amount = transfer_quantity.into();
+
+            let sender = Participant::Native(*address_starknet_relayer);
+
+            let receiver = Participant::External(address_cosmos_a.clone());
+
+            let memo = String::new();
+
+            TransferPacketData {
+                denom,
+                amount,
+                sender,
+                receiver,
+                memo,
+            }
+        };
+
         Ok(())
     })
 }
