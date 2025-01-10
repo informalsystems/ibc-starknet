@@ -52,6 +52,7 @@ use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use ibc::apps::transfer::types::packet::PacketData;
+use ibc::apps::transfer::types::PrefixedCoin;
 use ibc::core::channel::types::packet::Packet as IbcPacket;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
 use ibc::core::client::types::Height as IbcHeight;
@@ -734,7 +735,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         // submit to ics20 contract
 
-        let (_send_packet_event, _send_ics20_event) = {
+        let (send_packet_event, send_ics20_event) = {
             let call_data = cairo_encoding.encode(&starknet_ics20_send_message)?;
 
             let call = Call {
@@ -771,6 +772,46 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             };
 
             (send_packet_event, send_ics20_event)
+        };
+
+        // create ibc packet
+
+        let _starknet_ibc_packet = {
+            let timeout_height_on_b = IbcHeight::new(
+                send_packet_event.timeout_height_on_b.revision_number,
+                send_packet_event.timeout_height_on_b.revision_height,
+            )
+            .map(TimeoutHeight::At)
+            .unwrap_or_else(|_| TimeoutHeight::Never);
+
+            let timeout_timestamp_on_b = (send_packet_event.timeout_timestamp_on_b.timestamp > 0)
+                .then(|| {
+                    TimeoutTimestamp::At(IbcTimestamp::from_nanoseconds(
+                        send_packet_event.timeout_timestamp_on_b.timestamp * 1_000_000_000,
+                    ))
+                })
+                .unwrap_or(TimeoutTimestamp::Never);
+
+            let ibc_transfer_packet_data = PacketData {
+                token: PrefixedCoin {
+                    denom: send_ics20_event.denom.to_string().parse()?,
+                    amount: send_ics20_event.amount.to_string().parse()?,
+                },
+                sender: send_ics20_event.sender.to_string().into(),
+                receiver: send_ics20_event.receiver.to_string().into(),
+                memo: send_ics20_event.memo.into(),
+            };
+
+            IbcPacket {
+                seq_on_a: send_packet_event.sequence_on_a.sequence.into(),
+                port_id_on_a: send_packet_event.port_id_on_a.port_id.parse()?,
+                chan_id_on_a: send_packet_event.channel_id_on_a.channel_id.parse()?,
+                port_id_on_b: send_packet_event.port_id_on_b.port_id.parse()?,
+                chan_id_on_b: send_packet_event.channel_id_on_b.channel_id.parse()?,
+                data: serde_json::to_vec(&ibc_transfer_packet_data).unwrap(),
+                timeout_height_on_b,
+                timeout_timestamp_on_b,
+            }
         };
 
         Ok(())
