@@ -33,7 +33,6 @@ use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::encoding::components::StarknetLightClientEncodingComponents;
 use ibc_client_starknet_types::header::StarknetHeader;
 use prost_types::Any;
-use starknet::core::types::Felt;
 
 use crate::types::client_state::{
     ConvertWasmStarknetClientState, StarknetClientState, WasmStarknetClientState,
@@ -122,7 +121,6 @@ delegate_components! {
             (ViaProtobuf, StarknetHeader),
             (ViaProtobuf, CommitmentRoot),
             (ViaProtobuf, Timestamp),
-            (ViaProtobuf, Felt)
         ]:
             StarknetLightClientEncodingComponents,
     }
