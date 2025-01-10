@@ -686,7 +686,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         // submit ics20 transfer from Starknet to Cosmos
 
-        let _starknet_ic20_packet_data = {
+        let starknet_ic20_packet_data = {
             let denom = PrefixedDenom {
                 trace_path: vec![],
                 base: Denom::Native(erc20_token_address),
@@ -706,6 +706,29 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 sender,
                 receiver,
                 memo,
+            }
+        };
+
+        // create ibc transfer message
+
+        let _starknet_ics20_send_message = {
+            let current_starknet_time = SystemTime::now()
+                .duration_since(SystemTime::UNIX_EPOCH)?
+                .as_secs();
+
+            MsgTransfer {
+                port_id_on_a: PortId {
+                    port_id: ics20_port.to_string(),
+                },
+                chan_id_on_a: starknet_channel_id.clone(),
+                packet_data: starknet_ic20_packet_data,
+                timeout_height_on_b: Height {
+                    revision_number: 0,
+                    revision_height: 0,
+                },
+                timeout_timestamp_on_b: Timestamp {
+                    timestamp: current_starknet_time + 1800,
+                },
             }
         };
 
