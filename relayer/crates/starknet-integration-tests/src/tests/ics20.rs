@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::time::SystemTime;
 
 use cgp::prelude::*;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
@@ -472,9 +473,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         // create ibc transfer message
 
         let starknet_ics20_send_message = {
-            let current_starknet_time = SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)?
-                .as_secs();
+            let current_starknet_time = starknet_chain.query_chain_status().await?.time;
 
             MsgTransfer {
                 port_id_on_a: PortId {
@@ -487,7 +486,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                     revision_height: 0,
                 },
                 timeout_timestamp_on_b: Timestamp {
-                    timestamp: current_starknet_time + 1800,
+                    timestamp: u64::try_from(current_starknet_time.unix_timestamp()).unwrap()
+                        + 1800,
                 },
             }
         };
@@ -669,9 +669,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         // create ibc transfer message
 
         let starknet_ics20_send_message = {
-            let current_starknet_time = SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)?
-                .as_secs();
+            let current_starknet_time = starknet_chain.query_chain_status().await?.time;
 
             MsgTransfer {
                 port_id_on_a: PortId {
@@ -684,7 +682,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                     revision_height: 0,
                 },
                 timeout_timestamp_on_b: Timestamp {
-                    timestamp: current_starknet_time + 1800,
+                    timestamp: u64::try_from(current_starknet_time.unix_timestamp()).unwrap()
+                        + 1800,
                 },
             }
         };
