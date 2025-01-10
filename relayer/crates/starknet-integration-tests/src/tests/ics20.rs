@@ -440,8 +440,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         assert_eq!(balance_starknet_b_step_1.quantity, transfer_quantity.into());
 
-        // TODO(rano): send back the ics20 token to cosmos
-
         // create ibc transfer packet data
 
         let starknet_ic20_packet_data = {
