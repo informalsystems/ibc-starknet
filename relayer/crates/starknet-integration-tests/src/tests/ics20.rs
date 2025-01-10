@@ -372,7 +372,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let address_cosmos_a = &wallet_cosmos_a.address;
         let wallet_starknet_b = &starknet_chain_driver.user_wallet_b;
         let address_starknet_b = &wallet_starknet_b.account_address;
-        let transfer_quantity = 1000;
+        let transfer_quantity = 1_000u128;
         let denom_cosmos = &cosmos_chain_driver.genesis_config.transfer_denom;
 
         let balance_cosmos_a_step_0 = cosmos_chain
@@ -380,7 +380,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .await?;
 
         info!(
-            "cosmos balance before transfer: {:?}",
+            "cosmos balance before transfer: {}",
             balance_cosmos_a_step_0
         );
 
@@ -402,10 +402,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .query_balance(address_cosmos_a, denom_cosmos)
             .await?;
 
-        info!(
-            "cosmos balance after transfer: {:?}",
-            balance_cosmos_a_step_1
-        );
+        info!("cosmos balance after transfer: {}", balance_cosmos_a_step_1);
 
         assert_eq!(
             balance_cosmos_a_step_0.quantity,
@@ -433,11 +430,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         info!("ics20 token address: {:?}", ics20_token_address);
 
         let balance_starknet_b_step_1 = starknet_chain
-            .query_balance(address_starknet_b, &ics20_token_address)
+            .query_token_balance(&ics20_token_address, address_starknet_b)
             .await?;
 
         info!(
-            "starknet balance after transfer: {:?}",
+            "starknet balance after transfer: {}",
             balance_starknet_b_step_1
         );
 
@@ -585,7 +582,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .await?;
 
         info!(
-            "cosmos balance after transfer back: {:?}",
+            "cosmos balance after transfer back: {}",
             balance_cosmos_a_step_2
         );
 
@@ -595,11 +592,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         );
 
         let balance_starknet_b_step_2 = starknet_chain
-            .query_balance(address_starknet_b, &ics20_token_address)
+            .query_token_balance(&ics20_token_address, address_starknet_b)
             .await?;
 
         info!(
-            "starknet balance after transfer back: {:?}",
+            "starknet balance after transfer back: {}",
             balance_starknet_b_step_2
         );
 
