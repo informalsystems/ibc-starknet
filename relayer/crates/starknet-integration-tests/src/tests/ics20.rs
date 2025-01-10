@@ -4,13 +4,17 @@ use core::time::Duration;
 use std::path::PathBuf;
 use std::time::SystemTime;
 
+use cgp::prelude::*;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
+use hermes_cosmos_test_components::chain::impls::transfer::amount::derive_ibc_denom;
 use hermes_cosmos_test_components::chain::types::amount::Amount;
+use hermes_cosmos_test_components::chain::types::denom::Denom as IbcDenom;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -27,6 +31,7 @@ use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
+use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
@@ -49,6 +54,7 @@ use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use ibc::apps::transfer::types::packet::PacketData;
+use ibc::apps::transfer::types::PrefixedCoin;
 use ibc::core::channel::types::packet::Packet as IbcPacket;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
 use ibc::core::client::types::Height as IbcHeight;
@@ -57,7 +63,7 @@ use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
 use ibc::primitives::Timestamp as IbcTimestamp;
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, U256};
 use starknet::macros::{selector, short_string};
 use tracing::info;
 
@@ -366,7 +372,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let address_cosmos_a = &wallet_cosmos_a.address;
         let wallet_starknet_b = &starknet_chain_driver.user_wallet_b;
         let address_starknet_b = &wallet_starknet_b.account_address;
-        let transfer_quantity = 1000;
+        let transfer_quantity = 1_000u128;
         let denom_cosmos = &cosmos_chain_driver.genesis_config.transfer_denom;
 
         let balance_cosmos_a_step_0 = cosmos_chain
@@ -374,7 +380,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .await?;
 
         info!(
-            "cosmos balance before transfer: {:?}",
+            "cosmos balance before transfer: {}",
             balance_cosmos_a_step_0
         );
 
@@ -396,10 +402,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .query_balance(address_cosmos_a, denom_cosmos)
             .await?;
 
-        info!(
-            "cosmos balance after transfer: {:?}",
-            balance_cosmos_a_step_1
-        );
+        info!("cosmos balance after transfer: {}", balance_cosmos_a_step_1);
 
         assert_eq!(
             balance_cosmos_a_step_0.quantity,
@@ -427,17 +430,15 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         info!("ics20 token address: {:?}", ics20_token_address);
 
         let balance_starknet_b_step_1 = starknet_chain
-            .query_balance(address_starknet_b, &ics20_token_address)
+            .query_token_balance(&ics20_token_address, address_starknet_b)
             .await?;
 
         info!(
-            "starknet balance after transfer: {:?}",
+            "starknet balance after transfer: {}",
             balance_starknet_b_step_1
         );
 
         assert_eq!(balance_starknet_b_step_1.quantity, transfer_quantity.into());
-
-        // TODO(rano): send back the ics20 token to cosmos
 
         // create ibc transfer packet data
 
@@ -470,9 +471,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         // create ibc transfer message
 
         let starknet_ics20_send_message = {
-            let current_starknet_time = SystemTime::now()
-                .duration_since(SystemTime::UNIX_EPOCH)?
-                .as_secs();
+            let current_starknet_time = starknet_chain.query_chain_status().await?.time;
 
             MsgTransfer {
                 port_id_on_a: PortId {
@@ -485,7 +484,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                     revision_height: 0,
                 },
                 timeout_timestamp_on_b: Timestamp {
-                    timestamp: current_starknet_time + 1800,
+                    timestamp: u64::try_from(current_starknet_time.unix_timestamp()).unwrap()
+                        + 1800,
                 },
             }
         };
@@ -550,7 +550,10 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 .unwrap_or(TimeoutTimestamp::Never);
 
             let ibc_transfer_packet_data = PacketData {
-                token: format!("{}{}", send_ics20_event.amount, send_ics20_event.denom).parse()?,
+                token: PrefixedCoin {
+                    denom: send_ics20_event.denom.to_string().parse()?,
+                    amount: send_ics20_event.amount.to_string().parse()?,
+                },
                 sender: send_ics20_event.sender.to_string().into(),
                 receiver: send_ics20_event.receiver.to_string().into(),
                 memo: send_ics20_event.memo.into(),
@@ -579,7 +582,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .await?;
 
         info!(
-            "cosmos balance after transfer back: {:?}",
+            "cosmos balance after transfer back: {}",
             balance_cosmos_a_step_2
         );
 
@@ -589,15 +592,261 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         );
 
         let balance_starknet_b_step_2 = starknet_chain
-            .query_balance(address_starknet_b, &ics20_token_address)
+            .query_token_balance(&ics20_token_address, address_starknet_b)
             .await?;
 
         info!(
-            "starknet balance after transfer back: {:?}",
+            "starknet balance after transfer back: {}",
             balance_starknet_b_step_2
         );
 
         assert_eq!(balance_starknet_b_step_2.quantity, 0u64.into());
+
+        // send starknet erc20 token to cosmos
+
+        let wallet_starknet_relayer = &starknet_chain_driver.relayer_wallet;
+        let address_starknet_relayer = &wallet_starknet_relayer.account_address;
+        let erc20_token_address = &starknet_chain_driver.genesis_config.transfer_denom;
+
+        info!("erc20 token address: {:?}", erc20_token_address);
+
+        let balance_starknet_relayer_step_0 = starknet_chain
+            .query_token_balance(erc20_token_address, address_starknet_relayer)
+            .await?;
+
+        info!(
+            "erc20 balance on starknet: {}",
+            balance_starknet_relayer_step_0
+        );
+
+        {
+            // approve ics20 contract to spend the tokens for address_starknet_b
+            let call_data = cairo_encoding.encode(&product![
+                ics20_contract_address,
+                U256::from(transfer_quantity)
+            ])?;
+
+            let call = Call {
+                to: *erc20_token_address,
+                selector: selector!("approve"),
+                calldata: call_data,
+            };
+
+            let message = StarknetMessage::new(call);
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("ERC20 approve response: {:?}", response);
+        }
+
+        // submit ics20 transfer from Starknet to Cosmos
+
+        let starknet_ic20_packet_data = {
+            let denom = PrefixedDenom {
+                trace_path: vec![],
+                base: Denom::Native(*erc20_token_address),
+            };
+
+            let amount = transfer_quantity.into();
+
+            let sender = Participant::Native(*address_starknet_relayer);
+
+            let receiver = Participant::External(address_cosmos_a.clone());
+
+            let memo = String::new();
+
+            TransferPacketData {
+                denom,
+                amount,
+                sender,
+                receiver,
+                memo,
+            }
+        };
+
+        // create ibc transfer message
+
+        let starknet_ics20_send_message = {
+            let current_starknet_time = starknet_chain.query_chain_status().await?.time;
+
+            MsgTransfer {
+                port_id_on_a: PortId {
+                    port_id: ics20_port.to_string(),
+                },
+                chan_id_on_a: starknet_channel_id.clone(),
+                packet_data: starknet_ic20_packet_data,
+                timeout_height_on_b: Height {
+                    revision_number: 0,
+                    revision_height: 0,
+                },
+                timeout_timestamp_on_b: Timestamp {
+                    timestamp: u64::try_from(current_starknet_time.unix_timestamp()).unwrap()
+                        + 1800,
+                },
+            }
+        };
+
+        // submit to ics20 contract
+
+        let (send_packet_event, send_ics20_event) = {
+            let call_data = cairo_encoding.encode(&starknet_ics20_send_message)?;
+
+            let call = Call {
+                to: ics20_contract_address,
+                selector: selector!("send_transfer"),
+                calldata: call_data,
+            };
+
+            let message = StarknetMessage::new(call);
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("ICS20 send packet response: {:?}", response);
+
+            let mut ibc_packet_events: Vec<PacketRelayEvents> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            info!("IBC packet events: {:?}", ibc_packet_events);
+
+            let mut ibc_transfer_events: Vec<IbcTransferEvent> =
+                event_encoding.filter_decode_events(&response.events)?;
+
+            info!("IBC transfer events: {:?}", ibc_transfer_events);
+
+            assert_eq!(ibc_packet_events.len(), 1);
+            assert_eq!(ibc_transfer_events.len(), 1);
+
+            let Some(PacketRelayEvents::Send(send_packet_event)) = ibc_packet_events.pop() else {
+                panic!("expected send packet event");
+            };
+
+            let Some(IbcTransferEvent::Send(send_ics20_event)) = ibc_transfer_events.pop() else {
+                panic!("expected send ics20 event");
+            };
+
+            (send_packet_event, send_ics20_event)
+        };
+
+        // create ibc packet
+
+        let starknet_ibc_packet = {
+            let timeout_height_on_b = IbcHeight::new(
+                send_packet_event.timeout_height_on_b.revision_number,
+                send_packet_event.timeout_height_on_b.revision_height,
+            )
+            .map(TimeoutHeight::At)
+            .unwrap_or_else(|_| TimeoutHeight::Never);
+
+            let timeout_timestamp_on_b = (send_packet_event.timeout_timestamp_on_b.timestamp > 0)
+                .then(|| {
+                    TimeoutTimestamp::At(IbcTimestamp::from_nanoseconds(
+                        send_packet_event.timeout_timestamp_on_b.timestamp * 1_000_000_000,
+                    ))
+                })
+                .unwrap_or(TimeoutTimestamp::Never);
+
+            let ibc_transfer_packet_data = PacketData {
+                token: PrefixedCoin {
+                    denom: send_ics20_event.denom.to_string().parse()?,
+                    amount: send_ics20_event.amount.to_string().parse()?,
+                },
+                sender: send_ics20_event.sender.to_string().into(),
+                receiver: send_ics20_event.receiver.to_string().into(),
+                memo: send_ics20_event.memo.into(),
+            };
+
+            IbcPacket {
+                seq_on_a: send_packet_event.sequence_on_a.sequence.into(),
+                port_id_on_a: send_packet_event.port_id_on_a.port_id.parse()?,
+                chan_id_on_a: send_packet_event.channel_id_on_a.channel_id.parse()?,
+                port_id_on_b: send_packet_event.port_id_on_b.port_id.parse()?,
+                chan_id_on_b: send_packet_event.channel_id_on_b.channel_id.parse()?,
+                data: serde_json::to_vec(&ibc_transfer_packet_data).unwrap(),
+                timeout_height_on_b,
+                timeout_timestamp_on_b,
+            }
+        };
+
+        // relay the packet via starknet to cosmos relay
+
+        starknet_to_cosmos_relay
+            .relay_packet(&starknet_ibc_packet)
+            .await?;
+
+        // query balances
+
+        let cosmos_ibc_denom = derive_ibc_denom(
+            &ics20_port,
+            &cosmos_channel_id,
+            &IbcDenom::base(&erc20_token_address.to_string()),
+        )?;
+
+        info!("cosmos ibc denom: {:?}", cosmos_ibc_denom);
+
+        let balance_cosmos_a_step_3 = cosmos_chain
+            .query_balance(address_cosmos_a, &cosmos_ibc_denom)
+            .await?;
+
+        info!(
+            "cosmos balance after transfer from starknet: {}",
+            balance_cosmos_a_step_3
+        );
+
+        assert_eq!(balance_cosmos_a_step_3.quantity, transfer_quantity);
+
+        let balance_starknet_relayer_step_3 = starknet_chain
+            .query_token_balance(erc20_token_address, address_starknet_relayer)
+            .await?;
+
+        info!(
+            "starknet balance after transfer from starknet: {}",
+            balance_starknet_relayer_step_3
+        );
+
+        assert_eq!(
+            balance_starknet_relayer_step_3.quantity,
+            balance_starknet_relayer_step_0.quantity - transfer_quantity.into()
+        );
+
+        // send the tokens back to starknet
+
+        let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
+            cosmos_chain,
+            &cosmos_channel_id,
+            &IbcPortId::transfer(),
+            wallet_cosmos_a,
+            address_starknet_relayer,
+            &Amount::new(transfer_quantity, cosmos_ibc_denom.clone()),
+            &None,
+        )
+        .await?;
+
+        cosmos_to_starknet_relay.relay_packet(&packet).await?;
+
+        let balance_cosmos_a_step_4 = cosmos_chain
+            .query_balance(address_cosmos_a, &cosmos_ibc_denom)
+            .await?;
+
+        info!(
+            "cosmos balance after transfer back to starknet: {}",
+            balance_cosmos_a_step_4
+        );
+
+        assert_eq!(balance_cosmos_a_step_4.quantity, 0u64.into());
+
+        let balance_starknet_relayer_step_4 = starknet_chain
+            .query_token_balance(erc20_token_address, address_starknet_relayer)
+            .await?;
+
+        info!(
+            "starknet balance after transfer back to starknet: {}",
+            balance_starknet_relayer_step_4
+        );
+
+        assert_eq!(
+            balance_starknet_relayer_step_4.quantity,
+            balance_starknet_relayer_step_0.quantity
+        );
 
         Ok(())
     })
