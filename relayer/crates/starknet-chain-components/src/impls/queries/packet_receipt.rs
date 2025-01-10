@@ -85,10 +85,13 @@ where
 
         // TODO(rano): are these bytes correct?
         let receipt_bytes = if receipt_status {
-            b"SUCCESS".to_vec()
+            // 0x01 -> "AQ=="
+            br#"{"result":"AQ=="}"#
         } else {
-            b"FAIL".to_vec()
-        };
+            // 0x00 -> "AA=="
+            br#"{"result":"AA=="}"#
+        }
+        .to_vec();
 
         Ok((receipt_bytes, dummy_proof))
     }

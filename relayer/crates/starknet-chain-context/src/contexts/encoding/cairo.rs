@@ -42,7 +42,7 @@ use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
 };
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
-    IbcTransferMessage, Participant,
+    Participant, TransferPacketData,
 };
 use hermes_starknet_chain_components::types::messages::ibc::packet::Packet;
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
@@ -127,7 +127,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, TracePrefix>
     + CanEncodeAndDecode<ViaCairo, Vec<TracePrefix>>
     + CanEncodeAndDecode<ViaCairo, Participant>
-    + CanEncode<ViaCairo, IbcTransferMessage>
+    + CanEncode<ViaCairo, TransferPacketData>
     + CanEncodeAndDecode<ViaCairo, Height>
     + CanEncodeAndDecode<ViaCairo, Packet>
     + CanEncodeAndDecode<ViaCairo, ClientStatus>

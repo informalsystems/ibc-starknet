@@ -56,8 +56,11 @@ where
         })
     }
 
-    fn write_acknowledgement(_ack: &WriteAcknowledgementEvent) -> impl AsRef<Vec<u8>> + Send {
-        // TODO(rano): ack.acknowledgement.ack is Vec<Felt>
-        vec![0x1]
+    fn write_acknowledgement(ack: &WriteAcknowledgementEvent) -> impl AsRef<Vec<u8>> + Send {
+        ack.acknowledgement
+            .ack
+            .iter()
+            .map(|&felt| felt.try_into().unwrap())
+            .collect::<Vec<_>>()
     }
 }

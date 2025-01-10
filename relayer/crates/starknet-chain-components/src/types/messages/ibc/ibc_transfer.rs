@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
@@ -8,10 +10,14 @@ use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use starknet::core::types::{Felt, U256};
 
+use super::channel::PortId;
+use crate::types::channel_id::ChannelId;
+use crate::types::cosmos::height::Height;
+use crate::types::cosmos::timestamp::Timestamp;
 use crate::types::messages::ibc::denom::PrefixedDenom;
 
 #[derive(HasField)]
-pub struct IbcTransferMessage {
+pub struct TransferPacketData {
     pub denom: PrefixedDenom,
     pub amount: U256,
     pub sender: Participant,
@@ -19,7 +25,7 @@ pub struct IbcTransferMessage {
     pub memo: String,
 }
 
-pub type EncodeIbcTransferMessage = CombineEncoders<
+pub type EncodeTransferPacketData = CombineEncoders<
     Product![
         EncodeField<symbol!("denom"), UseContext>,
         EncodeField<symbol!("amount"), UseContext>,
@@ -29,10 +35,44 @@ pub type EncodeIbcTransferMessage = CombineEncoders<
     ],
 >;
 
+#[derive(HasField)]
+pub struct MsgTransfer {
+    pub port_id_on_a: PortId,
+    pub chan_id_on_a: ChannelId,
+    pub packet_data: TransferPacketData,
+    pub timeout_height_on_b: Height,
+    pub timeout_timestamp_on_b: Timestamp,
+}
+
+pub struct EncodeMsgTransfer;
+
+delegate_components! {
+    EncodeMsgTransfer {
+        MutEncoderComponent: CombineEncoders<
+            Product![
+                EncodeField<symbol!("port_id_on_a"), UseContext>,
+                EncodeField<symbol!("chan_id_on_a"), UseContext>,
+                EncodeField<symbol!("packet_data"), UseContext>,
+                EncodeField<symbol!("timeout_height_on_b"), UseContext>,
+                EncodeField<symbol!("timeout_timestamp_on_b"), UseContext>,
+            ],
+        >,
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Participant {
     Native(Felt),
     External(String),
+}
+
+impl Display for Participant {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Participant::Native(address) => write!(f, "{}", address),
+            Participant::External(address) => write!(f, "{}", address),
+        }
+    }
 }
 
 pub struct EncodeParticipant;

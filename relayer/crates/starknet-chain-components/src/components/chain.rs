@@ -41,10 +41,14 @@ pub use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterCo
 pub use hermes_relayer_components::transaction::traits::types::transaction::TransactionTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
+use hermes_test_components::chain::impls::ibc_transfer::SendIbcTransferMessage;
 use hermes_test_components::chain::traits::queries::balance::BalanceQuerierComponent;
+use hermes_test_components::chain::traits::transfer::ibc_transfer::TokenIbcTransferrerComponent;
+use hermes_test_components::chain::traits::transfer::string_memo::ProvideStringMemoType;
 pub use hermes_test_components::chain::traits::types::address::AddressTypeComponent;
 pub use hermes_test_components::chain::traits::types::amount::AmountTypeComponent;
 pub use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
+use hermes_test_components::chain::traits::types::memo::MemoTypeComponent;
 
 use crate::components::types::StarknetChainTypes;
 use crate::impls::commitment_prefix::GetStarknetCommitmentPrefix;
@@ -146,6 +150,10 @@ cgp_preset! {
             ProvideU256Amount,
         DenomTypeComponent:
             ProvideTokenAddressDenom,
+        MemoTypeComponent:
+            ProvideStringMemoType,
+        TokenIbcTransferrerComponent:
+            SendIbcTransferMessage,
         TransactionTypeComponent:
             ProvideCallTransaction,
         TransactionHashTypeComponent:
