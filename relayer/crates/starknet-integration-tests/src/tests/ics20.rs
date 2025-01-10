@@ -27,10 +27,12 @@ use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
+use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::events::packet::PacketRelayEvents;
+use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
@@ -598,6 +600,45 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         );
 
         assert_eq!(balance_starknet_b_step_2.quantity, 0u64.into());
+
+        // send starknet native token to cosmos
+
+        let wallet_starknet_relayer = &starknet_chain_driver.relayer_wallet;
+        let address_starknet_relayer = &wallet_starknet_relayer.account_address;
+
+        let erc20_token_supply = 1_000_000_000u128;
+
+        let erc20_token_address = {
+            let deploy_message = DeployErc20TokenMessage {
+                name: "token".into(),
+                symbol: "token".into(),
+                fixed_supply: erc20_token_supply.into(),
+                recipient: *address_starknet_relayer,
+                owner: *address_starknet_relayer,
+            };
+
+            let calldata = StarknetCairoEncoding.encode(&deploy_message)?;
+
+            starknet_chain
+                .deploy_contract(&erc20_class_hash, false, &calldata)
+                .await?
+        };
+
+        info!(
+            "deployed ERC20 contract to address: {:?}",
+            erc20_token_address
+        );
+
+        let balance_starknet_relayer_step_0 = starknet_chain
+            .query_token_balance(&erc20_token_address, address_starknet_relayer)
+            .await?;
+
+        info!("initial balance: {}", balance_starknet_relayer_step_0);
+
+        assert_eq!(
+            balance_starknet_relayer_step_0.quantity,
+            erc20_token_supply.into()
+        );
 
         Ok(())
     })
