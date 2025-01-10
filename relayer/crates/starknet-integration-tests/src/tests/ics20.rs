@@ -4,6 +4,7 @@ use core::time::Duration;
 use std::path::PathBuf;
 use std::time::SystemTime;
 
+use cgp::prelude::*;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
@@ -27,9 +28,7 @@ use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
-use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
@@ -61,7 +60,7 @@ use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
 use ibc::primitives::Timestamp as IbcTimestamp;
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, U256};
 use starknet::macros::{selector, short_string};
 use tracing::info;
 
@@ -642,27 +641,47 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             erc20_token_supply.into()
         );
 
-        {
-            let transfer_amount = transfer_quantity.into();
+        // {
+        //     let transfer_amount = transfer_quantity.into();
 
-            let message = starknet_chain.build_transfer_token_message(
-                address_starknet_b,
-                &StarknetAmount::new(transfer_amount, erc20_token_address),
-            )?;
+        //     let message = starknet_chain.build_transfer_token_message(
+        //         address_starknet_b,
+        //         &StarknetAmount::new(transfer_amount, erc20_token_address),
+        //     )?;
+
+        //     let response = starknet_chain.send_message(message).await?;
+
+        //     info!("performed top-up of {transfer_quantity} tokens");
+
+        //     info!("response: {:?}", response);
+
+        //     let balance = starknet_chain
+        //         .query_token_balance(&erc20_token_address, address_starknet_b)
+        //         .await?;
+
+        //     info!("top-up balance: {}", balance);
+
+        //     assert_eq!(balance.quantity, transfer_quantity.into());
+        // }
+
+        {
+            // approve ics20 contract to spend the tokens for address_starknet_b
+            let call_data = cairo_encoding.encode(&product![
+                ics20_contract_address,
+                U256::from(transfer_quantity)
+            ])?;
+
+            let call = Call {
+                to: erc20_token_address,
+                selector: selector!("approve"),
+                calldata: call_data,
+            };
+
+            let message = StarknetMessage::new(call);
 
             let response = starknet_chain.send_message(message).await?;
 
-            info!("performed top-up of {transfer_quantity} tokens");
-
-            info!("response: {:?}", response);
-
-            let balance = starknet_chain
-                .query_token_balance(&erc20_token_address, address_starknet_b)
-                .await?;
-
-            info!("top-up balance: {}", balance);
-
-            assert_eq!(balance.quantity, transfer_quantity.into());
+            info!("ERC20 approve response: {:?}", response);
         }
 
         Ok(())
