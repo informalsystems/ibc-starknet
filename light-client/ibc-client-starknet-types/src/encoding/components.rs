@@ -17,6 +17,7 @@ use hermes_protobuf_encoding_components::types::any::Any;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use ibc_core::client::types::Height;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
+use ibc_core::host::types::identifiers::ChainId;
 use ibc_core::primitives::Timestamp;
 
 use crate::encoding::impls::client_state::EncodeStarknetClientState;
@@ -88,6 +89,7 @@ delegate_components! {
             (ViaProtobuf, Any),
             (ViaProtobuf, CommitmentRoot),
             (ViaProtobuf, Timestamp),
+            (ViaProtobuf, ChainId),
         ]: CosmosEncodingComponents,
 
         (ViaProtobuf, StarknetClientState):
