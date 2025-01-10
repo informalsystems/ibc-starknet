@@ -857,6 +857,21 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             (erc20_token_supply - transfer_quantity).into()
         );
 
+        // send the tokens back to starknet
+
+        let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
+            cosmos_chain,
+            &cosmos_channel_id,
+            &IbcPortId::transfer(),
+            wallet_cosmos_a,
+            address_starknet_relayer,
+            &Amount::new(transfer_quantity, cosmos_ibc_denom.clone()),
+            &None,
+        )
+        .await?;
+
+        cosmos_to_starknet_relay.relay_packet(&packet).await?;
+
         Ok(())
     })
 }
