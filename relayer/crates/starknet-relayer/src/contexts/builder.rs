@@ -88,7 +88,7 @@ impl ChainBuilder<StarknetBuilder, Index<0>> for StarknetBuildComponents {
     async fn build_chain(
         build: &StarknetBuilder,
         _index: PhantomData<Index<0>>,
-        _chain_id: &String,
+        _chain_id: &ChainId,
     ) -> Result<StarknetChain, HermesError> {
         build.build_chain().await
     }
@@ -142,7 +142,7 @@ impl StarknetBuilder {
 
         let context = StarknetChain {
             runtime: self.runtime.clone(),
-            chain_id: chain_id.to_string(),
+            chain_id: chain_id.to_string().parse().unwrap(),
             rpc_client,
             account,
             ibc_client_contract_address: None,

@@ -7,6 +7,7 @@ use hermes_relayer_components::chain::traits::types::create_client::{
 };
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height;
+use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
 
 use crate::types::client_state::{StarknetClientState, WasmStarknetClientState};
@@ -26,7 +27,7 @@ where
             CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
-        + HasChainId<ChainId = String>
+        + HasChainId<ChainId = ChainId>
         + CanRaiseError<ClientError>,
 {
     async fn build_create_client_payload(
@@ -41,7 +42,7 @@ where
             wasm_code_hash: create_client_options.wasm_code_hash.into(),
             client_state: StarknetClientState {
                 latest_height: Height::new(0, 1).map_err(Chain::raise_error)?,
-                chain_id: chain.chain_id().to_string(),
+                chain_id: chain.chain_id().clone(),
             },
         };
 

@@ -13,7 +13,7 @@ impl RelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponen
     async fn build_relay(
         build: &StarknetBuilder,
         _index: PhantomData<(Index<0>, Index<1>)>,
-        _src_chain_id: &String,
+        _src_chain_id: &ChainId,
         dst_chain_id: &ChainId,
         src_client_id: &StarknetClientId,
         dst_client_id: &CosmosClientId,

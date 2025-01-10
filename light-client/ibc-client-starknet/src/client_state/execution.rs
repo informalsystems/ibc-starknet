@@ -61,7 +61,7 @@ where
 
         let new_client_state = ClientStateType {
             latest_height: header.height,
-            chain_id: "dummy".to_string(), // TODO: fill with correct info
+            chain_id: "dummy".parse().unwrap(), // TODO: fill with correct info
         }
         .into();
 

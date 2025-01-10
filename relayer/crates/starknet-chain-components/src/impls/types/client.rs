@@ -7,6 +7,7 @@ use hermes_relayer_components::chain::traits::types::client_state::{
 };
 use hermes_relayer_components::chain::traits::types::consensus_state::ProvideConsensusStateType;
 use hermes_relayer_components::chain::traits::types::height::HasHeightType;
+use ibc::core::host::types::identifiers::ChainId;
 
 use crate::types::client_state::WasmStarknetClientState;
 use crate::types::consensus_state::WasmStarknetConsensusState;
@@ -30,7 +31,7 @@ impl<Chain, Counterparty> ClientStateFieldsGetter<Chain, Counterparty>
 where
     Chain: HasHeightType<Height = u64>
         + HasClientStateType<Counterparty, ClientState = WasmStarknetClientState>
-        + HasChainIdType<ChainId = String>,
+        + HasChainIdType<ChainId = ChainId>,
 {
     fn client_state_latest_height(client_state: &WasmStarknetClientState) -> u64 {
         client_state.client_state.latest_height.revision_height()
@@ -45,6 +46,6 @@ where
     }
 
     fn client_state_chain_id(client_state: &WasmStarknetClientState) -> Chain::ChainId {
-        client_state.client_state.chain_id.to_string()
+        client_state.client_state.chain_id.clone()
     }
 }

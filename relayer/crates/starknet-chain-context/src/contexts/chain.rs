@@ -6,6 +6,7 @@ use cgp::core::field::impls::use_field::WithField;
 use cgp::core::types::impls::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_chain_type_components::traits::fields::chain_id::HasChainId;
 use hermes_chain_type_components::traits::types::commitment_proof::HasCommitmentProofType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
@@ -153,7 +154,7 @@ use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
 use ibc::core::channel::types::packet::Packet;
-use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence};
+use ibc::core::host::types::identifiers::{ChainId, PortId as IbcPortId, Sequence};
 use starknet::accounts::SingleOwnerAccount;
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
@@ -167,7 +168,7 @@ use crate::impls::error::HandleStarknetChainError;
 #[derive(HasField, Clone)]
 pub struct StarknetChain {
     pub runtime: HermesRuntime,
-    pub chain_id: String,
+    pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
     pub ibc_client_contract_address: Option<Felt>,
@@ -248,7 +249,7 @@ impl JsonRpcClientGetter<StarknetChain> for StarknetChainContextComponents {
 }
 
 impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
-    fn chain_id(chain: &StarknetChain) -> &String {
+    fn chain_id(chain: &StarknetChain) -> &ChainId {
         &chain.chain_id
     }
 }
@@ -263,6 +264,7 @@ pub trait CanUseStarknetChain:
     + HasDefaultEncoding<AsFelt, Encoding = StarknetCairoEncoding>
     + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
     + HasAddressType<Address = Felt>
+    + HasChainId<ChainId = ChainId>
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
     + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
@@ -371,6 +373,7 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
     + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CometUpdateHeader>
     + HasInitConnectionOptionsType<StarknetChain, InitConnectionOptions = CosmosInitConnectionOptions>
+    + HasChainId<ChainId = ChainId>
     + HasCounterpartyMessageHeight<StarknetChain>
     + HasClientStateFields<StarknetChain>
     + CanQueryClientState<StarknetChain>
