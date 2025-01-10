@@ -872,6 +872,31 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         cosmos_to_starknet_relay.relay_packet(&packet).await?;
 
+        let balance_cosmos_a_step_4 = cosmos_chain
+            .query_balance(address_cosmos_a, &cosmos_ibc_denom)
+            .await?;
+
+        info!(
+            "cosmos balance after transfer back to starknet: {}",
+            balance_cosmos_a_step_4
+        );
+
+        assert_eq!(balance_cosmos_a_step_4.quantity, 0u64.into());
+
+        let balance_starknet_relayer_step_4 = starknet_chain
+            .query_token_balance(&erc20_token_address, address_starknet_relayer)
+            .await?;
+
+        info!(
+            "starknet balance after transfer back to starknet: {}",
+            balance_starknet_relayer_step_4
+        );
+
+        assert_eq!(
+            balance_starknet_relayer_step_4.quantity,
+            balance_starknet_relayer_step_0.quantity
+        );
+
         Ok(())
     })
 }
