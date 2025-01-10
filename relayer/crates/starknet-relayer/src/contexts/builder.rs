@@ -26,7 +26,6 @@ use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
-use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
 use starknet::signers::{LocalWallet, SigningKey};
@@ -89,7 +88,7 @@ impl ChainBuilder<StarknetBuilder, Index<0>> for StarknetBuildComponents {
     async fn build_chain(
         build: &StarknetBuilder,
         _index: PhantomData<Index<0>>,
-        _chain_id: &Felt,
+        _chain_id: &String,
     ) -> Result<StarknetChain, HermesError> {
         build.build_chain().await
     }
@@ -143,7 +142,7 @@ impl StarknetBuilder {
 
         let context = StarknetChain {
             runtime: self.runtime.clone(),
-            chain_id,
+            chain_id: chain_id.to_string(),
             rpc_client,
             account,
             ibc_client_contract_address: None,

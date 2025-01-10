@@ -138,7 +138,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
 
         let chain = StarknetChain {
             runtime: runtime.clone(),
-            chain_id,
+            chain_id: chain_id.to_string(),
             rpc_client,
             account,
             ibc_client_contract_address: None,

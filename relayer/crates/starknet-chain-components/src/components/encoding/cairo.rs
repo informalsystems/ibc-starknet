@@ -11,7 +11,7 @@ use hermes_cairo_encoding_components::strategy::ViaCairo;
 pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 pub use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use ibc::core::host::types::identifiers::ChainId;
-use starknet::core::types::{Felt, U256};
+use starknet::core::types::U256;
 
 use crate::types::channel_id::{
     ChannelCounterparty, ChannelEnd, ChannelId, ChannelState, EncodeChannelCounterparty,

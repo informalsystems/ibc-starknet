@@ -137,22 +137,22 @@ delegate_components! {
 
 delegate_components! {
     StarknetParserComponents {
-        (QueryClientStateArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryClientStateArgs, symbol!("chain_id")): ParseFromString<String>,
         (QueryClientStateArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (QueryClientStateArgs, symbol!("height")): ParseFromOptionalString<u64>,
 
-        (QueryConsensusStateArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryConsensusStateArgs, symbol!("chain_id")): ParseFromString<String>,
         (QueryConsensusStateArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (QueryConsensusStateArgs, symbol!("query_height")): ParseFromOptionalString<u64>,
         (QueryConsensusStateArgs, symbol!("consensus_height")): ParseFromOptionalString<Height>,
 
-        (QueryChainStatusArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryChainStatusArgs, symbol!("chain_id")): ParseFromString<String>,
 
-        (QueryBalanceArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryBalanceArgs, symbol!("chain_id")): ParseFromString<String>,
         (QueryBalanceArgs, symbol!("address")): ParseFromString<Felt>,
         (QueryBalanceArgs, symbol!("denom")): ParseFromString<Felt>,
 
-        (UpdateClientArgs, symbol!("host_chain_id")): ParseFromString<Felt>,
+        (UpdateClientArgs, symbol!("host_chain_id")): ParseFromString<String>,
         (UpdateClientArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
         (UpdateClientArgs, symbol!("target_height")): ParseFromOptionalString<Height>,
