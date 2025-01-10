@@ -2820,6 +2820,7 @@ dependencies = [
  "ibc-core",
  "ibc-proto",
  "prost",
+ "starknet",
  "tendermint",
 ]
 

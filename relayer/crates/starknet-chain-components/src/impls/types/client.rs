@@ -1,3 +1,4 @@
+use core::str::FromStr;
 use core::time::Duration;
 
 use cgp::core::Async;
@@ -45,8 +46,7 @@ where
         false
     }
 
-    fn client_state_chain_id(_client_state: &WasmStarknetClientState) -> Chain::ChainId {
-        // FIXME: Return actual Starknet chain ID
-        Felt::ZERO
+    fn client_state_chain_id(client_state: &WasmStarknetClientState) -> Chain::ChainId {
+        Felt::from_str(&client_state.client_state.chain_id.to_string()).unwrap()
     }
 }

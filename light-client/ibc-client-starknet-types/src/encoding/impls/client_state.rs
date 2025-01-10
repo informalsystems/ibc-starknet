@@ -8,6 +8,7 @@ use hermes_protobuf_encoding_components::components::{MutDecoderComponent, MutEn
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::DecodeRequiredProtoField;
 use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::encode::EncodeLengthDelimitedProtoField;
 use ibc_core::client::types::Height;
+use starknet::core::types::Felt;
 
 use crate::StarknetClientState;
 
@@ -21,22 +22,27 @@ delegate_components! {
                     symbol!("latest_height"),
                     EncodeLengthDelimitedProtoField<1, UseContext>,
                 >,
+                EncodeField<
+                    symbol!("chain_id"),
+                    EncodeLengthDelimitedProtoField<2, UseContext>,
+                >,
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
             CombineEncoders<Product![
                 DecodeRequiredProtoField<1, UseContext>,
+                DecodeRequiredProtoField<2, UseContext>,
             ]>
         >,
     }
 }
 
 impl Transformer for EncodeStarknetClientState {
-    type From = Product![Height];
+    type From = Product![Height, Felt];
 
     type To = StarknetClientState;
 
-    fn transform(product![latest_height]: Self::From) -> Self::To {
-        StarknetClientState { latest_height }
+    fn transform(product![latest_height, chain_id]: Self::From) -> Self::To {
+        StarknetClientState { latest_height, chain_id }
     }
 }

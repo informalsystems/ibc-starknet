@@ -24,6 +24,7 @@ use ibc_core::commitment_types::commitment::CommitmentRoot;
 use ibc_core::host::types::error::DecodingError;
 use ibc_core::primitives::{Timestamp, TimestampError};
 use prost::DecodeError;
+use starknet::core::types::Felt;
 
 pub struct StarknetLightClientEncoding;
 
@@ -179,6 +180,7 @@ pub trait CanUseStarknetLightClientEncoding:
     Async
     + CanEncodeAndDecode<ViaProtobuf, Any>
     + CanEncodeAndDecode<ViaProtobuf, Height>
+    + CanEncodeAndDecode<ViaProtobuf, Felt>
     + CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
     + CanEncodeAndDecode<ViaProtobuf, StarknetConsensusState>
     + CanEncodeAndDecode<ViaProtobuf, StarknetHeader>
