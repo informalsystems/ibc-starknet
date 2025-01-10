@@ -35,7 +35,6 @@ use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::events::packet::PacketRelayEvents;
-use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
@@ -605,67 +604,22 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         assert_eq!(balance_starknet_b_step_2.quantity, 0u64.into());
 
-        // send starknet native token to cosmos
+        // send starknet erc20 token to cosmos
 
         let wallet_starknet_relayer = &starknet_chain_driver.relayer_wallet;
         let address_starknet_relayer = &wallet_starknet_relayer.account_address;
+        let erc20_token_address = &starknet_chain_driver.genesis_config.transfer_denom;
 
-        let erc20_token_supply = 1_000_000_000u128;
-
-        let erc20_token_address = {
-            let deploy_message = DeployErc20TokenMessage {
-                name: "token".into(),
-                symbol: "token".into(),
-                fixed_supply: erc20_token_supply.into(),
-                recipient: *address_starknet_relayer,
-                owner: *address_starknet_relayer,
-            };
-
-            let calldata = StarknetCairoEncoding.encode(&deploy_message)?;
-
-            starknet_chain
-                .deploy_contract(&erc20_class_hash, false, &calldata)
-                .await?
-        };
-
-        info!(
-            "deployed ERC20 contract to address: {:?}",
-            erc20_token_address
-        );
+        info!("erc20 token address: {:?}", erc20_token_address);
 
         let balance_starknet_relayer_step_0 = starknet_chain
-            .query_token_balance(&erc20_token_address, address_starknet_relayer)
+            .query_token_balance(erc20_token_address, address_starknet_relayer)
             .await?;
 
-        info!("initial balance: {}", balance_starknet_relayer_step_0);
-
-        assert_eq!(
-            balance_starknet_relayer_step_0.quantity,
-            erc20_token_supply.into()
+        info!(
+            "erc20 balance on starknet: {}",
+            balance_starknet_relayer_step_0
         );
-
-        // {
-        //     let transfer_amount = transfer_quantity.into();
-
-        //     let message = starknet_chain.build_transfer_token_message(
-        //         address_starknet_b,
-        //         &StarknetAmount::new(transfer_amount, erc20_token_address),
-        //     )?;
-
-        //     let response = starknet_chain.send_message(message).await?;
-
-        //     info!("performed top-up of {transfer_quantity} tokens");
-
-        //     info!("response: {:?}", response);
-
-        //     let balance = starknet_chain
-        //         .query_token_balance(&erc20_token_address, address_starknet_b)
-        //         .await?;
-
-        //     info!("top-up balance: {}", balance);
-
-        //     assert_eq!(balance.quantity, transfer_quantity.into());
-        // }
 
         {
             // approve ics20 contract to spend the tokens for address_starknet_b
@@ -675,7 +629,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             ])?;
 
             let call = Call {
-                to: erc20_token_address,
+                to: *erc20_token_address,
                 selector: selector!("approve"),
                 calldata: call_data,
             };
@@ -692,7 +646,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let starknet_ic20_packet_data = {
             let denom = PrefixedDenom {
                 trace_path: vec![],
-                base: Denom::Native(erc20_token_address),
+                base: Denom::Native(*erc20_token_address),
             };
 
             let amount = transfer_quantity.into();
@@ -844,7 +798,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         assert_eq!(balance_cosmos_a_step_3.quantity, transfer_quantity);
 
         let balance_starknet_relayer_step_3 = starknet_chain
-            .query_token_balance(&erc20_token_address, address_starknet_relayer)
+            .query_token_balance(erc20_token_address, address_starknet_relayer)
             .await?;
 
         info!(
@@ -854,7 +808,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         assert_eq!(
             balance_starknet_relayer_step_3.quantity,
-            (erc20_token_supply - transfer_quantity).into()
+            balance_starknet_relayer_step_0.quantity - transfer_quantity.into()
         );
 
         // send the tokens back to starknet
@@ -884,7 +838,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         assert_eq!(balance_cosmos_a_step_4.quantity, 0u64.into());
 
         let balance_starknet_relayer_step_4 = starknet_chain
-            .query_token_balance(&erc20_token_address, address_starknet_relayer)
+            .query_token_balance(erc20_token_address, address_starknet_relayer)
             .await?;
 
         info!(
