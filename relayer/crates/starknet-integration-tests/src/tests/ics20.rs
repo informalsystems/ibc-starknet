@@ -553,7 +553,10 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 .unwrap_or(TimeoutTimestamp::Never);
 
             let ibc_transfer_packet_data = PacketData {
-                token: format!("{}{}", send_ics20_event.amount, send_ics20_event.denom).parse()?,
+                token: PrefixedCoin {
+                    denom: send_ics20_event.denom.to_string().parse()?,
+                    amount: send_ics20_event.amount.to_string().parse()?,
+                },
                 sender: send_ics20_event.sender.to_string().into(),
                 receiver: send_ics20_event.receiver.to_string().into(),
                 memo: send_ics20_event.memo.into(),
