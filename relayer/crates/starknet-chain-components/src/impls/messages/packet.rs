@@ -267,6 +267,18 @@ where
 
     let trace_path: Vec<DummyTracePath> = serde_json::from_str(&trace_path_json).unwrap();
 
+    let denom_string = ibc_ics20_packet_data
+        .token
+        .denom
+        .base_denom
+        .as_str()
+        .to_string();
+
+    let base_denom = denom_string
+        .parse()
+        .map(Denom::Native)
+        .unwrap_or_else(|_| Denom::Hosted(denom_string));
+
     let denom = PrefixedDenom {
         trace_path: trace_path
             .into_iter()
@@ -280,14 +292,7 @@ where
                 },
             )
             .collect(),
-        base: Denom::Hosted(
-            ibc_ics20_packet_data
-                .token
-                .denom
-                .base_denom
-                .as_str()
-                .to_string(),
-        ),
+        base: base_denom,
     };
 
     let amount = {
