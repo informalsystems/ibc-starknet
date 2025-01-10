@@ -22,30 +22,30 @@ delegate_components! {
                     symbol!("latest_height"),
                     EncodeLengthDelimitedProtoField<1, UseContext>,
                 >,
-                EncodeField<
-                    symbol!("chain_id"),
-                    EncodeLengthDelimitedProtoField<2, UseContext>,
-                >,
+                // EncodeField<
+                //     symbol!("chain_id"),
+                //     EncodeLengthDelimitedProtoField<2, UseContext>,
+                // >,
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
             CombineEncoders<Product![
                 DecodeRequiredProtoField<1, UseContext>,
-                DecodeRequiredProtoField<2, UseContext>,
+                // DecodeRequiredProtoField<2, UseContext>,
             ]>
         >,
     }
 }
 
 impl Transformer for EncodeStarknetClientState {
-    type From = Product![Height, ChainId];
+    type From = Product![Height /*ChainId*/];
 
     type To = StarknetClientState;
 
-    fn transform(product![latest_height, chain_id]: Self::From) -> Self::To {
+    fn transform(product![latest_height /*chain_id*/]: Self::From) -> Self::To {
         StarknetClientState {
             latest_height,
-            chain_id,
+            chain_id: ChainId::new("starknet").unwrap(),
         }
     }
 }
