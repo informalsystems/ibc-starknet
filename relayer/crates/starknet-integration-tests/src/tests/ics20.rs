@@ -27,7 +27,9 @@ use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
+use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
+use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
 use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
@@ -639,6 +641,29 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_starknet_relayer_step_0.quantity,
             erc20_token_supply.into()
         );
+
+        {
+            let transfer_amount = transfer_quantity.into();
+
+            let message = starknet_chain.build_transfer_token_message(
+                address_starknet_b,
+                &StarknetAmount::new(transfer_amount, erc20_token_address),
+            )?;
+
+            let response = starknet_chain.send_message(message).await?;
+
+            info!("performed top-up of {transfer_quantity} tokens");
+
+            info!("response: {:?}", response);
+
+            let balance = starknet_chain
+                .query_token_balance(&erc20_token_address, address_starknet_b)
+                .await?;
+
+            info!("top-up balance: {}", balance);
+
+            assert_eq!(balance.quantity, transfer_quantity.into());
+        }
 
         Ok(())
     })
