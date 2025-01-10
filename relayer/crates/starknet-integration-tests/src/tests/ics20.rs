@@ -11,7 +11,9 @@ use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptio
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
+use hermes_cosmos_test_components::chain::impls::transfer::amount::derive_ibc_denom;
 use hermes_cosmos_test_components::chain::types::amount::Amount;
+use hermes_cosmos_test_components::chain::types::denom::Denom as IbcDenom;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -819,6 +821,41 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         starknet_to_cosmos_relay
             .relay_packet(&starknet_ibc_packet)
             .await?;
+
+        // query balances
+
+        let cosmos_ibc_denom = derive_ibc_denom(
+            &ics20_port,
+            &cosmos_channel_id,
+            &IbcDenom::base(&erc20_token_address.to_string()),
+        )?;
+
+        info!("cosmos ibc denom: {:?}", cosmos_ibc_denom);
+
+        let balance_cosmos_a_step_3 = cosmos_chain
+            .query_balance(address_cosmos_a, &cosmos_ibc_denom)
+            .await?;
+
+        info!(
+            "cosmos balance after transfer from starknet: {}",
+            balance_cosmos_a_step_3
+        );
+
+        assert_eq!(balance_cosmos_a_step_3.quantity, transfer_quantity);
+
+        let balance_starknet_relayer_step_3 = starknet_chain
+            .query_token_balance(&erc20_token_address, address_starknet_relayer)
+            .await?;
+
+        info!(
+            "starknet balance after transfer from starknet: {}",
+            balance_starknet_relayer_step_3
+        );
+
+        assert_eq!(
+            balance_starknet_relayer_step_3.quantity,
+            (erc20_token_supply - transfer_quantity).into()
+        );
 
         Ok(())
     })
