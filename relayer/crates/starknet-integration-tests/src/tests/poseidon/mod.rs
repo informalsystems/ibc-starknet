@@ -102,4 +102,25 @@ mod tests {
 
         assert_eq!(hash, Felt::from_hex(expected_hex).unwrap());
     }
+
+    #[test]
+    fn test_poseidon_equivalent() {
+        let data: [Felt; 20] = core::array::from_fn(Felt::from);
+
+        for i in 0..data.len() {
+            let mut hasher = PoseidonState::default();
+
+            let current_data = &data[..=i];
+
+            for felt in current_data {
+                hasher = hasher.write(*felt);
+            }
+
+            let update_hash = hasher.finish();
+
+            let digest_hash = PoseidonState::digest(current_data);
+
+            assert_eq!(update_hash, digest_hash);
+        }
+    }
 }
