@@ -65,6 +65,7 @@ pub impl RemotePathBuilderImpl of RemotePathBuilderTrait {
 mod tests {
     use core::hash::HashStateTrait;
     use core::poseidon::{PoseidonTrait, poseidon_hash_span};
+    use super::LocalKeyBuilderImpl;
 
     #[test]
     fn test_poseidon_hash() {
@@ -84,5 +85,37 @@ mod tests {
         state = state.update(2);
         let hash = state.finalize();
         assert_eq!(hash, 0x0371cb6995ea5e7effcd2e174de264b5b407027a75a231a70c2c8d196107f0e7);
+    }
+
+    #[derive(Drop, Serde)]
+    pub struct Foo {
+        pub foo: Array<ByteArray>,
+    }
+
+    fn direct_key(data: @Foo) -> felt252 {
+        let mut key_builder = LocalKeyBuilderImpl::init();
+        key_builder.append_serde(data);
+        key_builder.key()
+    }
+
+    fn manual_key(data: @Foo) -> felt252 {
+        let mut key_builder = LocalKeyBuilderImpl::init();
+        let mut data_span = data.foo.span();
+        while let Option::Some(value) = data_span.pop_front() {
+            key_builder.append_serde(value);
+        };
+        key_builder.key()
+    }
+
+    #[test]
+    fn test_struct_key() {
+        // depending on how you serialize the struct, the key will be different
+        let value = Foo { foo: array!["hello", "world"] };
+        assert_eq!(
+            direct_key(@value), 0x562cad83e4f09c5813d3d8cc79e67b24d7d979531160e90affd52d4ddf745fe
+        );
+        assert_eq!(
+            manual_key(@value), 0x6c667cf271320ba416f4956bd4c0a532920206fe281247da5c6e7feeec8aa61
+        );
     }
 }
