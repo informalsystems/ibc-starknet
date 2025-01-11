@@ -20,7 +20,8 @@ description = """
 test = { workspace = true }
 
 [dependencies]
-protobuf = { workspace = true }
+alexandria_numeric = { workspace = true }
+protobuf           = { workspace = true }
 
 [dev-dependencies]
 cairo_test  = { workspace = true }

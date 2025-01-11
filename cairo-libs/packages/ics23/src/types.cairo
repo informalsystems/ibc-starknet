@@ -5,6 +5,7 @@ use protobuf::types::message::{
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
+use ics23::{ICS23Errors, apply_inner, apply_leaf};
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct MerkleProof {
@@ -15,15 +16,59 @@ pub struct MerkleProof {
 pub impl MerkleProofImpl of MerkleProofTrait {
     fn verify_membership(
         self: @MerkleProof,
-        spec: ProofSpec,
+        specs: ProofSpecs,
         root: RootBytes,
         keys: Array<ByteArray>,
-        value: Array<u8>
-    ) {}
+        value: Array<u32>,
+    ) {
+        let proofs_len = self.proofs.len();
+        assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
+        assert(root == [0; 8], ICS23Errors::ZERO_MERKLE_ROOT);
+        assert(value.len() > 0, ICS23Errors::MISSING_VALUE);
+        assert(proofs_len == specs.specs.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
+        assert(proofs_len == keys.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
+        let mut subroot = [0; 8];
+        let mut subvalue: Array<u32> = ArrayTrait::new();
+        let mut i = 0;
+        while i < proofs_len {
+            match self.proofs[i] {
+                Proof::Exist(p) => {
+                    subroot = p.calculate_root();
+                    p.verify(specs.specs[i], @subroot, keys[proofs_len - 1 - i], @value);
+                },
+                _ => panic!("{}", ICS23Errors::INVALID_PROOF_TYPE),
+            }
+            subvalue = subroot.span().into();
+            i += 1;
+        };
+        assert(root == subroot, ICS23Errors::INVALID_MERKLE_PROOF);
+    }
 
     fn verify_non_membership(
-        self: @MerkleProof, spec: ProofSpec, root: RootBytes, keys: Array<ByteArray>
-    ) {}
+        self: @MerkleProof, specs: ProofSpecs, root: RootBytes, keys: Array<ByteArray>
+    ) {
+        let proofs_len = self.proofs.len();
+        assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
+        assert(root == [0; 8], ICS23Errors::ZERO_MERKLE_ROOT);
+        assert(proofs_len == specs.specs.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
+        assert(proofs_len == keys.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
+        let mut subroot = [0; 8];
+        let mut i = 0;
+        while i < proofs_len {
+            match self.proofs[i] {
+                Proof::NonExist(p) => {
+                    subroot = p.calculate_root();
+                    p.verify(specs.specs[i], @subroot, keys[proofs_len - i]);
+                    self
+                        .verify_membership(
+                            specs.clone(), root, keys.clone(), subroot.span().into()
+                        ) // TODO: add start_index
+                },
+                _ => panic!("{}", ICS23Errors::INVALID_PROOF_TYPE),
+            }
+            i += 1;
+        };
+    }
 }
 
 /// Contains nested proof types within a commitment proof. It currently supports
@@ -38,37 +83,54 @@ pub enum Proof {
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct ExistenceProof {
-    pub key: Array<u8>,
-    pub value: Array<u8>,
-    pub leaf: Array<u8>,
+    pub key: ByteArray,
+    pub value: Array<u32>,
+    pub leaf: LeafOp,
     pub path: Array<InnerOp>,
 }
 
 #[generate_trait]
 pub impl ExistenceProofImpl of ExistenceProofTrait {
-    fn calculate_existence_root(self: @ExistenceProof) -> RootBytes {
-        self.calculate_existence_root_for_spec(Option::None)
+    fn calculate_root(self: @ExistenceProof) -> RootBytes {
+        self.calculate_root_for_spec(Option::None)
     }
 
-    fn calculate_existence_root_for_spec(
-        self: @ExistenceProof, spec: Option<ProofSpec>
-    ) -> RootBytes {
-        [0; 8]
+    fn calculate_root_for_spec(self: @ExistenceProof, spec: Option<@ProofSpec>) -> RootBytes {
+        assert(self.key.len() > 0, ICS23Errors::MISSING_KEY);
+        assert(self.value.len() > 0, ICS23Errors::MISSING_VALUE);
+        let mut hash = apply_leaf(self.leaf, self.key, self.value.clone());
+        for i in 0..self.path.len() {
+            hash = apply_inner(self.path[i], hash);
+        };
+        hash
+    }
+
+    fn verify(
+        self: @ExistenceProof,
+        spec: @ProofSpec,
+        root: @RootBytes,
+        key: @ByteArray,
+        value: @Array<u32>,
+    ) {
+        assert(self.key == key, ICS23Errors::MISMATCHED_KEY);
+        assert(self.value == value, ICS23Errors::MISMATCHED_VALUE);
+        let calc = self.calculate_root_for_spec(Option::Some(spec));
+        assert(@calc == root, ICS23Errors::MISMATCHED_ROOT)
     }
 }
 
 impl ExistenceProofAsProtoMessage of ProtoMessage<ExistenceProof> {
     fn encode_raw(self: @ExistenceProof, ref context: EncodeContext) {
-        context.encode_repeated_field(1, self.key);
+        context.encode_field(1, self.key);
         context.encode_repeated_field(2, self.value);
-        context.encode_repeated_field(3, self.leaf);
+        context.encode_field(3, self.leaf);
         context.encode_repeated_field(4, self.path);
     }
 
     fn decode_raw(ref self: ExistenceProof, ref context: DecodeContext) {
-        context.decode_repeated_field(1, ref self.key);
+        context.decode_field(1, ref self.key);
         context.decode_repeated_field(2, ref self.value);
-        context.decode_repeated_field(3, ref self.leaf);
+        context.decode_field(3, ref self.leaf);
         context.decode_repeated_field(4, ref self.path);
     }
 
@@ -88,6 +150,19 @@ pub struct NonExistenceProof {
     pub key: Array<u8>,
     pub left: ExistenceProof,
     pub right: ExistenceProof,
+}
+
+#[generate_trait]
+pub impl NonExistenceProofImpl of NonExistenceProofTrait {
+    fn calculate_root(self: @NonExistenceProof) -> RootBytes {
+        self.calculate_root_for_spec(Option::None)
+    }
+
+    fn calculate_root_for_spec(self: @NonExistenceProof, spec: Option<ProofSpec>) -> RootBytes {
+        [0; 8]
+    }
+
+    fn verify(self: @NonExistenceProof, spec: @ProofSpec, root: @RootBytes, key: @ByteArray) {}
 }
 
 impl NonExistenceProofAsProtoMessage of ProtoMessage<NonExistenceProof> {
@@ -150,14 +225,6 @@ pub enum HashOp {
     #[default]
     NoOp,
     Sha256,
-    Sha512,
-    Keccak256,
-    Ripemd160,
-    Bitcoin,
-    Sha512_256,
-    Blake2b_512,
-    Blake2b_256,
-    Blake3,
 }
 
 impl HashOpIntoU64 of Into<HashOp, u64> {
@@ -165,14 +232,6 @@ impl HashOpIntoU64 of Into<HashOp, u64> {
         match self {
             HashOp::NoOp => 0,
             HashOp::Sha256 => 1,
-            HashOp::Sha512 => 2,
-            HashOp::Keccak256 => 3,
-            HashOp::Ripemd160 => 4,
-            HashOp::Bitcoin => 5,
-            HashOp::Sha512_256 => 6,
-            HashOp::Blake2b_512 => 7,
-            HashOp::Blake2b_256 => 8,
-            HashOp::Blake3 => 9,
         }
     }
 }
@@ -182,14 +241,6 @@ impl U64IntoHashOp of Into<u64, HashOp> {
         match self {
             0 => HashOp::NoOp,
             1 => HashOp::Sha256,
-            2 => HashOp::Sha512,
-            3 => HashOp::Keccak256,
-            4 => HashOp::Ripemd160,
-            5 => HashOp::Bitcoin,
-            6 => HashOp::Sha512_256,
-            7 => HashOp::Blake2b_512,
-            8 => HashOp::Blake2b_256,
-            9 => HashOp::Blake3,
             _ => panic!("invalid HashOp"),
         }
     }
@@ -200,13 +251,6 @@ pub enum LengthOp {
     #[default]
     NoPrefix,
     VarProto,
-    VarRlp,
-    Fixed32Big,
-    Fixed32Little,
-    Fixed64Big,
-    Fixed64Little,
-    Require32Bytes,
-    Require64Bytes,
 }
 
 impl LengthOpIntoU64 of Into<LengthOp, u64> {
@@ -214,13 +258,6 @@ impl LengthOpIntoU64 of Into<LengthOp, u64> {
         match self {
             LengthOp::NoPrefix => 0,
             LengthOp::VarProto => 1,
-            LengthOp::VarRlp => 2,
-            LengthOp::Fixed32Big => 3,
-            LengthOp::Fixed32Little => 4,
-            LengthOp::Fixed64Big => 5,
-            LengthOp::Fixed64Little => 6,
-            LengthOp::Require32Bytes => 7,
-            LengthOp::Require64Bytes => 8,
         }
     }
 }
@@ -230,13 +267,6 @@ impl U64IntoLengthOp of Into<u64, LengthOp> {
         match self {
             0 => LengthOp::NoPrefix,
             1 => LengthOp::VarProto,
-            2 => LengthOp::VarRlp,
-            3 => LengthOp::Fixed32Big,
-            4 => LengthOp::Fixed32Little,
-            5 => LengthOp::Fixed64Big,
-            6 => LengthOp::Fixed64Little,
-            7 => LengthOp::Require32Bytes,
-            8 => LengthOp::Require64Bytes,
             _ => panic!("invalid length op"),
         }
     }
@@ -248,7 +278,7 @@ pub struct InnerSpec {
     pub child_size: i32,
     pub min_prefix_length: i32,
     pub max_prefix_length: i32,
-    pub empty_child: ByteArray,
+    pub empty_child: ByteArray, // TODO: determine the correct type!
     pub hash: HashOp,
 }
 
@@ -288,7 +318,7 @@ pub struct LeafOp {
     pub prehash_key: HashOp,
     pub prehash_value: HashOp,
     pub length: LengthOp,
-    pub prefix: ByteArray,
+    pub prefix: Array<u8>,
 }
 
 impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
@@ -297,7 +327,7 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
         context.encode_field(2, self.prehash_key);
         context.encode_field(3, self.prehash_value);
         context.encode_field(4, self.length);
-        context.encode_field(5, self.prefix);
+        context.encode_repeated_field(5, self.prefix);
     }
 
     fn decode_raw(ref self: LeafOp, ref context: DecodeContext) {
@@ -305,7 +335,7 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
         context.decode_field(2, ref self.prehash_key);
         context.decode_field(3, ref self.prehash_value);
         context.decode_field(4, ref self.length);
-        context.decode_field(5, ref self.prefix);
+        context.decode_repeated_field(5, ref self.prefix);
     }
 
     fn wire_type() -> WireType {
@@ -320,12 +350,68 @@ impl LeafOpAsProtoName of ProtoName<LeafOp> {
 }
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
+pub struct ProofSpecs {
+    specs: Array<ProofSpec>,
+}
+
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ProofSpec {
     pub leaf_spec: LeafOp,
     pub inner_spec: InnerSpec,
     pub max_depth: i32,
     pub min_depth: i32,
     pub prehash_key_before_comparison: bool,
+}
+
+#[generate_trait]
+pub impl ProofSpecImpl of ProofSpecTrait {
+    fn iavl() -> ProofSpec {
+        let leaf_spec = LeafOp {
+            hash: HashOp::Sha256,
+            prehash_key: HashOp::NoOp,
+            prehash_value: HashOp::Sha256,
+            length: LengthOp::VarProto,
+            prefix: array![0],
+        };
+        let inner_spec = InnerSpec {
+            child_order: array![0, 1],
+            min_prefix_length: 4,
+            max_prefix_length: 12,
+            child_size: 33,
+            empty_child: "",
+            hash: HashOp::Sha256,
+        };
+        ProofSpec {
+            leaf_spec, inner_spec, min_depth: 0, max_depth: 0, prehash_key_before_comparison: false
+        }
+    }
+
+    fn tendermint() -> ProofSpec {
+        let leaf_spec = LeafOp {
+            hash: HashOp::Sha256,
+            prehash_key: HashOp::NoOp,
+            prehash_value: HashOp::Sha256,
+            length: LengthOp::VarProto,
+            prefix: array![0],
+        };
+        let inner_spec = InnerSpec {
+            child_order: array![0, 1],
+            min_prefix_length: 1,
+            max_prefix_length: 1,
+            child_size: 32,
+            empty_child: "",
+            hash: HashOp::Sha256,
+        };
+        ProofSpec {
+            leaf_spec, inner_spec, min_depth: 0, max_depth: 0, prehash_key_before_comparison: false
+        }
+    }
+
+    fn validate(self: @ProofSpec) {
+        assert(self.max_depth < @0, ICS23Errors::INVALID_DEPTH_RANGE);
+        assert(self.min_depth < @0, ICS23Errors::INVALID_DEPTH_RANGE);
+        assert(self.max_depth > self.min_depth, ICS23Errors::INVALID_DEPTH_RANGE);
+    }
 }
 
 impl ProofSpecAsProtoMessage of ProtoMessage<ProofSpec> {

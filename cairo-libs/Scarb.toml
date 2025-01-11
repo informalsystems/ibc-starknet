@@ -23,10 +23,11 @@ test = "snforge test"
 
 [workspace.dependencies]
 # external dependencies
-assert_macros = "2.8.4"
-cairo_test    = "2.8.4"
-starknet      = "2.8.4"
-snforge_std   = "0.31.0"
+alexandria_numeric = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "95d98a5" }
+assert_macros      = "2.8.4"
+cairo_test         = "2.8.4"
+starknet           = "2.8.4"
+snforge_std        = "0.31.0"
 
 # internal dependencies
 protobuf = { path = "packages/protobuf" }
