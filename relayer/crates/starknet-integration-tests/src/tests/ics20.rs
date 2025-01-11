@@ -67,6 +67,7 @@ use starknet::core::types::{Felt, U256};
 use starknet::macros::{selector, short_string};
 use tracing::info;
 
+use super::poseidon::PoseidonState;
 use crate::contexts::bootstrap::StarknetBootstrap;
 
 #[test]
@@ -409,22 +410,33 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_cosmos_a_step_1.quantity + transfer_quantity
         );
 
-        // TODO(rano): we should use the poseidon hash of the ibc denom to get the token address
+        let ics20_token_address: Felt = {
+            let ibc_prefixed_denom = PrefixedDenom {
+                trace_path: vec![TracePrefix {
+                    port_id: ics20_port.to_string(),
+                    channel_id: starknet_channel_id.channel_id.clone(),
+                }],
+                base: Denom::Hosted(denom_cosmos.to_string()),
+            };
 
-        let ics20_token_address = {
+            // https://github.com/informalsystems/ibc-starknet/blob/e64a8ecaa708c5c5150b058b6c9bbe1ba9f54d51/cairo-contracts/packages/utils/src/utils.cairo#L36
+            let ibc_prefixed_denom_key = PoseidonState::default()
+                .update(PoseidonState::update_slice(
+                    &cairo_encoding.encode(&ibc_prefixed_denom)?,
+                ))
+                .finish();
+
+            let calldata = cairo_encoding.encode(&product![ibc_prefixed_denom_key])?;
+
             let output = starknet_chain
                 .call_contract(
                     &ics20_contract_address,
-                    &selector!("ibc_token_addresses"),
-                    &vec![],
+                    &selector!("ibc_token_address"),
+                    &calldata,
                 )
                 .await?;
 
-            let addresses: Vec<Felt> = cairo_encoding.decode(&output)?;
-
-            assert_eq!(addresses.len(), 1);
-
-            addresses[0]
+            cairo_encoding.decode(&output)?
         };
 
         info!("ics20 token address: {:?}", ics20_token_address);
