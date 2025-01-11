@@ -420,11 +420,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             };
 
             // https://github.com/informalsystems/ibc-starknet/blob/e64a8ecaa708c5c5150b058b6c9bbe1ba9f54d51/cairo-contracts/packages/utils/src/utils.cairo#L36
-            let ibc_prefixed_denom_key = PoseidonState::default()
-                .write(PoseidonState::digest(
-                    &cairo_encoding.encode(&ibc_prefixed_denom)?,
-                ))
-                .finish();
+            let ibc_prefixed_denom_key = PoseidonState::digest(&[PoseidonState::digest(
+                &cairo_encoding.encode(&ibc_prefixed_denom)?,
+            )]);
 
             let calldata = cairo_encoding.encode(&product![ibc_prefixed_denom_key])?;
 
