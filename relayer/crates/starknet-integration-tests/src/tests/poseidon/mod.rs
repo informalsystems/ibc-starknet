@@ -32,7 +32,7 @@ impl Default for PoseidonState {
 }
 
 impl PoseidonState {
-    pub fn update(mut self, value: Felt) -> Self {
+    pub fn write(mut self, value: Felt) -> Self {
         if self.odd {
             self.state =
                 HADES_3.hades_permutation([self.state[0], self.state[1] + value, self.state[2]]);
@@ -52,7 +52,7 @@ impl PoseidonState {
         }
     }
 
-    pub fn update_slice(span: &[Felt]) -> Felt {
+    pub fn digest(span: &[Felt]) -> Felt {
         let mut state = [Felt::ZERO; 3];
 
         for chunk in span.chunks(2) {
@@ -78,11 +78,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_poseidon_hash_span() {
+    fn test_poseidon_digest() {
         // https://github.com/starkware-libs/cairo/blob/dff35c09bfaa1ae0969c48ce4e103bad46d5fe50/corelib/src/poseidon.cairo#L128
 
         let span = [Felt::ONE, Felt::TWO];
-        let hash = PoseidonState::update_slice(&span);
+        let hash = PoseidonState::digest(&span);
 
         let expected_hex = "0x0371cb6995ea5e7effcd2e174de264b5b407027a75a231a70c2c8d196107f0e7";
 
@@ -90,12 +90,12 @@ mod tests {
     }
 
     #[test]
-    fn test_update_finalize() {
+    fn test_poseidon_write_finish() {
         // https://github.com/starkware-libs/cairo/blob/dff35c09bfaa1ae0969c48ce4e103bad46d5fe50/corelib/src/poseidon.cairo#L99
 
         let hash = PoseidonState::default()
-            .update(Felt::ONE)
-            .update(Felt::TWO)
+            .write(Felt::ONE)
+            .write(Felt::TWO)
             .finish();
 
         let expected_hex = "0x0371cb6995ea5e7effcd2e174de264b5b407027a75a231a70c2c8d196107f0e7";
