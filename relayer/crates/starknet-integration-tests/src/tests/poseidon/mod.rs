@@ -11,21 +11,21 @@ use starknet::core::types::Felt;
 // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_hash.py
 // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py
 
-pub struct PoseidonState {
+pub struct Poseidon3Hasher {
     pub state: [Felt; 3],
     pub odd: bool,
 }
 
-impl Default for PoseidonState {
+impl Default for Poseidon3Hasher {
     fn default() -> Self {
-        PoseidonState {
+        Poseidon3Hasher {
             state: [Felt::ZERO; 3],
             odd: false,
         }
     }
 }
 
-impl PoseidonState {
+impl Poseidon3Hasher {
     pub fn write(mut self, value: Felt) -> Self {
         if self.odd {
             self.state = STARKNET_HADES_PERM_3.hades_permutation([
@@ -93,7 +93,7 @@ mod tests {
         // https://github.com/starkware-libs/cairo/blob/dff35c09bfaa1ae0969c48ce4e103bad46d5fe50/corelib/src/poseidon.cairo#L128
 
         let span = [Felt::ONE, Felt::TWO];
-        let hash = PoseidonState::digest(&span);
+        let hash = Poseidon3Hasher::digest(&span);
 
         let expected_hex = "0x0371cb6995ea5e7effcd2e174de264b5b407027a75a231a70c2c8d196107f0e7";
 
@@ -104,7 +104,7 @@ mod tests {
     fn test_poseidon_write_finish() {
         // https://github.com/starkware-libs/cairo/blob/dff35c09bfaa1ae0969c48ce4e103bad46d5fe50/corelib/src/poseidon.cairo#L99
 
-        let hash = PoseidonState::default()
+        let hash = Poseidon3Hasher::default()
             .write(Felt::ONE)
             .write(Felt::TWO)
             .finish();
@@ -119,7 +119,7 @@ mod tests {
         let data: [Felt; 20] = core::array::from_fn(Felt::from);
 
         for i in 0..data.len() {
-            let mut hasher = PoseidonState::default();
+            let mut hasher = Poseidon3Hasher::default();
 
             let current_data = &data[..=i];
 
@@ -129,7 +129,7 @@ mod tests {
 
             let update_hash = hasher.finish();
 
-            let digest_hash = PoseidonState::digest(current_data);
+            let digest_hash = Poseidon3Hasher::digest(current_data);
 
             assert_eq!(update_hash, digest_hash);
         }
