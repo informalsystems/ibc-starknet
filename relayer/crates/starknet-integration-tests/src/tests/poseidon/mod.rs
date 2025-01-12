@@ -1,5 +1,5 @@
 pub mod hades;
-pub mod starkent_consts;
+pub mod poseidon_3;
 
 use hades::STARKNET_HADES_PERM_3;
 use starknet::core::types::Felt;

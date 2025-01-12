@@ -2,7 +2,7 @@ use std::sync::LazyLock;
 
 use starknet::core::types::Felt;
 
-use super::starkent_consts::{FULL_ROUNDS, MDS, PARTIAL_ROUNDS, RATE_PLUS_1};
+use super::poseidon_3::{FULL_ROUNDS, MDS, PARTIAL_ROUNDS, RATE_PLUS_1};
 
 // References:
 // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py
