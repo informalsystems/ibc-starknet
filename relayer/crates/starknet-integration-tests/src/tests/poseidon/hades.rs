@@ -2,13 +2,20 @@ use std::sync::LazyLock;
 
 use starknet::core::types::Felt;
 
+use super::starkent_consts::{FULL_ROUNDS, MDS, PARTIAL_ROUNDS, RATE_PLUS_1};
+
 // References:
 // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py
 
 pub const FN_NAME: &str = "Hades";
 
-pub static ROUND_CONSTANTS: LazyLock<[Felt; 256]> =
+pub const N_ROUND_CONSTANTS: usize = RATE_PLUS_1 * (FULL_ROUNDS + PARTIAL_ROUNDS);
+
+pub static ROUND_CONSTANTS: LazyLock<[Felt; N_ROUND_CONSTANTS]> =
     LazyLock::new(|| core::array::from_fn(hades_ark));
+
+pub const STARKNET_HADES_PERM_3: HadesPermutate<RATE_PLUS_1, FULL_ROUNDS, PARTIAL_ROUNDS> =
+    HadesPermutate { mds: MDS };
 
 // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py#L15
 pub fn hades_ark(idx: usize) -> Felt {

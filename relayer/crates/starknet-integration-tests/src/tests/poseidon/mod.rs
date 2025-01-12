@@ -1,8 +1,7 @@
 pub mod hades;
 pub mod starkent_consts;
 
-use hades::HadesPermutate;
-use starkent_consts::{FULL_ROUNDS, MDS, PARTIAL_ROUNDS, RATE_PLUS_1};
+use hades::STARKNET_HADES_PERM_3;
 use starknet::core::types::Felt;
 
 // References:
@@ -11,9 +10,6 @@ use starknet::core::types::Felt;
 // https://github.com/starkware-libs/cairo/blob/master/corelib/src/poseidon.cairo
 // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_hash.py
 // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py
-
-const HADES_3: HadesPermutate<RATE_PLUS_1, FULL_ROUNDS, PARTIAL_ROUNDS> =
-    HadesPermutate { mds: MDS };
 
 pub struct PoseidonState {
     pub state: [Felt; 3],
@@ -32,8 +28,11 @@ impl Default for PoseidonState {
 impl PoseidonState {
     pub fn write(mut self, value: Felt) -> Self {
         if self.odd {
-            self.state =
-                HADES_3.hades_permutation([self.state[0], self.state[1] + value, self.state[2]]);
+            self.state = STARKNET_HADES_PERM_3.hades_permutation([
+                self.state[0],
+                self.state[1] + value,
+                self.state[2],
+            ]);
             self.odd = false;
         } else {
             self.state[0] += value;
@@ -44,9 +43,17 @@ impl PoseidonState {
 
     pub fn finish(self) -> Felt {
         if self.odd {
-            HADES_3.hades_permutation([self.state[0], self.state[1] + Felt::ONE, self.state[2]])[0]
+            STARKNET_HADES_PERM_3.hades_permutation([
+                self.state[0],
+                self.state[1] + Felt::ONE,
+                self.state[2],
+            ])[0]
         } else {
-            HADES_3.hades_permutation([self.state[0] + Felt::ONE, self.state[1], self.state[2]])[0]
+            STARKNET_HADES_PERM_3.hades_permutation([
+                self.state[0] + Felt::ONE,
+                self.state[1],
+                self.state[2],
+            ])[0]
         }
     }
 
@@ -55,7 +62,13 @@ impl PoseidonState {
 
         for chunk in span.chunks(2) {
             match chunk {
-                [x, y] => state = HADES_3.hades_permutation([state[0] + x, state[1] + y, state[2]]),
+                [x, y] => {
+                    state = STARKNET_HADES_PERM_3.hades_permutation([
+                        state[0] + x,
+                        state[1] + y,
+                        state[2],
+                    ])
+                }
                 [x] => {
                     return Self {
                         state: [state[0] + x, state[1], state[2]],
