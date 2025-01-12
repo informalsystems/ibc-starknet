@@ -1,7 +1,7 @@
 pub mod hades;
 pub mod poseidon_3;
 
-use hades::STARKNET_HADES_PERM_3;
+use hades::HADES_PERM_3;
 use starknet::core::types::Felt;
 
 // References:
@@ -28,7 +28,7 @@ impl Default for Poseidon3Hasher {
 impl Poseidon3Hasher {
     pub fn write(mut self, value: Felt) -> Self {
         if self.odd {
-            self.state = STARKNET_HADES_PERM_3.hades_permutation([
+            self.state = HADES_PERM_3.hades_permutation([
                 self.state[0],
                 self.state[1] + value,
                 self.state[2],
@@ -43,13 +43,13 @@ impl Poseidon3Hasher {
 
     pub fn finish(self) -> Felt {
         if self.odd {
-            STARKNET_HADES_PERM_3.hades_permutation([
+            HADES_PERM_3.hades_permutation([
                 self.state[0],
                 self.state[1] + Felt::ONE,
                 self.state[2],
             ])[0]
         } else {
-            STARKNET_HADES_PERM_3.hades_permutation([
+            HADES_PERM_3.hades_permutation([
                 self.state[0] + Felt::ONE,
                 self.state[1],
                 self.state[2],
@@ -63,11 +63,7 @@ impl Poseidon3Hasher {
         for chunk in span.chunks(2) {
             match chunk {
                 [x, y] => {
-                    state = STARKNET_HADES_PERM_3.hades_permutation([
-                        state[0] + x,
-                        state[1] + y,
-                        state[2],
-                    ])
+                    state = HADES_PERM_3.hades_permutation([state[0] + x, state[1] + y, state[2]])
                 }
                 [x] => {
                     return Self {

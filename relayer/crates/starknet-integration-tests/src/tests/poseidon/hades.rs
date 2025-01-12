@@ -9,28 +9,25 @@ use super::poseidon_3::{FULL_ROUNDS, MDS, PARTIAL_ROUNDS, RATE_PLUS_1};
 
 pub const FN_NAME: &str = "Hades";
 
-pub const N_ROUND_CONSTANTS: usize = RATE_PLUS_1 * (FULL_ROUNDS + PARTIAL_ROUNDS);
+pub static ROUND_CONSTANTS: LazyLock<[Felt; RATE_PLUS_1 * (FULL_ROUNDS + PARTIAL_ROUNDS)]> =
+    LazyLock::new(|| {
+        core::array::from_fn(|idx| {
+            // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py#L15
+            let value = format!("{}{}", FN_NAME, idx);
 
-pub static ROUND_CONSTANTS: LazyLock<[Felt; N_ROUND_CONSTANTS]> =
-    LazyLock::new(|| core::array::from_fn(hades_ark));
+            let hash = {
+                use sha2::Digest;
+                let mut hasher = sha2::Sha256::new();
+                hasher.update(value);
+                hasher.finalize()
+            };
 
-pub const STARKNET_HADES_PERM_3: HadesPermutate<RATE_PLUS_1, FULL_ROUNDS, PARTIAL_ROUNDS> =
+            Felt::from_bytes_be(&hash.into())
+        })
+    });
+
+pub const HADES_PERM_3: HadesPermutate<RATE_PLUS_1, FULL_ROUNDS, PARTIAL_ROUNDS> =
     HadesPermutate { mds: MDS };
-
-// https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py#L15
-pub fn hades_ark(idx: usize) -> Felt {
-    let value = format!("{}{}", FN_NAME, idx);
-
-    use sha2::Digest;
-
-    let hash = {
-        let mut hasher = sha2::Sha256::new();
-        hasher.update(value);
-        hasher.finalize()
-    };
-
-    Felt::from_bytes_be(&hash.into())
-}
 
 pub struct HadesPermutate<const DIM: usize, const FULL_ROUNDS: usize, const PARTIAL_ROUNDS: usize> {
     pub mds: [[i64; DIM]; DIM],
