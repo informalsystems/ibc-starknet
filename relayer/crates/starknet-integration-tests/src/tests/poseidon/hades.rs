@@ -24,21 +24,12 @@ pub fn hades_ark(idx: usize) -> Felt {
     Felt::from_bytes_be(&hash.into())
 }
 
-pub struct HadesPermutate<
-    const DIM: usize,
-    const FULL_ROUNDS: usize,
-    const PARTIAL_ROUNDS: usize,
-    const N_ROUNDS: usize,
-> {
+pub struct HadesPermutate<const DIM: usize, const FULL_ROUNDS: usize, const PARTIAL_ROUNDS: usize> {
     pub mds: [[i64; DIM]; DIM],
 }
 
-impl<
-        const DIM: usize,
-        const FULL_ROUNDS: usize,
-        const PARTIAL_ROUNDS: usize,
-        const N_ROUNDS: usize,
-    > HadesPermutate<DIM, FULL_ROUNDS, PARTIAL_ROUNDS, N_ROUNDS>
+impl<const DIM: usize, const FULL_ROUNDS: usize, const PARTIAL_ROUNDS: usize>
+    HadesPermutate<DIM, FULL_ROUNDS, PARTIAL_ROUNDS>
 {
     // Perform matrix multiplication in the field.
     fn matrix_multiply(matrix: &[[i64; DIM]; DIM], vector: &[Felt; DIM]) -> [Felt; DIM] {

@@ -7,7 +7,6 @@ pub const FULL_ROUNDS: usize = 8;
 pub const PARTIAL_ROUNDS: usize = 83;
 
 pub const MDS_DIM: usize = RATE + 1;
-pub const N_ROUNDS: usize = FULL_ROUNDS + PARTIAL_ROUNDS;
 
 pub const MDS: [[i64; MDS_DIM]; MDS_DIM] = [[3, 1, 1], [1, -1, 1], [1, 1, -2]];
 pub const ROUND_KEYS: [[&str; 3]; N_ROUNDS] = [

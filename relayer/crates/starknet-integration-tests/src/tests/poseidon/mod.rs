@@ -2,7 +2,7 @@ pub mod hades;
 pub mod starkent_consts;
 
 use hades::HadesPermutate;
-use starkent_consts::{FULL_ROUNDS, MDS, MDS_DIM, N_ROUNDS, PARTIAL_ROUNDS};
+use starkent_consts::{FULL_ROUNDS, MDS, MDS_DIM, PARTIAL_ROUNDS};
 use starknet::core::types::Felt;
 
 // References:
@@ -12,8 +12,7 @@ use starknet::core::types::Felt;
 // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_hash.py
 // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py
 
-const HADES_3: HadesPermutate<MDS_DIM, FULL_ROUNDS, PARTIAL_ROUNDS, N_ROUNDS> =
-    HadesPermutate { mds: MDS };
+const HADES_3: HadesPermutate<MDS_DIM, FULL_ROUNDS, PARTIAL_ROUNDS> = HadesPermutate { mds: MDS };
 
 pub struct PoseidonState {
     pub state: [Felt; 3],
