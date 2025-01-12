@@ -10,6 +10,7 @@ pub const FN_NAME: &str = "Hades";
 pub static ROUND_CONSTANTS: LazyLock<[Felt; 256]> =
     LazyLock::new(|| core::array::from_fn(hades_ark));
 
+// https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py#L15
 pub fn hades_ark(idx: usize) -> Felt {
     let value = format!("{}{}", FN_NAME, idx);
 
