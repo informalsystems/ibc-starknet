@@ -6,9 +6,9 @@ pub const CAPACITY: usize = 1;
 pub const FULL_ROUNDS: usize = 8;
 pub const PARTIAL_ROUNDS: usize = 83;
 
-pub const MDS_DIM: usize = RATE + 1;
+pub const RATE_PLUS_1: usize = RATE + 1;
 
-pub const MDS: [[i64; MDS_DIM]; MDS_DIM] = [[3, 1, 1], [1, -1, 1], [1, 1, -2]];
+pub const MDS: [[i64; RATE_PLUS_1]; RATE_PLUS_1] = [[3, 1, 1], [1, -1, 1], [1, 1, -2]];
 
 // we don't need to maintain ROUND_KEYS, as ROUND_KEYS[id] = Felt(sha256("Hades{id}"))
 // ref: https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py#L15
