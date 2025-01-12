@@ -1,7 +1,28 @@
+use std::sync::LazyLock;
+
 use starknet::core::types::Felt;
 
 // References:
 // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py
+
+pub const FN_NAME: &str = "Hades";
+
+pub static ROUND_CONSTANTS: LazyLock<[Felt; 256]> =
+    LazyLock::new(|| core::array::from_fn(hades_ark));
+
+pub fn hades_ark(idx: usize) -> Felt {
+    let value = format!("{}{}", FN_NAME, idx);
+
+    use sha2::Digest;
+
+    let hash = {
+        let mut hasher = sha2::Sha256::new();
+        hasher.update(value);
+        hasher.finalize()
+    };
+
+    Felt::from_bytes_be(&hash.into())
+}
 
 pub struct HadesPermutate<
     const DIM: usize,
@@ -38,9 +59,7 @@ impl<
         round_idx: usize,
     ) -> [Felt; DIM] {
         // Add-Round Key
-        let mut values = core::array::from_fn(|i| {
-            values[i] + Felt::from_dec_str(self.round_keys[round_idx][i]).unwrap()
-        });
+        let mut values = core::array::from_fn(|i| values[i] + ROUND_CONSTANTS[round_idx * DIM + i]);
 
         // Perform the cube operation (x^3) in the field.
         fn cube(x: Felt) -> Felt {
