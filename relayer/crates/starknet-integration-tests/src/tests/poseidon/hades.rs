@@ -102,3 +102,19 @@ impl<
         values
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hades_ark() {
+        let actual = ROUND_CONSTANTS[12];
+
+        let expected_num =
+            "2404084503073127963385083467393598147276436640877011103379112521338973185443";
+        let expected = Felt::from_dec_str(expected_num).unwrap();
+
+        assert_eq!(actual, expected);
+    }
+}
