@@ -31,7 +31,6 @@ pub struct HadesPermutate<
     const N_ROUNDS: usize,
 > {
     pub mds: [[i64; DIM]; DIM],
-    pub round_keys: [[&'static str; DIM]; N_ROUNDS],
 }
 
 impl<
