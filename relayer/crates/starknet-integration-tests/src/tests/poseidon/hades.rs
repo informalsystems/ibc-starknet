@@ -106,6 +106,7 @@ mod tests {
     fn test_hades_ark() {
         let actual = ROUND_CONSTANTS[12];
 
+        // https://github.com/starkware-industries/poseidon/blob/main/poseidon3.txt#L28
         let expected_num =
             "2404084503073127963385083467393598147276436640877011103379112521338973185443";
         let expected = Felt::from_dec_str(expected_num).unwrap();
