@@ -60,7 +60,6 @@ use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
 use ibc::core::client::types::Height as IbcHeight;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
-use ibc::primitives::Timestamp as IbcTimestamp;
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
 use starknet::core::types::{Felt, U256};
@@ -473,6 +472,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let starknet_ics20_send_message = {
             let current_starknet_time = starknet_chain.query_chain_status().await?.time;
 
+            // TODO(rano): should we use IbcTimestamp instead of HermesTimestamp as StarknetChain::HasTimeType ?
+            let ibc_current_time = Timestamp::from_unix_timestamp(
+                u64::try_from(current_starknet_time.unix_timestamp())?,
+                0,
+            )?;
+
             MsgTransfer {
                 port_id_on_a: PortId {
                     port_id: ics20_port.to_string(),
@@ -483,10 +488,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                     revision_number: 0,
                     revision_height: 0,
                 },
-                timeout_timestamp_on_b: Timestamp {
-                    timestamp: u64::try_from(current_starknet_time.unix_timestamp()).unwrap()
-                        + 1800,
-                },
+                timeout_timestamp_on_b: (ibc_current_time + core::time::Duration::from_secs(1800))?,
             }
         };
 
@@ -541,13 +543,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .map(TimeoutHeight::At)
             .unwrap_or_else(|_| TimeoutHeight::Never);
 
-            let timeout_timestamp_on_b = (send_packet_event.timeout_timestamp_on_b.timestamp > 0)
-                .then(|| {
-                    TimeoutTimestamp::At(IbcTimestamp::from_nanoseconds(
-                        send_packet_event.timeout_timestamp_on_b.timestamp * 1_000_000_000,
-                    ))
-                })
-                .unwrap_or(TimeoutTimestamp::Never);
+            let timeout_timestamp_on_b =
+                if send_packet_event.timeout_timestamp_on_b.nanoseconds() > 0 {
+                    TimeoutTimestamp::At(send_packet_event.timeout_timestamp_on_b)
+                } else {
+                    TimeoutTimestamp::Never
+                };
 
             let ibc_transfer_packet_data = PacketData {
                 token: PrefixedCoin {
@@ -669,6 +670,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let starknet_ics20_send_message = {
             let current_starknet_time = starknet_chain.query_chain_status().await?.time;
 
+            // TODO(rano): should we use IbcTimestamp instead of HermesTimestamp as StarknetChain::HasTimeType ?
+            let ibc_current_time = Timestamp::from_unix_timestamp(
+                u64::try_from(current_starknet_time.unix_timestamp())?,
+                0,
+            )?;
+
             MsgTransfer {
                 port_id_on_a: PortId {
                     port_id: ics20_port.to_string(),
@@ -679,10 +686,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                     revision_number: 0,
                     revision_height: 0,
                 },
-                timeout_timestamp_on_b: Timestamp {
-                    timestamp: u64::try_from(current_starknet_time.unix_timestamp()).unwrap()
-                        + 1800,
-                },
+                timeout_timestamp_on_b: (ibc_current_time + core::time::Duration::from_secs(1800))?,
             }
         };
 
@@ -737,13 +741,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .map(TimeoutHeight::At)
             .unwrap_or_else(|_| TimeoutHeight::Never);
 
-            let timeout_timestamp_on_b = (send_packet_event.timeout_timestamp_on_b.timestamp > 0)
-                .then(|| {
-                    TimeoutTimestamp::At(IbcTimestamp::from_nanoseconds(
-                        send_packet_event.timeout_timestamp_on_b.timestamp * 1_000_000_000,
-                    ))
-                })
-                .unwrap_or(TimeoutTimestamp::Never);
+            let timeout_timestamp_on_b =
+                if send_packet_event.timeout_timestamp_on_b.nanoseconds() > 0 {
+                    TimeoutTimestamp::At(send_packet_event.timeout_timestamp_on_b)
+                } else {
+                    TimeoutTimestamp::Never
+                };
 
             let ibc_transfer_packet_data = PacketData {
                 token: PrefixedCoin {

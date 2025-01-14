@@ -5,7 +5,7 @@ use hermes_relayer_components::chain::traits::types::client_state::HasClientStat
 use hermes_relayer_components::chain::traits::types::height::HasHeightType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use ibc::core::client::types::Height;
-use ibc::primitives::Timestamp;
+use ibc::primitives::{Timestamp, TimestampError};
 use ibc_client_starknet_types::header::StarknetHeader;
 use starknet::core::types::{BlockId, MaybePendingBlockWithTxHashes};
 use starknet::providers::{Provider, ProviderError};
@@ -26,7 +26,8 @@ where
         + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
         + HasStarknetProvider
         + CanRaiseError<&'static str>
-        + CanRaiseError<ProviderError>,
+        + CanRaiseError<ProviderError>
+        + CanRaiseError<TimestampError>,
 {
     async fn build_update_client_payload(
         chain: &Chain,
@@ -34,24 +35,22 @@ where
         target_height: &u64,
         _client_state: Chain::ClientState,
     ) -> Result<Chain::UpdateClientPayload, Chain::Error> {
-        let block_info = chain
+        let MaybePendingBlockWithTxHashes::Block(block) = chain
             .provider()
             .get_block_with_tx_hashes(BlockId::Number(*target_height))
             .await
-            .map_err(Chain::raise_error)?;
-
-        let block_hash = match block_info {
-            MaybePendingBlockWithTxHashes::Block(block) => block.block_hash,
-            MaybePendingBlockWithTxHashes::PendingBlock(_block) => {
-                return Err(Chain::raise_error("pending block is not supported"))
-            }
+            .map_err(Chain::raise_error)?
+        else {
+            return Err(Chain::raise_error("pending block is not supported"));
         };
+
+        let block_hash = block.block_hash;
 
         let root = Vec::from(block_hash.to_bytes_be());
 
         let consensus_state = StarknetConsensusState {
             root: root.into(),
-            time: Timestamp::now(),
+            time: Timestamp::from_unix_timestamp(block.timestamp, 0).map_err(Chain::raise_error)?,
         };
 
         let height = Height::new(0, *target_height).unwrap();
