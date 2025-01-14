@@ -6,7 +6,7 @@ use hermes_relayer_components::chain::traits::types::create_client::{
 };
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height;
-use ibc::primitives::Timestamp;
+use ibc::primitives::{Timestamp, TimestampError};
 
 use crate::types::client_state::{StarknetClientState, WasmStarknetClientState};
 use crate::types::consensus_state::{StarknetConsensusState, WasmStarknetConsensusState};
@@ -25,7 +25,9 @@ where
             CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
-        + CanRaiseError<ClientError>,
+        + CanRaiseError<ClientError>
+        + CanRaiseError<&'static str>
+        + CanRaiseError<TimestampError>,
 {
     async fn build_create_client_payload(
         chain: &Chain,
@@ -45,7 +47,12 @@ where
         let consensus_state = WasmStarknetConsensusState {
             consensus_state: StarknetConsensusState {
                 root: root.into(),
-                time: Timestamp::now(),
+                time: Timestamp::from_unix_timestamp(
+                    u64::try_from(chain_status.time.unix_timestamp())
+                        .map_err(|_| Chain::raise_error("Failed to convert timestamp"))?,
+                    0,
+                )
+                .map_err(Chain::raise_error)?,
             },
         };
 

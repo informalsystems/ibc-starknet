@@ -28,7 +28,13 @@ where
             MaybePendingBlockWithTxHashes::Block(block) => Ok(StarknetChainStatus {
                 height: block.block_number,
                 block_hash: block.block_hash,
-                time: Time::now(),
+                time: Time::from_unix_timestamp(
+                    i64::try_from(block.timestamp).map_err(|_| {
+                        Chain::raise_error("Failed to convert timestamp: u64 -> i64")
+                    })?,
+                    0,
+                )
+                .map_err(|_| Chain::raise_error("Failed to convert to tendermint timestamp"))?,
             }),
             MaybePendingBlockWithTxHashes::PendingBlock(_) => Err(Chain::raise_error(
                 "expected finalized block, but given pending block",
