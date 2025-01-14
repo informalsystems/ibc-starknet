@@ -120,12 +120,22 @@ impl PrefixedDenomDisplay of Display<PrefixedDenom> {
 impl PrefixedDenomKeyImpl of ComputeKey<PrefixedDenom> {
     fn key(self: @PrefixedDenom) -> felt252 {
         let mut key_builder = LocalKeyBuilderImpl::init();
-        // let mut trace_path_span = self.trace_path.span();
-        // while let Option::Some(path) = trace_path_span.pop_front() {
-        //     key_builder.append_serde(path);
-        // };
-        // key_builder.append_serde(self.base);
-        key_builder.append_serde(self);
+        // Note: why we didn't use `key_builder.append_serde(self)` here?
+        //
+        // We wanted to get the same hash for a standalone `base`
+        // and a `PrefixedDenom` the same `base` with empty `TracePath`.
+        //
+        // So, we pass serialization of each `TracePrefix` in `TracePath`
+        // separately and then the serialization of `base`.
+        //
+        // `key_builder.append_serde(self)` would have included the serialization
+        // of empty array which contains the length (zero).
+        // So, the hash would  have been different.
+        let mut trace_path_span = self.trace_path.span();
+        while let Option::Some(path) = trace_path_span.pop_front() {
+            key_builder.append_serde(path);
+        };
+        key_builder.append_serde(self.base);
         key_builder.key()
     }
 }
