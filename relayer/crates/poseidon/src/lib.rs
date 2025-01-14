@@ -2,7 +2,7 @@ pub mod hades;
 pub mod poseidon_3;
 
 use hades::HADES_PERM_3;
-use starknet::core::types::Felt;
+use starknet_types_core::felt::Felt;
 
 // References:
 // https://docs.starknet.io/architecture-and-concepts/cryptography/hash-functions

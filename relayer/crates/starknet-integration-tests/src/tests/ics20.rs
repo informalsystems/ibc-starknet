@@ -61,13 +61,13 @@ use ibc::core::client::types::Height as IbcHeight;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
 use ibc::primitives::Timestamp as IbcTimestamp;
+use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::{selector, short_string};
 use tracing::info;
 
-use super::poseidon::Poseidon3Hasher;
 use crate::contexts::bootstrap::StarknetBootstrap;
 
 #[test]

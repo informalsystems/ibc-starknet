@@ -1,6 +1,6 @@
 use std::sync::LazyLock;
 
-use starknet::core::types::Felt;
+use starknet_types_core::felt::Felt;
 
 use super::poseidon_3::{FULL_ROUNDS, MDS, PARTIAL_ROUNDS, RATE_PLUS_1};
 
