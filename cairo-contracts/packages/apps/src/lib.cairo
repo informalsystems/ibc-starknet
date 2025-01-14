@@ -25,7 +25,7 @@ pub mod transfer {
 
     /// The poseidon hash of the transfer port id.
     pub const TRANSFER_PORT_ID_HASH: felt252 =
-        506076466176013583354797631368330115868609515147080483618120063858966368900;
+        2995820167282656942975737886806038093312338834792943615550274240157014157818;
 
     pub fn TRANSFER_PORT_ID() -> starknet_ibc_core::host::PortId {
         starknet_ibc_core::host::PortId { port_id: "transfer" }
