@@ -543,10 +543,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .map(TimeoutHeight::At)
             .unwrap_or_else(|_| TimeoutHeight::Never);
 
-            let timeout_timestamp_on_b = (send_packet_event.timeout_timestamp_on_b.nanoseconds()
-                > 0)
-            .then(|| TimeoutTimestamp::At(send_packet_event.timeout_timestamp_on_b))
-            .unwrap_or(TimeoutTimestamp::Never);
+            let timeout_timestamp_on_b =
+                if send_packet_event.timeout_timestamp_on_b.nanoseconds() > 0 {
+                    TimeoutTimestamp::At(send_packet_event.timeout_timestamp_on_b)
+                } else {
+                    TimeoutTimestamp::Never
+                };
 
             let ibc_transfer_packet_data = PacketData {
                 token: PrefixedCoin {
@@ -739,10 +741,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .map(TimeoutHeight::At)
             .unwrap_or_else(|_| TimeoutHeight::Never);
 
-            let timeout_timestamp_on_b = (send_packet_event.timeout_timestamp_on_b.nanoseconds()
-                > 0)
-            .then(|| TimeoutTimestamp::At(send_packet_event.timeout_timestamp_on_b))
-            .unwrap_or(TimeoutTimestamp::Never);
+            let timeout_timestamp_on_b =
+                if send_packet_event.timeout_timestamp_on_b.nanoseconds() > 0 {
+                    TimeoutTimestamp::At(send_packet_event.timeout_timestamp_on_b)
+                } else {
+                    TimeoutTimestamp::Never
+                };
 
             let ibc_transfer_packet_data = PacketData {
                 token: PrefixedCoin {
