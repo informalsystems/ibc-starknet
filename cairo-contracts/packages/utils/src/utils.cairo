@@ -1,5 +1,4 @@
-use core::hash::HashStateTrait;
-use core::poseidon::{PoseidonTrait, poseidon_hash_span};
+use core::poseidon::poseidon_hash_span;
 
 pub trait ValidateBasic<T> {
     fn validate_basic(self: @T);
@@ -33,7 +32,7 @@ pub impl LocalKeyBuilderImpl of LocalKeyBuilderTrait {
     }
 
     fn key(self: @LocalKeyBuilder) -> felt252 {
-        PoseidonTrait::new().update(poseidon_hash_span(self.data.span())).finalize()
+        poseidon_hash_span(self.data.span())
     }
 }
 
