@@ -419,10 +419,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 base: Denom::Hosted(denom_cosmos.to_string()),
             };
 
-            // https://github.com/informalsystems/ibc-starknet/blob/e64a8ecaa708c5c5150b058b6c9bbe1ba9f54d51/cairo-contracts/packages/utils/src/utils.cairo#L36
-            let ibc_prefixed_denom_key = Poseidon3Hasher::digest(&[Poseidon3Hasher::digest(
-                &cairo_encoding.encode(&ibc_prefixed_denom)?,
-            )]);
+            // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/utils/src/utils.cairo#L35
+            let ibc_prefixed_denom_key =
+                Poseidon3Hasher::digest(&cairo_encoding.encode(&ibc_prefixed_denom)?);
 
             let calldata = cairo_encoding.encode(&product![ibc_prefixed_denom_key])?;
 
