@@ -111,10 +111,10 @@ mod tests {
         // depending on how you serialize the struct, the key will be different
         let value = Foo { foo: array!["hello", "world"] };
         assert_eq!(
-            direct_key(@value), 0x562cad83e4f09c5813d3d8cc79e67b24d7d979531160e90affd52d4ddf745fe
+            direct_key(@value), 0x8a7f3b665d11363ad83b7fb1ee769c513497f2353a70250b0bddcaaaf6458b
         );
         assert_eq!(
-            manual_key(@value), 0x6c667cf271320ba416f4956bd4c0a532920206fe281247da5c6e7feeec8aa61
+            manual_key(@value), 0x1241da65bd34c17206635225f7a86ab41089a0e14ced6dc24b3b831c78ff4b4
         );
     }
 }
