@@ -276,6 +276,7 @@ impl MemoValidateBasic of ValidateBasic<Memo> {
 pub mod tests {
     use serde_json::to_byte_array;
     use starknet_ibc_testkit::dummies::{PACKET_DATA_FROM_SN, ERC20};
+    use starknet_ibc_utils::{ComputeKey, LocalKeyBuilderImpl, LocalKeyBuilderTrait};
 
     // Snapshot test to ensure serialization stays consistent.
     #[test]
@@ -284,6 +285,20 @@ pub mod tests {
         let expected: ByteArray =
             "{\"denom\":\"2087021424722619777119509474943472645767659996348769578120564519014510906823\",\"amount\":\"100\",\"sender\":\"340767163730\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"memo\":\"\"}";
         assert_eq!(json, expected);
+    }
+
+    #[test]
+    fn test_prefixed_denom_key() {
+        let prefixed_denom = PACKET_DATA_FROM_SN(ERC20()).denom;
+        let direct_key = prefixed_denom.key();
+        let base_key = {
+            let mut hasher = LocalKeyBuilderImpl::init();
+            hasher.append_serde(@prefixed_denom.base);
+            hasher.key()
+        };
+        let expected: felt252 = 0x2e74acb5f5dfbbc9cddcd69d5ee307713735fe038880606804515cf078fc1ee;
+        assert_eq!(direct_key, expected);
+        assert_eq!(base_key, expected);
     }
 }
 
