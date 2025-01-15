@@ -142,7 +142,7 @@ impl StarknetBuilder {
 
         let context = StarknetChain {
             runtime: self.runtime.clone(),
-            chain_id: chain_id.to_string().parse().unwrap(),
+            chain_id: chain_id.to_string().parse()?,
             rpc_client,
             account,
             ibc_client_contract_address: None,
