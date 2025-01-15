@@ -61,6 +61,7 @@ use ibc::core::client::types::Height as IbcHeight;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
 use ibc::primitives::Timestamp as IbcTimestamp;
+use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
 use starknet::core::types::{Felt, U256};
@@ -409,22 +410,40 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_cosmos_a_step_1.quantity + transfer_quantity
         );
 
-        // TODO(rano): we should use the poseidon hash of the ibc denom to get the token address
+        let ics20_token_address: Felt = {
+            let ibc_prefixed_denom = PrefixedDenom {
+                trace_path: vec![TracePrefix {
+                    port_id: ics20_port.to_string(),
+                    channel_id: starknet_channel_id.channel_id.clone(),
+                }],
+                base: Denom::Hosted(denom_cosmos.to_string()),
+            };
 
-        let ics20_token_address = {
+            let mut denom_serialized = vec![];
+
+            {
+                // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/apps/src/transfer/types.cairo#L120-L130
+                for trace_prefix in &ibc_prefixed_denom.trace_path {
+                    denom_serialized.extend(cairo_encoding.encode(trace_prefix)?);
+                }
+
+                denom_serialized.extend(cairo_encoding.encode(&ibc_prefixed_denom.base)?);
+            }
+
+            // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/utils/src/utils.cairo#L35
+            let ibc_prefixed_denom_key = Poseidon3Hasher::digest(&denom_serialized);
+
+            let calldata = cairo_encoding.encode(&product![ibc_prefixed_denom_key])?;
+
             let output = starknet_chain
                 .call_contract(
                     &ics20_contract_address,
-                    &selector!("ibc_token_addresses"),
-                    &vec![],
+                    &selector!("ibc_token_address"),
+                    &calldata,
                 )
                 .await?;
 
-            let addresses: Vec<Felt> = cairo_encoding.decode(&output)?;
-
-            assert_eq!(addresses.len(), 1);
-
-            addresses[0]
+            cairo_encoding.decode(&output)?
         };
 
         info!("ics20 token address: {:?}", ics20_token_address);
