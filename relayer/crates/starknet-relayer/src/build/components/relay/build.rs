@@ -5,7 +5,6 @@ use hermes_relayer_components::build::traits::builders::relay_builder::RelayBuil
 use hermes_relayer_components::multi::types::index::Index;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
-use starknet::core::types::Felt;
 
 use crate::contexts::builder::{StarknetBuildComponents, StarknetBuilder};
 use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
@@ -14,7 +13,7 @@ impl RelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponen
     async fn build_relay(
         build: &StarknetBuilder,
         _index: PhantomData<(Index<0>, Index<1>)>,
-        _src_chain_id: &Felt,
+        _src_chain_id: &ChainId,
         dst_chain_id: &ChainId,
         src_client_id: &StarknetClientId,
         dst_client_id: &CosmosClientId,

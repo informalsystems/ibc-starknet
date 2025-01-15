@@ -3,6 +3,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::CanConvertBothWays;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
+use hermes_encoding_components::traits::encode_and_decode_mut::CanEncodeAndDecodeMut;
 use hermes_error::impls::ProvideHermesError;
 use hermes_protobuf_encoding_components::types::any::Any;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
@@ -16,6 +17,8 @@ use hermes_starknet_chain_components::types::consensus_state::{
 use hermes_wasm_encoding_components::types::client_state::WasmClientState;
 use hermes_wasm_encoding_components::types::consensus_state::WasmConsensusState;
 use ibc::clients::wasm_types::client_message::ClientMessage;
+use ibc::core::commitment_types::commitment::CommitmentRoot;
+use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::StarknetHeader;
 
 use crate::impls::error::HandleStarknetChainError;
@@ -58,6 +61,8 @@ pub trait CanUseStarknetProtobufEncoding:
     + CanConvertBothWays<WasmStarknetClientState, Any>
     + CanConvertBothWays<WasmStarknetConsensusState, Any>
     + CanConvertBothWays<StarknetHeader, Any>
+    + CanEncodeAndDecodeMut<ViaProtobuf, Timestamp>
+    + CanEncodeAndDecodeMut<ViaProtobuf, CommitmentRoot>
 {
 }
 

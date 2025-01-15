@@ -61,6 +61,7 @@ where
 
         let new_client_state = ClientStateType {
             latest_height: header.height,
+            chain_id: self.0.chain_id.clone(),
         }
         .into();
 
