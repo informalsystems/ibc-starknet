@@ -63,7 +63,6 @@ pub trait CanUseStarknetProtobufEncoding:
     + CanConvertBothWays<StarknetHeader, Any>
     + CanEncodeAndDecodeMut<ViaProtobuf, Timestamp>
     + CanEncodeAndDecodeMut<ViaProtobuf, CommitmentRoot>
-// + CanEncodeAndDecodeMut<ViaProtobuf, ChainId>
 {
 }
 

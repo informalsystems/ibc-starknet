@@ -1,5 +1,6 @@
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
+use hermes_cosmos_encoding_components::impls::chain_id::EncodeChainIdField;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
@@ -10,7 +11,6 @@ use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::encode:
 use ibc_core::client::types::Height;
 use ibc_core::host::types::identifiers::ChainId;
 
-use crate::encoding::impls::chain_id::EncodeChainIdField;
 use crate::StarknetClientState;
 
 pub struct EncodeStarknetClientState;

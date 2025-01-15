@@ -29,7 +29,6 @@ use hermes_wasm_encoding_components::types::consensus_state::WasmConsensusState;
 use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::client::types::Height;
 use ibc::core::commitment_types::commitment::CommitmentRoot;
-use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::encoding::components::StarknetLightClientEncodingComponents;
 use ibc_client_starknet_types::header::StarknetHeader;
@@ -122,7 +121,6 @@ delegate_components! {
             (ViaProtobuf, StarknetHeader),
             (ViaProtobuf, CommitmentRoot),
             (ViaProtobuf, Timestamp),
-            (ViaProtobuf, ChainId),
         ]:
             StarknetLightClientEncodingComponents,
     }
