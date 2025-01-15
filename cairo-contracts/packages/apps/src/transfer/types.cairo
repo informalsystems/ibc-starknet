@@ -290,14 +290,14 @@ pub mod tests {
     #[test]
     fn test_prefixed_denom_key() {
         let prefixed_denom = PACKET_DATA_FROM_SN(ERC20()).denom;
-        let direct_key = prefixed_denom.key();
+        let prefixed_key = prefixed_denom.key();
         let base_key = {
             let mut hasher = LocalKeyBuilderImpl::init();
             hasher.append_serde(@prefixed_denom.base);
             hasher.key()
         };
         let expected: felt252 = 0x2e74acb5f5dfbbc9cddcd69d5ee307713735fe038880606804515cf078fc1ee;
-        assert_eq!(direct_key, expected);
+        assert_eq!(prefixed_key, expected);
         assert_eq!(base_key, expected);
     }
 }
