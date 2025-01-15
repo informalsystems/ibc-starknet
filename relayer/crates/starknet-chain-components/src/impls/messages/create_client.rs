@@ -64,6 +64,7 @@ where
             trusting_period: payload.client_state.trusting_period.as_secs(),
             unbonding_period: payload.client_state.unbonding_period.as_secs(),
             status: ClientStatus::Active,
+            chain_id: payload.client_state.chain_id,
         };
 
         let consensus_state = CometConsensusState {

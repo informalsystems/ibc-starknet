@@ -36,6 +36,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
             trusting_period: *self.trusting_period,
             unbonding_period: *self.unbonding_period,
             status: Status::Active,
+            chain_id: "dummy_chain",
         };
 
         Serde::serialize(@client_state, ref serialized_client_state);

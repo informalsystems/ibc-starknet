@@ -2,12 +2,13 @@ use core::num::traits::Zero;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Height, HeightPartialOrd, Status, StatusTrait};
 
-#[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct CometClientState {
     pub latest_height: Height,
     pub trusting_period: u64,
     pub unbonding_period: u64,
     pub status: Status,
+    pub chain_id: ByteArray,
 }
 
 #[generate_trait]

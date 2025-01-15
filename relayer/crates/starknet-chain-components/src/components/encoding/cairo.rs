@@ -10,7 +10,8 @@ use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 pub use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 pub use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
-use starknet::core::types::{Felt, U256};
+use ibc::core::host::types::identifiers::ChainId;
+use starknet::core::types::U256;
 
 use crate::types::channel_id::{
     ChannelCounterparty, ChannelEnd, ChannelId, ChannelState, EncodeChannelCounterparty,
@@ -22,7 +23,7 @@ use crate::types::connection_id::{
     EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionId, EncodeConnectionState,
 };
 use crate::types::cosmos::client_state::{
-    ClientStatus, CometClientState, EncodeClientStatus, EncodeCometClientState,
+    ClientStatus, CometClientState, EncodeChainId, EncodeClientStatus, EncodeCometClientState,
 };
 use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsensusState};
 use crate::types::cosmos::height::{EncodeHeight, Height};
@@ -124,6 +125,7 @@ delegate_components! {
         (ViaCairo, CometClientState): EncodeCometClientState,
         (ViaCairo, CometConsensusState): EncodeCometConsensusState,
         (ViaCairo, ClientId): EncodeClientId,
+        (ViaCairo, ChainId): EncodeChainId,
         (ViaCairo, ConnectionId): EncodeConnectionId,
         (ViaCairo, ConnectionCounterparty): EncodeConnectionCounterparty,
         (ViaCairo, ConnectionState): EncodeConnectionState,
