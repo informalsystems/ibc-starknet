@@ -69,6 +69,7 @@ delegate_components! {
         [
             (ViaProtobuf, Any),
             (ViaProtobuf, Height),
+            (ViaProtobuf, ChainId),
             (ViaProtobuf, StarknetClientState),
             (ViaProtobuf, StarknetConsensusState),
             (ViaProtobuf, StarknetHeader),
@@ -89,7 +90,6 @@ delegate_components! {
             (ViaProtobuf, Any),
             (ViaProtobuf, CommitmentRoot),
             (ViaProtobuf, Timestamp),
-            (ViaProtobuf, ChainId),
         ]: CosmosEncodingComponents,
 
         (ViaProtobuf, StarknetClientState):

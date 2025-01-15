@@ -10,6 +10,7 @@ use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::encode:
 use ibc_core::client::types::Height;
 use ibc_core::host::types::identifiers::ChainId;
 
+use crate::encoding::impls::chain_id::EncodeChainIdField;
 use crate::StarknetClientState;
 
 pub struct EncodeStarknetClientState;
@@ -22,30 +23,30 @@ delegate_components! {
                     symbol!("latest_height"),
                     EncodeLengthDelimitedProtoField<1, UseContext>,
                 >,
-                // EncodeField<
-                //     symbol!("chain_id"),
-                //     EncodeLengthDelimitedProtoField<2, UseContext>,
-                // >,
+                EncodeField<
+                    symbol!("chain_id"),
+                    EncodeChainIdField<2>,
+                >,
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
             CombineEncoders<Product![
                 DecodeRequiredProtoField<1, UseContext>,
-                // DecodeRequiredProtoField<2, UseContext>,
+                EncodeChainIdField<2>,
             ]>
         >,
     }
 }
 
 impl Transformer for EncodeStarknetClientState {
-    type From = Product![Height /*ChainId*/];
+    type From = Product![Height, ChainId];
 
     type To = StarknetClientState;
 
-    fn transform(product![latest_height /*chain_id*/]: Self::From) -> Self::To {
+    fn transform(product![latest_height, chain_id]: Self::From) -> Self::To {
         StarknetClientState {
             latest_height,
-            chain_id: ChainId::new("starknet").unwrap(),
+            chain_id,
         }
     }
 }

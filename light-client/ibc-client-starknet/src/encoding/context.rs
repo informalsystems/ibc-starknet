@@ -21,7 +21,7 @@ use ibc_client_starknet_types::{StarknetClientState, StarknetConsensusState};
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
-use ibc_core::host::types::error::DecodingError;
+use ibc_core::host::types::error::{DecodingError, IdentifierError};
 use ibc_core::primitives::{Timestamp, TimestampError};
 use prost::DecodeError;
 
@@ -175,6 +175,16 @@ impl ErrorRaiser<StarknetLightClientEncoding, TypeUrlMismatchError>
     }
 }
 
+impl ErrorRaiser<StarknetLightClientEncoding, IdentifierError>
+    for StarknetLightClientEncodingContextComponents
+{
+    fn raise_error(e: IdentifierError) -> ClientError {
+        ClientError::ClientSpecific {
+            description: format!("{e:?}"),
+        }
+    }
+}
+
 pub trait CanUseStarknetLightClientEncoding:
     Async
     + CanEncodeAndDecode<ViaProtobuf, Any>
@@ -190,7 +200,6 @@ pub trait CanUseStarknetLightClientEncoding:
     + CanConvertBothWays<Any, StarknetHeader>
     + CanEncodeAndDecodeMut<ViaProtobuf, Timestamp>
     + CanEncodeAndDecodeMut<ViaProtobuf, CommitmentRoot>
-// + CanEncodeAndDecodeMut<ViaProtobuf, ChainId>
 {
 }
 
