@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-use cgp::core::error::CanRaiseError;
+use cgp::core::error::CanRaiseAsyncError;
 use hermes_encoding_components::traits::decode_mut::MutDecoder;
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 
@@ -12,7 +12,7 @@ pub struct NonEmptyBuffer;
 #[allow(unused_mut)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ()> for DecodeEnd
 where
-    Encoding: HasDecodeBufferType + CanRaiseError<NonEmptyBuffer>,
+    Encoding: HasDecodeBufferType + CanRaiseAsyncError<NonEmptyBuffer>,
     for<'a> Encoding::DecodeBuffer<'a>: Iterator,
 {
     fn decode_mut(

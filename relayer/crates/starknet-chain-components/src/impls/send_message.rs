@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-use cgp::core::error::CanRaiseError;
+use cgp::core::error::CanRaiseAsyncError;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_relayer_components::chain::traits::send_message::MessageSender;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
@@ -30,8 +30,8 @@ where
         + HasTxResponseType<TxResponse = TxResponse>
         + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
         + CanPollTxResponse
-        + CanRaiseError<RevertedInvocation>
-        + CanRaiseError<UnexpectedTransactionTraceType>,
+        + CanRaiseAsyncError<RevertedInvocation>
+        + CanRaiseAsyncError<UnexpectedTransactionTraceType>,
 {
     async fn send_messages(
         chain: &Chain,

@@ -1,7 +1,7 @@
 use core::time::Duration;
 
 use cgp::core::component::UseContext;
-use cgp::core::types::impls::WithType;
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_chain_components::traits::types::chain_id::HasChainIdType;
@@ -201,7 +201,7 @@ where
 
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChainId> for EncodeChainId
 where
-    Encoding: CanDecodeMut<Strategy, String> + CanRaiseError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, String> + CanRaiseAsyncError<&'static str>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,

@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
-use cgp::core::field::impls::use_field::WithField;
-use cgp::core::types::impls::WithType;
+use cgp::core::field::WithField;
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_type_components::traits::fields::chain_id::HasChainId;

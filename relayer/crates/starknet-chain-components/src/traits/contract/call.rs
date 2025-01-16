@@ -10,7 +10,7 @@ use crate::traits::types::method::HasSelectorType;
   context: Chain,
 }]
 #[async_trait]
-pub trait CanCallContract: HasAddressType + HasSelectorType + HasBlobType + HasErrorType {
+pub trait CanCallContract: HasAddressType + HasSelectorType + HasBlobType + HasAsyncErrorType {
     async fn call_contract(
         &self,
         contract_address: &Self::Address,

@@ -1,4 +1,4 @@
-use cgp::prelude::CanRaiseError;
+use cgp::prelude::CanRaiseAsyncError;
 use hermes_cosmos_chain_components::types::status::Time;
 use hermes_relayer_components::chain::traits::queries::chain_status::ChainStatusQuerier;
 use hermes_relayer_components::chain::traits::types::status::HasChainStatusType;
@@ -14,8 +14,8 @@ impl<Chain> ChainStatusQuerier<Chain> for QueryStarknetChainStatus
 where
     Chain: HasChainStatusType<ChainStatus = StarknetChainStatus>
         + HasStarknetProvider
-        + CanRaiseError<ProviderError>
-        + CanRaiseError<&'static str>,
+        + CanRaiseAsyncError<ProviderError>
+        + CanRaiseAsyncError<&'static str>,
 {
     async fn query_chain_status(chain: &Chain) -> Result<StarknetChainStatus, Chain::Error> {
         let block = chain

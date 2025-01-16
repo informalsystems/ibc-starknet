@@ -37,7 +37,7 @@ where
         + HasBlobType<Blob = Vec<Felt>>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasClientStateType<Chain, ClientState = CometClientState>,
     Encoding: CanEncode<ViaCairo, u64>
         + CanDecode<ViaCairo, Vec<Felt>>
@@ -79,7 +79,7 @@ where
         + HasHeightType<Height = u64>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryClientState<Counterparty>
-        + HasErrorType,
+        + HasAsyncErrorType,
     Counterparty: HasClientStateType<Chain> + HasHeightType,
 {
     async fn query_client_state_with_proofs(

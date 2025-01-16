@@ -1,4 +1,4 @@
-use cgp::prelude::CanRaiseError;
+use cgp::prelude::CanRaiseAsyncError;
 use hermes_cli_components::traits::build::{BuilderLoader, HasBuilderType};
 use hermes_cli_components::traits::config::load_config::CanLoadConfig;
 use hermes_cli_components::traits::types::config::HasConfigType;
@@ -16,7 +16,7 @@ where
         + HasConfigType<Config = StarknetRelayerConfig>
         + HasRuntime<Runtime = HermesRuntime>
         + CanLoadConfig
-        + CanRaiseError<&'static str>,
+        + CanRaiseAsyncError<&'static str>,
 {
     async fn load_builder(app: &App) -> Result<App::Builder, App::Error> {
         let runtime = app.runtime().clone();

@@ -1,7 +1,7 @@
 use cgp::core::component::UseDelegate;
 pub use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
-use cgp::core::field::impls::use_field::{UseField, WithField};
-use cgp::core::types::impls::WithType;
+use cgp::core::field::{UseField, WithField};
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::impls::ProvideHermesError;
@@ -14,7 +14,7 @@ pub use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeAtComponent,
 };
 pub use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
-use hermes_relayer_components::multi::types::index::Index;
+use cgp::core::field::Index;
 use hermes_relayer_components::relay::impls::packet_lock::PacketMutexGetterComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 pub use hermes_runtime_components::traits::runtime::{

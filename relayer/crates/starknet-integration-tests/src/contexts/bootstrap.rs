@@ -4,8 +4,8 @@ use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
-use cgp::core::field::impls::use_field::WithField;
-use cgp::core::types::impls::WithType;
+use cgp::core::field::WithField;
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cosmos_test_components::bootstrap::components::cosmos_sdk::{
     ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent,

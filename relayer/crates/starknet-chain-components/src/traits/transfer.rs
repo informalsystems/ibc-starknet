@@ -8,7 +8,7 @@ use hermes_test_components::chain::traits::types::amount::HasAmountType;
   context: Chain,
 }]
 #[async_trait]
-pub trait CanTransferToken: HasAddressType + HasAmountType + HasErrorType {
+pub trait CanTransferToken: HasAddressType + HasAmountType + HasAsyncErrorType {
     async fn transfer_token(
         &self,
         recipient: &Self::Address,

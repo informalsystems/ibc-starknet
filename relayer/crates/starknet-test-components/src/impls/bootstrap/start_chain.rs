@@ -1,4 +1,4 @@
-use cgp::core::error::CanRaiseError;
+use cgp::core::error::CanRaiseAsyncError;
 use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::ChainFullNodeStarter;
 use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::HasChainCommandPath;
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
@@ -18,7 +18,7 @@ where
         + HasChainNodeConfigType<ChainNodeConfig = StarknetNodeConfig>
         + HasChainGenesisConfigType<ChainGenesisConfig = StarknetGenesisConfig>
         + HasChainCommandPath
-        + CanRaiseError<Runtime::Error>,
+        + CanRaiseAsyncError<Runtime::Error>,
     Runtime: CanStartChildProcess + HasFilePathType,
 {
     async fn start_chain_full_node(

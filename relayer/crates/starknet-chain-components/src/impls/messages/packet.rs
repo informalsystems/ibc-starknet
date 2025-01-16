@@ -51,7 +51,7 @@ where
         + HasAddressType<Address = Felt>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasOutgoingPacketType<Chain, OutgoingPacket = IbcPacket>
         + HasHeightType<Height = Height>
         + HasCommitmentProofType
@@ -111,9 +111,9 @@ where
         + HasAddressType<Address = Felt>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanRaiseError<Encoding::Error>
+        + CanRaiseAsyncError<Encoding::Error>
         + HasOutgoingPacketType<Counterparty, OutgoingPacket = IbcPacket>
-        + HasErrorType,
+        + HasAsyncErrorType,
     Counterparty: HasAckPacketPayloadType<Chain, AckPacketPayload = AckPacketPayload<Counterparty, Chain>>
         + HasHeightType<Height = Height>
         + HasCommitmentProofType
@@ -177,9 +177,9 @@ where
         + HasAddressType<Address = Felt>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanRaiseError<Encoding::Error>
+        + CanRaiseAsyncError<Encoding::Error>
         + HasOutgoingPacketType<Counterparty, OutgoingPacket = IbcPacket>
-        + HasErrorType,
+        + HasAsyncErrorType,
     Counterparty: HasHeightType<Height = Height>
         + HasCommitmentProofType
         + HasTimeoutUnorderedPacketPayloadType<

@@ -1,11 +1,11 @@
-use cgp::core::error::{CanRaiseError, ErrorRaiser};
+use cgp::core::error::{CanRaiseAsyncError, ErrorRaiser};
 use starknet::core::types::StarknetError;
 
 pub struct RaiseStarknetError;
 
 impl<Context> ErrorRaiser<Context, StarknetError> for RaiseStarknetError
 where
-    Context: CanRaiseError<String>,
+    Context: CanRaiseAsyncError<String>,
 {
     fn raise_error(e: StarknetError) -> Context::Error {
         match e {

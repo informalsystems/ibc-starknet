@@ -1,4 +1,4 @@
-use cgp::core::types::impls::WithType;
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_chain_components::traits::types::ibc::CounterpartyMessageHeightGetterComponent;
 use hermes_cosmos_chain_components::components::client::{

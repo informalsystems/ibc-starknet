@@ -1,4 +1,4 @@
-use cgp::prelude::HasErrorType;
+use cgp::prelude::HasAsyncErrorType;
 use hermes_encoding_components::traits::convert::Converter;
 use hermes_wasm_encoding_components::impls::strategies::consensus_state::{
     DecodeViaWasmConsensusState, EncodeViaWasmConsensusState,
@@ -16,7 +16,7 @@ pub struct ConvertWasmStarknetConsensusState;
 impl<Encoding> Converter<Encoding, WasmStarknetConsensusState, Any>
     for ConvertWasmStarknetConsensusState
 where
-    Encoding: HasErrorType,
+    Encoding: HasAsyncErrorType,
     EncodeViaWasmConsensusState: Converter<Encoding, StarknetConsensusState, Any>,
 {
     fn convert(
@@ -30,7 +30,7 @@ where
 impl<Encoding> Converter<Encoding, Any, WasmStarknetConsensusState>
     for ConvertWasmStarknetConsensusState
 where
-    Encoding: HasErrorType,
+    Encoding: HasAsyncErrorType,
     DecodeViaWasmConsensusState: Converter<Encoding, Any, StarknetConsensusState>,
 {
     fn convert(

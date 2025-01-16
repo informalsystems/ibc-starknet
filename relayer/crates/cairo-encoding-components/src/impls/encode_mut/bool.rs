@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-use cgp::core::error::CanRaiseError;
+use cgp::core::error::CanRaiseAsyncError;
 use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use starknet::core::types::Felt;
@@ -29,7 +29,7 @@ where
 
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, bool> for EncodeBool
 where
-    Encoding: CanDecodeMut<Strategy, Felt> + CanRaiseError<DecodeBoolError>,
+    Encoding: CanDecodeMut<Strategy, Felt> + CanRaiseAsyncError<DecodeBoolError>,
 {
     fn decode_mut(
         encoding: &Encoding,

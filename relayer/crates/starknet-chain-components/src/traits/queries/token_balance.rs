@@ -8,7 +8,7 @@ use hermes_test_components::chain::traits::types::amount::HasAmountType;
   context: Chain,
 }]
 #[async_trait]
-pub trait CanQueryTokenBalance: HasAddressType + HasAmountType + HasErrorType {
+pub trait CanQueryTokenBalance: HasAddressType + HasAmountType + HasAsyncErrorType {
     async fn query_token_balance(
         &self,
         token_address: &Self::Address,

@@ -9,7 +9,7 @@ use hermes_chain_type_components::traits::types::address::HasAddressType;
   context: Chain,
 }]
 #[async_trait]
-pub trait CanQueryContractAddress<Tag: Async>: HasAddressType + HasErrorType {
+pub trait CanQueryContractAddress<Tag: Async>: HasAddressType + HasAsyncErrorType {
     async fn query_contract_address(
         &self,
         tag: PhantomData<Tag>,

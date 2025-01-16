@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use hermes_error::HermesError;
 use hermes_relayer_components::build::traits::builders::relay_builder::RelayBuilder;
-use hermes_relayer_components::multi::types::index::Index;
+use cgp::core::field::Index;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 
