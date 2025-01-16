@@ -1822,7 +1822,7 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 [[package]]
 name = "hermes-any-counterparty"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-cosmos-chain-components",
@@ -1839,7 +1839,7 @@ dependencies = [
 [[package]]
 name = "hermes-async-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "async-trait",
  "cgp",
@@ -1862,7 +1862,7 @@ dependencies = [
 [[package]]
 name = "hermes-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -1873,7 +1873,7 @@ dependencies = [
 [[package]]
 name = "hermes-chain-type-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
 ]
@@ -1881,7 +1881,7 @@ dependencies = [
 [[package]]
 name = "hermes-cli-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "clap",
@@ -1899,7 +1899,7 @@ dependencies = [
 [[package]]
 name = "hermes-comet-light-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -1908,7 +1908,7 @@ dependencies = [
 [[package]]
 name = "hermes-comet-light-client-context"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "eyre",
@@ -1924,7 +1924,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "bech32 0.9.1",
  "bitcoin",
@@ -1977,7 +1977,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -1991,7 +1991,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-integration-tests"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "eyre",
@@ -2024,7 +2024,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "dirs-next",
@@ -2073,7 +2073,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hdpath",
@@ -2100,7 +2100,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-wasm-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "eyre",
@@ -2149,7 +2149,7 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
 ]
@@ -2157,7 +2157,7 @@ dependencies = [
 [[package]]
 name = "hermes-error"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "eyre",
@@ -2167,7 +2167,7 @@ dependencies = [
 [[package]]
 name = "hermes-ibc-test-suite"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-logging-components",
@@ -2178,7 +2178,7 @@ dependencies = [
 [[package]]
 name = "hermes-logger"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-logging-components",
@@ -2190,7 +2190,7 @@ dependencies = [
 [[package]]
 name = "hermes-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
 ]
@@ -2198,7 +2198,7 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -2209,7 +2209,7 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-chain-components",
@@ -2222,7 +2222,7 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components-extra"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -2234,7 +2234,7 @@ dependencies = [
 [[package]]
 name = "hermes-runtime"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-async-runtime-components",
@@ -2246,7 +2246,7 @@ dependencies = [
 [[package]]
 name = "hermes-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
 ]
@@ -2429,7 +2429,7 @@ dependencies = [
 [[package]]
 name = "hermes-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -2441,7 +2441,7 @@ dependencies = [
 [[package]]
 name = "hermes-tokio-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "futures",
@@ -2455,7 +2455,7 @@ dependencies = [
 [[package]]
 name = "hermes-tracing-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-logging-components",
@@ -2467,7 +2467,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-cosmos-chain-components",
@@ -2486,7 +2486,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-cosmos-encoding-components",
@@ -2500,7 +2500,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/v0.3.1#95177e262bf55a3e912f8af8b278b7a890640b4b"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",

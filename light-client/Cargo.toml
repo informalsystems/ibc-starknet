@@ -77,6 +77,6 @@ ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
 # cgp-run                 = { git = "https://github.com/contextgeneric/cgp.git" }
 # cgp-inner               = { git = "https://github.com/contextgeneric/cgp.git" }
 
-hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/v0.3.1" }
-hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/v0.3.1" }
-hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/v0.3.1" }
+hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git" }
