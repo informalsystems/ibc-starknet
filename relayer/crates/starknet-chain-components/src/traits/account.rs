@@ -21,14 +21,14 @@ pub trait HasStarknetAccount: HasStarknetAccountType {
 
 pub trait CanRaiseAccountErrors:
     HasStarknetAccountType
-    + CanRaiseError<<Self::Account as Account>::SignError>
-    + CanRaiseError<AccountError<<Self::Account as Account>::SignError>>
+    + CanRaiseAsyncError<<Self::Account as Account>::SignError>
+    + CanRaiseAsyncError<AccountError<<Self::Account as Account>::SignError>>
 {
 }
 
 impl<Chain> CanRaiseAccountErrors for Chain where
     Chain: HasStarknetAccountType
-        + CanRaiseError<<Chain::Account as Account>::SignError>
-        + CanRaiseError<AccountError<<Self::Account as Account>::SignError>>
+        + CanRaiseAsyncError<<Chain::Account as Account>::SignError>
+        + CanRaiseAsyncError<AccountError<<Self::Account as Account>::SignError>>
 {
 }

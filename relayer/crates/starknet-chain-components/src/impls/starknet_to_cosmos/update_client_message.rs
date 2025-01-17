@@ -24,8 +24,8 @@ where
     Chain: HasIbcChainTypes<Counterparty, ClientId = ClientId>
         + HasMessageType<Message = CosmosMessage>
         + HasDefaultSigner<Signer = Secp256k1KeyPair>
-        + CanRaiseError<Encoding::Error>
-        + CanRaiseError<String>,
+        + CanRaiseAsyncError<Encoding::Error>
+        + CanRaiseAsyncError<String>,
     Counterparty: HasUpdateClientPayloadType<Chain, UpdateClientPayload = StarknetUpdateClientPayload>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>,
     Encoding: Async + CanConvert<StarknetHeader, Any> + CanConvert<SignedStarknetHeader, Any>,

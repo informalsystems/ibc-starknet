@@ -36,7 +36,7 @@ where
     Encoding: HasEncodedType<Encoded = StarknetEvent>
         + CanDecode<Strategy, TransferEvent>
         + CanDecode<Strategy, ApprovalEvent>
-        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
 {
     fn decode(encoding: &Encoding, event: &StarknetEvent) -> Result<Erc20Event, Encoding::Error> {
         let selector = event
@@ -58,7 +58,7 @@ impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, Tr
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>,
+        + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Felt, Felt]>
         + CanDecode<ViaCairo, U256>,
@@ -86,7 +86,7 @@ impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, Ap
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>,
+        + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Felt, Felt]>
         + CanDecode<ViaCairo, U256>,

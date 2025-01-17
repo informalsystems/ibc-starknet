@@ -12,7 +12,7 @@ use crate::traits::types::method::HasSelectorType;
 }]
 #[async_trait]
 pub trait CanInvokeContract:
-    HasAddressType + HasSelectorType + HasBlobType + HasMessageResponseType + HasErrorType
+    HasAddressType + HasSelectorType + HasBlobType + HasMessageResponseType + HasAsyncErrorType
 {
     async fn invoke_contract(
         &self,

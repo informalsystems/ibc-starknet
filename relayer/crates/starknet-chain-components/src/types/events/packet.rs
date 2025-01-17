@@ -1,4 +1,4 @@
-use cgp::prelude::{CanRaiseError, *};
+use cgp::prelude::{CanRaiseAsyncError, *};
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
@@ -97,7 +97,7 @@ where
         + CanDecode<Strategy, WriteAcknowledgementEvent>
         + CanDecode<Strategy, AcknowledgePacketEvent>
         + CanDecode<Strategy, TimeoutPacketEvent>
-        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
 {
     fn decode(
         encoding: &Encoding,
@@ -130,8 +130,8 @@ impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, Se
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>
-        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+        + CanRaiseAsyncError<CairoEncoding::Error>
+        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<
             ViaCairo,
@@ -189,8 +189,8 @@ impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, Re
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>
-        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+        + CanRaiseAsyncError<CairoEncoding::Error>
+        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<
             ViaCairo,
@@ -248,8 +248,8 @@ impl<EventEncoding, CairoEncoding, Strategy>
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>
-        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+        + CanRaiseAsyncError<CairoEncoding::Error>
+        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Sequence, PortId, ChannelId, PortId, ChannelId]>
         + CanDecode<ViaCairo, Product![Vec<Felt>, Acknowledgement]>,
@@ -291,8 +291,8 @@ impl<EventEncoding, CairoEncoding, Strategy>
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>
-        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+        + CanRaiseAsyncError<CairoEncoding::Error>
+        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<
             ViaCairo,
@@ -349,8 +349,8 @@ impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, Ti
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>
-        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+        + CanRaiseAsyncError<CairoEncoding::Error>
+        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<
             ViaCairo,

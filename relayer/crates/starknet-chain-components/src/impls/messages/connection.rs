@@ -62,11 +62,11 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-        + CanRaiseError<&'static str>
-        + CanRaiseError<Encoding::Error>
-        + CanRaiseError<ParseIntError>
-        + CanRaiseError<serde_json::Error>
-        + CanRaiseError<Utf8Error>,
+        + CanRaiseAsyncError<&'static str>
+        + CanRaiseAsyncError<Encoding::Error>
+        + CanRaiseAsyncError<ParseIntError>
+        + CanRaiseAsyncError<serde_json::Error>
+        + CanRaiseAsyncError<Utf8Error>,
     Counterparty: HasClientIdType<Chain, ClientId = CosmosClientId>
         + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
         + HasConnectionOpenInitPayloadType<
@@ -173,10 +173,10 @@ where
         + HasAddressType<Address = Felt>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-        + CanRaiseError<ParseIntError>
-        + CanRaiseError<Utf8Error>
-        + CanRaiseError<Encoding::Error>
-        + CanRaiseError<&'static str>,
+        + CanRaiseAsyncError<ParseIntError>
+        + CanRaiseAsyncError<Utf8Error>
+        + CanRaiseAsyncError<Encoding::Error>
+        + CanRaiseAsyncError<&'static str>,
     Counterparty: HasHeightType<Height = Height>
         + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType
@@ -274,7 +274,7 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasHeightType<Height = Height>
         + HasCommitmentProofType
         + HasConnectionIdType<Chain, ConnectionId = CosmosConnectionId>
@@ -349,7 +349,7 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasHeightType<Height = Height>
         + HasCommitmentProofType
         + HasConnectionOpenConfirmPayloadType<

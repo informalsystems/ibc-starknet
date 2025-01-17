@@ -1,4 +1,4 @@
-use cgp::prelude::CanRaiseError;
+use cgp::prelude::CanRaiseAsyncError;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CreateClientPayloadBuilder;
 use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
@@ -28,7 +28,7 @@ where
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
         + HasChainId<ChainId = ChainId>
-        + CanRaiseError<ClientError>,
+        + CanRaiseAsyncError<ClientError>,
 {
     async fn build_create_client_payload(
         chain: &Chain,

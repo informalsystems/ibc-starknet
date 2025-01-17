@@ -2,8 +2,8 @@ use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
-use cgp::core::field::impls::use_field::WithField;
-use cgp::core::types::impls::WithType;
+use cgp::core::field::WithField;
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
 use hermes_cli_components::impls::commands::client::update::{

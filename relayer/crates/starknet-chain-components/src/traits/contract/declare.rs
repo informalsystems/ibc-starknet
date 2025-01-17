@@ -9,7 +9,7 @@ use crate::traits::types::contract_class::{HasContractClassHashType, HasContract
 }]
 #[async_trait]
 pub trait CanDeclareContract:
-    HasContractClassType + HasContractClassHashType + HasErrorType
+    HasContractClassType + HasContractClassHashType + HasAsyncErrorType
 {
     async fn declare_contract(
         &self,

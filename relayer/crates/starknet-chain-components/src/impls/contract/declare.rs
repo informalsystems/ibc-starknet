@@ -4,7 +4,7 @@ use cairo_lang_starknet_classes::casm_contract_class::{
     CasmContractClass, StarknetSierraCompilationError,
 };
 use cairo_lang_starknet_classes::contract_class::ContractClass;
-use cgp::core::error::CanRaiseError;
+use cgp::core::error::CanRaiseAsyncError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use starknet::accounts::Account;
 use starknet::core::types::contract::{
@@ -29,11 +29,11 @@ where
         + HasStarknetAccount
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>
         + CanRaiseAccountErrors
-        + CanRaiseError<serde_json::error::Error>
-        + CanRaiseError<JsonError>
-        + CanRaiseError<ComputeClassHashError>
-        + CanRaiseError<RevertedInvocation>
-        + CanRaiseError<StarknetSierraCompilationError>,
+        + CanRaiseAsyncError<serde_json::error::Error>
+        + CanRaiseAsyncError<JsonError>
+        + CanRaiseAsyncError<ComputeClassHashError>
+        + CanRaiseAsyncError<RevertedInvocation>
+        + CanRaiseAsyncError<StarknetSierraCompilationError>,
 {
     async fn declare_contract(
         chain: &Chain,

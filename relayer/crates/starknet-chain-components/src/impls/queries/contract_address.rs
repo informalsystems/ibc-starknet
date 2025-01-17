@@ -13,7 +13,7 @@ pub struct ContractAddressNotFound;
 impl<Chain, Tag> ContractAddressQuerier<Chain, Tag> for GetContractAddressFromField
 where
     Chain: HasAddressType<Address: Clone>
-        + CanRaiseError<ContractAddressNotFound>
+        + CanRaiseAsyncError<ContractAddressNotFound>
         + HasField<Tag, Value = Option<Chain::Address>>,
     Tag: Async,
 {
