@@ -31,7 +31,7 @@ use ibc::core::client::types::Height;
 use ibc::core::commitment_types::commitment::CommitmentRoot;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::encoding::components::StarknetLightClientEncodingComponents;
-use ibc_client_starknet_types::header::StarknetHeader;
+use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use prost_types::Any;
 
 use crate::types::client_state::{
@@ -83,10 +83,12 @@ delegate_components! {
             (ViaProtobuf, StarknetClientState),
             (ViaProtobuf, StarknetConsensusState),
             (ViaProtobuf, StarknetHeader),
+            (ViaProtobuf, SignedStarknetHeader),
 
             (ViaAny, StarknetClientState),
             (ViaAny, StarknetConsensusState),
             (ViaAny, StarknetHeader),
+            (ViaAny, SignedStarknetHeader),
         ]:
             StarknetLightClientEncodingComponents,
 
@@ -119,6 +121,7 @@ delegate_components! {
             (ViaProtobuf, StarknetClientState),
             (ViaProtobuf, StarknetConsensusState),
             (ViaProtobuf, StarknetHeader),
+            (ViaProtobuf, SignedStarknetHeader),
             (ViaProtobuf, CommitmentRoot),
             (ViaProtobuf, Timestamp),
         ]:
@@ -135,6 +138,12 @@ delegate_components! {
             EncodeViaClientMessage,
 
         (Any, StarknetHeader):
+            DecodeViaClientMessage,
+
+        (SignedStarknetHeader, Any):
+            EncodeViaClientMessage,
+
+        (Any, SignedStarknetHeader):
             DecodeViaClientMessage,
 
         [
@@ -175,6 +184,7 @@ delegate_components! {
             StarknetClientState,
             StarknetConsensusState,
             StarknetHeader,
+            SignedStarknetHeader,
         ]:
             StarknetLightClientEncodingComponents,
 
