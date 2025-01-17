@@ -9,7 +9,7 @@ use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
 use starknet::accounts::Call;
 use starknet::core::types::{
-    ExecuteInvocation, FunctionInvocation, RevertedInvocation, TransactionTrace,
+    ExecuteInvocation, FunctionInvocation, ReceiptBlock, RevertedInvocation, TransactionTrace,
 };
 
 use crate::impls::types::message::StarknetMessage;
@@ -45,13 +45,15 @@ where
 
         let tx_response = chain.poll_tx_response(&tx_hash).await?;
 
+        let receipt_block = tx_response.receipt.block;
+
         match tx_response.trace {
             TransactionTrace::Invoke(trace) => match trace.execute_invocation {
                 ExecuteInvocation::Success(invocation) => {
                     let message_responses = invocation
                         .calls
                         .into_iter()
-                        .map(extract_events_from_function_invocation)
+                        .map(|e| extract_events_from_function_invocation(&receipt_block, e))
                         .collect();
 
                     Ok(message_responses)
@@ -68,6 +70,7 @@ where
 }
 
 pub fn extract_events_from_function_invocation(
+    receipt_block: &ReceiptBlock,
     invocation: FunctionInvocation,
 ) -> StarknetMessageResponse {
     let mut events: Vec<StarknetEvent> = invocation
@@ -83,11 +86,12 @@ pub fn extract_events_from_function_invocation(
         .collect();
 
     for inner in invocation.calls {
-        let mut message_response = extract_events_from_function_invocation(inner);
+        let mut message_response = extract_events_from_function_invocation(receipt_block, inner);
         events.append(&mut message_response.events);
     }
 
     StarknetMessageResponse {
+        receipt_block: receipt_block.clone(),
         result: invocation.result,
         events,
     }
