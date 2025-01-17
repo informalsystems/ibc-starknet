@@ -4,9 +4,10 @@ use cgp::prelude::*;
 use hermes_async_runtime_components::subscription::traits::subscription::Subscription;
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::height::HasHeightType;
-use starknet::core::types::BlockId;
+use starknet::core::types::{BlockId, ExecuteInvocation, TransactionTrace};
 use starknet::providers::{Provider, ProviderError};
 
+use crate::impls::send_message::extract_events_from_function_invocation;
 use crate::traits::provider::HasStarknetProvider;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::event::StarknetEvent;
@@ -57,6 +58,20 @@ where
             .await
             .map_err(Chain::raise_error)?;
 
-        todo!()
+        let events: Vec<StarknetEvent> = traces
+            .into_iter()
+            .filter_map(|trace| match trace.trace_root {
+                TransactionTrace::Invoke(invoke) => match invoke.execute_invocation {
+                    ExecuteInvocation::Success(invoke) => {
+                        Some(extract_events_from_function_invocation(invoke))
+                    }
+                    _ => None,
+                },
+                _ => None,
+            })
+            .flatten()
+            .collect();
+
+        Ok(events)
     }
 }
