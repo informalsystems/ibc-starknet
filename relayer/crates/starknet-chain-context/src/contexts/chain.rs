@@ -163,6 +163,7 @@ use starknet::providers::JsonRpcClient;
 use starknet::signers::LocalWallet;
 
 use crate::contexts::encoding::cairo::StarknetCairoEncoding;
+use crate::contexts::encoding::event::StarknetEventEncoding;
 use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use crate::impls::error::HandleStarknetChainError;
 
@@ -174,6 +175,7 @@ pub struct StarknetChain {
     pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
     pub ibc_client_contract_address: Option<Felt>,
     pub ibc_core_contract_address: Option<Felt>,
+    pub event_encoding: StarknetEventEncoding,
 }
 
 pub struct StarknetChainContextComponents;

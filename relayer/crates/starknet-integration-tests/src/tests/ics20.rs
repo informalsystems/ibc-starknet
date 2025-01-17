@@ -213,7 +213,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let cairo_encoding = StarknetCairoEncoding;
 
-        let event_encoding = StarknetEventEncoding {
+        starknet_chain.event_encoding = StarknetEventEncoding {
             erc20_hashes: [erc20_class_hash].into(),
             ics20_hashes: [ics20_class_hash].into(),
             ibc_client_hashes: [comet_client_class_hash].into(),
@@ -535,13 +535,15 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("ICS20 send packet response: {:?}", response);
 
-            let mut ibc_packet_events: Vec<PacketRelayEvents> =
-                event_encoding.filter_decode_events(&response.events)?;
+            let mut ibc_packet_events: Vec<PacketRelayEvents> = starknet_chain
+                .event_encoding
+                .filter_decode_events(&response.events)?;
 
             info!("IBC packet events: {:?}", ibc_packet_events);
 
-            let mut ibc_transfer_events: Vec<IbcTransferEvent> =
-                event_encoding.filter_decode_events(&response.events)?;
+            let mut ibc_transfer_events: Vec<IbcTransferEvent> = starknet_chain
+                .event_encoding
+                .filter_decode_events(&response.events)?;
 
             info!("IBC transfer events: {:?}", ibc_transfer_events);
 
@@ -579,8 +581,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
                 info!("polled events: {events:?}");
 
-                let parsed_events: Vec<PacketRelayEvents> =
-                    event_encoding.filter_decode_events(&response.events)?;
+                let parsed_events: Vec<PacketRelayEvents> = starknet_chain
+                    .event_encoding
+                    .filter_decode_events(&response.events)?;
 
                 info!("parsed polled events: {parsed_events:?}");
             }
@@ -762,13 +765,15 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("ICS20 send packet response: {:?}", response);
 
-            let mut ibc_packet_events: Vec<PacketRelayEvents> =
-                event_encoding.filter_decode_events(&response.events)?;
+            let mut ibc_packet_events: Vec<PacketRelayEvents> = starknet_chain
+                .event_encoding
+                .filter_decode_events(&response.events)?;
 
             info!("IBC packet events: {:?}", ibc_packet_events);
 
-            let mut ibc_transfer_events: Vec<IbcTransferEvent> =
-                event_encoding.filter_decode_events(&response.events)?;
+            let mut ibc_transfer_events: Vec<IbcTransferEvent> = starknet_chain
+                .event_encoding
+                .filter_decode_events(&response.events)?;
 
             info!("IBC transfer events: {:?}", ibc_transfer_events);
 
