@@ -45,7 +45,7 @@ pub mod TokenTransferComponent {
         RecvEvent: RecvEvent,
         AckEvent: AckEvent,
         AckStatusEvent: AckStatusEvent,
-        TimoutEvent: TimeoutEvent,
+        TimeoutEvent: TimeoutEvent,
         CreateTokenEvent: CreateTokenEvent,
     }
 

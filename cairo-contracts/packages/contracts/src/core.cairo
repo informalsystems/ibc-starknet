@@ -57,7 +57,7 @@ pub mod IBCCore {
     component!(path: ChannelHandlerComponent, storage: channel_handler, event: ChannelHandlerEvent);
 
     #[abi(embed_v0)]
-    impl CoreChannelHanderImpl =
+    impl CoreChannelHandlerImpl =
         ChannelHandlerComponent::CoreChannelHandler<ContractState>;
     #[abi(embed_v0)]
     impl CoreChannelQueryImpl =
@@ -70,7 +70,7 @@ pub mod IBCCore {
     component!(path: RouterHandlerComponent, storage: router_handler, event: RouterHandlerEvent);
 
     #[abi(embed_v0)]
-    impl CoreRouterHanderImpl =
+    impl CoreRouterHandlerImpl =
         RouterHandlerComponent::CoreRouterHandler<ContractState>;
     impl RouterInitializerImpl = RouterHandlerComponent::RouterInitializerImpl<ContractState>;
 

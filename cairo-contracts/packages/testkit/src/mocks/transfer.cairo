@@ -22,9 +22,9 @@ pub mod MockTransferApp {
 
     // Transferrable
     #[abi(embed_v0)]
-    impl TokenTransferreableImpl =
+    impl TokenTransferrableImpl =
         TransferrableComponent::Transferrable<ContractState>;
-    impl TokenTransferreableInternalImpl =
+    impl TokenTransferrableInternalImpl =
         TransferrableComponent::TransferrableInternalImpl<ContractState>;
 
     // Token Transfer

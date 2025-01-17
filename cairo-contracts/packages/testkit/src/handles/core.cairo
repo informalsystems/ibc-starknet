@@ -38,7 +38,7 @@ pub impl CoreHandleImpl of CoreHandle {
         IClientHandlerDispatcher { contract_address: *self.address }
     }
 
-    fn connecion_handler_dispatcher(self: @CoreContract) -> IConnectionHandlerDispatcher {
+    fn connection_handler_dispatcher(self: @CoreContract) -> IConnectionHandlerDispatcher {
         IConnectionHandlerDispatcher { contract_address: *self.address }
     }
 
@@ -79,19 +79,19 @@ pub impl CoreHandleImpl of CoreHandle {
     }
 
     fn conn_open_init(self: @CoreContract, msg: MsgConnOpenInit) -> ConnectionId {
-        self.connecion_handler_dispatcher().conn_open_init(msg)
+        self.connection_handler_dispatcher().conn_open_init(msg)
     }
 
     fn conn_open_try(self: @CoreContract, msg: MsgConnOpenTry) -> ConnectionId {
-        self.connecion_handler_dispatcher().conn_open_try(msg)
+        self.connection_handler_dispatcher().conn_open_try(msg)
     }
 
     fn conn_open_ack(self: @CoreContract, msg: MsgConnOpenAck) {
-        self.connecion_handler_dispatcher().conn_open_ack(msg)
+        self.connection_handler_dispatcher().conn_open_ack(msg)
     }
 
     fn conn_open_confirm(self: @CoreContract, msg: MsgConnOpenConfirm) {
-        self.connecion_handler_dispatcher().conn_open_confirm(msg)
+        self.connection_handler_dispatcher().conn_open_confirm(msg)
     }
 
     fn connection_end(self: @CoreContract, connection_id: ConnectionId) -> ConnectionEnd {

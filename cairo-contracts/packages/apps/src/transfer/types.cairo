@@ -54,9 +54,9 @@ pub impl PacketDataJsonSerialize of Serialize<PacketData> {
 
 pub impl ArrayFelt252IntoPacketData of Into<Array<felt252>, PacketData> {
     fn into(self: Array<felt252>) -> PacketData {
-        let mut pakcet_data_span = self.span();
+        let mut packet_data_span = self.span();
 
-        let maybe_packet_data: Option<PacketData> = Serde::deserialize(ref pakcet_data_span);
+        let maybe_packet_data: Option<PacketData> = Serde::deserialize(ref packet_data_span);
 
         match maybe_packet_data {
             Option::Some(packet_data) => packet_data,
