@@ -11,6 +11,7 @@ use hermes_chain_type_components::traits::types::commitment_proof::HasCommitment
 use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
+use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
@@ -84,7 +85,9 @@ use hermes_relayer_components::chain::traits::send_message::{
     CanSendMessages, CanSendSingleMessage,
 };
 use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
-use hermes_relayer_components::chain::traits::types::channel::HasChannelEndType;
+use hermes_relayer_components::chain::traits::types::channel::{
+    HasChannelEndType, HasInitChannelOptionsType,
+};
 use hermes_relayer_components::chain::traits::types::client_state::{
     HasClientStateFields, HasClientStateType,
 };
@@ -94,7 +97,9 @@ use hermes_relayer_components::chain::traits::types::connection::{
     HasInitConnectionOptionsType,
 };
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
-use hermes_relayer_components::chain::traits::types::create_client::HasCreateClientEvent;
+use hermes_relayer_components::chain::traits::types::create_client::{
+    HasCreateClientEvent, HasCreateClientMessageOptionsType, HasCreateClientPayloadOptionsType,
+};
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::{
     HasChannelIdType, HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
@@ -149,6 +154,7 @@ use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConse
 use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
 use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
+use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
@@ -255,8 +261,7 @@ impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
     }
 }
 
-pub trait CanUseStarknetChain:
-    HasRuntime
+pub trait CanUseStarknetChain: HasRuntime
     + HasLogger
     + HasHeightType<Height = u64>
     + HasEventType<Event = StarknetEvent>
@@ -277,10 +282,13 @@ pub trait CanUseStarknetChain:
     + HasConnectionEndType<CosmosChain, ConnectionEnd = ConnectionEnd>
     + HasChannelIdType<CosmosChain, ChannelId = ChannelId>
     + HasChannelEndType<CosmosChain, ChannelEnd = ChannelEnd>
-    // // FIXME: cannot use native PortId. PortIdTypeComponent needs to be wired for StarknetChainTypes
-    // + HasPortIdType<CosmosChain, PortId = PortId>
     + HasPortIdType<CosmosChain, PortId = IbcPortId>
-    + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
+    + HasCreateClientMessageOptionsType<CosmosChain, CreateClientMessageOptions = ()>
+    + HasCreateClientPayloadOptionsType<
+        CosmosChain,
+        CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
+    > + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
+    + HasInitChannelOptionsType<CosmosChain, InitChannelOptions = CosmosInitChannelOptions>
     + HasConnectionOpenInitPayloadType<CosmosChain>
     + HasConnectionOpenTryPayloadType<CosmosChain>
     + HasConnectionOpenAckPayloadType<CosmosChain>
@@ -366,8 +374,8 @@ pub trait CanUseStarknetChain:
     + HasSequenceType<CosmosChain, Sequence = Sequence>
     + CanQueryBalance
     + HasMemoType
-    // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
-    // + CanIbcTransferToken<CosmosChain>
+// TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
+// + CanIbcTransferToken<CosmosChain>
 {
 }
 
@@ -377,6 +385,7 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
     + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CometUpdateHeader>
     + HasInitConnectionOptionsType<StarknetChain, InitConnectionOptions = CosmosInitConnectionOptions>
+    + HasInitChannelOptionsType<StarknetChain, InitChannelOptions = CosmosInitChannelOptions>
     + HasChainId<ChainId = ChainId>
     + HasCounterpartyMessageHeight<StarknetChain>
     + HasClientStateFields<StarknetChain>
