@@ -38,7 +38,7 @@ pub impl SetupImpl of SetupTrait {
 
     /// Deploys an instance of IBC light client contract.
     fn deploy_client(self: @Setup, contract_name: ByteArray) -> ClientContract {
-        ClientHandle::deploy_client(contract_name)
+        ClientHandle::deploy_client(contract_name, *self.owner)
     }
 
     /// Deploys an instance of ERC20 contract.

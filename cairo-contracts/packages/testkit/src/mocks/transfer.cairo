@@ -1,11 +1,14 @@
 #[starknet::contract]
 pub mod MockTransferApp {
+    use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet_ibc_apps::transfer::ERC20Contract;
     use starknet_ibc_apps::transfer::types::{PrefixedDenom, Memo, MsgTransfer};
-    use starknet_ibc_apps::transfer::{TokenTransferComponent, TransferrableComponent};
+    use starknet_ibc_apps::transfer::{
+        TokenTransferComponent, TransferrableComponent, TransferErrors
+    };
     use starknet_ibc_core::host::{PortId, ChannelId};
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
@@ -62,6 +65,7 @@ pub mod MockTransferApp {
 
     #[constructor]
     fn constructor(ref self: ContractState, owner: ContractAddress, erc20_class_hash: ClassHash) {
+        assert(owner.is_non_zero(), TransferErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
         self.transferrable.initializer();
         self.transfer.initializer(erc20_class_hash);

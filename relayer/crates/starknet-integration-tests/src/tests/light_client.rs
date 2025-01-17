@@ -180,19 +180,24 @@ fn test_starknet_light_client() -> Result<(), Error> {
             class_hash
         };
 
-        let comet_client_address = starknet_chain
-            .deploy_contract(&comet_client_class_hash, false, &Vec::new())
-            .await?;
+        let cairo_encoding = StarknetCairoEncoding;
 
-        info!(
-            "deployed Comet client contract to address: {:?}",
-            comet_client_address
-        );
+        let comet_client_address = {
+            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
+            let contract_address = starknet_chain
+                .deploy_contract(&comet_client_class_hash, false, &owner_call_data)
+                .await?;
+
+            info!(
+                "deployed Comet client contract to address: {:?}",
+                contract_address
+            );
+
+            contract_address
+        };
 
         starknet_chain.ibc_core_contract_address = Some(ibc_core_address);
         starknet_chain.ibc_client_contract_address = Some(comet_client_address);
-
-        let cairo_encoding = StarknetCairoEncoding;
 
         {
             // register comet client contract with ibc-core
