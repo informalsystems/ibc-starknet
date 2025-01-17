@@ -2,7 +2,7 @@ use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::any::ConvertIbcAny;
 use hermes_encoding_components::impls::convert::ConvertVia;
 use hermes_encoding_components::traits::convert::Converter;
-use ibc_client_starknet_types::header::StarknetHeader;
+use ibc_client_starknet_types::header::SignedStarknetHeader;
 use ibc_client_starknet_types::StarknetClientState as ClientStateType;
 use ibc_core::client::context::client_state::ClientStateExecution;
 use ibc_core::client::context::prelude::{ClientStateCommon, ConsensusState};
@@ -50,10 +50,13 @@ where
         client_id: &ClientId,
         header: Any,
     ) -> Result<Vec<Height>, ClientError> {
-        let header: StarknetHeader = <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
-            &StarknetLightClientEncoding,
-            &header,
-        )?;
+        let signed_header: SignedStarknetHeader =
+            <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
+                &StarknetLightClientEncoding,
+                &header,
+            )?;
+
+        let header = signed_header.header;
 
         let latest_height = header.height;
 
