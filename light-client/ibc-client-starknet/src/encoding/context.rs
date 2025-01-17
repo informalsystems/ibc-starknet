@@ -5,7 +5,7 @@ use core::str::Utf8Error;
 
 use cgp::core::error::{ErrorRaiser, ProvideErrorType};
 use cgp::prelude::*;
-use hermes_encoding_components::traits::convert::CanConvertBothWays;
+use hermes_encoding_components::traits::convert::{CanConvert, CanConvertBothWays};
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_encoding_components::traits::encode_and_decode_mut::CanEncodeAndDecodeMut;
 use hermes_protobuf_encoding_components::impls::any::TypeUrlMismatchError;
@@ -16,7 +16,7 @@ use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_
 use hermes_protobuf_encoding_components::types::any::Any;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use ibc_client_starknet_types::encoding::components::*;
-use ibc_client_starknet_types::header::StarknetHeader;
+use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use ibc_client_starknet_types::{StarknetClientState, StarknetConsensusState};
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
@@ -192,12 +192,17 @@ pub trait CanUseStarknetLightClientEncoding:
     + CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
     + CanEncodeAndDecode<ViaProtobuf, StarknetConsensusState>
     + CanEncodeAndDecode<ViaProtobuf, StarknetHeader>
+    + CanEncodeAndDecode<ViaProtobuf, SignedStarknetHeader>
     + CanEncodeAndDecode<ViaAny, StarknetClientState>
     + CanEncodeAndDecode<ViaAny, StarknetConsensusState>
     + CanEncodeAndDecode<ViaAny, StarknetHeader>
+    + CanEncodeAndDecode<ViaAny, SignedStarknetHeader>
     + CanConvertBothWays<Any, StarknetClientState>
     + CanConvertBothWays<Any, StarknetConsensusState>
     + CanConvertBothWays<Any, StarknetHeader>
+    + CanConvertBothWays<Any, SignedStarknetHeader>
+    + CanConvert<StarknetHeader, Any>
+    + CanConvert<SignedStarknetHeader, Any>
     + CanEncodeAndDecodeMut<ViaProtobuf, Timestamp>
     + CanEncodeAndDecodeMut<ViaProtobuf, CommitmentRoot>
 {
