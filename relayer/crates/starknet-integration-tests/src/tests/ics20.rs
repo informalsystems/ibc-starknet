@@ -5,7 +5,9 @@ use std::path::PathBuf;
 use std::time::SystemTime;
 
 use cgp::prelude::*;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_chain_components::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
+};
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
@@ -64,8 +66,9 @@ use ibc::primitives::Timestamp as IbcTimestamp;
 use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
-use starknet::core::types::{Felt, U256};
+use starknet::core::types::{BlockId, EventFilter, Felt, U256};
 use starknet::macros::{selector, short_string};
+use starknet::providers::Provider;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
@@ -121,6 +124,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
 
         let starknet_chain = &mut starknet_chain_driver.chain;
+
+        info!(
+            "started starknet chain at port {}",
+            starknet_chain_driver.node_config.rpc_port
+        );
 
         let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
 
@@ -509,8 +517,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             }
         };
 
-        // submit to ics20 contract
+        let event_start_height = starknet_chain.query_chain_height().await?;
 
+        // submit to ics20 contract
         let (send_packet_event, send_ics20_event) = {
             let call_data = cairo_encoding.encode(&starknet_ics20_send_message)?;
 
@@ -547,8 +556,39 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 panic!("expected send ics20 event");
             };
 
+            {
+                tokio::time::sleep(core::time::Duration::from_secs(1)).await;
+
+                let event_end_height = starknet_chain.query_chain_height().await?;
+
+                info!("polling events from {event_start_height} to {event_end_height}");
+
+                let events = starknet_chain
+                    .rpc_client
+                    .get_events(
+                        EventFilter {
+                            from_block: Some(BlockId::Number(event_start_height)),
+                            to_block: None,
+                            address: Some(ibc_core_address),
+                            keys: None,
+                        },
+                        None,
+                        1000,
+                    )
+                    .await?;
+
+                info!("polled events: {events:?}");
+
+                let parsed_events: Vec<PacketRelayEvents> =
+                    event_encoding.filter_decode_events(&response.events)?;
+
+                info!("parsed polled events: {parsed_events:?}");
+            }
+
             (send_packet_event, send_ics20_event)
         };
+
+        tokio::time::sleep(core::time::Duration::from_secs(999999999)).await;
 
         // create ibc packet
 
