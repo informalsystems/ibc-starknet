@@ -6,6 +6,7 @@ use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_type_components::traits::fields::chain_id::HasChainId;
 use hermes_chain_type_components::traits::types::commitment_proof::HasCommitmentProofType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
@@ -13,9 +14,8 @@ use hermes_chain_type_components::traits::types::message_response::HasMessageRes
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
 use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetter, EncodingGetterComponent, HasDefaultEncoding, ProvideEncodingType,
+    DefaultEncodingGetter, EncodingGetter, HasDefaultEncoding, ProvideEncodingType,
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::ProvideHermesError;
@@ -196,7 +196,6 @@ delegate_components! {
             GlobalLoggerGetterComponent,
         ]:
             ProvideNoLogger,
-        EncodingGetterComponent: GetDefaultEncoding,
         [
             StarknetProviderTypeComponent,
             StarknetProviderGetterComponent,
@@ -229,9 +228,25 @@ impl ProvideEncodingType<StarknetChain, AsFelt> for StarknetChainContextComponen
     type Encoding = StarknetCairoEncoding;
 }
 
+impl ProvideEncodingType<StarknetChain, AsStarknetEvent> for StarknetChainContextComponents {
+    type Encoding = StarknetEventEncoding;
+}
+
 impl DefaultEncodingGetter<StarknetChain, AsFelt> for StarknetChainContextComponents {
     fn default_encoding() -> &'static StarknetCairoEncoding {
         &StarknetCairoEncoding
+    }
+}
+
+impl EncodingGetter<StarknetChain, AsFelt> for StarknetChainContextComponents {
+    fn encoding(_chain: &StarknetChain) -> &StarknetCairoEncoding {
+        &StarknetCairoEncoding
+    }
+}
+
+impl EncodingGetter<StarknetChain, AsStarknetEvent> for StarknetChainContextComponents {
+    fn encoding(chain: &StarknetChain) -> &StarknetEventEncoding {
+        &chain.event_encoding
     }
 }
 
