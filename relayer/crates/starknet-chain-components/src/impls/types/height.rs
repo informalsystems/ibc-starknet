@@ -1,5 +1,5 @@
 use cgp::core::Async;
-use cgp::prelude::CanRaiseError;
+use cgp::prelude::CanRaiseAsyncError;
 use hermes_chain_components::traits::types::height::HeightIncrementer;
 use hermes_relayer_components::chain::traits::types::height::{
     HasHeightType, HeightFieldGetter, ProvideHeightType,
@@ -26,7 +26,7 @@ where
 
 impl<Chain> HeightIncrementer<Chain> for ProvideStarknetHeight
 where
-    Chain: HasHeightType<Height = u64> + CanRaiseError<&'static str>,
+    Chain: HasHeightType<Height = u64> + CanRaiseAsyncError<&'static str>,
 {
     fn increment_height(height: &u64) -> Result<u64, Chain::Error> {
         height

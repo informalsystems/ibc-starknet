@@ -1,6 +1,6 @@
 use std::string::FromUtf8Error;
 
-use cgp::core::error::CanRaiseError;
+use cgp::core::error::CanRaiseAsyncError;
 use cgp::prelude::DelegateComponent;
 use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
@@ -15,7 +15,7 @@ impl DelegateComponent<MutEncoderComponent> for EncodeUtf8String {
 
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, String> for EncodeUtf8String
 where
-    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseError<FromUtf8Error>,
+    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<FromUtf8Error>,
 {
     fn decode_mut(
         encoding: &Encoding,

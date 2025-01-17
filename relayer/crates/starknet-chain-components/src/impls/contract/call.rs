@@ -1,4 +1,4 @@
-use cgp::core::error::CanRaiseError;
+use cgp::core::error::CanRaiseAsyncError;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet::providers::{Provider, ProviderError};
@@ -16,7 +16,7 @@ where
         + HasSelectorType<Selector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
         + HasStarknetProvider
-        + CanRaiseError<ProviderError>,
+        + CanRaiseAsyncError<ProviderError>,
 {
     async fn call_contract(
         chain: &Chain,

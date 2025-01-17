@@ -44,7 +44,7 @@ where
         + HasSelectorType<Selector = Felt>
         + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Encoding: CanEncode<ViaCairo, TransferErc20TokenMessage, Encoded = Vec<Felt>>,
 {
     fn build_transfer_token_message(

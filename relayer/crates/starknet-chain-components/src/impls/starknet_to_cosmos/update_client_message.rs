@@ -21,7 +21,7 @@ impl<Chain, Counterparty, Encoding> UpdateClientMessageBuilder<Chain, Counterpar
 where
     Chain: HasIbcChainTypes<Counterparty, ClientId = ClientId>
         + HasMessageType<Message = CosmosMessage>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasUpdateClientPayloadType<Chain, UpdateClientPayload = StarknetUpdateClientPayload>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>,
     Encoding: Async + CanConvert<StarknetHeader, Any>,

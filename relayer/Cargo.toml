@@ -27,8 +27,8 @@ rust-version = "1.81"
 overflow-checks = true
 
 [workspace.dependencies]
-cgp            = { version = "0.2.0" }
-cgp-error-eyre = { version = "0.2.0" }
+cgp            = { version = "0.3.1" }
+cgp-error-eyre = { version = "0.3.0" }
 
 starknet                    = { version = "0.11.0" }
 starknet-types-core         = { version = "0.1.7" }

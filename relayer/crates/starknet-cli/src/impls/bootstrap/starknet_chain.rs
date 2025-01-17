@@ -22,7 +22,7 @@ impl<App> BootstrapLoader<App, BootstrapStarknetChainArgs> for LoadStarknetBoots
 where
     App: HasBootstrapType<Bootstrap = StarknetBootstrap>
         + HasRuntime<Runtime = HermesRuntime>
-        + HasErrorType,
+        + HasAsyncErrorType,
 {
     async fn load_bootstrap(
         app: &App,

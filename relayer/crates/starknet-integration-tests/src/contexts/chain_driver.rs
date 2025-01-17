@@ -2,8 +2,8 @@ use std::collections::BTreeMap;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
-use cgp::core::field::impls::use_field::WithField;
-use cgp::core::types::impls::WithType;
+use cgp::core::field::WithField;
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_error::impls::ProvideHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;

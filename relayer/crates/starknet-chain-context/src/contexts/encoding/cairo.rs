@@ -102,7 +102,7 @@ where
 }
 
 pub trait CanUseCairoEncoding:
-    HasErrorType<Error = HermesError>
+    HasAsyncErrorType<Error = HermesError>
     + HasEncodedType<Encoded = Vec<Felt>>
     + HasEncodeBufferType<EncodeBuffer = Vec<Felt>>
     + for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Peekable<Iter<'a, Felt>>>

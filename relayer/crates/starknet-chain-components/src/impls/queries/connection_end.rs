@@ -38,7 +38,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanCallContract
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Encoding: CanEncode<ViaCairo, ConnectionId>
         + CanDecode<ViaCairo, ConnectionEnd>
         + HasEncodedType<Encoded = Vec<Felt>>,
@@ -77,7 +77,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanCallContract
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Encoding: CanEncode<ViaCairo, ConnectionId>
         + CanDecode<ViaCairo, ConnectionEnd>
         + HasEncodedType<Encoded = Vec<Felt>>,

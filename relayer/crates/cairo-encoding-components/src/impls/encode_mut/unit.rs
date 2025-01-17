@@ -1,4 +1,4 @@
-use cgp::core::error::HasErrorType;
+use cgp::core::error::HasAsyncErrorType;
 use cgp::prelude::Nil;
 use hermes_encoding_components::traits::decode_mut::MutDecoder;
 use hermes_encoding_components::traits::encode_mut::MutEncoder;
@@ -9,7 +9,7 @@ pub struct EncodeNothing;
 
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ()> for EncodeNothing
 where
-    Encoding: HasEncodeBufferType + HasErrorType,
+    Encoding: HasEncodeBufferType + HasAsyncErrorType,
 {
     fn encode_mut(
         _encoding: &Encoding,
@@ -22,7 +22,7 @@ where
 
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ()> for EncodeNothing
 where
-    Encoding: HasDecodeBufferType + HasErrorType,
+    Encoding: HasDecodeBufferType + HasAsyncErrorType,
 {
     fn decode_mut(
         _encoding: &Encoding,
@@ -34,7 +34,7 @@ where
 
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Nil> for EncodeNothing
 where
-    Encoding: HasEncodeBufferType + HasErrorType,
+    Encoding: HasEncodeBufferType + HasAsyncErrorType,
 {
     fn encode_mut(
         _encoding: &Encoding,
@@ -47,7 +47,7 @@ where
 
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Nil> for EncodeNothing
 where
-    Encoding: HasDecodeBufferType + HasErrorType,
+    Encoding: HasDecodeBufferType + HasAsyncErrorType,
 {
     fn decode_mut(
         _encoding: &Encoding,

@@ -85,7 +85,7 @@ where
         + CanDecode<Strategy, AckStatusIbcTransferEvent>
         + CanDecode<Strategy, TimeoutIbcTransferEvent>
         + CanDecode<Strategy, CreateIbcTokenEvent>
-        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
 {
     fn decode(
         encoding: &Encoding,
@@ -118,7 +118,7 @@ impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, Se
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>,
+        + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Participant, Participant, PrefixedDenom]>
         + CanDecode<ViaCairo, Product![U256, String]>,
@@ -152,7 +152,7 @@ impl<EventEncoding, CairoEncoding, Strategy>
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>,
+        + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Participant, Participant, PrefixedDenom]>
         + CanDecode<ViaCairo, Product![U256, String, bool]>,
@@ -187,7 +187,7 @@ impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, Ac
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>,
+        + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Participant, Participant, PrefixedDenom]>
         + CanDecode<ViaCairo, Product![U256, String, Acknowledgement]>,
@@ -222,8 +222,8 @@ impl<EventEncoding, CairoEncoding, Strategy>
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>
-        + for<'a> CanRaiseError<UnknownEvent<'a>>,
+        + CanRaiseAsyncError<CairoEncoding::Error>
+        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>> + CanDecode<ViaCairo, Product![AckStatus]>,
 {
     fn decode(
@@ -249,7 +249,7 @@ impl<EventEncoding, CairoEncoding, Strategy>
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>,
+        + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Participant, PrefixedDenom]>
         + CanDecode<ViaCairo, Product![U256, String]>,
@@ -282,7 +282,7 @@ impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, Cr
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseError<CairoEncoding::Error>,
+        + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![String, String, Felt]>
         + CanDecode<ViaCairo, Product![U256]>,

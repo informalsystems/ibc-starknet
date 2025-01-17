@@ -22,9 +22,9 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "anyhow"
-version = "1.0.94"
+version = "1.0.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1fd03a028ef38ba2276dce7e33fcd6369c158a1bca17946c4b1b701891c1ff7"
+checksum = "34ac096ce696dc2fcabef30516bb13c0a68a11d30131d3df6f04711467681b04"
 
 [[package]]
 name = "ark-bls12-381"
@@ -243,9 +243,9 @@ checksum = "3e31ea183f6ee62ac8b8a8cf7feddd766317adfb13ff469de57ce033efd6a790"
 
 [[package]]
 name = "borsh"
-version = "1.5.3"
+version = "1.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2506947f73ad44e344215ccd6403ac2ae18cd8e046e581a441bf8d199f257f03"
+checksum = "9fb65153674e51d3a42c8f27b05b9508cea85edfaade8aa46bc8fc18cecdfef3"
 dependencies = [
  "borsh-derive",
  "cfg_aliases",
@@ -253,15 +253,15 @@ dependencies = [
 
 [[package]]
 name = "borsh-derive"
-version = "1.5.3"
+version = "1.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2593a3b8b938bd68373196c9832f516be11fa487ef4ae745eb282e6a56a7244"
+checksum = "a396e17ad94059c650db3d253bb6e25927f1eb462eede7e7a153bb6e75dce0a7"
 dependencies = [
  "once_cell",
  "proc-macro-crate",
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -281,9 +281,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.2.4"
+version = "1.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9157bbaa6b165880c27a4293a474c91cdcf265cc68cc829bf10be0964a391caf"
+checksum = "c8293772165d9345bdaaa39b45b2109591e63fe5e6fbc23c6ff930a048aa310b"
 dependencies = [
  "shlex",
 ]
@@ -302,9 +302,8 @@ checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 
 [[package]]
 name = "cgp"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5adf76ce3579324bc8804a03da7e05a5012e4096e295d7ce16073dd0f55e923e"
+version = "0.3.1"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
  "cgp-async",
  "cgp-core",
@@ -313,9 +312,8 @@ dependencies = [
 
 [[package]]
 name = "cgp-async"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0623cc42c39044ad4223a60b58d427fdece736913fa70e0c0b7787b207545886"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
  "cgp-async-macro",
  "cgp-sync",
@@ -323,97 +321,97 @@ dependencies = [
 
 [[package]]
 name = "cgp-async-macro"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b22933d3a1fb401cc0208e4f8ef16f4c80579701a47b81d2f23ee5b0b697a7b0"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
 name = "cgp-component"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "82a567833f055c865fb46258f7c6a511b22a1da6bc22f58b47a5e5e3da7a2dd2"
-dependencies = [
- "cgp-component-macro",
-]
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 
 [[package]]
 name = "cgp-component-macro"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1c4c375220b569b618d6b4ec8793c61bbdd24925786aeb4ea1eac5010916c262"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
  "cgp-component-macro-lib",
- "proc-macro2",
+ "syn 2.0.96",
 ]
 
 [[package]]
 name = "cgp-component-macro-lib"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f7e9fa127625afac0527a2f1595ba365142d8d875ff04f155cb248aee456d2c0"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
- "itertools 0.11.0",
+ "itertools 0.14.0",
  "prettyplease",
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
 name = "cgp-core"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39951e4828fb216d51bfa42121095654f2adb0e4abbc9d03b011c5b47372a4c1"
+version = "0.3.1"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
  "cgp-async",
  "cgp-component",
+ "cgp-component-macro",
  "cgp-error",
  "cgp-field",
- "cgp-inner",
- "cgp-type",
-]
-
-[[package]]
-name = "cgp-error"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3866da7384b88d3260e781e60bc9da3a68d5552c33eea56e6780fea8c97d000"
-dependencies = [
- "cgp-async",
- "cgp-component",
- "cgp-type",
-]
-
-[[package]]
-name = "cgp-extra"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f79c15ed0088b1ca06ad58a8f124c1d63f4a554073ed372ff2b488a3fbf6fb9"
-dependencies = [
- "cgp-run",
-]
-
-[[package]]
-name = "cgp-field"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6956ca07b849e38106ee5b3c71c7e396088619115fe60934fd2598b873a9efac"
-dependencies = [
- "cgp-component",
  "cgp-field-macro",
  "cgp-type",
 ]
 
 [[package]]
+name = "cgp-error"
+version = "0.3.1"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
+dependencies = [
+ "cgp-async",
+ "cgp-component",
+ "cgp-component-macro",
+ "cgp-type",
+]
+
+[[package]]
+name = "cgp-error-extra"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
+dependencies = [
+ "cgp-error",
+]
+
+[[package]]
+name = "cgp-extra"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
+dependencies = [
+ "cgp-error-extra",
+ "cgp-inner",
+ "cgp-run",
+ "cgp-runtime",
+]
+
+[[package]]
+name = "cgp-field"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
+dependencies = [
+ "cgp-component",
+ "cgp-type",
+]
+
+[[package]]
 name = "cgp-field-macro"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2286ec0bd3a48571ee3644e80a52ba029f10c2edd6bc3da4f4ef9279583798d5"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
  "cgp-field-macro-lib",
  "proc-macro2",
@@ -421,53 +419,58 @@ dependencies = [
 
 [[package]]
 name = "cgp-field-macro-lib"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7e05fc04f941c797c28db9dd9685d779b76784f29bdbe2eb368329abfca14d9a"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
- "itertools 0.11.0",
  "prettyplease",
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
 name = "cgp-inner"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0cd062e3bef5a8353acdcdae3e04c0012de0b19e9bd02acbccfce09e895814cf"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
  "cgp-component",
+ "cgp-component-macro",
 ]
 
 [[package]]
 name = "cgp-run"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2bf13ddcb395e915d314abf917d86dc7fa461bd73a3da2724b4698d45eaa283e"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
  "cgp-async",
  "cgp-component",
+ "cgp-component-macro",
  "cgp-error",
 ]
 
 [[package]]
+name = "cgp-runtime"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
+dependencies = [
+ "cgp-core",
+]
+
+[[package]]
 name = "cgp-sync"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a1c0e460bcccd3e2e39ded6a2078f012d3c00b523caafc05b5bdace9205b0cf"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
  "cgp-async-macro",
 ]
 
 [[package]]
 name = "cgp-type"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d3c9a9059625de770e4acddff6d5e56c5defd959b010b9643cfcb81832f5bed"
+version = "0.3.0"
+source = "git+https://github.com/contextgeneric/cgp.git#ee19ad1775997b0bc83cd71bd24dac0b0381307b"
 dependencies = [
  "cgp-component",
+ "cgp-component-macro",
 ]
 
 [[package]]
@@ -538,7 +541,7 @@ checksum = "3c94a4b93e722c91d2e58471cfe69480f4a656cfccacd8bfda5638f2a5d4512b"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -562,7 +565,7 @@ checksum = "edd3d80310cd7b86b09dbe886f4f2ca235a5ddb8d478493c6e50e720a3b38a42"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -675,7 +678,7 @@ checksum = "f46882e17999c6cc590af592290432be3bce0428cb0d5f8b6715e4dc7b383eb3"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -742,7 +745,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "rustc_version",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -762,7 +765,7 @@ checksum = "cb7330aeadfbe296029522e6c40f315320aba36fc43a5b3632f3795348f3bd22"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
  "unicode-xid",
 ]
 
@@ -795,7 +798,7 @@ checksum = "97369cbbc041bc366949bc74d34658d6cda5621039731c6310521892a3a20ae0"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -1041,7 +1044,7 @@ checksum = "bf151400ff0baff5465007dd2f3e717f3fe502074ca563069ce3a6629d07b289"
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#9dd5e3539cf60d645f13a9787b7c40d5b943fecc"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -1055,7 +1058,7 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#9dd5e3539cf60d645f13a9787b7c40d5b943fecc"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
 ]
@@ -1063,7 +1066,7 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#9dd5e3539cf60d645f13a9787b7c40d5b943fecc"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#4414c1237b35c171c4232ff84dfd844e5b458f45"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -1546,7 +1549,7 @@ checksum = "7b2bbdb8c5306e4b53545026d6ecbdbf6f9fc5a6459749c60017b99cf895fed4"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -1643,9 +1646,18 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.11.0"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
 dependencies = [
  "either",
 ]
@@ -1679,9 +1691,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.168"
+version = "0.2.169"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5aaeb2981e0606ca11d79718f8bb01164f1d6ed75080182d3abf017e6d244b6d"
+checksum = "b5aba8db14291edd000dfcc4d620c7ebfb122c613afb886ca8803fa4e128a20a"
 
 [[package]]
 name = "memchr"
@@ -1755,9 +1767,9 @@ checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
 
 [[package]]
 name = "pin-project-lite"
-version = "0.2.15"
+version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "915a1e146535de9163f3987b8944ed8cf49a18bb0056bcebcdcece385cece4ff"
+checksum = "3b3cff922bd51709b605d9ead9aa71031d81447142d828eb4a6eba76fe619f9b"
 
 [[package]]
 name = "pin-utils"
@@ -1792,12 +1804,12 @@ dependencies = [
 
 [[package]]
 name = "prettyplease"
-version = "0.2.25"
+version = "0.2.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64d1ec885c64d0457d564db4ec299b2dae3f9c02808b8ad9c3a089c591b18033"
+checksum = "6924ced06e1f7dfe3fa48d57b9f74f55d8915f5036121bef647ef4b204895fac"
 dependencies = [
  "proc-macro2",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -1831,9 +1843,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.92"
+version = "1.0.93"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37d3544b3f2748c54e147655edb5025752e2303145b5aefb3c3ea2c78b973bb0"
+checksum = "60946a68e5f9d28b0dc1c21bb8a97ee7d018a8b322fa57838ba31cc878e22d99"
 dependencies = [
  "unicode-ident",
 ]
@@ -1855,10 +1867,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "157c5a9d7ea5c2ed2d9fb8f495b64759f7816c7eaea54ba3978f0d63000162e3"
 dependencies = [
  "anyhow",
- "itertools 0.11.0",
+ "itertools 0.13.0",
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -1872,9 +1884,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.37"
+version = "1.0.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5b9d34b8991d19d98081b46eacdd8eb58c6f2b201139f7c5f643cc155a633af"
+checksum = "0e4dccaaaf89514f546c693ddc140f729f958c247918a13380cccc6078391acc"
 dependencies = [
  "proc-macro2",
 ]
@@ -2005,7 +2017,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "serde_derive_internals",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -2029,9 +2041,9 @@ checksum = "3cb6eb87a131f756572d7fb904f6e7b68633f09cca868c5df1c4b8d1a694bbba"
 
 [[package]]
 name = "serde"
-version = "1.0.216"
+version = "1.0.217"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b9781016e935a97e8beecf0c933758c97a5520d32930e460142b4cd80c6338e"
+checksum = "02fc4265df13d6fa1d00ecff087228cc0a2b5f3c0e87e258d8b94a156e984c70"
 dependencies = [
  "serde_derive",
 ]
@@ -2056,13 +2068,13 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.216"
+version = "1.0.217"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46f859dbbf73865c6627ed570e78961cd3ac92407a2d117204c49232485da55e"
+checksum = "5a9bf7cf98d04a2b28aead066b7496853d4779c9cc183c440dbac457641e19a0"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -2073,14 +2085,14 @@ checksum = "18d26a20a969b9e3fdf2fc2d9f21eda6c40e2de84c9408bb5d3b05d499aae711"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
 name = "serde_json"
-version = "1.0.133"
+version = "1.0.135"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7fceb2473b9166b2294ef05efcb65a3db80803f0b03ef86a5fc88a2b85ee377"
+checksum = "2b0d7ba2887406110130a978386c4e1befb98c674b4fba677954e4db976630d9"
 dependencies = [
  "itoa",
  "memchr",
@@ -2096,7 +2108,7 @@ checksum = "6c64451ba24fc7a6a2d60fc75dd9c83c90903b19028d4eff35e88fc1e86564e9"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -2199,9 +2211,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "2.0.90"
+version = "2.0.96"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "919d3b74a5dd0ccd15aeb8f93e7006bd9e14c295087c9896a110f490752bcf31"
+checksum = "d5d0adab1ae378d7f53bdebc67a39f1f151407ef230f0ce2883572f5d8985c80"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2210,9 +2222,9 @@ dependencies = [
 
 [[package]]
 name = "tendermint"
-version = "0.40.0"
+version = "0.40.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37d513ce7f9e41c67ab2dd3d554ef65f36fbcc61745af1e1f93eafdeefa1ce37"
+checksum = "d9703e34d940c2a293804752555107f8dbe2b84ec4c6dd5203831235868105d2"
 dependencies = [
  "bytes",
  "digest 0.10.7",
@@ -2238,9 +2250,9 @@ dependencies = [
 
 [[package]]
 name = "tendermint-light-client-verifier"
-version = "0.40.0"
+version = "0.40.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7affc5fffe9df158185e15bce3e47fc3a0c901e6708f3b7d33f0867d7aef8ce1"
+checksum = "f0cda4a449fc70985a95f892a67286f13afa4e048d90b8d04a2bf6341e88d1c2"
 dependencies = [
  "derive_more 0.99.18",
  "flex-error",
@@ -2251,9 +2263,9 @@ dependencies = [
 
 [[package]]
 name = "tendermint-proto"
-version = "0.40.0"
+version = "0.40.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c81ba1b023ec00763c3bc4f4376c67c0047f185cccf95c416c7a2f16272c4cbb"
+checksum = "9ae9e1705aa0fa5ecb2c6aa7fb78c2313c4a31158ea5f02048bf318f849352eb"
 dependencies = [
  "borsh",
  "bytes",
@@ -2283,7 +2295,7 @@ checksum = "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -2377,9 +2389,9 @@ checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
 
 [[package]]
 name = "winnow"
-version = "0.6.20"
+version = "0.6.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36c1fec1a2bb5866f07c25f68c26e565c4c200aebb96d7e55710c19d3e8ac49b"
+checksum = "c8d71a593cc5c42ad7876e2c1fda56f314f3754c084128833e64f1345ff8a03a"
 dependencies = [
  "memchr",
 ]
@@ -2402,7 +2414,7 @@ checksum = "fa4f8080344d4671fb4e831a13ad1e68092748387dfc4f55e356242fae12ce3e"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]
 
 [[package]]
@@ -2422,5 +2434,5 @@ checksum = "ce36e65b0d2999d2aafac989fb249189a141aee1f53c612c1f37d72631959f69"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.90",
+ "syn 2.0.96",
 ]

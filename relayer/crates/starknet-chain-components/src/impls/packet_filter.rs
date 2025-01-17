@@ -1,4 +1,4 @@
-use cgp::prelude::HasErrorType;
+use cgp::prelude::HasAsyncErrorType;
 use hermes_chain_components::traits::packet::filter::{IncomingPacketFilter, OutgoingPacketFilter};
 use hermes_chain_components::traits::types::packet::{
     HasIncomingPacketType, HasOutgoingPacketType,
@@ -8,7 +8,7 @@ pub struct FilterStarknetPackets;
 
 impl<Chain, Counterparty> OutgoingPacketFilter<Chain, Counterparty> for FilterStarknetPackets
 where
-    Chain: HasOutgoingPacketType<Counterparty> + HasErrorType,
+    Chain: HasOutgoingPacketType<Counterparty> + HasAsyncErrorType,
 {
     async fn should_relay_outgoing_packet(
         _chain: &Chain,
@@ -20,7 +20,7 @@ where
 
 impl<Chain, Counterparty> IncomingPacketFilter<Chain, Counterparty> for FilterStarknetPackets
 where
-    Chain: HasIncomingPacketType<Counterparty> + HasErrorType,
+    Chain: HasIncomingPacketType<Counterparty> + HasAsyncErrorType,
 {
     async fn should_relay_incoming_packet(
         _chain: &Chain,

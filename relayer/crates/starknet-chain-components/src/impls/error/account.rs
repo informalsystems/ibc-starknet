@@ -1,6 +1,6 @@
 use core::fmt::Debug;
 
-use cgp::core::error::{CanRaiseError, ErrorRaiser};
+use cgp::core::error::{CanRaiseAsyncError, ErrorRaiser};
 use starknet::accounts::AccountError;
 use starknet::providers::ProviderError;
 
@@ -8,7 +8,7 @@ pub struct RaiseAccountError;
 
 impl<Context, S> ErrorRaiser<Context, AccountError<S>> for RaiseAccountError
 where
-    Context: CanRaiseError<ProviderError> + CanRaiseError<String>,
+    Context: CanRaiseAsyncError<ProviderError> + CanRaiseAsyncError<String>,
     S: Debug,
 {
     fn raise_error(e: AccountError<S>) -> Context::Error {

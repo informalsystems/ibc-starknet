@@ -1,5 +1,5 @@
 use cgp::core::component::WithProvider;
-use cgp::core::types::impls::UseDelegatedType;
+use cgp::core::types::UseDelegatedType;
 use cgp::prelude::*;
 use hermes_chain_components::impls::payload_builders::channel::BuildChannelHandshakePayload;
 use hermes_chain_components::impls::payload_builders::connection::BuildConnectionHandshakePayload;

@@ -33,7 +33,7 @@ where
         + HasAddressType<Address = Felt>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
         HasCreateClientPayloadType<Chain, CreateClientPayload = CosmosCreateClientPayload>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>

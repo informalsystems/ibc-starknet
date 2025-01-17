@@ -1,6 +1,6 @@
 use core::iter;
 
-use cgp::core::error::{CanRaiseError, HasErrorType};
+use cgp::core::error::{CanRaiseAsyncError, HasAsyncErrorType};
 use hermes_encoding_components::traits::decode_mut::MutDecoder;
 use hermes_encoding_components::traits::encode_mut::MutEncoder;
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
@@ -15,7 +15,7 @@ pub struct UnexpectedEndOfBuffer;
 #[allow(unused_mut)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Felt> for EncodeFelt
 where
-    Encoding: HasEncodeBufferType + HasErrorType,
+    Encoding: HasEncodeBufferType + HasAsyncErrorType,
     Encoding::EncodeBuffer: Extend<Felt>,
 {
     fn encode_mut(
@@ -32,7 +32,7 @@ where
 #[allow(unused_mut)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Felt> for EncodeFelt
 where
-    Encoding: HasDecodeBufferType + CanRaiseError<UnexpectedEndOfBuffer>,
+    Encoding: HasDecodeBufferType + CanRaiseAsyncError<UnexpectedEndOfBuffer>,
     for<'a> Encoding::DecodeBuffer<'a>: CanIterFeltBuffer<'a>,
 {
     fn decode_mut(
