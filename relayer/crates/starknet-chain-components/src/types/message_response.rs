@@ -10,7 +10,6 @@ use crate::types::event::StarknetEvent;
 
 #[derive(Debug)]
 pub struct StarknetMessageResponse {
-    pub receipt_block: ReceiptBlock,
     pub result: Vec<Felt>,
     pub events: Vec<StarknetEvent>,
 }
