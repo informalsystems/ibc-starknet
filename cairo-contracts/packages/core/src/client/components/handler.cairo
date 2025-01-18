@@ -68,7 +68,9 @@ pub mod ClientHandlerComponent {
         fn update_client(
             ref self: ComponentState<TContractState>, msg: MsgUpdateClient
         ) -> UpdateResponse {
-            assert(self.in_allowed_relayers(get_caller_address()), ClientErrors::INVALID_RELAYER);
+            assert(
+                self.in_allowed_relayers(get_caller_address()), ClientErrors::UNAUTHORIZED_RELAYER
+            );
 
             let mut client = self.get_client(msg.client_id.client_type);
 
