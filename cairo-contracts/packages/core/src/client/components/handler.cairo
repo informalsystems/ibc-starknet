@@ -8,7 +8,7 @@ pub mod ClientHandlerComponent {
     use starknet::{ContractAddress, get_caller_address, get_tx_info};
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
     use starknet_ibc_core::client::ClientEventEmitterComponent;
-    use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient};
+    use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient, IRegisterRelayer};
     use starknet_ibc_core::client::{
         MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height,
         CreateResponse, UpdateResponse, ClientErrors, ClientContract, ClientContractHandlerTrait
@@ -126,13 +126,13 @@ pub mod ClientHandlerComponent {
     // Allowed Relayers
     // -----------------------------------------------------------
 
-    #[generate_trait]
-    pub impl RegisterRelayerImpl<
+    #[embeddable_as(CoreRegisterRelayer)]
+    pub impl CoreRegisterRelayerImpl<
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
         impl Governance: IBCGovernanceComponent::HasComponent<TContractState>
-    > of RegisterRelayerTrait<TContractState> {
+    > of IRegisterRelayer<ComponentState<TContractState>> {
         fn register_relayer(
             ref self: ComponentState<TContractState>, relayer_address: ContractAddress
         ) {
@@ -144,7 +144,10 @@ pub mod ClientHandlerComponent {
 
             let governor = get_dep_component!(@self, Governance).governor();
 
-            assert(governor == get_caller_address(), ClientErrors::INVALID_GOVERNOR);
+            assert(
+                governor.is_zero() || governor == get_caller_address(),
+                ClientErrors::INVALID_GOVERNOR
+            );
 
             self.write_allowed_relayer(relayer_address);
         }

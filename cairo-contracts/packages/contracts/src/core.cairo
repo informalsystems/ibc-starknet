@@ -1,6 +1,5 @@
 #[starknet::contract]
 pub mod IBCCore {
-    use starknet::ContractAddress;
     use starknet_ibc_core::channel::ChannelEventEmitterComponent;
     use starknet_ibc_core::channel::ChannelHandlerComponent;
     use starknet_ibc_core::client::ClientEventEmitterComponent;
@@ -35,7 +34,9 @@ pub mod IBCCore {
     #[abi(embed_v0)]
     impl CoreRegisterClientImpl =
         ClientHandlerComponent::CoreRegisterClient<ContractState>;
-    impl CoreRegisterRelayerImpl = ClientHandlerComponent::RegisterRelayerImpl<ContractState>;
+    #[abi(embed_v0)]
+    impl CoreRegisterRelayerImpl =
+        ClientHandlerComponent::CoreRegisterRelayer<ContractState>;
     impl ClientInitializerImpl = ClientHandlerComponent::ClientInitializerImpl<ContractState>;
 
     // -----------------------------------------------------------
@@ -134,10 +135,5 @@ pub mod IBCCore {
         self.governance.initializer();
         self.client_handler.initializer();
         self.router_handler.initializer();
-    }
-
-    #[external(v0)]
-    fn register_relayer(ref self: ContractState, relayer_address: ContractAddress) {
-        self.client_handler.register_relayer(relayer_address);
     }
 }
