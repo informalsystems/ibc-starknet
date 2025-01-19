@@ -5,7 +5,7 @@ pub mod ClientHandlerComponent {
         Map, StorageMapReadAccess, StorageMapWriteAccess, Vec, VecTrait, MutableVecTrait,
         StoragePointerReadAccess, StoragePointerWriteAccess
     };
-    use starknet::{ContractAddress, get_caller_address};
+    use starknet::{ContractAddress, get_caller_address, get_tx_info};
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
     use starknet_ibc_core::client::ClientEventEmitterComponent;
     use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient};
@@ -38,7 +38,10 @@ pub mod ClientHandlerComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientInitializerTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>) {
-            self.write_allowed_relayer(get_caller_address());
+            // NOTE: authorizing the contract's deployer as a relayer to
+            // simplify the process. This avoids an additional registration step
+            // for the relayer, as this setup is temporary.
+            self.write_allowed_relayer(get_tx_info().deref().account_contract_address);
         }
     }
 
@@ -133,6 +136,12 @@ pub mod ClientHandlerComponent {
         fn register_relayer(
             ref self: ComponentState<TContractState>, relayer_address: ContractAddress
         ) {
+            assert(relayer_address.is_non_zero(), ClientErrors::ZERO_RELAYER_ADDRESS);
+
+            assert(
+                !self.in_allowed_relayers(relayer_address), ClientErrors::RELAYER_ALREADY_REGISTERED
+            );
+
             let governor = get_dep_component!(@self, Governance).governor();
 
             assert(governor == get_caller_address(), ClientErrors::INVALID_GOVERNOR);

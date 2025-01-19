@@ -31,8 +31,6 @@ fn test_register_client() {
 #[test]
 fn test_allowed_relayers() {
     let mut state = setup();
-    assert!(state.in_allowed_relayers(starknet::get_caller_address()));
-
     assert!(!state.in_allowed_relayers(RELAYER()));
     state.write_allowed_relayer(RELAYER());
     assert!(state.in_allowed_relayers(RELAYER()));

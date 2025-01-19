@@ -1,7 +1,7 @@
 #[starknet::component]
 pub mod IBCGovernanceComponent {
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
-    use starknet::{ContractAddress, get_caller_address};
+    use starknet::{ContractAddress, get_tx_info};
     use starknet_ibc_utils::governance::IGovernance;
 
     #[storage]
@@ -23,7 +23,7 @@ pub mod IBCGovernanceComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of GovernanceInternalTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>) {
-            self.governor.write(get_caller_address());
+            self.governor.write(get_tx_info().deref().account_contract_address);
         }
 
         fn governor(self: @ComponentState<TContractState>) -> ContractAddress {
