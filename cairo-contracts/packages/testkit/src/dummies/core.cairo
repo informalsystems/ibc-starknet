@@ -25,6 +25,10 @@ pub fn TIMEOUT_TIMESTAMP(timestamp: u64) -> Timestamp {
     TIMESTAMP(timestamp)
 }
 
+pub fn RELAYER() -> ContractAddress {
+    contract_address_const::<'RELAYER'>()
+}
+
 pub fn CLIENT() -> ContractAddress {
     contract_address_const::<'COMETBFT'>()
 }

@@ -34,7 +34,7 @@ fn test_array_u8_into_array_u32() {
     assert_eq!(result, (array![4294967295], 0, 0));
 
     // This corresponds to the following JSON: {"result": "AQ=="}, which
-    // represents the successful acknoledgement in ICS-20 application.
+    // represents the successful acknowledgement in ICS-20 application.
     let array = array![123, 34, 114, 101, 115, 117, 108, 116, 34, 58, 34, 65, 81, 61, 61, 34, 125];
     let result = array_u8_into_array_u32(array);
     assert_eq!(result, (array![2065855077, 1937075316, 574235201, 1362967842], 125, 1));

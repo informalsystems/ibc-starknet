@@ -26,9 +26,9 @@ pub mod TransferApp {
 
     // Transferrable
     #[abi(embed_v0)]
-    impl TokenTransferreableImpl =
+    impl TokenTransferrableImpl =
         TransferrableComponent::Transferrable<ContractState>;
-    impl TokenTransferreableInternal =
+    impl TokenTransferrableInternal =
         TransferrableComponent::TransferrableInternalImpl<ContractState>;
 
     // Token Transfer

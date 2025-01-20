@@ -1,10 +1,10 @@
-use snforge_std::{spy_events, test_address};
+use snforge_std::{spy_events, test_address, start_cheat_caller_address_global};
 use starknet_ibc_core::client::ClientHandlerComponent::{
     ClientInitializerImpl, CoreRegisterClientImpl, CoreClientHandlerImpl, EventEmitterImpl,
-    ClientInternalImpl, ClientReaderTrait
+    ClientInternalImpl, ClientReaderTrait, ClientWriterTrait
 };
-use starknet_ibc_core::client::{ClientHandlerComponent, CreateResponse};
-use starknet_ibc_testkit::dummies::{CLIENT, CLIENT_TYPE, CLIENT_ID, HEIGHT};
+use starknet_ibc_core::client::{ClientHandlerComponent, CreateResponse, MsgUpdateClient};
+use starknet_ibc_testkit::dummies::{CLIENT, CLIENT_TYPE, CLIENT_ID, HEIGHT, RELAYER};
 use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
 use starknet_ibc_testkit::mocks::MockClientHandler;
 
@@ -29,6 +29,23 @@ fn test_register_client() {
 }
 
 #[test]
+fn test_allowed_relayers() {
+    let mut state = setup();
+    assert!(!state.in_allowed_relayers(RELAYER()));
+    state.write_allowed_relayer(RELAYER());
+    assert!(state.in_allowed_relayers(RELAYER()));
+}
+
+#[should_panic(expected: 'ICS02: unauthorized relayer')]
+#[test]
+fn test_unauthorized_update_client() {
+    let mut state = setup();
+    start_cheat_caller_address_global(RELAYER());
+    let msg = MsgUpdateClient { client_id: CLIENT_ID(), client_message: array![] };
+    state.update_client(msg);
+}
+
+#[test]
 fn test_get_client_ok() {
     let mut state = setup();
     state.register_client(CLIENT_TYPE(), CLIENT());
@@ -38,7 +55,7 @@ fn test_get_client_ok() {
 
 #[should_panic(expected: 'ICS02: client address is 0')]
 #[test]
-fn test_get_cleint_fail() {
+fn test_get_client_fail() {
     let state = setup();
     state.get_client(CLIENT_TYPE());
 }

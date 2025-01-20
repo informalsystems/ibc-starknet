@@ -52,10 +52,10 @@ fn test_update_client_ok() {
     let msg = cfg.dummy_msg_create_client();
     let create_resp = state.create_client(msg);
     let updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_timestmap = cfg.latest_timestamp + 1;
+    let updating_timestamp = cfg.latest_timestamp + 1;
     let msg = cfg
         .dummy_msg_update_client(
-            create_resp.client_id, create_resp.height, updating_height.clone(), updating_timestmap
+            create_resp.client_id, create_resp.height, updating_height.clone(), updating_timestamp
         );
     state.update_client(msg);
     assert_eq!(state.client_type(), cfg.client_type);

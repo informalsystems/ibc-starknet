@@ -646,7 +646,7 @@ pub mod ChannelHandlerComponent {
 
                     // If the packet sequence matches the expected next
                     // sequence, we check if the ack not exists. As the
-                    // existance means the packet was already relayed.
+                    // existence means the packet was already relayed.
                     if next_sequence_recv == msg.packet.seq_on_a {
                         let ack_exists = self
                             .packet_ack_exists(

@@ -70,23 +70,23 @@ pub fn next_sequence_recv_path(
     builder.path()
 }
 
-pub fn append_prefix(ref path_builer: RemotePathBuilder, prefix: ByteArray) {
-    path_builer.append(prefix);
+pub fn append_prefix(ref path_builder: RemotePathBuilder, prefix: ByteArray) {
+    path_builder.append(prefix);
 }
 
-pub fn append_port(ref path_builer: RemotePathBuilder, port_id: PortId) {
-    path_builer.append(PORTS_PREFIX());
-    path_builer.append(port_id);
+pub fn append_port(ref path_builder: RemotePathBuilder, port_id: PortId) {
+    path_builder.append(PORTS_PREFIX());
+    path_builder.append(port_id);
 }
 
-pub fn append_channel(ref path_builer: RemotePathBuilder, channel_id: ChannelId) {
-    path_builer.append(CHANNELS_PREFIX());
-    path_builer.append(channel_id);
+pub fn append_channel(ref path_builder: RemotePathBuilder, channel_id: ChannelId) {
+    path_builder.append(CHANNELS_PREFIX());
+    path_builder.append(channel_id);
 }
 
-pub fn append_sequence(ref path_builer: RemotePathBuilder, sequence: Sequence) {
-    path_builer.append(SEQUENCES_PREFIX());
-    path_builer.append(sequence);
+pub fn append_sequence(ref path_builder: RemotePathBuilder, sequence: Sequence) {
+    path_builder.append(SEQUENCES_PREFIX());
+    path_builder.append(sequence);
 }
 
 #[cfg(test)]
