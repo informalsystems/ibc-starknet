@@ -90,7 +90,7 @@ where
         let new_client_state = ClientStateType {
             latest_height: header.height,
             chain_id: self.0.chain_id.clone(),
-            pub_key: self.0.pub_key.clone(),
+            pub_key: self.0.pub_key,
         }
         .into();
 
