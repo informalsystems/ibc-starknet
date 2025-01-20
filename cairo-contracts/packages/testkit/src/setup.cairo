@@ -12,7 +12,7 @@ use starknet_ibc_testkit::configs::{
     TransferAppConfig, TransferAppConfigTrait, CoreConfig, CoreConfigTrait, CometClientConfig,
     CometClientConfigTrait
 };
-use starknet_ibc_testkit::dummies::{OWNER, CLIENT_TYPE};
+use starknet_ibc_testkit::dummies::{OWNER, CLIENT_TYPE, RELAYER};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle, AppHandle, ERC20Handle, ClientHandle};
 
 #[derive(Drop, Serde)]
@@ -38,7 +38,7 @@ pub impl SetupImpl of SetupTrait {
 
     /// Deploys an instance of IBC light client contract.
     fn deploy_client(self: @Setup, contract_name: ByteArray) -> ClientContract {
-        ClientHandle::deploy_client(contract_name)
+        ClientHandle::deploy_client(contract_name, *self.owner)
     }
 
     /// Deploys an instance of ERC20 contract.
@@ -69,6 +69,8 @@ pub impl SetupImpl of SetupTrait {
         let mut comet = setup.deploy_client(client_contract_name);
 
         core.register_client(CLIENT_TYPE(), comet.address);
+
+        start_cheat_caller_address(core.address, RELAYER());
 
         (core, comet)
     }
@@ -114,6 +116,8 @@ pub impl SetupImpl of SetupTrait {
         let mut ics20 = setup.deploy_transfer(transfer_contract_name);
 
         core.register_app(TRANSFER_PORT_ID(), ics20.address);
+
+        start_cheat_caller_address(core.address, RELAYER());
 
         (core, ics20, erc20)
     }

@@ -1,19 +1,27 @@
 #[starknet::component]
 pub mod ClientHandlerComponent {
     use core::num::traits::Zero;
-    use starknet::ContractAddress;
-    use starknet::storage::{Map, StorageMapReadAccess, StorageMapWriteAccess};
+    use starknet::storage::{
+        Map, StorageMapReadAccess, StorageMapWriteAccess, Vec, VecTrait, MutableVecTrait,
+        StoragePointerReadAccess, StoragePointerWriteAccess
+    };
+    use starknet::{ContractAddress, get_caller_address, get_tx_info};
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
     use starknet_ibc_core::client::ClientEventEmitterComponent;
-    use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient};
+    use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient, IRegisterRelayer};
     use starknet_ibc_core::client::{
         MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height,
         CreateResponse, UpdateResponse, ClientErrors, ClientContract, ClientContractHandlerTrait
     };
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
+    use starknet_ibc_utils::governance::IBCGovernanceComponent::GovernanceInternalTrait;
+    use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
     #[storage]
     pub struct Storage {
+        // NOTE: Temporary relayer whitelist for phase two,
+        // to be replaced after Comet client contract is implemented.
+        allowed_relayers: Vec<ContractAddress>,
         supported_clients: Map<felt252, ContractAddress>,
     }
 
@@ -29,7 +37,12 @@ pub mod ClientHandlerComponent {
     pub impl ClientInitializerImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientInitializerTrait<TContractState> {
-        fn initializer(ref self: ComponentState<TContractState>) {}
+        fn initializer(ref self: ComponentState<TContractState>) {
+            // NOTE: authorizing the contract's deployer as a relayer to
+            // simplify the process. This avoids an additional registration step
+            // for the relayer, as this setup is temporary.
+            self.write_allowed_relayer(get_tx_info().deref().account_contract_address);
+        }
     }
 
     // -----------------------------------------------------------
@@ -41,7 +54,7 @@ pub mod ClientHandlerComponent {
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
-        impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>
+        impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>,
     > of IClientHandler<ComponentState<TContractState>> {
         fn create_client(
             ref self: ComponentState<TContractState>, msg: MsgCreateClient
@@ -58,6 +71,10 @@ pub mod ClientHandlerComponent {
         fn update_client(
             ref self: ComponentState<TContractState>, msg: MsgUpdateClient
         ) -> UpdateResponse {
+            assert(
+                self.in_allowed_relayers(get_caller_address()), ClientErrors::UNAUTHORIZED_RELAYER
+            );
+
             let mut client = self.get_client(msg.client_id.client_type);
 
             let update_result = client.update(msg.clone());
@@ -106,6 +123,37 @@ pub mod ClientHandlerComponent {
     }
 
     // -----------------------------------------------------------
+    // Allowed Relayers
+    // -----------------------------------------------------------
+
+    #[embeddable_as(CoreRegisterRelayer)]
+    pub impl CoreRegisterRelayerImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl Governance: IBCGovernanceComponent::HasComponent<TContractState>
+    > of IRegisterRelayer<ComponentState<TContractState>> {
+        fn register_relayer(
+            ref self: ComponentState<TContractState>, relayer_address: ContractAddress
+        ) {
+            assert(relayer_address.is_non_zero(), ClientErrors::ZERO_RELAYER_ADDRESS);
+
+            assert(
+                !self.in_allowed_relayers(relayer_address), ClientErrors::RELAYER_ALREADY_REGISTERED
+            );
+
+            let governor = get_dep_component!(@self, Governance).governor();
+
+            assert(
+                governor.is_zero() || governor == get_caller_address(),
+                ClientErrors::INVALID_GOVERNOR
+            );
+
+            self.write_allowed_relayer(relayer_address);
+        }
+    }
+
+    // -----------------------------------------------------------
     // Client Internal
     // -----------------------------------------------------------
 
@@ -128,6 +176,21 @@ pub mod ClientHandlerComponent {
     pub(crate) impl ClientReaderImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientReaderTrait<TContractState> {
+        fn in_allowed_relayers(
+            self: @ComponentState<TContractState>, caller: ContractAddress
+        ) -> bool {
+            let mut allowed = false;
+            let mut i = 0;
+            while i < self.allowed_relayers.len() {
+                if self.allowed_relayers.at(i).read() == caller {
+                    allowed = true;
+                    break;
+                }
+                i += 1;
+            };
+            allowed
+        }
+
         fn read_supported_client(
             self: @ComponentState<TContractState>, client_type: felt252
         ) -> ContractAddress {
@@ -143,6 +206,12 @@ pub mod ClientHandlerComponent {
     pub(crate) impl ClientWriterImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of ClientWriterTrait<TContractState> {
+        fn write_allowed_relayer(
+            ref self: ComponentState<TContractState>, relayer_address: ContractAddress
+        ) {
+            self.allowed_relayers.append().write(relayer_address);
+        }
+
         fn write_supported_client(
             ref self: ComponentState<TContractState>,
             client_type: felt252,

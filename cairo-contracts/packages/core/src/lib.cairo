@@ -106,7 +106,8 @@ pub mod client {
         IClientStateValidationDispatcherTrait, IClientStateExecution,
         IClientStateExecutionDispatcher, IClientStateExecutionDispatcherTrait, IRegisterClient,
         IRegisterClientDispatcher, IRegisterClientDispatcherTrait, IClientQuery,
-        IClientQueryDispatcher, IClientQueryDispatcherTrait
+        IClientQueryDispatcher, IClientQueryDispatcherTrait, IRegisterRelayer,
+        IRegisterRelayerDispatcher, IRegisterRelayerDispatcherTrait
     };
     pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient};
     pub use types::{

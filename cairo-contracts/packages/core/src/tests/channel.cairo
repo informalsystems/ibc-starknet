@@ -16,7 +16,7 @@ fn setup() -> ComponentState {
 }
 
 #[test]
-fn test_intial_state() {
+fn test_initial_state() {
     let state = setup();
     let next_channel_sequence = state.read_next_channel_sequence();
     assert!(next_channel_sequence.is_zero());

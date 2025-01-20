@@ -3,11 +3,13 @@ pub mod CometClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
     use alexandria_sorting::MergeSort;
     use core::num::traits::Zero;
+    use openzeppelin_access::ownable::OwnableComponent;
+    use openzeppelin_access::ownable::interface::IOwnable;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,
     };
-    use starknet::{get_block_timestamp, get_block_number};
+    use starknet::{ContractAddress, get_block_timestamp, get_block_number, get_caller_address};
     use starknet_ibc_clients::cometbft::{
         CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
         CometHeader, CometHeaderImpl, CometErrors
@@ -42,11 +44,15 @@ pub mod CometClientComponent {
 
     #[embeddable_as(CometClientHandler)]
     impl ClientHandlerImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of IClientHandler<ComponentState<TContractState>> {
         fn create_client(
             ref self: ComponentState<TContractState>, msg: MsgCreateClient
         ) -> CreateResponse {
+            self.assert_owner();
             let client_sequence = self.read_next_client_sequence();
             self.create_validate(client_sequence, msg.clone());
             self.create_execute(client_sequence, msg)
@@ -55,13 +61,18 @@ pub mod CometClientComponent {
         fn update_client(
             ref self: ComponentState<TContractState>, msg: MsgUpdateClient
         ) -> UpdateResponse {
+            self.assert_owner();
             self.update_validate(msg.clone());
             self.update_execute(msg)
         }
 
-        fn recover_client(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {}
+        fn recover_client(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
+            self.assert_owner();
+        }
 
-        fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {}
+        fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
+            self.assert_owner();
+        }
     }
 
     // -----------------------------------------------------------
@@ -373,6 +384,26 @@ pub mod CometClientComponent {
             new_client_state: Array<felt252>,
             new_consensus_state: Array<felt252>
         ) {}
+    }
+
+    // -----------------------------------------------------------
+    // Client Owner
+    // -----------------------------------------------------------
+
+    #[generate_trait]
+    pub(crate) impl ClientOwnerImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
+    > of ClientOwnerTrait<TContractState> {
+        fn owner(self: @ComponentState<TContractState>) -> ContractAddress {
+            get_dep_component!(self, Ownable).owner()
+        }
+
+        fn assert_owner(self: @ComponentState<TContractState>) {
+            assert(self.owner() == get_caller_address(), CometErrors::INVALID_OWNER);
+        }
     }
 
     // -----------------------------------------------------------

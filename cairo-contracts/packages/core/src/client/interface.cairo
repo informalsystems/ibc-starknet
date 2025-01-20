@@ -24,6 +24,11 @@ pub trait IRegisterClient<TContractState> {
 }
 
 #[starknet::interface]
+pub trait IRegisterRelayer<TContractState> {
+    fn register_relayer(ref self: TContractState, relayer_address: ContractAddress);
+}
+
+#[starknet::interface]
 pub trait IClientStateValidation<TContractState> {
     fn verify_membership(
         self: @TContractState,
