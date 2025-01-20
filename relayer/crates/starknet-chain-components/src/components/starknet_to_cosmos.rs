@@ -25,6 +25,7 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::{
     ConsensusStateQuerierComponent, ConsensusStateWithProofsQuerierComponent,
 };
 
+use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::starknet_to_cosmos::channel_message::BuildStarknetToCosmosChannelHandshakeMessage;
 use crate::impls::starknet_to_cosmos::connection_message::BuildStarknetToCosmosConnectionHandshake;
 use crate::impls::starknet_to_cosmos::counterparty_message_height::GetCosmosCounterpartyMessageStarknetHeight;
@@ -46,11 +47,12 @@ cgp_preset! {
             CreateClientPayloadTypeComponent,
             CreateClientMessageOptionsTypeComponent,
             CreateClientPayloadOptionsTypeComponent,
-            CreateClientMessageBuilderComponent,
             CreateClientPayloadBuilderComponent,
             ChannelOpenInitMessageBuilderComponent,
         ]:
             CosmosToCosmosComponents,
+        CreateClientMessageBuilderComponent:
+            BuildStarknetCreateClientPayload,
         [
             ClientStateTypeComponent,
             ClientStateFieldsComponent,

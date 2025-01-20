@@ -2,7 +2,9 @@ use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::any::ConvertIbcAny;
 use hermes_encoding_components::impls::convert::ConvertVia;
 use hermes_encoding_components::traits::convert::Converter;
-use ibc_client_starknet_types::header::SignedStarknetHeader;
+use ibc_client_starknet_types::header::{
+    SignedStarknetHeader, StarknetHeader, STARKNET_HEADER_TYPE_URL,
+};
 use ibc_client_starknet_types::StarknetClientState as ClientStateType;
 use ibc_core::client::context::client_state::ClientStateExecution;
 use ibc_core::client::context::prelude::{ClientStateCommon, ConsensusState};
@@ -14,7 +16,7 @@ use ibc_core::host::types::path::{ClientConsensusStatePath, ClientStatePath};
 use ibc_core::primitives::proto::Any;
 use prost_types::Any as ProstAny;
 use secp256k1::ecdsa::Signature;
-use secp256k1::Secp256k1;
+use secp256k1::{Message, Secp256k1};
 
 use super::ClientState;
 use crate::encoding::context::StarknetLightClientEncoding;
@@ -58,19 +60,29 @@ where
                 &header,
             )?;
 
-        let header = signed_header.header;
+        let raw_header = signed_header.header;
 
         // TODO: Encode header to byte array
         self.0
             .pub_key
             .verify(
                 &Secp256k1::verification_only(),
-                &header.into(),
+                &Message::from_digest_slice(&raw_header).unwrap(),
                 &Signature::from_der(&signed_header.signature).unwrap(),
             )
             .map_err(|e| ClientError::ClientSpecific {
                 description: e.to_string(),
             })?;
+
+        let any_header = Any {
+            type_url: STARKNET_HEADER_TYPE_URL.to_owned(),
+            value: raw_header,
+        };
+
+        let header: StarknetHeader = <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
+            &StarknetLightClientEncoding,
+            &any_header,
+        )?;
 
         let latest_height = header.height;
 

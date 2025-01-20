@@ -48,7 +48,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let signed_header = SignedStarknetHeader {
-            header: payload.header.clone(),
+            header: header_bytes.value.clone(),
             signature,
         };
 

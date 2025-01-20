@@ -13,6 +13,6 @@ pub struct StarknetHeader {
 
 #[derive(Debug, Clone, HasField)]
 pub struct SignedStarknetHeader {
-    pub header: StarknetHeader,
+    pub header: Vec<u8>,
     pub signature: Vec<u8>,
 }

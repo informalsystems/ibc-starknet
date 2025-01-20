@@ -2275,6 +2275,7 @@ dependencies = [
  "ibc-client-starknet-types",
  "ibc-proto",
  "prost-types",
+ "secp256k1",
  "serde",
  "serde_json",
  "starknet",
