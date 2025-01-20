@@ -44,12 +44,10 @@ where
     ) -> Result<CosmosMessage, Chain::Error> {
         let encoding = Counterparty::default_encoding();
 
-        let pub_key = chain.get_default_signer().public_key.clone();
-
         let starknet_client_state = StarknetClientState {
             latest_height: payload.latest_height,
             chain_id: payload.chain_id,
-            pub_key,
+            pub_key: chain.get_default_signer().public_key,
         };
 
         let client_state = WasmStarknetClientState {
