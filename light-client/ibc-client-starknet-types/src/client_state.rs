@@ -1,6 +1,7 @@
 use cgp::prelude::*;
 use ibc_core::client::types::Height;
 use ibc_core::host::types::identifiers::ChainId;
+use secp256k1::PublicKey;
 
 pub const STARKNET_CLIENT_STATE_TYPE_URL: &str = "/StarknetClientState";
 
@@ -9,4 +10,5 @@ pub const STARKNET_CLIENT_STATE_TYPE_URL: &str = "/StarknetClientState";
 pub struct StarknetClientState {
     pub latest_height: Height,
     pub chain_id: ChainId,
+    pub pub_key: PublicKey,
 }

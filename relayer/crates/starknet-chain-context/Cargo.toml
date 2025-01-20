@@ -34,6 +34,7 @@ starknet                    = { workspace = true }
 url                         = { workspace = true }
 eyre                        = { workspace = true }
 prost                       = { workspace = true }
+secp256k1                   = { workspace = true }
 serde_json                  = { workspace = true }
 cairo-lang-starknet-classes = { workspace = true }
 ibc-client-starknet-types   = { workspace = true }

@@ -16,6 +16,7 @@ workspace = true
 [dependencies]
 # external dependencies
 derive_more                         = { workspace = true }
+secp256k1                           = { workspace = true }
 serde                               = { workspace = true, optional = true }
 prost                               = { workspace = true }
 prost-types                         = { workspace = true }

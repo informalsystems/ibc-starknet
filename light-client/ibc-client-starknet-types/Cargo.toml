@@ -20,6 +20,7 @@ ibc-core                            = { workspace = true }
 tendermint                          = { workspace = true }
 derive_more                         = { workspace = true }
 prost                               = { workspace = true }
+secp256k1                           = { workspace = true, features = [ "serde" ] }
 serde                               = { workspace = true, optional = true }
 cgp                                 = { workspace = true }
 hermes-encoding-components          = { workspace = true }

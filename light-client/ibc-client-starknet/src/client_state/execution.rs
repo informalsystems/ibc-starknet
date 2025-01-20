@@ -13,6 +13,8 @@ use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::host::types::path::{ClientConsensusStatePath, ClientStatePath};
 use ibc_core::primitives::proto::Any;
 use prost_types::Any as ProstAny;
+use secp256k1::ecdsa::Signature;
+use secp256k1::Secp256k1;
 
 use super::ClientState;
 use crate::encoding::context::StarknetLightClientEncoding;
@@ -58,6 +60,18 @@ where
 
         let header = signed_header.header;
 
+        // TODO: Encode header to byte array
+        self.0
+            .pub_key
+            .verify(
+                &Secp256k1::verification_only(),
+                &header.into(),
+                &Signature::from_der(&signed_header.signature).unwrap(),
+            )
+            .map_err(|e| ClientError::ClientSpecific {
+                description: e.to_string(),
+            })?;
+
         let latest_height = header.height;
 
         let new_consensus_state = header.consensus_state;
@@ -65,6 +79,7 @@ where
         let new_client_state = ClientStateType {
             latest_height: header.height,
             chain_id: self.0.chain_id.clone(),
+            pub_key: self.0.pub_key.clone(),
         }
         .into();
 

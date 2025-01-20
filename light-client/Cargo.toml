@@ -22,6 +22,7 @@ ibc-client-starknet-types = { version = "0.1.0" }
 
 # external dependencies
 derive_more = { version = "0.99.11", features = [ "from", "try_into" ] }
+secp256k1   = { version = "0.28.2" }
 serde       = { version = "1.0.210", features = [ "derive" ] }
 prost       = { version = "0.13.1" }
 prost-types = { version = "0.13.1" }

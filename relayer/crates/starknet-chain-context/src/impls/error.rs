@@ -42,6 +42,7 @@ use ibc::core::client::types::error::ClientError;
 use ibc::core::host::types::error::IdentifierError;
 use ibc::primitives::TimestampError;
 use prost::{DecodeError, EncodeError};
+use secp256k1::Error as Secp256k1Error;
 use starknet::accounts::{single_owner, AccountError};
 use starknet::core::types::contract::{ComputeClassHashError, JsonError};
 use starknet::core::types::{RevertedInvocation, StarknetError};
@@ -72,6 +73,7 @@ delegate_components! {
             ClientError,
             TimestampError,
             IdentifierError,
+            Secp256k1Error,
             ComputeClassHashError,
             StarknetSierraCompilationError,
         ]: ReportError,

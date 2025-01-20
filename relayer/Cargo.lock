@@ -2308,6 +2308,7 @@ dependencies = [
  "ibc",
  "ibc-client-starknet-types",
  "prost",
+ "secp256k1",
  "serde_json",
  "starknet",
  "url",
@@ -2863,6 +2864,7 @@ dependencies = [
  "ibc-core",
  "ibc-proto",
  "prost",
+ "secp256k1",
  "tendermint",
 ]
 
