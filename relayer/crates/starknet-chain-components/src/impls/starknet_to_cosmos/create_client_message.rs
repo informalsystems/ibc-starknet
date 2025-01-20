@@ -30,12 +30,12 @@ where
         + HasDefaultSigner<Signer = Secp256k1KeyPair>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasCreateClientPayloadType<Chain, CreateClientPayload = StarknetCreateClientPayload>
-        + HasClientStateType<Chain>
-        + HasConsensusStateType<Chain>
+        + HasClientStateType<Chain, ClientState = WasmStarknetClientState>
+        + HasConsensusStateType<Chain, ConsensusState = WasmStarknetConsensusState>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>,
     Encoding: Async
-        + CanConvert<WasmStarknetClientState, Any>
-        + CanConvert<WasmStarknetConsensusState, Any>,
+        + CanConvert<Counterparty::ClientState, Any>
+        + CanConvert<Counterparty::ConsensusState, Any>,
 {
     async fn build_create_client_message(
         chain: &Chain,

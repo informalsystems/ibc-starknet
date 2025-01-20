@@ -62,7 +62,6 @@ where
 
         let raw_header = signed_header.header;
 
-        // TODO: Encode header to byte array
         self.0
             .pub_key
             .verify(
