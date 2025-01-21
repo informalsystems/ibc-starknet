@@ -44,7 +44,7 @@ where
     ) -> Result<(), Self::Error> {
         loop {
             let mut height_ref = height_mutex.lock().await;
-            let height = height_ref.clone();
+            let height = *height_ref;
 
             let events = self.query_block_events(&height).await?;
             for event in events {
@@ -71,7 +71,7 @@ impl<Chain> Task for PollStarknetEventsTask<Chain>
 where
     Chain: CanSendStarknetEvents,
 {
-    async fn run(self) -> () {
+    async fn run(self) {
         let _ = self
             .chain
             .send_starknet_events(self.height, self.sender)

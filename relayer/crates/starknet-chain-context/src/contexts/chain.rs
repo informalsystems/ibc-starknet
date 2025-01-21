@@ -102,6 +102,7 @@ use hermes_relayer_components::chain::traits::types::ibc::{
 };
 use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
+use hermes_relayer_components::chain::traits::types::ibc_events::send_packet::HasSendPacketEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::write_ack::HasWriteAckEvent;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::chain::traits::types::packets::ack::HasAcknowledgementType;
@@ -438,6 +439,8 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanFilterIncomingPacket<StarknetChain>
     + HasAcknowledgementType<StarknetChain, Acknowledgement = Vec<u8>>
     + HasSequenceType<StarknetChain, Sequence = Sequence>
+    + HasSendPacketEvent<StarknetChain>
+    + HasWriteAckEvent<StarknetChain>
 {
 }
 
