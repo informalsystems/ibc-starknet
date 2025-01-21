@@ -10,9 +10,9 @@ use crate::traits::provider::HasStarknetProvider;
 use crate::traits::queries::block_events::BlockEventsQuerier;
 use crate::types::event::StarknetEvent;
 
-pub struct QueryStarknetBlockEvents;
+pub struct QueryStarknetBlockEventsFromTraces;
 
-impl<Chain> BlockEventsQuerier<Chain> for QueryStarknetBlockEvents
+impl<Chain> BlockEventsQuerier<Chain> for QueryStarknetBlockEventsFromTraces
 where
     Chain: HasHeightType<Height = u64>
         + HasEventType<Event = StarknetEvent>

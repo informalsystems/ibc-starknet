@@ -1,5 +1,5 @@
-pub mod all;
+pub mod default;
 pub mod get;
-pub mod query;
 pub mod retry;
+pub mod traces;
 pub mod wait;

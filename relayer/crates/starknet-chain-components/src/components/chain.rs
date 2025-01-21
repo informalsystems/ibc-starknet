@@ -73,7 +73,7 @@ use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayl
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
 use crate::impls::queries::balance::QueryStarknetWalletBalance;
-use crate::impls::queries::block_events::all::QueryBlockEventsWithWaitAndRetry;
+use crate::impls::queries::block_events::default::DefaultQueryBlockEvents;
 use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
 use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
@@ -232,7 +232,7 @@ cgp_preset! {
         ChainStatusQuerierComponent:
             QueryStarknetChainStatus,
         BlockEventsQuerierComponent:
-            QueryBlockEventsWithWaitAndRetry,
+            DefaultQueryBlockEvents,
         MessageSenderComponent:
             SendCallMessages,
         TxSubmitterComponent:
