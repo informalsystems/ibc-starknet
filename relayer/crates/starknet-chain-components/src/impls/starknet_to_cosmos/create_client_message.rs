@@ -47,7 +47,7 @@ where
         let starknet_client_state = StarknetClientState {
             latest_height: payload.latest_height,
             chain_id: payload.chain_id,
-            pub_key: chain.get_default_signer().public_key,
+            pub_key: chain.get_default_signer().public_key.serialize().to_vec(),
         };
 
         let client_state = WasmStarknetClientState {

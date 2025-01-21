@@ -24,7 +24,6 @@ use ibc_core::commitment_types::commitment::CommitmentRoot;
 use ibc_core::host::types::error::{DecodingError, IdentifierError};
 use ibc_core::primitives::{Timestamp, TimestampError};
 use prost::DecodeError;
-use secp256k1::Error as Secp256k1Error;
 
 pub struct StarknetLightClientEncoding;
 
@@ -180,16 +179,6 @@ impl ErrorRaiser<StarknetLightClientEncoding, IdentifierError>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: IdentifierError) -> ClientError {
-        ClientError::ClientSpecific {
-            description: format!("{e:?}"),
-        }
-    }
-}
-
-impl ErrorRaiser<StarknetLightClientEncoding, Secp256k1Error>
-    for StarknetLightClientEncodingContextComponents
-{
-    fn raise_error(e: Secp256k1Error) -> ClientError {
         ClientError::ClientSpecific {
             description: format!("{e:?}"),
         }

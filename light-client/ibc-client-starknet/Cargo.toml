@@ -16,7 +16,6 @@ workspace = true
 [dependencies]
 # external dependencies
 derive_more                         = { workspace = true }
-secp256k1                           = { workspace = true }
 serde                               = { workspace = true, optional = true }
 prost                               = { workspace = true }
 prost-types                         = { workspace = true }
@@ -28,6 +27,7 @@ hermes-cosmos-encoding-components   = { workspace = true }
 # ibc dependencies
 ibc-core                  = { workspace = true }
 ibc-client-starknet-types = { workspace = true }
+ibc-client-cw             = { workspace = true }
 
 [features]
 default = [ "std" ]

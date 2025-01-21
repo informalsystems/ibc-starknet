@@ -22,7 +22,6 @@ ibc-client-starknet-types = { version = "0.1.0" }
 
 # external dependencies
 derive_more = { version = "0.99.11", features = [ "from", "try_into" ] }
-secp256k1   = { version = "0.28.2" }
 serde       = { version = "1.0.210", features = [ "derive" ] }
 prost       = { version = "0.13.1" }
 prost-types = { version = "0.13.1" }
@@ -61,6 +60,8 @@ uninlined_format_args         = "deny"
 ibc-client-starknet       = { path = "./ibc-client-starknet" }
 ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
 ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
+
+ibc-client-cw = { git = "https://github.com/informalsystems/cosmwasm-ibc.git", branch = "luca_joss/add-cw-client-extension-trait" }
 
 cgp                     = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-core                = { git = "https://github.com/contextgeneric/cgp.git" }

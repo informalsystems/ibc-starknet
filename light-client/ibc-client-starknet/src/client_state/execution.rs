@@ -2,6 +2,7 @@ use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::any::ConvertIbcAny;
 use hermes_encoding_components::impls::convert::ConvertVia;
 use hermes_encoding_components::traits::convert::Converter;
+use ibc_client_cw::context::client_ctx::CwClientExecution;
 use ibc_client_starknet_types::header::{
     SignedStarknetHeader, StarknetHeader, STARKNET_HEADER_TYPE_URL,
 };
@@ -15,8 +16,6 @@ use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::host::types::path::{ClientConsensusStatePath, ClientStatePath};
 use ibc_core::primitives::proto::Any;
 use prost_types::Any as ProstAny;
-use secp256k1::ecdsa::Signature;
-use secp256k1::{Message, Secp256k1};
 
 use super::ClientState;
 use crate::encoding::context::StarknetLightClientEncoding;
@@ -24,10 +23,7 @@ use crate::ConsensusState as StarknetConsensusState;
 
 impl<E> ClientStateExecution<E> for ClientState
 where
-    E: ClientExecutionContext<
-        ClientStateMut = ClientState,
-        ConsensusStateRef = StarknetConsensusState,
-    >,
+    E: CwClientExecution<ClientStateMut = ClientState, ConsensusStateRef = StarknetConsensusState>,
 {
     fn initialise(
         &self,
@@ -62,16 +58,23 @@ where
 
         let raw_header = signed_header.header;
 
-        self.0
-            .pub_key
-            .verify(
-                &Secp256k1::verification_only(),
-                &Message::from_digest_slice(&raw_header).unwrap(),
-                &Signature::from_der(&signed_header.signature).unwrap(),
-            )
-            .map_err(|e| ClientError::ClientSpecific {
-                description: e.to_string(),
+        let deps = ctx
+            .cosmwasm_query_context()
+            .ok_or_else(|| ClientError::ClientSpecific {
+                description: "missing Deps from context".to_owned(),
             })?;
+
+        match deps
+            .api
+            .secp256k1_verify(&raw_header, &signed_header.signature, &self.0.pub_key)
+        {
+            Ok(validation) if validation => {}
+            _ => {
+                return Err(ClientError::ClientSpecific {
+                    description: "Header signature not valid".to_owned(),
+                })
+            }
+        }
 
         let any_header = Any {
             type_url: STARKNET_HEADER_TYPE_URL.to_owned(),
@@ -90,7 +93,7 @@ where
         let new_client_state = ClientStateType {
             latest_height: header.height,
             chain_id: self.0.chain_id.clone(),
-            pub_key: self.0.pub_key,
+            pub_key: self.0.pub_key.clone(),
         }
         .into();
 
