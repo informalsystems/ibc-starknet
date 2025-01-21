@@ -9,6 +9,9 @@ use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainC
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
 };
+use hermes_cli_components::impls::commands::connection::create::{
+    CreateConnectionArgs, RunCreateConnectionCommand,
+};
 use hermes_cli_components::impls::commands::queries::balance::{
     QueryBalanceArgs, RunQueryBalanceCommand,
 };
@@ -156,6 +159,11 @@ delegate_components! {
         (UpdateClientArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
         (UpdateClientArgs, symbol!("target_height")): ParseFromOptionalString<Height>,
+
+        (CreateConnectionArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateConnectionArgs, symbol!("target_client_id")): ParseFromString<ClientId>,
+        (CreateConnectionArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateConnectionArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
     }
 }
 
@@ -172,6 +180,8 @@ delegate_components! {
 
         ClientSubCommand: RunClientSubCommand,
         UpdateClientArgs: RunUpdateClientCommand,
+
+        CreateConnectionArgs: RunCreateConnectionCommand,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<UpdateStarknetConfig>,
     }
@@ -237,6 +247,7 @@ pub trait CanUseStarknetApp:
     + CanRunCommand<QueryBalanceArgs>
     + CanRunCommand<ClientSubCommand>
     + CanRunCommand<UpdateClientArgs>
+    + CanRunCommand<CreateConnectionArgs>
 {
 }
 
