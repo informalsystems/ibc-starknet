@@ -598,8 +598,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             (send_packet_event, send_ics20_event)
         };
 
-        tokio::time::sleep(core::time::Duration::from_secs(999999999)).await;
-
         // create ibc packet
 
         let starknet_ibc_packet = {
