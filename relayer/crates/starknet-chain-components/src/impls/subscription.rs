@@ -1,18 +1,19 @@
-use core::marker::PhantomData;
 use core::pin::Pin;
 use std::sync::Arc;
 
 use cgp::prelude::*;
-use futures::{stream, Stream, StreamExt, TryStreamExt};
+use futures::channel::mpsc::{unbounded, UnboundedSender};
+use futures::Stream;
+use hermes_async_runtime_components::channel::types::ChannelClosedError;
 use hermes_async_runtime_components::subscription::impls::closure::CanCreateClosureSubscription;
 use hermes_async_runtime_components::subscription::traits::subscription::Subscription;
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_runtime_components::traits::runtime::HasRuntime;
+use hermes_runtime_components::traits::spawn::CanSpawnTask;
+use hermes_runtime_components::traits::task::Task;
 
-use crate::traits::queries::address::CanQueryContractAddress;
 use crate::traits::queries::block_events::CanQueryBlockEvents;
-use crate::types::event::StarknetEvent;
 
 #[async_trait]
 pub trait CanCreateStarknetSubscription: HasHeightType + HasEventType + HasAsyncErrorType {
@@ -22,54 +23,92 @@ pub trait CanCreateStarknetSubscription: HasHeightType + HasEventType + HasAsync
     ) -> Result<Arc<dyn Subscription<Item = (Self::Height, Arc<Self::Event>)>>, Self::Error>;
 }
 
+#[async_trait]
+pub trait CanSendStarknetEvents: HasHeightType + HasEventType + HasAsyncErrorType {
+    async fn send_starknet_events(
+        &self,
+        start_height: Self::Height,
+        sender: UnboundedSender<(Self::Height, Arc<Self::Event>)>,
+    ) -> Result<(), Self::Error>;
+}
+
+impl<Chain> CanSendStarknetEvents for Chain
+where
+    Chain: HasHeightType<Height = u64> + CanQueryBlockEvents + CanRaiseError<ChannelClosedError>,
+{
+    async fn send_starknet_events(
+        &self,
+        mut height: u64,
+        sender: UnboundedSender<(u64, Arc<Self::Event>)>,
+    ) -> Result<(), Self::Error> {
+        loop {
+            let events = self.query_block_events(&height).await?;
+            for event in events {
+                sender
+                    .unbounded_send((height, Arc::new(event)))
+                    .map_err(|_| Chain::raise_error(ChannelClosedError))?;
+            }
+            height += 1;
+        }
+    }
+}
+
+pub struct PollStarknetEventsTask<Chain>
+where
+    Chain: HasHeightType + HasEventType,
+{
+    pub chain: Chain,
+    pub height: Chain::Height,
+    pub sender: UnboundedSender<(Chain::Height, Arc<Chain::Event>)>,
+}
+
+impl<Chain> Task for PollStarknetEventsTask<Chain>
+where
+    Chain: CanSendStarknetEvents,
+{
+    async fn run(self) -> () {
+        let _ = self
+            .chain
+            .send_starknet_events(self.height, self.sender)
+            .await;
+    }
+}
+
 impl<Chain> CanCreateStarknetSubscription for Chain
 where
-    Chain: Clone
-        + Send
-        + Sync
-        + 'static
-        + HasRuntime
-        + HasHeightType<Height = u64>
-        + HasEventType<Event = StarknetEvent>
-        + CanQueryBlockEvents
-        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>,
-    Chain::Runtime: CanCreateClosureSubscription,
+    Chain: Clone + HasRuntime + CanSendStarknetEvents,
+    Chain::Runtime: CanCreateClosureSubscription + CanSpawnTask,
 {
     async fn create_event_subscription(
         self,
-        mut next_height: u64,
-    ) -> Result<Arc<dyn Subscription<Item = (u64, Arc<StarknetEvent>)>>, Self::Error> {
-        let ibc_core_contract_address = self.query_contract_address(PhantomData).await?;
-
+        height: Chain::Height,
+    ) -> Result<Arc<dyn Subscription<Item = (Chain::Height, Arc<Chain::Event>)>>, Chain::Error>
+    {
         Ok(Chain::Runtime::new_closure_subscription(move || {
             let chain = self.clone();
+            let height = height.clone();
+
             Box::pin(async move {
-                let height_stream = stream::repeat_with(move || {
-                    let height = next_height.clone();
-                    next_height += 1;
-                    height
-                });
+                let (sender, receiver) = unbounded();
 
-                let event_stream = height_stream
-                    .filter_map(|height| {
-                        let chain = chain.clone();
-                        async move {
-                            // let chain = chain.clone();
-                            // let events = chain.query_block_events(&height).await.ok()?;
-                            let events_with_height =
-                                [].into_iter().map(move |event| (height, Arc::new(event)));
+                let task = PollStarknetEventsTask {
+                    chain: chain.clone(),
+                    sender,
+                    height: height.clone(),
+                };
 
-                            Some(stream::iter(events_with_height))
-                        }
-                    })
-                    .flatten();
+                chain.runtime().spawn_task(task);
 
-                let boxed_stream: Pin<
-                    Box<dyn Stream<Item = (u64, Arc<StarknetEvent>)> + Send + Sync>,
-                > = Box::pin(event_stream);
+                let stream: Pin<
+                    Box<
+                        dyn Stream<Item = (Chain::Height, Arc<Chain::Event>)>
+                            + Send
+                            + Sync
+                            + 'static,
+                    >,
+                > = Box::pin(receiver);
 
-                todo!()
-                // Some(Box::pin(event_stream))
+                Some(stream)
             })
         }))
     }
