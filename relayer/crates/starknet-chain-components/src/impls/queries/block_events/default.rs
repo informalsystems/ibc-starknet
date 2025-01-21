@@ -8,8 +8,8 @@ use hermes_runtime_components::traits::sleep::CanSleep;
 use starknet::core::types::Felt;
 use starknet::providers::ProviderError;
 
+use crate::impls::queries::block_events::get::GetStarknetBlockEvents;
 use crate::impls::queries::block_events::retry::RetryQueryBlockEvents;
-use crate::impls::queries::block_events::traces::QueryStarknetBlockEventsFromTraces;
 use crate::impls::queries::block_events::wait::WaitBlockHeightAndQueryEvents;
 use crate::traits::provider::HasStarknetProvider;
 use crate::traits::queries::block_events::BlockEventsQuerier;
@@ -33,6 +33,6 @@ where
         height: &Chain::Height,
         address: &Chain::Address,
     ) -> Result<Vec<Chain::Event>, Chain::Error> {
-        <RetryQueryBlockEvents<WaitBlockHeightAndQueryEvents<QueryStarknetBlockEventsFromTraces>>>::query_block_events(chain, height, address).await
+        <RetryQueryBlockEvents<WaitBlockHeightAndQueryEvents<GetStarknetBlockEvents>>>::query_block_events(chain, height, address).await
     }
 }

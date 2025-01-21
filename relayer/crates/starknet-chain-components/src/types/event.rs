@@ -33,8 +33,10 @@ impl StarknetEvent {
             data,
         }
     }
+}
 
-    pub fn from_emitted_event(event: EmittedEvent) -> Self {
+impl From<EmittedEvent> for StarknetEvent {
+    fn from(event: EmittedEvent) -> Self {
         let mut keys = event.keys.into_iter();
         let selector = keys.next();
 
