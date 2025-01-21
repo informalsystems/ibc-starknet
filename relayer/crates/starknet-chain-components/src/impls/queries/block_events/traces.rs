@@ -23,8 +23,8 @@ where
     async fn query_block_events(
         chain: &Chain,
         height: &u64,
-        address: &Chain::Address,
-    ) -> Result<Vec<Chain::Event>, Chain::Error> {
+        address: &Felt,
+    ) -> Result<Vec<StarknetEvent>, Chain::Error> {
         let provider = chain.provider();
 
         let traces = provider
