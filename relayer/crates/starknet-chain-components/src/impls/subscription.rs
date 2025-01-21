@@ -5,7 +5,6 @@ use cgp::prelude::*;
 use futures::channel::mpsc::{unbounded, UnboundedSender};
 use futures::lock::Mutex;
 use futures::Stream;
-use hermes_async_runtime_components::channel::types::ChannelClosedError;
 use hermes_async_runtime_components::subscription::impls::closure::CanCreateClosureSubscription;
 use hermes_async_runtime_components::subscription::impls::multiplex::CanMultiplexSubscription;
 use hermes_async_runtime_components::subscription::traits::subscription::Subscription;
@@ -36,7 +35,7 @@ pub trait CanSendStarknetEvents: HasHeightType + HasEventType + HasAsyncErrorTyp
 
 impl<Chain> CanSendStarknetEvents for Chain
 where
-    Chain: HasHeightType<Height = u64> + CanQueryBlockEvents + CanRaiseError<ChannelClosedError>,
+    Chain: HasHeightType<Height = u64> + CanQueryBlockEvents + CanRaiseError<&'static str>,
 {
     async fn send_starknet_events(
         &self,
@@ -51,7 +50,7 @@ where
             for event in events {
                 sender
                     .unbounded_send((height, Arc::new(event)))
-                    .map_err(|_| Chain::raise_error(ChannelClosedError))?;
+                    .map_err(|_| Chain::raise_error("channel closed"))?;
             }
 
             *height_ref = height + 1;

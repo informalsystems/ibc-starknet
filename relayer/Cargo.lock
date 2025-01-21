@@ -2290,6 +2290,7 @@ dependencies = [
  "cairo-lang-starknet-classes",
  "cgp",
  "eyre",
+ "hermes-async-runtime-components",
  "hermes-cairo-encoding-components",
  "hermes-chain-type-components",
  "hermes-cosmos-chain-components",

@@ -73,6 +73,7 @@ use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayl
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
 use crate::impls::queries::balance::QueryStarknetWalletBalance;
+use crate::impls::queries::block_events::all::QueryBlockEventsWithWaitAndRetry;
 use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
 use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
@@ -111,6 +112,7 @@ pub use crate::traits::contract::invoke::ContractInvokerComponent;
 pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
 pub use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
 pub use crate::traits::queries::address::ContractAddressQuerierComponent;
+use crate::traits::queries::block_events::BlockEventsQuerierComponent;
 pub use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
 pub use crate::traits::transfer::TokenTransferComponent;
 pub use crate::traits::types::blob::BlobTypeComponent;
@@ -229,6 +231,8 @@ cgp_preset! {
             ReadPacketSrcStarknetFields,
         ChainStatusQuerierComponent:
             QueryStarknetChainStatus,
+        BlockEventsQuerierComponent:
+            QueryBlockEventsWithWaitAndRetry,
         MessageSenderComponent:
             SendCallMessages,
         TxSubmitterComponent:

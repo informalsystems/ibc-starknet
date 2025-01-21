@@ -122,6 +122,7 @@ use hermes_starknet_chain_components::components::chain::{
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
+use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetSubscription;
 use hermes_starknet_chain_components::traits::account::{
     HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeComponent,
 };
@@ -134,6 +135,7 @@ use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
 use hermes_starknet_chain_components::traits::queries::address::CanQueryContractAddress;
+use hermes_starknet_chain_components::traits::queries::block_events::CanQueryBlockEvents;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
@@ -294,8 +296,6 @@ pub trait CanUseStarknetChain:
     + HasConnectionEndType<CosmosChain, ConnectionEnd = ConnectionEnd>
     + HasChannelIdType<CosmosChain, ChannelId = ChannelId>
     + HasChannelEndType<CosmosChain, ChannelEnd = ChannelEnd>
-    // // FIXME: cannot use native PortId. PortIdTypeComponent needs to be wired for StarknetChainTypes
-    // + HasPortIdType<CosmosChain, PortId = PortId>
     + HasPortIdType<CosmosChain, PortId = IbcPortId>
     + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
     + HasConnectionOpenInitPayloadType<CosmosChain>
@@ -314,6 +314,8 @@ pub trait CanUseStarknetChain:
     + HasStarknetAccount
     + CanQueryChainStatus
     + CanQueryChainHeight
+    + CanQueryBlockEvents
+    + CanCreateStarknetSubscription
     + CanSendMessages
     + CanSendSingleMessage
     + CanSubmitTx
@@ -383,8 +385,8 @@ pub trait CanUseStarknetChain:
     + HasSequenceType<CosmosChain, Sequence = Sequence>
     + CanQueryBalance
     + HasMemoType
-    // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
-    // + CanIbcTransferToken<CosmosChain>
+// TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
+// + CanIbcTransferToken<CosmosChain>
 {
 }
 
