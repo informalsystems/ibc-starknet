@@ -10,6 +10,7 @@ use hermes_async_runtime_components::subscription::impls::multiplex::CanMultiple
 use hermes_async_runtime_components::subscription::traits::subscription::Subscription;
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::height::HasHeightType;
+use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_runtime_components::traits::runtime::HasRuntime;
 use hermes_runtime_components::traits::spawn::CanSpawnTask;
 use hermes_runtime_components::traits::task::Task;
@@ -17,17 +18,23 @@ use hermes_runtime_components::traits::task::Task;
 use crate::traits::queries::block_events::CanQueryBlockEvents;
 
 #[async_trait]
-pub trait CanCreateStarknetSubscription: HasHeightType + HasEventType + HasAsyncErrorType {
+pub trait CanCreateStarknetSubscription:
+    HasHeightType + HasAddressType + HasEventType + HasAsyncErrorType
+{
     async fn create_event_subscription(
         self,
         start_height: Self::Height,
+        address: Self::Address,
     ) -> Result<Arc<dyn Subscription<Item = (Self::Height, Arc<Self::Event>)>>, Self::Error>;
 }
 
 #[async_trait]
-pub trait CanSendStarknetEvents: HasHeightType + HasEventType + HasAsyncErrorType {
+pub trait CanSendStarknetEvents:
+    HasHeightType + HasAddressType + HasEventType + HasAsyncErrorType
+{
     async fn send_starknet_events(
         &self,
+        address: &Self::Address,
         start_height: Arc<Mutex<Self::Height>>,
         sender: UnboundedSender<(Self::Height, Arc<Self::Event>)>,
     ) -> Result<(), Self::Error>;
@@ -35,10 +42,14 @@ pub trait CanSendStarknetEvents: HasHeightType + HasEventType + HasAsyncErrorTyp
 
 impl<Chain> CanSendStarknetEvents for Chain
 where
-    Chain: HasHeightType<Height = u64> + CanQueryBlockEvents + CanRaiseError<&'static str>,
+    Chain: HasHeightType<Height = u64>
+        + HasAddressType
+        + CanQueryBlockEvents
+        + CanRaiseError<&'static str>,
 {
     async fn send_starknet_events(
         &self,
+        address: &Self::Address,
         height_mutex: Arc<Mutex<u64>>,
         sender: UnboundedSender<(u64, Arc<Self::Event>)>,
     ) -> Result<(), Self::Error> {
@@ -46,7 +57,7 @@ where
             let mut height_ref = height_mutex.lock().await;
             let height = *height_ref;
 
-            let events = self.query_block_events(&height).await?;
+            let events = self.query_block_events(&height, address).await?;
             for event in events {
                 sender
                     .unbounded_send((height, Arc::new(event)))
@@ -60,9 +71,10 @@ where
 
 pub struct PollStarknetEventsTask<Chain>
 where
-    Chain: HasHeightType + HasEventType,
+    Chain: HasHeightType + HasAddressType + HasEventType,
 {
     pub chain: Chain,
+    pub address: Chain::Address,
     pub height: Arc<Mutex<Chain::Height>>,
     pub sender: UnboundedSender<(Chain::Height, Arc<Chain::Event>)>,
 }
@@ -74,7 +86,7 @@ where
     async fn run(self) {
         let _ = self
             .chain
-            .send_starknet_events(self.height, self.sender)
+            .send_starknet_events(&self.address, self.height, self.sender)
             .await;
     }
 }
@@ -83,10 +95,12 @@ impl<Chain> CanCreateStarknetSubscription for Chain
 where
     Chain: Clone + HasRuntime + CanSendStarknetEvents,
     Chain::Runtime: Clone + CanCreateClosureSubscription + CanMultiplexSubscription + CanSpawnTask,
+    Chain::Address: Clone,
 {
     async fn create_event_subscription(
         self,
         height: Chain::Height,
+        address: Chain::Address,
     ) -> Result<Arc<dyn Subscription<Item = (Chain::Height, Arc<Chain::Event>)>>, Chain::Error>
     {
         let runtime = self.runtime().clone();
@@ -94,6 +108,7 @@ where
 
         let subscription = Chain::Runtime::new_closure_subscription(move || {
             let chain = self.clone();
+            let address = address.clone();
             let height_mutex = height_mutex.clone();
 
             Box::pin(async move {
@@ -102,6 +117,7 @@ where
                 let task = PollStarknetEventsTask {
                     chain: chain.clone(),
                     sender,
+                    address,
                     height: height_mutex.clone(),
                 };
 
