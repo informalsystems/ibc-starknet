@@ -23,7 +23,11 @@ use crate::ConsensusState as StarknetConsensusState;
 
 impl<'a, E> ClientStateExecution<E> for ClientState
 where
-    E: CwClientExecution<'a, ClientStateMut = ClientState, ConsensusStateRef = StarknetConsensusState>,
+    E: CwClientExecution<
+        'a,
+        ClientStateMut = ClientState,
+        ConsensusStateRef = StarknetConsensusState,
+    >,
 {
     fn initialise(
         &self,
