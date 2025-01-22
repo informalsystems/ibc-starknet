@@ -1,6 +1,9 @@
+use core::marker::PhantomData;
+
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_chain_components::traits::extract_data::EventExtractor;
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::ibc_events::write_ack::ProvideWriteAckEvent;
 use hermes_chain_components::traits::types::packets::ack::HasAcknowledgementType;
@@ -9,16 +12,14 @@ use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use starknet::core::types::Felt;
 
+use crate::impls::events::UseStarknetEvents;
 use crate::types::channel_id::ChannelId;
 use crate::types::event::StarknetEvent;
 use crate::types::events::packet::WriteAcknowledgementEvent;
 use crate::types::messages::ibc::channel::PortId;
 use crate::types::messages::ibc::packet::{Acknowledgement, Sequence};
 
-pub struct UseStarknetWriteAckEvent;
-
-impl<Chain, Counterparty, Encoding> ProvideWriteAckEvent<Chain, Counterparty>
-    for UseStarknetWriteAckEvent
+impl<Chain, Counterparty, Encoding> ProvideWriteAckEvent<Chain, Counterparty> for UseStarknetEvents
 where
     Chain: HasEventType<Event = StarknetEvent>
         + HasAcknowledgementType<Counterparty, Acknowledgement = Vec<u8>>
@@ -29,7 +30,27 @@ where
 {
     type WriteAckEvent = WriteAcknowledgementEvent;
 
-    fn try_extract_write_ack_event(event: &StarknetEvent) -> Option<Self::WriteAckEvent> {
+    fn write_acknowledgement(ack: &WriteAcknowledgementEvent) -> impl AsRef<Vec<u8>> + Send {
+        ack.acknowledgement
+            .ack
+            .iter()
+            .map(|&felt| felt.try_into().unwrap())
+            .collect::<Vec<_>>()
+    }
+}
+
+impl<Chain, Encoding> EventExtractor<Chain, WriteAcknowledgementEvent> for UseStarknetEvents
+where
+    Chain: HasEventType<Event = StarknetEvent> + HasDefaultEncoding<AsFelt, Encoding = Encoding>,
+    Encoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, Product![Sequence, PortId, ChannelId, PortId, ChannelId]>
+        + CanDecode<ViaCairo, Product![Vec<Felt>, Acknowledgement]>,
+{
+    fn try_extract_from_event(
+        _chain: &Chain,
+        _tag: PhantomData<WriteAcknowledgementEvent>,
+        event: &StarknetEvent,
+    ) -> Option<WriteAcknowledgementEvent> {
         // TODO(rano): don't have access to the EventEncoding
         // Ideally, EventEncoding to decode directly from StarknetEvent
 
@@ -54,13 +75,5 @@ where
             packet_data,
             acknowledgement,
         })
-    }
-
-    fn write_acknowledgement(ack: &WriteAcknowledgementEvent) -> impl AsRef<Vec<u8>> + Send {
-        ack.acknowledgement
-            .ack
-            .iter()
-            .map(|&felt| felt.try_into().unwrap())
-            .collect::<Vec<_>>()
     }
 }

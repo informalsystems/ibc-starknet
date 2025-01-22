@@ -58,10 +58,7 @@ use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::counterparty_message_height::GetCounterpartyCosmosHeightFromStarknetMessage;
-use crate::impls::events::ack::UseStarknetWriteAckEvent;
-use crate::impls::events::channel::UseStarknetChannelEvents;
-use crate::impls::events::connection_id::UseStarknetConnectionEvents;
-use crate::impls::events::create_client::UseStarknetCreateClientEvent;
+use crate::impls::events::UseStarknetEvents;
 use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
 use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
@@ -265,20 +262,17 @@ cgp_preset! {
             QueryErc20TokenBalance,
         BalanceQuerierComponent:
             QueryStarknetWalletBalance,
-        CreateClientEventComponent:
-            UseStarknetCreateClientEvent,
         [
+            CreateClientEventComponent,
             ConnectionOpenInitEventComponent,
             ConnectionOpenTryEventComponent,
-        ]:
-            UseStarknetConnectionEvents,
-        [
             ChannelOpenInitEventComponent,
             ChannelOpenTryEventComponent,
+            WriteAckEventComponent,
+            EventExtractorComponent,
+            MessageResponseExtractorComponent,
         ]:
-            UseStarknetChannelEvents,
-        WriteAckEventComponent:
-            UseStarknetWriteAckEvent,
+            UseStarknetEvents,
         CreateClientMessageOptionsTypeComponent:
             ProvideNoCreateClientMessageOptionsType,
         CreateClientPayloadBuilderComponent:
