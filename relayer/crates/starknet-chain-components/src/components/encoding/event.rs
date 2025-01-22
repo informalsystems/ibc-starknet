@@ -32,13 +32,13 @@ cgp_preset! {
     }
 }
 
-pub struct StarknetEventEncoderComponents;
-
 pub struct ProvideEncodedStarknetEventType;
 
 impl<Encoding: Async> ProvideEncodedType<Encoding> for ProvideEncodedStarknetEventType {
     type Encoded = StarknetEvent;
 }
+
+pub struct StarknetEventEncoderComponents;
 
 delegate_components! {
     StarknetEventEncoderComponents {
