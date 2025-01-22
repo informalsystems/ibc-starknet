@@ -24,10 +24,12 @@ impl<Chain, Counterparty> ProvideConnectionOpenInitEvent<Chain, Counterparty> fo
 where
     Chain: HasConnectionIdType<Counterparty, ConnectionId = ConnectionId>,
 {
-    type ConnectionOpenInitEvent = ConnectionId;
+    type ConnectionOpenInitEvent = StarknetConnectionOpenInitEvent;
 
-    fn connection_open_init_event_connection_id(connection_id: &ConnectionId) -> &ConnectionId {
-        connection_id
+    fn connection_open_init_event_connection_id(
+        event: &StarknetConnectionOpenInitEvent,
+    ) -> &ConnectionId {
+        &event.connection_id
     }
 }
 

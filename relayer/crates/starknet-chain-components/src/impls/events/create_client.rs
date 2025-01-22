@@ -25,10 +25,10 @@ where
         + HasDefaultEncoding<AsFelt, Encoding = Encoding>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>> + CanDecode<ViaCairo, CreateClientResponse>,
 {
-    type CreateClientEvent = ClientId;
+    type CreateClientEvent = StarknetCreateClientEvent;
 
-    fn create_client_event_client_id(client_id: &ClientId) -> &ClientId {
-        client_id
+    fn create_client_event_client_id(event: &StarknetCreateClientEvent) -> &ClientId {
+        &event.client_id
     }
 }
 

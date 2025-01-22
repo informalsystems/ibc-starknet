@@ -26,6 +26,7 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
+use hermes_relayer_components::chain::traits::extract_data::CanExtractFromMessageResponse;
 use hermes_relayer_components::chain::traits::message_builders::ack_packet::CanBuildAckPacketMessage;
 use hermes_relayer_components::chain::traits::message_builders::channel_handshake::{
     CanBuildChannelOpenAckMessage, CanBuildChannelOpenConfirmMessage,
@@ -124,6 +125,7 @@ use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetTo
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetSubscription;
+use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
     HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeComponent,
 };
@@ -386,6 +388,8 @@ pub trait CanUseStarknetChain:
     + HasSequenceType<CosmosChain, Sequence = Sequence>
     + CanQueryBalance
     + HasMemoType
+    + HasCreateClientEvent<CosmosChain, CreateClientEvent = StarknetCreateClientEvent>
+    + CanExtractFromMessageResponse<StarknetCreateClientEvent>
 // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
 // + CanIbcTransferToken<CosmosChain>
 {
@@ -439,6 +443,7 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanFilterIncomingPacket<StarknetChain>
     + HasAcknowledgementType<StarknetChain, Acknowledgement = Vec<u8>>
     + HasSequenceType<StarknetChain, Sequence = Sequence>
+    + HasCreateClientEvent<StarknetChain>
     + HasSendPacketEvent<StarknetChain>
     + HasWriteAckEvent<StarknetChain>
 {
