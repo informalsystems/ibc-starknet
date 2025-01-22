@@ -23,7 +23,7 @@ use crate::ConsensusState as StarknetConsensusState;
 
 impl<E> ClientStateExecution<E> for ClientState
 where
-    E: CwClientExecution<ClientStateMut = ClientState, ConsensusStateRef = StarknetConsensusState>,
+    E: for<'a> CwClientExecution<'a, ClientStateMut = ClientState, ConsensusStateRef = StarknetConsensusState>,
 {
     fn initialise(
         &self,
@@ -59,7 +59,7 @@ where
         let raw_header = signed_header.header;
 
         let deps = ctx
-            .cosmwasm_query_context()
+            .cosmwasm_execute_context()
             .ok_or_else(|| ClientError::ClientSpecific {
                 description: "missing Deps from context".to_owned(),
             })?;

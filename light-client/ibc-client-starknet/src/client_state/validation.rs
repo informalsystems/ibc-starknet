@@ -10,7 +10,7 @@ use crate::ConsensusState;
 
 impl<V> ClientStateValidation<V> for ClientState
 where
-    V: CwClientValidation<ClientStateRef = ClientState, ConsensusStateRef = ConsensusState>,
+    V: for<'a> CwClientValidation<'a, ClientStateRef = ClientState, ConsensusStateRef = ConsensusState>,
 {
     fn verify_client_message(
         &self,
