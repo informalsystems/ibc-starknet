@@ -33,6 +33,7 @@ use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
+use hermes_starknet_chain_components::traits::queries::block_events::CanQueryBlockEvents;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
@@ -66,9 +67,8 @@ use ibc::primitives::Timestamp as IbcTimestamp;
 use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
-use starknet::core::types::{BlockId, EventFilter, Felt, U256};
+use starknet::core::types::{Felt, U256};
 use starknet::macros::{selector, short_string};
-use starknet::providers::Provider;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
@@ -572,27 +572,19 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
                 info!("polling events from {event_start_height} to {event_end_height}");
 
-                let events = starknet_chain
-                    .rpc_client
-                    .get_events(
-                        EventFilter {
-                            from_block: Some(BlockId::Number(event_start_height)),
-                            to_block: None,
-                            address: Some(ibc_core_address),
-                            keys: None,
-                        },
-                        None,
-                        1000,
-                    )
-                    .await?;
+                for height in event_start_height..event_end_height {
+                    let events = starknet_chain
+                        .query_block_events(&height, &ibc_core_address)
+                        .await?;
 
-                info!("polled events: {events:?}");
+                    info!("polled events at height {height}: {events:?}");
 
-                let parsed_events: Vec<PacketRelayEvents> = starknet_chain
-                    .event_encoding
-                    .filter_decode_events(&response.events)?;
+                    let parsed_events: Vec<PacketRelayEvents> = starknet_chain
+                        .event_encoding
+                        .filter_decode_events(&events)?;
 
-                info!("parsed polled events: {parsed_events:?}");
+                    info!("parsed polled events at height {height}: {parsed_events:?}");
+                }
             }
 
             (send_packet_event, send_ics20_event)
