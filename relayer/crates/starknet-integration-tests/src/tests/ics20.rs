@@ -224,7 +224,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             erc20_hashes: [erc20_class_hash].into(),
             ics20_hashes: [ics20_class_hash].into(),
             ibc_client_hashes: [comet_client_class_hash].into(),
-            ibc_core_hashes: [ibc_core_class_hash].into(),
+            ibc_core_contract_addresses: [ibc_core_address].into(),
         };
 
         {
