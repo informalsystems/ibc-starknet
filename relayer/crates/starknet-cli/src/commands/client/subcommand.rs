@@ -3,6 +3,7 @@ use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
 
 #[derive(Debug, clap::Subcommand)]
 pub enum ClientSubCommand {
+    CreateClient(CreateClientArgs),
     UpdateClient(UpdateClientArgs),
 }
 
@@ -18,6 +19,7 @@ where
     ) -> Result<App::Output, App::Error> {
         match subcommand {
             ClientSubCommand::UpdateClient(args) => app.run_command(args).await,
+            ClientSubCommand::CreateClient(args) => app.run_command(args).await,
         }
     }
 }

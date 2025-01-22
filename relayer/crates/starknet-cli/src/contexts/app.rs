@@ -6,6 +6,9 @@ use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
+use hermes_cli_components::impls::commands::channel::create::{
+    CreateChannelArgs, RunCreateChannelCommand,
+};
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
 };
@@ -59,6 +62,8 @@ use hermes_starknet_chain_components::impls::types::config::{
     StarknetChainConfig, StarknetRelayerConfig,
 };
 use hermes_starknet_chain_components::types::client_id::ClientId;
+use hermes_starknet_chain_components::types::connection_id::ConnectionId;
+use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
@@ -156,6 +161,15 @@ delegate_components! {
         (UpdateClientArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
         (UpdateClientArgs, symbol!("target_height")): ParseFromOptionalString<Height>,
+
+        (CreateChannelArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateChannelArgs, symbol!("target_client_id")): ParseFromString<ClientId>,
+        (CreateChannelArgs, symbol!("target_connectio_id")): ParseFromString<ConnectionId>,
+        (CreateChannelArgs, symbol!("target_port_id")): ParseFromString<PortId>,
+        (CreateChannelArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateChannelArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
+        (CreateChannelArgs, symbol!("counterparty_port_id")): ParseFromString<PortId>,
+        // TODO Parse ordering and version connection options
     }
 }
 
