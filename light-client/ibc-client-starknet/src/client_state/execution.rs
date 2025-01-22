@@ -21,9 +21,9 @@ use super::ClientState;
 use crate::encoding::context::StarknetLightClientEncoding;
 use crate::ConsensusState as StarknetConsensusState;
 
-impl<E> ClientStateExecution<E> for ClientState
+impl<'a, E> ClientStateExecution<E> for ClientState
 where
-    E: for<'a> CwClientExecution<'a, ClientStateMut = ClientState, ConsensusStateRef = StarknetConsensusState>,
+    E: CwClientExecution<'a, ClientStateMut = ClientState, ConsensusStateRef = StarknetConsensusState>,
 {
     fn initialise(
         &self,

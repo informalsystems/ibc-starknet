@@ -8,9 +8,9 @@ use ibc_core::primitives::proto::Any;
 use super::ClientState;
 use crate::ConsensusState;
 
-impl<V> ClientStateValidation<V> for ClientState
+impl<'a, V> ClientStateValidation<V> for ClientState
 where
-    V: for<'a> CwClientValidation<'a, ClientStateRef = ClientState, ConsensusStateRef = ConsensusState>,
+    V: CwClientValidation<'a, ClientStateRef = ClientState, ConsensusStateRef = ConsensusState>,
 {
     fn verify_client_message(
         &self,
