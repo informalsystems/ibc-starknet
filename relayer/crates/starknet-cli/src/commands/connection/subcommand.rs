@@ -2,22 +2,22 @@ use hermes_cli_components::impls::commands::connection::create::CreateConnection
 use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
 
 #[derive(Debug, clap::Subcommand)]
-pub enum ConnectionSubCommand {
-    Create(CreateConnectionArgs),
+pub enum CreateSubCommand {
+    Connection(CreateConnectionArgs),
 }
 
-pub struct RunConnectionSubCommand;
+pub struct RunCreateSubCommand;
 
-impl<App> CommandRunner<App, ConnectionSubCommand> for RunConnectionSubCommand
+impl<App> CommandRunner<App, CreateSubCommand> for RunCreateSubCommand
 where
     App: CanRunCommand<CreateConnectionArgs>,
 {
     async fn run_command(
         app: &App,
-        subcommand: &ConnectionSubCommand,
+        subcommand: &CreateSubCommand,
     ) -> Result<App::Output, App::Error> {
         match subcommand {
-            ConnectionSubCommand::Create(args) => app.run_command(args).await,
+            CreateSubCommand::Connection(args) => app.run_command(args).await,
         }
     }
 }
