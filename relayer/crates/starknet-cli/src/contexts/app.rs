@@ -2,10 +2,11 @@ use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
-use cgp::core::field::WithField;
+use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
+use hermes_cli_components::impls::commands::client::create::CreateClientOptionsParser;
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
 };
@@ -43,6 +44,7 @@ use hermes_cli_components::traits::output::{
 };
 use hermes_cli_components::traits::parse::ArgParserComponent;
 use hermes_cli_components::traits::types::config::ConfigTypeComponent;
+use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::traits::wrap::CanWrapError;
 use hermes_error::types::HermesError;
@@ -59,6 +61,8 @@ use hermes_starknet_chain_components::impls::types::config::{
     StarknetChainConfig, StarknetRelayerConfig,
 };
 use hermes_starknet_chain_components::types::client_id::ClientId;
+use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
@@ -215,6 +219,36 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
         config.starknet_chain_config = Some(chain_config);
 
         Ok(chain_config_str)
+    }
+}
+
+pub struct CreateStarketClientOnCosmosArgs;
+
+impl CreateClientOptionsParser<StarknetApp, CreateStarketClientOnCosmosArgs, Index<0>, Index<1>>
+    for StarknetAppComponents
+{
+    async fn parse_create_client_options(
+        _app: &StarknetApp,
+        args: &CreateStarketClientOnCosmosArgs,
+        target_chain: &StarknetChain,
+        counterparty_chain: &CosmosChain,
+    ) -> Result<((), CosmosCreateClientOptions), HermesError> {
+        todo!()
+    }
+}
+
+pub struct CreateCosmosClientOnStarknetArgs;
+
+impl CreateClientOptionsParser<StarknetApp, CreateCosmosClientOnStarknetArgs, Index<1>, Index<0>>
+    for StarknetAppComponents
+{
+    async fn parse_create_client_options(
+        _app: &StarknetApp,
+        args: &CreateCosmosClientOnStarknetArgs,
+        target_chain: &CosmosChain,
+        counterparty_chain: &StarknetChain,
+    ) -> Result<((), StarknetCreateClientPayloadOptions), HermesError> {
+        todo!()
     }
 }
 

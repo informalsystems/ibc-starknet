@@ -2336,6 +2336,7 @@ dependencies = [
  "hermes-runtime",
  "hermes-runtime-components",
  "hermes-starknet-chain-components",
+ "hermes-starknet-chain-context",
  "hermes-starknet-integration-tests",
  "hermes-starknet-relayer",
  "hermes-starknet-test-components",
