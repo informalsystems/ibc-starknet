@@ -13,6 +13,7 @@ use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSi
 use ibc::core::host::types::identifiers::ClientId;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use prost_types::Any;
+use sha2::{Digest, Sha256};
 
 use crate::types::payloads::client::StarknetUpdateClientPayload;
 
@@ -37,28 +38,28 @@ where
     ) -> Result<Vec<CosmosMessage>, Chain::Error> {
         let encoding = Counterparty::default_encoding();
 
-        let header_bytes: Any = encoding
+        let header_any: Any = encoding
             .convert(&payload.header)
             .map_err(Chain::raise_error)?;
 
         let signer = chain.get_default_signer();
 
         let signature = signer
-            .sign(&header_bytes.value)
+            .sign(&Sha256::digest(&header_any.value))
             .map_err(Chain::raise_error)?;
 
         let signed_header = SignedStarknetHeader {
-            header: header_bytes.value.clone(),
+            header: header_any.value.clone(),
             signature,
         };
 
-        let header_any: Any = encoding
+        let signed_header_any: Any = encoding
             .convert(&signed_header)
             .map_err(Chain::raise_error)?;
 
         let update_client_message = CosmosUpdateClientMessage {
             client_id: client_id.clone(),
-            header: header_any,
+            header: signed_header_any,
         }
         .to_cosmos_message();
 

@@ -1139,7 +1139,7 @@ dependencies = [
 [[package]]
 name = "ibc-client-cw"
 version = "0.56.0"
-source = "git+https://github.com/informalsystems/cosmwasm-ibc.git?branch=luca_joss/add-cw-client-extension-trait#08038c5c1b83f21b460de2eccc2ea04d5af52116"
+source = "git+https://github.com/informalsystems/cosmwasm-ibc.git?branch=luca_joss/add-cw-client-extension-trait#9160e505a664aaa430f9c3cdc40e115d6d364ceb"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",

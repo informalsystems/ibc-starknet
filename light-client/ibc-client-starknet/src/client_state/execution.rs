@@ -62,16 +62,19 @@ where
 
         let raw_header = signed_header.header;
 
+        let header_digest = ctx.generate_sha256_digest(&raw_header);
+
         let deps = ctx
             .cosmwasm_execute_context()
             .ok_or_else(|| ClientError::ClientSpecific {
                 description: "missing Deps from context".to_owned(),
             })?;
 
-        match deps
-            .api
-            .secp256k1_verify(&raw_header, &signed_header.signature, &self.0.pub_key)
-        {
+        match deps.api.secp256k1_verify(
+            header_digest.as_slice(),
+            &signed_header.signature,
+            &self.0.pub_key,
+        ) {
             Ok(validation) if validation => {}
             _ => {
                 return Err(ClientError::ClientSpecific {
