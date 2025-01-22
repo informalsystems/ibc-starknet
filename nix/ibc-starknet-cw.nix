@@ -12,7 +12,7 @@ let
       outputHashes = {
         "hermes-cosmos-encoding-components-0.1.0" = "sha256-V1TlMnVHBwlSBJmB9gSJV/BgUTy7S0yhrtn3anZyorU=";
         "cgp-0.3.1" = "sha256-AOQ+WVQWPlF2ZfYYc5Eq3t7XAljd5P2qExWLYZWNnd8=";
-        "ibc-client-cw-0.56.0" = "sha256-NEF3u/sZHdd+QH4nITCjVYFRnt3p5yuHXt25Vo7FV4U=";
+        "ibc-client-cw-0.56.0" = "sha256-cncV3XQSJuqb7WqaKPI7OcSpsXNoTT0twFsgyjAxaNY=";
       };
     };
 
