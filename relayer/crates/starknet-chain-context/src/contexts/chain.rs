@@ -94,7 +94,9 @@ use hermes_relayer_components::chain::traits::types::connection::{
     HasInitConnectionOptionsType,
 };
 use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
-use hermes_relayer_components::chain::traits::types::create_client::HasCreateClientEvent;
+use hermes_relayer_components::chain::traits::types::create_client::{
+    HasCreateClientEvent, HasCreateClientMessageOptionsType, HasCreateClientPayloadOptionsType,
+};
 use hermes_relayer_components::chain::traits::types::event::HasEventType;
 use hermes_relayer_components::chain::traits::types::ibc::{
     HasChannelIdType, HasClientIdType, HasConnectionIdType, HasCounterpartyMessageHeight,
@@ -152,6 +154,7 @@ use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConse
 use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
 use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
+use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
@@ -334,6 +337,11 @@ pub trait CanUseStarknetChain:
     + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
     + HasCreateClientEvent<CosmosChain>
     + CanBuildCreateClientPayload<CosmosChain>
+    + HasCreateClientMessageOptionsType<CosmosChain, CreateClientMessageOptions = ()>
+    + HasCreateClientPayloadOptionsType<
+        CosmosChain,
+        CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
+    > + CanBuildCreateClientPayload<CosmosChain>
     + CanBuildCreateClientMessage<CosmosChain>
     + CanBuildUpdateClientPayload<CosmosChain>
     + CanBuildUpdateClientMessage<CosmosChain>

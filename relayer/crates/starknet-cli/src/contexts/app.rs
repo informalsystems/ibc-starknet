@@ -2,13 +2,11 @@ use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
-use cgp::core::field::WithField;
+use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
-use hermes_cli_components::impls::commands::channel::create::{
-    CreateChannelArgs, RunCreateChannelCommand,
-};
+use hermes_cli_components::impls::commands::client::create::CreateClientOptionsParser;
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
 };
@@ -161,15 +159,6 @@ delegate_components! {
         (UpdateClientArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
         (UpdateClientArgs, symbol!("target_height")): ParseFromOptionalString<Height>,
-
-        (CreateChannelArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
-        (CreateChannelArgs, symbol!("target_client_id")): ParseFromString<ClientId>,
-        (CreateChannelArgs, symbol!("target_connectio_id")): ParseFromString<ConnectionId>,
-        (CreateChannelArgs, symbol!("target_port_id")): ParseFromString<PortId>,
-        (CreateChannelArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
-        (CreateChannelArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
-        (CreateChannelArgs, symbol!("counterparty_port_id")): ParseFromString<PortId>,
-        // TODO Parse ordering and version connection options
     }
 }
 
@@ -231,6 +220,35 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
         Ok(chain_config_str)
     }
 }
+
+pub struct CreateStarknetClientOnCosmosArgs;
+
+impl CreateClientOptionsParser<StarknetApp, CreateStarknetClientOnCosmosArgs, Index<<0>, Index<1>> for StarknetAppComponents
+{
+    async fn parse_create_client_options(
+        _app: &StarknetApp,
+        args: &CreateStarknetClientOnCosmosArgs,
+        target_chain: &StarknetChain,
+        counterparty_chain: &CosmosChain,
+    ) -> Result<((), CosmosCreateClientOptions), HermesError> {
+        todo!()
+    }
+}
+
+// TODO(seanchen1991): Implement Cosmos-to-Starknet client creation
+// pub struct CreateCosmosClientOnStarknetArgs;
+
+// impl CreateClientOptionsParser<StarknetApp, CreateCosmosClientOnStarknetArgs, Index<<1>, Index<0>> for StarknetAppComponents
+// {
+//     async fn parse_create_client_options(
+//         _app: &StarknetApp,
+//         args: &CreateCosmosClientOnStarknetArgs,
+//         target_chain: &CosmosChain,
+//         counterparty_chain: &StarknetChain,
+//     ) -> Result<((), StarknetCreateClientPayloadOptions), HermesError> {
+//         todo!()
+//     }
+// }
 
 pub trait CanUseStarknetApp:
     HasRuntime
