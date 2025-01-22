@@ -21,11 +21,16 @@ where
     ) -> Result<Option<Value>, Encoding::Error> {
         let class_hashes = encoding.get_field(PhantomData);
 
-        if class_hashes.contains(&event.class_hash) {
-            let value = encoding.decode(event)?;
-            Ok(Some(value))
-        } else {
-            Ok(None)
+        match &event.class_hash {
+            Some(class_hash) => {
+                if class_hashes.contains(class_hash) {
+                    let value = encoding.decode(event)?;
+                    Ok(Some(value))
+                } else {
+                    Ok(None)
+                }
+            }
+            None => Ok(None),
         }
     }
 }

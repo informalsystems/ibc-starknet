@@ -6,6 +6,7 @@ use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_type_components::traits::fields::chain_id::HasChainId;
 use hermes_chain_type_components::traits::types::commitment_proof::HasCommitmentProofType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
@@ -13,9 +14,8 @@ use hermes_chain_type_components::traits::types::message_response::HasMessageRes
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
 use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetter, EncodingGetterComponent, HasDefaultEncoding, ProvideEncodingType,
+    DefaultEncodingGetter, EncodingGetter, HasDefaultEncoding, ProvideEncodingType,
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::ProvideHermesError;
@@ -102,6 +102,7 @@ use hermes_relayer_components::chain::traits::types::ibc::{
 };
 use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenTryEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenTryEvent;
+use hermes_relayer_components::chain::traits::types::ibc_events::send_packet::HasSendPacketEvent;
 use hermes_relayer_components::chain::traits::types::ibc_events::write_ack::HasWriteAckEvent;
 use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::chain::traits::types::packets::ack::HasAcknowledgementType;
@@ -122,6 +123,7 @@ use hermes_starknet_chain_components::components::chain::{
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
+use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetSubscription;
 use hermes_starknet_chain_components::traits::account::{
     HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeComponent,
 };
@@ -134,6 +136,7 @@ use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
 use hermes_starknet_chain_components::traits::queries::address::CanQueryContractAddress;
+use hermes_starknet_chain_components::traits::queries::block_events::CanQueryBlockEvents;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
@@ -163,6 +166,7 @@ use starknet::providers::JsonRpcClient;
 use starknet::signers::LocalWallet;
 
 use crate::contexts::encoding::cairo::StarknetCairoEncoding;
+use crate::contexts::encoding::event::StarknetEventEncoding;
 use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use crate::impls::error::HandleStarknetChainError;
 
@@ -174,6 +178,7 @@ pub struct StarknetChain {
     pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
     pub ibc_client_contract_address: Option<Felt>,
     pub ibc_core_contract_address: Option<Felt>,
+    pub event_encoding: StarknetEventEncoding,
 }
 
 pub struct StarknetChainContextComponents;
@@ -194,7 +199,6 @@ delegate_components! {
             GlobalLoggerGetterComponent,
         ]:
             ProvideNoLogger,
-        EncodingGetterComponent: GetDefaultEncoding,
         [
             StarknetProviderTypeComponent,
             StarknetProviderGetterComponent,
@@ -227,9 +231,25 @@ impl ProvideEncodingType<StarknetChain, AsFelt> for StarknetChainContextComponen
     type Encoding = StarknetCairoEncoding;
 }
 
+impl ProvideEncodingType<StarknetChain, AsStarknetEvent> for StarknetChainContextComponents {
+    type Encoding = StarknetEventEncoding;
+}
+
 impl DefaultEncodingGetter<StarknetChain, AsFelt> for StarknetChainContextComponents {
     fn default_encoding() -> &'static StarknetCairoEncoding {
         &StarknetCairoEncoding
+    }
+}
+
+impl EncodingGetter<StarknetChain, AsFelt> for StarknetChainContextComponents {
+    fn encoding(_chain: &StarknetChain) -> &StarknetCairoEncoding {
+        &StarknetCairoEncoding
+    }
+}
+
+impl EncodingGetter<StarknetChain, AsStarknetEvent> for StarknetChainContextComponents {
+    fn encoding(chain: &StarknetChain) -> &StarknetEventEncoding {
+        &chain.event_encoding
     }
 }
 
@@ -277,8 +297,6 @@ pub trait CanUseStarknetChain:
     + HasConnectionEndType<CosmosChain, ConnectionEnd = ConnectionEnd>
     + HasChannelIdType<CosmosChain, ChannelId = ChannelId>
     + HasChannelEndType<CosmosChain, ChannelEnd = ChannelEnd>
-    // // FIXME: cannot use native PortId. PortIdTypeComponent needs to be wired for StarknetChainTypes
-    // + HasPortIdType<CosmosChain, PortId = PortId>
     + HasPortIdType<CosmosChain, PortId = IbcPortId>
     + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
     + HasConnectionOpenInitPayloadType<CosmosChain>
@@ -297,6 +315,8 @@ pub trait CanUseStarknetChain:
     + HasStarknetAccount
     + CanQueryChainStatus
     + CanQueryChainHeight
+    + CanQueryBlockEvents
+    + CanCreateStarknetSubscription
     + CanSendMessages
     + CanSendSingleMessage
     + CanSubmitTx
@@ -366,8 +386,8 @@ pub trait CanUseStarknetChain:
     + HasSequenceType<CosmosChain, Sequence = Sequence>
     + CanQueryBalance
     + HasMemoType
-    // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
-    // + CanIbcTransferToken<CosmosChain>
+// TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
+// + CanIbcTransferToken<CosmosChain>
 {
 }
 
@@ -419,6 +439,8 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanFilterIncomingPacket<StarknetChain>
     + HasAcknowledgementType<StarknetChain, Acknowledgement = Vec<u8>>
     + HasSequenceType<StarknetChain, Sequence = Sequence>
+    + HasSendPacketEvent<StarknetChain>
+    + HasWriteAckEvent<StarknetChain>
 {
 }
 

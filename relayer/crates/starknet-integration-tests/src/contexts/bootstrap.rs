@@ -143,6 +143,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             account,
             ibc_client_contract_address: None,
             ibc_core_contract_address: None,
+            event_encoding: Default::default(),
         };
 
         let chain_driver = StarknetChainDriver {

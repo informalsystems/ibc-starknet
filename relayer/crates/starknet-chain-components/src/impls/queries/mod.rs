@@ -1,5 +1,6 @@
 pub mod ack_commitment;
 pub mod balance;
+pub mod block_events;
 pub mod channel_end;
 pub mod client_state;
 pub mod connection_end;
