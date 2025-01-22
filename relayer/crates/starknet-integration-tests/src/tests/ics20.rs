@@ -5,7 +5,9 @@ use std::path::PathBuf;
 use std::time::SystemTime;
 
 use cgp::prelude::*;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_chain_components::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
+};
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
@@ -64,8 +66,9 @@ use ibc::primitives::Timestamp as IbcTimestamp;
 use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
-use starknet::core::types::{Felt, U256};
+use starknet::core::types::{BlockId, EventFilter, Felt, U256};
 use starknet::macros::{selector, short_string};
+use starknet::providers::Provider;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
@@ -121,6 +124,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
 
         let starknet_chain = &mut starknet_chain_driver.chain;
+
+        info!(
+            "started starknet chain at port {}",
+            starknet_chain_driver.node_config.rpc_port
+        );
 
         let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
 
@@ -191,21 +199,28 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             class_hash
         };
 
-        let comet_client_address = starknet_chain
-            .deploy_contract(&comet_client_class_hash, false, &Vec::new())
-            .await?;
+        let cairo_encoding = StarknetCairoEncoding;
 
-        info!(
-            "deployed Comet client contract to address: {:?}",
-            comet_client_address
-        );
+        let comet_client_address = {
+            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
+            let contract_address = starknet_chain
+                .deploy_contract(&comet_client_class_hash, false, &owner_call_data)
+                .await?;
+
+            info!(
+                "deployed Comet client contract to address: {:?}",
+                contract_address
+            );
+
+            contract_address
+        };
 
         starknet_chain.ibc_core_contract_address = Some(ibc_core_address);
         starknet_chain.ibc_client_contract_address = Some(comet_client_address);
 
         let cairo_encoding = StarknetCairoEncoding;
 
-        let event_encoding = StarknetEventEncoding {
+        starknet_chain.event_encoding = StarknetEventEncoding {
             erc20_hashes: [erc20_class_hash].into(),
             ics20_hashes: [ics20_class_hash].into(),
             ibc_client_hashes: [comet_client_class_hash].into(),
@@ -509,8 +524,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             }
         };
 
-        // submit to ics20 contract
+        let event_start_height = starknet_chain.query_chain_height().await?;
 
+        // submit to ics20 contract
         let (send_packet_event, send_ics20_event) = {
             let call_data = cairo_encoding.encode(&starknet_ics20_send_message)?;
 
@@ -526,13 +542,15 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("ICS20 send packet response: {:?}", response);
 
-            let mut ibc_packet_events: Vec<PacketRelayEvents> =
-                event_encoding.filter_decode_events(&response.events)?;
+            let mut ibc_packet_events: Vec<PacketRelayEvents> = starknet_chain
+                .event_encoding
+                .filter_decode_events(&response.events)?;
 
             info!("IBC packet events: {:?}", ibc_packet_events);
 
-            let mut ibc_transfer_events: Vec<IbcTransferEvent> =
-                event_encoding.filter_decode_events(&response.events)?;
+            let mut ibc_transfer_events: Vec<IbcTransferEvent> = starknet_chain
+                .event_encoding
+                .filter_decode_events(&response.events)?;
 
             info!("IBC transfer events: {:?}", ibc_transfer_events);
 
@@ -546,6 +564,36 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let Some(IbcTransferEvent::Send(send_ics20_event)) = ibc_transfer_events.pop() else {
                 panic!("expected send ics20 event");
             };
+
+            {
+                tokio::time::sleep(core::time::Duration::from_secs(1)).await;
+
+                let event_end_height = starknet_chain.query_chain_height().await?;
+
+                info!("polling events from {event_start_height} to {event_end_height}");
+
+                let events = starknet_chain
+                    .rpc_client
+                    .get_events(
+                        EventFilter {
+                            from_block: Some(BlockId::Number(event_start_height)),
+                            to_block: None,
+                            address: Some(ibc_core_address),
+                            keys: None,
+                        },
+                        None,
+                        1000,
+                    )
+                    .await?;
+
+                info!("polled events: {events:?}");
+
+                let parsed_events: Vec<PacketRelayEvents> = starknet_chain
+                    .event_encoding
+                    .filter_decode_events(&response.events)?;
+
+                info!("parsed polled events: {parsed_events:?}");
+            }
 
             (send_packet_event, send_ics20_event)
         };
@@ -722,13 +770,15 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("ICS20 send packet response: {:?}", response);
 
-            let mut ibc_packet_events: Vec<PacketRelayEvents> =
-                event_encoding.filter_decode_events(&response.events)?;
+            let mut ibc_packet_events: Vec<PacketRelayEvents> = starknet_chain
+                .event_encoding
+                .filter_decode_events(&response.events)?;
 
             info!("IBC packet events: {:?}", ibc_packet_events);
 
-            let mut ibc_transfer_events: Vec<IbcTransferEvent> =
-                event_encoding.filter_decode_events(&response.events)?;
+            let mut ibc_transfer_events: Vec<IbcTransferEvent> = starknet_chain
+                .event_encoding
+                .filter_decode_events(&response.events)?;
 
             info!("IBC transfer events: {:?}", ibc_transfer_events);
 

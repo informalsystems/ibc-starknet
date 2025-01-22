@@ -127,6 +127,6 @@ fn test_mint_burn_roundtrip() {
     // Check the balance of the `TransferApp` contract.
     erc20.assert_balance(ics20.address, 0);
 
-    // Chekck the total supply of the ERC20 contract.
+    // Check the total supply of the ERC20 contract.
     erc20.assert_total_supply(0);
 }

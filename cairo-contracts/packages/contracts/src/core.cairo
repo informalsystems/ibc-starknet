@@ -7,6 +7,17 @@ pub mod IBCCore {
     use starknet_ibc_core::connection::ConnectionEventEmitterComponent;
     use starknet_ibc_core::connection::ConnectionHandlerComponent;
     use starknet_ibc_core::router::RouterHandlerComponent;
+    use starknet_ibc_utils::governance::IBCGovernanceComponent;
+
+    // -----------------------------------------------------------
+    // Setup Governance Component
+    // -----------------------------------------------------------
+
+    component!(path: IBCGovernanceComponent, storage: governance, event: IBCGovernanceEvent);
+
+    #[abi(embed_v0)]
+    impl IBCGovernanceImpl = IBCGovernanceComponent::Governance<ContractState>;
+    impl IBCGovernanceInternalImpl = IBCGovernanceComponent::GovernanceInternalImpl<ContractState>;
 
     // -----------------------------------------------------------
     // Setup Client Components
@@ -23,6 +34,9 @@ pub mod IBCCore {
     #[abi(embed_v0)]
     impl CoreRegisterClientImpl =
         ClientHandlerComponent::CoreRegisterClient<ContractState>;
+    #[abi(embed_v0)]
+    impl CoreRegisterRelayerImpl =
+        ClientHandlerComponent::CoreRegisterRelayer<ContractState>;
     impl ClientInitializerImpl = ClientHandlerComponent::ClientInitializerImpl<ContractState>;
 
     // -----------------------------------------------------------
@@ -57,7 +71,7 @@ pub mod IBCCore {
     component!(path: ChannelHandlerComponent, storage: channel_handler, event: ChannelHandlerEvent);
 
     #[abi(embed_v0)]
-    impl CoreChannelHanderImpl =
+    impl CoreChannelHandlerImpl =
         ChannelHandlerComponent::CoreChannelHandler<ContractState>;
     #[abi(embed_v0)]
     impl CoreChannelQueryImpl =
@@ -70,13 +84,15 @@ pub mod IBCCore {
     component!(path: RouterHandlerComponent, storage: router_handler, event: RouterHandlerEvent);
 
     #[abi(embed_v0)]
-    impl CoreRouterHanderImpl =
+    impl CoreRouterHandlerImpl =
         RouterHandlerComponent::CoreRouterHandler<ContractState>;
     impl RouterInitializerImpl = RouterHandlerComponent::RouterInitializerImpl<ContractState>;
 
 
     #[storage]
     struct Storage {
+        #[substorage(v0)]
+        governance: IBCGovernanceComponent::Storage,
         #[substorage(v0)]
         client_emitter: ClientEventEmitterComponent::Storage,
         #[substorage(v0)]
@@ -97,6 +113,8 @@ pub mod IBCCore {
     #[derive(Debug, Drop, starknet::Event)]
     pub enum Event {
         #[flat]
+        IBCGovernanceEvent: IBCGovernanceComponent::Event,
+        #[flat]
         ClientEventEmitterEvent: ClientEventEmitterComponent::Event,
         #[flat]
         ClientHandlerEvent: ClientHandlerComponent::Event,
@@ -114,6 +132,7 @@ pub mod IBCCore {
 
     #[constructor]
     fn constructor(ref self: ContractState) {
+        self.governance.initializer();
         self.client_handler.initializer();
         self.router_handler.initializer();
     }

@@ -23,7 +23,7 @@ use starknet::core::types::Felt;
 use crate::contexts::encoding::cairo::{ProvideCairoEncoding, StarknetCairoEncoding};
 use crate::impls::error::HandleStarknetChainError;
 
-#[derive(HasField, Default)]
+#[derive(HasField, Default, Clone)]
 pub struct StarknetEventEncoding {
     pub erc20_hashes: HashSet<Felt>,
     pub ics20_hashes: HashSet<Felt>,

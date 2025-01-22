@@ -51,7 +51,7 @@ where
                     let message_responses = invocation
                         .calls
                         .into_iter()
-                        .map(extract_events_from_function_invocation)
+                        .map(extract_message_response_from_function_invocation)
                         .collect();
 
                     Ok(message_responses)
@@ -67,9 +67,18 @@ where
     }
 }
 
-pub fn extract_events_from_function_invocation(
+pub fn extract_message_response_from_function_invocation(
     invocation: FunctionInvocation,
 ) -> StarknetMessageResponse {
+    let result = invocation.result.clone();
+    let events = extract_events_from_function_invocation(invocation);
+
+    StarknetMessageResponse { result, events }
+}
+
+pub fn extract_events_from_function_invocation(
+    invocation: FunctionInvocation,
+) -> Vec<StarknetEvent> {
     let mut events: Vec<StarknetEvent> = invocation
         .events
         .into_iter()
@@ -83,14 +92,11 @@ pub fn extract_events_from_function_invocation(
         .collect();
 
     for inner in invocation.calls {
-        let mut message_response = extract_events_from_function_invocation(inner);
-        events.append(&mut message_response.events);
+        let mut in_events = extract_events_from_function_invocation(inner);
+        events.append(&mut in_events);
     }
 
-    StarknetMessageResponse {
-        result: invocation.result,
-        events,
-    }
+    events
 }
 
 impl Debug for UnexpectedTransactionTraceType {

@@ -146,6 +146,7 @@ impl StarknetBuilder {
             account,
             ibc_client_contract_address: None,
             ibc_core_contract_address: None,
+            event_encoding: Default::default(),
         };
 
         Ok(context)

@@ -19,7 +19,7 @@ fn setup() -> ComponentState {
 }
 
 #[test]
-fn test_intial_state() {
+fn test_initial_state() {
     let state = setup();
     let next_connection_sequence = state.read_next_connection_sequence();
     assert!(next_connection_sequence.is_zero());

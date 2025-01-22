@@ -96,6 +96,5 @@ cgp_preset! {
             PacketDstChannelIdGetterComponent,
         ]:
             ReadPacketDstStarknetFields,
-
     }
 }
