@@ -5,6 +5,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
+use hermes_async_runtime_components::subscription::traits::subscription::Subscription;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_type_components::traits::fields::chain_id::HasChainId;
@@ -26,6 +27,7 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
+use hermes_relayer_components::chain::traits::event_subscription::EventSubscriptionGetter;
 use hermes_relayer_components::chain::traits::extract_data::CanExtractFromMessageResponse;
 use hermes_relayer_components::chain::traits::message_builders::ack_packet::CanBuildAckPacketMessage;
 use hermes_relayer_components::chain::traits::message_builders::channel_handshake::{
@@ -181,6 +183,7 @@ pub struct StarknetChain {
     pub ibc_client_contract_address: Option<Felt>,
     pub ibc_core_contract_address: Option<Felt>,
     pub event_encoding: StarknetEventEncoding,
+    pub event_subscription: Option<Arc<dyn Subscription<Item = (u64, StarknetEvent)>>>,
 }
 
 pub struct StarknetChainContextComponents;
@@ -274,6 +277,14 @@ impl JsonRpcClientGetter<StarknetChain> for StarknetChainContextComponents {
 impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
     fn chain_id(chain: &StarknetChain) -> &ChainId {
         &chain.chain_id
+    }
+}
+
+impl EventSubscriptionGetter<StarknetChain> for StarknetChainContextComponents {
+    fn event_subscription(
+        chain: &StarknetChain,
+    ) -> Option<&Arc<dyn Subscription<Item = (u64, StarknetEvent)>>> {
+        chain.event_subscription.as_ref()
     }
 }
 
