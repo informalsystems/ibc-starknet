@@ -1,3 +1,4 @@
+use hermes_cli::commands::client::create::CreateClientArgs;
 use hermes_cli_components::impls::commands::client::update::UpdateClientArgs;
 use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
 
@@ -11,7 +12,7 @@ pub struct RunClientSubCommand;
 
 impl<App> CommandRunner<App, ClientSubCommand> for RunClientSubCommand
 where
-    App: CanRunCommand<UpdateClientArgs>,
+    App: CanRunCommand<UpdateClientArgs> + CanRunCommand<CreateClientArgs>,
 {
     async fn run_command(
         app: &App,
