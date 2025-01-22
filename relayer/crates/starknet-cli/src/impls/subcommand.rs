@@ -1,6 +1,6 @@
 use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
 
-use crate::commands::connection::create::ConnectionSubCommand;
+use crate::commands::connection::subcommand::ConnectionSubCommand;
 use crate::commands::query::subcommand::QuerySubCommand;
 use crate::impls::bootstrap::subcommand::BootstrapSubCommand;
 
