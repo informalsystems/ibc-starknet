@@ -1,4 +1,3 @@
-use hermes_cli::commands::client::update::UpdateClientArgs;
 use hermes_cli_components::impls::commands::client::update::UpdateClientArgs;
 use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
 
