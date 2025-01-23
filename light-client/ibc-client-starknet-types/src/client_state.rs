@@ -9,4 +9,5 @@ pub const STARKNET_CLIENT_STATE_TYPE_URL: &str = "/StarknetClientState";
 pub struct StarknetClientState {
     pub latest_height: Height,
     pub chain_id: ChainId,
+    pub pub_key: Vec<u8>,
 }
