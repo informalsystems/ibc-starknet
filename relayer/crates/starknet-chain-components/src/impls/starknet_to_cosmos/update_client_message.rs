@@ -13,7 +13,6 @@ use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSi
 use ibc::core::host::types::identifiers::ClientId;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use prost_types::Any;
-use sha2::{Digest, Sha256};
 
 use crate::types::payloads::client::StarknetUpdateClientPayload;
 
@@ -45,7 +44,7 @@ where
         let signer = chain.get_default_signer();
 
         let signature = signer
-            .sign(&Sha256::digest(&header_any.value))
+            .sign(&header_any.value)
             .map_err(Chain::raise_error)?;
 
         let signed_header = SignedStarknetHeader {
