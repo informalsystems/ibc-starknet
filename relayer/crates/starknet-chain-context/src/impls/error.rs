@@ -39,7 +39,7 @@ use hermes_starknet_chain_components::impls::queries::contract_address::Contract
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use hermes_starknet_chain_components::types::event::UnknownEvent;
 use ibc::core::client::types::error::ClientError;
-use ibc::core::host::types::error::IdentifierError;
+use ibc::core::host::types::error::{DecodingError, IdentifierError};
 use ibc::primitives::TimestampError;
 use prost::{DecodeError, EncodeError};
 use starknet::accounts::{single_owner, AccountError};
@@ -69,6 +69,7 @@ delegate_components! {
             JsonError,
             EncodeError,
             DecodeError,
+            DecodingError,
             ClientError,
             TimestampError,
             IdentifierError,
