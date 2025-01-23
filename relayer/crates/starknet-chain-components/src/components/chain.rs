@@ -14,6 +14,7 @@ use hermes_chain_components::impls::types::payloads::connection::ProvideConnecti
 use hermes_chain_components::impls::types::payloads::packet::ProvidePacketPayloadTypes;
 use hermes_chain_components::impls::types::receipt::ProvideBytesPacketReceipt;
 use hermes_chain_components::traits::commitment_prefix::IbcCommitmentPrefixGetterComponent;
+pub use hermes_chain_components::traits::packet::from_send_packet::PacketFromSendPacketEventBuilderComponent;
 pub use hermes_cosmos_chain_components::components::client::*;
 use hermes_cosmos_chain_components::impls::channel::init_channel_options::ProvideCosmosInitChannelOptionsType;
 use hermes_cosmos_chain_components::impls::connection::init_connection_options::ProvideCosmosInitConnectionOptionsType;
@@ -273,7 +274,8 @@ cgp_preset! {
             WriteAckEventComponent,
             EventExtractorComponent,
             MessageResponseExtractorComponent,
-            PacketFromWriteAckBuilderComponent,
+            PacketFromWriteAckEventBuilderComponent,
+            PacketFromSendPacketEventBuilderComponent,
         ]:
             UseStarknetEvents,
         CreateClientMessageOptionsTypeComponent:

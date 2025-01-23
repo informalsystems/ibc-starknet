@@ -1,10 +1,14 @@
 use core::marker::PhantomData;
 
+use cgp::prelude::HasAsyncErrorType;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::extract_data::EventExtractor;
+use hermes_chain_components::traits::packet::from_send_packet::PacketFromSendPacketEventBuilder;
 use hermes_chain_components::traits::types::event::HasEventType;
-use hermes_chain_components::traits::types::ibc_events::send_packet::ProvideSendPacketEvent;
+use hermes_chain_components::traits::types::ibc_events::send_packet::{
+    HasSendPacketEvent, ProvideSendPacketEvent,
+};
 use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -19,8 +23,18 @@ where
     Chain: HasOutgoingPacketType<Counterparty, OutgoingPacket = Packet> + HasEventType,
 {
     type SendPacketEvent = SendPacketEvent;
+}
 
-    fn extract_packet_from_send_packet_event(_event: &SendPacketEvent) -> Packet {
+impl<Chain, Counterparty> PacketFromSendPacketEventBuilder<Chain, Counterparty>
+    for UseStarknetEvents
+where
+    Chain:
+        HasSendPacketEvent<Counterparty> + HasOutgoingPacketType<Counterparty> + HasAsyncErrorType,
+{
+    async fn build_packet_from_send_packet_event(
+        _chain: &Chain,
+        _event: &Chain::SendPacketEvent,
+    ) -> Result<Chain::OutgoingPacket, Chain::Error> {
         todo!()
     }
 }

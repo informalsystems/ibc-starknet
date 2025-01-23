@@ -1,9 +1,10 @@
 use core::marker::PhantomData;
 
+use cgp::prelude::HasAsyncErrorType;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::extract_data::EventExtractor;
-use hermes_chain_components::traits::packet::from_write_ack::PacketFromWriteAckBuilder;
+use hermes_chain_components::traits::packet::from_write_ack::PacketFromWriteAckEventBuilder;
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::ibc_events::write_ack::{
     HasWriteAckEvent, ProvideWriteAckEvent,
@@ -52,14 +53,15 @@ where
     }
 }
 
-impl<Chain, Counterparty> PacketFromWriteAckBuilder<Chain, Counterparty> for UseStarknetEvents
+impl<Chain, Counterparty> PacketFromWriteAckEventBuilder<Chain, Counterparty> for UseStarknetEvents
 where
-    Chain: Sized + HasWriteAckEvent<Counterparty>,
+    Chain: Sized + HasWriteAckEvent<Counterparty> + HasAsyncErrorType,
     Counterparty: HasOutgoingPacketType<Chain>,
 {
-    fn build_packet_from_write_ack_event(
+    async fn build_packet_from_write_ack_event(
+        _chain: &Chain,
         _ack: &Chain::WriteAckEvent,
-    ) -> &Counterparty::OutgoingPacket {
+    ) -> Result<Counterparty::OutgoingPacket, Chain::Error> {
         todo!()
     }
 }
