@@ -3,8 +3,10 @@ use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMes
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::messages::client::update::CosmosUpdateClientMessage;
 use hermes_encoding_components::traits::convert::CanConvert;
+use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
 use hermes_encoding_components::types::AsBytes;
+use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use hermes_relayer_components::chain::traits::message_builders::update_client::UpdateClientMessageBuilder;
 use hermes_relayer_components::chain::traits::types::ibc::HasIbcChainTypes;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
@@ -28,7 +30,9 @@ where
         + CanRaiseAsyncError<String>,
     Counterparty: HasUpdateClientPayloadType<Chain, UpdateClientPayload = StarknetUpdateClientPayload>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>,
-    Encoding: Async + CanConvert<StarknetHeader, Any> + CanConvert<SignedStarknetHeader, Any>,
+    Encoding: Async
+        + CanEncode<ViaProtobuf, StarknetHeader, Encoded = Vec<u8>>
+        + CanConvert<SignedStarknetHeader, Any>,
 {
     async fn build_update_client_message(
         chain: &Chain,
@@ -37,16 +41,16 @@ where
     ) -> Result<Vec<CosmosMessage>, Chain::Error> {
         let encoding = Counterparty::default_encoding();
 
-        let header_any: Any = encoding
-            .convert(&payload.header)
+        let encoded_header = encoding
+            .encode(&payload.header)
             .map_err(Chain::raise_error)?;
 
         let signer = chain.get_default_signer();
 
-        let signature = signer.sign(&header_any.value).map_err(Chain::raise_error)?;
+        let signature = signer.sign(&encoded_header).map_err(Chain::raise_error)?;
 
         let signed_header = SignedStarknetHeader {
-            header: header_any.value.clone(),
+            header: encoded_header.clone(),
             signature,
         };
 

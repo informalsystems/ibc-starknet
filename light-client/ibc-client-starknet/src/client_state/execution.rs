@@ -2,10 +2,10 @@ use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::any::ConvertIbcAny;
 use hermes_encoding_components::impls::convert::ConvertVia;
 use hermes_encoding_components::traits::convert::Converter;
+use hermes_encoding_components::traits::decode::CanDecode;
+use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc_client_cw::context::client_ctx::CwClientExecution;
-use ibc_client_starknet_types::header::{
-    SignedStarknetHeader, StarknetHeader, STARKNET_HEADER_TYPE_URL,
-};
+use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use ibc_client_starknet_types::StarknetClientState as ClientStateType;
 use ibc_core::client::context::client_state::ClientStateExecution;
 use ibc_core::client::context::prelude::{ClientStateCommon, ConsensusState};
@@ -87,16 +87,10 @@ where
                 })
             }
         }
-
-        let any_header = Any {
-            type_url: STARKNET_HEADER_TYPE_URL.to_owned(),
-            value: raw_header,
-        };
-
-        let header: StarknetHeader = <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
-            &StarknetLightClientEncoding,
-            &any_header,
-        )?;
+        let header: StarknetHeader = <StarknetLightClientEncoding as CanDecode<
+            ViaProtobuf,
+            StarknetHeader,
+        >>::decode(&StarknetLightClientEncoding, &raw_header)?;
 
         let latest_height = header.height;
 
