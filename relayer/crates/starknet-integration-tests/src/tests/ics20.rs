@@ -25,21 +25,18 @@ use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage
 use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapChannel;
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
+use hermes_relayer_components::relay::traits::event_relayer::CanRelayEvent;
 use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
-use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
 use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::traits::queries::block_events::CanQueryBlockEvents;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
-use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
-use hermes_starknet_chain_components::types::events::packet::PacketRelayEvents;
 use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
@@ -57,14 +54,8 @@ use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmo
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
-use ibc::apps::transfer::types::packet::PacketData;
-use ibc::apps::transfer::types::PrefixedCoin;
-use ibc::core::channel::types::packet::Packet as IbcPacket;
-use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
-use ibc::core::client::types::Height as IbcHeight;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
-use ibc::primitives::Timestamp as IbcTimestamp;
 use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
@@ -418,7 +409,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         )
         .await?;
 
-        // TODO(rano): how do I get the ics20 token contract address from starknet events
         cosmos_to_starknet_relay.relay_packet(&packet).await?;
 
         let balance_cosmos_a_step_1 = cosmos_chain
@@ -531,10 +521,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             }
         };
 
-        let event_start_height = starknet_chain.query_chain_height().await?;
-
         // submit to ics20 contract
-        let (send_packet_event, send_ics20_event) = {
+        {
             let call_data = cairo_encoding.encode(&starknet_ics20_send_message)?;
 
             let call = Call {
@@ -547,101 +535,17 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let response = starknet_chain.send_message(message).await?;
 
-            info!("ICS20 send packet response: {:?}", response);
+            let height = starknet_chain.query_chain_height().await?;
 
-            let mut ibc_packet_events: Vec<PacketRelayEvents> = starknet_chain
-                .event_encoding
-                .filter_decode_events(&response.events)?;
-
-            info!("IBC packet events: {:?}", ibc_packet_events);
-
-            let mut ibc_transfer_events: Vec<IbcTransferEvent> = starknet_chain
-                .event_encoding
-                .filter_decode_events(&response.events)?;
-
-            info!("IBC transfer events: {:?}", ibc_transfer_events);
-
-            assert_eq!(ibc_packet_events.len(), 1);
-            assert_eq!(ibc_transfer_events.len(), 1);
-
-            let Some(PacketRelayEvents::Send(send_packet_event)) = ibc_packet_events.pop() else {
-                panic!("expected send packet event");
-            };
-
-            let Some(IbcTransferEvent::Send(send_ics20_event)) = ibc_transfer_events.pop() else {
-                panic!("expected send ics20 event");
-            };
-
-            {
-                tokio::time::sleep(core::time::Duration::from_secs(1)).await;
-
-                let event_end_height = starknet_chain.query_chain_height().await?;
-
-                info!("polling events from {event_start_height} to {event_end_height}");
-
-                for height in event_start_height..event_end_height {
-                    let events = starknet_chain
-                        .query_block_events(&height, &ibc_core_address)
-                        .await?;
-
-                    info!("polled events at height {height}: {events:?}");
-
-                    let parsed_events: Vec<PacketRelayEvents> = starknet_chain
-                        .event_encoding
-                        .filter_decode_events(&events)?;
-
-                    info!("parsed polled events at height {height}: {parsed_events:?}");
-                }
-            }
-
-            (send_packet_event, send_ics20_event)
-        };
-
-        // create ibc packet
-
-        let starknet_ibc_packet = {
-            let timeout_height_on_b = IbcHeight::new(
-                send_packet_event.timeout_height_on_b.revision_number,
-                send_packet_event.timeout_height_on_b.revision_height,
-            )
-            .map(TimeoutHeight::At)
-            .unwrap_or_else(|_| TimeoutHeight::Never);
-
-            let timeout_timestamp_on_b = (send_packet_event.timeout_timestamp_on_b.timestamp > 0)
-                .then(|| {
-                    TimeoutTimestamp::At(IbcTimestamp::from_nanoseconds(
-                        send_packet_event.timeout_timestamp_on_b.timestamp * 1_000_000_000,
-                    ))
-                })
-                .unwrap_or(TimeoutTimestamp::Never);
-
-            let ibc_transfer_packet_data = PacketData {
-                token: PrefixedCoin {
-                    denom: send_ics20_event.denom.to_string().parse()?,
-                    amount: send_ics20_event.amount.to_string().parse()?,
-                },
-                sender: send_ics20_event.sender.to_string().into(),
-                receiver: send_ics20_event.receiver.to_string().into(),
-                memo: send_ics20_event.memo.into(),
-            };
-
-            IbcPacket {
-                seq_on_a: send_packet_event.sequence_on_a.sequence.into(),
-                port_id_on_a: send_packet_event.port_id_on_a.port_id.parse()?,
-                chan_id_on_a: send_packet_event.channel_id_on_a.channel_id.parse()?,
-                port_id_on_b: send_packet_event.port_id_on_b.port_id.parse()?,
-                chan_id_on_b: send_packet_event.channel_id_on_b.channel_id.parse()?,
-                data: serde_json::to_vec(&ibc_transfer_packet_data).unwrap(),
-                timeout_height_on_b,
-                timeout_timestamp_on_b,
+            for event in response.events {
+                <StarknetToCosmosRelay as CanRelayEvent<SourceTarget>>::relay_chain_event(
+                    &starknet_to_cosmos_relay,
+                    &height,
+                    &event,
+                )
+                .await?;
             }
         };
-
-        // relay the packet via starknet to cosmos relay
-
-        starknet_to_cosmos_relay
-            .relay_packet(&starknet_ibc_packet)
-            .await?;
 
         let balance_cosmos_a_step_2 = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)
@@ -752,9 +656,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             }
         };
 
-        // submit to ics20 contract
-
-        let (send_packet_event, send_ics20_event) = {
+        {
             let call_data = cairo_encoding.encode(&starknet_ics20_send_message)?;
 
             let call = Call {
@@ -769,77 +671,17 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             info!("ICS20 send packet response: {:?}", response);
 
-            let mut ibc_packet_events: Vec<PacketRelayEvents> = starknet_chain
-                .event_encoding
-                .filter_decode_events(&response.events)?;
+            let height = starknet_chain.query_chain_height().await?;
 
-            info!("IBC packet events: {:?}", ibc_packet_events);
-
-            let mut ibc_transfer_events: Vec<IbcTransferEvent> = starknet_chain
-                .event_encoding
-                .filter_decode_events(&response.events)?;
-
-            info!("IBC transfer events: {:?}", ibc_transfer_events);
-
-            assert_eq!(ibc_packet_events.len(), 1);
-            assert_eq!(ibc_transfer_events.len(), 1);
-
-            let Some(PacketRelayEvents::Send(send_packet_event)) = ibc_packet_events.pop() else {
-                panic!("expected send packet event");
-            };
-
-            let Some(IbcTransferEvent::Send(send_ics20_event)) = ibc_transfer_events.pop() else {
-                panic!("expected send ics20 event");
-            };
-
-            (send_packet_event, send_ics20_event)
-        };
-
-        // create ibc packet
-
-        let starknet_ibc_packet = {
-            let timeout_height_on_b = IbcHeight::new(
-                send_packet_event.timeout_height_on_b.revision_number,
-                send_packet_event.timeout_height_on_b.revision_height,
-            )
-            .map(TimeoutHeight::At)
-            .unwrap_or_else(|_| TimeoutHeight::Never);
-
-            let timeout_timestamp_on_b = (send_packet_event.timeout_timestamp_on_b.timestamp > 0)
-                .then(|| {
-                    TimeoutTimestamp::At(IbcTimestamp::from_nanoseconds(
-                        send_packet_event.timeout_timestamp_on_b.timestamp * 1_000_000_000,
-                    ))
-                })
-                .unwrap_or(TimeoutTimestamp::Never);
-
-            let ibc_transfer_packet_data = PacketData {
-                token: PrefixedCoin {
-                    denom: send_ics20_event.denom.to_string().parse()?,
-                    amount: send_ics20_event.amount.to_string().parse()?,
-                },
-                sender: send_ics20_event.sender.to_string().into(),
-                receiver: send_ics20_event.receiver.to_string().into(),
-                memo: send_ics20_event.memo.into(),
-            };
-
-            IbcPacket {
-                seq_on_a: send_packet_event.sequence_on_a.sequence.into(),
-                port_id_on_a: send_packet_event.port_id_on_a.port_id.parse()?,
-                chan_id_on_a: send_packet_event.channel_id_on_a.channel_id.parse()?,
-                port_id_on_b: send_packet_event.port_id_on_b.port_id.parse()?,
-                chan_id_on_b: send_packet_event.channel_id_on_b.channel_id.parse()?,
-                data: serde_json::to_vec(&ibc_transfer_packet_data).unwrap(),
-                timeout_height_on_b,
-                timeout_timestamp_on_b,
+            for event in response.events {
+                <StarknetToCosmosRelay as CanRelayEvent<SourceTarget>>::relay_chain_event(
+                    &starknet_to_cosmos_relay,
+                    &height,
+                    &event,
+                )
+                .await?;
             }
         };
-
-        // relay the packet via starknet to cosmos relay
-
-        starknet_to_cosmos_relay
-            .relay_packet(&starknet_ibc_packet)
-            .await?;
 
         // query balances
 
