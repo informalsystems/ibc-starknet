@@ -3,8 +3,12 @@ use core::marker::PhantomData;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::extract_data::EventExtractor;
+use hermes_chain_components::traits::packet::from_write_ack::PacketFromWriteAckBuilder;
 use hermes_chain_components::traits::types::event::HasEventType;
-use hermes_chain_components::traits::types::ibc_events::write_ack::ProvideWriteAckEvent;
+use hermes_chain_components::traits::types::ibc_events::write_ack::{
+    HasWriteAckEvent, ProvideWriteAckEvent,
+};
+use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
 use hermes_chain_components::traits::types::packets::ack::HasAcknowledgementType;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -45,5 +49,17 @@ where
             PacketRelayEvents::WriteAcknowledgement(ack) => Some(ack),
             _ => None,
         }
+    }
+}
+
+impl<Chain, Counterparty> PacketFromWriteAckBuilder<Chain, Counterparty> for UseStarknetEvents
+where
+    Chain: Sized + HasWriteAckEvent<Counterparty>,
+    Counterparty: HasOutgoingPacketType<Chain>,
+{
+    fn build_packet_from_write_ack_event(
+        _ack: &Chain::WriteAckEvent,
+    ) -> &Counterparty::OutgoingPacket {
+        todo!()
     }
 }

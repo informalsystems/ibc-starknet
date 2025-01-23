@@ -271,6 +271,7 @@ cgp_preset! {
             WriteAckEventComponent,
             EventExtractorComponent,
             MessageResponseExtractorComponent,
+            PacketFromWriteAckBuilderComponent,
         ]:
             UseStarknetEvents,
         CreateClientMessageOptionsTypeComponent:

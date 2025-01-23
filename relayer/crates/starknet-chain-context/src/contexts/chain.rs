@@ -28,7 +28,9 @@ use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
 use hermes_relayer_components::chain::traits::event_subscription::EventSubscriptionGetter;
-use hermes_relayer_components::chain::traits::extract_data::CanExtractFromMessageResponse;
+use hermes_relayer_components::chain::traits::extract_data::{
+    CanExtractFromEvent, CanExtractFromMessageResponse,
+};
 use hermes_relayer_components::chain::traits::message_builders::ack_packet::CanBuildAckPacketMessage;
 use hermes_relayer_components::chain::traits::message_builders::channel_handshake::{
     CanBuildChannelOpenAckMessage, CanBuildChannelOpenConfirmMessage,
@@ -49,6 +51,7 @@ use hermes_relayer_components::chain::traits::packet::fields::{
 use hermes_relayer_components::chain::traits::packet::filter::{
     CanFilterIncomingPacket, CanFilterOutgoingPacket,
 };
+use hermes_relayer_components::chain::traits::packet::from_write_ack::CanBuildPacketFromWriteAck;
 use hermes_relayer_components::chain::traits::payload_builders::ack_packet::CanBuildAckPacketPayload;
 use hermes_relayer_components::chain::traits::payload_builders::channel_handshake::{
     CanBuildChannelOpenAckPayload, CanBuildChannelOpenConfirmPayload, CanBuildChannelOpenTryPayload,
@@ -79,6 +82,7 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::{
 use hermes_relayer_components::chain::traits::queries::consensus_state_height::{
     CanQueryConsensusStateHeight, CanQueryConsensusStateHeights,
 };
+use hermes_relayer_components::chain::traits::queries::counterparty_chain_id::CanQueryCounterpartyChainId;
 use hermes_relayer_components::chain::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
 use hermes_relayer_components::chain::traits::queries::packet_commitment::CanQueryPacketCommitment;
 use hermes_relayer_components::chain::traits::queries::packet_is_received::CanQueryPacketIsReceived;
@@ -155,6 +159,7 @@ use hermes_starknet_chain_components::types::cosmos::client_state::CometClientSt
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
 use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
+use hermes_starknet_chain_components::types::events::packet::WriteAcknowledgementEvent;
 use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
@@ -401,7 +406,13 @@ pub trait CanUseStarknetChain:
     + HasMemoType
     + CanCreateStarknetEventSubscription
     + HasCreateClientEvent<CosmosChain, CreateClientEvent = StarknetCreateClientEvent>
+    + HasWriteAckEvent<CosmosChain, WriteAckEvent = WriteAcknowledgementEvent>
     + CanExtractFromMessageResponse<StarknetCreateClientEvent>
+    + CanExtractFromEvent<WriteAcknowledgementEvent>
+    + CanBuildPacketFromWriteAck<CosmosChain>
+    + CanFilterIncomingPacket<CosmosChain>
+    + CanFilterOutgoingPacket<CosmosChain>
+// + CanQueryCounterpartyChainId<CosmosChain>
 // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
 // + CanIbcTransferToken<CosmosChain>
 {
@@ -458,6 +469,10 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + HasCreateClientEvent<StarknetChain>
     + HasSendPacketEvent<StarknetChain>
     + HasWriteAckEvent<StarknetChain>
+    + CanBuildPacketFromWriteAck<StarknetChain>
+    + CanQueryCounterpartyChainId<StarknetChain>
+    + CanFilterIncomingPacket<StarknetChain>
+    + CanFilterOutgoingPacket<StarknetChain>
 {
 }
 
