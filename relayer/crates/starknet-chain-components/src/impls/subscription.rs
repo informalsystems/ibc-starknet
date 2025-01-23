@@ -130,8 +130,6 @@ where
             })
         });
 
-        let subscription = runtime.multiplex_subscription(subscription, |e| e);
-
-        subscription
+        runtime.multiplex_subscription(subscription, |e| e)
     }
 }

@@ -14,6 +14,9 @@ use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use ibc::core::channel::types::packet::Packet;
+use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
+use ibc::core::client::types::Height;
+use ibc::primitives::Timestamp;
 
 use crate::impls::events::UseStarknetEvents;
 use crate::types::events::packet::{PacketRelayEvents, SendPacketEvent};
@@ -28,13 +31,29 @@ where
 impl<Chain, Counterparty> PacketFromSendPacketEventBuilder<Chain, Counterparty>
     for UseStarknetEvents
 where
-    Chain:
-        HasSendPacketEvent<Counterparty> + HasOutgoingPacketType<Counterparty> + HasAsyncErrorType,
+    Chain: HasSendPacketEvent<Counterparty, SendPacketEvent = SendPacketEvent>
+        + HasOutgoingPacketType<Counterparty, OutgoingPacket = Packet>
+        + HasAsyncErrorType,
 {
     async fn build_packet_from_send_packet_event(
         _chain: &Chain,
-        _event: &Chain::SendPacketEvent,
-    ) -> Result<Chain::OutgoingPacket, Chain::Error> {
+        event: &SendPacketEvent,
+    ) -> Result<Packet, Chain::Error> {
+        let timeout_height_on_b = Height::new(
+            event.timeout_height_on_b.revision_number,
+            event.timeout_height_on_b.revision_height,
+        )
+        .map(TimeoutHeight::At)
+        .unwrap_or_else(|_| TimeoutHeight::Never);
+
+        let timeout_timestamp_on_b = (event.timeout_timestamp_on_b.timestamp > 0)
+            .then(|| {
+                TimeoutTimestamp::At(Timestamp::from_nanoseconds(
+                    event.timeout_timestamp_on_b.timestamp * 1_000_000_000,
+                ))
+            })
+            .unwrap_or(TimeoutTimestamp::Never);
+
         todo!()
     }
 }
