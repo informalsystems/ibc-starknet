@@ -6,6 +6,7 @@ pub mod ChannelErrors {
     pub const EMPTY_ACK: felt252 = 'ICS04: empty acknowledgement';
     pub const EMPTY_UNRECEIVED_PROOF: felt252 = 'ICS04: empty unreceived proof';
     pub const EMPTY_ACK_PROOF: felt252 = 'ICS04: empty ack proof';
+    pub const EMPTY_SEQUENCE_LIST: felt252 = 'ICS04: empty sequence list';
     pub const ZERO_PROOF_HEIGHT: felt252 = 'ICS04: zero proof height';
     pub const UNSUPPORTED_ORDERING: felt252 = 'ICS04: unsupported ordering';
     pub const INVALID_CHANNEL_STATE: felt252 = 'ICS04: invalid channel state';

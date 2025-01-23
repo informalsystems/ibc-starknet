@@ -5,9 +5,8 @@ pub mod ChannelHandlerComponent {
     use ConnectionHandlerComponent::CoreConnectionQuery;
     use RouterHandlerComponent::RouterInternalTrait;
     use core::num::traits::Zero;
-    use starknet::storage::Map;
     use starknet::storage::{
-        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess
     };
     use starknet::{get_block_timestamp, get_block_number};
@@ -164,7 +163,6 @@ pub mod ChannelHandlerComponent {
             self.read_packet_ack(@port_id, @channel_id, @sequence)
         }
 
-
         fn is_packet_received(
             self: @ComponentState<TContractState>,
             port_id: PortId,
@@ -172,6 +170,41 @@ pub mod ChannelHandlerComponent {
             sequence: Sequence
         ) -> bool {
             self.packet_ack_exists(@port_id, @channel_id, @sequence)
+        }
+
+        fn unreceived_packet_sequences(
+            self: @ComponentState<TContractState>,
+            port_id: PortId,
+            channel_id: ChannelId,
+            sequences: Array<Sequence>
+        ) -> Array<Sequence> {
+            assert(sequences.len() > 0, ChannelErrors::EMPTY_SEQUENCE_LIST);
+            let mut unreceived_sequences = ArrayTrait::new();
+            for seq in sequences {
+                if self.read_packet_receipt(@port_id, @channel_id, @seq).is_none() {
+                    unreceived_sequences.append(seq);
+                }
+            };
+            unreceived_sequences
+        }
+
+        fn unreceived_ack_sequences(
+            self: @ComponentState<TContractState>,
+            port_id: PortId,
+            channel_id: ChannelId,
+            sequences: Array<Sequence>
+        ) -> Array<Sequence> {
+            assert(sequences.len() > 0, ChannelErrors::EMPTY_SEQUENCE_LIST);
+            let mut unreceived_sequences = ArrayTrait::new();
+            for seq in sequences {
+                if self
+                    .packet_commitments
+                    .read(commitment_key(@port_id, @channel_id, @seq))
+                    .is_non_zero() {
+                    unreceived_sequences.append(seq)
+                };
+            };
+            unreceived_sequences
         }
 
         fn next_sequence_send(
