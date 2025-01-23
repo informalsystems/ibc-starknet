@@ -1,8 +1,9 @@
 use core::num::traits::Zero;
 use core::sha256::{compute_sha256_byte_array, compute_sha256_u32_array};
+use ics23::{IntoArrayU32, array_u32_into_array_u8};
 use starknet_ibc_core::channel::Acknowledgement;
 use starknet_ibc_core::client::{Height, Timestamp};
-use starknet_ibc_core::commitment::{U32CollectorImpl, IntoArrayU32, array_u32_into_array_u8};
+use starknet_ibc_core::commitment::U32CollectorImpl;
 
 // -----------------------------------------------------------
 // Commitment Value

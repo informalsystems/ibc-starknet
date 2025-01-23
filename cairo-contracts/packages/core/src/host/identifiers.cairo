@@ -3,7 +3,8 @@ use core::num::traits::CheckedAdd;
 use core::num::traits::Zero;
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
-use starknet_ibc_core::commitment::{ArrayU32IntoArrayU8, StateValue, u64_into_array_u32};
+use ics23::{ArrayU32IntoArrayU8, u64_into_array_u32};
+use starknet_ibc_core::commitment::StateValue;
 use starknet_ibc_core::host::errors::HostErrors;
 use starknet_ibc_utils::{ValidateBasic, ComputeKey, poseidon_hash};
 

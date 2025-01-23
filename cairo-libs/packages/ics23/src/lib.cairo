@@ -5,6 +5,7 @@ mod ops;
 #[cfg(test)]
 mod tests {
     mod ops;
+    mod utils;
 }
 
 pub use types::{
@@ -13,7 +14,7 @@ pub use types::{
 };
 pub use errors::ICS23Errors;
 pub use utils::{
-    array_u8_into_array_u32, array_u32_into_array_u8, byte_array_to_array_u8, ArrayU32IntoArrayU8,
-    SliceU32IntoArrayU32, IntoArrayU32,
+    array_u8_into_array_u32, array_u32_into_array_u8, byte_array_to_array_u8, u64_into_array_u32,
+    ArrayU32IntoArrayU8, SliceU32IntoArrayU32, IntoArrayU32, U64IntoArrayU32
 };
 pub(crate) use ops::{apply_inner, apply_leaf, proto_len};

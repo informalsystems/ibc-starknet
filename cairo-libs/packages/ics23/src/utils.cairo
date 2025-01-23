@@ -38,16 +38,6 @@ pub fn array_u32_into_array_u8(input: Array<u32>) -> Array<u8> {
     result
 }
 
-pub fn byte_array_to_array_u8(input: @ByteArray) -> Array<u8> {
-    let mut output: Array<u8> = array![];
-    let mut i = 0;
-    while i < input.len() {
-        output.append(input[i]);
-        i += 1;
-    };
-    output
-}
-
 /// Converts the give type `T` into an array of `u32` values. If the last word
 /// is not a full word, the method returns the last word and its length.
 pub trait IntoArrayU32<T> {
@@ -72,3 +62,29 @@ pub impl SliceU32IntoArrayU32 of Into<[u32; 8], Array<u8>> {
         u32_array.into()
     }
 }
+
+pub fn byte_array_to_array_u8(input: @ByteArray) -> Array<u8> {
+    let mut output: Array<u8> = array![];
+    let mut i = 0;
+    while i < input.len() {
+        output.append(input[i]);
+        i += 1;
+    };
+    output
+}
+
+pub fn u64_into_array_u32(value: u64) -> Array<u32> {
+    let mut array: Array<u32> = ArrayTrait::new();
+    let upper = (value / 0x100000000).try_into().unwrap();
+    let lower = (value % 0x100000000).try_into().unwrap();
+    array.append(upper);
+    array.append(lower);
+    array
+}
+
+pub impl U64IntoArrayU32 of IntoArrayU32<u64> {
+    fn into_array_u32(self: u64) -> (Array<u32>, u32, u32) {
+        (u64_into_array_u32(self), 0, 0)
+    }
+}
+
