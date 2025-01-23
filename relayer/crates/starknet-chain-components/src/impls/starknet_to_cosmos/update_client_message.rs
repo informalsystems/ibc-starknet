@@ -43,9 +43,7 @@ where
 
         let signer = chain.get_default_signer();
 
-        let signature = signer
-            .sign(&header_any.value)
-            .map_err(Chain::raise_error)?;
+        let signature = signer.sign(&header_any.value).map_err(Chain::raise_error)?;
 
         let signed_header = SignedStarknetHeader {
             header: header_any.value.clone(),
