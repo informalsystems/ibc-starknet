@@ -10,7 +10,6 @@ use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
 
-use crate::types::client_state::{StarknetClientState, WasmStarknetClientState};
 use crate::types::consensus_state::{StarknetConsensusState, WasmStarknetConsensusState};
 use crate::types::payloads::client::{
     StarknetCreateClientPayload, StarknetCreateClientPayloadOptions,
@@ -38,14 +37,6 @@ where
 
         let root = Vec::from(chain_status.block_hash.to_bytes_be());
 
-        let client_state = WasmStarknetClientState {
-            wasm_code_hash: create_client_options.wasm_code_hash.into(),
-            client_state: StarknetClientState {
-                latest_height: Height::new(0, 1).map_err(Chain::raise_error)?,
-                chain_id: chain.chain_id().clone(),
-            },
-        };
-
         let consensus_state = WasmStarknetConsensusState {
             consensus_state: StarknetConsensusState {
                 root: root.into(),
@@ -54,7 +45,9 @@ where
         };
 
         Ok(StarknetCreateClientPayload {
-            client_state,
+            latest_height: Height::new(0, 1).map_err(Chain::raise_error)?,
+            chain_id: chain.chain_id().clone(),
+            client_state_wasm_code_hash: create_client_options.wasm_code_hash.into(),
             consensus_state,
         })
     }

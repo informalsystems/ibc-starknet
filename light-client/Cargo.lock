@@ -1139,8 +1139,7 @@ dependencies = [
 [[package]]
 name = "ibc-client-cw"
 version = "0.56.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b9620ac23289491d842beeacd4512feb3e1610ba031bbceec9cffe46e07fb8c"
+source = "git+https://github.com/informalsystems/cosmwasm-ibc.git?branch=luca_joss/add-cw-client-extension-trait#9160e505a664aaa430f9c3cdc40e115d6d364ceb"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
@@ -1160,6 +1159,7 @@ dependencies = [
  "hermes-cosmos-encoding-components",
  "hermes-encoding-components",
  "hermes-protobuf-encoding-components",
+ "ibc-client-cw",
  "ibc-client-starknet-types",
  "ibc-core",
  "prost",

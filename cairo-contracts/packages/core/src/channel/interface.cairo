@@ -70,6 +70,12 @@ pub trait IChannelQuery<TContractState> {
     fn is_packet_received(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
     ) -> bool;
+    fn unreceived_packet_sequences(
+        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>
+    ) -> Array<Sequence>;
+    fn unreceived_ack_sequences(
+        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>
+    ) -> Array<Sequence>;
     fn next_sequence_send(
         self: @TContractState, port_id: PortId, channel_id: ChannelId
     ) -> Sequence;

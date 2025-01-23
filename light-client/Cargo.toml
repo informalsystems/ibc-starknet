@@ -61,6 +61,8 @@ ibc-client-starknet       = { path = "./ibc-client-starknet" }
 ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
 ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
 
+ibc-client-cw = { git = "https://github.com/informalsystems/cosmwasm-ibc.git", branch = "luca_joss/add-cw-client-extension-trait" }
+
 cgp                     = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-core                = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-extra               = { git = "https://github.com/contextgeneric/cgp.git" }

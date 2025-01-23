@@ -22,7 +22,9 @@ use ibc_core::primitives::Timestamp;
 use crate::encoding::impls::client_state::EncodeStarknetClientState;
 use crate::encoding::impls::consensus_state::EncodeStarknetConsensusState;
 use crate::encoding::impls::header::{EncodeSignedStarknetHeader, EncodeStarknetHeader};
-use crate::header::{SignedStarknetHeader, StarknetHeader, STARKNET_HEADER_TYPE_URL};
+use crate::header::{
+    SignedStarknetHeader, StarknetHeader, SIGNED_STARKNET_HEADER_TYPE_URL, STARKNET_HEADER_TYPE_URL,
+};
 use crate::{
     StarknetClientState, StarknetConsensusState, STARKNET_CLIENT_STATE_TYPE_URL,
     STARKNET_CONSENSUS_STATE_TYPE_URL,
@@ -145,5 +147,5 @@ impl_type_url!(
 impl_type_url!(
     StarknetLightClientTypeUrlSchemas,
     SignedStarknetHeader,
-    STARKNET_HEADER_TYPE_URL,
+    SIGNED_STARKNET_HEADER_TYPE_URL,
 );
