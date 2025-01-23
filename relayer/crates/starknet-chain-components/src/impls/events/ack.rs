@@ -14,7 +14,6 @@ use hermes_chain_components::traits::types::packets::ack::HasAcknowledgementType
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use ibc::core::channel::types::acknowledgement::{AcknowledgementStatus, StatusValue};
 use ibc::core::channel::types::error::ChannelError;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
@@ -97,15 +96,18 @@ where
 
     async fn build_ack_from_write_ack_event(
         _chain: &Chain,
-        _ack: &WriteAcknowledgementEvent,
+        ack: &WriteAcknowledgementEvent,
     ) -> Result<Vec<u8>, Chain::Error> {
-        // FIXME: Fix the Cairo contract to return Vec<u8> acknowledgement inside event
+        // FIXME: Fix the Cairo contract to return ByteArray acknowledgement inside event.
+        // The Cairo encoding for ByteArray is different from Array<u8>
 
-        let status =
-            AcknowledgementStatus::Success(StatusValue::new("dummy").map_err(Chain::raise_error)?);
+        let ack_bytes = ack
+            .acknowledgement
+            .ack
+            .iter()
+            .map(|&felt| felt.try_into().unwrap())
+            .collect::<Vec<_>>();
 
-        let ack = serde_json::to_vec(&status).map_err(Chain::raise_error)?;
-
-        Ok(ack)
+        Ok(ack_bytes)
     }
 }
