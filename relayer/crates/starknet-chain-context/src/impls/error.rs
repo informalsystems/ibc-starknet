@@ -38,6 +38,7 @@ use hermes_starknet_chain_components::impls::queries::consensus_state::Consensus
 use hermes_starknet_chain_components::impls::queries::contract_address::ContractAddressNotFound;
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use hermes_starknet_chain_components::types::event::UnknownEvent;
+use ibc::core::channel::types::error::ChannelError;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};
 use ibc::primitives::TimestampError;
@@ -71,6 +72,7 @@ delegate_components! {
             DecodeError,
             DecodingError,
             ClientError,
+            ChannelError,
             TimestampError,
             IdentifierError,
             ComputeClassHashError,
