@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::HasAsyncErrorType;
+use cgp::prelude::CanRaiseAsyncError;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::extract_data::EventExtractor;
@@ -14,6 +14,9 @@ use hermes_chain_components::traits::types::packets::ack::HasAcknowledgementType
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use ibc::core::channel::types::packet::Packet;
+use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
+use ibc::core::host::types::error::IdentifierError;
 
 use crate::impls::events::UseStarknetEvents;
 use crate::types::events::packet::{PacketRelayEvents, WriteAcknowledgementEvent};
@@ -55,13 +58,43 @@ where
 
 impl<Chain, Counterparty> PacketFromWriteAckEventBuilder<Chain, Counterparty> for UseStarknetEvents
 where
-    Chain: Sized + HasWriteAckEvent<Counterparty> + HasAsyncErrorType,
-    Counterparty: HasOutgoingPacketType<Chain>,
+    Chain: HasWriteAckEvent<Counterparty, WriteAckEvent = WriteAcknowledgementEvent>
+        + CanRaiseAsyncError<IdentifierError>,
+    Counterparty: HasOutgoingPacketType<Chain, OutgoingPacket = Packet>,
 {
     async fn build_packet_from_write_ack_event(
         _chain: &Chain,
-        _ack: &Chain::WriteAckEvent,
-    ) -> Result<Counterparty::OutgoingPacket, Chain::Error> {
-        todo!()
+        event: &WriteAcknowledgementEvent,
+    ) -> Result<Packet, Chain::Error> {
+        let packet = Packet {
+            seq_on_a: event.sequence_on_a.sequence.into(),
+            port_id_on_a: event
+                .port_id_on_a
+                .port_id
+                .parse()
+                .map_err(Chain::raise_error)?,
+            chan_id_on_a: event
+                .channel_id_on_a
+                .channel_id
+                .parse()
+                .map_err(Chain::raise_error)?,
+            port_id_on_b: event
+                .port_id_on_b
+                .port_id
+                .parse()
+                .map_err(Chain::raise_error)?,
+            chan_id_on_b: event
+                .channel_id_on_b
+                .channel_id
+                .parse()
+                .map_err(Chain::raise_error)?,
+
+            // FIXME: make the Cairo contract include these fields in the event
+            data: Vec::new(),
+            timeout_height_on_b: TimeoutHeight::Never,
+            timeout_timestamp_on_b: TimeoutTimestamp::Never,
+        };
+
+        Ok(packet)
     }
 }
