@@ -75,8 +75,8 @@ where
             &signed_header.signature,
             &self.0.pub_key,
         ) {
-            Ok(validation) if validation => {}
-            Ok(_) => {
+            Ok(true) => {}
+            Ok(false) => {
                 return Err(ClientError::ClientSpecific {
                     description: "Header signature not valid".to_owned(),
                 })
