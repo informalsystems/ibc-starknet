@@ -63,6 +63,7 @@ dependencies = [
 name = "ics23"
 version = "0.1.0"
 dependencies = [
+ "alexandria_math",
  "alexandria_numeric",
  "protobuf",
  "snforge_std",

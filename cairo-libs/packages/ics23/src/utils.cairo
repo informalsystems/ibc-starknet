@@ -37,3 +37,38 @@ pub fn array_u32_into_array_u8(input: Array<u32>) -> Array<u8> {
     };
     result
 }
+
+pub fn byte_array_to_array_u8(input: @ByteArray) -> Array<u8> {
+    let mut output: Array<u8> = array![];
+    let mut i = 0;
+    while i < input.len() {
+        output.append(input[i]);
+        i += 1;
+    };
+    output
+}
+
+/// Converts the give type `T` into an array of `u32` values. If the last word
+/// is not a full word, the method returns the last word and its length.
+pub trait IntoArrayU32<T> {
+    fn into_array_u32(self: T) -> (Array<u32>, u32, u32);
+}
+
+pub impl ArrayU8IntoArrayU32 of IntoArrayU32<Array<u8>> {
+    fn into_array_u32(self: Array<u8>) -> (Array<u32>, u32, u32) {
+        array_u8_into_array_u32(self)
+    }
+}
+
+pub impl ArrayU32IntoArrayU8 of Into<Array<u32>, Array<u8>> {
+    fn into(self: Array<u32>) -> Array<u8> {
+        array_u32_into_array_u8(self)
+    }
+}
+
+pub impl SliceU32IntoArrayU32 of Into<[u32; 8], Array<u8>> {
+    fn into(self: [u32; 8]) -> Array<u8> {
+        let u32_array: Array<u32> = self.span().into();
+        u32_array.into()
+    }
+}

@@ -9,6 +9,7 @@ pub mod ICS23Errors {
     pub const MISMATCHED_NUM_OF_PROOFS: felt252 = 'ICS23: mismatched num of proofs';
     pub const INVALID_MERKLE_PROOF: felt252 = 'ICS23: invalid merkle proof';
     pub const INVALID_PROOF_TYPE: felt252 = 'ICS23: invalid proof type';
+    pub const INVALID_INNER_SPEC: felt252 = 'ICS23: invalid inner spec';
     pub const INVALID_DEPTH_RANGE: felt252 = 'ICS23: invalid depth range';
     pub const UNSUPPORTED_HASH_OP: felt252 = 'ICS23: unsupported hash op';
     pub const ZERO_MERKLE_ROOT: felt252 = 'ICS23: zero merkle root';

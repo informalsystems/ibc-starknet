@@ -23,7 +23,7 @@ pub impl MerkleProofImpl of MerkleProofTrait {
     ) {
         let proofs_len = self.proofs.len();
         assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
-        assert(root == [0; 8], ICS23Errors::ZERO_MERKLE_ROOT);
+        assert(root != [0; 8], ICS23Errors::ZERO_MERKLE_ROOT);
         assert(value.len() > 0, ICS23Errors::MISSING_VALUE);
         assert(proofs_len == specs.specs.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
         assert(proofs_len == keys.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
@@ -31,12 +31,11 @@ pub impl MerkleProofImpl of MerkleProofTrait {
         let mut subvalue: Array<u32> = ArrayTrait::new();
         let mut i = 0;
         while i < proofs_len {
-            match self.proofs[i] {
-                Proof::Exist(p) => {
-                    subroot = p.calculate_root();
-                    p.verify(specs.specs[i], @subroot, keys[proofs_len - 1 - i], @value);
-                },
-                _ => panic!("{}", ICS23Errors::INVALID_PROOF_TYPE),
+            if let Proof::Exist(p) = self.proofs[i] {
+                subroot = p.calculate_root();
+                p.verify(specs.specs[i], @subroot, keys[proofs_len - 1 - i], @value);
+            } else {
+                panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
             }
             subvalue = subroot.span().into();
             i += 1;
@@ -99,9 +98,21 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
         assert(self.key.len() > 0, ICS23Errors::MISSING_KEY);
         assert(self.value.len() > 0, ICS23Errors::MISSING_VALUE);
         let mut hash = apply_leaf(self.leaf, self.key, self.value.clone());
-        for i in 0..self.path.len() {
-            hash = apply_inner(self.path[i], hash);
-        };
+        for i in 0
+            ..self
+                .path
+                .len() {
+                    hash = apply_inner(self.path[i], hash);
+                    if let Option::Some(s) = spec {
+                        // NOTE: Multiplied by 4 since the hash is a u32 array, but the
+                        // child size is in u8 bytes.
+                        assert(
+                            !(hash.span().len()
+                                * 4 > *s.inner_spec.child_size && s.inner_spec.child_size >= @32),
+                            ICS23Errors::INVALID_INNER_SPEC
+                        );
+                    }
+                };
         hash
     }
 
@@ -274,10 +285,10 @@ impl U64IntoLengthOp of Into<u64, LengthOp> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct InnerSpec {
-    pub child_order: Array<i32>,
-    pub child_size: i32,
-    pub min_prefix_length: i32,
-    pub max_prefix_length: i32,
+    pub child_order: Array<u32>,
+    pub child_size: u32,
+    pub min_prefix_length: u32,
+    pub max_prefix_length: u32,
     pub empty_child: ByteArray, // TODO: determine the correct type!
     pub hash: HashOp,
 }
@@ -358,8 +369,8 @@ pub struct ProofSpecs {
 pub struct ProofSpec {
     pub leaf_spec: LeafOp,
     pub inner_spec: InnerSpec,
-    pub max_depth: i32,
-    pub min_depth: i32,
+    pub max_depth: u32,
+    pub min_depth: u32,
     pub prehash_key_before_comparison: bool,
 }
 
