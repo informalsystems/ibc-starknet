@@ -59,7 +59,7 @@ delegate_components! {
             CombineEncoders<Product![
                 EncodeField<
                     symbol!("header"),
-                    EncodeLengthDelimitedProtoField<1, UseContext>,
+                    EncodeByteField<1>,
                 >,
                 EncodeField<
                     symbol!("signature"),
@@ -69,7 +69,7 @@ delegate_components! {
         MutDecoderComponent: DecodeFrom<
             Self,
             CombineEncoders<Product![
-                DecodeRequiredProtoField<1, UseContext>,
+                EncodeByteField<1>,
                 EncodeByteField<2>,
             ]>
         >,
@@ -77,7 +77,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeSignedStarknetHeader {
-    type From = Product![StarknetHeader, Vec<u8>];
+    type From = Product![Vec<u8>, Vec<u8>];
 
     type To = SignedStarknetHeader;
 

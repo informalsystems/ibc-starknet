@@ -27,6 +27,7 @@ hermes-cosmos-encoding-components   = { workspace = true }
 # ibc dependencies
 ibc-core                  = { workspace = true }
 ibc-client-starknet-types = { workspace = true }
+ibc-client-cw             = { workspace = true }
 
 [features]
 default = [ "std" ]
