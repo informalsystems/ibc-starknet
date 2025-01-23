@@ -76,6 +76,7 @@ use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
 use crate::impls::queries::consensus_state::QueryCometConsensusState;
 use crate::impls::queries::contract_address::GetContractAddressFromField;
+use crate::impls::queries::counterparty_chain_id::QueryCosmosChainIdFromStarknetChannelId;
 use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
 use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
 use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
@@ -268,6 +269,7 @@ cgp_preset! {
             ConnectionOpenTryEventComponent,
             ChannelOpenInitEventComponent,
             ChannelOpenTryEventComponent,
+            SendPacketEventComponent,
             WriteAckEventComponent,
             EventExtractorComponent,
             MessageResponseExtractorComponent,
@@ -385,5 +387,7 @@ cgp_preset! {
             FilterStarknetPackets,
         ReceivedPacketQuerierComponent:
             QueryPacketIsReceivedOnStarknet,
+        CounterpartyChainIdQuerierComponent:
+            QueryCosmosChainIdFromStarknetChannelId,
     }
 }

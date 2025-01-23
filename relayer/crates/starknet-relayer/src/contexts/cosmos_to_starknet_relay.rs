@@ -161,9 +161,9 @@ pub trait CanUseCosmosToStarknetRelay:
     + HasPacketLock
     + HasLogger
     + CanRelayEvent<SourceTarget>
-    // + CanRelayEvent<DestinationTarget>
+    + CanRelayEvent<DestinationTarget>
     + CanAutoRelay<SourceTarget>
-    // + CanAutoRelay<DestinationTarget>
+    + CanAutoRelay<DestinationTarget>
 {
 }
 

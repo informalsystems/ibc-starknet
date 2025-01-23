@@ -406,13 +406,16 @@ pub trait CanUseStarknetChain:
     + HasMemoType
     + CanCreateStarknetEventSubscription
     + HasCreateClientEvent<CosmosChain, CreateClientEvent = StarknetCreateClientEvent>
+    + HasSendPacketEvent<CosmosChain>
     + HasWriteAckEvent<CosmosChain, WriteAckEvent = WriteAcknowledgementEvent>
     + CanExtractFromMessageResponse<StarknetCreateClientEvent>
     + CanExtractFromEvent<WriteAcknowledgementEvent>
     + CanBuildPacketFromWriteAck<CosmosChain>
     + CanFilterIncomingPacket<CosmosChain>
     + CanFilterOutgoingPacket<CosmosChain>
-// + CanQueryCounterpartyChainId<CosmosChain>
+    + CanQueryCounterpartyChainId<CosmosChain>
+    + HasPacketDstChannelId<CosmosChain>
+    + HasPacketDstPortId<CosmosChain>
 // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
 // + CanIbcTransferToken<CosmosChain>
 {
