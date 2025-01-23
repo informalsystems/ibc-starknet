@@ -75,8 +75,9 @@ use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 use starknet::core::types::Felt;
 use toml::to_string_pretty;
 
-use crate::commands::client::subcommand::{ClientSubCommand, RunClientSubCommand};
+use crate::commands::create::subcommand::{CreateSubCommand, RunCreateSubCommand};
 use crate::commands::query::subcommand::{QuerySubCommand, RunQuerySubCommand};
+use crate::commands::update::subcommand::{RunUpdateSubCommand, UpdateSubCommand};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
 use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::impls::build::LoadStarknetBuilder;
@@ -180,7 +181,9 @@ delegate_components! {
         QueryChainStatusArgs: RunQueryChainStatusCommand,
         QueryBalanceArgs: RunQueryBalanceCommand,
 
-        ClientSubCommand: RunClientSubCommand,
+        CreateSubCommand: RunCreateSubCommand,
+        UpdateSubCommand: RunUpdateSubCommand,
+
         UpdateClientArgs: RunUpdateClientCommand,
         CreateClientArgs: RunCreateClientCommand,
 
@@ -292,7 +295,8 @@ pub trait CanUseStarknetApp:
     + CanRunCommand<QueryClientStateArgs>
     + CanRunCommand<QueryConsensusStateArgs>
     + CanRunCommand<QueryBalanceArgs>
-    + CanRunCommand<ClientSubCommand>
+    + CanRunCommand<CreateSubCommand>
+    + CanRunCommand<UpdateSubCommand>
     + CanRunCommand<UpdateClientArgs>
     + CanRunCommand<CreateClientArgs>
 {
