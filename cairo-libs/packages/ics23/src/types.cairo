@@ -5,7 +5,7 @@ use protobuf::types::message::{
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
-use ics23::{ICS23Errors, apply_inner, apply_leaf};
+use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf};
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct MerkleProof {
@@ -19,7 +19,7 @@ pub impl MerkleProofImpl of MerkleProofTrait {
         specs: ProofSpecs,
         root: RootBytes,
         keys: Array<ByteArray>,
-        value: Array<u32>,
+        value: Array<u8>,
     ) {
         let proofs_len = self.proofs.len();
         assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
@@ -60,7 +60,7 @@ pub impl MerkleProofImpl of MerkleProofTrait {
                     p.verify(specs.specs[i], @subroot, keys[proofs_len - i]);
                     self
                         .verify_membership(
-                            specs.clone(), root, keys.clone(), subroot.span().into()
+                            specs.clone(), root, keys.clone(), subroot.into()
                         ) // TODO: add start_index
                 },
                 _ => panic!("{}", ICS23Errors::INVALID_PROOF_TYPE),
@@ -83,7 +83,7 @@ pub enum Proof {
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct ExistenceProof {
     pub key: ByteArray,
-    pub value: Array<u32>,
+    pub value: Array<u8>,
     pub leaf: LeafOp,
     pub path: Array<InnerOp>,
 }
@@ -102,7 +102,7 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
             ..self
                 .path
                 .len() {
-                    hash = apply_inner(self.path[i], hash);
+                    hash = apply_inner(self.path[i], hash.into());
                     if let Option::Some(s) = spec {
                         // NOTE: Multiplied by 4 since the hash is a u32 array, but the
                         // child size is in u8 bytes.
@@ -121,7 +121,7 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
         spec: @ProofSpec,
         root: @RootBytes,
         key: @ByteArray,
-        value: @Array<u32>,
+        value: @Array<u8>,
     ) {
         assert(self.key == key, ICS23Errors::MISMATCHED_KEY);
         assert(self.value == value, ICS23Errors::MISMATCHED_VALUE);

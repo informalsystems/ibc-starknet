@@ -1,19 +1,18 @@
 use core::sha256::{compute_sha256_u32_array, compute_sha256_byte_array};
 use ics23::{
-    InnerOp, LeafOp, HashOp, ICS23Errors, byte_array_to_array_u8, LengthOp, ArrayU32IntoArrayU8,
-    SliceU32IntoArrayU32, IntoArrayU32,
+    InnerOp, LeafOp, HashOp, ICS23Errors, LengthOp, ArrayU32IntoArrayU8, SliceU32IntoArrayU8,
+    IntoArrayU32, byte_array_to_array_u8
 };
 
-pub fn apply_inner(inner: @InnerOp, child: [u32; 8]) -> [u32; 8] {
+pub fn apply_inner(inner: @InnerOp, child: Array<u8>) -> [u32; 8] {
     // Sanity checks
     assert(inner.hash == @HashOp::Sha256, ICS23Errors::UNSUPPORTED_HASH_OP);
-    assert(child != [0; 8], ICS23Errors::MISSING_CHILD_HASH);
+    assert(child.len() > 0, ICS23Errors::MISSING_CHILD_HASH);
 
     // Construct the data
     let mut data: Array<u8> = ArrayTrait::new();
     data.append_span(inner.prefix.span());
-    let u8_child_array: Array<u8> = child.into();
-    data.append_span(u8_child_array.span());
+    data.append_span(child.span());
     data.append_span(inner.suffix.span());
 
     // Compute the hash
@@ -21,7 +20,7 @@ pub fn apply_inner(inner: @InnerOp, child: [u32; 8]) -> [u32; 8] {
     compute_sha256_u32_array(bytes, last_word, last_word_len)
 }
 
-pub fn apply_leaf(leaf_op: @LeafOp, key: @ByteArray, value: Array<u32>) -> [u32; 8] {
+pub fn apply_leaf(leaf_op: @LeafOp, key: @ByteArray, value: Array<u8>,) -> [u32; 8] {
     // Sanity check
     assert(leaf_op.hash == @HashOp::Sha256, ICS23Errors::UNSUPPORTED_HASH_OP);
 
@@ -38,7 +37,7 @@ pub fn apply_leaf(leaf_op: @LeafOp, key: @ByteArray, value: Array<u32>) -> [u32;
     compute_sha256_u32_array(bytes, last_word, last_word_len)
 }
 
-pub fn prepare_leaf_u32_array(prehash: @HashOp, length: @LengthOp, data: Array<u32>) -> Array<u8> {
+pub fn prepare_leaf_u32_array(prehash: @HashOp, length: @LengthOp, data: Array<u8>,) -> Array<u8> {
     assert(data.len() > 0, ICS23Errors::MISSING_VALUE);
     do_length(length, hash_u32_array(prehash, data))
 }
@@ -48,10 +47,13 @@ pub fn prepare_leaf_byte_array(prehash: @HashOp, length: @LengthOp, data: @ByteA
     do_length(length, hash_byte_array(prehash, data))
 }
 
-pub fn hash_u32_array(hash_op: @HashOp, data: Array<u32>) -> Array<u8> {
+pub fn hash_u32_array(hash_op: @HashOp, data: Array<u8>) -> Array<u8> {
     match hash_op {
-        HashOp::NoOp => data.into(),
-        HashOp::Sha256 => { compute_sha256_u32_array(data, 0, 0).into() }
+        HashOp::NoOp => { data },
+        HashOp::Sha256 => {
+            let (bytes, last_word, last_word_len) = data.into_array_u32();
+            compute_sha256_u32_array(bytes, last_word, last_word_len).into()
+        }
     }
 }
 

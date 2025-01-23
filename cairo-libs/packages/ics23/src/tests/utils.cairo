@@ -1,4 +1,4 @@
-use ics23::{array_u8_into_array_u32, u64_into_array_u32};
+use ics23::{array_u8_into_array_u32, u64_into_array_u32, encode_hex};
 
 #[test]
 fn test_array_u8_into_array_u32() {
@@ -41,4 +41,17 @@ fn test_u64_into_array_u32() {
     assert_eq!(u64_into_array_u32(8589934593), array![2, 1]);
     assert_eq!(u64_into_array_u32(4294967295), array![0, 4294967295]);
     assert_eq!(u64_into_array_u32(18446744073709551615), array![4294967295, 4294967295]);
+}
+
+#[test]
+fn test_encode_hex() {
+    assert_eq!("", encode_hex(array![]));
+    assert_eq!("00", encode_hex(array![0]));
+    assert_eq!("01", encode_hex(array![1]));
+    assert_eq!("7f", encode_hex(array![127]));
+    assert_eq!("80", encode_hex(array![128]));
+    assert_eq!("ff", encode_hex(array![255]));
+    assert_eq!("0001", encode_hex(array![0, 1]));
+    assert_eq!("fffe", encode_hex(array![255, 254]));
+    assert_eq!("0123456789abcdef", encode_hex(array![1, 35, 69, 103, 137, 171, 205, 239]));
 }
