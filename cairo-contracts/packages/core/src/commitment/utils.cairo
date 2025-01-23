@@ -31,17 +31,3 @@ pub impl U32CollectorImpl of U32CollectorTrait {
     }
 }
 
-pub impl U64IntoArrayU32 of IntoArrayU32<u64> {
-    fn into_array_u32(self: u64) -> (Array<u32>, u32, u32) {
-        (u64_into_array_u32(self), 0, 0)
-    }
-}
-
-pub fn u64_into_array_u32(value: u64) -> Array<u32> {
-    let mut array: Array<u32> = ArrayTrait::new();
-    let upper = (value / 0x100000000).try_into().unwrap();
-    let lower = (value % 0x100000000).try_into().unwrap();
-    array.append(upper);
-    array.append(lower);
-    array
-}
