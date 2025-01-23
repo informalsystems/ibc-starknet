@@ -43,7 +43,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanCallContract
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Encoding: CanEncode<ViaCairo, Product![CairoPortId, ChannelId, Sequence]>
         + CanDecode<ViaCairo, Product![[u32; 8]]>
         + HasEncodedType<Encoded = Vec<Felt>>,

@@ -10,3 +10,9 @@ pub struct StarknetHeader {
     pub height: Height,
     pub consensus_state: StarknetConsensusState,
 }
+
+#[derive(Debug, Clone, HasField)]
+pub struct SignedStarknetHeader {
+    pub header: StarknetHeader,
+    pub signature: Vec<u8>,
+}

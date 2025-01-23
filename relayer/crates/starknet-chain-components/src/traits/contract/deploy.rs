@@ -11,7 +11,7 @@ use crate::traits::types::contract_class::HasContractClassHashType;
 }]
 #[async_trait]
 pub trait CanDeployContract:
-    HasContractClassHashType + HasBlobType + HasAddressType + HasErrorType
+    HasContractClassHashType + HasBlobType + HasAddressType + HasAsyncErrorType
 {
     async fn deploy_contract(
         &self,

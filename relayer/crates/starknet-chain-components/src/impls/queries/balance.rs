@@ -1,4 +1,4 @@
-use cgp::prelude::CanRaiseError;
+use cgp::prelude::CanRaiseAsyncError;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
@@ -28,8 +28,8 @@ where
         + HasSelectorType<Selector = Felt>
         + CanCallContract
         + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanRaiseError<&'static str>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<&'static str>
+        + CanRaiseAsyncError<Encoding::Error>,
     Encoding: CanDecode<ViaCairo, U256, Encoded = Vec<Felt>>,
 {
     async fn query_balance(

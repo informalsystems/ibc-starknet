@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use cgp::core::error::{CanRaiseError, HasErrorType};
+use cgp::core::error::CanRaiseAsyncError;
 use cgp::prelude::*;
 use hermes_encoding_components::traits::decode_mut::{
     CanDecodeMut, CanPeekDecodeBuffer, MutDecoder,
@@ -33,7 +33,7 @@ where
         encoding: &Encoding,
         value: &Either<ValueA, ValueB>,
         buffer: &mut <Encoding as HasEncodeBufferType>::EncodeBuffer,
-    ) -> Result<(), <Encoding as HasErrorType>::Error> {
+    ) -> Result<(), Encoding::Error> {
         match value {
             Either::Left(value) => {
                 encoding.encode_mut(&I::N, buffer)?;
@@ -72,7 +72,7 @@ where
     Encoding: CanDecodeMut<Strategy, ValueA>
         + CanDecodeMut<Strategy, usize>
         + CanPeekDecodeBuffer<Felt>
-        + CanRaiseError<UnexpectedEndOfBuffer>,
+        + CanRaiseAsyncError<UnexpectedEndOfBuffer>,
     I: Nat,
     SumEncoders<S<I>, N>: MutDecoder<Encoding, Strategy, ValueB>,
 {
@@ -102,7 +102,7 @@ where
     Encoding: CanDecodeMut<Strategy, Value>
         + CanDecodeMut<Strategy, usize>
         + CanPeekDecodeBuffer<Felt>
-        + CanRaiseError<VariantIndexOutOfBound>,
+        + CanRaiseAsyncError<VariantIndexOutOfBound>,
     I: Nat,
 {
     fn decode_mut(

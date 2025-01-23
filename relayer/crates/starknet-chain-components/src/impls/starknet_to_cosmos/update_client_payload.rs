@@ -1,4 +1,4 @@
-use cgp::prelude::HasErrorType;
+use cgp::prelude::HasAsyncErrorType;
 use hermes_chain_components::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_chain_components::traits::payload_builders::update_client::UpdateClientPayloadBuilder;
 use hermes_chain_components::traits::types::client_state::HasClientStateType;
@@ -36,7 +36,7 @@ where
         + HasUpdateClientPayloadType<Counterparty, UpdateClientPayload = CometUpdateHeader>
         + HasClientStateType<Counterparty>
         + HasHeightType<Height = CosmosHeight>
-        + HasErrorType,
+        + HasAsyncErrorType,
 {
     async fn build_update_client_payload(
         chain: &Chain,

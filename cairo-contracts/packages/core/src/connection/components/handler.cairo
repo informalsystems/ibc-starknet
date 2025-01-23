@@ -289,7 +289,7 @@ pub mod ConnectionHandlerComponent {
         +Drop<TContractState>,
         impl EventEmitter: ConnectionEventEmitterComponent::HasComponent<TContractState>,
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
-    > of ConnOpenConfitmTrait<TContractState> {
+    > of ConnOpenConfirmTrait<TContractState> {
         fn conn_open_confirm_validate(
             self: @ComponentState<TContractState>,
             conn_end_on_b: ConnectionEnd,

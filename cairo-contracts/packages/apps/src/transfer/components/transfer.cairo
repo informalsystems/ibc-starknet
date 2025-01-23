@@ -11,7 +11,7 @@ pub mod TokenTransferComponent {
     use starknet::ContractAddress;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
-        StoragePointerWriteAccess, Vec, VecTrait, MutableVecTrait
+        StoragePointerWriteAccess
     };
     use starknet::{get_contract_address, get_caller_address};
     use starknet_ibc_apps::transfer::types::{
@@ -36,7 +36,6 @@ pub mod TokenTransferComponent {
         salt: felt252,
         ibc_token_key_to_address: Map<felt252, ContractAddress>,
         ibc_token_address_to_key: Map<ContractAddress, felt252>,
-        token_addresses: Vec<ContractAddress>,
     }
 
     #[event]
@@ -46,7 +45,7 @@ pub mod TokenTransferComponent {
         RecvEvent: RecvEvent,
         AckEvent: AckEvent,
         AckStatusEvent: AckStatusEvent,
-        TimoutEvent: TimeoutEvent,
+        TimeoutEvent: TimeoutEvent,
         CreateTokenEvent: CreateTokenEvent,
     }
 
@@ -282,10 +281,6 @@ pub mod TokenTransferComponent {
             assert(address.is_non_zero(), TransferErrors::ZERO_TOKEN_ADDRESS);
 
             address
-        }
-
-        fn ibc_token_addresses(self: @ComponentState<TContractState>) -> Array<ContractAddress> {
-            self.read_ibc_token_addresses()
         }
     }
 
@@ -781,8 +776,6 @@ pub mod TokenTransferComponent {
         ) {
             let denom_key = denom.key();
 
-            self.append_ibc_token_address(token_address);
-
             self.write_ibc_token_key_to_address(denom_key, token_address);
 
             self.write_ibc_token_address_to_key(token_address, denom_key);
@@ -846,19 +839,6 @@ pub mod TokenTransferComponent {
             self.ibc_token_key_to_address.read(token_key)
         }
 
-        fn read_ibc_token_addresses(
-            self: @ComponentState<TContractState>
-        ) -> Array<ContractAddress> {
-            let mut addresses = array![];
-            for i in 0
-                ..self
-                    .token_addresses
-                    .len() {
-                        addresses.append(self.token_addresses.at(i).read());
-                    };
-            addresses
-        }
-
         fn read_ibc_token_key(
             self: @ComponentState<TContractState>, token_address: ContractAddress
         ) -> felt252 {
@@ -878,12 +858,6 @@ pub mod TokenTransferComponent {
 
         fn write_salt(ref self: ComponentState<TContractState>, salt: felt252) {
             self.salt.write(salt);
-        }
-
-        fn append_ibc_token_address(
-            ref self: ComponentState<TContractState>, token_address: ContractAddress,
-        ) {
-            self.token_addresses.append().write(token_address);
         }
 
         fn write_ibc_token_key_to_address(

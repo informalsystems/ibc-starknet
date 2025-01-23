@@ -10,7 +10,8 @@ let
     cargoLock = {
       lockFile = ./../light-client/Cargo.lock;
       outputHashes = {
-        "hermes-cosmos-encoding-components-0.1.0" = "sha256-OrNFK6UQjQ7cpj8HqPipG2YcqCV4/KjiV5oRLnoUUyY=";
+        "hermes-cosmos-encoding-components-0.1.0" = "sha256-V1TlMnVHBwlSBJmB9gSJV/BgUTy7S0yhrtn3anZyorU=";
+        "cgp-0.3.1" = "sha256-AOQ+WVQWPlF2ZfYYc5Eq3t7XAljd5P2qExWLYZWNnd8=";
       };
     };
 

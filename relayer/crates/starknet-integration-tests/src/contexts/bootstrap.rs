@@ -4,8 +4,8 @@ use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
-use cgp::core::field::impls::use_field::WithField;
-use cgp::core::types::impls::WithType;
+use cgp::core::field::WithField;
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cosmos_test_components::bootstrap::components::cosmos_sdk::{
     ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent,
@@ -138,11 +138,12 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
 
         let chain = StarknetChain {
             runtime: runtime.clone(),
-            chain_id,
+            chain_id: chain_id.to_string().parse()?,
             rpc_client,
             account,
             ibc_client_contract_address: None,
             ibc_core_contract_address: None,
+            event_encoding: Default::default(),
         };
 
         let chain_driver = StarknetChainDriver {

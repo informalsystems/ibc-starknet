@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use cgp::core::error::HasErrorType;
+use cgp::core::error::HasAsyncErrorType;
 use hermes_encoding_components::traits::decode_mut::MutDecoder;
 use hermes_encoding_components::traits::encode_mut::MutEncoder;
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
@@ -11,7 +11,7 @@ pub struct EncoderPair<EncoderA, EncoderB>(pub PhantomData<(EncoderA, EncoderB)>
 impl<Encoding, Strategy, EncoderA, EncoderB, ValueA, ValueB>
     MutEncoder<Encoding, Strategy, (ValueA, ValueB)> for EncoderPair<EncoderA, EncoderB>
 where
-    Encoding: HasEncodeBufferType + HasErrorType,
+    Encoding: HasEncodeBufferType + HasAsyncErrorType,
     EncoderA: MutEncoder<Encoding, Strategy, ValueA>,
     EncoderB: MutEncoder<Encoding, Strategy, ValueB>,
 {
@@ -30,7 +30,7 @@ where
 impl<Encoding, Strategy, EncoderA, EncoderB, ValueA, ValueB>
     MutDecoder<Encoding, Strategy, (ValueA, ValueB)> for EncoderPair<EncoderA, EncoderB>
 where
-    Encoding: HasDecodeBufferType + HasErrorType,
+    Encoding: HasDecodeBufferType + HasAsyncErrorType,
     EncoderA: MutDecoder<Encoding, Strategy, ValueA>,
     EncoderB: MutDecoder<Encoding, Strategy, ValueB>,
 {

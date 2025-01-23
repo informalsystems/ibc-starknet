@@ -32,7 +32,7 @@ ibc-client-cw = { version = "0.56.0", default-features = false }
 ibc-proto     = { version = "0.51.1", default-features = false }
 tendermint    = { version = "0.40.0", default-features = false }
 
-cgp                                 = { version = "0.2.0" }
+cgp                                 = { version = "0.3.1" }
 hermes-encoding-components          = { version = "0.1.0" }
 hermes-protobuf-encoding-components = { version = "0.1.0" }
 hermes-cosmos-encoding-components   = { version = "0.1.0" }
@@ -61,21 +61,24 @@ ibc-client-starknet       = { path = "./ibc-client-starknet" }
 ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
 ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
 
-# cgp                     = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-core                = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-extra               = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-async               = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-async-macro         = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-component           = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-component-macro     = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-component-macro-lib = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-type                = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-field               = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-field-macro         = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-field-macro-lib     = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-error               = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-run                 = { git = "https://github.com/contextgeneric/cgp.git" }
-# cgp-inner               = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp                     = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-core                = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-extra               = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-async               = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-async-macro         = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-component           = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-component-macro     = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-component-macro-lib = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-type                = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-field               = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-field-macro         = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-field-macro-lib     = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-error               = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-error-extra         = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-run                 = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-runtime             = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-sync                = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-inner               = { git = "https://github.com/contextgeneric/cgp.git" }
 
 hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }

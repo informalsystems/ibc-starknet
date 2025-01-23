@@ -4,8 +4,8 @@ use core::ops::Deref;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
-use cgp::core::field::impls::use_field::WithField;
-use cgp::core::types::impls::WithType;
+use cgp::core::field::{Index, WithField};
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
@@ -17,7 +17,6 @@ use hermes_relayer_components::build::traits::builders::chain_builder::{
 };
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
 use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
-use hermes_relayer_components::multi::types::index::Index;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{RuntimeGetterComponent, RuntimeTypeComponent};
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
@@ -26,7 +25,6 @@ use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
-use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
 use starknet::signers::{LocalWallet, SigningKey};
@@ -89,7 +87,7 @@ impl ChainBuilder<StarknetBuilder, Index<0>> for StarknetBuildComponents {
     async fn build_chain(
         build: &StarknetBuilder,
         _index: PhantomData<Index<0>>,
-        _chain_id: &Felt,
+        _chain_id: &ChainId,
     ) -> Result<StarknetChain, HermesError> {
         build.build_chain().await
     }
@@ -143,11 +141,12 @@ impl StarknetBuilder {
 
         let context = StarknetChain {
             runtime: self.runtime.clone(),
-            chain_id,
+            chain_id: chain_id.to_string().parse()?,
             rpc_client,
             account,
             ibc_client_contract_address: None,
             ibc_core_contract_address: None,
+            event_encoding: Default::default(),
         };
 
         Ok(context)

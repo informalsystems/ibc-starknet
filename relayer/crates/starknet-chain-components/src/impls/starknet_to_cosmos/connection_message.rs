@@ -49,7 +49,7 @@ where
             InitConnectionOptions = CosmosInitConnectionOptions,
         > + HasClientIdType<Counterparty, ClientId = CosmosClientId>
         + HasMessageType<Message = CosmosMessage>
-        + HasErrorType,
+        + HasAsyncErrorType,
     Counterparty: HasClientIdType<Chain, ClientId = StarknetClientId>
         + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
         + HasConnectionOpenInitPayloadType<
@@ -82,7 +82,7 @@ where
     Chain: HasMessageType<Message = CosmosMessage>
         + HasHeightType<Height = CosmosHeight>
         + HasClientIdType<Counterparty, ClientId = CosmosClientId>
-        + CanRaiseError<ClientError>
+        + CanRaiseAsyncError<ClientError>
         + HasClientStateType<Counterparty, ClientState = CometClientState>,
     Counterparty: HasConnectionOpenTryPayloadType<
             Chain,
@@ -146,7 +146,7 @@ where
         + HasConnectionIdType<Counterparty, ConnectionId = CosmosConnectionId>
         + HasClientStateType<Counterparty, ClientState = CometClientState>
         + HasHeightType<Height = CosmosHeight>
-        + CanRaiseError<ClientError>,
+        + CanRaiseAsyncError<ClientError>,
     Counterparty: HasConnectionOpenAckPayloadType<
             Chain,
             ConnectionOpenAckPayload = ConnectionOpenAckPayload<Counterparty, Chain>,
@@ -196,7 +196,7 @@ impl<Chain, Counterparty> ConnectionOpenConfirmMessageBuilder<Chain, Counterpart
 where
     Chain: HasMessageType<Message = CosmosMessage>
         + HasConnectionIdType<Counterparty, ConnectionId = CosmosConnectionId>
-        + CanRaiseError<ClientError>,
+        + CanRaiseAsyncError<ClientError>,
     Counterparty: HasConnectionOpenConfirmPayloadType<
             Chain,
             ConnectionOpenConfirmPayload = ConnectionOpenConfirmPayload<Counterparty>,

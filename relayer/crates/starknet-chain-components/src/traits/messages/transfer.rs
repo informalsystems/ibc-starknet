@@ -9,7 +9,7 @@ use hermes_test_components::chain::traits::types::amount::HasAmountType;
   context: Chain,
 }]
 pub trait CanBuildTransferTokenMessage:
-    HasAddressType + HasAmountType + HasMessageType + HasErrorType
+    HasAddressType + HasAmountType + HasMessageType + HasAsyncErrorType
 {
     fn build_transfer_token_message(
         &self,

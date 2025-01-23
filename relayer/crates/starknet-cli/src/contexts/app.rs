@@ -2,8 +2,8 @@ use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
-use cgp::core::field::impls::use_field::WithField;
-use cgp::core::types::impls::WithType;
+use cgp::core::field::WithField;
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
 use hermes_cli_components::impls::commands::client::update::{
@@ -64,7 +64,7 @@ use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriv
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::ConfigUpdater;
 use ibc::core::client::types::Height;
-use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
+use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 use starknet::core::types::Felt;
 use toml::to_string_pretty;
 
@@ -137,22 +137,22 @@ delegate_components! {
 
 delegate_components! {
     StarknetParserComponents {
-        (QueryClientStateArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryClientStateArgs, symbol!("chain_id")): ParseFromString<ChainId>,
         (QueryClientStateArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (QueryClientStateArgs, symbol!("height")): ParseFromOptionalString<u64>,
 
-        (QueryConsensusStateArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryConsensusStateArgs, symbol!("chain_id")): ParseFromString<ChainId>,
         (QueryConsensusStateArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (QueryConsensusStateArgs, symbol!("query_height")): ParseFromOptionalString<u64>,
         (QueryConsensusStateArgs, symbol!("consensus_height")): ParseFromOptionalString<Height>,
 
-        (QueryChainStatusArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryChainStatusArgs, symbol!("chain_id")): ParseFromString<ChainId>,
 
-        (QueryBalanceArgs, symbol!("chain_id")): ParseFromString<Felt>,
+        (QueryBalanceArgs, symbol!("chain_id")): ParseFromString<ChainId>,
         (QueryBalanceArgs, symbol!("address")): ParseFromString<Felt>,
         (QueryBalanceArgs, symbol!("denom")): ParseFromString<Felt>,
 
-        (UpdateClientArgs, symbol!("host_chain_id")): ParseFromString<Felt>,
+        (UpdateClientArgs, symbol!("host_chain_id")): ParseFromString<ChainId>,
         (UpdateClientArgs, symbol!("client_id")): ParseFromString<ClientId>,
         (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
         (UpdateClientArgs, symbol!("target_height")): ParseFromOptionalString<Height>,

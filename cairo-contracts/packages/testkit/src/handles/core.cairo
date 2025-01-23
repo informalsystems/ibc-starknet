@@ -7,8 +7,8 @@ use starknet_ibc_core::channel::{
 };
 use starknet_ibc_core::client::{
     IClientHandlerDispatcher, IClientHandlerDispatcherTrait, IRegisterClientDispatcher,
-    IRegisterClientDispatcherTrait, MsgCreateClient, MsgUpdateClient, CreateResponse,
-    UpdateResponse,
+    IRegisterClientDispatcherTrait, IRegisterRelayerDispatcher, IRegisterRelayerDispatcherTrait,
+    MsgCreateClient, MsgUpdateClient, CreateResponse, UpdateResponse
 };
 use starknet_ibc_core::commitment::Commitment;
 use starknet_ibc_core::connection::{
@@ -38,7 +38,7 @@ pub impl CoreHandleImpl of CoreHandle {
         IClientHandlerDispatcher { contract_address: *self.address }
     }
 
-    fn connecion_handler_dispatcher(self: @CoreContract) -> IConnectionHandlerDispatcher {
+    fn connection_handler_dispatcher(self: @CoreContract) -> IConnectionHandlerDispatcher {
         IConnectionHandlerDispatcher { contract_address: *self.address }
     }
 
@@ -62,12 +62,20 @@ pub impl CoreHandleImpl of CoreHandle {
         IRegisterClientDispatcher { contract_address: *self.address }
     }
 
+    fn register_relayer_dispatcher(self: @CoreContract) -> IRegisterRelayerDispatcher {
+        IRegisterRelayerDispatcher { contract_address: *self.address }
+    }
+
     fn create_client(self: @CoreContract, msg: MsgCreateClient) -> CreateResponse {
         self.client_handler_dispatcher().create_client(msg)
     }
 
     fn update_client(self: @CoreContract, msg: MsgUpdateClient) -> UpdateResponse {
         self.client_handler_dispatcher().update_client(msg)
+    }
+
+    fn register_relayer(self: @CoreContract, relayer_address: ContractAddress) {
+        self.register_relayer_dispatcher().register_relayer(relayer_address)
     }
 
     fn register_client(self: @CoreContract, client_type: felt252, client_address: ContractAddress) {
@@ -79,19 +87,19 @@ pub impl CoreHandleImpl of CoreHandle {
     }
 
     fn conn_open_init(self: @CoreContract, msg: MsgConnOpenInit) -> ConnectionId {
-        self.connecion_handler_dispatcher().conn_open_init(msg)
+        self.connection_handler_dispatcher().conn_open_init(msg)
     }
 
     fn conn_open_try(self: @CoreContract, msg: MsgConnOpenTry) -> ConnectionId {
-        self.connecion_handler_dispatcher().conn_open_try(msg)
+        self.connection_handler_dispatcher().conn_open_try(msg)
     }
 
     fn conn_open_ack(self: @CoreContract, msg: MsgConnOpenAck) {
-        self.connecion_handler_dispatcher().conn_open_ack(msg)
+        self.connection_handler_dispatcher().conn_open_ack(msg)
     }
 
     fn conn_open_confirm(self: @CoreContract, msg: MsgConnOpenConfirm) {
-        self.connecion_handler_dispatcher().conn_open_confirm(msg)
+        self.connection_handler_dispatcher().conn_open_confirm(msg)
     }
 
     fn connection_end(self: @CoreContract, connection_id: ConnectionId) -> ConnectionEnd {

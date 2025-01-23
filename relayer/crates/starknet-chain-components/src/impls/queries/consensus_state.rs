@@ -44,8 +44,8 @@ where
         + HasBlobType<Blob = Vec<Felt>>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
-        + CanRaiseError<ConsensusStateNotFound>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<ConsensusStateNotFound>
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
         HasConsensusStateType<Chain, ConsensusState = CometConsensusState> + HasHeightFields,
     Encoding: CanEncode<ViaCairo, (u64, Height)>
@@ -104,7 +104,7 @@ where
         + HasHeightType<Height = u64>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryConsensusState<Counterparty>
-        + HasErrorType,
+        + HasAsyncErrorType,
     Counterparty: HasConsensusStateType<Chain> + HasHeightType,
 {
     async fn query_consensus_state_with_proofs(

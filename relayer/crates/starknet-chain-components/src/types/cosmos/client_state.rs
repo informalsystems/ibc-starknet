@@ -1,7 +1,7 @@
 use core::time::Duration;
 
 use cgp::core::component::UseContext;
-use cgp::core::types::impls::WithType;
+use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_chain_components::traits::types::chain_id::HasChainIdType;
@@ -13,6 +13,8 @@ use hermes_cosmos_chain_components::components::client::ClientStateTypeComponent
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use ibc::clients::tendermint::types::{
@@ -31,6 +33,7 @@ pub struct CometClientState {
     pub trusting_period: u64,
     pub unbonding_period: u64,
     pub status: ClientStatus,
+    pub chain_id: ChainId,
 }
 
 #[derive(Debug)]
@@ -75,9 +78,8 @@ where
         false // todo
     }
 
-    fn client_state_chain_id(_client_state: &CometClientState) -> ChainId {
-        // FIXME: Store Cosmos chain ID in CometClientState and return it here
-        ChainId::new("cosmos").unwrap()
+    fn client_state_chain_id(client_state: &CometClientState) -> ChainId {
+        client_state.chain_id.clone()
     }
 }
 
@@ -89,6 +91,7 @@ delegate_components! {
                 EncodeField<symbol!("trusting_period"), UseContext>,
                 EncodeField<symbol!("unbonding_period"), UseContext>,
                 EncodeField<symbol!("status"), UseContext>,
+                EncodeField<symbol!("chain_id"), UseContext>,
             ],
         >,
         MutDecoderComponent: DecodeFrom<Self, UseContext>,
@@ -96,17 +99,24 @@ delegate_components! {
 }
 
 impl Transformer for EncodeCometClientState {
-    type From = Product![Height, u64, u64, ClientStatus];
+    type From = Product![Height, u64, u64, ClientStatus, ChainId];
     type To = CometClientState;
 
     fn transform(
-        product![latest_height, trusting_period, unbonding_period, status]: Self::From,
+        product![
+            latest_height,
+            trusting_period,
+            unbonding_period,
+            status,
+            chain_id
+        ]: Self::From,
     ) -> CometClientState {
         CometClientState {
             latest_height,
             trusting_period,
             unbonding_period,
             status,
+            chain_id,
         }
     }
 }
@@ -149,10 +159,8 @@ impl Transformer for EncodeClientStatus {
 
 impl From<CometClientState> for Any {
     fn from(client_state: CometClientState) -> Self {
-        let chain_revision_number = client_state.latest_height.revision_number;
-
         IbcCometClientState::new(
-            ChainId::new(&format!("cosmos-{}", chain_revision_number)).expect("no error"),
+            client_state.chain_id,
             TrustThreshold::ONE_THIRD,
             Duration::from_secs(client_state.trusting_period),
             Duration::from_secs(client_state.unbonding_period),
@@ -171,5 +179,35 @@ impl From<CometClientState> for Any {
         )
         .expect("no error")
         .into()
+    }
+}
+
+pub struct EncodeChainId;
+
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChainId> for EncodeChainId
+where
+    Encoding: CanEncodeMut<Strategy, String>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        chain_id: &ChainId,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        let chain_id_str = chain_id.as_str().to_string();
+        encoding.encode_mut(&chain_id_str, buffer)?;
+        Ok(())
+    }
+}
+
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChainId> for EncodeChainId
+where
+    Encoding: CanDecodeMut<Strategy, String> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ChainId, Encoding::Error> {
+        let chain_id_str = encoding.decode_mut(buffer)?;
+        ChainId::new(&chain_id_str).map_err(|_| Encoding::raise_error("invalid chain id"))
     }
 }

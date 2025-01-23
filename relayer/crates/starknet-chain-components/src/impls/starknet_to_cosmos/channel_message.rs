@@ -40,11 +40,11 @@ impl<Chain, Counterparty> ChannelOpenTryMessageBuilder<Chain, Counterparty>
 where
     Chain: HasMessageType<Message = CosmosMessage>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
-        + CanRaiseError<Infallible>
-        + CanRaiseError<ClientError>
-        + CanRaiseError<&'static str>
-        + CanRaiseError<ParseIntError>
-        + CanRaiseError<IdentifierError>,
+        + CanRaiseAsyncError<Infallible>
+        + CanRaiseAsyncError<ClientError>
+        + CanRaiseAsyncError<&'static str>
+        + CanRaiseAsyncError<ParseIntError>
+        + CanRaiseAsyncError<IdentifierError>,
     Counterparty: HasChannelIdType<Chain, ChannelId = StarknetChannelId>
         + HasPortIdType<Chain, PortId = IbcPortId>
         + HasHeightType<Height = u64>
@@ -128,7 +128,7 @@ where
     Chain: HasMessageType<Message = CosmosMessage>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + HasChannelIdType<Counterparty, ChannelId = IbcChannelId>
-        + CanRaiseError<ClientError>,
+        + CanRaiseAsyncError<ClientError>,
     Counterparty: HasChannelIdType<Chain, ChannelId = StarknetChannelId>
         + HasPortIdType<Chain, PortId = IbcPortId>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
@@ -170,7 +170,7 @@ where
     Chain: HasMessageType<Message = CosmosMessage>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + HasChannelIdType<Counterparty, ChannelId = IbcChannelId>
-        + CanRaiseError<ClientError>,
+        + CanRaiseAsyncError<ClientError>,
     Counterparty: HasHeightType<Height = u64>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + HasChannelOpenConfirmPayloadType<

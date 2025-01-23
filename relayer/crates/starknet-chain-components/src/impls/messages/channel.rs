@@ -51,8 +51,8 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + HasInitChannelOptionsType<Counterparty, InitChannelOptions = CosmosInitChannelOptions>
-        + CanRaiseError<&'static str>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<&'static str>
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasPortIdType<Chain, PortId = IbcPortId>,
     Encoding: CanEncode<ViaCairo, MsgChanOpenInit> + HasEncodedType<Encoded = Vec<Felt>>,
 {
@@ -127,8 +127,8 @@ where
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
-        + CanRaiseError<&'static str>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<&'static str>
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasChannelIdType<Chain, ChannelId = ChannelId>
         + HasHeightType<Height = Height>
         + HasPortIdType<Chain, PortId = IbcPortId>
@@ -230,7 +230,7 @@ where
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasChannelOpenAckPayloadType<
             Chain,
             ChannelOpenAckPayload = ChannelOpenAckPayload<Counterparty, Chain>,
@@ -307,7 +307,7 @@ where
         + HasAddressType<Address = Felt>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-        + CanRaiseError<Encoding::Error>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasHeightType<Height = Height>
         + HasCommitmentProofType
         + HasChannelOpenConfirmPayloadType<

@@ -1,4 +1,5 @@
-use cgp::prelude::CanRaiseError;
+use cgp::prelude::CanRaiseAsyncError;
+use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CreateClientPayloadBuilder;
 use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_relayer_components::chain::traits::types::create_client::{
@@ -6,6 +7,7 @@ use hermes_relayer_components::chain::traits::types::create_client::{
 };
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height;
+use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
 
 use crate::types::client_state::{StarknetClientState, WasmStarknetClientState};
@@ -25,7 +27,8 @@ where
             CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
-        + CanRaiseError<ClientError>,
+        + HasChainId<ChainId = ChainId>
+        + CanRaiseAsyncError<ClientError>,
 {
     async fn build_create_client_payload(
         chain: &Chain,
@@ -39,6 +42,7 @@ where
             wasm_code_hash: create_client_options.wasm_code_hash.into(),
             client_state: StarknetClientState {
                 latest_height: Height::new(0, 1).map_err(Chain::raise_error)?,
+                chain_id: chain.chain_id().clone(),
             },
         };
 

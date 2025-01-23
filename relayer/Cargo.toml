@@ -10,6 +10,7 @@ members = [
   "crates/starknet-test-components",
   "crates/starknet-integration-tests",
   "crates/starknet-cli",
+  "crates/poseidon",
 ]
 
 [workspace.package]
@@ -26,8 +27,8 @@ rust-version = "1.81"
 overflow-checks = true
 
 [workspace.dependencies]
-cgp            = { version = "0.2.0" }
-cgp-error-eyre = { version = "0.2.0" }
+cgp            = { version = "0.3.1" }
+cgp-error-eyre = { version = "0.3.0" }
 
 starknet                    = { version = "0.11.0" }
 starknet-types-core         = { version = "0.1.7" }
@@ -88,6 +89,7 @@ hermes-starknet-test-components     = { version = "0.1.0" }
 hermes-starknet-chain-context       = { version = "0.1.0" }
 hermes-starknet-relayer             = { version = "0.1.0" }
 hermes-starknet-integration-tests   = { version = "0.1.0" }
+poseidon                            = { version = "0.1.0" }
 
 [patch.crates-io]
 hermes-cairo-encoding-components  = { path = "./crates/cairo-encoding-components" }
@@ -99,6 +101,8 @@ hermes-starknet-cli               = { path = "./crates/starknet-cli" }
 hermes-starknet-integration-tests = { path = "./crates/starknet-integration-tests" }
 
 ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types" }
+
+poseidon = { path = "./crates/poseidon" }
 
 # ibc                   = { git = "https://github.com/cosmos/ibc-rs.git" }
 # ibc-core              = { git = "https://github.com/cosmos/ibc-rs.git" }
