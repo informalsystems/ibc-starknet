@@ -93,6 +93,36 @@ pub fn array_u8_to_byte_array(input: @Array<u8>) -> ByteArray {
     output
 }
 
+pub fn decode_hex(hex: @ByteArray) -> Array<u8> {
+    let mut output: Array<u8> = array![];
+    let len = hex.len();
+    assert(len % 2 == 0, 'Invalid hex length');
+    let mut i = 0;
+    while i < len {
+        let high = hex[i];
+        let low = hex[i + 1];
+        assert(is_valid_hex_char(high), 'Invalid hex character');
+        assert(is_valid_hex_char(low), 'Invalid hex character');
+        let high = if high >= 97 {
+            high - 87
+        } else {
+            high - 48
+        };
+        let low = if low >= 97 {
+            low - 87
+        } else {
+            low - 48
+        };
+        output.append(high * 16 + low);
+        i += 2;
+    };
+    output
+}
+// Only accept lowercase hex characters
+pub fn is_valid_hex_char(c: u8) -> bool {
+    (c >= 48 && c <= 57) || (c >= 97 && c <= 102)
+}
+
 pub fn encode_hex(bytes: Array<u8>) -> ByteArray {
     let mut output = "";
     let hex_chars: ByteArray = "0123456789abcdef";

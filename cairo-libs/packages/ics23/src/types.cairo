@@ -7,69 +7,6 @@ use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, B
 use protobuf::types::tag::WireType;
 use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf};
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
-pub struct MerkleProof {
-    pub proofs: Array<Proof>,
-}
-
-#[generate_trait]
-pub impl MerkleProofImpl of MerkleProofTrait {
-    fn verify_membership(
-        self: @MerkleProof,
-        specs: ProofSpecs,
-        root: RootBytes,
-        keys: Array<ByteArray>,
-        value: Array<u8>,
-    ) {
-        let proofs_len = self.proofs.len();
-        assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
-        assert(root != [0; 8], ICS23Errors::ZERO_MERKLE_ROOT);
-        assert(value.len() > 0, ICS23Errors::MISSING_VALUE);
-        assert(proofs_len == specs.specs.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
-        assert(proofs_len == keys.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
-        let mut subroot = [0; 8];
-        let mut subvalue: Array<u32> = ArrayTrait::new();
-        let mut i = 0;
-        while i < proofs_len {
-            if let Proof::Exist(p) = self.proofs[i] {
-                subroot = p.calculate_root();
-                p.verify(specs.specs[i], @subroot, keys[proofs_len - 1 - i], @value);
-            } else {
-                panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
-            }
-            subvalue = subroot.span().into();
-            i += 1;
-        };
-        assert(root == subroot, ICS23Errors::INVALID_MERKLE_PROOF);
-    }
-
-    fn verify_non_membership(
-        self: @MerkleProof, specs: ProofSpecs, root: RootBytes, keys: Array<ByteArray>
-    ) {
-        let proofs_len = self.proofs.len();
-        assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
-        assert(root == [0; 8], ICS23Errors::ZERO_MERKLE_ROOT);
-        assert(proofs_len == specs.specs.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
-        assert(proofs_len == keys.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
-        let mut subroot = [0; 8];
-        let mut i = 0;
-        while i < proofs_len {
-            match self.proofs[i] {
-                Proof::NonExist(p) => {
-                    subroot = p.calculate_root();
-                    p.verify(specs.specs[i], @subroot, keys[proofs_len - i]);
-                    self
-                        .verify_membership(
-                            specs.clone(), root, keys.clone(), subroot.into()
-                        ) // TODO: add start_index
-                },
-                _ => panic!("{}", ICS23Errors::INVALID_PROOF_TYPE),
-            }
-            i += 1;
-        };
-    }
-}
-
 /// Contains nested proof types within a commitment proof. It currently supports
 /// existence and non-existence proofs to meet the core requirements of IBC. Batch
 /// and compressed proofs can be added in the future if necessary.
@@ -358,11 +295,6 @@ impl LeafOpAsProtoName of ProtoName<LeafOp> {
     fn type_url() -> ByteArray {
         "LeafOp"
     }
-}
-
-#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
-pub struct ProofSpecs {
-    specs: Array<ProofSpec>,
 }
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]

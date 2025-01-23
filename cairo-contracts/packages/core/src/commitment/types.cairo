@@ -44,7 +44,7 @@ pub impl CommitmentZero of Zero<Commitment> {
 
 pub impl CommitmentIntoStateValue of Into<Commitment, StateValue> {
     fn into(self: Commitment) -> StateValue {
-        let value = array_u32_into_array_u8(self.into());
+        let value = array_u32_into_array_u8(self.into(), 0, 0);
         StateValue { value }
     }
 }
