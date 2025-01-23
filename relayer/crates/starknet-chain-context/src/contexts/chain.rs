@@ -126,7 +126,7 @@ use hermes_starknet_chain_components::components::chain::{
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
-use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetSubscription;
+use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
 use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
     HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeComponent,
@@ -329,7 +329,7 @@ pub trait CanUseStarknetChain:
     + CanQueryChainStatus
     + CanQueryChainHeight
     + CanQueryBlockEvents
-    + CanCreateStarknetSubscription
+    + CanCreateStarknetEventSubscription
     + CanSendMessages
     + CanSendSingleMessage
     + CanSubmitTx
@@ -399,6 +399,7 @@ pub trait CanUseStarknetChain:
     + HasSequenceType<CosmosChain, Sequence = Sequence>
     + CanQueryBalance
     + HasMemoType
+    + CanCreateStarknetEventSubscription
     + HasCreateClientEvent<CosmosChain, CreateClientEvent = StarknetCreateClientEvent>
     + CanExtractFromMessageResponse<StarknetCreateClientEvent>
 // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token

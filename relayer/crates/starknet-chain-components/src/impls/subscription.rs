@@ -17,15 +17,14 @@ use hermes_runtime_components::traits::task::Task;
 
 use crate::traits::queries::block_events::CanQueryBlockEvents;
 
-#[async_trait]
-pub trait CanCreateStarknetSubscription:
+pub trait CanCreateStarknetEventSubscription:
     HasHeightType + HasAddressType + HasEventType + HasAsyncErrorType
 {
-    async fn create_event_subscription(
+    fn create_starknet_event_subscription(
         self,
         start_height: Self::Height,
         address: Self::Address,
-    ) -> Result<Arc<dyn Subscription<Item = (Self::Height, Arc<Self::Event>)>>, Self::Error>;
+    ) -> Arc<dyn Subscription<Item = (Self::Height, Self::Event)>>;
 }
 
 #[async_trait]
@@ -36,7 +35,7 @@ pub trait CanSendStarknetEvents:
         &self,
         address: &Self::Address,
         start_height: Arc<Mutex<Self::Height>>,
-        sender: UnboundedSender<(Self::Height, Arc<Self::Event>)>,
+        sender: UnboundedSender<(Self::Height, Self::Event)>,
     ) -> Result<(), Self::Error>;
 }
 
@@ -51,7 +50,7 @@ where
         &self,
         address: &Self::Address,
         height_mutex: Arc<Mutex<u64>>,
-        sender: UnboundedSender<(u64, Arc<Self::Event>)>,
+        sender: UnboundedSender<(u64, Self::Event)>,
     ) -> Result<(), Self::Error> {
         loop {
             let mut height_ref = height_mutex.lock().await;
@@ -60,7 +59,7 @@ where
             let events = self.query_block_events(&height, address).await?;
             for event in events {
                 sender
-                    .unbounded_send((height, Arc::new(event)))
+                    .unbounded_send((height, event))
                     .map_err(|_| Chain::raise_error("channel closed"))?;
             }
 
@@ -76,7 +75,7 @@ where
     pub chain: Chain,
     pub address: Chain::Address,
     pub height: Arc<Mutex<Chain::Height>>,
-    pub sender: UnboundedSender<(Chain::Height, Arc<Chain::Event>)>,
+    pub sender: UnboundedSender<(Chain::Height, Chain::Event)>,
 }
 
 impl<Chain> Task for PollStarknetEventsTask<Chain>
@@ -91,18 +90,18 @@ where
     }
 }
 
-impl<Chain> CanCreateStarknetSubscription for Chain
+impl<Chain> CanCreateStarknetEventSubscription for Chain
 where
     Chain: Clone + HasRuntime + CanSendStarknetEvents,
     Chain::Runtime: Clone + CanCreateClosureSubscription + CanMultiplexSubscription + CanSpawnTask,
     Chain::Address: Clone,
+    Chain::Event: Clone,
 {
-    async fn create_event_subscription(
+    fn create_starknet_event_subscription(
         self,
         height: Chain::Height,
         address: Chain::Address,
-    ) -> Result<Arc<dyn Subscription<Item = (Chain::Height, Arc<Chain::Event>)>>, Chain::Error>
-    {
+    ) -> Arc<dyn Subscription<Item = (Chain::Height, Chain::Event)>> {
         let runtime = self.runtime().clone();
         let height_mutex = Arc::new(Mutex::new(height));
 
@@ -124,12 +123,7 @@ where
                 chain.runtime().spawn_task(task);
 
                 let stream: Pin<
-                    Box<
-                        dyn Stream<Item = (Chain::Height, Arc<Chain::Event>)>
-                            + Send
-                            + Sync
-                            + 'static,
-                    >,
+                    Box<dyn Stream<Item = (Chain::Height, Chain::Event)> + Send + Sync + 'static>,
                 > = Box::pin(receiver);
 
                 Some(stream)
@@ -138,6 +132,6 @@ where
 
         let subscription = runtime.multiplex_subscription(subscription, |e| e);
 
-        Ok(subscription)
+        subscription
     }
 }

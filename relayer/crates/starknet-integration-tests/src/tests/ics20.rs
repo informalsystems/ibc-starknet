@@ -29,6 +29,7 @@ use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
+use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
@@ -300,6 +301,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             contract_address
         };
+
+        starknet_chain.event_subscription = Some(
+            starknet_chain
+                .clone()
+                .create_starknet_event_subscription(0, ibc_core_address),
+        );
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
             runtime.clone(),
