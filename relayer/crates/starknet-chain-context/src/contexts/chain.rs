@@ -165,6 +165,7 @@ use hermes_starknet_chain_components::types::events::packet::WriteAcknowledgemen
 use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
+use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
@@ -424,6 +425,7 @@ pub trait CanUseStarknetChain:
     + CanQueryCounterpartyChainId<CosmosChain>
     + HasPacketDstChannelId<CosmosChain>
     + HasPacketDstPortId<CosmosChain>
+    + CanAssertEventualAmount
 // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
 // + CanIbcTransferToken<CosmosChain>
 {

@@ -11,6 +11,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::bool::DecodeBoolError;
 use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::variant::VariantIndexOutOfBound;
+use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_error::handlers::debug::DebugError;
 use hermes_error::handlers::display::DisplayError;
@@ -38,6 +39,8 @@ use hermes_starknet_chain_components::impls::queries::consensus_state::Consensus
 use hermes_starknet_chain_components::impls::queries::contract_address::ContractAddressNotFound;
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use hermes_starknet_chain_components::types::event::UnknownEvent;
+use hermes_test_components::chain::impls::assert::poll_assert_eventual_amount::EventualAmountTimeoutError;
+use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use ibc::core::channel::types::error::ChannelError;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};
@@ -98,6 +101,7 @@ delegate_components! {
             EmptyMessageResponse,
             ConsensusStateNotFound,
             <'a> UnknownEvent<'a>,
+            <'a, Chain: HasAddressType + HasAmountType> EventualAmountTimeoutError<'a, Chain>,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
             <'a, Chain: HasClientIdType<Counterparty>, Counterparty: HasHeightType>
                 NoConsensusStateAtLessThanHeight<'a, Chain, Counterparty>,

@@ -42,7 +42,11 @@ pub use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterCo
 pub use hermes_relayer_components::transaction::traits::types::transaction::TransactionTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
+use hermes_test_components::chain::impls::assert::default_assert_duration::ProvideDefaultPollAssertDuration;
+use hermes_test_components::chain::impls::assert::poll_assert_eventual_amount::PollAssertEventualAmount;
 use hermes_test_components::chain::impls::ibc_transfer::SendIbcTransferMessage;
+pub use hermes_test_components::chain::traits::assert::eventual_amount::EventualAmountAsserterComponent;
+pub use hermes_test_components::chain::traits::assert::poll_assert::PollAssertDurationGetterComponent;
 use hermes_test_components::chain::traits::queries::balance::BalanceQuerierComponent;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::TokenIbcTransferrerComponent;
 use hermes_test_components::chain::traits::transfer::string_memo::ProvideStringMemoType;
@@ -391,5 +395,9 @@ cgp_preset! {
             QueryPacketIsReceivedOnStarknet,
         CounterpartyChainIdQuerierComponent:
             QueryCosmosChainIdFromStarknetChannelId,
+        EventualAmountAsserterComponent:
+            PollAssertEventualAmount,
+        PollAssertDurationGetterComponent:
+            ProvideDefaultPollAssertDuration,
     }
 }
