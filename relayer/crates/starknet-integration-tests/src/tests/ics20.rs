@@ -10,6 +10,7 @@ use hermes_chain_components::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
 };
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
+use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
@@ -27,7 +28,6 @@ use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapCha
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::event_relayer::CanRelayEvent;
-use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::sleep::CanSleep;
@@ -273,11 +273,18 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         info!("client state on Starknet: {:?}", client_state_on_starknet);
 
+        assert_eq!(&client_state_on_starknet.chain_id, cosmos_chain.chain_id());
+
         let client_state_on_cosmos = cosmos_chain
             .query_client_state_with_latest_height(PhantomData::<StarknetChain>, &cosmos_client_id)
             .await?;
 
         info!("client state on Cosmos: {:?}", client_state_on_cosmos);
+
+        assert_eq!(
+            &client_state_on_cosmos.client_state.chain_id,
+            starknet_chain.chain_id()
+        );
 
         let ics20_contract_address = {
             let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
@@ -321,7 +328,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         {
             let starknet_to_cosmos_relay = starknet_to_cosmos_relay.clone();
 
-            let cosmos_to_starknet_relay = starknet_to_cosmos_relay.clone();
+            let cosmos_to_starknet_relay = cosmos_to_starknet_relay.clone();
 
             runtime.runtime.spawn(async move {
                 let _ = starknet_to_cosmos_relay.run().await;
@@ -415,7 +422,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_cosmos_a_step_0
         );
 
-        <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
+        let _packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
             cosmos_chain,
             &cosmos_channel_id,
             &IbcPortId::transfer(),
@@ -425,6 +432,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             &None,
         )
         .await?;
+
+        // cosmos_to_starknet_relay.relay_packet(&packet).await?;
 
         let balance_cosmos_a_step_1 = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)
@@ -438,7 +447,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         );
 
         // Wait for background relayer to relay packet
-        runtime.sleep(Duration::from_secs(2)).await;
+        runtime.sleep(Duration::from_secs(5)).await;
 
         let ics20_token_address: Felt = {
             let ibc_prefixed_denom = PrefixedDenom {
@@ -711,7 +720,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         // send the tokens back to starknet
 
-        let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
+        let _packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
             cosmos_chain,
             &cosmos_channel_id,
             &IbcPortId::transfer(),
@@ -722,7 +731,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         )
         .await?;
 
-        cosmos_to_starknet_relay.relay_packet(&packet).await?;
+        // cosmos_to_starknet_relay.relay_packet(&packet).await?;
 
         let balance_cosmos_a_step_4 = cosmos_chain
             .query_balance(address_cosmos_a, &cosmos_ibc_denom)
