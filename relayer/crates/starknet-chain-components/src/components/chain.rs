@@ -47,6 +47,7 @@ use hermes_test_components::chain::impls::assert::poll_assert_eventual_amount::P
 use hermes_test_components::chain::impls::ibc_transfer::SendIbcTransferMessage;
 pub use hermes_test_components::chain::traits::assert::eventual_amount::EventualAmountAsserterComponent;
 pub use hermes_test_components::chain::traits::assert::poll_assert::PollAssertDurationGetterComponent;
+use hermes_test_components::chain::traits::messages::ibc_transfer::IbcTokenTransferMessageBuilderComponent;
 use hermes_test_components::chain::traits::queries::balance::BalanceQuerierComponent;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::TokenIbcTransferrerComponent;
 use hermes_test_components::chain::traits::transfer::string_memo::ProvideStringMemoType;
@@ -67,6 +68,7 @@ use crate::impls::events::UseStarknetEvents;
 use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
 use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
+use crate::impls::messages::ibc_transfer::BuildStarknetIbcTransferMessage;
 use crate::impls::messages::packet::BuildStarknetPacketMessages;
 use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
 use crate::impls::packet_fields::ReadPacketSrcStarknetFields;
@@ -399,5 +401,7 @@ cgp_preset! {
             PollAssertEventualAmount,
         PollAssertDurationGetterComponent:
             ProvideDefaultPollAssertDuration,
+        IbcTokenTransferMessageBuilderComponent:
+            BuildStarknetIbcTransferMessage,
     }
 }
