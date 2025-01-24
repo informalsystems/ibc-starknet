@@ -1,9 +1,10 @@
 use core::num::traits::{CheckedAdd, Zero};
 use core::traits::PartialOrd;
+use ics23::IntoArrayU32;
 use starknet::SyscallResult;
 use starknet::storage_access::{Store, StorageBaseAddress};
 use starknet_ibc_core::client::ClientErrors;
-use starknet_ibc_core::commitment::{IntoArrayU32, U32CollectorImpl};
+use starknet_ibc_core::commitment::U32CollectorImpl;
 use starknet_ibc_core::host::ClientId;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]

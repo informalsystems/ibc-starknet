@@ -59,6 +59,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ics23"
+version = "0.1.0"
+dependencies = [
+ "alexandria_numeric",
+ "protobuf",
+]
+
+[[package]]
 name = "openzeppelin_access"
 version = "0.18.0"
 source = "registry+https://scarbs.xyz/"
@@ -109,6 +117,10 @@ name = "openzeppelin_utils"
 version = "0.18.0"
 source = "registry+https://scarbs.xyz/"
 checksum = "sha256:725b212839f3eddc32791408609099c5e808c167ca0cf331d8c1d778b07a4e21"
+
+[[package]]
+name = "protobuf"
+version = "0.1.0"
 
 [[package]]
 name = "serde_json"
@@ -182,7 +194,7 @@ dependencies = [
 name = "starknet_ibc_core"
 version = "0.1.0"
 dependencies = [
- "alexandria_numeric",
+ "ics23",
  "openzeppelin_testing",
  "snforge_std",
  "starknet_ibc_testkit",
