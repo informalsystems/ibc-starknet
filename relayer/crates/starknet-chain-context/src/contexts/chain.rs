@@ -5,6 +5,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
+use hermes_async_runtime_components::subscription::traits::subscription::Subscription;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_type_components::traits::fields::chain_id::HasChainId;
@@ -26,6 +27,10 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
+use hermes_relayer_components::chain::traits::event_subscription::EventSubscriptionGetter;
+use hermes_relayer_components::chain::traits::extract_data::{
+    CanExtractFromEvent, CanExtractFromMessageResponse,
+};
 use hermes_relayer_components::chain::traits::message_builders::ack_packet::CanBuildAckPacketMessage;
 use hermes_relayer_components::chain::traits::message_builders::channel_handshake::{
     CanBuildChannelOpenAckMessage, CanBuildChannelOpenConfirmMessage,
@@ -46,6 +51,7 @@ use hermes_relayer_components::chain::traits::packet::fields::{
 use hermes_relayer_components::chain::traits::packet::filter::{
     CanFilterIncomingPacket, CanFilterOutgoingPacket,
 };
+use hermes_relayer_components::chain::traits::packet::from_write_ack::CanBuildPacketFromWriteAck;
 use hermes_relayer_components::chain::traits::payload_builders::ack_packet::CanBuildAckPacketPayload;
 use hermes_relayer_components::chain::traits::payload_builders::channel_handshake::{
     CanBuildChannelOpenAckPayload, CanBuildChannelOpenConfirmPayload, CanBuildChannelOpenTryPayload,
@@ -76,6 +82,7 @@ use hermes_relayer_components::chain::traits::queries::consensus_state::{
 use hermes_relayer_components::chain::traits::queries::consensus_state_height::{
     CanQueryConsensusStateHeight, CanQueryConsensusStateHeights,
 };
+use hermes_relayer_components::chain::traits::queries::counterparty_chain_id::CanQueryCounterpartyChainId;
 use hermes_relayer_components::chain::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
 use hermes_relayer_components::chain::traits::queries::packet_commitment::CanQueryPacketCommitment;
 use hermes_relayer_components::chain::traits::queries::packet_is_received::CanQueryPacketIsReceived;
@@ -125,7 +132,8 @@ use hermes_starknet_chain_components::components::chain::{
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
-use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetSubscription;
+use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
+use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
     HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeComponent,
 };
@@ -153,6 +161,7 @@ use hermes_starknet_chain_components::types::cosmos::client_state::CometClientSt
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
 use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
+use hermes_starknet_chain_components::types::events::packet::WriteAcknowledgementEvent;
 use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
@@ -182,6 +191,7 @@ pub struct StarknetChain {
     pub ibc_client_contract_address: Option<Felt>,
     pub ibc_core_contract_address: Option<Felt>,
     pub event_encoding: StarknetEventEncoding,
+    pub event_subscription: Option<Arc<dyn Subscription<Item = (u64, StarknetEvent)>>>,
 }
 
 pub struct StarknetChainContextComponents;
@@ -278,6 +288,14 @@ impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
     }
 }
 
+impl EventSubscriptionGetter<StarknetChain> for StarknetChainContextComponents {
+    fn event_subscription(
+        chain: &StarknetChain,
+    ) -> Option<&Arc<dyn Subscription<Item = (u64, StarknetEvent)>>> {
+        chain.event_subscription.as_ref()
+    }
+}
+
 pub trait CanUseStarknetChain:
     HasRuntime
     + HasLogger
@@ -319,7 +337,7 @@ pub trait CanUseStarknetChain:
     + CanQueryChainStatus
     + CanQueryChainHeight
     + CanQueryBlockEvents
-    + CanCreateStarknetSubscription
+    + CanCreateStarknetEventSubscription
     + CanSendMessages
     + CanSendSingleMessage
     + CanSubmitTx
@@ -394,6 +412,18 @@ pub trait CanUseStarknetChain:
     + HasSequenceType<CosmosChain, Sequence = Sequence>
     + CanQueryBalance
     + HasMemoType
+    + CanCreateStarknetEventSubscription
+    + HasCreateClientEvent<CosmosChain, CreateClientEvent = StarknetCreateClientEvent>
+    + HasSendPacketEvent<CosmosChain>
+    + HasWriteAckEvent<CosmosChain, WriteAckEvent = WriteAcknowledgementEvent>
+    + CanExtractFromMessageResponse<StarknetCreateClientEvent>
+    + CanExtractFromEvent<WriteAcknowledgementEvent>
+    + CanBuildPacketFromWriteAck<CosmosChain>
+    + CanFilterIncomingPacket<CosmosChain>
+    + CanFilterOutgoingPacket<CosmosChain>
+    + CanQueryCounterpartyChainId<CosmosChain>
+    + HasPacketDstChannelId<CosmosChain>
+    + HasPacketDstPortId<CosmosChain>
 // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
 // + CanIbcTransferToken<CosmosChain>
 {
@@ -447,8 +477,13 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanFilterIncomingPacket<StarknetChain>
     + HasAcknowledgementType<StarknetChain, Acknowledgement = Vec<u8>>
     + HasSequenceType<StarknetChain, Sequence = Sequence>
+    + HasCreateClientEvent<StarknetChain>
     + HasSendPacketEvent<StarknetChain>
     + HasWriteAckEvent<StarknetChain>
+    + CanBuildPacketFromWriteAck<StarknetChain>
+    + CanQueryCounterpartyChainId<StarknetChain>
+    + CanFilterIncomingPacket<StarknetChain>
+    + CanFilterOutgoingPacket<StarknetChain>
 {
 }
 

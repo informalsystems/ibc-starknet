@@ -14,6 +14,7 @@ use hermes_chain_components::impls::types::payloads::connection::ProvideConnecti
 use hermes_chain_components::impls::types::payloads::packet::ProvidePacketPayloadTypes;
 use hermes_chain_components::impls::types::receipt::ProvideBytesPacketReceipt;
 use hermes_chain_components::traits::commitment_prefix::IbcCommitmentPrefixGetterComponent;
+pub use hermes_chain_components::traits::packet::from_send_packet::PacketFromSendPacketEventBuilderComponent;
 pub use hermes_cosmos_chain_components::components::client::*;
 use hermes_cosmos_chain_components::impls::channel::init_channel_options::ProvideCosmosInitChannelOptionsType;
 use hermes_cosmos_chain_components::impls::connection::init_connection_options::ProvideCosmosInitConnectionOptionsType;
@@ -58,10 +59,7 @@ use crate::impls::contract::deploy::DeployStarknetContract;
 use crate::impls::contract::invoke::InvokeStarknetContract;
 use crate::impls::contract::message::BuildInvokeContractCall;
 use crate::impls::counterparty_message_height::GetCounterpartyCosmosHeightFromStarknetMessage;
-use crate::impls::events::ack::UseStarknetWriteAckEvent;
-use crate::impls::events::channel::UseStarknetChannelEvents;
-use crate::impls::events::connection_id::UseStarknetConnectionEvents;
-use crate::impls::events::create_client::UseStarknetCreateClientEvent;
+use crate::impls::events::UseStarknetEvents;
 use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
 use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
@@ -79,6 +77,7 @@ use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
 use crate::impls::queries::consensus_state::QueryCometConsensusState;
 use crate::impls::queries::contract_address::GetContractAddressFromField;
+use crate::impls::queries::counterparty_chain_id::QueryCosmosChainIdFromStarknetChannelId;
 use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
 use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
 use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
@@ -265,20 +264,20 @@ cgp_preset! {
             QueryErc20TokenBalance,
         BalanceQuerierComponent:
             QueryStarknetWalletBalance,
-        CreateClientEventComponent:
-            UseStarknetCreateClientEvent,
         [
+            CreateClientEventComponent,
             ConnectionOpenInitEventComponent,
             ConnectionOpenTryEventComponent,
-        ]:
-            UseStarknetConnectionEvents,
-        [
             ChannelOpenInitEventComponent,
             ChannelOpenTryEventComponent,
+            SendPacketEventComponent,
+            WriteAckEventComponent,
+            EventExtractorComponent,
+            MessageResponseExtractorComponent,
+            PacketFromWriteAckEventBuilderComponent,
+            PacketFromSendPacketEventBuilderComponent,
         ]:
-            UseStarknetChannelEvents,
-        WriteAckEventComponent:
-            UseStarknetWriteAckEvent,
+            UseStarknetEvents,
         CreateClientMessageOptionsTypeComponent:
             ProvideNoCreateClientMessageOptionsType,
         CreateClientPayloadBuilderComponent:
@@ -390,5 +389,7 @@ cgp_preset! {
             FilterStarknetPackets,
         ReceivedPacketQuerierComponent:
             QueryPacketIsReceivedOnStarknet,
+        CounterpartyChainIdQuerierComponent:
+            QueryCosmosChainIdFromStarknetChannelId,
     }
 }

@@ -248,8 +248,7 @@ impl<EventEncoding, CairoEncoding, Strategy>
 where
     EventEncoding: HasEncodedType<Encoded = StarknetEvent>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseAsyncError<CairoEncoding::Error>
-        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
+        + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Sequence, PortId, ChannelId, PortId, ChannelId]>
         + CanDecode<ViaCairo, Product![Vec<Felt>, Acknowledgement]>,

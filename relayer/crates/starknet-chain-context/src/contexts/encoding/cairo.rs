@@ -127,7 +127,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, TracePrefix>
     + CanEncodeAndDecode<ViaCairo, Vec<TracePrefix>>
     + CanEncodeAndDecode<ViaCairo, Participant>
-    + CanEncode<ViaCairo, TransferPacketData>
+    + CanEncodeAndDecode<ViaCairo, TransferPacketData>
     + CanEncodeAndDecode<ViaCairo, Height>
     + CanEncodeAndDecode<ViaCairo, Packet>
     + CanEncodeAndDecode<ViaCairo, ClientStatus>

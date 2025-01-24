@@ -14,6 +14,7 @@ use hermes_relayer_components::multi::types::tags::{Dst, Src};
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::impls::packet_lock::PacketMutexOf;
 use hermes_relayer_components::relay::impls::selector::SelectRelayBToA;
+use hermes_relayer_components::relay::traits::auto_relayer::CanAutoRelay;
 use hermes_relayer_components::relay::traits::chains::{
     CanRaiseRelayChainErrors, HasRelayChains, HasRelayClientIds,
 };
@@ -22,6 +23,7 @@ use hermes_relayer_components::relay::traits::connection::open_ack::CanRelayConn
 use hermes_relayer_components::relay::traits::connection::open_confirm::CanRelayConnectionOpenConfirm;
 use hermes_relayer_components::relay::traits::connection::open_init::CanInitConnection;
 use hermes_relayer_components::relay::traits::connection::open_try::CanRelayConnectionOpenTry;
+use hermes_relayer_components::relay::traits::event_relayer::CanRelayEvent;
 use hermes_relayer_components::relay::traits::ibc_message_sender::{
     CanSendIbcMessages, CanSendSingleIbcMessage,
 };
@@ -146,6 +148,10 @@ pub trait CanUseStarknetToCosmosRelay:
     + CanRelayConnectionOpenConfirm
     + CanBootstrapConnection
     + CanRelayPacket
+    + CanRelayEvent<SourceTarget>
+    + CanRelayEvent<DestinationTarget>
+    + CanAutoRelay<SourceTarget>
+    + CanAutoRelay<DestinationTarget>
 {
 }
 

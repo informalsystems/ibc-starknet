@@ -8,10 +8,13 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use flate2::write::GzEncoder;
 use flate2::Compression;
+use hermes_chain_components::traits::extract_data::CanExtractFromMessageResponse;
 use hermes_cosmos_chain_components::impls::connection::connection_handshake_message::default_connection_version;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
 use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
+use hermes_cosmos_chain_components::types::events::channel::CosmosChannelOpenInitEvent;
+use hermes_cosmos_chain_components::types::events::connection::CosmosConnectionOpenInitEvent;
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_init::CosmosChannelOpenInitMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
@@ -30,8 +33,6 @@ use hermes_relayer_components::chain::traits::queries::chain_status::{
 use hermes_relayer_components::chain::traits::queries::client_state::CanQueryClientState;
 use hermes_relayer_components::chain::traits::queries::consensus_state::CanQueryConsensusState;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
-use hermes_relayer_components::chain::traits::types::ibc_events::channel::HasChannelOpenInitEvent;
-use hermes_relayer_components::chain::traits::types::ibc_events::connection::HasConnectionOpenInitEvent;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
@@ -372,7 +373,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let events = cosmos_chain.send_message(open_init_message.to_cosmos_message()).await?;
 
-            let connection_id = <CosmosChain as HasConnectionOpenInitEvent<StarknetChain>>::try_extract_connection_open_init_event(&events)
+            let connection_id = cosmos_chain.try_extract_from_message_response(PhantomData::<CosmosConnectionOpenInitEvent>, &events)
                 .unwrap()
                 .connection_id
             ;
@@ -427,7 +428,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let events = cosmos_chain.send_message(open_init_message.to_cosmos_message()).await?;
 
-            let channel_id = <CosmosChain as HasChannelOpenInitEvent<StarknetChain>>::try_extract_channel_open_init_event(&events)
+            let channel_id = cosmos_chain.try_extract_from_message_response(PhantomData::<CosmosChannelOpenInitEvent>, &events)
                 .unwrap()
                 .channel_id
             ;

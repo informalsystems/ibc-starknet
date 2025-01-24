@@ -92,7 +92,7 @@ fn test_erc20_transfer() -> Result<(), Error> {
             erc20_hashes: [erc20_class_hash].into(),
             ics20_hashes: Default::default(),
             ibc_client_hashes: Default::default(),
-            ibc_core_hashes: Default::default(),
+            ibc_core_contract_addresses: Default::default(),
         };
 
         {

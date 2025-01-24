@@ -5,6 +5,7 @@ use core::ops::Deref;
 use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
+use hermes_logging_components::traits::has_logger::HasLogger;
 use hermes_relayer_components::components::default::relay::MainSink;
 use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeAtComponent,
@@ -15,6 +16,7 @@ use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapCha
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::impls::packet_lock::PacketMutexOf;
 use hermes_relayer_components::relay::impls::selector::SelectRelayAToB;
+use hermes_relayer_components::relay::traits::auto_relayer::CanAutoRelay;
 use hermes_relayer_components::relay::traits::chains::{
     CanRaiseRelayChainErrors, HasRelayChains, HasRelayClientIds,
 };
@@ -26,9 +28,11 @@ use hermes_relayer_components::relay::traits::connection::open_ack::CanRelayConn
 use hermes_relayer_components::relay::traits::connection::open_confirm::CanRelayConnectionOpenConfirm;
 use hermes_relayer_components::relay::traits::connection::open_init::CanInitConnection;
 use hermes_relayer_components::relay::traits::connection::open_try::CanRelayConnectionOpenTry;
+use hermes_relayer_components::relay::traits::event_relayer::CanRelayEvent;
 use hermes_relayer_components::relay::traits::ibc_message_sender::{
     CanSendIbcMessages, CanSendSingleIbcMessage,
 };
+use hermes_relayer_components::relay::traits::packet_lock::HasPacketLock;
 use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::target::{
     DestinationTarget, HasDestinationTargetChainTypes, HasSourceTargetChainTypes,
@@ -154,6 +158,12 @@ pub trait CanUseCosmosToStarknetRelay:
     + CanRelayChannelOpenConfirm
     + CanBootstrapChannel
     + CanRelayPacket
+    + HasPacketLock
+    + HasLogger
+    + CanRelayEvent<SourceTarget>
+    + CanRelayEvent<DestinationTarget>
+    + CanAutoRelay<SourceTarget>
+    + CanAutoRelay<DestinationTarget>
 {
 }
 

@@ -8,6 +8,7 @@ pub mod config;
 pub mod contract;
 pub mod denom;
 pub mod event;
+pub mod events;
 pub mod height;
 pub mod message;
 pub mod method;
