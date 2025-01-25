@@ -300,59 +300,49 @@ pub mod TokenTransferComponent {
 
             msg.validate_basic();
 
-            let sender: Option<ContractAddress> = msg.packet_data.sender.clone().try_into();
+            let sender = get_caller_address();
 
-            assert(sender.is_some(), TransferErrors::INVALID_SENDER);
+            assert(sender.is_non_zero(), TransferErrors::ZERO_SENDER);
 
-            match @msg.packet_data.denom.base {
+            match @msg.denom.base {
                 Denom::Native(erc20_token) => {
                     self
                         .escrow_validate(
-                            sender.unwrap(),
+                            sender,
                             msg.port_id_on_a.clone(),
                             msg.chan_id_on_a.clone(),
                             erc20_token.clone(),
-                            msg.packet_data.amount,
-                            msg.packet_data.memo.clone(),
+                            msg.amount,
+                            msg.memo.clone(),
                         );
                 },
                 Denom::Hosted(_) => {
-                    self
-                        .burn_validate(
-                            sender.unwrap(),
-                            msg.packet_data.denom.clone(),
-                            msg.packet_data.amount,
-                            msg.packet_data.memo.clone(),
-                        );
+                    self.burn_validate(sender, msg.denom.clone(), msg.amount, msg.memo.clone(),);
                 }
             }
         }
 
         fn send_execute(ref self: ComponentState<TContractState>, msg: MsgTransfer) {
-            let sender: Option<ContractAddress> = msg.packet_data.sender.clone().try_into();
+            let sender = get_caller_address();
 
-            match @msg.packet_data.denom.base {
+            match @msg.denom.base {
                 Denom::Native(erc20_token) => {
-                    self
-                        .escrow_execute(
-                            sender.unwrap(),
-                            erc20_token.clone(),
-                            msg.packet_data.amount,
-                            msg.packet_data.memo.clone(),
-                        );
+                    self.escrow_execute(sender, erc20_token.clone(), msg.amount, msg.memo.clone(),);
                 },
                 Denom::Hosted(_) => {
-                    self
-                        .burn_execute(
-                            sender.unwrap(),
-                            msg.packet_data.denom.clone(),
-                            msg.packet_data.amount,
-                            msg.packet_data.memo.clone(),
-                        );
+                    self.burn_execute(sender, msg.denom.clone(), msg.amount, msg.memo.clone(),);
                 }
             }
 
-            self.emit_send_event(msg.packet_data);
+            let packet_data = PacketData {
+                sender: Participant::Native(sender),
+                receiver: msg.receiver.clone(),
+                denom: msg.denom.clone(),
+                amount: msg.amount,
+                memo: msg.memo.clone(),
+            };
+
+            self.emit_send_event(packet_data);
         }
 
         fn construct_send_packet(
@@ -370,7 +360,15 @@ pub mod TokenTransferComponent {
 
             let mut data: Array<felt252> = ArrayTrait::new();
 
-            msg.packet_data.serialize(ref data);
+            let packet_data = PacketData {
+                sender: Participant::Native(get_caller_address()),
+                receiver: msg.receiver.clone(),
+                denom: msg.denom.clone(),
+                amount: msg.amount,
+                memo: msg.memo.clone(),
+            };
+
+            packet_data.serialize(ref data);
 
             Packet {
                 seq_on_a,

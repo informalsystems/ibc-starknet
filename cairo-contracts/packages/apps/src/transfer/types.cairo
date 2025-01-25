@@ -19,7 +19,10 @@ pub(crate) const MAXIMUM_MEMO_LENGTH: u32 = 32768;
 pub struct MsgTransfer {
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
-    pub packet_data: PacketData,
+    pub denom: PrefixedDenom,
+    pub amount: u256,
+    pub receiver: Participant,
+    pub memo: Memo,
     pub timeout_height_on_b: Height,
     pub timeout_timestamp_on_b: Timestamp,
 }
@@ -28,7 +31,9 @@ impl MsgTransferValidateBasic of ValidateBasic<MsgTransfer> {
     fn validate_basic(self: @MsgTransfer) {
         self.port_id_on_a.validate(TRANSFER_PORT_ID_HASH);
         self.chan_id_on_a.validate();
-        self.packet_data.validate_basic();
+        assert(self.denom.base.is_non_zero(), TransferErrors::INVALID_DENOM);
+        assert(self.receiver.is_non_zero(), TransferErrors::INVALID_RECEIVER);
+        assert(self.amount.is_non_zero(), TransferErrors::ZERO_AMOUNT);
     }
 }
 
@@ -283,7 +288,7 @@ pub mod tests {
     fn test_json_serialized_packet_data() {
         let json = to_byte_array(PACKET_DATA_FROM_SN(ERC20()));
         let expected: ByteArray =
-            "{\"denom\":\"2087021424722619777119509474943472645767659996348769578120564519014510906823\",\"amount\":\"100\",\"sender\":\"340767163730\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"memo\":\"\"}";
+            "{\"denom\":\"2087021424722619777119509474943472645767659996348769578120564519014510906823\",\"amount\":\"100\",\"sender\":\"1431520594\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"memo\":\"\"}";
         assert_eq!(json, expected);
     }
 

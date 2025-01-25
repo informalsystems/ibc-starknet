@@ -19,10 +19,6 @@ pub fn SYMBOL() -> ByteArray {
     "IBC/UATOM"
 }
 
-pub fn OWNER() -> ContractAddress {
-    contract_address_const::<'OWNER'>()
-}
-
 pub fn CLASS_HASH() -> ClassHash {
     class_hash_const::<'ERC20Mintable'>()
 }
@@ -32,8 +28,16 @@ pub fn ERC20() -> ERC20Contract {
         .into()
 }
 
+pub fn OWNER() -> ContractAddress {
+    contract_address_const::<'OWNER'>()
+}
+
+pub fn USER() -> ContractAddress {
+    contract_address_const::<'USER'>()
+}
+
 pub fn STARKNET() -> Participant {
-    OWNER().into()
+    USER().into()
 }
 
 pub fn COSMOS() -> Participant {
