@@ -36,13 +36,16 @@ pub fn USER() -> ContractAddress {
     contract_address_const::<'USER'>()
 }
 
+pub fn CS_USER() -> ByteArray {
+    "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng"
+}
+
 pub fn STARKNET() -> Participant {
     USER().into()
 }
 
 pub fn COSMOS() -> Participant {
-    let bech32_address: ByteArray = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng";
-    bech32_address.into()
+    CS_USER().into()
 }
 
 pub fn NATIVE_DENOM() -> PrefixedDenom {

@@ -4,7 +4,7 @@ use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
     Event, SendEvent, RecvEvent, AckEvent, AckStatusEvent, CreateTokenEvent
 };
-use starknet_ibc_apps::transfer::types::{Participant, PrefixedDenom};
+use starknet_ibc_apps::transfer::types::PrefixedDenom;
 use starknet_ibc_core::channel::{Acknowledgement, AckStatus};
 use starknet_ibc_testkit::dummies::EMPTY_MEMO;
 
@@ -13,8 +13,8 @@ pub impl TransferEventSpyExtImpl of TransferEventSpyExt {
     fn assert_send_event(
         ref self: EventSpy,
         contract_address: ContractAddress,
-        sender: Participant,
-        receiver: Participant,
+        sender: ContractAddress,
+        receiver: ByteArray,
         denom: PrefixedDenom,
         amount: u256
     ) {
@@ -27,8 +27,8 @@ pub impl TransferEventSpyExtImpl of TransferEventSpyExt {
     fn assert_recv_event(
         ref self: EventSpy,
         contract_address: ContractAddress,
-        sender: Participant,
-        receiver: Participant,
+        sender: ByteArray,
+        receiver: ContractAddress,
         denom: PrefixedDenom,
         amount: u256,
         success: bool
@@ -42,8 +42,8 @@ pub impl TransferEventSpyExtImpl of TransferEventSpyExt {
     fn assert_ack_event(
         ref self: EventSpy,
         contract_address: ContractAddress,
-        sender: Participant,
-        receiver: Participant,
+        sender: ContractAddress,
+        receiver: ByteArray,
         denom: PrefixedDenom,
         amount: u256,
         ack: Acknowledgement

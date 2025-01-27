@@ -12,7 +12,7 @@ use starknet_ibc_core::router::{AppContract, AppContractTrait};
 use starknet_ibc_testkit::configs::{TransferAppConfigTrait, TransferAppConfig};
 use starknet_ibc_testkit::dummies::CLASS_HASH;
 use starknet_ibc_testkit::dummies::{
-    AMOUNT, SUPPLY, OWNER, USER, NAME, SYMBOL, COSMOS, STARKNET, HOSTED_DENOM, EMPTY_MEMO
+    AMOUNT, SUPPLY, OWNER, USER, CS_USER, NAME, SYMBOL, COSMOS, STARKNET, HOSTED_DENOM, EMPTY_MEMO
 };
 use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
 use starknet_ibc_testkit::handles::{ERC20Handle, AppHandle};
@@ -84,15 +84,12 @@ fn test_escrow_ok() {
     // User approves the amount of allowance for the `TransferApp` contract.
     erc20.approve(USER(), ics20.address, cfg.amount);
 
-    let msg_transfer = cfg.dummy_msg_transfer(cfg.native_denom.clone(), COSMOS());
+    let msg_transfer = cfg.dummy_msg_transfer(cfg.native_denom.clone(), CS_USER());
 
     call_contract(ics20.address, selector!("send_transfer_internal"), @msg_transfer);
 
     // Assert the `SendEvent` emitted.
-    spy
-        .assert_send_event(
-            ics20.address, STARKNET(), COSMOS(), cfg.native_denom.clone(), cfg.amount
-        );
+    spy.assert_send_event(ics20.address, USER(), CS_USER(), cfg.native_denom.clone(), cfg.amount);
 
     // Check the balance of the sender.
     erc20.assert_balance(USER(), SUPPLY - cfg.amount);
@@ -110,7 +107,7 @@ fn test_unescrow_ok() {
     // User approves the amount of allowance for the `TransferApp` contract.
     erc20.approve(USER(), ics20.address, cfg.amount);
 
-    let msg_transfer = cfg.dummy_msg_transfer(cfg.native_denom.clone(), COSMOS());
+    let msg_transfer = cfg.dummy_msg_transfer(cfg.native_denom.clone(), CS_USER());
 
     call_contract(ics20.address, selector!("send_transfer_internal"), @msg_transfer);
 
@@ -126,7 +123,7 @@ fn test_unescrow_ok() {
     ics20.on_recv_packet(recv_packet);
 
     // Assert the `RecvEvent` emitted.
-    spy.assert_recv_event(ics20.address, COSMOS(), STARKNET(), prefixed_denom, cfg.amount, true);
+    spy.assert_recv_event(ics20.address, CS_USER(), USER(), prefixed_denom, cfg.amount, true);
 
     erc20.assert_balance(ics20.address, 0);
 
@@ -153,7 +150,7 @@ fn test_mint_ok() {
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
-            ics20.address, COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true
+            ics20.address, CS_USER(), USER(), prefixed_denom.clone(), cfg.amount, true
         );
 
     spy.drop_all_events();
@@ -164,7 +161,7 @@ fn test_mint_ok() {
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
-            ics20.address, COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true
+            ics20.address, CS_USER(), USER(), prefixed_denom.clone(), cfg.amount, true
         );
 
     let erc20: ERC20Contract = token_address.into();
@@ -189,18 +186,21 @@ fn test_burn_ok() {
 
     let token_address = ics20.ibc_token_address(prefixed_denom.key());
 
-    let erc20: ERC20Contract = token_address.into();
+    let mut erc20: ERC20Contract = token_address.into();
 
     spy.drop_all_events();
 
     start_cheat_caller_address(ics20.address, USER());
 
-    let msg_transfer = cfg.dummy_msg_transfer(prefixed_denom.clone(), COSMOS());
+    // User approves the amount of allowance for the `TransferApp` contract.
+    erc20.approve(USER(), ics20.address, cfg.amount);
+
+    let msg_transfer = cfg.dummy_msg_transfer(prefixed_denom.clone(), CS_USER());
 
     call_contract(ics20.address, selector!("send_transfer_internal"), @msg_transfer);
 
     // Assert the `SendEvent` emitted.
-    spy.assert_send_event(ics20.address, STARKNET(), COSMOS(), prefixed_denom, cfg.amount);
+    spy.assert_send_event(ics20.address, USER(), CS_USER(), prefixed_denom, cfg.amount);
 
     // Check the balance of the sender.
     erc20.assert_balance(USER(), 0);

@@ -21,7 +21,7 @@ pub struct MsgTransfer {
     pub chan_id_on_a: ChannelId,
     pub denom: PrefixedDenom,
     pub amount: u256,
-    pub receiver: Participant,
+    pub receiver: ByteArray,
     pub memo: Memo,
     pub timeout_height_on_b: Height,
     pub timeout_timestamp_on_b: Timestamp,
@@ -32,7 +32,7 @@ impl MsgTransferValidateBasic of ValidateBasic<MsgTransfer> {
         self.port_id_on_a.validate(TRANSFER_PORT_ID_HASH);
         self.chan_id_on_a.validate();
         assert(self.denom.base.is_non_zero(), TransferErrors::INVALID_DENOM);
-        assert(self.receiver.is_non_zero(), TransferErrors::INVALID_RECEIVER);
+        assert(self.receiver.len() > 0, TransferErrors::INVALID_RECEIVER);
         assert(self.amount.is_non_zero(), TransferErrors::ZERO_AMOUNT);
     }
 }
@@ -215,6 +215,22 @@ pub enum Participant {
 
 #[generate_trait]
 pub impl ParticipantImpl of ParticipantTrait {
+    fn native(self: @Participant) -> Option<ContractAddress> {
+        if let Participant::Native(contract_address) = self {
+            Option::Some(*contract_address)
+        } else {
+            Option::None
+        }
+    }
+
+    fn external(self: @Participant) -> Option<ByteArray> {
+        if let Participant::External(byte_array) = self {
+            Option::Some(byte_array.clone())
+        } else {
+            Option::None
+        }
+    }
+
     fn is_non_zero(self: @Participant) -> bool {
         match self {
             Participant::Native(contract_address) => contract_address.is_non_zero(),

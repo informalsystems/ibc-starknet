@@ -8,7 +8,7 @@ use starknet_ibc_testkit::configs::{
 };
 use starknet_ibc_testkit::dummies::{
     HEIGHT, TIMESTAMP, COSMOS, STARKNET, CLIENT_ID, CONNECTION_ID, CHANNEL_ID, PORT_ID, SUPPLY,
-    PACKET_COMMITMENT_ON_SN, RELAYER, USER
+    PACKET_COMMITMENT_ON_SN, RELAYER, USER, CS_USER
 };
 use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ChannelEventSpyExt};
 use starknet_ibc_testkit::handles::{CoreHandle, AppHandle, ERC20Handle};
@@ -207,7 +207,7 @@ fn test_recv_packet_ok() {
     // Assert the `RecvEvent` emitted by the ICS20 contract.
     spy
         .assert_recv_event(
-            ics20.address, COSMOS(), STARKNET(), prefixed_denom.clone(), transfer_cfg.amount, true
+            ics20.address, CS_USER(), USER(), prefixed_denom.clone(), transfer_cfg.amount, true
         );
 
     // Assert the `ReceivePacketEvent` emitted by the core contract.
@@ -257,7 +257,8 @@ fn test_successful_ack_packet_ok() {
     // User approves the amount of allowance for the `TransferApp` contract.
     erc20.approve(USER(), ics20.address, transfer_cfg.amount);
 
-    let msg_transfer = transfer_cfg.dummy_msg_transfer(transfer_cfg.native_denom.clone(), COSMOS());
+    let msg_transfer = transfer_cfg
+        .dummy_msg_transfer(transfer_cfg.native_denom.clone(), CS_USER());
 
     // Submit a `MsgTransfer` to the `TransferApp` contract.
     ics20.send_transfer(msg_transfer.clone());
@@ -301,8 +302,8 @@ fn test_successful_ack_packet_ok() {
     spy
         .assert_ack_event(
             ics20.address,
-            STARKNET(),
-            COSMOS(),
+            USER(),
+            CS_USER(),
             transfer_cfg.native_denom.clone(),
             transfer_cfg.amount,
             SUCCESS_ACK()
@@ -339,7 +340,8 @@ fn test_failure_ack_packet_ok() {
     // User approves the amount of allowance for the `TransferApp` contract.
     erc20.approve(USER(), ics20.address, transfer_cfg.amount);
 
-    let msg_transfer = transfer_cfg.dummy_msg_transfer(transfer_cfg.native_denom.clone(), COSMOS());
+    let msg_transfer = transfer_cfg
+        .dummy_msg_transfer(transfer_cfg.native_denom.clone(), CS_USER());
 
     // Submit a `MsgTransfer` to the `TransferApp` contract.
     ics20.send_transfer(msg_transfer.clone());
@@ -385,8 +387,8 @@ fn test_failure_ack_packet_ok() {
     spy
         .assert_ack_event(
             ics20.address,
-            STARKNET(),
-            COSMOS(),
+            USER(),
+            CS_USER(),
             transfer_cfg.native_denom.clone(),
             transfer_cfg.amount,
             failure_ack.clone()
@@ -453,7 +455,8 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
 
     erc20.approve(USER(), ics20.address, transfer_cfg.amount);
 
-    let msg_transfer = transfer_cfg.dummy_msg_transfer(transfer_cfg.native_denom.clone(), COSMOS());
+    let msg_transfer = transfer_cfg
+        .dummy_msg_transfer(transfer_cfg.native_denom.clone(), CS_USER());
 
     ics20.send_transfer(msg_transfer.clone());
 

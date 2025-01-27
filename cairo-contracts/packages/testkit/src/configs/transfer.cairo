@@ -74,7 +74,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     }
 
     fn dummy_msg_transfer(
-        self: @TransferAppConfig, denom: PrefixedDenom, receiver: Participant
+        self: @TransferAppConfig, denom: PrefixedDenom, receiver: ByteArray
     ) -> MsgTransfer {
         MsgTransfer {
             port_id_on_a: PORT_ID(),
