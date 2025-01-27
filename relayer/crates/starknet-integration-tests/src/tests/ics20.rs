@@ -6,9 +6,7 @@ use std::time::SystemTime;
 
 use cgp::extra::run::CanRun;
 use cgp::prelude::*;
-use hermes_chain_components::traits::queries::chain_status::{
-    CanQueryChainHeight, CanQueryChainStatus,
-};
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
@@ -27,7 +25,6 @@ use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage
 use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapChannel;
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
-use hermes_relayer_components::relay::traits::event_relayer::CanRelayEvent;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
@@ -459,8 +456,10 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_cosmos_a_step_1.quantity + transfer_quantity
         );
 
-        // Wait for background relayer to relay packet
-        runtime.sleep(Duration::from_secs(5)).await;
+        // Wait for background relayer to relay packet.
+        // We cannot poll the balance here, because the IBC denom will only
+        // be relayed after the first token transfer.
+        runtime.sleep(Duration::from_secs(2)).await;
 
         let ics20_token_address: Felt = {
             let ibc_prefixed_denom = PrefixedDenom {
@@ -599,14 +598,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         info!("erc20 token address: {:?}", erc20_token_address);
 
-        let balance_starknet_relayer_step_0 = starknet_chain
+        let balance_starknet_step_0 = starknet_chain
             .query_token_balance(erc20_token_address, address_starknet_b)
             .await?;
 
-        info!(
-            "erc20 balance on starknet: {}",
-            balance_starknet_relayer_step_0
-        );
+        info!("erc20 balance on starknet: {}", balance_starknet_step_0);
 
         {
             // approve ics20 contract to spend the tokens for address_starknet_b
@@ -689,19 +685,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let tx_hash = execution.send().await?.transaction_hash;
 
             starknet_chain.poll_tx_response(&tx_hash).await?;
-
-            // info!("ICS20 send packet response: {:?}", response);
-
-            // let height = starknet_chain.query_chain_height().await?;
-
-            // for event in response.events {
-            //     <StarknetToCosmosRelay as CanRelayEvent<SourceTarget>>::relay_chain_event(
-            //         &starknet_to_cosmos_relay,
-            //         &height,
-            //         &event,
-            //     )
-            //     .await?;
-            // }
         };
 
         let cosmos_ibc_denom = derive_ibc_denom(
@@ -730,7 +713,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         assert_eq!(
             balance_starknet_relayer_step_3.quantity,
-            balance_starknet_relayer_step_0.quantity - transfer_quantity.into()
+            balance_starknet_step_0.quantity - transfer_quantity.into()
         );
 
         // send the tokens back to starknet
@@ -746,8 +729,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         )
         .await?;
 
-        // cosmos_to_starknet_relay.relay_packet(&packet).await?;
-
         let balance_cosmos_a_step_4 = cosmos_chain
             .query_balance(address_cosmos_a, &cosmos_ibc_denom)
             .await?;
@@ -760,7 +741,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         assert_eq!(balance_cosmos_a_step_4.quantity, 0u64.into());
 
         starknet_chain
-            .assert_eventual_amount(erc20_token_address, &balance_starknet_relayer_step_0)
+            .assert_eventual_amount(address_starknet_b, &balance_starknet_step_0)
             .await?;
 
         Ok(())
