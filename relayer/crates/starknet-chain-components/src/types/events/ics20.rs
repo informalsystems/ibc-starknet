@@ -9,7 +9,6 @@ use starknet::macros::selector;
 
 use crate::types::event::{StarknetEvent, UnknownEvent};
 use crate::types::messages::ibc::denom::PrefixedDenom;
-use crate::types::messages::ibc::ibc_transfer::Participant;
 use crate::types::messages::ibc::packet::{AckStatus, Acknowledgement};
 
 #[derive(Debug)]
@@ -24,8 +23,8 @@ pub enum IbcTransferEvent {
 
 #[derive(Debug)]
 pub struct SendIbcTransferEvent {
-    pub sender: Participant,
-    pub receiver: Participant,
+    pub sender: Felt,
+    pub receiver: String,
     pub denom: PrefixedDenom,
     pub amount: U256,
     pub memo: String,
@@ -33,8 +32,8 @@ pub struct SendIbcTransferEvent {
 
 #[derive(Debug)]
 pub struct ReceiveIbcTransferEvent {
-    pub sender: Participant,
-    pub receiver: Participant,
+    pub sender: String,
+    pub receiver: Felt,
     pub denom: PrefixedDenom,
     pub amount: U256,
     pub memo: String,
@@ -43,8 +42,8 @@ pub struct ReceiveIbcTransferEvent {
 
 #[derive(Debug)]
 pub struct AckIbcTransferEvent {
-    pub sender: Participant,
-    pub receiver: Participant,
+    pub sender: Felt,
+    pub receiver: String,
     pub denom: PrefixedDenom,
 
     pub amount: U256,
@@ -59,9 +58,8 @@ pub struct AckStatusIbcTransferEvent {
 
 #[derive(Debug)]
 pub struct TimeoutIbcTransferEvent {
-    pub receiver: Participant,
+    pub receiver: String,
     pub denom: PrefixedDenom,
-
     pub amount: U256,
     pub memo: String,
 }
@@ -120,7 +118,7 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, Product![Participant, Participant, PrefixedDenom]>
+        + CanDecode<ViaCairo, Product![Felt, String, PrefixedDenom]>
         + CanDecode<ViaCairo, Product![U256, String]>,
 {
     fn decode(
@@ -154,7 +152,7 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, Product![Participant, Participant, PrefixedDenom]>
+        + CanDecode<ViaCairo, Product![String, Felt, PrefixedDenom]>
         + CanDecode<ViaCairo, Product![U256, String, bool]>,
 {
     fn decode(
@@ -189,7 +187,7 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, Product![Participant, Participant, PrefixedDenom]>
+        + CanDecode<ViaCairo, Product![Felt, String, PrefixedDenom]>
         + CanDecode<ViaCairo, Product![U256, String, Acknowledgement]>,
 {
     fn decode(
@@ -251,7 +249,7 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, Product![Participant, PrefixedDenom]>
+        + CanDecode<ViaCairo, Product![String, PrefixedDenom]>
         + CanDecode<ViaCairo, Product![U256, String]>,
 {
     fn decode(

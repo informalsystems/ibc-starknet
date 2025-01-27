@@ -41,9 +41,7 @@ use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
 };
-use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
-    MsgTransfer, Participant, TransferPacketData,
-};
+use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::MsgTransfer;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
@@ -471,9 +469,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         assert_eq!(balance_starknet_b_step_1.quantity, transfer_quantity.into());
 
-        // create ibc transfer packet data
+        // create ibc transfer message
 
-        let starknet_ic20_packet_data = {
+        let starknet_ics20_send_message = {
+            let current_starknet_time = starknet_chain.query_chain_status().await?.time;
+
             let denom = PrefixedDenom {
                 trace_path: vec![TracePrefix {
                     port_id: ics20_port.to_string(),
@@ -482,34 +482,15 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 base: Denom::Hosted(denom_cosmos.to_string()),
             };
 
-            let amount = transfer_quantity.into();
-
-            let sender = Participant::Native(*address_starknet_b);
-
-            let receiver = Participant::External(address_cosmos_a.clone());
-
-            let memo = String::new();
-
-            TransferPacketData {
-                denom,
-                amount,
-                sender,
-                receiver,
-                memo,
-            }
-        };
-
-        // create ibc transfer message
-
-        let starknet_ics20_send_message = {
-            let current_starknet_time = starknet_chain.query_chain_status().await?.time;
-
             MsgTransfer {
                 port_id_on_a: PortId {
                     port_id: ics20_port.to_string(),
                 },
                 chan_id_on_a: starknet_channel_id.clone(),
-                packet_data: starknet_ic20_packet_data,
+                denom,
+                amount: transfer_quantity.into(),
+                receiver: address_cosmos_a.clone(),
+                memo: String::new(),
                 timeout_height_on_b: Height {
                     revision_number: 0,
                     revision_height: 0,
@@ -611,40 +592,23 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         // submit ics20 transfer from Starknet to Cosmos
 
-        let starknet_ic20_packet_data = {
+        let starknet_ics20_send_message = {
+            let current_starknet_time = starknet_chain.query_chain_status().await?.time;
+
             let denom = PrefixedDenom {
                 trace_path: vec![],
                 base: Denom::Native(*erc20_token_address),
             };
-
-            let amount = transfer_quantity.into();
-
-            let sender = Participant::Native(*address_starknet_relayer);
-
-            let receiver = Participant::External(address_cosmos_a.clone());
-
-            let memo = String::new();
-
-            TransferPacketData {
-                denom,
-                amount,
-                sender,
-                receiver,
-                memo,
-            }
-        };
-
-        // create ibc transfer message
-
-        let starknet_ics20_send_message = {
-            let current_starknet_time = starknet_chain.query_chain_status().await?.time;
 
             MsgTransfer {
                 port_id_on_a: PortId {
                     port_id: ics20_port.to_string(),
                 },
                 chan_id_on_a: starknet_channel_id.clone(),
-                packet_data: starknet_ic20_packet_data,
+                denom,
+                amount: transfer_quantity.into(),
+                receiver: address_cosmos_a.clone(),
+                memo: String::new(),
                 timeout_height_on_b: Height {
                     revision_number: 0,
                     revision_height: 0,

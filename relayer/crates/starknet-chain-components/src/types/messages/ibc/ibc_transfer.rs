@@ -64,7 +64,10 @@ impl Transformer for EncodeTransferPacketData {
 pub struct MsgTransfer {
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
-    pub packet_data: TransferPacketData,
+    pub denom: PrefixedDenom,
+    pub amount: U256,
+    pub receiver: String,
+    pub memo: String,
     pub timeout_height_on_b: Height,
     pub timeout_timestamp_on_b: Timestamp,
 }
@@ -77,7 +80,10 @@ delegate_components! {
             Product![
                 EncodeField<symbol!("port_id_on_a"), UseContext>,
                 EncodeField<symbol!("chan_id_on_a"), UseContext>,
-                EncodeField<symbol!("packet_data"), UseContext>,
+                EncodeField<symbol!("denom"), UseContext>,
+                EncodeField<symbol!("amount"), UseContext>,
+                EncodeField<symbol!("receiver"), UseContext>,
+                EncodeField<symbol!("memo"), UseContext>,
                 EncodeField<symbol!("timeout_height_on_b"), UseContext>,
                 EncodeField<symbol!("timeout_timestamp_on_b"), UseContext>,
             ],
