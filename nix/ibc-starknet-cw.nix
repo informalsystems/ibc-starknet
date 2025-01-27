@@ -13,6 +13,7 @@ let
         "hermes-cosmos-encoding-components-0.1.0" = "sha256-uxXpzxVc89DkAC4VqC/Au3cpBzUbxiSS2KiFKZ+rqdg=";
         "cgp-0.3.1" = "sha256-AOQ+WVQWPlF2ZfYYc5Eq3t7XAljd5P2qExWLYZWNnd8=";
         "ibc-client-cw-0.56.0" = "sha256-EkLxuJfr3vf0busmSZD7DwOS9GfgfhT+sdopi1nNiCs=";
+        "ibc-0.56.0" = "sha256-Lw0rwumJ17J/KLtZNJ7KeWdqNUkHtKghcJSkyr0Qn/s=";
       };
     };
 
