@@ -13,7 +13,6 @@ use ibc::primitives::Timestamp;
 use crate::impls::types::message::StarknetMessage;
 use crate::types::amount::StarknetAmount;
 use crate::types::channel_id::ChannelId;
-use crate::types::messages::ibc::ibc_transfer::{MsgTransfer, TransferPacketData};
 
 pub struct BuildStarknetIbcTransferMessage;
 
@@ -31,39 +30,16 @@ where
     Counterparty: HasAddressType,
 {
     async fn build_ibc_token_transfer_message(
-        chain: &Chain,
-        channel_id: &ChannelId,
-        port_id: &PortId,
-        recipient_address: &Counterparty::Address,
-        amount: &StarknetAmount,
-        memo: &Option<String>,
-        timeout_height: Option<&u64>,
-        timeout_time: Option<&Timestamp>,
+        _chain: &Chain,
+        _channel_id: &ChannelId,
+        _port_id: &PortId,
+        _recipient_address: &Counterparty::Address,
+        _amount: &StarknetAmount,
+        _memo: &Option<String>,
+        _timeout_height: Option<&u64>,
+        _timeout_time: Option<&Timestamp>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // let packet_data =
-        //     TransferPacketData {
-        //         denom,
-        //         amount,
-        //         sender,
-        //         receiver,
-        //         memo,
-        //     };
-
-        // let message =
-        //     MsgTransfer {
-        //         port_id_on_a: port_id.clone(),
-        //         chan_id_on_a: channel_id.clone(),
-        //         packet_data: starknet_ic20_packet_data,
-        //         timeout_height_on_b: Height {
-        //             revision_number: 0,
-        //             revision_height: 0,
-        //         },
-        //         timeout_timestamp_on_b: Timestamp {
-        //             timestamp: u64::try_from(current_starknet_time.unix_timestamp()).unwrap()
-        //                 + 1800,
-        //         },
-        //     };
-
+        // FIXME: Implement the logic to build the token transfer message
         todo!()
     }
 }
