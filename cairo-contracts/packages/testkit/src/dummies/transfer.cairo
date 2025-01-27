@@ -32,7 +32,7 @@ pub fn OWNER() -> ContractAddress {
     contract_address_const::<'OWNER'>()
 }
 
-pub fn USER() -> ContractAddress {
+pub fn SN_USER() -> ContractAddress {
     contract_address_const::<'USER'>()
 }
 
@@ -41,7 +41,7 @@ pub fn CS_USER() -> ByteArray {
 }
 
 pub fn STARKNET() -> Participant {
-    USER().into()
+    SN_USER().into()
 }
 
 pub fn COSMOS() -> Participant {

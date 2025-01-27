@@ -8,7 +8,7 @@ use starknet_ibc_testkit::configs::{
 };
 use starknet_ibc_testkit::dummies::{
     HEIGHT, TIMESTAMP, COSMOS, STARKNET, CLIENT_ID, CONNECTION_ID, CHANNEL_ID, PORT_ID, SUPPLY,
-    PACKET_COMMITMENT_ON_SN, RELAYER, USER, CS_USER
+    PACKET_COMMITMENT_ON_SN, RELAYER, SN_USER, CS_USER
 };
 use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ChannelEventSpyExt};
 use starknet_ibc_testkit::handles::{CoreHandle, AppHandle, ERC20Handle};
@@ -207,7 +207,7 @@ fn test_recv_packet_ok() {
     // Assert the `RecvEvent` emitted by the ICS20 contract.
     spy
         .assert_recv_event(
-            ics20.address, CS_USER(), USER(), prefixed_denom.clone(), transfer_cfg.amount, true
+            ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), transfer_cfg.amount, true
         );
 
     // Assert the `ReceivePacketEvent` emitted by the core contract.
@@ -219,7 +219,7 @@ fn test_recv_packet_ok() {
     let erc20: ERC20Contract = token_address.into();
 
     // Check the balance of the receiver.
-    erc20.assert_balance(USER(), transfer_cfg.amount);
+    erc20.assert_balance(SN_USER(), transfer_cfg.amount);
 
     // Check the total supply of the ERC20 contract.
     erc20.assert_total_supply(transfer_cfg.amount);
@@ -252,10 +252,10 @@ fn test_successful_ack_packet_ok() {
     // Send Packet (from Starknet to Cosmos)
     // -----------------------------------------------------------
 
-    start_cheat_caller_address(ics20.address, USER());
+    start_cheat_caller_address(ics20.address, SN_USER());
 
     // User approves the amount of allowance for the `TransferApp` contract.
-    erc20.approve(USER(), ics20.address, transfer_cfg.amount);
+    erc20.approve(SN_USER(), ics20.address, transfer_cfg.amount);
 
     let msg_transfer = transfer_cfg
         .dummy_msg_transfer(transfer_cfg.native_denom.clone(), CS_USER());
@@ -280,7 +280,7 @@ fn test_successful_ack_packet_ok() {
     assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
 
     // Check the balance of the sender.
-    erc20.assert_balance(USER(), SUPPLY - transfer_cfg.amount);
+    erc20.assert_balance(SN_USER(), SUPPLY - transfer_cfg.amount);
 
     // -----------------------------------------------------------
     // Acknowledge Packet (on Starknet)
@@ -302,7 +302,7 @@ fn test_successful_ack_packet_ok() {
     spy
         .assert_ack_event(
             ics20.address,
-            USER(),
+            SN_USER(),
             CS_USER(),
             transfer_cfg.native_denom.clone(),
             transfer_cfg.amount,
@@ -314,7 +314,7 @@ fn test_successful_ack_packet_ok() {
     spy.assert_ack_packet_event(core.address, ChannelOrdering::Unordered, msg.packet.clone());
 
     // Check the balance of the sender.
-    erc20.assert_balance(USER(), SUPPLY - transfer_cfg.amount);
+    erc20.assert_balance(SN_USER(), SUPPLY - transfer_cfg.amount);
 
     core
         .packet_commitment(
@@ -335,10 +335,10 @@ fn test_failure_ack_packet_ok() {
     // Send Packet (from Starknet to Cosmos)
     // -----------------------------------------------------------
 
-    start_cheat_caller_address(ics20.address, USER());
+    start_cheat_caller_address(ics20.address, SN_USER());
 
     // User approves the amount of allowance for the `TransferApp` contract.
-    erc20.approve(USER(), ics20.address, transfer_cfg.amount);
+    erc20.approve(SN_USER(), ics20.address, transfer_cfg.amount);
 
     let msg_transfer = transfer_cfg
         .dummy_msg_transfer(transfer_cfg.native_denom.clone(), CS_USER());
@@ -363,7 +363,7 @@ fn test_failure_ack_packet_ok() {
     assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
 
     // Check the balance of the sender.
-    erc20.assert_balance(USER(), SUPPLY - transfer_cfg.amount);
+    erc20.assert_balance(SN_USER(), SUPPLY - transfer_cfg.amount);
 
     // -----------------------------------------------------------
     // Acknowledge Packet (on Starknet)
@@ -387,7 +387,7 @@ fn test_failure_ack_packet_ok() {
     spy
         .assert_ack_event(
             ics20.address,
-            USER(),
+            SN_USER(),
             CS_USER(),
             transfer_cfg.native_denom.clone(),
             transfer_cfg.amount,
@@ -399,7 +399,7 @@ fn test_failure_ack_packet_ok() {
     spy.assert_ack_packet_event(core.address, ChannelOrdering::Unordered, msg.packet.clone());
 
     // Check if the balance of the sender to ensure the refund.
-    erc20.assert_balance(USER(), SUPPLY);
+    erc20.assert_balance(SN_USER(), SUPPLY);
 
     core
         .packet_commitment(
@@ -451,9 +451,9 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
     // Send Packet (from Starknet to Cosmos)
     // -----------------------------------------------------------
 
-    start_cheat_caller_address(ics20.address, USER());
+    start_cheat_caller_address(ics20.address, SN_USER());
 
-    erc20.approve(USER(), ics20.address, transfer_cfg.amount);
+    erc20.approve(SN_USER(), ics20.address, transfer_cfg.amount);
 
     let msg_transfer = transfer_cfg
         .dummy_msg_transfer(transfer_cfg.native_denom.clone(), CS_USER());
@@ -495,7 +495,7 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
     spy.assert_timeout_packet_event(core.address, ChannelOrdering::Unordered, packet.clone());
 
     // Check if the balance of the sender to ensure the refund.
-    erc20.assert_balance(USER(), SUPPLY);
+    erc20.assert_balance(SN_USER(), SUPPLY);
 
     core
         .packet_commitment(
