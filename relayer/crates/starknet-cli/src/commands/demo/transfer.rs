@@ -36,10 +36,14 @@ pub struct TransferArgs {
     )]
     pub amount: String,
 
-    /// Denom of the amount to transfer. If not specified this
-    /// will default to `stake`
-    #[clap(long = "denom", value_name = "DENOM")]
-    pub denom: Option<String>,
+    /// Denom of the amount to transfer
+    #[clap(
+        long = "denom",
+        required = true,
+        value_name = "DENOM",
+        help_heading = "REQUIRED"
+    )]
+    pub denom: String,
 
     /// Address of the receiver
     #[clap(
@@ -83,17 +87,13 @@ impl CommandRunner<StarknetApp, TransferArgs> for RunTransferArgs {
         let starknet_chain = builder.build_chain().await?;
 
         let ics20_port = IbcPortId::transfer();
-        let denom_cosmos = if let Some(denom) = &args.denom {
-            denom
-        } else {
-            "stake"
-        };
+
         let denom = PrefixedDenom {
             trace_path: vec![TracePrefix {
                 port_id: ics20_port.to_string(),
                 channel_id: args.channel_id.clone(),
             }],
-            base: Denom::Hosted(denom_cosmos.to_string()),
+            base: Denom::Hosted(args.denom.clone()),
         };
 
         let amount_u128: u128 = args.amount.parse()?;
