@@ -1,6 +1,7 @@
 use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
 
 use crate::commands::create::subcommand::CreateSubCommand;
+use crate::commands::demo::subcommand::DemoSubCommand;
 use crate::commands::query::subcommand::QuerySubCommand;
 use crate::commands::update::subcommand::UpdateSubCommand;
 use crate::impls::bootstrap::subcommand::BootstrapSubCommand;
@@ -15,6 +16,10 @@ pub enum AllSubCommands {
     Create(CreateSubCommand),
     #[clap(subcommand)]
     Update(UpdateSubCommand),
+
+    // CLIs for demo only
+    #[clap(subcommand)]
+    Demo(DemoSubCommand),
 }
 
 pub struct RunAllSubCommand;
@@ -24,7 +29,9 @@ where
     App: CanRunCommand<BootstrapSubCommand>
         + CanRunCommand<QuerySubCommand>
         + CanRunCommand<CreateSubCommand>
-        + CanRunCommand<UpdateSubCommand>,
+        + CanRunCommand<UpdateSubCommand>
+        // CLIs for demo only
+        + CanRunCommand<DemoSubCommand>,
 {
     async fn run_command(
         app: &App,
@@ -35,6 +42,8 @@ where
             AllSubCommands::Query(args) => app.run_command(args).await,
             AllSubCommands::Create(args) => app.run_command(args).await,
             AllSubCommands::Update(args) => app.run_command(args).await,
+            // CLIs for demo only
+            AllSubCommands::Demo(args) => app.run_command(args).await,
         }
     }
 }
