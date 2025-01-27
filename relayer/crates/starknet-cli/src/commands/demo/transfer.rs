@@ -27,7 +27,7 @@ use crate::contexts::app::StarknetApp;
 
 #[derive(Debug, clap::Parser, HasField)]
 pub struct TransferArgs {
-    /// TODO
+    /// Amount to transfer
     #[clap(
         long = "amount",
         required = true,
@@ -35,20 +35,22 @@ pub struct TransferArgs {
         help_heading = "REQUIRED"
     )]
     pub amount: String,
-    /// TODO
+
+    /// Denom of the amount to transfer. If not specified this
+    /// will default to `stake`
     #[clap(long = "denom", value_name = "DENOM")]
     pub denom: Option<String>,
 
-    /// TODO
+    /// Address of the receiver
     #[clap(
-        long = "reeiver",
+        long = "receiver",
         required = true,
         value_name = "RECEIVER",
         help_heading = "REQUIRED"
     )]
     pub receiver: String,
 
-    /// TODO
+    /// Address of the sender
     #[clap(
         long = "sender",
         required = true,
@@ -57,16 +59,7 @@ pub struct TransferArgs {
     )]
     pub sender: String,
 
-    /// TODO
-    #[clap(
-        long = "port-id",
-        required = true,
-        value_name = "PORT_ID",
-        help_heading = "REQUIRED"
-    )]
-    pub port_id: String,
-
-    /// TODO
+    /// ID of the channel used for the transfer
     #[clap(
         long = "channel-id",
         required = true,
