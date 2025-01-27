@@ -76,14 +76,6 @@ pub struct TransferArgs {
     pub channel_id: String,
 }
 
-impl HasOutputType for TransferArgs {
-    type Output = <StarknetApp as HasOutputType>::Output;
-}
-
-impl HasErrorType for TransferArgs {
-    type Error = <StarknetApp as HasErrorType>::Error;
-}
-
 pub struct RunTransferArgs;
 
 #[async_trait]
