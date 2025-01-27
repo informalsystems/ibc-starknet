@@ -149,7 +149,7 @@ impl CommandRunner<StarknetApp, TransferArgs> for RunTransferArgs {
 
         let call_data_str = call_data
             .iter()
-            .map(|data| data.to_string())
+            .map(|data| data.to_hex_string())
             .collect::<Vec<String>>()
             .join(" ");
 
