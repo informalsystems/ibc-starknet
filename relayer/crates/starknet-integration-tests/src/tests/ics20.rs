@@ -29,6 +29,7 @@ use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrap
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::event_relayer::CanRelayEvent;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
+use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
@@ -61,9 +62,11 @@ use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
 use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
-use starknet::accounts::Call;
+use starknet::accounts::{Account, Call, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::{Felt, U256};
 use starknet::macros::{selector, short_string};
+use starknet::providers::Provider;
+use starknet::signers::{LocalWallet, SigningKey};
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
@@ -413,6 +416,16 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let transfer_quantity = 1_000u128;
         let denom_cosmos = &cosmos_chain_driver.genesis_config.transfer_denom;
 
+        let starknet_account_b = SingleOwnerAccount::new(
+            starknet_chain.rpc_client.clone(),
+            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
+                wallet_starknet_b.signing_key,
+            )),
+            wallet_starknet_b.account_address,
+            starknet_chain.rpc_client.chain_id().await?,
+            ExecutionEncoding::New,
+        );
+
         let balance_cosmos_a_step_0 = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)
             .await?;
@@ -558,9 +571,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: call_data,
             };
 
-            let message = StarknetMessage::new(call);
+            let execution = starknet_account_b.execute_v3(vec![call]);
 
-            starknet_chain.send_message(message).await?;
+            let tx_hash = execution.send().await?.transaction_hash;
+
+            starknet_chain.poll_tx_response(&tx_hash).await?;
         };
 
         cosmos_chain
@@ -580,14 +595,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         // send starknet erc20 token to cosmos
 
-        let wallet_starknet_relayer = &starknet_chain_driver.relayer_wallet;
-        let address_starknet_relayer = &wallet_starknet_relayer.account_address;
         let erc20_token_address = &starknet_chain_driver.genesis_config.transfer_denom;
 
         info!("erc20 token address: {:?}", erc20_token_address);
 
         let balance_starknet_relayer_step_0 = starknet_chain
-            .query_token_balance(erc20_token_address, address_starknet_relayer)
+            .query_token_balance(erc20_token_address, address_starknet_b)
             .await?;
 
         info!(
@@ -608,11 +621,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: call_data,
             };
 
-            let message = StarknetMessage::new(call);
+            let execution = starknet_account_b.execute_v3(vec![call]);
 
-            let response = starknet_chain.send_message(message).await?;
+            let tx_hash = execution.send().await?.transaction_hash;
 
-            info!("ERC20 approve response: {:?}", response);
+            starknet_chain.poll_tx_response(&tx_hash).await?;
         }
 
         // submit ics20 transfer from Starknet to Cosmos
@@ -625,7 +638,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let amount = transfer_quantity.into();
 
-            let sender = Participant::Native(*address_starknet_relayer);
+            let sender = Participant::Native(*address_starknet_b);
 
             let receiver = Participant::External(address_cosmos_a.clone());
 
@@ -671,22 +684,24 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: call_data,
             };
 
-            let message = StarknetMessage::new(call);
+            let execution = starknet_account_b.execute_v3(vec![call]);
 
-            let response = starknet_chain.send_message(message).await?;
+            let tx_hash = execution.send().await?.transaction_hash;
 
-            info!("ICS20 send packet response: {:?}", response);
+            starknet_chain.poll_tx_response(&tx_hash).await?;
 
-            let height = starknet_chain.query_chain_height().await?;
+            // info!("ICS20 send packet response: {:?}", response);
 
-            for event in response.events {
-                <StarknetToCosmosRelay as CanRelayEvent<SourceTarget>>::relay_chain_event(
-                    &starknet_to_cosmos_relay,
-                    &height,
-                    &event,
-                )
-                .await?;
-            }
+            // let height = starknet_chain.query_chain_height().await?;
+
+            // for event in response.events {
+            //     <StarknetToCosmosRelay as CanRelayEvent<SourceTarget>>::relay_chain_event(
+            //         &starknet_to_cosmos_relay,
+            //         &height,
+            //         &event,
+            //     )
+            //     .await?;
+            // }
         };
 
         let cosmos_ibc_denom = derive_ibc_denom(
@@ -705,7 +720,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .await?;
 
         let balance_starknet_relayer_step_3 = starknet_chain
-            .query_token_balance(erc20_token_address, address_starknet_relayer)
+            .query_token_balance(erc20_token_address, address_starknet_b)
             .await?;
 
         info!(
@@ -725,7 +740,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             &cosmos_channel_id,
             &IbcPortId::transfer(),
             wallet_cosmos_a,
-            address_starknet_relayer,
+            address_starknet_b,
             &Amount::new(transfer_quantity, cosmos_ibc_denom.clone()),
             &None,
         )
