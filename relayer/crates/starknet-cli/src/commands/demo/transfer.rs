@@ -148,7 +148,6 @@ impl CommandRunner<StarknetApp, TransferArgs> for RunTransferArgs {
             )
             .await;
 
-        //Ok(Output::success(call_data_str))
         Ok(())
     }
 }
