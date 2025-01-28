@@ -1,6 +1,7 @@
 use core::fmt::Debug;
 
 use cgp::core::error::CanRaiseAsyncError;
+use cgp::prelude::HasAsyncErrorType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_relayer_components::chain::traits::send_message::MessageSender;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
@@ -30,6 +31,7 @@ where
         + HasTxResponseType<TxResponse = TxResponse>
         + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
         + CanPollTxResponse
+        + CanExtractMessageResponsesFromTxResponse
         + CanRaiseAsyncError<RevertedInvocation>
         + CanRaiseAsyncError<UnexpectedTransactionTraceType>,
 {
@@ -45,6 +47,28 @@ where
 
         let tx_response = chain.poll_tx_response(&tx_hash).await?;
 
+        Chain::extract_message_responses_from_tx_response(tx_response)
+    }
+}
+
+pub trait CanExtractMessageResponsesFromTxResponse:
+    HasTxResponseType + HasMessageResponseType + HasAsyncErrorType
+{
+    fn extract_message_responses_from_tx_response(
+        tx_response: Self::TxResponse,
+    ) -> Result<Vec<Self::MessageResponse>, Self::Error>;
+}
+
+impl<Chain> CanExtractMessageResponsesFromTxResponse for Chain
+where
+    Chain: HasTxResponseType<TxResponse = TxResponse>
+        + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
+        + CanRaiseAsyncError<RevertedInvocation>
+        + CanRaiseAsyncError<UnexpectedTransactionTraceType>,
+{
+    fn extract_message_responses_from_tx_response(
+        tx_response: TxResponse,
+    ) -> Result<Vec<StarknetMessageResponse>, Chain::Error> {
         match tx_response.trace {
             TransactionTrace::Invoke(trace) => match trace.execute_invocation {
                 ExecuteInvocation::Success(invocation) => {
