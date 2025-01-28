@@ -121,7 +121,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             .clone();
 
         let json_rpc_url = Url::parse(&format!(
-            "{}:{}/",
+            "http://{}:{}/",
             node_config.rpc_addr, node_config.rpc_port
         ))?;
 
