@@ -1,3 +1,4 @@
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
@@ -220,7 +221,11 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
             .clone();
 
         let chain_config = StarknetChainConfig {
-            json_rpc_url: format!("http://localhost:{}/", chain_driver.node_config.rpc_port),
+            json_rpc_url: SocketAddr::new(
+                // FIXME: Should we use a configured address here?
+                IpAddr::V4(Ipv4Addr::LOCALHOST),
+                chain_driver.node_config.rpc_port,
+            ),
             relayer_wallet,
         };
 

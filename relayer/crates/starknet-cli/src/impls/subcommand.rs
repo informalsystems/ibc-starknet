@@ -24,7 +24,7 @@ where
     App: CanRunCommand<BootstrapSubCommand>
         + CanRunCommand<QuerySubCommand>
         + CanRunCommand<CreateSubCommand>
-        + CanRunCommand<UpdateSubCommand>
+        + CanRunCommand<UpdateSubCommand>,
 {
     async fn run_command(
         app: &App,
