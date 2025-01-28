@@ -31,7 +31,7 @@ where
         + HasTxResponseType<TxResponse = TxResponse>
         + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
         + CanPollTxResponse
-        + CanExtracMessageResponsesFromTxResponse
+        + CanExtractMessageResponsesFromTxResponse
         + CanRaiseAsyncError<RevertedInvocation>
         + CanRaiseAsyncError<UnexpectedTransactionTraceType>,
 {
@@ -51,7 +51,7 @@ where
     }
 }
 
-pub trait CanExtracMessageResponsesFromTxResponse:
+pub trait CanExtractMessageResponsesFromTxResponse:
     HasTxResponseType + HasMessageResponseType + HasAsyncErrorType
 {
     fn extract_message_responses_from_tx_response(
@@ -59,7 +59,7 @@ pub trait CanExtracMessageResponsesFromTxResponse:
     ) -> Result<Vec<Self::MessageResponse>, Self::Error>;
 }
 
-impl<Chain> CanExtracMessageResponsesFromTxResponse for Chain
+impl<Chain> CanExtractMessageResponsesFromTxResponse for Chain
 where
     Chain: HasTxResponseType<TxResponse = TxResponse>
         + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
