@@ -59,7 +59,7 @@
 
           rust-1_79 = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-1.79.toml;
 
-          wasm-simapp = cosmos-nix.ibc-go-v9-wasm-simapp;
+          wasm-simapp = cosmos-nix.ibc-go-v8-wasm-simapp;
 
           osmosis = cosmos-nix.osmosis;
 
