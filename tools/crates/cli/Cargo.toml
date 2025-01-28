@@ -1,0 +1,49 @@
+[package]
+name = "cli"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+keywords = { workspace = true }
+repository = { workspace = true }
+authors = { workspace = true }
+rust-version = { workspace = true }
+description = """
+    CLI Tool used to help development of ibc-starknet
+"""
+
+[[bin]]
+name = "main"
+path = "bin/main.rs"
+
+[dependencies]
+
+cgp            = { workspace = true }
+cgp-error-eyre = { workspace = true }
+
+clap               = { workspace = true }
+eyre               = { workspace = true }
+stable-eyre        = { workspace = true }
+starknet           = { workspace = true }
+tokio              = { workspace = true }
+toml               = { workspace = true }
+tracing            = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+ibc = { workspace = true }
+
+hermes-cli                        = { workspace = true }
+hermes-cli-components             = { workspace = true }
+hermes-cosmos-relayer             = { workspace = true }
+hermes-encoding-components        = { workspace = true }
+hermes-error                      = { workspace = true }
+hermes-logger                     = { workspace = true }
+hermes-logging-components         = { workspace = true }
+hermes-relayer-components         = { workspace = true }
+hermes-runtime                    = { workspace = true }
+hermes-runtime-components         = { workspace = true }
+hermes-starknet-chain-components  = { workspace = true }
+hermes-starknet-chain-context     = { workspace = true }
+hermes-starknet-cli               = { workspace = true }
+hermes-starknet-integration-tests = { workspace = true }
+hermes-starknet-relayer           = { workspace = true }
+hermes-test-components            = { workspace = true }
