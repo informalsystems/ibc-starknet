@@ -88,12 +88,21 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
 
         let ics20_port = IbcPortId::transfer();
 
-        let denom = PrefixedDenom {
-            trace_path: vec![TracePrefix {
-                port_id: ics20_port.to_string(),
-                channel_id: args.channel_id.clone(),
-            }],
-            base: Denom::Hosted(args.denom.clone()),
+        // If the passed denom starts with 0x this means it is an ERC20 token
+        // Else it is a Cosmos token
+        let denom = if args.denom.starts_with("0x") {
+            PrefixedDenom {
+                trace_path: vec![],
+                base: Denom::Native(Felt::from_hex(&args.denom)?),
+            }
+        } else {
+            PrefixedDenom {
+                trace_path: vec![TracePrefix {
+                    port_id: ics20_port.to_string(),
+                    channel_id: args.channel_id.clone(),
+                }],
+                base: Denom::Hosted(args.denom.clone()),
+            }
         };
 
         let amount_u128: u128 = args.amount.parse()?;
