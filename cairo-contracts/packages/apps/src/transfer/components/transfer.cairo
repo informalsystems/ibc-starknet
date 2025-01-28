@@ -563,13 +563,7 @@ pub mod TokenTransferComponent {
 
             assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
 
-            // Checks if the token is an IBC-created token. If so, it cannot
-            // be transferred back to the source by escrowing. A prefixed
-            // denom should be passed to burn instead.
-            assert(
-                self.ibc_token_key(denom, port_id, channel_id).is_none(),
-                TransferErrors::INVALID_DENOM
-            );
+            self.assert_non_ibc_token(denom, port_id, channel_id);
         }
 
         fn unescrow_validate(
@@ -584,10 +578,7 @@ pub mod TokenTransferComponent {
 
             assert(balance >= amount, TransferErrors::INSUFFICIENT_BALANCE);
 
-            assert(
-                self.ibc_token_key(denom, port_id, channel_id).is_none(),
-                TransferErrors::INVALID_DENOM
-            );
+            self.assert_non_ibc_token(denom, port_id, channel_id);
         }
 
         fn mint_validate(
@@ -793,12 +784,12 @@ pub mod TokenTransferComponent {
             self.write_ibc_token_address_to_key(token_address, denom_key);
         }
 
-        fn ibc_token_key(
+        fn assert_non_ibc_token(
             self: @ComponentState<TContractState>,
             denom: ERC20Contract,
             port_id: PortId,
             channel_id: ChannelId,
-        ) -> Option<felt252> {
+        ) {
             let token_key = self.read_ibc_token_key(denom.address);
 
             if token_key.is_non_zero() {
@@ -808,12 +799,11 @@ pub mod TokenTransferComponent {
                     trace_path: array![trace_prefix], base: Denom::Native(denom),
                 };
 
-                if token_key == denom.key() {
-                    return Option::Some(token_key);
-                }
+                // Checks if the token is an IBC-created token. If so, it cannot
+                // be transferred back to the source by escrowing. A prefixed
+                // denom should be passed to burn instead.
+                assert(token_key == denom.key(), TransferErrors::INVALID_DENOM);
             }
-
-            Option::None
         }
     }
 
