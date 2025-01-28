@@ -1,15 +1,20 @@
 use alloc::sync::Arc;
 use core::marker::PhantomData;
 use core::time::Duration;
+use std::io::Write;
 use std::path::PathBuf;
 use std::time::SystemTime;
 
 use cgp::extra::run::CanRun;
 use cgp::prelude::*;
+use flate2::write::GzEncoder;
+use flate2::Compression;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
+use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
+use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
@@ -17,7 +22,6 @@ use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_test_components::chain::impls::transfer::amount::derive_ibc_denom;
 use hermes_cosmos_test_components::chain::types::amount::Amount;
 use hermes_cosmos_test_components::chain::types::denom::Denom as IbcDenom;
-use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
@@ -67,6 +71,7 @@ use starknet::signers::{LocalWallet, SigningKey};
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
+use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
 
 #[test]
 fn test_starknet_ics20_contract() -> Result<(), Error> {
@@ -102,18 +107,29 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
 
-        let cosmos_bootstrap = Arc::new(CosmosWithWasmClientBootstrap {
+        let wasm_client_byte_code_gzip = {
+            let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+            encoder.write_all(&wasm_client_byte_code)?;
+            encoder.finish()?
+        };
+
+        let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
             runtime: runtime.clone(),
             cosmos_builder,
             should_randomize_identifiers: true,
-            chain_store_dir: format!("./test-data/{timestamp}/cosmos").into(),
-            chain_command_path: "simd".into(),
-            account_prefix: "cosmos".into(),
+            chain_store_dir: format!("./test-data/{timestamp}/osmosis").into(),
+            chain_command_path: "osmosisd".into(),
+            account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code,
-            governance_proposal_authority: "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn".into(), // TODO: don't hard code this
-            dynamic_gas: None,
+            wasm_client_byte_code: wasm_client_byte_code_gzip,
+            governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
+            dynamic_gas: Some(DynamicGasConfig {
+                multiplier: 1.1,
+                max: 1.6,
+                eip_query_type: EipQueryType::Osmosis,
+                denom: "stake".to_owned(),
+            }),
         });
 
         let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
