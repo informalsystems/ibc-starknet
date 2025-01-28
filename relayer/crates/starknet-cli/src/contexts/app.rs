@@ -76,8 +76,6 @@ use starknet::core::types::Felt;
 use toml::to_string_pretty;
 
 use crate::commands::create::subcommand::{CreateSubCommand, RunCreateSubCommand};
-use crate::commands::demo::subcommand::{DemoSubCommand, RunDemoSubCommand};
-use crate::commands::demo::transfer::{RunTransferArgs, TransferArgs};
 use crate::commands::query::subcommand::{QuerySubCommand, RunQuerySubCommand};
 use crate::commands::update::subcommand::{RunUpdateSubCommand, UpdateSubCommand};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
@@ -190,10 +188,6 @@ delegate_components! {
         CreateClientArgs: RunCreateClientCommand,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<UpdateStarknetConfig>,
-
-        // CLIs for demo only
-        DemoSubCommand: RunDemoSubCommand,
-        TransferArgs: RunTransferArgs,
     }
 }
 

@@ -2541,7 +2541,6 @@ dependencies = [
  "hermes-cosmos-chain-components",
  "hermes-cosmos-integration-tests",
  "hermes-cosmos-relayer",
- "hermes-encoding-components",
  "hermes-error",
  "hermes-logger",
  "hermes-logging-components",
