@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use cgp::prelude::*;
 use hermes_cli_components::traits::build::CanLoadBuilder;
 use hermes_cli_components::traits::command::CommandRunner;
@@ -16,9 +14,7 @@ use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
 };
-use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
-    MsgTransfer, Participant, TransferPacketData,
-};
+use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::MsgTransfer;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use starknet::core::types::Felt;
@@ -107,18 +103,7 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
 
         let amount_u128: u128 = args.amount.parse()?;
 
-        let sender = Participant::Native(Felt::from_str(&args.sender)?);
-        let receiver = Participant::External(args.receiver.clone());
-
         let current_starknet_time = starknet_chain.query_chain_status().await?.time;
-
-        let starknet_ic20_packet_data = TransferPacketData {
-            denom,
-            amount: amount_u128.into(),
-            sender,
-            receiver,
-            memo: "demo transfer".to_owned(),
-        };
 
         let msg_transfer = MsgTransfer {
             port_id_on_a: PortId {
@@ -127,7 +112,10 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
             chan_id_on_a: ChannelId {
                 channel_id: args.channel_id.clone(),
             },
-            packet_data: starknet_ic20_packet_data,
+            denom,
+            amount: amount_u128.into(),
+            receiver: args.receiver.clone(),
+            memo: "demo transfer".to_owned(),
             timeout_height_on_b: Height {
                 revision_number: 0,
                 revision_height: 0,
