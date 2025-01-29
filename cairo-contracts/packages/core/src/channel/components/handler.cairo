@@ -103,7 +103,6 @@ pub mod ChannelHandlerComponent {
         }
 
         fn send_packet(ref self: ComponentState<TContractState>, packet: Packet) {
-            self.assert_authorized_relayer();
             let chan_end_on_a = self.read_channel_end(@packet.port_id_on_a, @packet.chan_id_on_a);
             self.send_packet_validate(packet.clone(), chan_end_on_a.clone());
             self.send_packet_execute(packet, chan_end_on_a);
