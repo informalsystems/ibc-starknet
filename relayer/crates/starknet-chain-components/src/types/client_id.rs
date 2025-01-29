@@ -17,6 +17,7 @@ where
         value: &ClientId,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
+        // FIXME: add `sequence_number` method at `ibc-rs`
         let (client_type, sequence) = value.as_str().rsplit_once('-').expect("valid client id");
         let seq_u64 = sequence.parse::<u64>().expect("valid sequence");
         let client_type_felt = string_to_felt(client_type).expect("valid client type");
