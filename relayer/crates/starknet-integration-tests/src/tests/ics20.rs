@@ -58,7 +58,7 @@ use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEve
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
-use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
+use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
 use starknet::accounts::{Account, Call, ExecutionEncoding, SingleOwnerAccount};
@@ -398,14 +398,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             info!("register ics20 response: {:?}", response);
         }
 
-        let starknet_connection_id_seq = starknet_connection_id
-            .connection_id
-            .strip_prefix("connection-")
-            .unwrap()
-            .parse::<u64>()?;
-
-        let init_channel_options =
-            CosmosInitChannelOptions::new(ConnectionId::new(starknet_connection_id_seq));
+        let init_channel_options = CosmosInitChannelOptions::new(starknet_connection_id);
 
         let (starknet_channel_id, cosmos_channel_id) = starknet_to_cosmos_relay
             .bootstrap_channel(

@@ -33,7 +33,6 @@ use starknet::macros::selector;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::channel_id::ChannelId as StarknetChannelId;
-use crate::types::connection_id::ConnectionId as StarknetConnectionId;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::channel::{
     AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
@@ -76,9 +75,9 @@ where
             ));
         }
 
-        let conn_id_on_a = StarknetConnectionId {
-            connection_id: init_channel_options.connection_hops[0].to_string(),
-        };
+        assert_eq!(init_channel_options.connection_hops.len(), 1);
+
+        let conn_id_on_a = init_channel_options.connection_hops[0].clone();
 
         let version_proposal = AppVersion {
             version: init_channel_options.channel_version.to_string(),
@@ -157,9 +156,9 @@ where
             ));
         }
 
-        let conn_id_on_b = StarknetConnectionId {
-            connection_id: counterparty_payload.channel_end.connection_hops[0].to_string(),
-        };
+        assert_eq!(counterparty_payload.channel_end.connection_hops.len(), 1);
+
+        let conn_id_on_b = counterparty_payload.channel_end.connection_hops[0].clone();
 
         let port_id_on_a = StarknetPortId {
             port_id: counterparty_port_id.to_string(),

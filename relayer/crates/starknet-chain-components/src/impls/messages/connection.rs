@@ -207,9 +207,7 @@ where
         let conn_open_init_msg: MsgConnOpenTry = MsgConnOpenTry {
             client_id_on_a: counterparty_client_id.clone(),
             client_id_on_b: client_id.clone(),
-            conn_id_on_a: StarknetConnectionId {
-                connection_id: counterparty_connection_id.to_string(),
-            },
+            conn_id_on_a: counterparty_connection_id.clone(),
             prefix_on_a: BasePrefix {
                 prefix: commitment_prefix.into(),
             },
@@ -266,10 +264,6 @@ where
         counterparty_connection_id: &CosmosConnectionId,
         counterparty_payload: ConnectionOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let counterparty_connection_id_as_cairo = StarknetConnectionId {
-            connection_id: counterparty_connection_id.to_string(),
-        };
-
         // TODO(rano): use the connection version from the payload
         let connection_version = ConnectionVersion {
             identifier: "1".into(),
@@ -290,7 +284,7 @@ where
 
         let conn_open_ack_msg = MsgConnOpenAck {
             conn_id_on_a: connection_id.clone(),
-            conn_id_on_b: counterparty_connection_id_as_cairo,
+            conn_id_on_b: counterparty_connection_id.clone(),
             proof_conn_end_on_b: commitment_proof,
             proof_height_on_b: proof_height,
             version: connection_version,

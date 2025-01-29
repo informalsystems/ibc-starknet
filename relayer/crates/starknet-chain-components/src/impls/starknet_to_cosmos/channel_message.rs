@@ -90,11 +90,7 @@ where
             channel_id: Some(IbcChannelId::new(cosmos_channel_seq)),
         };
 
-        let connection_id = starknet_channel_end
-            .connection_id
-            .connection_id
-            .parse()
-            .map_err(Chain::raise_error)?;
+        let connection_id = starknet_channel_end.connection_id;
 
         let version = starknet_channel_end
             .version
