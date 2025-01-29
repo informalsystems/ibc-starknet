@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 use core::num::ParseIntError;
-use core::str::{from_utf8, FromStr, Utf8Error};
+use core::str::{from_utf8, Utf8Error};
 
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
@@ -82,18 +82,6 @@ where
         init_connection_options: &CosmosInitConnectionOptions,
         counterparty_payload: ConnectionOpenInitPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let counterparty_client_id_as_cairo = {
-            let counterparty_client_id_str = counterparty_client_id.to_string();
-            let (client_type, sequence_str) = counterparty_client_id_str
-                .rsplit_once('-')
-                .ok_or_else(|| Chain::raise_error("malformatted client id"))?;
-
-            Chain::ClientId {
-                client_type: Felt::from_bytes_be_slice(client_type.as_bytes()),
-                sequence: sequence_str.parse().map_err(Chain::raise_error)?,
-            }
-        };
-
         // TODO(rano): dirty hack; make fields public at ibc-rs and tidy it up
 
         let json_connection_version =
@@ -138,7 +126,7 @@ where
 
         let conn_open_init_msg = MsgConnOpenInit {
             client_id_on_a: client_id.clone(),
-            client_id_on_b: counterparty_client_id_as_cairo.clone(),
+            client_id_on_b: counterparty_client_id.clone(),
             prefix_on_b: base_prefix,
             version: cairo_connection_version,
             delay_period: init_connection_options.delay_period.as_secs(),
@@ -196,19 +184,6 @@ where
         counterparty_connection_id: &CosmosConnectionId,
         counterparty_payload: ConnectionOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: Cairo IBC should accept counterparty client ID as string value
-        let counterparty_client_id_as_cairo = {
-            let counterparty_client_id_str = counterparty_client_id.to_string();
-            let (client_type, sequence_str) = counterparty_client_id_str
-                .rsplit_once('-')
-                .ok_or_else(|| Chain::raise_error("malformatted client id"))?;
-
-            StarknetClientId {
-                client_type: Felt::from_bytes_be_slice(client_type.as_bytes()),
-                sequence: u64::from_str(sequence_str).map_err(Chain::raise_error)?,
-            }
-        };
-
         // FIXME: Cairo IBC should use bytes for commitment prefix
         let commitment_prefix =
             from_utf8(&counterparty_payload.commitment_prefix).map_err(Chain::raise_error)?;
@@ -230,7 +205,7 @@ where
         };
 
         let conn_open_init_msg: MsgConnOpenTry = MsgConnOpenTry {
-            client_id_on_a: counterparty_client_id_as_cairo.clone(),
+            client_id_on_a: counterparty_client_id.clone(),
             client_id_on_b: client_id.clone(),
             conn_id_on_a: StarknetConnectionId {
                 connection_id: counterparty_connection_id.to_string(),
