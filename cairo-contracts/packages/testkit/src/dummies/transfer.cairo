@@ -19,10 +19,6 @@ pub fn SYMBOL() -> ByteArray {
     "IBC/UATOM"
 }
 
-pub fn OWNER() -> ContractAddress {
-    contract_address_const::<'OWNER'>()
-}
-
 pub fn CLASS_HASH() -> ClassHash {
     class_hash_const::<'ERC20Mintable'>()
 }
@@ -32,13 +28,24 @@ pub fn ERC20() -> ERC20Contract {
         .into()
 }
 
+pub fn OWNER() -> ContractAddress {
+    contract_address_const::<'OWNER'>()
+}
+
+pub fn SN_USER() -> ContractAddress {
+    contract_address_const::<'USER'>()
+}
+
+pub fn CS_USER() -> ByteArray {
+    "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng"
+}
+
 pub fn STARKNET() -> Participant {
-    OWNER().into()
+    SN_USER().into()
 }
 
 pub fn COSMOS() -> Participant {
-    let bech32_address: ByteArray = "cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng";
-    bech32_address.into()
+    CS_USER().into()
 }
 
 pub fn NATIVE_DENOM() -> PrefixedDenom {

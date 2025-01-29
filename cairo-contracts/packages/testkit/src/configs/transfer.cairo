@@ -74,12 +74,15 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     }
 
     fn dummy_msg_transfer(
-        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+        self: @TransferAppConfig, denom: PrefixedDenom, receiver: ByteArray
     ) -> MsgTransfer {
         MsgTransfer {
             port_id_on_a: PORT_ID(),
             chan_id_on_a: self.chan_id_on_a.clone(),
-            packet_data: self.dummy_packet_data(denom, sender, receiver),
+            denom,
+            amount: *self.amount,
+            receiver,
+            memo: EMPTY_MEMO(),
             timeout_height_on_b: self.timeout_height.clone(),
             timeout_timestamp_on_b: self.timeout_timestamp.clone(),
         }

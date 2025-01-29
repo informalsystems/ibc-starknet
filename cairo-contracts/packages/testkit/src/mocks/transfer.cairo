@@ -2,8 +2,7 @@
 pub mod MockTransferApp {
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
-    use starknet::ClassHash;
-    use starknet::ContractAddress;
+    use starknet::{ClassHash, ContractAddress, get_caller_address};
     use starknet_ibc_apps::transfer::ERC20Contract;
     use starknet_ibc_apps::transfer::types::{PrefixedDenom, Memo, MsgTransfer};
     use starknet_ibc_apps::transfer::{
@@ -73,8 +72,9 @@ pub mod MockTransferApp {
 
     #[external(v0)]
     fn send_transfer_internal(ref self: ContractState, msg: MsgTransfer) {
-        self.transfer.send_validate(msg.clone());
-        self.transfer.send_execute(msg);
+        let sender = get_caller_address();
+        self.transfer.send_validate(msg.clone(), sender);
+        self.transfer.send_execute(msg, sender);
     }
 
     #[external(v0)]

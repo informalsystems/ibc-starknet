@@ -42,7 +42,12 @@ pub use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterCo
 pub use hermes_relayer_components::transaction::traits::types::transaction::TransactionTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
 pub use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
+use hermes_test_components::chain::impls::assert::default_assert_duration::ProvideDefaultPollAssertDuration;
+use hermes_test_components::chain::impls::assert::poll_assert_eventual_amount::PollAssertEventualAmount;
 use hermes_test_components::chain::impls::ibc_transfer::SendIbcTransferMessage;
+pub use hermes_test_components::chain::traits::assert::eventual_amount::EventualAmountAsserterComponent;
+pub use hermes_test_components::chain::traits::assert::poll_assert::PollAssertDurationGetterComponent;
+use hermes_test_components::chain::traits::messages::ibc_transfer::IbcTokenTransferMessageBuilderComponent;
 use hermes_test_components::chain::traits::queries::balance::BalanceQuerierComponent;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::TokenIbcTransferrerComponent;
 use hermes_test_components::chain::traits::transfer::string_memo::ProvideStringMemoType;
@@ -63,6 +68,7 @@ use crate::impls::events::UseStarknetEvents;
 use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
 use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
 use crate::impls::messages::create_client::BuildCreateCometClientMessage;
+use crate::impls::messages::ibc_transfer::BuildStarknetIbcTransferMessage;
 use crate::impls::messages::packet::BuildStarknetPacketMessages;
 use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
 use crate::impls::packet_fields::ReadPacketSrcStarknetFields;
@@ -391,5 +397,11 @@ cgp_preset! {
             QueryPacketIsReceivedOnStarknet,
         CounterpartyChainIdQuerierComponent:
             QueryCosmosChainIdFromStarknetChannelId,
+        EventualAmountAsserterComponent:
+            PollAssertEventualAmount,
+        PollAssertDurationGetterComponent:
+            ProvideDefaultPollAssertDuration,
+        IbcTokenTransferMessageBuilderComponent:
+            BuildStarknetIbcTransferMessage,
     }
 }
