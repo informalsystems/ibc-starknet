@@ -1,12 +1,10 @@
 use cgp::prelude::*;
-use hermes_cli_components::traits::build::CanLoadBuilder;
 use hermes_cli_components::traits::command::CommandRunner;
 use hermes_cli_components::traits::output::HasOutputType;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_logging_components::traits::has_logger::HasLogger;
 use hermes_logging_components::traits::logger::CanLog;
 use hermes_logging_components::types::level::LevelInfo;
-use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_starknet_chain_components::types::channel_id::ChannelId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
@@ -58,6 +56,15 @@ pub struct TransferArgs {
         help_heading = "REQUIRED"
     )]
     pub channel_id: String,
+
+    /// Timeout timestamp for the transfer
+    #[clap(
+        long = "timeout-timestamp",
+        required = true,
+        value_name = "TIMEOUT_TIMESTAMP",
+        help_heading = "REQUIRED"
+    )]
+    pub timeout_timestamp: u64,
 }
 
 pub struct RunTransferArgs;
@@ -68,10 +75,7 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
         app: &ToolApp,
         args: &TransferArgs,
     ) -> Result<<ToolApp as HasOutputType>::Output, <ToolApp as HasErrorType>::Error> {
-        let builder = app.load_builder().await?;
         let logger = app.logger();
-
-        let starknet_chain = builder.build_chain().await?;
 
         let ics20_port = IbcPortId::transfer();
 
@@ -94,8 +98,6 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
 
         let amount_u128: u128 = args.amount.parse()?;
 
-        let current_starknet_time = starknet_chain.query_chain_status().await?.time;
-
         let msg_transfer = MsgTransfer {
             port_id_on_a: PortId {
                 port_id: ics20_port.to_string(),
@@ -112,7 +114,7 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
                 revision_height: 0,
             },
             timeout_timestamp_on_b: Timestamp {
-                timestamp: u64::try_from(current_starknet_time.unix_timestamp())? + 1800,
+                timestamp: args.timeout_timestamp,
             },
         };
 
