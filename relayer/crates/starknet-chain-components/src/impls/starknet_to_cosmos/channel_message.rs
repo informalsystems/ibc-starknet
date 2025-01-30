@@ -25,7 +25,10 @@ use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::host::types::error::IdentifierError;
 use ibc::core::host::types::identifiers::{ChannelId as IbcChannelId, PortId as IbcPortId};
 
-use crate::types::channel_id::{ChannelEnd as StarknetChannelEnd, ChannelId as StarknetChannelId};
+use crate::types::channel_id::{
+    ChannelCounterparty, ChannelEnd, ChannelEnd as StarknetChannelEnd,
+    ChannelId as StarknetChannelId, ChannelState,
+};
 use crate::types::commitment_proof::StarknetCommitmentProof;
 
 pub struct BuildStarknetToCosmosChannelHandshakeMessage;
@@ -53,19 +56,33 @@ where
     async fn build_channel_open_try_message(
         _chain: &Chain,
         port_id: &IbcPortId,
-        // FIXME: these two are already in the channel_end
-        _counterparty_port_id: &IbcPortId,
-        _counterparty_channel_id: &StarknetChannelId,
+        counterparty_port_id: &IbcPortId,
+        counterparty_channel_id: &StarknetChannelId,
         counterparty_payload: ChannelOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
+        let starknet_channel_end = counterparty_payload.channel_end;
+
+        let remote = ChannelCounterparty {
+            port_id: counterparty_port_id.clone(),
+            channel_id: Some(counterparty_channel_id.clone()),
+        };
+
+        // building expected channel_end at counterparty
+        let channel_end = ChannelEnd {
+            state: ChannelState::TryOpen,
+            ordering: starknet_channel_end.ordering,
+            remote,
+            connection_hops: starknet_channel_end.connection_hops,
+            version: starknet_channel_end.version.clone(),
+        };
+
         let message = CosmosChannelOpenTryMessage {
             port_id: port_id.to_string(),
-            // FIXME: why this needs to be passed here. it's already in the channel_end
-            counterparty_version: counterparty_payload.channel_end.version.to_string(),
-            channel: counterparty_payload.channel_end.into(),
+            channel: channel_end.into(),
+            counterparty_version: starknet_channel_end.version.to_string(),
             update_height,
             proof_init: counterparty_payload.proof_init.proof_bytes,
         };
