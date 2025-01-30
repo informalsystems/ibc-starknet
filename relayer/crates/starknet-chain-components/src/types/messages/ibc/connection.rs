@@ -62,7 +62,7 @@ where
     ) -> Result<ConnectionVersion, Encoding::Error> {
         let product![identifier, features] = encoding.decode_mut(buffer)?;
 
-        // FIXME: ibc-rs type doesn't have public fields
+        // FIXME: ibc-rs type doesn't new method
         #[derive(serde::Serialize)]
         struct DummyConnectionVersion {
             pub identifier: String,
