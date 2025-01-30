@@ -11,6 +11,7 @@ use hermes_encoding_components::traits::encode_mut::{
     CanEncodeMut, MutEncoder, MutEncoderComponent,
 };
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
+pub use ibc::core::channel::types::channel::Order as ChannelOrdering;
 pub use ibc::core::host::types::identifiers::PortId;
 
 use super::packet::StateProof;
@@ -73,12 +74,6 @@ impl Transformer for EncodeAppVersion {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum ChannelOrdering {
-    Unordered,
-    Ordered,
-}
-
 pub struct EncodeChannelOrdering;
 
 delegate_components! {
@@ -98,6 +93,7 @@ impl TransformerRef for EncodeChannelOrdering {
         match value {
             ChannelOrdering::Unordered => Either::Left(()),
             ChannelOrdering::Ordered => Either::Right(Either::Left(())),
+            ChannelOrdering::None => unimplemented!("ChannelOrdering::None is not supported"),
         }
     }
 }
