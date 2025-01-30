@@ -50,15 +50,6 @@ pub struct TransferArgs {
     )]
     pub receiver: String,
 
-    /// Address of the sender
-    #[clap(
-        long = "sender",
-        required = true,
-        value_name = "SENDER",
-        help_heading = "REQUIRED"
-    )]
-    pub sender: String,
-
     /// ID of the channel used for the transfer
     #[clap(
         long = "channel-id",
