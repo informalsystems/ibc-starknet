@@ -1,17 +1,13 @@
 use core::time::Duration;
 
-use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
-use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
-use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 pub use ibc::core::connection::types::{
-    Counterparty as ConnectionCounterparty, State as ConnectionState,
+    ConnectionEnd, Counterparty as ConnectionCounterparty, State as ConnectionState,
 };
 pub use ibc::core::host::types::identifiers::ConnectionId;
 
@@ -78,50 +74,83 @@ where
     }
 }
 
-#[derive(HasField)]
-pub struct ConnectionEnd {
-    pub state: ConnectionState,
-    pub client_id: ClientId,
-    pub counterparty: ConnectionCounterparty,
-    pub version: ConnectionVersion,
-    pub delay_period: Duration,
-}
-
 pub struct EncodeConnectionEnd;
 
-delegate_components! {
-    EncodeConnectionEnd {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("state"), UseContext>,
-            EncodeField<symbol!("client_id"), UseContext>,
-            EncodeField<symbol!("counterparty"), UseContext>,
-            EncodeField<symbol!("version"), UseContext>,
-            EncodeField<symbol!("delay_period"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ConnectionEnd> for EncodeConnectionEnd
+where
+    Encoding: CanEncodeMut<
+            Strategy,
+            Product![
+                ConnectionState,
+                ClientId,
+                ConnectionCounterparty,
+                ConnectionVersion,
+                Duration
+            ],
+        > + CanRaiseAsyncError<&'static str>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &ConnectionEnd,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        // FIXME: ibc-rs type doesn't have public fields
 
-impl Transformer for EncodeConnectionEnd {
-    type From = Product![
-        ConnectionState,
-        ClientId,
-        ConnectionCounterparty,
-        ConnectionVersion,
-        Duration
-    ];
-    type To = ConnectionEnd;
+        #[derive(serde::Deserialize)]
+        struct DummyConnectionEnd {
+            pub state: ConnectionState,
+            pub client_id: ClientId,
+            pub counterparty: ConnectionCounterparty,
+            pub version: ConnectionVersion,
+            pub delay_period: Duration,
+        }
 
-    fn transform(
-        product![state, client_id, counterparty, version, delay_period,]: Self::From,
-    ) -> ConnectionEnd {
-        ConnectionEnd {
+        let DummyConnectionEnd {
             state,
             client_id,
             counterparty,
             version,
             delay_period,
-        }
+        } = serde_json::to_value(value)
+            .and_then(serde_json::from_value)
+            .map_err(|_| Encoding::raise_error("invalid connection end"))?;
+
+        encoding.encode_mut(
+            &product![
+                state,
+                client_id.clone(),
+                counterparty.clone(),
+                version.clone(),
+                delay_period,
+            ],
+            buffer,
+        )?;
+        Ok(())
+    }
+}
+
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ConnectionEnd> for EncodeConnectionEnd
+where
+    Encoding: CanDecodeMut<
+            Strategy,
+            Product![
+                ConnectionState,
+                ClientId,
+                ConnectionCounterparty,
+                ConnectionVersion,
+                Duration
+            ],
+        > + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ConnectionEnd, Encoding::Error> {
+        let product![state, client_id, counterparty, version, delay_period] =
+            encoding.decode_mut(buffer)?;
+
+        ConnectionEnd::new(state, client_id, counterparty, vec![version], delay_period)
+            .map_err(|_| Encoding::raise_error("invalid connection end"))
     }
 }
 
