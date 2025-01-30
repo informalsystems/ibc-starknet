@@ -1,3 +1,5 @@
+use core::time::Duration;
+
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
@@ -45,13 +47,42 @@ where
     }
 }
 
+pub struct EncodeDuration;
+
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Duration> for EncodeDuration
+where
+    Encoding: CanEncodeMut<Strategy, Product![u64]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &Duration,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&product![value.as_secs()], buffer)?;
+        Ok(())
+    }
+}
+
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Duration> for EncodeDuration
+where
+    Encoding: CanDecodeMut<Strategy, Product![u64]>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<Duration, Encoding::Error> {
+        let product![secs] = encoding.decode_mut(buffer)?;
+        Ok(Duration::from_secs(secs))
+    }
+}
+
 #[derive(HasField)]
 pub struct ConnectionEnd {
     pub state: ConnectionState,
     pub client_id: ClientId,
     pub counterparty: ConnectionCounterparty,
     pub version: ConnectionVersion,
-    pub delay_period: u64,
+    pub delay_period: Duration,
 }
 
 pub struct EncodeConnectionEnd;
@@ -75,7 +106,7 @@ impl Transformer for EncodeConnectionEnd {
         ClientId,
         ConnectionCounterparty,
         ConnectionVersion,
-        u64
+        Duration
     ];
     type To = ConnectionEnd;
 
