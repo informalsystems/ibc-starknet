@@ -953,7 +953,6 @@ dependencies = [
  "eyre",
  "hermes-cli",
  "hermes-cli-components",
- "hermes-cosmos-relayer",
  "hermes-encoding-components",
  "hermes-error",
  "hermes-logger",

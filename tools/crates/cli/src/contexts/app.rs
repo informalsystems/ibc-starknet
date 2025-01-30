@@ -8,7 +8,6 @@ use cgp::prelude::*;
 use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField;
 use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
 use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
-use hermes_cli_components::traits::any_counterparty::ProvideAnyCounterparty;
 use hermes_cli_components::traits::bootstrap::{
     BootstrapLoaderComponent, BootstrapTypeComponent, CanLoadBootstrap,
 };
@@ -25,7 +24,6 @@ use hermes_cli_components::traits::output::{
     CanProduceOutput, OutputProducer, OutputTypeComponent,
 };
 use hermes_cli_components::traits::types::config::{ConfigTypeComponent, HasConfigType};
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::traits::wrap::CanWrapError;
 use hermes_logger::ProvideHermesLogger;
 use hermes_logging_components::traits::has_logger::{
@@ -57,11 +55,7 @@ pub struct ToolApp {
 
 pub struct ToolAppComponents;
 
-pub struct ToolParserComponents;
-
 pub struct ToolCommandRunnerComponents;
-
-pub struct UpdateToolConfig;
 
 impl HasComponents for ToolApp {
     type Components = ToolAppComponents;
@@ -113,13 +107,6 @@ delegate_components! {
         StarknetSubCommand: RunStarknetSubCommand,
         TransferArgs: RunTransferArgs,
     }
-}
-
-impl<App> ProvideAnyCounterparty<App> for ToolAppComponents
-where
-    App: Async,
-{
-    type AnyCounterparty = CosmosChain;
 }
 
 impl<Value> OutputProducer<ToolApp, Value> for ToolAppComponents {

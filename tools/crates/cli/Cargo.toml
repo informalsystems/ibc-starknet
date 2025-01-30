@@ -33,7 +33,6 @@ ibc = { workspace = true }
 
 hermes-cli                        = { workspace = true }
 hermes-cli-components             = { workspace = true }
-hermes-cosmos-relayer             = { workspace = true }
 hermes-encoding-components        = { workspace = true }
 hermes-error                      = { workspace = true }
 hermes-logger                     = { workspace = true }
