@@ -93,7 +93,7 @@ where
     ) -> Result<(), Encoding::Error> {
         encoding.encode_mut(
             &product![String::from_utf8(value.clone().into_vec())
-                .map_err(|_| Encoding::raise_error("invalid utf8 string"))?],
+                .map_err(|_| Encoding::raise_error("invalid utf8 string for commitment prefix"))?],
             buffer,
         )?;
 

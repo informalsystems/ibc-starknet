@@ -45,9 +45,7 @@ where
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<PortId, Encoding::Error> {
         let product![value_str] = encoding.decode_mut(buffer)?;
-        value_str
-            .parse()
-            .map_err(|_| Encoding::raise_error("invalid channel id"))
+        PortId::new(value_str).map_err(|_| Encoding::raise_error("invalid port id"))
     }
 }
 pub struct EncodeAppVersion;

@@ -250,7 +250,7 @@ where
                 Some(
                     connection_id_str
                         .parse()
-                        .map_err(|_| Encoding::raise_error("invalid connection id"))?,
+                        .map_err(|_| Encoding::raise_error("invalid connection counterparty"))?,
                 ),
                 base_prefix,
             ))

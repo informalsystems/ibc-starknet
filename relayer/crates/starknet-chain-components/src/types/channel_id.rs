@@ -141,9 +141,11 @@ where
         } else {
             Ok(ChannelCounterparty::new(
                 port_id,
-                Some(channel_id_str.parse().map_err(|_| {
-                    Encoding::raise_error("invalid channel counterparty channel id")
-                })?),
+                Some(
+                    channel_id_str
+                        .parse()
+                        .map_err(|_| Encoding::raise_error("invalid channel counterparty"))?,
+                ),
             ))
         }
     }
