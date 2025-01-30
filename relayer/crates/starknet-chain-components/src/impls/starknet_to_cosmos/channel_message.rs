@@ -20,9 +20,6 @@ use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMes
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_confirm::CosmosChannelOpenConfirmMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_try::CosmosChannelOpenTryMessage;
-use ibc::core::channel::types::channel::{
-    ChannelEnd as IbcChannelEnd, Counterparty as IbcChannelCounterparty, State as IbcChannelState,
-};
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::host::types::error::IdentifierError;
@@ -56,35 +53,19 @@ where
     async fn build_channel_open_try_message(
         _chain: &Chain,
         port_id: &IbcPortId,
-        counterparty_port_id: &IbcPortId,
-        counterparty_channel_id: &StarknetChannelId,
+        // FIXME: these two are already in the channel_end
+        _counterparty_port_id: &IbcPortId,
+        _counterparty_channel_id: &StarknetChannelId,
         counterparty_payload: ChannelOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
-        let starknet_channel_end = counterparty_payload.channel_end;
-
-        let remote = IbcChannelCounterparty {
-            port_id: counterparty_port_id.clone(),
-            channel_id: Some(counterparty_channel_id.clone()),
-        };
-
-        let connection_id = starknet_channel_end.connection_id;
-
-        let channel_end = IbcChannelEnd {
-            state: IbcChannelState::TryOpen,
-            ordering: starknet_channel_end.ordering,
-            remote,
-            connection_hops: vec![connection_id],
-            version: starknet_channel_end.version.clone(),
-        };
-
         let message = CosmosChannelOpenTryMessage {
             port_id: port_id.to_string(),
-            channel: channel_end.into(),
             // FIXME: why this needs to be passed here. it's already in the channel_end
-            counterparty_version: starknet_channel_end.version.to_string(),
+            counterparty_version: counterparty_payload.channel_end.version.to_string(),
+            channel: counterparty_payload.channel_end.into(),
             update_height,
             proof_init: counterparty_payload.proof_init.proof_bytes,
         };

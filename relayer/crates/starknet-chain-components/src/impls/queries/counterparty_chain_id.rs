@@ -45,7 +45,7 @@ where
             .await?;
 
         let connection_end = chain
-            .query_connection_end(&channel_end.connection_id, &height)
+            .query_connection_end(&channel_end.connection_hops[0], &height)
             .await?;
 
         let client_state = chain
