@@ -104,6 +104,7 @@ impl Transformer for EncodeChannelState {
 #[derive(Debug, PartialEq, Clone, HasField)]
 pub struct ChannelCounterparty {
     pub port_id: PortId,
+    // FIXME: this should be optional
     pub channel_id: ChannelId,
 }
 
