@@ -8,6 +8,7 @@ use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
+pub use ibc::core::connection::types::Counterparty as ConnectionCounterparty;
 pub use ibc::core::host::types::identifiers::ConnectionId;
 
 use crate::types::client_id::ClientId;
@@ -138,37 +139,66 @@ impl Transformer for EncodeConnectionState {
     }
 }
 
-#[derive(HasField)]
-pub struct ConnectionCounterparty {
-    pub client_id: ClientId,
-    pub connection_id: ConnectionId,
-    pub prefix: BasePrefix,
-}
-
 pub struct EncodeConnectionCounterparty;
 
-delegate_components! {
-    EncodeConnectionCounterparty {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("client_id"), UseContext>,
-            EncodeField<symbol!("connection_id"), UseContext>,
-            EncodeField<symbol!("prefix"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ConnectionCounterparty>
+    for EncodeConnectionCounterparty
+where
+    Encoding: CanEncodeMut<Strategy, Product![ClientId, Product![String], BasePrefix]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &ConnectionCounterparty,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        match &value.connection_id {
+            Some(connection_id) => encoding.encode_mut(
+                &product![
+                    value.client_id.clone(),
+                    product![connection_id.to_string()],
+                    value.prefix.clone()
+                ],
+                buffer,
+            )?,
+            None => encoding.encode_mut(
+                &product![
+                    value.client_id.clone(),
+                    product![String::new()],
+                    value.prefix.clone()
+                ],
+                buffer,
+            )?,
+        }
+
+        Ok(())
     }
 }
 
-impl Transformer for EncodeConnectionCounterparty {
-    type From = Product![ClientId, ConnectionId, BasePrefix];
-    type To = ConnectionCounterparty;
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ConnectionCounterparty>
+    for EncodeConnectionCounterparty
+where
+    Encoding: CanDecodeMut<Strategy, Product![ClientId, Product![String], BasePrefix]>
+        + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ConnectionCounterparty, Encoding::Error> {
+        let product![client_id, product![connection_id_str], base_prefix] =
+            encoding.decode_mut(buffer)?;
 
-    fn transform(
-        product![client_id, connection_id, prefix,]: Self::From,
-    ) -> ConnectionCounterparty {
-        ConnectionCounterparty {
-            client_id,
-            connection_id,
-            prefix,
+        if connection_id_str.is_empty() {
+            Ok(ConnectionCounterparty::new(client_id, None, base_prefix))
+        } else {
+            Ok(ConnectionCounterparty::new(
+                client_id,
+                Some(
+                    connection_id_str
+                        .parse()
+                        .map_err(|_| Encoding::raise_error("invalid connection id"))?,
+                ),
+                base_prefix,
+            ))
         }
     }
 }
