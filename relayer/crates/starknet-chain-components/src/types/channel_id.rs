@@ -8,6 +8,7 @@ use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
+pub use ibc::core::channel::types::channel::Counterparty as ChannelCounterparty;
 pub use ibc::core::host::types::identifiers::ChannelId;
 
 use super::connection_id::ConnectionId;
@@ -101,33 +102,56 @@ impl Transformer for EncodeChannelState {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, HasField)]
-pub struct ChannelCounterparty {
-    pub port_id: PortId,
-    // FIXME: this should be optional
-    pub channel_id: ChannelId,
-}
-
 pub struct EncodeChannelCounterparty;
 
-delegate_components! {
-    EncodeChannelCounterparty {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("port_id"), UseContext>,
-            EncodeField<symbol!("channel_id"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChannelCounterparty>
+    for EncodeChannelCounterparty
+where
+    Encoding: CanEncodeMut<Strategy, Product![PortId, Product![String]]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &ChannelCounterparty,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        match &value.channel_id {
+            Some(channel_id) => {
+                encoding.encode_mut(
+                    &product![value.port_id.clone(), product![channel_id.to_string()]],
+                    buffer,
+                )?;
+            }
+            None => {
+                encoding.encode_mut(
+                    &product![value.port_id.clone(), product![String::new()]],
+                    buffer,
+                )?;
+            }
+        }
+        Ok(())
     }
 }
 
-impl Transformer for EncodeChannelCounterparty {
-    type From = Product![PortId, ChannelId];
-    type To = ChannelCounterparty;
-
-    fn transform(product![port_id, channel_id]: Self::From) -> ChannelCounterparty {
-        ChannelCounterparty {
-            port_id,
-            channel_id,
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChannelCounterparty>
+    for EncodeChannelCounterparty
+where
+    Encoding: CanDecodeMut<Strategy, Product![PortId, Product![String]]>
+        + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ChannelCounterparty, Encoding::Error> {
+        let product![port_id, product![channel_id_str]] = encoding.decode_mut(buffer)?;
+        if channel_id_str.is_empty() {
+            Ok(ChannelCounterparty::new(port_id, None))
+        } else {
+            Ok(ChannelCounterparty::new(
+                port_id,
+                Some(channel_id_str.parse().map_err(|_| {
+                    Encoding::raise_error("invalid channel counterparty channel id")
+                })?),
+            ))
         }
     }
 }
