@@ -966,7 +966,6 @@ dependencies = [
  "hermes-starknet-cli",
  "hermes-starknet-integration-tests",
  "hermes-starknet-relayer",
- "hermes-test-components",
  "ibc",
  "stable-eyre",
  "starknet",
