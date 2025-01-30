@@ -21,8 +21,7 @@ use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosCh
 use hermes_cosmos_chain_components::types::messages::channel::open_confirm::CosmosChannelOpenConfirmMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_try::CosmosChannelOpenTryMessage;
 use ibc::core::channel::types::channel::{
-    ChannelEnd as IbcChannelEnd, Counterparty as IbcChannelCounterparty, Order as IbcChannelOrder,
-    State as IbcChannelState,
+    ChannelEnd as IbcChannelEnd, Counterparty as IbcChannelCounterparty, State as IbcChannelState,
 };
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
@@ -31,7 +30,6 @@ use ibc::core::host::types::identifiers::{ChannelId as IbcChannelId, PortId as I
 
 use crate::types::channel_id::{ChannelEnd as StarknetChannelEnd, ChannelId as StarknetChannelId};
 use crate::types::commitment_proof::StarknetCommitmentProof;
-use crate::types::messages::ibc::channel::ChannelOrdering as StarknetChannelOrdering;
 
 pub struct BuildStarknetToCosmosChannelHandshakeMessage;
 
@@ -67,11 +65,6 @@ where
 
         let starknet_channel_end = counterparty_payload.channel_end;
 
-        let ordering = match starknet_channel_end.ordering {
-            StarknetChannelOrdering::Ordered => IbcChannelOrder::Ordered,
-            StarknetChannelOrdering::Unordered => IbcChannelOrder::Unordered,
-        };
-
         let remote = IbcChannelCounterparty {
             port_id: counterparty_port_id.clone(),
             channel_id: Some(counterparty_channel_id.clone()),
@@ -87,7 +80,7 @@ where
 
         let channel_end = IbcChannelEnd {
             state: IbcChannelState::TryOpen,
-            ordering,
+            ordering: starknet_channel_end.ordering,
             remote,
             connection_hops: vec![connection_id],
             version,
