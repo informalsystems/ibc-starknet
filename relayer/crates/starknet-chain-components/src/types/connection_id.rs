@@ -10,7 +10,9 @@ use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
-pub use ibc::core::connection::types::Counterparty as ConnectionCounterparty;
+pub use ibc::core::connection::types::{
+    Counterparty as ConnectionCounterparty, State as ConnectionState,
+};
 pub use ibc::core::host::types::identifiers::ConnectionId;
 
 use crate::types::client_id::ClientId;
@@ -121,13 +123,6 @@ impl Transformer for EncodeConnectionEnd {
             delay_period,
         }
     }
-}
-
-pub enum ConnectionState {
-    Uninitialized,
-    Init,
-    TryOpen,
-    Open,
 }
 
 pub struct EncodeConnectionState;
