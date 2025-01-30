@@ -37,8 +37,8 @@ where
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<ConnectionId, Encoding::Error> {
-        let product![connection_id_str] = encoding.decode_mut(buffer)?;
-        connection_id_str
+        let product![value_str] = encoding.decode_mut(buffer)?;
+        value_str
             .parse()
             .map_err(|_| Encoding::raise_error("invalid connection id"))
     }
