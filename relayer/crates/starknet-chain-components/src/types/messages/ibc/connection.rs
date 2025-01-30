@@ -3,9 +3,14 @@ use cgp::prelude::*;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
-use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 use hermes_encoding_components::traits::transform::Transformer;
+pub use ibc::core::commitment_types::commitment::CommitmentPrefix as BasePrefix;
 
 use super::packet::StateProof;
 use crate::types::client_id::ClientId;
@@ -42,28 +47,37 @@ impl Transformer for EncodeConnectionVersion {
     }
 }
 
-#[derive(HasField, Clone)]
-pub struct BasePrefix {
-    pub prefix: String,
-}
-
 pub struct EncodeBasePrefix;
 
-delegate_components! {
-    EncodeBasePrefix {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("prefix"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, BasePrefix> for EncodeBasePrefix
+where
+    Encoding: CanEncodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &BasePrefix,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(
+            &product![String::from_utf8(value.clone().into_vec())
+                .map_err(|_| Encoding::raise_error("invalid utf8 string"))?],
+            buffer,
+        )?;
+
+        Ok(())
     }
 }
 
-impl Transformer for EncodeBasePrefix {
-    type From = String;
-    type To = BasePrefix;
-
-    fn transform(prefix: Self::From) -> BasePrefix {
-        BasePrefix { prefix }
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, BasePrefix> for EncodeBasePrefix
+where
+    Encoding: CanDecodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<BasePrefix, Encoding::Error> {
+        let product![value_str] = encoding.decode_mut(buffer)?;
+        Ok(BasePrefix::from_bytes(value_str.as_bytes()))
     }
 }
 
