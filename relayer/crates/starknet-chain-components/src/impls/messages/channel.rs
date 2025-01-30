@@ -35,8 +35,7 @@ use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::channel_id::ChannelId as StarknetChannelId;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::channel::{
-    AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
-    MsgChanOpenTry,
+    ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry,
 };
 use crate::types::messages::ibc::packet::StateProof;
 pub struct BuildStarknetChannelHandshakeMessages;
@@ -71,10 +70,6 @@ where
 
         let conn_id_on_a = init_channel_options.connection_hops[0].clone();
 
-        let version_proposal = AppVersion {
-            version: init_channel_options.channel_version.to_string(),
-        };
-
         let ordering = match init_channel_options.ordering {
             IbcOrder::None => {
                 return Err(Chain::raise_error("Starknet does not support no ordering"))
@@ -87,7 +82,7 @@ where
             port_id_on_a: port_id.clone(),
             conn_id_on_a,
             port_id_on_b: counterparty_port_id.clone(),
-            version_proposal,
+            version_proposal: init_channel_options.channel_version.clone(),
             ordering,
         };
 
@@ -148,10 +143,6 @@ where
 
         let conn_id_on_b = counterparty_payload.channel_end.connection_hops[0].clone();
 
-        let version_on_a = AppVersion {
-            version: counterparty_payload.channel_end.version.to_string(),
-        };
-
         let proof_chan_end_on_a = StateProof {
             proof: vec![Felt::ONE],
         };
@@ -174,7 +165,7 @@ where
             conn_id_on_b,
             port_id_on_a: counterparty_port_id.clone(),
             chan_id_on_a: counterparty_channel_id.clone(),
-            version_on_a,
+            version_on_a: counterparty_payload.channel_end.version.clone(),
             proof_chan_end_on_a,
             proof_height_on_a,
             ordering,
@@ -227,10 +218,6 @@ where
         counterparty_channel_id: &ChannelId,
         counterparty_payload: ChannelOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let version_on_b = AppVersion {
-            version: counterparty_payload.channel_end.version.to_string(),
-        };
-
         let proof_chan_end_on_b = StateProof {
             proof: vec![Felt::ONE],
         };
@@ -244,7 +231,7 @@ where
             port_id_on_a: port_id.clone(),
             chan_id_on_a: channel_id.clone(),
             chan_id_on_b: counterparty_channel_id.clone(),
-            version_on_b,
+            version_on_b: counterparty_payload.channel_end.version.clone(),
             proof_chan_end_on_b,
             proof_height_on_b,
         };

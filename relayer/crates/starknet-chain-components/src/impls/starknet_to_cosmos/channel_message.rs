@@ -72,24 +72,19 @@ where
 
         let connection_id = starknet_channel_end.connection_id;
 
-        let version = starknet_channel_end
-            .version
-            .version
-            .parse()
-            .map_err(Chain::raise_error)?;
-
         let channel_end = IbcChannelEnd {
             state: IbcChannelState::TryOpen,
             ordering: starknet_channel_end.ordering,
             remote,
             connection_hops: vec![connection_id],
-            version,
+            version: starknet_channel_end.version.clone(),
         };
 
         let message = CosmosChannelOpenTryMessage {
             port_id: port_id.to_string(),
             channel: channel_end.into(),
-            counterparty_version: starknet_channel_end.version.version,
+            // FIXME: why this needs to be passed here. it's already in the channel_end
+            counterparty_version: starknet_channel_end.version.to_string(),
             update_height,
             proof_init: counterparty_payload.proof_init.proof_bytes,
         };
@@ -131,7 +126,7 @@ where
             port_id: port_id.to_string(),
             channel_id: channel_id.to_string(),
             counterparty_channel_id: counterparty_channel_id.to_string(),
-            counterparty_version: counterparty_payload.channel_end.version.version,
+            counterparty_version: counterparty_payload.channel_end.version.to_string(),
             update_height,
             proof_try,
         };
