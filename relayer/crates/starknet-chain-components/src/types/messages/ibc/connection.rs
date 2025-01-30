@@ -11,39 +11,72 @@ use hermes_encoding_components::traits::encode_mut::{
 };
 use hermes_encoding_components::traits::transform::Transformer;
 pub use ibc::core::commitment_types::commitment::CommitmentPrefix as BasePrefix;
+pub use ibc::core::connection::types::version::Version as ConnectionVersion;
 
 use super::packet::StateProof;
 use crate::types::client_id::ClientId;
 use crate::types::connection_id::ConnectionId;
 use crate::types::cosmos::height::Height;
 
-#[derive(HasField, Clone)]
-pub struct ConnectionVersion {
-    pub identifier: String,
-    pub features: [String; 2],
-}
-
 pub struct EncodeConnectionVersion;
 
-delegate_components! {
-    EncodeConnectionVersion {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("identifier"), UseContext>,
-            EncodeField<symbol!("features"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ConnectionVersion>
+    for EncodeConnectionVersion
+where
+    Encoding:
+        CanEncodeMut<Strategy, Product![String, [String; 2]]> + CanRaiseAsyncError<&'static str>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &ConnectionVersion,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        // FIXME: ibc-rs type doesn't have public fields
+        #[derive(serde::Deserialize)]
+        struct DummyConnectionVersion {
+            pub identifier: String,
+            pub features: [String; 2],
+        }
+
+        let DummyConnectionVersion {
+            identifier,
+            features,
+        } = serde_json::to_value(value)
+            .and_then(serde_json::from_value)
+            .map_err(|_| Encoding::raise_error("invalid connection version"))?;
+
+        encoding.encode_mut(&product![identifier, features], buffer)?;
+        Ok(())
     }
 }
 
-impl Transformer for EncodeConnectionVersion {
-    type From = (String, [String; 2]);
-    type To = ConnectionVersion;
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ConnectionVersion>
+    for EncodeConnectionVersion
+where
+    Encoding:
+        CanDecodeMut<Strategy, Product![String, [String; 2]]> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ConnectionVersion, Encoding::Error> {
+        let product![identifier, features] = encoding.decode_mut(buffer)?;
 
-    fn transform((identifier, features): Self::From) -> ConnectionVersion {
-        ConnectionVersion {
+        // FIXME: ibc-rs type doesn't have public fields
+        #[derive(serde::Serialize)]
+        struct DummyConnectionVersion {
+            pub identifier: String,
+            pub features: [String; 2],
+        }
+
+        let connection_version = serde_json::to_value(DummyConnectionVersion {
             identifier,
             features,
-        }
+        })
+        .and_then(serde_json::from_value)
+        .map_err(|_| Encoding::raise_error("invalid connection version"))?;
+
+        Ok(connection_version)
     }
 }
 
