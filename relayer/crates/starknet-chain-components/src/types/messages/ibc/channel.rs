@@ -12,6 +12,7 @@ use hermes_encoding_components::traits::encode_mut::{
 };
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 pub use ibc::core::channel::types::channel::Order as ChannelOrdering;
+pub use ibc::core::channel::types::Version as AppVersion;
 pub use ibc::core::host::types::identifiers::PortId;
 
 use super::packet::StateProof;
@@ -49,28 +50,32 @@ where
             .map_err(|_| Encoding::raise_error("invalid channel id"))
     }
 }
-#[derive(HasField, Debug, PartialEq, Clone)]
-pub struct AppVersion {
-    pub version: String,
-}
-
 pub struct EncodeAppVersion;
 
-delegate_components! {
-    EncodeAppVersion {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("version"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, AppVersion> for EncodeAppVersion
+where
+    Encoding: CanEncodeMut<Strategy, Product![String]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &AppVersion,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&product![value.to_string()], buffer)?;
+        Ok(())
     }
 }
 
-impl Transformer for EncodeAppVersion {
-    type From = String;
-    type To = AppVersion;
-
-    fn transform(version: Self::From) -> AppVersion {
-        AppVersion { version }
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, AppVersion> for EncodeAppVersion
+where
+    Encoding: CanDecodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<AppVersion, Encoding::Error> {
+        let product![value_str] = encoding.decode_mut(buffer)?;
+        Ok(AppVersion::new(value_str))
     }
 }
 
