@@ -81,47 +81,11 @@ where
         init_connection_options: &CosmosInitConnectionOptions,
         counterparty_payload: ConnectionOpenInitPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // TODO(rano): dirty hack; make fields public at ibc-rs and tidy it up
-
-        let json_connection_version =
-            serde_json::to_value(&init_connection_options.connection_version)
-                .map_err(Chain::raise_error)?;
-
-        let identifier = json_connection_version
-            .pointer("/identifier")
-            .ok_or_else(|| Chain::raise_error("connection version does not have a features field"))?
-            .as_str()
-            .ok_or_else(|| Chain::raise_error("connection version identifier is not a string"))?;
-
-        let features = json_connection_version
-            .pointer("/features")
-            .ok_or_else(|| Chain::raise_error("connection version does not have a features field"))?
-            .as_array()
-            .ok_or_else(|| Chain::raise_error("connection version features is not an array"))?
-            .iter()
-            .map(|value| {
-                value
-                    .as_str()
-                    .ok_or_else(|| Chain::raise_error("connection version feature is not a string"))
-            })
-            .collect::<Result<Vec<&str>, Chain::Error>>()?;
-
-        if features.len() != 2 {
-            return Err(Chain::raise_error(
-                "connection version features must have 2 elements",
-            ));
-        }
-
-        let cairo_connection_version = ConnectionVersion {
-            identifier: identifier.to_string(),
-            features: [features[0].to_string(), features[1].to_string()],
-        };
-
         let conn_open_init_msg = MsgConnOpenInit {
             client_id_on_a: client_id.clone(),
             client_id_on_b: counterparty_client_id.clone(),
             prefix_on_b: counterparty_payload.commitment_prefix.into(),
-            version: cairo_connection_version,
+            version: init_connection_options.connection_version.clone(),
             delay_period: init_connection_options.delay_period.as_secs(),
         };
 
@@ -177,11 +141,8 @@ where
         counterparty_connection_id: &CosmosConnectionId,
         counterparty_payload: ConnectionOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: Use the connection version from the payload
-        let connection_version = ConnectionVersion {
-            identifier: "1".into(),
-            features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
-        };
+        // TODO(rano): use the connection version from the payload
+        let connection_version = ConnectionVersion::compatibles()[0].clone();
 
         // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         let commitment_proof = StateProof {
@@ -252,10 +213,7 @@ where
         counterparty_payload: ConnectionOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
         // TODO(rano): use the connection version from the payload
-        let connection_version = ConnectionVersion {
-            identifier: "1".into(),
-            features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
-        };
+        let connection_version = ConnectionVersion::compatibles()[0].clone();
 
         // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         // TODO(rano): submitting dummy proofs
