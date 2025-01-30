@@ -66,8 +66,6 @@ where
             ));
         }
 
-        assert_eq!(init_channel_options.connection_hops.len(), 1);
-
         let conn_id_on_a = init_channel_options.connection_hops[0].clone();
 
         let ordering = match init_channel_options.ordering {
@@ -138,8 +136,6 @@ where
                 "Starknet only supports a single connection hop",
             ));
         }
-
-        assert_eq!(counterparty_payload.channel_end.connection_hops.len(), 1);
 
         let conn_id_on_b = counterparty_payload.channel_end.connection_hops[0].clone();
 
