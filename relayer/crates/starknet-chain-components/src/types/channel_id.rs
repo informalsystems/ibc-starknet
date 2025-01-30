@@ -1,15 +1,11 @@
-use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
-use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
-use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 pub use ibc::core::channel::types::channel::{
-    Counterparty as ChannelCounterparty, State as ChannelState,
+    ChannelEnd, Counterparty as ChannelCounterparty, State as ChannelState,
 };
 pub use ibc::core::host::types::identifiers::ChannelId;
 
@@ -151,49 +147,65 @@ where
     }
 }
 
-#[derive(Debug, PartialEq, Clone, HasField)]
-pub struct ChannelEnd {
-    pub state: ChannelState,
-    pub ordering: ChannelOrdering,
-    pub remote: ChannelCounterparty,
-    pub connection_id: ConnectionId,
-    pub version: AppVersion,
-}
-
 pub struct EncodeChannelEnd;
 
-delegate_components! {
-    EncodeChannelEnd {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("state"), UseContext>,
-            EncodeField<symbol!("ordering"), UseContext>,
-            EncodeField<symbol!("remote"), UseContext>,
-            EncodeField<symbol!("connection_id"), UseContext>,
-            EncodeField<symbol!("version"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChannelEnd> for EncodeChannelEnd
+where
+    Encoding: CanEncodeMut<
+            Strategy,
+            Product![
+                ChannelState,
+                ChannelOrdering,
+                ChannelCounterparty,
+                ConnectionId,
+                AppVersion,
+            ],
+        > + CanRaiseAsyncError<&'static str>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &ChannelEnd,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        if value.connection_hops.len() != 1 {
+            return Err(Encoding::raise_error("invalid connection hops"));
+        }
+
+        encoding.encode_mut(
+            &product![
+                value.state,
+                value.ordering,
+                value.counterparty().clone(),
+                value.connection_hops[0].clone(),
+                value.version.clone(),
+            ],
+            buffer,
+        )?;
+        Ok(())
     }
 }
 
-impl Transformer for EncodeChannelEnd {
-    type From = Product![
-        ChannelState,
-        ChannelOrdering,
-        ChannelCounterparty,
-        ConnectionId,
-        AppVersion,
-    ];
-    type To = ChannelEnd;
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChannelEnd> for EncodeChannelEnd
+where
+    Encoding: CanDecodeMut<
+            Strategy,
+            Product![
+                ChannelState,
+                ChannelOrdering,
+                ChannelCounterparty,
+                ConnectionId,
+                AppVersion,
+            ],
+        > + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ChannelEnd, Encoding::Error> {
+        let product![state, ordering, counterparty, connection_id, version,] =
+            encoding.decode_mut(buffer)?;
 
-    fn transform(
-        product![state, ordering, remote, connection_id, version]: Self::From,
-    ) -> ChannelEnd {
-        ChannelEnd {
-            state,
-            ordering,
-            remote,
-            connection_id,
-            version,
-        }
+        ChannelEnd::new(state, ordering, counterparty, vec![connection_id], version)
+            .map_err(|_| Encoding::raise_error("invalid channel end"))
     }
 }
