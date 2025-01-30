@@ -41,7 +41,6 @@ use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContrac
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
-use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
 };
@@ -374,12 +373,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         {
             // register the ICS20 contract with the IBC core contract
 
-            let port_id_on_starknet = PortId {
-                port_id: ics20_port.to_string(),
-            };
-
             let register_app = MsgRegisterApp {
-                port_id: port_id_on_starknet.clone(),
+                port_id: ics20_port.clone(),
                 contract_address: ics20_contract_address,
             };
 
@@ -531,9 +526,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             };
 
             MsgTransfer {
-                port_id_on_a: PortId {
-                    port_id: ics20_port.to_string(),
-                },
+                port_id_on_a: ics20_port.clone(),
                 chan_id_on_a: starknet_channel_id.clone(),
                 denom,
                 amount: transfer_quantity.into(),
@@ -625,9 +618,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             };
 
             MsgTransfer {
-                port_id_on_a: PortId {
-                    port_id: ics20_port.to_string(),
-                },
+                port_id_on_a: ics20_port.clone(),
                 chan_id_on_a: starknet_channel_id.clone(),
                 denom,
                 amount: transfer_quantity.into(),
