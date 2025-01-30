@@ -49,7 +49,7 @@ where
             .await?;
 
         let client_state = chain
-            .query_client_state(PhantomData, &connection_end.client_id, &height)
+            .query_client_state(PhantomData, connection_end.client_id(), &height)
             .await?;
 
         let chain_id = Counterparty::client_state_chain_id(&client_state);
