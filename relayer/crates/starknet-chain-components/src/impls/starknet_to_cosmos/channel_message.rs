@@ -72,22 +72,9 @@ where
             StarknetChannelOrdering::Unordered => IbcChannelOrder::Unordered,
         };
 
-        if !starknet_channel_end.remote.channel_id.channel_id.is_empty() {
-            return Err(Chain::raise_error(
-                "ChannelEnd has non-empty channel_id after chan_open_init",
-            ));
-        }
-
-        let cosmos_channel_seq = counterparty_channel_id
-            .channel_id
-            .strip_prefix("channel-")
-            .ok_or_else(|| Chain::raise_error("ChannelId does not have the expected prefix"))?
-            .parse::<u64>()
-            .map_err(Chain::raise_error)?;
-
         let remote = IbcChannelCounterparty {
             port_id: counterparty_port_id.clone(),
-            channel_id: Some(IbcChannelId::new(cosmos_channel_seq)),
+            channel_id: Some(counterparty_channel_id.clone()),
         };
 
         let connection_id = starknet_channel_end.connection_id;
@@ -150,7 +137,7 @@ where
         let message = CosmosChannelOpenAckMessage {
             port_id: port_id.to_string(),
             channel_id: channel_id.to_string(),
-            counterparty_channel_id: counterparty_channel_id.channel_id.clone(),
+            counterparty_channel_id: counterparty_channel_id.to_string(),
             counterparty_version: counterparty_payload.channel_end.version.version,
             update_height,
             proof_try,

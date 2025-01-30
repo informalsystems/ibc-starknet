@@ -472,7 +472,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let ibc_prefixed_denom = PrefixedDenom {
                 trace_path: vec![TracePrefix {
                     port_id: ics20_port.to_string(),
-                    channel_id: starknet_channel_id.channel_id.clone(),
+                    channel_id: starknet_channel_id.to_string(),
                 }],
                 base: Denom::Hosted(denom_cosmos.to_string()),
             };
@@ -525,7 +525,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let denom = PrefixedDenom {
                 trace_path: vec![TracePrefix {
                     port_id: ics20_port.to_string(),
-                    channel_id: starknet_channel_id.channel_id.clone(),
+                    channel_id: starknet_channel_id.to_string(),
                 }],
                 base: Denom::Hosted(denom_cosmos.to_string()),
             };

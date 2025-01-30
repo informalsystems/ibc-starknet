@@ -164,10 +164,6 @@ where
             port_id: counterparty_port_id.to_string(),
         };
 
-        let chan_id_on_a = StarknetChannelId {
-            channel_id: counterparty_channel_id.to_string(),
-        };
-
         let version_on_a = AppVersion {
             version: counterparty_payload.channel_end.version.to_string(),
         };
@@ -193,7 +189,7 @@ where
             port_id_on_b,
             conn_id_on_b,
             port_id_on_a,
-            chan_id_on_a,
+            chan_id_on_a: counterparty_channel_id.clone(),
             version_on_a,
             proof_chan_end_on_a,
             proof_height_on_a,
@@ -251,10 +247,6 @@ where
             port_id: port_id.to_string(),
         };
 
-        let chan_id_on_b = StarknetChannelId {
-            channel_id: counterparty_channel_id.to_string(),
-        };
-
         let version_on_b = AppVersion {
             version: counterparty_payload.channel_end.version.to_string(),
         };
@@ -271,7 +263,7 @@ where
         let chan_open_ack_msg = MsgChanOpenAck {
             port_id_on_a,
             chan_id_on_a: channel_id.clone(),
-            chan_id_on_b,
+            chan_id_on_b: counterparty_channel_id.clone(),
             version_on_b,
             proof_chan_end_on_b,
             proof_height_on_b,
