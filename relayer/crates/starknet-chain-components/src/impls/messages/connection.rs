@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 use core::num::ParseIntError;
-use core::str::{from_utf8, Utf8Error};
+use core::str::Utf8Error;
 
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
@@ -44,8 +44,7 @@ use crate::types::client_id::ClientId as StarknetClientId;
 use crate::types::connection_id::ConnectionId as StarknetConnectionId;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::connection::{
-    BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit,
-    MsgConnOpenTry,
+    ConnectionVersion, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
 };
 use crate::types::messages::ibc::packet::StateProof;
 
@@ -118,16 +117,10 @@ where
             features: [features[0].to_string(), features[1].to_string()],
         };
 
-        let base_prefix = BasePrefix {
-            prefix: from_utf8(&counterparty_payload.commitment_prefix)
-                .map_err(Chain::raise_error)?
-                .to_owned(),
-        };
-
         let conn_open_init_msg = MsgConnOpenInit {
             client_id_on_a: client_id.clone(),
             client_id_on_b: counterparty_client_id.clone(),
-            prefix_on_b: base_prefix,
+            prefix_on_b: counterparty_payload.commitment_prefix.into(),
             version: cairo_connection_version,
             delay_period: init_connection_options.delay_period.as_secs(),
         };
@@ -184,10 +177,6 @@ where
         counterparty_connection_id: &CosmosConnectionId,
         counterparty_payload: ConnectionOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: Cairo IBC should use bytes for commitment prefix
-        let commitment_prefix =
-            from_utf8(&counterparty_payload.commitment_prefix).map_err(Chain::raise_error)?;
-
         // FIXME: Use the connection version from the payload
         let connection_version = ConnectionVersion {
             identifier: "1".into(),
@@ -208,9 +197,7 @@ where
             client_id_on_a: counterparty_client_id.clone(),
             client_id_on_b: client_id.clone(),
             conn_id_on_a: counterparty_connection_id.clone(),
-            prefix_on_a: BasePrefix {
-                prefix: commitment_prefix.into(),
-            },
+            prefix_on_a: counterparty_payload.commitment_prefix.into(),
             version_on_a: connection_version,
             proof_conn_end_on_a: commitment_proof,
             proof_height_on_a: proof_height,
