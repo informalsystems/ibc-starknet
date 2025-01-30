@@ -4,36 +4,46 @@ use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVar
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
+pub use ibc::core::host::types::identifiers::ChannelId;
 
 use super::connection_id::ConnectionId;
 use super::messages::ibc::channel::{AppVersion, ChannelOrdering, PortId};
 
-#[derive(Debug, PartialEq, Clone, HasField, Eq, Ord, PartialOrd)]
-pub struct ChannelId {
-    pub channel_id: String,
-}
-
 pub struct EncodeChannelId;
 
-delegate_components! {
-    EncodeChannelId {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("channel_id"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChannelId> for EncodeChannelId
+where
+    Encoding: CanEncodeMut<Strategy, Product![String]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &ChannelId,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&product![value.to_string()], buffer)?;
+        Ok(())
     }
 }
 
-impl Transformer for EncodeChannelId {
-    type From = String;
-    type To = ChannelId;
-
-    fn transform(channel_id: Self::From) -> ChannelId {
-        ChannelId { channel_id }
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChannelId> for EncodeChannelId
+where
+    Encoding: CanDecodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ChannelId, Encoding::Error> {
+        let product![connection_id_str] = encoding.decode_mut(buffer)?;
+        connection_id_str
+            .parse()
+            .map_err(|_| Encoding::raise_error("invalid channel id"))
     }
 }
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum ChannelState {
     Uninitialized,
