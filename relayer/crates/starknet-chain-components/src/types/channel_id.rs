@@ -8,7 +8,9 @@ use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
-pub use ibc::core::channel::types::channel::Counterparty as ChannelCounterparty;
+pub use ibc::core::channel::types::channel::{
+    Counterparty as ChannelCounterparty, State as ChannelState,
+};
 pub use ibc::core::host::types::identifiers::ChannelId;
 
 use super::connection_id::ConnectionId;
@@ -43,15 +45,6 @@ where
             .parse()
             .map_err(|_| Encoding::raise_error("invalid channel id"))
     }
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum ChannelState {
-    Uninitialized,
-    Init,
-    TryOpen,
-    Open,
-    Closed,
 }
 
 pub struct EncodeChannelState;
