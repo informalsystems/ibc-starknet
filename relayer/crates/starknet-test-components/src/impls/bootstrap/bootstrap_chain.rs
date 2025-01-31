@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::net::{IpAddr, Ipv4Addr};
 
 use cgp::core::error::CanRaiseAsyncError;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::CanBuildChainDriver;
@@ -58,6 +59,10 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
+        // FIXME: RPC address is set to localhost and port is set to a random free port
+        // The values should be configurable to connect to a specific node
+        let rpc_addr = IpAddr::V4(Ipv4Addr::LOCALHOST);
+
         let rpc_port = runtime
             .reserve_tcp_port()
             .await
@@ -74,7 +79,7 @@ where
             ),
         };
 
-        let node_config = StarknetNodeConfig { rpc_port };
+        let node_config = StarknetNodeConfig { rpc_addr, rpc_port };
 
         let chain_process = bootstrap
             .start_chain_full_node(&chain_home_dir, &node_config, &genesis_config)
