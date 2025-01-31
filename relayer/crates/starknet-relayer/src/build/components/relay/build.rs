@@ -13,12 +13,12 @@ impl RelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponen
     async fn build_relay(
         build: &StarknetBuilder,
         _index: PhantomData<(Index<0>, Index<1>)>,
-        _src_chain_id: &ChainId,
+        src_chain_id: &ChainId,
         dst_chain_id: &ChainId,
         src_client_id: &StarknetClientId,
         dst_client_id: &CosmosClientId,
     ) -> Result<StarknetToCosmosRelay, HermesError> {
-        let src_chain = build.build_chain().await?;
+        let src_chain = build.build_chain(src_chain_id).await?;
 
         let dst_chain = build.cosmos_builder.build_chain(dst_chain_id).await?;
 
