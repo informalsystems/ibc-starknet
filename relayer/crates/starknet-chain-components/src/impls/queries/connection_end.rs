@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::connection_end::{
     ConnectionEndQuerier, ConnectionEndWithProofsQuerier,
 };
@@ -24,6 +24,7 @@ use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::commitment_proof::StarknetCommitmentProof;
 use crate::types::connection_id::{ConnectionEnd, ConnectionId};
+use crate::types::status::StarknetChainStatus;
 
 pub struct QueryConnectionEndFromStarknet;
 
@@ -68,7 +69,7 @@ impl<Chain, Counterparty, Encoding> ConnectionEndWithProofsQuerier<Chain, Counte
     for QueryConnectionEndFromStarknet
 where
     Chain: HasHeightType<Height = u64>
-        + CanQueryChainHeight
+        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + HasConnectionIdType<Counterparty, ConnectionId = ConnectionId>
         + HasConnectionEndType<Counterparty, ConnectionEnd = ConnectionEnd>
@@ -99,10 +100,13 @@ where
             .call_contract(&contract_address, &selector!("connection_end"), &calldata)
             .await?;
 
+        // hack(rano): passing block hash to message builder
+        let chain_status = chain.query_chain_status().await?;
+
         // TODO(rano): how to get the proof?
         let dummy_proof = StarknetCommitmentProof {
-            proof_height: chain.query_chain_height().await?,
-            proof_bytes: vec![0x1],
+            proof_height: chain_status.height,
+            proof_bytes: chain_status.block_hash.to_bytes_be().to_vec(),
         };
 
         Ok((
