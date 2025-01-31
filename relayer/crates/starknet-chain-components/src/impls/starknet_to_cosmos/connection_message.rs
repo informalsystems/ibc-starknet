@@ -214,6 +214,7 @@ where
                 value: client_state_any.value,
             },
             update_height,
+            // FIXME: build the open_ack_proof similar to open_confirm_proof
             proof_try: counterparty_payload.proof_try.proof_bytes,
             proof_client: b"ignored".into(),
             proof_consensus: b"ignored".into(),
