@@ -20,7 +20,6 @@ use ibc::core::channel::types::packet::Packet;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
 use ibc::core::client::types::Height;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};
-use ibc::primitives::Timestamp;
 use starknet::core::types::Felt;
 
 use crate::impls::events::UseStarknetEvents;
@@ -57,13 +56,11 @@ where
         .map(TimeoutHeight::At)
         .unwrap_or_else(|_| TimeoutHeight::Never);
 
-        let timeout_timestamp_on_b = (event.timeout_timestamp_on_b.timestamp > 0)
-            .then(|| {
-                TimeoutTimestamp::At(Timestamp::from_nanoseconds(
-                    event.timeout_timestamp_on_b.timestamp * 1_000_000_000,
-                ))
-            })
-            .unwrap_or(TimeoutTimestamp::Never);
+        let timeout_timestamp_on_b = if event.timeout_timestamp_on_b.nanoseconds() > 0 {
+            TimeoutTimestamp::At(event.timeout_timestamp_on_b)
+        } else {
+            TimeoutTimestamp::Never
+        };
 
         /*
             FIXME: the packet data format in Cairo is incompatible with the packet data on Cosmos.

@@ -536,10 +536,10 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                     revision_number: 0,
                     revision_height: 0,
                 },
-                timeout_timestamp_on_b: Timestamp {
-                    timestamp: u64::try_from(current_starknet_time.unix_timestamp()).unwrap()
-                        + 1800,
-                },
+                timeout_timestamp_on_b: Timestamp::from_nanoseconds(
+                    u64::try_from(current_starknet_time.unix_timestamp() + 1800).unwrap()
+                        * 1_000_000_000,
+                ),
             }
         };
 
@@ -628,10 +628,10 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                     revision_number: 0,
                     revision_height: 0,
                 },
-                timeout_timestamp_on_b: Timestamp {
-                    timestamp: u64::try_from(current_starknet_time.unix_timestamp()).unwrap()
-                        + 1800,
-                },
+                timeout_timestamp_on_b: Timestamp::from_nanoseconds(
+                    u64::try_from(current_starknet_time.unix_timestamp() + 1800).unwrap()
+                        * 1_000_000_000,
+                ),
             }
         };
 

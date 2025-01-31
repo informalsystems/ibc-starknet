@@ -27,6 +27,7 @@ where
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
         + HasChainId<ChainId = ChainId>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<ClientError>,
 {
     async fn build_create_client_payload(
@@ -40,7 +41,10 @@ where
         let consensus_state = WasmStarknetConsensusState {
             consensus_state: StarknetConsensusState {
                 root: root.into(),
-                time: Timestamp::now(),
+                time: u64::try_from(chain_status.time.unix_timestamp_nanos())
+                    .ok()
+                    .map(Timestamp::from_nanoseconds)
+                    .ok_or_else(|| Chain::raise_error("invalid timestamp"))?,
             },
         };
 
