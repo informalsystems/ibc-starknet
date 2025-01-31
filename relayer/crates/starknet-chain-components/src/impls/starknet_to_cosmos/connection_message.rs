@@ -1,12 +1,17 @@
 use core::time::Duration;
 
 use cgp::prelude::*;
-use hermes_chain_components::traits::commitment_prefix::HasCommitmentPrefixType;
+use hermes_chain_components::traits::commitment_prefix::{
+    HasCommitmentPrefixType, HasIbcCommitmentPrefix,
+};
 use hermes_chain_components::traits::message_builders::connection_handshake::{
     ConnectionOpenAckMessageBuilder, ConnectionOpenConfirmMessageBuilder,
     ConnectionOpenInitMessageBuilder, ConnectionOpenTryMessageBuilder,
 };
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_chain_components::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
+};
+use hermes_chain_components::traits::queries::connection_end::CanQueryConnectionEnd;
 use hermes_chain_components::traits::queries::consensus_state::CanQueryConsensusStateWithLatestHeight;
 use hermes_chain_components::traits::types::client_state::HasClientStateType;
 use hermes_chain_components::traits::types::connection::{
@@ -35,7 +40,9 @@ use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSi
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::connection::types::version::Version as CosmosConnectionVersion;
-use ibc::core::connection::types::ConnectionEnd;
+use ibc::core::connection::types::{
+    ConnectionEnd, Counterparty as ConnectionCounterparty, State as ConnectionState,
+};
 use ibc::core::host::types::identifiers::{
     ClientId as CosmosClientId, ConnectionId as CosmosConnectionId,
 };
@@ -221,7 +228,13 @@ impl<Chain, Counterparty> ConnectionOpenConfirmMessageBuilder<Chain, Counterpart
     for BuildStarknetToCosmosConnectionHandshake
 where
     Chain: HasMessageType<Message = CosmosMessage>
+        + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
+        + CanQueryChainHeight<Height = CosmosHeight>
+        + CanQueryConnectionEnd<Counterparty, ConnectionEnd = ConnectionEnd>
         + HasConnectionIdType<Counterparty, ConnectionId = CosmosConnectionId>
+        + HasDefaultSigner<Signer = Secp256k1KeyPair>
+        + CanRaiseAsyncError<String>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<ClientError>,
     Counterparty: HasConnectionOpenConfirmPayloadType<
             Chain,
@@ -230,18 +243,64 @@ where
         + HasHeightType<Height = u64>,
 {
     async fn build_connection_open_confirm_message(
-        _chain: &Chain,
+        chain: &Chain,
         connection_id: &CosmosConnectionId,
         counterparty_payload: ConnectionOpenConfirmPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
+        let cosmos_latest_height = chain.query_chain_height().await?;
+
+        let connection_end_at_cosmos = chain
+            .query_connection_end(connection_id, &cosmos_latest_height)
+            .await?;
+
+        let cosmos_prefix = chain.ibc_commitment_prefix();
+
+        let counterparty_at_starknet = ConnectionCounterparty::new(
+            connection_end_at_cosmos.client_id().clone(),
+            Some(connection_id.clone()),
+            cosmos_prefix.clone().into(),
+        );
+
+        let connection_end_at_starknet = ConnectionEnd::new(
+            ConnectionState::Open,
+            connection_end_at_cosmos.counterparty().client_id().clone(),
+            counterparty_at_starknet,
+            connection_end_at_cosmos.versions().to_vec(),
+            connection_end_at_cosmos.delay_period(),
+        )
+        .map_err(|_| Chain::raise_error("invalid connection end"))?;
+
+        let connection_id_at_starknet = connection_end_at_cosmos
+            .counterparty()
+            .connection_id()
+            .ok_or_else(|| Chain::raise_error("missing connection id"))?;
+
+        let prefix_at_starknet = connection_end_at_cosmos.counterparty().prefix();
+
+        let proof_ack = {
+            let data = MembershipVerifierContainer {
+                // FIXME(hack) we are passing consensus root as proof
+                state_root: counterparty_payload.proof_ack.proof_bytes,
+                prefix: prefix_at_starknet.clone().into_vec(),
+                path: Path::Connection(ConnectionPath::new(connection_id_at_starknet))
+                    .to_string()
+                    .into(),
+                value: Some(connection_end_at_starknet.encode_vec()),
+            };
+
+            chain
+                .get_default_signer()
+                .sign(&data.canonical_bytes())
+                .map_err(Chain::raise_error)?
+        };
+
         let message = CosmosConnectionOpenConfirmMessage {
             connection_id: connection_id.to_string(),
             update_height,
-            // FIXME(rano): generate the signature
-            proof_ack: dbg!(counterparty_payload.proof_ack.proof_bytes),
+            proof_ack,
         };
 
         Ok(message.to_cosmos_message())
