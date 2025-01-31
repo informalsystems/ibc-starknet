@@ -21,12 +21,12 @@ where
         let (client_type, sequence) = value
             .as_str()
             .rsplit_once('-')
-            .ok_or_else(|| Encoding::raise_error("valid client id"))?;
+            .ok_or_else(|| Encoding::raise_error("invalid client id"))?;
         let seq_u64 = sequence
             .parse::<u64>()
-            .map_err(|_| Encoding::raise_error("valid sequence"))?;
+            .map_err(|_| Encoding::raise_error("invalid sequence"))?;
         let client_type_felt = string_to_felt(client_type)
-            .ok_or_else(|| Encoding::raise_error("valid client type"))?;
+            .ok_or_else(|| Encoding::raise_error("invalid client type"))?;
         encoding.encode_mut(&product![client_type_felt, seq_u64], buffer)?;
         Ok(())
     }

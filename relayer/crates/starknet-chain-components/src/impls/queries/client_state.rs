@@ -58,10 +58,10 @@ where
         let client_id_seq = client_id
             .as_str()
             .rsplit_once('-')
-            .ok_or_else(|| Chain::raise_error("valid client id"))?
+            .ok_or_else(|| Chain::raise_error("invalid client id"))?
             .1
             .parse::<u64>()
-            .map_err(|_| Chain::raise_error("valid sequence"))?;
+            .map_err(|_| Chain::raise_error("invalid sequence"))?;
 
         let calldata = encoding
             .encode(&client_id_seq)

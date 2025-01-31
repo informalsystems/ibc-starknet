@@ -72,10 +72,10 @@ where
         let client_id_seq = client_id
             .as_str()
             .rsplit_once('-')
-            .expect("valid client id")
+            .expect("invalid client id")
             .1
             .parse::<u64>()
-            .expect("valid sequence");
+            .expect("invalid sequence");
 
         let calldata = encoding
             .encode(&(client_id_seq, height.clone()))
