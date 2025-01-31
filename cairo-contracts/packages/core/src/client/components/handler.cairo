@@ -118,6 +118,10 @@ pub mod ClientHandlerComponent {
             client_type: felt252,
             client_address: ContractAddress
         ) {
+            assert(
+                self.in_allowed_relayers(get_caller_address()), ClientErrors::UNAUTHORIZED_RELAYER
+            );
+
             self.write_supported_client(client_type, client_address);
         }
     }

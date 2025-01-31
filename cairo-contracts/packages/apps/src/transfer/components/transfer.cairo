@@ -184,6 +184,8 @@ pub mod TokenTransferComponent {
             version_proposal: AppVersion,
             ordering: ChannelOrdering
         ) -> AppVersion {
+            self.assert_owner();
+
             assert(port_id_on_a == TRANSFER_PORT_ID(), TransferErrors::INVALID_PORT_ID);
 
             if version_proposal.is_non_zero() {
@@ -204,6 +206,8 @@ pub mod TokenTransferComponent {
             version_on_a: AppVersion,
             ordering: ChannelOrdering
         ) -> AppVersion {
+            self.assert_owner();
+
             assert(version_on_a == VERSION(), TransferErrors::INVALID_APP_VERSION);
 
             VERSION()
@@ -215,12 +219,16 @@ pub mod TokenTransferComponent {
             chan_id_on_a: ChannelId,
             version_on_b: AppVersion
         ) {
+            self.assert_owner();
+
             assert(version_on_b == VERSION(), TransferErrors::INVALID_APP_VERSION);
         }
 
         fn on_chan_open_confirm(
             ref self: ComponentState<TContractState>, port_id_on_b: PortId, chan_id_on_b: ChannelId
-        ) {}
+        ) {
+            self.assert_owner();
+        }
 
         fn on_recv_packet(
             ref self: ComponentState<TContractState>, packet: Packet

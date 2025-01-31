@@ -1,35 +1,34 @@
-use cgp::core::component::UseContext;
 use cgp::prelude::*;
-use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
-use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
-use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
-use hermes_encoding_components::traits::transform::Transformer;
-
-#[derive(Debug, Clone, HasField)]
-pub struct Timestamp {
-    pub timestamp: u64,
-}
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+pub use ibc::primitives::Timestamp;
 
 pub struct EncodeTimestamp;
 
-delegate_components! {
-    EncodeTimestamp {
-        MutEncoderComponent: CombineEncoders<
-            Product![
-                EncodeField<symbol!("timestamp"), UseContext>,
-            ],
-        >,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Timestamp> for EncodeTimestamp
+where
+    Encoding: CanEncodeMut<Strategy, Product![u64]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &Timestamp,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        let unix_secs = value.nanoseconds() / 1_000_000_000;
+        encoding.encode_mut(&product![unix_secs], buffer)?;
+        Ok(())
     }
 }
 
-impl Transformer for EncodeTimestamp {
-    type From = u64;
-    type To = Timestamp;
-
-    fn transform(timestamp: Self::From) -> Timestamp {
-        Timestamp { timestamp }
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Timestamp> for EncodeTimestamp
+where
+    Encoding: CanDecodeMut<Strategy, Product![u64]>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<Timestamp, Encoding::Error> {
+        let product![unix_secs] = encoding.decode_mut(buffer)?;
+        Ok(Timestamp::from_nanoseconds(unix_secs * 1_000_000_000))
     }
 }
