@@ -37,6 +37,7 @@ where
         + HasBlobType<Blob = Vec<Felt>>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasClientStateType<Chain, ClientState = CometClientState>,
     Encoding: CanEncode<ViaCairo, u64>
@@ -57,10 +58,10 @@ where
         let client_id_seq = client_id
             .as_str()
             .rsplit_once('-')
-            .expect("valid client id")
+            .ok_or_else(|| Chain::raise_error("valid client id"))?
             .1
             .parse::<u64>()
-            .expect("valid sequence");
+            .map_err(|_| Chain::raise_error("valid sequence"))?;
 
         let calldata = encoding
             .encode(&client_id_seq)

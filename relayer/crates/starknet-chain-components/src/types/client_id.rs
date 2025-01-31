@@ -10,7 +10,7 @@ pub struct EncodeClientId;
 
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ClientId> for EncodeClientId
 where
-    Encoding: CanEncodeMut<Strategy, Product![Felt, u64]>,
+    Encoding: CanEncodeMut<Strategy, Product![Felt, u64]> + CanRaiseError<&'static str>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -18,9 +18,15 @@ where
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
         // FIXME: add `sequence_number` method at `ibc-rs`
-        let (client_type, sequence) = value.as_str().rsplit_once('-').expect("valid client id");
-        let seq_u64 = sequence.parse::<u64>().expect("valid sequence");
-        let client_type_felt = string_to_felt(client_type).expect("valid client type");
+        let (client_type, sequence) = value
+            .as_str()
+            .rsplit_once('-')
+            .ok_or_else(|| Encoding::raise_error("valid client id"))?;
+        let seq_u64 = sequence
+            .parse::<u64>()
+            .map_err(|_| Encoding::raise_error("valid sequence"))?;
+        let client_type_felt = string_to_felt(client_type)
+            .ok_or_else(|| Encoding::raise_error("valid client type"))?;
         encoding.encode_mut(&product![client_type_felt, seq_u64], buffer)?;
         Ok(())
     }
