@@ -3,6 +3,8 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::packet_acknowledgement::PacketAcknowledgementQuerier;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{
@@ -15,6 +17,7 @@ use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence as IbcSequence};
+use ibc::core::host::types::path::{AckPath, Path};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
@@ -24,8 +27,10 @@ use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::channel_id::ChannelId;
 use crate::types::commitment_proof::StarknetCommitmentProof;
+use crate::types::membership_proof_signer::MembershipVerifierContainer;
 use crate::types::messages::ibc::channel::PortId as CairoPortId;
 use crate::types::messages::ibc::packet::Sequence;
+use crate::types::status::StarknetChainStatus;
 
 pub struct QueryStarknetAckCommitment;
 
@@ -33,6 +38,8 @@ impl<Chain, Counterparty, Encoding> PacketAcknowledgementQuerier<Chain, Counterp
     for QueryStarknetAckCommitment
 where
     Chain: HasHeightType<Height = u64>
+        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + HasAcknowledgementType<Counterparty, Acknowledgement = Vec<u8>>
@@ -54,7 +61,7 @@ where
         channel_id: &ChannelId,
         port_id: &IbcPortId,
         sequence: &IbcSequence,
-        height: &u64,
+        _height: &u64,
     ) -> Result<(Vec<u8>, StarknetCommitmentProof), Chain::Error> {
         let encoding = chain.encoding();
 
@@ -80,12 +87,6 @@ where
             )
             .await?;
 
-        // TODO(rano): how to get the proof?
-        let dummy_proof = StarknetCommitmentProof {
-            proof_height: *height,
-            proof_bytes: vec![0x1],
-        };
-
         let product![ack,] = encoding.decode(&output).map_err(Chain::raise_error)?;
 
         let ack_bytes = ack
@@ -93,6 +94,25 @@ where
             // TODO(rano): cairo uses [u32; 8], but in cosmos it's Vec<u8>
             .flat_map(|felt| felt.to_be_bytes())
             .collect::<Vec<_>>();
+
+        let chain_status = chain.query_chain_status().await?;
+
+        // hack(rano): passing block hash to message builder
+        let membership_proof_message = MembershipVerifierContainer {
+            state_root: chain_status.block_hash.to_bytes_be().to_vec(),
+            prefix: chain.ibc_commitment_prefix().clone(),
+            path: Path::Ack(AckPath::new(port_id, channel_id, *sequence))
+                .to_string()
+                .into(),
+            value: Some(ack_bytes.clone()),
+        }
+        .canonical_bytes();
+
+        // TODO(rano): how to get the proof?
+        let dummy_proof = StarknetCommitmentProof {
+            proof_height: chain_status.height,
+            proof_bytes: membership_proof_message,
+        };
 
         Ok((ack_bytes, dummy_proof))
     }
