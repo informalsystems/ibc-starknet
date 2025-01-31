@@ -18,9 +18,7 @@ where
     Counterparty: HasChannelIdType<Chain, ChannelId = ChannelId>,
 {
     fn packet_dst_channel_id(packet: &Packet) -> ChannelId {
-        ChannelId {
-            channel_id: packet.chan_id_on_b.to_string(),
-        }
+        packet.chan_id_on_b.clone()
     }
 }
 

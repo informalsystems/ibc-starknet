@@ -69,8 +69,16 @@ where
             revision_height: Counterparty::revision_height(consensus_height),
         };
 
+        let client_id_seq = client_id
+            .as_str()
+            .rsplit_once('-')
+            .expect("valid client id")
+            .1
+            .parse::<u64>()
+            .expect("valid sequence");
+
         let calldata = encoding
-            .encode(&(client_id.sequence, height.clone()))
+            .encode(&(client_id_seq, height.clone()))
             .map_err(Chain::raise_error)?;
 
         let output = chain

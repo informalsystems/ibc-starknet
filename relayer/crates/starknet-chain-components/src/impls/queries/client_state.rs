@@ -54,8 +54,16 @@ where
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
 
+        let client_id_seq = client_id
+            .as_str()
+            .rsplit_once('-')
+            .expect("valid client id")
+            .1
+            .parse::<u64>()
+            .expect("valid sequence");
+
         let calldata = encoding
-            .encode(&client_id.sequence)
+            .encode(&client_id_seq)
             .map_err(Chain::raise_error)?;
 
         let output = chain

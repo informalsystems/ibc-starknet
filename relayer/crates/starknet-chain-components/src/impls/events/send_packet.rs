@@ -107,26 +107,10 @@ where
 
         let packet = Packet {
             seq_on_a: event.sequence_on_a.sequence.into(),
-            port_id_on_a: event
-                .port_id_on_a
-                .port_id
-                .parse()
-                .map_err(Chain::raise_error)?,
-            chan_id_on_a: event
-                .channel_id_on_a
-                .channel_id
-                .parse()
-                .map_err(Chain::raise_error)?,
-            port_id_on_b: event
-                .port_id_on_b
-                .port_id
-                .parse()
-                .map_err(Chain::raise_error)?,
-            chan_id_on_b: event
-                .channel_id_on_b
-                .channel_id
-                .parse()
-                .map_err(Chain::raise_error)?,
+            port_id_on_a: event.port_id_on_a.clone(),
+            chan_id_on_a: event.channel_id_on_a.clone(),
+            port_id_on_b: event.port_id_on_b.clone(),
+            chan_id_on_b: event.channel_id_on_b.clone(),
             data: cosmos_packet_data,
             timeout_height_on_b,
             timeout_timestamp_on_b,

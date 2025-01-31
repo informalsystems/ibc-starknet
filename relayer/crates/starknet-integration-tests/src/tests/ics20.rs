@@ -41,7 +41,6 @@ use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContrac
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
-use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
 };
@@ -58,7 +57,7 @@ use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEve
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
-use ibc::core::host::types::identifiers::{ConnectionId, PortId as IbcPortId};
+use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
 use starknet::accounts::{Account, Call, ExecutionEncoding, SingleOwnerAccount};
@@ -374,12 +373,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         {
             // register the ICS20 contract with the IBC core contract
 
-            let port_id_on_starknet = PortId {
-                port_id: ics20_port.to_string(),
-            };
-
             let register_app = MsgRegisterApp {
-                port_id: port_id_on_starknet.clone(),
+                port_id: ics20_port.clone(),
                 contract_address: ics20_contract_address,
             };
 
@@ -398,14 +393,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             info!("register ics20 response: {:?}", response);
         }
 
-        let starknet_connection_id_seq = starknet_connection_id
-            .connection_id
-            .strip_prefix("connection-")
-            .unwrap()
-            .parse::<u64>()?;
-
-        let init_channel_options =
-            CosmosInitChannelOptions::new(ConnectionId::new(starknet_connection_id_seq));
+        let init_channel_options = CosmosInitChannelOptions::new(starknet_connection_id);
 
         let (starknet_channel_id, cosmos_channel_id) = starknet_to_cosmos_relay
             .bootstrap_channel(
@@ -479,7 +467,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let ibc_prefixed_denom = PrefixedDenom {
                 trace_path: vec![TracePrefix {
                     port_id: ics20_port.to_string(),
-                    channel_id: starknet_channel_id.channel_id.clone(),
+                    channel_id: starknet_channel_id.to_string(),
                 }],
                 base: Denom::Hosted(denom_cosmos.to_string()),
             };
@@ -532,15 +520,13 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             let denom = PrefixedDenom {
                 trace_path: vec![TracePrefix {
                     port_id: ics20_port.to_string(),
-                    channel_id: starknet_channel_id.channel_id.clone(),
+                    channel_id: starknet_channel_id.to_string(),
                 }],
                 base: Denom::Hosted(denom_cosmos.to_string()),
             };
 
             MsgTransfer {
-                port_id_on_a: PortId {
-                    port_id: ics20_port.to_string(),
-                },
+                port_id_on_a: ics20_port.clone(),
                 chan_id_on_a: starknet_channel_id.clone(),
                 denom,
                 amount: transfer_quantity.into(),
@@ -632,9 +618,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             };
 
             MsgTransfer {
-                port_id_on_a: PortId {
-                    port_id: ics20_port.to_string(),
-                },
+                port_id_on_a: ics20_port.clone(),
                 chan_id_on_a: starknet_channel_id.clone(),
                 denom,
                 amount: transfer_quantity.into(),

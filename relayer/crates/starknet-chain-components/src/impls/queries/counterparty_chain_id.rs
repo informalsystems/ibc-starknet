@@ -45,11 +45,11 @@ where
             .await?;
 
         let connection_end = chain
-            .query_connection_end(&channel_end.connection_id, &height)
+            .query_connection_end(&channel_end.connection_hops[0], &height)
             .await?;
 
         let client_state = chain
-            .query_client_state(PhantomData, &connection_end.client_id, &height)
+            .query_client_state(PhantomData, connection_end.client_id(), &height)
             .await?;
 
         let chain_id = Counterparty::client_state_chain_id(&client_state);

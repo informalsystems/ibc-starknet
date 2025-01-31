@@ -33,7 +33,7 @@ impl<Chain, Counterparty, Encoding> ChannelEndQuerier<Chain, Counterparty>
 where
     Chain: HasHeightType
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
-        + HasPortIdType<Counterparty>
+        + HasPortIdType<Counterparty, PortId = PortId>
         + HasChannelEndType<Counterparty, ChannelEnd = ChannelEnd>
         + HasBlobType<Blob = Vec<Felt>>
         + HasSelectorType<Selector = Felt>
@@ -57,10 +57,6 @@ where
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
 
-        let port_id = PortId {
-            port_id: port_id.to_string(),
-        };
-
         let calldata = encoding
             .encode(&product![port_id.clone(), channel_id.clone()])
             .map_err(Chain::raise_error)?;
@@ -79,7 +75,7 @@ where
     Chain: HasHeightType<Height = u64>
         + CanQueryChainHeight
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
-        + HasPortIdType<Counterparty>
+        + HasPortIdType<Counterparty, PortId = PortId>
         + HasChannelEndType<Counterparty, ChannelEnd = ChannelEnd>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + HasBlobType<Blob = Vec<Felt>>
@@ -103,10 +99,6 @@ where
         let encoding = chain.encoding();
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
-
-        let port_id = PortId {
-            port_id: port_id.to_string(),
-        };
 
         let calldata = encoding
             .encode(&product![port_id.clone(), channel_id.clone()])

@@ -20,18 +20,16 @@ use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMes
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_confirm::CosmosChannelOpenConfirmMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_try::CosmosChannelOpenTryMessage;
-use ibc::core::channel::types::channel::{
-    ChannelEnd as IbcChannelEnd, Counterparty as IbcChannelCounterparty, Order as IbcChannelOrder,
-    State as IbcChannelState,
-};
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::host::types::error::IdentifierError;
 use ibc::core::host::types::identifiers::{ChannelId as IbcChannelId, PortId as IbcPortId};
 
-use crate::types::channel_id::{ChannelEnd as StarknetChannelEnd, ChannelId as StarknetChannelId};
+use crate::types::channel_id::{
+    ChannelCounterparty, ChannelEnd, ChannelEnd as StarknetChannelEnd,
+    ChannelId as StarknetChannelId, ChannelState,
+};
 use crate::types::commitment_proof::StarknetCommitmentProof;
-use crate::types::messages::ibc::channel::ChannelOrdering as StarknetChannelOrdering;
 
 pub struct BuildStarknetToCosmosChannelHandshakeMessage;
 
@@ -67,53 +65,24 @@ where
 
         let starknet_channel_end = counterparty_payload.channel_end;
 
-        let ordering = match starknet_channel_end.ordering {
-            StarknetChannelOrdering::Ordered => IbcChannelOrder::Ordered,
-            StarknetChannelOrdering::Unordered => IbcChannelOrder::Unordered,
-        };
-
-        if !starknet_channel_end.remote.channel_id.channel_id.is_empty() {
-            return Err(Chain::raise_error(
-                "ChannelEnd has non-empty channel_id after chan_open_init",
-            ));
-        }
-
-        let cosmos_channel_seq = counterparty_channel_id
-            .channel_id
-            .strip_prefix("channel-")
-            .ok_or_else(|| Chain::raise_error("ChannelId does not have the expected prefix"))?
-            .parse::<u64>()
-            .map_err(Chain::raise_error)?;
-
-        let remote = IbcChannelCounterparty {
+        let remote = ChannelCounterparty {
             port_id: counterparty_port_id.clone(),
-            channel_id: Some(IbcChannelId::new(cosmos_channel_seq)),
+            channel_id: Some(counterparty_channel_id.clone()),
         };
 
-        let connection_id = starknet_channel_end
-            .connection_id
-            .connection_id
-            .parse()
-            .map_err(Chain::raise_error)?;
-
-        let version = starknet_channel_end
-            .version
-            .version
-            .parse()
-            .map_err(Chain::raise_error)?;
-
-        let channel_end = IbcChannelEnd {
-            state: IbcChannelState::TryOpen,
-            ordering,
+        // building expected channel_end at counterparty
+        let channel_end = ChannelEnd {
+            state: ChannelState::TryOpen,
+            ordering: starknet_channel_end.ordering,
             remote,
-            connection_hops: vec![connection_id],
-            version,
+            connection_hops: starknet_channel_end.connection_hops,
+            version: starknet_channel_end.version.clone(),
         };
 
         let message = CosmosChannelOpenTryMessage {
             port_id: port_id.to_string(),
             channel: channel_end.into(),
-            counterparty_version: starknet_channel_end.version.version,
+            counterparty_version: starknet_channel_end.version.to_string(),
             update_height,
             proof_init: counterparty_payload.proof_init.proof_bytes,
         };
@@ -154,8 +123,8 @@ where
         let message = CosmosChannelOpenAckMessage {
             port_id: port_id.to_string(),
             channel_id: channel_id.to_string(),
-            counterparty_channel_id: counterparty_channel_id.channel_id.clone(),
-            counterparty_version: counterparty_payload.channel_end.version.version,
+            counterparty_channel_id: counterparty_channel_id.to_string(),
+            counterparty_version: counterparty_payload.channel_end.version.to_string(),
             update_height,
             proof_try,
         };
