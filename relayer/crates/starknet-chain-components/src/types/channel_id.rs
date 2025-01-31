@@ -1,46 +1,46 @@
-use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
-use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
-use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
+use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
+pub use ibc::core::channel::types::channel::{
+    ChannelEnd, Counterparty as ChannelCounterparty, State as ChannelState,
+};
+pub use ibc::core::host::types::identifiers::ChannelId;
 
 use super::connection_id::ConnectionId;
 use super::messages::ibc::channel::{AppVersion, ChannelOrdering, PortId};
 
-#[derive(Debug, PartialEq, Clone, HasField, Eq, Ord, PartialOrd)]
-pub struct ChannelId {
-    pub channel_id: String,
-}
-
 pub struct EncodeChannelId;
 
-delegate_components! {
-    EncodeChannelId {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("channel_id"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChannelId> for EncodeChannelId
+where
+    Encoding: CanEncodeMut<Strategy, Product![String]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &ChannelId,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&product![value.to_string()], buffer)?;
+        Ok(())
     }
 }
 
-impl Transformer for EncodeChannelId {
-    type From = String;
-    type To = ChannelId;
-
-    fn transform(channel_id: Self::From) -> ChannelId {
-        ChannelId { channel_id }
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChannelId> for EncodeChannelId
+where
+    Encoding: CanDecodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ChannelId, Encoding::Error> {
+        let product![value_str] = encoding.decode_mut(buffer)?;
+        value_str
+            .parse()
+            .map_err(|_| Encoding::raise_error("invalid channel id"))
     }
-}
-#[derive(Debug, PartialEq, Clone)]
-pub enum ChannelState {
-    Uninitialized,
-    Init,
-    TryOpen,
-    Open,
-    Closed,
 }
 
 pub struct EncodeChannelState;
@@ -91,79 +91,121 @@ impl Transformer for EncodeChannelState {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, HasField)]
-pub struct ChannelCounterparty {
-    pub port_id: PortId,
-    pub channel_id: ChannelId,
-}
-
 pub struct EncodeChannelCounterparty;
 
-delegate_components! {
-    EncodeChannelCounterparty {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("port_id"), UseContext>,
-            EncodeField<symbol!("channel_id"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChannelCounterparty>
+    for EncodeChannelCounterparty
+where
+    Encoding: CanEncodeMut<Strategy, Product![PortId, Product![String]]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &ChannelCounterparty,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        match &value.channel_id {
+            Some(channel_id) => {
+                encoding.encode_mut(
+                    &product![value.port_id.clone(), product![channel_id.to_string()]],
+                    buffer,
+                )?;
+            }
+            None => {
+                encoding.encode_mut(
+                    &product![value.port_id.clone(), product![String::new()]],
+                    buffer,
+                )?;
+            }
+        }
+        Ok(())
     }
 }
 
-impl Transformer for EncodeChannelCounterparty {
-    type From = Product![PortId, ChannelId];
-    type To = ChannelCounterparty;
-
-    fn transform(product![port_id, channel_id]: Self::From) -> ChannelCounterparty {
-        ChannelCounterparty {
-            port_id,
-            channel_id,
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChannelCounterparty>
+    for EncodeChannelCounterparty
+where
+    Encoding: CanDecodeMut<Strategy, Product![PortId, Product![String]]>
+        + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ChannelCounterparty, Encoding::Error> {
+        let product![port_id, product![channel_id_str]] = encoding.decode_mut(buffer)?;
+        if channel_id_str.is_empty() {
+            Ok(ChannelCounterparty::new(port_id, None))
+        } else {
+            Ok(ChannelCounterparty::new(
+                port_id,
+                Some(
+                    channel_id_str
+                        .parse()
+                        .map_err(|_| Encoding::raise_error("invalid channel counterparty"))?,
+                ),
+            ))
         }
     }
-}
-
-#[derive(Debug, PartialEq, Clone, HasField)]
-pub struct ChannelEnd {
-    pub state: ChannelState,
-    pub ordering: ChannelOrdering,
-    pub remote: ChannelCounterparty,
-    pub connection_id: ConnectionId,
-    pub version: AppVersion,
 }
 
 pub struct EncodeChannelEnd;
 
-delegate_components! {
-    EncodeChannelEnd {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("state"), UseContext>,
-            EncodeField<symbol!("ordering"), UseContext>,
-            EncodeField<symbol!("remote"), UseContext>,
-            EncodeField<symbol!("connection_id"), UseContext>,
-            EncodeField<symbol!("version"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChannelEnd> for EncodeChannelEnd
+where
+    Encoding: CanEncodeMut<
+            Strategy,
+            Product![
+                ChannelState,
+                ChannelOrdering,
+                ChannelCounterparty,
+                ConnectionId,
+                AppVersion,
+            ],
+        > + CanRaiseAsyncError<&'static str>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &ChannelEnd,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        if value.connection_hops.len() != 1 {
+            return Err(Encoding::raise_error("invalid connection hops"));
+        }
+
+        encoding.encode_mut(
+            &product![
+                value.state,
+                value.ordering,
+                value.counterparty().clone(),
+                value.connection_hops[0].clone(),
+                value.version.clone(),
+            ],
+            buffer,
+        )?;
+        Ok(())
     }
 }
 
-impl Transformer for EncodeChannelEnd {
-    type From = Product![
-        ChannelState,
-        ChannelOrdering,
-        ChannelCounterparty,
-        ConnectionId,
-        AppVersion,
-    ];
-    type To = ChannelEnd;
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChannelEnd> for EncodeChannelEnd
+where
+    Encoding: CanDecodeMut<
+            Strategy,
+            Product![
+                ChannelState,
+                ChannelOrdering,
+                ChannelCounterparty,
+                ConnectionId,
+                AppVersion,
+            ],
+        > + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ChannelEnd, Encoding::Error> {
+        let product![state, ordering, counterparty, connection_id, version,] =
+            encoding.decode_mut(buffer)?;
 
-    fn transform(
-        product![state, ordering, remote, connection_id, version]: Self::From,
-    ) -> ChannelEnd {
-        ChannelEnd {
-            state,
-            ordering,
-            remote,
-            connection_id,
-            version,
-        }
+        ChannelEnd::new(state, ordering, counterparty, vec![connection_id], version)
+            .map_err(|_| Encoding::raise_error("invalid channel end"))
     }
 }

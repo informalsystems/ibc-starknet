@@ -37,6 +37,7 @@ where
         + HasBlobType<Blob = Vec<Felt>>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasClientStateType<Chain, ClientState = CometClientState>,
     Encoding: CanEncode<ViaCairo, u64>
@@ -54,8 +55,16 @@ where
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
 
+        let client_id_seq = client_id
+            .as_str()
+            .rsplit_once('-')
+            .ok_or_else(|| Chain::raise_error("invalid client id"))?
+            .1
+            .parse::<u64>()
+            .map_err(|_| Chain::raise_error("invalid sequence"))?;
+
         let calldata = encoding
-            .encode(&client_id.sequence)
+            .encode(&client_id_seq)
             .map_err(Chain::raise_error)?;
 
         let output = chain

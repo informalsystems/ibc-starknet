@@ -45,6 +45,7 @@ where
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
         + CanRaiseAsyncError<ConsensusStateNotFound>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
         HasConsensusStateType<Chain, ConsensusState = CometConsensusState> + HasHeightFields,
@@ -69,8 +70,16 @@ where
             revision_height: Counterparty::revision_height(consensus_height),
         };
 
+        let client_id_seq = client_id
+            .as_str()
+            .rsplit_once('-')
+            .ok_or_else(|| Chain::raise_error("invalid client id"))?
+            .1
+            .parse::<u64>()
+            .map_err(|_| Chain::raise_error("invalid sequence"))?;
+
         let calldata = encoding
-            .encode(&(client_id.sequence, height.clone()))
+            .encode(&(client_id_seq, height.clone()))
             .map_err(Chain::raise_error)?;
 
         let output = chain

@@ -1,7 +1,7 @@
 use TokenTransferComponent::TransferValidationTrait;
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::cheatcodes::events::EventSpy;
-use snforge_std::spy_events;
+use snforge_std::{spy_events, start_cheat_caller_address};
 use starknet::class_hash::class_hash_const;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
@@ -12,7 +12,8 @@ use starknet_ibc_core::router::{AppContract, AppContractTrait};
 use starknet_ibc_testkit::configs::{TransferAppConfigTrait, TransferAppConfig};
 use starknet_ibc_testkit::dummies::CLASS_HASH;
 use starknet_ibc_testkit::dummies::{
-    AMOUNT, SUPPLY, OWNER, NAME, SYMBOL, COSMOS, STARKNET, HOSTED_DENOM, EMPTY_MEMO
+    AMOUNT, SUPPLY, OWNER, SN_USER, CS_USER, NAME, SYMBOL, COSMOS, STARKNET, HOSTED_DENOM,
+    EMPTY_MEMO
 };
 use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
 use starknet_ibc_testkit::handles::{ERC20Handle, AppHandle};
@@ -79,21 +80,23 @@ fn test_missing_ibc_token_address() {
 fn test_escrow_ok() {
     let (ics20, mut erc20, cfg, mut spy) = setup();
 
-    // Owner approves the amount of allowance for the `TransferApp` contract.
-    erc20.approve(OWNER(), ics20.address, cfg.amount);
+    start_cheat_caller_address(ics20.address, SN_USER());
 
-    let msg_transfer = cfg.dummy_msg_transfer(cfg.native_denom.clone(), STARKNET(), COSMOS());
+    // User approves the amount of allowance for the `TransferApp` contract.
+    erc20.approve(SN_USER(), ics20.address, cfg.amount);
+
+    let msg_transfer = cfg.dummy_msg_transfer(cfg.native_denom.clone(), CS_USER());
 
     call_contract(ics20.address, selector!("send_transfer_internal"), @msg_transfer);
 
     // Assert the `SendEvent` emitted.
     spy
         .assert_send_event(
-            ics20.address, STARKNET(), COSMOS(), cfg.native_denom.clone(), cfg.amount
+            ics20.address, SN_USER(), CS_USER(), cfg.native_denom.clone(), cfg.amount
         );
 
     // Check the balance of the sender.
-    erc20.assert_balance(OWNER(), SUPPLY - cfg.amount);
+    erc20.assert_balance(SN_USER(), SUPPLY - cfg.amount);
 
     // Check the balance of the transfer contract.
     erc20.assert_balance(ics20.address, cfg.amount);
@@ -103,14 +106,18 @@ fn test_escrow_ok() {
 fn test_unescrow_ok() {
     let (ics20, mut erc20, cfg, mut spy) = setup();
 
-    // Owner approves the amount of allowance for the `TransferApp` contract.
-    erc20.approve(OWNER(), ics20.address, cfg.amount);
+    start_cheat_caller_address(ics20.address, SN_USER());
 
-    let msg_transfer = cfg.dummy_msg_transfer(cfg.native_denom.clone(), STARKNET(), COSMOS());
+    // User approves the amount of allowance for the `TransferApp` contract.
+    erc20.approve(SN_USER(), ics20.address, cfg.amount);
+
+    let msg_transfer = cfg.dummy_msg_transfer(cfg.native_denom.clone(), CS_USER());
 
     call_contract(ics20.address, selector!("send_transfer_internal"), @msg_transfer);
 
     spy.drop_all_events();
+
+    start_cheat_caller_address(ics20.address, OWNER());
 
     let prefixed_denom = cfg.prefix_native_denom();
 
@@ -120,12 +127,12 @@ fn test_unescrow_ok() {
     ics20.on_recv_packet(recv_packet);
 
     // Assert the `RecvEvent` emitted.
-    spy.assert_recv_event(ics20.address, COSMOS(), STARKNET(), prefixed_denom, cfg.amount, true);
+    spy.assert_recv_event(ics20.address, CS_USER(), SN_USER(), prefixed_denom, cfg.amount, true);
 
     erc20.assert_balance(ics20.address, 0);
 
     // Check the balance of the recipient.
-    erc20.assert_balance(OWNER(), SUPPLY);
+    erc20.assert_balance(SN_USER(), SUPPLY);
 }
 
 #[test]
@@ -147,7 +154,7 @@ fn test_mint_ok() {
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
-            ics20.address, COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true
+            ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), cfg.amount, true
         );
 
     spy.drop_all_events();
@@ -158,13 +165,13 @@ fn test_mint_ok() {
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
-            ics20.address, COSMOS(), STARKNET(), prefixed_denom.clone(), cfg.amount, true
+            ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), cfg.amount, true
         );
 
     let erc20: ERC20Contract = token_address.into();
 
     // Check the balance of the receiver.
-    erc20.assert_balance(OWNER(), cfg.amount * 2);
+    erc20.assert_balance(SN_USER(), cfg.amount * 2);
 
     // Check the total supply of the ERC20 contract.
     erc20.assert_total_supply(cfg.amount * 2);
@@ -183,24 +190,29 @@ fn test_burn_ok() {
 
     let token_address = ics20.ibc_token_address(prefixed_denom.key());
 
-    let erc20: ERC20Contract = token_address.into();
+    let mut erc20: ERC20Contract = token_address.into();
 
     spy.drop_all_events();
 
-    let msg_transfer = cfg.dummy_msg_transfer(prefixed_denom.clone(), STARKNET(), COSMOS());
+    start_cheat_caller_address(ics20.address, SN_USER());
+
+    // User approves the amount of allowance for the `TransferApp` contract.
+    erc20.approve(SN_USER(), ics20.address, cfg.amount);
+
+    let msg_transfer = cfg.dummy_msg_transfer(prefixed_denom.clone(), CS_USER());
 
     call_contract(ics20.address, selector!("send_transfer_internal"), @msg_transfer);
 
     // Assert the `SendEvent` emitted.
-    spy.assert_send_event(ics20.address, STARKNET(), COSMOS(), prefixed_denom, cfg.amount);
+    spy.assert_send_event(ics20.address, SN_USER(), CS_USER(), prefixed_denom, cfg.amount);
 
     // Check the balance of the sender.
-    erc20.assert_balance(OWNER(), 0);
+    erc20.assert_balance(SN_USER(), 0);
 
     // Check the balance of the `TransferApp` contract.
     erc20.assert_balance(ics20.address, 0);
 
-    // Chekck the total supply of the ERC20 contract.
+    // Check the total supply of the ERC20 contract.
     erc20.assert_total_supply(0);
 }
 
@@ -208,5 +220,5 @@ fn test_burn_ok() {
 #[should_panic(expected: 'ICS20: missing token address')]
 fn test_burn_non_existence_ibc_token() {
     let state = setup_component();
-    state.burn_validate(OWNER(), HOSTED_DENOM(), AMOUNT, EMPTY_MEMO());
+    state.burn_validate(SN_USER(), HOSTED_DENOM(), AMOUNT, EMPTY_MEMO());
 }

@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 use core::num::ParseIntError;
-use core::str::{from_utf8, FromStr, Utf8Error};
+use core::str::Utf8Error;
 
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
@@ -44,8 +44,7 @@ use crate::types::client_id::ClientId as StarknetClientId;
 use crate::types::connection_id::ConnectionId as StarknetConnectionId;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::connection::{
-    BasePrefix, ConnectionVersion, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit,
-    MsgConnOpenTry,
+    ConnectionVersion, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
 };
 use crate::types::messages::ibc::packet::StateProof;
 
@@ -82,65 +81,11 @@ where
         init_connection_options: &CosmosInitConnectionOptions,
         counterparty_payload: ConnectionOpenInitPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let counterparty_client_id_as_cairo = {
-            let counterparty_client_id_str = counterparty_client_id.to_string();
-            let (client_type, sequence_str) = counterparty_client_id_str
-                .rsplit_once('-')
-                .ok_or_else(|| Chain::raise_error("malformatted client id"))?;
-
-            Chain::ClientId {
-                client_type: Felt::from_bytes_be_slice(client_type.as_bytes()),
-                sequence: sequence_str.parse().map_err(Chain::raise_error)?,
-            }
-        };
-
-        // TODO(rano): dirty hack; make fields public at ibc-rs and tidy it up
-
-        let json_connection_version =
-            serde_json::to_value(&init_connection_options.connection_version)
-                .map_err(Chain::raise_error)?;
-
-        let identifier = json_connection_version
-            .pointer("/identifier")
-            .ok_or_else(|| Chain::raise_error("connection version does not have a features field"))?
-            .as_str()
-            .ok_or_else(|| Chain::raise_error("connection version identifier is not a string"))?;
-
-        let features = json_connection_version
-            .pointer("/features")
-            .ok_or_else(|| Chain::raise_error("connection version does not have a features field"))?
-            .as_array()
-            .ok_or_else(|| Chain::raise_error("connection version features is not an array"))?
-            .iter()
-            .map(|value| {
-                value
-                    .as_str()
-                    .ok_or_else(|| Chain::raise_error("connection version feature is not a string"))
-            })
-            .collect::<Result<Vec<&str>, Chain::Error>>()?;
-
-        if features.len() != 2 {
-            return Err(Chain::raise_error(
-                "connection version features must have 2 elements",
-            ));
-        }
-
-        let cairo_connection_version = ConnectionVersion {
-            identifier: identifier.to_string(),
-            features: [features[0].to_string(), features[1].to_string()],
-        };
-
-        let base_prefix = BasePrefix {
-            prefix: from_utf8(&counterparty_payload.commitment_prefix)
-                .map_err(Chain::raise_error)?
-                .to_owned(),
-        };
-
         let conn_open_init_msg = MsgConnOpenInit {
             client_id_on_a: client_id.clone(),
-            client_id_on_b: counterparty_client_id_as_cairo.clone(),
-            prefix_on_b: base_prefix,
-            version: cairo_connection_version,
+            client_id_on_b: counterparty_client_id.clone(),
+            prefix_on_b: counterparty_payload.commitment_prefix.into(),
+            version: init_connection_options.connection_version.clone(),
             delay_period: init_connection_options.delay_period.as_secs(),
         };
 
@@ -196,28 +141,8 @@ where
         counterparty_connection_id: &CosmosConnectionId,
         counterparty_payload: ConnectionOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: Cairo IBC should accept counterparty client ID as string value
-        let counterparty_client_id_as_cairo = {
-            let counterparty_client_id_str = counterparty_client_id.to_string();
-            let (client_type, sequence_str) = counterparty_client_id_str
-                .rsplit_once('-')
-                .ok_or_else(|| Chain::raise_error("malformatted client id"))?;
-
-            StarknetClientId {
-                client_type: Felt::from_bytes_be_slice(client_type.as_bytes()),
-                sequence: u64::from_str(sequence_str).map_err(Chain::raise_error)?,
-            }
-        };
-
-        // FIXME: Cairo IBC should use bytes for commitment prefix
-        let commitment_prefix =
-            from_utf8(&counterparty_payload.commitment_prefix).map_err(Chain::raise_error)?;
-
-        // FIXME: Use the connection version from the payload
-        let connection_version = ConnectionVersion {
-            identifier: "1".into(),
-            features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
-        };
+        // TODO(rano): use the connection version from the payload
+        let connection_version = ConnectionVersion::compatibles()[0].clone();
 
         // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         let commitment_proof = StateProof {
@@ -230,14 +155,10 @@ where
         };
 
         let conn_open_init_msg: MsgConnOpenTry = MsgConnOpenTry {
-            client_id_on_a: counterparty_client_id_as_cairo.clone(),
+            client_id_on_a: counterparty_client_id.clone(),
             client_id_on_b: client_id.clone(),
-            conn_id_on_a: StarknetConnectionId {
-                connection_id: counterparty_connection_id.to_string(),
-            },
-            prefix_on_a: BasePrefix {
-                prefix: commitment_prefix.into(),
-            },
+            conn_id_on_a: counterparty_connection_id.clone(),
+            prefix_on_a: counterparty_payload.commitment_prefix.into(),
             version_on_a: connection_version,
             proof_conn_end_on_a: commitment_proof,
             proof_height_on_a: proof_height,
@@ -291,15 +212,8 @@ where
         counterparty_connection_id: &CosmosConnectionId,
         counterparty_payload: ConnectionOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let counterparty_connection_id_as_cairo = StarknetConnectionId {
-            connection_id: counterparty_connection_id.to_string(),
-        };
-
         // TODO(rano): use the connection version from the payload
-        let connection_version = ConnectionVersion {
-            identifier: "1".into(),
-            features: ["ORDER_ORDERED".into(), "ORDER_UNORDERED".into()],
-        };
+        let connection_version = ConnectionVersion::compatibles()[0].clone();
 
         // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         // TODO(rano): submitting dummy proofs
@@ -315,7 +229,7 @@ where
 
         let conn_open_ack_msg = MsgConnOpenAck {
             conn_id_on_a: connection_id.clone(),
-            conn_id_on_b: counterparty_connection_id_as_cairo,
+            conn_id_on_b: counterparty_connection_id.clone(),
             proof_conn_end_on_b: commitment_proof,
             proof_height_on_b: proof_height,
             version: connection_version,

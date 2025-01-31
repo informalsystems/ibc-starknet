@@ -5,6 +5,7 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
+use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
@@ -25,21 +26,48 @@ pub struct TransferPacketData {
     pub memo: String,
 }
 
-pub type EncodeTransferPacketData = CombineEncoders<
-    Product![
-        EncodeField<symbol!("denom"), UseContext>,
-        EncodeField<symbol!("amount"), UseContext>,
-        EncodeField<symbol!("sender"), UseContext>,
-        EncodeField<symbol!("receiver"), UseContext>,
-        EncodeField<symbol!("memo"), UseContext>,
-    ],
->;
+pub struct EncodeTransferPacketData;
+
+delegate_components! {
+    EncodeTransferPacketData {
+        MutEncoderComponent: CombineEncoders<
+            Product![
+                EncodeField<symbol!("denom"), UseContext>,
+                EncodeField<symbol!("amount"), UseContext>,
+                EncodeField<symbol!("sender"), UseContext>,
+                EncodeField<symbol!("receiver"), UseContext>,
+                EncodeField<symbol!("memo"), UseContext>,
+            ],
+        >,
+        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+    }
+}
+
+impl Transformer for EncodeTransferPacketData {
+    type From = Product![PrefixedDenom, U256, Participant, Participant, String];
+    type To = TransferPacketData;
+
+    fn transform(
+        product![denom, amount, sender, receiver, memo,]: Self::From,
+    ) -> TransferPacketData {
+        TransferPacketData {
+            denom,
+            amount,
+            sender,
+            receiver,
+            memo,
+        }
+    }
+}
 
 #[derive(HasField)]
 pub struct MsgTransfer {
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
-    pub packet_data: TransferPacketData,
+    pub denom: PrefixedDenom,
+    pub amount: U256,
+    pub receiver: String,
+    pub memo: String,
     pub timeout_height_on_b: Height,
     pub timeout_timestamp_on_b: Timestamp,
 }
@@ -52,7 +80,10 @@ delegate_components! {
             Product![
                 EncodeField<symbol!("port_id_on_a"), UseContext>,
                 EncodeField<symbol!("chan_id_on_a"), UseContext>,
-                EncodeField<symbol!("packet_data"), UseContext>,
+                EncodeField<symbol!("denom"), UseContext>,
+                EncodeField<symbol!("amount"), UseContext>,
+                EncodeField<symbol!("receiver"), UseContext>,
+                EncodeField<symbol!("memo"), UseContext>,
                 EncodeField<symbol!("timeout_height_on_b"), UseContext>,
                 EncodeField<symbol!("timeout_timestamp_on_b"), UseContext>,
             ],

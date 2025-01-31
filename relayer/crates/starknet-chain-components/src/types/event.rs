@@ -1,12 +1,28 @@
+use core::ops::Deref;
+use std::sync::Arc;
+
 use starknet::core::types::{EmittedEvent, Felt, OrderedEvent};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StarknetEvent {
+    pub fields: Arc<StarknetEventFields>,
+}
+
+#[derive(Debug)]
+pub struct StarknetEventFields {
     pub contract_address: Felt,
     pub class_hash: Option<Felt>,
     pub selector: Option<Felt>,
     pub keys: Vec<Felt>,
     pub data: Vec<Felt>,
+}
+
+impl Deref for StarknetEvent {
+    type Target = StarknetEventFields;
+
+    fn deref(&self) -> &StarknetEventFields {
+        &self.fields
+    }
 }
 
 #[derive(Debug)]
@@ -26,11 +42,13 @@ impl StarknetEvent {
         let selector = keys.next();
 
         Self {
-            contract_address,
-            class_hash: Some(class_hash),
-            selector,
-            keys: keys.collect(),
-            data,
+            fields: Arc::new(StarknetEventFields {
+                contract_address,
+                class_hash: Some(class_hash),
+                selector,
+                keys: keys.collect(),
+                data,
+            }),
         }
     }
 }
@@ -41,11 +59,13 @@ impl From<EmittedEvent> for StarknetEvent {
         let selector = keys.next();
 
         Self {
-            contract_address: event.from_address,
-            class_hash: None,
-            selector,
-            keys: keys.collect(),
-            data: event.data,
+            fields: Arc::new(StarknetEventFields {
+                contract_address: event.from_address,
+                class_hash: None,
+                selector,
+                keys: keys.collect(),
+                data: event.data,
+            }),
         }
     }
 }

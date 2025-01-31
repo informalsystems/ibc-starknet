@@ -120,7 +120,10 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             .ok_or_else(|| StarknetBootstrap::raise_error("expect relayer wallet to be present"))?
             .clone();
 
-        let json_rpc_url = Url::parse(&format!("http://localhost:{}/", node_config.rpc_port))?;
+        let json_rpc_url = Url::parse(&format!(
+            "http://{}:{}/",
+            node_config.rpc_addr, node_config.rpc_port
+        ))?;
 
         let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
 
@@ -144,6 +147,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             ibc_client_contract_address: None,
             ibc_core_contract_address: None,
             event_encoding: Default::default(),
+            event_subscription: None,
         };
 
         let chain_driver = StarknetChainDriver {

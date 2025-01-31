@@ -1,5 +1,6 @@
 use core::iter::Peekable;
 use core::slice::Iter;
+use core::time::Duration;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
@@ -127,7 +128,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, TracePrefix>
     + CanEncodeAndDecode<ViaCairo, Vec<TracePrefix>>
     + CanEncodeAndDecode<ViaCairo, Participant>
-    + CanEncode<ViaCairo, TransferPacketData>
+    + CanEncodeAndDecode<ViaCairo, TransferPacketData>
     + CanEncodeAndDecode<ViaCairo, Height>
     + CanEncodeAndDecode<ViaCairo, Packet>
     + CanEncodeAndDecode<ViaCairo, ClientStatus>
@@ -148,6 +149,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenTry>
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenAck>
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenConfirm>
+    + CanEncodeAndDecode<ViaCairo, Duration>
     + CanEncode<ViaCairo, CometUpdateHeader>
     + CanDecode<ViaCairo, CreateClientResponse>
 {

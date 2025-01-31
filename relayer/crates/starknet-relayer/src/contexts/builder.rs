@@ -123,7 +123,7 @@ impl StarknetBuilder {
     }
 
     pub async fn build_chain_with_config(&self) -> Result<StarknetChain, HermesError> {
-        let json_rpc_url = Url::parse(&self.starknet_chain_config.json_rpc_url)?;
+        let json_rpc_url = Url::parse(&self.starknet_chain_config.json_rpc_url.to_string())?;
 
         let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
 
@@ -147,6 +147,7 @@ impl StarknetBuilder {
             ibc_client_contract_address: None,
             ibc_core_contract_address: None,
             event_encoding: Default::default(),
+            event_subscription: None,
         };
 
         Ok(context)

@@ -28,7 +28,7 @@ pub struct StarknetEventEncoding {
     pub erc20_hashes: HashSet<Felt>,
     pub ics20_hashes: HashSet<Felt>,
     pub ibc_client_hashes: HashSet<Felt>,
-    pub ibc_core_hashes: HashSet<Felt>,
+    pub ibc_core_contract_addresses: HashSet<Felt>,
 }
 
 pub struct StarknetEventEncodingContextComponents;

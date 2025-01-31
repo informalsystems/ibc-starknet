@@ -33,11 +33,9 @@ use starknet::macros::selector;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::channel_id::ChannelId as StarknetChannelId;
-use crate::types::connection_id::ConnectionId as StarknetConnectionId;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::channel::{
-    AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
-    MsgChanOpenTry, PortId as StarknetPortId,
+    ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry,
 };
 use crate::types::messages::ibc::packet::StateProof;
 pub struct BuildStarknetChannelHandshakeMessages;
@@ -62,27 +60,13 @@ where
         counterparty_port_id: &IbcPortId,
         init_channel_options: &CosmosInitChannelOptions,
     ) -> Result<Chain::Message, Chain::Error> {
-        let port_id_on_a = StarknetPortId {
-            port_id: port_id.to_string(),
-        };
-
-        let port_id_on_b = StarknetPortId {
-            port_id: counterparty_port_id.to_string(),
-        };
-
         if init_channel_options.connection_hops.len() != 1 {
             return Err(Chain::raise_error(
                 "Starknet only supports a single connection hop",
             ));
         }
 
-        let conn_id_on_a = StarknetConnectionId {
-            connection_id: init_channel_options.connection_hops[0].to_string(),
-        };
-
-        let version_proposal = AppVersion {
-            version: init_channel_options.channel_version.to_string(),
-        };
+        let conn_id_on_a = init_channel_options.connection_hops[0].clone();
 
         let ordering = match init_channel_options.ordering {
             IbcOrder::None => {
@@ -93,10 +77,10 @@ where
         };
 
         let chan_open_init_msg = MsgChanOpenInit {
-            port_id_on_a,
+            port_id_on_a: port_id.clone(),
             conn_id_on_a,
-            port_id_on_b,
-            version_proposal,
+            port_id_on_b: counterparty_port_id.clone(),
+            version_proposal: init_channel_options.channel_version.clone(),
             ordering,
         };
 
@@ -147,31 +131,13 @@ where
         counterparty_channel_id: &ChannelId,
         counterparty_payload: ChannelOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let port_id_on_b = StarknetPortId {
-            port_id: port_id.to_string(),
-        };
-
         if counterparty_payload.channel_end.connection_hops.len() != 1 {
             return Err(Chain::raise_error(
                 "Starknet only supports a single connection hop",
             ));
         }
 
-        let conn_id_on_b = StarknetConnectionId {
-            connection_id: counterparty_payload.channel_end.connection_hops[0].to_string(),
-        };
-
-        let port_id_on_a = StarknetPortId {
-            port_id: counterparty_port_id.to_string(),
-        };
-
-        let chan_id_on_a = StarknetChannelId {
-            channel_id: counterparty_channel_id.to_string(),
-        };
-
-        let version_on_a = AppVersion {
-            version: counterparty_payload.channel_end.version.to_string(),
-        };
+        let conn_id_on_b = counterparty_payload.channel_end.connection_hops[0].clone();
 
         let proof_chan_end_on_a = StateProof {
             proof: vec![Felt::ONE],
@@ -191,11 +157,11 @@ where
         };
 
         let chan_open_try_msg = MsgChanOpenTry {
-            port_id_on_b,
+            port_id_on_b: port_id.clone(),
             conn_id_on_b,
-            port_id_on_a,
-            chan_id_on_a,
-            version_on_a,
+            port_id_on_a: counterparty_port_id.clone(),
+            chan_id_on_a: counterparty_channel_id.clone(),
+            version_on_a: counterparty_payload.channel_end.version.clone(),
             proof_chan_end_on_a,
             proof_height_on_a,
             ordering,
@@ -248,18 +214,6 @@ where
         counterparty_channel_id: &ChannelId,
         counterparty_payload: ChannelOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let port_id_on_a = StarknetPortId {
-            port_id: port_id.to_string(),
-        };
-
-        let chan_id_on_b = StarknetChannelId {
-            channel_id: counterparty_channel_id.to_string(),
-        };
-
-        let version_on_b = AppVersion {
-            version: counterparty_payload.channel_end.version.to_string(),
-        };
-
         let proof_chan_end_on_b = StateProof {
             proof: vec![Felt::ONE],
         };
@@ -270,10 +224,10 @@ where
         };
 
         let chan_open_ack_msg = MsgChanOpenAck {
-            port_id_on_a,
+            port_id_on_a: port_id.clone(),
             chan_id_on_a: channel_id.clone(),
-            chan_id_on_b,
-            version_on_b,
+            chan_id_on_b: counterparty_channel_id.clone(),
+            version_on_b: counterparty_payload.channel_end.version.clone(),
             proof_chan_end_on_b,
             proof_height_on_b,
         };
@@ -322,10 +276,6 @@ where
         channel_id: &StarknetChannelId,
         counterparty_payload: ChannelOpenConfirmPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        let port_id_on_b = StarknetPortId {
-            port_id: port_id.to_string(),
-        };
-
         let proof_chan_end_on_a = StateProof {
             proof: vec![Felt::ONE],
         };
@@ -336,7 +286,7 @@ where
         };
 
         let chan_open_confirm_msg = MsgChanOpenConfirm {
-            port_id_on_b,
+            port_id_on_b: port_id.clone(),
             chan_id_on_b: channel_id.clone(),
             proof_chan_end_on_a,
             proof_height_on_a,

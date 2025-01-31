@@ -16,7 +16,7 @@ pub mod TokenTransferComponent {
     use starknet::{get_contract_address, get_caller_address};
     use starknet_ibc_apps::transfer::types::{
         MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, Memo, TracePrefixTrait,
-        PrefixedDenomTrait, Participant
+        PrefixedDenomTrait, Participant, ParticipantTrait,
     };
     use starknet_ibc_apps::transfer::{
         ITransferrable, ISendTransfer, ITransferQuery, ERC20Contract, ERC20ContractTrait,
@@ -52,9 +52,9 @@ pub mod TokenTransferComponent {
     #[derive(Debug, Drop, Serde, starknet::Event)]
     pub struct SendEvent {
         #[key]
-        pub sender: Participant,
+        pub sender: ContractAddress,
         #[key]
-        pub receiver: Participant,
+        pub receiver: ByteArray,
         #[key]
         pub denom: PrefixedDenom,
         pub amount: u256,
@@ -64,9 +64,9 @@ pub mod TokenTransferComponent {
     #[derive(Debug, Drop, Serde, starknet::Event)]
     pub struct RecvEvent {
         #[key]
-        pub sender: Participant,
+        pub sender: ByteArray,
         #[key]
-        pub receiver: Participant,
+        pub receiver: ContractAddress,
         #[key]
         pub denom: PrefixedDenom,
         pub amount: u256,
@@ -77,9 +77,9 @@ pub mod TokenTransferComponent {
     #[derive(Debug, Drop, Serde, starknet::Event)]
     pub struct AckEvent {
         #[key]
-        pub sender: Participant,
+        pub sender: ContractAddress,
         #[key]
-        pub receiver: Participant,
+        pub receiver: ByteArray,
         #[key]
         pub denom: PrefixedDenom,
         pub amount: u256,
@@ -96,7 +96,7 @@ pub mod TokenTransferComponent {
     #[derive(Debug, Drop, Serde, starknet::Event)]
     pub struct TimeoutEvent {
         #[key]
-        pub receiver: Participant,
+        pub receiver: ByteArray,
         #[key]
         pub denom: PrefixedDenom,
         pub amount: u256,
@@ -149,7 +149,9 @@ pub mod TokenTransferComponent {
         // packet is first executed in the core contract, followed by execution
         // at the application level.
         fn send_transfer(ref self: ComponentState<TContractState>, msg: MsgTransfer) {
-            self.send_validate(msg.clone());
+            let sender = get_caller_address();
+
+            self.send_validate(msg.clone(), sender);
 
             let channel: ChannelContract = self.owner().into();
 
@@ -157,7 +159,7 @@ pub mod TokenTransferComponent {
 
             channel.send_packet(packet);
 
-            self.send_execute(msg);
+            self.send_execute(msg, sender);
         }
     }
 
@@ -182,6 +184,8 @@ pub mod TokenTransferComponent {
             version_proposal: AppVersion,
             ordering: ChannelOrdering
         ) -> AppVersion {
+            self.assert_owner();
+
             assert(port_id_on_a == TRANSFER_PORT_ID(), TransferErrors::INVALID_PORT_ID);
 
             if version_proposal.is_non_zero() {
@@ -202,6 +206,8 @@ pub mod TokenTransferComponent {
             version_on_a: AppVersion,
             ordering: ChannelOrdering
         ) -> AppVersion {
+            self.assert_owner();
+
             assert(version_on_a == VERSION(), TransferErrors::INVALID_APP_VERSION);
 
             VERSION()
@@ -213,12 +219,16 @@ pub mod TokenTransferComponent {
             chan_id_on_a: ChannelId,
             version_on_b: AppVersion
         ) {
+            self.assert_owner();
+
             assert(version_on_b == VERSION(), TransferErrors::INVALID_APP_VERSION);
         }
 
         fn on_chan_open_confirm(
             ref self: ComponentState<TContractState>, port_id_on_b: PortId, chan_id_on_b: ChannelId
-        ) {}
+        ) {
+            self.assert_owner();
+        }
 
         fn on_recv_packet(
             ref self: ComponentState<TContractState>, packet: Packet
@@ -295,64 +305,49 @@ pub mod TokenTransferComponent {
         +ITransferrable<TContractState>,
         +Drop<TContractState>
     > of SendTransferInternalTrait<TContractState> {
-        fn send_validate(self: @ComponentState<TContractState>, msg: MsgTransfer) {
+        fn send_validate(
+            self: @ComponentState<TContractState>, msg: MsgTransfer, sender: ContractAddress
+        ) {
             self.get_contract().can_send();
 
             msg.validate_basic();
 
-            let sender: Option<ContractAddress> = msg.packet_data.sender.clone().try_into();
+            assert(sender.is_non_zero(), TransferErrors::ZERO_SENDER);
 
-            assert(sender.is_some(), TransferErrors::INVALID_SENDER);
-
-            match @msg.packet_data.denom.base {
+            match @msg.denom.base {
                 Denom::Native(erc20_token) => {
                     self
                         .escrow_validate(
-                            sender.unwrap(),
+                            sender,
                             msg.port_id_on_a.clone(),
                             msg.chan_id_on_a.clone(),
                             erc20_token.clone(),
-                            msg.packet_data.amount,
-                            msg.packet_data.memo.clone(),
+                            msg.amount,
+                            msg.memo.clone(),
                         );
                 },
                 Denom::Hosted(_) => {
-                    self
-                        .burn_validate(
-                            sender.unwrap(),
-                            msg.packet_data.denom.clone(),
-                            msg.packet_data.amount,
-                            msg.packet_data.memo.clone(),
-                        );
+                    self.burn_validate(sender, msg.denom.clone(), msg.amount, msg.memo.clone(),);
                 }
             }
         }
 
-        fn send_execute(ref self: ComponentState<TContractState>, msg: MsgTransfer) {
-            let sender: Option<ContractAddress> = msg.packet_data.sender.clone().try_into();
-
-            match @msg.packet_data.denom.base {
+        fn send_execute(
+            ref self: ComponentState<TContractState>, msg: MsgTransfer, sender: ContractAddress
+        ) {
+            match @msg.denom.base {
                 Denom::Native(erc20_token) => {
-                    self
-                        .escrow_execute(
-                            sender.unwrap(),
-                            erc20_token.clone(),
-                            msg.packet_data.amount,
-                            msg.packet_data.memo.clone(),
-                        );
+                    self.escrow_execute(sender, erc20_token.clone(), msg.amount, msg.memo.clone(),);
                 },
                 Denom::Hosted(_) => {
-                    self
-                        .burn_execute(
-                            sender.unwrap(),
-                            msg.packet_data.denom.clone(),
-                            msg.packet_data.amount,
-                            msg.packet_data.memo.clone(),
-                        );
+                    self.burn_execute(sender, msg.denom.clone(), msg.amount, msg.memo.clone(),);
                 }
             }
 
-            self.emit_send_event(msg.packet_data);
+            self
+                .emit_send_event(
+                    sender, msg.receiver.clone(), msg.denom.clone(), msg.amount, msg.memo.clone()
+                )
         }
 
         fn construct_send_packet(
@@ -370,7 +365,15 @@ pub mod TokenTransferComponent {
 
             let mut data: Array<felt252> = ArrayTrait::new();
 
-            msg.packet_data.serialize(ref data);
+            let packet_data = PacketData {
+                sender: Participant::Native(get_caller_address()),
+                receiver: Participant::External(msg.receiver.clone()),
+                denom: msg.denom.clone(),
+                amount: msg.amount,
+                memo: msg.memo.clone(),
+            };
+
+            packet_data.serialize(ref data);
 
             Packet {
                 seq_on_a,
@@ -414,6 +417,9 @@ pub mod TokenTransferComponent {
             packet.validate_basic();
 
             packet_data.validate_basic();
+
+            assert(packet_data.sender.external().is_some(), TransferErrors::INVALID_SENDER);
+            assert(packet_data.receiver.native().is_some(), TransferErrors::INVALID_RECEIVER);
 
             match @packet_data.denom.base {
                 Denom::Native(erc20_token) => {
@@ -480,6 +486,7 @@ pub mod TokenTransferComponent {
 
             (packet_data, ack_status)
         }
+
         fn ack_validate(
             self: @ComponentState<TContractState>,
             packet: @Packet,
@@ -490,6 +497,8 @@ pub mod TokenTransferComponent {
 
             packet_data.validate_basic();
 
+            assert(packet_data.sender.native().is_some(), TransferErrors::INVALID_SENDER);
+            assert(packet_data.receiver.external().is_some(), TransferErrors::INVALID_RECEIVER);
             assert(ack_status.is_non_empty(), TransferErrors::EMPTY_ACK_STATUS);
 
             if ack_status.is_error() {
@@ -526,6 +535,8 @@ pub mod TokenTransferComponent {
             packet.validate_basic();
 
             packet_data.validate_basic();
+
+            assert(packet_data.receiver.external().is_some(), TransferErrors::INVALID_RECEIVER);
 
             self.refund_validate(packet.clone(), packet_data.clone());
         }
@@ -885,17 +896,15 @@ pub mod TokenTransferComponent {
     pub(crate) impl TransferEventImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>
     > of TransferEventTrait<TContractState> {
-        fn emit_send_event(ref self: ComponentState<TContractState>, packet_data: PacketData) {
-            self
-                .emit(
-                    SendEvent {
-                        sender: packet_data.sender,
-                        receiver: packet_data.receiver,
-                        denom: packet_data.denom,
-                        amount: packet_data.amount,
-                        memo: packet_data.memo,
-                    }
-                );
+        fn emit_send_event(
+            ref self: ComponentState<TContractState>,
+            sender: ContractAddress,
+            receiver: ByteArray,
+            denom: PrefixedDenom,
+            amount: u256,
+            memo: Memo
+        ) {
+            self.emit(SendEvent { sender, receiver, denom, amount, memo });
         }
 
         fn emit_recv_event(
@@ -904,8 +913,8 @@ pub mod TokenTransferComponent {
             self
                 .emit(
                     RecvEvent {
-                        sender: packet_data.sender,
-                        receiver: packet_data.receiver,
+                        sender: packet_data.sender.external().unwrap(),
+                        receiver: packet_data.receiver.native().unwrap(),
                         denom: packet_data.denom,
                         amount: packet_data.amount,
                         memo: packet_data.memo,
@@ -920,8 +929,14 @@ pub mod TokenTransferComponent {
             self
                 .emit(
                     AckEvent {
-                        sender: packet_data.sender,
-                        receiver: packet_data.receiver,
+                        sender: packet_data
+                            .sender
+                            .native()
+                            .unwrap(), // NOTE: Safe to unwrap, since it's checked in the validation.
+                        receiver: packet_data
+                            .receiver
+                            .external()
+                            .unwrap(), // NOTE: Safe to unwrap, since it's checked in the validation.
                         denom: packet_data.denom,
                         amount: packet_data.amount,
                         memo: packet_data.memo,
@@ -938,7 +953,10 @@ pub mod TokenTransferComponent {
             self
                 .emit(
                     TimeoutEvent {
-                        receiver: packet_data.receiver,
+                        receiver: packet_data
+                            .receiver
+                            .external()
+                            .unwrap(), // NOTE: Safe to unwrap, since it's checked in the validation.
                         denom: packet_data.denom,
                         amount: packet_data.amount,
                         memo: packet_data.memo,

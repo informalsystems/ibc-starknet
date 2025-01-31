@@ -5,7 +5,8 @@ use hermes_cairo_encoding_components::strategy::ViaCairo;
 pub use hermes_encoding_components::traits::decode::DecoderComponent;
 use hermes_encoding_components::traits::types::encoded::ProvideEncodedType;
 
-use crate::impls::encoding::option::DecodeOptionalByClassHash;
+use crate::impls::encoding::class_hash::DecodeOptionalByClassHash;
+use crate::impls::encoding::contract_address::DecodeOptionalByContractAddress;
 use crate::types::event::StarknetEvent;
 use crate::types::events::channel::{
     ChanOpenAckEvent, ChanOpenConfirmEvent, ChanOpenInitEvent, ChanOpenTryEvent,
@@ -32,13 +33,13 @@ cgp_preset! {
     }
 }
 
-pub struct StarknetEventEncoderComponents;
-
 pub struct ProvideEncodedStarknetEventType;
 
 impl<Encoding: Async> ProvideEncodedType<Encoding> for ProvideEncodedStarknetEventType {
     type Encoded = StarknetEvent;
 }
+
+pub struct StarknetEventEncoderComponents;
 
 delegate_components! {
     StarknetEventEncoderComponents {
@@ -87,11 +88,11 @@ delegate_components! {
             DecodeOptionalByClassHash<symbol!("erc20_hashes")>,
         (ViaCairo, Option<IbcTransferEvent>):
             DecodeOptionalByClassHash<symbol!("ics20_hashes")>,
-        (ViaCairo, Option<ConnectionHandshakeEvents>):
-            DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
-        (ViaCairo, Option<ChannelHandshakeEvents>):
-            DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
-        (ViaCairo, Option<PacketRelayEvents>):
-            DecodeOptionalByClassHash<symbol!("ibc_core_hashes")>,
+        [
+            (ViaCairo, Option<ConnectionHandshakeEvents>),
+            (ViaCairo, Option<ChannelHandshakeEvents>),
+            (ViaCairo, Option<PacketRelayEvents>),
+        ]:
+            DecodeOptionalByContractAddress<symbol!("ibc_core_contract_addresses")>,
     }
 }

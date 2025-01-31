@@ -20,6 +20,7 @@ cgp                               = { workspace = true }
 cgp-error-eyre                    = { workspace = true }
 hermes-any-counterparty           = { workspace = true }
 hermes-cli-components             = { workspace = true }
+hermes-cli                        = { workspace = true }
 hermes-error                      = { workspace = true }
 hermes-runtime                    = { workspace = true }
 hermes-runtime-components         = { workspace = true }
@@ -30,6 +31,7 @@ hermes-cosmos-relayer             = { workspace = true }
 hermes-cosmos-integration-tests   = { workspace = true }
 hermes-cosmos-chain-components    = { workspace = true }
 hermes-starknet-chain-components  = { workspace = true }
+hermes-starknet-chain-context     = { workspace = true }
 hermes-starknet-relayer           = { workspace = true }
 hermes-starknet-integration-tests = { workspace = true }
 hermes-starknet-test-components   = { workspace = true }

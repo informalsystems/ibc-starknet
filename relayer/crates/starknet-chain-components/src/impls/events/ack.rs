@@ -1,66 +1,96 @@
-use cgp::prelude::*;
+use core::marker::PhantomData;
+
+use cgp::prelude::CanRaiseAsyncError;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
-use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
+use hermes_chain_components::traits::extract_data::EventExtractor;
+use hermes_chain_components::traits::packet::from_write_ack::PacketFromWriteAckEventBuilder;
 use hermes_chain_components::traits::types::event::HasEventType;
-use hermes_chain_components::traits::types::ibc_events::write_ack::ProvideWriteAckEvent;
+use hermes_chain_components::traits::types::ibc_events::write_ack::{
+    HasWriteAckEvent, ProvideWriteAckEvent,
+};
+use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
 use hermes_chain_components::traits::types::packets::ack::HasAcknowledgementType;
 use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
+use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use starknet::core::types::Felt;
+use ibc::core::channel::types::error::ChannelError;
+use ibc::core::channel::types::packet::Packet;
+use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
+use ibc::core::host::types::error::IdentifierError;
 
-use crate::types::channel_id::ChannelId;
-use crate::types::event::StarknetEvent;
-use crate::types::events::packet::WriteAcknowledgementEvent;
-use crate::types::messages::ibc::channel::PortId;
-use crate::types::messages::ibc::packet::{Acknowledgement, Sequence};
+use crate::impls::events::UseStarknetEvents;
+use crate::types::events::packet::{PacketRelayEvents, WriteAcknowledgementEvent};
 
-pub struct UseStarknetWriteAckEvent;
-
-impl<Chain, Counterparty, Encoding> ProvideWriteAckEvent<Chain, Counterparty>
-    for UseStarknetWriteAckEvent
+impl<Chain, Counterparty> ProvideWriteAckEvent<Chain, Counterparty> for UseStarknetEvents
 where
-    Chain: HasEventType<Event = StarknetEvent>
-        + HasAcknowledgementType<Counterparty, Acknowledgement = Vec<u8>>
-        + HasDefaultEncoding<AsFelt, Encoding = Encoding>,
-    Encoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, Product![Sequence, PortId, ChannelId, PortId, ChannelId]>
-        + CanDecode<ViaCairo, Product![Vec<Felt>, Acknowledgement]>,
+    Chain: HasAcknowledgementType<Counterparty, Acknowledgement = Vec<u8>>,
 {
     type WriteAckEvent = WriteAcknowledgementEvent;
+}
 
-    fn try_extract_write_ack_event(event: &StarknetEvent) -> Option<Self::WriteAckEvent> {
-        // TODO(rano): don't have access to the EventEncoding
-        // Ideally, EventEncoding to decode directly from StarknetEvent
+impl<Chain, Encoding> EventExtractor<Chain, WriteAcknowledgementEvent> for UseStarknetEvents
+where
+    Chain: HasEventType + HasEncoding<AsStarknetEvent, Encoding = Encoding>,
+    Encoding:
+        HasEncodedType<Encoded = Chain::Event> + CanDecode<ViaCairo, Option<PacketRelayEvents>>,
+{
+    fn try_extract_from_event(
+        chain: &Chain,
+        _tag: PhantomData<WriteAcknowledgementEvent>,
+        raw_event: &Chain::Event,
+    ) -> Option<WriteAcknowledgementEvent> {
+        let event = chain.encoding().decode(raw_event).ok()??;
 
-        let cairo_encoding = Chain::default_encoding();
+        match event {
+            PacketRelayEvents::WriteAcknowledgement(ack) => Some(ack),
+            _ => None,
+        }
+    }
+}
 
-        let product![
-            sequence_on_a,
-            port_id_on_a,
-            channel_id_on_a,
-            port_id_on_b,
-            channel_id_on_b,
-        ] = cairo_encoding.decode(&event.keys).ok()?;
+impl<Chain, Counterparty> PacketFromWriteAckEventBuilder<Chain, Counterparty> for UseStarknetEvents
+where
+    Chain: HasWriteAckEvent<Counterparty, WriteAckEvent = WriteAcknowledgementEvent>
+        + HasAcknowledgementType<Counterparty, Acknowledgement = Vec<u8>>
+        + CanRaiseAsyncError<IdentifierError>
+        + CanRaiseAsyncError<ChannelError>
+        + CanRaiseAsyncError<serde_json::Error>,
+    Counterparty: HasOutgoingPacketType<Chain, OutgoingPacket = Packet>,
+{
+    async fn build_packet_from_write_ack_event(
+        _chain: &Chain,
+        event: &WriteAcknowledgementEvent,
+    ) -> Result<Packet, Chain::Error> {
+        let packet = Packet {
+            seq_on_a: event.sequence_on_a.sequence.into(),
+            port_id_on_a: event.port_id_on_a.clone(),
+            chan_id_on_a: event.channel_id_on_a.clone(),
+            port_id_on_b: event.port_id_on_b.clone(),
+            chan_id_on_b: event.channel_id_on_b.clone(),
+            // FIXME: make the Cairo contract include these fields in the event
+            data: Vec::new(),
+            timeout_height_on_b: TimeoutHeight::Never,
+            timeout_timestamp_on_b: TimeoutTimestamp::Never,
+        };
 
-        let product![packet_data, acknowledgement,] = cairo_encoding.decode(&event.data).ok()?;
-
-        Some(WriteAcknowledgementEvent {
-            sequence_on_a,
-            port_id_on_a,
-            channel_id_on_a,
-            port_id_on_b,
-            channel_id_on_b,
-            packet_data,
-            acknowledgement,
-        })
+        Ok(packet)
     }
 
-    fn write_acknowledgement(ack: &WriteAcknowledgementEvent) -> impl AsRef<Vec<u8>> + Send {
-        ack.acknowledgement
+    async fn build_ack_from_write_ack_event(
+        _chain: &Chain,
+        ack: &WriteAcknowledgementEvent,
+    ) -> Result<Vec<u8>, Chain::Error> {
+        // FIXME: Fix the Cairo contract to return ByteArray acknowledgement inside event.
+        // The Cairo encoding for ByteArray is different from Array<u8>
+
+        let ack_bytes = ack
+            .acknowledgement
             .ack
             .iter()
             .map(|&felt| felt.try_into().unwrap())
-            .collect::<Vec<_>>()
+            .collect::<Vec<_>>();
+
+        Ok(ack_bytes)
     }
 }

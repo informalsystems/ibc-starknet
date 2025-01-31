@@ -1,6 +1,7 @@
+use snforge_std::start_cheat_caller_address;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_testkit::configs::TransferAppConfigTrait;
-use starknet_ibc_testkit::dummies::{NAME, SYMBOL, SUPPLY, OWNER, COSMOS, STARKNET};
+use starknet_ibc_testkit::dummies::{NAME, SYMBOL, SUPPLY, COSMOS, STARKNET, SN_USER, CS_USER};
 use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
 use starknet_ibc_testkit::handles::{AppHandle, CoreHandle, ERC20Handle};
 use starknet_ibc_testkit::setup::{setup, Mode};
@@ -18,11 +19,13 @@ fn test_escrow_unescrow_roundtrip() {
     // Escrow
     // -----------------------------------------------------------
 
-    // Owner approves the amount of allowance for the `TransferApp` contract.
-    erc20.approve(OWNER(), ics20.address, transfer_cfg.amount);
+    start_cheat_caller_address(ics20.address, SN_USER());
+
+    // User approves the amount of allowance for the `TransferApp` contract.
+    erc20.approve(SN_USER(), ics20.address, transfer_cfg.amount);
 
     let msg_transfer = transfer_cfg
-        .dummy_msg_transfer(transfer_cfg.native_denom.clone(), STARKNET(), COSMOS());
+        .dummy_msg_transfer(transfer_cfg.native_denom.clone(), CS_USER());
 
     // Submit a `MsgTransfer` to the `TransferApp` contract.
     ics20.send_transfer(msg_transfer);
@@ -31,14 +34,14 @@ fn test_escrow_unescrow_roundtrip() {
     spy
         .assert_send_event(
             ics20.address,
-            STARKNET(),
-            COSMOS(),
+            SN_USER(),
+            CS_USER(),
             transfer_cfg.native_denom.clone(),
             transfer_cfg.amount
         );
 
     // Check the balance of the sender.
-    erc20.assert_balance(OWNER(), SUPPLY - transfer_cfg.amount);
+    erc20.assert_balance(SN_USER(), SUPPLY - transfer_cfg.amount);
 
     // Check the balance of the `TransferApp` contract.
     erc20.assert_balance(ics20.address, transfer_cfg.amount);
@@ -46,6 +49,8 @@ fn test_escrow_unescrow_roundtrip() {
     // -----------------------------------------------------------
     // Unescrow
     // -----------------------------------------------------------
+
+    start_cheat_caller_address(ics20.address, core.address);
 
     let prefixed_denom = transfer_cfg.prefix_native_denom();
 
@@ -57,13 +62,13 @@ fn test_escrow_unescrow_roundtrip() {
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
-            ics20.address, COSMOS(), STARKNET(), prefixed_denom, transfer_cfg.amount, true
+            ics20.address, CS_USER(), SN_USER(), prefixed_denom, transfer_cfg.amount, true
         );
 
     erc20.assert_balance(ics20.address, 0);
 
     // Check the balance of the recipient.
-    erc20.assert_balance(OWNER(), SUPPLY);
+    erc20.assert_balance(SN_USER(), SUPPLY);
 }
 
 #[test]
@@ -97,13 +102,13 @@ fn test_mint_burn_roundtrip() {
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
-            ics20.address, COSMOS(), STARKNET(), prefixed_denom.clone(), transfer_cfg.amount, true
+            ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), transfer_cfg.amount, true
         );
 
     let erc20: ERC20Contract = token_address.into();
 
     // Check the balance of the receiver.
-    erc20.assert_balance(OWNER(), transfer_cfg.amount);
+    erc20.assert_balance(SN_USER(), transfer_cfg.amount);
 
     // Check the total supply of the ERC20 contract.
     erc20.assert_total_supply(transfer_cfg.amount);
@@ -112,17 +117,18 @@ fn test_mint_burn_roundtrip() {
     // Burn
     // -----------------------------------------------------------
 
-    let msg_transfer = transfer_cfg
-        .dummy_msg_transfer(prefixed_denom.clone(), STARKNET(), COSMOS());
+    start_cheat_caller_address(ics20.address, SN_USER());
 
-    // Owner approves the amount of allowance for the `TransferApp` contract.
+    let msg_transfer = transfer_cfg.dummy_msg_transfer(prefixed_denom.clone(), CS_USER());
+
+    // User approves the amount of allowance for the `TransferApp` contract.
     ics20.send_transfer(msg_transfer);
 
     // Assert the `SendEvent` emitted.
-    spy.assert_send_event(ics20.address, STARKNET(), COSMOS(), prefixed_denom, transfer_cfg.amount);
+    spy.assert_send_event(ics20.address, SN_USER(), CS_USER(), prefixed_denom, transfer_cfg.amount);
 
     // Check the balance of the sender.
-    erc20.assert_balance(OWNER(), 0);
+    erc20.assert_balance(SN_USER(), 0);
 
     // Check the balance of the `TransferApp` contract.
     erc20.assert_balance(ics20.address, 0);

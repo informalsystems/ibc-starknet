@@ -1,3 +1,5 @@
+use core::time::Duration;
+
 use cgp::core::component::{UseContext, UseDelegate};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::components::encode_mut::*;
@@ -21,6 +23,7 @@ use crate::types::client_id::{ClientId, EncodeClientId};
 use crate::types::connection_id::{
     ConnectionCounterparty, ConnectionEnd, ConnectionId, ConnectionState,
     EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionId, EncodeConnectionState,
+    EncodeDuration,
 };
 use crate::types::cosmos::client_state::{
     ClientStatus, CometClientState, EncodeChainId, EncodeClientStatus, EncodeCometClientState,
@@ -127,6 +130,7 @@ delegate_components! {
         (ViaCairo, ClientId): EncodeClientId,
         (ViaCairo, ChainId): EncodeChainId,
         (ViaCairo, ConnectionId): EncodeConnectionId,
+        (ViaCairo, Duration): EncodeDuration,
         (ViaCairo, ConnectionCounterparty): EncodeConnectionCounterparty,
         (ViaCairo, ConnectionState): EncodeConnectionState,
         (ViaCairo, ConnectionEnd): EncodeConnectionEnd,
