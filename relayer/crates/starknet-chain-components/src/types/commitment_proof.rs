@@ -1,4 +1,4 @@
 pub struct StarknetCommitmentProof {
     pub proof_height: u64,
-    pub proof_bytes: Vec<u8>,
+    pub unsigned_membership_proof_bytes: Vec<u8>,
 }

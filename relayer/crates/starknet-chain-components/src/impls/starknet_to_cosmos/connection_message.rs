@@ -123,7 +123,11 @@ where
 
         let proof_init = chain
             .get_default_signer()
-            .sign(&counterparty_payload.proof_init.proof_bytes)
+            .sign(
+                &counterparty_payload
+                    .proof_init
+                    .unsigned_membership_proof_bytes,
+            )
             .map_err(Chain::raise_error)?;
 
         let message = CosmosConnectionOpenTryMessage {
@@ -182,7 +186,11 @@ where
 
         let proof_try = chain
             .get_default_signer()
-            .sign(&counterparty_payload.proof_try.proof_bytes)
+            .sign(
+                &counterparty_payload
+                    .proof_try
+                    .unsigned_membership_proof_bytes,
+            )
             .map_err(Chain::raise_error)?;
 
         let message = CosmosConnectionOpenAckMessage {
@@ -229,7 +237,11 @@ where
 
         let proof_ack = chain
             .get_default_signer()
-            .sign(&counterparty_payload.proof_ack.proof_bytes)
+            .sign(
+                &counterparty_payload
+                    .proof_ack
+                    .unsigned_membership_proof_bytes,
+            )
             .map_err(Chain::raise_error)?;
 
         let message = CosmosConnectionOpenConfirmMessage {

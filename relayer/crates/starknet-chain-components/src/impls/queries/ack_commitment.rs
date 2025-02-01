@@ -98,7 +98,7 @@ where
         let chain_status = chain.query_chain_status().await?;
 
         // hack(rano): passing block hash to message builder
-        let membership_proof_message = MembershipVerifierContainer {
+        let unsigned_membership_proof_bytes = MembershipVerifierContainer {
             state_root: chain_status.block_hash.to_bytes_be().to_vec(),
             prefix: chain.ibc_commitment_prefix().clone(),
             path: Path::Ack(AckPath::new(port_id, channel_id, *sequence))
@@ -111,7 +111,7 @@ where
         // TODO(rano): how to get the proof?
         let dummy_proof = StarknetCommitmentProof {
             proof_height: chain_status.height,
-            proof_bytes: membership_proof_message,
+            unsigned_membership_proof_bytes,
         };
 
         Ok((ack_bytes, dummy_proof))

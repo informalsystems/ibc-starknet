@@ -28,6 +28,7 @@ where
     Chain: HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>,
 {
     fn commitment_proof_bytes(proof: &StarknetCommitmentProof) -> &[u8] {
-        &proof.proof_bytes
+        // FIXME: this is not the actual commitment proof bytes
+        &proof.unsigned_membership_proof_bytes
     }
 }

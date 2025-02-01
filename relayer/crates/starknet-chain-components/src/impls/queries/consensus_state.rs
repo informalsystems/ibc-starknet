@@ -129,7 +129,7 @@ where
 
         let proof = StarknetCommitmentProof {
             proof_height: *query_height,
-            proof_bytes: Vec::new(),
+            unsigned_membership_proof_bytes: Vec::new(),
         };
 
         Ok((consensus_state, proof))
