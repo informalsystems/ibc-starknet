@@ -109,7 +109,6 @@ where
 
         let chain_status = chain.query_chain_status().await?;
 
-        // hack(rano): passing block hash to message builder
         let unsigned_membership_proof_bytes = MembershipVerifierContainer {
             state_root: chain_status.block_hash.to_bytes_be().to_vec(),
             prefix: chain.ibc_commitment_prefix().clone(),
@@ -120,7 +119,6 @@ where
         }
         .canonical_bytes();
 
-        // TODO(rano): how to get the proof?
         let dummy_proof = StarknetCommitmentProof {
             proof_height: chain_status.height,
             // FIXME(hack) we are passing msg hash as proof as we don't have access to signer
