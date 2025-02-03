@@ -121,11 +121,28 @@ where
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
-        let proof_init = chain
-            .get_default_signer()
+        let default_signer = chain.get_default_signer();
+
+        let proof_init = default_signer
             .sign(
                 &counterparty_payload
                     .proof_init
+                    .unsigned_membership_proof_bytes,
+            )
+            .map_err(Chain::raise_error)?;
+
+        let proof_client = default_signer
+            .sign(
+                &counterparty_payload
+                    .proof_client
+                    .unsigned_membership_proof_bytes,
+            )
+            .map_err(Chain::raise_error)?;
+
+        let proof_consensus = default_signer
+            .sign(
+                &counterparty_payload
+                    .proof_consensus
                     .unsigned_membership_proof_bytes,
             )
             .map_err(Chain::raise_error)?;
@@ -143,8 +160,10 @@ where
             delay_period,
             update_height,
             proof_init,
-            proof_client: b"ignored".into(),
-            proof_consensus: b"ignored".into(),
+            // client and consensus proofs are passed but ignored
+            // cosmos/ibc-go#7129
+            proof_client,
+            proof_consensus,
             proof_consensus_height: counterparty_payload.proof_consensus_height,
         };
 
@@ -184,11 +203,28 @@ where
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
-        let proof_try = chain
-            .get_default_signer()
+        let default_signer = chain.get_default_signer();
+
+        let proof_try = default_signer
             .sign(
                 &counterparty_payload
                     .proof_try
+                    .unsigned_membership_proof_bytes,
+            )
+            .map_err(Chain::raise_error)?;
+
+        let proof_client = default_signer
+            .sign(
+                &counterparty_payload
+                    .proof_client
+                    .unsigned_membership_proof_bytes,
+            )
+            .map_err(Chain::raise_error)?;
+
+        let proof_consensus = default_signer
+            .sign(
+                &counterparty_payload
+                    .proof_consensus
                     .unsigned_membership_proof_bytes,
             )
             .map_err(Chain::raise_error)?;
@@ -203,8 +239,10 @@ where
             },
             update_height,
             proof_try,
-            proof_client: b"ignored".into(),
-            proof_consensus: b"ignored".into(),
+            // client and consensus proofs are passed but ignored
+            // cosmos/ibc-go#7129
+            proof_client,
+            proof_consensus,
             proof_consensus_height: counterparty_payload.proof_consensus_height,
         };
 

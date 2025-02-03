@@ -3,6 +3,8 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::consensus_state::{
     CanQueryConsensusState, ConsensusStateQuerier, ConsensusStateWithProofsQuerier,
 };
@@ -14,6 +16,8 @@ use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use ibc::core::client::types::Height as IbcHeight;
+use ibc::core::host::types::path::{ClientConsensusStatePath, Path};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
@@ -25,7 +29,8 @@ use crate::types::client_id::ClientId;
 use crate::types::commitment_proof::StarknetCommitmentProof;
 use crate::types::cosmos::consensus_state::CometConsensusState;
 use crate::types::cosmos::height::Height;
-
+use crate::types::membership_proof_signer::MembershipVerifierContainer;
+use crate::types::status::StarknetChainStatus;
 #[derive(Debug)]
 pub struct ConsensusStateNotFound {
     pub client_id: ClientId,
@@ -108,12 +113,15 @@ where
 impl<Chain, Counterparty> ConsensusStateWithProofsQuerier<Chain, Counterparty>
     for QueryCometConsensusState
 where
-    Chain: HasClientIdType<Counterparty>
+    Chain: HasClientIdType<Counterparty, ClientId = ClientId>
         + HasHeightType<Height = u64>
+        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryConsensusState<Counterparty>
         + HasAsyncErrorType,
-    Counterparty: HasConsensusStateType<Chain> + HasHeightType,
+    Counterparty: HasConsensusStateType<Chain, ConsensusState = CometConsensusState>
+        + HasHeightType<Height = IbcHeight>,
 {
     async fn query_consensus_state_with_proofs(
         chain: &Chain,
@@ -127,9 +135,31 @@ where
             .query_consensus_state(tag, client_id, consensus_height, query_height)
             .await?;
 
+        let chain_status = chain.query_chain_status().await?;
+
+        // FIXME: CometConsensusState can't be encoded to protobuf
+        let protobuf_encoded_consensus_state = Vec::new();
+        // let protobuf_encoded_consensus_state = Counterparty::default_encoding()
+        //     .encode(&consensus_state)
+        //     .map_err(Chain::raise_error)?;
+
+        let unsigned_membership_proof_bytes = MembershipVerifierContainer {
+            state_root: chain_status.block_hash.to_bytes_be().to_vec(),
+            prefix: chain.ibc_commitment_prefix().clone(),
+            path: Path::ClientConsensusState(ClientConsensusStatePath::new(
+                client_id.clone(),
+                consensus_height.revision_number(),
+                consensus_height.revision_height(),
+            ))
+            .to_string()
+            .into(),
+            value: Some(protobuf_encoded_consensus_state),
+        }
+        .canonical_bytes();
+
         let proof = StarknetCommitmentProof {
             proof_height: *query_height,
-            unsigned_membership_proof_bytes: Vec::new(),
+            unsigned_membership_proof_bytes,
         };
 
         Ok((consensus_state, proof))
