@@ -26,6 +26,7 @@ use hermes_cli_components::impls::commands::queries::client_state::{
 use hermes_cli_components::impls::commands::queries::consensus_state::{
     QueryConsensusStateArgs, RunQueryConsensusStateCommand,
 };
+use hermes_cli_components::impls::commands::start::{RunStartRelayerCommand, StartRelayerArgs};
 use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField;
 use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
 use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
@@ -168,6 +169,12 @@ delegate_components! {
 
         (CreateClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
         (CreateClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+
+        (StartRelayerArgs, symbol!("chain_id_a")): ParseFromString<ChainId>,
+        (StartRelayerArgs, symbol!("client_id_a")): ParseFromString<ClientId>,
+        (StartRelayerArgs, symbol!("chain_id_b")): ParseFromString<ChainId>,
+        (StartRelayerArgs, symbol!("client_id_b")): ParseFromString<ClientId>,
+
     }
 }
 
@@ -175,6 +182,8 @@ delegate_components! {
     StarknetCommandRunnerComponents {
         AllSubCommands: RunAllSubCommand,
         BootstrapSubCommand: RunBootstrapSubCommand,
+
+        StartRelayerArgs: RunStartRelayerCommand,
 
         QuerySubCommand: RunQuerySubCommand,
         QueryClientStateArgs: RunQueryClientStateCommand,
@@ -303,6 +312,7 @@ pub trait CanUseStarknetApp:
     + CanRunCommand<UpdateSubCommand>
     + CanRunCommand<UpdateClientArgs>
     + CanRunCommand<CreateClientArgs>
+    + CanRunCommand<StartRelayerArgs>
 {
 }
 
