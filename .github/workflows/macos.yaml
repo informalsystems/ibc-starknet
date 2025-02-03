@@ -9,8 +9,12 @@ on:
 
 jobs:
   test-contracts:
-    name: Build MacOS Nix dependencies
-    runs-on: macos-14
+    name: Build Nix dependencies
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-14]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +28,11 @@ jobs:
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: Run Nix build
+      - name: Remove Homebrew
+        if: ${{ matrix.os == 'macos-14' }}
         run: |
           sudo rm -rf /opt/homebrew
+
+      - name: Run Nix build
+        run: |
           nix develop -c true
