@@ -158,7 +158,7 @@ where
         .canonical_bytes();
 
         let proof = StarknetCommitmentProof {
-            proof_height: *query_height,
+            proof_height: chain_status.height,
             unsigned_membership_proof_bytes,
         };
 
