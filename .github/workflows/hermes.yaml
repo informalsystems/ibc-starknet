@@ -12,7 +12,11 @@ concurrency:
 jobs:
   starknet-integration-tests:
     name: Run Starknet Integration Tests
-    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm, macos-14]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
