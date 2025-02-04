@@ -89,6 +89,11 @@ jobs:
           nix shell ..#scarb -c \
             scarb build -p starknet_ibc_contracts
 
+      - name: Remove Homebrew
+        if: ${{ matrix.os == 'macos-14' }}
+        run: |
+          sudo rm -rf /opt/homebrew
+
       - name: Run Integration Tests
         env:
           RUST_BACKTRACE: 1
