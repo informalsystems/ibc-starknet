@@ -130,7 +130,6 @@ where
 
         let dummy_proof = StarknetCommitmentProof {
             proof_height: chain_status.height,
-            // FIXME(hack) we are passing msg hash as proof as we don't have access to signer
             proof_bytes: signed_bytes,
         };
 
