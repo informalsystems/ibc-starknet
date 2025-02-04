@@ -48,11 +48,6 @@ jobs:
           done
           exit 1
 
-      - name: Remove Homebrew
-        if: ${{ matrix.os == 'macos-14' }}
-        run: |
-          sudo rm -rf /opt/homebrew
-
       - name: Nix build
         env:
           RUST_BACKTRACE: 1
