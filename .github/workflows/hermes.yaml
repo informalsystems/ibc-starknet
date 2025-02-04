@@ -58,6 +58,7 @@ jobs:
             .#scarb \
             .#universal-sierra-compiler \
             .#rust \
+            .#cargo-nextest \
             .#ibc-starknet-cw \
             .#wasm-simapp \
             .#osmosis
@@ -79,7 +80,13 @@ jobs:
           export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json"
 
-          nix shell ..#osmosis ..#wasm-simapp ..#starknet-devnet ..#rust ..#cargo-nextest -c \
+          nix shell \
+            ..#osmosis \
+            ..#wasm-simapp \
+            ..#starknet-devnet \
+            ..#rust \
+            ..#cargo-nextest \
+            -c \
             cargo nextest run --test-threads=2
 
   lint-relayer:
