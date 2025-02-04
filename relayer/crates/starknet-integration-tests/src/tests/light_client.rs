@@ -235,8 +235,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
         );
 
         {
-            let client_state =
-                cosmos_chain.query_client_state(
+            let client_state = cosmos_chain
+                .query_client_state(
                     PhantomData::<StarknetChain>,
                     &cosmos_client_id,
                     &cosmos_chain.query_chain_height().await?,
@@ -245,8 +245,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let client_height = client_state.client_state.latest_height.revision_height();
 
-            let consensus_state =
-                cosmos_chain.query_consensus_state(
+            let consensus_state = cosmos_chain
+                .query_consensus_state(
                     PhantomData::<StarknetChain>,
                     &cosmos_client_id,
                     &client_height,
@@ -262,16 +262,16 @@ fn test_starknet_light_client() -> Result<(), Error> {
         }
 
         {
-            let client_state =
-                starknet_chain.query_client_state(
+            let client_state = starknet_chain
+                .query_client_state(
                     PhantomData::<CosmosChain>,
                     &starknet_client_id,
                     &starknet_chain.query_chain_height().await?,
                 )
                 .await?;
 
-            let consensus_state =
-                starknet_chain.query_consensus_state(
+            let consensus_state = starknet_chain
+                .query_consensus_state(
                     PhantomData::<CosmosChain>,
                     &starknet_client_id,
                     &Height::new(
@@ -284,8 +284,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             info!(
                 "initial Cosmos consensus state height {} and root: {:?} on Starknet",
-                client_state.latest_height.revision_height,
-                consensus_state.root
+                client_state.latest_height.revision_height, consensus_state.root
             );
         }
 
@@ -304,8 +303,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .send_target_update_client_messages(DestinationTarget, &starknet_status.height)
                 .await?;
 
-            let consensus_state =
-                cosmos_chain.query_consensus_state(
+            let consensus_state = cosmos_chain
+                .query_consensus_state(
                     PhantomData::<StarknetChain>,
                     &cosmos_client_id,
                     &starknet_status.height,
@@ -322,7 +321,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         {
             runtime.sleep(Duration::from_secs(2)).await;
 
-            let cosmos_status= cosmos_chain.query_chain_status().await?;
+            let cosmos_status = cosmos_chain.query_chain_status().await?;
 
             info!(
                 "updating Cosmos client to Starknet to height {}",
@@ -335,8 +334,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .send_target_update_client_messages(SourceTarget, &cosmos_status.height)
                 .await?;
 
-            let consensus_state =
-                starknet_chain.query_consensus_state(
+            let consensus_state = starknet_chain
+                .query_consensus_state(
                     PhantomData::<CosmosChain>,
                     &starknet_client_id,
                     &cosmos_status.height,
@@ -344,17 +343,15 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 )
                 .await?;
 
-
             // TODO(rano): add assert
 
             info!(
                 "updated Cosmos client to Starknet to height {} and root: {:?}",
-                cosmos_status.height,
-                consensus_state.root
+                cosmos_status.height, consensus_state.root
             );
         }
 
-        let cosmos_connection_id = {
+        let _cosmos_connection_id = {
             let open_init_message = CosmosConnectionOpenInitMessage {
                 client_id: cosmos_client_id.to_string(),
                 counterparty_client_id: starknet_client_id.to_string(),
@@ -363,12 +360,17 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 delay_period: Duration::from_secs(0),
             };
 
-            let events = cosmos_chain.send_message(open_init_message.to_cosmos_message()).await?;
+            let events = cosmos_chain
+                .send_message(open_init_message.to_cosmos_message())
+                .await?;
 
-            let connection_id = cosmos_chain.try_extract_from_message_response(PhantomData::<CosmosConnectionOpenInitEvent>, &events)
+            let connection_id = cosmos_chain
+                .try_extract_from_message_response(
+                    PhantomData::<CosmosConnectionOpenInitEvent>,
+                    &events,
+                )
                 .unwrap()
-                .connection_id
-            ;
+                .connection_id;
 
             info!("initialized connection on Cosmos: {connection_id}");
 
