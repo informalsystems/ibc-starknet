@@ -2598,6 +2598,7 @@ dependencies = [
  "sha2 0.10.8",
  "starknet",
  "tendermint-rpc",
+ "tiny-bip39",
  "tokio",
  "toml",
  "tracing",
@@ -2625,6 +2626,7 @@ dependencies = [
  "ibc",
  "serde",
  "starknet",
+ "tiny-bip39",
  "url",
 ]
 

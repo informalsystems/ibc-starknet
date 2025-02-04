@@ -30,3 +30,5 @@ eyre    = { workspace = true }
 serde   = { workspace = true }
 url     = { workspace = true }
 futures = { workspace = true }
+
+tiny-bip39 = { workspace = true }
