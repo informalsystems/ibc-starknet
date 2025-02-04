@@ -89,9 +89,6 @@ jobs:
           nix shell ..#scarb -c \
             scarb build -p starknet_ibc_contracts
 
-      - name: Build Starknet Wasm light client
-        run: nix build .#ibc-starknet-cw
-
       - name: Run Integration Tests
         env:
           RUST_BACKTRACE: 1
@@ -100,7 +97,7 @@ jobs:
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
           export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json"
           export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_CometClient.contract_class.json"
-          export STARKNET_WASM_CLIENT_PATH="$(nix path-info ..#ibc-starknet-cw)/ibc_client_starknet_cw.wasm"
+          export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json"
 
           nix develop ..#rust -c \
