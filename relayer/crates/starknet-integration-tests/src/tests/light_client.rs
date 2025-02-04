@@ -13,20 +13,13 @@ use hermes_cosmos_chain_components::impls::connection::connection_handshake_mess
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
 use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
-use hermes_cosmos_chain_components::types::events::channel::CosmosChannelOpenInitEvent;
 use hermes_cosmos_chain_components::types::events::connection::CosmosConnectionOpenInitEvent;
-use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
-use hermes_cosmos_chain_components::types::messages::channel::open_init::CosmosChannelOpenInitMessage;
-use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_init::CosmosConnectionOpenInitMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_cosmos_relayer::contexts::encoding::CosmosEncoding;
-use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
-use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
 };
@@ -48,9 +41,7 @@ use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncod
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
-use ibc::core::channel::types::channel::State;
 use ibc::core::client::types::Height;
-use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
 use starknet::macros::{selector, short_string};
