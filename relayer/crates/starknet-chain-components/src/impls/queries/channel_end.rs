@@ -14,6 +14,7 @@ use hermes_chain_components::traits::types::channel::HasChannelEndType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
+use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -24,6 +25,7 @@ use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 use crate::traits::contract::call::CanCallContract;
+use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
@@ -92,6 +94,8 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanCallContract
+        + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
+        + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<Encoding::Error>,
     Encoding: CanEncode<ViaCairo, Product![PortId, ChannelId]>
         + CanDecode<ViaCairo, ChannelEnd>
@@ -131,9 +135,14 @@ where
         }
         .canonical_bytes();
 
+        let signed_bytes = chain
+            .proof_signer()
+            .sign(&unsigned_membership_proof_bytes)
+            .map_err(Chain::raise_error)?;
+
         let dummy_proof = StarknetCommitmentProof {
             proof_height: chain_status.height,
-            unsigned_membership_proof_bytes,
+            proof_bytes: signed_bytes,
         };
 
         Ok((channel_end, dummy_proof))

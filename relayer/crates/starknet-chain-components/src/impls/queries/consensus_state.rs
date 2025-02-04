@@ -12,6 +12,7 @@ use hermes_chain_components::traits::types::consensus_state::HasConsensusStateTy
 use hermes_chain_components::traits::types::height::{HasHeightFields, HasHeightType};
 use hermes_chain_components::traits::types::ibc::HasClientIdType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
+use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -22,6 +23,7 @@ use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 use crate::traits::contract::call::CanCallContract;
+use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
@@ -119,6 +121,8 @@ where
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryConsensusState<Counterparty>
+        + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
+        + CanRaiseAsyncError<String>
         + HasAsyncErrorType,
     Counterparty: HasConsensusStateType<Chain, ConsensusState = CometConsensusState>
         + HasHeightType<Height = IbcHeight>,
@@ -157,9 +161,14 @@ where
         }
         .canonical_bytes();
 
+        let signed_bytes = chain
+            .proof_signer()
+            .sign(&unsigned_membership_proof_bytes)
+            .map_err(Chain::raise_error)?;
+
         let proof = StarknetCommitmentProof {
             proof_height: chain_status.height,
-            unsigned_membership_proof_bytes,
+            proof_bytes: signed_bytes,
         };
 
         Ok((consensus_state, proof))

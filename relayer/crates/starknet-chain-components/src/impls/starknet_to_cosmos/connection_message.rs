@@ -24,12 +24,10 @@ use hermes_chain_components::types::payloads::connection::{
 };
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
-use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_confirm::CosmosConnectionOpenConfirmMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_init::CosmosConnectionOpenInitMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_try::CosmosConnectionOpenTryMessage;
-use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::connection::types::version::Version as CosmosConnectionVersion;
@@ -89,8 +87,6 @@ where
         + HasHeightType<Height = CosmosHeight>
         + HasClientIdType<Counterparty, ClientId = CosmosClientId>
         + CanRaiseAsyncError<ClientError>
-        + HasDefaultSigner<Signer = Secp256k1KeyPair>
-        + CanRaiseAsyncError<String>
         + HasClientStateType<Counterparty, ClientState = CometClientState>,
     Counterparty: HasConnectionOpenTryPayloadType<
             Chain,
@@ -104,7 +100,7 @@ where
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>,
 {
     async fn build_connection_open_try_message(
-        chain: &Chain,
+        _chain: &Chain,
         client_id: &CosmosClientId,
         counterparty_client_id: &StarknetClientId,
         counterparty_connection_id: &StarknetConnectionId,
@@ -121,32 +117,6 @@ where
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
-        let default_signer = chain.get_default_signer();
-
-        let proof_init = default_signer
-            .sign(
-                &counterparty_payload
-                    .proof_init
-                    .unsigned_membership_proof_bytes,
-            )
-            .map_err(Chain::raise_error)?;
-
-        let proof_client = default_signer
-            .sign(
-                &counterparty_payload
-                    .proof_client
-                    .unsigned_membership_proof_bytes,
-            )
-            .map_err(Chain::raise_error)?;
-
-        let proof_consensus = default_signer
-            .sign(
-                &counterparty_payload
-                    .proof_consensus
-                    .unsigned_membership_proof_bytes,
-            )
-            .map_err(Chain::raise_error)?;
-
         let message = CosmosConnectionOpenTryMessage {
             client_id: client_id.to_string(),
             counterparty_client_id: counterparty_client_id.to_string(),
@@ -159,11 +129,11 @@ where
             },
             delay_period,
             update_height,
-            proof_init,
+            proof_init: counterparty_payload.proof_init.proof_bytes,
             // client and consensus proofs are passed but ignored
             // cosmos/ibc-go#7129
-            proof_client,
-            proof_consensus,
+            proof_client: counterparty_payload.proof_client.proof_bytes,
+            proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
             proof_consensus_height: counterparty_payload.proof_consensus_height,
         };
 
@@ -177,8 +147,6 @@ where
     Chain: HasMessageType<Message = CosmosMessage>
         + HasConnectionIdType<Counterparty, ConnectionId = CosmosConnectionId>
         + HasClientStateType<Counterparty, ClientState = CometClientState>
-        + HasDefaultSigner<Signer = Secp256k1KeyPair>
-        + CanRaiseAsyncError<String>
         + HasHeightType<Height = CosmosHeight>
         + CanRaiseAsyncError<ClientError>,
     Counterparty: HasConnectionOpenAckPayloadType<
@@ -190,7 +158,7 @@ where
         + HasConnectionEndType<Chain>,
 {
     async fn build_connection_open_ack_message(
-        chain: &Chain,
+        _chain: &Chain,
         connection_id: &CosmosConnectionId,
         counterparty_connection_id: &StarknetConnectionId,
         counterparty_payload: ConnectionOpenAckPayload<Counterparty, Chain>,
@@ -203,32 +171,6 @@ where
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
-        let default_signer = chain.get_default_signer();
-
-        let proof_try = default_signer
-            .sign(
-                &counterparty_payload
-                    .proof_try
-                    .unsigned_membership_proof_bytes,
-            )
-            .map_err(Chain::raise_error)?;
-
-        let proof_client = default_signer
-            .sign(
-                &counterparty_payload
-                    .proof_client
-                    .unsigned_membership_proof_bytes,
-            )
-            .map_err(Chain::raise_error)?;
-
-        let proof_consensus = default_signer
-            .sign(
-                &counterparty_payload
-                    .proof_consensus
-                    .unsigned_membership_proof_bytes,
-            )
-            .map_err(Chain::raise_error)?;
-
         let message = CosmosConnectionOpenAckMessage {
             connection_id: connection_id.to_string(),
             counterparty_connection_id: counterparty_connection_id.to_string(),
@@ -238,11 +180,11 @@ where
                 value: client_state_any.value,
             },
             update_height,
-            proof_try,
+            proof_try: counterparty_payload.proof_try.proof_bytes,
             // client and consensus proofs are passed but ignored
             // cosmos/ibc-go#7129
-            proof_client,
-            proof_consensus,
+            proof_client: counterparty_payload.proof_client.proof_bytes,
+            proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
             proof_consensus_height: counterparty_payload.proof_consensus_height,
         };
 
@@ -256,8 +198,6 @@ where
     Chain: HasMessageType<Message = CosmosMessage>
         + CanQueryChainHeight<Height = CosmosHeight>
         + HasConnectionIdType<Counterparty, ConnectionId = CosmosConnectionId>
-        + HasDefaultSigner<Signer = Secp256k1KeyPair>
-        + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<ClientError>,
     Counterparty: HasConnectionOpenConfirmPayloadType<
             Chain,
@@ -266,26 +206,17 @@ where
         + HasHeightType<Height = u64>,
 {
     async fn build_connection_open_confirm_message(
-        chain: &Chain,
+        _chain: &Chain,
         connection_id: &CosmosConnectionId,
         counterparty_payload: ConnectionOpenConfirmPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
-        let proof_ack = chain
-            .get_default_signer()
-            .sign(
-                &counterparty_payload
-                    .proof_ack
-                    .unsigned_membership_proof_bytes,
-            )
-            .map_err(Chain::raise_error)?;
-
         let message = CosmosConnectionOpenConfirmMessage {
             connection_id: connection_id.to_string(),
             update_height,
-            proof_ack,
+            proof_ack: counterparty_payload.proof_ack.proof_bytes,
         };
 
         Ok(message.to_cosmos_message())

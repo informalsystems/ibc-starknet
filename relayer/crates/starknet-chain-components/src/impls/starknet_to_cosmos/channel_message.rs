@@ -17,11 +17,9 @@ use hermes_chain_components::types::payloads::channel::{
     ChannelOpenAckPayload, ChannelOpenConfirmPayload, ChannelOpenTryPayload,
 };
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
-use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_confirm::CosmosChannelOpenConfirmMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_try::CosmosChannelOpenTryMessage;
-use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::host::types::error::IdentifierError;
@@ -42,9 +40,6 @@ where
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + CanRaiseAsyncError<Infallible>
         + CanRaiseAsyncError<ClientError>
-        + CanRaiseAsyncError<&'static str>
-        + HasDefaultSigner<Signer = Secp256k1KeyPair>
-        + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<ParseIntError>
         + CanRaiseAsyncError<IdentifierError>,
     Counterparty: HasChannelIdType<Chain, ChannelId = StarknetChannelId>
@@ -58,7 +53,7 @@ where
         >,
 {
     async fn build_channel_open_try_message(
-        chain: &Chain,
+        _chain: &Chain,
         port_id: &IbcPortId,
         counterparty_port_id: &IbcPortId,
         counterparty_channel_id: &StarknetChannelId,
@@ -83,21 +78,12 @@ where
             version: starknet_channel_end.version.clone(),
         };
 
-        let proof_init = chain
-            .get_default_signer()
-            .sign(
-                &counterparty_payload
-                    .proof_init
-                    .unsigned_membership_proof_bytes,
-            )
-            .map_err(Chain::raise_error)?;
-
         let message = CosmosChannelOpenTryMessage {
             port_id: port_id.to_string(),
             channel: channel_end.into(),
             counterparty_version: starknet_channel_end.version.to_string(),
             update_height,
-            proof_init,
+            proof_init: counterparty_payload.proof_init.proof_bytes,
         };
 
         Ok(message.to_cosmos_message())
@@ -109,8 +95,6 @@ impl<Chain, Counterparty> ChannelOpenAckMessageBuilder<Chain, Counterparty>
 where
     Chain: HasMessageType<Message = CosmosMessage>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
-        + HasDefaultSigner<Signer = Secp256k1KeyPair>
-        + CanRaiseAsyncError<String>
         + HasChannelIdType<Counterparty, ChannelId = IbcChannelId>
         + CanRaiseAsyncError<ClientError>,
     Counterparty: HasChannelIdType<Chain, ChannelId = StarknetChannelId>
@@ -124,7 +108,7 @@ where
         >,
 {
     async fn build_channel_open_ack_message(
-        chain: &Chain,
+        _chain: &Chain,
         port_id: &IbcPortId,
         channel_id: &IbcChannelId,
         counterparty_channel_id: &StarknetChannelId,
@@ -133,22 +117,13 @@ where
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
-        let proof_try = chain
-            .get_default_signer()
-            .sign(
-                &counterparty_payload
-                    .proof_try
-                    .unsigned_membership_proof_bytes,
-            )
-            .map_err(Chain::raise_error)?;
-
         let message = CosmosChannelOpenAckMessage {
             port_id: port_id.to_string(),
             channel_id: channel_id.to_string(),
             counterparty_channel_id: counterparty_channel_id.to_string(),
             counterparty_version: counterparty_payload.channel_end.version.to_string(),
             update_height,
-            proof_try,
+            proof_try: counterparty_payload.proof_try.proof_bytes,
         };
 
         Ok(message.to_cosmos_message())
@@ -161,8 +136,6 @@ where
     Chain: HasMessageType<Message = CosmosMessage>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + HasChannelIdType<Counterparty, ChannelId = IbcChannelId>
-        + HasDefaultSigner<Signer = Secp256k1KeyPair>
-        + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<ClientError>,
     Counterparty: HasHeightType<Height = u64>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
@@ -172,7 +145,7 @@ where
         >,
 {
     async fn build_channel_open_confirm_message(
-        chain: &Chain,
+        _chain: &Chain,
         port_id: &IbcPortId,
         channel_id: &IbcChannelId,
         counterparty_payload: Counterparty::ChannelOpenConfirmPayload,
@@ -180,20 +153,11 @@ where
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
-        let proof_ack = chain
-            .get_default_signer()
-            .sign(
-                &counterparty_payload
-                    .proof_ack
-                    .unsigned_membership_proof_bytes,
-            )
-            .map_err(Chain::raise_error)?;
-
         let message = CosmosChannelOpenConfirmMessage {
             port_id: port_id.to_string(),
             channel_id: channel_id.to_string(),
             update_height,
-            proof_ack,
+            proof_ack: counterparty_payload.proof_ack.proof_bytes,
         };
 
         Ok(message.to_cosmos_message())
