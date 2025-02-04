@@ -29,7 +29,7 @@ fn test_cairo_packet_commitment() {
     .chunks(4)
     .map(|chunk| {
         let mut bytes = [0u8; 4];
-        bytes.copy_from_slice(&chunk);
+        bytes.copy_from_slice(chunk);
         u32::from_be_bytes(bytes)
     })
     .collect::<Vec<_>>();
