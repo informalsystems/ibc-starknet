@@ -36,11 +36,6 @@ jobs:
             relayer -> relayer/target
             light-client -> light-client/target
 
-      - name: Remove Homebrew
-        if: ${{ matrix.os == 'macos-14' }}
-        run: |
-          sudo rm -rf /opt/homebrew
-
       - name: Pre-fetch Osmosis repo
         run: |
           OSMOSIS_REV=`nix flake metadata --json | jq -r '.locks.nodes["osmosis-src"].locked.rev'`
@@ -52,6 +47,11 @@ jobs:
             fi
           done
           exit 1
+
+      - name: Remove Homebrew
+        if: ${{ matrix.os == 'macos-14' }}
+        run: |
+          sudo rm -rf /opt/homebrew
 
       - name: Nix build
         env:
