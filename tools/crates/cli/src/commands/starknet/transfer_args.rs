@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use cgp::prelude::*;
 use hermes_cli_components::traits::command::CommandRunner;
 use hermes_cli_components::traits::output::HasOutputType;
@@ -102,7 +100,7 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
 
         let msg_transfer = MsgTransfer {
             port_id_on_a: PortId::transfer(),
-            chan_id_on_a: ChannelId::from_str(&args.channel_id)?,
+            chan_id_on_a: &args.channel_id.parse()?,
             denom,
             amount: amount_u128.into(),
             receiver: args.receiver.clone(),
@@ -111,7 +109,9 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
                 revision_number: 0,
                 revision_height: 0,
             },
-            timeout_timestamp_on_b: Timestamp::from_nanoseconds(args.timeout_timestamp),
+            timeout_timestamp_on_b: Timestamp::from_nanoseconds(
+                args.timeout_timestamp * 1_000_000_000,
+            ),
         };
 
         let cairo_encoding = StarknetCairoEncoding;
