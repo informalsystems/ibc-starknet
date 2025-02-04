@@ -12,7 +12,8 @@ mod tests {
 
 pub use types::{
     Proof, ExistenceProof, ExistenceProofImpl, ExistenceProofTrait, NonExistenceProof,
-    NonExistenceProofImpl, InnerOp, LeafOp, ProofSpec, HashOp, LengthOp, RootBytes, ProofSpecImpl
+    NonExistenceProofImpl, InnerOp, LeafOp, ProofSpec, HashOp, LengthOp, RootBytes, ProofSpecImpl,
+    ProofSpecTrait, InnerSpec
 };
 pub use errors::ICS23Errors;
 pub use utils::{
@@ -21,4 +22,4 @@ pub use utils::{
     array_u8_to_byte_array, encode_hex, decode_hex,
 };
 pub use verify::{verify_membership, verify_non_membership};
-pub(crate) use ops::{apply_inner, apply_leaf, proto_len};
+pub(crate) use ops::{apply_inner, apply_leaf};

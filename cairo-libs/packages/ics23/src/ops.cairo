@@ -3,6 +3,7 @@ use ics23::{
     InnerOp, LeafOp, HashOp, ICS23Errors, LengthOp, ArrayU32IntoArrayU8, SliceU32IntoArrayU8,
     IntoArrayU32, byte_array_to_array_u8
 };
+use protobuf::varint::encode_varint_to_u8_array;
 
 pub fn apply_inner(inner: @InnerOp, child: Array<u8>) -> [u32; 8] {
     // Sanity checks
@@ -69,26 +70,10 @@ pub fn do_length(length_op: @LengthOp, data: Array<u8>) -> Array<u8> {
         LengthOp::NoPrefix => data,
         LengthOp::VarProto => {
             let mut data = data;
-            let mut len = proto_len(data.len());
+            let mut len = encode_varint_to_u8_array(data.len());
             len.append_span(data.span());
             len
         }
     }
 }
 
-pub fn proto_len(length: u32) -> Array<u8> {
-    let mut result: Array<u8> = ArrayTrait::new();
-    let mut len = length;
-    for _ in 0
-        ..10_u32 {
-            if len < 0x80 {
-                result.append(len.try_into().unwrap());
-                break;
-            } else {
-                let remaining_len = (len & 0x7F) | 0x80;
-                result.append(remaining_len.try_into().unwrap());
-                len /= 0x80;
-            };
-        };
-    result
-}

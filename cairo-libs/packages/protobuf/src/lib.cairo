@@ -3,6 +3,11 @@ pub mod types;
 pub mod base64;
 pub mod hex;
 pub mod utils;
+pub mod varint;
+pub mod errors;
 
 #[cfg(test)]
-mod tests;
+mod tests {
+    mod proto;
+    mod varint;
+}

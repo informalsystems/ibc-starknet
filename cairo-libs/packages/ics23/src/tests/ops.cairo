@@ -1,6 +1,5 @@
-use alexandria_math::pow;
 use ics23::{
-    InnerOp, LeafOp, LengthOp, HashOp, apply_leaf, apply_inner, proto_len, encode_hex, decode_hex,
+    InnerOp, LeafOp, LengthOp, HashOp, apply_leaf, apply_inner, encode_hex, decode_hex,
     SliceU32IntoArrayU8, ByteArrayIntoArrayU32, byte_array_to_array_u8,
 };
 
@@ -105,21 +104,3 @@ fn test_apply_inner_suffix_only() {
     );
 }
 
-fn check_proto_len(value: u32, expected: Array<u8>) {
-    assert_eq!(proto_len(value), expected);
-}
-
-#[test]
-fn test_proto_len() {
-    check_proto_len(pow(2, 0) - 1, array![0x00]);
-    check_proto_len(pow(2, 0), array![0x01]); // 1
-    check_proto_len(pow(2, 7) - 1, array![0x7F]); // 127
-    check_proto_len(pow(2, 7), array![0x80, 0x01]); // 128
-    check_proto_len(pow(2, 14) - 1, array![0xFF, 0x7F]); // [255, 127]
-    check_proto_len(pow(2, 14), array![0x80, 0x80, 0x01]); // [128, 128, 1]
-    check_proto_len(pow(2, 21) - 1, array![0xFF, 0xFF, 0x7F]); // [255, 255, 127]
-    check_proto_len(pow(2, 21), array![0x80, 0x80, 0x80, 0x01]); // [128, 128, 128, 1]
-    check_proto_len(pow(2, 28) - 1, array![0xFF, 0xFF, 0xFF, 0x7F]); // [255, 255, 255, 127]
-    check_proto_len(pow(2, 28), array![0x80, 0x80, 0x80, 0x80, 0x01]); // [128, 128, 128, 128, 1]
-    check_proto_len(0xffffffff, array![0xFF, 0xFF, 0xFF, 0xFF, 0x0F]); // [255, 255, 255, 255, 15]
-}

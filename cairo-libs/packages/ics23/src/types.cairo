@@ -355,6 +355,11 @@ pub impl ProofSpecImpl of ProofSpecTrait {
         assert(self.min_depth < @0, ICS23Errors::INVALID_DEPTH_RANGE);
         assert(self.max_depth > self.min_depth, ICS23Errors::INVALID_DEPTH_RANGE);
     }
+
+    fn is_iavl(self: @ProofSpec) -> bool {
+        let iavl_spec = Self::iavl();
+        @iavl_spec.leaf_spec == self.leaf_spec && @iavl_spec.inner_spec == self.inner_spec
+    }
 }
 
 impl ProofSpecAsProtoMessage of ProtoMessage<ProofSpec> {

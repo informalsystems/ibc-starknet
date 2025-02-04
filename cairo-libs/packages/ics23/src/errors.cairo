@@ -10,7 +10,20 @@ pub mod ICS23Errors {
     pub const INVALID_MERKLE_PROOF: felt252 = 'ICS23: invalid merkle proof';
     pub const INVALID_PROOF_TYPE: felt252 = 'ICS23: invalid proof type';
     pub const INVALID_INNER_SPEC: felt252 = 'ICS23: invalid inner spec';
+    pub const INVALID_INNER_OP_SIZE: felt252 = 'ICS23: invalid inner op size';
+    pub const INVALID_INNER_PREFIX: felt252 = 'ICS23: invalid inner prefix';
+    pub const INVALID_INNER_PREFIX_LEN: felt252 = 'ICS23: invalid inner prefix len';
+    pub const INVALID_INNER_SUFFIX: felt252 = 'ICS23: invalid inner suffix';
+    pub const INVALID_HASH_OP: felt252 = 'ICS23: invalid hash op';
+    pub const INVALID_PREHASH_KEY: felt252 = 'ICS23: invalid prehash key';
+    pub const INVALID_PREHASH_VALUE: felt252 = 'ICS23: invalid prehash value';
+    pub const INVALID_LENGTH_OP: felt252 = 'ICS23: invalid length op';
     pub const INVALID_DEPTH_RANGE: felt252 = 'ICS23: invalid depth range';
+    pub const INVALID_LEAF_PREFIX: felt252 = 'ICS23: invalid leaf prefix';
+    pub const INVALID_IAVL_HEIGHT_PREFIX: felt252 = 'ICS23: invalid height prefix';
     pub const UNSUPPORTED_HASH_OP: felt252 = 'ICS23: unsupported hash op';
     pub const ZERO_MERKLE_ROOT: felt252 = 'ICS23: zero merkle root';
+    pub const ZERO_IAVL_SIZE_PREFIX: felt252 = 'ICS23: zero size prefix';
+    pub const ZERO_IAVL_VERSION_PREFIX: felt252 = 'ICS23: zero version prefix';
+    pub const ZERO_CHILD_SIZE: felt252 = 'ICS23: zero child size';
 }
