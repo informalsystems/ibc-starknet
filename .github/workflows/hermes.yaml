@@ -44,8 +44,9 @@ jobs:
 
       - name: Pre-fetch Osmosis repo
         run: |
+          OSMOSIS_REV=`nix flake metadata --json | jq -r '.locks.nodes["osmosis-src"].locked.rev'`
           for i in `seq 1 10`; do
-            if nix flake prefetch "github:osmosis-labs/osmosis/v28.0.0"; then
+            if nix flake prefetch "github:osmosis-labs/osmosis/${OSMOSIS_REV}"; then
               exit 0
             else
               sleep 2
