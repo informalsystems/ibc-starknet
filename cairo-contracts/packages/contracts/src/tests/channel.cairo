@@ -8,7 +8,7 @@ use starknet_ibc_testkit::configs::{
 };
 use starknet_ibc_testkit::dummies::{
     HEIGHT, TIMESTAMP, COSMOS, STARKNET, CLIENT_ID, CONNECTION_ID, CHANNEL_ID, PORT_ID, SUPPLY,
-    PACKET_COMMITMENT_ON_SN, RELAYER, SN_USER, CS_USER
+    PACKET_COMMITMENT_ON_SN, SN_USER, CS_USER
 };
 use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ChannelEventSpyExt};
 use starknet_ibc_testkit::handles::{CoreHandle, AppHandle, ERC20Handle};
@@ -465,8 +465,6 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
     // -----------------------------------------------------------
 
     start_cheat_caller_address(ics20.address, core.address);
-
-    core.register_relayer(RELAYER());
 
     let msg = comet_cfg
         .dummy_msg_update_client(

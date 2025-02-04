@@ -51,18 +51,20 @@ where
             .await
             .map_err(Chain::raise_error)?;
 
-        let block_hash = match block_info {
-            MaybePendingBlockWithTxHashes::Block(block) => block.block_hash,
+        let block = match block_info {
+            MaybePendingBlockWithTxHashes::Block(block) => block,
             MaybePendingBlockWithTxHashes::PendingBlock(_block) => {
                 return Err(Chain::raise_error("pending block is not supported"))
             }
         };
 
+        let block_hash = block.block_hash;
+
         let root = Vec::from(block_hash.to_bytes_be());
 
         let consensus_state = StarknetConsensusState {
             root: root.into(),
-            time: Timestamp::now(),
+            time: Timestamp::from_nanoseconds(block.timestamp * 1_000_000_000),
         };
 
         let height = Height::new(0, *target_height).unwrap();

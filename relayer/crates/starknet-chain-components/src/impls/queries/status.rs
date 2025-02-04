@@ -28,7 +28,10 @@ where
             MaybePendingBlockWithTxHashes::Block(block) => Ok(StarknetChainStatus {
                 height: block.block_number,
                 block_hash: block.block_hash,
-                time: Time::now(),
+                time: i64::try_from(block.timestamp)
+                    .ok()
+                    .and_then(|ts| Time::from_unix_timestamp(ts, 0).ok())
+                    .ok_or_else(|| Chain::raise_error("invalid timestamp"))?,
             }),
             MaybePendingBlockWithTxHashes::PendingBlock(_) => Err(Chain::raise_error(
                 "expected finalized block, but given pending block",

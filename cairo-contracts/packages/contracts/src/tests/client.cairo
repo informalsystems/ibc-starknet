@@ -1,7 +1,7 @@
 use snforge_std::spy_events;
 use starknet_ibc_core::client::{UpdateResponse, StatusTrait, ClientContractTrait};
 use starknet_ibc_testkit::configs::CometClientConfigTrait;
-use starknet_ibc_testkit::dummies::{HEIGHT, RELAYER};
+use starknet_ibc_testkit::dummies::HEIGHT;
 use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
 use starknet_ibc_testkit::handles::CoreHandle;
 use starknet_ibc_testkit::setup::SetupImpl;
@@ -57,8 +57,6 @@ fn test_update_comet_client_ok() {
     // -----------------------------------------------------------
     // Update Client
     // -----------------------------------------------------------
-
-    core.register_relayer(RELAYER());
 
     // Update the client to a new height and time.
     let updating_height = cfg.latest_height.clone() + HEIGHT(1);

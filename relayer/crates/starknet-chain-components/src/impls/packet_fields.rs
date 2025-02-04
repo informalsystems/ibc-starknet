@@ -14,6 +14,6 @@ where
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>,
 {
     fn packet_src_channel_id(packet: &Packet) -> ChannelId {
-        packet.chan_id_on_b.clone()
+        packet.chan_id_on_a.clone()
     }
 }

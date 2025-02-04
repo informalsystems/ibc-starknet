@@ -52,6 +52,7 @@ where
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
         + CanRaiseAsyncError<ConsensusStateNotFound>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
         HasConsensusStateType<Chain, ConsensusState = CometConsensusState> + HasHeightFields,
@@ -79,10 +80,10 @@ where
         let client_id_seq = client_id
             .as_str()
             .rsplit_once('-')
-            .expect("valid client id")
+            .ok_or_else(|| Chain::raise_error("invalid client id"))?
             .1
             .parse::<u64>()
-            .expect("valid sequence");
+            .map_err(|_| Chain::raise_error("invalid sequence"))?;
 
         let calldata = encoding
             .encode(&(client_id_seq, height.clone()))
