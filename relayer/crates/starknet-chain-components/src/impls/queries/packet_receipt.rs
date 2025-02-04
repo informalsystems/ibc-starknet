@@ -53,6 +53,7 @@ where
         + CanCallContract
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<String>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasSequenceType<Chain, Sequence = IbcSequence>,
     Encoding: CanEncode<ViaCairo, Product![CairoPortId, ChannelId, Sequence]>
@@ -88,15 +89,11 @@ where
 
         let receipt_status = encoding.decode(&output).map_err(Chain::raise_error)?;
 
-        // TODO(rano): are these bytes correct?
-        let receipt_bytes = if receipt_status {
-            // 0x01 -> "AQ=="
-            br#"{"result":"AQ=="}"#
-        } else {
-            // 0x00 -> "AA=="
-            br#"{"result":"AA=="}"#
+        if receipt_status {
+            return Err(Chain::raise_error(
+                "Packet is received. No non-membership proof.",
+            ));
         }
-        .to_vec();
 
         let chain_status = chain.query_chain_status().await?;
 
@@ -106,7 +103,7 @@ where
             path: Path::Receipt(ReceiptPath::new(port_id, channel_id, *sequence))
                 .to_string()
                 .into(),
-            value: Some(receipt_bytes.clone()),
+            value: None,
         }
         .canonical_bytes();
 
@@ -120,6 +117,6 @@ where
             proof_bytes: signed_bytes,
         };
 
-        Ok((receipt_bytes, dummy_proof))
+        Ok((vec![], dummy_proof))
     }
 }
