@@ -24,5 +24,5 @@ alexandria_numeric = { workspace = true }
 protobuf           = { workspace = true }
 
 [dev-dependencies]
-cairo_test      = { workspace = true }
-snforge_std     = { workspace = true }
+cairo_test  = { workspace = true }
+snforge_std = { workspace = true }
