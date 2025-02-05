@@ -6,7 +6,7 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url = "github:numtide/flake-utils";
     cairo-nix.url = "github:cairo-nix/cairo-nix";
-    cosmos-nix.url = "github:informalsystems/cosmos.nix";
+    cosmos-nix.url = "github:informalsystems/cosmos.nix/rano/osmosis-fetchgit";
 
     starknet-devnet-src = {
       url = "github:0xSpaceShard/starknet-devnet-rs";
