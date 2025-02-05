@@ -298,6 +298,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .send_target_update_client_messages(DestinationTarget, &starknet_status.height)
                 .await?;
 
+            runtime.sleep(Duration::from_secs(2)).await;
+
             let consensus_state = cosmos_chain
                 .query_consensus_state(
                     PhantomData::<StarknetChain>,
@@ -328,6 +330,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
             starknet_to_cosmos_relay
                 .send_target_update_client_messages(SourceTarget, &cosmos_status.height)
                 .await?;
+
+            runtime.sleep(Duration::from_secs(2)).await;
 
             let consensus_state = starknet_chain
                 .query_consensus_state(
