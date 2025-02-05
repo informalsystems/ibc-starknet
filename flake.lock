@@ -267,11 +267,11 @@
         "wasmvm_2_1_4-src": "wasmvm_2_1_4-src"
       },
       "locked": {
-        "lastModified": 1738597515,
-        "narHash": "sha256-tT33fT87qANHaFPNYpbb5edoo5Z8YD6l/uTwGacZuYc=",
+        "lastModified": 1738754233,
+        "narHash": "sha256-Z3xF0UsI1O+3AZYEAfNegW2UCB1jvlSH1UZzsY0+DL8=",
         "owner": "informalsystems",
         "repo": "cosmos.nix",
-        "rev": "6ba1b5e0787de4e6d9abf0d72416a57b91ea9905",
+        "rev": "b7125841f14af672a4f656f5607f9cf8b8c67970",
         "type": "github"
       },
       "original": {
@@ -1555,11 +1555,11 @@
     },
     "nixpkgs_6": {
       "locked": {
-        "lastModified": 1738452225,
-        "narHash": "sha256-Qmwx3FXM0x0pdjibwTk/uRbayqDrs3EwmRJe7tQWu48=",
+        "lastModified": 1738734093,
+        "narHash": "sha256-UEYOKfXXKU49fR7dGB05As0s2pGbLK4xDo48Qtdm7xs=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "6c4e0724e0a785a20679b1bca3a46bfce60f05b6",
+        "rev": "5b2753b0356d1c951d7a3ef1d086ba5a71fff43c",
         "type": "github"
       },
       "original": {
@@ -1589,17 +1589,17 @@
       "flake": false,
       "locked": {
         "lastModified": 1733410232,
-        "narHash": "sha256-N4uI3cpmQZwAtT3/GnHak62URIUtVRlsDtGR3uMvK+o=",
-        "owner": "osmosis-labs",
-        "repo": "osmosis",
+        "narHash": "sha256-XU6eRpngXZMzDS3C68T7ocHAorPXPP0jtC/nDB7XGeE=",
+        "ref": "refs/tags/v28.0.0",
         "rev": "39ec8f9e54742aa52ed531210b02218171dfadd9",
-        "type": "github"
+        "revCount": 4026,
+        "type": "git",
+        "url": "https://github.com/osmosis-labs/osmosis"
       },
       "original": {
-        "owner": "osmosis-labs",
-        "ref": "v28.0.0",
-        "repo": "osmosis",
-        "type": "github"
+        "ref": "refs/tags/v28.0.0",
+        "type": "git",
+        "url": "https://github.com/osmosis-labs/osmosis"
       }
     },
     "pre-commit-hooks": {
@@ -1735,11 +1735,11 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "lastModified": 1738549608,
-        "narHash": "sha256-GdyT9QEUSx5k/n8kILuNy83vxxdyUfJ8jL5mMpQZWfw=",
+        "lastModified": 1738722444,
+        "narHash": "sha256-DHVyKCiIQVDqjYoVU2j7UaLNIlOnpB9sP1cPRNRpqvY=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "35c6f8c4352f995ecd53896200769f80a3e8f22d",
+        "rev": "347fb01821c3cd8d54e563d244a599c1e27a393d",
         "type": "github"
       },
       "original": {

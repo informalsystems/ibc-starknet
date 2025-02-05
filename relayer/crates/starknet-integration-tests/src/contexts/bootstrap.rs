@@ -7,6 +7,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
+use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_test_components::bootstrap::components::cosmos_sdk::{
     ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent,
 };
@@ -139,6 +140,18 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             ExecutionEncoding::New,
         );
 
+        let proof_signer = Secp256k1KeyPair::from_mnemonic(
+            bip39::Mnemonic::from_entropy(
+                &relayer_wallet.signing_key.to_bytes_be(),
+                bip39::Language::English,
+            )
+            .expect("valid mnemonic")
+            .phrase(),
+            &"m/84'/0'/0'/0/0".parse().expect("valid hdpath"),
+            "strk",
+        )
+        .expect("valid key pair");
+
         let chain = StarknetChain {
             runtime: runtime.clone(),
             chain_id: chain_id.to_string().parse()?,
@@ -148,6 +161,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             ibc_core_contract_address: None,
             event_encoding: Default::default(),
             event_subscription: None,
+            proof_signer,
         };
 
         let chain_driver = StarknetChainDriver {

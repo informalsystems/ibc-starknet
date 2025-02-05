@@ -1,6 +1,5 @@
 use cgp::prelude::*;
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
-use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::messages::client::update::CosmosUpdateClientMessage;
 use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -11,7 +10,6 @@ use hermes_relayer_components::chain::traits::message_builders::update_client::U
 use hermes_relayer_components::chain::traits::types::ibc::HasIbcChainTypes;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
-use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
 use ibc::core::host::types::identifiers::ClientId;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use prost_types::Any;
@@ -25,9 +23,7 @@ impl<Chain, Counterparty, Encoding> UpdateClientMessageBuilder<Chain, Counterpar
 where
     Chain: HasIbcChainTypes<Counterparty, ClientId = ClientId>
         + HasMessageType<Message = CosmosMessage>
-        + HasDefaultSigner<Signer = Secp256k1KeyPair>
-        + CanRaiseAsyncError<Encoding::Error>
-        + CanRaiseAsyncError<String>,
+        + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasUpdateClientPayloadType<Chain, UpdateClientPayload = StarknetUpdateClientPayload>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>,
     Encoding: Async
@@ -35,7 +31,7 @@ where
         + CanConvert<SignedStarknetHeader, Any>,
 {
     async fn build_update_client_message(
-        chain: &Chain,
+        _chain: &Chain,
         client_id: &Chain::ClientId,
         payload: StarknetUpdateClientPayload,
     ) -> Result<Vec<CosmosMessage>, Chain::Error> {
@@ -45,13 +41,9 @@ where
             .encode(&payload.header)
             .map_err(Chain::raise_error)?;
 
-        let signer = chain.get_default_signer();
-
-        let signature = signer.sign(&encoded_header).map_err(Chain::raise_error)?;
-
         let signed_header = SignedStarknetHeader {
             header: encoded_header.clone(),
-            signature,
+            signature: payload.signature,
         };
 
         let signed_header_any: Any = encoding

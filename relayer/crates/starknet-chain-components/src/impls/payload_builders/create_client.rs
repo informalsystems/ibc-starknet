@@ -1,5 +1,6 @@
 use cgp::prelude::CanRaiseAsyncError;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
+use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CreateClientPayloadBuilder;
 use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_relayer_components::chain::traits::types::create_client::{
@@ -10,6 +11,7 @@ use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
 
+use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::types::consensus_state::{StarknetConsensusState, WasmStarknetConsensusState};
 use crate::types::payloads::client::{
     StarknetCreateClientPayload, StarknetCreateClientPayloadOptions,
@@ -27,6 +29,7 @@ where
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
         + HasChainId<ChainId = ChainId>
+        + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<ClientError>,
 {
@@ -53,6 +56,7 @@ where
             chain_id: chain.chain_id().clone(),
             client_state_wasm_code_hash: create_client_options.wasm_code_hash.into(),
             consensus_state,
+            proof_signer_pub_key: chain.proof_signer().public_key.serialize().to_vec(),
         })
     }
 }
