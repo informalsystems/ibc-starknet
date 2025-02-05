@@ -3,6 +3,8 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::packet_receipt::PacketReceiptQuerier;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{
@@ -10,22 +12,27 @@ use hermes_chain_components::traits::types::ibc::{
 };
 use hermes_chain_components::traits::types::packets::timeout::HasPacketReceiptType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
+use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence as IbcSequence};
+use ibc::core::host::types::path::{Path, ReceiptPath};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 use crate::traits::contract::call::CanCallContract;
+use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::channel_id::ChannelId;
 use crate::types::commitment_proof::StarknetCommitmentProof;
+use crate::types::membership_proof_signer::MembershipVerifierContainer;
 use crate::types::messages::ibc::channel::PortId as CairoPortId;
 use crate::types::messages::ibc::packet::Sequence;
+use crate::types::status::StarknetChainStatus;
 
 pub struct QueryStarknetPacketReceipt;
 
@@ -33,6 +40,8 @@ impl<Chain, Counterparty, Encoding> PacketReceiptQuerier<Chain, Counterparty>
     for QueryStarknetPacketReceipt
 where
     Chain: HasHeightType<Height = u64>
+        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + HasPacketReceiptType<Counterparty, PacketReceipt = Vec<u8>>
@@ -42,6 +51,9 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanCallContract
+        + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
+        + CanRaiseAsyncError<String>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasSequenceType<Chain, Sequence = IbcSequence>,
     Encoding: CanEncode<ViaCairo, Product![CairoPortId, ChannelId, Sequence]>
@@ -53,7 +65,7 @@ where
         channel_id: &ChannelId,
         port_id: &IbcPortId,
         sequence: &IbcSequence,
-        height: &u64,
+        _height: &u64,
     ) -> Result<(Vec<u8>, StarknetCommitmentProof), Chain::Error> {
         let encoding = chain.encoding();
 
@@ -75,24 +87,36 @@ where
             .call_contract(&contract_address, &selector!("packet_receipt"), &calldata)
             .await?;
 
-        // TODO(rano): how to get the proof?
-        let dummy_proof = StarknetCommitmentProof {
-            proof_height: *height,
-            proof_bytes: vec![0x1],
-        };
-
         let receipt_status = encoding.decode(&output).map_err(Chain::raise_error)?;
 
-        // TODO(rano): are these bytes correct?
-        let receipt_bytes = if receipt_status {
-            // 0x01 -> "AQ=="
-            br#"{"result":"AQ=="}"#
-        } else {
-            // 0x00 -> "AA=="
-            br#"{"result":"AA=="}"#
+        if receipt_status {
+            return Err(Chain::raise_error(
+                "Packet is received. No non-membership proof.",
+            ));
         }
-        .to_vec();
 
-        Ok((receipt_bytes, dummy_proof))
+        let chain_status = chain.query_chain_status().await?;
+
+        let unsigned_membership_proof_bytes = MembershipVerifierContainer {
+            state_root: chain_status.block_hash.to_bytes_be().to_vec(),
+            prefix: chain.ibc_commitment_prefix().clone(),
+            path: Path::Receipt(ReceiptPath::new(port_id, channel_id, *sequence))
+                .to_string()
+                .into(),
+            value: None,
+        }
+        .canonical_bytes();
+
+        let signed_bytes = chain
+            .proof_signer()
+            .sign(&unsigned_membership_proof_bytes)
+            .map_err(Chain::raise_error)?;
+
+        let dummy_proof = StarknetCommitmentProof {
+            proof_height: chain_status.height,
+            proof_bytes: signed_bytes,
+        };
+
+        Ok((vec![], dummy_proof))
     }
 }

@@ -67,9 +67,6 @@ pub trait IChannelQuery<TContractState> {
     fn packet_acknowledgement(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
     ) -> Commitment;
-    fn is_packet_received(
-        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
-    ) -> bool;
     fn unreceived_packet_sequences(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>
     ) -> Array<Sequence>;

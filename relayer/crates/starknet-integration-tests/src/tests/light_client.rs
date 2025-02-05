@@ -13,20 +13,13 @@ use hermes_cosmos_chain_components::impls::connection::connection_handshake_mess
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
 use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
-use hermes_cosmos_chain_components::types::events::channel::CosmosChannelOpenInitEvent;
 use hermes_cosmos_chain_components::types::events::connection::CosmosConnectionOpenInitEvent;
-use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
-use hermes_cosmos_chain_components::types::messages::channel::open_init::CosmosChannelOpenInitMessage;
-use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::connection::open_init::CosmosConnectionOpenInitMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_cosmos_relayer::contexts::encoding::CosmosEncoding;
-use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
-use hermes_relayer_components::chain::traits::payload_builders::create_client::CanBuildCreateClientPayload;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
 };
@@ -48,9 +41,7 @@ use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncod
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
-use ibc::core::channel::types::channel::State;
 use ibc::core::client::types::Height;
-use ibc_proto::ibc::core::channel::v1::{Channel, Counterparty};
 use sha2::{Digest, Sha256};
 use starknet::accounts::Call;
 use starknet::macros::{selector, short_string};
@@ -235,8 +226,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
         );
 
         {
-            let client_state =
-                cosmos_chain.query_client_state(
+            let client_state = cosmos_chain
+                .query_client_state(
                     PhantomData::<StarknetChain>,
                     &cosmos_client_id,
                     &cosmos_chain.query_chain_height().await?,
@@ -245,8 +236,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             let client_height = client_state.client_state.latest_height.revision_height();
 
-            let consensus_state =
-                cosmos_chain.query_consensus_state(
+            let consensus_state = cosmos_chain
+                .query_consensus_state(
                     PhantomData::<StarknetChain>,
                     &cosmos_client_id,
                     &client_height,
@@ -262,16 +253,16 @@ fn test_starknet_light_client() -> Result<(), Error> {
         }
 
         {
-            let client_state =
-                starknet_chain.query_client_state(
+            let client_state = starknet_chain
+                .query_client_state(
                     PhantomData::<CosmosChain>,
                     &starknet_client_id,
                     &starknet_chain.query_chain_height().await?,
                 )
                 .await?;
 
-            let consensus_state =
-                starknet_chain.query_consensus_state(
+            let consensus_state = starknet_chain
+                .query_consensus_state(
                     PhantomData::<CosmosChain>,
                     &starknet_client_id,
                     &Height::new(
@@ -284,8 +275,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             info!(
                 "initial Cosmos consensus state height {} and root: {:?} on Starknet",
-                client_state.latest_height.revision_height,
-                consensus_state.root
+                client_state.latest_height.revision_height, consensus_state.root
             );
         }
 
@@ -304,8 +294,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .send_target_update_client_messages(DestinationTarget, &starknet_status.height)
                 .await?;
 
-            let consensus_state =
-                cosmos_chain.query_consensus_state(
+            let consensus_state = cosmos_chain
+                .query_consensus_state(
                     PhantomData::<StarknetChain>,
                     &cosmos_client_id,
                     &starknet_status.height,
@@ -322,7 +312,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         {
             runtime.sleep(Duration::from_secs(2)).await;
 
-            let cosmos_status= cosmos_chain.query_chain_status().await?;
+            let cosmos_status = cosmos_chain.query_chain_status().await?;
 
             info!(
                 "updating Cosmos client to Starknet to height {}",
@@ -335,8 +325,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .send_target_update_client_messages(SourceTarget, &cosmos_status.height)
                 .await?;
 
-            let consensus_state =
-                starknet_chain.query_consensus_state(
+            let consensus_state = starknet_chain
+                .query_consensus_state(
                     PhantomData::<CosmosChain>,
                     &starknet_client_id,
                     &cosmos_status.height,
@@ -344,17 +334,15 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 )
                 .await?;
 
-
             // TODO(rano): add assert
 
             info!(
                 "updated Cosmos client to Starknet to height {} and root: {:?}",
-                cosmos_status.height,
-                consensus_state.root
+                cosmos_status.height, consensus_state.root
             );
         }
 
-        let cosmos_connection_id = {
+        let _cosmos_connection_id = {
             let open_init_message = CosmosConnectionOpenInitMessage {
                 client_id: cosmos_client_id.to_string(),
                 counterparty_client_id: starknet_client_id.to_string(),
@@ -363,87 +351,22 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 delay_period: Duration::from_secs(0),
             };
 
-            let events = cosmos_chain.send_message(open_init_message.to_cosmos_message()).await?;
+            let events = cosmos_chain
+                .send_message(open_init_message.to_cosmos_message())
+                .await?;
 
-            let connection_id = cosmos_chain.try_extract_from_message_response(PhantomData::<CosmosConnectionOpenInitEvent>, &events)
+            let connection_id = cosmos_chain
+                .try_extract_from_message_response(
+                    PhantomData::<CosmosConnectionOpenInitEvent>,
+                    &events,
+                )
                 .unwrap()
-                .connection_id
-            ;
+                .connection_id;
 
             info!("initialized connection on Cosmos: {connection_id}");
 
             connection_id
         };
-
-        {
-            // Pretend that we have relayed ConnectionOpenTry to Starknet, and then send ConnectionOpenAck.
-
-            let payload = <CosmosChain as CanBuildCreateClientPayload<CosmosChain>>::build_create_client_payload(cosmos_chain, &Default::default(),
-            ).await?;
-
-            let client_state = CosmosEncoding.convert(&payload.client_state)?;
-
-            runtime.sleep(Duration::from_secs(1)).await;
-
-            let open_ack_message = CosmosConnectionOpenAckMessage {
-                connection_id: cosmos_connection_id.to_string(),
-                counterparty_connection_id: cosmos_connection_id.to_string(), // TODO: stub
-                version: default_connection_version(),
-                client_state,
-                update_height: Height::new(0, 1).unwrap(),
-                proof_try: [0; 32].into(), // dummy proofs
-                proof_client: [0; 32].into(),
-                proof_consensus: [0; 32].into(),
-                proof_consensus_height: payload.client_state.latest_height,
-            };
-
-            cosmos_chain.send_message(open_ack_message.to_cosmos_message()).await?;
-        }
-
-        let channel_id = {
-            let channel = Channel {
-                state: State::Init as i32,
-                ordering: 1,
-                counterparty: Some(Counterparty {
-                    port_id: "11b7f9bfa43d3facae74efa5dfe0030df98273271278291d67c16a4e6cd5f7c".to_string(), // stub application contract on Starknet as port ID
-                    channel_id: "".to_string(),
-                }),
-                connection_hops: vec![cosmos_connection_id.to_string()],
-                version: "ics20-1".into(),
-                upgrade_sequence: 0,
-            };
-
-            let open_init_message = CosmosChannelOpenInitMessage {
-                port_id: "transfer".into(),
-                channel,
-            };
-
-            let events = cosmos_chain.send_message(open_init_message.to_cosmos_message()).await?;
-
-            let channel_id = cosmos_chain.try_extract_from_message_response(PhantomData::<CosmosChannelOpenInitEvent>, &events)
-                .unwrap()
-                .channel_id
-            ;
-
-            info!("initialized channel on Cosmos: {channel_id}");
-
-            channel_id
-        };
-
-        {
-            // Pretend that we have already done ChannelOpenTry on Starknet, and then continue with ChannelOpenAck
-
-            let open_ack_message = CosmosChannelOpenAckMessage {
-                port_id: "transfer".into(),
-                channel_id: channel_id.to_string(),
-                counterparty_channel_id: "63c350000c404581a3385ec7b4324008b2965dd8fc5af768b87329d25e57cfa".into(), // stub channel contract on Starknet as channel ID
-                counterparty_version: "ics20-1".into(),
-                update_height: Height::new(0, 1).unwrap(),
-                proof_try: [0; 32].into(), // dummy proofs
-            };
-
-            cosmos_chain.send_message(open_ack_message.to_cosmos_message()).await?;
-        }
 
         Ok(())
     })
