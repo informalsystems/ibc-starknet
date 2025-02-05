@@ -89,6 +89,7 @@ use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
 use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
+use crate::impls::queries::unreceived_packets::QueryStarknetUnreceivedPacketSequences;
 use crate::impls::send_message::SendCallMessages;
 use crate::impls::submit_tx::SubmitCallTransaction;
 use crate::impls::transfer::TransferErc20Token;
@@ -384,6 +385,8 @@ cgp_preset! {
             QueryChannelEndFromStarknet,
         PacketCommitmentQuerierComponent:
             QueryStarknetPacketCommitment,
+        UnreceivedPacketSequencesQuerierComponent:
+            QueryStarknetUnreceivedPacketSequences,
         PacketAcknowledgementQuerierComponent:
             QueryStarknetAckCommitment,
         PacketReceiptQuerierComponent:
