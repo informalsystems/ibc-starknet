@@ -79,10 +79,6 @@ jobs:
             -c \
             cargo nextest run --test-threads=2
 
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-
   lint-relayer:
     name: Lint Relayer Code
     runs-on: ubuntu-latest

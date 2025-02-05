@@ -116,21 +116,6 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let starknet_chain = &mut starknet_chain_driver.chain;
 
-        // just waiting for the chains to progress
-        // Starknet block height starts at zero
-        runtime.sleep(Duration::from_secs(2)).await;
-
-        let cosmos_client_id = StarknetToCosmosRelay::create_client(
-            DestinationTarget,
-            cosmos_chain,
-            starknet_chain,
-            &StarknetCreateClientPayloadOptions { wasm_code_hash },
-            &(),
-        )
-        .await?;
-
-        info!("created client id on Cosmos: {:?}", cosmos_client_id);
-
         let ibc_core_class_hash = {
             let contract_path = std::env::var("IBC_CORE_CONTRACT")?;
 
@@ -209,6 +194,17 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             info!("IBC register client response: {:?}", response);
         }
+
+        let cosmos_client_id = StarknetToCosmosRelay::create_client(
+            DestinationTarget,
+            cosmos_chain,
+            starknet_chain,
+            &StarknetCreateClientPayloadOptions { wasm_code_hash },
+            &(),
+        )
+        .await?;
+
+        info!("created client id on Cosmos: {:?}", cosmos_client_id);
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
@@ -302,7 +298,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .await?;
 
             // wait till the starknet_status is incremented
-            while dbg!(cosmos_status.height) == cosmos_height {
+            while cosmos_status.height <= cosmos_height {
                 runtime.sleep(Duration::from_secs(1)).await;
                 cosmos_status = cosmos_chain.query_chain_status().await?;
             }
@@ -342,7 +338,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .await?;
 
             // wait till the starknet_status is incremented
-            while dbg!(starknet_status.height) <= starknet_height + 5 {
+            while starknet_status.height <= starknet_height {
                 runtime.sleep(Duration::from_secs(1)).await;
                 starknet_status = starknet_chain.query_chain_status().await?;
             }
