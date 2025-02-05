@@ -182,6 +182,14 @@ impl From<CometClientState> for Any {
     }
 }
 
+impl From<CometClientState> for IbcCometClientState {
+    fn from(value: CometClientState) -> Self {
+        Any::from(value)
+            .try_into()
+            .expect("valid tendermint client state")
+    }
+}
+
 pub struct EncodeChainId;
 
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChainId> for EncodeChainId
