@@ -1,6 +1,5 @@
 use cgp::prelude::*;
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
-use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::messages::client::create::CosmosCreateClientMessage;
 use hermes_encoding_components::traits::convert::CanConvert;
 use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
@@ -12,7 +11,6 @@ use hermes_relayer_components::chain::traits::types::create_client::{
     HasCreateClientMessageOptionsType, HasCreateClientPayloadType,
 };
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
-use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
 use ibc_client_starknet_types::StarknetClientState;
 use prost_types::Any;
 
@@ -27,7 +25,6 @@ impl<Chain, Counterparty, Encoding> CreateClientMessageBuilder<Chain, Counterpar
 where
     Chain: HasMessageType<Message = CosmosMessage>
         + HasCreateClientMessageOptionsType<Counterparty>
-        + HasDefaultSigner<Signer = Secp256k1KeyPair>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasCreateClientPayloadType<Chain, CreateClientPayload = StarknetCreateClientPayload>
         + HasClientStateType<Chain, ClientState = WasmStarknetClientState>
@@ -38,7 +35,7 @@ where
         + CanConvert<Counterparty::ConsensusState, Any>,
 {
     async fn build_create_client_message(
-        chain: &Chain,
+        _chain: &Chain,
         _options: &Chain::CreateClientMessageOptions,
         payload: StarknetCreateClientPayload,
     ) -> Result<CosmosMessage, Chain::Error> {
@@ -47,7 +44,7 @@ where
         let starknet_client_state = StarknetClientState {
             latest_height: payload.latest_height,
             chain_id: payload.chain_id,
-            pub_key: chain.get_default_signer().public_key.serialize().to_vec(),
+            pub_key: payload.proof_signer_pub_key,
         };
 
         let client_state = WasmStarknetClientState {

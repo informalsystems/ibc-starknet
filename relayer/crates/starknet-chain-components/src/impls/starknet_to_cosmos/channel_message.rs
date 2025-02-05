@@ -40,7 +40,6 @@ where
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + CanRaiseAsyncError<Infallible>
         + CanRaiseAsyncError<ClientError>
-        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<ParseIntError>
         + CanRaiseAsyncError<IdentifierError>,
     Counterparty: HasChannelIdType<Chain, ChannelId = StarknetChannelId>
@@ -118,15 +117,13 @@ where
         let update_height =
             CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
-        let proof_try = counterparty_payload.proof_try.proof_bytes;
-
         let message = CosmosChannelOpenAckMessage {
             port_id: port_id.to_string(),
             channel_id: channel_id.to_string(),
             counterparty_channel_id: counterparty_channel_id.to_string(),
             counterparty_version: counterparty_payload.channel_end.version.to_string(),
             update_height,
-            proof_try,
+            proof_try: counterparty_payload.proof_try.proof_bytes,
         };
 
         Ok(message.to_cosmos_message())

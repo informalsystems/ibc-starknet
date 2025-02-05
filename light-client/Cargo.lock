@@ -1135,12 +1135,13 @@ dependencies = [
 [[package]]
 name = "ibc-client-cw"
 version = "0.56.0"
-source = "git+https://github.com/informalsystems/cosmwasm-ibc.git?branch=luca_joss/add-cw-client-extension-trait#9160e505a664aaa430f9c3cdc40e115d6d364ceb"
+source = "git+https://github.com/informalsystems/cosmwasm-ibc.git?branch=starknet/demo2#7d37df42469728747fde966d6e4789bc87404b42"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-storage-plus",
  "derive_more 1.0.0",
+ "ibc-client-tendermint",
  "ibc-client-wasm-types",
  "ibc-core",
  "prost",

@@ -7,14 +7,18 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
+use eyre::eyre;
+use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::Error;
 use hermes_error::HermesError;
+use hermes_relayer_components::build::traits::builders::birelay_builder::BiRelayBuilder;
 use hermes_relayer_components::build::traits::builders::chain_builder::{
     CanBuildChain, ChainBuilder,
 };
+use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeAtComponent;
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
 use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
@@ -23,7 +27,7 @@ use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
-use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
+use ibc::core::host::types::identifiers::{ChainId, ClientId, ClientId as CosmosClientId};
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
@@ -31,6 +35,7 @@ use starknet::signers::{LocalWallet, SigningKey};
 use url::Url;
 
 use super::cosmos_to_starknet_relay::CosmosToStarknetRelay;
+use crate::contexts::birelay::StarknetCosmosBiRelay;
 use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 
 #[derive(Clone)]
@@ -42,8 +47,8 @@ pub struct StarknetBuilder {
 pub struct StarknetBuilderFields {
     // Used to build CosmosChain
     pub cosmos_builder: CosmosBuilder,
-    // Fields for StarknetChain
     pub runtime: HermesRuntime,
+    // Fields for StarknetChain
     pub starknet_chain_config: StarknetChainConfig,
 }
 
@@ -80,6 +85,8 @@ delegate_components! {
         RuntimeTypeComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
         RelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
+        RelayTypeAtComponent<Index<1>, Index<0>>: WithType<CosmosToStarknetRelay>,
+        BiRelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetCosmosBiRelay>,
     }
 }
 
@@ -87,9 +94,9 @@ impl ChainBuilder<StarknetBuilder, Index<0>> for StarknetBuildComponents {
     async fn build_chain(
         build: &StarknetBuilder,
         _index: PhantomData<Index<0>>,
-        _chain_id: &ChainId,
+        chain_id: &ChainId,
     ) -> Result<StarknetChain, HermesError> {
-        build.build_chain().await
+        build.build_chain(chain_id).await
     }
 }
 
@@ -100,6 +107,43 @@ impl ChainBuilder<StarknetBuilder, Index<1>> for StarknetBuildComponents {
         chain_id: &ChainId,
     ) -> Result<CosmosChain, Error> {
         build.cosmos_builder.build_chain(chain_id).await
+    }
+}
+
+impl BiRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponents {
+    async fn build_birelay(
+        build: &StarknetBuilder,
+        chain_id_a: &ChainId,
+        chain_id_b: &ChainId,
+        client_id_a: &ClientId,
+        client_id_b: &ClientId,
+    ) -> Result<StarknetCosmosBiRelay, HermesError> {
+        let starknet_chain = build.build_chain(chain_id_a).await?;
+        let cosmos_chain = build.cosmos_builder.build_chain(chain_id_b).await?;
+
+        let relay_a_to_b = StarknetToCosmosRelay::new(
+            build.runtime.clone(),
+            starknet_chain.clone(),
+            cosmos_chain.clone(),
+            client_id_a.clone(),
+            client_id_b.clone(),
+        );
+
+        let relay_b_to_a = CosmosToStarknetRelay::new(
+            build.runtime.clone(),
+            cosmos_chain,
+            starknet_chain,
+            client_id_b.clone(),
+            client_id_a.clone(),
+        );
+
+        let birelay = StarknetCosmosBiRelay {
+            runtime: build.runtime.clone(),
+            relay_a_to_b,
+            relay_b_to_a,
+        };
+
+        Ok(birelay)
     }
 }
 
@@ -118,16 +162,25 @@ impl StarknetBuilder {
         }
     }
 
-    pub async fn build_chain(&self) -> Result<StarknetChain, HermesError> {
-        self.build_chain_with_config().await
+    pub async fn build_chain(&self, chain_id: &ChainId) -> Result<StarknetChain, HermesError> {
+        self.build_chain_with_config(chain_id).await
     }
 
-    pub async fn build_chain_with_config(&self) -> Result<StarknetChain, HermesError> {
+    pub async fn build_chain_with_config(
+        &self,
+        expected_chain_id: &ChainId,
+    ) -> Result<StarknetChain, HermesError> {
         let json_rpc_url = Url::parse(&self.starknet_chain_config.json_rpc_url.to_string())?;
 
         let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
 
-        let chain_id = rpc_client.chain_id().await?;
+        let chain_id_felt = rpc_client.chain_id().await?;
+
+        let chain_id = chain_id_felt.to_string().parse()?;
+
+        if &chain_id != expected_chain_id {
+            return Err(eyre!("Starknet chain has a different ID as configured. Expected: {expected_chain_id}, got: {chain_id}").into());
+        }
 
         let account = SingleOwnerAccount::new(
             rpc_client.clone(),
@@ -135,19 +188,36 @@ impl StarknetBuilder {
                 self.starknet_chain_config.relayer_wallet.signing_key,
             )),
             self.starknet_chain_config.relayer_wallet.account_address,
-            chain_id,
+            chain_id_felt,
             ExecutionEncoding::New,
         );
 
+        let proof_signer = Secp256k1KeyPair::from_mnemonic(
+            bip39::Mnemonic::from_entropy(
+                &self
+                    .starknet_chain_config
+                    .relayer_wallet
+                    .signing_key
+                    .to_bytes_be(),
+                bip39::Language::English,
+            )
+            .expect("valid mnemonic")
+            .phrase(),
+            &"m/84'/0'/0'/0/0".parse().expect("valid hdpath"),
+            "strk",
+        )
+        .expect("valid key pair");
+
         let context = StarknetChain {
             runtime: self.runtime.clone(),
-            chain_id: chain_id.to_string().parse()?,
+            chain_id,
             rpc_client,
             account,
             ibc_client_contract_address: None,
             ibc_core_contract_address: None,
             event_encoding: Default::default(),
             event_subscription: None,
+            proof_signer,
         };
 
         Ok(context)
