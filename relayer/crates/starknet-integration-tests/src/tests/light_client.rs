@@ -347,6 +347,38 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 starknet_status = starknet_chain.query_chain_status().await?;
             }
 
+            info!(
+                "submitted Cosmos client to Starknet to height {}",
+                cosmos_status.height
+            );
+
+            {
+                let client_state = starknet_chain
+                    .query_client_state(
+                        PhantomData::<CosmosChain>,
+                        &starknet_client_id,
+                        &starknet_chain.query_chain_height().await?,
+                    )
+                    .await?;
+
+                let consensus_state = starknet_chain
+                    .query_consensus_state(
+                        PhantomData::<CosmosChain>,
+                        &starknet_client_id,
+                        &Height::new(
+                            client_state.latest_height.revision_number,
+                            client_state.latest_height.revision_height,
+                        )?,
+                        &starknet_chain.query_chain_height().await?,
+                    )
+                    .await?;
+
+                info!(
+                    "after updating Cosmos consensus state height {:?} and root: {:?} on Starknet",
+                    client_state.latest_height, consensus_state.root
+                );
+            }
+
             let consensus_state = starknet_chain
                 .query_consensus_state(
                     PhantomData::<CosmosChain>,
