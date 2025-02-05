@@ -7,6 +7,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     cairo-nix.url = "github:cairo-nix/cairo-nix";
     cosmos-nix.url = "github:informalsystems/cosmos.nix";
+    crate2nix.url = "github:nix-community/crate2nix";
 
     starknet-devnet-src = {
       url = "github:0xSpaceShard/starknet-devnet-rs";
@@ -93,6 +94,26 @@
             rust = rust-wasm;
           };
 
+          buildRustCrateForPkgs =
+            crate:
+            nixpkgs.buildRustCrate.override {
+              rustc = rust;
+              cargo = rust;
+            };
+
+          generatedCargoNix = inputs.crate2nix.tools.${system}.appliedCargoNix {
+            name = "relayer";
+            src = ./relayer;
+          };
+
+          cargoNix = import generatedCargoNix {
+            inherit buildRustCrateForPkgs;
+
+            pkgs = nixpkgs;
+          };
+
+          relayer = cargoNix.rootCrate.build;
+
           starknet-pkgs = {
             inherit
               starknet-devnet
@@ -135,6 +156,7 @@
                 rust-nightly
                 rust-wasm
                 ibc-starknet-cw
+                relayer
                 ;
             }
             // tools
