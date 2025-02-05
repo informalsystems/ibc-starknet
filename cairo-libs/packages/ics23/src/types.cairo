@@ -10,14 +10,35 @@ use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf};
 /// Contains nested proof types within a commitment proof. It currently supports
 /// existence and non-existence proofs to meet the core requirements of IBC. Batch
 /// and compressed proofs can be added in the future if necessary.
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
 pub enum Proof {
     #[default]
     Exist: ExistenceProof,
     NonExist: NonExistenceProof,
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+impl ProofAsProtoMessage of ProtoMessage<Proof> {
+    fn encode_raw(self: @Proof, ref context: EncodeContext) {
+        match self {
+            Proof::Exist(p) => p.encode_raw(ref context),
+            Proof::NonExist(p) => p.encode_raw(ref context),
+        }
+    }
+
+    fn decode_raw(ref self: Proof, ref context: DecodeContext) {
+        match self.clone() {
+            Proof::Exist(mut p) => p.decode_raw(ref context),
+            Proof::NonExist(mut p) => p.decode_raw(ref context),
+        }
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+
+#[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
 pub struct ExistenceProof {
     pub key: ByteArray,
     pub value: Array<u8>,
@@ -52,19 +73,6 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
                 };
         hash
     }
-
-    fn verify(
-        self: @ExistenceProof,
-        spec: @ProofSpec,
-        root: @RootBytes,
-        key: @ByteArray,
-        value: @Array<u8>,
-    ) {
-        assert(self.key == key, ICS23Errors::MISMATCHED_KEY);
-        assert(self.value == value, ICS23Errors::MISMATCHED_VALUE);
-        let calc = self.calculate_root_for_spec(Option::Some(spec));
-        assert(@calc == root, ICS23Errors::MISMATCHED_ROOT)
-    }
 }
 
 impl ExistenceProofAsProtoMessage of ProtoMessage<ExistenceProof> {
@@ -93,7 +101,7 @@ impl ExistenceProofAsProtoName of ProtoName<InnerOp> {
     }
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
 pub struct NonExistenceProof {
     pub key: Array<u8>,
     pub left: ExistenceProof,
@@ -109,8 +117,6 @@ pub impl NonExistenceProofImpl of NonExistenceProofTrait {
     fn calculate_root_for_spec(self: @NonExistenceProof, spec: Option<ProofSpec>) -> RootBytes {
         [0; 8]
     }
-
-    fn verify(self: @NonExistenceProof, spec: @ProofSpec, root: @RootBytes, key: @ByteArray) {}
 }
 
 impl NonExistenceProofAsProtoMessage of ProtoMessage<NonExistenceProof> {
@@ -137,7 +143,7 @@ impl NonExistenceProofAsProtoName of ProtoName<InnerOp> {
     }
 }
 
-#[derive(Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
 pub struct InnerOp {
     pub hash: HashOp,
     pub prefix: Array<u8>,

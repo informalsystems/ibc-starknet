@@ -8,6 +8,7 @@ mod tests {
     mod ops;
     mod utils;
     mod verify;
+    mod data;
 }
 
 pub use types::{

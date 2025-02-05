@@ -1,5 +1,5 @@
 use ics23::{
-    Proof, ProofSpec, ProofSpecTrait, RootBytes, ICS23Errors, ExistenceProofImpl,
+    Proof, ProofSpec, ProofSpecTrait, RootBytes, ICS23Errors, ExistenceProofImpl, NonExistenceProof,
     NonExistenceProofImpl, SliceU32IntoArrayU8, ExistenceProof, LeafOp, HashOp, InnerOp,
 };
 use protobuf::varint::decode_varint_from_u8_array;
@@ -18,16 +18,16 @@ pub fn verify_membership(
     assert(proofs_len == specs.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
     assert(proofs_len == keys.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
     let mut subroot = [0; 8];
-    let mut subvalue: Array<u32> = ArrayTrait::new();
+    let mut subvalue = value;
     let mut i = 0;
     while i < proofs_len {
         if let Proof::Exist(p) = proofs[i] {
             subroot = p.calculate_root();
-            p.verify(specs[i], @subroot, keys[proofs_len - 1 - i], @value);
+            verify_existence(specs[i], p, @subroot, keys[proofs_len - 1 - i], @subvalue);
         } else {
             panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
         }
-        subvalue = subroot.span().into();
+        subvalue = subroot.into();
         i += 1;
     };
     assert(root == subroot, ICS23Errors::INVALID_MERKLE_PROOF);
@@ -46,7 +46,7 @@ pub fn verify_non_membership(
     while i < proofs_len {
         if let Proof::NonExist(p) = proofs[i] {
             subroot = p.calculate_root();
-            p.verify(specs[i], @subroot, keys[proofs_len - 1 - i]);
+            verify_non_existence(specs[i], p, @subroot, keys[proofs_len - 1 - i]);
 
             verify_membership(
                 specs.clone(), proofs, root, keys.clone(), subroot.into()
@@ -58,16 +58,30 @@ pub fn verify_non_membership(
     };
 }
 
-fn check_existence_spec(proof: ExistenceProof, spec: ProofSpec) {
+pub fn verify_existence(
+    spec: @ProofSpec, proof: @ExistenceProof, root: @RootBytes, key: @ByteArray, value: @Array<u8>
+) {
+    check_existence_spec(spec, proof);
+    assert(proof.key == key, ICS23Errors::MISMATCHED_KEY);
+    assert(proof.value == value, ICS23Errors::MISMATCHED_VALUE);
+    let calc = proof.calculate_root_for_spec(Option::Some(spec));
+    assert(@calc == root, ICS23Errors::MISMATCHED_ROOT)
+}
+
+pub fn verify_non_existence(
+    spec: @ProofSpec, proof: @NonExistenceProof, root: @RootBytes, key: @ByteArray
+) {}
+
+fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {
     if spec.is_iavl() {
         ensure_leaf_prefix(proof.leaf.prefix.clone());
     }
-    ensure_leaf(@proof.leaf, @spec.leaf_spec);
+    ensure_leaf(proof.leaf, spec.leaf_spec);
 
     let inner_len = proof.path.len();
-    if spec.min_depth != 0 {
-        assert(inner_len >= spec.min_depth, ICS23Errors::INVALID_INNER_OP_SIZE);
-        assert(inner_len <= spec.max_depth, ICS23Errors::INVALID_INNER_OP_SIZE);
+    if spec.min_depth != @0 {
+        assert(@inner_len >= spec.min_depth, ICS23Errors::INVALID_INNER_OP_SIZE);
+        assert(@inner_len <= spec.max_depth, ICS23Errors::INVALID_INNER_OP_SIZE);
     }
 
     for i in 0

@@ -1,7 +1,19 @@
 use ics23::{
     LeafOp, LengthOp, HashOp, InnerOp, ExistenceProof, ExistenceProofImpl, SliceU32IntoArrayU8,
-    byte_array_to_array_u8, encode_hex, decode_hex
+    byte_array_to_array_u8, encode_hex, decode_hex, ProofSpec, ProofSpecImpl,
 };
+use ics23::tests::data::{TestData, smt_exist_left};
+use protobuf::types::message::ProtoCodecImpl;
+
+
+fn test_verify_membership(data: TestData, spec: ProofSpec) {
+    let _proof = ProtoCodecImpl::decode::<ExistenceProof>(@data.proof);
+}
+
+#[test]
+fn test_verify_existence() {
+    test_verify_membership(smt_exist_left(), ProofSpecImpl::iavl());
+}
 
 #[test]
 fn test_calculate_root_from_leaf() {
