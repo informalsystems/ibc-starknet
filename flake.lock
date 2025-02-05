@@ -267,16 +267,15 @@
         "wasmvm_2_1_4-src": "wasmvm_2_1_4-src"
       },
       "locked": {
-        "lastModified": 1738751378,
+        "lastModified": 1738754233,
         "narHash": "sha256-Z3xF0UsI1O+3AZYEAfNegW2UCB1jvlSH1UZzsY0+DL8=",
         "owner": "informalsystems",
         "repo": "cosmos.nix",
-        "rev": "29d684f2de9ecbf8d92a3e19cbd886437810791a",
+        "rev": "b7125841f14af672a4f656f5607f9cf8b8c67970",
         "type": "github"
       },
       "original": {
         "owner": "informalsystems",
-        "ref": "rano/osmosis-fetchgit",
         "repo": "cosmos.nix",
         "type": "github"
       }
