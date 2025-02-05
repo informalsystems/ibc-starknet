@@ -37,8 +37,6 @@ jobs:
             light-client -> light-client/target
 
       - name: Nix build
-        env:
-          RUST_BACKTRACE: 1
         run: |
           nix build \
             .#starknet-devnet \
@@ -46,6 +44,10 @@ jobs:
             .#scarb \
             .#universal-sierra-compiler \
             .#rust \
+            .#rust-wasm \
+            .#rust-nightly \
+            .#taplo \
+            .#nixfmt \
             .#cargo-nextest \
             .#ibc-starknet-cw \
             .#wasm-simapp \

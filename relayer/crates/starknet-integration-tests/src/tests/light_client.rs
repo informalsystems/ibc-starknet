@@ -116,6 +116,10 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let starknet_chain = &mut starknet_chain_driver.chain;
 
+        // just waiting for the chains to progress
+        // Starknet block height starts at zero
+        runtime.sleep(Duration::from_secs(2)).await;
+
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
