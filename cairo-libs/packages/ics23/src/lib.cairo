@@ -3,6 +3,7 @@ mod errors;
 mod utils;
 mod verify;
 mod ops;
+mod specs;
 #[cfg(test)]
 mod tests {
     mod ops;
@@ -11,6 +12,7 @@ mod tests {
     mod data;
 }
 
+pub use specs::{iavl_spec, tendermint_spec};
 pub use types::{
     Proof, ExistenceProof, ExistenceProofImpl, ExistenceProofTrait, NonExistenceProof,
     NonExistenceProofImpl, InnerOp, LeafOp, ProofSpec, HashOp, LengthOp, RootBytes, ProofSpecImpl,

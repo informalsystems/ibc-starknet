@@ -5,7 +5,7 @@ use protobuf::types::message::{
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
-use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf};
+use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, iavl_spec};
 
 /// Contains nested proof types within a commitment proof. It currently supports
 /// existence and non-existence proofs to meet the core requirements of IBC. Batch
@@ -314,48 +314,6 @@ pub struct ProofSpec {
 
 #[generate_trait]
 pub impl ProofSpecImpl of ProofSpecTrait {
-    fn iavl() -> ProofSpec {
-        let leaf_spec = LeafOp {
-            hash: HashOp::Sha256,
-            prehash_key: HashOp::NoOp,
-            prehash_value: HashOp::Sha256,
-            length: LengthOp::VarProto,
-            prefix: array![0],
-        };
-        let inner_spec = InnerSpec {
-            child_order: array![0, 1],
-            min_prefix_length: 4,
-            max_prefix_length: 12,
-            child_size: 33,
-            empty_child: "",
-            hash: HashOp::Sha256,
-        };
-        ProofSpec {
-            leaf_spec, inner_spec, min_depth: 0, max_depth: 0, prehash_key_before_comparison: false
-        }
-    }
-
-    fn tendermint() -> ProofSpec {
-        let leaf_spec = LeafOp {
-            hash: HashOp::Sha256,
-            prehash_key: HashOp::NoOp,
-            prehash_value: HashOp::Sha256,
-            length: LengthOp::VarProto,
-            prefix: array![0],
-        };
-        let inner_spec = InnerSpec {
-            child_order: array![0, 1],
-            min_prefix_length: 1,
-            max_prefix_length: 1,
-            child_size: 32,
-            empty_child: "",
-            hash: HashOp::Sha256,
-        };
-        ProofSpec {
-            leaf_spec, inner_spec, min_depth: 0, max_depth: 0, prehash_key_before_comparison: false
-        }
-    }
-
     fn validate(self: @ProofSpec) {
         assert(self.max_depth < @0, ICS23Errors::INVALID_DEPTH_RANGE);
         assert(self.min_depth < @0, ICS23Errors::INVALID_DEPTH_RANGE);
@@ -363,7 +321,7 @@ pub impl ProofSpecImpl of ProofSpecTrait {
     }
 
     fn is_iavl(self: @ProofSpec) -> bool {
-        let iavl_spec = Self::iavl();
+        let iavl_spec = iavl_spec();
         @iavl_spec.leaf_spec == self.leaf_spec && @iavl_spec.inner_spec == self.inner_spec
     }
 }
