@@ -381,6 +381,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
             let payload = <CosmosChain as CanBuildCreateClientPayload<CosmosChain>>::build_create_client_payload(cosmos_chain, &Default::default(),
             ).await?;
 
+            let starknet_update_height = starknet_chain.query_chain_height().await?;
+
             let client_state = CosmosEncoding.convert(&payload.client_state)?;
 
             runtime.sleep(Duration::from_secs(1)).await;
@@ -390,7 +392,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 counterparty_connection_id: cosmos_connection_id.to_string(), // TODO: stub
                 version: default_connection_version(),
                 client_state,
-                update_height: Height::new(0, 1).unwrap(),
+                update_height: Height::new(0, starknet_update_height).unwrap(),
                 proof_try: [0; 32].into(), // dummy proofs
                 proof_client: [0; 32].into(),
                 proof_consensus: [0; 32].into(),
@@ -433,12 +435,14 @@ fn test_starknet_light_client() -> Result<(), Error> {
         {
             // Pretend that we have already done ChannelOpenTry on Starknet, and then continue with ChannelOpenAck
 
+            let starknet_update_height = starknet_chain.query_chain_height().await?;
+
             let open_ack_message = CosmosChannelOpenAckMessage {
                 port_id: "transfer".into(),
                 channel_id: channel_id.to_string(),
                 counterparty_channel_id: "63c350000c404581a3385ec7b4324008b2965dd8fc5af768b87329d25e57cfa".into(), // stub channel contract on Starknet as channel ID
                 counterparty_version: "ics20-1".into(),
-                update_height: Height::new(0, 1).unwrap(),
+                update_height: Height::new(0, starknet_update_height).unwrap(),
                 proof_try: [0; 32].into(), // dummy proofs
             };
 
