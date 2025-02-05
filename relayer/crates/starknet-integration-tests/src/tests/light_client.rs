@@ -302,7 +302,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .await?;
 
             // wait till the starknet_status is incremented
-            while cosmos_status.height == cosmos_height {
+            while dbg!(cosmos_status.height) == cosmos_height {
                 runtime.sleep(Duration::from_secs(1)).await;
                 cosmos_status = cosmos_chain.query_chain_status().await?;
             }
@@ -342,7 +342,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .await?;
 
             // wait till the starknet_status is incremented
-            while starknet_status.height == starknet_height {
+            while dbg!(starknet_status.height) == starknet_height {
                 runtime.sleep(Duration::from_secs(1)).await;
                 starknet_status = starknet_chain.query_chain_status().await?;
             }
