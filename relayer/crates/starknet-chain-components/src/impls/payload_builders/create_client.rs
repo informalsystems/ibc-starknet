@@ -49,7 +49,7 @@ where
         };
 
         Ok(StarknetCreateClientPayload {
-            latest_height: Height::new(0, 1).map_err(Chain::raise_error)?,
+            latest_height: Height::new(0, chain_status.height).map_err(Chain::raise_error)?,
             chain_id: chain.chain_id().clone(),
             client_state_wasm_code_hash: create_client_options.wasm_code_hash.into(),
             consensus_state,
