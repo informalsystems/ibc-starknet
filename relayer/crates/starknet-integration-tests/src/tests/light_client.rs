@@ -342,7 +342,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .await?;
 
             // wait till the starknet_status is incremented
-            while dbg!(starknet_status.height) == starknet_height {
+            while dbg!(starknet_status.height) <= starknet_height + 5 {
                 runtime.sleep(Duration::from_secs(1)).await;
                 starknet_status = starknet_chain.query_chain_status().await?;
             }
