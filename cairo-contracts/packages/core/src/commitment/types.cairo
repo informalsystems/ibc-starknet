@@ -52,7 +52,9 @@ pub fn compute_packet_commitment(
     json_packet_data: @ByteArray, timeout_height: Height, timeout_timestamp: Timestamp
 ) -> Commitment {
     let mut coll = U32CollectorImpl::init();
-    coll.extend(timeout_timestamp);
+    // ibc-go uses nanosecs
+    // https://github.com/cosmos/ibc-go/blob/98d7e7550a23ecf8d96ce042ab11ef857b184f2a/proto/ibc/core/channel/v1/channel.proto#L179-L180
+    coll.extend(timeout_timestamp.timestamp * 1_000_000_000);
     coll.extend(timeout_height);
     coll.extend_from_chunk(compute_sha256_byte_array(json_packet_data));
     compute_sha256_u32_array(coll.value(), 0, 0).into()

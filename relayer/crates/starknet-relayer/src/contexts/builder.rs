@@ -8,6 +8,7 @@ use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
 use eyre::eyre;
+use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::impls::ProvideHermesError;
@@ -191,6 +192,22 @@ impl StarknetBuilder {
             ExecutionEncoding::New,
         );
 
+        let proof_signer = Secp256k1KeyPair::from_mnemonic(
+            bip39::Mnemonic::from_entropy(
+                &self
+                    .starknet_chain_config
+                    .relayer_wallet
+                    .signing_key
+                    .to_bytes_be(),
+                bip39::Language::English,
+            )
+            .expect("valid mnemonic")
+            .phrase(),
+            &"m/84'/0'/0'/0/0".parse().expect("valid hdpath"),
+            "strk",
+        )
+        .expect("valid key pair");
+
         let context = StarknetChain {
             runtime: self.runtime.clone(),
             chain_id,
@@ -200,6 +217,7 @@ impl StarknetBuilder {
             ibc_core_contract_address: None,
             event_encoding: Default::default(),
             event_subscription: None,
+            proof_signer,
         };
 
         Ok(context)

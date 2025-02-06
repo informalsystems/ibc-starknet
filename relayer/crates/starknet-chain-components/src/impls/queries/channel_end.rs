@@ -3,7 +3,10 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
+use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
+use hermes_chain_components::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
+};
 use hermes_chain_components::traits::queries::channel_end::{
     ChannelEndQuerier, ChannelEndWithProofsQuerier,
 };
@@ -11,20 +14,26 @@ use hermes_chain_components::traits::types::channel::HasChannelEndType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
+use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use ibc::core::host::types::path::{ChannelEndPath, Path};
+use ibc_proto::Protobuf;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 use crate::traits::contract::call::CanCallContract;
+use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::channel_id::{ChannelEnd, ChannelId};
 use crate::types::commitment_proof::StarknetCommitmentProof;
+use crate::types::membership_proof_signer::MembershipVerifierContainer;
 use crate::types::messages::ibc::channel::PortId;
+use crate::types::status::StarknetChainStatus;
 
 pub struct QueryChannelEndFromStarknet;
 
@@ -74,6 +83,8 @@ impl<Chain, Counterparty, Encoding> ChannelEndWithProofsQuerier<Chain, Counterpa
 where
     Chain: HasHeightType<Height = u64>
         + CanQueryChainHeight
+        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
         + HasPortIdType<Counterparty, PortId = PortId>
         + HasChannelEndType<Counterparty, ChannelEnd = ChannelEnd>
@@ -83,6 +94,8 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanCallContract
+        + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
+        + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<Encoding::Error>,
     Encoding: CanEncode<ViaCairo, Product![PortId, ChannelId]>
         + CanDecode<ViaCairo, ChannelEnd>
@@ -108,15 +121,30 @@ where
             .call_contract(&contract_address, &selector!("channel_end"), &calldata)
             .await?;
 
-        // TODO(rano): how to get the proof?
+        let channel_end = encoding.decode(&output).map_err(Chain::raise_error)?;
+
+        let chain_status = chain.query_chain_status().await?;
+
+        let unsigned_membership_proof_bytes = MembershipVerifierContainer {
+            state_root: chain_status.block_hash.to_bytes_be().to_vec(),
+            prefix: chain.ibc_commitment_prefix().clone(),
+            path: Path::ChannelEnd(ChannelEndPath::new(port_id, channel_id))
+                .to_string()
+                .into(),
+            value: Some(channel_end.clone().encode_vec()),
+        }
+        .canonical_bytes();
+
+        let signed_bytes = chain
+            .proof_signer()
+            .sign(&unsigned_membership_proof_bytes)
+            .map_err(Chain::raise_error)?;
+
         let dummy_proof = StarknetCommitmentProof {
-            proof_height: chain.query_chain_height().await?,
-            proof_bytes: vec![0x1],
+            proof_height: chain_status.height,
+            proof_bytes: signed_bytes,
         };
 
-        Ok((
-            encoding.decode(&output).map_err(Chain::raise_error)?,
-            dummy_proof,
-        ))
+        Ok((channel_end, dummy_proof))
     }
 }

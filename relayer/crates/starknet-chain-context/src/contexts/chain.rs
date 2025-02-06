@@ -14,6 +14,7 @@ use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
+use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, EncodingGetter, HasDefaultEncoding, ProvideEncodingType,
@@ -132,6 +133,7 @@ use hermes_starknet_chain_components::components::chain::{
 };
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
+use hermes_starknet_chain_components::impls::proof_signer::GetStarknetProofSignerField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
 use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
@@ -143,6 +145,9 @@ use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
+use hermes_starknet_chain_components::traits::proof_signer::{
+    HasStarknetProofSigner, StarknetProofSignerGetterComponent, StarknetProofSignerTypeComponent,
+};
 use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
@@ -195,6 +200,8 @@ pub struct StarknetChain {
     pub ibc_core_contract_address: Option<Felt>,
     pub event_encoding: StarknetEventEncoding,
     pub event_subscription: Option<Arc<dyn Subscription<Item = (u64, StarknetEvent)>>>,
+    // FIXME: only needed for demo2
+    pub proof_signer: Secp256k1KeyPair,
 }
 
 pub struct StarknetChainContextComponents;
@@ -225,6 +232,11 @@ delegate_components! {
             StarknetAccountGetterComponent,
         ]:
             GetStarknetAccountField<symbol!("account")>,
+        [
+            StarknetProofSignerTypeComponent,
+            StarknetProofSignerGetterComponent,
+        ]:
+            GetStarknetProofSignerField<symbol!("proof_signer")>,
         WalletTypeComponent:
             ProvideStarknetWalletType,
     }
@@ -430,6 +442,7 @@ pub trait CanUseStarknetChain:
     + HasPacketDstPortId<CosmosChain>
     + CanAssertEventualAmount
     + CanBuildIbcTokenTransferMessage<CosmosChain>
+    + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
 // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
 // + CanIbcTransferToken<CosmosChain>
 {

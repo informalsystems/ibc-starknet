@@ -11,6 +11,9 @@ pub struct StarknetCreateClientPayload {
     pub chain_id: ChainId,
     pub client_state_wasm_code_hash: Vec<u8>,
     pub consensus_state: WasmStarknetConsensusState,
+
+    // FIXME: only needed for demo2
+    pub proof_signer_pub_key: Vec<u8>,
 }
 
 pub struct StarknetCreateClientPayloadOptions {
@@ -19,4 +22,7 @@ pub struct StarknetCreateClientPayloadOptions {
 
 pub struct StarknetUpdateClientPayload {
     pub header: StarknetHeader,
+
+    // FIXME: only needed for demo2
+    pub signature: Vec<u8>,
 }

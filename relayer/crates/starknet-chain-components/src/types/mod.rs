@@ -8,6 +8,7 @@ pub mod consensus_state;
 pub mod cosmos;
 pub mod event;
 pub mod events;
+pub mod membership_proof_signer;
 pub mod message_response;
 pub mod message_responses;
 pub mod messages;

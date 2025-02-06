@@ -6,12 +6,14 @@ use hermes_chain_components::traits::message_builders::connection_handshake::{
     ConnectionOpenAckMessageBuilder, ConnectionOpenConfirmMessageBuilder,
     ConnectionOpenInitMessageBuilder, ConnectionOpenTryMessageBuilder,
 };
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::types::client_state::HasClientStateType;
 use hermes_chain_components::traits::types::connection::{
     HasConnectionEndType, HasConnectionOpenAckPayloadType, HasConnectionOpenConfirmPayloadType,
     HasConnectionOpenInitPayloadType, HasConnectionOpenTryPayloadType,
     HasInitConnectionOptionsType,
 };
+use hermes_chain_components::traits::types::consensus_state::HasConsensusStateType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{HasClientIdType, HasConnectionIdType};
 use hermes_chain_components::traits::types::message::HasMessageType;
@@ -29,6 +31,7 @@ use hermes_cosmos_chain_components::types::messages::connection::open_try::Cosmo
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::connection::types::version::Version as CosmosConnectionVersion;
+use ibc::core::connection::types::ConnectionEnd;
 use ibc::core::host::types::identifiers::{
     ClientId as CosmosClientId, ConnectionId as CosmosConnectionId,
 };
@@ -38,6 +41,7 @@ use prost_types::Any;
 use crate::types::client_id::ClientId as StarknetClientId;
 use crate::types::commitment_proof::StarknetCommitmentProof;
 use crate::types::connection_id::ConnectionId as StarknetConnectionId;
+use crate::types::consensus_state::WasmStarknetConsensusState;
 use crate::types::cosmos::client_state::CometClientState;
 pub struct BuildStarknetToCosmosConnectionHandshake;
 
@@ -90,7 +94,8 @@ where
         > + HasClientIdType<Chain, ClientId = StarknetClientId>
         + HasConnectionIdType<Chain, ConnectionId = StarknetConnectionId>
         + HasHeightType<Height = u64>
-        + HasConnectionEndType<Chain>
+        + HasConsensusStateType<Chain, ConsensusState = WasmStarknetConsensusState>
+        + HasConnectionEndType<Chain, ConnectionEnd = ConnectionEnd>
         + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>,
 {
@@ -109,10 +114,8 @@ where
         // TODO(rano): delay period
         let delay_period = Duration::from_secs(0);
 
-        // TODO(rano): apparently update height is set to zero
         let update_height =
-            CosmosHeight::new(0, core::cmp::max(1, counterparty_payload.update_height))
-                .map_err(Chain::raise_error)?;
+            CosmosHeight::new(0, counterparty_payload.update_height).map_err(Chain::raise_error)?;
 
         let message = CosmosConnectionOpenTryMessage {
             client_id: client_id.to_string(),
@@ -127,11 +130,10 @@ where
             delay_period,
             update_height,
             proof_init: counterparty_payload.proof_init.proof_bytes,
-            // TODO(rano): counterparty_payload has empty proofs?
-            // proof_client: counterparty_payload.proof_client.proof_bytes,
-            proof_client: vec![0x1],
-            // proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
-            proof_consensus: vec![0x1],
+            // client and consensus proofs are passed but ignored
+            // cosmos/ibc-go#7129
+            proof_client: counterparty_payload.proof_client.proof_bytes,
+            proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
             proof_consensus_height: counterparty_payload.proof_consensus_height,
         };
 
@@ -179,11 +181,10 @@ where
             },
             update_height,
             proof_try: counterparty_payload.proof_try.proof_bytes,
-            // TODO(rano): counterparty_payload has empty proofs?
-            // proof_client: counterparty_payload.proof_client.proof_bytes,
-            proof_client: vec![0x1],
-            // proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
-            proof_consensus: vec![0x1],
+            // client and consensus proofs are passed but ignored
+            // cosmos/ibc-go#7129
+            proof_client: counterparty_payload.proof_client.proof_bytes,
+            proof_consensus: counterparty_payload.proof_consensus.proof_bytes,
             proof_consensus_height: counterparty_payload.proof_consensus_height,
         };
 
@@ -195,6 +196,7 @@ impl<Chain, Counterparty> ConnectionOpenConfirmMessageBuilder<Chain, Counterpart
     for BuildStarknetToCosmosConnectionHandshake
 where
     Chain: HasMessageType<Message = CosmosMessage>
+        + CanQueryChainHeight<Height = CosmosHeight>
         + HasConnectionIdType<Counterparty, ConnectionId = CosmosConnectionId>
         + CanRaiseAsyncError<ClientError>,
     Counterparty: HasConnectionOpenConfirmPayloadType<
