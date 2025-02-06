@@ -397,7 +397,7 @@ pub trait CanUseStarknetChain:
     + HasConnectionOpenTryEvent<CosmosChain>
     + HasChannelOpenTryEvent<CosmosChain>
     + CanQueryPacketCommitment<CosmosChain>
-    //+ CanQueryUnreceivedPacketSequences<CosmosChain>
+    + CanQueryUnreceivedPacketSequences<CosmosChain>
     + CanQueryPacketAcknowledgement<CosmosChain>
     + CanQueryPacketReceipt<CosmosChain>
     + CanBuildReceivePacketPayload<CosmosChain>

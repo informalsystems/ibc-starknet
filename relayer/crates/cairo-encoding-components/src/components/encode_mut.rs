@@ -21,6 +21,7 @@ cgp_preset! {
         // TODO(rano): ByteArray and Array<u8> are different types in Cairo
         // for now, we CANNOT use Vec<u8> to deserialize to Array<u8>
         (ViaCairo, Vec<u8>): EncodeByteArray,
+        (ViaCairo, Vec<u64>): EncodeList,
         (ViaCairo, Vec<Felt>): EncodeList,
         (ViaCairo, bool): EncodeBool,
         (ViaCairo, u64): EncodeFromU128,

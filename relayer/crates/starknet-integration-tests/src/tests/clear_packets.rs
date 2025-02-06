@@ -5,6 +5,7 @@ use std::io::Write;
 use std::path::PathBuf;
 use std::time::SystemTime;
 
+use cgp::prelude::*;
 use flate2::write::GzEncoder;
 use flate2::Compression;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
@@ -18,17 +19,25 @@ use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_test_components::chain::types::amount::Amount;
+use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapChannel;
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
+use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
+use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
+use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
+use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
+use hermes_starknet_chain_components::types::messages::ibc::denom::{
+    Denom, PrefixedDenom, TracePrefix,
+};
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
@@ -41,11 +50,11 @@ use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence};
+use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
-use starknet::accounts::{Call, ExecutionEncoding, SingleOwnerAccount};
+use starknet::accounts::Call;
+use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
-use starknet::providers::Provider;
-use starknet::signers::{LocalWallet, SigningKey};
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
@@ -367,7 +376,8 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
 
         info!("starknet_channel_id: {:?}", starknet_channel_id);
         info!("cosmos_channel_id: {:?}", cosmos_channel_id);
-                // submit ics20 transfer to Cosmos
+
+        // First ics20 transfer to Cosmos
 
         let wallet_cosmos_a = &cosmos_chain_driver.user_wallet_a;
         let address_cosmos_a = &wallet_cosmos_a.address;
@@ -375,16 +385,6 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
         let address_starknet_b = &wallet_starknet_b.account_address;
         let transfer_quantity = 1_000u128;
         let denom_cosmos = &cosmos_chain_driver.genesis_config.transfer_denom;
-
-        let starknet_account_b = SingleOwnerAccount::new(
-            starknet_chain.rpc_client.clone(),
-            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
-                wallet_starknet_b.signing_key,
-            )),
-            wallet_starknet_b.account_address,
-            starknet_chain.rpc_client.chain_id().await?,
-            ExecutionEncoding::New,
-        );
 
         let balance_cosmos_a_step_0 = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)
@@ -395,7 +395,15 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
             balance_cosmos_a_step_0
         );
 
-        let _packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
+        let commitment_sequences = vec!(Sequence::from(1));
+
+        let pending_before = <StarknetChain as CanQueryUnreceivedPacketSequences<CosmosChain>>::query_unreceived_packet_sequences(
+            starknet_chain, &starknet_channel_id,
+            &IbcPortId::transfer(),
+            commitment_sequences.as_slice()
+        ).await?;
+
+        let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
             cosmos_chain,
             &cosmos_channel_id,
             &IbcPortId::transfer(),
@@ -406,50 +414,188 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
         )
         .await?;
 
-            // submit ics20 transfer to Cosmos
+        assert_eq!(pending_before, commitment_sequences);
 
-            let wallet_cosmos_a = &cosmos_chain_driver.user_wallet_a;
-            let address_cosmos_a = &wallet_cosmos_a.address;
-            let wallet_starknet_b = &starknet_chain_driver.user_wallet_b;
-            let address_starknet_b = &wallet_starknet_b.account_address;
-            let transfer_quantity = 1_000u128;
-            let denom_cosmos = &cosmos_chain_driver.genesis_config.transfer_denom;
+        runtime.sleep(Duration::from_secs(2)).await;
 
-            let starknet_account_b = SingleOwnerAccount::new(
-                starknet_chain.rpc_client.clone(),
-                LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
-                    wallet_starknet_b.signing_key,
-                )),
-                wallet_starknet_b.account_address,
-                starknet_chain.rpc_client.chain_id().await?,
-                ExecutionEncoding::New,
-            );
-
-            let balance_cosmos_a_step_0 = cosmos_chain
-                .query_balance(address_cosmos_a, denom_cosmos)
-                .await?;
-
-            info!(
-                "cosmos balance before transfer: {}",
-                balance_cosmos_a_step_0
-            );
-
-            let _packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
-                cosmos_chain,
-                &cosmos_channel_id,
-                &IbcPortId::transfer(),
-                wallet_cosmos_a,
-                address_starknet_b,
-                &Amount::new(transfer_quantity, denom_cosmos.clone()),
-                &None,
-            )
+        let balance_cosmos_a_step_1_pre = cosmos_chain
+            .query_balance(address_cosmos_a, denom_cosmos)
             .await?;
 
-        let pending = <StarknetChain as CanQueryUnreceivedPacketSequences<CosmosChain>>::query_unreceived_packet_sequences(starknet_chain, &starknet_channel_id, &IbcPortId::transfer(), vec!(Sequence::from(1)).as_slice()).await?;
+        // Assert tokens have been escrowed from the wallet
+        assert_eq!(
+            balance_cosmos_a_step_0.quantity - transfer_quantity,
+            balance_cosmos_a_step_1_pre.quantity
+        );
+
+        cosmos_to_starknet_relay.relay_packet(&packet).await?;
+
+        runtime.sleep(Duration::from_secs(2)).await;
+
+        let balance_cosmos_a_step_1 = cosmos_chain
+            .query_balance(address_cosmos_a, denom_cosmos)
+            .await?;
+
+        info!("cosmos balance after transfer: {}", balance_cosmos_a_step_1);
+
+        assert_eq!(
+            balance_cosmos_a_step_0.quantity - transfer_quantity,
+            balance_cosmos_a_step_1.quantity
+        );
+
+        let pending_after = <StarknetChain as CanQueryUnreceivedPacketSequences<CosmosChain>>::query_unreceived_packet_sequences(
+            starknet_chain,
+            &starknet_channel_id,
+            &IbcPortId::transfer(),
+            commitment_sequences.as_slice()
+        ).await?;
+
+        info!("unreceived sequences after relaying: {pending_after:?}");
+
+        assert_eq!(pending_after, vec!());
+
+        let ics20_token_address: Felt = {
+            let ibc_prefixed_denom = PrefixedDenom {
+                trace_path: vec![TracePrefix {
+                    port_id: IbcPortId::transfer().to_string(),
+                    channel_id: starknet_channel_id.to_string(),
+                }],
+                base: Denom::Hosted(denom_cosmos.to_string()),
+            };
+
+            let mut denom_serialized = vec![];
+
+            {
+                // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/apps/src/transfer/types.cairo#L120-L130
+                for trace_prefix in &ibc_prefixed_denom.trace_path {
+                    denom_serialized.extend(cairo_encoding.encode(trace_prefix)?);
+                }
+
+                denom_serialized.extend(cairo_encoding.encode(&ibc_prefixed_denom.base)?);
+            }
+
+            // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/utils/src/utils.cairo#L35
+            let ibc_prefixed_denom_key = Poseidon3Hasher::digest(&denom_serialized);
+
+            let calldata = cairo_encoding.encode(&product![ibc_prefixed_denom_key])?;
+
+            let output = starknet_chain
+                .call_contract(
+                    &ics20_contract_address,
+                    &selector!("ibc_token_address"),
+                    &calldata,
+                )
+                .await?;
+
+            cairo_encoding.decode(&output)?
+        };
+
+        info!("ics20 token address: {:?}", ics20_token_address);
+
+        // Second ics20 transfer to Cosmos
+
+        let balance_cosmos_a_step_0 = cosmos_chain
+        .query_balance(address_cosmos_a, denom_cosmos)
+        .await?;
+
+        let balance_starknet_b_step_0 = starknet_chain
+            .query_token_balance(&ics20_token_address, address_starknet_b)
+            .await?;
 
         info!(
-            "unreceived sequences: {pending:#?}"
+            "cosmos balance before transfer: {}",
+            balance_cosmos_a_step_0
         );
+
+        info!(
+            "starknet balance before transfer: {}",
+            balance_starknet_b_step_0.quantity
+        );
+
+        let commitment_sequences = vec!(Sequence::from(1), Sequence::from(2));
+
+        let pending_before = <StarknetChain as CanQueryUnreceivedPacketSequences<CosmosChain>>::query_unreceived_packet_sequences(
+            starknet_chain, &starknet_channel_id,
+            &IbcPortId::transfer(),
+            commitment_sequences.as_slice()
+        ).await?;
+
+        assert_eq!(pending_before, commitment_sequences);
+
+        let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
+            cosmos_chain,
+            &cosmos_channel_id,
+            &IbcPortId::transfer(),
+            wallet_cosmos_a,
+            address_starknet_b,
+            &Amount::new(transfer_quantity, denom_cosmos.clone()),
+            &None,
+        )
+        .await?;
+
+        runtime.sleep(Duration::from_secs(2)).await;
+
+        let balance_cosmos_a_step_1_pre = cosmos_chain
+            .query_balance(address_cosmos_a, denom_cosmos)
+            .await?;
+
+        let balance_starknet_b_step_1_pre = starknet_chain
+            .query_token_balance(&ics20_token_address, address_starknet_b)
+            .await?;
+
+        info!(
+            "starknet balance before relaying: {}",
+            balance_starknet_b_step_1_pre.quantity
+        );
+
+        // Assert tokens have been escrowed from the wallet
+        assert_eq!(
+            balance_cosmos_a_step_0.quantity - transfer_quantity,
+            balance_cosmos_a_step_1_pre.quantity
+        );
+
+        cosmos_to_starknet_relay.relay_packet(&packet).await?;
+
+        runtime.sleep(Duration::from_secs(2)).await;
+
+        let balance_cosmos_a_step_1 = cosmos_chain
+            .query_balance(address_cosmos_a, denom_cosmos)
+            .await?;
+
+        let balance_starknet_b_step_1 = starknet_chain
+            .query_token_balance(&ics20_token_address, address_starknet_b)
+            .await?;
+
+        info!("cosmos balance after transfer: {}", balance_cosmos_a_step_1);
+
+        info!(
+            "starknet balance after relaying: {}",
+            balance_starknet_b_step_1.quantity
+        );
+
+        assert_eq!(
+            balance_cosmos_a_step_0.quantity - transfer_quantity,
+            balance_cosmos_a_step_1.quantity
+        );
+
+        let pending_after = <StarknetChain as CanQueryUnreceivedPacketSequences<CosmosChain>>::query_unreceived_packet_sequences(
+            starknet_chain,
+            &starknet_channel_id,
+            &IbcPortId::transfer(),
+            commitment_sequences.as_slice()
+        ).await?;
+
+        let pending_after_2 = <CosmosChain as CanQueryUnreceivedPacketSequences<StarknetChain>>::query_unreceived_packet_sequences(
+            cosmos_chain,
+            &cosmos_channel_id,
+            &IbcPortId::transfer(),
+            commitment_sequences.as_slice()
+        ).await?;
+
+        info!("unreceived sequences after relaying: {pending_after:?}");
+        info!("unreceived sequences after relaying 2: {pending_after_2:?}");
+
+        assert_eq!(pending_after, vec!());
 
         Ok(())
     })
