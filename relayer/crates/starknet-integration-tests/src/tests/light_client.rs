@@ -294,11 +294,6 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .send_target_update_client_messages(DestinationTarget, &starknet_status.height)
                 .await?;
 
-            info!(
-                "submitted Starknet client to Cosmos to height {}",
-                starknet_status.height
-            );
-
             {
                 let client_state = cosmos_chain
                     .query_client_state(
@@ -318,7 +313,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                     .await?;
 
                 info!(
-                    "after updating Starknet consensus state height {:?} and root: {:?} on Cosmos",
+                    "after updating Starknet client state height {:?} and root: {:?} on Cosmos",
                     client_state.client_state.latest_height, consensus_state.consensus_state.root
                 );
             }
@@ -333,8 +328,13 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .await?;
 
             assert_eq!(
-                consensus_state.consensus_state.root.into_vec(),
+                consensus_state.consensus_state.root.clone().into_vec(),
                 starknet_status.block_hash.to_bytes_be()
+            );
+
+            info!(
+                "updated Starknet consensus state to Cosmos to height {} and root: {:?}",
+                starknet_status.height, consensus_state.consensus_state.root
             );
         }
 
@@ -353,11 +353,6 @@ fn test_starknet_light_client() -> Result<(), Error> {
             starknet_to_cosmos_relay
                 .send_target_update_client_messages(SourceTarget, &cosmos_status.height)
                 .await?;
-
-            info!(
-                "submitted Cosmos client to Starknet to height {}",
-                cosmos_status.height
-            );
 
             {
                 let client_state = starknet_chain
@@ -381,7 +376,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
                     .await?;
 
                 info!(
-                    "after updating Cosmos consensus state height {:?} and root: {:?} on Starknet",
+                    "after updating Cosmos client state with height {:?} and root: {:?} on Starknet",
                     client_state.latest_height, consensus_state.root
                 );
             }
@@ -398,7 +393,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             // TODO(rano): add assert
 
             info!(
-                "updated Cosmos client to Starknet to height {} and root: {:?}",
+                "updated Cosmos consensus state to Starknet to height {} and root: {:?}",
                 cosmos_status.height, consensus_state.root
             );
         }
