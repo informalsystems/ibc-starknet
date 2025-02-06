@@ -52,18 +52,11 @@ where
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
 
-        let cairo_sequences = sequences
-            .iter()
-            .map(|sequence| Sequence {
-                sequence: sequence.value(),
-            })
-            .collect::<Vec<_>>();
-
         let calldata = encoding
             .encode(&product![
                 port_id.clone(),
                 channel_id.clone(),
-                cairo_sequences
+                sequences.to_owned()
             ])
             .map_err(Chain::raise_error)?;
 
@@ -77,11 +70,6 @@ where
 
         let product![packet_sequences,] = encoding.decode(&output).map_err(Chain::raise_error)?;
 
-        let unreceived_packet_sequences = packet_sequences
-            .into_iter()
-            .map(|seq| IbcSequence::from(seq.sequence))
-            .collect::<Vec<_>>();
-
-        Ok(unreceived_packet_sequences)
+        Ok(packet_sequences)
     }
 }
