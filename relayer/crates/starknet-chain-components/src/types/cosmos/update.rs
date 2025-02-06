@@ -3,6 +3,9 @@ use cgp::prelude::*;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_wasm_encoding_components::components::MutEncoderComponent;
+use ibc::clients::tendermint::types::{
+    ConsensusState as TendermintConsensusState, Header as TendermintHeader,
+};
 
 use crate::types::cosmos::height::Height;
 
@@ -26,5 +29,34 @@ delegate_components! {
                 EncodeField<symbol!("root"), UseContext>,
             ],
         >,
+    }
+}
+
+impl From<TendermintHeader> for CometUpdateHeader {
+    fn from(header: TendermintHeader) -> Self {
+        let trusted_height = Height {
+            revision_number: header.trusted_height.revision_number(),
+            revision_height: header.trusted_height.revision_height(),
+        };
+
+        let target_height = {
+            let header_height = header.height();
+
+            Height {
+                revision_number: header_height.revision_number(),
+                revision_height: header_height.revision_height(),
+            }
+        };
+
+        let time = header.timestamp().expect("valid timestamp").nanoseconds() / 1_000_000_000;
+
+        let root = TendermintConsensusState::from(header).root.into_vec();
+
+        Self {
+            trusted_height,
+            target_height,
+            time,
+            root,
+        }
     }
 }
