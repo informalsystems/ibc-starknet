@@ -2,7 +2,6 @@
 ///
 /// This test will be built step by step when each component
 /// required for packet clearing is added.
-
 use alloc::sync::Arc;
 use core::marker::PhantomData;
 use core::time::Duration;
