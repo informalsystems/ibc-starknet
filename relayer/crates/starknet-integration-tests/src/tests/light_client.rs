@@ -290,18 +290,9 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 starknet_status.block_hash.to_bytes_be()
             );
 
-            let mut cosmos_status = cosmos_chain.query_chain_status().await?;
-            let cosmos_height = cosmos_status.height;
-
             starknet_to_cosmos_relay
                 .send_target_update_client_messages(DestinationTarget, &starknet_status.height)
                 .await?;
-
-            // wait till the starknet_status is incremented
-            while cosmos_status.height <= cosmos_height {
-                runtime.sleep(Duration::from_secs(1)).await;
-                cosmos_status = cosmos_chain.query_chain_status().await?;
-            }
 
             info!(
                 "submitted Starknet client to Cosmos to height {}",
@@ -359,18 +350,9 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
             // TODO(rano): how do I query cosmos block root
 
-            let mut starknet_status = starknet_chain.query_chain_status().await?;
-            let starknet_height = starknet_status.height;
-
             starknet_to_cosmos_relay
                 .send_target_update_client_messages(SourceTarget, &cosmos_status.height)
                 .await?;
-
-            // wait till the starknet_status is incremented
-            while starknet_status.height <= starknet_height {
-                runtime.sleep(Duration::from_secs(1)).await;
-                starknet_status = starknet_chain.query_chain_status().await?;
-            }
 
             info!(
                 "submitted Cosmos client to Starknet to height {}",
