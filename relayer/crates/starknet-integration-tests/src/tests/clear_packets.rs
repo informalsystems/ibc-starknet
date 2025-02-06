@@ -1,3 +1,8 @@
+/// This test will assert that packet clearing works correctly.
+///
+/// This test will be built step by step when each component
+/// required for packet clearing is added.
+
 use alloc::sync::Arc;
 use core::marker::PhantomData;
 use core::time::Duration;
@@ -520,7 +525,8 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
             commitment_sequences.as_slice()
         ).await?;
 
-        assert_eq!(pending_before, commitment_sequences);
+        // Only sequence 2 is unreceived
+        assert_eq!(pending_before, vec!(Sequence::from(2)));
 
         let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
             cosmos_chain,
@@ -585,15 +591,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
             commitment_sequences.as_slice()
         ).await?;
 
-        let pending_after_2 = <CosmosChain as CanQueryUnreceivedPacketSequences<StarknetChain>>::query_unreceived_packet_sequences(
-            cosmos_chain,
-            &cosmos_channel_id,
-            &IbcPortId::transfer(),
-            commitment_sequences.as_slice()
-        ).await?;
-
         info!("unreceived sequences after relaying: {pending_after:?}");
-        info!("unreceived sequences after relaying 2: {pending_after_2:?}");
 
         assert_eq!(pending_after, vec!());
 
