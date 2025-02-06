@@ -45,7 +45,7 @@ use hermes_starknet_chain_components::types::messages::ibc::denom::{
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
     Participant, TransferPacketData,
 };
-use hermes_starknet_chain_components::types::messages::ibc::packet::{Packet, Sequence, Sequences};
+use hermes_starknet_chain_components::types::messages::ibc::packet::{Packet, Sequence};
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use starknet::core::types::{Felt, U256};
 
@@ -140,7 +140,6 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, ChannelId>
     + CanEncodeAndDecode<ViaCairo, ChannelEnd>
     + CanEncodeAndDecode<ViaCairo, Sequence>
-    + CanEncodeAndDecode<ViaCairo, Sequences>
     + CanEncodeAndDecode<ViaCairo, MsgRegisterClient>
     + CanEncodeAndDecode<ViaCairo, MsgRegisterApp>
     + CanEncodeAndDecode<ViaCairo, MsgConnOpenInit>
