@@ -103,7 +103,7 @@ where
             serde_json::to_vec(&cosmos_ibc_transfer_packet_data).map_err(Chain::raise_error)?;
 
         let packet = Packet {
-            seq_on_a: event.sequence_on_a.sequence.into(),
+            seq_on_a: event.sequence_on_a,
             port_id_on_a: event.port_id_on_a.clone(),
             chan_id_on_a: event.channel_id_on_a.clone(),
             port_id_on_b: event.port_id_on_b.clone(),

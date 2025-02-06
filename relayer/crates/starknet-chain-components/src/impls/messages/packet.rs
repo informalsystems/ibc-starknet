@@ -39,7 +39,7 @@ use crate::types::messages::ibc::ibc_transfer::{
 };
 use crate::types::messages::ibc::packet::{
     Acknowledgement as CairoAck, MsgAckPacket, MsgRecvPacket, MsgTimeoutPacket,
-    Packet as CairoPacket, Sequence, StateProof,
+    Packet as CairoPacket, StateProof,
 };
 
 pub struct BuildStarknetPacketMessages;
@@ -209,7 +209,7 @@ where
             packet: from_cosmos_to_cairo_packet(packet, chain.encoding()),
             // Cairo only accepts unordered packets.
             // So, this sequence is ignored.
-            next_seq_recv_on_b: Sequence { sequence: 1 },
+            next_seq_recv_on_b: 1.into(),
             proof_unreceived_on_b,
             proof_height_on_b,
         };

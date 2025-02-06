@@ -71,16 +71,8 @@ where
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
 
-        let cairo_sequence = Sequence {
-            sequence: sequence.value(),
-        };
-
         let calldata = encoding
-            .encode(&product![
-                port_id.clone(),
-                channel_id.clone(),
-                cairo_sequence
-            ])
+            .encode(&product![port_id.clone(), channel_id.clone(), *sequence])
             .map_err(Chain::raise_error)?;
 
         let output = chain

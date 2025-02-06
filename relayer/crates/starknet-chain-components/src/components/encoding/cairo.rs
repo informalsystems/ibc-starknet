@@ -123,6 +123,7 @@ delegate_components! {
         (ViaCairo, MsgAckPacket): EncodeMsgAckPacket,
         (ViaCairo, AckStatus): EncodeAckStatus,
         (ViaCairo, Sequence): EncodeSequence,
+        (ViaCairo, Vec<Sequence>): EncodeList,
         (ViaCairo, MsgTimeoutPacket): EncodeMsgTimeoutPacket,
         (ViaCairo, ClientStatus): EncodeClientStatus,
         (ViaCairo, CometClientState): EncodeCometClientState,
