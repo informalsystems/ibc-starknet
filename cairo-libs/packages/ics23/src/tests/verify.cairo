@@ -1,10 +1,12 @@
 use ics23::{
     LeafOp, LengthOp, HashOp, InnerOp, ExistenceProof, ExistenceProofImpl, SliceU32IntoArrayU8,
     Proof, encode_hex, decode_hex, ProofSpec, ByteArrayIntoArrayU8, CommitmentProof,
-    verify_existence, verify_non_existence, byte_array_to_slice_u32, smt_spec, iavl_spec
+    verify_existence, verify_non_existence, byte_array_to_slice_u32, smt_spec, iavl_spec,
+    tendermint_spec
 };
 use ics23::tests::data::{
-    TestData, smt_exist_left, smt_exist_right, smt_exist_middle, iavl_exist_left, iavl_exist_right, iavl_exist_middle
+    TestData, smt_exist_left, smt_exist_right, smt_exist_middle, iavl_exist_left, iavl_exist_right,
+    iavl_exist_middle, tendermint_exist_left, tendermint_exist_right, tendermint_exist_middle
 };
 use protobuf::types::message::ProtoCodecImpl;
 use protobuf::hex::decode as decode_hex_byte_array;
@@ -39,6 +41,24 @@ fn test_vector_iavl_right() {
 #[test]
 fn test_vector_iavl_middle() {
     decode_and_verify(@iavl_exist_middle(), @iavl_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L501
+#[test]
+fn test_vector_tendermint_left() {
+    decode_and_verify(@tendermint_exist_left(), @tendermint_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L508
+#[test]
+fn test_vector_tendermint_right() {
+    decode_and_verify(@tendermint_exist_right(), @tendermint_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L515
+#[test]
+fn test_vector_tendermint_middle() {
+    decode_and_verify(@tendermint_exist_middle(), @tendermint_spec());
 }
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L543
