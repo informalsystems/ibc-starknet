@@ -68,8 +68,8 @@ impl ProofAsProtoMessage of ProtoMessage<Proof> {
 
 #[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
 pub struct ExistenceProof {
-    pub key: Array<u8>,
-    pub value: Array<u8>,
+    pub key: KeyBytes,
+    pub value: ValueBytes,
     pub leaf: LeafOp,
     pub path: Array<InnerOp>,
 }
@@ -391,3 +391,5 @@ impl ProofSpecAsProtoName of ProtoName<ProofSpec> {
 }
 
 pub type RootBytes = [u32; 8];
+pub type KeyBytes = Array<u8>;
+pub type ValueBytes = Array<u8>;

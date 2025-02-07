@@ -1,6 +1,7 @@
 use ics23::{
-    Proof, ProofSpec, ProofSpecTrait, RootBytes, ICS23Errors, ExistenceProofImpl, NonExistenceProof,
-    NonExistenceProofImpl, SliceU32IntoArrayU8, ExistenceProof, LeafOp, HashOp, InnerOp,
+    Proof, ProofSpec, ProofSpecTrait, RootBytes, KeyBytes, ValueBytes, ICS23Errors,
+    ExistenceProofImpl, NonExistenceProof, NonExistenceProofImpl, SliceU32IntoArrayU8,
+    ExistenceProof, LeafOp, HashOp, InnerOp,
 };
 use protobuf::varint::decode_varint_from_u8_array;
 
@@ -8,8 +9,8 @@ pub fn verify_membership(
     specs: Array<ProofSpec>,
     proofs: @Array<Proof>,
     root: RootBytes,
-    keys: Array<Array<u8>>,
-    value: Array<u8>,
+    keys: Array<KeyBytes>,
+    value: ValueBytes,
 ) {
     let proofs_len = proofs.len();
     assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
@@ -34,7 +35,7 @@ pub fn verify_membership(
 }
 
 pub fn verify_non_membership(
-    specs: Array<ProofSpec>, proofs: @Array<Proof>, root: RootBytes, keys: Array<Array<u8>>
+    specs: Array<ProofSpec>, proofs: @Array<Proof>, root: RootBytes, keys: Array<KeyBytes>
 ) {
     let proofs_len = proofs.len();
     assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
@@ -59,7 +60,7 @@ pub fn verify_non_membership(
 }
 
 pub fn verify_existence(
-    spec: @ProofSpec, proof: @ExistenceProof, root: @RootBytes, key: @Array<u8>, value: @Array<u8>
+    spec: @ProofSpec, proof: @ExistenceProof, root: @RootBytes, key: @KeyBytes, value: @ValueBytes
 ) {
     check_existence_spec(spec, proof);
     assert(proof.key == key, ICS23Errors::MISMATCHED_KEY);
@@ -69,7 +70,7 @@ pub fn verify_existence(
 }
 
 pub fn verify_non_existence(
-    spec: @ProofSpec, proof: @NonExistenceProof, root: @RootBytes, key: @Array<u8>
+    spec: @ProofSpec, proof: @NonExistenceProof, root: @RootBytes, key: @KeyBytes
 ) {}
 
 fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {

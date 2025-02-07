@@ -1,7 +1,7 @@
 use core::sha256::{compute_sha256_u32_array, compute_sha256_byte_array};
 use ics23::{
     InnerOp, LeafOp, HashOp, ICS23Errors, LengthOp, ArrayU32IntoArrayU8, SliceU32IntoArrayU8,
-    IntoArrayU32, byte_array_to_array_u8
+    IntoArrayU32, byte_array_to_array_u8, KeyBytes, ValueBytes
 };
 use protobuf::varint::encode_varint_to_u8_array;
 
@@ -21,7 +21,7 @@ pub fn apply_inner(inner: @InnerOp, child: Array<u8>) -> [u32; 8] {
     compute_sha256_u32_array(bytes, last_word, last_word_len)
 }
 
-pub fn apply_leaf(leaf_op: @LeafOp, key: Array<u8>, value: Array<u8>,) -> [u32; 8] {
+pub fn apply_leaf(leaf_op: @LeafOp, key: KeyBytes, value: ValueBytes) -> [u32; 8] {
     // Sanity check
     assert(leaf_op.hash == @HashOp::Sha256, ICS23Errors::UNSUPPORTED_HASH_OP);
 

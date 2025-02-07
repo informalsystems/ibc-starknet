@@ -15,8 +15,8 @@ mod tests {
 pub use specs::{iavl_spec, tendermint_spec};
 pub use types::{
     Proof, ExistenceProof, ExistenceProofImpl, ExistenceProofTrait, NonExistenceProof,
-    NonExistenceProofImpl, InnerOp, LeafOp, ProofSpec, HashOp, LengthOp, RootBytes, ProofSpecImpl,
-    ProofSpecTrait, InnerSpec, CommitmentProof
+    NonExistenceProofImpl, InnerOp, LeafOp, ProofSpec, HashOp, LengthOp, RootBytes, KeyBytes,
+    ValueBytes, ProofSpecImpl, ProofSpecTrait, InnerSpec, CommitmentProof
 };
 pub use errors::ICS23Errors;
 pub use utils::{
