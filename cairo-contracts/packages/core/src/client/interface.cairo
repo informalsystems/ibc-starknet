@@ -21,6 +21,8 @@ pub trait IRegisterClient<TContractState> {
     fn register_client(
         ref self: TContractState, client_type: felt252, client_address: ContractAddress,
     );
+
+    fn registered_client(self: @TContractState, client_type: felt252) -> ContractAddress;
 }
 
 #[starknet::interface]
