@@ -32,10 +32,8 @@ use crate::impls::starknet_to_cosmos::create_client_message::BuildStarknetCreate
 use crate::impls::starknet_to_cosmos::packet_fields::ReadPacketDstStarknetFields;
 use crate::impls::starknet_to_cosmos::query_consensus_state_height::QueryStarknetConsensusStateHeightsFromGrpc;
 use crate::impls::starknet_to_cosmos::update_client_message::BuildStarknetUpdateClientMessage;
-use crate::impls::starknet_to_cosmos::update_client_payload::BuildUpdateCometClientPayload;
 use crate::types::cosmos::client_state::UseCometClientState;
 use crate::types::cosmos::consensus_state::CometConsensusState;
-use crate::types::cosmos::update::CometUpdateHeader;
 
 cgp_preset! {
     StarknetToCosmosComponents {
@@ -45,9 +43,11 @@ cgp_preset! {
             ConsensusStateQuerierComponent,
             ConsensusStateWithProofsQuerierComponent,
             CreateClientPayloadTypeComponent,
+            UpdateClientPayloadTypeComponent,
             CreateClientMessageOptionsTypeComponent,
             CreateClientPayloadOptionsTypeComponent,
             CreateClientPayloadBuilderComponent,
+            UpdateClientPayloadBuilderComponent,
             ChannelOpenInitMessageBuilderComponent,
         ]:
             CosmosToCosmosComponents,
@@ -60,10 +60,6 @@ cgp_preset! {
             UseCometClientState,
         ConsensusStateTypeComponent:
             WithType<CometConsensusState>,
-        UpdateClientPayloadTypeComponent:
-            WithType<CometUpdateHeader>,
-        UpdateClientPayloadBuilderComponent:
-            BuildUpdateCometClientPayload,
         UpdateClientMessageBuilderComponent:
             BuildStarknetUpdateClientMessage,
         ConsensusStateHeightsQuerierComponent:

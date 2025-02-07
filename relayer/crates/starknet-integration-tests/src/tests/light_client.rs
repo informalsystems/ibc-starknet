@@ -116,21 +116,6 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let starknet_chain = &mut starknet_chain_driver.chain;
 
-        // just waiting for the chains to progress
-        // Starknet block height starts at zero
-        runtime.sleep(Duration::from_secs(2)).await;
-
-        let cosmos_client_id = StarknetToCosmosRelay::create_client(
-            DestinationTarget,
-            cosmos_chain,
-            starknet_chain,
-            &StarknetCreateClientPayloadOptions { wasm_code_hash },
-            &(),
-        )
-        .await?;
-
-        info!("created client id on Cosmos: {:?}", cosmos_client_id);
-
         let ibc_core_class_hash = {
             let contract_path = std::env::var("IBC_CORE_CONTRACT")?;
 
@@ -210,6 +195,17 @@ fn test_starknet_light_client() -> Result<(), Error> {
             info!("IBC register client response: {:?}", response);
         }
 
+        let cosmos_client_id = StarknetToCosmosRelay::create_client(
+            DestinationTarget,
+            cosmos_chain,
+            starknet_chain,
+            &StarknetCreateClientPayloadOptions { wasm_code_hash },
+            &(),
+        )
+        .await?;
+
+        info!("created client id on Cosmos: {:?}", cosmos_client_id);
+
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
             starknet_chain,
@@ -238,13 +234,13 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 )
                 .await?;
 
-            let client_height = client_state.client_state.latest_height.revision_height();
+            let client_height = client_state.client_state.latest_height;
 
             let consensus_state = cosmos_chain
                 .query_consensus_state(
                     PhantomData::<StarknetChain>,
                     &cosmos_client_id,
-                    &client_height,
+                    &client_height.revision_height(),
                     &cosmos_chain.query_chain_height().await?,
                 )
                 .await?;
@@ -278,8 +274,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .await?;
 
             info!(
-                "initial Cosmos consensus state height {} and root: {:?} on Starknet",
-                client_state.latest_height.revision_height, consensus_state.root
+                "initial Cosmos consensus state height {:?} and root: {:?} on Starknet",
+                client_state.latest_height, consensus_state.root
             );
         }
 
@@ -298,6 +294,30 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .send_target_update_client_messages(DestinationTarget, &starknet_status.height)
                 .await?;
 
+            {
+                let client_state = cosmos_chain
+                    .query_client_state(
+                        PhantomData::<StarknetChain>,
+                        &cosmos_client_id,
+                        &cosmos_chain.query_chain_height().await?,
+                    )
+                    .await?;
+
+                let consensus_state = cosmos_chain
+                    .query_consensus_state(
+                        PhantomData::<StarknetChain>,
+                        &cosmos_client_id,
+                        &client_state.client_state.latest_height.revision_height(),
+                        &cosmos_chain.query_chain_height().await?,
+                    )
+                    .await?;
+
+                info!(
+                    "after updating Starknet client state height {:?} and root: {:?} on Cosmos",
+                    client_state.client_state.latest_height, consensus_state.consensus_state.root
+                );
+            }
+
             let consensus_state = cosmos_chain
                 .query_consensus_state(
                     PhantomData::<StarknetChain>,
@@ -308,8 +328,13 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .await?;
 
             assert_eq!(
-                consensus_state.consensus_state.root.into_vec(),
+                consensus_state.consensus_state.root.clone().into_vec(),
                 starknet_status.block_hash.to_bytes_be()
+            );
+
+            info!(
+                "updated Starknet consensus state to Cosmos to height {} and root: {:?}",
+                starknet_status.height, consensus_state.consensus_state.root
             );
         }
 
@@ -329,6 +354,33 @@ fn test_starknet_light_client() -> Result<(), Error> {
                 .send_target_update_client_messages(SourceTarget, &cosmos_status.height)
                 .await?;
 
+            {
+                let client_state = starknet_chain
+                    .query_client_state(
+                        PhantomData::<CosmosChain>,
+                        &starknet_client_id,
+                        &starknet_chain.query_chain_height().await?,
+                    )
+                    .await?;
+
+                let consensus_state = starknet_chain
+                    .query_consensus_state(
+                        PhantomData::<CosmosChain>,
+                        &starknet_client_id,
+                        &Height::new(
+                            client_state.latest_height.revision_number,
+                            client_state.latest_height.revision_height,
+                        )?,
+                        &starknet_chain.query_chain_height().await?,
+                    )
+                    .await?;
+
+                info!(
+                    "after updating Cosmos client state with height {:?} and root: {:?} on Starknet",
+                    client_state.latest_height, consensus_state.root
+                );
+            }
+
             let consensus_state = starknet_chain
                 .query_consensus_state(
                     PhantomData::<CosmosChain>,
@@ -341,7 +393,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             // TODO(rano): add assert
 
             info!(
-                "updated Cosmos client to Starknet to height {} and root: {:?}",
+                "updated Cosmos consensus state to Starknet to height {} and root: {:?}",
                 cosmos_status.height, consensus_state.root
             );
         }

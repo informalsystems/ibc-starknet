@@ -15,6 +15,7 @@ use hermes_chain_type_components::traits::types::message_response::HasMessageRes
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
+use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientPayload;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, EncodingGetter, HasDefaultEncoding, ProvideEncodingType,
@@ -88,6 +89,7 @@ use hermes_relayer_components::chain::traits::queries::packet_acknowledgement::C
 use hermes_relayer_components::chain::traits::queries::packet_commitment::CanQueryPacketCommitment;
 use hermes_relayer_components::chain::traits::queries::packet_is_received::CanQueryPacketIsReceived;
 use hermes_relayer_components::chain::traits::queries::packet_receipt::CanQueryPacketReceipt;
+use hermes_relayer_components::chain::traits::queries::unreceived_packet_sequences::CanQueryUnreceivedPacketSequences;
 use hermes_relayer_components::chain::traits::send_message::{
     CanSendMessages, CanSendSingleMessage,
 };
@@ -164,11 +166,12 @@ use hermes_starknet_chain_components::types::connection_id::{ConnectionEnd, Conn
 use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
 use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
-use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
 use hermes_starknet_chain_components::types::events::packet::WriteAcknowledgementEvent;
 use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
-use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_components::types::payloads::client::{
+    StarknetCreateClientPayloadOptions, StarknetUpdateClientPayload,
+};
 use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessage;
@@ -375,7 +378,7 @@ pub trait CanUseStarknetChain:
         CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
     > + CanBuildCreateClientPayload<CosmosChain>
     + CanBuildCreateClientMessage<CosmosChain>
-    + CanBuildUpdateClientPayload<CosmosChain>
+    + CanBuildUpdateClientPayload<CosmosChain, UpdateClientPayload = StarknetUpdateClientPayload>
     + CanBuildUpdateClientMessage<CosmosChain>
     + CanQueryClientState<CosmosChain>
     + CanQueryClientStateWithProofs<CosmosChain>
@@ -408,6 +411,7 @@ pub trait CanUseStarknetChain:
     + HasConnectionOpenTryEvent<CosmosChain>
     + HasChannelOpenTryEvent<CosmosChain>
     + CanQueryPacketCommitment<CosmosChain>
+    + CanQueryUnreceivedPacketSequences<CosmosChain>
     + CanQueryPacketAcknowledgement<CosmosChain>
     + CanQueryPacketReceipt<CosmosChain>
     + CanBuildReceivePacketPayload<CosmosChain>
@@ -450,7 +454,7 @@ impl CanUseStarknetChain for StarknetChain {}
 
 pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, ClientState = CometClientState>
     + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
-    + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CometUpdateHeader>
+    + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CosmosUpdateClientPayload>
     + HasInitConnectionOptionsType<StarknetChain, InitConnectionOptions = CosmosInitConnectionOptions>
     + HasChainId<ChainId = ChainId>
     + HasCounterpartyMessageHeight<StarknetChain>
@@ -458,7 +462,6 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanQueryClientState<StarknetChain>
     + CanQueryConsensusState<StarknetChain>
     + CanBuildCreateClientMessage<StarknetChain>
-    + CanBuildUpdateClientPayload<StarknetChain>
     + CanBuildUpdateClientMessage<StarknetChain>
     + CanQueryConsensusStateHeight<StarknetChain>
     + CanBuildCreateClientPayload<StarknetChain>

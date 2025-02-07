@@ -9,6 +9,7 @@ use hermes_chain_components::traits::types::ibc::HasClientIdType;
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientPayload;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
@@ -33,7 +34,8 @@ where
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseAsyncError<Encoding::Error>,
-    Counterparty: HasUpdateClientPayloadType<Chain, UpdateClientPayload = CometUpdateHeader>,
+    Counterparty:
+        HasUpdateClientPayloadType<Chain, UpdateClientPayload = CosmosUpdateClientPayload>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanEncode<ViaCairo, CometUpdateHeader>
         + CanEncode<ViaCairo, (ClientId, Vec<Felt>)>,
@@ -41,28 +43,36 @@ where
     async fn build_update_client_message(
         chain: &Chain,
         client_id: &ClientId,
-        update_header: CometUpdateHeader,
+        counterparty_payload: CosmosUpdateClientPayload,
     ) -> Result<Vec<Chain::Message>, Chain::Error> {
-        let encoding = chain.encoding();
+        let mut messages = Vec::with_capacity(counterparty_payload.headers.len());
 
-        let contract_address = chain.query_contract_address(PhantomData).await?;
+        for header in counterparty_payload.headers {
+            let update_header = CometUpdateHeader::from(header);
 
-        let raw_header = encoding
-            .encode(&update_header)
-            .map_err(Chain::raise_error)?;
+            let encoding = chain.encoding();
 
-        let calldata = encoding
-            .encode(&(client_id.clone(), raw_header))
-            .map_err(Chain::raise_error)?;
+            let contract_address = chain.query_contract_address(PhantomData).await?;
 
-        let call = Call {
-            to: contract_address,
-            selector: selector!("update_client"),
-            calldata,
-        };
+            let raw_header = encoding
+                .encode(&update_header)
+                .map_err(Chain::raise_error)?;
 
-        let message = StarknetMessage::new(call);
+            let calldata = encoding
+                .encode(&(client_id.clone(), raw_header))
+                .map_err(Chain::raise_error)?;
 
-        Ok(vec![message])
+            let call = Call {
+                to: contract_address,
+                selector: selector!("update_client"),
+                calldata,
+            };
+
+            let message = StarknetMessage::new(call);
+
+            messages.push(message);
+        }
+
+        Ok(messages)
     }
 }

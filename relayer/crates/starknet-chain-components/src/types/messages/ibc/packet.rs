@@ -4,9 +4,14 @@ use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVar
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
-use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
+pub use ibc::core::host::types::identifiers::Sequence;
 use starknet::core::types::Felt;
 
 use crate::types::cosmos::height::Height;
@@ -208,30 +213,32 @@ impl Transformer for EncodeMsgAckPacket {
     }
 }
 
-#[derive(HasField, Debug)]
-pub struct Sequence {
-    pub sequence: u64,
-}
-
 pub struct EncodeSequence;
 
-delegate_components! {
-    EncodeSequence {
-        MutEncoderComponent: CombineEncoders<
-            Product![
-                EncodeField<symbol!("sequence"), UseContext>,
-            ],
-        >,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Sequence> for EncodeSequence
+where
+    Encoding: CanEncodeMut<Strategy, Product![u64]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        sequence: &Sequence,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&product![sequence.value()], buffer)?;
+        Ok(())
     }
 }
 
-impl Transformer for EncodeSequence {
-    type From = Product![u64];
-    type To = Sequence;
-
-    fn transform(product![sequence]: Self::From) -> Sequence {
-        Sequence { sequence }
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Sequence> for EncodeSequence
+where
+    Encoding: CanDecodeMut<Strategy, Product![u64]>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<Sequence, Encoding::Error> {
+        let product![value] = encoding.decode_mut(buffer)?;
+        Ok(Sequence::from(value))
     }
 }
 
