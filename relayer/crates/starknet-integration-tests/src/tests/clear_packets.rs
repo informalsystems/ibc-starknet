@@ -2,7 +2,6 @@
 ///
 /// This test will be built step by step when each component
 /// required for packet clearing is added.
-
 use alloc::sync::Arc;
 use core::marker::PhantomData;
 use core::time::Duration;
@@ -400,7 +399,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
             balance_cosmos_a_step_0
         );
 
-        let commitment_sequences = vec!(Sequence::from(1));
+        let commitment_sequences = vec![Sequence::from(1)];
 
         let pending_before = <StarknetChain as CanQueryUnreceivedPacketSequences<CosmosChain>>::query_unreceived_packet_sequences(
             starknet_chain, &starknet_channel_id,
@@ -457,7 +456,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
 
         info!("unreceived sequences after relaying: {pending_after:?}");
 
-        assert_eq!(pending_after, vec!());
+        assert_eq!(pending_after, vec![]);
 
         let ics20_token_address: Felt = {
             let ibc_prefixed_denom = PrefixedDenom {
@@ -517,7 +516,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
             balance_starknet_b_step_0.quantity
         );
 
-        let commitment_sequences = vec!(Sequence::from(1), Sequence::from(2));
+        let commitment_sequences = vec![Sequence::from(1), Sequence::from(2)];
 
         let pending_before = <StarknetChain as CanQueryUnreceivedPacketSequences<CosmosChain>>::query_unreceived_packet_sequences(
             starknet_chain, &starknet_channel_id,
@@ -526,7 +525,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
         ).await?;
 
         // Only sequence 2 is unreceived
-        assert_eq!(pending_before, vec!(Sequence::from(2)));
+        assert_eq!(pending_before, vec![Sequence::from(2)]);
 
         let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
             cosmos_chain,
@@ -593,7 +592,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
 
         info!("unreceived sequences after relaying: {pending_after:?}");
 
-        assert_eq!(pending_after, vec!());
+        assert_eq!(pending_after, vec![]);
 
         Ok(())
     })
