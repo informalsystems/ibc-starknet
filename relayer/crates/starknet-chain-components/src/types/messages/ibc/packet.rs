@@ -242,34 +242,6 @@ where
     }
 }
 
-#[derive(HasField, Debug)]
-pub struct Sequences {
-    pub sequences: Vec<u64>,
-}
-
-pub struct EncodeVecSequence;
-
-delegate_components! {
-    EncodeVecSequence {
-        MutEncoderComponent: CombineEncoders<
-            Product![
-                EncodeField<symbol!("sequences"), UseContext>,
-            ],
-        >,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
-
-impl Transformer for EncodeVecSequence {
-    type From = Product![Vec<u64>];
-    type To = Sequences;
-
-    fn transform(product![sequence]: Self::From) -> Sequences {
-        let sequences = sequence.to_vec();
-        Sequences { sequences }
-    }
-}
-
 #[derive(HasField)]
 pub struct MsgTimeoutPacket {
     pub packet: Packet,
