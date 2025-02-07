@@ -32,6 +32,10 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
     }
 
     fn status(self: @CometConsensusState, host_timestamp: u64, trusting_period: u64) -> Status {
+        if (host_timestamp < self.timestamp()) {
+            return Status::Active;
+        }
+
         assert(host_timestamp >= self.timestamp(), CometErrors::INVALID_HEADER_TIMESTAMP);
 
         let elapsed_time = host_timestamp - self.timestamp();
