@@ -66,6 +66,12 @@ pub impl SliceU32IntoArrayU8 of Into<[u32; 8], Array<u8>> {
     }
 }
 
+pub impl ByteArrayIntoArrayU8 of Into<ByteArray, Array<u8>> {
+    fn into(self: ByteArray) -> Array<u8> {
+        byte_array_to_array_u8(@self)
+    }
+}
+
 pub impl ByteArrayIntoArrayU32 of IntoArrayU32<ByteArray> {
     fn into_array_u32(self: ByteArray) -> (Array<u32>, u32, u32) {
         let bytes = byte_array_to_array_u8(@self);

@@ -9,7 +9,7 @@ use protobuf::types::message::{
     DecodeContextImpl, ProtoName
 };
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
-use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
+use protobuf::primitives::numeric::{I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]

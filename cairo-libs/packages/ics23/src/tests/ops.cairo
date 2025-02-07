@@ -1,6 +1,6 @@
 use ics23::{
     InnerOp, LeafOp, LengthOp, HashOp, apply_leaf, apply_inner, encode_hex, decode_hex,
-    SliceU32IntoArrayU8, ByteArrayIntoArrayU32, byte_array_to_array_u8,
+    SliceU32IntoArrayU8, ByteArrayIntoArrayU32, byte_array_to_array_u8, ByteArrayIntoArrayU8
 };
 
 // https://github.com/cosmos/ics23/blob/c7c728879896fb260fe76b208ea6a17c2b0132a3/rust/src/ops.rs#L210
@@ -15,7 +15,7 @@ fn test_apply_leaf_hash() {
     };
     let key: ByteArray = "foo";
     let value: ByteArray = "bar";
-    let hash = apply_leaf(@leaf, @key, byte_array_to_array_u8(@value));
+    let hash = apply_leaf(@leaf, key.into(), value.into());
 
     assert_eq!(
         encode_hex(hash.into()), "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
@@ -32,10 +32,9 @@ fn test_apply_leaf_hash_length() {
         length: LengthOp::VarProto,
         prefix: array![],
     };
-
     let key: ByteArray = "food";
     let value: ByteArray = "some longer text";
-    let hash = apply_leaf(@leaf, @key, byte_array_to_array_u8(@value));
+    let hash = apply_leaf(@leaf, key.into(), value.into());
 
     assert_eq!(
         encode_hex(hash.into()), "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"
@@ -52,10 +51,9 @@ fn test_apply_leaf_prehash_value() {
         length: LengthOp::VarProto,
         prefix: array![],
     };
-
     let key: ByteArray = "food";
     let value: ByteArray = "yet another long string";
-    let hash = apply_leaf(@leaf, @key, byte_array_to_array_u8(@value));
+    let hash = apply_leaf(@leaf, key.into(), value.into());
 
     assert_eq!(
         encode_hex(hash.into()), "87e0483e8fb624aef2e2f7b13f4166cda485baa8e39f437c83d74c94bedb148f"

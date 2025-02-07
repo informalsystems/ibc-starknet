@@ -21,14 +21,14 @@ pub fn apply_inner(inner: @InnerOp, child: Array<u8>) -> [u32; 8] {
     compute_sha256_u32_array(bytes, last_word, last_word_len)
 }
 
-pub fn apply_leaf(leaf_op: @LeafOp, key: @ByteArray, value: Array<u8>,) -> [u32; 8] {
+pub fn apply_leaf(leaf_op: @LeafOp, key: Array<u8>, value: Array<u8>,) -> [u32; 8] {
     // Sanity check
     assert(leaf_op.hash == @HashOp::Sha256, ICS23Errors::UNSUPPORTED_HASH_OP);
 
     // Construct the data
     let mut data: Array<u8> = ArrayTrait::new();
     data.append_span(leaf_op.prefix.span());
-    let prekey = prepare_leaf_byte_array(leaf_op.prehash_key, leaf_op.length, key);
+    let prekey = prepare_leaf_u32_array(leaf_op.prehash_key, leaf_op.length, key);
     data.append_span(prekey.span());
     let preval = prepare_leaf_u32_array(leaf_op.prehash_value, leaf_op.length, value);
     data.append_span(preval.span());

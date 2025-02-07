@@ -3,7 +3,6 @@ use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl, DecodeContextImpl
 };
 use protobuf::types::tag::WireType;
-use protobuf::primitives::numeric::UnsignedAsProtoMessage;
 
 pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
     fn encode_raw(self: @ByteArray, ref context: EncodeContext) {
@@ -21,7 +20,6 @@ pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
         WireType::LengthDelimited
     }
 }
-
 
 // for packed repeated fields (default for scalars)
 pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of ProtoMessage<Array<T>> {
@@ -68,3 +66,26 @@ pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of Prot
     }
 }
 
+pub impl BytesAsProtoMessage of ProtoMessage<Array<u8>> {
+    fn encode_raw(self: @Array<u8>, ref context: EncodeContext) {
+        let mut i = 0;
+        if self.len() == 0 {
+            context.buffer.append_byte(0);
+        }
+        while i < self.len() {
+            context.buffer.append_byte(self[i].clone());
+            i += 1;
+        };
+    }
+
+    fn decode_raw(ref self: Array<u8>, ref context: DecodeContext) {
+        while context.can_read_branch() {
+            self.append(context.buffer[context.index]);
+            context.index += 1;
+        };
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}

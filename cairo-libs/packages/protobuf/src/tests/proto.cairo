@@ -4,8 +4,10 @@ use protobuf::types::message::{
 };
 use protobuf::types::wkt::Any;
 use protobuf::types::tag::WireType;
-use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
-use protobuf::primitives::numeric::{BoolAsProtoMessage, I64AsProtoMessage};
+use protobuf::primitives::array::{
+    ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage
+};
+use protobuf::primitives::numeric::{BoolAsProtoMessage, I64AsProtoMessage, U64AsProtoMessage};
 use protobuf::hex::decode as hex_decode;
 use protobuf::base64::decode as base64_decode;
 
@@ -45,25 +47,28 @@ enum ValidatorType {
     Light,
 }
 
-impl ValidatorTypeIntoU64 of Into<ValidatorType, u64> {
-    fn into(self: ValidatorType) -> u64 {
+impl ValidatorAsProtoMessage of ProtoMessage<ValidatorType> {
+    fn encode_raw(self: @ValidatorType, ref context: EncodeContext) {
         match self {
-            ValidatorType::Full => 0,
-            ValidatorType::Light => 1,
+            ValidatorType::Full => 0_u32.encode_raw(ref context),
+            ValidatorType::Light => 1_u32.encode_raw(ref context),
         }
     }
-}
 
-impl U64IntoValidatorType of Into<u64, ValidatorType> {
-    fn into(self: u64) -> ValidatorType {
-        match self {
-            0 => ValidatorType::Full,
-            1 => ValidatorType::Light,
-            _ => panic!("invalid ValidatorType"),
+    fn decode_raw(ref self: ValidatorType, ref context: DecodeContext) {
+        let mut var = Default::<u32>::default();
+        var.decode_raw(ref context);
+        match var {
+            0 => self = ValidatorType::Full,
+            1 => self = ValidatorType::Light,
+            _ => panic!("invalid validator type"),
         }
     }
-}
 
+    fn wire_type() -> WireType {
+        WireType::Varint
+    }
+}
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 struct TmHeader {

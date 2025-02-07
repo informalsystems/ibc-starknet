@@ -7,17 +7,32 @@ use protobuf::primitives::utils::{
 };
 use protobuf::varint::{encode_varint_to_byte_array, decode_varint_from_byte_array};
 
-pub impl UnsignedAsProtoMessage<
-    T, +Into<T, u64>, +TryInto<u64, T>, +Copy<T>, +Drop<T>
-> of ProtoMessage<T> {
-    fn encode_raw(self: @T, ref context: EncodeContext) {
+pub impl U64AsProtoMessage of ProtoMessage<u64> {
+    fn encode_raw(self: @u64, ref context: EncodeContext) {
         let num = (*self).into();
 
         let bytes = encode_varint_to_byte_array(num);
         context.buffer.append(@bytes);
     }
 
-    fn decode_raw(ref self: T, ref context: DecodeContext) {
+    fn decode_raw(ref self: u64, ref context: DecodeContext) {
+        self = decode_varint_from_byte_array(context.buffer, ref context.index).try_into().unwrap()
+    }
+
+    fn wire_type() -> WireType {
+        WireType::Varint
+    }
+}
+
+pub impl U32AsProtoMessage of ProtoMessage<u32> {
+    fn encode_raw(self: @u32, ref context: EncodeContext) {
+        let num = (*self).into();
+
+        let bytes = encode_varint_to_byte_array(num);
+        context.buffer.append(@bytes);
+    }
+
+    fn decode_raw(ref self: u32, ref context: DecodeContext) {
         self = decode_varint_from_byte_array(context.buffer, ref context.index).try_into().unwrap()
     }
 

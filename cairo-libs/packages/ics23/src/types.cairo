@@ -1,11 +1,33 @@
+use protobuf::types::message::DecodeContextTrait;
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
     DecodeContextImpl, ProtoName
 };
-use protobuf::primitives::array::{ByteArrayAsProtoMessage};
-use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
+use protobuf::primitives::array::{
+    ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage
+};
+use protobuf::primitives::numeric::{I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
 use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, iavl_spec};
+
+#[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
+pub struct CommitmentProof {
+    proof: Proof,
+}
+
+impl CommitmentProofAsProtoMessage of ProtoMessage<CommitmentProof> {
+    fn encode_raw(self: @CommitmentProof, ref context: EncodeContext) {
+        context.encode_field(1, self.proof);
+    }
+
+    fn decode_raw(ref self: CommitmentProof, ref context: DecodeContext) {
+        context.decode_field(1, ref self.proof)
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
 
 /// Contains nested proof types within a commitment proof. It currently supports
 /// existence and non-existence proofs to meet the core requirements of IBC. Batch
@@ -27,8 +49,14 @@ impl ProofAsProtoMessage of ProtoMessage<Proof> {
 
     fn decode_raw(ref self: Proof, ref context: DecodeContext) {
         match self.clone() {
-            Proof::Exist(mut p) => p.decode_raw(ref context),
-            Proof::NonExist(mut p) => p.decode_raw(ref context),
+            Proof::Exist(mut p) => {
+                p.decode_raw(ref context);
+                self = Proof::Exist(p);
+            },
+            Proof::NonExist(mut p) => {
+                p.decode_raw(ref context);
+                self = Proof::NonExist(p);
+            },
         }
     }
 
@@ -40,7 +68,7 @@ impl ProofAsProtoMessage of ProtoMessage<Proof> {
 
 #[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
 pub struct ExistenceProof {
-    pub key: ByteArray,
+    pub key: Array<u8>,
     pub value: Array<u8>,
     pub leaf: LeafOp,
     pub path: Array<InnerOp>,
@@ -55,7 +83,7 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
     fn calculate_root_for_spec(self: @ExistenceProof, spec: Option<@ProofSpec>) -> RootBytes {
         assert(self.key.len() > 0, ICS23Errors::MISSING_KEY);
         assert(self.value.len() > 0, ICS23Errors::MISSING_VALUE);
-        let mut hash = apply_leaf(self.leaf, self.key, self.value.clone());
+        let mut hash = apply_leaf(self.leaf, self.key.clone(), self.value.clone());
         for i in 0
             ..self
                 .path
@@ -78,14 +106,14 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
 impl ExistenceProofAsProtoMessage of ProtoMessage<ExistenceProof> {
     fn encode_raw(self: @ExistenceProof, ref context: EncodeContext) {
         context.encode_field(1, self.key);
-        context.encode_repeated_field(2, self.value);
+        context.encode_field(2, self.value);
         context.encode_field(3, self.leaf);
         context.encode_repeated_field(4, self.path);
     }
 
     fn decode_raw(ref self: ExistenceProof, ref context: DecodeContext) {
         context.decode_field(1, ref self.key);
-        context.decode_repeated_field(2, ref self.value);
+        context.decode_field(2, ref self.value);
         context.decode_field(3, ref self.leaf);
         context.decode_repeated_field(4, ref self.path);
     }
@@ -95,7 +123,7 @@ impl ExistenceProofAsProtoMessage of ProtoMessage<ExistenceProof> {
     }
 }
 
-impl ExistenceProofAsProtoName of ProtoName<InnerOp> {
+impl ExistenceProofAsProtoName of ProtoName<ExistenceProof> {
     fn type_url() -> ByteArray {
         "ExistenceProof"
     }
@@ -121,13 +149,13 @@ pub impl NonExistenceProofImpl of NonExistenceProofTrait {
 
 impl NonExistenceProofAsProtoMessage of ProtoMessage<NonExistenceProof> {
     fn encode_raw(self: @NonExistenceProof, ref context: EncodeContext) {
-        context.encode_repeated_field(1, self.key);
+        context.encode_field(1, self.key);
         context.encode_field(2, self.left);
         context.encode_field(3, self.right);
     }
 
     fn decode_raw(ref self: NonExistenceProof, ref context: DecodeContext) {
-        context.decode_repeated_field(1, ref self.key);
+        context.decode_field(1, ref self.key);
         context.decode_field(2, ref self.left);
         context.decode_field(3, ref self.right);
     }
@@ -137,7 +165,7 @@ impl NonExistenceProofAsProtoMessage of ProtoMessage<NonExistenceProof> {
     }
 }
 
-impl NonExistenceProofAsProtoName of ProtoName<InnerOp> {
+impl NonExistenceProofAsProtoName of ProtoName<NonExistenceProof> {
     fn type_url() -> ByteArray {
         "NonExistenceProof"
     }
@@ -153,14 +181,14 @@ pub struct InnerOp {
 impl InnerOpAsProtoMessage of ProtoMessage<InnerOp> {
     fn encode_raw(self: @InnerOp, ref context: EncodeContext) {
         context.encode_field(1, self.hash);
-        context.encode_repeated_field(2, self.prefix);
-        context.encode_repeated_field(3, self.suffix);
+        context.encode_field(2, self.prefix);
+        context.encode_field(3, self.suffix);
     }
 
     fn decode_raw(ref self: InnerOp, ref context: DecodeContext) {
         context.decode_field(1, ref self.hash);
-        context.decode_repeated_field(2, ref self.prefix);
-        context.decode_repeated_field(3, ref self.suffix);
+        context.decode_field(2, ref self.prefix);
+        context.decode_field(3, ref self.suffix);
     }
 
     fn wire_type() -> WireType {
@@ -181,22 +209,26 @@ pub enum HashOp {
     Sha256,
 }
 
-impl HashOpIntoU64 of Into<HashOp, u64> {
-    fn into(self: HashOp) -> u64 {
+impl HashOpAsProtoMessage of ProtoMessage<HashOp> {
+    fn encode_raw(self: @HashOp, ref context: EncodeContext) {
         match self {
-            HashOp::NoOp => 0,
-            HashOp::Sha256 => 1,
+            HashOp::NoOp => 0_u32.encode_raw(ref context),
+            HashOp::Sha256 => 1_u32.encode_raw(ref context),
         }
     }
-}
 
-impl U64IntoHashOp of Into<u64, HashOp> {
-    fn into(self: u64) -> HashOp {
-        match self {
-            0 => HashOp::NoOp,
-            1 => HashOp::Sha256,
-            _ => panic!("invalid HashOp"),
+    fn decode_raw(ref self: HashOp, ref context: DecodeContext) {
+        let mut var = Default::<u32>::default();
+        var.decode_raw(ref context);
+        match var {
+            0 => self = HashOp::NoOp,
+            1 => self = HashOp::Sha256,
+            _ => panic!("invalid hash op")
         }
+    }
+
+    fn wire_type() -> WireType {
+        WireType::Varint
     }
 }
 
@@ -207,22 +239,26 @@ pub enum LengthOp {
     VarProto,
 }
 
-impl LengthOpIntoU64 of Into<LengthOp, u64> {
-    fn into(self: LengthOp) -> u64 {
+impl LengthOpAsProtoMessage of ProtoMessage<LengthOp> {
+    fn encode_raw(self: @LengthOp, ref context: EncodeContext) {
         match self {
-            LengthOp::NoPrefix => 0,
-            LengthOp::VarProto => 1,
+            LengthOp::NoPrefix => 0_u32.encode_raw(ref context),
+            LengthOp::VarProto => 1_u32.encode_raw(ref context),
         }
     }
-}
 
-impl U64IntoLengthOp of Into<u64, LengthOp> {
-    fn into(self: u64) -> LengthOp {
-        match self {
-            0 => LengthOp::NoPrefix,
-            1 => LengthOp::VarProto,
+    fn decode_raw(ref self: LengthOp, ref context: DecodeContext) {
+        let mut var = Default::<u32>::default();
+        var.decode_raw(ref context);
+        match var {
+            0 => self = LengthOp::NoPrefix,
+            1 => self = LengthOp::VarProto,
             _ => panic!("invalid length op"),
         }
+    }
+
+    fn wire_type() -> WireType {
+        WireType::Varint
     }
 }
 
@@ -238,7 +274,7 @@ pub struct InnerSpec {
 
 impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
     fn encode_raw(self: @InnerSpec, ref context: EncodeContext) {
-        context.encode_repeated_field(1, self.child_order);
+        context.encode_field(1, self.child_order);
         context.encode_field(2, self.child_size);
         context.encode_field(3, self.min_prefix_length);
         context.encode_field(4, self.max_prefix_length);
@@ -247,7 +283,7 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
     }
 
     fn decode_raw(ref self: InnerSpec, ref context: DecodeContext) {
-        context.decode_repeated_field(1, ref self.child_order);
+        context.decode_field(1, ref self.child_order);
         context.decode_field(2, ref self.child_size);
         context.decode_field(3, ref self.min_prefix_length);
         context.decode_field(4, ref self.max_prefix_length);
@@ -281,7 +317,7 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
         context.encode_field(2, self.prehash_key);
         context.encode_field(3, self.prehash_value);
         context.encode_field(4, self.length);
-        context.encode_repeated_field(5, self.prefix);
+        context.encode_field(5, self.prefix);
     }
 
     fn decode_raw(ref self: LeafOp, ref context: DecodeContext) {
@@ -289,7 +325,7 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
         context.decode_field(2, ref self.prehash_key);
         context.decode_field(3, ref self.prehash_value);
         context.decode_field(4, ref self.length);
-        context.decode_repeated_field(5, ref self.prefix);
+        context.decode_field(5, ref self.prefix);
     }
 
     fn wire_type() -> WireType {

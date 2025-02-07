@@ -3,7 +3,7 @@ use protobuf::types::message::{
     DecodeContextImpl, ProtoName
 };
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
-use protobuf::primitives::numeric::UnsignedAsProtoMessage;
+use protobuf::primitives::numeric::U64AsProtoMessage;
 use protobuf::types::tag::WireType;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]

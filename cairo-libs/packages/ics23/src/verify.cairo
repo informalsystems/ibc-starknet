@@ -8,7 +8,7 @@ pub fn verify_membership(
     specs: Array<ProofSpec>,
     proofs: @Array<Proof>,
     root: RootBytes,
-    keys: Array<ByteArray>,
+    keys: Array<Array<u8>>,
     value: Array<u8>,
 ) {
     let proofs_len = proofs.len();
@@ -34,7 +34,7 @@ pub fn verify_membership(
 }
 
 pub fn verify_non_membership(
-    specs: Array<ProofSpec>, proofs: @Array<Proof>, root: RootBytes, keys: Array<ByteArray>
+    specs: Array<ProofSpec>, proofs: @Array<Proof>, root: RootBytes, keys: Array<Array<u8>>
 ) {
     let proofs_len = proofs.len();
     assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
@@ -59,7 +59,7 @@ pub fn verify_non_membership(
 }
 
 pub fn verify_existence(
-    spec: @ProofSpec, proof: @ExistenceProof, root: @RootBytes, key: @ByteArray, value: @Array<u8>
+    spec: @ProofSpec, proof: @ExistenceProof, root: @RootBytes, key: @Array<u8>, value: @Array<u8>
 ) {
     check_existence_spec(spec, proof);
     assert(proof.key == key, ICS23Errors::MISMATCHED_KEY);
@@ -69,7 +69,7 @@ pub fn verify_existence(
 }
 
 pub fn verify_non_existence(
-    spec: @ProofSpec, proof: @NonExistenceProof, root: @RootBytes, key: @ByteArray
+    spec: @ProofSpec, proof: @NonExistenceProof, root: @RootBytes, key: @Array<u8>
 ) {}
 
 fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {
