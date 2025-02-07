@@ -1,9 +1,11 @@
 use ics23::{
     LeafOp, LengthOp, HashOp, InnerOp, ExistenceProof, ExistenceProofImpl, SliceU32IntoArrayU8,
-    Proof, encode_hex, decode_hex, ProofSpec, smt_spec, ByteArrayIntoArrayU8, CommitmentProof,
-    verify_existence, verify_non_existence, byte_array_to_slice_u32
+    Proof, encode_hex, decode_hex, ProofSpec, ByteArrayIntoArrayU8, CommitmentProof,
+    verify_existence, verify_non_existence, byte_array_to_slice_u32, smt_spec, iavl_spec
 };
-use ics23::tests::data::{TestData, smt_exist_left, smt_exist_right, smt_exist_middle};
+use ics23::tests::data::{
+    TestData, smt_exist_left, smt_exist_right, smt_exist_middle, iavl_exist_left, iavl_exist_right, iavl_exist_middle
+};
 use protobuf::types::message::ProtoCodecImpl;
 use protobuf::hex::decode as decode_hex_byte_array;
 
@@ -19,6 +21,24 @@ fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
             verify_non_existence(spec, @p, @root, @key);
         }
     };
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L459
+#[test]
+fn test_vector_iavl_left() {
+    decode_and_verify(@iavl_exist_left(), @iavl_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L466
+#[test]
+fn test_vector_iavl_right() {
+    decode_and_verify(@iavl_exist_right(), @iavl_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L473
+#[test]
+fn test_vector_iavl_middle() {
+    decode_and_verify(@iavl_exist_middle(), @iavl_spec());
 }
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L543

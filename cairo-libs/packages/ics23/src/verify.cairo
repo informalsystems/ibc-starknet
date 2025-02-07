@@ -75,8 +75,7 @@ pub fn verify_non_existence(
 
 fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {
     if spec.is_iavl() {
-        let mut prefix = proof.leaf.prefix.clone();
-        ensure_leaf_prefix(ref prefix);
+        ensure_leaf_prefix(proof.leaf.prefix.clone());
     }
     ensure_leaf(proof.leaf, spec.leaf_spec);
 
@@ -88,15 +87,17 @@ fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {
 
     for i in 0
         ..inner_len {
-            let mut inner = proof.path.at(i).clone();
             if spec.is_iavl() {
-                ensure_inner_prefix(ref inner.prefix, i.try_into().unwrap(), @inner.hash);
+                ensure_inner_prefix(
+                    proof.path.at(i).prefix, i.try_into().unwrap(), proof.path.at(i).hash
+                );
             }
-            ensure_inner(@inner, spec.clone());
+            ensure_inner(proof.path.at(i), spec.clone());
         }
 }
 
-fn ensure_leaf_prefix(ref prefix: Array<u8>) {
+fn ensure_leaf_prefix(prefix: Array<u8>) {
+    let mut prefix = prefix.clone();
     let rem = ensure_iavl_prefix(ref prefix, 0);
     assert(rem == 0, ICS23Errors::INVALID_LEAF_PREFIX);
 }
@@ -119,7 +120,8 @@ fn ensure_leaf(leaf: @LeafOp, leaf_spec: @LeafOp) {
     assert(has_prefix(leaf.prefix, leaf_spec.prefix), ICS23Errors::INVALID_LEAF_PREFIX);
 }
 
-fn ensure_inner_prefix(ref prefix: Array<u8>, min_height: u64, hash_op: @HashOp) {
+fn ensure_inner_prefix(prefix: @Array<u8>, min_height: u64, hash_op: @HashOp) {
+    let mut prefix = prefix.clone();
     let rem = ensure_iavl_prefix(ref prefix, min_height);
     assert(rem == 0 || rem == 1 || rem == 34, ICS23Errors::INVALID_INNER_PREFIX);
     assert(hash_op == @HashOp::Sha256, ICS23Errors::INVALID_HASH_OP);
