@@ -1,27 +1,42 @@
 use ics23::{
     LeafOp, LengthOp, HashOp, InnerOp, ExistenceProof, ExistenceProofImpl, SliceU32IntoArrayU8,
     Proof, encode_hex, decode_hex, ProofSpec, smt_spec, ByteArrayIntoArrayU8, CommitmentProof,
-    verify_existence, byte_array_to_slice_u32
+    verify_existence, verify_non_existence, byte_array_to_slice_u32
 };
-use ics23::tests::data::{TestData, smt_exist_left};
+use ics23::tests::data::{TestData, smt_exist_left, smt_exist_right, smt_exist_middle};
 use protobuf::types::message::ProtoCodecImpl;
 use protobuf::hex::decode as decode_hex_byte_array;
 
-fn decode_and_verify_existence(data: TestData, spec: @ProofSpec) {
-    let p = ProtoCodecImpl::decode::<CommitmentProof>(@decode_hex_byte_array(@data.proof));
-    let proof = match p.proof {
-        Proof::Exist(p) => p,
-        _ => panic!("Expect exitence proof"),
+fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
+    let root = byte_array_to_slice_u32(decode_hex_byte_array(data.root));
+    let key = decode_hex_byte_array(data.key).into();
+    let value = decode_hex_byte_array(data.value).into();
+    let p = ProtoCodecImpl::decode::<CommitmentProof>(@decode_hex_byte_array(data.proof));
+    match p.proof {
+        Proof::Exist(p) => { verify_existence(spec, @p, @root, @key, @value); },
+        Proof::NonExist(p) => {
+            assert(value.len() == 0, 'value must not exist');
+            verify_non_existence(spec, @p, @root, @key);
+        }
     };
-    let root = byte_array_to_slice_u32(decode_hex_byte_array(@data.root));
-    let key = decode_hex_byte_array(@data.key).into();
-    let value = decode_hex_byte_array(@data.value).into();
-    verify_existence(spec, @proof, @root, @key, @value);
 }
 
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L543
 #[test]
-fn test_verify_existence() {
-    decode_and_verify_existence(smt_exist_left(), @smt_spec());
+fn test_vector_smt_left() {
+    decode_and_verify(@smt_exist_left(), @smt_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L550
+#[test]
+fn test_vector_smt_right() {
+    decode_and_verify(@smt_exist_right(), @smt_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L557
+#[test]
+fn test_vector_smt_middle() {
+    decode_and_verify(@smt_exist_middle(), @smt_spec());
 }
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/verify.rs#L381
