@@ -124,6 +124,12 @@ pub mod ClientHandlerComponent {
 
             self.write_supported_client(client_type, client_address);
         }
+
+        fn registered_client(
+            self: @ComponentState<TContractState>, client_type: felt252
+        ) -> ContractAddress {
+            self.supported_clients.read(client_type)
+        }
     }
 
     // -----------------------------------------------------------
