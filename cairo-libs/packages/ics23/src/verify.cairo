@@ -1,7 +1,7 @@
 use ics23::{
     Proof, ProofSpec, ProofSpecTrait, RootBytes, KeyBytes, ValueBytes, ICS23Errors,
     ExistenceProofImpl, NonExistenceProof, NonExistenceProofImpl, SliceU32IntoArrayU8,
-    ExistenceProof, LeafOp, HashOp, InnerOp,
+    ExistenceProof, LeafOp, HashOp, InnerOp
 };
 use protobuf::varint::decode_varint_from_u8_array;
 
@@ -75,7 +75,8 @@ pub fn verify_non_existence(
 
 fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {
     if spec.is_iavl() {
-        ensure_leaf_prefix(proof.leaf.prefix.clone());
+        let mut prefix = proof.leaf.prefix.clone();
+        ensure_leaf_prefix(ref prefix);
     }
     ensure_leaf(proof.leaf, spec.leaf_spec);
 
@@ -87,28 +88,27 @@ fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {
 
     for i in 0
         ..inner_len {
-            let inner = proof.path.at(i);
+            let mut inner = proof.path.at(i).clone();
             if spec.is_iavl() {
-                ensure_inner_prefix(inner.prefix.clone(), i.try_into().unwrap(), inner.hash);
+                ensure_inner_prefix(ref inner.prefix, i.try_into().unwrap(), @inner.hash);
             }
-            ensure_inner(inner, spec.clone());
+            ensure_inner(@inner, spec.clone());
         }
 }
 
-fn ensure_leaf_prefix(prefix: Array<u8>) {
-    let rem = ensure_iavl_prefix(prefix, 0);
+fn ensure_leaf_prefix(ref prefix: Array<u8>) {
+    let rem = ensure_iavl_prefix(ref prefix, 0);
     assert(rem == 0, ICS23Errors::INVALID_LEAF_PREFIX);
 }
 
-fn ensure_iavl_prefix(prefix: Array<u8>, min_height: u64) -> u32 {
-    let mut prefix_bytes = prefix;
-    let (height, _) = decode_varint_from_u8_array(ref prefix_bytes);
-    assert(height > min_height, ICS23Errors::INVALID_IAVL_HEIGHT_PREFIX);
-    let (size, _) = decode_varint_from_u8_array(ref prefix_bytes);
-    assert(size > 0, ICS23Errors::ZERO_IAVL_SIZE_PREFIX);
-    let (version, _) = decode_varint_from_u8_array(ref prefix_bytes);
-    assert(version > 0, ICS23Errors::ZERO_IAVL_VERSION_PREFIX);
-    prefix_bytes.len()
+fn ensure_iavl_prefix(ref prefix: Array<u8>, min_height: u64) -> u32 {
+    let (height, _) = decode_varint_from_u8_array(ref prefix);
+    assert(height >= min_height, ICS23Errors::INVALID_IAVL_HEIGHT_PREFIX);
+
+    // Checks if the size and version get successfully decoded to u64 from prefix.
+    decode_varint_from_u8_array(ref prefix);
+    decode_varint_from_u8_array(ref prefix);
+    prefix.len()
 }
 
 fn ensure_leaf(leaf: @LeafOp, leaf_spec: @LeafOp) {
@@ -116,24 +116,27 @@ fn ensure_leaf(leaf: @LeafOp, leaf_spec: @LeafOp) {
     assert(leaf.prehash_key == leaf_spec.prehash_key, ICS23Errors::INVALID_PREHASH_KEY);
     assert(leaf.prehash_value == leaf_spec.prehash_value, ICS23Errors::INVALID_PREHASH_VALUE);
     assert(leaf.length == leaf_spec.length, ICS23Errors::INVALID_LENGTH_OP);
-    assert(leaf.prefix == leaf_spec.prefix, ICS23Errors::INVALID_LEAF_PREFIX);
+    assert(has_prefix(leaf.prefix, leaf_spec.prefix), ICS23Errors::INVALID_LEAF_PREFIX);
 }
 
-fn ensure_inner_prefix(prefix: Array<u8>, min_height: u64, hash_op: @HashOp) {
-    let rem = ensure_iavl_prefix(prefix, min_height);
+fn ensure_inner_prefix(ref prefix: Array<u8>, min_height: u64, hash_op: @HashOp) {
+    let rem = ensure_iavl_prefix(ref prefix, min_height);
     assert(rem == 0 || rem == 1 || rem == 34, ICS23Errors::INVALID_INNER_PREFIX);
     assert(hash_op == @HashOp::Sha256, ICS23Errors::INVALID_HASH_OP);
 }
 
 fn ensure_inner(inner: @InnerOp, spec: ProofSpec) {
     let inner_spec = spec.inner_spec;
+    let inner_p_len = inner.prefix.len();
+    let max_left_child_bytes = (inner_spec.child_order.len() - 1) * inner_spec.child_size;
+    inner_spec.child_size;
+
     assert(inner.hash == @inner_spec.hash, ICS23Errors::INVALID_HASH_OP);
-    assert(inner.prefix == @spec.leaf_spec.prefix, ICS23Errors::INVALID_INNER_PREFIX);
+    assert(!has_prefix(inner.prefix, @spec.leaf_spec.prefix), ICS23Errors::INVALID_INNER_PREFIX);
+    assert(inner_p_len >= inner_spec.min_prefix_length, ICS23Errors::INVALID_INNER_PREFIX_LEN);
     assert(
-        inner.prefix.len() >= inner_spec.min_prefix_length, ICS23Errors::INVALID_INNER_PREFIX_LEN
-    );
-    assert(
-        inner.prefix.len() <= inner_spec.min_prefix_length, ICS23Errors::INVALID_INNER_PREFIX_LEN
+        inner_p_len <= inner_spec.max_prefix_length + max_left_child_bytes,
+        ICS23Errors::INVALID_INNER_PREFIX_LEN
     );
     assert(inner_spec.child_size > 0, ICS23Errors::ZERO_CHILD_SIZE);
     assert(
@@ -141,4 +144,17 @@ fn ensure_inner(inner: @InnerOp, spec: ProofSpec) {
         ICS23Errors::INVALID_INNER_PREFIX_LEN
     );
     assert(inner.suffix.len() % inner_spec.child_size == 0, ICS23Errors::INVALID_INNER_SUFFIX);
+}
+
+fn has_prefix(proof_prefix: @Array<u8>, spec_prefix: @Array<u8>) -> bool {
+    if spec_prefix.len() > proof_prefix.len() {
+        return false;
+    }
+    let mut expected: Array<u8> = ArrayTrait::new();
+    let mut i = 0;
+    while i < spec_prefix.len() {
+        expected.append(*proof_prefix[i]);
+        i += 1;
+    };
+    spec_prefix == @expected
 }

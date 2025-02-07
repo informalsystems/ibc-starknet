@@ -23,7 +23,5 @@ pub mod ICS23Errors {
     pub const INVALID_IAVL_HEIGHT_PREFIX: felt252 = 'ICS23: invalid height prefix';
     pub const UNSUPPORTED_HASH_OP: felt252 = 'ICS23: unsupported hash op';
     pub const ZERO_MERKLE_ROOT: felt252 = 'ICS23: zero merkle root';
-    pub const ZERO_IAVL_SIZE_PREFIX: felt252 = 'ICS23: zero size prefix';
-    pub const ZERO_IAVL_VERSION_PREFIX: felt252 = 'ICS23: zero version prefix';
     pub const ZERO_CHILD_SIZE: felt252 = 'ICS23: zero child size';
 }

@@ -12,7 +12,7 @@ use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, iavl_spec
 
 #[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
 pub struct CommitmentProof {
-    proof: Proof,
+    pub proof: Proof,
 }
 
 impl CommitmentProofAsProtoMessage of ProtoMessage<CommitmentProof> {

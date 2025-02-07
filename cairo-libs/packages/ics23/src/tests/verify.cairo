@@ -1,19 +1,27 @@
 use ics23::{
     LeafOp, LengthOp, HashOp, InnerOp, ExistenceProof, ExistenceProofImpl, SliceU32IntoArrayU8,
-    encode_hex, decode_hex, ProofSpec, iavl_spec, ByteArrayIntoArrayU8, CommitmentProof
+    Proof, encode_hex, decode_hex, ProofSpec, smt_spec, ByteArrayIntoArrayU8, CommitmentProof,
+    verify_existence, byte_array_to_slice_u32
 };
 use ics23::tests::data::{TestData, smt_exist_left};
 use protobuf::types::message::ProtoCodecImpl;
 use protobuf::hex::decode as decode_hex_byte_array;
 
-fn test_verify_membership(data: TestData, spec: ProofSpec) {
-    let decoded_proof = decode_hex_byte_array(@data.proof);
-    let _proof = ProtoCodecImpl::decode::<CommitmentProof>(@decoded_proof);
+fn decode_and_verify_existence(data: TestData, spec: @ProofSpec) {
+    let p = ProtoCodecImpl::decode::<CommitmentProof>(@decode_hex_byte_array(@data.proof));
+    let proof = match p.proof {
+        Proof::Exist(p) => p,
+        _ => panic!("Expect exitence proof"),
+    };
+    let root = byte_array_to_slice_u32(decode_hex_byte_array(@data.root));
+    let key = decode_hex_byte_array(@data.key).into();
+    let value = decode_hex_byte_array(@data.value).into();
+    verify_existence(spec, @proof, @root, @key, @value);
 }
 
 #[test]
 fn test_verify_existence() {
-    test_verify_membership(smt_exist_left(), iavl_spec());
+    decode_and_verify_existence(smt_exist_left(), @smt_spec());
 }
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/verify.rs#L381
