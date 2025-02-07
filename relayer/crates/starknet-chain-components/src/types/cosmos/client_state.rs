@@ -157,7 +157,7 @@ impl Transformer for EncodeClientStatus {
     }
 }
 
-impl From<CometClientState> for Any {
+impl From<CometClientState> for IbcCometClientState {
     fn from(client_state: CometClientState) -> Self {
         IbcCometClientState::new(
             client_state.chain_id,
@@ -178,7 +178,12 @@ impl From<CometClientState> for Any {
             },
         )
         .expect("no error")
-        .into()
+    }
+}
+
+impl From<CometClientState> for Any {
+    fn from(client_state: CometClientState) -> Self {
+        IbcCometClientState::from(client_state).into()
     }
 }
 
