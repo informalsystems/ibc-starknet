@@ -96,7 +96,7 @@ impl ChainBuilder<StarknetBuilder, Index<0>> for StarknetBuildComponents {
         _index: PhantomData<Index<0>>,
         chain_id: &ChainId,
     ) -> Result<StarknetChain, HermesError> {
-        build.build_chain(chain_id).await
+        build.build_starknet_chain(chain_id).await
     }
 }
 
@@ -118,7 +118,7 @@ impl BiRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildCompon
         client_id_a: &ClientId,
         client_id_b: &ClientId,
     ) -> Result<StarknetCosmosBiRelay, HermesError> {
-        let starknet_chain = build.build_chain(chain_id_a).await?;
+        let starknet_chain = build.build_starknet_chain(chain_id_a).await?;
         let cosmos_chain = build.cosmos_builder.build_chain(chain_id_b).await?;
 
         let relay_a_to_b = StarknetToCosmosRelay::new(
@@ -162,11 +162,14 @@ impl StarknetBuilder {
         }
     }
 
-    pub async fn build_chain(&self, chain_id: &ChainId) -> Result<StarknetChain, HermesError> {
-        self.build_chain_with_config(chain_id).await
+    pub async fn build_starknet_chain(
+        &self,
+        chain_id: &ChainId,
+    ) -> Result<StarknetChain, HermesError> {
+        self.build_starknet_chain_with_config(chain_id).await
     }
 
-    pub async fn build_chain_with_config(
+    pub async fn build_starknet_chain_with_config(
         &self,
         expected_chain_id: &ChainId,
     ) -> Result<StarknetChain, HermesError> {
