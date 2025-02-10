@@ -2,6 +2,7 @@ pub mod ICS23Errors {
     pub const MISSING_MERKLE_PROOF: felt252 = 'ICS23: missing merkle proof';
     pub const MISSING_KEY: felt252 = 'ICS23: missing key';
     pub const MISSING_VALUE: felt252 = 'ICS23: missing value';
+    pub const MISSING_LEAF_DATA: felt252 = 'ICS23: missing leaf data';
     pub const MISSING_CHILD_HASH: felt252 = 'ICS23: missing child hash';
     pub const MISMATCHED_KEY: felt252 = 'ICS23: mismatched key';
     pub const MISMATCHED_VALUE: felt252 = 'ICS23: mismatched value';

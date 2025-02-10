@@ -1,7 +1,7 @@
-use core::sha256::{compute_sha256_u32_array, compute_sha256_byte_array};
+use core::sha256::compute_sha256_u32_array;
 use ics23::{
     InnerOp, LeafOp, HashOp, ICS23Errors, LengthOp, ArrayU32IntoArrayU8, SliceU32IntoArrayU8,
-    IntoArrayU32, byte_array_to_array_u8, KeyBytes, ValueBytes
+    IntoArrayU32, KeyBytes, ValueBytes,
 };
 use protobuf::varint::encode_varint_to_u8_array;
 
@@ -39,13 +39,8 @@ pub fn apply_leaf(leaf_op: @LeafOp, key: KeyBytes, value: ValueBytes) -> [u32; 8
 }
 
 pub fn prepare_leaf_u32_array(prehash: @HashOp, length: @LengthOp, data: Array<u8>,) -> Array<u8> {
-    assert(data.len() > 0, ICS23Errors::MISSING_VALUE);
+    assert(data.len() > 0, ICS23Errors::MISSING_LEAF_DATA);
     do_length(length, hash_u32_array(prehash, data))
-}
-
-pub fn prepare_leaf_byte_array(prehash: @HashOp, length: @LengthOp, data: @ByteArray) -> Array<u8> {
-    assert(data.len() > 0, ICS23Errors::MISSING_KEY);
-    do_length(length, hash_byte_array(prehash, data))
 }
 
 pub fn hash_u32_array(hash_op: @HashOp, data: Array<u8>) -> Array<u8> {
@@ -55,13 +50,6 @@ pub fn hash_u32_array(hash_op: @HashOp, data: Array<u8>) -> Array<u8> {
             let (bytes, last_word, last_word_len) = data.into_array_u32();
             compute_sha256_u32_array(bytes, last_word, last_word_len).into()
         }
-    }
-}
-
-pub fn hash_byte_array(hash_op: @HashOp, data: @ByteArray) -> Array<u8> {
-    match hash_op {
-        HashOp::NoOp => byte_array_to_array_u8(data),
-        HashOp::Sha256 => { compute_sha256_byte_array(data).into() }
     }
 }
 
