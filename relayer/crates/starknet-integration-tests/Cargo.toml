@@ -48,3 +48,5 @@ prost-types = { workspace = true }
 tracing     = { workspace = true }
 flate2      = { workspace = true }
 tiny-bip39  = { workspace = true }
+serde       = { workspace = true }
+hex         = { workspace = true }
