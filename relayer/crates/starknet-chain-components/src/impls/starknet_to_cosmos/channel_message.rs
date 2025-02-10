@@ -23,7 +23,9 @@ use hermes_cosmos_chain_components::types::messages::channel::open_try::CosmosCh
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::host::types::error::IdentifierError;
-use ibc::core::host::types::identifiers::{ChannelId as IbcChannelId, PortId as IbcPortId};
+use ibc::core::host::types::identifiers::{
+    ChannelId as IbcChannelId, ConnectionId, PortId as IbcPortId,
+};
 
 use crate::types::channel_id::{
     ChannelCounterparty, ChannelEnd, ChannelEnd as StarknetChannelEnd,
@@ -74,7 +76,9 @@ where
             state: ChannelState::TryOpen,
             ordering: starknet_channel_end.ordering,
             remote,
-            connection_hops: starknet_channel_end.connection_hops,
+            // FIXME: this was wrong
+            // hardcoded for now, as we don't have access to the connection_id at cosmos
+            connection_hops: vec![ConnectionId::new(3827)],
             version: starknet_channel_end.version.clone(),
         };
 
