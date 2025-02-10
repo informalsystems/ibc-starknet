@@ -84,6 +84,9 @@ where
 
         let declare_result = declaration.send().await.map_err(Chain::raise_error)?;
 
+        // starknet block time is 30 secs
+        std::thread::sleep(core::time::Duration::from_secs(40));
+
         let tx_response = chain
             .poll_tx_response(&declare_result.transaction_hash)
             .await?;

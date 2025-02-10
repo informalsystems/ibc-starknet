@@ -28,6 +28,9 @@ where
             .map_err(Chain::raise_error)?
             .transaction_hash;
 
+        // starknet block time is 30 secs
+        std::thread::sleep(core::time::Duration::from_secs(40));
+
         Ok(tx_hash)
     }
 }
