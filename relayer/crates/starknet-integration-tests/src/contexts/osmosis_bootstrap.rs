@@ -65,8 +65,6 @@ pub struct OsmosisBootstrap {
     pub dynamic_gas: Option<DynamicGasConfig>,
 }
 
-impl CanUseLegacyCosmosSdkChainBootstrapper for OsmosisBootstrap {}
-
 pub struct OsmosisBootstrapComponents;
 
 impl HasComponents for OsmosisBootstrap {

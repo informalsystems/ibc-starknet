@@ -5,7 +5,6 @@ use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_logging_components::traits::has_logger::HasLogger;
 use hermes_logging_components::traits::logger::CanLog;
 use hermes_logging_components::types::level::LevelInfo;
-use hermes_starknet_chain_components::types::channel_id::ChannelId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
 use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
@@ -100,7 +99,7 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
 
         let msg_transfer = MsgTransfer {
             port_id_on_a: PortId::transfer(),
-            chan_id_on_a: &args.channel_id.parse()?,
+            chan_id_on_a: args.channel_id.parse()?,
             denom,
             amount: amount_u128.into(),
             receiver: args.receiver.clone(),
