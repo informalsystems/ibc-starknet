@@ -119,7 +119,7 @@ pub mod ChannelHandlerComponent {
         fn ack_packet(ref self: ComponentState<TContractState>, msg: MsgAckPacket) {
             self.assert_authorized_relayer();
             let chan_end_on_a = self
-                .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_b);
+                .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
             self.ack_packet_validate(msg.clone(), chan_end_on_a.clone());
             self.ack_packet_execute(msg, chan_end_on_a);
         }
@@ -754,7 +754,7 @@ pub mod ChannelHandlerComponent {
 
             let packet = @msg.packet;
 
-            chan_end_on_a.validate(packet.port_id_on_a, packet.chan_id_on_a);
+            chan_end_on_a.validate(packet.port_id_on_b, packet.chan_id_on_b);
 
             let conn_end_on_a = self.get_connection(chan_end_on_a.connection_id.clone());
 
