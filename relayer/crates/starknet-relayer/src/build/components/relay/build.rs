@@ -18,7 +18,7 @@ impl RelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponen
         src_client_id: &StarknetClientId,
         dst_client_id: &CosmosClientId,
     ) -> Result<StarknetToCosmosRelay, HermesError> {
-        let src_chain = build.build_chain(src_chain_id).await?;
+        let src_chain = build.build_starknet_chain(src_chain_id).await?;
 
         let dst_chain = build.cosmos_builder.build_chain(dst_chain_id).await?;
 
