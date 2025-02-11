@@ -6,11 +6,12 @@ use starknet::core::types::{BlockId, EventFilter, Felt};
 use starknet::providers::{Provider, ProviderError};
 
 use crate::traits::provider::HasStarknetProvider;
-use crate::traits::queries::block_events::BlockEventsQuerier;
+use crate::traits::queries::block_events::{BlockEventsQuerier, BlockEventsQuerierComponent};
 use crate::types::event::StarknetEvent;
 
 pub struct GetStarknetBlockEvents;
 
+#[cgp_provider(BlockEventsQuerierComponent)]
 impl<Chain> BlockEventsQuerier<Chain> for GetStarknetBlockEvents
 where
     Chain: HasHeightType<Height = u64>

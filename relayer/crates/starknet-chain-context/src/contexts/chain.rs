@@ -17,12 +17,16 @@ use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptio
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientPayload;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
+use hermes_cosmos_relayer::presets::chain::{
+    PacketCommitmentQuerierComponent, SendPacketQuerierComponent,
+    UnreceivedPacketSequencesQuerierComponent,
+};
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, EncodingGetter, HasDefaultEncoding, ProvideEncodingType,
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::ProvideHermesError;
-use hermes_logging_components::contexts::no_logger::ProvideNoLogger;
+use hermes_logger::ProvideHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
 };
@@ -223,7 +227,7 @@ delegate_components! {
             LoggerGetterComponent,
             GlobalLoggerGetterComponent,
         ]:
-            ProvideNoLogger,
+            ProvideHermesLogger,
         [
             StarknetProviderTypeComponent,
             StarknetProviderGetterComponent,
@@ -249,6 +253,13 @@ where
     Self: IsStarknetChainComponents<Name>,
 {
     type Delegate = StarknetChainComponents;
+}
+
+impl<Name, Context, Params> IsProviderFor<Name, Context, Params> for StarknetChainContextComponents
+where
+    Self: IsStarknetChainComponents<Name>,
+    StarknetChainComponents: IsProviderFor<Name, Context, Params>,
+{
 }
 
 delegate_components! {
@@ -445,6 +456,9 @@ pub trait CanUseStarknetChain:
     + CanAssertEventualAmount
     + CanBuildIbcTokenTransferMessage<CosmosChain>
     + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
+// + CanUseComponent<PacketCommitmentQuerierComponent, CosmosChain>
+// + CanUseComponent<SendPacketQuerierComponent, CosmosChain>
+// + CanUseComponent<UnreceivedPacketSequencesQuerierComponent, CosmosChain>
 // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
 // + CanIbcTransferToken<CosmosChain>
 {
@@ -504,6 +518,9 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanQueryCounterpartyChainId<StarknetChain>
     + CanFilterIncomingPacket<StarknetChain>
     + CanFilterOutgoingPacket<StarknetChain>
+    + CanUseComponent<PacketCommitmentQuerierComponent, StarknetChain>
+    + CanUseComponent<SendPacketQuerierComponent, StarknetChain>
+    + CanUseComponent<UnreceivedPacketSequencesQuerierComponent, StarknetChain>
 {
 }
 

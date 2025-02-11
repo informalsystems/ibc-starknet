@@ -7,6 +7,7 @@ use hermes_chain_components::traits::queries::unreceived_acks_sequences::Unrecei
 use hermes_chain_components::traits::types::ibc::{
     HasChannelIdType, HasIbcChainTypes, HasPortIdType, HasSequenceType,
 };
+use hermes_cosmos_chain_components::components::client::UnreceivedAcksSequencesQuerierComponent;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -25,6 +26,7 @@ use crate::types::messages::ibc::packet::Sequence;
 
 pub struct QueryStarknetUnreceivedAckSequences;
 
+#[cgp_provider(UnreceivedAcksSequencesQuerierComponent)]
 impl<Chain, Counterparty, Encoding> UnreceivedAcksSequencesQuerier<Chain, Counterparty>
     for QueryStarknetUnreceivedAckSequences
 where

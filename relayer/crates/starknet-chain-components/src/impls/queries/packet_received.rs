@@ -10,6 +10,7 @@ use hermes_chain_components::traits::types::ibc::{
 };
 use hermes_chain_components::traits::types::packets::receive::HasPacketCommitmentType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
+use hermes_cosmos_chain_components::components::client::ReceivedPacketQuerierComponent;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -29,6 +30,7 @@ use crate::types::messages::ibc::packet::Sequence;
 
 pub struct QueryPacketIsReceivedOnStarknet;
 
+#[cgp_provider(ReceivedPacketQuerierComponent)]
 impl<Chain, Counterparty, Encoding> ReceivedPacketQuerier<Chain, Counterparty>
     for QueryPacketIsReceivedOnStarknet
 where

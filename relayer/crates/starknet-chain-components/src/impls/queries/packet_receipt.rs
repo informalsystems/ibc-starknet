@@ -12,6 +12,7 @@ use hermes_chain_components::traits::types::ibc::{
 };
 use hermes_chain_components::traits::types::packets::timeout::HasPacketReceiptType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
+use hermes_cosmos_chain_components::components::client::PacketReceiptQuerierComponent;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -36,6 +37,7 @@ use crate::types::status::StarknetChainStatus;
 
 pub struct QueryStarknetPacketReceipt;
 
+#[cgp_provider(PacketReceiptQuerierComponent)]
 impl<Chain, Counterparty, Encoding> PacketReceiptQuerier<Chain, Counterparty>
     for QueryStarknetPacketReceipt
 where

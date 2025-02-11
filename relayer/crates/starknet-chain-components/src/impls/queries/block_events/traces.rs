@@ -7,11 +7,12 @@ use starknet::providers::{Provider, ProviderError};
 
 use crate::impls::send_message::extract_events_from_function_invocation;
 use crate::traits::provider::HasStarknetProvider;
-use crate::traits::queries::block_events::BlockEventsQuerier;
+use crate::traits::queries::block_events::{BlockEventsQuerier, BlockEventsQuerierComponent};
 use crate::types::event::StarknetEvent;
 
 pub struct QueryStarknetBlockEventsFromTraces;
 
+#[cgp_provider(BlockEventsQuerierComponent)]
 impl<Chain> BlockEventsQuerier<Chain> for QueryStarknetBlockEventsFromTraces
 where
     Chain: HasHeightType<Height = u64>

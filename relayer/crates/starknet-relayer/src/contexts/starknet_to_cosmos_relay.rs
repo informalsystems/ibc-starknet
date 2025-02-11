@@ -109,6 +109,13 @@ where
     type Delegate = StarknetCommonRelayContextPreset;
 }
 
+impl<Name, Context, Params> IsProviderFor<Name, Context, Params> for StarknetToCosmosRelayComponents
+where
+    Self: IsStarknetCommonRelayContextPreset<Name>,
+    StarknetCommonRelayContextPreset: IsProviderFor<Name, Context, Params>,
+{
+}
+
 delegate_components! {
     StarknetToCosmosRelayComponents {
         [

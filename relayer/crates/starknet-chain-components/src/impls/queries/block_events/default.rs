@@ -1,4 +1,4 @@
-use cgp::prelude::CanRaiseAsyncError;
+use cgp::prelude::*;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::height::HasHeightType;
@@ -12,11 +12,12 @@ use crate::impls::queries::block_events::get::GetStarknetBlockEvents;
 use crate::impls::queries::block_events::retry::RetryQueryBlockEvents;
 use crate::impls::queries::block_events::wait::WaitBlockHeightAndQueryEvents;
 use crate::traits::provider::HasStarknetProvider;
-use crate::traits::queries::block_events::BlockEventsQuerier;
+use crate::traits::queries::block_events::{BlockEventsQuerier, BlockEventsQuerierComponent};
 use crate::types::event::StarknetEvent;
 
 pub struct DefaultQueryBlockEvents;
 
+#[cgp_provider(BlockEventsQuerierComponent)]
 impl<Chain> BlockEventsQuerier<Chain> for DefaultQueryBlockEvents
 where
     Chain: HasRuntime
