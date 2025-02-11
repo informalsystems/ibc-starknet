@@ -14,7 +14,6 @@ use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetterComp
 use hermes_relayer_components::multi::types::tags::{Dst, Src};
 use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapChannel;
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
-use hermes_relayer_components::relay::impls::packet_clearers::receive_packet::ClearReceivePackets;
 use hermes_relayer_components::relay::impls::packet_lock::PacketMutexOf;
 use hermes_relayer_components::relay::impls::selector::SelectRelayAToB;
 use hermes_relayer_components::relay::traits::auto_relayer::CanAutoRelay;
@@ -172,14 +171,8 @@ pub trait CanUseCosmosToStarknetRelay:
     + CanRelayEvent<DestinationTarget>
     + CanAutoRelay<SourceTarget>
     + CanAutoRelay<DestinationTarget>
+    + CanUseComponent<PacketClearerComponent>
 {
 }
 
 impl CanUseCosmosToStarknetRelay for CosmosToStarknetRelay {}
-
-pub trait CanUsePacketClearer:
-    IsProviderFor<PacketClearerComponent, CosmosToStarknetRelay, ()>
-{
-}
-
-impl CanUsePacketClearer for ClearReceivePackets {}

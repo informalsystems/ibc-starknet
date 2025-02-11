@@ -18,8 +18,9 @@ use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPai
 use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientPayload;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_relayer::presets::chain::{
-    PacketCommitmentQuerierComponent, SendPacketQuerierComponent,
-    UnreceivedPacketSequencesQuerierComponent,
+    AckPacketsQuerierComponent, PacketAcknowledgementsQuerierComponent,
+    PacketCommitmentQuerierComponent, SendPacketQuerierComponent, SendPacketsQuerierComponent,
+    UnreceivedAcksSequencesQuerierComponent, UnreceivedPacketSequencesQuerierComponent,
 };
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, EncodingGetter, HasDefaultEncoding, ProvideEncodingType,
@@ -457,8 +458,11 @@ pub trait CanUseStarknetChain:
     + CanBuildIbcTokenTransferMessage<CosmosChain>
     + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
     + CanUseComponent<PacketCommitmentQuerierComponent, CosmosChain>
-    + CanUseComponent<SendPacketQuerierComponent, CosmosChain>
+    + CanUseComponent<SendPacketsQuerierComponent, CosmosChain>
+    + CanUseComponent<AckPacketsQuerierComponent, CosmosChain>
+    + CanUseComponent<PacketAcknowledgementsQuerierComponent, CosmosChain>
     + CanUseComponent<UnreceivedPacketSequencesQuerierComponent, CosmosChain>
+    + CanUseComponent<UnreceivedAcksSequencesQuerierComponent, CosmosChain>
 // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
 // + CanIbcTransferToken<CosmosChain>
 {
@@ -521,6 +525,8 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanUseComponent<PacketCommitmentQuerierComponent, StarknetChain>
     + CanUseComponent<SendPacketQuerierComponent, StarknetChain>
     + CanUseComponent<UnreceivedPacketSequencesQuerierComponent, StarknetChain>
+    + CanUseComponent<UnreceivedAcksSequencesQuerierComponent, StarknetChain>
+    + CanUseComponent<PacketAcknowledgementsQuerierComponent, StarknetChain>
 {
 }
 

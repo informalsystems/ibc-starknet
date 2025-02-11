@@ -76,6 +76,7 @@ use crate::impls::packet_filter::FilterStarknetPackets;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
+use crate::impls::queries::ack_packets::QueryStarknetAckPackets;
 use crate::impls::queries::balance::QueryStarknetWalletBalance;
 use crate::impls::queries::block_events::default::DefaultQueryBlockEvents;
 use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
@@ -399,6 +400,11 @@ cgp_preset! {
             SendPacketsQuerierComponent,
         ]:
             QueryStarknetSendPacket,
+        [
+            AckPacketsQuerierComponent,
+            PacketAcknowledgementsQuerierComponent,
+        ]:
+            QueryStarknetAckPackets,
         PacketAcknowledgementQuerierComponent:
             QueryStarknetAckCommitment,
         PacketReceiptQuerierComponent:
