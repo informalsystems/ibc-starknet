@@ -647,11 +647,11 @@ pub mod TokenTransferComponent {
         fn escrow_execute(
             ref self: ComponentState<TContractState>,
             from_account: ContractAddress,
-            denom: ERC20Contract,
+            token: ERC20Contract,
             amount: u256,
             memo: Memo,
         ) {
-            denom.transfer_from(from_account, get_contract_address(), amount);
+            token.transfer_from(from_account, get_contract_address(), amount);
         }
 
         fn unescrow_execute(
@@ -659,10 +659,10 @@ pub mod TokenTransferComponent {
             to_account: ContractAddress,
             port_id: PortId,
             channel_id: ChannelId,
-            denom: ERC20Contract,
+            token: ERC20Contract,
             amount: u256,
         ) {
-            denom.transfer(to_account, amount);
+            token.transfer(to_account, amount);
         }
 
         fn mint_execute(
