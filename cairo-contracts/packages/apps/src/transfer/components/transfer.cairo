@@ -406,6 +406,7 @@ pub mod TokenTransferComponent {
 
             (packet_data, receiver.unwrap())
         }
+
         fn recv_validate(
             self: @ComponentState<TContractState>,
             packet: Packet,
@@ -671,19 +672,17 @@ pub mod TokenTransferComponent {
             denom: PrefixedDenom,
             amount: u256,
         ) {
-            let token = self.get_token(denom.key());
-
+            let mut token = self.get_token(denom.key());
             if token.is_non_zero() {
-                token.mint(account, amount);
+                token.mint(get_contract_address(), amount);
             } else {
                 let name = denom.base.hosted().unwrap();
 
-                let token = self.create_token(name, amount);
+                token = self.create_token(name, amount);
 
                 self.record_ibc_token(denom, token.address);
-
-                token.transfer(account, amount);
             }
+            token.transfer(account, amount);
         }
 
         fn burn_execute(

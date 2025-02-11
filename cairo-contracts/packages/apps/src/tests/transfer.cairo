@@ -1,7 +1,7 @@
 use TokenTransferComponent::TransferValidationTrait;
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::cheatcodes::events::EventSpy;
-use snforge_std::{spy_events, start_cheat_caller_address};
+use snforge_std::{spy_events, start_cheat_caller_address, start_cheat_account_contract_address};
 use starknet::class_hash::class_hash_const;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
@@ -159,7 +159,7 @@ fn test_mint_ok() {
 
     let erc20: ERC20Contract = token_address.into();
 
-    // Assert if the trasfer happens from the ICS20 address.
+    // Assert if the transfer happens from the ICS20 address.
     spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), cfg.amount);
 
     spy.drop_all_events();
@@ -172,6 +172,9 @@ fn test_mint_ok() {
         .assert_recv_event(
             ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), cfg.amount, true
         );
+
+    // Assert if the transfer happens from the ICS20 address.
+    spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), cfg.amount);
 
     // Check the balance of the receiver.
     erc20.assert_balance(SN_USER(), cfg.amount * 2);

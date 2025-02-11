@@ -108,7 +108,7 @@ fn test_mint_burn_roundtrip() {
 
     let erc20: ERC20Contract = token_address.into();
 
-    // Assert if the tranfer happens from the ICS20 address.
+    // Assert if the transfer happens from the ICS20 address.
     spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), transfer_cfg.amount);
 
     // Check the balance of the receiver.
