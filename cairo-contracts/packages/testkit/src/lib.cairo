@@ -42,11 +42,13 @@ pub mod event_spy {
     mod channel;
     mod client;
     mod connection;
+    mod erc20;
     mod transfer;
 
     pub use channel::{ChannelEventSpyExtImpl, ChannelEventSpyExt};
     pub use client::ClientEventSpyExt;
     pub use connection::{ConnectionEventSpyExtImpl, ConnectionEventSpyExt};
+    pub use erc20::{ERC20EventSpyExtImpl, ERC20EventSpyExt};
     pub use transfer::{TransferEventSpyExtImpl, TransferEventSpyExt};
 }
 pub mod handles {

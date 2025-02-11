@@ -2,7 +2,8 @@ use snforge_std::start_cheat_caller_address;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_testkit::configs::TransferAppConfigTrait;
 use starknet_ibc_testkit::dummies::{NAME, SYMBOL, SUPPLY, COSMOS, STARKNET, SN_USER, CS_USER};
-use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
+use starknet_ibc_testkit::event_spy::ERC20EventSpyExt;
+use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ERC20EventSpyExtImpl};
 use starknet_ibc_testkit::handles::{AppHandle, CoreHandle, ERC20Handle};
 use starknet_ibc_testkit::setup::{setup, Mode};
 use starknet_ibc_utils::ComputeKey;
@@ -106,6 +107,9 @@ fn test_mint_burn_roundtrip() {
         );
 
     let erc20: ERC20Contract = token_address.into();
+
+    // Assert if the tranfer happens from the ICS20 address.
+    spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), transfer_cfg.amount);
 
     // Check the balance of the receiver.
     erc20.assert_balance(SN_USER(), transfer_cfg.amount);
