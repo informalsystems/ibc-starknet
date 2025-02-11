@@ -26,13 +26,11 @@ pub impl CoreConfigImpl of CoreConfigTrait {
             conn_sequence_on_a: 0,
             conn_sequence_on_b: 0,
             chan_sequence_on_a: 0,
-            chan_sequence_on_b: 0,
+            // This represents channel sequence of counterparty chains. It's set to sufficiently
+            // high value to prevent low values (especially 0 or 1) hiding ID misuse cases.
+            chan_sequence_on_b: 10,
             channel_ordering: ChannelOrdering::Unordered
         }
-    }
-
-    fn set_chan_sequence_on_b(ref self: CoreConfig, sequence: u64) {
-        self.chan_sequence_on_b = sequence;
     }
 
     fn dummy_msg_conn_open_init(self: @CoreConfig) -> MsgConnOpenInit {
@@ -91,7 +89,9 @@ pub impl CoreConfigImpl of CoreConfigTrait {
             port_id_on_b: PORT_ID(),
             conn_id_on_b: CONNECTION_ID(0),
             port_id_on_a: PORT_ID(),
-            chan_id_on_a: CHANNEL_ID(*self.chan_sequence_on_b),
+            chan_id_on_a: CHANNEL_ID(
+                *self.chan_sequence_on_a
+            ), // Set to `*_on_a` since dummy messages are meant to be submitted to Starknet (source chain).
             version_on_a: VERSION(),
             proof_chan_end_on_a: STATE_PROOF(),
             proof_height_on_a: HEIGHT(10),
@@ -113,7 +113,9 @@ pub impl CoreConfigImpl of CoreConfigTrait {
     fn dummy_msg_chan_open_confirm(self: @CoreConfig) -> MsgChanOpenConfirm {
         MsgChanOpenConfirm {
             port_id_on_b: PORT_ID(),
-            chan_id_on_b: CHANNEL_ID(*self.chan_sequence_on_b),
+            chan_id_on_b: CHANNEL_ID(
+                *self.chan_sequence_on_a
+            ), // Set to `*_on_a` since dummy messages are meant to be submitted to Starknet (source chain).
             proof_chan_end_on_a: STATE_PROOF(),
             proof_height_on_a: HEIGHT(10),
         }

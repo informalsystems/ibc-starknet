@@ -30,7 +30,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
             native_denom: NATIVE_DENOM(),
             hosted_denom: HOSTED_DENOM(),
             chan_id_on_a: CHANNEL_ID(0),
-            chan_id_on_b: CHANNEL_ID(0),
+            chan_id_on_b: CHANNEL_ID(10),
             amount: AMOUNT,
             timeout_height: TIMEOUT_HEIGHT(1000),
             timeout_timestamp: TIMEOUT_TIMESTAMP(1000),
@@ -56,7 +56,9 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     }
 
     fn prefix_hosted_denom(self: @TransferAppConfig) -> PrefixedDenom {
-        let trace_prefix = TracePrefixTrait::new(PORT_ID(), self.chan_id_on_b.clone());
+        // NOTE: Used the `chan_id_on_a` since this runs during the recv packet test
+        // with incoming packets, where `*_on_a` represents the counterparty chains.
+        let trace_prefix = TracePrefixTrait::new(PORT_ID(), self.chan_id_on_a.clone());
 
         let mut hosted_denom = self.hosted_denom.clone();
 
@@ -92,7 +94,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
     ) -> MsgRecvPacket {
         MsgRecvPacket {
-            packet: self.dummy_packet(denom, sender, receiver),
+            packet: self.dummy_incoming_packet(denom, sender, receiver),
             proof_commitment_on_a: STATE_PROOF(),
             proof_height_on_a: HEIGHT(10),
         }
@@ -106,7 +108,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         acknowledgement: Acknowledgement
     ) -> MsgAckPacket {
         MsgAckPacket {
-            packet: self.dummy_packet(denom, sender, receiver),
+            packet: self.dummy_outgoing_packet(denom, sender, receiver),
             acknowledgement,
             proof_ack_on_b: STATE_PROOF(),
             proof_height_on_b: HEIGHT(10),
@@ -121,15 +123,38 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         proof_height: Height,
     ) -> MsgTimeoutPacket {
         MsgTimeoutPacket {
-            packet: self.dummy_packet(denom, sender, receiver),
+            packet: self.dummy_outgoing_packet(denom, sender, receiver),
             next_seq_recv_on_b: Sequence { sequence: 2 },
             proof_unreceived_on_b: STATE_PROOF(),
             proof_height_on_b: proof_height,
         }
     }
 
-    fn dummy_packet(
+    fn dummy_outgoing_packet(
         self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+    ) -> Packet {
+        self
+            .dummy_packet(
+                self.chan_id_on_a.clone(), self.chan_id_on_b.clone(), denom, sender, receiver
+            )
+    }
+
+    fn dummy_incoming_packet(
+        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+    ) -> Packet {
+        self
+            .dummy_packet(
+                self.chan_id_on_b.clone(), self.chan_id_on_a.clone(), denom, sender, receiver
+            )
+    }
+
+    fn dummy_packet(
+        self: @TransferAppConfig,
+        chan_id_on_a: ChannelId,
+        chan_id_on_b: ChannelId,
+        denom: PrefixedDenom,
+        sender: Participant,
+        receiver: Participant
     ) -> Packet {
         let mut serialized_data = array![];
         Serde::serialize(@self.dummy_packet_data(denom, sender, receiver), ref serialized_data);
@@ -137,9 +162,9 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         Packet {
             seq_on_a: Sequence { sequence: 1 },
             port_id_on_a: PORT_ID(),
-            chan_id_on_a: self.chan_id_on_a.clone(),
+            chan_id_on_a,
             port_id_on_b: PORT_ID(),
-            chan_id_on_b: self.chan_id_on_b.clone(),
+            chan_id_on_b,
             data: serialized_data,
             timeout_height_on_b: self.timeout_height.clone(),
             timeout_timestamp_on_b: self.timeout_timestamp.clone(),
