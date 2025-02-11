@@ -8,6 +8,7 @@ pub mod consensus_state;
 pub mod contract_address;
 pub mod counterparty_chain_id;
 pub mod packet_commitment;
+pub mod packet_commitments;
 pub mod packet_receipt;
 pub mod packet_received;
 pub mod status;
