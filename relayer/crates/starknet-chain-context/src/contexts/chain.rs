@@ -456,9 +456,9 @@ pub trait CanUseStarknetChain:
     + CanAssertEventualAmount
     + CanBuildIbcTokenTransferMessage<CosmosChain>
     + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
-// + CanUseComponent<PacketCommitmentQuerierComponent, CosmosChain>
-// + CanUseComponent<SendPacketQuerierComponent, CosmosChain>
-// + CanUseComponent<UnreceivedPacketSequencesQuerierComponent, CosmosChain>
+    + CanUseComponent<PacketCommitmentQuerierComponent, CosmosChain>
+    + CanUseComponent<SendPacketQuerierComponent, CosmosChain>
+    + CanUseComponent<UnreceivedPacketSequencesQuerierComponent, CosmosChain>
 // TODO(rano): need this to <Starknet as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token
 // + CanIbcTransferToken<CosmosChain>
 {

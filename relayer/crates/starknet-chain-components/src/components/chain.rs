@@ -87,6 +87,7 @@ use crate::impls::queries::counterparty_chain_id::QueryCosmosChainIdFromStarknet
 use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
 use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
 use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
+use crate::impls::queries::send_packet::QueryStarknetSendPacket;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
 use crate::impls::queries::unreceived_acks::QueryStarknetUnreceivedAckSequences;
@@ -384,12 +385,20 @@ cgp_preset! {
             ChannelEndWithProofsQuerierComponent,
         ]:
             QueryChannelEndFromStarknet,
-        PacketCommitmentQuerierComponent:
+        [
+            PacketCommitmentQuerierComponent,
+            PacketCommitmentsQuerierComponent,
+        ]:
             QueryStarknetPacketCommitment,
         UnreceivedPacketSequencesQuerierComponent:
             QueryStarknetUnreceivedPacketSequences,
         UnreceivedAcksSequencesQuerierComponent:
             QueryStarknetUnreceivedAckSequences,
+        [
+            SendPacketQuerierComponent,
+            SendPacketsQuerierComponent,
+        ]:
+            QueryStarknetSendPacket,
         PacketAcknowledgementQuerierComponent:
             QueryStarknetAckCommitment,
         PacketReceiptQuerierComponent:
