@@ -174,6 +174,39 @@ pub mod ChannelHandlerComponent {
             self.read_packet_ack(@port_id, @channel_id, @sequence)
         }
 
+        fn packet_commitment_sequences(
+            self: @ComponentState<TContractState>, port_id: PortId, channel_id: ChannelId
+        ) -> Array<Sequence> {
+            let mut send_sequences = ArrayTrait::new();
+            let mut send_seq = self.read_next_sequence_send(@port_id, @channel_id).decrement();
+            while let Option::Some(sequence) = @send_seq {
+                if self
+                    .packet_commitments
+                    .read(commitment_key(@port_id, @channel_id, sequence))
+                    .is_non_zero() {
+                    send_sequences.append(sequence.clone());
+                }
+                send_seq = send_seq.unwrap().decrement();
+            };
+            send_sequences
+        }
+
+        fn packet_ack_sequences(
+            self: @ComponentState<TContractState>,
+            port_id: PortId,
+            channel_id: ChannelId,
+            sequences: Array<Sequence>
+        ) -> Array<Sequence> {
+            assert(sequences.len() > 0, ChannelErrors::EMPTY_SEQUENCE_LIST);
+            let mut ack_sequences = ArrayTrait::new();
+            for seq in sequences {
+                if self.packet_acks.read(ack_key(@port_id, @channel_id, @seq)).is_non_zero() {
+                    ack_sequences.append(seq);
+                }
+            };
+            ack_sequences
+        }
+
         fn unreceived_packet_sequences(
             self: @ComponentState<TContractState>,
             port_id: PortId,

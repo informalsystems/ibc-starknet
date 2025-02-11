@@ -1,6 +1,6 @@
 use core::byte_array::ByteArrayTrait;
-use core::num::traits::CheckedAdd;
 use core::num::traits::Zero;
+use core::num::traits::{CheckedAdd, CheckedSub};
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
 use starknet_ibc_core::commitment::{ArrayU32IntoArrayU8, StateValue, u64_into_array_u32};
@@ -245,6 +245,10 @@ pub impl SequenceImpl of SequenceTrait {
         }
     }
 
+    fn decrement(self: Sequence) -> Option<Sequence> {
+        self.checked_sub(Self::one())
+    }
+
     fn to_array_u8(self: Sequence) -> Array<u8> {
         u64_into_array_u32(self.sequence).into()
     }
@@ -267,6 +271,17 @@ pub impl SequenceZero of Zero<Sequence> {
 
     fn is_non_zero(self: @Sequence) -> bool {
         !self.is_zero()
+    }
+}
+
+pub impl SequenceCheckedSub of CheckedSub<Sequence> {
+    fn checked_sub(self: Sequence, v: Sequence) -> Option<Sequence> {
+        let maybe_prev_sequence = self.sequence.checked_sub(1);
+        if let Option::Some(sequence) = maybe_prev_sequence {
+            Option::Some(Sequence { sequence })
+        } else {
+            Option::None
+        }
     }
 }
 
