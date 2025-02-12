@@ -12,4 +12,5 @@ test = { workspace = true }
 protobuf = { path = "../protobuf" }
 
 [dev-dependencies]
-snforge_std = { workspace = true }
+assert_macros = { workspace = true }
+snforge_std   = { workspace = true }
