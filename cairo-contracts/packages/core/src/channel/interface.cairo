@@ -67,6 +67,14 @@ pub trait IChannelQuery<TContractState> {
     fn packet_acknowledgement(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
     ) -> Commitment;
+    /// Returns all committed packet sequences pending finalization on the counterparty chain.
+    fn packet_commitment_sequences(
+        self: @TContractState, port_id: PortId, channel_id: ChannelId
+    ) -> Array<Sequence>;
+    /// Returns sequences from the given list that are acknowledged (finalized) on this chain.
+    fn packet_ack_sequences(
+        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>
+    ) -> Array<Sequence>;
     fn unreceived_packet_sequences(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>
     ) -> Array<Sequence>;

@@ -1,7 +1,14 @@
 use core::num::traits::Zero;
 use starknet_ibc_core::channel::ChannelHandlerComponent::{ChannelWriterTrait, ChannelReaderTrait};
-use starknet_ibc_core::channel::{ChannelHandlerComponent, Receipt, ReceiptTrait};
-use starknet_ibc_testkit::dummies::{CHANNEL_END, CHANNEL_ID, PORT_ID, SEQUENCE};
+use starknet_ibc_core::channel::{IChannelQuery, ChannelHandlerComponent, Receipt, ReceiptTrait};
+use starknet_ibc_core::commitment::compute_packet_commitment;
+use starknet_ibc_core::host::SequenceImpl;
+use starknet_ibc_testkit::configs::TransferAppConfigImpl;
+use starknet_ibc_testkit::configs::TransferAppConfigTrait;
+use starknet_ibc_testkit::dummies::{
+    CHANNEL_END, CHANNEL_ID, PORT_ID, SEQUENCE, NATIVE_DENOM, STARKNET, COSMOS, TIMEOUT_HEIGHT,
+    TIMEOUT_TIMESTAMP
+};
 use starknet_ibc_testkit::mocks::MockChannelHandler;
 
 type ComponentState = ChannelHandlerComponent::ComponentState<MockChannelHandler::ContractState>;
@@ -80,4 +87,27 @@ fn test_packet_ack_existence() {
     let state = setup();
     let if_exists = state.packet_ack_exists(@PORT_ID(), @CHANNEL_ID(0), @SEQUENCE(0));
     assert!(!if_exists);
+}
+
+#[test]
+fn test_packet_commitment_sequences() {
+    let mut state = setup();
+    let cfg = TransferAppConfigImpl::default();
+    let packet_data = cfg.dummy_packet_data(NATIVE_DENOM(), STARKNET(), COSMOS());
+    let packet_commitment = compute_packet_commitment(
+        @serde_json::to_byte_array(packet_data), TIMEOUT_HEIGHT(0), TIMEOUT_TIMESTAMP(1000),
+    );
+    let port_id = PORT_ID();
+    let channel_id = CHANNEL_ID(0);
+    // Assuming packets with sequence number of 2 and 4 are finalized(hence no commitment exists).
+    let seq_1 = SEQUENCE(1);
+    let seq_2 = SEQUENCE(3);
+    let seq_3 = SEQUENCE(5);
+    state.write_packet_commitment(@port_id, @channel_id, @seq_1, packet_commitment.clone());
+    state.write_packet_commitment(@port_id, @channel_id, @seq_2, packet_commitment.clone());
+    state.write_packet_commitment(@port_id, @channel_id, @seq_3, packet_commitment);
+    state.write_next_sequence_send(@port_id, @channel_id, SEQUENCE(6));
+
+    let sequences = state.packet_commitment_sequences(port_id, channel_id);
+    assert_eq!(sequences, array![seq_3, seq_2, seq_1]);
 }
