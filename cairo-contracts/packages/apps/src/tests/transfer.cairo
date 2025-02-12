@@ -1,7 +1,7 @@
 use TokenTransferComponent::TransferValidationTrait;
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::cheatcodes::events::EventSpy;
-use snforge_std::{spy_events, start_cheat_caller_address, start_cheat_account_contract_address};
+use snforge_std::{spy_events, start_cheat_caller_address};
 use starknet::class_hash::class_hash_const;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
