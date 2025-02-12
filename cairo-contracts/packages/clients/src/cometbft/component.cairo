@@ -324,7 +324,13 @@ pub mod CometClientComponent {
 
             let comet_consensus_state = CometConsensusStateImpl::deserialize(consensus_state);
 
-            self._update_state(client_sequence, comet_client_state.clone(), comet_consensus_state);
+            self
+                ._update_state(
+                    client_sequence,
+                    comet_client_state.latest_height,
+                    comet_client_state.clone(),
+                    comet_consensus_state
+                );
 
             let client_id = ClientIdImpl::new(self.client_type(), client_sequence);
 
@@ -349,7 +355,10 @@ pub mod CometClientComponent {
 
                 let new_consensus_state: CometConsensusState = header.into();
 
-                self._update_state(client_sequence, client_state, new_consensus_state);
+                self
+                    ._update_state(
+                        client_sequence, header_height, client_state, new_consensus_state
+                    );
             }
 
             array![header_height].into()
@@ -439,29 +448,28 @@ pub mod CometClientComponent {
         fn _update_state(
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
+            update_height: Height,
             client_state: CometClientState,
             consensus_state: CometConsensusState,
         ) {
             self.write_client_state(client_sequence, client_state.clone());
 
-            let latest_height = client_state.latest_height;
-
-            self.write_update_height(client_sequence, latest_height.clone());
+            self.write_update_height(client_sequence, update_height.clone());
 
             self
                 .write_consensus_state(
-                    client_sequence, latest_height.clone(), consensus_state.clone()
+                    client_sequence, update_height.clone(), consensus_state.clone()
                 );
 
             let host_height = get_block_number();
 
-            self.write_client_processed_height(client_sequence, latest_height.clone(), host_height);
+            self.write_client_processed_height(client_sequence, update_height.clone(), host_height);
 
             let host_timestamp = get_block_timestamp();
 
             self
                 .write_client_processed_time(
-                    client_sequence, latest_height.clone(), host_timestamp
+                    client_sequence, update_height.clone(), host_timestamp
                 );
 
             self.write_next_client_sequence(client_sequence + 1);
