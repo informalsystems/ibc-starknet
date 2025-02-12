@@ -27,6 +27,11 @@
       url = "github:software-mansion/universal-sierra-compiler/v2.3.0";
       flake = false;
     };
+
+    starknet-foundry-src = {
+      url = "github:foundry-rs/starknet-foundry/v0.37.0";
+      flake = false;
+    };
   };
 
   outputs =
@@ -87,6 +92,11 @@
             rust = rust-1_79;
           };
 
+          starknet-foundry = import ./nix/starknet-foundry.nix {
+            inherit nixpkgs;
+            inherit (inputs) starknet-foundry-src;
+          };
+
           ibc-starknet-cw = import ./nix/ibc-starknet-cw.nix {
             inherit nixpkgs;
 
@@ -99,6 +109,7 @@
               cairo
               scarb
               universal-sierra-compiler
+              starknet-foundry
               wasm-simapp
               osmosis
               ;
