@@ -14,12 +14,12 @@
     };
 
     cairo-src = {
-      url = "github:starkware-libs/cairo/v2.8.4";
+      url = "github:starkware-libs/cairo/v2.9.2";
       flake = false;
     };
 
     scarb-src = {
-      url = "github:software-mansion/scarb/v2.8.4";
+      url = "github:software-mansion/scarb/v2.9.2";
       flake = false;
     };
 
