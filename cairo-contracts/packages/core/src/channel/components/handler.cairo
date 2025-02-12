@@ -119,7 +119,7 @@ pub mod ChannelHandlerComponent {
         fn ack_packet(ref self: ComponentState<TContractState>, msg: MsgAckPacket) {
             self.assert_authorized_relayer();
             let chan_end_on_a = self
-                .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_b);
+                .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
             self.ack_packet_validate(msg.clone(), chan_end_on_a.clone());
             self.ack_packet_execute(msg, chan_end_on_a);
         }
@@ -172,6 +172,39 @@ pub mod ChannelHandlerComponent {
             sequence: Sequence
         ) -> Commitment {
             self.read_packet_ack(@port_id, @channel_id, @sequence)
+        }
+
+        fn packet_commitment_sequences(
+            self: @ComponentState<TContractState>, port_id: PortId, channel_id: ChannelId
+        ) -> Array<Sequence> {
+            let mut send_sequences = ArrayTrait::new();
+            let mut send_seq = self.read_next_sequence_send(@port_id, @channel_id).decrement();
+            while let Option::Some(sequence) = @send_seq {
+                if self
+                    .packet_commitments
+                    .read(commitment_key(@port_id, @channel_id, sequence))
+                    .is_non_zero() {
+                    send_sequences.append(sequence.clone());
+                }
+                send_seq = send_seq.unwrap().decrement();
+            };
+            send_sequences
+        }
+
+        fn packet_ack_sequences(
+            self: @ComponentState<TContractState>,
+            port_id: PortId,
+            channel_id: ChannelId,
+            sequences: Array<Sequence>
+        ) -> Array<Sequence> {
+            assert(sequences.len() > 0, ChannelErrors::EMPTY_SEQUENCE_LIST);
+            let mut ack_sequences = ArrayTrait::new();
+            for seq in sequences {
+                if self.packet_acks.read(ack_key(@port_id, @channel_id, @seq)).is_non_zero() {
+                    ack_sequences.append(seq);
+                }
+            };
+            ack_sequences
         }
 
         fn unreceived_packet_sequences(
@@ -754,7 +787,7 @@ pub mod ChannelHandlerComponent {
 
             let packet = @msg.packet;
 
-            chan_end_on_a.validate(packet.port_id_on_a, packet.chan_id_on_a);
+            chan_end_on_a.validate(packet.port_id_on_b, packet.chan_id_on_b);
 
             let conn_end_on_a = self.get_connection(chan_end_on_a.connection_id.clone());
 

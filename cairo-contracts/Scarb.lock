@@ -196,6 +196,7 @@ version = "0.1.0"
 dependencies = [
  "ics23",
  "openzeppelin_testing",
+ "serde_json",
  "snforge_std",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
