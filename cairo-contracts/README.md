@@ -31,7 +31,7 @@ directory that includes:
 
 ## How to build
 
-Install `scarb v2.8.4` with the instruction provided in the [Scarb
+Install `scarb v2.9.2` with the instruction provided in the [Scarb
 Documentation](https://docs.swmansion.com/scarb/download.html). Then, to build
 the contracts, you simply need to run the following command:
 
