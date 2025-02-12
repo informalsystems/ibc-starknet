@@ -25,7 +25,7 @@ test = "snforge test"
 assert_macros = "2.9.2"
 cairo_test    = "2.9.2"
 starknet      = "2.9.2"
-snforge_std   = "0.37.0"
+snforge_std   = "0.34.0"
 
 [workspace.tool.fmt]
 sort-module-level-items = true

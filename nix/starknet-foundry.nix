@@ -2,7 +2,7 @@
 let
   starknet-foundry = nixpkgs.rustPlatform.buildRustPackage {
     pname = "starknet-foundry";
-    version = "0.37.0";
+    version = "0.34.0";
 
     src = starknet-foundry-src;
 
