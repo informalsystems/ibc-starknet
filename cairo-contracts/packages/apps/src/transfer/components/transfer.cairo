@@ -406,6 +406,7 @@ pub mod TokenTransferComponent {
 
             (packet_data, receiver.unwrap())
         }
+
         fn recv_validate(
             self: @ComponentState<TContractState>,
             packet: Packet,
@@ -647,11 +648,11 @@ pub mod TokenTransferComponent {
         fn escrow_execute(
             ref self: ComponentState<TContractState>,
             from_account: ContractAddress,
-            denom: ERC20Contract,
+            token: ERC20Contract,
             amount: u256,
             memo: Memo,
         ) {
-            denom.transfer_from(from_account, get_contract_address(), amount);
+            token.transfer_from(from_account, get_contract_address(), amount);
         }
 
         fn unescrow_execute(
@@ -659,10 +660,10 @@ pub mod TokenTransferComponent {
             to_account: ContractAddress,
             port_id: PortId,
             channel_id: ChannelId,
-            denom: ERC20Contract,
+            token: ERC20Contract,
             amount: u256,
         ) {
-            denom.transfer(to_account, amount);
+            token.transfer(to_account, amount);
         }
 
         fn mint_execute(
@@ -671,17 +672,17 @@ pub mod TokenTransferComponent {
             denom: PrefixedDenom,
             amount: u256,
         ) {
-            let token = self.get_token(denom.key());
-
+            let mut token = self.get_token(denom.key());
             if token.is_non_zero() {
-                token.mint(account, amount);
+                token.mint(get_contract_address(), amount);
             } else {
                 let name = denom.base.hosted().unwrap();
 
-                let token_address = self.create_token(account, name, amount);
+                token = self.create_token(name, amount);
 
-                self.record_ibc_token(denom, token_address);
+                self.record_ibc_token(denom, token.address);
             }
+            token.transfer(account, amount);
         }
 
         fn burn_execute(
@@ -752,11 +753,8 @@ pub mod TokenTransferComponent {
         }
 
         fn create_token(
-            ref self: ComponentState<TContractState>,
-            account: ContractAddress,
-            name: ByteArray,
-            amount: u256,
-        ) -> ContractAddress {
+            ref self: ComponentState<TContractState>, name: ByteArray, amount: u256,
+        ) -> ERC20Contract {
             let salt = self.read_salt();
 
             let mut symbol: ByteArray = "IBC/";
@@ -769,7 +767,7 @@ pub mod TokenTransferComponent {
                 name.clone(),
                 symbol.clone(), // TODO: Determine what the symbol should be.
                 amount.clone(),
-                account,
+                get_contract_address(),
                 get_contract_address()
             );
 
@@ -777,7 +775,7 @@ pub mod TokenTransferComponent {
 
             self.emit_create_token_event(name, symbol, erc20_token.address, amount);
 
-            erc20_token.address
+            erc20_token
         }
 
         fn record_ibc_token(

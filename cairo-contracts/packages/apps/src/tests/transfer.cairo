@@ -15,7 +15,7 @@ use starknet_ibc_testkit::dummies::{
     AMOUNT, SUPPLY, OWNER, SN_USER, CS_USER, NAME, SYMBOL, COSMOS, STARKNET, HOSTED_DENOM,
     EMPTY_MEMO
 };
-use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
+use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ERC20EventSpyExt};
 use starknet_ibc_testkit::handles::{ERC20Handle, AppHandle};
 use starknet_ibc_testkit::mocks::MockTransferApp;
 use starknet_ibc_testkit::setup::SetupImpl;
@@ -157,6 +157,11 @@ fn test_mint_ok() {
             ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), cfg.amount, true
         );
 
+    let erc20: ERC20Contract = token_address.into();
+
+    // Assert if the transfer happens from the ICS20 address.
+    spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), cfg.amount);
+
     spy.drop_all_events();
 
     // Submit another `RecvPacket`, which will mint the amount of tokens.
@@ -168,7 +173,8 @@ fn test_mint_ok() {
             ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), cfg.amount, true
         );
 
-    let erc20: ERC20Contract = token_address.into();
+    // Assert if the transfer happens from the ICS20 address.
+    spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), cfg.amount);
 
     // Check the balance of the receiver.
     erc20.assert_balance(SN_USER(), cfg.amount * 2);
