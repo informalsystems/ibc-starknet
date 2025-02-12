@@ -23,7 +23,6 @@ test = "snforge test"
 [workspace.dependencies]
 # external dependencies
 assert_macros = "2.9.2"
-cairo_test    = "2.9.2"
 starknet      = "2.9.2"
 snforge_std   = "0.34.0"
 
