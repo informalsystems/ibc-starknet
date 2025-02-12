@@ -109,7 +109,7 @@
               cairo
               scarb
               universal-sierra-compiler
-              starknet-foundry
+              # starknet-foundry
               wasm-simapp
               osmosis
               ;
