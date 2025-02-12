@@ -29,10 +29,10 @@ alexandria_numeric   = { git = "https://github.com/keep-starknet-strange/alexand
 alexandria_sorting   = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "95d98a5" }
 assert_macros        = "2.9.2"
 starknet             = "2.9.2"
-openzeppelin_access  = "0.18.0"
-openzeppelin_token   = "0.18.0"
-openzeppelin_testing = "0.18.0"
-openzeppelin_utils   = "0.18.0"
+openzeppelin_access  = "0.20.0"
+openzeppelin_token   = "0.20.0"
+openzeppelin_testing = "0.20.0"
+openzeppelin_utils   = "0.20.0"
 snforge_std          = "0.37.0"
 
 # internal dependencies
