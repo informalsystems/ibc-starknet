@@ -1708,6 +1708,7 @@
         "rust-overlay": "rust-overlay_2",
         "scarb-src": "scarb-src",
         "starknet-devnet-src": "starknet-devnet-src",
+        "starknet-foundry-src": "starknet-foundry-src",
         "universal-sierra-compiler-src": "universal-sierra-compiler-src"
       }
     },
@@ -1875,6 +1876,23 @@
       "original": {
         "owner": "0xSpaceShard",
         "repo": "starknet-devnet-rs",
+        "type": "github"
+      }
+    },
+    "starknet-foundry-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1738659589,
+        "narHash": "sha256-ZUMGuQNbRl+1ZiH0m10cfIJwk7ZymrHx2+2NdMTuA7U=",
+        "owner": "foundry-rs",
+        "repo": "starknet-foundry",
+        "rev": "05c840d1b4367088296225284e2d722256778f58",
+        "type": "github"
+      },
+      "original": {
+        "owner": "foundry-rs",
+        "ref": "v0.37.0",
+        "repo": "starknet-foundry",
         "type": "github"
       }
     },
