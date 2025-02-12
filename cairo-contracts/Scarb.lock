@@ -146,9 +146,11 @@ name = "starknet_ibc_apps"
 version = "0.1.0"
 dependencies = [
  "openzeppelin_access",
+ "openzeppelin_testing",
  "openzeppelin_token",
  "openzeppelin_utils",
  "serde_json",
+ "snforge_std",
  "starknet_ibc_contracts",
  "starknet_ibc_core",
  "starknet_ibc_testkit",
@@ -159,9 +161,13 @@ dependencies = [
 name = "starknet_ibc_clients"
 version = "0.1.0"
 dependencies = [
+ "alexandria_data_structures",
  "alexandria_sorting",
+ "openzeppelin_access",
+ "snforge_std",
  "starknet_ibc_core",
  "starknet_ibc_testkit",
+ "starknet_ibc_utils",
 ]
 
 [[package]]
@@ -183,6 +189,7 @@ dependencies = [
 name = "starknet_ibc_core"
 version = "0.1.0"
 dependencies = [
+ "alexandria_data_structures",
  "alexandria_numeric",
  "openzeppelin_testing",
  "serde_json",
@@ -197,7 +204,9 @@ version = "0.1.0"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_testing",
+ "openzeppelin_token",
  "openzeppelin_utils",
+ "serde_json",
  "snforge_std",
  "starknet_ibc_apps",
  "starknet_ibc_clients",
