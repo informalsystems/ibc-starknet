@@ -184,6 +184,7 @@ version = "0.1.0"
 dependencies = [
  "alexandria_numeric",
  "openzeppelin_testing",
+ "serde_json",
  "snforge_std",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",

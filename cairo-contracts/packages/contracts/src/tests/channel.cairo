@@ -155,7 +155,7 @@ fn test_send_packet_ok() {
     // -----------------------------------------------------------
 
     let mut packet = transfer_cfg
-        .dummy_packet(transfer_cfg.native_denom.clone(), STARKNET(), COSMOS());
+        .dummy_outgoing_packet(transfer_cfg.native_denom.clone(), STARKNET(), COSMOS());
 
     core.send_packet(packet.clone());
 
@@ -233,7 +233,7 @@ fn test_recv_packet_ok() {
 
     // Retrieve the packet receipt.
     let receipt = core
-        .packet_receipt(msg.packet.port_id_on_b, msg.packet.chan_id_on_b, msg.packet.seq_on_a,);
+        .packet_receipt(msg.packet.port_id_on_b, msg.packet.chan_id_on_b, msg.packet.seq_on_a);
 
     // Assert the packet receipt is true.
     assert!(receipt);

@@ -34,6 +34,7 @@ starknet_ibc_utils = { workspace = true }
 # external dependencies
 openzeppelin_testing = { workspace = true }
 snforge_std          = { workspace = true }
+serde_json           = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_testkit = { workspace = true }
