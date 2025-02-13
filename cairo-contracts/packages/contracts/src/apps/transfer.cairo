@@ -5,7 +5,7 @@ pub mod TransferApp {
     use starknet::ClassHash;
     use starknet::ContractAddress;
     use starknet_ibc_apps::transfer::{
-        TokenTransferComponent, TransferrableComponent, TransferErrors
+        TokenTransferComponent, TransferErrors, TransferrableComponent,
     };
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 

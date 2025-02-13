@@ -5,17 +5,16 @@ use protobuf::errors::ProtobufErrors;
 pub fn encode_varint_to_u8_array(value: u32) -> Array<u8> {
     let mut result: Array<u8> = ArrayTrait::new();
     let mut value = value;
-    for _ in 0
-        ..10_u32 {
-            if value < 0x80 {
-                result.append(value.try_into().unwrap());
-                break;
-            } else {
-                let remaining = (value & 0x7F) | 0x80;
-                result.append(remaining.try_into().unwrap());
-                value /= 0x80;
-            };
+    for _ in 0..10_u32 {
+        if value < 0x80 {
+            result.append(value.try_into().unwrap());
+            break;
+        } else {
+            let remaining = (value & 0x7F) | 0x80;
+            result.append(remaining.try_into().unwrap());
+            value /= 0x80;
         };
+    };
     result
 }
 
@@ -23,17 +22,16 @@ pub fn encode_varint_to_u8_array(value: u32) -> Array<u8> {
 pub fn encode_varint_to_byte_array(value: u64) -> ByteArray {
     let mut result: ByteArray = "";
     let mut value = value;
-    for _ in 0
-        ..10_u32 {
-            if value < 0x80 {
-                result.append_byte(value.try_into().unwrap());
-                break;
-            } else {
-                let remaining = (value & 0x7F) | 0x80;
-                result.append_byte(remaining.try_into().unwrap());
-                value /= 0x80;
-            };
+    for _ in 0..10_u32 {
+        if value < 0x80 {
+            result.append_byte(value.try_into().unwrap());
+            break;
+        } else {
+            let remaining = (value & 0x7F) | 0x80;
+            result.append_byte(remaining.try_into().unwrap());
+            value /= 0x80;
         };
+    };
     result
 }
 

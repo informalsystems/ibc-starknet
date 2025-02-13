@@ -44,7 +44,7 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
         symbol: ByteArray,
         amount: u256,
         recipient: ContractAddress,
-        owner: ContractAddress
+        owner: ContractAddress,
     ) -> ERC20Contract {
         let mut call_data = array![];
 
@@ -54,7 +54,7 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
         call_data.append_serde(recipient);
         call_data.append_serde(owner);
 
-        let (address, _) = deploy_syscall(class_hash, salt, call_data.span(), false,)
+        let (address, _) = deploy_syscall(class_hash, salt, call_data.span(), false)
             .unwrap_syscall();
 
         ERC20Contract { address }
@@ -65,7 +65,7 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
     }
 
     fn transfer_from(
-        self: @ERC20Contract, sender: ContractAddress, recipient: ContractAddress, amount: u256
+        self: @ERC20Contract, sender: ContractAddress, recipient: ContractAddress, amount: u256,
     ) -> bool {
         self.dispatcher().transfer_from(sender, recipient, amount)
     }

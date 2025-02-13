@@ -1,7 +1,7 @@
 use CometClientComponent::ClientWriterTrait;
 use snforge_std::start_cheat_block_timestamp_global;
 use starknet_ibc_clients::cometbft::CometClientComponent::{
-    CometClientHandler, CometClientQuery, ClientReaderImpl
+    ClientReaderImpl, CometClientHandler, CometClientQuery,
 };
 use starknet_ibc_clients::cometbft::{CometClientComponent, CometConsensusStateTrait};
 use starknet_ibc_core::client::StatusTrait;
@@ -55,7 +55,7 @@ fn test_update_client_ok() {
     let updating_timestamp = cfg.latest_timestamp + 1;
     let msg = cfg
         .dummy_msg_update_client(
-            create_resp.client_id, create_resp.height, updating_height.clone(), updating_timestamp
+            create_resp.client_id, create_resp.height, updating_height.clone(), updating_timestamp,
         );
     state.update_client(msg);
     assert_eq!(state.client_type(), cfg.client_type);
@@ -83,7 +83,7 @@ fn test_update_client_with_older_header() {
             create_resp.client_id.clone(),
             create_resp.height,
             updating_height_1.clone(),
-            updating_timestamp_1
+            updating_timestamp_1,
         );
 
     // Second update client with an older height = 11.
@@ -95,7 +95,7 @@ fn test_update_client_with_older_header() {
             create_resp.client_id,
             updating_height_1,
             updating_height_2.clone(),
-            updating_timestamp_2
+            updating_timestamp_2,
         );
 
     state.update_client(msg);

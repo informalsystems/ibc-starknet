@@ -19,11 +19,11 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
         *self.timestamp.timestamp
     }
 
-    fn deserialize(consensus_state: Array<felt252>,) -> CometConsensusState {
+    fn deserialize(consensus_state: Array<felt252>) -> CometConsensusState {
         let mut consensus_state_span = consensus_state.span();
 
         let maybe_consensus_state = Serde::<
-            CometConsensusState
+            CometConsensusState,
         >::deserialize(ref consensus_state_span);
 
         assert(maybe_consensus_state.is_some(), CometErrors::INVALID_CONSENSUS_STATE);

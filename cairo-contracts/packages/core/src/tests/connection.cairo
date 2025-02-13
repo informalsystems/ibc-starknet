@@ -1,9 +1,9 @@
 use core::num::traits::Zero;
-use starknet_ibc_core::connection::ConnectionHandlerComponent::{
-    ConnectionWriterTrait, ConnectionReaderTrait
-};
 use starknet_ibc_core::connection::ConnectionHandlerComponent;
-use starknet_ibc_testkit::dummies::{CONNECTION_END, CONNECTION_ID, CLIENT_ID};
+use starknet_ibc_core::connection::ConnectionHandlerComponent::{
+    ConnectionReaderTrait, ConnectionWriterTrait,
+};
+use starknet_ibc_testkit::dummies::{CLIENT_ID, CONNECTION_END, CONNECTION_ID};
 use starknet_ibc_testkit::mocks::MockConnectionHandler;
 
 type ComponentState =

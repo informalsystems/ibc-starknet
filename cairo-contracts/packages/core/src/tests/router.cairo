@@ -1,6 +1,6 @@
 use starknet::contract_address_const;
-use starknet_ibc_core::router::RouterHandlerComponent::{RouterInitializerImpl, CoreRouterHandler};
 use starknet_ibc_core::router::RouterHandlerComponent;
+use starknet_ibc_core::router::RouterHandlerComponent::{CoreRouterHandler, RouterInitializerImpl};
 use starknet_ibc_testkit::dummies::PORT_ID;
 use starknet_ibc_testkit::mocks::MockRouterHandler;
 

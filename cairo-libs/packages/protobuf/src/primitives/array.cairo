@@ -1,6 +1,7 @@
 use super::super::types::message::DecodeContextTrait;
 use protobuf::types::message::{
-    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl, DecodeContextImpl
+    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    DecodeContextImpl,
 };
 use protobuf::types::tag::WireType;
 

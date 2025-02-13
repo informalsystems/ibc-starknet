@@ -11,23 +11,23 @@ pub mod TokenTransferComponent {
     use starknet::ContractAddress;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
-        StoragePointerWriteAccess
+        StoragePointerWriteAccess,
     };
-    use starknet::{get_contract_address, get_caller_address};
+    use starknet::{get_caller_address, get_contract_address};
     use starknet_ibc_apps::transfer::types::{
-        MsgTransfer, PrefixedDenom, Denom, DenomTrait, PacketData, Memo, TracePrefixTrait,
-        PrefixedDenomTrait, Participant, ParticipantTrait,
+        Denom, DenomTrait, Memo, MsgTransfer, PacketData, Participant, ParticipantTrait,
+        PrefixedDenom, PrefixedDenomTrait, TracePrefixTrait,
     };
     use starknet_ibc_apps::transfer::{
-        ITransferrable, ISendTransfer, ITransferQuery, ERC20Contract, ERC20ContractTrait,
-        TransferErrors, TRANSFER_PORT_ID, VERSION, SUCCESS_ACK
+        ERC20Contract, ERC20ContractTrait, ISendTransfer, ITransferQuery, ITransferrable,
+        SUCCESS_ACK, TRANSFER_PORT_ID, TransferErrors, VERSION,
     };
     use starknet_ibc_core::channel::{
-        Packet, Acknowledgement, AckStatus, AckStatusImpl, IAppCallback, ChannelContract,
-        ChannelContractTrait, ChannelEndTrait, ChannelOrdering, AppVersion
+        AckStatus, AckStatusImpl, Acknowledgement, AppVersion, ChannelContract,
+        ChannelContractTrait, ChannelEndTrait, ChannelOrdering, IAppCallback, Packet,
     };
 
-    use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId};
+    use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId};
     use starknet_ibc_utils::{ComputeKey, ValidateBasic};
 
     #[storage]
@@ -182,7 +182,7 @@ pub mod TokenTransferComponent {
             conn_id_on_a: ConnectionId,
             port_id_on_b: PortId,
             version_proposal: AppVersion,
-            ordering: ChannelOrdering
+            ordering: ChannelOrdering,
         ) -> AppVersion {
             self.assert_owner();
 
@@ -204,7 +204,7 @@ pub mod TokenTransferComponent {
             conn_id_on_b: ConnectionId,
             port_id_on_a: PortId,
             version_on_a: AppVersion,
-            ordering: ChannelOrdering
+            ordering: ChannelOrdering,
         ) -> AppVersion {
             self.assert_owner();
 
@@ -217,7 +217,7 @@ pub mod TokenTransferComponent {
             ref self: ComponentState<TContractState>,
             port_id_on_a: PortId,
             chan_id_on_a: ChannelId,
-            version_on_b: AppVersion
+            version_on_b: AppVersion,
         ) {
             self.assert_owner();
 
@@ -225,13 +225,13 @@ pub mod TokenTransferComponent {
         }
 
         fn on_chan_open_confirm(
-            ref self: ComponentState<TContractState>, port_id_on_b: PortId, chan_id_on_b: ChannelId
+            ref self: ComponentState<TContractState>, port_id_on_b: PortId, chan_id_on_b: ChannelId,
         ) {
             self.assert_owner();
         }
 
         fn on_recv_packet(
-            ref self: ComponentState<TContractState>, packet: Packet
+            ref self: ComponentState<TContractState>, packet: Packet,
         ) -> Acknowledgement {
             self.assert_owner();
 
@@ -245,7 +245,7 @@ pub mod TokenTransferComponent {
         }
 
         fn on_ack_packet(
-            ref self: ComponentState<TContractState>, packet: Packet, ack: Acknowledgement
+            ref self: ComponentState<TContractState>, packet: Packet, ack: Acknowledgement,
         ) {
             self.assert_owner();
 
@@ -267,7 +267,7 @@ pub mod TokenTransferComponent {
         }
 
         fn json_packet_data(
-            self: @ComponentState<TContractState>, raw_packet_data: Array<felt252>
+            self: @ComponentState<TContractState>, raw_packet_data: Array<felt252>,
         ) -> ByteArray {
             let packet_data: PacketData = raw_packet_data.into();
 
@@ -281,10 +281,10 @@ pub mod TokenTransferComponent {
 
     #[embeddable_as(TokenTransferQuery)]
     impl ITransferQueryImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ITransferQuery<ComponentState<TContractState>> {
         fn ibc_token_address(
-            self: @ComponentState<TContractState>, token_key: felt252
+            self: @ComponentState<TContractState>, token_key: felt252,
         ) -> ContractAddress {
             let address = self.read_ibc_token_address(token_key);
 
@@ -303,10 +303,10 @@ pub mod TokenTransferComponent {
         TContractState,
         +HasComponent<TContractState>,
         +ITransferrable<TContractState>,
-        +Drop<TContractState>
+        +Drop<TContractState>,
     > of SendTransferInternalTrait<TContractState> {
         fn send_validate(
-            self: @ComponentState<TContractState>, msg: MsgTransfer, sender: ContractAddress
+            self: @ComponentState<TContractState>, msg: MsgTransfer, sender: ContractAddress,
         ) {
             self.get_contract().can_send();
 
@@ -327,31 +327,31 @@ pub mod TokenTransferComponent {
                         );
                 },
                 Denom::Hosted(_) => {
-                    self.burn_validate(sender, msg.denom.clone(), msg.amount, msg.memo.clone(),);
-                }
+                    self.burn_validate(sender, msg.denom.clone(), msg.amount, msg.memo.clone());
+                },
             }
         }
 
         fn send_execute(
-            ref self: ComponentState<TContractState>, msg: MsgTransfer, sender: ContractAddress
+            ref self: ComponentState<TContractState>, msg: MsgTransfer, sender: ContractAddress,
         ) {
             match @msg.denom.base {
                 Denom::Native(erc20_token) => {
-                    self.escrow_execute(sender, erc20_token.clone(), msg.amount, msg.memo.clone(),);
+                    self.escrow_execute(sender, erc20_token.clone(), msg.amount, msg.memo.clone());
                 },
                 Denom::Hosted(_) => {
-                    self.burn_execute(sender, msg.denom.clone(), msg.amount, msg.memo.clone(),);
-                }
+                    self.burn_execute(sender, msg.denom.clone(), msg.amount, msg.memo.clone());
+                },
             }
 
             self
                 .emit_send_event(
-                    sender, msg.receiver.clone(), msg.denom.clone(), msg.amount, msg.memo.clone()
+                    sender, msg.receiver.clone(), msg.denom.clone(), msg.amount, msg.memo.clone(),
                 )
         }
 
         fn construct_send_packet(
-            self: @ComponentState<TContractState>, channel: @ChannelContract, msg: MsgTransfer
+            self: @ComponentState<TContractState>, channel: @ChannelContract, msg: MsgTransfer,
         ) -> Packet {
             let chan_end_on_a = channel
                 .channel_end(msg.port_id_on_a.clone(), msg.chan_id_on_a.clone());
@@ -383,7 +383,7 @@ pub mod TokenTransferComponent {
                 chan_id_on_b,
                 data,
                 timeout_height_on_b: msg.timeout_height_on_b,
-                timeout_timestamp_on_b: msg.timeout_timestamp_on_b
+                timeout_timestamp_on_b: msg.timeout_timestamp_on_b,
             }
         }
     }
@@ -393,10 +393,10 @@ pub mod TokenTransferComponent {
         TContractState,
         +HasComponent<TContractState>,
         +ITransferrable<TContractState>,
-        +Drop<TContractState>
+        +Drop<TContractState>,
     > of RecvPacketInternalTrait<TContractState> {
         fn recv_deserialize(
-            self: @ComponentState<TContractState>, packet: Packet
+            self: @ComponentState<TContractState>, packet: Packet,
         ) -> (PacketData, ContractAddress) {
             let packet_data: PacketData = packet.data.into();
 
@@ -411,7 +411,7 @@ pub mod TokenTransferComponent {
             self: @ComponentState<TContractState>,
             packet: Packet,
             packet_data: PacketData,
-            receiver: ContractAddress
+            receiver: ContractAddress,
         ) {
             self.get_contract().can_receive();
 
@@ -435,7 +435,7 @@ pub mod TokenTransferComponent {
                 },
                 Denom::Hosted(_) => {
                     self.mint_validate(receiver, packet_data.denom.clone(), packet_data.amount);
-                }
+                },
             }
         }
 
@@ -443,10 +443,10 @@ pub mod TokenTransferComponent {
             ref self: ComponentState<TContractState>,
             packet: Packet,
             ref packet_data: PacketData,
-            receiver: ContractAddress
+            receiver: ContractAddress,
         ) {
             let trace_prefix = TracePrefixTrait::new(
-                packet.port_id_on_b.clone(), packet.chan_id_on_b.clone()
+                packet.port_id_on_b.clone(), packet.chan_id_on_b.clone(),
             );
 
             match @packet_data.denom.base {
@@ -464,7 +464,7 @@ pub mod TokenTransferComponent {
                     packet_data.denom.add_prefix(trace_prefix);
 
                     self.mint_execute(receiver, packet_data.denom.clone(), packet_data.amount)
-                }
+                },
             };
 
             self.emit_recv_event(packet_data.clone(), true);
@@ -476,10 +476,10 @@ pub mod TokenTransferComponent {
         TContractState,
         +HasComponent<TContractState>,
         +ITransferrable<TContractState>,
-        +Drop<TContractState>
+        +Drop<TContractState>,
     > of AckPacketInternalTrait<TContractState> {
         fn ack_deserialize(
-            self: @ComponentState<TContractState>, packet: Packet, ack: Acknowledgement
+            self: @ComponentState<TContractState>, packet: Packet, ack: Acknowledgement,
         ) -> (PacketData, AckStatus) {
             let packet_data = packet.data.into();
 
@@ -528,7 +528,7 @@ pub mod TokenTransferComponent {
         TContractState,
         +HasComponent<TContractState>,
         +ITransferrable<TContractState>,
-        +Drop<TContractState>
+        +Drop<TContractState>,
     > of TimeoutPacketInternalTrait<TContractState> {
         fn timeout_validate(
             self: @ComponentState<TContractState>, packet: @Packet, packet_data: @PacketData,
@@ -557,7 +557,7 @@ pub mod TokenTransferComponent {
 
     #[generate_trait]
     pub impl TransferValidationImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of TransferValidationTrait<TContractState> {
         fn escrow_validate(
             self: @ComponentState<TContractState>,
@@ -617,7 +617,7 @@ pub mod TokenTransferComponent {
         }
 
         fn refund_validate(
-            self: @ComponentState<TContractState>, packet: Packet, packet_data: PacketData
+            self: @ComponentState<TContractState>, packet: Packet, packet_data: PacketData,
         ) {
             let sender: Option<ContractAddress> = packet_data.sender.try_into();
 
@@ -636,14 +636,14 @@ pub mod TokenTransferComponent {
                 },
                 Denom::Hosted(_) => {
                     self.mint_validate(sender.unwrap(), packet_data.denom, packet_data.amount)
-                }
+                },
             };
         }
     }
 
     #[generate_trait]
     pub impl TransferExecutionImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of TransferExecutionTrait<TContractState> {
         fn escrow_execute(
             ref self: ComponentState<TContractState>,
@@ -698,7 +698,7 @@ pub mod TokenTransferComponent {
         }
 
         fn refund_execute(
-            ref self: ComponentState<TContractState>, packet: Packet, packet_data: PacketData
+            ref self: ComponentState<TContractState>, packet: Packet, packet_data: PacketData,
         ) {
             let sender: Option<ContractAddress> = packet_data.sender.try_into();
 
@@ -715,7 +715,7 @@ pub mod TokenTransferComponent {
                 },
                 Denom::Hosted(_) => {
                     self.mint_execute(sender.unwrap(), packet_data.denom, packet_data.amount)
-                }
+                },
             };
         }
     }
@@ -746,7 +746,7 @@ pub mod TokenTransferComponent {
 
     #[generate_trait]
     pub(crate) impl TransferInternalImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of TransferInternalTrait<TContractState> {
         fn get_token(self: @ComponentState<TContractState>, token_key: felt252) -> ERC20Contract {
             self.read_ibc_token_address(token_key).into()
@@ -768,7 +768,7 @@ pub mod TokenTransferComponent {
                 symbol.clone(), // TODO: Determine what the symbol should be.
                 amount.clone(),
                 get_contract_address(),
-                get_contract_address()
+                get_contract_address(),
             );
 
             self.write_salt(salt + 1);
@@ -819,7 +819,7 @@ pub mod TokenTransferComponent {
 
     #[generate_trait]
     pub(crate) impl TransferReaderImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of TransferReaderTrait<TContractState> {
         fn read_erc20_class_hash(self: @ComponentState<TContractState>) -> ClassHash {
             let class_hash = self.erc20_class_hash.read();
@@ -843,13 +843,13 @@ pub mod TokenTransferComponent {
         // handling non-existent cases.
 
         fn read_ibc_token_address(
-            self: @ComponentState<TContractState>, token_key: felt252
+            self: @ComponentState<TContractState>, token_key: felt252,
         ) -> ContractAddress {
             self.ibc_token_key_to_address.read(token_key)
         }
 
         fn read_ibc_token_key(
-            self: @ComponentState<TContractState>, token_address: ContractAddress
+            self: @ComponentState<TContractState>, token_address: ContractAddress,
         ) -> felt252 {
             self.ibc_token_address_to_key.read(token_address)
         }
@@ -857,10 +857,10 @@ pub mod TokenTransferComponent {
 
     #[generate_trait]
     pub(crate) impl TransferWriterImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of TransferWriterTrait<TContractState> {
         fn write_erc20_class_hash(
-            ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash
+            ref self: ComponentState<TContractState>, erc20_class_hash: ClassHash,
         ) {
             self.erc20_class_hash.write(erc20_class_hash);
         }
@@ -892,7 +892,7 @@ pub mod TokenTransferComponent {
 
     #[generate_trait]
     pub(crate) impl TransferEventImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of TransferEventTrait<TContractState> {
         fn emit_send_event(
             ref self: ComponentState<TContractState>,
@@ -900,7 +900,7 @@ pub mod TokenTransferComponent {
             receiver: ByteArray,
             denom: PrefixedDenom,
             amount: u256,
-            memo: Memo
+            memo: Memo,
         ) {
             self.emit(SendEvent { sender, receiver, denom, amount, memo });
         }
@@ -917,7 +917,7 @@ pub mod TokenTransferComponent {
                         amount: packet_data.amount,
                         memo: packet_data.memo,
                         success,
-                    }
+                    },
                 );
         }
 
@@ -939,7 +939,7 @@ pub mod TokenTransferComponent {
                         amount: packet_data.amount,
                         memo: packet_data.memo,
                         ack,
-                    }
+                    },
                 );
         }
 
@@ -947,7 +947,7 @@ pub mod TokenTransferComponent {
             self.emit(AckStatusEvent { ack_status });
         }
 
-        fn emit_timeout_event(ref self: ComponentState<TContractState>, packet_data: PacketData,) {
+        fn emit_timeout_event(ref self: ComponentState<TContractState>, packet_data: PacketData) {
             self
                 .emit(
                     TimeoutEvent {
@@ -958,7 +958,7 @@ pub mod TokenTransferComponent {
                         denom: packet_data.denom,
                         amount: packet_data.amount,
                         memo: packet_data.memo,
-                    }
+                    },
                 );
         }
 

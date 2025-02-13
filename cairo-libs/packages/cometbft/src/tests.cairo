@@ -11,7 +11,7 @@ fn test_height_decode() {
     let bytes = base64_decode(@base64);
     let height = ProtoCodecImpl::decode::<Height>(@bytes);
     assert_eq!(
-        height, Height { revision_number: 0, revision_height: 64 }, "height decode mismatch"
+        height, Height { revision_number: 0, revision_height: 64 }, "height decode mismatch",
     );
     let bytes2 = ProtoCodecImpl::encode(@height);
     assert_eq!(bytes, bytes2, "height encode/decode mismatch");

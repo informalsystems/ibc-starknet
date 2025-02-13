@@ -1,5 +1,5 @@
 use snforge_std::spy_events;
-use starknet_ibc_core::client::{UpdateResponse, StatusTrait, ClientContractTrait};
+use starknet_ibc_core::client::{ClientContractTrait, StatusTrait, UpdateResponse};
 use starknet_ibc_testkit::configs::CometClientConfigTrait;
 use starknet_ibc_testkit::dummies::HEIGHT;
 use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
@@ -68,7 +68,7 @@ fn test_update_comet_client_ok() {
             create_resp.client_id,
             create_resp.height,
             updating_height.clone(),
-            updating_time.clone()
+            updating_time.clone(),
         );
 
     // Submit a `MsgUpdateClient` to the IBC core contract.

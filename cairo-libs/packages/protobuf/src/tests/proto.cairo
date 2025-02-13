@@ -5,7 +5,7 @@ use protobuf::types::message::{
 use protobuf::types::wkt::Any;
 use protobuf::types::tag::WireType;
 use protobuf::primitives::array::{
-    ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage
+    ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage,
 };
 use protobuf::primitives::numeric::{BoolAsProtoMessage, I64AsProtoMessage, U64AsProtoMessage};
 use protobuf::hex::decode as hex_decode;
@@ -152,7 +152,7 @@ fn test_proto_to_cairo_struct() {
         time: 0x5fee6600,
         hash: array![0x12, 0x34, 0x56, 0x78],
         indexes: array![0x12345678, 0x9abcdef0],
-        proposer: Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", },
+        proposer: Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234" },
         validator_type: ValidatorType::Light,
         proposers: array![],
     };
@@ -173,7 +173,7 @@ fn test_proto_to_cairo_struct_absent_field() {
         time: 0x5fee6600,
         hash: array![],
         indexes: array![],
-        proposer: Proposer { address: "", pub_key: "", },
+        proposer: Proposer { address: "", pub_key: "" },
         validator_type: ValidatorType::Full,
         proposers: array![],
     };
@@ -203,12 +203,12 @@ fn test_repeated_default_value() {
         time: 0x5fee6600,
         hash: array![0x12, 0x00, 0x34, 0x00, 0x56, 0x00, 0x78],
         indexes: array![],
-        proposer: Proposer { address: "", pub_key: "", },
+        proposer: Proposer { address: "", pub_key: "" },
         validator_type: ValidatorType::Full,
         proposers: array![
-            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", },
+            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234" },
             Default::<Proposer>::default(),
-            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", },
+            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234" },
         ],
     };
     assert_eq!(header2, header, "repeated default value failed");
@@ -225,11 +225,11 @@ fn test_proto_to_any() {
         time: 0x5fee6600,
         hash: array![],
         indexes: array![],
-        proposer: Proposer { address: "abc", pub_key: "def", },
+        proposer: Proposer { address: "abc", pub_key: "def" },
         validator_type: ValidatorType::Full,
         proposers: array![
-            Proposer { address: "abc", pub_key: "def", },
-            Proposer { address: "pqr", pub_key: "stu", }
+            Proposer { address: "abc", pub_key: "def" },
+            Proposer { address: "pqr", pub_key: "stu" },
         ],
     };
     let any: Any = header.clone().into();

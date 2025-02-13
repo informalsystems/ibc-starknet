@@ -3,7 +3,7 @@ pub struct TestData {
     pub proof: ByteArray,
     pub root: ByteArray,
     pub key: ByteArray,
-    pub value: ByteArray
+    pub value: ByteArray,
 }
 
 pub fn iavl_exist_left() -> TestData {

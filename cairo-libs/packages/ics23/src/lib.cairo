@@ -16,7 +16,7 @@ pub use specs::{iavl_spec, tendermint_spec, smt_spec};
 pub use types::{
     Proof, ExistenceProof, ExistenceProofImpl, ExistenceProofTrait, NonExistenceProof,
     NonExistenceProofImpl, InnerOp, LeafOp, ProofSpec, HashOp, LengthOp, RootBytes, KeyBytes,
-    ValueBytes, ProofSpecImpl, ProofSpecTrait, InnerSpec, CommitmentProof
+    ValueBytes, ProofSpecImpl, ProofSpecTrait, InnerSpec, CommitmentProof,
 };
 pub use errors::ICS23Errors;
 pub use utils::{

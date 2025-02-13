@@ -1,9 +1,9 @@
 #[starknet::contract]
 pub mod MockClientHandler {
-    use starknet_ibc_core::client::{ClientHandlerComponent, ClientEventEmitterComponent};
+    use starknet_ibc_core::client::{ClientEventEmitterComponent, ClientHandlerComponent};
 
     component!(
-        path: ClientEventEmitterComponent, storage: Client_emitter, event: ClientEventEmitterEvent
+        path: ClientEventEmitterComponent, storage: Client_emitter, event: ClientEventEmitterEvent,
     );
     component!(path: ClientHandlerComponent, storage: client_handler, event: ClientHandlerEvent);
 
@@ -14,7 +14,7 @@ pub mod MockClientHandler {
         #[substorage(v0)]
         Client_emitter: ClientEventEmitterComponent::Storage,
         #[substorage(v0)]
-        client_handler: ClientHandlerComponent::Storage
+        client_handler: ClientHandlerComponent::Storage,
     }
 
     #[event]
@@ -23,7 +23,7 @@ pub mod MockClientHandler {
         #[flat]
         ClientEventEmitterEvent: ClientEventEmitterComponent::Event,
         #[flat]
-        ClientHandlerEvent: ClientHandlerComponent::Event
+        ClientHandlerEvent: ClientHandlerComponent::Event,
     }
 
     #[constructor]

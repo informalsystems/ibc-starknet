@@ -1,10 +1,10 @@
 use core::num::traits::Zero;
-use starknet_ibc_core::connection::{ConnectionState, ConnectionEndTrait};
+use starknet_ibc_core::connection::{ConnectionEndTrait, ConnectionState};
 use starknet_ibc_testkit::configs::CoreConfigTrait;
 use starknet_ibc_testkit::dummies::CONNECTION_ID;
 use starknet_ibc_testkit::event_spy::ConnectionEventSpyExt;
 use starknet_ibc_testkit::handles::CoreHandle;
-use starknet_ibc_testkit::setup::{setup, Mode};
+use starknet_ibc_testkit::setup::{Mode, setup};
 
 
 #[test]

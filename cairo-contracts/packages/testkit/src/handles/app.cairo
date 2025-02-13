@@ -5,7 +5,7 @@ use snforge_std::ContractClass;
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::types::MsgTransfer;
 use starknet_ibc_apps::transfer::{
-    ISendTransferDispatcher, ITransferQueryDispatcher, ISendTransferDispatcherTrait,
+    ISendTransferDispatcher, ISendTransferDispatcherTrait, ITransferQueryDispatcher,
     ITransferQueryDispatcherTrait,
 };
 use starknet_ibc_core::channel::IAppCallbackDispatcher;
@@ -14,7 +14,7 @@ use starknet_ibc_core::router::AppContract;
 #[generate_trait]
 pub impl AppHandleImpl of AppHandle {
     fn deploy_transfer(
-        contract_name: ByteArray, owner: ContractAddress, erc20_class: ContractClass
+        contract_name: ByteArray, owner: ContractAddress, erc20_class: ContractClass,
     ) -> AppContract {
         let mut call_data = array![];
 

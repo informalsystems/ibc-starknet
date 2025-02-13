@@ -23,7 +23,7 @@ pub impl EncodeContextImpl of EncodeContextTrait {
     }
 
     fn encode_field<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Drop<T>>(
-        ref self: EncodeContext, field_number: u8, value: @T
+        ref self: EncodeContext, field_number: u8, value: @T,
     ) {
         // ignore default values
         if value != @Default::<T>::default() {
@@ -40,7 +40,7 @@ pub impl EncodeContextImpl of EncodeContextTrait {
 
     // for unpacked repeated fields (default for non-scalars)
     fn encode_repeated_field<T, +ProtoMessage<T>>(
-        ref self: EncodeContext, field_number: u8, value: @Array<T>
+        ref self: EncodeContext, field_number: u8, value: @Array<T>,
     ) {
         let mut i = 0;
         while i < value.len() {
@@ -83,7 +83,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
     }
 
     fn decode_field<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(
-        ref self: DecodeContext, field_number: u8, ref value: T
+        ref self: DecodeContext, field_number: u8, ref value: T,
     ) {
         if self.can_read_branch() {
             let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
@@ -107,7 +107,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
                 panic!(
                     "unexpected field number order: at expected field {} but got older field {}",
                     field_number,
-                    tag.field_number
+                    tag.field_number,
                 );
             }
         }
@@ -115,7 +115,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
 
     // for unpacked repeated fields (default for non-scalars)
     fn decode_repeated_field<T, +ProtoMessage<T>, +Default<T>, +Drop<T>>(
-        ref self: DecodeContext, field_number: u8, ref value: Array<T>
+        ref self: DecodeContext, field_number: u8, ref value: Array<T>,
     ) {
         while self.can_read_branch() {
             let tag = ProtobufTagImpl::decode(self.buffer[self.index]);

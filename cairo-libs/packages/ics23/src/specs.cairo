@@ -17,7 +17,7 @@ pub fn iavl_spec() -> ProofSpec {
         hash: HashOp::Sha256,
     };
     ProofSpec {
-        leaf_spec, inner_spec, min_depth: 0, max_depth: 0, prehash_key_before_comparison: false
+        leaf_spec, inner_spec, min_depth: 0, max_depth: 0, prehash_key_before_comparison: false,
     }
 }
 
@@ -38,7 +38,7 @@ pub fn tendermint_spec() -> ProofSpec {
         hash: HashOp::Sha256,
     };
     ProofSpec {
-        leaf_spec, inner_spec, min_depth: 0, max_depth: 0, prehash_key_before_comparison: false
+        leaf_spec, inner_spec, min_depth: 0, max_depth: 0, prehash_key_before_comparison: false,
     }
 }
 
@@ -59,6 +59,6 @@ pub fn smt_spec() -> ProofSpec {
         hash: HashOp::Sha256,
     };
     ProofSpec {
-        leaf_spec, inner_spec, min_depth: 0, max_depth: 0, prehash_key_before_comparison: true
+        leaf_spec, inner_spec, min_depth: 0, max_depth: 0, prehash_key_before_comparison: true,
     }
 }

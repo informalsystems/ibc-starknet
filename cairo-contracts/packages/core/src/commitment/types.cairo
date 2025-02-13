@@ -50,7 +50,7 @@ pub impl CommitmentIntoStateValue of Into<Commitment, StateValue> {
 }
 
 pub fn compute_packet_commitment(
-    json_packet_data: @ByteArray, timeout_height: Height, timeout_timestamp: Timestamp
+    json_packet_data: @ByteArray, timeout_height: Height, timeout_timestamp: Timestamp,
 ) -> Commitment {
     let mut coll = U32CollectorImpl::init();
     // ibc-go uses nanosecs
@@ -133,7 +133,7 @@ pub impl StateProofZero of Zero<StateProof> {
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct StateRoot {
-    pub root: ByteArray, // TODO: Determine the correct type (ByteArray or Array<u8>) once implemented membership proof verification.
+    pub root: ByteArray // TODO: Determine the correct type (ByteArray or Array<u8>) once implemented membership proof verification.
 }
 
 pub impl ByteArrayIntoRoot of Into<ByteArray, StateRoot> {

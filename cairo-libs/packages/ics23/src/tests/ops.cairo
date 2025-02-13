@@ -1,6 +1,6 @@
 use ics23::{
     InnerOp, LeafOp, LengthOp, HashOp, apply_leaf, apply_inner, encode_hex, decode_hex,
-    SliceU32IntoArrayU8, ByteArrayIntoArrayU32, byte_array_to_array_u8, ByteArrayIntoArrayU8
+    SliceU32IntoArrayU8, ByteArrayIntoArrayU32, byte_array_to_array_u8, ByteArrayIntoArrayU8,
 };
 
 // https://github.com/cosmos/ics23/blob/c7c728879896fb260fe76b208ea6a17c2b0132a3/rust/src/ops.rs#L210
@@ -18,7 +18,7 @@ fn test_apply_leaf_hash() {
     let hash = apply_leaf(@leaf, key.into(), value.into());
 
     assert_eq!(
-        encode_hex(hash.into()), "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
+        encode_hex(hash.into()), "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2",
     );
 }
 
@@ -37,7 +37,7 @@ fn test_apply_leaf_hash_length() {
     let hash = apply_leaf(@leaf, key.into(), value.into());
 
     assert_eq!(
-        encode_hex(hash.into()), "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265"
+        encode_hex(hash.into()), "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265",
     );
 }
 
@@ -56,7 +56,7 @@ fn test_apply_leaf_prehash_value() {
     let hash = apply_leaf(@leaf, key.into(), value.into());
 
     assert_eq!(
-        encode_hex(hash.into()), "87e0483e8fb624aef2e2f7b13f4166cda485baa8e39f437c83d74c94bedb148f"
+        encode_hex(hash.into()), "87e0483e8fb624aef2e2f7b13f4166cda485baa8e39f437c83d74c94bedb148f",
     );
 }
 
@@ -70,7 +70,7 @@ fn test_apply_inner_prefix_suffix() {
     let hash = apply_inner(@inner, child);
 
     assert_eq!(
-        encode_hex(hash.into()), "0339f76086684506a6d42a60da4b5a719febd4d96d8b8d85ae92849e3a849a5e"
+        encode_hex(hash.into()), "0339f76086684506a6d42a60da4b5a719febd4d96d8b8d85ae92849e3a849a5e",
     );
 }
 
@@ -84,7 +84,7 @@ fn test_apply_inner_prefix_only() {
     let hash = apply_inner(@inner, child);
 
     assert_eq!(
-        encode_hex(hash.into()), "45bece1678cf2e9f4f2ae033e546fc35a2081b2415edcb13121a0e908dca1927"
+        encode_hex(hash.into()), "45bece1678cf2e9f4f2ae033e546fc35a2081b2415edcb13121a0e908dca1927",
     );
 }
 
@@ -92,13 +92,13 @@ fn test_apply_inner_prefix_only() {
 #[test]
 fn test_apply_inner_suffix_only() {
     let inner = InnerOp {
-        hash: HashOp::Sha256, prefix: array![], suffix: byte_array_to_array_u8(@" just kidding!")
+        hash: HashOp::Sha256, prefix: array![], suffix: byte_array_to_array_u8(@" just kidding!"),
     };
     let child = byte_array_to_array_u8(@"this is a sha256 hash, really....");
     let hash = apply_inner(@inner, child);
 
     assert_eq!(
-        encode_hex(hash.into()), "79ef671d27e42a53fba2201c1bbc529a099af578ee8a38df140795db0ae2184b"
+        encode_hex(hash.into()), "79ef671d27e42a53fba2201c1bbc529a099af578ee8a38df140795db0ae2184b",
     );
 }
 

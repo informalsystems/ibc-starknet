@@ -1,7 +1,7 @@
 #[starknet::component]
 pub mod TransferrableComponent {
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
-    use starknet_ibc_apps::transfer::{TransferErrors, ITransferrable};
+    use starknet_ibc_apps::transfer::{ITransferrable, TransferErrors};
 
     #[storage]
     pub struct Storage {
@@ -15,7 +15,7 @@ pub mod TransferrableComponent {
 
     #[embeddable_as(Transferrable)]
     pub impl TransferrableImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ITransferrable<ComponentState<TContractState>> {
         fn can_send(self: @ComponentState<TContractState>) {
             let send_capability = self.send_capability.read();
@@ -29,7 +29,7 @@ pub mod TransferrableComponent {
 
     #[generate_trait]
     pub impl TransferrableInternalImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of TransferrableInternalTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>) {
             self.send_capability.write(true);

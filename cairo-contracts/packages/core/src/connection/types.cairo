@@ -3,7 +3,8 @@ use core::num::traits::Zero;
 use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::connection::ConnectionErrors;
 use starknet_ibc_core::host::{
-    ClientId, ClientIdImpl, ClientIdZero, ConnectionId, ConnectionIdZero, BasePrefix, BasePrefixZero
+    BasePrefix, BasePrefixZero, ClientId, ClientIdImpl, ClientIdZero, ConnectionId,
+    ConnectionIdZero,
 };
 use starknet_ibc_utils::ValidateBasic;
 

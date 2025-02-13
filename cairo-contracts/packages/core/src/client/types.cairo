@@ -2,7 +2,7 @@ use core::num::traits::{CheckedAdd, Zero};
 use core::traits::PartialOrd;
 use ics23::IntoArrayU32;
 use starknet::SyscallResult;
-use starknet::storage_access::{Store, StorageBaseAddress};
+use starknet::storage_access::{StorageBaseAddress, Store};
 use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::commitment::U32CollectorImpl;
 use starknet_ibc_core::host::ClientId;
@@ -144,13 +144,13 @@ pub impl StoreHeightArray of Store<Array<Height>> {
     }
 
     fn write(
-        address_domain: u32, base: StorageBaseAddress, value: Array<Height>
+        address_domain: u32, base: StorageBaseAddress, value: Array<Height>,
     ) -> SyscallResult<()> {
         Self::write_at_offset(address_domain, base, 0, value)
     }
 
     fn read_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8,
     ) -> SyscallResult<Array<Height>> {
         let mut arr: Array<Height> = array![];
 
@@ -173,7 +173,7 @@ pub impl StoreHeightArray of Store<Array<Height>> {
     }
 
     fn write_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<Height>
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<Height>,
     ) -> SyscallResult<()> {
         let len: u8 = value.len().try_into().expect('Storage - Span too large');
         Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();

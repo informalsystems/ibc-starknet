@@ -1,10 +1,10 @@
 use starknet_ibc_clients::cometbft::{
-    CometClientState, CometConsensusState, CometHeader, SignedHeader
+    CometClientState, CometConsensusState, CometHeader, SignedHeader,
 };
 use starknet_ibc_core::client::CreateResponse;
-use starknet_ibc_core::client::{MsgCreateClient, MsgUpdateClient, Height, Status};
+use starknet_ibc_core::client::{Height, MsgCreateClient, MsgUpdateClient, Status};
 use starknet_ibc_core::host::ClientId;
-use starknet_ibc_testkit::dummies::{HEIGHT, CLIENT_TYPE, STATE_ROOT};
+use starknet_ibc_testkit::dummies::{CLIENT_TYPE, HEIGHT, STATE_ROOT};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -44,7 +44,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         let mut serialized_consensus_state: Array<felt252> = ArrayTrait::new();
 
         let consensus_state = CometConsensusState {
-            timestamp: self.latest_timestamp.clone().into(), root: STATE_ROOT()
+            timestamp: self.latest_timestamp.clone().into(), root: STATE_ROOT(),
         };
 
         Serde::serialize(@consensus_state, ref serialized_consensus_state);
@@ -66,7 +66,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         let mut serialized_header: Array<felt252> = ArrayTrait::new();
 
         let signed_header = SignedHeader {
-            height: latest_height, time: latest_timestamp, root: STATE_ROOT()
+            height: latest_height, time: latest_timestamp, root: STATE_ROOT(),
         };
 
         let header = CometHeader { trusted_height, signed_header };
