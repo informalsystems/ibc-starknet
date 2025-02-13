@@ -3,7 +3,7 @@ use openzeppelin_token::erc20::ERC20ABIDispatcherTrait;
 use snforge_std::{ContractClass, start_cheat_caller_address};
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait};
-use starknet_ibc_testkit::dummies::{NAME, SYMBOL, SUPPLY, OWNER, SN_USER};
+use starknet_ibc_testkit::dummies::{NAME, OWNER, SN_USER, SUPPLY, SYMBOL};
 
 #[generate_trait]
 pub impl ERC20HandleImpl of ERC20Handle {
@@ -12,7 +12,7 @@ pub impl ERC20HandleImpl of ERC20Handle {
     }
 
     fn approve(
-        ref self: ERC20Contract, owner: ContractAddress, spender: ContractAddress, amount: u256
+        ref self: ERC20Contract, owner: ContractAddress, spender: ContractAddress, amount: u256,
     ) {
         start_cheat_caller_address(self.address, owner);
         self.dispatcher().approve(spender, amount);

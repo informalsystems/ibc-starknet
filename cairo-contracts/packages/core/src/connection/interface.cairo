@@ -1,5 +1,5 @@
 use starknet_ibc_core::connection::{
-    MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry, ConnectionEnd,
+    ConnectionEnd, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
 };
 use starknet_ibc_core::host::ConnectionId;
 

@@ -30,11 +30,11 @@ pub trait SerializerTrait<S> {
     fn serialize_string(ref self: S, v: ByteArray);
 
     fn serialize_field<V, +Drop<V>, +Serialize<V>>(
-        ref self: S, field_name: ByteArray, field_value: V
+        ref self: S, field_name: ByteArray, field_value: V,
     );
 
     fn serialize_variant<V, +Drop<V>, +Serialize<V>>(
-        ref self: S, variant_name: ByteArray, variant_value: V
+        ref self: S, variant_name: ByteArray, variant_value: V,
     );
 }
 
@@ -98,7 +98,7 @@ pub impl SerializerImpl of SerializerTrait<DefaultSerializer> {
     }
 
     fn serialize_field<V, +Drop<V>, +Serialize<V>>(
-        ref self: DefaultSerializer, field_name: ByteArray, field_value: V
+        ref self: DefaultSerializer, field_name: ByteArray, field_value: V,
     ) {
         if self.writer.len() == 0 {
             self.formatter.begin_object(ref self.writer);
@@ -114,7 +114,7 @@ pub impl SerializerImpl of SerializerTrait<DefaultSerializer> {
     }
 
     fn serialize_variant<V, +Drop<V>, +Serialize<V>>(
-        ref self: DefaultSerializer, variant_name: ByteArray, variant_value: V
+        ref self: DefaultSerializer, variant_name: ByteArray, variant_value: V,
     ) {
         if self.writer.len() == 0 {
             self.formatter.begin_object(ref self.writer);

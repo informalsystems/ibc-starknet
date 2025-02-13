@@ -1,42 +1,3 @@
-pub fn decode_varint_u64(bytes: @ByteArray, ref index: usize) -> u64 {
-    let mut value: u64 = 0;
-    let mut shift: u64 = 1;
-    let mut done = false;
-    while index < bytes.len() {
-        let byte = bytes[index];
-        index += 1;
-        // 0x7F == 0x0111_1111
-        value = value | ((byte & 0x7F).into() * shift);
-        if byte & 0x80 == 0 {
-            done = true;
-            break;
-        }
-        // 0x80 == 0x1000_0000
-        shift *= 0x80;
-    };
-    if !done {
-        panic!("invalid varint");
-    }
-    value
-}
-
-pub fn encode_varint_u64(value: @u64) -> ByteArray {
-    if value == @0 {
-        return "\x00";
-    }
-    let mut bytes = "";
-    let mut value = *value;
-    while value > 0 {
-        let mut byte: u8 = (value & 0x7F).try_into().unwrap();
-        value = value / 0x80;
-        if value > 0 {
-            byte = byte | 0x80;
-        }
-        bytes.append_byte(byte);
-    };
-    bytes
-}
-
 pub fn encode_2_complement_64(value: @i64) -> u64 {
     let value = *value;
     if value < 0 {
@@ -77,30 +38,7 @@ pub fn decode_2_complement_32(value: @u32) -> i32 {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        decode_varint_u64, encode_varint_u64, decode_2_complement_64, encode_2_complement_64
-    };
-
-    use protobuf::hex::decode as hex_decode;
-
-    #[test]
-    fn test_encode_varint_u64_default() {
-        assert_eq!(encode_varint_u64(@0), "\x00");
-        let mut index = 0;
-        assert_eq!(decode_varint_u64(@"\x00", ref index), 0);
-    }
-
-    #[test]
-    fn test_encode_decode_varint_u64() {
-        let value = 0x1234567890ABCDEF;
-        let bytes = encode_varint_u64(@value);
-        let hex = "ef9baf8589cf959a12";
-        let bytes2 = hex_decode(@hex);
-        assert_eq!(bytes, bytes2, "invalid encoded bytes");
-        let mut index = 0;
-        let decoded = decode_varint_u64(@bytes, ref index);
-        assert_eq!(decoded, value, "invalid decoded value");
-    }
+    use super::{decode_2_complement_64, encode_2_complement_64};
 
     #[test]
     fn test_encode_decode_2_complement_zero() {
@@ -110,7 +48,6 @@ mod tests {
         let decoded = decode_2_complement_64(@encoded);
         assert_eq!(decoded, value, "invalid decoded value");
     }
-
 
     #[test]
     fn test_encode_decode_2_complement_one() {

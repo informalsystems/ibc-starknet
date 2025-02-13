@@ -1,11 +1,11 @@
 use starknet_ibc_core::host::{
-    CHANNEL_ENDS_PREFIX, PORTS_PREFIX, CLIENTS_PREFIX, CONNECTIONS_PREFIX, CHANNELS_PREFIX,
-    SEQUENCES_PREFIX, COMMITMENTS_PREFIX, RECEIPTS_PREFIX, ACKS_PREFIX, NEXT_SEQ_RECV_PREFIX,
-    NEXT_SEQ_SEND_PREFIX, NEXT_SEQ_ACK_PREFIX
+    ACKS_PREFIX, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, CLIENTS_PREFIX, COMMITMENTS_PREFIX,
+    CONNECTIONS_PREFIX, NEXT_SEQ_ACK_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX,
+    PORTS_PREFIX, RECEIPTS_PREFIX, SEQUENCES_PREFIX,
 };
-use starknet_ibc_core::host::{ClientId, ConnectionId, ChannelId, PortId, Sequence};
+use starknet_ibc_core::host::{ChannelId, ClientId, ConnectionId, PortId, Sequence};
 use starknet_ibc_utils::LocalKeyBuilderTrait;
-use starknet_ibc_utils::{LocalKeyBuilderImpl, LocalKeyBuilder};
+use starknet_ibc_utils::{LocalKeyBuilder, LocalKeyBuilderImpl};
 
 /// Constructs the client to connections local key for the given client ID.
 pub fn client_connection_key(client_id: @ClientId) -> felt252 {

@@ -1,19 +1,19 @@
 use openzeppelin_testing::declare_class;
 use snforge_std::{
-    start_cheat_caller_address, start_cheat_block_timestamp_global, start_cheat_block_number_global,
-    ContractClass
+    ContractClass, start_cheat_block_number_global, start_cheat_block_timestamp_global,
+    start_cheat_caller_address,
 };
-use snforge_std::{spy_events, EventSpy};
+use snforge_std::{EventSpy, spy_events};
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::{ERC20Contract, TRANSFER_PORT_ID};
 use starknet_ibc_core::client::ClientContract;
 use starknet_ibc_core::router::AppContract;
 use starknet_ibc_testkit::configs::{
-    TransferAppConfig, TransferAppConfigTrait, CoreConfig, CoreConfigTrait, CometClientConfig,
-    CometClientConfigTrait
+    CometClientConfig, CometClientConfigTrait, CoreConfig, CoreConfigTrait, TransferAppConfig,
+    TransferAppConfigTrait,
 };
-use starknet_ibc_testkit::dummies::{OWNER, CLIENT_TYPE, RELAYER};
-use starknet_ibc_testkit::handles::{CoreContract, CoreHandle, AppHandle, ERC20Handle, ClientHandle};
+use starknet_ibc_testkit::dummies::{CLIENT_TYPE, OWNER, RELAYER};
+use starknet_ibc_testkit::handles::{AppHandle, ClientHandle, CoreContract, CoreHandle, ERC20Handle};
 
 #[derive(Drop, Serde)]
 pub struct Setup {
@@ -54,7 +54,7 @@ pub impl SetupImpl of SetupTrait {
     /// Sets up testing environment by deploying an instance of IBC core
     /// contract and a light client contract.
     fn setup_core_with_client(
-        core_contract_name: ByteArray, client_contract_name: ByteArray
+        core_contract_name: ByteArray, client_contract_name: ByteArray,
     ) -> (CoreContract, ClientContract) {
         let mut setup = Self::default();
 
@@ -97,7 +97,7 @@ pub impl SetupImpl of SetupTrait {
     fn setup_full(
         core_contract_name: ByteArray,
         client_contract_name: ByteArray,
-        transfer_contract_name: ByteArray
+        transfer_contract_name: ByteArray,
     ) -> (CoreContract, AppContract, ERC20Contract) {
         let mut setup = Self::default();
 
@@ -136,7 +136,7 @@ pub enum Mode {
 }
 
 pub fn setup(
-    mode: Mode
+    mode: Mode,
 ) -> (
     CoreContract,
     AppContract,
@@ -144,7 +144,7 @@ pub fn setup(
     CoreConfig,
     CometClientConfig,
     TransferAppConfig,
-    EventSpy
+    EventSpy,
 ) {
     let mut core_cfg = CoreConfigTrait::default();
 
@@ -169,7 +169,7 @@ pub fn setup(
             comet_cfg.create_client(@core);
             core_cfg.create_connection(@core);
             core_cfg.create_channel(@core);
-        }
+        },
     }
 
     (core, ics20, erc20, core_cfg, comet_cfg, transfer_cfg, spy)

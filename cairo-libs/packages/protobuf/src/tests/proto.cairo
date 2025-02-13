@@ -4,8 +4,10 @@ use protobuf::types::message::{
 };
 use protobuf::types::wkt::Any;
 use protobuf::types::tag::WireType;
-use protobuf::primitives::array::{ByteArrayAsProtoMessage, ArrayAsProtoMessage};
-use protobuf::primitives::numeric::{BoolAsProtoMessage, I64AsProtoMessage};
+use protobuf::primitives::array::{
+    ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage,
+};
+use protobuf::primitives::numeric::{BoolAsProtoMessage, I64AsProtoMessage, U64AsProtoMessage};
 use protobuf::hex::decode as hex_decode;
 use protobuf::base64::decode as base64_decode;
 
@@ -45,25 +47,28 @@ enum ValidatorType {
     Light,
 }
 
-impl ValidatorTypeIntoU64 of Into<ValidatorType, u64> {
-    fn into(self: ValidatorType) -> u64 {
+impl ValidatorAsProtoMessage of ProtoMessage<ValidatorType> {
+    fn encode_raw(self: @ValidatorType, ref context: EncodeContext) {
         match self {
-            ValidatorType::Full => 0,
-            ValidatorType::Light => 1,
+            ValidatorType::Full => 0_u32.encode_raw(ref context),
+            ValidatorType::Light => 1_u32.encode_raw(ref context),
         }
     }
-}
 
-impl U64IntoValidatorType of Into<u64, ValidatorType> {
-    fn into(self: u64) -> ValidatorType {
-        match self {
-            0 => ValidatorType::Full,
-            1 => ValidatorType::Light,
-            _ => panic!("invalid ValidatorType"),
+    fn decode_raw(ref self: ValidatorType, ref context: DecodeContext) {
+        let mut var = Default::<u32>::default();
+        var.decode_raw(ref context);
+        match var {
+            0 => self = ValidatorType::Full,
+            1 => self = ValidatorType::Light,
+            _ => panic!("invalid validator type"),
         }
     }
-}
 
+    fn wire_type() -> WireType {
+        WireType::Varint
+    }
+}
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 struct TmHeader {
@@ -147,7 +152,7 @@ fn test_proto_to_cairo_struct() {
         time: 0x5fee6600,
         hash: array![0x12, 0x34, 0x56, 0x78],
         indexes: array![0x12345678, 0x9abcdef0],
-        proposer: Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", },
+        proposer: Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234" },
         validator_type: ValidatorType::Light,
         proposers: array![],
     };
@@ -168,7 +173,7 @@ fn test_proto_to_cairo_struct_absent_field() {
         time: 0x5fee6600,
         hash: array![],
         indexes: array![],
-        proposer: Proposer { address: "", pub_key: "", },
+        proposer: Proposer { address: "", pub_key: "" },
         validator_type: ValidatorType::Full,
         proposers: array![],
     };
@@ -198,12 +203,12 @@ fn test_repeated_default_value() {
         time: 0x5fee6600,
         hash: array![0x12, 0x00, 0x34, 0x00, 0x56, 0x00, 0x78],
         indexes: array![],
-        proposer: Proposer { address: "", pub_key: "", },
+        proposer: Proposer { address: "", pub_key: "" },
         validator_type: ValidatorType::Full,
         proposers: array![
-            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", },
+            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234" },
             Default::<Proposer>::default(),
-            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234", },
+            Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234" },
         ],
     };
     assert_eq!(header2, header, "repeated default value failed");
@@ -220,11 +225,11 @@ fn test_proto_to_any() {
         time: 0x5fee6600,
         hash: array![],
         indexes: array![],
-        proposer: Proposer { address: "abc", pub_key: "def", },
+        proposer: Proposer { address: "abc", pub_key: "def" },
         validator_type: ValidatorType::Full,
         proposers: array![
-            Proposer { address: "abc", pub_key: "def", },
-            Proposer { address: "pqr", pub_key: "stu", }
+            Proposer { address: "abc", pub_key: "def" },
+            Proposer { address: "pqr", pub_key: "stu" },
         ],
     };
     let any: Any = header.clone().into();

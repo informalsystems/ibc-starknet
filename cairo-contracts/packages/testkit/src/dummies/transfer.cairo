@@ -1,8 +1,8 @@
 use starknet::class_hash::class_hash_const;
 use starknet::contract_address_const;
-use starknet::{ContractAddress, ClassHash};
+use starknet::{ClassHash, ContractAddress};
 use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_apps::transfer::types::{PacketData, Denom, Participant, PrefixedDenom, Memo};
+use starknet_ibc_apps::transfer::types::{Denom, Memo, PacketData, Participant, PrefixedDenom};
 use starknet_ibc_core::commitment::{Commitment, compute_packet_commitment};
 use starknet_ibc_testkit::dummies::{TIMEOUT_HEIGHT, TIMEOUT_TIMESTAMP};
 
@@ -74,6 +74,6 @@ pub fn PACKET_COMMITMENT_ON_SN(token: ERC20Contract) -> Commitment {
     compute_packet_commitment(
         @serde_json::to_byte_array(PACKET_DATA_FROM_SN(token)),
         TIMEOUT_HEIGHT(1000),
-        TIMEOUT_TIMESTAMP(1000)
+        TIMEOUT_TIMESTAMP(1000),
     )
 }

@@ -24,7 +24,7 @@ pub mod IBCCore {
     // -----------------------------------------------------------
 
     component!(
-        path: ClientEventEmitterComponent, storage: client_emitter, event: ClientEventEmitterEvent
+        path: ClientEventEmitterComponent, storage: client_emitter, event: ClientEventEmitterEvent,
     );
     component!(path: ClientHandlerComponent, storage: client_handler, event: ClientHandlerEvent);
 
@@ -46,10 +46,12 @@ pub mod IBCCore {
     component!(
         path: ConnectionEventEmitterComponent,
         storage: connection_emitter,
-        event: ConnectionEventEmitterEvent
+        event: ConnectionEventEmitterEvent,
     );
     component!(
-        path: ConnectionHandlerComponent, storage: connection_handler, event: ConnectionHandlerEvent
+        path: ConnectionHandlerComponent,
+        storage: connection_handler,
+        event: ConnectionHandlerEvent,
     );
 
     #[abi(embed_v0)]
@@ -66,7 +68,7 @@ pub mod IBCCore {
     component!(
         path: ChannelEventEmitterComponent,
         storage: channel_emitter,
-        event: ChannelEventEmitterEvent
+        event: ChannelEventEmitterEvent,
     );
     component!(path: ChannelHandlerComponent, storage: channel_handler, event: ChannelHandlerEvent);
 

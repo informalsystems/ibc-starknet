@@ -1,15 +1,16 @@
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::types::{
-    MsgTransfer, PacketData, PrefixedDenom, Denom, TracePrefixTrait, Participant, PrefixedDenomTrait
+    Denom, MsgTransfer, PacketData, Participant, PrefixedDenom, PrefixedDenomTrait,
+    TracePrefixTrait,
 };
 use starknet_ibc_core::channel::{
-    Packet, MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket, Acknowledgement
+    Acknowledgement, MsgAckPacket, MsgRecvPacket, MsgTimeoutPacket, Packet,
 };
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{ChannelId, Sequence};
 use starknet_ibc_testkit::dummies::{
-    NATIVE_DENOM, HOSTED_DENOM, AMOUNT, EMPTY_MEMO, PORT_ID, CHANNEL_ID, HEIGHT, TIMEOUT_HEIGHT,
-    TIMEOUT_TIMESTAMP, STATE_PROOF
+    AMOUNT, CHANNEL_ID, EMPTY_MEMO, HEIGHT, HOSTED_DENOM, NATIVE_DENOM, PORT_ID, STATE_PROOF,
+    TIMEOUT_HEIGHT, TIMEOUT_TIMESTAMP,
 };
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -42,7 +43,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
             .native_denom =
                 PrefixedDenom {
                     trace_path: self.native_denom.trace_path,
-                    base: Denom::Native(native_token_address.into())
+                    base: Denom::Native(native_token_address.into()),
                 };
     }
 
@@ -76,7 +77,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     }
 
     fn dummy_msg_transfer(
-        self: @TransferAppConfig, denom: PrefixedDenom, receiver: ByteArray
+        self: @TransferAppConfig, denom: PrefixedDenom, receiver: ByteArray,
     ) -> MsgTransfer {
         MsgTransfer {
             port_id_on_a: PORT_ID(),
@@ -91,7 +92,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     }
 
     fn dummy_msg_recv_packet(
-        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant,
     ) -> MsgRecvPacket {
         MsgRecvPacket {
             packet: self.dummy_incoming_packet(denom, sender, receiver),
@@ -105,7 +106,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         denom: PrefixedDenom,
         sender: Participant,
         receiver: Participant,
-        acknowledgement: Acknowledgement
+        acknowledgement: Acknowledgement,
     ) -> MsgAckPacket {
         MsgAckPacket {
             packet: self.dummy_outgoing_packet(denom, sender, receiver),
@@ -131,20 +132,20 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     }
 
     fn dummy_outgoing_packet(
-        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant,
     ) -> Packet {
         self
             .dummy_packet(
-                self.chan_id_on_a.clone(), self.chan_id_on_b.clone(), denom, sender, receiver
+                self.chan_id_on_a.clone(), self.chan_id_on_b.clone(), denom, sender, receiver,
             )
     }
 
     fn dummy_incoming_packet(
-        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant,
     ) -> Packet {
         self
             .dummy_packet(
-                self.chan_id_on_b.clone(), self.chan_id_on_a.clone(), denom, sender, receiver
+                self.chan_id_on_b.clone(), self.chan_id_on_a.clone(), denom, sender, receiver,
             )
     }
 
@@ -154,7 +155,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
         chan_id_on_b: ChannelId,
         denom: PrefixedDenom,
         sender: Participant,
-        receiver: Participant
+        receiver: Participant,
     ) -> Packet {
         let mut serialized_data = array![];
         Serde::serialize(@self.dummy_packet_data(denom, sender, receiver), ref serialized_data);
@@ -172,7 +173,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
     }
 
     fn dummy_packet_data(
-        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant
+        self: @TransferAppConfig, denom: PrefixedDenom, sender: Participant, receiver: Participant,
     ) -> PacketData {
         PacketData { denom, amount: *self.amount, sender, receiver, memo: EMPTY_MEMO() }
     }

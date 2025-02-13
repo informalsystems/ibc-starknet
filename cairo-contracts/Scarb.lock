@@ -60,6 +60,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "ics23"
+version = "0.1.0"
+dependencies = [
+ "protobuf",
+]
+
+[[package]]
 name = "openzeppelin_access"
 version = "0.20.0"
 source = "registry+https://scarbs.xyz/"
@@ -110,6 +117,10 @@ name = "openzeppelin_utils"
 version = "0.20.0"
 source = "registry+https://scarbs.xyz/"
 checksum = "sha256:44f32d242af1e43982decc49c563e613a9b67ade552f5c3d5cde504e92f74607"
+
+[[package]]
+name = "protobuf"
+version = "0.1.0"
 
 [[package]]
 name = "serde_json"
@@ -191,6 +202,7 @@ version = "0.1.0"
 dependencies = [
  "alexandria_data_structures",
  "alexandria_numeric",
+ "ics23",
  "openzeppelin_testing",
  "serde_json",
  "snforge_std",

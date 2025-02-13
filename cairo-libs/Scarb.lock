@@ -2,7 +2,21 @@
 version = 1
 
 [[package]]
+name = "alexandria_math"
+version = "0.2.1"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=95d98a5#95d98a5182001d07673b856a356eff0e6bd05354"
+
+[[package]]
 name = "cometbft"
+version = "0.1.0"
+dependencies = [
+ "ics23",
+ "protobuf",
+ "snforge_std",
+]
+
+[[package]]
+name = "ics23"
 version = "0.1.0"
 dependencies = [
  "protobuf",
@@ -13,6 +27,7 @@ dependencies = [
 name = "protobuf"
 version = "0.1.0"
 dependencies = [
+ "alexandria_math",
  "snforge_std",
 ]
 

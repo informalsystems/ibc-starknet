@@ -1,7 +1,8 @@
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName
+    DecodeContextImpl, ProtoName,
 };
+use protobuf::primitives::numeric::U64AsProtoMessage;
 use protobuf::types::tag::WireType;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]

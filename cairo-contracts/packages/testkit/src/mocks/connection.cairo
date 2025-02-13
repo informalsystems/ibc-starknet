@@ -1,16 +1,16 @@
 #[starknet::contract]
 pub mod MockConnectionHandler {
     use starknet_ibc_core::connection::{
-        ConnectionHandlerComponent, ConnectionEventEmitterComponent
+        ConnectionEventEmitterComponent, ConnectionHandlerComponent,
     };
 
     component!(
         path: ConnectionEventEmitterComponent,
         storage: channel_emitter,
-        event: ConnectionEventEmitterEvent
+        event: ConnectionEventEmitterEvent,
     );
     component!(
-        path: ConnectionHandlerComponent, storage: channel_handler, event: ConnectionHandlerEvent
+        path: ConnectionHandlerComponent, storage: channel_handler, event: ConnectionHandlerEvent,
     );
 
     #[storage]
@@ -18,7 +18,7 @@ pub mod MockConnectionHandler {
         #[substorage(v0)]
         channel_emitter: ConnectionEventEmitterComponent::Storage,
         #[substorage(v0)]
-        channel_handler: ConnectionHandlerComponent::Storage
+        channel_handler: ConnectionHandlerComponent::Storage,
     }
 
     #[event]
@@ -27,7 +27,7 @@ pub mod MockConnectionHandler {
         #[flat]
         ConnectionEventEmitterEvent: ConnectionEventEmitterComponent::Event,
         #[flat]
-        ConnectionHandlerEvent: ConnectionHandlerComponent::Event
+        ConnectionHandlerEvent: ConnectionHandlerComponent::Event,
     }
 
     #[constructor]

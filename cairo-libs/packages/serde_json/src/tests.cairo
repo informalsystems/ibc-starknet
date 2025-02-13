@@ -18,16 +18,16 @@ pub impl UserImpl of UserTrait {
         email: Option<ByteArray>,
         permission: Permission,
         is_active: bool,
-        metadata: felt252
+        metadata: felt252,
     ) -> User {
-        User { name, age, email, permission, is_active, metadata, }
+        User { name, age, email, permission, is_active, metadata }
     }
 }
 
 #[derive(Drop)]
 pub enum Permission {
     Admin: u8,
-    Guest
+    Guest,
 }
 
 pub impl PermissionSerialize of Serialize<Permission> {
@@ -37,7 +37,7 @@ pub impl PermissionSerialize of Serialize<Permission> {
                 serializer.serialize_variant("admin", level);
                 serializer.end();
             },
-            Permission::Guest => { serializer.serialize_string("guest"); }
+            Permission::Guest => { serializer.serialize_string("guest"); },
         }
     }
 }
@@ -45,7 +45,7 @@ pub impl PermissionSerialize of Serialize<Permission> {
 #[derive(Drop)]
 pub enum AccountStatus {
     Active: User,
-    InActive
+    InActive,
 }
 
 pub impl UserSerialize of Serialize<User> {
@@ -67,14 +67,14 @@ pub impl AccountStatusSerialize of Serialize<AccountStatus> {
                 serializer.serialize_variant("active", user);
                 serializer.end();
             },
-            AccountStatus::InActive => { serializer.serialize_string("inactive"); }
+            AccountStatus::InActive => { serializer.serialize_string("inactive"); },
         }
     }
 }
 
 pub fn DUMMY_USER() -> User {
     UserImpl::new(
-        "john doe", 25, Option::Some("john.doe@example.com"), Permission::Admin(0), true, 100
+        "john doe", 25, Option::Some("john.doe@example.com"), Permission::Admin(0), true, 100,
     )
 }
 

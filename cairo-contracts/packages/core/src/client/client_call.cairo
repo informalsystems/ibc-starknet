@@ -1,12 +1,12 @@
 use starknet::ContractAddress;
 use starknet_ibc_core::client::{
-    IClientHandlerDispatcher, IClientQueryDispatcher, IClientQueryDispatcherTrait,
-    IClientHandlerDispatcherTrait, IClientStateValidationDispatcher,
-    IClientStateValidationDispatcherTrait, MsgCreateClient, MsgUpdateClient, MsgRecoverClient,
-    MsgUpgradeClient, CreateResponse, UpdateResponse, Height, HeightPartialOrd, Status, StatusTrait,
-    ClientErrors, Timestamp,
+    ClientErrors, CreateResponse, Height, HeightPartialOrd, IClientHandlerDispatcher,
+    IClientHandlerDispatcherTrait, IClientQueryDispatcher, IClientQueryDispatcherTrait,
+    IClientStateValidationDispatcher, IClientStateValidationDispatcherTrait, MsgCreateClient,
+    MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient, Status, StatusTrait, Timestamp,
+    UpdateResponse,
 };
-use starknet_ibc_core::commitment::{StateValue, StateProof, StateRoot};
+use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct ClientContract {
@@ -44,7 +44,7 @@ pub impl ClientContractImpl of ClientContractTrait {
     }
 
     fn consensus_state_root(
-        self: @ClientContract, client_sequence: u64, height: Height
+        self: @ClientContract, client_sequence: u64, height: Height,
     ) -> StateRoot {
         IClientQueryDispatcher { contract_address: *self.address }
             .consensus_state_root(client_sequence, height)
@@ -90,15 +90,15 @@ pub impl ClientContractHandlerImpl of ClientContractHandlerTrait {
         IClientHandlerDispatcher { contract_address: self.address }.create_client(msg)
     }
 
-    fn update(ref self: ClientContract, msg: MsgUpdateClient,) -> UpdateResponse {
+    fn update(ref self: ClientContract, msg: MsgUpdateClient) -> UpdateResponse {
         IClientHandlerDispatcher { contract_address: self.address }.update_client(msg)
     }
 
-    fn recover(ref self: ClientContract, msg: MsgRecoverClient,) {
+    fn recover(ref self: ClientContract, msg: MsgRecoverClient) {
         IClientHandlerDispatcher { contract_address: self.address }.recover_client(msg)
     }
 
-    fn upgrade(ref self: ClientContract, msg: MsgUpgradeClient,) {
+    fn upgrade(ref self: ClientContract, msg: MsgUpgradeClient) {
         IClientHandlerDispatcher { contract_address: self.address }.upgrade_client(msg)
     }
 }

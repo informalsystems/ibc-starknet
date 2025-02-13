@@ -15,12 +15,12 @@ pub mod IBCGovernanceComponent {
 
     #[embeddable_as(Governance)]
     pub impl GovernanceImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of IGovernance<ComponentState<TContractState>> {}
 
     #[generate_trait]
     pub impl GovernanceInternalImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of GovernanceInternalTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>) {
             self.governor.write(get_tx_info().deref().account_contract_address);

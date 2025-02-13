@@ -1,10 +1,10 @@
-use snforge_std::{spy_events, test_address, start_cheat_caller_address_global};
+use snforge_std::{spy_events, start_cheat_caller_address_global, test_address};
 use starknet_ibc_core::client::ClientHandlerComponent::{
-    ClientInitializerImpl, CoreRegisterClientImpl, CoreClientHandlerImpl, EventEmitterImpl,
-    ClientInternalImpl, ClientReaderTrait, ClientWriterTrait
+    ClientInitializerImpl, ClientInternalImpl, ClientReaderTrait, ClientWriterTrait,
+    CoreClientHandlerImpl, CoreRegisterClientImpl, EventEmitterImpl,
 };
 use starknet_ibc_core::client::{ClientHandlerComponent, CreateResponse, MsgUpdateClient};
-use starknet_ibc_testkit::dummies::{CLIENT, CLIENT_TYPE, CLIENT_ID, HEIGHT, RELAYER};
+use starknet_ibc_testkit::dummies::{CLIENT, CLIENT_ID, CLIENT_TYPE, HEIGHT, RELAYER};
 use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
 use starknet_ibc_testkit::mocks::MockClientHandler;
 
