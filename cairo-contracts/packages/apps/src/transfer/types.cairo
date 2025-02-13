@@ -198,8 +198,7 @@ pub impl DenomDisplay of Display<Denom> {
     fn fmt(self: @Denom, ref f: Formatter) -> Result<(), Error> {
         match self {
             Denom::Native(contract) => {
-                let address_as_felt: felt252 = (*contract.address).into();
-                Display::fmt(@format!("{address_as_felt}"), ref f)
+                Display::fmt(@format!("0x{:x}", *contract.address), ref f)
             },
             Denom::Hosted(byte_array) => Display::fmt(@byte_array, ref f),
         }
@@ -241,8 +240,7 @@ pub impl ParticipantImpl of ParticipantTrait {
     fn as_byte_array(self: @Participant) -> ByteArray {
         match self {
             Participant::Native(contract_address) => {
-                let address_as_felt: felt252 = (*contract_address).into();
-                format!("{address_as_felt}")
+                format!("0x{:x}", *contract_address)
             },
             Participant::External(byte_array) => byte_array.clone()
         }
