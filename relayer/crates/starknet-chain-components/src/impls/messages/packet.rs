@@ -30,6 +30,7 @@ use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
+use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::cosmos::height::Height as CairoHeight;
@@ -48,7 +49,7 @@ impl<Chain, Counterparty, Encoding> ReceivePacketMessageBuilder<Chain, Counterpa
     for BuildStarknetPacketMessages
 where
     Chain: HasMessageType<Message = StarknetMessage>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseAsyncError<Encoding::Error>,
@@ -92,7 +93,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let call = Call {
-            to: ibc_core_address,
+            to: *ibc_core_address,
             selector: selector!("recv_packet"),
             calldata,
         };
@@ -108,7 +109,7 @@ impl<Chain, Counterparty, Encoding> AckPacketMessageBuilder<Chain, Counterparty>
     for BuildStarknetPacketMessages
 where
     Chain: HasMessageType<Message = StarknetMessage>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseAsyncError<Encoding::Error>
@@ -158,7 +159,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let call = Call {
-            to: ibc_core_address,
+            to: *ibc_core_address,
             selector: selector!("ack_packet"),
             calldata,
         };
@@ -174,7 +175,7 @@ impl<Chain, Counterparty, Encoding> TimeoutUnorderedPacketMessageBuilder<Chain, 
     for BuildStarknetPacketMessages
 where
     Chain: HasMessageType<Message = StarknetMessage>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseAsyncError<Encoding::Error>
@@ -222,7 +223,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let call = Call {
-            to: ibc_core_address,
+            to: *ibc_core_address,
             selector: selector!("timeout_packet"),
             calldata,
         };

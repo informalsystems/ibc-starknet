@@ -3,6 +3,7 @@ use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet::providers::{Provider, ProviderError};
 
+use crate::impls::types::address::StarknetAddress;
 use crate::traits::contract::call::ContractCaller;
 use crate::traits::provider::HasStarknetProvider;
 use crate::traits::types::blob::HasBlobType;
@@ -12,7 +13,7 @@ pub struct CallStarknetContract;
 
 impl<Chain> ContractCaller<Chain> for CallStarknetContract
 where
-    Chain: HasAddressType<Address = Felt>
+    Chain: HasAddressType<Address = StarknetAddress>
         + HasSelectorType<Selector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
         + HasStarknetProvider
@@ -20,7 +21,7 @@ where
 {
     async fn call_contract(
         chain: &Chain,
-        contract_address: &Felt,
+        contract_address: &StarknetAddress,
         entry_point_selector: &Felt,
         calldata: &Vec<Felt>,
     ) -> Result<Vec<Felt>, Chain::Error> {
@@ -30,7 +31,7 @@ where
             .provider()
             .call(
                 FunctionCall {
-                    contract_address: *contract_address,
+                    contract_address: **contract_address,
                     entry_point_selector: *entry_point_selector,
                     calldata: calldata.clone(),
                 },

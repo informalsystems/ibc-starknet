@@ -3,6 +3,7 @@ use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
 
+use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::contract::message::InvokeContractMessageBuilder;
 use crate::traits::types::blob::HasBlobType;
@@ -12,19 +13,19 @@ pub struct BuildInvokeContractCall;
 
 impl<Chain> InvokeContractMessageBuilder<Chain> for BuildInvokeContractCall
 where
-    Chain: HasAddressType<Address = Felt>
+    Chain: HasAddressType<Address = StarknetAddress>
         + HasSelectorType<Selector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
         + HasMessageType<Message = StarknetMessage>,
 {
     fn build_invoke_contract_message(
         _chain: &Chain,
-        contract_address: &Felt,
+        contract_address: &StarknetAddress,
         entry_point_selector: &Felt,
         calldata: &Vec<Felt>,
     ) -> StarknetMessage {
         let call = Call {
-            to: *contract_address,
+            to: **contract_address,
             selector: *entry_point_selector,
             calldata: calldata.clone(),
         };

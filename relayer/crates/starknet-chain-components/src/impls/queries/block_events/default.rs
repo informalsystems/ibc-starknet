@@ -5,12 +5,12 @@ use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_runtime_components::traits::runtime::HasRuntime;
 use hermes_runtime_components::traits::sleep::CanSleep;
-use starknet::core::types::Felt;
 use starknet::providers::ProviderError;
 
 use crate::impls::queries::block_events::get::GetStarknetBlockEvents;
 use crate::impls::queries::block_events::retry::RetryQueryBlockEvents;
 use crate::impls::queries::block_events::wait::WaitBlockHeightAndQueryEvents;
+use crate::impls::types::address::StarknetAddress;
 use crate::traits::provider::HasStarknetProvider;
 use crate::traits::queries::block_events::BlockEventsQuerier;
 use crate::types::event::StarknetEvent;
@@ -22,7 +22,7 @@ where
     Chain: HasRuntime
         + HasHeightType<Height = u64>
         + HasEventType<Event = StarknetEvent>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + HasStarknetProvider
         + CanQueryChainHeight
         + CanRaiseAsyncError<ProviderError>,

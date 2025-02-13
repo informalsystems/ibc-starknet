@@ -108,7 +108,7 @@ pub fn extract_events_from_function_invocation(
         .into_iter()
         .map(|event| {
             StarknetEvent::from_ordered_event(
-                invocation.contract_address,
+                invocation.contract_address.into(),
                 invocation.class_hash,
                 event,
             )
