@@ -18,9 +18,15 @@ impl DurationAsProtoMessage of ProtoMessage<Duration> {
         context.encode_field(2, self.nanos);
     }
 
-    fn decode_raw(ref self: Duration, ref context: DecodeContext) {
-        context.decode_field(1, ref self.seconds);
-        context.decode_field(2, ref self.nanos);
+    fn decode_raw(ref context: DecodeContext) -> Option<Duration> {
+        let mut duration = Default::<Duration>::default();
+        if !context.decode_field(1, ref duration.seconds) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref duration.nanos) {
+            return Option::None;
+        }
+        Option::Some(duration)
     }
 
     fn wire_type() -> WireType {
@@ -46,9 +52,15 @@ impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
         context.encode_field(2, self.nanos);
     }
 
-    fn decode_raw(ref self: Timestamp, ref context: DecodeContext) {
-        context.decode_field(1, ref self.seconds);
-        context.decode_field(2, ref self.nanos);
+    fn decode_raw(ref context: DecodeContext) -> Option<Timestamp> {
+        let mut timestamp = Default::<Timestamp>::default();
+        if !context.decode_field(1, ref timestamp.seconds) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref timestamp.nanos) {
+            return Option::None;
+        }
+        Option::Some(timestamp)
     }
 
     fn wire_type() -> WireType {
@@ -74,9 +86,15 @@ impl AnyAsProtoMessage of ProtoMessage<Any> {
         context.encode_field(2, self.value);
     }
 
-    fn decode_raw(ref self: Any, ref context: DecodeContext) {
-        context.decode_field(1, ref self.type_url);
-        context.decode_field(2, ref self.value);
+    fn decode_raw(ref context: DecodeContext) -> Option<Any> {
+        let mut any = Default::<Any>::default();
+        if !context.decode_field(1, ref any.type_url) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref any.value) {
+            return Option::None;
+        }
+        Option::Some(any)
     }
 
     fn wire_type() -> WireType {
@@ -102,7 +120,7 @@ pub impl AnyTryIntoProtoMessage<
 > of TryInto<Any, T> {
     fn try_into(self: Any) -> Option<T> {
         if self.type_url == ProtoName::<T>::type_url() {
-            Option::Some(ProtoCodecImpl::decode::<T>(@self.value))
+            ProtoCodecImpl::decode::<T>(@self.value)
         } else {
             Option::None
         }

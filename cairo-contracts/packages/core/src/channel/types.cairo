@@ -1,9 +1,8 @@
 use core::num::traits::Zero;
+use ics23::{IntoArrayU32, array_u8_into_array_u32};
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
-use starknet_ibc_core::commitment::{
-    array_u8_into_array_u32, IntoArrayU32, StateValueZero, StateValue
-};
+use starknet_ibc_core::commitment::{StateValueZero, StateValue};
 use starknet_ibc_core::host::{
     ConnectionId, ChannelId, ChannelIdZero, PortId, PortIdTrait, Sequence
 };

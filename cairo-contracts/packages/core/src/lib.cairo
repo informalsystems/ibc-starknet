@@ -25,10 +25,7 @@ pub mod commitment {
         Commitment, CommitmentZero, StateValue, StateValueZero, StateProof, StateProofZero,
         StateRoot, StateRootZero, compute_packet_commitment, compute_ack_commitment,
     };
-    pub use utils::{
-        IntoArrayU32, U64IntoArrayU32, U32Collector, U32CollectorImpl, U32CollectorTrait,
-        u64_into_array_u32, array_u8_into_array_u32, array_u32_into_array_u8, ArrayU32IntoArrayU8
-    };
+    pub use utils::{U32Collector, U32CollectorImpl, U32CollectorTrait,};
 }
 pub mod connection {
     mod errors;

@@ -25,7 +25,6 @@ test = "snforge test"
 
 [workspace.dependencies]
 # external dependencies
-alexandria_numeric   = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "95d98a5" }
 alexandria_sorting   = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "95d98a5" }
 assert_macros        = "2.8.4"
 starknet             = "2.8.4"
@@ -36,6 +35,7 @@ openzeppelin_utils   = "0.18.0"
 snforge_std          = "0.31.0"
 
 # internal dependencies
+ics23      = { path = "../cairo-libs/packages/ics23" }
 serde_json = { path = "../cairo-libs/packages/serde_json" }
 
 # ibc dependencies
