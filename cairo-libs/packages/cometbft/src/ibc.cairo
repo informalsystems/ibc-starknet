@@ -18,9 +18,15 @@ impl HeightAsProtoMessage of ProtoMessage<Height> {
         context.encode_field(2, self.revision_height);
     }
 
-    fn decode_raw(ref self: Height, ref context: DecodeContext) {
-        context.decode_field(1, ref self.revision_number);
-        context.decode_field(2, ref self.revision_height);
+    fn decode_raw(ref context: DecodeContext) -> Option<Height> {
+        let mut height = Default::<Height>::default();
+        if !context.decode_field(1, ref height.revision_number) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref height.revision_height) {
+            return Option::None;
+        }
+        Option::Some(height)
     }
 
     fn wire_type() -> WireType {
@@ -44,8 +50,12 @@ impl MerkleRootAsProtoMessage of ProtoMessage<MerkleRoot> {
         context.encode_field(1, self.hash);
     }
 
-    fn decode_raw(ref self: MerkleRoot, ref context: DecodeContext) {
-        context.decode_field(1, ref self.hash);
+    fn decode_raw(ref context: DecodeContext) -> Option<MerkleRoot> {
+        let mut root = Default::<MerkleRoot>::default();
+        if !context.decode_field(1, ref root.hash) {
+            return Option::None;
+        }
+        Option::Some(root)
     }
 
     fn wire_type() -> WireType {

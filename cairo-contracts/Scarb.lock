@@ -62,7 +62,6 @@ dependencies = [
 name = "ics23"
 version = "0.1.0"
 dependencies = [
- "alexandria_numeric",
  "protobuf",
 ]
 

@@ -21,9 +21,15 @@ impl ConsensusAsProtoMessage of ProtoMessage<Consensus> {
         context.encode_field(2, self.app);
     }
 
-    fn decode_raw(ref self: Consensus, ref context: DecodeContext) {
-        context.decode_field(1, ref self.block);
-        context.decode_field(2, ref self.app);
+    fn decode_raw(ref context: DecodeContext) -> Option<Consensus> {
+        let mut consensus = Default::<Consensus>::default();
+        if !context.decode_field(1, ref consensus.block) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref consensus.app) {
+            return Option::None;
+        }
+        Option::Some(consensus)
     }
 
     fn wire_type() -> WireType {
@@ -49,9 +55,15 @@ impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
         context.encode_field(2, self.hash);
     }
 
-    fn decode_raw(ref self: PartSetHeader, ref context: DecodeContext) {
-        context.decode_field(1, ref self.total);
-        context.decode_field(2, ref self.hash);
+    fn decode_raw(ref context: DecodeContext) -> Option<PartSetHeader> {
+        let mut psh = Default::<PartSetHeader>::default();
+        if !context.decode_field(1, ref psh.total) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref psh.hash) {
+            return Option::None;
+        }
+        Option::Some(psh)
     }
 
     fn wire_type() -> WireType {
@@ -77,9 +89,15 @@ impl BlockIdAsProtoMessage of ProtoMessage<BlockId> {
         context.encode_field(2, self.part_set_header);
     }
 
-    fn decode_raw(ref self: BlockId, ref context: DecodeContext) {
-        context.decode_field(1, ref self.hash);
-        context.decode_field(2, ref self.part_set_header);
+    fn decode_raw(ref context: DecodeContext) -> Option<BlockId> {
+        let mut block_id = Default::<BlockId>::default();
+        if !context.decode_field(1, ref block_id.hash) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref block_id.part_set_header) {
+            return Option::None;
+        }
+        Option::Some(block_id)
     }
 
     fn wire_type() -> WireType {
@@ -129,21 +147,51 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
         context.encode_field(14, self.proposer_address);
     }
 
-    fn decode_raw(ref self: Header, ref context: DecodeContext) {
-        context.decode_field(1, ref self.version);
-        context.decode_field(2, ref self.chain_id);
-        context.decode_field(3, ref self.height);
-        context.decode_field(4, ref self.time);
-        context.decode_field(5, ref self.last_block_id);
-        context.decode_field(6, ref self.last_commit_hash);
-        context.decode_field(7, ref self.data_hash);
-        context.decode_field(8, ref self.validators_hash);
-        context.decode_field(9, ref self.next_validators_hash);
-        context.decode_field(10, ref self.consensus_hash);
-        context.decode_field(11, ref self.app_hash);
-        context.decode_field(12, ref self.last_results_hash);
-        context.decode_field(13, ref self.evidence_hash);
-        context.decode_field(14, ref self.proposer_address);
+    fn decode_raw(ref context: DecodeContext) -> Option<Header> {
+        let mut header = Default::<Header>::default();
+        if !context.decode_field(1, ref header.version) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref header.chain_id) {
+            return Option::None;
+        }
+        if !context.decode_field(3, ref header.height) {
+            return Option::None;
+        }
+        if !context.decode_field(4, ref header.time) {
+            return Option::None;
+        }
+        if !context.decode_field(5, ref header.last_block_id) {
+            return Option::None;
+        }
+        if !context.decode_field(6, ref header.last_commit_hash) {
+            return Option::None;
+        }
+        if !context.decode_field(7, ref header.data_hash) {
+            return Option::None;
+        }
+        if !context.decode_field(8, ref header.validators_hash) {
+            return Option::None;
+        }
+        if !context.decode_field(9, ref header.next_validators_hash) {
+            return Option::None;
+        }
+        if !context.decode_field(10, ref header.consensus_hash) {
+            return Option::None;
+        }
+        if !context.decode_field(11, ref header.app_hash) {
+            return Option::None;
+        }
+        if !context.decode_field(12, ref header.last_results_hash) {
+            return Option::None;
+        }
+        if !context.decode_field(13, ref header.evidence_hash) {
+            return Option::None;
+        }
+        if !context.decode_field(14, ref header.proposer_address) {
+            return Option::None;
+        }
+        Option::Some(header)
     }
 
     fn wire_type() -> WireType {
@@ -176,16 +224,19 @@ impl BlockIdFlagAsProtoMessage of ProtoMessage<BlockIdFlag> {
         }
     }
 
-    fn decode_raw(ref self: BlockIdFlag, ref context: DecodeContext) {
-        let mut var = Default::<u32>::default();
-        var.decode_raw(ref context);
-        match var {
-            0 => self = BlockIdFlag::Unknown,
-            1 => self = BlockIdFlag::Absent,
-            2 => self = BlockIdFlag::Commit,
-            3 => self = BlockIdFlag::Nil,
-            _ => panic!("invalid block Id flag"),
+    fn decode_raw(ref context: DecodeContext) -> Option<BlockIdFlag> {
+        let var: Option<u32> = context.decode_raw();
+        if var.is_none() {
+            return Option::None;
         }
+        let value = match var.unwrap() {
+            0 => Option::Some(BlockIdFlag::Unknown),
+            1 => Option::Some(BlockIdFlag::Absent),
+            2 => Option::Some(BlockIdFlag::Commit),
+            3 => Option::Some(BlockIdFlag::Nil),
+            _ => Option::None,
+        };
+        value
     }
 
     fn wire_type() -> WireType {
@@ -209,11 +260,21 @@ impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
         context.encode_field(4, self.signature);
     }
 
-    fn decode_raw(ref self: CommitSig, ref context: DecodeContext) {
-        context.decode_field(1, ref self.block_id_flag);
-        context.decode_field(2, ref self.validator_address);
-        context.decode_field(3, ref self.timestamp);
-        context.decode_field(4, ref self.signature);
+    fn decode_raw(ref context: DecodeContext) -> Option<CommitSig> {
+        let mut commit_sig = Default::<CommitSig>::default();
+        if !context.decode_field(1, ref commit_sig.block_id_flag) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref commit_sig.validator_address) {
+            return Option::None;
+        }
+        if !context.decode_field(3, ref commit_sig.timestamp) {
+            return Option::None;
+        }
+        if !context.decode_field(4, ref commit_sig.signature) {
+            return Option::None;
+        }
+        Option::Some(commit_sig)
     }
 
     fn wire_type() -> WireType {
@@ -243,11 +304,21 @@ impl CommitAsProtoMessage of ProtoMessage<Commit> {
         context.encode_repeated_field(4, self.signatures);
     }
 
-    fn decode_raw(ref self: Commit, ref context: DecodeContext) {
-        context.decode_field(1, ref self.height);
-        context.decode_field(2, ref self.round);
-        context.decode_field(3, ref self.block_id);
-        context.decode_repeated_field(4, ref self.signatures);
+    fn decode_raw(ref context: DecodeContext) -> Option<Commit> {
+        let mut commit = Default::<Commit>::default();
+        if !context.decode_field(1, ref commit.height) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref commit.round) {
+            return Option::None;
+        }
+        if !context.decode_field(3, ref commit.block_id) {
+            return Option::None;
+        }
+        if !context.decode_repeated_field(4, ref commit.signatures) {
+            return Option::None;
+        }
+        Option::Some(commit)
     }
 
     fn wire_type() -> WireType {
@@ -273,9 +344,15 @@ impl SignedHeaderAsProtoMessage of ProtoMessage<SignedHeader> {
         context.encode_field(2, self.commit);
     }
 
-    fn decode_raw(ref self: SignedHeader, ref context: DecodeContext) {
-        context.decode_field(1, ref self.header);
-        context.decode_field(2, ref self.commit);
+    fn decode_raw(ref context: DecodeContext) -> Option<SignedHeader> {
+        let mut signed_header = Default::<SignedHeader>::default();
+        if !context.decode_field(1, ref signed_header.header) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref signed_header.commit) {
+            return Option::None;
+        }
+        Option::Some(signed_header)
     }
 
     fn wire_type() -> WireType {
@@ -302,9 +379,15 @@ impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
         context.encode_field(2, self.secp256k1);
     }
 
-    fn decode_raw(ref self: PublicKey, ref context: DecodeContext) {
-        context.decode_field(1, ref self.ed25519);
-        context.decode_field(2, ref self.secp256k1);
+    fn decode_raw(ref context: DecodeContext) -> Option<PublicKey> {
+        let mut public_key = Default::<PublicKey>::default();
+        if !context.decode_field(1, ref public_key.ed25519) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref public_key.secp256k1) {
+            return Option::None;
+        }
+        Option::Some(public_key)
     }
 
     fn wire_type() -> WireType {
@@ -334,11 +417,21 @@ impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
         context.encode_field(4, self.proposer_priority);
     }
 
-    fn decode_raw(ref self: Validator, ref context: DecodeContext) {
-        context.decode_field(1, ref self.address);
-        context.decode_field(2, ref self.pub_key);
-        context.decode_field(3, ref self.voting_power);
-        context.decode_field(4, ref self.proposer_priority);
+    fn decode_raw(ref context: DecodeContext) -> Option<Validator> {
+        let mut validator = Default::<Validator>::default();
+        if !context.decode_field(1, ref validator.address) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref validator.pub_key) {
+            return Option::None;
+        }
+        if !context.decode_field(3, ref validator.voting_power) {
+            return Option::None;
+        }
+        if !context.decode_field(4, ref validator.proposer_priority) {
+            return Option::None;
+        }
+        Option::Some(validator)
     }
 
     fn wire_type() -> WireType {
@@ -366,10 +459,18 @@ impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
         context.encode_field(3, self.total_voting_power);
     }
 
-    fn decode_raw(ref self: ValidatorSet, ref context: DecodeContext) {
-        context.decode_repeated_field(1, ref self.validators);
-        context.decode_field(2, ref self.proposer);
-        context.decode_field(3, ref self.total_voting_power);
+    fn decode_raw(ref context: DecodeContext) -> Option<ValidatorSet> {
+        let mut set = Default::<ValidatorSet>::default();
+        if !context.decode_repeated_field(1, ref set.validators) {
+            return Option::None;
+        }
+        if !context.decode_field(2, ref set.proposer) {
+            return Option::None;
+        }
+        if !context.decode_field(3, ref set.total_voting_power) {
+            return Option::None;
+        }
+        Option::Some(set)
     }
 
     fn wire_type() -> WireType {
