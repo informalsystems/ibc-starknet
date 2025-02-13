@@ -11,8 +11,8 @@ members = [
 [workspace.package]
 version       = "0.1.0"
 edition       = "2024_07"
-cairo-version = "2.8.4"
-scarb-version = "2.8.4"
+cairo-version = "2.9.2"
+scarb-version = "2.9.2"
 license       = "Apache-2.0"
 authors       = [ "Informal Systems <hello@informal.systems>" ]
 repository    = "https://github.com/informalsystems/ibc-starknet"
@@ -25,14 +25,16 @@ test = "snforge test"
 
 [workspace.dependencies]
 # external dependencies
-alexandria_sorting   = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "95d98a5" }
-assert_macros        = "2.8.4"
-starknet             = "2.8.4"
-openzeppelin_access  = "0.18.0"
-openzeppelin_token   = "0.18.0"
-openzeppelin_testing = "0.18.0"
-openzeppelin_utils   = "0.18.0"
-snforge_std          = "0.31.0"
+alexandria_data_structures = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "162bed1" }
+alexandria_numeric         = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "162bed1" }
+alexandria_sorting         = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "162bed1" }
+assert_macros              = "2.9.2"
+starknet                   = "2.9.2"
+openzeppelin_access        = "0.20.0"
+openzeppelin_token         = "0.20.0"
+openzeppelin_testing       = "0.20.0"
+openzeppelin_utils         = "0.20.0"
+snforge_std                = "0.34.0"
 
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }

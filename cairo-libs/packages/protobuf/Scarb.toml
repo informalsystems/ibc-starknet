@@ -12,5 +12,4 @@ test = { workspace = true }
 
 [dev-dependencies]
 alexandria_math = { workspace = true }
-cairo_test      = { workspace = true }
 snforge_std     = { workspace = true }

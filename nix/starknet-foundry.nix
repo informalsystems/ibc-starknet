@@ -1,16 +1,15 @@
-{ nixpkgs, snforge-src }:
+{ nixpkgs, starknet-foundry-src }:
 let
-  snforge = nixpkgs.rustPlatform.buildRustPackage {
-    pname = "forge";
-    version = "0.31.0";
+  starknet-foundry = nixpkgs.rustPlatform.buildRustPackage {
+    pname = "starknet-foundry";
+    version = "0.34.0";
 
-    src = snforge-src;
+    src = starknet-foundry-src;
 
     cargoLock = {
-      lockFile = snforge-src + "/Cargo.lock";
+      lockFile = starknet-foundry-src + "/Cargo.lock";
       outputHashes = {
         "starknet-0.11.0" = "sha256-Dgx5Czrzj2JKwmSJ5EvqpikRFwpWwEydkhZl0pnjfWE=";
-        "trace-data-0.4.0" = "sha256-C5rgp+wthWkjNBkY1PlHfLkGexrmjOQpUgbPKPrKf7g=";
       };
     };
 
@@ -26,4 +25,4 @@ let
     ];
   };
 in
-snforge
+starknet-foundry
