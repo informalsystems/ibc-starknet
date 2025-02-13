@@ -12,7 +12,7 @@ fn test_cairo_packet_commitment() {
     let timeout_timestamp = TimeoutTimestamp::At(Timestamp::from_nanoseconds(1000 * 1_000_000_000));
 
     let packet_json_data: &str =
-            "{\"denom\":\"2087021424722619777119509474943472645767659996348769578120564519014510906823\",\"amount\":\"100\",\"sender\":\"1431520594\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"memo\":\"\"}";
+            "{\"denom\":\"0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7\",\"amount\":\"100\",\"sender\":\"0x55534552\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"memo\":\"\"}";
 
     let expected: Vec<u32> = [
         1561496803, 591083406, 1958596266, 2480824962, 846563094, 2634790765, 145282158, 2139799705,
