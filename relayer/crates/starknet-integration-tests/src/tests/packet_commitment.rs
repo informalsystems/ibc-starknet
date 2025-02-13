@@ -5,8 +5,8 @@ use ibc::primitives::Timestamp;
 
 #[test]
 fn test_cairo_packet_commitment() {
-    // https://github.com/informalsystems/ibc-starknet/blob/7967c8045ed6b4453030e01d0df12c47c2d77b37/cairo-contracts/packages/apps/src/transfer/types.cairo#L307
-    // https://github.com/informalsystems/ibc-starknet/blob/7967c8045ed6b4453030e01d0df12c47c2d77b37/cairo-contracts/packages/core/src/tests/commitment.cairo#L52-L58
+    // https://github.com/informalsystems/ibc-starknet/blob/ce122321883d6dbceb89f1bde3521f9112284a8e/cairo-contracts/packages/apps/src/transfer/types.cairo#L307
+    // https://github.com/informalsystems/ibc-starknet/blob/ce122321883d6dbceb89f1bde3521f9112284a8e/cairo-contracts/packages/core/src/tests/commitment.cairo#L52-L58
 
     let timeout_height = TimeoutHeight::At(Height::new(0, 1000).expect("valid height"));
     let timeout_timestamp = TimeoutTimestamp::At(Timestamp::from_nanoseconds(1000 * 1_000_000_000));
