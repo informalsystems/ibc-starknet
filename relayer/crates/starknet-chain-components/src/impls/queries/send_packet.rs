@@ -31,7 +31,6 @@ where
         _counterparty_channel_id: &Counterparty::ChannelId,
         _counterparty_port_id: &Counterparty::PortId,
         _sequences: &[Chain::Sequence],
-        _height: &Chain::Height,
     ) -> Result<Vec<Chain::OutgoingPacket>, Chain::Error> {
         todo!()
     }
@@ -55,7 +54,6 @@ where
         _counterparty_channel_id: &Counterparty::ChannelId,
         _counterparty_port_id: &Counterparty::PortId,
         _sequence: &Chain::Sequence,
-        _height: &Chain::Height,
     ) -> Result<Chain::OutgoingPacket, Chain::Error> {
         todo!()
     }

@@ -54,7 +54,7 @@ where
         _chain: &Chain,
         _channel_id: &Chain::ChannelId,
         _port_id: &Chain::PortId,
-    ) -> Result<(Vec<Chain::Sequence>, Chain::Height), Chain::Error> {
+    ) -> Result<Vec<Chain::Sequence>, Chain::Error> {
         todo!()
     }
 }
