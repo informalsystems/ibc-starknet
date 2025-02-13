@@ -3,8 +3,13 @@ name    = "protobuf"
 version = "0.1.0"
 edition = { workspace = true }
 
+[lib]
+
+[scripts]
+test = { workspace = true }
+
 [dependencies]
 
 [dev-dependencies]
-cairo_test  = { workspace = true }
-snforge_std = { workspace = true }
+assert_macros = { workspace = true }
+snforge_std   = { workspace = true }

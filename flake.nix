@@ -14,17 +14,22 @@
     };
 
     cairo-src = {
-      url = "github:starkware-libs/cairo/v2.8.4";
+      url = "github:starkware-libs/cairo/v2.9.2";
       flake = false;
     };
 
     scarb-src = {
-      url = "github:software-mansion/scarb/v2.8.4";
+      url = "github:software-mansion/scarb/v2.9.2";
       flake = false;
     };
 
     universal-sierra-compiler-src = {
       url = "github:software-mansion/universal-sierra-compiler/v2.3.0";
+      flake = false;
+    };
+
+    starknet-foundry-src = {
+      url = "github:foundry-rs/starknet-foundry/v0.34.0";
       flake = false;
     };
   };
@@ -87,6 +92,11 @@
             rust = rust-1_79;
           };
 
+          starknet-foundry = import ./nix/starknet-foundry.nix {
+            inherit nixpkgs;
+            inherit (inputs) starknet-foundry-src;
+          };
+
           ibc-starknet-cw = import ./nix/ibc-starknet-cw.nix {
             inherit nixpkgs;
 
@@ -99,6 +109,7 @@
               cairo
               scarb
               universal-sierra-compiler
+              # starknet-foundry
               wasm-simapp
               osmosis
               ;

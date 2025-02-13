@@ -27,6 +27,7 @@ fmt = { workspace = true }
 openzeppelin_access  = { workspace = true }
 openzeppelin_testing = { workspace = true }
 openzeppelin_utils   = { workspace = true }
+openzeppelin_token   = { workspace = true }
 snforge_std          = { workspace = true }
 starknet             = { workspace = true }
 
@@ -34,6 +35,8 @@ starknet             = { workspace = true }
 starknet_ibc_core    = { workspace = true }
 starknet_ibc_clients = { workspace = true }
 starknet_ibc_apps    = { workspace = true }
+
+serde_json = { workspace = true }
 
 [[target.starknet-contract]]
 allowed-libfuncs-list.name = "experimental"
