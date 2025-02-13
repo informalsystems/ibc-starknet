@@ -189,7 +189,7 @@ impl BlockIdFlagAsProtoMessage of ProtoMessage<BlockIdFlag> {
     }
 
     fn wire_type() -> WireType {
-        WireType::LengthDelimited
+        WireType::Varint
     }
 }
 

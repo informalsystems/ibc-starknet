@@ -23,4 +23,5 @@ test = { workspace = true }
 protobuf = { workspace = true }
 
 [dev-dependencies]
-snforge_std = { workspace = true }
+assert_macros = { workspace = true }
+snforge_std   = { workspace = true }

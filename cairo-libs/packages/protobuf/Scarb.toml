@@ -12,4 +12,5 @@ test = { workspace = true }
 
 [dev-dependencies]
 alexandria_math = { workspace = true }
+assert_macros   = { workspace = true }
 snforge_std     = { workspace = true }
