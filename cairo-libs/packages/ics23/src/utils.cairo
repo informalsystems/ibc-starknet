@@ -75,7 +75,7 @@ pub fn u32_to_bytes(self: u32, mode: ConvMode) -> Span<u8> {
             (val3 / 0x1000000).try_into().unwrap(),
             (val2 / 0x10000).try_into().unwrap(),
             (val1 / 0x100).try_into().unwrap(),
-            val0
+            val0,
         ]
             .span();
     }

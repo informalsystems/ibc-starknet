@@ -1,6 +1,6 @@
 use alexandria_math::pow;
 use protobuf::varint::{
-    encode_varint_to_byte_array, decode_varint_from_byte_array, encode_varint_to_u8_array
+    encode_varint_to_byte_array, decode_varint_from_byte_array, encode_varint_to_u8_array,
 };
 use protobuf::hex::decode as hex_decode;
 
@@ -20,10 +20,10 @@ fn test_encode_varint() {
     assert_encode_varint(pow(2, 21), array![0x80, 0x80, 0x80, 0x01]); // [128, 128, 128, 1]
     assert_encode_varint(pow(2, 28) - 1, array![0xFF, 0xFF, 0xFF, 0x7F]); // [255, 255, 255, 127]
     assert_encode_varint(
-        pow(2, 28), array![0x80, 0x80, 0x80, 0x80, 0x01]
+        pow(2, 28), array![0x80, 0x80, 0x80, 0x80, 0x01],
     ); // [128, 128, 128, 128, 1]
     assert_encode_varint(
-        0xffffffff, array![0xFF, 0xFF, 0xFF, 0xFF, 0x0F]
+        0xffffffff, array![0xFF, 0xFF, 0xFF, 0xFF, 0x0F],
     ); // [255, 255, 255, 255, 15]
 }
 

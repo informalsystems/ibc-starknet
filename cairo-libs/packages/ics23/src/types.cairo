@@ -1,10 +1,10 @@
 use protobuf::types::message::DecodeContextTrait;
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName
+    DecodeContextImpl, ProtoName,
 };
 use protobuf::primitives::array::{
-    ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage
+    ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage,
 };
 use protobuf::primitives::numeric::{I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
@@ -84,21 +84,18 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
         assert(self.key.len() > 0, ICS23Errors::MISSING_KEY);
         assert(self.value.len() > 0, ICS23Errors::MISSING_VALUE);
         let mut hash = apply_leaf(self.leaf, self.key.clone(), self.value.clone());
-        for i in 0
-            ..self
-                .path
-                .len() {
-                    hash = apply_inner(self.path[i], hash.into());
-                    if let Option::Some(s) = spec {
-                        // NOTE: Multiplied by 4 since the hash is a u32 array, but the
-                        // child size is in u8 bytes.
-                        assert(
-                            !(hash.span().len()
-                                * 4 > *s.inner_spec.child_size && s.inner_spec.child_size >= @32),
-                            ICS23Errors::INVALID_INNER_SPEC
-                        );
-                    }
-                };
+        for i in 0..self.path.len() {
+            hash = apply_inner(self.path[i], hash.into());
+            if let Option::Some(s) = spec {
+                // NOTE: Multiplied by 4 since the hash is a u32 array, but the
+                // child size is in u8 bytes.
+                assert(
+                    !(hash.span().len()
+                        * 4 > *s.inner_spec.child_size && s.inner_spec.child_size >= @32),
+                    ICS23Errors::INVALID_INNER_SPEC,
+                );
+            }
+        };
         hash
     }
 }
@@ -223,7 +220,7 @@ impl HashOpAsProtoMessage of ProtoMessage<HashOp> {
         match var {
             0 => self = HashOp::NoOp,
             1 => self = HashOp::Sha256,
-            _ => panic!("invalid hash op")
+            _ => panic!("invalid hash op"),
         }
     }
 

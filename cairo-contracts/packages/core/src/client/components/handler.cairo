@@ -2,20 +2,20 @@
 pub mod ClientHandlerComponent {
     use core::num::traits::Zero;
     use starknet::storage::{
-        Map, StorageMapReadAccess, StorageMapWriteAccess, Vec, VecTrait, MutableVecTrait,
-        StoragePointerReadAccess, StoragePointerWriteAccess
+        Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
+        StoragePointerWriteAccess, Vec, VecTrait,
     };
     use starknet::{ContractAddress, get_caller_address, get_tx_info};
-    use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
     use starknet_ibc_core::client::ClientEventEmitterComponent;
+    use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
     use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient, IRegisterRelayer};
     use starknet_ibc_core::client::{
-        MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height,
-        CreateResponse, UpdateResponse, ClientErrors, ClientContract, ClientContractHandlerTrait
+        ClientContract, ClientContractHandlerTrait, ClientErrors, CreateResponse, Height,
+        MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient, UpdateResponse,
     };
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
-    use starknet_ibc_utils::governance::IBCGovernanceComponent::GovernanceInternalTrait;
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
+    use starknet_ibc_utils::governance::IBCGovernanceComponent::GovernanceInternalTrait;
 
     #[storage]
     pub struct Storage {
@@ -35,7 +35,7 @@ pub mod ClientHandlerComponent {
 
     #[generate_trait]
     pub impl ClientInitializerImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ClientInitializerTrait<TContractState> {
         fn initializer(ref self: ComponentState<TContractState>) {
             // NOTE: authorizing the contract's deployer as a relayer to
@@ -57,7 +57,7 @@ pub mod ClientHandlerComponent {
         impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>,
     > of IClientHandler<ComponentState<TContractState>> {
         fn create_client(
-            ref self: ComponentState<TContractState>, msg: MsgCreateClient
+            ref self: ComponentState<TContractState>, msg: MsgCreateClient,
         ) -> CreateResponse {
             let mut client = self.get_client(msg.client_type);
 
@@ -69,10 +69,10 @@ pub mod ClientHandlerComponent {
         }
 
         fn update_client(
-            ref self: ComponentState<TContractState>, msg: MsgUpdateClient
+            ref self: ComponentState<TContractState>, msg: MsgUpdateClient,
         ) -> UpdateResponse {
             assert(
-                self.in_allowed_relayers(get_caller_address()), ClientErrors::UNAUTHORIZED_RELAYER
+                self.in_allowed_relayers(get_caller_address()), ClientErrors::UNAUTHORIZED_RELAYER,
             );
 
             let mut client = self.get_client(msg.client_id.client_type);
@@ -111,15 +111,15 @@ pub mod ClientHandlerComponent {
 
     #[embeddable_as(CoreRegisterClient)]
     pub impl CoreRegisterClientImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of IRegisterClient<ComponentState<TContractState>> {
         fn register_client(
             ref self: ComponentState<TContractState>,
             client_type: felt252,
-            client_address: ContractAddress
+            client_address: ContractAddress,
         ) {
             assert(
-                self.in_allowed_relayers(get_caller_address()), ClientErrors::UNAUTHORIZED_RELAYER
+                self.in_allowed_relayers(get_caller_address()), ClientErrors::UNAUTHORIZED_RELAYER,
             );
 
             self.write_supported_client(client_type, client_address);
@@ -135,22 +135,23 @@ pub mod ClientHandlerComponent {
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
-        impl Governance: IBCGovernanceComponent::HasComponent<TContractState>
+        impl Governance: IBCGovernanceComponent::HasComponent<TContractState>,
     > of IRegisterRelayer<ComponentState<TContractState>> {
         fn register_relayer(
-            ref self: ComponentState<TContractState>, relayer_address: ContractAddress
+            ref self: ComponentState<TContractState>, relayer_address: ContractAddress,
         ) {
             assert(relayer_address.is_non_zero(), ClientErrors::ZERO_RELAYER_ADDRESS);
 
             assert(
-                !self.in_allowed_relayers(relayer_address), ClientErrors::RELAYER_ALREADY_REGISTERED
+                !self.in_allowed_relayers(relayer_address),
+                ClientErrors::RELAYER_ALREADY_REGISTERED,
             );
 
             let governor = get_dep_component!(@self, Governance).governor();
 
             assert(
                 governor.is_zero() || governor == get_caller_address(),
-                ClientErrors::INVALID_GOVERNOR
+                ClientErrors::INVALID_GOVERNOR,
             );
 
             self.write_allowed_relayer(relayer_address);
@@ -163,10 +164,10 @@ pub mod ClientHandlerComponent {
 
     #[generate_trait]
     pub(crate) impl ClientInternalImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ClientInternalTrait<TContractState> {
         fn get_client(
-            self: @ComponentState<TContractState>, client_type: felt252
+            self: @ComponentState<TContractState>, client_type: felt252,
         ) -> ClientContract {
             self.read_supported_client(client_type).into()
         }
@@ -178,10 +179,10 @@ pub mod ClientHandlerComponent {
 
     #[generate_trait]
     pub(crate) impl ClientReaderImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ClientReaderTrait<TContractState> {
         fn in_allowed_relayers(
-            self: @ComponentState<TContractState>, caller: ContractAddress
+            self: @ComponentState<TContractState>, caller: ContractAddress,
         ) -> bool {
             let mut allowed = false;
             let mut i = 0;
@@ -196,7 +197,7 @@ pub mod ClientHandlerComponent {
         }
 
         fn read_supported_client(
-            self: @ComponentState<TContractState>, client_type: felt252
+            self: @ComponentState<TContractState>, client_type: felt252,
         ) -> ContractAddress {
             let client_address = self.supported_clients.read(client_type);
 
@@ -208,10 +209,10 @@ pub mod ClientHandlerComponent {
 
     #[generate_trait]
     pub(crate) impl ClientWriterImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ClientWriterTrait<TContractState> {
         fn write_allowed_relayer(
-            ref self: ComponentState<TContractState>, relayer_address: ContractAddress
+            ref self: ComponentState<TContractState>, relayer_address: ContractAddress,
         ) {
             self.allowed_relayers.append().write(relayer_address);
         }
@@ -219,7 +220,7 @@ pub mod ClientHandlerComponent {
         fn write_supported_client(
             ref self: ComponentState<TContractState>,
             client_type: felt252,
-            client_address: ContractAddress
+            client_address: ContractAddress,
         ) {
             self.supported_clients.write(client_type, client_address);
         }
@@ -234,10 +235,10 @@ pub mod ClientHandlerComponent {
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
-        impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>
+        impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>,
     > of EventEmitterTrait<TContractState> {
         fn emit_create_client_event(
-            ref self: ComponentState<TContractState>, create_resp: CreateResponse
+            ref self: ComponentState<TContractState>, create_resp: CreateResponse,
         ) {
             let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
 
@@ -248,7 +249,7 @@ pub mod ClientHandlerComponent {
             ref self: ComponentState<TContractState>,
             client_id: ClientId,
             update_heights: Array<Height>,
-            client_message: Array<felt252>
+            client_message: Array<felt252>,
         ) {
             let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
 

@@ -38,7 +38,7 @@ pub fn apply_leaf(leaf_op: @LeafOp, key: KeyBytes, value: ValueBytes) -> [u32; 8
     compute_sha256_u32_array(bytes, last_word, last_word_len)
 }
 
-pub fn prepare_leaf_u32_array(prehash: @HashOp, length: @LengthOp, data: Array<u8>,) -> Array<u8> {
+pub fn prepare_leaf_u32_array(prehash: @HashOp, length: @LengthOp, data: Array<u8>) -> Array<u8> {
     assert(data.len() > 0, ICS23Errors::MISSING_LEAF_DATA);
     do_length(length, hash_u32_array(prehash, data))
 }
@@ -49,7 +49,7 @@ pub fn hash_u32_array(hash_op: @HashOp, data: Array<u8>) -> Array<u8> {
         HashOp::Sha256 => {
             let (bytes, last_word, last_word_len) = data.into_array_u32();
             compute_sha256_u32_array(bytes, last_word, last_word_len).into()
-        }
+        },
     }
 }
 
@@ -61,7 +61,7 @@ pub fn do_length(length_op: @LengthOp, data: Array<u8>) -> Array<u8> {
             let mut len = encode_varint_to_u8_array(data.len());
             len.append_span(data.span());
             len
-        }
+        },
     }
 }
 

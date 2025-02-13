@@ -49,7 +49,7 @@ pub impl ProtobufTagImpl of ProtobufTagTrait {
 
         let field_number: u8 = tag / 0x08;
 
-        ProtobufTag { field_number, wire_type, }
+        ProtobufTag { field_number, wire_type }
     }
 
     fn encode(self: ProtobufTag) -> u8 {

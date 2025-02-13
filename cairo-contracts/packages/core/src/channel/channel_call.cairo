@@ -1,9 +1,9 @@
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
-    IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, Packet, IChannelQueryDispatcher,
-    IChannelQueryDispatcherTrait, ChannelEnd
+    ChannelEnd, IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, IChannelQueryDispatcher,
+    IChannelQueryDispatcherTrait, Packet,
 };
-use starknet_ibc_core::host::{PortId, ChannelId, Sequence};
+use starknet_ibc_core::host::{ChannelId, PortId, Sequence};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct ChannelContract {
@@ -33,7 +33,7 @@ pub impl ChannelContractImpl of ChannelContractTrait {
     }
 
     fn next_sequence_send(
-        self: @ChannelContract, port_id: PortId, channel_id: ChannelId
+        self: @ChannelContract, port_id: PortId, channel_id: ChannelId,
     ) -> Sequence {
         IChannelQueryDispatcher { contract_address: *self.address }
             .next_sequence_send(port_id, channel_id)

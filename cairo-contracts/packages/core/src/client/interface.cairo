@@ -1,9 +1,9 @@
 use starknet::ContractAddress;
 use starknet_ibc_core::client::{
-    MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, Status,
-    CreateResponse, UpdateResponse, Timestamp,
+    CreateResponse, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient,
+    Status, Timestamp, UpdateResponse,
 };
-use starknet_ibc_core::commitment::{StateProof, StateValue, StateRoot};
+use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
 
 #[starknet::interface]
 pub trait IClientHandler<TContractState> {
@@ -19,7 +19,7 @@ pub trait IClientHandler<TContractState> {
 #[starknet::interface]
 pub trait IRegisterClient<TContractState> {
     fn register_client(
-        ref self: TContractState, client_type: felt252, client_address: ContractAddress
+        ref self: TContractState, client_type: felt252, client_address: ContractAddress,
     );
 }
 
@@ -48,11 +48,11 @@ pub trait IClientStateValidation<TContractState> {
     );
 
     fn verify_client_message(
-        self: @TContractState, client_sequence: u64, client_message: Array<felt252>
+        self: @TContractState, client_sequence: u64, client_message: Array<felt252>,
     );
 
     fn verify_misbehaviour(
-        self: @TContractState, client_sequence: u64, client_message: Array<felt252>
+        self: @TContractState, client_sequence: u64, client_message: Array<felt252>,
     ) -> bool;
 
     fn verify_substitute(self: @TContractState, substitute_client_state: Array<felt252>);
@@ -73,7 +73,7 @@ pub trait IClientStateExecution<TContractState> {
         ref self: TContractState,
         client_sequence: u64,
         client_state: Array<felt252>,
-        consensus_state: Array<felt252>
+        consensus_state: Array<felt252>,
     ) -> CreateResponse;
 
     fn update_state(
@@ -108,7 +108,7 @@ pub trait IClientQuery<TContractState> {
     /// Returns the latest update height that is less than or equal to the
     /// target height.
     fn update_height_before(
-        self: @TContractState, client_sequence: u64, target_height: Height
+        self: @TContractState, client_sequence: u64, target_height: Height,
     ) -> Height;
 
     fn latest_timestamp(self: @TContractState, client_sequence: u64) -> Timestamp;
@@ -118,10 +118,10 @@ pub trait IClientQuery<TContractState> {
     fn client_state(self: @TContractState, client_sequence: u64) -> Array<felt252>;
 
     fn consensus_state(
-        self: @TContractState, client_sequence: u64, height: Height
+        self: @TContractState, client_sequence: u64, height: Height,
     ) -> Array<felt252>;
 
     fn consensus_state_root(
-        self: @TContractState, client_sequence: u64, height: Height
+        self: @TContractState, client_sequence: u64, height: Height,
     ) -> StateRoot;
 }

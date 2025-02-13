@@ -3,8 +3,8 @@ pub mod ERC20Mintable {
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::ContractAddress;
-    use starknet_ibc_utils::mintable::ERC20MintableComponent::ERC20MintableInternalTrait;
     use starknet_ibc_utils::mintable::ERC20MintableComponent;
+    use starknet_ibc_utils::mintable::ERC20MintableComponent::ERC20MintableInternalTrait;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: ERC20MintableComponent, storage: mintable, event: MintableEvent);
@@ -52,7 +52,7 @@ pub mod ERC20Mintable {
         symbol: ByteArray,
         initial_supply: u256,
         recipient: ContractAddress,
-        owner: ContractAddress
+        owner: ContractAddress,
     ) {
         self.ownable.initializer(owner);
         self.mintable.initializer();

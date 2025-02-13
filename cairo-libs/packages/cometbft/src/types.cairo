@@ -1,11 +1,11 @@
 use protobuf::types::wkt::Timestamp;
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName
+    DecodeContextImpl, ProtoName,
 };
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{
-    I32AsProtoMessage, I64AsProtoMessage, BoolAsProtoMessage, U64AsProtoMessage
+    I32AsProtoMessage, I64AsProtoMessage, BoolAsProtoMessage, U64AsProtoMessage,
 };
 use protobuf::types::tag::WireType;
 

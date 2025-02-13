@@ -1,7 +1,7 @@
 use ics23::{
     Proof, ProofSpec, ProofSpecTrait, RootBytes, KeyBytes, ValueBytes, ICS23Errors,
     ExistenceProofImpl, NonExistenceProof, NonExistenceProofImpl, SliceU32IntoArrayU8,
-    ExistenceProof, LeafOp, HashOp, InnerOp
+    ExistenceProof, LeafOp, HashOp, InnerOp,
 };
 use protobuf::varint::decode_varint_from_u8_array;
 
@@ -35,7 +35,7 @@ pub fn verify_membership(
 }
 
 pub fn verify_non_membership(
-    specs: Array<ProofSpec>, proofs: @Array<Proof>, root: RootBytes, keys: Array<KeyBytes>
+    specs: Array<ProofSpec>, proofs: @Array<Proof>, root: RootBytes, keys: Array<KeyBytes>,
 ) {
     let proofs_len = proofs.len();
     assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
@@ -50,7 +50,7 @@ pub fn verify_non_membership(
             verify_non_existence(specs[i], p, @subroot, keys[proofs_len - 1 - i]);
 
             verify_membership(
-                specs.clone(), proofs, root, keys.clone(), subroot.into()
+                specs.clone(), proofs, root, keys.clone(), subroot.into(),
             ) // TODO: add start_index
         } else {
             panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
@@ -60,7 +60,7 @@ pub fn verify_non_membership(
 }
 
 pub fn verify_existence(
-    spec: @ProofSpec, proof: @ExistenceProof, root: @RootBytes, key: @KeyBytes, value: @ValueBytes
+    spec: @ProofSpec, proof: @ExistenceProof, root: @RootBytes, key: @KeyBytes, value: @ValueBytes,
 ) {
     check_existence_spec(spec, proof);
     assert(proof.key == key, ICS23Errors::MISMATCHED_KEY);
@@ -70,7 +70,7 @@ pub fn verify_existence(
 }
 
 pub fn verify_non_existence(
-    spec: @ProofSpec, proof: @NonExistenceProof, root: @RootBytes, key: @KeyBytes
+    spec: @ProofSpec, proof: @NonExistenceProof, root: @RootBytes, key: @KeyBytes,
 ) {}
 
 fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {
@@ -85,15 +85,14 @@ fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {
         assert(@inner_len <= spec.max_depth, ICS23Errors::INVALID_INNER_OP_SIZE);
     }
 
-    for i in 0
-        ..inner_len {
-            if spec.is_iavl() {
-                ensure_inner_prefix(
-                    proof.path.at(i).prefix, i.try_into().unwrap(), proof.path.at(i).hash
-                );
-            }
-            ensure_inner(proof.path.at(i), spec.clone());
+    for i in 0..inner_len {
+        if spec.is_iavl() {
+            ensure_inner_prefix(
+                proof.path.at(i).prefix, i.try_into().unwrap(), proof.path.at(i).hash,
+            );
         }
+        ensure_inner(proof.path.at(i), spec.clone());
+    }
 }
 
 fn ensure_leaf_prefix(prefix: Array<u8>) {
@@ -138,12 +137,12 @@ fn ensure_inner(inner: @InnerOp, spec: ProofSpec) {
     assert(inner_p_len >= inner_spec.min_prefix_length, ICS23Errors::INVALID_INNER_PREFIX_LEN);
     assert(
         inner_p_len <= inner_spec.max_prefix_length + max_left_child_bytes,
-        ICS23Errors::INVALID_INNER_PREFIX_LEN
+        ICS23Errors::INVALID_INNER_PREFIX_LEN,
     );
     assert(inner_spec.child_size > 0, ICS23Errors::ZERO_CHILD_SIZE);
     assert(
         inner_spec.min_prefix_length + inner_spec.child_size > inner_spec.max_prefix_length,
-        ICS23Errors::INVALID_INNER_PREFIX_LEN
+        ICS23Errors::INVALID_INNER_PREFIX_LEN,
     );
     assert(inner.suffix.len() % inner_spec.child_size == 0, ICS23Errors::INVALID_INNER_SUFFIX);
 }

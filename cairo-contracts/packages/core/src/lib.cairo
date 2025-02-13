@@ -22,10 +22,10 @@ pub mod commitment {
     mod utils;
 
     pub use types::{
-        Commitment, CommitmentZero, StateValue, StateValueZero, StateProof, StateProofZero,
-        StateRoot, StateRootZero, compute_packet_commitment, compute_ack_commitment,
+        Commitment, CommitmentZero, StateProof, StateProofZero, StateRoot, StateRootZero,
+        StateValue, StateValueZero, compute_ack_commitment, compute_packet_commitment,
     };
-    pub use utils::{U32Collector, U32CollectorImpl, U32CollectorTrait,};
+    pub use utils::{U32Collector, U32CollectorImpl, U32CollectorTrait};
 }
 pub mod connection {
     mod errors;
@@ -38,15 +38,15 @@ pub mod connection {
     pub use errors::ConnectionErrors;
     pub use interface::{
         IConnectionHandler, IConnectionHandlerDispatcher, IConnectionHandlerDispatcherTrait,
-        IConnectionQuery, IConnectionQueryDispatcher, IConnectionQueryDispatcherTrait
+        IConnectionQuery, IConnectionQueryDispatcher, IConnectionQueryDispatcherTrait,
     };
     pub use msgs::{
-        MsgConnOpenInit, MsgConnOpenInitImpl, MsgConnOpenInitTrait, MsgConnOpenTry,
-        MsgConnOpenTryImpl, MsgConnOpenTryTrait, MsgConnOpenAck, MsgConnOpenConfirm
+        MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenInitImpl,
+        MsgConnOpenInitTrait, MsgConnOpenTry, MsgConnOpenTryImpl, MsgConnOpenTryTrait,
     };
     pub use types::{
         ConnectionEnd, ConnectionEndImpl, ConnectionEndTrait, ConnectionState, Counterparty,
-        Version, VersionImpl, VersionTrait
+        Version, VersionImpl, VersionTrait,
     };
     mod components {
         pub mod events;
@@ -65,18 +65,18 @@ pub mod channel {
     pub use components::handler::ChannelHandlerComponent;
     pub use errors::ChannelErrors;
     pub use interface::{
-        IChannelHandler, IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, IAppCallback,
-        IAppCallbackDispatcher, IAppCallbackDispatcherTrait, IChannelQuery, IChannelQueryDispatcher,
-        IChannelQueryDispatcherTrait
+        IAppCallback, IAppCallbackDispatcher, IAppCallbackDispatcherTrait, IChannelHandler,
+        IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, IChannelQuery,
+        IChannelQueryDispatcher, IChannelQueryDispatcherTrait,
     };
     pub use msgs::{
-        MsgChanOpenInit, MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket,
-        MsgAckPacket, MsgTimeoutPacket
+        MsgAckPacket, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry,
+        MsgRecvPacket, MsgTimeoutPacket,
     };
     pub use types::{
-        Packet, PacketImpl, PacketTrait, ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelState,
-        ChannelOrdering, AppVersion, AppVersionZero, Counterparty, Acknowledgement, AckStatus,
-        AckStatusImpl, AckStatusTrait, Receipt, ReceiptImpl, ReceiptTrait
+        AckStatus, AckStatusImpl, AckStatusTrait, Acknowledgement, AppVersion, AppVersionZero,
+        ChannelEnd, ChannelEndImpl, ChannelEndTrait, ChannelOrdering, ChannelState, Counterparty,
+        Packet, PacketImpl, PacketTrait, Receipt, ReceiptImpl, ReceiptTrait,
     };
     mod components {
         pub mod events;
@@ -91,26 +91,26 @@ pub mod client {
     mod types;
 
     pub use client_call::{
-        ClientContract, ClientContractImpl, ClientContractTrait, ClientContractHandlerImpl,
-        ClientContractHandlerTrait
+        ClientContract, ClientContractHandlerImpl, ClientContractHandlerTrait, ClientContractImpl,
+        ClientContractTrait,
     };
     pub use components::events::ClientEventEmitterComponent;
     pub use components::handler::ClientHandlerComponent;
     pub use errors::ClientErrors;
     pub use interface::{
-        IClientHandler, IClientHandlerDispatcher, IClientHandlerDispatcherTrait,
+        IClientHandler, IClientHandlerDispatcher, IClientHandlerDispatcherTrait, IClientQuery,
+        IClientQueryDispatcher, IClientQueryDispatcherTrait, IClientStateExecution,
+        IClientStateExecutionDispatcher, IClientStateExecutionDispatcherTrait,
         IClientStateValidation, IClientStateValidationDispatcher,
-        IClientStateValidationDispatcherTrait, IClientStateExecution,
-        IClientStateExecutionDispatcher, IClientStateExecutionDispatcherTrait, IRegisterClient,
-        IRegisterClientDispatcher, IRegisterClientDispatcherTrait, IClientQuery,
-        IClientQueryDispatcher, IClientQueryDispatcherTrait, IRegisterRelayer,
-        IRegisterRelayerDispatcher, IRegisterRelayerDispatcherTrait
+        IClientStateValidationDispatcherTrait, IRegisterClient, IRegisterClientDispatcher,
+        IRegisterClientDispatcherTrait, IRegisterRelayer, IRegisterRelayerDispatcher,
+        IRegisterRelayerDispatcherTrait,
     };
     pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient};
     pub use types::{
-        CreateResponse, CreateResponseImpl, UpdateResponse, Status, StatusImpl, StatusTrait, Height,
-        HeightImpl, HeightTrait, HeightZero, HeightPartialOrd, HeightsIntoUpdateResponse,
-        StoreHeightArray, Timestamp, TimestampZero, TimestampPartialOrd, U64IntoTimestamp,
+        CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightTrait,
+        HeightZero, HeightsIntoUpdateResponse, Status, StatusImpl, StatusTrait, StoreHeightArray,
+        Timestamp, TimestampPartialOrd, TimestampZero, U64IntoTimestamp, UpdateResponse,
     };
     mod components {
         pub mod events;
@@ -126,22 +126,22 @@ pub mod host {
 
     pub use errors::HostErrors;
     pub use identifiers::{
-        ClientId, ClientIdImpl, ClientIdTrait, ClientIdZero, ConnectionId, ConnectionIdImpl,
-        ConnectionIdTrait, ConnectionIdZero, ChannelId, ChannelIdImpl, ChannelIdTrait,
-        ChannelIdZero, PortId, PortIdImpl, PortIdTrait, Sequence, SequenceImpl, SequenceTrait,
-        SequencePartialOrd, SequenceZero
+        ChannelId, ChannelIdImpl, ChannelIdTrait, ChannelIdZero, ClientId, ClientIdImpl,
+        ClientIdTrait, ClientIdZero, ConnectionId, ConnectionIdImpl, ConnectionIdTrait,
+        ConnectionIdZero, PortId, PortIdImpl, PortIdTrait, Sequence, SequenceImpl,
+        SequencePartialOrd, SequenceTrait, SequenceZero,
     };
     pub use keys::{
-        client_connection_key, connection_end_key, channel_end_key, commitment_key, receipt_key,
-        ack_key, next_sequence_recv_key, next_sequence_send_key, next_sequence_ack_key
+        ack_key, channel_end_key, client_connection_key, commitment_key, connection_end_key,
+        next_sequence_ack_key, next_sequence_recv_key, next_sequence_send_key, receipt_key,
     };
     pub use paths::{
-        connection_path, channel_end_path, commitment_path, receipt_path, ack_path,
-        next_sequence_recv_path
+        ack_path, channel_end_path, commitment_path, connection_path, next_sequence_recv_path,
+        receipt_path,
     };
     pub use prefixes::{
-        BasePrefix, BasePrefixZero, CLIENTS_PREFIX, CONNECTIONS_PREFIX, CHANNELS_PREFIX,
-        CHANNEL_ENDS_PREFIX, PORTS_PREFIX, SEQUENCES_PREFIX, COMMITMENTS_PREFIX, ACKS_PREFIX,
-        RECEIPTS_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX, NEXT_SEQ_ACK_PREFIX
+        ACKS_PREFIX, BasePrefix, BasePrefixZero, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX,
+        CLIENTS_PREFIX, COMMITMENTS_PREFIX, CONNECTIONS_PREFIX, NEXT_SEQ_ACK_PREFIX,
+        NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX, PORTS_PREFIX, RECEIPTS_PREFIX, SEQUENCES_PREFIX,
     };
 }

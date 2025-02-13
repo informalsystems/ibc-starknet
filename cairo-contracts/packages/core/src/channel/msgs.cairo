@@ -1,11 +1,11 @@
 use core::num::traits::Zero;
 use starknet_ibc_core::channel::{
-    Acknowledgement, Packet, ChannelErrors, ChannelOrdering, AppVersion
+    Acknowledgement, AppVersion, ChannelErrors, ChannelOrdering, Packet,
 };
 use starknet_ibc_core::client::{Height, HeightPartialOrd};
 use starknet_ibc_core::commitment::StateProof;
 use starknet_ibc_core::host::Sequence;
-use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId, PortIdTrait};
+use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId, PortIdTrait};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -34,7 +34,7 @@ pub struct MsgChanOpenTry {
     pub version_on_a: AppVersion,
     pub proof_chan_end_on_a: StateProof,
     pub proof_height_on_a: Height,
-    pub ordering: ChannelOrdering
+    pub ordering: ChannelOrdering,
 }
 
 pub impl MsgChanOpenTryValidateBasic of ValidateBasic<MsgChanOpenTry> {
@@ -56,7 +56,7 @@ pub struct MsgChanOpenAck {
     pub chan_id_on_b: ChannelId,
     pub version_on_b: AppVersion,
     pub proof_chan_end_on_b: StateProof,
-    pub proof_height_on_b: Height
+    pub proof_height_on_b: Height,
 }
 
 pub impl MsgChanOpenAckValidateBasic of ValidateBasic<MsgChanOpenAck> {
@@ -75,7 +75,7 @@ pub struct MsgChanOpenConfirm {
     pub port_id_on_b: PortId,
     pub chan_id_on_b: ChannelId,
     pub proof_chan_end_on_a: StateProof,
-    pub proof_height_on_a: Height
+    pub proof_height_on_a: Height,
 }
 
 pub impl MsgChanOpenConfirmValidateBasic of ValidateBasic<MsgChanOpenConfirm> {
@@ -106,7 +106,7 @@ pub struct MsgAckPacket {
     pub packet: Packet,
     pub acknowledgement: Acknowledgement,
     pub proof_ack_on_b: StateProof,
-    pub proof_height_on_b: Height
+    pub proof_height_on_b: Height,
 }
 
 impl MsgAcknowledgePacketValidateBasic of ValidateBasic<MsgAckPacket> {

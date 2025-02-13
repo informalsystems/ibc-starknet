@@ -19,7 +19,7 @@ pub impl CometClientStateImpl of CometClientStateTrait {
             && self.status.is_expired())
     }
 
-    fn deserialize(client_state: Array<felt252>,) -> CometClientState {
+    fn deserialize(client_state: Array<felt252>) -> CometClientState {
         let mut client_state_span = client_state.span();
 
         let maybe_client_state = Serde::<CometClientState>::deserialize(ref client_state_span);

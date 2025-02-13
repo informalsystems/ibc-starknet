@@ -1,8 +1,8 @@
 use starknet_ibc_core::host::{
-    CONNECTIONS_PREFIX, COMMITMENTS_PREFIX, RECEIPTS_PREFIX, ACKS_PREFIX, NEXT_SEQ_RECV_PREFIX,
-    PORTS_PREFIX, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, SEQUENCES_PREFIX
+    ACKS_PREFIX, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, COMMITMENTS_PREFIX, CONNECTIONS_PREFIX,
+    NEXT_SEQ_RECV_PREFIX, PORTS_PREFIX, RECEIPTS_PREFIX, SEQUENCES_PREFIX,
 };
-use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId, Sequence, BasePrefix};
+use starknet_ibc_core::host::{BasePrefix, ChannelId, ConnectionId, PortId, Sequence};
 use starknet_ibc_utils::{RemotePathBuilder, RemotePathBuilderImpl};
 
 pub fn connection_path(base: BasePrefix, connection_id: ConnectionId) -> ByteArray {
@@ -23,7 +23,7 @@ pub fn channel_end_path(base: BasePrefix, port_id: PortId, channel_id: ChannelId
 /// Constructs the commitment path of the counterparty chain for the given port
 /// ID, channel ID, and sequence.
 pub fn commitment_path(
-    base: BasePrefix, port_id: PortId, channel_id: ChannelId, sequence: Sequence
+    base: BasePrefix, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
 ) -> ByteArray {
     let mut builder = RemotePathBuilderImpl::init(base);
     append_prefix(ref builder, COMMITMENTS_PREFIX());
@@ -36,7 +36,7 @@ pub fn commitment_path(
 /// Constructs the receipt path of the counterparty chain for the given port ID,
 /// channel ID, and sequence.
 pub fn receipt_path(
-    base: BasePrefix, port_id: PortId, channel_id: ChannelId, sequence: Sequence
+    base: BasePrefix, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
 ) -> ByteArray {
     let mut builder = RemotePathBuilderImpl::init(base);
     append_prefix(ref builder, RECEIPTS_PREFIX());
@@ -49,7 +49,7 @@ pub fn receipt_path(
 /// Constructs the ack path of the counterparty chain for the given port ID,
 /// channel ID, and sequence.
 pub fn ack_path(
-    base: BasePrefix, port_id: PortId, channel_id: ChannelId, sequence: Sequence
+    base: BasePrefix, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
 ) -> ByteArray {
     let mut builder = RemotePathBuilderImpl::init(base);
     append_prefix(ref builder, ACKS_PREFIX());
@@ -61,7 +61,7 @@ pub fn ack_path(
 
 /// Constructs the next sequence send path for the given port ID and channel ID.
 pub fn next_sequence_recv_path(
-    base: BasePrefix, port_id: PortId, channel_id: ChannelId
+    base: BasePrefix, port_id: PortId, channel_id: ChannelId,
 ) -> ByteArray {
     let mut builder = RemotePathBuilderImpl::init(base);
     append_prefix(ref builder, NEXT_SEQ_RECV_PREFIX());
@@ -91,7 +91,7 @@ pub fn append_sequence(ref path_builder: RemotePathBuilder, sequence: Sequence) 
 
 #[cfg(test)]
 mod tests {
-    use starknet_ibc_core::host::{ChannelId, PortId, Sequence, BasePrefixZero};
+    use starknet_ibc_core::host::{BasePrefixZero, ChannelId, PortId, Sequence};
     use starknet_ibc_testkit::dummies::IBC_PREFIX;
     use starknet_ibc_utils::RemotePathBuilderImpl;
     use super::commitment_path;
@@ -103,7 +103,7 @@ mod tests {
         let sequence = Sequence { sequence: 0 };
 
         let path = commitment_path(
-            BasePrefixZero::zero(), port_id.clone(), channel_id.clone(), sequence.clone()
+            BasePrefixZero::zero(), port_id.clone(), channel_id.clone(), sequence.clone(),
         );
         assert_eq!(path, "commitments/ports/transfer/channels/channel-0/sequences/0");
 

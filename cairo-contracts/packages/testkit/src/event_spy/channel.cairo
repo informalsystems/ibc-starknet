@@ -2,12 +2,12 @@ use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
 use snforge_std::EventSpy;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::ChannelEventEmitterComponent::{
-    Event, ChanOpenInitEvent, ChanOpenTryEvent, ChanOpenAckEvent, ChanOpenConfirmEvent,
-    SendPacketEvent, ReceivePacketEvent, AcknowledgePacketEvent, TimeoutPacketEvent
+    AcknowledgePacketEvent, ChanOpenAckEvent, ChanOpenConfirmEvent, ChanOpenInitEvent,
+    ChanOpenTryEvent, Event, ReceivePacketEvent, SendPacketEvent, TimeoutPacketEvent,
 };
 use starknet_ibc_core::channel::{
-    MsgChanOpenInit, MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm, Packet, ChannelOrdering,
-    AppVersion
+    AppVersion, ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
+    MsgChanOpenTry, Packet,
 };
 use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId};
 
@@ -18,7 +18,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
         contract_address: ContractAddress,
         channel_id_on_a: ChannelId,
         version_on_a: AppVersion,
-        msg: MsgChanOpenInit
+        msg: MsgChanOpenInit,
     ) {
         let expected = Event::ChanOpenInitEvent(
             ChanOpenInitEvent {
@@ -27,7 +27,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
                 port_id_on_b: msg.port_id_on_b,
                 connection_id_on_a: msg.conn_id_on_a,
                 version_on_a,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -37,7 +37,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
         contract_address: ContractAddress,
         channel_id_on_b: ChannelId,
         version_on_b: AppVersion,
-        msg: MsgChanOpenTry
+        msg: MsgChanOpenTry,
     ) {
         let expected = Event::ChanOpenTryEvent(
             ChanOpenTryEvent {
@@ -47,7 +47,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
                 channel_id_on_a: msg.chan_id_on_a,
                 connection_id_on_b: msg.conn_id_on_b,
                 version_on_b,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -57,7 +57,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
         contract_address: ContractAddress,
         port_id_on_b: PortId,
         connection_id_on_a: ConnectionId,
-        msg: MsgChanOpenAck
+        msg: MsgChanOpenAck,
     ) {
         let expected = Event::ChanOpenAckEvent(
             ChanOpenAckEvent {
@@ -66,7 +66,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
                 port_id_on_b,
                 channel_id_on_b: msg.chan_id_on_b,
                 connection_id_on_a,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -77,7 +77,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
         port_id_on_a: PortId,
         channel_id_on_a: ChannelId,
         connection_id_on_b: ConnectionId,
-        msg: MsgChanOpenConfirm
+        msg: MsgChanOpenConfirm,
     ) {
         let expected = Event::ChanOpenConfirmEvent(
             ChanOpenConfirmEvent {
@@ -86,7 +86,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
                 port_id_on_a,
                 channel_id_on_a,
                 connection_id_on_b,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -108,7 +108,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
                 timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
                 channel_ordering,
                 packet_data: packet.data,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -130,7 +130,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
                 timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
                 channel_ordering,
                 packet_data: packet.data,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -151,7 +151,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
                 timeout_height_on_b: packet.timeout_height_on_b,
                 timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
                 channel_ordering,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -172,7 +172,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
                 timeout_height_on_b: packet.timeout_height_on_b,
                 timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
                 channel_ordering,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }

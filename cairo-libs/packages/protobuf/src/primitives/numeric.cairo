@@ -1,9 +1,10 @@
 use protobuf::types::message::{
-    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl, DecodeContextImpl
+    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    DecodeContextImpl,
 };
 use protobuf::types::tag::WireType;
 use protobuf::primitives::utils::{
-    encode_2_complement_64, decode_2_complement_64, encode_2_complement_32, decode_2_complement_32
+    encode_2_complement_64, decode_2_complement_64, encode_2_complement_32, decode_2_complement_32,
 };
 use protobuf::varint::{encode_varint_to_byte_array, decode_varint_from_byte_array};
 

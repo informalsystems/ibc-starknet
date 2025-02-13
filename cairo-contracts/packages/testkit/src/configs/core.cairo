@@ -1,12 +1,13 @@
 use starknet_ibc_apps::transfer::VERSION;
 use starknet_ibc_core::channel::{
-    ChannelOrdering, MsgChanOpenInit, MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm
+    ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry,
 };
 use starknet_ibc_core::connection::{
-    MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm, VersionImpl
+    MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry, VersionImpl,
 };
 use starknet_ibc_testkit::dummies::{
-    HEIGHT, CONNECTION_ID, CHANNEL_ID, PORT_ID, VERSION_PROPOSAL, STATE_PROOF, CLIENT_ID, IBC_PREFIX
+    CHANNEL_ID, CLIENT_ID, CONNECTION_ID, HEIGHT, IBC_PREFIX, PORT_ID, STATE_PROOF,
+    VERSION_PROPOSAL,
 };
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
 
@@ -29,7 +30,7 @@ pub impl CoreConfigImpl of CoreConfigTrait {
             // This represents channel sequence of counterparty chains. It's set to sufficiently
             // high value to prevent low values (especially 0 or 1) hiding ID misuse cases.
             chan_sequence_on_b: 10,
-            channel_ordering: ChannelOrdering::Unordered
+            channel_ordering: ChannelOrdering::Unordered,
         }
     }
 
@@ -90,7 +91,7 @@ pub impl CoreConfigImpl of CoreConfigTrait {
             conn_id_on_b: CONNECTION_ID(0),
             port_id_on_a: PORT_ID(),
             chan_id_on_a: CHANNEL_ID(
-                *self.chan_sequence_on_a
+                *self.chan_sequence_on_a,
             ), // Set to `*_on_a` since dummy messages are meant to be submitted to Starknet (source chain).
             version_on_a: VERSION(),
             proof_chan_end_on_a: STATE_PROOF(),
@@ -114,7 +115,7 @@ pub impl CoreConfigImpl of CoreConfigTrait {
         MsgChanOpenConfirm {
             port_id_on_b: PORT_ID(),
             chan_id_on_b: CHANNEL_ID(
-                *self.chan_sequence_on_a
+                *self.chan_sequence_on_a,
             ), // Set to `*_on_a` since dummy messages are meant to be submitted to Starknet (source chain).
             proof_chan_end_on_a: STATE_PROOF(),
             proof_height_on_a: HEIGHT(10),

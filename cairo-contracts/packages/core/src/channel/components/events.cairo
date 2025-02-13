@@ -1,8 +1,8 @@
 #[starknet::component]
 pub mod ChannelEventEmitterComponent {
-    use starknet_ibc_core::channel::{Packet, ChannelOrdering, AppVersion, Acknowledgement};
+    use starknet_ibc_core::channel::{Acknowledgement, AppVersion, ChannelOrdering, Packet};
     use starknet_ibc_core::client::{Height, Timestamp};
-    use starknet_ibc_core::host::{ConnectionId, PortId, ChannelId, Sequence};
+    use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId, Sequence};
 
     #[storage]
     pub struct Storage {}
@@ -179,7 +179,7 @@ pub mod ChannelEventEmitterComponent {
 
     #[generate_trait]
     pub impl ChannelEventEmitterImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ChannelEventEmitterTrait<TContractState> {
         fn emit_chan_open_init_event(
             ref self: ComponentState<TContractState>,
@@ -197,7 +197,7 @@ pub mod ChannelEventEmitterComponent {
                         port_id_on_b,
                         connection_id_on_a,
                         version_on_a,
-                    }
+                    },
                 );
         }
 
@@ -219,7 +219,7 @@ pub mod ChannelEventEmitterComponent {
                         channel_id_on_a,
                         connection_id_on_b,
                         version_on_b,
-                    }
+                    },
                 );
         }
 
@@ -239,7 +239,7 @@ pub mod ChannelEventEmitterComponent {
                         port_id_on_b,
                         channel_id_on_b,
                         connection_id_on_a,
-                    }
+                    },
                 );
         }
 
@@ -259,7 +259,7 @@ pub mod ChannelEventEmitterComponent {
                         port_id_on_a,
                         channel_id_on_a,
                         connection_id_on_b,
-                    }
+                    },
                 );
         }
 
@@ -278,7 +278,7 @@ pub mod ChannelEventEmitterComponent {
                         timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
                         channel_ordering: ordering,
                         packet_data: packet.data,
-                    }
+                    },
                 );
         }
 
@@ -297,7 +297,7 @@ pub mod ChannelEventEmitterComponent {
                         timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
                         channel_ordering: ordering,
                         packet_data: packet.data,
-                    }
+                    },
                 );
         }
 
@@ -316,7 +316,7 @@ pub mod ChannelEventEmitterComponent {
                         channel_id_on_b: packet.chan_id_on_b,
                         packet_data: packet.data,
                         acknowledgement: acknowledgement,
-                    }
+                    },
                 );
         }
 
@@ -334,7 +334,7 @@ pub mod ChannelEventEmitterComponent {
                         timeout_height_on_b: packet.timeout_height_on_b,
                         timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
                         channel_ordering: ordering,
-                    }
+                    },
                 );
         }
 
@@ -352,7 +352,7 @@ pub mod ChannelEventEmitterComponent {
                         timeout_height_on_b: packet.timeout_height_on_b,
                         timeout_timestamp_on_b: packet.timeout_timestamp_on_b,
                         channel_ordering: ordering,
-                    }
+                    },
                 );
         }
     }

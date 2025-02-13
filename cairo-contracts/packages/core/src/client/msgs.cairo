@@ -42,7 +42,7 @@ impl MsgRecoverClientValidateBasic of ValidateBasic<MsgRecoverClient> {
     fn validate_basic(self: @MsgRecoverClient) {
         assert(
             self.subject_client_id.client_type == self.substitute_client_id.client_type,
-            ClientErrors::INVALID_SUBSTITUTE_CLIENT_ID
+            ClientErrors::INVALID_SUBSTITUTE_CLIENT_ID,
         );
     }
 }

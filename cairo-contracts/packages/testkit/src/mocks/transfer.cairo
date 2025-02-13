@@ -4,11 +4,11 @@ pub mod MockTransferApp {
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::{ClassHash, ContractAddress, get_caller_address};
     use starknet_ibc_apps::transfer::ERC20Contract;
-    use starknet_ibc_apps::transfer::types::{PrefixedDenom, Memo, MsgTransfer};
+    use starknet_ibc_apps::transfer::types::{Memo, MsgTransfer, PrefixedDenom};
     use starknet_ibc_apps::transfer::{
-        TokenTransferComponent, TransferrableComponent, TransferErrors
+        TokenTransferComponent, TransferErrors, TransferrableComponent,
     };
-    use starknet_ibc_core::host::{PortId, ChannelId};
+    use starknet_ibc_core::host::{ChannelId, PortId};
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: TransferrableComponent, storage: transferrable, event: TransferrableEvent);
@@ -87,7 +87,7 @@ pub mod MockTransferApp {
         amount: u256,
         memo: Memo,
     ) {
-        self.transfer.escrow_validate(from_account, port_id, channel_id, denom, amount, memo,);
+        self.transfer.escrow_validate(from_account, port_id, channel_id, denom, amount, memo);
     }
 
     #[external(v0)]
@@ -99,7 +99,7 @@ pub mod MockTransferApp {
         denom: ERC20Contract,
         amount: u256,
     ) {
-        self.transfer.unescrow_validate(to_account, port_id, channel_id, denom, amount,);
+        self.transfer.unescrow_validate(to_account, port_id, channel_id, denom, amount);
     }
 
     #[external(v0)]

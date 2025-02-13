@@ -163,13 +163,11 @@ mod tests {
             ("hi", "aGk="),
             (
                 "The quick brown fox jumps over the lazy dog",
-                "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw=="
+                "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==",
             ),
         ];
 
-        for (
-            input, expected_encoded
-        ) in test_cases {
+        for (input, expected_encoded) in test_cases {
             let encoded = encode(@input);
             assert_eq!(encoded, expected_encoded, "Encoding failed for input: '{}'", input);
 

@@ -62,7 +62,7 @@ pub mod ConnectionEventEmitterComponent {
 
     #[generate_trait]
     pub impl ConnectionEventEmitterImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ConnectionEventEmitterTrait<TContractState> {
         fn emit_conn_open_init_event(
             ref self: ComponentState<TContractState>,
@@ -84,7 +84,7 @@ pub mod ConnectionEventEmitterComponent {
                 .emit(
                     ConnOpenTryEvent {
                         client_id_on_b, connection_id_on_b, client_id_on_a, connection_id_on_a,
-                    }
+                    },
                 );
         }
 
@@ -99,7 +99,7 @@ pub mod ConnectionEventEmitterComponent {
                 .emit(
                     ConnOpenAckEvent {
                         client_id_on_a, connection_id_on_a, client_id_on_b, connection_id_on_b,
-                    }
+                    },
                 );
         }
 
@@ -114,7 +114,7 @@ pub mod ConnectionEventEmitterComponent {
                 .emit(
                     ConnOpenConfirmEvent {
                         client_id_on_b, connection_id_on_b, client_id_on_a, connection_id_on_a,
-                    }
+                    },
                 );
         }
     }
