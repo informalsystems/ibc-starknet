@@ -38,6 +38,7 @@ use hermes_relayer_components::relay::traits::target::{DestinationTarget, Source
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
+use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
@@ -106,7 +107,7 @@ pub struct StarknetContractDb {
     #[serde(skip)]
     pub path: String,
     pub hash: HashMap<String, Felt>,
-    pub address: HashMap<String, Felt>,
+    pub address: HashMap<String, StarknetAddress>,
 }
 
 impl StarknetContractDb {
@@ -154,7 +155,7 @@ impl StarknetContractDb {
         key: &str,
         starknet_chain: &StarknetChain,
         data: T,
-    ) -> Result<Felt, Error>
+    ) -> Result<StarknetAddress, Error>
     where
         StarknetCairoEncoding: CanEncode<ViaCairo, T>,
     {
@@ -324,7 +325,7 @@ fn test_public_testnets() -> Result<(), Error> {
         //     let calldata = cairo_encoding.encode(&register_client)?;
 
         //     let call = Call {
-        //         to: ibc_core_address,
+        //         to: *ibc_core_address,
         //         selector: selector!("register_client"),
         //         calldata,
         //     };
@@ -475,7 +476,7 @@ fn test_public_testnets() -> Result<(), Error> {
         //     let register_call_data = cairo_encoding.encode(&register_app)?;
 
         //     let call = Call {
-        //         to: ibc_core_address,
+        //         to: *ibc_core_address,
         //         selector: selector!("bind_port_id"),
         //         calldata: register_call_data,
         //     };
@@ -543,7 +544,7 @@ fn test_public_testnets() -> Result<(), Error> {
             LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
                 wallet_starknet_b.signing_key,
             )),
-            wallet_starknet_b.account_address,
+            *wallet_starknet_b.account_address,
             starknet_chain.rpc_client.chain_id().await?,
             ExecutionEncoding::New,
         );
@@ -586,7 +587,7 @@ fn test_public_testnets() -> Result<(), Error> {
         // be relayed after the first token transfer.
         runtime.sleep(Duration::from_secs(60)).await;
 
-        let ics20_token_address: Felt = {
+        let ics20_token_address: StarknetAddress = {
             let ibc_prefixed_denom = PrefixedDenom {
                 trace_path: vec![TracePrefix {
                     port_id: ics20_port.to_string(),
@@ -698,7 +699,7 @@ fn test_public_testnets() -> Result<(), Error> {
 
         // send starknet erc20 token to cosmos
 
-        let erc20_token_address = &STARKNET_STRK;
+        let erc20_token_address = &STARKNET_STRK.into();
 
         info!("erc20 token address: {:?}", erc20_token_address);
 
