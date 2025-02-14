@@ -1,11 +1,11 @@
 #[starknet::contract]
 pub mod MockChannelHandler {
-    use starknet_ibc_core::channel::{ChannelHandlerComponent, ChannelEventEmitterComponent};
+    use starknet_ibc_core::channel::{ChannelEventEmitterComponent, ChannelHandlerComponent};
 
     component!(
         path: ChannelEventEmitterComponent,
         storage: channel_emitter,
-        event: ChannelEventEmitterEvent
+        event: ChannelEventEmitterEvent,
     );
     component!(path: ChannelHandlerComponent, storage: channel_handler, event: ChannelHandlerEvent);
 
@@ -14,7 +14,7 @@ pub mod MockChannelHandler {
         #[substorage(v0)]
         channel_emitter: ChannelEventEmitterComponent::Storage,
         #[substorage(v0)]
-        channel_handler: ChannelHandlerComponent::Storage
+        channel_handler: ChannelHandlerComponent::Storage,
     }
 
     #[event]
@@ -23,7 +23,7 @@ pub mod MockChannelHandler {
         #[flat]
         ChannelEventEmitterEvent: ChannelEventEmitterComponent::Event,
         #[flat]
-        ChannelHandlerEvent: ChannelHandlerComponent::Event
+        ChannelHandlerEvent: ChannelHandlerComponent::Event,
     }
 
     #[constructor]

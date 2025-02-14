@@ -1,11 +1,11 @@
 use protobuf::types::wkt::Timestamp;
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName
+    DecodeContextImpl, ProtoName,
 };
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{
-    UnsignedAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, BoolAsProtoMessage
+    I32AsProtoMessage, I64AsProtoMessage, BoolAsProtoMessage, U64AsProtoMessage,
 };
 use protobuf::types::tag::WireType;
 
@@ -166,26 +166,30 @@ pub enum BlockIdFlag {
     Nil,
 }
 
-impl BlockIdFlagIntoU64 of Into<BlockIdFlag, u64> {
-    fn into(self: BlockIdFlag) -> u64 {
+impl BlockIdFlagAsProtoMessage of ProtoMessage<BlockIdFlag> {
+    fn encode_raw(self: @BlockIdFlag, ref context: EncodeContext) {
         match self {
-            BlockIdFlag::Unknown => 0,
-            BlockIdFlag::Absent => 1,
-            BlockIdFlag::Commit => 2,
-            BlockIdFlag::Nil => 3,
+            BlockIdFlag::Unknown => 0_u32.encode_raw(ref context),
+            BlockIdFlag::Absent => 1_u32.encode_raw(ref context),
+            BlockIdFlag::Commit => 2_u32.encode_raw(ref context),
+            BlockIdFlag::Nil => 3_u32.encode_raw(ref context),
         }
     }
-}
 
-impl U64IntoBlockIdFlag of Into<u64, BlockIdFlag> {
-    fn into(self: u64) -> BlockIdFlag {
-        match self {
-            0 => BlockIdFlag::Unknown,
-            1 => BlockIdFlag::Absent,
-            2 => BlockIdFlag::Commit,
-            3 => BlockIdFlag::Nil,
-            _ => panic!("invalid BlockIdFlag"),
+    fn decode_raw(ref self: BlockIdFlag, ref context: DecodeContext) {
+        let mut var = Default::<u32>::default();
+        var.decode_raw(ref context);
+        match var {
+            0 => self = BlockIdFlag::Unknown,
+            1 => self = BlockIdFlag::Absent,
+            2 => self = BlockIdFlag::Commit,
+            3 => self = BlockIdFlag::Nil,
+            _ => panic!("invalid block Id flag"),
         }
+    }
+
+    fn wire_type() -> WireType {
+        WireType::Varint
     }
 }
 

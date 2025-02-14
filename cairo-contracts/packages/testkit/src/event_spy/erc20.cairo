@@ -10,7 +10,7 @@ pub impl ERC20EventSpyExtImpl of ERC20EventSpyExt {
         contract_address: ContractAddress,
         from: ContractAddress,
         to: ContractAddress,
-        value: u256
+        value: u256,
     ) {
         let expected = Event::Transfer(Transfer { from, to, value });
         self.assert_emitted_single(contract_address, expected);

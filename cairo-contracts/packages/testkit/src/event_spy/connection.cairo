@@ -2,7 +2,7 @@ use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
 use snforge_std::EventSpy;
 use starknet::ContractAddress;
 use starknet_ibc_core::connection::ConnectionEventEmitterComponent::{
-    Event, ConnOpenInitEvent, ConnOpenTryEvent, ConnOpenAckEvent, ConnOpenConfirmEvent
+    ConnOpenAckEvent, ConnOpenConfirmEvent, ConnOpenInitEvent, ConnOpenTryEvent, Event,
 };
 use starknet_ibc_core::host::{ClientId, ConnectionId};
 
@@ -16,7 +16,7 @@ pub impl ConnectionEventSpyExtImpl of ConnectionEventSpyExt {
         client_id_on_b: ClientId,
     ) {
         let expected = Event::ConnOpenInitEvent(
-            ConnOpenInitEvent { client_id_on_a, connection_id_on_a, client_id_on_b }
+            ConnOpenInitEvent { client_id_on_a, connection_id_on_a, client_id_on_b },
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -32,7 +32,7 @@ pub impl ConnectionEventSpyExtImpl of ConnectionEventSpyExt {
         let expected = Event::ConnOpenTryEvent(
             ConnOpenTryEvent {
                 client_id_on_b, connection_id_on_b, client_id_on_a, connection_id_on_a,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -48,7 +48,7 @@ pub impl ConnectionEventSpyExtImpl of ConnectionEventSpyExt {
         let expected = Event::ConnOpenAckEvent(
             ConnOpenAckEvent {
                 client_id_on_a, connection_id_on_a, client_id_on_b, connection_id_on_b,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }
@@ -64,7 +64,7 @@ pub impl ConnectionEventSpyExtImpl of ConnectionEventSpyExt {
         let expected = Event::ConnOpenConfirmEvent(
             ConnOpenConfirmEvent {
                 client_id_on_b, connection_id_on_b, client_id_on_a, connection_id_on_a,
-            }
+            },
         );
         self.assert_emitted_single(contract_address, expected);
     }

@@ -9,7 +9,8 @@ edition = { workspace = true }
 test = { workspace = true }
 
 [dependencies]
-protobuf = { path = "../protobuf" }
+protobuf = { workspace = true }
+ics23    = { workspace = true }
 
 [dev-dependencies]
 assert_macros = { workspace = true }

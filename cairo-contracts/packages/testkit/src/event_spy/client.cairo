@@ -2,7 +2,7 @@ use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
 use snforge_std::EventSpy;
 use starknet::ContractAddress;
 use starknet_ibc_core::client::ClientEventEmitterComponent::{
-    Event, CreateClientEvent, UpdateClientEvent
+    CreateClientEvent, Event, UpdateClientEvent,
 };
 use starknet_ibc_core::client::Height;
 use starknet_ibc_core::host::ClientId;
@@ -27,7 +27,7 @@ pub impl ClientEventSpyExtImpl of ClientEventSpyExt {
         header: Array<felt252>,
     ) {
         let expected = Event::UpdateClientEvent(
-            UpdateClientEvent { client_id, consensus_heights, header }
+            UpdateClientEvent { client_id, consensus_heights, header },
         );
         self.assert_emitted_single(contract_address, expected);
     }

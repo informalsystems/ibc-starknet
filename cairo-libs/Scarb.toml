@@ -3,6 +3,7 @@ members = [
   "packages/protobuf",
   "packages/cometbft",
   "packages/serde_json",
+  "packages/ics23",
 ]
 
 [workspace.package]
@@ -22,9 +23,14 @@ test = "snforge test"
 
 [workspace.dependencies]
 # external dependencies
-assert_macros = "2.9.2"
-starknet      = "2.9.2"
-snforge_std   = "0.34.0"
+alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "95d98a5" }
+assert_macros   = "2.9.2"
+starknet        = "2.9.2"
+snforge_std     = "0.34.0"
+
+# internal dependencies
+protobuf = { path = "packages/protobuf" }
+ics23    = { path = "packages/ics23" }
 
 [workspace.tool.fmt]
 sort-module-level-items = true

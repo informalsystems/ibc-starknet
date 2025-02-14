@@ -1,8 +1,9 @@
 use core::num::traits::Zero;
 use core::sha256::{compute_sha256_byte_array, compute_sha256_u32_array};
+use ics23::{IntoArrayU32, array_u32_into_array_u8};
 use starknet_ibc_core::channel::Acknowledgement;
 use starknet_ibc_core::client::{Height, Timestamp};
-use starknet_ibc_core::commitment::{U32CollectorImpl, IntoArrayU32, array_u32_into_array_u8};
+use starknet_ibc_core::commitment::U32CollectorImpl;
 
 // -----------------------------------------------------------
 // Commitment Value
@@ -43,13 +44,13 @@ pub impl CommitmentZero of Zero<Commitment> {
 
 pub impl CommitmentIntoStateValue of Into<Commitment, StateValue> {
     fn into(self: Commitment) -> StateValue {
-        let value = array_u32_into_array_u8(self.into());
+        let value = array_u32_into_array_u8(self.into(), 0, 0);
         StateValue { value }
     }
 }
 
 pub fn compute_packet_commitment(
-    json_packet_data: @ByteArray, timeout_height: Height, timeout_timestamp: Timestamp
+    json_packet_data: @ByteArray, timeout_height: Height, timeout_timestamp: Timestamp,
 ) -> Commitment {
     let mut coll = U32CollectorImpl::init();
     // ibc-go uses nanosecs
@@ -132,7 +133,7 @@ pub impl StateProofZero of Zero<StateProof> {
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct StateRoot {
-    pub root: ByteArray, // TODO: Determine the correct type (ByteArray or Array<u8>) once implemented membership proof verification.
+    pub root: ByteArray // TODO: Determine the correct type (ByteArray or Array<u8>) once implemented membership proof verification.
 }
 
 pub impl ByteArrayIntoRoot of Into<ByteArray, StateRoot> {

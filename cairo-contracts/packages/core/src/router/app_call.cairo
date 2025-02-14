@@ -1,9 +1,9 @@
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
-    IAppCallbackDispatcher, IAppCallbackDispatcherTrait, Packet, Acknowledgement, ChannelOrdering,
-    AppVersion
+    Acknowledgement, AppVersion, ChannelOrdering, IAppCallbackDispatcher,
+    IAppCallbackDispatcherTrait, Packet,
 };
-use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId};
+use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct AppContract {
@@ -31,11 +31,11 @@ pub impl AppContractImpl of AppContractTrait {
         conn_id_on_a: ConnectionId,
         port_id_on_b: PortId,
         version_proposal: AppVersion,
-        ordering: ChannelOrdering
+        ordering: ChannelOrdering,
     ) -> AppVersion {
         IAppCallbackDispatcher { contract_address: *self.address }
             .on_chan_open_init(
-                port_id_on_a, chan_id_on_a, conn_id_on_a, port_id_on_b, version_proposal, ordering
+                port_id_on_a, chan_id_on_a, conn_id_on_a, port_id_on_b, version_proposal, ordering,
             )
     }
 
@@ -46,11 +46,11 @@ pub impl AppContractImpl of AppContractTrait {
         conn_id_on_b: ConnectionId,
         port_id_on_a: PortId,
         version_on_a: AppVersion,
-        ordering: ChannelOrdering
+        ordering: ChannelOrdering,
     ) -> AppVersion {
         IAppCallbackDispatcher { contract_address: *self.address }
             .on_chan_open_try(
-                port_id_on_b, chan_id_on_b, conn_id_on_b, port_id_on_a, version_on_a, ordering
+                port_id_on_b, chan_id_on_b, conn_id_on_b, port_id_on_a, version_on_a, ordering,
             )
     }
 
