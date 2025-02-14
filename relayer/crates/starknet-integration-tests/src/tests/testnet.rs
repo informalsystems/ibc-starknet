@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 use core::time::Duration;
 use std::collections::HashMap;
+use std::ops::{Deref, DerefMut};
 
 use cgp::core::field::Index;
 use cgp::extra::run::CanRun;
@@ -24,8 +25,7 @@ use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_test_components::chain::impls::transfer::amount::derive_ibc_denom;
 use hermes_cosmos_test_components::chain::types::amount::Amount;
-use hermes_cosmos_test_components::chain::types::denom::Denom as HermesDenom;
-use hermes_cosmos_test_components::chain::types::denom::Denom as IbcDenom;
+use hermes_cosmos_test_components::chain::types::denom::{Denom as HermesDenom, Denom as IbcDenom};
 use hermes_cosmos_test_components::chain::types::wallet::CosmosTestWallet;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -47,8 +47,9 @@ use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContrac
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
-use hermes_starknet_chain_components::types::messages::ibc::denom::TracePrefix;
-use hermes_starknet_chain_components::types::messages::ibc::denom::{Denom, PrefixedDenom};
+use hermes_starknet_chain_components::types::messages::ibc::denom::{
+    Denom, PrefixedDenom, TracePrefix,
+};
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::MsgTransfer;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
@@ -64,13 +65,11 @@ use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use hex::FromHex;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
-use ibc::core::host::types::identifiers::PortId;
-use ibc::core::host::types::identifiers::{ChannelId, ConnectionId, PortId as IbcPortId};
+use ibc::core::host::types::identifiers::{ChannelId, ConnectionId, PortId, PortId as IbcPortId};
 use ibc::core::primitives::Timestamp;
 use poseidon::Poseidon3Hasher;
 use serde::{Deserialize, Serialize};
-use starknet::accounts::Account;
-use starknet::accounts::{Call, ExecutionEncoding, SingleOwnerAccount};
+use starknet::accounts::{Account, Call, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::{Felt, U256};
 use starknet::macros::{selector, short_string};
 use starknet::providers::Provider;
@@ -104,25 +103,71 @@ pub struct RelayerConfig {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StarknetContractDb {
-    #[serde(skip)]
-    pub path: String,
     pub hash: HashMap<String, Felt>,
     pub address: HashMap<String, StarknetAddress>,
 }
 
+pub struct ConfigDumper<T>
+where
+    T: Serialize + for<'a> Deserialize<'a>,
+{
+    pub path: String,
+    pub config: T,
+}
+
+impl<T> Drop for ConfigDumper<T>
+where
+    T: Serialize + for<'a> Deserialize<'a>,
+{
+    fn drop(&mut self) {
+        match toml::to_string_pretty(&self.config) {
+            Ok(value_str) => match std::fs::write(&self.path, &value_str) {
+                Ok(_) => info!("wrote config to file: {}", self.path),
+                Err(e) => {
+                    eprintln!("failed to write config to file: {:?}", e);
+                    eprintln!("config: {}", value_str);
+                }
+            },
+            Err(e) => eprintln!("failed to serialize: {:?}", e),
+        }
+    }
+}
+
+impl<T> ConfigDumper<T>
+where
+    T: Serialize + for<'a> Deserialize<'a>,
+{
+    pub fn new(path: &str) -> Result<Self, Error> {
+        let config = toml::from_str(&std::fs::read_to_string(path)?)?;
+
+        Ok(Self {
+            path: path.to_string(),
+            config,
+        })
+    }
+}
+
+impl<T> Deref for ConfigDumper<T>
+where
+    T: Serialize + for<'a> Deserialize<'a>,
+{
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.config
+    }
+}
+
+impl<T> DerefMut for ConfigDumper<T>
+where
+    T: Serialize + for<'a> Deserialize<'a>,
+{
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.config
+    }
+}
+
 impl StarknetContractDb {
-    pub fn load(path: &str) -> Result<Self, Error> {
-        let mut value: Self = toml::from_str(&std::fs::read_to_string(path)?)?;
-
-        value.path = path.to_string();
-
-        Ok(value)
-    }
-
-    pub fn write(&self) -> Result<(), Error> {
-        Ok(std::fs::write(&self.path, toml::to_string_pretty(self)?)?)
-    }
-
     pub async fn get_hash(
         &mut self,
         key: &str,
@@ -143,8 +188,6 @@ impl StarknetContractDb {
             info!("declared {} class: {:?}", key, class_hash);
 
             self.hash.insert(key.to_string(), class_hash);
-
-            self.write()?;
         }
 
         Ok(self.hash[key])
@@ -174,8 +217,6 @@ impl StarknetContractDb {
             );
 
             self.address.insert(key.to_string(), address);
-
-            self.write()?;
         }
 
         Ok(self.address[key])
@@ -267,7 +308,7 @@ fn test_public_testnets() -> Result<(), Error> {
             "6be4d4cbb85ea2d7e0b17b7053e613af11e041617bdb163107dfd29f706318ef",
         )?;
 
-        let mut starknet_contract_db = StarknetContractDb::load(concat!(
+        let mut starknet_contract_db = ConfigDumper::<StarknetContractDb>::new(concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/../../../starknet_db.toml"
         ))?;
