@@ -15,7 +15,7 @@ fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
     let root = byte_array_to_slice_u32(decode_hex_byte_array(data.root));
     let key = decode_hex_byte_array(data.key).into();
     let value = decode_hex_byte_array(data.value).into();
-    let p = ProtoCodecImpl::decode::<CommitmentProof>(@decode_hex_byte_array(data.proof));
+    let p = ProtoCodecImpl::decode::<CommitmentProof>(@decode_hex_byte_array(data.proof)).unwrap();
     match p.proof {
         Proof::Exist(p) => { verify_existence(spec, @p, @root, @key, @value); },
         Proof::NonExist(p) => {
@@ -42,6 +42,11 @@ fn test_vector_iavl_right() {
 fn test_vector_iavl_middle() {
     decode_and_verify(@iavl_exist_middle(), @iavl_spec());
 }
+
+// #[test]
+// fn test_vector_iavl_left_non() {
+//     decode_and_verify(@iavl_nonexist_left(), @iavl_spec());
+// }
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L501
 #[test]
