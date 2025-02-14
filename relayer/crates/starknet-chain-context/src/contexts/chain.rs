@@ -137,6 +137,7 @@ use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::proof_signer::GetStarknetProofSignerField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
+use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
     HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeComponent,
@@ -198,8 +199,8 @@ pub struct StarknetChain {
     pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
-    pub ibc_client_contract_address: Option<Felt>,
-    pub ibc_core_contract_address: Option<Felt>,
+    pub ibc_client_contract_address: Option<StarknetAddress>,
+    pub ibc_core_contract_address: Option<StarknetAddress>,
     pub event_encoding: StarknetEventEncoding,
     pub event_subscription: Option<Arc<dyn Subscription<Item = (u64, StarknetEvent)>>>,
     // FIXME: only needed for demo2
@@ -322,7 +323,7 @@ pub trait CanUseStarknetChain:
     + HasDefaultEncoding<AsBytes, Encoding = StarknetProtobufEncoding>
     + HasDefaultEncoding<AsFelt, Encoding = StarknetCairoEncoding>
     + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
-    + HasAddressType<Address = Felt>
+    + HasAddressType<Address = StarknetAddress>
     + HasChainId<ChainId = ChainId>
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>

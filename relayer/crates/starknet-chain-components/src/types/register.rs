@@ -7,12 +7,13 @@ use hermes_encoding_components::traits::transform::Transformer;
 use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use starknet::core::types::Felt;
 
+use crate::impls::types::address::StarknetAddress;
 use crate::types::messages::ibc::channel::PortId;
 
 #[derive(HasField)]
 pub struct MsgRegisterClient {
     pub client_type: Felt,
-    pub contract_address: Felt,
+    pub contract_address: StarknetAddress,
 }
 
 pub struct EncodeRegisterClient;
@@ -30,7 +31,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeRegisterClient {
-    type From = Product![Felt, Felt];
+    type From = Product![Felt, StarknetAddress];
     type To = MsgRegisterClient;
 
     fn transform(product![client_type, contract_address]: Self::From) -> MsgRegisterClient {
@@ -44,7 +45,7 @@ impl Transformer for EncodeRegisterClient {
 #[derive(HasField)]
 pub struct MsgRegisterApp {
     pub port_id: PortId,
-    pub contract_address: Felt,
+    pub contract_address: StarknetAddress,
 }
 
 pub struct EncodeRegisterApp;
@@ -62,7 +63,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeRegisterApp {
-    type From = Product![PortId, Felt];
+    type From = Product![PortId, StarknetAddress];
     type To = MsgRegisterApp;
 
     fn transform(product![port_id, contract_address]: Self::From) -> MsgRegisterApp {

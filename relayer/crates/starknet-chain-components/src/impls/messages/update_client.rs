@@ -17,6 +17,7 @@ use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
+use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::client_id::ClientId;
@@ -29,7 +30,7 @@ impl<Chain, Counterparty, Encoding> UpdateClientMessageBuilder<Chain, Counterpar
 where
     Chain: HasCreateClientMessageOptionsType<Counterparty>
         + HasMessageType<Message = StarknetMessage>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + HasClientIdType<Counterparty, ClientId = ClientId>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
@@ -63,7 +64,7 @@ where
                 .map_err(Chain::raise_error)?;
 
             let call = Call {
-                to: contract_address,
+                to: *contract_address,
                 selector: selector!("update_client"),
                 calldata,
             };
