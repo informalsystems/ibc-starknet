@@ -435,7 +435,7 @@ fn test_public_testnets() -> Result<(), Error> {
         //     .await?;
 
         let (starknet_connection_id, cosmos_connection_id) =
-            (ConnectionId::new(0), ConnectionId::new(3827));
+            (ConnectionId::new(0), ConnectionId::new(3840));
 
         let starknet_connection_end = CanQueryConnectionEnd::<CosmosChain>::query_connection_end(
             &starknet_chain,
@@ -498,7 +498,7 @@ fn test_public_testnets() -> Result<(), Error> {
         //     )
         //     .await?;
 
-        let (starknet_channel_id, cosmos_channel_id) = (ChannelId::new(0), ChannelId::new(10097));
+        let (starknet_channel_id, cosmos_channel_id) = (ChannelId::new(0), ChannelId::new(10125));
 
         let starknet_channel_end = CanQueryChannelEnd::<CosmosChain>::query_channel_end(
             &starknet_chain,

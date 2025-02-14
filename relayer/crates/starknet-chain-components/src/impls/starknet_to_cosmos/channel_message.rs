@@ -78,7 +78,8 @@ where
             remote,
             // FIXME: this was wrong
             // hardcoded for now, as we don't have access to the connection_id at cosmos
-            connection_hops: vec![ConnectionId::new(3827)],
+            // latest unused connection_id on osmosis
+            connection_hops: vec![ConnectionId::new(3840)],
             version: starknet_channel_end.version.clone(),
         };
 
