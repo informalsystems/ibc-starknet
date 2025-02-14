@@ -9,10 +9,7 @@ repository    = { workspace = true }
 license       = { workspace = true }
 Readme        = { workspace = true }
 keywords      = { workspace = true }
-
-description = """
-    Contains the implementation of ICS-23 vector commitments in Cairo.
-"""
+description   = "Cairo implementation of ICS-23 vector commitments"
 
 [lib]
 
