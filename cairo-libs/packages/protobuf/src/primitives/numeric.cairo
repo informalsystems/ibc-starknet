@@ -1,6 +1,6 @@
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl,
+    DecodeContextImpl, decode_raw,
 };
 use protobuf::types::tag::WireType;
 use protobuf::primitives::utils::{
@@ -16,8 +16,8 @@ pub impl U64AsProtoMessage of ProtoMessage<u64> {
         context.buffer.append(@bytes);
     }
 
-    fn decode_raw(ref self: u64, ref context: DecodeContext) {
-        self = decode_varint_from_byte_array(context.buffer, ref context.index).try_into().unwrap()
+    fn decode_raw(ref context: DecodeContext) -> Option<u64> {
+        decode_varint_from_byte_array(context.buffer, ref context.index).ok()
     }
 
     fn wire_type() -> WireType {
@@ -33,8 +33,18 @@ pub impl U32AsProtoMessage of ProtoMessage<u32> {
         context.buffer.append(@bytes);
     }
 
-    fn decode_raw(ref self: u32, ref context: DecodeContext) {
-        self = decode_varint_from_byte_array(context.buffer, ref context.index).try_into().unwrap()
+    fn decode_raw(ref context: DecodeContext) -> Option<u32> {
+        let varint = decode_varint_from_byte_array(context.buffer, ref context.index);
+        if let Result::Ok(v_u64) = varint {
+            let v_u32 = v_u64.try_into();
+            if let Option::Some(_) = v_u32 {
+                return v_u32;
+            } else {
+                return Option::None;
+            }
+        } else {
+            return Option::None;
+        }
     }
 
     fn wire_type() -> WireType {
@@ -48,10 +58,13 @@ pub impl I32AsProtoMessage of ProtoMessage<i32> {
         num.encode_raw(ref context);
     }
 
-    fn decode_raw(ref self: i32, ref context: DecodeContext) {
-        let mut num: u32 = 0;
-        num.decode_raw(ref context);
-        self = decode_2_complement_32(@num)
+    fn decode_raw(ref context: DecodeContext) -> Option<i32> {
+        let num: Option<u32> = decode_raw(ref context);
+        if let Option::Some(n) = num {
+            return Option::Some(decode_2_complement_32(@n));
+        } else {
+            return Option::None;
+        }
     }
 
     fn wire_type() -> WireType {
@@ -65,10 +78,13 @@ pub impl I64AsProtoMessage of ProtoMessage<i64> {
         num.encode_raw(ref context);
     }
 
-    fn decode_raw(ref self: i64, ref context: DecodeContext) {
-        let mut num: u64 = 0;
-        num.decode_raw(ref context);
-        self = decode_2_complement_64(@num)
+    fn decode_raw(ref context: DecodeContext) -> Option<i64> {
+        let num: Option<u64> = decode_raw(ref context);
+        if let Option::Some(n) = num {
+            return Option::Some(decode_2_complement_64(@n));
+        } else {
+            return Option::None;
+        }
     }
 
     fn wire_type() -> WireType {
@@ -86,13 +102,16 @@ pub impl BoolAsProtoMessage of ProtoMessage<bool> {
         num.encode_raw(ref context);
     }
 
-    fn decode_raw(ref self: bool, ref context: DecodeContext) {
-        let mut num: u64 = 0;
-        num.decode_raw(ref context);
-        if num != 0 && num != 1 {
-            panic!("invalid boolean value");
+    fn decode_raw(ref context: DecodeContext) -> Option<bool> {
+        let num: Option<u64> = decode_raw(ref context);
+        if let Option::Some(n) = num {
+            if n != 0 && n != 1 {
+                return Option::None;
+            }
+            return Option::Some(n == 1);
+        } else {
+            return Option::None;
         }
-        self = num == 1
     }
 
     fn wire_type() -> WireType {
