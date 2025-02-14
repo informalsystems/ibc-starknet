@@ -160,7 +160,6 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             ibc_client_contract_address: None,
             ibc_core_contract_address: None,
             event_encoding: Default::default(),
-            event_subscription: None,
             proof_signer,
         };
 

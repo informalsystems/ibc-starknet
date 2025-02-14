@@ -5,7 +5,6 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
 use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_async_runtime_components::subscription::traits::subscription::Subscription;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_type_components::traits::fields::chain_id::HasChainId;
@@ -34,7 +33,6 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
-use hermes_relayer_components::chain::traits::event_subscription::EventSubscriptionGetter;
 use hermes_relayer_components::chain::traits::extract_data::{
     CanExtractFromEvent, CanExtractFromMessageResponse,
 };
@@ -71,6 +69,7 @@ use hermes_relayer_components::chain::traits::payload_builders::create_client::C
 use hermes_relayer_components::chain::traits::payload_builders::receive_packet::CanBuildReceivePacketPayload;
 use hermes_relayer_components::chain::traits::payload_builders::timeout_unordered_packet::CanBuildTimeoutUnorderedPacketPayload;
 use hermes_relayer_components::chain::traits::payload_builders::update_client::CanBuildUpdateClientPayload;
+use hermes_relayer_components::chain::traits::queries::block_events::CanQueryBlockEvents;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
 };
@@ -141,7 +140,6 @@ use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetTo
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::proof_signer::GetStarknetProofSignerField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
-use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
 use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
     HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeComponent,
@@ -158,7 +156,6 @@ use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
 use hermes_starknet_chain_components::traits::queries::address::CanQueryContractAddress;
-use hermes_starknet_chain_components::traits::queries::block_events::CanQueryBlockEvents;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
@@ -206,7 +203,6 @@ pub struct StarknetChain {
     pub ibc_client_contract_address: Option<Felt>,
     pub ibc_core_contract_address: Option<Felt>,
     pub event_encoding: StarknetEventEncoding,
-    pub event_subscription: Option<Arc<dyn Subscription<Item = (u64, StarknetEvent)>>>,
     // FIXME: only needed for demo2
     pub proof_signer: Secp256k1KeyPair,
 }
@@ -317,14 +313,6 @@ impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
     }
 }
 
-impl EventSubscriptionGetter<StarknetChain> for StarknetChainContextComponents {
-    fn event_subscription(
-        chain: &StarknetChain,
-    ) -> Option<&Arc<dyn Subscription<Item = (u64, StarknetEvent)>>> {
-        chain.event_subscription.as_ref()
-    }
-}
-
 pub trait CanUseStarknetChain:
     HasRuntime
     + HasLogger
@@ -366,7 +354,6 @@ pub trait CanUseStarknetChain:
     + CanQueryChainStatus
     + CanQueryChainHeight
     + CanQueryBlockEvents
-    + CanCreateStarknetEventSubscription
     + CanSendMessages
     + CanSendSingleMessage
     + CanSubmitTx
@@ -442,7 +429,6 @@ pub trait CanUseStarknetChain:
     + HasSequenceType<CosmosChain, Sequence = Sequence>
     + CanQueryBalance
     + HasMemoType
-    + CanCreateStarknetEventSubscription
     + HasCreateClientEvent<CosmosChain, CreateClientEvent = StarknetCreateClientEvent>
     + HasSendPacketEvent<CosmosChain>
     + HasWriteAckEvent<CosmosChain, WriteAckEvent = WriteAcknowledgementEvent>

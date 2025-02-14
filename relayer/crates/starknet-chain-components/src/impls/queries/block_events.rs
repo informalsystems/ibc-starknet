@@ -1,12 +1,16 @@
+use core::marker::PhantomData;
+
 use cgp::prelude::*;
+use hermes_chain_components::traits::queries::block_events::BlockEventsQuerier;
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_cosmos_chain_components::components::client::BlockEventsQuerierComponent;
 use starknet::core::types::{BlockId, EventFilter, Felt};
 use starknet::providers::{Provider, ProviderError};
 
 use crate::traits::provider::HasStarknetProvider;
-use crate::traits::queries::block_events::{BlockEventsQuerier, BlockEventsQuerierComponent};
+use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::event::StarknetEvent;
 
 pub struct GetStarknetBlockEvents;
@@ -17,22 +21,23 @@ where
     Chain: HasHeightType<Height = u64>
         + HasEventType<Event = StarknetEvent>
         + HasAddressType<Address = Felt>
+        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasStarknetProvider
         + CanRaiseAsyncError<ProviderError>,
 {
     async fn query_block_events(
         chain: &Chain,
         height: &u64,
-        address: &Felt,
     ) -> Result<Vec<StarknetEvent>, Chain::Error> {
         let provider = chain.provider();
+        let address = chain.query_contract_address(PhantomData).await?;
 
         let raw_events = provider
             .get_events(
                 EventFilter {
                     from_block: Some(BlockId::Number(*height)),
                     to_block: Some(BlockId::Number(*height)),
-                    address: Some(*address),
+                    address: Some(address),
                     keys: None,
                 },
                 None,

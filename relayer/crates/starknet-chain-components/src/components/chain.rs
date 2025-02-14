@@ -4,6 +4,9 @@ use cgp::prelude::*;
 use hermes_chain_components::impls::payload_builders::channel::BuildChannelHandshakePayload;
 use hermes_chain_components::impls::payload_builders::connection::BuildConnectionHandshakePayload;
 use hermes_chain_components::impls::payload_builders::packet::BuildPacketPayloads;
+use hermes_chain_components::impls::queries::block_events::{
+    RetryQueryBlockEvents, WaitBlockHeightAndQueryEvents,
+};
 use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
 use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
 use hermes_chain_components::impls::types::ack::ProvideBytesAcknowlegement;
@@ -78,7 +81,7 @@ use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayl
 use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
 use crate::impls::queries::ack_packets::QueryStarknetAckPackets;
 use crate::impls::queries::balance::QueryStarknetWalletBalance;
-use crate::impls::queries::block_events::default::DefaultQueryBlockEvents;
+use crate::impls::queries::block_events::GetStarknetBlockEvents;
 use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
 use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
@@ -121,7 +124,6 @@ pub use crate::traits::contract::invoke::ContractInvokerComponent;
 pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
 pub use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
 pub use crate::traits::queries::address::ContractAddressQuerierComponent;
-use crate::traits::queries::block_events::BlockEventsQuerierComponent;
 pub use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
 pub use crate::traits::transfer::TokenTransferComponent;
 pub use crate::traits::types::blob::BlobTypeComponent;
@@ -241,7 +243,11 @@ cgp_preset! {
         ChainStatusQuerierComponent:
             QueryStarknetChainStatus,
         BlockEventsQuerierComponent:
-            DefaultQueryBlockEvents,
+            RetryQueryBlockEvents<
+                5,
+                WaitBlockHeightAndQueryEvents<
+                    GetStarknetBlockEvents
+                >>,
         MessageSenderComponent:
             SendCallMessages,
         TxSubmitterComponent:
