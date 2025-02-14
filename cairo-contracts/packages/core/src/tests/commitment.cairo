@@ -7,7 +7,8 @@ use starknet_ibc_testkit::dummies::{ERC20, PACKET_COMMITMENT_ON_SN};
 fn test_compute_packet_commitment() {
     let commitment = PACKET_COMMITMENT_ON_SN(ERC20());
     let expected: [u32; 8] = [
-        3066915652, 3854894583, 2733453543, 2666376403, 1143720361, 1661963047, 2055864332, 3822377424
+        3066915652, 3854894583, 2733453543, 2666376403, 1143720361, 1661963047, 2055864332,
+        3822377424,
     ];
     assert_eq!(commitment, expected.into());
 }

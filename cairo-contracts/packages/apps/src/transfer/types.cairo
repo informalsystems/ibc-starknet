@@ -239,9 +239,7 @@ pub impl ParticipantImpl of ParticipantTrait {
 
     fn as_byte_array(self: @Participant) -> ByteArray {
         match self {
-            Participant::Native(contract_address) => {
-                format!("0x{:x}", *contract_address)
-            },
+            Participant::Native(contract_address) => { format!("0x{:x}", *contract_address) },
             Participant::External(byte_array) => byte_array.clone(),
         }
     }
