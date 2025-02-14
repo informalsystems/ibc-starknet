@@ -15,6 +15,7 @@ pub use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use ibc::core::host::types::identifiers::ChainId;
 use starknet::core::types::U256;
 
+use crate::impls::types::address::{EncodeStarknetAddress, StarknetAddress};
 use crate::types::channel_id::{
     ChannelCounterparty, ChannelEnd, ChannelId, ChannelState, EncodeChannelCounterparty,
     EncodeChannelEnd, EncodeChannelId, EncodeChannelState,
@@ -116,6 +117,7 @@ delegate_components! {
         (ViaCairo, MsgTransfer): EncodeMsgTransfer,
         (ViaCairo, Height): EncodeHeight,
         (ViaCairo, Timestamp): EncodeTimestamp,
+        (ViaCairo, StarknetAddress): EncodeStarknetAddress,
         (ViaCairo, Packet): EncodePacket,
         (ViaCairo, StateProof): EncodeStateProof,
         (ViaCairo, MsgRecvPacket): EncodeMsgRecvPacket,

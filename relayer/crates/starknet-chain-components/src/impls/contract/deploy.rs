@@ -6,6 +6,7 @@ use starknet::core::types::{Felt, RevertedInvocation};
 use starknet::macros::felt;
 use starknet::signers::SigningKey;
 
+use crate::impls::types::address::StarknetAddress;
 use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
 use crate::traits::contract::deploy::ContractDeployer;
 use crate::traits::types::blob::HasBlobType;
@@ -20,7 +21,7 @@ const DEFAULT_UDC_ADDRESS: Felt =
 impl<Chain> ContractDeployer<Chain> for DeployStarknetContract
 where
     Chain: HasContractClassHashType<ContractClassHash = Felt>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + HasBlobType<Blob = Vec<Felt>>
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>
         + HasStarknetAccount
@@ -32,7 +33,7 @@ where
         class_hash: &Felt,
         unique: bool,
         constructor_call_data: &Vec<Felt>,
-    ) -> Result<Felt, Chain::Error> {
+    ) -> Result<StarknetAddress, Chain::Error> {
         let account = chain.account();
 
         let factory = ContractFactory::new_with_udc(*class_hash, account, DEFAULT_UDC_ADDRESS);
@@ -55,6 +56,6 @@ where
             return Err(Chain::raise_error(reverted));
         }
 
-        Ok(deployed_address)
+        Ok(deployed_address.into())
     }
 }

@@ -3,6 +3,8 @@ use std::sync::Arc;
 
 use starknet::core::types::{EmittedEvent, Felt, OrderedEvent};
 
+use crate::impls::types::address::StarknetAddress;
+
 #[derive(Debug, Clone)]
 pub struct StarknetEvent {
     pub fields: Arc<StarknetEventFields>,
@@ -10,7 +12,7 @@ pub struct StarknetEvent {
 
 #[derive(Debug)]
 pub struct StarknetEventFields {
-    pub contract_address: Felt,
+    pub contract_address: StarknetAddress,
     pub class_hash: Option<Felt>,
     pub selector: Option<Felt>,
     pub keys: Vec<Felt>,
@@ -32,7 +34,7 @@ pub struct UnknownEvent<'a> {
 
 impl StarknetEvent {
     pub fn from_ordered_event(
-        contract_address: Felt,
+        contract_address: StarknetAddress,
         class_hash: Felt,
         event: OrderedEvent,
     ) -> Self {
@@ -60,7 +62,7 @@ impl From<EmittedEvent> for StarknetEvent {
 
         Self {
             fields: Arc::new(StarknetEventFields {
-                contract_address: event.from_address,
+                contract_address: event.from_address.into(),
                 class_hash: None,
                 selector,
                 keys: keys.collect(),

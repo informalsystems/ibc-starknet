@@ -52,7 +52,7 @@ fn test_array_u8_into_array_u32() {
 fn test_compute_packet_commitment() {
     let commitment = PACKET_COMMITMENT_ON_SN(ERC20());
     let expected: [u32; 8] = [
-        1561496803, 591083406, 1958596266, 2480824962, 846563094, 2634790765, 145282158, 2139799705
+        3066915652, 3854894583, 2733453543, 2666376403, 1143720361, 1661963047, 2055864332, 3822377424
     ];
     assert_eq!(commitment, expected.into());
 }

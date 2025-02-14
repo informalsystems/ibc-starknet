@@ -13,6 +13,7 @@ use starknet::accounts::Call;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
+use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::messages::transfer::TransferTokenMessageBuilder;
 use crate::traits::types::blob::HasBlobType;
@@ -25,7 +26,7 @@ pub struct BuildTransferErc20TokenMessage;
 
 #[derive(Debug, HasField)]
 pub struct TransferErc20TokenMessage {
-    pub recipient: Felt,
+    pub recipient: StarknetAddress,
     pub amount: U256,
 }
 
@@ -38,7 +39,7 @@ pub type EncodeTransferErc20TokenMessage = CombineEncoders<
 
 impl<Chain, Encoding> TransferTokenMessageBuilder<Chain> for BuildTransferErc20TokenMessage
 where
-    Chain: HasAddressType<Address = Felt>
+    Chain: HasAddressType<Address = StarknetAddress>
         + HasAmountType<Amount = StarknetAmount>
         + HasBlobType<Blob = Vec<Felt>>
         + HasSelectorType<Selector = Felt>
@@ -49,7 +50,7 @@ where
 {
     fn build_transfer_token_message(
         chain: &Chain,
-        recipient: &Felt,
+        recipient: &StarknetAddress,
         amount: &StarknetAmount,
     ) -> Result<StarknetMessage, Chain::Error> {
         let message = TransferErc20TokenMessage {
@@ -63,7 +64,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let call = Call {
-            to: amount.token_address,
+            to: *amount.token_address,
             selector: TRANSFER_SELECTOR,
             calldata,
         };

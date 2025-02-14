@@ -62,6 +62,7 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeComponent,
 };
+use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::config::{
     StarknetChainConfig, StarknetRelayerConfig,
 };
@@ -74,7 +75,6 @@ use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::ConfigUpdater;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
-use starknet::core::types::Felt;
 use toml::to_string_pretty;
 
 use crate::commands::create::subcommand::{CreateSubCommand, RunCreateSubCommand};
@@ -159,8 +159,8 @@ delegate_components! {
         (QueryChainStatusArgs, symbol!("chain_id")): ParseFromString<ChainId>,
 
         (QueryBalanceArgs, symbol!("chain_id")): ParseFromString<ChainId>,
-        (QueryBalanceArgs, symbol!("address")): ParseFromString<Felt>,
-        (QueryBalanceArgs, symbol!("denom")): ParseFromString<Felt>,
+        (QueryBalanceArgs, symbol!("address")): ParseFromString<StarknetAddress>,
+        (QueryBalanceArgs, symbol!("denom")): ParseFromString<StarknetAddress>,
 
         (UpdateClientArgs, symbol!("host_chain_id")): ParseFromString<ChainId>,
         (UpdateClientArgs, symbol!("client_id")): ParseFromString<ClientId>,
