@@ -43,11 +43,6 @@ fn test_vector_iavl_middle() {
     decode_and_verify(@iavl_exist_middle(), @iavl_spec());
 }
 
-// #[test]
-// fn test_vector_iavl_left_non() {
-//     decode_and_verify(@iavl_nonexist_left(), @iavl_spec());
-// }
-
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L501
 #[test]
 fn test_vector_tendermint_left() {
