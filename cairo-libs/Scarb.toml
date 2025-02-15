@@ -16,7 +16,7 @@ authors       = [ "Informal Systems <hello@informal.systems>" ]
 repository    = "https://github.com/informalsystems/ibc-starknet"
 Readme        = "README.md"
 keywords      = [ "protobuf", "cometbft", "ibc" ]
-description   = "Collection of Cairo libraries for IBC integration with Starknet"
+description   = "Cairo libraries for integrating Starknet with IBC"
 
 [workspace.scripts]
 test = "snforge test"

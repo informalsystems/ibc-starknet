@@ -9,10 +9,7 @@ repository    = { workspace = true }
 license       = { workspace = true }
 Readme        = { workspace = true }
 keywords      = { workspace = true }
-
-description = """
-    Provides the implementation of IBC clients for Starknet.
-"""
+description   = "IBC client contracts for Starknet"
 
 [lib]
 

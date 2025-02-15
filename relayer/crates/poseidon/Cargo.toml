@@ -7,7 +7,7 @@ keywords     = [ "poseidon", "hash", "cryptography", "starknet" ]
 repository   = { workspace = true }
 authors      = { workspace = true }
 rust-version = { workspace = true }
-description  = "Poseidon hash function implementation for StarkNet"
+description  = "Poseidon hash function for Starknet"
 
 [lints]
 workspace = true

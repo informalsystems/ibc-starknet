@@ -8,7 +8,7 @@ rust-version = { workspace = true }
 version      = { workspace = true }
 readme       = "./../README.md"
 keywords     = [ "ibc", "light-client", "starknet", "CosmWasm" ]
-description  = ""
+description  = "Starknet IBC wasm light-client"
 
 [lib]
 crate-type = [ "cdylib", "rlib" ]

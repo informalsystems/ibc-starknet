@@ -1,15 +1,14 @@
 [package]
-name = "ibc-client-starknet-types"
-authors = { workspace = true }
-edition = { workspace = true }
-license = { workspace = true }
+name         = "ibc-client-starknet-types"
+authors      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
 rust-version = { workspace = true }
-version = { workspace = true }
-repository = { workspace = true }
-readme = "./../README.md"
-keywords = [ "starknet", "ibc", "light-client", "data-structures" ]
-description = """
-"""
+version      = { workspace = true }
+repository   = { workspace = true }
+readme       = "./../README.md"
+keywords     = [ "starknet", "ibc", "light-client", "data-structures" ]
+description  = "Starknet IBC light-client types"
 
 [lints]
 workspace = true

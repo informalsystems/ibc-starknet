@@ -18,7 +18,7 @@ authors       = [ "Informal Systems <hello@informal.systems>" ]
 repository    = "https://github.com/informalsystems/ibc-starknet"
 Readme        = "README.md"
 keywords      = [ "ethereum", "starknet", "ibc", "cairo", "contracts" ]
-description   = "Collection of Cairo components and contracts that implement and integrate IBC protocol with Starknet"
+description   = "Cairo components and contracts for integrating Starknet with IBC"
 
 [workspace.scripts]
 test = "snforge test"
