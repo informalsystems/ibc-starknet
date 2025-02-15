@@ -35,8 +35,6 @@ pub struct QueryPacketIsReceivedOnStarknet;
 impl<Chain, Counterparty, Encoding> PacketIsReceivedQuerier<Chain, Counterparty>
     for QueryPacketIsReceivedOnStarknet
 where
-    Counterparty: HasSequenceType<Chain>,
-
     Chain: HasHeightType<Height = u64>
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
         + HasPortIdType<Counterparty, PortId = IbcPortId>

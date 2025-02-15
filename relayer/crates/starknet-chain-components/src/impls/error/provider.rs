@@ -13,7 +13,7 @@ where
     fn raise_error(e: ProviderError) -> Context::Error {
         match e {
             ProviderError::StarknetError(e) => Context::raise_error(e),
-            _ => Context::raise_error(format!("ProviderError: {:?}", e)),
+            _ => Context::raise_error(format!("ProviderError: {e:?}")),
         }
     }
 }

@@ -16,7 +16,7 @@ where
     fn raise_error(e: AccountError<S>) -> Context::Error {
         match e {
             AccountError::Provider(e) => Context::raise_error(e),
-            _ => Context::raise_error(format!("AccountError: {:?}", e)),
+            _ => Context::raise_error(format!("AccountError: {e:?}")),
         }
     }
 }

@@ -364,8 +364,7 @@ pub trait CanUseStarknetChain:
     + HasCreateClientPayloadOptionsType<
         CosmosChain,
         CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
-    > + CanBuildCreateClientPayload<CosmosChain>
-    + CanBuildCreateClientMessage<CosmosChain>
+    > + CanBuildCreateClientMessage<CosmosChain>
     + CanBuildUpdateClientPayload<CosmosChain, UpdateClientPayload = StarknetUpdateClientPayload>
     + CanBuildUpdateClientMessage<CosmosChain>
     + CanQueryClientState<CosmosChain>
@@ -423,11 +422,7 @@ pub trait CanUseStarknetChain:
     + CanExtractFromMessageResponse<StarknetCreateClientEvent>
     + CanExtractFromEvent<WriteAcknowledgementEvent>
     + CanBuildPacketFromWriteAck<CosmosChain>
-    + CanFilterIncomingPacket<CosmosChain>
-    + CanFilterOutgoingPacket<CosmosChain>
     + CanQueryCounterpartyChainId<CosmosChain>
-    + HasPacketDstChannelId<CosmosChain>
-    + HasPacketDstPortId<CosmosChain>
     + CanAssertEventualAmount
     + CanBuildIbcTokenTransferMessage<CosmosChain>
     + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
@@ -456,7 +451,6 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildConnectionOpenTryPayload<StarknetChain>
     + HasConnectionEndType<StarknetChain>
     + CanBuildConnectionOpenInitPayload<StarknetChain>
-    + CanBuildConnectionOpenTryPayload<StarknetChain>
     + CanBuildConnectionOpenAckPayload<StarknetChain>
     + CanBuildConnectionOpenConfirmPayload<StarknetChain>
     + CanBuildConnectionOpenInitMessage<StarknetChain>
@@ -489,8 +483,6 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + HasWriteAckEvent<StarknetChain>
     + CanBuildPacketFromWriteAck<StarknetChain>
     + CanQueryCounterpartyChainId<StarknetChain>
-    + CanFilterIncomingPacket<StarknetChain>
-    + CanFilterOutgoingPacket<StarknetChain>
     + CanUseComponent<PacketCommitmentQuerierComponent, StarknetChain>
 {
 }

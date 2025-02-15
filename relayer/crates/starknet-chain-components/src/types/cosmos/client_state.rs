@@ -162,7 +162,7 @@ impl Transformer for EncodeClientStatus {
 
 impl From<CometClientState> for IbcCometClientState {
     fn from(client_state: CometClientState) -> Self {
-        IbcCometClientState::new(
+        Self::new(
             client_state.chain_id,
             TrustThreshold::ONE_THIRD,
             Duration::from_secs(client_state.trusting_period),
