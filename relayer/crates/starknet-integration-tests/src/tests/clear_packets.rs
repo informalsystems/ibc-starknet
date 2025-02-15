@@ -1,7 +1,8 @@
-/// This test will assert that packet clearing works correctly.
-///
-/// This test will be built step by step when each component
-/// required for packet clearing is added.
+//! This test will assert that packet clearing works correctly.
+//!
+//! This test will be built step by step when each component
+//! required for packet clearing is added.
+
 use core::marker::PhantomData;
 use core::time::Duration;
 use std::io::Write;
