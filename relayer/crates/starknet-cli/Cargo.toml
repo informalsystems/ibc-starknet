@@ -11,6 +11,9 @@ description = """
     Hermes: IBC Relayer in Rust
 """
 
+[lints]
+workspace = true
+
 [[bin]]
 name = "hermes-starknet"
 path = "bin/hermes_starknet.rs"

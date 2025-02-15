@@ -11,6 +11,9 @@ description = """
     CLI Tool used to help development of ibc-starknet
 """
 
+[lints]
+workspace = true
+
 [[bin]]
 name = "main"
 path = "bin/main.rs"

@@ -45,6 +45,7 @@ rust_2018_idioms     = { level = "deny", priority = -1 }
 trivial_casts        = "deny"
 unused_import_braces = "deny"
 unused_variables     = "allow"
+unused_extern_crates = "allow"
 
 [workspace.lints.clippy]
 debug_assert_with_mut_call    = "deny"
@@ -55,6 +56,10 @@ manual_ok_or                  = "deny"
 match_same_arms               = "deny"
 semicolon_if_nothing_returned = "deny"
 uninlined_format_args         = "deny"
+trait_duplication_in_bounds   = "deny"
+use_self                      = "deny"
+redundant_clone               = "deny"
+type_repetition_in_bounds     = "deny"
 
 [patch.crates-io]
 ibc-client-starknet       = { path = "./ibc-client-starknet" }

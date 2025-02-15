@@ -13,6 +13,9 @@ description  = ""
 [lib]
 crate-type = [ "cdylib", "rlib" ]
 
+[lints]
+workspace = true
+
 [dependencies]
 # ibc dependencies
 ibc-core            = { workspace = true }

@@ -9,6 +9,9 @@ authors      = { workspace = true }
 rust-version = { workspace = true }
 description  = "Poseidon hash function implementation for StarkNet"
 
+[lints]
+workspace = true
+
 [dependencies]
 starknet-types-core = { workspace = true }
 sha2                = { workspace = true }
