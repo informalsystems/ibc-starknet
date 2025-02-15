@@ -45,7 +45,6 @@ rust_2018_idioms     = { level = "deny", priority = -1 }
 trivial_casts        = "deny"
 unused_import_braces = "deny"
 unused_variables     = "allow"
-unused_extern_crates = "allow"
 
 [workspace.lints.clippy]
 debug_assert_with_mut_call    = "deny"
