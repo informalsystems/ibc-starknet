@@ -6,16 +6,13 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::packet_commitment::PacketCommitmentQuerier;
-use hermes_chain_components::traits::queries::packet_commitments::PacketCommitmentsQuerier;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{
     HasChannelIdType, HasPortIdType, HasSequenceType,
 };
 use hermes_chain_components::traits::types::packets::receive::HasPacketCommitmentType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_cosmos_chain_components::components::client::{
-    PacketCommitmentQuerierComponent, PacketCommitmentsQuerierComponent,
-};
+use hermes_cosmos_chain_components::components::client::PacketCommitmentQuerierComponent;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -39,25 +36,6 @@ use crate::types::messages::ibc::packet::Sequence;
 use crate::types::status::StarknetChainStatus;
 
 pub struct QueryStarknetPacketCommitment;
-
-#[cgp_provider(PacketCommitmentsQuerierComponent)]
-impl<Chain, Counterparty> PacketCommitmentsQuerier<Chain, Counterparty>
-    for QueryStarknetPacketCommitment
-where
-    Chain: HasHeightType
-        + HasChannelIdType<Counterparty>
-        + HasPortIdType<Counterparty>
-        + HasSequenceType<Counterparty>
-        + HasAsyncErrorType,
-{
-    async fn query_packet_commitments(
-        _chain: &Chain,
-        _channel_id: &Chain::ChannelId,
-        _port_id: &Chain::PortId,
-    ) -> Result<Vec<Chain::Sequence>, Chain::Error> {
-        todo!()
-    }
-}
 
 #[cgp_provider(PacketCommitmentQuerierComponent)]
 impl<Chain, Counterparty, Encoding> PacketCommitmentQuerier<Chain, Counterparty>

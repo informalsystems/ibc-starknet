@@ -79,7 +79,6 @@ use crate::impls::packet_filter::FilterStarknetPackets;
 use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
-use crate::impls::queries::ack_packets::QueryStarknetAckPackets;
 use crate::impls::queries::balance::QueryStarknetWalletBalance;
 use crate::impls::queries::block_events::GetStarknetBlockEvents;
 use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
@@ -91,11 +90,8 @@ use crate::impls::queries::counterparty_chain_id::QueryCosmosChainIdFromStarknet
 use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
 use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
 use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
-use crate::impls::queries::send_packet::QueryStarknetSendPacket;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
-use crate::impls::queries::unreceived_acks::QueryStarknetUnreceivedAckSequences;
-use crate::impls::queries::unreceived_packets::QueryStarknetUnreceivedPacketSequences;
 use crate::impls::send_message::SendCallMessages;
 use crate::impls::submit_tx::SubmitCallTransaction;
 use crate::impls::transfer::TransferErc20Token;
@@ -392,25 +388,8 @@ cgp_preset! {
             ChannelEndWithProofsQuerierComponent,
         ]:
             QueryChannelEndFromStarknet,
-        [
-            PacketCommitmentQuerierComponent,
-            PacketCommitmentsQuerierComponent,
-        ]:
+        PacketCommitmentQuerierComponent:
             QueryStarknetPacketCommitment,
-        UnreceivedPacketSequencesQuerierComponent:
-            QueryStarknetUnreceivedPacketSequences,
-        UnreceivedAcksSequencesQuerierComponent:
-            QueryStarknetUnreceivedAckSequences,
-        [
-            SendPacketQuerierComponent,
-            SendPacketsQuerierComponent,
-        ]:
-            QueryStarknetSendPacket,
-        [
-            AckPacketsQuerierComponent,
-            PacketAcknowledgementsQuerierComponent,
-        ]:
-            QueryStarknetAckPackets,
         PacketAcknowledgementQuerierComponent:
             QueryStarknetAckCommitment,
         PacketReceiptQuerierComponent:
@@ -420,8 +399,6 @@ cgp_preset! {
             IncomingPacketFilterComponent,
         ]:
             FilterStarknetPackets,
-        ReceivedPacketQuerierComponent:
-            QueryPacketIsReceivedOnStarknet,
         CounterpartyChainIdQuerierComponent:
             QueryCosmosChainIdFromStarknetChannelId,
         EventualAmountAsserterComponent:
@@ -430,5 +407,7 @@ cgp_preset! {
             ProvideDefaultPollAssertDuration,
         IbcTokenTransferMessageBuilderComponent:
             BuildStarknetIbcTransferMessage,
+        PacketIsReceivedQuerierComponent:
+            QueryPacketIsReceivedOnStarknet,
     }
 }

@@ -1,5 +1,4 @@
 pub mod ack_commitment;
-pub mod ack_packets;
 pub mod balance;
 pub mod block_events;
 pub mod channel_end;
@@ -11,8 +10,5 @@ pub mod counterparty_chain_id;
 pub mod packet_commitment;
 pub mod packet_receipt;
 pub mod packet_received;
-pub mod send_packet;
 pub mod status;
 pub mod token_balance;
-pub mod unreceived_acks;
-pub mod unreceived_packets;

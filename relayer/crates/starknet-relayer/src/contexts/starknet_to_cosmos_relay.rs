@@ -5,7 +5,7 @@ use core::ops::Deref;
 use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_relayer_components::components::default::relay::{MainSink, PacketClearerComponent};
+use hermes_relayer_components::components::default::relay::MainSink;
 use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeAtComponent,
 };
@@ -47,6 +47,7 @@ pub struct StarknetToCosmosRelay {
     pub fields: Arc<dyn HasStarknetToCosmosRelayFields>,
 }
 
+#[cgp_context(StarknetToCosmosRelayComponents: StarknetCommonRelayContextPreset)]
 #[derive(HasField)]
 pub struct StarknetToCosmosRelayFields {
     pub runtime: HermesRuntime,
@@ -96,26 +97,6 @@ impl StarknetToCosmosRelay {
     }
 }
 
-pub struct StarknetToCosmosRelayComponents;
-
-impl HasComponents for StarknetToCosmosRelay {
-    type Components = StarknetToCosmosRelayComponents;
-}
-
-impl<Name> DelegateComponent<Name> for StarknetToCosmosRelayComponents
-where
-    Self: IsStarknetCommonRelayContextPreset<Name>,
-{
-    type Delegate = StarknetCommonRelayContextPreset;
-}
-
-impl<Name, Context, Params> IsProviderFor<Name, Context, Params> for StarknetToCosmosRelayComponents
-where
-    Self: IsStarknetCommonRelayContextPreset<Name>,
-    StarknetCommonRelayContextPreset: IsProviderFor<Name, Context, Params>,
-{
-}
-
 delegate_components! {
     StarknetToCosmosRelayComponents {
         [
@@ -159,7 +140,6 @@ pub trait CanUseStarknetToCosmosRelay:
     + CanRelayEvent<DestinationTarget>
     + CanAutoRelay<SourceTarget>
     + CanAutoRelay<DestinationTarget>
-    + CanUseComponent<PacketClearerComponent>
 {
 }
 

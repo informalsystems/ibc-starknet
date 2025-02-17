@@ -1,5 +1,5 @@
 use cgp::core::component::UseDelegate;
-pub use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+pub use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::{Index, UseField, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
@@ -17,7 +17,7 @@ pub use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetter
 use hermes_relayer_components::relay::impls::packet_lock::PacketMutexGetterComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 pub use hermes_runtime_components::traits::runtime::{
-    RuntimeGetterComponent, RuntimeTypeComponent,
+    RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 
@@ -27,9 +27,9 @@ with_default_relay_preset! {
     | Components | {
         cgp_preset! {
             StarknetCommonRelayContextPreset {
-                ErrorTypeComponent: ProvideHermesError,
+                ErrorTypeProviderComponent: ProvideHermesError,
                 ErrorRaiserComponent: UseDelegate<HandleStarknetRelayError>,
-                RuntimeTypeComponent: WithType<HermesRuntime>,
+                RuntimeTypeProviderComponent: WithType<HermesRuntime>,
                 RuntimeGetterComponent: WithField<symbol!("runtime")>,
                 [
                     LoggerTypeComponent,

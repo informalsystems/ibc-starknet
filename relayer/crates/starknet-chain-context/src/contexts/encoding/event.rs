@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use cgp::core::component::UseDelegate;
-use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
@@ -23,6 +23,7 @@ use starknet::core::types::Felt;
 use crate::contexts::encoding::cairo::{ProvideCairoEncoding, StarknetCairoEncoding};
 use crate::impls::error::HandleStarknetChainError;
 
+#[cgp_context(StarknetEventEncodingContextComponents: StarknetEventEncodingComponents)]
 #[derive(HasField, Default, Clone)]
 pub struct StarknetEventEncoding {
     pub erc20_hashes: HashSet<Felt>,
@@ -31,25 +32,9 @@ pub struct StarknetEventEncoding {
     pub ibc_core_contract_addresses: HashSet<Felt>,
 }
 
-pub struct StarknetEventEncodingContextComponents;
-
-impl HasComponents for StarknetEventEncoding {
-    type Components = StarknetEventEncodingContextComponents;
-}
-
-with_starknet_event_encoding_components! {
-    | Components | {
-        delegate_components! {
-            StarknetEventEncodingContextComponents{
-                Components: StarknetEventEncodingComponents,
-            }
-        }
-    }
-}
-
 delegate_components! {
     StarknetEventEncodingContextComponents{
-        ErrorTypeComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: ProvideHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         [
             EncodingTypeComponent,

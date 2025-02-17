@@ -1,5 +1,5 @@
 use cgp::core::component::UseDelegate;
-use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::extra::run::CanRun;
@@ -13,13 +13,16 @@ use hermes_relayer_components::components::default::birelay::{
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
 use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::{RuntimeGetterComponent, RuntimeTypeComponent};
+use hermes_runtime_components::traits::runtime::{
+    RuntimeGetterComponent, RuntimeTypeProviderComponent,
+};
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 
 use crate::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 
+#[cgp_context(StarknetCosmosBiRelayComponents: DefaultBiRelayComponents)]
 #[derive(Clone, HasField)]
 pub struct StarknetCosmosBiRelay {
     pub runtime: HermesRuntime,
@@ -27,24 +30,11 @@ pub struct StarknetCosmosBiRelay {
     pub relay_b_to_a: CosmosToStarknetRelay,
 }
 
-pub struct StarknetCosmosBiRelayComponents;
-
-impl HasComponents for StarknetCosmosBiRelay {
-    type Components = StarknetCosmosBiRelayComponents;
-}
-
-impl<Component> DelegateComponent<Component> for StarknetCosmosBiRelayComponents
-where
-    Self: IsDefaultBiRelayComponents<Component>,
-{
-    type Delegate = DefaultBiRelayComponents;
-}
-
 delegate_components! {
     StarknetCosmosBiRelayComponents {
-        ErrorTypeComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: ProvideHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
-        RuntimeTypeComponent: WithType<HermesRuntime>,
+        RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
         ChainTypeAtComponent<Index<0>>: WithType<StarknetChain>,
         ChainTypeAtComponent<Index<1>>: WithType<CosmosChain>,
