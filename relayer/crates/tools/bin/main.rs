@@ -4,11 +4,11 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use clap::Parser;
-use cli::commands::subcommand::AllSubCommands;
-use cli::contexts::app::ToolApp;
 use eyre::{eyre, Error};
 use hermes_cli_components::traits::command::CanRunCommand;
 use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_starknet_tools_cli::commands::subcommand::AllSubCommands;
+use hermes_starknet_tools_cli::contexts::app::ToolApp;
 use tokio::runtime::Builder;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::layer::SubscriberExt;
