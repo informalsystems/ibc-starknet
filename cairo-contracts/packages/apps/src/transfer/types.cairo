@@ -4,11 +4,11 @@ use core::num::traits::Zero;
 use serde_json::{Serialize, SerializerTrait};
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::{
-    ERC20Contract, ERC20ContractTrait, TransferErrors, TRANSFER_PORT_ID_HASH
+    ERC20Contract, ERC20ContractTrait, TRANSFER_PORT_ID_HASH, TransferErrors,
 };
 use starknet_ibc_core::client::{Height, Timestamp};
-use starknet_ibc_core::host::{PortId, PortIdTrait, ChannelId, ChannelIdTrait};
-use starknet_ibc_utils::{ValidateBasic, ComputeKey, LocalKeyBuilderImpl};
+use starknet_ibc_core::host::{ChannelId, ChannelIdTrait, PortId, PortIdTrait};
+use starknet_ibc_utils::{ComputeKey, LocalKeyBuilderImpl, ValidateBasic};
 
 /// Maximum memo length allowed for ICS-20 transfers. This bound corresponds to
 /// the `MaximumMemoLength` in the `ibc-go`.
@@ -154,7 +154,7 @@ pub struct TracePrefix {
 #[generate_trait]
 pub impl TracePrefixImpl of TracePrefixTrait {
     fn new(port_id: PortId, channel_id: ChannelId) -> TracePrefix {
-        TracePrefix { port_id: port_id, channel_id: channel_id, }
+        TracePrefix { port_id: port_id, channel_id: channel_id }
     }
 }
 
@@ -183,7 +183,7 @@ pub impl DenomImpl of DenomTrait {
     fn hosted(self: @Denom) -> Option<ByteArray> {
         match self {
             Denom::Native(_) => Option::None,
-            Denom::Hosted(base) => Option::Some(base.clone())
+            Denom::Hosted(base) => Option::Some(base.clone()),
         }
     }
 }
@@ -198,8 +198,7 @@ pub impl DenomDisplay of Display<Denom> {
     fn fmt(self: @Denom, ref f: Formatter) -> Result<(), Error> {
         match self {
             Denom::Native(contract) => {
-                let address_as_felt: felt252 = (*contract.address).into();
-                Display::fmt(@format!("{address_as_felt}"), ref f)
+                Display::fmt(@format!("0x{:x}", *contract.address), ref f)
             },
             Denom::Hosted(byte_array) => Display::fmt(@byte_array, ref f),
         }
@@ -234,17 +233,14 @@ pub impl ParticipantImpl of ParticipantTrait {
     fn is_non_zero(self: @Participant) -> bool {
         match self {
             Participant::Native(contract_address) => contract_address.is_non_zero(),
-            Participant::External(byte_array) => byte_array.len() > 0
+            Participant::External(byte_array) => byte_array.len() > 0,
         }
     }
 
     fn as_byte_array(self: @Participant) -> ByteArray {
         match self {
-            Participant::Native(contract_address) => {
-                let address_as_felt: felt252 = (*contract_address).into();
-                format!("{address_as_felt}")
-            },
-            Participant::External(byte_array) => byte_array.clone()
+            Participant::Native(contract_address) => { format!("0x{:x}", *contract_address) },
+            Participant::External(byte_array) => byte_array.clone(),
         }
     }
 }
@@ -296,7 +292,7 @@ impl MemoValidateBasic of ValidateBasic<Memo> {
 #[cfg(test)]
 pub mod tests {
     use serde_json::to_byte_array;
-    use starknet_ibc_testkit::dummies::{PACKET_DATA_FROM_SN, ERC20};
+    use starknet_ibc_testkit::dummies::{ERC20, PACKET_DATA_FROM_SN};
     use starknet_ibc_utils::{ComputeKey, LocalKeyBuilderImpl, LocalKeyBuilderTrait};
 
     // Snapshot test to ensure serialization stays consistent.
@@ -304,7 +300,7 @@ pub mod tests {
     fn test_json_serialized_packet_data() {
         let json = to_byte_array(PACKET_DATA_FROM_SN(ERC20()));
         let expected: ByteArray =
-            "{\"denom\":\"2087021424722619777119509474943472645767659996348769578120564519014510906823\",\"amount\":\"100\",\"sender\":\"1431520594\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"memo\":\"\"}";
+            "{\"denom\":\"0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7\",\"amount\":\"100\",\"sender\":\"0x55534552\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"memo\":\"\"}";
         assert_eq!(json, expected);
     }
 

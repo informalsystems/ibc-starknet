@@ -1,15 +1,15 @@
 use cometbft::ibc::{Height, MerkleRoot};
-use cometbft::ics23::ProofSpec;
+use ics23::ProofSpec;
 use protobuf::types::wkt::{Timestamp, Duration};
 use cometbft::utils::Fraction;
 use cometbft::types::{SignedHeader, ValidatorSet};
 
 use protobuf::types::message::{
     ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName
+    DecodeContextImpl, ProtoName,
 };
 use protobuf::primitives::array::{ByteArrayAsProtoMessage};
-use protobuf::primitives::numeric::{UnsignedAsProtoMessage, I32AsProtoMessage, BoolAsProtoMessage};
+use protobuf::primitives::numeric::{I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]

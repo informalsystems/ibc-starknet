@@ -38,6 +38,7 @@ use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
+use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::client_id::ClientId as StarknetClientId;
@@ -57,7 +58,7 @@ where
             Counterparty,
             InitConnectionOptions = CosmosInitConnectionOptions,
         > + HasClientIdType<Counterparty, ClientId = StarknetClientId>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
@@ -97,7 +98,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let call = Call {
-            to: ibc_core_address,
+            to: *ibc_core_address,
             selector: selector!("conn_open_init"),
             calldata,
         };
@@ -115,7 +116,7 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasClientIdType<Counterparty, ClientId = StarknetClientId>
         + HasClientStateType<Counterparty>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseAsyncError<ParseIntError>
@@ -173,7 +174,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let call = Call {
-            to: ibc_core_address,
+            to: *ibc_core_address,
             selector: selector!("conn_open_init"),
             calldata,
         };
@@ -191,7 +192,7 @@ where
     Chain: HasHeightType
         + HasClientStateType<Counterparty>
         + HasConnectionIdType<Counterparty, ConnectionId = StarknetConnectionId>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
@@ -243,7 +244,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let call = Call {
-            to: ibc_core_address,
+            to: *ibc_core_address,
             selector: selector!("conn_open_ack"),
             calldata,
         };
@@ -259,7 +260,7 @@ impl<Chain, Counterparty, Encoding> ConnectionOpenConfirmMessageBuilder<Chain, C
     for BuildStarknetConnectionHandshakeMessages
 where
     Chain: HasConnectionIdType<Counterparty, ConnectionId = StarknetConnectionId>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
@@ -303,7 +304,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let call = Call {
-            to: ibc_core_address,
+            to: *ibc_core_address,
             selector: selector!("conn_open_confirm"),
             calldata,
         };

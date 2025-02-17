@@ -6,9 +6,10 @@ use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_cosmos_chain_components::components::client::BlockEventsQuerierComponent;
-use starknet::core::types::{BlockId, EventFilter, Felt};
+use starknet::core::types::{BlockId, EventFilter};
 use starknet::providers::{Provider, ProviderError};
 
+use crate::impls::types::address::StarknetAddress;
 use crate::traits::provider::HasStarknetProvider;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::event::StarknetEvent;
@@ -20,8 +21,8 @@ impl<Chain> BlockEventsQuerier<Chain> for GetStarknetBlockEvents
 where
     Chain: HasHeightType<Height = u64>
         + HasEventType<Event = StarknetEvent>
-        + HasAddressType<Address = Felt>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasAddressType<Address = StarknetAddress>
         + HasStarknetProvider
         + CanRaiseAsyncError<ProviderError>,
 {
@@ -37,7 +38,7 @@ where
                 EventFilter {
                     from_block: Some(BlockId::Number(*height)),
                     to_block: Some(BlockId::Number(*height)),
-                    address: Some(address),
+                    address: Some(*address),
                     keys: None,
                 },
                 None,

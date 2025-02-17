@@ -40,7 +40,6 @@ jobs:
         run: |
           nix build \
             .#starknet-devnet \
-            .#cairo \
             .#scarb \
             .#universal-sierra-compiler \
             .#rust \

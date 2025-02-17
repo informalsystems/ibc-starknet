@@ -1,6 +1,6 @@
 #[starknet::component]
 pub mod ClientEventEmitterComponent {
-    use starknet_ibc_core::client::{Height, CreateResponse};
+    use starknet_ibc_core::client::{CreateResponse, Height};
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
 
     #[storage]
@@ -46,16 +46,16 @@ pub mod ClientEventEmitterComponent {
 
     #[generate_trait]
     pub impl ClientEventEmitterImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ClientEventEmitterTrait<TContractState> {
         fn emit_create_client_event(
-            ref self: ComponentState<TContractState>, create_resp: CreateResponse
+            ref self: ComponentState<TContractState>, create_resp: CreateResponse,
         ) {
             self
                 .emit(
                     CreateClientEvent {
                         client_id: create_resp.client_id, consensus_height: create_resp.height,
-                    }
+                    },
                 );
         }
 
@@ -63,13 +63,13 @@ pub mod ClientEventEmitterComponent {
             ref self: ComponentState<TContractState>,
             client_id: ClientId,
             update_heights: Array<Height>,
-            client_message: Array<felt252>
+            client_message: Array<felt252>,
         ) {
             self
                 .emit(
                     UpdateClientEvent {
                         client_id, consensus_heights: update_heights, header: client_message,
-                    }
+                    },
                 );
         }
 

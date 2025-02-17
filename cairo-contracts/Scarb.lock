@@ -4,7 +4,7 @@ version = 1
 [[package]]
 name = "alexandria_bytes"
 version = "0.1.0"
-source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=95d98a5#95d98a5182001d07673b856a356eff0e6bd05354"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=162bed1#162bed1c636d31ccaaa90ed3eb32c9eb1d5e3bd3"
 dependencies = [
  "alexandria_data_structures",
  "alexandria_math",
@@ -13,7 +13,7 @@ dependencies = [
 [[package]]
 name = "alexandria_data_structures"
 version = "0.2.0"
-source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=95d98a5#95d98a5182001d07673b856a356eff0e6bd05354"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=162bed1#162bed1c636d31ccaaa90ed3eb32c9eb1d5e3bd3"
 dependencies = [
  "alexandria_encoding",
 ]
@@ -21,9 +21,10 @@ dependencies = [
 [[package]]
 name = "alexandria_encoding"
 version = "0.1.0"
-source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=95d98a5#95d98a5182001d07673b856a356eff0e6bd05354"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=162bed1#162bed1c636d31ccaaa90ed3eb32c9eb1d5e3bd3"
 dependencies = [
  "alexandria_bytes",
+ "alexandria_data_structures",
  "alexandria_math",
  "alexandria_numeric",
 ]
@@ -31,12 +32,12 @@ dependencies = [
 [[package]]
 name = "alexandria_math"
 version = "0.2.1"
-source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=95d98a5#95d98a5182001d07673b856a356eff0e6bd05354"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=162bed1#162bed1c636d31ccaaa90ed3eb32c9eb1d5e3bd3"
 
 [[package]]
 name = "alexandria_numeric"
 version = "0.1.0"
-source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=95d98a5#95d98a5182001d07673b856a356eff0e6bd05354"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=162bed1#162bed1c636d31ccaaa90ed3eb32c9eb1d5e3bd3"
 dependencies = [
  "alexandria_math",
  "alexandria_searching",
@@ -45,7 +46,7 @@ dependencies = [
 [[package]]
 name = "alexandria_searching"
 version = "0.1.0"
-source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=95d98a5#95d98a5182001d07673b856a356eff0e6bd05354"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=162bed1#162bed1c636d31ccaaa90ed3eb32c9eb1d5e3bd3"
 dependencies = [
  "alexandria_data_structures",
 ]
@@ -53,26 +54,32 @@ dependencies = [
 [[package]]
 name = "alexandria_sorting"
 version = "0.1.0"
-source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=95d98a5#95d98a5182001d07673b856a356eff0e6bd05354"
+source = "git+https://github.com/keep-starknet-strange/alexandria.git?rev=162bed1#162bed1c636d31ccaaa90ed3eb32c9eb1d5e3bd3"
 dependencies = [
  "alexandria_data_structures",
 ]
 
 [[package]]
+name = "ics23"
+version = "0.1.0"
+dependencies = [
+ "protobuf",
+]
+
+[[package]]
 name = "openzeppelin_access"
-version = "0.18.0"
+version = "0.20.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:424314072ae27d5b6f4264472a5c403711448ea62763a661b89e6ff5f23297fd"
+checksum = "sha256:7734901a0ca7a7065e69416fea615dd1dc586c8dc9e76c032f25ee62e8b2a06c"
 dependencies = [
  "openzeppelin_introspection",
- "openzeppelin_utils",
 ]
 
 [[package]]
 name = "openzeppelin_account"
-version = "0.18.0"
+version = "0.20.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:83e6571cac4c67049c8d0ab4e3c7ad146d582d7605e7354248835833e1d26c4a"
+checksum = "sha256:1aa3a71e2f40f66f98d96aa9bf9f361f53db0fd20fa83ef7df04426a3c3a926a"
 dependencies = [
  "openzeppelin_introspection",
  "openzeppelin_utils",
@@ -80,25 +87,26 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_introspection"
-version = "0.18.0"
+version = "0.20.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:46c4cc6c95c9baa4c7d5cc0ed2bdaf334f46c25a8c92b3012829fff936e3042b"
+checksum = "sha256:13e04a2190684e6804229a77a6c56de7d033db8b9ef519e5e8dee400a70d8a3d"
 
 [[package]]
 name = "openzeppelin_testing"
-version = "0.18.0"
+version = "0.20.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:87a8f984f68870e0039fa678112a22ec67db263e53b5faa23775f495b14455d1"
+checksum = "sha256:2fa9aaadacffd6a95754781ed18f6ee660f52a30d27b024efcde2b4b5648e0b3"
 dependencies = [
  "snforge_std",
 ]
 
 [[package]]
 name = "openzeppelin_token"
-version = "0.18.0"
+version = "0.20.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:eafbe13f6a0487ce212459e25a81ae07f340ba76208ad4616626eb2d25a9625e"
+checksum = "sha256:4452f449dc6c1ea97cf69d1d9182749abd40e85bd826cd79652c06a627eafd91"
 dependencies = [
+ "openzeppelin_access",
  "openzeppelin_account",
  "openzeppelin_introspection",
  "openzeppelin_utils",
@@ -106,9 +114,13 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_utils"
-version = "0.18.0"
+version = "0.20.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:725b212839f3eddc32791408609099c5e808c167ca0cf331d8c1d778b07a4e21"
+checksum = "sha256:44f32d242af1e43982decc49c563e613a9b67ade552f5c3d5cde504e92f74607"
+
+[[package]]
+name = "protobuf"
+version = "0.1.0"
 
 [[package]]
 name = "serde_json"
@@ -116,15 +128,15 @@ version = "0.1.0"
 
 [[package]]
 name = "snforge_scarb_plugin"
-version = "0.31.0"
+version = "0.34.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:1fce075fcbf7fce1b0935f6f9a034549704837fb221da212d3b6e9134cebfdaa"
+checksum = "sha256:56f2b06ff2f0d8bbdfb7fb6c211fba7e4da6e5334ea70ba849af329a739faf11"
 
 [[package]]
 name = "snforge_std"
-version = "0.31.0"
+version = "0.34.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:60ac980b297281f9a59a5f1668cb56bdea1b28fd2f8008008270f9a3c91ad3ba"
+checksum = "sha256:bd20964bde07e6fd0f7adb50d41216f05d66abd422ed82241030369333385876"
 dependencies = [
  "snforge_scarb_plugin",
 ]
@@ -145,9 +157,11 @@ name = "starknet_ibc_apps"
 version = "0.1.0"
 dependencies = [
  "openzeppelin_access",
+ "openzeppelin_testing",
  "openzeppelin_token",
  "openzeppelin_utils",
  "serde_json",
+ "snforge_std",
  "starknet_ibc_contracts",
  "starknet_ibc_core",
  "starknet_ibc_testkit",
@@ -158,9 +172,13 @@ dependencies = [
 name = "starknet_ibc_clients"
 version = "0.1.0"
 dependencies = [
+ "alexandria_data_structures",
  "alexandria_sorting",
+ "openzeppelin_access",
+ "snforge_std",
  "starknet_ibc_core",
  "starknet_ibc_testkit",
+ "starknet_ibc_utils",
 ]
 
 [[package]]
@@ -182,7 +200,9 @@ dependencies = [
 name = "starknet_ibc_core"
 version = "0.1.0"
 dependencies = [
+ "alexandria_data_structures",
  "alexandria_numeric",
+ "ics23",
  "openzeppelin_testing",
  "serde_json",
  "snforge_std",
@@ -196,7 +216,9 @@ version = "0.1.0"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_testing",
+ "openzeppelin_token",
  "openzeppelin_utils",
+ "serde_json",
  "snforge_std",
  "starknet_ibc_apps",
  "starknet_ibc_clients",

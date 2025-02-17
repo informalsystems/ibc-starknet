@@ -130,7 +130,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
                 relayer_wallet.signing_key,
             )),
-            relayer_wallet.account_address,
+            *relayer_wallet.account_address,
             chain_id,
             ExecutionEncoding::New,
         );

@@ -1,11 +1,10 @@
 use core::num::traits::Zero;
+use ics23::{IntoArrayU32, array_u8_into_array_u32};
 use starknet_ibc_core::channel::ChannelErrors;
-use starknet_ibc_core::client::{Height, Timestamp, HeightPartialOrd, TimestampPartialOrd};
-use starknet_ibc_core::commitment::{
-    array_u8_into_array_u32, IntoArrayU32, StateValueZero, StateValue
-};
+use starknet_ibc_core::client::{Height, HeightPartialOrd, Timestamp, TimestampPartialOrd};
+use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::host::{
-    ConnectionId, ChannelId, ChannelIdZero, PortId, PortIdTrait, Sequence
+    ChannelId, ChannelIdZero, ConnectionId, PortId, PortIdTrait, Sequence,
 };
 use starknet_ibc_utils::ValidateBasic;
 
@@ -160,7 +159,7 @@ pub impl ChannelEndImpl of ChannelEndTrait {
 
     /// Returns true if the counterparty matches the given counterparty.
     fn counterparty_matches(
-        self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_channel_id: @ChannelId
+        self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_channel_id: @ChannelId,
     ) -> bool {
         self.remote.port_id == counterparty_port_id
             && self.remote.channel_id == counterparty_channel_id
@@ -169,12 +168,12 @@ pub impl ChannelEndImpl of ChannelEndTrait {
     /// Validates the channel end be in the open state and the counterparty
     /// parameters match with the expected one.
     fn validate(
-        self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_chan_id: @ChannelId
+        self: @ChannelEnd, counterparty_port_id: @PortId, counterparty_chan_id: @ChannelId,
     ) {
         assert(self.is_open(), ChannelErrors::INVALID_CHANNEL_STATE);
         assert(
             self.counterparty_matches(counterparty_port_id, counterparty_chan_id),
-            ChannelErrors::INVALID_COUNTERPARTY
+            ChannelErrors::INVALID_COUNTERPARTY,
         );
     }
 
@@ -191,7 +190,7 @@ pub impl ChannelEndImpl of ChannelEndTrait {
 
     /// Opens the channel end with the given counterparty channel ID and version.
     fn to_open_with_params(
-        self: ChannelEnd, couterparty_chan_id: ChannelId, version: AppVersion
+        self: ChannelEnd, couterparty_chan_id: ChannelId, version: AppVersion,
     ) -> ChannelEnd {
         ChannelEnd {
             state: ChannelState::Open,
@@ -276,7 +275,7 @@ pub struct Counterparty {
 #[generate_trait]
 pub impl CounterpartyImpl of CounterpartyTrait {
     fn new(port_id: PortId, channel_id: ChannelId) -> Counterparty {
-        Counterparty { port_id, channel_id, }
+        Counterparty { port_id, channel_id }
     }
 
     fn is_zero(self: @Counterparty) -> bool {
@@ -288,7 +287,7 @@ pub impl CounterpartyImpl of CounterpartyTrait {
 pub enum Receipt {
     #[default]
     None,
-    Ok
+    Ok,
 }
 
 #[generate_trait]

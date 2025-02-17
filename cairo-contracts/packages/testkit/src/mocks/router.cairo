@@ -9,14 +9,14 @@ pub mod MockRouterHandler {
     #[storage]
     struct Storage {
         #[substorage(v0)]
-        router_handler: RouterHandlerComponent::Storage
+        router_handler: RouterHandlerComponent::Storage,
     }
 
     #[event]
     #[derive(Drop, starknet::Event)]
     enum Event {
         #[flat]
-        RouterHandlerEvent: RouterHandlerComponent::Event
+        RouterHandlerEvent: RouterHandlerComponent::Event,
     }
 
     #[constructor]

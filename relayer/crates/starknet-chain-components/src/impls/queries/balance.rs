@@ -12,6 +12,7 @@ use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
+use crate::impls::types::address::StarknetAddress;
 use crate::traits::contract::call::CanCallContract;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
@@ -24,8 +25,8 @@ pub struct QueryStarknetWalletBalance;
 #[cgp_provider(BalanceQuerierComponent)]
 impl<Chain, Encoding> BalanceQuerier<Chain> for QueryStarknetWalletBalance
 where
-    Chain: HasAddressType<Address = Felt>
-        + HasDenomType<Denom = Felt>
+    Chain: HasAddressType<Address = StarknetAddress>
+        + HasDenomType<Denom = StarknetAddress>
         + HasAmountType<Amount = StarknetAmount>
         + HasBlobType<Blob = Vec<Felt>>
         + HasSelectorType<Selector = Felt>
@@ -41,7 +42,7 @@ where
         denom: &Chain::Denom,
     ) -> Result<Chain::Amount, Chain::Error> {
         let output = chain
-            .call_contract(denom, &BALANCE_SELECTOR, &vec![*address])
+            .call_contract(denom, &BALANCE_SELECTOR, &vec![**address])
             .await?;
 
         let quantity = chain

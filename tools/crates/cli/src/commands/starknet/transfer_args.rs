@@ -83,7 +83,7 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
         let denom = if args.denom.starts_with("0x") {
             PrefixedDenom {
                 trace_path: vec![],
-                base: Denom::Native(Felt::from_hex(&args.denom)?),
+                base: Denom::Native(Felt::from_hex(&args.denom)?.into()),
             }
         } else {
             PrefixedDenom {

@@ -1,13 +1,13 @@
 use core::num::traits::Zero;
-use starknet_ibc_core::channel::ChannelHandlerComponent::{ChannelWriterTrait, ChannelReaderTrait};
-use starknet_ibc_core::channel::{IChannelQuery, ChannelHandlerComponent, Receipt, ReceiptTrait};
+use starknet_ibc_core::channel::ChannelHandlerComponent::{ChannelReaderTrait, ChannelWriterTrait};
+use starknet_ibc_core::channel::{ChannelHandlerComponent, IChannelQuery, Receipt, ReceiptTrait};
 use starknet_ibc_core::commitment::compute_packet_commitment;
 use starknet_ibc_core::host::SequenceImpl;
 use starknet_ibc_testkit::configs::TransferAppConfigImpl;
 use starknet_ibc_testkit::configs::TransferAppConfigTrait;
 use starknet_ibc_testkit::dummies::{
-    CHANNEL_END, CHANNEL_ID, PORT_ID, SEQUENCE, NATIVE_DENOM, STARKNET, COSMOS, TIMEOUT_HEIGHT,
-    TIMEOUT_TIMESTAMP
+    CHANNEL_END, CHANNEL_ID, COSMOS, NATIVE_DENOM, PORT_ID, SEQUENCE, STARKNET, TIMEOUT_HEIGHT,
+    TIMEOUT_TIMESTAMP,
 };
 use starknet_ibc_testkit::mocks::MockChannelHandler;
 

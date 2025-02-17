@@ -1,10 +1,10 @@
 use starknet_ibc_core::channel::{
-    ChannelEnd, MsgChanOpenInit, MsgChanOpenTry, MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket,
-    MsgAckPacket, MsgTimeoutPacket, Packet, Acknowledgement
+    Acknowledgement, ChannelEnd, MsgAckPacket, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
+    MsgChanOpenTry, MsgRecvPacket, MsgTimeoutPacket, Packet,
 };
-use starknet_ibc_core::channel::{ChannelOrdering, AppVersion};
+use starknet_ibc_core::channel::{AppVersion, ChannelOrdering};
 use starknet_ibc_core::commitment::Commitment;
-use starknet_ibc_core::host::{ConnectionId, PortId, ChannelId, Sequence};
+use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId, Sequence};
 
 #[starknet::interface]
 pub trait IChannelHandler<TContractState> {
@@ -27,7 +27,7 @@ pub trait IAppCallback<TContractState> {
         conn_id_on_a: ConnectionId,
         port_id_on_b: PortId,
         version_proposal: AppVersion,
-        ordering: ChannelOrdering
+        ordering: ChannelOrdering,
     ) -> AppVersion;
     fn on_chan_open_try(
         ref self: TContractState,
@@ -36,16 +36,16 @@ pub trait IAppCallback<TContractState> {
         conn_id_on_b: ConnectionId,
         port_id_on_a: PortId,
         version_on_a: AppVersion,
-        ordering: ChannelOrdering
+        ordering: ChannelOrdering,
     ) -> AppVersion;
     fn on_chan_open_ack(
         ref self: TContractState,
         port_id_on_a: PortId,
         chan_id_on_a: ChannelId,
-        version_on_b: AppVersion
+        version_on_b: AppVersion,
     );
     fn on_chan_open_confirm(
-        ref self: TContractState, port_id_on_b: PortId, chan_id_on_b: ChannelId
+        ref self: TContractState, port_id_on_b: PortId, chan_id_on_b: ChannelId,
     );
     fn on_recv_packet(ref self: TContractState, packet: Packet) -> Acknowledgement;
     fn on_ack_packet(ref self: TContractState, packet: Packet, ack: Acknowledgement);
@@ -59,32 +59,32 @@ pub trait IAppCallback<TContractState> {
 pub trait IChannelQuery<TContractState> {
     fn channel_end(self: @TContractState, port_id: PortId, channel_id: ChannelId) -> ChannelEnd;
     fn packet_commitment(
-        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
+        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
     ) -> Commitment;
     fn packet_receipt(
-        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
+        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
     ) -> bool;
     fn packet_acknowledgement(
-        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence
+        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
     ) -> Commitment;
     /// Returns all committed packet sequences pending finalization on the counterparty chain.
     fn packet_commitment_sequences(
-        self: @TContractState, port_id: PortId, channel_id: ChannelId
+        self: @TContractState, port_id: PortId, channel_id: ChannelId,
     ) -> Array<Sequence>;
     /// Returns sequences from the given list that are acknowledged (finalized) on this chain.
     fn packet_ack_sequences(
-        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>
+        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>,
     ) -> Array<Sequence>;
     fn unreceived_packet_sequences(
-        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>
+        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>,
     ) -> Array<Sequence>;
     fn unreceived_ack_sequences(
-        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>
+        self: @TContractState, port_id: PortId, channel_id: ChannelId, sequences: Array<Sequence>,
     ) -> Array<Sequence>;
     fn next_sequence_send(
-        self: @TContractState, port_id: PortId, channel_id: ChannelId
+        self: @TContractState, port_id: PortId, channel_id: ChannelId,
     ) -> Sequence;
     fn next_sequence_recv(
-        self: @TContractState, port_id: PortId, channel_id: ChannelId
+        self: @TContractState, port_id: PortId, channel_id: ChannelId,
     ) -> Sequence;
 }

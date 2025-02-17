@@ -9,18 +9,18 @@ pub mod CometClientComponent {
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,
     };
-    use starknet::{ContractAddress, get_block_timestamp, get_block_number, get_caller_address};
+    use starknet::{ContractAddress, get_block_number, get_block_timestamp, get_caller_address};
     use starknet_ibc_clients::cometbft::{
         CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
-        CometHeader, CometHeaderImpl, CometErrors
+        CometErrors, CometHeader, CometHeaderImpl,
     };
     use starknet_ibc_core::client::{
-        MsgCreateClient, MsgUpdateClient, MsgRecoverClient, MsgUpgradeClient, Height, HeightZero,
-        HeightImpl, StoreHeightArray, HeightPartialOrd, Timestamp, Status, StatusTrait,
-        CreateResponse, CreateResponseImpl, UpdateResponse, IClientHandler, IClientQuery,
-        IClientStateValidation, IClientStateExecution,
+        CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
+        IClientHandler, IClientQuery, IClientStateExecution, IClientStateValidation,
+        MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient, Status, StatusTrait,
+        StoreHeightArray, Timestamp, UpdateResponse,
     };
-    use starknet_ibc_core::commitment::{StateProof, StateValue, StateRoot};
+    use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
     use starknet_ibc_core::host::ClientIdImpl;
     use starknet_ibc_utils::ValidateBasic;
 
@@ -50,7 +50,7 @@ pub mod CometClientComponent {
         impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of IClientHandler<ComponentState<TContractState>> {
         fn create_client(
-            ref self: ComponentState<TContractState>, msg: MsgCreateClient
+            ref self: ComponentState<TContractState>, msg: MsgCreateClient,
         ) -> CreateResponse {
             self.assert_owner();
             let client_sequence = self.read_next_client_sequence();
@@ -59,7 +59,7 @@ pub mod CometClientComponent {
         }
 
         fn update_client(
-            ref self: ComponentState<TContractState>, msg: MsgUpdateClient
+            ref self: ComponentState<TContractState>, msg: MsgUpdateClient,
         ) -> UpdateResponse {
             self.assert_owner();
             self.update_validate(msg.clone());
@@ -81,7 +81,7 @@ pub mod CometClientComponent {
 
     #[embeddable_as(CometClientQuery)]
     impl ClientQueryImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of IClientQuery<ComponentState<TContractState>> {
         fn client_type(self: @ComponentState<TContractState>) -> felt252 {
             '07-tendermint'
@@ -94,7 +94,7 @@ pub mod CometClientComponent {
         }
 
         fn update_height_before(
-            self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height
+            self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height,
         ) -> Height {
             let update_heights = self.read_update_heights(client_sequence);
 
@@ -121,7 +121,7 @@ pub mod CometClientComponent {
         }
 
         fn latest_timestamp(
-            self: @ComponentState<TContractState>, client_sequence: u64
+            self: @ComponentState<TContractState>, client_sequence: u64,
         ) -> Timestamp {
             let latest_height = self.latest_height(client_sequence);
 
@@ -140,7 +140,7 @@ pub mod CometClientComponent {
         }
 
         fn client_state(
-            self: @ComponentState<TContractState>, client_sequence: u64
+            self: @ComponentState<TContractState>, client_sequence: u64,
         ) -> Array<felt252> {
             let mut client_state: Array<felt252> = ArrayTrait::new();
 
@@ -150,7 +150,7 @@ pub mod CometClientComponent {
         }
 
         fn consensus_state(
-            self: @ComponentState<TContractState>, client_sequence: u64, height: Height
+            self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) -> Array<felt252> {
             let mut consensus_state: Array<felt252> = ArrayTrait::new();
 
@@ -160,7 +160,7 @@ pub mod CometClientComponent {
         }
 
         fn consensus_state_root(
-            self: @ComponentState<TContractState>, client_sequence: u64, height: Height
+            self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) -> StateRoot {
             self.read_consensus_state(client_sequence, height).root
         }
@@ -172,10 +172,10 @@ pub mod CometClientComponent {
 
     #[generate_trait]
     pub(crate) impl CreateClientImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of CreateClientTrait<TContractState> {
         fn create_validate(
-            self: @ComponentState<TContractState>, client_sequence: u64, msg: MsgCreateClient
+            self: @ComponentState<TContractState>, client_sequence: u64, msg: MsgCreateClient,
         ) {
             msg.validate_basic();
 
@@ -191,7 +191,7 @@ pub mod CometClientComponent {
         }
 
         fn create_execute(
-            ref self: ComponentState<TContractState>, client_sequence: u64, msg: MsgCreateClient
+            ref self: ComponentState<TContractState>, client_sequence: u64, msg: MsgCreateClient,
         ) -> CreateResponse {
             self.initialize(client_sequence, msg.client_state, msg.consensus_state)
         }
@@ -199,13 +199,13 @@ pub mod CometClientComponent {
 
     #[generate_trait]
     pub(crate) impl UpdateClientImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of UpdateClientTrait<TContractState> {
         fn update_validate(self: @ComponentState<TContractState>, msg: MsgUpdateClient) {
             msg.validate_basic();
 
             assert(
-                msg.client_id.client_type == self.client_type(), CometErrors::INVALID_CLIENT_TYPE
+                msg.client_id.client_type == self.client_type(), CometErrors::INVALID_CLIENT_TYPE,
             );
 
             let client_sequence = msg.client_id.sequence;
@@ -223,7 +223,7 @@ pub mod CometClientComponent {
         }
 
         fn update_execute(
-            ref self: ComponentState<TContractState>, msg: MsgUpdateClient
+            ref self: ComponentState<TContractState>, msg: MsgUpdateClient,
         ) -> UpdateResponse {
             let client_sequence = msg.client_id.sequence;
 
@@ -237,7 +237,7 @@ pub mod CometClientComponent {
 
     #[generate_trait]
     pub(crate) impl RecoverClientImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of RecoverClientTrait<TContractState> {
         fn recover_validate(self: @ComponentState<TContractState>, msg: MsgRecoverClient) {
             msg.validate_basic();
@@ -248,13 +248,13 @@ pub mod CometClientComponent {
 
     #[generate_trait]
     pub(crate) impl UpgradeClientImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of UpgradeClientTrait<TContractState> {
         fn upgrade_validate(self: @ComponentState<TContractState>, msg: MsgUpgradeClient) {
             msg.validate_basic();
         }
 
-        fn upgrade_execute(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient,) {}
+        fn upgrade_execute(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {}
     }
 
     // -----------------------------------------------------------
@@ -263,7 +263,7 @@ pub mod CometClientComponent {
 
     #[embeddable_as(CometClientValidation)]
     impl ClientValidationImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of IClientStateValidation<ComponentState<TContractState>> {
         fn verify_membership(
             self: @ComponentState<TContractState>,
@@ -285,19 +285,19 @@ pub mod CometClientComponent {
         fn verify_client_message(
             self: @ComponentState<TContractState>,
             client_sequence: u64,
-            client_message: Array<felt252>
+            client_message: Array<felt252>,
         ) {}
 
         fn verify_misbehaviour(
             self: @ComponentState<TContractState>,
             client_sequence: u64,
-            client_message: Array<felt252>
+            client_message: Array<felt252>,
         ) -> bool {
             false
         }
 
         fn verify_substitute(
-            self: @ComponentState<TContractState>, substitute_client_state: Array<felt252>
+            self: @ComponentState<TContractState>, substitute_client_state: Array<felt252>,
         ) {}
 
         fn verify_upgrade(
@@ -306,25 +306,31 @@ pub mod CometClientComponent {
             upgrade_consensus_state: Array<felt252>,
             proof_upgrade_client: Array<felt252>,
             proof_upgrade_consensus: Array<felt252>,
-            root: ByteArray
+            root: ByteArray,
         ) {}
     }
 
     #[embeddable_as(CometClientExecution)]
     impl ClientExecutionImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of IClientStateExecution<ComponentState<TContractState>> {
         fn initialize(
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
             client_state: Array<felt252>,
-            consensus_state: Array<felt252>
+            consensus_state: Array<felt252>,
         ) -> CreateResponse {
             let comet_client_state = CometClientStateImpl::deserialize(client_state);
 
             let comet_consensus_state = CometConsensusStateImpl::deserialize(consensus_state);
 
-            self._update_state(client_sequence, comet_client_state.clone(), comet_consensus_state);
+            self
+                ._update_state(
+                    client_sequence,
+                    comet_client_state.latest_height,
+                    comet_client_state.clone(),
+                    comet_consensus_state,
+                );
 
             let client_id = ClientIdImpl::new(self.client_type(), client_sequence);
 
@@ -334,7 +340,7 @@ pub mod CometClientComponent {
         fn update_state(
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
-            client_message: Array<felt252>
+            client_message: Array<felt252>,
         ) -> UpdateResponse {
             let header: CometHeader = CometHeaderImpl::deserialize(client_message);
 
@@ -349,7 +355,10 @@ pub mod CometClientComponent {
 
                 let new_consensus_state: CometConsensusState = header.into();
 
-                self._update_state(client_sequence, client_state, new_consensus_state);
+                self
+                    ._update_state(
+                        client_sequence, header_height, client_state, new_consensus_state,
+                    );
             }
 
             array![header_height].into()
@@ -358,7 +367,7 @@ pub mod CometClientComponent {
         fn update_on_misbehaviour(
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
-            client_message: Array<felt252>
+            client_message: Array<felt252>,
         ) -> UpdateResponse {
             let header = CometHeaderImpl::deserialize(client_message);
 
@@ -375,14 +384,14 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>,
             subject_client_sequence: u64,
             substitute_client_state: Array<felt252>,
-            substitute_consensus_state: Array<felt252>
+            substitute_consensus_state: Array<felt252>,
         ) {}
 
         fn update_on_upgrade(
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
             new_client_state: Array<felt252>,
-            new_consensus_state: Array<felt252>
+            new_consensus_state: Array<felt252>,
         ) {}
     }
 
@@ -412,13 +421,13 @@ pub mod CometClientComponent {
 
     #[generate_trait]
     pub(crate) impl ClientInternalImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ClientInternalTrait<TContractState> {
         fn _status(
             self: @ComponentState<TContractState>,
             client_state: CometClientState,
             consensus_state: CometConsensusState,
-            client_sequence: u64
+            client_sequence: u64,
         ) -> Status {
             if !client_state.status.is_active() {
                 return client_state.status;
@@ -439,29 +448,28 @@ pub mod CometClientComponent {
         fn _update_state(
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
+            update_height: Height,
             client_state: CometClientState,
             consensus_state: CometConsensusState,
         ) {
             self.write_client_state(client_sequence, client_state.clone());
 
-            let latest_height = client_state.latest_height;
-
-            self.write_update_height(client_sequence, latest_height.clone());
+            self.write_update_height(client_sequence, update_height.clone());
 
             self
                 .write_consensus_state(
-                    client_sequence, latest_height.clone(), consensus_state.clone()
+                    client_sequence, update_height.clone(), consensus_state.clone(),
                 );
 
             let host_height = get_block_number();
 
-            self.write_client_processed_height(client_sequence, latest_height.clone(), host_height);
+            self.write_client_processed_height(client_sequence, update_height.clone(), host_height);
 
             let host_timestamp = get_block_timestamp();
 
             self
                 .write_client_processed_time(
-                    client_sequence, latest_height.clone(), host_timestamp
+                    client_sequence, update_height.clone(), host_timestamp,
                 );
 
             self.write_next_client_sequence(client_sequence + 1);
@@ -474,14 +482,14 @@ pub mod CometClientComponent {
 
     #[generate_trait]
     pub(crate) impl ClientReaderImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ClientReaderTrait<TContractState> {
         fn read_next_client_sequence(self: @ComponentState<TContractState>) -> u64 {
             self.next_client_sequence.read()
         }
 
         fn read_client_state(
-            self: @ComponentState<TContractState>, client_sequence: u64
+            self: @ComponentState<TContractState>, client_sequence: u64,
         ) -> CometClientState {
             let client_state = self.client_states.read(client_sequence);
 
@@ -491,7 +499,7 @@ pub mod CometClientComponent {
         }
 
         fn read_consensus_state(
-            self: @ComponentState<TContractState>, client_sequence: u64, height: Height
+            self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) -> CometConsensusState {
             let consensus_state = self.consensus_states.read((client_sequence, height));
 
@@ -501,13 +509,13 @@ pub mod CometClientComponent {
         }
 
         fn consensus_state_exists(
-            self: @ComponentState<TContractState>, client_sequence: u64, height: Height
+            self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) -> bool {
             self.consensus_states.read((client_sequence, height)).is_non_zero()
         }
 
         fn read_client_processed_time(
-            self: @ComponentState<TContractState>, client_sequence: u64, height: Height
+            self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) -> Timestamp {
             let processed_time = self.client_processed_times.read((client_sequence, height));
 
@@ -517,7 +525,7 @@ pub mod CometClientComponent {
         }
 
         fn read_client_processed_height(
-            self: @ComponentState<TContractState>, client_sequence: u64, height: Height
+            self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) -> u64 {
             let processed_height = self.client_processed_heights.read((client_sequence, height));
 
@@ -527,7 +535,7 @@ pub mod CometClientComponent {
         }
 
         fn read_update_heights(
-            self: @ComponentState<TContractState>, client_sequence: u64
+            self: @ComponentState<TContractState>, client_sequence: u64,
         ) -> Array<Height> {
             self.update_heights.read(client_sequence)
         }
@@ -535,16 +543,16 @@ pub mod CometClientComponent {
 
     #[generate_trait]
     pub(crate) impl ClientWriterImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of ClientWriterTrait<TContractState> {
         fn write_next_client_sequence(
-            ref self: ComponentState<TContractState>, client_sequence: u64
+            ref self: ComponentState<TContractState>, client_sequence: u64,
         ) {
             self.next_client_sequence.write(client_sequence);
         }
 
         fn write_update_height(
-            ref self: ComponentState<TContractState>, client_sequence: u64, update_height: Height
+            ref self: ComponentState<TContractState>, client_sequence: u64, update_height: Height,
         ) {
             let mut update_heights = self.update_heights.read(client_sequence);
 
@@ -573,7 +581,7 @@ pub mod CometClientComponent {
         fn write_client_state(
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
-            client_state: CometClientState
+            client_state: CometClientState,
         ) {
             self.client_states.write(client_sequence, client_state);
         }
@@ -582,7 +590,7 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
             height: Height,
-            consensus_state: CometConsensusState
+            consensus_state: CometConsensusState,
         ) {
             self.consensus_states.write((client_sequence, height), consensus_state);
         }
@@ -591,7 +599,7 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
             height: Height,
-            timestamp: u64
+            timestamp: u64,
         ) {
             self.client_processed_times.write((client_sequence, height), timestamp);
         }
@@ -600,7 +608,7 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
             height: Height,
-            host_height: u64
+            host_height: u64,
         ) {
             self.client_processed_heights.write((client_sequence, height), host_height);
         }

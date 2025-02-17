@@ -1,18 +1,18 @@
 use snforge_std::start_cheat_caller_address;
 use starknet_ibc_apps::transfer::{ERC20Contract, SUCCESS_ACK, VERSION};
-use starknet_ibc_core::channel::{ChannelEndTrait, ChannelOrdering, AckStatus, ChannelState};
+use starknet_ibc_core::channel::{AckStatus, ChannelEndTrait, ChannelOrdering, ChannelState};
 use starknet_ibc_core::client::{Height, Timestamp};
-use starknet_ibc_core::host::{SequenceImpl, Sequence};
+use starknet_ibc_core::host::{Sequence, SequenceImpl};
 use starknet_ibc_testkit::configs::{
-    TransferAppConfigTrait, CoreConfigTrait, CometClientConfigTrait
+    CometClientConfigTrait, CoreConfigTrait, TransferAppConfigTrait,
 };
 use starknet_ibc_testkit::dummies::{
-    HEIGHT, TIMESTAMP, COSMOS, STARKNET, CLIENT_ID, CONNECTION_ID, CHANNEL_ID, PORT_ID, SUPPLY,
-    PACKET_COMMITMENT_ON_SN, SN_USER, CS_USER
+    CHANNEL_ID, CLIENT_ID, CONNECTION_ID, COSMOS, CS_USER, HEIGHT, PACKET_COMMITMENT_ON_SN, PORT_ID,
+    SN_USER, STARKNET, SUPPLY, TIMESTAMP,
 };
-use starknet_ibc_testkit::event_spy::{TransferEventSpyExt, ChannelEventSpyExt};
-use starknet_ibc_testkit::handles::{CoreHandle, AppHandle, ERC20Handle};
-use starknet_ibc_testkit::setup::{setup, Mode};
+use starknet_ibc_testkit::event_spy::{ChannelEventSpyExt, TransferEventSpyExt};
+use starknet_ibc_testkit::handles::{AppHandle, CoreHandle, ERC20Handle};
+use starknet_ibc_testkit::setup::{Mode, setup};
 use starknet_ibc_utils::ComputeKey;
 
 #[test]
@@ -134,7 +134,7 @@ fn test_chan_open_confirm_ok() {
 
     spy
         .assert_chan_open_confirm_event(
-            core.address, PORT_ID(), CHANNEL_ID(0), CONNECTION_ID(0), msg.clone()
+            core.address, PORT_ID(), CHANNEL_ID(0), CONNECTION_ID(0), msg.clone(),
         );
 
     let chan_end_on_b = core.channel_end(msg.port_id_on_b, msg.chan_id_on_b);
@@ -171,7 +171,7 @@ fn test_send_packet_ok() {
 
     let commitment = core
         .packet_commitment(
-            packet.port_id_on_a.clone(), packet.chan_id_on_a.clone(), packet.seq_on_a.clone()
+            packet.port_id_on_a.clone(), packet.chan_id_on_a.clone(), packet.seq_on_a.clone(),
         );
 
     assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
@@ -207,7 +207,7 @@ fn test_recv_packet_ok() {
     // Assert the `RecvEvent` emitted by the ICS20 contract.
     spy
         .assert_recv_event(
-            ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), transfer_cfg.amount, true
+            ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), transfer_cfg.amount, true,
         );
 
     // Assert the `ReceivePacketEvent` emitted by the core contract.
@@ -274,7 +274,7 @@ fn test_successful_ack_packet_ok() {
 
     let commitment = core
         .packet_commitment(
-            msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a.clone()
+            msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a.clone(),
         );
 
     assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
@@ -290,7 +290,7 @@ fn test_successful_ack_packet_ok() {
 
     let msg = transfer_cfg
         .dummy_msg_ack_packet(
-            transfer_cfg.native_denom.clone(), STARKNET(), COSMOS(), SUCCESS_ACK()
+            transfer_cfg.native_denom.clone(), STARKNET(), COSMOS(), SUCCESS_ACK(),
         );
 
     core.ack_packet(msg.clone());
@@ -306,7 +306,7 @@ fn test_successful_ack_packet_ok() {
             CS_USER(),
             transfer_cfg.native_denom.clone(),
             transfer_cfg.amount,
-            SUCCESS_ACK()
+            SUCCESS_ACK(),
         );
 
     spy.assert_ack_status_event(ics20.address, AckStatus::Success(SUCCESS_ACK()));
@@ -318,7 +318,7 @@ fn test_successful_ack_packet_ok() {
 
     core
         .packet_commitment(
-            msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a
+            msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a,
         );
 }
 
@@ -357,7 +357,7 @@ fn test_failure_ack_packet_ok() {
 
     let commitment = core
         .packet_commitment(
-            msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a.clone()
+            msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a.clone(),
         );
 
     assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
@@ -375,7 +375,7 @@ fn test_failure_ack_packet_ok() {
 
     let msg = transfer_cfg
         .dummy_msg_ack_packet(
-            transfer_cfg.native_denom.clone(), STARKNET(), COSMOS(), failure_ack.clone()
+            transfer_cfg.native_denom.clone(), STARKNET(), COSMOS(), failure_ack.clone(),
         );
 
     core.ack_packet(msg.clone());
@@ -391,7 +391,7 @@ fn test_failure_ack_packet_ok() {
             CS_USER(),
             transfer_cfg.native_denom.clone(),
             transfer_cfg.amount,
-            failure_ack.clone()
+            failure_ack.clone(),
         );
 
     spy.assert_ack_status_event(ics20.address, AckStatus::Error(failure_ack));
@@ -403,7 +403,7 @@ fn test_failure_ack_packet_ok() {
 
     core
         .packet_commitment(
-            msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a
+            msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a,
         );
 }
 
@@ -422,7 +422,7 @@ fn test_ack_packet_for_never_sent_packet() {
 
     let msg = transfer_cfg
         .dummy_msg_ack_packet(
-            transfer_cfg.native_denom.clone(), STARKNET(), COSMOS(), SUCCESS_ACK()
+            transfer_cfg.native_denom.clone(), STARKNET(), COSMOS(), SUCCESS_ACK(),
         );
 
     core.ack_packet(msg);
@@ -434,7 +434,7 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
     // -----------------------------------------------------------
 
     let (core, ics20, mut erc20, mut core_cfg, comet_cfg, mut transfer_cfg, mut spy) = setup(
-        Mode::WithConnection
+        Mode::WithConnection,
     );
 
     let updating_height = HEIGHT(11); // Set to 11 as client is created at height 10.
@@ -497,7 +497,7 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
 
     core
         .packet_commitment(
-            packet.port_id_on_a.clone(), packet.chan_id_on_a.clone(), packet.seq_on_a
+            packet.port_id_on_a.clone(), packet.chan_id_on_a.clone(), packet.seq_on_a,
         );
 }
 

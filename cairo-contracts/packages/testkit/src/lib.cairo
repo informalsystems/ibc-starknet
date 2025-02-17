@@ -28,26 +28,28 @@ pub mod dummies {
     mod transfer;
 
     pub use core::{
-        HEIGHT, TIMESTAMP, CLIENT, CLIENT_TYPE, CLIENT_ID, CONNECTION_ID, CONNECTION_END, PORT_ID,
-        CHANNEL_ID, SEQUENCE, CHANNEL_END, VERSION_PROPOSAL, TIMEOUT_HEIGHT, TIMEOUT_TIMESTAMP,
-        STATE_PROOF, STATE_ROOT, IBC_PREFIX, RELAYER
+        CHANNEL_END, CHANNEL_ID, CLIENT, CLIENT_ID, CLIENT_TYPE, CONNECTION_END, CONNECTION_ID,
+        HEIGHT, IBC_PREFIX, PORT_ID, RELAYER, SEQUENCE, STATE_PROOF, STATE_ROOT, TIMEOUT_HEIGHT,
+        TIMEOUT_TIMESTAMP, TIMESTAMP, VERSION_PROPOSAL,
     };
     pub use transfer::{
-        NAME, SYMBOL, ERC20, AMOUNT, SUPPLY, OWNER, SN_USER, CS_USER, STARKNET, COSMOS,
-        NATIVE_DENOM, HOSTED_DENOM, SALT, DECIMALS, CLASS_HASH, EMPTY_MEMO, PACKET_DATA_FROM_SN,
-        PACKET_COMMITMENT_ON_SN
+        AMOUNT, CLASS_HASH, COSMOS, CS_USER, DECIMALS, EMPTY_MEMO, ERC20, HOSTED_DENOM, NAME,
+        NATIVE_DENOM, OWNER, PACKET_COMMITMENT_ON_SN, PACKET_DATA_FROM_SN, SALT, SN_USER, STARKNET,
+        SUPPLY, SYMBOL,
     };
 }
 pub mod event_spy {
     mod channel;
     mod client;
     mod connection;
+    mod erc20;
     mod transfer;
 
-    pub use channel::{ChannelEventSpyExtImpl, ChannelEventSpyExt};
+    pub use channel::{ChannelEventSpyExt, ChannelEventSpyExtImpl};
     pub use client::ClientEventSpyExt;
-    pub use connection::{ConnectionEventSpyExtImpl, ConnectionEventSpyExt};
-    pub use transfer::{TransferEventSpyExtImpl, TransferEventSpyExt};
+    pub use connection::{ConnectionEventSpyExt, ConnectionEventSpyExtImpl};
+    pub use erc20::{ERC20EventSpyExt, ERC20EventSpyExtImpl};
+    pub use transfer::{TransferEventSpyExt, TransferEventSpyExtImpl};
 }
 pub mod handles {
     mod app;
@@ -55,8 +57,8 @@ pub mod handles {
     mod core;
     mod erc20;
 
-    pub use app::{AppHandleImpl, AppHandle};
-    pub use client::{ClientHandleImpl, ClientHandle};
-    pub use core::{CoreContract, CoreHandleImpl, CoreHandle};
-    pub use erc20::{ERC20HandleImpl, ERC20Handle};
+    pub use app::{AppHandle, AppHandleImpl};
+    pub use client::{ClientHandle, ClientHandleImpl};
+    pub use core::{CoreContract, CoreHandle, CoreHandleImpl};
+    pub use erc20::{ERC20Handle, ERC20HandleImpl};
 }

@@ -2,8 +2,8 @@ mod errors;
 mod utils;
 pub use errors::UtilErrors;
 pub use utils::{
-    ValidateBasic, ComputeKey, LocalKeyBuilder, LocalKeyBuilderTrait, LocalKeyBuilderImpl,
-    poseidon_hash, RemotePathBuilderImpl, RemotePathBuilder, RemotePathBuilderTrait
+    ComputeKey, LocalKeyBuilder, LocalKeyBuilderImpl, LocalKeyBuilderTrait, RemotePathBuilder,
+    RemotePathBuilderImpl, RemotePathBuilderTrait, ValidateBasic, poseidon_hash,
 };
 pub mod governance {
     mod component;

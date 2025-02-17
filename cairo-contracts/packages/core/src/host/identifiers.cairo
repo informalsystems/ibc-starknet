@@ -3,9 +3,10 @@ use core::num::traits::Zero;
 use core::num::traits::{CheckedAdd, CheckedSub};
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
-use starknet_ibc_core::commitment::{ArrayU32IntoArrayU8, StateValue, u64_into_array_u32};
+use ics23::{ArrayU32IntoArrayU8, u64_into_array_u32};
+use starknet_ibc_core::commitment::StateValue;
 use starknet_ibc_core::host::errors::HostErrors;
-use starknet_ibc_utils::{ValidateBasic, ComputeKey, poseidon_hash};
+use starknet_ibc_utils::{ComputeKey, ValidateBasic, poseidon_hash};
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ClientId {
@@ -38,7 +39,7 @@ pub impl ClientIdZero of Zero<ClientId> {
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ConnectionId {
-    pub connection_id: ByteArray
+    pub connection_id: ByteArray,
 }
 
 #[generate_trait]
@@ -241,7 +242,7 @@ pub impl SequenceImpl of SequenceTrait {
 
         match maybe_next_sequence {
             Option::Some(sequence) => Sequence { sequence },
-            Option::None => panic!("{}", HostErrors::OVERFLOWED_SEQUENCE)
+            Option::None => panic!("{}", HostErrors::OVERFLOWED_SEQUENCE),
         }
     }
 
@@ -312,7 +313,7 @@ pub(crate) fn assert_numeric(char_bytes: u8) {
 
 #[cfg(test)]
 mod tests {
-    use super::{ConnectionId, ConnectionIdTrait, ChannelId, ChannelIdTrait};
+    use super::{ChannelId, ChannelIdTrait, ConnectionId, ConnectionIdTrait};
 
     #[test]
     fn test_connection_id_validate() {

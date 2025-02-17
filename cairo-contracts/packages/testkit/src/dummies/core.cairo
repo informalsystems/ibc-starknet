@@ -1,13 +1,13 @@
-use starknet::{contract_address_const, ContractAddress};
+use starknet::{ContractAddress, contract_address_const};
 use starknet_ibc_core::channel::{
-    ChannelEnd, ChannelState, ChannelOrdering, Counterparty as ChanCounterparty, AppVersion
+    AppVersion, ChannelEnd, ChannelOrdering, ChannelState, Counterparty as ChanCounterparty,
 };
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::commitment::{StateProof, StateRoot};
 use starknet_ibc_core::connection::{
-    ConnectionEnd, ConnectionState, Counterparty as ConnCounterparty, VersionImpl
+    ConnectionEnd, ConnectionState, Counterparty as ConnCounterparty, VersionImpl,
 };
-use starknet_ibc_core::host::{BasePrefix, ClientId, ConnectionId, PortId, ChannelId, Sequence};
+use starknet_ibc_core::host::{BasePrefix, ChannelId, ClientId, ConnectionId, PortId, Sequence};
 
 pub fn HEIGHT(revision_height: u64) -> Height {
     Height { revision_number: 0, revision_height }

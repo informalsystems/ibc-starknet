@@ -1,27 +1,27 @@
 use openzeppelin_testing::declare_and_deploy;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
-    IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, MsgChanOpenInit, MsgChanOpenTry,
-    MsgChanOpenAck, MsgChanOpenConfirm, MsgRecvPacket, MsgAckPacket, MsgTimeoutPacket,
-    IChannelQueryDispatcher, IChannelQueryDispatcherTrait, ChannelEnd, Packet,
+    ChannelEnd, IChannelHandlerDispatcher, IChannelHandlerDispatcherTrait, IChannelQueryDispatcher,
+    IChannelQueryDispatcherTrait, MsgAckPacket, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
+    MsgChanOpenTry, MsgRecvPacket, MsgTimeoutPacket, Packet,
 };
 use starknet_ibc_core::client::{
-    IClientHandlerDispatcher, IClientHandlerDispatcherTrait, IRegisterClientDispatcher,
-    IRegisterClientDispatcherTrait, IRegisterRelayerDispatcher, IRegisterRelayerDispatcherTrait,
-    MsgCreateClient, MsgUpdateClient, CreateResponse, UpdateResponse
+    CreateResponse, IClientHandlerDispatcher, IClientHandlerDispatcherTrait,
+    IRegisterClientDispatcher, IRegisterClientDispatcherTrait, IRegisterRelayerDispatcher,
+    IRegisterRelayerDispatcherTrait, MsgCreateClient, MsgUpdateClient, UpdateResponse,
 };
 use starknet_ibc_core::commitment::Commitment;
 use starknet_ibc_core::connection::{
-    MsgConnOpenInit, MsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm,
-    IConnectionHandlerDispatcher, IConnectionHandlerDispatcherTrait, IConnectionQueryDispatcher,
-    IConnectionQueryDispatcherTrait, ConnectionEnd,
+    ConnectionEnd, IConnectionHandlerDispatcher, IConnectionHandlerDispatcherTrait,
+    IConnectionQueryDispatcher, IConnectionQueryDispatcherTrait, MsgConnOpenAck, MsgConnOpenConfirm,
+    MsgConnOpenInit, MsgConnOpenTry,
 };
-use starknet_ibc_core::host::{ConnectionId, ChannelId, PortId, Sequence};
+use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId, Sequence};
 use starknet_ibc_core::router::{IRouterDispatcher, IRouterDispatcherTrait};
 
 #[derive(Copy, Drop, Serde)]
 pub struct CoreContract {
-    pub address: ContractAddress
+    pub address: ContractAddress,
 }
 
 #[generate_trait]
@@ -143,19 +143,19 @@ pub impl CoreHandleImpl of CoreHandle {
     }
 
     fn packet_commitment(
-        self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence
+        self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
     ) -> Commitment {
         self.channel_query_dispatcher().packet_commitment(port_id, channel_id, sequence)
     }
 
     fn packet_receipt(
-        self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence
+        self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
     ) -> bool {
         self.channel_query_dispatcher().packet_receipt(port_id, channel_id, sequence)
     }
 
     fn packet_acknowledgement(
-        self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence
+        self: @CoreContract, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
     ) -> Commitment {
         self.channel_query_dispatcher().packet_acknowledgement(port_id, channel_id, sequence)
     }

@@ -9,6 +9,7 @@ use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
 use crate::components::chain::TokenBalanceQuerierComponent;
+use crate::impls::types::address::StarknetAddress;
 use crate::traits::contract::call::CanCallContract;
 use crate::traits::queries::token_balance::TokenBalanceQuerier;
 use crate::traits::types::blob::HasBlobType;
@@ -22,7 +23,7 @@ pub const BALANCE_SELECTOR: Felt = selector!("balance_of");
 #[cgp_provider(TokenBalanceQuerierComponent)]
 impl<Chain, Encoding> TokenBalanceQuerier<Chain> for QueryErc20TokenBalance
 where
-    Chain: HasAddressType<Address = Felt>
+    Chain: HasAddressType<Address = StarknetAddress>
         + HasAmountType<Amount = StarknetAmount>
         + HasBlobType<Blob = Vec<Felt>>
         + HasSelectorType<Selector = Felt>
@@ -34,11 +35,11 @@ where
 {
     async fn query_token_balance(
         chain: &Chain,
-        token_address: &Felt,
-        account_address: &Felt,
+        token_address: &StarknetAddress,
+        account_address: &StarknetAddress,
     ) -> Result<StarknetAmount, Chain::Error> {
         let output = chain
-            .call_contract(token_address, &BALANCE_SELECTOR, &vec![*account_address])
+            .call_contract(token_address, &BALANCE_SELECTOR, &vec![**account_address])
             .await?;
 
         let quantity = chain

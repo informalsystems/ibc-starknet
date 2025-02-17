@@ -12,6 +12,7 @@ use hermes_encoding_components::traits::has_encoding::{
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_error::impls::ProvideHermesError;
 use hermes_starknet_chain_components::components::encoding::event::*;
+use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
 use hermes_starknet_chain_components::types::events::channel::ChannelHandshakeEvents;
 use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
@@ -29,7 +30,7 @@ pub struct StarknetEventEncoding {
     pub erc20_hashes: HashSet<Felt>,
     pub ics20_hashes: HashSet<Felt>,
     pub ibc_client_hashes: HashSet<Felt>,
-    pub ibc_core_contract_addresses: HashSet<Felt>,
+    pub ibc_core_contract_addresses: HashSet<StarknetAddress>,
 }
 
 delegate_components! {

@@ -184,7 +184,7 @@ impl StarknetBuilder {
             LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
                 self.starknet_chain_config.relayer_wallet.signing_key,
             )),
-            self.starknet_chain_config.relayer_wallet.account_address,
+            *self.starknet_chain_config.relayer_wallet.account_address,
             chain_id_felt,
             ExecutionEncoding::New,
         );

@@ -14,7 +14,7 @@ fn test_success_ack_ok() {
 #[should_panic]
 fn test_success_ack_with_leading_zero() {
     let case = array![
-        123, 34, 114, 101, 115, 117, 108, 116, 34, 58, 34, 65, 81, 61, 61, 34, 125, 0
+        123, 34, 114, 101, 115, 117, 108, 116, 34, 58, 34, 65, 81, 61, 61, 34, 125, 0,
     ];
     assert_eq_success_ack(case);
 }

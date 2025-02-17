@@ -17,6 +17,7 @@ use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
+use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::cosmos::client_state::{ClientStatus, CometClientState};
@@ -30,7 +31,7 @@ impl<Chain, Counterparty, Encoding> CreateClientMessageBuilder<Chain, Counterpar
 where
     Chain: HasCreateClientMessageOptionsType<Counterparty>
         + HasMessageType<Message = StarknetMessage>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseAsyncError<Encoding::Error>,
@@ -86,7 +87,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let call = Call {
-            to: contract_address,
+            to: *contract_address,
             selector: selector!("create_client"),
             calldata,
         };

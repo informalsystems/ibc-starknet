@@ -1,6 +1,6 @@
 use protobuf::types::message::{
     ProtoMessage, ProtoName, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl
+    DecodeContextImpl,
 };
 use protobuf::types::tag::WireType;
 use protobuf::primitives::numeric::{I32AsProtoMessage, I64AsProtoMessage};
@@ -93,12 +93,12 @@ impl AnyAsProtoName of ProtoName<Any> {
 
 pub impl ProtoMessageIntoAny<T, +ProtoName<T>, +ProtoMessage<T>, +Drop<T>> of Into<T, Any> {
     fn into(self: T) -> Any {
-        Any { type_url: ProtoName::<T>::type_url(), value: ProtoCodecImpl::encode(@self), }
+        Any { type_url: ProtoName::<T>::type_url(), value: ProtoCodecImpl::encode(@self) }
     }
 }
 
 pub impl AnyTryIntoProtoMessage<
-    T, +ProtoName<T>, +ProtoMessage<T>, +Drop<T>, +Default<T>
+    T, +ProtoName<T>, +ProtoMessage<T>, +Drop<T>, +Default<T>,
 > of TryInto<Any, T> {
     fn try_into(self: Any) -> Option<T> {
         if self.type_url == ProtoName::<T>::type_url() {

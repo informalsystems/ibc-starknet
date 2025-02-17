@@ -12,6 +12,7 @@ use hermes_encoding_components::traits::transform::{Transformer, TransformerRef}
 use starknet::core::types::{Felt, U256};
 
 use super::channel::PortId;
+use crate::impls::types::address::StarknetAddress;
 use crate::types::channel_id::ChannelId;
 use crate::types::cosmos::height::Height;
 use crate::types::cosmos::timestamp::Timestamp;
@@ -93,7 +94,7 @@ delegate_components! {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Participant {
-    Native(Felt),
+    Native(StarknetAddress),
     External(String),
 }
 
@@ -123,7 +124,7 @@ impl TransformerRef for EncodeParticipant {
 
     fn transform<'a>(from: &'a Participant) -> Sum![Felt, &'a String] {
         match from {
-            Participant::Native(address) => Either::Left(*address),
+            Participant::Native(address) => Either::Left(**address),
             Participant::External(address) => Either::Right(Either::Left(address)),
         }
     }
@@ -135,7 +136,7 @@ impl Transformer for EncodeParticipant {
 
     fn transform(value: Sum![Felt, String]) -> Participant {
         match value {
-            Either::Left(value) => Participant::Native(value),
+            Either::Left(value) => Participant::Native(value.into()),
             Either::Right(Either::Left(value)) => Participant::External(value),
             Either::Right(Either::Right(value)) => match value {},
         }

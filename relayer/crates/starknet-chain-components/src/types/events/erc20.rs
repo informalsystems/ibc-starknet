@@ -7,6 +7,7 @@ use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
+use crate::impls::types::address::StarknetAddress;
 use crate::types::event::{StarknetEvent, UnknownEvent};
 
 #[derive(Debug)]
@@ -17,15 +18,15 @@ pub enum Erc20Event {
 
 #[derive(Debug)]
 pub struct TransferEvent {
-    pub from: Felt,
-    pub to: Felt,
+    pub from: StarknetAddress,
+    pub to: StarknetAddress,
     pub value: U256,
 }
 
 #[derive(Debug)]
 pub struct ApprovalEvent {
-    pub owner: Felt,
-    pub spender: Felt,
+    pub owner: StarknetAddress,
+    pub spender: StarknetAddress,
     pub value: U256,
 }
 
@@ -60,7 +61,7 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, Product![Felt, Felt]>
+        + CanDecode<ViaCairo, Product![StarknetAddress, StarknetAddress]>
         + CanDecode<ViaCairo, U256>,
 {
     fn decode(
@@ -88,7 +89,7 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, Product![Felt, Felt]>
+        + CanDecode<ViaCairo, Product![StarknetAddress, StarknetAddress]>
         + CanDecode<ViaCairo, U256>,
 {
     fn decode(

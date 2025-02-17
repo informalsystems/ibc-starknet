@@ -11,9 +11,11 @@ use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use starknet::core::types::Felt;
 
+use crate::impls::types::address::StarknetAddress;
+
 #[derive(Debug)]
 pub enum Denom {
-    Native(Felt),
+    Native(StarknetAddress),
     Hosted(String),
 }
 
@@ -116,7 +118,7 @@ impl TransformerRef for EncodeDenom {
 
     fn transform<'a>(from: &'a Denom) -> Sum![Felt, &'a String] {
         match from {
-            Denom::Native(denom) => Either::Left(*denom),
+            Denom::Native(denom) => Either::Left(**denom),
             Denom::Hosted(denom) => Either::Right(Either::Left(denom)),
         }
     }
@@ -128,7 +130,7 @@ impl Transformer for EncodeDenom {
 
     fn transform(value: Sum![Felt, String]) -> Denom {
         match value {
-            Either::Left(value) => Denom::Native(value),
+            Either::Left(value) => Denom::Native(value.into()),
             Either::Right(Either::Left(value)) => Denom::Hosted(value),
             Either::Right(Either::Right(value)) => match value {},
         }

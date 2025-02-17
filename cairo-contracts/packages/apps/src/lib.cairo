@@ -12,7 +12,7 @@ pub mod transfer {
         ITransferQueryDispatcher, ITransferQueryDispatcherTrait,
     };
     pub use interfaces::transferrable::{
-        ITransferrable, ITransferrableDispatcher, ITransferrableDispatcherTrait
+        ITransferrable, ITransferrableDispatcher, ITransferrableDispatcherTrait,
     };
     pub mod components {
         pub mod transfer;

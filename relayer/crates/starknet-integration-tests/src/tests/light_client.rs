@@ -183,7 +183,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             let calldata = cairo_encoding.encode(&register_client)?;
 
             let call = Call {
-                to: ibc_core_address,
+                to: *ibc_core_address,
                 selector: selector!("register_client"),
                 calldata,
             };

@@ -1,10 +1,11 @@
 use snforge_std::start_cheat_caller_address;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_testkit::configs::TransferAppConfigTrait;
-use starknet_ibc_testkit::dummies::{NAME, SYMBOL, SUPPLY, COSMOS, STARKNET, SN_USER, CS_USER};
-use starknet_ibc_testkit::event_spy::TransferEventSpyExt;
+use starknet_ibc_testkit::dummies::{COSMOS, CS_USER, NAME, SN_USER, STARKNET, SUPPLY, SYMBOL};
+use starknet_ibc_testkit::event_spy::ERC20EventSpyExt;
+use starknet_ibc_testkit::event_spy::{ERC20EventSpyExtImpl, TransferEventSpyExt};
 use starknet_ibc_testkit::handles::{AppHandle, CoreHandle, ERC20Handle};
-use starknet_ibc_testkit::setup::{setup, Mode};
+use starknet_ibc_testkit::setup::{Mode, setup};
 use starknet_ibc_utils::ComputeKey;
 
 #[test]
@@ -37,7 +38,7 @@ fn test_escrow_unescrow_roundtrip() {
             SN_USER(),
             CS_USER(),
             transfer_cfg.native_denom.clone(),
-            transfer_cfg.amount
+            transfer_cfg.amount,
         );
 
     // Check the balance of the sender.
@@ -62,7 +63,7 @@ fn test_escrow_unescrow_roundtrip() {
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
-            ics20.address, CS_USER(), SN_USER(), prefixed_denom, transfer_cfg.amount, true
+            ics20.address, CS_USER(), SN_USER(), prefixed_denom, transfer_cfg.amount, true,
         );
 
     erc20.assert_balance(ics20.address, 0);
@@ -96,16 +97,19 @@ fn test_mint_burn_roundtrip() {
     // Assert the `CreateTokenEvent` emitted.
     spy
         .assert_create_token_event(
-            ics20.address, NAME(), SYMBOL(), token_address, transfer_cfg.amount
+            ics20.address, NAME(), SYMBOL(), token_address, transfer_cfg.amount,
         );
 
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
-            ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), transfer_cfg.amount, true
+            ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), transfer_cfg.amount, true,
         );
 
     let erc20: ERC20Contract = token_address.into();
+
+    // Assert if the transfer happens from the ICS20 address.
+    spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), transfer_cfg.amount);
 
     // Check the balance of the receiver.
     erc20.assert_balance(SN_USER(), transfer_cfg.amount);
