@@ -136,6 +136,7 @@ cgp-run                 = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-runtime             = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-sync                = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-inner               = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp-error-eyre          = { git = "https://github.com/contextgeneric/cgp.git" }
 
 hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git" }

@@ -770,8 +770,7 @@ dependencies = [
 [[package]]
 name = "cgp-error-eyre"
 version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b55353f7f8495c809b21e386f2a35c4665f382836a46a2c961216b5aa2bcdc05"
+source = "git+https://github.com/contextgeneric/cgp.git#6dd33da8574520c409bda44c6e078e49b9c8c002"
 dependencies = [
  "cgp-core",
  "eyre",
