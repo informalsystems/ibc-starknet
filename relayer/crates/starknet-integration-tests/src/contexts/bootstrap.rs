@@ -46,17 +46,12 @@ use url::Url;
 
 use crate::contexts::chain_driver::StarknetChainDriver;
 
+#[cgp_context(StarknetBootstrapComponents)]
 #[derive(HasField)]
 pub struct StarknetBootstrap {
     pub runtime: HermesRuntime,
     pub chain_command_path: PathBuf,
     pub chain_store_dir: PathBuf,
-}
-
-pub struct StarknetBootstrapComponents;
-
-impl HasComponents for StarknetBootstrap {
-    type Components = StarknetBootstrapComponents;
 }
 
 delegate_components! {

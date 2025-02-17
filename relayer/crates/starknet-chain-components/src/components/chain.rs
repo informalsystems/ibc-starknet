@@ -88,6 +88,7 @@ use crate::impls::queries::consensus_state::QueryCometConsensusState;
 use crate::impls::queries::contract_address::GetContractAddressFromField;
 use crate::impls::queries::counterparty_chain_id::QueryCosmosChainIdFromStarknetChannelId;
 use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
+use crate::impls::queries::packet_is_cleared::QueryStarknetPacketIsCleared;
 use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
 use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
 use crate::impls::queries::status::QueryStarknetChainStatus;
@@ -409,5 +410,7 @@ cgp_preset! {
             BuildStarknetIbcTransferMessage,
         PacketIsReceivedQuerierComponent:
             QueryPacketIsReceivedOnStarknet,
+        PacketIsClearedQuerierComponent:
+            QueryStarknetPacketIsCleared,
     }
 }

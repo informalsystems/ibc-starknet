@@ -52,6 +52,7 @@ use hermes_wasm_test_components::traits::bootstrap::gov_authority::GovernancePro
    A bootstrap context for bootstrapping a new Cosmos chain, and builds
    a `CosmosChainDriver`.
 */
+#[cgp_context(OsmosisBootstrapComponents: LegacyCosmosSdkBootstrapComponents)]
 #[derive(HasField)]
 pub struct OsmosisBootstrap {
     pub runtime: HermesRuntime,
@@ -65,19 +66,6 @@ pub struct OsmosisBootstrap {
     pub wasm_client_byte_code: Vec<u8>,
     pub governance_proposal_authority: String,
     pub dynamic_gas: Option<DynamicGasConfig>,
-}
-
-pub struct OsmosisBootstrapComponents;
-
-impl HasComponents for OsmosisBootstrap {
-    type Components = OsmosisBootstrapComponents;
-}
-
-impl<Name> DelegateComponent<Name> for OsmosisBootstrapComponents
-where
-    Self: IsLegacyCosmosSdkBootstrapComponents<Name>,
-{
-    type Delegate = LegacyCosmosSdkBootstrapComponents;
 }
 
 delegate_components! {

@@ -2,7 +2,7 @@ use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
-use cgp::extra::run::CanRun;
+use cgp::extra::run::RunnerComponent;
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::impls::ProvideHermesError;
@@ -53,6 +53,6 @@ impl TwoWayRelayGetter<StarknetCosmosBiRelay> for StarknetCosmosBiRelayComponent
     }
 }
 
-pub trait CanUseCosmosStarnetBiRelay: CanRun {}
+pub trait CanUseCosmosStarnetBiRelay: CanUseComponent<RunnerComponent> {}
 
 impl CanUseCosmosStarnetBiRelay for StarknetCosmosBiRelay {}

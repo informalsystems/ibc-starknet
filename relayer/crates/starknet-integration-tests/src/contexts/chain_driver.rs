@@ -21,6 +21,7 @@ use hermes_test_components::chain_driver::traits::types::chain::{
 };
 use tokio::process::Child;
 
+#[cgp_context(StarknetChainDriverComponents)]
 #[derive(HasField)]
 pub struct StarknetChainDriver {
     pub runtime: HermesRuntime,
@@ -32,12 +33,6 @@ pub struct StarknetChainDriver {
     pub relayer_wallet: StarknetWallet,
     pub user_wallet_a: StarknetWallet,
     pub user_wallet_b: StarknetWallet,
-}
-
-pub struct StarknetChainDriverComponents;
-
-impl HasComponents for StarknetChainDriver {
-    type Components = StarknetChainDriverComponents;
 }
 
 delegate_components! {

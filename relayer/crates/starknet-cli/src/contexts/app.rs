@@ -86,23 +86,18 @@ use crate::impls::build::LoadStarknetBuilder;
 use crate::impls::error::ProvideCliError;
 use crate::impls::subcommand::{AllSubCommands, RunAllSubCommand};
 
+#[cgp_context(StarknetAppComponents)]
 #[derive(HasField)]
 pub struct StarknetApp {
     pub config_path: PathBuf,
     pub runtime: HermesRuntime,
 }
 
-pub struct StarknetAppComponents;
-
 pub struct StarknetParserComponents;
 
 pub struct StarknetCommandRunnerComponents;
 
 pub struct UpdateStarknetConfig;
-
-impl HasComponents for StarknetApp {
-    type Components = StarknetAppComponents;
-}
 
 delegate_components! {
     StarknetAppComponents {
