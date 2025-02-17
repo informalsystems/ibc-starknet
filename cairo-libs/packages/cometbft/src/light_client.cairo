@@ -44,39 +44,17 @@ impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<ClientState> {
         let mut client_state = Default::<ClientState>::default();
-        if !context.decode_field(1, ref client_state.chain_id) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref client_state.trust_level) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref client_state.trusting_period) {
-            return Option::None;
-        }
-        if !context.decode_field(4, ref client_state.unbonding_period) {
-            return Option::None;
-        }
-        if !context.decode_field(5, ref client_state.max_clock_drift) {
-            return Option::None;
-        }
-        if !context.decode_field(6, ref client_state.frozen_height) {
-            return Option::None;
-        }
-        if !context.decode_field(7, ref client_state.latest_height) {
-            return Option::None;
-        }
-        if !context.decode_repeated_field(8, ref client_state.proof_specs) {
-            return Option::None;
-        }
-        if !context.decode_repeated_field(9, ref client_state.upgrade_path) {
-            return Option::None;
-        }
-        if !context.decode_field(10, ref client_state.allow_update_after_expiry) {
-            return Option::None;
-        }
-        if !context.decode_field(11, ref client_state.allow_update_after_misbehaviour) {
-            return Option::None;
-        }
+        client_state.chain_id = context.decode_field(1)?;
+        client_state.trust_level = context.decode_field(2)?;
+        client_state.trusting_period = context.decode_field(3)?;
+        client_state.unbonding_period = context.decode_field(4)?;
+        client_state.max_clock_drift = context.decode_field(5)?;
+        client_state.frozen_height = context.decode_field(6)?;
+        client_state.latest_height = context.decode_field(7)?;
+        client_state.proof_specs = context.decode_repeated_field(8)?;
+        client_state.upgrade_path = context.decode_repeated_field(9)?;
+        client_state.allow_update_after_expiry = context.decode_field(10)?;
+        client_state.allow_update_after_misbehaviour = context.decode_field(11)?;
         Option::Some(client_state)
     }
 
@@ -109,15 +87,9 @@ impl ConsensusStateAsProtoMessage of ProtoMessage<ConsensusState> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<ConsensusState> {
         let mut consensus_state = Default::<ConsensusState>::default();
-        if !context.decode_field(1, ref consensus_state.timestamp) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref consensus_state.root) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref consensus_state.next_validators_hash) {
-            return Option::None;
-        }
+        consensus_state.timestamp = context.decode_field(1)?;
+        consensus_state.root = context.decode_field(2)?;
+        consensus_state.next_validators_hash = context.decode_field(3)?;
         Option::Some(consensus_state)
     }
 
@@ -148,15 +120,9 @@ impl MisbehaviourAsProtoMessage of ProtoMessage<Misbehaviour> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Misbehaviour> {
         let mut misbehaviour = Default::<Misbehaviour>::default();
-        if !context.decode_field(1, ref misbehaviour.client_id) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref misbehaviour.header_1) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref misbehaviour.header_2) {
-            return Option::None;
-        }
+        misbehaviour.client_id = context.decode_field(1)?;
+        misbehaviour.header_1 = context.decode_field(2)?;
+        misbehaviour.header_2 = context.decode_field(3)?;
         Option::Some(misbehaviour)
     }
 
@@ -189,18 +155,10 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Header> {
         let mut header = Default::<Header>::default();
-        if !context.decode_field(1, ref header.signed_header) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref header.validator_set) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref header.trusted_height) {
-            return Option::None;
-        }
-        if !context.decode_field(4, ref header.trusted_validator_set) {
-            return Option::None;
-        }
+        header.signed_header = context.decode_field(1)?;
+        header.validator_set = context.decode_field(2)?;
+        header.trusted_height = context.decode_field(3)?;
+        header.trusted_validator_set = context.decode_field(4)?;
         Option::Some(header)
     }
 

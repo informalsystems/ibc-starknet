@@ -1,3 +1,4 @@
+use super::super::types::message::DecodeContextTrait;
 use protobuf::types::message::{
     ProtoMessage, ProtoName, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
     DecodeContextImpl,
@@ -25,12 +26,8 @@ impl ProposerAsProtoMessage of ProtoMessage<Proposer> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Proposer> {
         let mut value = Default::<Proposer>::default();
-        if !context.decode_field(1, ref value.address) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref value.pub_key) {
-            return Option::None;
-        }
+        value.address = context.decode_field(1)?;
+        value.pub_key = context.decode_field(2)?;
         Option::Some(value)
     }
 
@@ -107,33 +104,15 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<TmHeader> {
         let mut header = Default::<TmHeader>::default();
-        if !context.decode_field(1, ref header.height) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref header.active) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref header.chain_id) {
-            return Option::None;
-        }
-        if !context.decode_field(4, ref header.time) {
-            return Option::None;
-        }
-        if !context.decode_field(5, ref header.hash) {
-            return Option::None;
-        }
-        if !context.decode_field(6, ref header.indexes) {
-            return Option::None;
-        }
-        if !context.decode_field(7, ref header.proposer) {
-            return Option::None;
-        }
-        if !context.decode_field(8, ref header.validator_type) {
-            return Option::None;
-        }
-        if !context.decode_repeated_field(9, ref header.proposers) {
-            return Option::None;
-        }
+        header.height = context.decode_field(1)?;
+        header.active = context.decode_field(2)?;
+        header.chain_id = context.decode_field(3)?;
+        header.time = context.decode_field(4)?;
+        header.hash = context.decode_field(5)?;
+        header.indexes = context.decode_field(6)?;
+        header.proposer = context.decode_field(7)?;
+        header.validator_type = context.decode_field(8)?;
+        header.proposers = context.decode_repeated_field(9)?;
         Option::Some(header)
     }
 

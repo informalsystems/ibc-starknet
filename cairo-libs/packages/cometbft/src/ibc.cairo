@@ -20,12 +20,8 @@ impl HeightAsProtoMessage of ProtoMessage<Height> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Height> {
         let mut height = Default::<Height>::default();
-        if !context.decode_field(1, ref height.revision_number) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref height.revision_height) {
-            return Option::None;
-        }
+        height.revision_number = context.decode_field(1)?;
+        height.revision_height = context.decode_field(2)?;
         Option::Some(height)
     }
 
@@ -52,9 +48,7 @@ impl MerkleRootAsProtoMessage of ProtoMessage<MerkleRoot> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<MerkleRoot> {
         let mut root = Default::<MerkleRoot>::default();
-        if !context.decode_field(1, ref root.hash) {
-            return Option::None;
-        }
+        root.hash = context.decode_field(1)?;
         Option::Some(root)
     }
 

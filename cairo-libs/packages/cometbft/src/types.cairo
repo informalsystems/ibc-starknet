@@ -23,12 +23,8 @@ impl ConsensusAsProtoMessage of ProtoMessage<Consensus> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Consensus> {
         let mut consensus = Default::<Consensus>::default();
-        if !context.decode_field(1, ref consensus.block) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref consensus.app) {
-            return Option::None;
-        }
+        consensus.block = context.decode_field(1)?;
+        consensus.app = context.decode_field(2)?;
         Option::Some(consensus)
     }
 
@@ -57,12 +53,8 @@ impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<PartSetHeader> {
         let mut psh = Default::<PartSetHeader>::default();
-        if !context.decode_field(1, ref psh.total) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref psh.hash) {
-            return Option::None;
-        }
+        psh.total = context.decode_field(1)?;
+        psh.hash = context.decode_field(2)?;
         Option::Some(psh)
     }
 
@@ -91,12 +83,8 @@ impl BlockIdAsProtoMessage of ProtoMessage<BlockId> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<BlockId> {
         let mut block_id = Default::<BlockId>::default();
-        if !context.decode_field(1, ref block_id.hash) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref block_id.part_set_header) {
-            return Option::None;
-        }
+        block_id.hash = context.decode_field(1)?;
+        block_id.part_set_header = context.decode_field(2)?;
         Option::Some(block_id)
     }
 
@@ -149,48 +137,20 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Header> {
         let mut header = Default::<Header>::default();
-        if !context.decode_field(1, ref header.version) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref header.chain_id) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref header.height) {
-            return Option::None;
-        }
-        if !context.decode_field(4, ref header.time) {
-            return Option::None;
-        }
-        if !context.decode_field(5, ref header.last_block_id) {
-            return Option::None;
-        }
-        if !context.decode_field(6, ref header.last_commit_hash) {
-            return Option::None;
-        }
-        if !context.decode_field(7, ref header.data_hash) {
-            return Option::None;
-        }
-        if !context.decode_field(8, ref header.validators_hash) {
-            return Option::None;
-        }
-        if !context.decode_field(9, ref header.next_validators_hash) {
-            return Option::None;
-        }
-        if !context.decode_field(10, ref header.consensus_hash) {
-            return Option::None;
-        }
-        if !context.decode_field(11, ref header.app_hash) {
-            return Option::None;
-        }
-        if !context.decode_field(12, ref header.last_results_hash) {
-            return Option::None;
-        }
-        if !context.decode_field(13, ref header.evidence_hash) {
-            return Option::None;
-        }
-        if !context.decode_field(14, ref header.proposer_address) {
-            return Option::None;
-        }
+        header.version = context.decode_field(1)?;
+        header.chain_id = context.decode_field(2)?;
+        header.height = context.decode_field(3)?;
+        header.time = context.decode_field(4)?;
+        header.last_block_id = context.decode_field(5)?;
+        header.last_commit_hash = context.decode_field(6)?;
+        header.data_hash = context.decode_field(7)?;
+        header.validators_hash = context.decode_field(8)?;
+        header.next_validators_hash = context.decode_field(9)?;
+        header.consensus_hash = context.decode_field(10)?;
+        header.app_hash = context.decode_field(11)?;
+        header.last_results_hash = context.decode_field(12)?;
+        header.evidence_hash = context.decode_field(13)?;
+        header.proposer_address = context.decode_field(14)?;
         Option::Some(header)
     }
 
@@ -262,18 +222,10 @@ impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<CommitSig> {
         let mut commit_sig = Default::<CommitSig>::default();
-        if !context.decode_field(1, ref commit_sig.block_id_flag) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref commit_sig.validator_address) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref commit_sig.timestamp) {
-            return Option::None;
-        }
-        if !context.decode_field(4, ref commit_sig.signature) {
-            return Option::None;
-        }
+        commit_sig.block_id_flag = context.decode_field(1)?;
+        commit_sig.validator_address = context.decode_field(2)?;
+        commit_sig.timestamp = context.decode_field(3)?;
+        commit_sig.signature = context.decode_field(4)?;
         Option::Some(commit_sig)
     }
 
@@ -306,18 +258,10 @@ impl CommitAsProtoMessage of ProtoMessage<Commit> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Commit> {
         let mut commit = Default::<Commit>::default();
-        if !context.decode_field(1, ref commit.height) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref commit.round) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref commit.block_id) {
-            return Option::None;
-        }
-        if !context.decode_repeated_field(4, ref commit.signatures) {
-            return Option::None;
-        }
+        commit.height = context.decode_field(1)?;
+        commit.round = context.decode_field(2)?;
+        commit.block_id = context.decode_field(3)?;
+        commit.signatures = context.decode_repeated_field(4)?;
         Option::Some(commit)
     }
 
@@ -346,12 +290,8 @@ impl SignedHeaderAsProtoMessage of ProtoMessage<SignedHeader> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<SignedHeader> {
         let mut signed_header = Default::<SignedHeader>::default();
-        if !context.decode_field(1, ref signed_header.header) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref signed_header.commit) {
-            return Option::None;
-        }
+        signed_header.header = context.decode_field(1)?;
+        signed_header.commit = context.decode_field(2)?;
         Option::Some(signed_header)
     }
 
@@ -381,12 +321,8 @@ impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<PublicKey> {
         let mut public_key = Default::<PublicKey>::default();
-        if !context.decode_field(1, ref public_key.ed25519) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref public_key.secp256k1) {
-            return Option::None;
-        }
+        public_key.ed25519 = context.decode_field(1)?;
+        public_key.secp256k1 = context.decode_field(2)?;
         Option::Some(public_key)
     }
 
@@ -419,18 +355,10 @@ impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Validator> {
         let mut validator = Default::<Validator>::default();
-        if !context.decode_field(1, ref validator.address) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref validator.pub_key) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref validator.voting_power) {
-            return Option::None;
-        }
-        if !context.decode_field(4, ref validator.proposer_priority) {
-            return Option::None;
-        }
+        validator.address = context.decode_field(1)?;
+        validator.pub_key = context.decode_field(2)?;
+        validator.voting_power = context.decode_field(3)?;
+        validator.proposer_priority = context.decode_field(4)?;
         Option::Some(validator)
     }
 
@@ -461,15 +389,9 @@ impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<ValidatorSet> {
         let mut set = Default::<ValidatorSet>::default();
-        if !context.decode_repeated_field(1, ref set.validators) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref set.proposer) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref set.total_voting_power) {
-            return Option::None;
-        }
+        set.validators = context.decode_repeated_field(1)?;
+        set.proposer = context.decode_field(2)?;
+        set.total_voting_power = context.decode_field(3)?;
         Option::Some(set)
     }
 

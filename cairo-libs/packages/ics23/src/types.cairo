@@ -22,9 +22,7 @@ impl CommitmentProofAsProtoMessage of ProtoMessage<CommitmentProof> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<CommitmentProof> {
         let mut comm = Default::<CommitmentProof>::default();
-        if !context.decode_field(1, ref comm.proof) {
-            return Option::None;
-        }
+        comm.proof = context.decode_field(1)?;
         Option::Some(comm)
     }
 
@@ -115,18 +113,10 @@ impl ExistenceProofAsProtoMessage of ProtoMessage<ExistenceProof> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<ExistenceProof> {
         let mut proof = Default::<ExistenceProof>::default();
-        if !context.decode_field(1, ref proof.key) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref proof.value) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref proof.leaf) {
-            return Option::None;
-        }
-        if !context.decode_repeated_field(4, ref proof.path) {
-            return Option::None;
-        }
+        proof.key = context.decode_field(1)?;
+        proof.value = context.decode_field(2)?;
+        proof.leaf = context.decode_field(3)?;
+        proof.path = context.decode_repeated_field(4)?;
         Option::Some(proof)
     }
 
@@ -168,15 +158,9 @@ impl NonExistenceProofAsProtoMessage of ProtoMessage<NonExistenceProof> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<NonExistenceProof> {
         let mut proof = Default::<NonExistenceProof>::default();
-        if !context.decode_field(1, ref proof.key) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref proof.left) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref proof.right) {
-            return Option::None;
-        }
+        proof.key = context.decode_field(1)?;
+        proof.left = context.decode_field(2)?;
+        proof.right = context.decode_field(3)?;
         Option::Some(proof)
     }
 
@@ -207,15 +191,9 @@ impl InnerOpAsProtoMessage of ProtoMessage<InnerOp> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<InnerOp> {
         let mut inner_op = Default::<InnerOp>::default();
-        if !context.decode_field(1, ref inner_op.hash) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref inner_op.prefix) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref inner_op.suffix) {
-            return Option::None;
-        }
+        inner_op.hash = context.decode_field(1)?;
+        inner_op.prefix = context.decode_field(2)?;
+        inner_op.suffix = context.decode_field(3)?;
         Option::Some(inner_op)
     }
 
@@ -318,24 +296,12 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<InnerSpec> {
         let mut inner_spec = Default::<InnerSpec>::default();
-        if !context.decode_field(1, ref inner_spec.child_order) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref inner_spec.child_size) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref inner_spec.min_prefix_length) {
-            return Option::None;
-        }
-        if !context.decode_field(4, ref inner_spec.max_prefix_length) {
-            return Option::None;
-        }
-        if !context.decode_field(5, ref inner_spec.empty_child) {
-            return Option::None;
-        }
-        if !context.decode_field(6, ref inner_spec.hash) {
-            return Option::None;
-        }
+        inner_spec.child_order = context.decode_field(1)?;
+        inner_spec.child_size = context.decode_field(2)?;
+        inner_spec.min_prefix_length = context.decode_field(3)?;
+        inner_spec.max_prefix_length = context.decode_field(4)?;
+        inner_spec.empty_child = context.decode_field(5)?;
+        inner_spec.hash = context.decode_field(6)?;
         Option::Some(inner_spec)
     }
 
@@ -370,21 +336,11 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<LeafOp> {
         let mut leaf_op = Default::<LeafOp>::default();
-        if !context.decode_field(1, ref leaf_op.hash) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref leaf_op.prehash_key) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref leaf_op.prehash_value) {
-            return Option::None;
-        }
-        if !context.decode_field(4, ref leaf_op.length) {
-            return Option::None;
-        }
-        if !context.decode_field(5, ref leaf_op.prefix) {
-            return Option::None;
-        }
+        leaf_op.hash = context.decode_field(1)?;
+        leaf_op.prehash_key = context.decode_field(2)?;
+        leaf_op.prehash_value = context.decode_field(3)?;
+        leaf_op.length = context.decode_field(4)?;
+        leaf_op.prefix = context.decode_field(5)?;
         Option::Some(leaf_op)
     }
 
@@ -433,21 +389,11 @@ impl ProofSpecAsProtoMessage of ProtoMessage<ProofSpec> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<ProofSpec> {
         let mut spec = Default::<ProofSpec>::default();
-        if !context.decode_field(1, ref spec.leaf_spec) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref spec.inner_spec) {
-            return Option::None;
-        }
-        if !context.decode_field(3, ref spec.max_depth) {
-            return Option::None;
-        }
-        if !context.decode_field(4, ref spec.min_depth) {
-            return Option::None;
-        }
-        if !context.decode_field(5, ref spec.prehash_key_before_comparison) {
-            return Option::None;
-        }
+        spec.leaf_spec = context.decode_field(1)?;
+        spec.inner_spec = context.decode_field(2)?;
+        spec.max_depth = context.decode_field(3)?;
+        spec.min_depth = context.decode_field(4)?;
+        spec.prehash_key_before_comparison = context.decode_field(5)?;
         Option::Some(spec)
     }
 

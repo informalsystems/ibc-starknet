@@ -20,12 +20,8 @@ impl DurationAsProtoMessage of ProtoMessage<Duration> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Duration> {
         let mut duration = Default::<Duration>::default();
-        if !context.decode_field(1, ref duration.seconds) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref duration.nanos) {
-            return Option::None;
-        }
+        duration.seconds = context.decode_field(1)?;
+        duration.nanos = context.decode_field(2)?;
         Option::Some(duration)
     }
 
@@ -54,12 +50,8 @@ impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Timestamp> {
         let mut timestamp = Default::<Timestamp>::default();
-        if !context.decode_field(1, ref timestamp.seconds) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref timestamp.nanos) {
-            return Option::None;
-        }
+        timestamp.seconds = context.decode_field(1)?;
+        timestamp.nanos = context.decode_field(2)?;
         Option::Some(timestamp)
     }
 
@@ -88,12 +80,8 @@ impl AnyAsProtoMessage of ProtoMessage<Any> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Any> {
         let mut any = Default::<Any>::default();
-        if !context.decode_field(1, ref any.type_url) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref any.value) {
-            return Option::None;
-        }
+        any.type_url = context.decode_field(1)?;
+        any.value = context.decode_field(2)?;
         Option::Some(any)
     }
 

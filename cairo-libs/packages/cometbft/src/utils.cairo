@@ -19,12 +19,8 @@ impl FractionAsProtoMessage of ProtoMessage<Fraction> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<Fraction> {
         let mut fraction = Default::<Fraction>::default();
-        if !context.decode_field(1, ref fraction.numerator) {
-            return Option::None;
-        }
-        if !context.decode_field(2, ref fraction.denominator) {
-            return Option::None;
-        }
+        fraction.numerator = context.decode_field(1)?;
+        fraction.denominator = context.decode_field(2)?;
         Option::Some(fraction)
     }
 

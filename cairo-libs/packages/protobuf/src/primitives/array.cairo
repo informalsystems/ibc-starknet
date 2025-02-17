@@ -54,7 +54,7 @@ pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of Prot
                     failed = true;
                     break;
                 }
-                if !context.init_branch(length.unwrap()) {
+                if context.init_branch(length.unwrap()).is_none() {
                     failed = true;
                     break;
                 }
@@ -63,7 +63,7 @@ pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of Prot
                     failed = true;
                     break;
                 }
-                if !context.end_branch() {
+                if context.end_branch().is_none() {
                     failed = true;
                     break;
                 }

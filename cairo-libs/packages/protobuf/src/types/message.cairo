@@ -78,13 +78,13 @@ pub impl DecodeContextImpl of DecodeContextTrait {
         DecodeContext { buffer, index: 0, limits: array![] }
     }
 
-    fn init_branch(ref self: DecodeContext, length: usize) -> bool {
+    fn init_branch(ref self: DecodeContext, length: usize) -> Option<()> {
         let limit = self.index + length;
         if limit > self.buffer.len() {
-            return false;
+            return Option::None;
         }
         self.limits.append(self.index + length);
-        true
+        Option::Some(())
     }
 
     fn can_read_branch(ref self: DecodeContext) -> bool {
@@ -98,8 +98,9 @@ pub impl DecodeContextImpl of DecodeContextTrait {
     }
 
     fn decode_field<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(
-        ref self: DecodeContext, field_number: u8, ref field: T,
-    ) -> bool {
+        ref self: DecodeContext, field_number: u8,
+    ) -> Option<T> {
+        let mut field = Default::<T>::default();
         if self.can_read_branch() {
             let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
             if tag.field_number == field_number {
@@ -108,64 +109,57 @@ pub impl DecodeContextImpl of DecodeContextTrait {
                 let wire_type = ProtoMessage::<T>::wire_type();
 
                 if wire_type != tag.wire_type {
-                    return false;
+                    return Option::None;
                 }
+
                 if wire_type == WireType::LengthDelimited {
-                    let length = self.decode_raw();
-                    if length.is_none() {
-                        return false;
-                    }
-                    if !self.init_branch(length.unwrap()) {
-                        return false;
-                    }
-                    let value = self.decode_raw();
-                    if value.is_none() {
-                        return false;
-                    }
-                    field = value.unwrap();
-                    if !self.end_branch() {
-                        return false;
-                    }
+                    let length = self.decode_raw()?;
+                    self.init_branch(length)?;
+                    field = self.decode_raw()?;
+                    self.end_branch()?;
                 } else {
-                    let value = self.decode_raw();
-                    if value.is_none() {
-                        return false;
-                    }
-                    field = value.unwrap();
+                    field = self.decode_raw()?;
                 }
             } else if tag.field_number < field_number {
-                return false;
+                return Option::None;
             }
         }
-        true
+        Option::Some(field)
     }
 
     // for unpacked repeated fields (default for non-scalars)
     fn decode_repeated_field<T, +ProtoMessage<T>, +Default<T>, +Drop<T>>(
-        ref self: DecodeContext, field_number: u8, ref value: Array<T>,
-    ) -> bool {
-        let mut succeeded = true;
+        ref self: DecodeContext, field_number: u8,
+    ) -> Option<Array<T>> {
+        let mut field = ArrayTrait::new();
+        let mut failed = false;
         while self.can_read_branch() {
             let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
             if tag.field_number != field_number {
                 break;
             }
-            let mut item = Default::<T>::default();
-            if !self.decode_field(field_number, ref item) {
-                succeeded = false;
+            if let Option::Some(item) = self.decode_field(field_number) {
+                field.append(item)
+            } else {
+                failed = true;
                 break;
             }
-            value.append(item);
         };
-        succeeded
+        if failed {
+            return Option::None;
+        }
+        Option::Some(field)
     }
 
-    fn end_branch(ref self: DecodeContext) -> bool {
+    fn end_branch(ref self: DecodeContext) -> Option<()> {
         // TODO(rano): pop_back is not impl for Array<T>, this is inefficient
         let mut span = self.limits.span();
         let limit = span.pop_back().unwrap();
         self.limits = span.into();
-        limit == @self.index
+        if limit != @self.index {
+            return Option::None;
+        }
+        Option::Some(())
     }
 }
 
@@ -175,23 +169,11 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
         let mut value = Default::<T>::default();
         let mut context = DecodeContextImpl::new(serialized);
         if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
-            if !context.init_branch(serialized.len()) {
-                return Option::None;
-            }
-            let maybe_value = context.decode_raw();
-            if maybe_value.is_none() {
-                return Option::None;
-            }
-            value = maybe_value.unwrap();
-            if !context.end_branch() {
-                return Option::None;
-            }
+            context.init_branch(serialized.len())?;
+            value = context.decode_raw()?;
+            context.end_branch()?;
         } else {
-            let maybe_value = context.decode_raw();
-            if maybe_value.is_none() {
-                return Option::None;
-            }
-            value = maybe_value.unwrap();
+            value = context.decode_raw()?;
         };
         Option::Some(value)
     }
