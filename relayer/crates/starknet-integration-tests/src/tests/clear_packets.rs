@@ -521,7 +521,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
         // ### SETUP PENDING PACKETS AND ACKS ###
 
         // TODO: Will be replaced by query commitments
-        let _commitment_sequences = vec![Sequence::from(1), Sequence::from(2), Sequence::from(3)];
+        let _commitment_sequences = [Sequence::from(1), Sequence::from(2), Sequence::from(3)];
 
         // Create Cosmos to Starknet transfer
         let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
