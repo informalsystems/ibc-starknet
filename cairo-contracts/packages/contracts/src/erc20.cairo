@@ -1,7 +1,7 @@
 #[starknet::contract]
 pub mod ERC20Mintable {
     use openzeppelin_access::ownable::OwnableComponent;
-    use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
+    use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl, interface::IERC20Metadata};
     use starknet::ContractAddress;
     use starknet_ibc_utils::mintable::ERC20MintableComponent;
     use starknet_ibc_utils::mintable::ERC20MintableComponent::ERC20MintableInternalTrait;
@@ -19,9 +19,10 @@ pub mod ERC20Mintable {
     #[abi(embed_v0)]
     impl ERC20MintableImpl = ERC20MintableComponent::ERC20Mintable<ContractState>;
 
-    // ERC20 Mixin
     #[abi(embed_v0)]
-    impl ERC20MixinImpl = ERC20Component::ERC20MixinImpl<ContractState>;
+    impl ERC20Impl = ERC20Component::ERC20Impl<ContractState>;
+    #[abi(embed_v0)]
+    impl ERC20CamelOnlyImpl = ERC20Component::ERC20CamelOnlyImpl<ContractState>;
     impl ERC20InternalImpl = ERC20Component::InternalImpl<ContractState>;
 
     #[storage]
@@ -58,5 +59,21 @@ pub mod ERC20Mintable {
         self.mintable.initializer();
         self.erc20.initializer(name, symbol);
         self.erc20.mint(recipient, initial_supply);
+    }
+
+
+    #[abi(embed_v0)]
+    impl ERC20MetadataImpl of IERC20Metadata<ContractState> {
+        fn name(self: @ContractState) -> ByteArray {
+            self.erc20.name()
+        }
+
+        fn symbol(self: @ContractState) -> ByteArray {
+            self.erc20.symbol()
+        }
+
+        fn decimals(self: @ContractState) -> u8 {
+            0
+        }
     }
 }
