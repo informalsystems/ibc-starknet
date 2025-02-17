@@ -1,11 +1,17 @@
 use core::marker::PhantomData;
 use core::time::Duration;
 use std::collections::HashMap;
+use std::io::Write;
 use std::ops::{Deref, DerefMut};
+use std::path::PathBuf;
+use std::sync::Arc;
+use std::time::SystemTime;
 
 use cgp::core::field::Index;
 use cgp::extra::run::CanRun;
 use cgp::prelude::*;
+use flate2::write::GzEncoder;
+use flate2::Compression;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_chain_components::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
@@ -17,6 +23,8 @@ use hermes_chain_components::traits::send_message::CanSendSingleMessage;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_cosmos_chain_components::impls::types::config::CosmosChainConfig;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
+use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
+use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
@@ -35,6 +43,7 @@ use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapCha
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
+use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
@@ -52,12 +61,14 @@ use hermes_starknet_chain_components::types::messages::ibc::denom::{
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::MsgTransfer;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
+use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
+use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use hex::FromHex;
@@ -68,12 +79,16 @@ use ibc::core::host::types::identifiers::{
 use ibc::core::primitives::Timestamp;
 use poseidon::Poseidon3Hasher;
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use starknet::accounts::{Call, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::{Felt, U256};
 use starknet::macros::{selector, short_string};
 use starknet::providers::Provider;
 use starknet::signers::{LocalWallet, SigningKey};
 use tracing::info;
+
+use crate::contexts::bootstrap::StarknetBootstrap;
+use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
 
 pub const COSMOS_HD_PATH: &str = "m/44'/118'/0'/0/0";
 
@@ -98,13 +113,13 @@ pub struct RelayerConfig {
     pub mnemonic: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct TestnetDb {
     osmosis: OsmosisTestnet,
     starknet: StarknetTestnet,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct StarknetTestnet {
     pub hash: HashMap<String, Felt>,
     pub address: HashMap<String, StarknetAddress>,
@@ -114,7 +129,7 @@ pub struct StarknetTestnet {
     // port id is "transfer"
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct OsmosisTestnet {
     pub wasm_code_hash: String,
     pub client: Option<ClientId>,
@@ -160,6 +175,13 @@ where
             path: path.to_string(),
             config,
         })
+    }
+
+    pub fn new_from(path: &str, config: T) -> Self {
+        Self {
+            path: path.to_string(),
+            config,
+        }
     }
 }
 
@@ -239,12 +261,104 @@ impl StarknetTestnet {
     }
 }
 
-#[test]
-fn test_public_testnets() -> Result<(), Error> {
-    let runtime = init_test_runtime();
+pub async fn testnet_setup(
+    runtime: &HermesRuntime,
+) -> Result<
+    (
+        CosmosChain,
+        StarknetChain,
+        ConfigDumper<TestnetDb>,
+        StarknetWallet,
+        CosmosTestWallet,
+    ),
+    Error,
+> {
+    if std::env::var("CI").is_ok() {
+        info!("CI environment detected, using devnets as testnets.");
 
-    runtime.runtime.clone().block_on(async move {
-        info!("Running public testnets tests");
+        let chain_command_path = std::env::var("STARKNET_BIN")
+            .unwrap_or("starknet-devnet".into())
+            .into();
+
+        let wasm_client_code_path = PathBuf::from(
+            std::env::var("STARKNET_WASM_CLIENT_PATH")
+                .expect("Wasm blob for Starknet light client is required"),
+        );
+
+        let timestamp = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)?
+            .as_secs();
+
+        let starknet_bootstrap = StarknetBootstrap {
+            runtime: runtime.clone(),
+            chain_command_path,
+            chain_store_dir: format!("./test-data/{timestamp}").into(),
+        };
+
+        let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
+
+        let wasm_code_hash: [u8; 32] = {
+            let mut hasher = Sha256::new();
+            hasher.update(&wasm_client_byte_code);
+            hasher.finalize().into()
+        };
+
+        let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
+
+        let wasm_client_byte_code_gzip = {
+            let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+            encoder.write_all(&wasm_client_byte_code)?;
+            encoder.finish()?
+        };
+
+        let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
+            runtime: runtime.clone(),
+            cosmos_builder,
+            should_randomize_identifiers: true,
+            chain_store_dir: format!("./test-data/{timestamp}/osmosis").into(),
+            chain_command_path: "osmosisd".into(),
+            account_prefix: "osmo".into(),
+            staking_denom_prefix: "stake".into(),
+            transfer_denom_prefix: "coin".into(),
+            wasm_client_byte_code: wasm_client_byte_code_gzip,
+            governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
+            dynamic_gas: Some(DynamicGasConfig {
+                multiplier: 1.1,
+                max: 1.6,
+                eip_query_type: EipQueryType::Osmosis,
+                denom: "stake".to_owned(),
+            }),
+        });
+
+        let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
+
+        let starknet_chain = &mut starknet_chain_driver.chain;
+
+        info!(
+            "started starknet chain at port {}",
+            starknet_chain_driver.node_config.rpc_port
+        );
+
+        let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
+
+        let cosmos_chain = &cosmos_chain_driver.chain;
+
+        let mut testnet_db = ConfigDumper::<TestnetDb>::new_from(
+            concat!(env!("CARGO_MANIFEST_DIR"), "/../../../starknet_db.toml"),
+            TestnetDb::default(),
+        );
+
+        testnet_db.osmosis.wasm_code_hash = hex::encode(wasm_code_hash);
+
+        Ok((
+            cosmos_chain.clone(),
+            starknet_chain.clone(),
+            testnet_db,
+            starknet_chain_driver.relayer_wallet,
+            cosmos_chain_driver.user_wallet_a,
+        ))
+    } else {
+        info!("local environment detected. using real testnets.");
 
         // StarknetRelayerConfig doesn't have mnenomic field
         let RelayerConfig {
@@ -295,7 +409,13 @@ fn test_public_testnets() -> Result<(), Error> {
             starknet_chain_config,
         );
 
-        let mut starknet_chain: StarknetChain = starknet_builder
+        let cosmos_wallet_a = CosmosTestWallet {
+            id: "cosmos-relayer".into(),
+            address: osmosis_secp256k1_keypair.account(),
+            keypair: osmosis_secp256k1_keypair,
+        };
+
+        let starknet_chain: StarknetChain = starknet_builder
             .build_chain(
                 PhantomData::<Index<0>>,
                 &STARKNET_TESTNET_CHAIN_ID.to_string().parse()?,
@@ -320,10 +440,35 @@ fn test_public_testnets() -> Result<(), Error> {
             cosmos_chain.query_chain_status().await?
         );
 
-        let mut starknet_contract_db = ConfigDumper::<TestnetDb>::new(concat!(
+        let starknet_contract_db = ConfigDumper::<TestnetDb>::new(concat!(
             env!("CARGO_MANIFEST_DIR"),
             "/../../../starknet_db.toml"
         ))?;
+
+        Ok((
+            cosmos_chain,
+            starknet_chain,
+            starknet_contract_db,
+            starknet_relayer_wallet,
+            cosmos_wallet_a,
+        ))
+    }
+}
+
+#[test]
+fn test_public_testnets() -> Result<(), Error> {
+    let runtime = init_test_runtime();
+
+    runtime.runtime.clone().block_on(async move {
+        info!("Running public testnets tests");
+
+        let (
+            cosmos_chain,
+            mut starknet_chain,
+            mut starknet_contract_db,
+            starknet_relayer_wallet,
+            cosmos_wallet_a,
+        ) = testnet_setup(&runtime).await?;
 
         let ibc_core_address = starknet_contract_db
             .starknet
@@ -629,12 +774,7 @@ fn test_public_testnets() -> Result<(), Error> {
 
         // submit ics20 transfer to Cosmos
 
-        let wallet_cosmos_a = CosmosTestWallet {
-            id: "cosmos-relayer".into(),
-            address: osmosis_secp256k1_keypair.account(),
-            keypair: osmosis_secp256k1_keypair,
-        };
-        let address_cosmos_a = &wallet_cosmos_a.address;
+        let address_cosmos_a = &cosmos_wallet_a.address;
         let wallet_starknet_b = &starknet_relayer_wallet;
         let address_starknet_b = &wallet_starknet_b.account_address;
         let transfer_quantity = 118u128;
@@ -663,7 +803,7 @@ fn test_public_testnets() -> Result<(), Error> {
             &cosmos_chain,
             cosmos_channel_id,
             &IbcPortId::transfer(),
-            &wallet_cosmos_a,
+            &cosmos_wallet_a,
             address_starknet_b,
             &Amount::new(transfer_quantity, denom_cosmos.clone()),
             &None,
@@ -899,7 +1039,7 @@ fn test_public_testnets() -> Result<(), Error> {
             &cosmos_chain,
             cosmos_channel_id,
             &IbcPortId::transfer(),
-            &wallet_cosmos_a,
+            &cosmos_wallet_a,
             address_starknet_b,
             &Amount::new(transfer_quantity, cosmos_ibc_denom.clone()),
             &None,
