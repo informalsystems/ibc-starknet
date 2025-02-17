@@ -2500,6 +2500,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "hermes-starknet-tools-cli"
+version = "0.1.0"
+dependencies = [
+ "cgp",
+ "cgp-error-eyre",
+ "clap",
+ "eyre",
+ "hermes-cli",
+ "hermes-cli-components",
+ "hermes-encoding-components",
+ "hermes-error",
+ "hermes-logger",
+ "hermes-logging-components",
+ "hermes-relayer-components",
+ "hermes-runtime",
+ "hermes-runtime-components",
+ "hermes-starknet-chain-components",
+ "hermes-starknet-chain-context",
+ "hermes-starknet-cli",
+ "hermes-starknet-integration-tests",
+ "hermes-starknet-relayer",
+ "ibc",
+ "stable-eyre",
+ "starknet",
+ "tokio",
+ "toml",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "hermes-test-components"
 version = "0.1.0"
 source = "git+https://github.com/informalsystems/hermes-sdk.git#8d87ae8098c0a9301047f75f190c0ee55d098a81"

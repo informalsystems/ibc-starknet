@@ -11,6 +11,7 @@ members = [
   "crates/starknet-integration-tests",
   "crates/starknet-cli",
   "crates/poseidon",
+  "crates/tools",
 ]
 
 [workspace.package]
@@ -84,6 +85,7 @@ hermes-wasm-test-components         = { version = "0.1.0" }
 hermes-wasm-encoding-components     = { version = "0.1.0" }
 hermes-cli-components               = { version = "0.1.0" }
 hermes-cli                          = { version = "0.1.0" }
+hermes-starknet-cli                 = { version = "0.1.0" }
 hermes-test-components              = { version = "0.1.0" }
 hermes-cairo-encoding-components    = { version = "0.1.0" }
 hermes-protobuf-encoding-components = { version = "0.1.0" }
