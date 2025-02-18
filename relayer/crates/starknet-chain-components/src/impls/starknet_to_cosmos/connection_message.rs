@@ -22,6 +22,10 @@ use hermes_chain_components::types::payloads::connection::{
     ConnectionOpenAckPayload, ConnectionOpenConfirmPayload, ConnectionOpenInitPayload,
     ConnectionOpenTryPayload,
 };
+use hermes_cosmos_chain_components::components::client::{
+    ConnectionOpenAckMessageBuilderComponent, ConnectionOpenConfirmMessageBuilderComponent,
+    ConnectionOpenInitMessageBuilderComponent, ConnectionOpenTryMessageBuilderComponent,
+};
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
@@ -45,6 +49,7 @@ use crate::types::consensus_state::WasmStarknetConsensusState;
 use crate::types::cosmos::client_state::CometClientState;
 pub struct BuildStarknetToCosmosConnectionHandshake;
 
+#[cgp_provider(ConnectionOpenInitMessageBuilderComponent)]
 impl<Chain, Counterparty> ConnectionOpenInitMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosConnectionHandshake
 where
@@ -80,6 +85,7 @@ where
     }
 }
 
+#[cgp_provider(ConnectionOpenTryMessageBuilderComponent)]
 impl<Chain, Counterparty> ConnectionOpenTryMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosConnectionHandshake
 where
@@ -141,6 +147,7 @@ where
     }
 }
 
+#[cgp_provider(ConnectionOpenAckMessageBuilderComponent)]
 impl<Chain, Counterparty> ConnectionOpenAckMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosConnectionHandshake
 where
@@ -192,6 +199,7 @@ where
     }
 }
 
+#[cgp_provider(ConnectionOpenConfirmMessageBuilderComponent)]
 impl<Chain, Counterparty> ConnectionOpenConfirmMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosConnectionHandshake
 where

@@ -2,19 +2,25 @@ use core::iter::Peekable;
 use core::ops::Deref;
 use core::slice::Iter;
 
-use hermes_encoding_components::traits::decode_mut::DecodeBufferPeeker;
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{
+    DecodeBufferPeeker, DecodeBufferPeekerComponent,
+};
 use hermes_encoding_components::traits::types::decode_buffer::{
-    DecodeBufferBuilder, HasDecodeBufferType, ProvideDecodeBufferType,
+    DecodeBufferBuilder, DecodeBufferBuilderComponent, DecodeBufferTypeComponent,
+    HasDecodeBufferType, ProvideDecodeBufferType,
 };
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use starknet::core::types::Felt;
 
 pub struct ProvideVecIterDecodeBuffer;
 
+#[cgp_provider(DecodeBufferTypeComponent)]
 impl<Encoding> ProvideDecodeBufferType<Encoding> for ProvideVecIterDecodeBuffer {
     type DecodeBuffer<'a> = Peekable<Iter<'a, Felt>>;
 }
 
+#[cgp_provider(DecodeBufferBuilderComponent)]
 impl<Encoding> DecodeBufferBuilder<Encoding> for ProvideVecIterDecodeBuffer
 where
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
@@ -25,6 +31,7 @@ where
     }
 }
 
+#[cgp_provider(DecodeBufferPeekerComponent)]
 impl<Encoding> DecodeBufferPeeker<Encoding, Felt> for ProvideVecIterDecodeBuffer
 where
     Encoding: for<'a> HasDecodeBufferType<DecodeBuffer<'a> = Peekable<Iter<'a, Felt>>>,

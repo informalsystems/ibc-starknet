@@ -1,13 +1,19 @@
 use core::marker::PhantomData;
 
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::extract_data::MessageResponseExtractor;
+use hermes_chain_components::traits::extract_data::{
+    MessageResponseExtractor, MessageResponseExtractorComponent,
+};
 use hermes_chain_components::traits::types::ibc::HasConnectionIdType;
 use hermes_chain_components::traits::types::ibc_events::connection::{
     ProvideConnectionOpenInitEvent, ProvideConnectionOpenTryEvent,
 };
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
+use hermes_cosmos_chain_components::components::client::{
+    ConnectionOpenInitEventComponent, ConnectionOpenTryEventComponent,
+};
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
@@ -20,6 +26,7 @@ use crate::impls::types::events::{
 use crate::types::connection_id::ConnectionId;
 use crate::types::message_response::StarknetMessageResponse;
 
+#[cgp_provider(ConnectionOpenInitEventComponent)]
 impl<Chain, Counterparty> ProvideConnectionOpenInitEvent<Chain, Counterparty> for UseStarknetEvents
 where
     Chain: HasConnectionIdType<Counterparty, ConnectionId = ConnectionId>,
@@ -33,6 +40,7 @@ where
     }
 }
 
+#[cgp_provider(MessageResponseExtractorComponent)]
 impl<Chain, Encoding> MessageResponseExtractor<Chain, StarknetConnectionOpenInitEvent>
     for UseStarknetEvents
 where
@@ -53,6 +61,7 @@ where
     }
 }
 
+#[cgp_provider(ConnectionOpenTryEventComponent)]
 impl<Chain, Counterparty> ProvideConnectionOpenTryEvent<Chain, Counterparty> for UseStarknetEvents
 where
     Chain: HasConnectionIdType<Counterparty, ConnectionId = ConnectionId>,
@@ -66,6 +75,7 @@ where
     }
 }
 
+#[cgp_provider(MessageResponseExtractorComponent)]
 impl<Chain, Encoding> MessageResponseExtractor<Chain, StarknetConnectionOpenTryEvent>
     for UseStarknetEvents
 where

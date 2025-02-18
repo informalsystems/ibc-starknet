@@ -1,11 +1,15 @@
-use cgp::prelude::HasAsyncErrorType;
+use cgp::prelude::*;
 use hermes_chain_components::traits::packet::filter::{IncomingPacketFilter, OutgoingPacketFilter};
 use hermes_chain_components::traits::types::packet::{
     HasIncomingPacketType, HasOutgoingPacketType,
 };
+use hermes_cosmos_chain_components::components::client::{
+    IncomingPacketFilterComponent, OutgoingPacketFilterComponent,
+};
 
 pub struct FilterStarknetPackets;
 
+#[cgp_provider(OutgoingPacketFilterComponent)]
 impl<Chain, Counterparty> OutgoingPacketFilter<Chain, Counterparty> for FilterStarknetPackets
 where
     Chain: HasOutgoingPacketType<Counterparty> + HasAsyncErrorType,
@@ -18,6 +22,7 @@ where
     }
 }
 
+#[cgp_provider(IncomingPacketFilterComponent)]
 impl<Chain, Counterparty> IncomingPacketFilter<Chain, Counterparty> for FilterStarknetPackets
 where
     Chain: HasIncomingPacketType<Counterparty> + HasAsyncErrorType,

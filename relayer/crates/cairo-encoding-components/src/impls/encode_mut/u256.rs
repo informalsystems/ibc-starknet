@@ -1,9 +1,15 @@
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 use starknet::core::types::U256;
 
 pub struct EncodeU256;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, U256> for EncodeU256
 where
     Encoding: CanEncodeMut<Strategy, u128>,
@@ -20,6 +26,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, U256> for EncodeU256
 where
     Encoding: CanDecodeMut<Strategy, u128>,

@@ -15,9 +15,11 @@ use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
-use hermes_test_components::chain_driver::traits::chain_process::ChainProcessTaker;
+use hermes_test_components::chain_driver::traits::chain_process::{
+    ChainProcessTaker, ChainProcessTakerComponent,
+};
 use hermes_test_components::chain_driver::traits::types::chain::{
-    ChainGetter, HasChain, ProvideChainType,
+    ChainGetter, ChainGetterComponent, ChainTypeComponent, HasChain, ProvideChainType,
 };
 use tokio::process::Child;
 
@@ -44,16 +46,19 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(ChainTypeComponent)]
 impl ProvideChainType<StarknetChainDriver> for StarknetChainDriverComponents {
     type Chain = StarknetChain;
 }
 
+#[cgp_provider(ChainGetterComponent)]
 impl ChainGetter<StarknetChainDriver> for StarknetChainDriverComponents {
     fn chain(driver: &StarknetChainDriver) -> &StarknetChain {
         &driver.chain
     }
 }
 
+#[cgp_provider(ChainProcessTakerComponent)]
 impl ChainProcessTaker<StarknetChainDriver> for StarknetChainDriverComponents {
     fn take_chain_process(chain_driver: &mut StarknetChainDriver) -> Option<Child> {
         chain_driver.chain_process.take()

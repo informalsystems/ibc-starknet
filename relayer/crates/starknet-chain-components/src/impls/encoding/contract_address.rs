@@ -1,14 +1,16 @@
 use core::marker::PhantomData;
 use std::collections::HashSet;
 
-use cgp::prelude::HasField;
+use cgp::prelude::*;
 use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
+use hermes_wasm_encoding_components::components::DecoderComponent;
 
 use crate::impls::types::address::StarknetAddress;
 use crate::types::event::StarknetEvent;
 
 pub struct DecodeOptionalByContractAddress<Tag>(pub PhantomData<Tag>);
 
+#[cgp_provider(DecoderComponent)]
 impl<Encoding, Strategy, Value, Tag> Decoder<Encoding, Strategy, Option<Value>>
     for DecodeOptionalByContractAddress<Tag>
 where

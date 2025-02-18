@@ -1,6 +1,7 @@
-use hermes_encoding_components::traits::decode::Decoder;
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode::{Decoder, DecoderComponent};
 use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use hermes_encoding_components::traits::encode::Encoder;
+use hermes_encoding_components::traits::encode::{Encoder, EncoderComponent};
 use hermes_encoding_components::traits::encode_mut::CanEncodeMut;
 use hermes_encoding_components::traits::types::decode_buffer::CanBuildDecodeBuffer;
 use hermes_encoding_components::traits::types::encode_buffer::CanFinalizedEncodeBuffer;
@@ -9,6 +10,7 @@ use crate::impls::encode_mut::end::DecodeEnd;
 
 pub struct EncodeWithMutBuffer;
 
+#[cgp_provider(EncoderComponent)]
 impl<Encoding, Strategy, Value> Encoder<Encoding, Strategy, Value> for EncodeWithMutBuffer
 where
     Encoding: CanEncodeMut<Strategy, Value> + CanFinalizedEncodeBuffer,
@@ -22,6 +24,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<Encoding, Strategy, Value> Decoder<Encoding, Strategy, Value> for EncodeWithMutBuffer
 where
     Encoding: CanDecodeMut<Strategy, Value> + CanBuildDecodeBuffer,

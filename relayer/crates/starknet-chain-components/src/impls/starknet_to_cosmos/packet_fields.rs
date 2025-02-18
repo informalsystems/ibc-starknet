@@ -1,9 +1,13 @@
+use cgp::prelude::*;
 use hermes_chain_components::traits::packet::fields::{
     PacketDstChannelIdGetter, PacketTimeoutHeightGetter,
 };
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::HasChannelIdType;
 use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
+use hermes_cosmos_chain_components::components::client::{
+    PacketDstChannelIdGetterComponent, PacketTimeoutHeightGetterComponent,
+};
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::channel::types::timeout::TimeoutHeight;
 
@@ -11,6 +15,7 @@ use crate::types::channel_id::ChannelId;
 
 pub struct ReadPacketDstStarknetFields;
 
+#[cgp_provider(PacketDstChannelIdGetterComponent)]
 impl<Chain, Counterparty> PacketDstChannelIdGetter<Chain, Counterparty>
     for ReadPacketDstStarknetFields
 where
@@ -22,6 +27,7 @@ where
     }
 }
 
+#[cgp_provider(PacketTimeoutHeightGetterComponent)]
 impl<Chain, Counterparty> PacketTimeoutHeightGetter<Chain, Counterparty>
     for ReadPacketDstStarknetFields
 where

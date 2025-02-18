@@ -1,5 +1,7 @@
-use cgp::core::Async;
-use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
+use cgp::prelude::*;
+use hermes_cli_components::traits::command::{
+    CanRunCommand, CommandRunner, CommandRunnerComponent,
+};
 
 use crate::commands::starknet::transfer_args::TransferArgs;
 
@@ -13,6 +15,7 @@ pub enum StarknetSubCommand {
 
 pub struct RunStarknetSubCommand;
 
+#[cgp_provider(CommandRunnerComponent)]
 impl<App> CommandRunner<App, StarknetSubCommand> for RunStarknetSubCommand
 where
     App: CanRunCommand<TransferArgs>,

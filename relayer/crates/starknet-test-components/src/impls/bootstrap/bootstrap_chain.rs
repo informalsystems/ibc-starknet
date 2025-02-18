@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 use std::net::{IpAddr, Ipv4Addr};
 
 use cgp::core::error::CanRaiseAsyncError;
+use cgp::prelude::*;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::CanBuildChainDriver;
 use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::CanStartChainFullNode;
 use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::HasChainStoreDir;
@@ -14,7 +15,9 @@ use hermes_runtime_components::traits::os::reserve_port::CanReserveTcpPort;
 use hermes_runtime_components::traits::random::CanGenerateRandom;
 use hermes_runtime_components::traits::runtime::HasRuntime;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
-use hermes_test_components::bootstrap::traits::chain::ChainBootstrapper;
+use hermes_test_components::bootstrap::traits::chain::{
+    ChainBootstrapper, ChainBootstrapperComponent,
+};
 use hermes_test_components::chain::traits::types::wallet::HasWalletType;
 use hermes_test_components::chain_driver::traits::types::chain::HasChainType;
 use starknet::macros::felt;
@@ -24,6 +27,7 @@ use crate::types::node_config::StarknetNodeConfig;
 
 pub struct BootstrapStarknetDevnet;
 
+#[cgp_provider(ChainBootstrapperComponent)]
 impl<Bootstrap, Runtime> ChainBootstrapper<Bootstrap> for BootstrapStarknetDevnet
 where
     Bootstrap: HasRuntime<Runtime = Runtime>

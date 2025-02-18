@@ -1,10 +1,16 @@
 use core::fmt::Debug;
 
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 
 pub struct EncodeArray;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy, Value, const SIZE: usize> MutEncoder<Encoding, Strategy, [Value; SIZE]>
     for EncodeArray
 where
@@ -23,6 +29,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy, Value, const SIZE: usize> MutDecoder<Encoding, Strategy, [Value; SIZE]>
     for EncodeArray
 where

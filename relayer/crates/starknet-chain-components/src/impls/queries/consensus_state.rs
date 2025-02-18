@@ -12,7 +12,9 @@ use hermes_chain_components::traits::types::consensus_state::HasConsensusStateTy
 use hermes_chain_components::traits::types::height::{HasHeightFields, HasHeightType};
 use hermes_chain_components::traits::types::ibc::HasClientIdType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_cosmos_chain_components::components::client::ConsensusStateQuerierComponent;
+use hermes_cosmos_chain_components::components::client::{
+    ConsensusStateQuerierComponent, ConsensusStateWithProofsQuerierComponent,
+};
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -115,6 +117,7 @@ where
     }
 }
 
+#[cgp_provider(ConsensusStateWithProofsQuerierComponent)]
 impl<Chain, Counterparty> ConsensusStateWithProofsQuerier<Chain, Counterparty>
     for QueryCometConsensusState
 where

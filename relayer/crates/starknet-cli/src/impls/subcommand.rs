@@ -1,5 +1,8 @@
+use cgp::prelude::*;
 use hermes_cli_components::impls::commands::start::StartRelayerArgs;
-use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
+use hermes_cli_components::traits::command::{
+    CanRunCommand, CommandRunner, CommandRunnerComponent,
+};
 
 use crate::commands::create::subcommand::CreateSubCommand;
 use crate::commands::query::subcommand::QuerySubCommand;
@@ -22,6 +25,7 @@ pub enum AllSubCommands {
 
 pub struct RunAllSubCommand;
 
+#[cgp_provider(CommandRunnerComponent)]
 impl<App> CommandRunner<App, AllSubCommands> for RunAllSubCommand
 where
     App: CanRunCommand<BootstrapSubCommand>

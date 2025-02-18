@@ -1,4 +1,5 @@
-use cgp::core::error::CanRaiseAsyncError;
+use cgp::prelude::*;
+use hermes_cosmos_chain_components::components::client::ConsensusStateHeightsQuerierComponent;
 use hermes_cosmos_chain_components::traits::grpc_address::HasGrpcAddress;
 use hermes_relayer_components::chain::traits::queries::consensus_state_height::ConsensusStateHeightsQuerier;
 use hermes_relayer_components::chain::traits::types::height::HasHeightType;
@@ -13,6 +14,7 @@ use tonic::Status;
 
 pub struct QueryStarknetConsensusStateHeightsFromGrpc;
 
+#[cgp_provider(ConsensusStateHeightsQuerierComponent)]
 impl<Chain, Counterparty> ConsensusStateHeightsQuerier<Chain, Counterparty>
     for QueryStarknetConsensusStateHeightsFromGrpc
 where

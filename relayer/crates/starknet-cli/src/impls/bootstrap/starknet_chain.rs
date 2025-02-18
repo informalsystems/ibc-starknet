@@ -1,5 +1,7 @@
 use cgp::prelude::*;
-use hermes_cli_components::traits::bootstrap::{BootstrapLoader, HasBootstrapType};
+use hermes_cli_components::traits::bootstrap::{
+    BootstrapLoader, BootstrapLoaderComponent, HasBootstrapType,
+};
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::HasRuntime;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
@@ -18,6 +20,7 @@ pub struct BootstrapStarknetChainArgs {
 
 pub struct LoadStarknetBootstrap;
 
+#[cgp_provider(BootstrapLoaderComponent)]
 impl<App> BootstrapLoader<App, BootstrapStarknetChainArgs> for LoadStarknetBootstrap
 where
     App: HasBootstrapType<Bootstrap = StarknetBootstrap>

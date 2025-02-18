@@ -11,12 +11,18 @@ use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPai
 use hermes_cosmos_test_components::bootstrap::components::cosmos_sdk::{
     ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent,
 };
-use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::ChainDriverBuilder;
+use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
+    ChainDriverBuilder, ChainDriverBuilderComponent,
+};
 use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::{
     CanStartChainFullNode, ChainFullNodeStarterComponent,
 };
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::ChainCommandPathGetter;
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::ChainStoreDirGetter;
+use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::{
+    ChainCommandPathGetter, ChainCommandPathGetterComponent,
+};
+use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::{
+    ChainStoreDirGetter, ChainStoreDirGetterComponent,
+};
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
@@ -35,8 +41,12 @@ use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
 use hermes_test_components::bootstrap::traits::chain::{
     CanBootstrapChain, ChainBootstrapperComponent,
 };
-use hermes_test_components::chain_driver::traits::types::chain::ProvideChainType;
-use hermes_test_components::driver::traits::types::chain_driver::ProvideChainDriverType;
+use hermes_test_components::chain_driver::traits::types::chain::{
+    ChainTypeComponent, ProvideChainType,
+};
+use hermes_test_components::driver::traits::types::chain_driver::{
+    ChainDriverTypeComponent, ProvideChainDriverType,
+};
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
@@ -71,26 +81,31 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(ChainTypeComponent)]
 impl ProvideChainType<StarknetBootstrap> for StarknetBootstrapComponents {
     type Chain = StarknetChain;
 }
 
+#[cgp_provider(ChainDriverTypeComponent)]
 impl ProvideChainDriverType<StarknetBootstrap> for StarknetBootstrapComponents {
     type ChainDriver = StarknetChainDriver;
 }
 
+#[cgp_provider(ChainCommandPathGetterComponent)]
 impl ChainCommandPathGetter<StarknetBootstrap> for StarknetBootstrapComponents {
     fn chain_command_path(bootstrap: &StarknetBootstrap) -> &PathBuf {
         &bootstrap.chain_command_path
     }
 }
 
+#[cgp_provider(ChainStoreDirGetterComponent)]
 impl ChainStoreDirGetter<StarknetBootstrap> for StarknetBootstrapComponents {
     fn chain_store_dir(bootstrap: &StarknetBootstrap) -> &PathBuf {
         &bootstrap.chain_store_dir
     }
 }
 
+#[cgp_provider(ChainDriverBuilderComponent)]
 impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
     async fn build_chain_driver(
         bootstrap: &StarknetBootstrap,

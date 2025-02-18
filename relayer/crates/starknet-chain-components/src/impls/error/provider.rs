@@ -1,9 +1,11 @@
-use cgp::core::error::{CanRaiseAsyncError, ErrorRaiser};
+use cgp::core::error::{ErrorRaiser, ErrorRaiserComponent};
+use cgp::prelude::*;
 use starknet::core::types::StarknetError;
 use starknet::providers::ProviderError;
 
 pub struct RaiseProviderError;
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl<Context> ErrorRaiser<Context, ProviderError> for RaiseProviderError
 where
     Context: CanRaiseAsyncError<StarknetError> + CanRaiseAsyncError<String>,

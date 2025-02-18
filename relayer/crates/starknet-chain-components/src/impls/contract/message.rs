@@ -1,8 +1,10 @@
+use cgp::prelude::*;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
 
+use crate::components::chain::InvokeContractMessageBuilderComponent;
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::contract::message::InvokeContractMessageBuilder;
@@ -11,6 +13,7 @@ use crate::traits::types::method::HasSelectorType;
 
 pub struct BuildInvokeContractCall;
 
+#[cgp_provider(InvokeContractMessageBuilderComponent)]
 impl<Chain> InvokeContractMessageBuilder<Chain> for BuildInvokeContractCall
 where
     Chain: HasAddressType<Address = StarknetAddress>

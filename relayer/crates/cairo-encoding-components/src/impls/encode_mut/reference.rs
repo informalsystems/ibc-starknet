@@ -1,9 +1,13 @@
 use core::ops::Deref;
 
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use cgp::prelude::*;
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 
 pub struct EncodeDeref;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Value> for EncodeDeref
 where
     Encoding: CanEncodeMut<Strategy, Value::Target>,

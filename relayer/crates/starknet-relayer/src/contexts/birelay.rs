@@ -6,7 +6,9 @@ use cgp::extra::run::RunnerComponent;
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::impls::ProvideHermesError;
-use hermes_relayer_components::birelay::traits::two_way::TwoWayRelayGetter;
+use hermes_relayer_components::birelay::traits::two_way::{
+    TwoWayRelayGetter, TwoWayRelayGetterComponent,
+};
 use hermes_relayer_components::components::default::birelay::{
     DefaultBiRelayComponents, IsDefaultBiRelayComponents,
 };
@@ -43,6 +45,7 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(TwoWayRelayGetterComponent)]
 impl TwoWayRelayGetter<StarknetCosmosBiRelay> for StarknetCosmosBiRelayComponents {
     fn relay_a_to_b(birelay: &StarknetCosmosBiRelay) -> &StarknetToCosmosRelay {
         &birelay.relay_a_to_b

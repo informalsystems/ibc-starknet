@@ -18,6 +18,9 @@ use hermes_relayer_components::build::traits::builders::birelay_builder::BiRelay
 use hermes_relayer_components::build::traits::builders::chain_builder::{
     CanBuildChain, ChainBuilder,
 };
+use hermes_relayer_components::components::default::build::{
+    BiRelayBuilderComponent, ChainBuilderComponent,
+};
 use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeAtComponent;
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
 use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
@@ -87,6 +90,7 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(ChainBuilderComponent)]
 impl ChainBuilder<StarknetBuilder, Index<0>> for StarknetBuildComponents {
     async fn build_chain(
         build: &StarknetBuilder,
@@ -97,6 +101,7 @@ impl ChainBuilder<StarknetBuilder, Index<0>> for StarknetBuildComponents {
     }
 }
 
+#[cgp_provider(ChainBuilderComponent)]
 impl ChainBuilder<StarknetBuilder, Index<1>> for StarknetBuildComponents {
     async fn build_chain(
         build: &StarknetBuilder,
@@ -107,6 +112,7 @@ impl ChainBuilder<StarknetBuilder, Index<1>> for StarknetBuildComponents {
     }
 }
 
+#[cgp_provider(BiRelayBuilderComponent)]
 impl BiRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponents {
     async fn build_birelay(
         build: &StarknetBuilder,

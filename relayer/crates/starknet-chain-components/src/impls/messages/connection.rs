@@ -25,6 +25,10 @@ use hermes_chain_components::types::payloads::connection::{
     ConnectionOpenTryPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_cosmos_chain_components::components::client::{
+    ConnectionOpenAckMessageBuilderComponent, ConnectionOpenConfirmMessageBuilderComponent,
+    ConnectionOpenInitMessageBuilderComponent, ConnectionOpenTryMessageBuilderComponent,
+};
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -51,6 +55,7 @@ use crate::types::messages::ibc::packet::StateProof;
 
 pub struct BuildStarknetConnectionHandshakeMessages;
 
+#[cgp_provider(ConnectionOpenInitMessageBuilderComponent)]
 impl<Chain, Counterparty, Encoding> ConnectionOpenInitMessageBuilder<Chain, Counterparty>
     for BuildStarknetConnectionHandshakeMessages
 where
@@ -109,6 +114,7 @@ where
     }
 }
 
+#[cgp_provider(ConnectionOpenTryMessageBuilderComponent)]
 impl<Chain, Counterparty, Encoding> ConnectionOpenTryMessageBuilder<Chain, Counterparty>
     for BuildStarknetConnectionHandshakeMessages
 where
@@ -186,6 +192,7 @@ where
     }
 }
 
+#[cgp_provider(ConnectionOpenAckMessageBuilderComponent)]
 impl<Chain, Counterparty, Encoding> ConnectionOpenAckMessageBuilder<Chain, Counterparty>
     for BuildStarknetConnectionHandshakeMessages
 where
@@ -256,6 +263,7 @@ where
     }
 }
 
+#[cgp_provider(ConnectionOpenConfirmMessageBuilderComponent)]
 impl<Chain, Counterparty, Encoding> ConnectionOpenConfirmMessageBuilder<Chain, Counterparty>
     for BuildStarknetConnectionHandshakeMessages
 where

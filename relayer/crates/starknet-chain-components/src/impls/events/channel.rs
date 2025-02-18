@@ -1,13 +1,19 @@
 use core::marker::PhantomData;
 
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::extract_data::MessageResponseExtractor;
+use hermes_chain_components::traits::extract_data::{
+    MessageResponseExtractor, MessageResponseExtractorComponent,
+};
 use hermes_chain_components::traits::types::ibc::HasChannelIdType;
 use hermes_chain_components::traits::types::ibc_events::channel::{
     ProvideChannelOpenInitEvent, ProvideChannelOpenTryEvent,
 };
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
+use hermes_cosmos_chain_components::components::client::{
+    ChannelOpenInitEventComponent, ChannelOpenTryEventComponent,
+};
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
@@ -18,6 +24,7 @@ use crate::impls::types::events::{StarknetChannelOpenInitEvent, StarknetChannelO
 use crate::types::channel_id::ChannelId;
 use crate::types::message_response::StarknetMessageResponse;
 
+#[cgp_provider(ChannelOpenInitEventComponent)]
 impl<Chain, Counterparty> ProvideChannelOpenInitEvent<Chain, Counterparty> for UseStarknetEvents
 where
     Chain: HasChannelIdType<Counterparty, ChannelId = ChannelId>,
@@ -29,6 +36,7 @@ where
     }
 }
 
+#[cgp_provider(MessageResponseExtractorComponent)]
 impl<Chain, Encoding> MessageResponseExtractor<Chain, StarknetChannelOpenInitEvent>
     for UseStarknetEvents
 where
@@ -49,6 +57,7 @@ where
     }
 }
 
+#[cgp_provider(ChannelOpenTryEventComponent)]
 impl<Chain, Counterparty> ProvideChannelOpenTryEvent<Chain, Counterparty> for UseStarknetEvents
 where
     Chain: HasChannelIdType<Counterparty, ChannelId = ChannelId>,
@@ -60,6 +69,7 @@ where
     }
 }
 
+#[cgp_provider(MessageResponseExtractorComponent)]
 impl<Chain, Encoding> MessageResponseExtractor<Chain, StarknetChannelOpenTryEvent>
     for UseStarknetEvents
 where

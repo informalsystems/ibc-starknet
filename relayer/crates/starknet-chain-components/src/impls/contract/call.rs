@@ -1,8 +1,9 @@
-use cgp::core::error::CanRaiseAsyncError;
+use cgp::prelude::*;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet::providers::{Provider, ProviderError};
 
+use crate::components::chain::ContractCallerComponent;
 use crate::impls::types::address::StarknetAddress;
 use crate::traits::contract::call::ContractCaller;
 use crate::traits::provider::HasStarknetProvider;
@@ -11,6 +12,7 @@ use crate::traits::types::method::HasSelectorType;
 
 pub struct CallStarknetContract;
 
+#[cgp_provider(ContractCallerComponent)]
 impl<Chain> ContractCaller<Chain> for CallStarknetContract
 where
     Chain: HasAddressType<Address = StarknetAddress>

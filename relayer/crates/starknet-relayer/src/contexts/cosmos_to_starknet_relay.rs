@@ -6,7 +6,7 @@ use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_logging_components::traits::has_logger::HasLogger;
-use hermes_relayer_components::components::default::relay::MainSink;
+use hermes_relayer_components::components::default::relay::{IbcMessageSenderComponent, MainSink};
 use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeAtComponent,
 };
@@ -29,9 +29,6 @@ use hermes_relayer_components::relay::traits::connection::open_confirm::CanRelay
 use hermes_relayer_components::relay::traits::connection::open_init::CanInitConnection;
 use hermes_relayer_components::relay::traits::connection::open_try::CanRelayConnectionOpenTry;
 use hermes_relayer_components::relay::traits::event_relayer::CanRelayEvent;
-use hermes_relayer_components::relay::traits::ibc_message_sender::{
-    CanSendIbcMessages, CanSendSingleIbcMessage,
-};
 use hermes_relayer_components::relay::traits::packet_lock::HasPacketLock;
 use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::target::{
@@ -128,14 +125,10 @@ pub trait CanUseCosmosToStarknetRelay:
     + HasTargetClientIds<DestinationTarget>
     + CanCreateClient<DestinationTarget>
     + CanCreateClient<SourceTarget>
-    + CanSendSingleIbcMessage<MainSink, SourceTarget>
-    + CanSendSingleIbcMessage<MainSink, DestinationTarget>
     + CanBuildTargetUpdateClientMessage<SourceTarget>
     + CanBuildTargetUpdateClientMessage<DestinationTarget>
     + CanSendTargetUpdateClientMessage<SourceTarget>
     + CanSendTargetUpdateClientMessage<DestinationTarget>
-    + CanSendIbcMessages<MainSink, SourceTarget>
-    + CanSendIbcMessages<MainSink, DestinationTarget>
     + CanInitConnection
     + CanRelayConnectionOpenTry
     + CanRelayConnectionOpenAck
@@ -152,6 +145,8 @@ pub trait CanUseCosmosToStarknetRelay:
     + CanRelayEvent<DestinationTarget>
     + CanAutoRelay<SourceTarget>
     + CanAutoRelay<DestinationTarget>
+    + CanUseComponent<IbcMessageSenderComponent<MainSink>, (MainSink, SourceTarget)>
+    + CanUseComponent<IbcMessageSenderComponent<MainSink>, (MainSink, DestinationTarget)>
 {
 }
 
