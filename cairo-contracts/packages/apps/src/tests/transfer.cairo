@@ -210,7 +210,13 @@ fn test_burn_ok() {
     call_contract(ics20.address, selector!("send_transfer_internal"), @msg_transfer);
 
     // Assert the `SendEvent` emitted.
-    spy.assert_send_event(ics20.address, SN_USER(), CS_USER(), prefixed_denom, cfg.amount);
+    spy
+        .assert_send_event(
+            ics20.address, SN_USER(), CS_USER(), prefixed_denom, cfg.amount,
+        ); // Assert if the transfer happens from the ICS20 address.
+
+    // Assert if the burn happens from the ICS20 address.
+    spy.assert_transfer_event(erc20.address, SN_USER(), ics20.address, cfg.amount);
 
     // Check the balance of the sender.
     erc20.assert_balance(SN_USER(), 0);
