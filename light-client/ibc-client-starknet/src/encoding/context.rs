@@ -3,7 +3,9 @@ use core::convert::Infallible;
 use core::num::{ParseIntError, TryFromIntError};
 use core::str::Utf8Error;
 
-use cgp::core::error::{ErrorRaiser, ErrorRaiserComponent, ErrorTypeProvider, ErrorTypeProviderComponent};
+use cgp::core::error::{
+    ErrorRaiser, ErrorRaiserComponent, ErrorTypeProvider, ErrorTypeProviderComponent,
+};
 use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::{CanConvert, CanConvertBothWays};
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
