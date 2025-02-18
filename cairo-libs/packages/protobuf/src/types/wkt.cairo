@@ -19,10 +19,9 @@ impl DurationAsProtoMessage of ProtoMessage<Duration> {
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<Duration> {
-        let mut duration = Default::<Duration>::default();
-        duration.seconds = context.decode_field(1)?;
-        duration.nanos = context.decode_field(2)?;
-        Option::Some(duration)
+        let seconds = context.decode_field(1)?;
+        let nanos = context.decode_field(2)?;
+        Option::Some(Duration { seconds, nanos })
     }
 
     fn wire_type() -> WireType {
@@ -49,10 +48,9 @@ impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<Timestamp> {
-        let mut timestamp = Default::<Timestamp>::default();
-        timestamp.seconds = context.decode_field(1)?;
-        timestamp.nanos = context.decode_field(2)?;
-        Option::Some(timestamp)
+        let seconds = context.decode_field(1)?;
+        let nanos = context.decode_field(2)?;
+        Option::Some(Timestamp { seconds, nanos })
     }
 
     fn wire_type() -> WireType {
@@ -79,10 +77,9 @@ impl AnyAsProtoMessage of ProtoMessage<Any> {
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<Any> {
-        let mut any = Default::<Any>::default();
-        any.type_url = context.decode_field(1)?;
-        any.value = context.decode_field(2)?;
-        Option::Some(any)
+        let type_url = context.decode_field(1)?;
+        let value = context.decode_field(2)?;
+        Option::Some(Any { type_url, value })
     }
 
     fn wire_type() -> WireType {

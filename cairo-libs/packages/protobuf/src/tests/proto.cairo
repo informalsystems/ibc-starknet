@@ -25,10 +25,9 @@ impl ProposerAsProtoMessage of ProtoMessage<Proposer> {
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<Proposer> {
-        let mut value = Default::<Proposer>::default();
-        value.address = context.decode_field(1)?;
-        value.pub_key = context.decode_field(2)?;
-        Option::Some(value)
+        let address = context.decode_field(1)?;
+        let pub_key = context.decode_field(2)?;
+        Option::Some(Proposer { address, pub_key })
     }
 
     fn wire_type() -> WireType {
@@ -103,17 +102,20 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<TmHeader> {
-        let mut header = Default::<TmHeader>::default();
-        header.height = context.decode_field(1)?;
-        header.active = context.decode_field(2)?;
-        header.chain_id = context.decode_field(3)?;
-        header.time = context.decode_field(4)?;
-        header.hash = context.decode_field(5)?;
-        header.indexes = context.decode_field(6)?;
-        header.proposer = context.decode_field(7)?;
-        header.validator_type = context.decode_field(8)?;
-        header.proposers = context.decode_repeated_field(9)?;
-        Option::Some(header)
+        let height = context.decode_field(1)?;
+        let active = context.decode_field(2)?;
+        let chain_id = context.decode_field(3)?;
+        let time = context.decode_field(4)?;
+        let hash = context.decode_field(5)?;
+        let indexes = context.decode_field(6)?;
+        let proposer = context.decode_field(7)?;
+        let validator_type = context.decode_field(8)?;
+        let proposers = context.decode_repeated_field(9)?;
+        Option::Some(
+            TmHeader {
+                height, active, chain_id, time, hash, indexes, proposer, validator_type, proposers,
+            },
+        )
     }
 
     fn wire_type() -> WireType {
