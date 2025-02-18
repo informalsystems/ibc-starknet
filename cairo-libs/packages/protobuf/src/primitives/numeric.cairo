@@ -88,10 +88,11 @@ pub impl BoolAsProtoMessage of ProtoMessage<bool> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<bool> {
         let num: u64 = decode_raw(ref context)?;
-        if num != 0 && num != 1 {
-            return Option::None;
+        match num {
+            0 => { return Option::Some(false); },
+            1 => { return Option::Some(true); },
+            _ => { return Option::None; },
         }
-        Option::Some(num == 1)
     }
 
     fn wire_type() -> WireType {
