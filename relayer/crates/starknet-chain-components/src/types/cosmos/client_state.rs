@@ -32,6 +32,7 @@ pub struct CometClientState {
     pub latest_height: Height,
     pub trusting_period: u64,
     pub unbonding_period: u64,
+    pub max_clock_drift: u64,
     pub status: ClientStatus,
     pub chain_id: ChainId,
 }
@@ -90,6 +91,7 @@ delegate_components! {
                 EncodeField<symbol!("latest_height"), UseContext>,
                 EncodeField<symbol!("trusting_period"), UseContext>,
                 EncodeField<symbol!("unbonding_period"), UseContext>,
+                EncodeField<symbol!("max_clock_drift"), UseContext>,
                 EncodeField<symbol!("status"), UseContext>,
                 EncodeField<symbol!("chain_id"), UseContext>,
             ],
@@ -99,7 +101,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeCometClientState {
-    type From = Product![Height, u64, u64, ClientStatus, ChainId];
+    type From = Product![Height, u64, u64, u64, ClientStatus, ChainId];
     type To = CometClientState;
 
     fn transform(
@@ -107,6 +109,7 @@ impl Transformer for EncodeCometClientState {
             latest_height,
             trusting_period,
             unbonding_period,
+            max_clock_drift,
             status,
             chain_id
         ]: Self::From,
@@ -115,6 +118,7 @@ impl Transformer for EncodeCometClientState {
             latest_height,
             trusting_period,
             unbonding_period,
+            max_clock_drift,
             status,
             chain_id,
         }
@@ -164,7 +168,7 @@ impl From<CometClientState> for IbcCometClientState {
             TrustThreshold::ONE_THIRD,
             Duration::from_secs(client_state.trusting_period),
             Duration::from_secs(client_state.unbonding_period),
-            Duration::from_secs(3),
+            Duration::from_secs(client_state.max_clock_drift),
             CosmosHeight::new(
                 client_state.latest_height.revision_number,
                 client_state.latest_height.revision_height,

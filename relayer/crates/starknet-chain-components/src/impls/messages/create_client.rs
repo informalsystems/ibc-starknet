@@ -64,6 +64,7 @@ where
             latest_height: height,
             trusting_period: payload.client_state.trusting_period.as_secs(),
             unbonding_period: payload.client_state.unbonding_period.as_secs(),
+            max_clock_drift: payload.client_state.max_clock_drift.as_secs(),
             status: ClientStatus::Active,
             chain_id: payload.client_state.chain_id,
         };
