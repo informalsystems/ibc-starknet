@@ -52,7 +52,7 @@ pub impl I32AsProtoMessage of ProtoMessage<i32> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<i32> {
         let num = decode_raw(ref context)?;
-        return Option::Some(decode_2_complement_32(@num));
+        Option::Some(decode_2_complement_32(@num))
     }
 
     fn wire_type() -> WireType {
@@ -68,7 +68,7 @@ pub impl I64AsProtoMessage of ProtoMessage<i64> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<i64> {
         let num = decode_raw(ref context)?;
-        return Option::Some(decode_2_complement_64(@num));
+        Option::Some(decode_2_complement_64(@num))
     }
 
     fn wire_type() -> WireType {
@@ -91,7 +91,7 @@ pub impl BoolAsProtoMessage of ProtoMessage<bool> {
         if num != 0 && num != 1 {
             return Option::None;
         }
-        return Option::Some(num == 1);
+        Option::Some(num == 1)
     }
 
     fn wire_type() -> WireType {

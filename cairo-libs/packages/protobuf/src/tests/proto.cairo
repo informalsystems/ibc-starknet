@@ -59,12 +59,11 @@ impl ValidatorAsProtoMessage of ProtoMessage<ValidatorType> {
 
     fn decode_raw(ref context: DecodeContext) -> Option<ValidatorType> {
         let var: u32 = context.decode_raw()?;
-        let validator = match var {
+        match var {
             0 => Option::Some(ValidatorType::Full),
             1 => Option::Some(ValidatorType::Light),
             _ => Option::None,
-        };
-        validator
+        }
     }
 
     fn wire_type() -> WireType {
