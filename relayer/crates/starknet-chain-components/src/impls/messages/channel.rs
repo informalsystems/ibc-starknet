@@ -31,7 +31,7 @@ use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use ibc::core::channel::types::channel::{ChannelEnd, Order as IbcOrder};
 use ibc::core::client::types::Height;
-use ibc::core::host::types::identifiers::{ChannelId, PortId as IbcPortId};
+use ibc::core::host::types::identifiers::{ChannelId, ConnectionId, PortId as IbcPortId};
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
@@ -119,7 +119,7 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-        + HasConnectionIdType<Counterparty>
+        + HasConnectionIdType<Counterparty, ConnectionId = ConnectionId>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
@@ -139,26 +139,26 @@ where
         port_id: &IbcPortId,
         counterparty_port_id: &IbcPortId,
         counterparty_channel_id: &ChannelId,
-        counterparty_payload: ChannelOpenTryPayload<Counterparty, Chain>,
+        payload: ChannelOpenTryPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        if counterparty_payload.channel_end.connection_hops.len() != 1 {
+        if payload.channel_end.connection_hops.len() != 1 {
             return Err(Chain::raise_error(
                 "Starknet only supports a single connection hop",
             ));
         }
 
-        let conn_id_on_b = counterparty_payload.channel_end.connection_hops[0].clone();
+        let conn_id_on_b = payload.counterparty_connection_id;
 
         let proof_chan_end_on_a = StateProof {
             proof: vec![Felt::ONE],
         };
 
         let proof_height_on_a = CairoHeight {
-            revision_number: counterparty_payload.update_height.revision_number(),
-            revision_height: counterparty_payload.update_height.revision_height(),
+            revision_number: payload.update_height.revision_number(),
+            revision_height: payload.update_height.revision_height(),
         };
 
-        let ordering = match counterparty_payload.channel_end.ordering {
+        let ordering = match payload.channel_end.ordering {
             IbcOrder::None => {
                 return Err(Chain::raise_error("Starknet does not support no ordering"))
             }
@@ -171,7 +171,7 @@ where
             conn_id_on_b,
             port_id_on_a: counterparty_port_id.clone(),
             chan_id_on_a: counterparty_channel_id.clone(),
-            version_on_a: counterparty_payload.channel_end.version.clone(),
+            version_on_a: payload.channel_end.version.clone(),
             proof_chan_end_on_a,
             proof_height_on_a,
             ordering,
@@ -190,8 +190,7 @@ where
             calldata,
         };
 
-        let message =
-            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+        let message = StarknetMessage::new(call).with_counterparty_height(payload.update_height);
 
         Ok(message)
     }
