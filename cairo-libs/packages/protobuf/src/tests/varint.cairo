@@ -31,7 +31,7 @@ fn test_encode_varint() {
 fn test_encode_varint_u64_default() {
     assert_eq!(encode_varint_to_byte_array(0), "\x00");
     let mut index = 0;
-    assert_eq!(decode_varint_from_byte_array(@"\x00", ref index), 0);
+    assert_eq!(decode_varint_from_byte_array(@"\x00", ref index).unwrap(), 0);
 }
 
 #[test]
@@ -42,7 +42,7 @@ fn test_encode_decode_varint_u64() {
     let bytes2 = hex_decode(@hex);
     assert_eq!(bytes, bytes2, "invalid encoded bytes");
     let mut index = 0;
-    let decoded = decode_varint_from_byte_array(@bytes, ref index);
+    let decoded = decode_varint_from_byte_array(@bytes, ref index).unwrap();
     assert_eq!(decoded, value, "invalid decoded value");
 }
 

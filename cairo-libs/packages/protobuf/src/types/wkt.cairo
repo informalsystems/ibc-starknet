@@ -18,9 +18,10 @@ impl DurationAsProtoMessage of ProtoMessage<Duration> {
         context.encode_field(2, self.nanos);
     }
 
-    fn decode_raw(ref self: Duration, ref context: DecodeContext) {
-        context.decode_field(1, ref self.seconds);
-        context.decode_field(2, ref self.nanos);
+    fn decode_raw(ref context: DecodeContext) -> Option<Duration> {
+        let seconds = context.decode_field(1)?;
+        let nanos = context.decode_field(2)?;
+        Option::Some(Duration { seconds, nanos })
     }
 
     fn wire_type() -> WireType {
@@ -46,9 +47,10 @@ impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
         context.encode_field(2, self.nanos);
     }
 
-    fn decode_raw(ref self: Timestamp, ref context: DecodeContext) {
-        context.decode_field(1, ref self.seconds);
-        context.decode_field(2, ref self.nanos);
+    fn decode_raw(ref context: DecodeContext) -> Option<Timestamp> {
+        let seconds = context.decode_field(1)?;
+        let nanos = context.decode_field(2)?;
+        Option::Some(Timestamp { seconds, nanos })
     }
 
     fn wire_type() -> WireType {
@@ -74,9 +76,10 @@ impl AnyAsProtoMessage of ProtoMessage<Any> {
         context.encode_field(2, self.value);
     }
 
-    fn decode_raw(ref self: Any, ref context: DecodeContext) {
-        context.decode_field(1, ref self.type_url);
-        context.decode_field(2, ref self.value);
+    fn decode_raw(ref context: DecodeContext) -> Option<Any> {
+        let type_url = context.decode_field(1)?;
+        let value = context.decode_field(2)?;
+        Option::Some(Any { type_url, value })
     }
 
     fn wire_type() -> WireType {
@@ -102,7 +105,7 @@ pub impl AnyTryIntoProtoMessage<
 > of TryInto<Any, T> {
     fn try_into(self: Any) -> Option<T> {
         if self.type_url == ProtoName::<T>::type_url() {
-            Option::Some(ProtoCodecImpl::decode::<T>(@self.value))
+            ProtoCodecImpl::decode::<T>(@self.value)
         } else {
             Option::None
         }

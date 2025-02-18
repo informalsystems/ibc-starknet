@@ -42,18 +42,33 @@ impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
         context.encode_field(11, self.allow_update_after_misbehaviour);
     }
 
-    fn decode_raw(ref self: ClientState, ref context: DecodeContext) {
-        context.decode_field(1, ref self.chain_id);
-        context.decode_field(2, ref self.trust_level);
-        context.decode_field(3, ref self.trusting_period);
-        context.decode_field(4, ref self.unbonding_period);
-        context.decode_field(5, ref self.max_clock_drift);
-        context.decode_field(6, ref self.frozen_height);
-        context.decode_field(7, ref self.latest_height);
-        context.decode_repeated_field(8, ref self.proof_specs);
-        context.decode_repeated_field(9, ref self.upgrade_path);
-        context.decode_field(10, ref self.allow_update_after_expiry);
-        context.decode_field(11, ref self.allow_update_after_misbehaviour);
+    fn decode_raw(ref context: DecodeContext) -> Option<ClientState> {
+        let chain_id = context.decode_field(1)?;
+        let trust_level = context.decode_field(2)?;
+        let trusting_period = context.decode_field(3)?;
+        let unbonding_period = context.decode_field(4)?;
+        let max_clock_drift = context.decode_field(5)?;
+        let frozen_height = context.decode_field(6)?;
+        let latest_height = context.decode_field(7)?;
+        let proof_specs = context.decode_repeated_field(8)?;
+        let upgrade_path = context.decode_repeated_field(9)?;
+        let allow_update_after_expiry = context.decode_field(10)?;
+        let allow_update_after_misbehaviour = context.decode_field(11)?;
+        Option::Some(
+            ClientState {
+                chain_id,
+                trust_level,
+                trusting_period,
+                unbonding_period,
+                max_clock_drift,
+                frozen_height,
+                latest_height,
+                proof_specs,
+                upgrade_path,
+                allow_update_after_expiry,
+                allow_update_after_misbehaviour,
+            },
+        )
     }
 
     fn wire_type() -> WireType {
@@ -83,10 +98,11 @@ impl ConsensusStateAsProtoMessage of ProtoMessage<ConsensusState> {
         context.encode_field(3, self.next_validators_hash);
     }
 
-    fn decode_raw(ref self: ConsensusState, ref context: DecodeContext) {
-        context.decode_field(1, ref self.timestamp);
-        context.decode_field(2, ref self.root);
-        context.decode_field(3, ref self.next_validators_hash);
+    fn decode_raw(ref context: DecodeContext) -> Option<ConsensusState> {
+        let timestamp = context.decode_field(1)?;
+        let root = context.decode_field(2)?;
+        let next_validators_hash = context.decode_field(3)?;
+        Option::Some(ConsensusState { timestamp, root, next_validators_hash })
     }
 
     fn wire_type() -> WireType {
@@ -114,10 +130,11 @@ impl MisbehaviourAsProtoMessage of ProtoMessage<Misbehaviour> {
         context.encode_field(3, self.header_2);
     }
 
-    fn decode_raw(ref self: Misbehaviour, ref context: DecodeContext) {
-        context.decode_field(1, ref self.client_id);
-        context.decode_field(2, ref self.header_1);
-        context.decode_field(3, ref self.header_2);
+    fn decode_raw(ref context: DecodeContext) -> Option<Misbehaviour> {
+        let client_id = context.decode_field(1)?;
+        let header_1 = context.decode_field(2)?;
+        let header_2 = context.decode_field(3)?;
+        Option::Some(Misbehaviour { client_id, header_1, header_2 })
     }
 
     fn wire_type() -> WireType {
@@ -147,11 +164,12 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
         context.encode_field(4, self.trusted_validator_set);
     }
 
-    fn decode_raw(ref self: Header, ref context: DecodeContext) {
-        context.decode_field(1, ref self.signed_header);
-        context.decode_field(2, ref self.validator_set);
-        context.decode_field(3, ref self.trusted_height);
-        context.decode_field(4, ref self.trusted_validator_set);
+    fn decode_raw(ref context: DecodeContext) -> Option<Header> {
+        let signed_header = context.decode_field(1)?;
+        let validator_set = context.decode_field(2)?;
+        let trusted_height = context.decode_field(3)?;
+        let trusted_validator_set = context.decode_field(4)?;
+        Option::Some(Header { signed_header, validator_set, trusted_height, trusted_validator_set })
     }
 
     fn wire_type() -> WireType {

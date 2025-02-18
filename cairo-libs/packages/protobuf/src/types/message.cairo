@@ -2,9 +2,15 @@ use protobuf::types::tag::{WireType, ProtobufTag, ProtobufTagImpl};
 use protobuf::primitives::numeric::U32AsProtoMessage;
 
 pub trait ProtoMessage<T> {
-    fn decode_raw(ref self: T, ref context: DecodeContext);
+    fn decode_raw(ref context: DecodeContext) -> Option<T>;
     fn encode_raw(self: @T, ref context: EncodeContext);
     fn wire_type() -> WireType;
+}
+
+pub fn decode_raw<T, +Drop<T>, +Default<T>, +ProtoMessage<T>>(
+    ref context: DecodeContext,
+) -> Option<T> {
+    ProtoMessage::<T>::decode_raw(ref context)
 }
 
 pub trait ProtoName<T> {
@@ -72,19 +78,29 @@ pub impl DecodeContextImpl of DecodeContextTrait {
         DecodeContext { buffer, index: 0, limits: array![] }
     }
 
-    fn init_branch(ref self: DecodeContext, length: usize) {
+    fn init_branch(ref self: DecodeContext, length: usize) -> Option<()> {
         let limit = self.index + length;
-        assert(limit <= self.buffer.len(), 'bigger limit for branch');
+        if limit > self.buffer.len() {
+            return Option::None;
+        }
         self.limits.append(self.index + length);
+        Option::Some(())
     }
 
     fn can_read_branch(ref self: DecodeContext) -> bool {
         @self.index < self.limits[self.limits.len() - 1]
     }
 
+    fn decode_raw<T, +Drop<T>, +Default<T>, +ProtoMessage<T>>(
+        ref self: DecodeContext,
+    ) -> Option<T> {
+        ProtoMessage::<T>::decode_raw(ref self)
+    }
+
     fn decode_field<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(
-        ref self: DecodeContext, field_number: u8, ref value: T,
-    ) {
+        ref self: DecodeContext, field_number: u8,
+    ) -> Option<T> {
+        let mut field = Default::<T>::default();
         if self.can_read_branch() {
             let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
             if tag.field_number == field_number {
@@ -92,65 +108,74 @@ pub impl DecodeContextImpl of DecodeContextTrait {
 
                 let wire_type = ProtoMessage::<T>::wire_type();
 
-                assert(wire_type == tag.wire_type, 'unexpected wire type');
+                if wire_type != tag.wire_type {
+                    return Option::None;
+                }
 
                 if wire_type == WireType::LengthDelimited {
-                    let mut length = 0;
-                    length.decode_raw(ref self);
-                    self.init_branch(length);
-                    value.decode_raw(ref self);
-                    self.end_branch();
+                    let length = self.decode_raw()?;
+                    self.init_branch(length)?;
+                    field = self.decode_raw()?;
+                    self.end_branch()?;
                 } else {
-                    value.decode_raw(ref self);
+                    field = self.decode_raw()?;
                 }
             } else if tag.field_number < field_number {
-                panic!(
-                    "unexpected field number order: at expected field {} but got older field {}",
-                    field_number,
-                    tag.field_number,
-                );
+                return Option::None;
             }
         }
+        Option::Some(field)
     }
 
     // for unpacked repeated fields (default for non-scalars)
     fn decode_repeated_field<T, +ProtoMessage<T>, +Default<T>, +Drop<T>>(
-        ref self: DecodeContext, field_number: u8, ref value: Array<T>,
-    ) {
+        ref self: DecodeContext, field_number: u8,
+    ) -> Option<Array<T>> {
+        let mut field = ArrayTrait::new();
+        let mut failed = false;
         while self.can_read_branch() {
             let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
             if tag.field_number != field_number {
                 break;
             }
-            let mut item = Default::<T>::default();
-
-            self.decode_field(field_number, ref item);
-            value.append(item);
+            if let Option::Some(item) = self.decode_field(field_number) {
+                field.append(item)
+            } else {
+                failed = true;
+                break;
+            }
         };
+        if failed {
+            return Option::None;
+        }
+        Option::Some(field)
     }
 
-    fn end_branch(ref self: DecodeContext) {
+    fn end_branch(ref self: DecodeContext) -> Option<()> {
         // TODO(rano): pop_back is not impl for Array<T>, this is inefficient
         let mut span = self.limits.span();
-        let limit = span.pop_back().unwrap();
+        let limit = span.pop_back()?;
         self.limits = span.into();
-        assert(limit == @self.index, 'smaller limit for branch');
+        if limit != @self.index {
+            return Option::None;
+        }
+        Option::Some(())
     }
 }
 
 #[generate_trait]
 pub impl ProtoCodecImpl of ProtoCodecTrait {
-    fn decode<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(serialized: @ByteArray) -> T {
+    fn decode<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(serialized: @ByteArray) -> Option<T> {
         let mut value = Default::<T>::default();
         let mut context = DecodeContextImpl::new(serialized);
         if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
-            context.init_branch(serialized.len());
-            value.decode_raw(ref context);
-            context.end_branch();
+            context.init_branch(serialized.len())?;
+            value = context.decode_raw()?;
+            context.end_branch()?;
         } else {
-            value.decode_raw(ref context);
+            value = context.decode_raw()?;
         };
-        value
+        Option::Some(value)
     }
 
     fn encode<T, +ProtoMessage<T>>(value: @T) -> ByteArray {
