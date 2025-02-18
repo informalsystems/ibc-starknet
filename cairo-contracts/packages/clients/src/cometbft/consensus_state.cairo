@@ -42,14 +42,20 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
         //
         // PS. the following check is always successful once a consensus state is validated and
         // accepted as trusted. Because the `block_timestamp` is always increasing.
+
+        let self_timestamp = self.timestamp();
+
         assert(
-            host_timestamp + max_clock_drift >= self.timestamp(),
+            host_timestamp + max_clock_drift >= self_timestamp,
             CometErrors::HEADER_TIMESTAMP_FROM_FUTURE,
         );
 
-        let elapsed_time = host_timestamp - self.timestamp();
+        // The header is in future but within the `max_clock_drift` period.
+        if host_timestamp < self_timestamp {
+            return Status::Active;
+        }
 
-        if elapsed_time < trusting_period {
+        if host_timestamp - self_timestamp < trusting_period {
             Status::Active
         } else {
             Status::Expired
