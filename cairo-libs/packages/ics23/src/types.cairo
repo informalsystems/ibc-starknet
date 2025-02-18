@@ -220,11 +220,8 @@ impl HashOpAsProtoMessage of ProtoMessage<HashOp> {
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<HashOp> {
-        let var: Option<u32> = context.decode_raw();
-        if var.is_none() {
-            return Option::None;
-        }
-        let value = match var.unwrap() {
+        let var: u32 = context.decode_raw()?;
+        let value = match var {
             0 => Option::Some(HashOp::NoOp),
             1 => Option::Some(HashOp::Sha256),
             _ => Option::None,
@@ -253,11 +250,8 @@ impl LengthOpAsProtoMessage of ProtoMessage<LengthOp> {
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<LengthOp> {
-        let var: Option<u32> = context.decode_raw();
-        if var.is_none() {
-            return Option::None;
-        }
-        let value = match var.unwrap() {
+        let var: u32 = context.decode_raw()?;
+        let value = match var {
             0 => Option::Some(LengthOp::NoPrefix),
             1 => Option::Some(LengthOp::VarProto),
             _ => Option::None,

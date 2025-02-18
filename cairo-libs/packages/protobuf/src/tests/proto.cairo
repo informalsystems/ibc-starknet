@@ -58,11 +58,8 @@ impl ValidatorAsProtoMessage of ProtoMessage<ValidatorType> {
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<ValidatorType> {
-        let var: Option<u32> = context.decode_raw();
-        if var.is_none() {
-            return Option::None;
-        };
-        let validator = match var.unwrap() {
+        let var: u32 = context.decode_raw()?;
+        let validator = match var {
             0 => Option::Some(ValidatorType::Full),
             1 => Option::Some(ValidatorType::Light),
             _ => Option::None,

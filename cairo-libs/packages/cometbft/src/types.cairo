@@ -198,11 +198,8 @@ impl BlockIdFlagAsProtoMessage of ProtoMessage<BlockIdFlag> {
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<BlockIdFlag> {
-        let var: Option<u32> = context.decode_raw();
-        if var.is_none() {
-            return Option::None;
-        }
-        let value = match var.unwrap() {
+        let var: u32 = context.decode_raw()?;
+        let value = match var {
             0 => Option::Some(BlockIdFlag::Unknown),
             1 => Option::Some(BlockIdFlag::Absent),
             2 => Option::Some(BlockIdFlag::Commit),
