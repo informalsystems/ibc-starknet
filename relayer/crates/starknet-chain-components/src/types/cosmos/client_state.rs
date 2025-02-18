@@ -9,7 +9,9 @@ use hermes_chain_components::traits::types::client_state::{
     ClientStateFieldsGetter, HasClientStateType,
 };
 use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_cosmos_chain_components::components::client::ClientStateTypeComponent;
+use hermes_cosmos_chain_components::components::client::{
+    ClientStateFieldsComponent, ClientStateTypeComponent,
+};
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
@@ -57,6 +59,7 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(ClientStateFieldsComponent)]
 impl<Chain, Counterparty> ClientStateFieldsGetter<Chain, Counterparty> for UseCometClientState
 where
     Chain: HasClientStateType<Counterparty, ClientState = CometClientState>
@@ -163,7 +166,7 @@ impl Transformer for EncodeClientStatus {
 
 impl From<CometClientState> for IbcCometClientState {
     fn from(client_state: CometClientState) -> Self {
-        IbcCometClientState::new(
+        Self::new(
             client_state.chain_id,
             TrustThreshold::ONE_THIRD,
             Duration::from_secs(client_state.trusting_period),
@@ -193,6 +196,7 @@ impl From<CometClientState> for Any {
 
 pub struct EncodeChainId;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChainId> for EncodeChainId
 where
     Encoding: CanEncodeMut<Strategy, String>,
@@ -208,6 +212,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChainId> for EncodeChainId
 where
     Encoding: CanDecodeMut<Strategy, String> + CanRaiseAsyncError<&'static str>,

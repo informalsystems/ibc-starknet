@@ -1,3 +1,5 @@
+use cgp::prelude::*;
+use hermes_cosmos_chain_components::components::client::CounterpartyMessageHeightGetterComponent;
 use hermes_cosmos_chain_components::traits::message::CosmosMessage;
 use hermes_relayer_components::chain::traits::types::height::HasHeightType;
 use hermes_relayer_components::chain::traits::types::ibc::CounterpartyMessageHeightGetter;
@@ -5,6 +7,7 @@ use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 
 pub struct GetCosmosCounterpartyMessageStarknetHeight;
 
+#[cgp_provider(CounterpartyMessageHeightGetterComponent)]
 impl<Chain, Counterparty> CounterpartyMessageHeightGetter<Chain, Counterparty>
     for GetCosmosCounterpartyMessageStarknetHeight
 where

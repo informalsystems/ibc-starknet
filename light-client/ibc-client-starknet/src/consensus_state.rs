@@ -35,7 +35,7 @@ impl From<ConsensusState> for Any {
             .convert(&consensus_state.0)
             .unwrap();
 
-        Any {
+        Self {
             type_url: any.type_url,
             value: any.value,
         }

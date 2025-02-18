@@ -1,5 +1,6 @@
 use core::marker::PhantomData;
 
+use cgp::prelude::*;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::channel_end::CanQueryChannelEnd;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientState;
@@ -11,6 +12,7 @@ use hermes_chain_components::traits::types::connection::HasConnectionEndType;
 use hermes_chain_components::traits::types::ibc::{
     HasChannelIdType, HasClientIdType, HasConnectionIdType, HasPortIdType,
 };
+use hermes_cosmos_chain_components::components::client::CounterpartyChainIdQuerierComponent;
 
 use crate::types::channel_id::ChannelEnd;
 use crate::types::client_id::ClientId;
@@ -18,6 +20,7 @@ use crate::types::connection_id::{ConnectionEnd, ConnectionId};
 
 pub struct QueryCosmosChainIdFromStarknetChannelId;
 
+#[cgp_provider(CounterpartyChainIdQuerierComponent)]
 impl<Chain, Counterparty> CounterpartyChainIdQuerier<Chain, Counterparty>
     for QueryCosmosChainIdFromStarknetChannelId
 where

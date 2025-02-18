@@ -1,11 +1,10 @@
 use cgp::prelude::*;
-use hermes_cli_components::traits::command::CommandRunner;
+use hermes_cli_components::traits::command::{CommandRunner, CommandRunnerComponent};
 use hermes_cli_components::traits::output::HasOutputType;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_logging_components::traits::has_logger::HasLogger;
 use hermes_logging_components::traits::logger::CanLog;
 use hermes_logging_components::types::level::LevelInfo;
-use hermes_starknet_chain_components::types::channel_id::ChannelId;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
 use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
@@ -69,6 +68,7 @@ pub struct TransferArgs {
 
 pub struct RunTransferArgs;
 
+#[cgp_provider(CommandRunnerComponent)]
 #[async_trait]
 impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
     async fn run_command(
@@ -84,7 +84,7 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
         let denom = if args.denom.starts_with("0x") {
             PrefixedDenom {
                 trace_path: vec![],
-                base: Denom::Native(Felt::from_hex(&args.denom)?),
+                base: Denom::Native(Felt::from_hex(&args.denom)?.into()),
             }
         } else {
             PrefixedDenom {
@@ -100,7 +100,7 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
 
         let msg_transfer = MsgTransfer {
             port_id_on_a: PortId::transfer(),
-            chan_id_on_a: &args.channel_id.parse()?,
+            chan_id_on_a: args.channel_id.parse()?,
             denom,
             amount: amount_u128.into(),
             receiver: args.receiver.clone(),
@@ -126,10 +126,7 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
 
         logger
             .log(
-                &format!(
-                    "Arguments to send transaction using `starkli invoke` are: {}",
-                    call_data_str
-                ),
+                "Arguments to send transaction using `starkli invoke` are: {call_data_str}",
                 &LevelInfo,
             )
             .await;

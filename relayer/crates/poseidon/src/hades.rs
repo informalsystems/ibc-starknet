@@ -13,7 +13,7 @@ pub static ROUND_CONSTANTS: LazyLock<[Felt; RATE_PLUS_1 * (FULL_ROUNDS + PARTIAL
     LazyLock::new(|| {
         core::array::from_fn(|idx| {
             // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py#L15
-            let value = format!("{}{}", FN_NAME, idx);
+            let value = format!("{FN_NAME}{idx}");
 
             let hash = {
                 use sha2::Digest;

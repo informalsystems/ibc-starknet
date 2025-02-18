@@ -1,3 +1,4 @@
+use super::super::types::message::DecodeContextTrait;
 use protobuf::types::message::{
     ProtoMessage, ProtoName, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
     DecodeContextImpl,
@@ -23,9 +24,10 @@ impl ProposerAsProtoMessage of ProtoMessage<Proposer> {
         context.encode_field(2, self.pub_key);
     }
 
-    fn decode_raw(ref self: Proposer, ref context: DecodeContext) {
-        context.decode_field(1, ref self.address);
-        context.decode_field(2, ref self.pub_key);
+    fn decode_raw(ref context: DecodeContext) -> Option<Proposer> {
+        let address = context.decode_field(1)?;
+        let pub_key = context.decode_field(2)?;
+        Option::Some(Proposer { address, pub_key })
     }
 
     fn wire_type() -> WireType {
@@ -55,13 +57,12 @@ impl ValidatorAsProtoMessage of ProtoMessage<ValidatorType> {
         }
     }
 
-    fn decode_raw(ref self: ValidatorType, ref context: DecodeContext) {
-        let mut var = Default::<u32>::default();
-        var.decode_raw(ref context);
+    fn decode_raw(ref context: DecodeContext) -> Option<ValidatorType> {
+        let var: u32 = context.decode_raw()?;
         match var {
-            0 => self = ValidatorType::Full,
-            1 => self = ValidatorType::Light,
-            _ => panic!("invalid validator type"),
+            0 => Option::Some(ValidatorType::Full),
+            1 => Option::Some(ValidatorType::Light),
+            _ => Option::None,
         }
     }
 
@@ -96,16 +97,21 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
         context.encode_repeated_field(9, self.proposers);
     }
 
-    fn decode_raw(ref self: TmHeader, ref context: DecodeContext) {
-        context.decode_field(1, ref self.height);
-        context.decode_field(2, ref self.active);
-        context.decode_field(3, ref self.chain_id);
-        context.decode_field(4, ref self.time);
-        context.decode_field(5, ref self.hash);
-        context.decode_field(6, ref self.indexes);
-        context.decode_field(7, ref self.proposer);
-        context.decode_field(8, ref self.validator_type);
-        context.decode_repeated_field(9, ref self.proposers);
+    fn decode_raw(ref context: DecodeContext) -> Option<TmHeader> {
+        let height = context.decode_field(1)?;
+        let active = context.decode_field(2)?;
+        let chain_id = context.decode_field(3)?;
+        let time = context.decode_field(4)?;
+        let hash = context.decode_field(5)?;
+        let indexes = context.decode_field(6)?;
+        let proposer = context.decode_field(7)?;
+        let validator_type = context.decode_field(8)?;
+        let proposers = context.decode_repeated_field(9)?;
+        Option::Some(
+            TmHeader {
+                height, active, chain_id, time, hash, indexes, proposer, validator_type, proposers,
+            },
+        )
     }
 
     fn wire_type() -> WireType {
@@ -123,7 +129,7 @@ pub impl TmHeaderAsProtoName of ProtoName<TmHeader> {
 fn test_proto_u64() {
     let hex = "d295fcd8ceb1aaaaab01";
     let bytes = hex_decode(@hex);
-    let num = ProtoCodecImpl::decode::<u64>(@bytes);
+    let num = ProtoCodecImpl::decode::<u64>(@bytes).unwrap();
     assert_eq!(num, 0xab54a98ceb1f0ad2, "number decode failed");
     let bytes2 = ProtoCodecImpl::encode(@num);
     assert_eq!(bytes, bytes2, "num encode failed");
@@ -133,7 +139,7 @@ fn test_proto_u64() {
 fn test_proto_byte_array() {
     let hex = "48656C6C6F2C20576F726C6421";
     let bytes = hex_decode(@hex);
-    let byte_array = ProtoCodecImpl::decode::<ByteArray>(@bytes);
+    let byte_array = ProtoCodecImpl::decode::<ByteArray>(@bytes).unwrap();
     assert_eq!(byte_array, "Hello, World!", "byte array decode failed");
     let bytes2 = ProtoCodecImpl::encode(@byte_array);
     assert_eq!(bytes, bytes2, "byte array encode failed");
@@ -144,7 +150,7 @@ fn test_proto_to_cairo_struct() {
     let base64 =
         "CPb//////////wEQARoLY29zbW9zaHViLTQggMy5/wUqBBI0VngyCvis0ZEB8L3z1Qk6JgoSY29zbW9zMWhhZnB0bTR6eHk2EhBjb3Ntb3N2YWxwdWIxMjM0QAE=";
     let bytes = base64_decode(@base64);
-    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes);
+    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes).unwrap();
     let header2 = TmHeader {
         height: -10,
         active: true,
@@ -165,7 +171,7 @@ fn test_proto_to_cairo_struct() {
 fn test_proto_to_cairo_struct_absent_field() {
     let hex = "08f6ffffffffffffffff012080ccb9ff05";
     let bytes = hex_decode(@hex);
-    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes);
+    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes).unwrap();
     let header2 = TmHeader {
         height: -10,
         active: false,
@@ -187,7 +193,7 @@ fn test_proto_to_cairo_struct_absent_field() {
 fn test_proto_to_cairo_struct_non_canonical_order() {
     let hex = "2080ccb9ff0508f6ffffffffffffffff01";
     let bytes = hex_decode(@hex);
-    ProtoCodecImpl::decode::<TmHeader>(@bytes);
+    ProtoCodecImpl::decode::<TmHeader>(@bytes).unwrap();
 }
 
 #[test]
@@ -195,7 +201,7 @@ fn test_repeated_default_value() {
     let base64 =
         "IIDMuf8FKgcSADQAVgB4SiYKEmNvc21vczFoYWZwdG00enh5NhIQY29zbW9zdmFscHViMTIzNEoASiYKEmNvc21vczFoYWZwdG00enh5NhIQY29zbW9zdmFscHViMTIzNA==";
     let bytes = base64_decode(@base64);
-    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes);
+    let header = ProtoCodecImpl::decode::<TmHeader>(@bytes).unwrap();
     let header2 = TmHeader {
         height: 0,
         active: false,

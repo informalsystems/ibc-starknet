@@ -17,9 +17,10 @@ impl FractionAsProtoMessage of ProtoMessage<Fraction> {
         context.encode_field(2, self.denominator);
     }
 
-    fn decode_raw(ref self: Fraction, ref context: DecodeContext) {
-        context.decode_field(1, ref self.numerator);
-        context.decode_field(2, ref self.denominator);
+    fn decode_raw(ref context: DecodeContext) -> Option<Fraction> {
+        let numerator = context.decode_field(1)?;
+        let denominator = context.decode_field(2)?;
+        Option::Some(Fraction { numerator, denominator })
     }
 
     fn wire_type() -> WireType {

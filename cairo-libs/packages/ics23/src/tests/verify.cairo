@@ -15,7 +15,7 @@ fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
     let root = byte_array_to_slice_u32(decode_hex_byte_array(data.root));
     let key = decode_hex_byte_array(data.key).into();
     let value = decode_hex_byte_array(data.value).into();
-    let p = ProtoCodecImpl::decode::<CommitmentProof>(@decode_hex_byte_array(data.proof));
+    let p = ProtoCodecImpl::decode::<CommitmentProof>(@decode_hex_byte_array(data.proof)).unwrap();
     match p.proof {
         Proof::Exist(p) => { verify_existence(spec, @p, @root, @key, @value); },
         Proof::NonExist(p) => {

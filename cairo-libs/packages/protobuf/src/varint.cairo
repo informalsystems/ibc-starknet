@@ -67,7 +67,7 @@ pub fn decode_varint_from_u8_array(ref bytes: Array<u8>) -> (u64, u32) {
 }
 
 #[inline]
-pub fn decode_varint_from_byte_array(bytes: @ByteArray, ref index: usize) -> u64 {
+pub fn decode_varint_from_byte_array(bytes: @ByteArray, ref index: usize) -> Result<u64, felt252> {
     let mut value: u64 = 0;
     let mut shift: u64 = 1;
     let mut done = false;
@@ -83,7 +83,9 @@ pub fn decode_varint_from_byte_array(bytes: @ByteArray, ref index: usize) -> u64
         // 0x80 == 0x1000_0000
         shift *= 0x80;
     };
-    assert(done, ProtobufErrors::INVALID_VARINT);
-    value
+    if !done {
+        return Result::Err(ProtobufErrors::INVALID_VARINT);
+    };
+    Result::Ok(value)
 }
 

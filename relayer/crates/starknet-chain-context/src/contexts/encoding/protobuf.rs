@@ -1,5 +1,5 @@
 use cgp::core::component::UseDelegate;
-use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::CanConvertBothWays;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
@@ -23,28 +23,13 @@ use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 
 use crate::impls::error::HandleStarknetChainError;
 
+#[cgp_context(StarknetProtobufEncodingContextComponents: StarknetProtobufEncodingComponents)]
 pub struct StarknetProtobufEncoding;
-
-pub struct StarknetProtobufEncodingContextComponents;
-
-impl HasComponents for StarknetProtobufEncoding {
-    type Components = StarknetProtobufEncodingContextComponents;
-}
 
 delegate_components! {
     StarknetProtobufEncodingContextComponents {
-        ErrorTypeComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: ProvideHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
-    }
-}
-
-with_starknet_protobuf_encoding_components! {
-    | Components | {
-        delegate_components! {
-            StarknetProtobufEncodingContextComponents{
-                Components: StarknetProtobufEncodingComponents,
-            }
-        }
     }
 }
 

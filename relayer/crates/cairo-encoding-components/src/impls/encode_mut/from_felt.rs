@@ -1,8 +1,12 @@
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use cgp::prelude::*;
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 use starknet::core::types::Felt;
 
 pub struct EncodeFromFelt;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Strategy, Encoding, Value> MutEncoder<Encoding, Strategy, Value> for EncodeFromFelt
 where
     Encoding: CanEncodeMut<Strategy, Felt>,

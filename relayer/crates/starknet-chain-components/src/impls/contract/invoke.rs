@@ -1,10 +1,13 @@
+use cgp::prelude::*;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 
+use crate::components::chain::ContractInvokerComponent;
 use crate::traits::contract::invoke::ContractInvoker;
 use crate::traits::contract::message::CanBuildInvokeContractMessage;
 
 pub struct InvokeStarknetContract;
 
+#[cgp_provider(ContractInvokerComponent)]
 impl<Chain> ContractInvoker<Chain> for InvokeStarknetContract
 where
     Chain: CanBuildInvokeContractMessage + CanSendSingleMessage,

@@ -1,10 +1,12 @@
-use cgp::prelude::HasAsyncErrorType;
+use cgp::prelude::*;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::timestamp::HasTimeoutType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_test_components::chain::traits::messages::ibc_transfer::IbcTokenTransferMessageBuilder;
+use hermes_test_components::chain::traits::messages::ibc_transfer::{
+    IbcTokenTransferMessageBuilder, IbcTokenTransferMessageBuilderComponent,
+};
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
 use ibc::core::host::types::identifiers::PortId;
@@ -16,6 +18,7 @@ use crate::types::channel_id::ChannelId;
 
 pub struct BuildStarknetIbcTransferMessage;
 
+#[cgp_provider(IbcTokenTransferMessageBuilderComponent)]
 impl<Chain, Counterparty> IbcTokenTransferMessageBuilder<Chain, Counterparty>
     for BuildStarknetIbcTransferMessage
 where

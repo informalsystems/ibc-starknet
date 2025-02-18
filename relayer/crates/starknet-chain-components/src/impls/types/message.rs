@@ -1,4 +1,5 @@
-use cgp::core::Async;
+use cgp::prelude::*;
+use hermes_cosmos_chain_components::components::client::MessageTypeComponent;
 use hermes_relayer_components::chain::traits::types::message::ProvideMessageType;
 use ibc::core::client::types::Height as CosmosHeight;
 use starknet::accounts::Call;
@@ -30,6 +31,7 @@ impl StarknetMessage {
 
 pub struct ProvideCallMessage;
 
+#[cgp_provider(MessageTypeComponent)]
 impl<Chain: Async> ProvideMessageType<Chain> for ProvideCallMessage {
     type Message = StarknetMessage;
 }

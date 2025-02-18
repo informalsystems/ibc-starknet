@@ -5,7 +5,9 @@ use core::ops::Deref;
 use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_relayer_components::components::default::relay::MainSink;
+use hermes_relayer_components::components::default::relay::{
+    AutoRelayerComponent, AutoRelayerWithHeightsComponent, EventRelayerComponent, MainSink,
+};
 use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeAtComponent,
 };
@@ -14,7 +16,6 @@ use hermes_relayer_components::multi::types::tags::{Dst, Src};
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::impls::packet_lock::PacketMutexOf;
 use hermes_relayer_components::relay::impls::selector::SelectRelayBToA;
-use hermes_relayer_components::relay::traits::auto_relayer::CanAutoRelay;
 use hermes_relayer_components::relay::traits::chains::{
     CanRaiseRelayChainErrors, HasRelayChains, HasRelayClientIds,
 };
@@ -23,7 +24,6 @@ use hermes_relayer_components::relay::traits::connection::open_ack::CanRelayConn
 use hermes_relayer_components::relay::traits::connection::open_confirm::CanRelayConnectionOpenConfirm;
 use hermes_relayer_components::relay::traits::connection::open_init::CanInitConnection;
 use hermes_relayer_components::relay::traits::connection::open_try::CanRelayConnectionOpenTry;
-use hermes_relayer_components::relay::traits::event_relayer::CanRelayEvent;
 use hermes_relayer_components::relay::traits::ibc_message_sender::{
     CanSendIbcMessages, CanSendSingleIbcMessage,
 };
@@ -42,6 +42,7 @@ use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
 
 use crate::presets::relay::{IsStarknetCommonRelayContextPreset, StarknetCommonRelayContextPreset};
 
+#[cgp_context(StarknetToCosmosRelayComponents: StarknetCommonRelayContextPreset)]
 #[derive(Clone)]
 pub struct StarknetToCosmosRelay {
     pub fields: Arc<dyn HasStarknetToCosmosRelayFields>,
@@ -96,19 +97,6 @@ impl StarknetToCosmosRelay {
     }
 }
 
-pub struct StarknetToCosmosRelayComponents;
-
-impl HasComponents for StarknetToCosmosRelay {
-    type Components = StarknetToCosmosRelayComponents;
-}
-
-impl<Name> DelegateComponent<Name> for StarknetToCosmosRelayComponents
-where
-    Self: IsStarknetCommonRelayContextPreset<Name>,
-{
-    type Delegate = StarknetCommonRelayContextPreset;
-}
-
 delegate_components! {
     StarknetToCosmosRelayComponents {
         [
@@ -148,10 +136,12 @@ pub trait CanUseStarknetToCosmosRelay:
     + CanRelayConnectionOpenConfirm
     + CanBootstrapConnection
     + CanRelayPacket
-    + CanRelayEvent<SourceTarget>
-    + CanRelayEvent<DestinationTarget>
-    + CanAutoRelay<SourceTarget>
-    + CanAutoRelay<DestinationTarget>
+    + CanUseComponent<EventRelayerComponent, SourceTarget>
+    + CanUseComponent<EventRelayerComponent, DestinationTarget>
+    + CanUseComponent<AutoRelayerComponent, SourceTarget>
+    + CanUseComponent<AutoRelayerComponent, DestinationTarget>
+    + CanUseComponent<AutoRelayerWithHeightsComponent, SourceTarget>
+    + CanUseComponent<AutoRelayerWithHeightsComponent, DestinationTarget>
 {
 }
 

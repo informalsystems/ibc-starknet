@@ -1,9 +1,14 @@
-use cgp::core::error::CanRaiseAsyncError;
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 
 pub struct EncodeFromU128;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Strategy, Encoding, Value, Error> MutEncoder<Encoding, Strategy, Value> for EncodeFromU128
 where
     Encoding: CanEncodeMut<Strategy, u128> + CanRaiseAsyncError<Error>,
@@ -19,6 +24,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Strategy, Encoding, Value, Error> MutDecoder<Encoding, Strategy, Value> for EncodeFromU128
 where
     Encoding: CanDecodeMut<Strategy, u128> + CanRaiseAsyncError<Error>,

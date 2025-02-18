@@ -5,6 +5,7 @@ use cairo_lang_starknet_classes::casm_contract_class::{
 };
 use cairo_lang_starknet_classes::contract_class::ContractClass;
 use cgp::core::error::CanRaiseAsyncError;
+use cgp::prelude::*;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use starknet::accounts::Account;
 use starknet::core::types::contract::{
@@ -13,6 +14,7 @@ use starknet::core::types::contract::{
 use starknet::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
 use starknet::providers::Provider;
 
+use crate::components::chain::ContractDeclarerComponent;
 use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
 use crate::traits::contract::declare::ContractDeclarer;
 use crate::traits::provider::HasStarknetProvider;
@@ -21,6 +23,7 @@ use crate::types::tx_response::TxResponse;
 
 pub struct DeclareSierraContract;
 
+#[cgp_provider(ContractDeclarerComponent)]
 impl<Chain> ContractDeclarer<Chain> for DeclareSierraContract
 where
     Chain: HasContractClassType<ContractClass = SierraClass>

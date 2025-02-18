@@ -16,6 +16,7 @@ use crate::types::messages::ibc::connection::{BasePrefix, ConnectionVersion};
 
 pub struct EncodeConnectionId;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ConnectionId> for EncodeConnectionId
 where
     Encoding: CanEncodeMut<Strategy, Product![String]>,
@@ -30,6 +31,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ConnectionId> for EncodeConnectionId
 where
     Encoding: CanDecodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
@@ -47,6 +49,7 @@ where
 
 pub struct EncodeDuration;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Duration> for EncodeDuration
 where
     Encoding: CanEncodeMut<Strategy, Product![u64]>,
@@ -61,6 +64,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Duration> for EncodeDuration
 where
     Encoding: CanDecodeMut<Strategy, Product![u64]>,
@@ -76,6 +80,7 @@ where
 
 pub struct EncodeConnectionEnd;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ConnectionEnd> for EncodeConnectionEnd
 where
     Encoding: CanEncodeMut<
@@ -116,19 +121,14 @@ where
             .map_err(|_| Encoding::raise_error("invalid connection end"))?;
 
         encoding.encode_mut(
-            &product![
-                state,
-                client_id.clone(),
-                counterparty.clone(),
-                version.clone(),
-                delay_period,
-            ],
+            &product![state, client_id, counterparty, version, delay_period,],
             buffer,
         )?;
         Ok(())
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ConnectionEnd> for EncodeConnectionEnd
 where
     Encoding: CanDecodeMut<
@@ -196,6 +196,7 @@ impl Transformer for EncodeConnectionState {
 
 pub struct EncodeConnectionCounterparty;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ConnectionCounterparty>
     for EncodeConnectionCounterparty
 where
@@ -229,6 +230,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ConnectionCounterparty>
     for EncodeConnectionCounterparty
 where

@@ -1,16 +1,19 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::CanRaiseAsyncError;
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_chain_components::traits::extract_data::EventExtractor;
+use hermes_chain_components::traits::extract_data::{EventExtractor, EventExtractorComponent};
 use hermes_chain_components::traits::packet::from_send_packet::PacketFromSendPacketEventBuilder;
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::ibc_events::send_packet::{
     HasSendPacketEvent, ProvideSendPacketEvent,
 };
 use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
+use hermes_cosmos_chain_components::components::client::{
+    PacketFromSendPacketEventBuilderComponent, SendPacketEventComponent,
+};
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
@@ -26,6 +29,7 @@ use crate::impls::events::UseStarknetEvents;
 use crate::types::events::packet::{PacketRelayEvents, SendPacketEvent};
 use crate::types::messages::ibc::ibc_transfer::TransferPacketData;
 
+#[cgp_provider(SendPacketEventComponent)]
 impl<Chain, Counterparty> ProvideSendPacketEvent<Chain, Counterparty> for UseStarknetEvents
 where
     Chain: HasOutgoingPacketType<Counterparty, OutgoingPacket = Packet> + HasEventType,
@@ -33,6 +37,7 @@ where
     type SendPacketEvent = SendPacketEvent;
 }
 
+#[cgp_provider(PacketFromSendPacketEventBuilderComponent)]
 impl<Chain, Counterparty, Encoding> PacketFromSendPacketEventBuilder<Chain, Counterparty>
     for UseStarknetEvents
 where
@@ -117,6 +122,7 @@ where
     }
 }
 
+#[cgp_provider(EventExtractorComponent)]
 impl<Chain, Encoding> EventExtractor<Chain, SendPacketEvent> for UseStarknetEvents
 where
     Chain: HasEventType + HasEncoding<AsStarknetEvent, Encoding = Encoding>,
