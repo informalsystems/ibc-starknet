@@ -10,7 +10,9 @@ use hermes_chain_components::traits::types::channel::{
     HasChannelOpenTryPayloadType,
 };
 use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
+use hermes_chain_components::traits::types::ibc::{
+    HasChannelIdType, HasConnectionIdType, HasPortIdType,
+};
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::channel::{
@@ -42,6 +44,7 @@ impl<Chain, Counterparty> ChannelOpenTryMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosChannelHandshakeMessage
 where
     Chain: HasMessageType<Message = CosmosMessage>
+        + HasConnectionIdType<Counterparty>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + CanRaiseAsyncError<Infallible>
         + CanRaiseAsyncError<ClientError>

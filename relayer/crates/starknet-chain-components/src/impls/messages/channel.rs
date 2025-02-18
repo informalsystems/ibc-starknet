@@ -12,7 +12,9 @@ use hermes_chain_components::traits::types::channel::{
     HasChannelOpenTryPayloadType, HasInitChannelOptionsType,
 };
 use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
+use hermes_chain_components::traits::types::ibc::{
+    HasChannelIdType, HasConnectionIdType, HasPortIdType,
+};
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::channel::{
@@ -117,6 +119,7 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasConnectionIdType<Counterparty>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
