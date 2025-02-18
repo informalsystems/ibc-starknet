@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
-use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
@@ -21,7 +21,7 @@ use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
-    HasRuntime, RuntimeGetterComponent, RuntimeTypeComponent,
+    HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
@@ -46,6 +46,7 @@ use url::Url;
 
 use crate::contexts::chain_driver::StarknetChainDriver;
 
+#[cgp_context(StarknetBootstrapComponents)]
 #[derive(HasField)]
 pub struct StarknetBootstrap {
     pub runtime: HermesRuntime,
@@ -53,17 +54,11 @@ pub struct StarknetBootstrap {
     pub chain_store_dir: PathBuf,
 }
 
-pub struct StarknetBootstrapComponents;
-
-impl HasComponents for StarknetBootstrap {
-    type Components = StarknetBootstrapComponents;
-}
-
 delegate_components! {
     StarknetBootstrapComponents {
-        ErrorTypeComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: ProvideHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
-        RuntimeTypeComponent: WithType<HermesRuntime>,
+        RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
         ChainNodeConfigTypeComponent:
             ProvideStarknetNodeConfigType,
@@ -160,7 +155,6 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             ibc_client_contract_address: None,
             ibc_core_contract_address: None,
             event_encoding: Default::default(),
-            event_subscription: None,
             proof_signer,
         };
 

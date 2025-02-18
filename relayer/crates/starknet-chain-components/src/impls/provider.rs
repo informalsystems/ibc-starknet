@@ -15,15 +15,15 @@ where
     Tag: Async,
     Chain::Value: Async + Provider,
 {
-    type Provider = Chain::Value;
+    type StarknetProvider = Chain::Value;
 }
 
 impl<Chain, Tag> StarknetProviderGetter<Chain> for GetStarknetProviderField<Tag>
 where
-    Chain: Async + HasStarknetProviderType + HasField<Tag, Value = Chain::Provider>,
+    Chain: Async + HasStarknetProviderType + HasField<Tag, Value = Chain::StarknetProvider>,
     Tag: Async,
 {
-    fn provider(chain: &Chain) -> &Chain::Provider {
+    fn provider(chain: &Chain) -> &Chain::StarknetProvider {
         chain.get_field(PhantomData)
     }
 }

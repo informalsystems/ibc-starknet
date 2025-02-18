@@ -3,7 +3,9 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::queries::packet_is_received::ReceivedPacketQuerier;
+use hermes_chain_components::traits::queries::packet_is_received::{
+    PacketIsReceivedQuerier, PacketIsReceivedQuerierComponent,
+};
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{
     HasChannelIdType, HasPortIdType, HasSequenceType,
@@ -29,7 +31,8 @@ use crate::types::messages::ibc::packet::Sequence;
 
 pub struct QueryPacketIsReceivedOnStarknet;
 
-impl<Chain, Counterparty, Encoding> ReceivedPacketQuerier<Chain, Counterparty>
+#[cgp_provider(PacketIsReceivedQuerierComponent)]
+impl<Chain, Counterparty, Encoding> PacketIsReceivedQuerier<Chain, Counterparty>
     for QueryPacketIsReceivedOnStarknet
 where
     Counterparty: HasSequenceType<Chain>,

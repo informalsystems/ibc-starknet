@@ -48,6 +48,7 @@ use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
 
 use crate::presets::relay::{IsStarknetCommonRelayContextPreset, StarknetCommonRelayContextPreset};
 
+#[cgp_context(CosmosToStarknetRelayComponents: StarknetCommonRelayContextPreset)]
 #[derive(Clone)]
 pub struct CosmosToStarknetRelay {
     pub fields: Arc<dyn HasCosmosToStarknetRelayFields>,
@@ -100,19 +101,6 @@ impl CosmosToStarknetRelay {
             }),
         }
     }
-}
-
-pub struct CosmosToStarknetRelayComponents;
-
-impl HasComponents for CosmosToStarknetRelay {
-    type Components = CosmosToStarknetRelayComponents;
-}
-
-impl<Name> DelegateComponent<Name> for CosmosToStarknetRelayComponents
-where
-    Self: IsStarknetCommonRelayContextPreset<Name>,
-{
-    type Delegate = StarknetCommonRelayContextPreset;
 }
 
 delegate_components! {

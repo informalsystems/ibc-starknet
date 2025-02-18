@@ -3,7 +3,7 @@ use core::convert::Infallible;
 use core::num::{ParseIntError, TryFromIntError};
 use core::str::Utf8Error;
 
-use cgp::core::error::{ErrorRaiser, ProvideErrorType};
+use cgp::core::error::{ErrorRaiser, ErrorTypeProvider};
 use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::{CanConvert, CanConvertBothWays};
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
@@ -25,25 +25,10 @@ use ibc_core::host::types::error::{DecodingError, IdentifierError};
 use ibc_core::primitives::{Timestamp, TimestampError};
 use prost::DecodeError;
 
+#[cgp_context(StarknetLightClientEncodingContextComponents: StarknetLightClientEncodingComponents)]
 pub struct StarknetLightClientEncoding;
 
-pub struct StarknetLightClientEncodingContextComponents;
-
-impl HasComponents for StarknetLightClientEncoding {
-    type Components = StarknetLightClientEncodingContextComponents;
-}
-
-with_starknet_light_client_encoding_components! {
-    | Components | {
-        delegate_components! {
-            StarknetLightClientEncodingContextComponents {
-                Components: StarknetLightClientEncodingComponents
-            }
-        }
-    }
-}
-
-impl ProvideErrorType<StarknetLightClientEncoding>
+impl ErrorTypeProvider<StarknetLightClientEncoding>
     for StarknetLightClientEncodingContextComponents
 {
     type Error = ClientError;

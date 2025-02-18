@@ -4,6 +4,9 @@ use cgp::prelude::*;
 use hermes_chain_components::impls::payload_builders::channel::BuildChannelHandshakePayload;
 use hermes_chain_components::impls::payload_builders::connection::BuildConnectionHandshakePayload;
 use hermes_chain_components::impls::payload_builders::packet::BuildPacketPayloads;
+use hermes_chain_components::impls::queries::block_events::{
+    RetryQueryBlockEvents, WaitBlockHeightAndQueryEvents,
+};
 use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
 use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
 use hermes_chain_components::impls::types::ack::ProvideBytesAcknowlegement;
@@ -77,7 +80,7 @@ use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayl
 use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
 use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
 use crate::impls::queries::balance::QueryStarknetWalletBalance;
-use crate::impls::queries::block_events::default::DefaultQueryBlockEvents;
+use crate::impls::queries::block_events::GetStarknetBlockEvents;
 use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
 use crate::impls::queries::client_state::QueryCometClientState;
 use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
@@ -85,12 +88,11 @@ use crate::impls::queries::consensus_state::QueryCometConsensusState;
 use crate::impls::queries::contract_address::GetContractAddressFromField;
 use crate::impls::queries::counterparty_chain_id::QueryCosmosChainIdFromStarknetChannelId;
 use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
+use crate::impls::queries::packet_is_cleared::QueryStarknetPacketIsCleared;
 use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
 use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
 use crate::impls::queries::status::QueryStarknetChainStatus;
 use crate::impls::queries::token_balance::QueryErc20TokenBalance;
-use crate::impls::queries::unreceived_acks::QueryStarknetUnreceivedAckSequences;
-use crate::impls::queries::unreceived_packets::QueryStarknetUnreceivedPacketSequences;
 use crate::impls::send_message::SendCallMessages;
 use crate::impls::submit_tx::SubmitCallTransaction;
 use crate::impls::transfer::TransferErc20Token;
@@ -119,7 +121,6 @@ pub use crate::traits::contract::invoke::ContractInvokerComponent;
 pub use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
 pub use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
 pub use crate::traits::queries::address::ContractAddressQuerierComponent;
-use crate::traits::queries::block_events::BlockEventsQuerierComponent;
 pub use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
 pub use crate::traits::transfer::TokenTransferComponent;
 pub use crate::traits::types::blob::BlobTypeComponent;
@@ -239,7 +240,11 @@ cgp_preset! {
         ChainStatusQuerierComponent:
             QueryStarknetChainStatus,
         BlockEventsQuerierComponent:
-            DefaultQueryBlockEvents,
+            RetryQueryBlockEvents<
+                5,
+                WaitBlockHeightAndQueryEvents<
+                    GetStarknetBlockEvents
+                >>,
         MessageSenderComponent:
             SendCallMessages,
         TxSubmitterComponent:
@@ -386,10 +391,6 @@ cgp_preset! {
             QueryChannelEndFromStarknet,
         PacketCommitmentQuerierComponent:
             QueryStarknetPacketCommitment,
-        UnreceivedPacketSequencesQuerierComponent:
-            QueryStarknetUnreceivedPacketSequences,
-        UnreceivedAcksSequencesQuerierComponent:
-            QueryStarknetUnreceivedAckSequences,
         PacketAcknowledgementQuerierComponent:
             QueryStarknetAckCommitment,
         PacketReceiptQuerierComponent:
@@ -399,8 +400,6 @@ cgp_preset! {
             IncomingPacketFilterComponent,
         ]:
             FilterStarknetPackets,
-        ReceivedPacketQuerierComponent:
-            QueryPacketIsReceivedOnStarknet,
         CounterpartyChainIdQuerierComponent:
             QueryCosmosChainIdFromStarknetChannelId,
         EventualAmountAsserterComponent:
@@ -409,5 +408,9 @@ cgp_preset! {
             ProvideDefaultPollAssertDuration,
         IbcTokenTransferMessageBuilderComponent:
             BuildStarknetIbcTransferMessage,
+        PacketIsReceivedQuerierComponent:
+            QueryPacketIsReceivedOnStarknet,
+        PacketIsClearedQuerierComponent:
+            QueryStarknetPacketIsCleared,
     }
 }

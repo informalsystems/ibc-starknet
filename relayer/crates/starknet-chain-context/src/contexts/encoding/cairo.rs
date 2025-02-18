@@ -3,7 +3,7 @@ use core::slice::Iter;
 use core::time::Duration;
 
 use cgp::core::component::UseDelegate;
-use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
@@ -51,30 +51,15 @@ use starknet::core::types::{Felt, U256};
 
 use crate::impls::error::HandleStarknetChainError;
 
+#[cgp_context(StarknetCairoEncodingContextComponents: StarknetCairoEncodingComponents)]
 pub struct StarknetCairoEncoding;
-
-pub struct StarknetCairoEncodingContextComponents;
 
 pub struct StarknetEncodeMutComponents;
 
-impl HasComponents for StarknetCairoEncoding {
-    type Components = StarknetCairoEncodingContextComponents;
-}
-
 delegate_components! {
     StarknetCairoEncodingContextComponents {
-        ErrorTypeComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: ProvideHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
-    }
-}
-
-with_starknet_cairo_encoding_components! {
-    | Components | {
-        delegate_components! {
-            StarknetCairoEncodingContextComponents {
-                Components: StarknetCairoEncodingComponents,
-            }
-        }
     }
 }
 
