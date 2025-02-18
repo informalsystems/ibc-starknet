@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_cli_components::traits::command::CommandRunner;
+use hermes_cli_components::traits::command::{CommandRunner, CommandRunnerComponent};
 use hermes_cli_components::traits::output::HasOutputType;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_logging_components::traits::has_logger::HasLogger;
@@ -68,6 +68,7 @@ pub struct TransferArgs {
 
 pub struct RunTransferArgs;
 
+#[cgp_provider(CommandRunnerComponent)]
 #[async_trait]
 impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
     async fn run_command(

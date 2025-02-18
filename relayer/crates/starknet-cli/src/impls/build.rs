@@ -1,5 +1,5 @@
-use cgp::prelude::CanRaiseAsyncError;
-use hermes_cli_components::traits::build::{BuilderLoader, HasBuilderType};
+use cgp::prelude::*;
+use hermes_cli_components::traits::build::{BuilderLoader, BuilderLoaderComponent, HasBuilderType};
 use hermes_cli_components::traits::config::load_config::CanLoadConfig;
 use hermes_cli_components::traits::types::config::HasConfigType;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
@@ -10,6 +10,7 @@ use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 
 pub struct LoadStarknetBuilder;
 
+#[cgp_provider(BuilderLoaderComponent)]
 impl<App> BuilderLoader<App> for LoadStarknetBuilder
 where
     App: HasBuilderType<Builder = StarknetBuilder>

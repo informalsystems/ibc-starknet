@@ -10,8 +10,10 @@ use crate::impls::encode_mut::byte_array::EncodeByteArray;
 
 pub struct EncodeUtf8String;
 
-impl DelegateComponent<MutEncoderComponent> for EncodeUtf8String {
-    type Delegate = EncodeByteArray;
+delegate_components! {
+    EncodeUtf8String {
+        MutEncoderComponent: EncodeByteArray,
+    }
 }
 
 #[cgp_provider(MutDecoderComponent)]

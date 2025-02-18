@@ -9,7 +9,7 @@ use cgp::prelude::*;
 use hermes_cli::commands::client::create::CreateClientArgs;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
 use hermes_cli_components::impls::commands::client::create::{
-    CreateClientOptionsParser, RunCreateClientCommand,
+    CreateClientOptionsParser, CreateClientOptionsParserComponent, RunCreateClientCommand,
 };
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
@@ -31,7 +31,9 @@ use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField
 use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
 use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
 use hermes_cli_components::impls::parse::string::{ParseFromOptionalString, ParseFromString};
-use hermes_cli_components::traits::any_counterparty::ProvideAnyCounterparty;
+use hermes_cli_components::traits::any_counterparty::{
+    AnyCounterpartyComponent, ProvideAnyCounterparty,
+};
 use hermes_cli_components::traits::bootstrap::{
     BootstrapLoaderComponent, BootstrapTypeComponent, CanLoadBootstrap,
 };
@@ -45,7 +47,7 @@ use hermes_cli_components::traits::config::config_path::{
 use hermes_cli_components::traits::config::load_config::{CanLoadConfig, ConfigLoaderComponent};
 use hermes_cli_components::traits::config::write_config::{CanWriteConfig, ConfigWriterComponent};
 use hermes_cli_components::traits::output::{
-    CanProduceOutput, OutputProducer, OutputTypeComponent,
+    CanProduceOutput, OutputProducer, OutputProducerComponent, OutputTypeComponent,
 };
 use hermes_cli_components::traits::parse::ArgParserComponent;
 use hermes_cli_components::traits::types::config::ConfigTypeComponent;
@@ -72,7 +74,7 @@ use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
-use hermes_test_components::chain_driver::traits::config::ConfigUpdater;
+use hermes_test_components::chain_driver::traits::config::{ConfigUpdater, ConfigUpdaterComponent};
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 use toml::to_string_pretty;
@@ -196,6 +198,7 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(AnyCounterpartyComponent)]
 impl<App> ProvideAnyCounterparty<App> for StarknetAppComponents
 where
     App: Async,
@@ -203,10 +206,12 @@ where
     type AnyCounterparty = CosmosChain;
 }
 
+#[cgp_provider(OutputProducerComponent)]
 impl<Value> OutputProducer<StarknetApp, Value> for StarknetAppComponents {
     fn produce_output(_app: &StarknetApp, _value: Value) {}
 }
 
+#[cgp_provider(ConfigUpdaterComponent)]
 impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarknetConfig {
     fn update_config(
         chain_driver: &StarknetChainDriver,
@@ -240,6 +245,7 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
     }
 }
 
+#[cgp_provider(CreateClientOptionsParserComponent)]
 impl CreateClientOptionsParser<StarknetApp, CreateClientArgs, Index<0>, Index<1>>
     for StarknetAppComponents
 {
@@ -273,6 +279,7 @@ impl CreateClientOptionsParser<StarknetApp, CreateClientArgs, Index<0>, Index<1>
 // TODO(seanchen1991): Implement Cosmos-to-Starknet client creation
 pub struct CreateCosmosClientOnStarknetArgs;
 
+#[cgp_provider(CreateClientOptionsParserComponent)]
 impl CreateClientOptionsParser<StarknetApp, CreateCosmosClientOnStarknetArgs, Index<1>, Index<0>>
     for StarknetAppComponents
 {

@@ -1,4 +1,7 @@
-use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
+use cgp::prelude::*;
+use hermes_cli_components::traits::command::{
+    CanRunCommand, CommandRunner, CommandRunnerComponent,
+};
 
 use crate::commands::starknet::subcommand::StarknetSubCommand;
 
@@ -10,6 +13,7 @@ pub enum AllSubCommands {
 
 pub struct RunAllSubCommand;
 
+#[cgp_provider(CommandRunnerComponent)]
 impl<App> CommandRunner<App, AllSubCommands> for RunAllSubCommand
 where
     App: CanRunCommand<StarknetSubCommand>,

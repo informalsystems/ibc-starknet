@@ -21,7 +21,7 @@ use hermes_cli_components::traits::config::config_path::{
 use hermes_cli_components::traits::config::load_config::{CanLoadConfig, ConfigLoaderComponent};
 use hermes_cli_components::traits::config::write_config::{CanWriteConfig, ConfigWriterComponent};
 use hermes_cli_components::traits::output::{
-    CanProduceOutput, OutputProducer, OutputTypeComponent,
+    CanProduceOutput, OutputProducer, OutputProducerComponent, OutputTypeComponent,
 };
 use hermes_cli_components::traits::types::config::{ConfigTypeComponent, HasConfigType};
 use hermes_error::traits::wrap::CanWrapError;
@@ -104,6 +104,7 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(OutputProducerComponent)]
 impl<Value> OutputProducer<ToolApp, Value> for ToolAppComponents {
     fn produce_output(_app: &ToolApp, _value: Value) {}
 }
