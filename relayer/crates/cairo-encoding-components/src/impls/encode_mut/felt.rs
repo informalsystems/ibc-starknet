@@ -1,8 +1,8 @@
 use core::iter;
 
-use cgp::core::error::{CanRaiseAsyncError, HasAsyncErrorType};
-use hermes_encoding_components::traits::decode_mut::MutDecoder;
-use hermes_encoding_components::traits::encode_mut::MutEncoder;
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{MutDecoder, MutDecoderComponent};
+use hermes_encoding_components::traits::encode_mut::{MutEncoder, MutEncoderComponent};
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 use starknet::core::types::Felt;
@@ -12,6 +12,7 @@ pub struct EncodeFelt;
 #[derive(Debug, Copy, Clone)]
 pub struct UnexpectedEndOfBuffer;
 
+#[cgp_provider(MutEncoderComponent)]
 #[allow(unused_mut)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Felt> for EncodeFelt
 where
@@ -29,6 +30,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 #[allow(unused_mut)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Felt> for EncodeFelt
 where

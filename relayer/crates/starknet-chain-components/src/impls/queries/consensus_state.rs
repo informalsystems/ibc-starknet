@@ -115,6 +115,7 @@ where
     }
 }
 
+#[cgp_provider(ConsensusStateWithProofsQuerierComponent)]
 impl<Chain, Counterparty> ConsensusStateWithProofsQuerier<Chain, Counterparty>
     for QueryCometConsensusState
 where

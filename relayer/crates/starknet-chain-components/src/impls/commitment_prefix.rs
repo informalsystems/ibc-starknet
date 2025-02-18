@@ -1,11 +1,13 @@
 use std::sync::LazyLock;
 
+use cgp::prelude::*;
 use hermes_chain_components::traits::commitment_prefix::{
-    HasCommitmentPrefixType, IbcCommitmentPrefixGetter,
+    HasCommitmentPrefixType, IbcCommitmentPrefixGetter, IbcCommitmentPrefixGetterComponent,
 };
 
 pub struct GetStarknetCommitmentPrefix;
 
+#[cgp_provider(IbcCommitmentPrefixGetterComponent)]
 impl<Chain> IbcCommitmentPrefixGetter<Chain> for GetStarknetCommitmentPrefix
 where
     Chain: HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>,

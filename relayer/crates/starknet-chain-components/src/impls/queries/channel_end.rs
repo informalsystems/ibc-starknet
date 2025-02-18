@@ -14,7 +14,9 @@ use hermes_chain_components::traits::types::channel::HasChannelEndType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_cosmos_chain_components::components::client::ChannelEndQuerierComponent;
+use hermes_cosmos_chain_components::components::client::{
+    ChannelEndQuerierComponent, ChannelEndWithProofsQuerierComponent,
+};
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -80,6 +82,7 @@ where
     }
 }
 
+#[cgp_provider(ChannelEndWithProofsQuerierComponent)]
 impl<Chain, Counterparty, Encoding> ChannelEndWithProofsQuerier<Chain, Counterparty>
     for QueryChannelEndFromStarknet
 where

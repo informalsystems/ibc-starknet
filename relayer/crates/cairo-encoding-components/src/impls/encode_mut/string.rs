@@ -1,8 +1,9 @@
 use std::string::FromUtf8Error;
 
-use cgp::core::error::CanRaiseAsyncError;
-use cgp::prelude::DelegateComponent;
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 
 use crate::impls::encode_mut::byte_array::EncodeByteArray;
@@ -13,6 +14,7 @@ impl DelegateComponent<MutEncoderComponent> for EncodeUtf8String {
     type Delegate = EncodeByteArray;
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, String> for EncodeUtf8String
 where
     Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<FromUtf8Error>,

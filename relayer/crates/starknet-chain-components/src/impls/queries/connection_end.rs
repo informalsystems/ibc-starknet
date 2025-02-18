@@ -73,6 +73,7 @@ where
     }
 }
 
+#[cgp_provider(ConnectionEndWithProofsQuerierComponent)]
 impl<Chain, Counterparty, Encoding> ConnectionEndWithProofsQuerier<Chain, Counterparty>
     for QueryConnectionEndFromStarknet
 where
