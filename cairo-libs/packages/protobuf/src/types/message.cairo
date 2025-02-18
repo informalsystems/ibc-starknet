@@ -154,7 +154,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
     fn end_branch(ref self: DecodeContext) -> Option<()> {
         // TODO(rano): pop_back is not impl for Array<T>, this is inefficient
         let mut span = self.limits.span();
-        let limit = span.pop_back().unwrap();
+        let limit = span.pop_back()?;
         self.limits = span.into();
         if limit != @self.index {
             return Option::None;
