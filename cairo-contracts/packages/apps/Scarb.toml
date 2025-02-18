@@ -9,7 +9,7 @@ repository    = { workspace = true }
 license       = { workspace = true }
 Readme        = { workspace = true }
 keywords      = { workspace = true }
-description   = "IBC application contracts for Starknet"
+description   = "IBC application components for Starknet"
 
 [lib]
 
