@@ -26,7 +26,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
             latest_timestamp: 10,
             trusting_period: 100,
             unbonding_period: 200,
-            max_clock_drift: 10,
+            max_clock_drift: 1,
         }
     }
 

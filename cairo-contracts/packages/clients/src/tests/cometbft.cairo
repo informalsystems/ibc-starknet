@@ -20,6 +20,29 @@ fn setup() -> ComponentState {
     state
 }
 
+/// Performs an update client by taking an elapsed timestamp from the client's latest timestamp.
+fn simulate_update_client(elapsed_timestamp: u64) {
+    let mut state = setup();
+    let mut cfg = CometClientConfigTrait::default();
+    start_cheat_block_timestamp_global(cfg.latest_timestamp.clone() + 1);
+    let msg = cfg.dummy_msg_create_client();
+    let create_resp = state.create_client(msg);
+    let updating_height = cfg.latest_height.clone() + HEIGHT(1);
+    let updating_timestamp = cfg.latest_timestamp + elapsed_timestamp;
+    let msg = cfg
+        .dummy_msg_update_client(
+            create_resp.client_id, create_resp.height, updating_height.clone(), updating_timestamp,
+        );
+    state.update_client(msg);
+    assert_eq!(state.client_type(), cfg.client_type);
+    assert!(state.status(0).is_active());
+    assert_eq!(state.latest_height(0), updating_height);
+    let consensus_state = state.read_consensus_state(0, updating_height);
+    assert_eq!(consensus_state.timestamp(), updating_timestamp);
+    state.read_client_processed_time(0, updating_height);
+    state.read_client_processed_height(0, updating_height);
+}
+
 #[test]
 fn test_create_client_ok() {
     let mut state = setup();
@@ -46,25 +69,20 @@ fn test_client_sequence_ok() {
 
 #[test]
 fn test_update_client_ok() {
-    let mut state = setup();
-    let mut cfg = CometClientConfigTrait::default();
-    start_cheat_block_timestamp_global(cfg.latest_timestamp.clone() + 1);
-    let msg = cfg.dummy_msg_create_client();
-    let create_resp = state.create_client(msg);
-    let updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_timestamp = cfg.latest_timestamp + 1;
-    let msg = cfg
-        .dummy_msg_update_client(
-            create_resp.client_id, create_resp.height, updating_height.clone(), updating_timestamp,
-        );
-    state.update_client(msg);
-    assert_eq!(state.client_type(), cfg.client_type);
-    assert!(state.status(0).is_active());
-    assert_eq!(state.latest_height(0), updating_height);
-    let consensus_state = state.read_consensus_state(0, updating_height);
-    assert_eq!(consensus_state.timestamp(), updating_timestamp);
-    state.read_client_processed_time(0, updating_height);
-    state.read_client_processed_height(0, updating_height);
+    simulate_update_client(1)
+}
+
+// Tests with a future header with the elapsed timestamp within the `max_clock_drift`.
+#[test]
+fn test_update_client_with_valid_future_header() {
+    simulate_update_client(2)
+}
+
+// Tests with a future header with the elapsed timestamp exceeds the `max_clock_drift`.
+#[test]
+#[should_panic(expected: 'ICS07: header ts from future')]
+fn test_update_client_with_invalid_future_header() {
+    simulate_update_client(3)
 }
 
 #[test]
