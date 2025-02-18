@@ -393,6 +393,8 @@ mod preset {
                 FilterStarknetPackets,
             CounterpartyChainIdQuerierComponent:
                 QueryCosmosChainIdFromStarknetChannelId,
+            CounterpartyConnectionIdQuerierComponent:
+                QueryCounterpartyConnectionId,
             EventualAmountAsserterComponent:
                 PollAssertEventualAmount,
             PollAssertDurationGetterComponent:
