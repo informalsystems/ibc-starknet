@@ -14,6 +14,7 @@ pub struct CometClientConfig {
     pub latest_timestamp: u64,
     pub trusting_period: u64,
     pub unbonding_period: u64,
+    pub max_clock_drift: u64,
 }
 
 #[generate_trait]
@@ -25,6 +26,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
             latest_timestamp: 10,
             trusting_period: 100,
             unbonding_period: 200,
+            max_clock_drift: 10,
         }
     }
 
@@ -35,6 +37,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
             latest_height: self.latest_height.clone(),
             trusting_period: *self.trusting_period,
             unbonding_period: *self.unbonding_period,
+            max_clock_drift: *self.max_clock_drift,
             status: Status::Active,
             chain_id: "dummy_chain",
         };

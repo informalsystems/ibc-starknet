@@ -7,6 +7,7 @@ pub struct CometClientState {
     pub latest_height: Height,
     pub trusting_period: u64,
     pub unbonding_period: u64,
+    pub max_clock_drift: u64,
     pub status: Status,
     pub chain_id: ByteArray,
 }
