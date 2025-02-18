@@ -37,13 +37,11 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
         // Consider `clock_drift` on Starknet with large `block_time`.
         //
         // `block_timestamp` is when the sequencer started building the block, which may be in the
-        // past.
-        // Without the `clock_drift`, the untrusted consensus state would be considered from future
-        // and fail.
+        // past. In that case, without the `clock_drift`, the untrusted consensus state would be
+        // considered from future and fail.
         //
         // PS. the following check is always successful once a consensus state is validated and
-        // accepted as trusted.
-        // Because the `block_timestamp` is always increasing.
+        // accepted as trusted. Because the `block_timestamp` is always increasing.
         assert(
             host_timestamp + max_clock_drift >= self.timestamp(),
             CometErrors::HEADER_TIMESTAMP_FROM_FUTURE,
