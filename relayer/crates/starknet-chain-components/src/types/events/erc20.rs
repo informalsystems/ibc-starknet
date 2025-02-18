@@ -4,6 +4,7 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_wasm_encoding_components::components::DecoderComponent;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
@@ -32,6 +33,7 @@ pub struct ApprovalEvent {
 
 pub struct DecodeErc20Events;
 
+#[cgp_provider(DecoderComponent)]
 impl<Encoding, Strategy> Decoder<Encoding, Strategy, Erc20Event> for DecodeErc20Events
 where
     Encoding: HasEncodedType<Encoded = StarknetEvent>
@@ -54,6 +56,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, TransferEvent>
     for DecodeErc20Events
 where
@@ -82,6 +85,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, ApprovalEvent>
     for DecodeErc20Events
 where

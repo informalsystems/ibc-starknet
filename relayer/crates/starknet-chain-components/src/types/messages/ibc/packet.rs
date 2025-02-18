@@ -215,6 +215,7 @@ impl Transformer for EncodeMsgAckPacket {
 
 pub struct EncodeSequence;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Sequence> for EncodeSequence
 where
     Encoding: CanEncodeMut<Strategy, Product![u64]>,
@@ -229,6 +230,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Sequence> for EncodeSequence
 where
     Encoding: CanDecodeMut<Strategy, Product![u64]>,

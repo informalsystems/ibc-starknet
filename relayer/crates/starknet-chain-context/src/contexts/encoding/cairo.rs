@@ -13,7 +13,8 @@ use hermes_encoding_components::traits::decode_mut::CanPeekDecodeBuffer;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetter, EncodingGetterComponent, HasEncodingType, ProvideEncodingType,
+    DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetterComponent,
+    EncodingTypeComponent, HasEncodingType, ProvideEncodingType,
 };
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
@@ -71,6 +72,7 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(EncodingTypeComponent)]
 impl<Context> ProvideEncodingType<Context, AsFelt> for ProvideCairoEncoding
 where
     Context: Async,
@@ -78,6 +80,7 @@ where
     type Encoding = StarknetCairoEncoding;
 }
 
+#[cgp_provider(DefaultEncodingGetterComponent)]
 impl<Context> DefaultEncodingGetter<Context, AsFelt> for ProvideCairoEncoding
 where
     Context: HasEncodingType<AsFelt, Encoding = StarknetCairoEncoding>,

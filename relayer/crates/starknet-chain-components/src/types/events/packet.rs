@@ -1,7 +1,7 @@
 use cgp::prelude::{CanRaiseAsyncError, *};
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
+use hermes_encoding_components::traits::decode::{CanDecode, Decoder, DecoderComponent};
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use starknet::core::types::Felt;
@@ -89,6 +89,7 @@ pub struct TimeoutPacketEvent {
 
 pub struct DecodePacketRelayEvents;
 
+#[cgp_provider(DecoderComponent)]
 impl<Encoding, Strategy> Decoder<Encoding, Strategy, PacketRelayEvents> for DecodePacketRelayEvents
 where
     Encoding: HasEncodedType<Encoded = StarknetEvent>
@@ -125,6 +126,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, SendPacketEvent>
     for DecodePacketRelayEvents
 where
@@ -184,6 +186,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, ReceivePacketEvent>
     for DecodePacketRelayEvents
 where
@@ -243,6 +246,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy>
     Decoder<EventEncoding, Strategy, WriteAcknowledgementEvent> for DecodePacketRelayEvents
 where
@@ -285,6 +289,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy>
     Decoder<EventEncoding, Strategy, AcknowledgePacketEvent> for DecodePacketRelayEvents
 where
@@ -343,6 +348,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, TimeoutPacketEvent>
     for DecodePacketRelayEvents
 where

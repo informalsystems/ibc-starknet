@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 
-use cgp::core::error::CanRaiseAsyncError;
-use cgp::prelude::HasAsyncErrorType;
+use cgp::prelude::*;
+use hermes_chain_components::traits::send_message::MessageSenderComponent;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_relayer_components::chain::traits::send_message::MessageSender;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
@@ -24,6 +24,7 @@ pub struct UnexpectedTransactionTraceType {
     pub trace: TransactionTrace,
 }
 
+#[cgp_provider(MessageSenderComponent)]
 impl<Chain> MessageSender<Chain> for SendCallMessages
 where
     Chain: HasMessageType<Message = StarknetMessage>

@@ -1,3 +1,5 @@
+use cgp::prelude::*;
+use hermes_cosmos_chain_components::components::transaction::TxSubmitterComponent;
 use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitter;
 use hermes_relayer_components::transaction::traits::types::transaction::HasTransactionType;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
@@ -9,6 +11,7 @@ use crate::traits::provider::HasStarknetProvider;
 
 pub struct SubmitCallTransaction;
 
+#[cgp_provider(TxSubmitterComponent)]
 impl<Chain> TxSubmitter<Chain> for SubmitCallTransaction
 where
     Chain: HasTransactionType<Transaction = Vec<Call>>

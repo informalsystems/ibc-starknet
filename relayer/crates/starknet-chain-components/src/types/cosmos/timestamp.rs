@@ -1,10 +1,12 @@
 use cgp::prelude::*;
 use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
 use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 pub use ibc::primitives::Timestamp;
 
 pub struct EncodeTimestamp;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Timestamp> for EncodeTimestamp
 where
     Encoding: CanEncodeMut<Strategy, Product![u64]>,
@@ -20,6 +22,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Timestamp> for EncodeTimestamp
 where
     Encoding: CanDecodeMut<Strategy, Product![u64]>,

@@ -1,4 +1,5 @@
-use cgp::prelude::{Async, CanRaiseAsyncError};
+use cgp::prelude::*;
+use hermes_cosmos_chain_components::components::client::UpdateClientPayloadBuilderComponent;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
@@ -23,6 +24,7 @@ use crate::types::status::StarknetChainStatus;
 
 pub struct BuildStarknetUpdateClientPayload;
 
+#[cgp_provider(UpdateClientPayloadBuilderComponent)]
 impl<Chain, Counterparty, Encoding> UpdateClientPayloadBuilder<Chain, Counterparty>
     for BuildStarknetUpdateClientPayload
 where

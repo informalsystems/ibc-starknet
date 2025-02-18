@@ -1,6 +1,9 @@
 use core::time::Duration;
 
-use cgp::core::error::CanRaiseAsyncError;
+use cgp::prelude::*;
+use hermes_cosmos_chain_components::components::transaction::{
+    PollTimeoutGetterComponent, TxResponseQuerierComponent,
+};
 use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeoutGetter;
 use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerier;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
@@ -15,6 +18,7 @@ use crate::types::tx_response::TxResponse;
 
 pub struct QueryTransactionReceipt;
 
+#[cgp_provider(TxResponseQuerierComponent)]
 impl<Chain> TxResponseQuerier<Chain> for QueryTransactionReceipt
 where
     Chain: HasTransactionHashType<TxHash = Felt>
@@ -52,6 +56,7 @@ where
 
 pub struct DefaultPollTimeout;
 
+#[cgp_provider(PollTimeoutGetterComponent)]
 impl<Chain> PollTimeoutGetter<Chain> for DefaultPollTimeout {
     fn poll_timeout(_chain: &Chain) -> Duration {
         Duration::from_secs(300)

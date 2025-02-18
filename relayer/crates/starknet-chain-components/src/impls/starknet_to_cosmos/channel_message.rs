@@ -16,6 +16,10 @@ use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::channel::{
     ChannelOpenAckPayload, ChannelOpenConfirmPayload, ChannelOpenTryPayload,
 };
+use hermes_cosmos_chain_components::components::client::{
+    ChannelOpenAckMessageBuilderComponent, ChannelOpenConfirmMessageBuilderComponent,
+    ChannelOpenTryMessageBuilderComponent,
+};
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_chain_components::types::messages::channel::open_ack::CosmosChannelOpenAckMessage;
 use hermes_cosmos_chain_components::types::messages::channel::open_confirm::CosmosChannelOpenConfirmMessage;
@@ -33,6 +37,7 @@ use crate::types::commitment_proof::StarknetCommitmentProof;
 
 pub struct BuildStarknetToCosmosChannelHandshakeMessage;
 
+#[cgp_provider(ChannelOpenTryMessageBuilderComponent)]
 impl<Chain, Counterparty> ChannelOpenTryMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosChannelHandshakeMessage
 where
@@ -90,6 +95,7 @@ where
     }
 }
 
+#[cgp_provider(ChannelOpenAckMessageBuilderComponent)]
 impl<Chain, Counterparty> ChannelOpenAckMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosChannelHandshakeMessage
 where
@@ -130,6 +136,7 @@ where
     }
 }
 
+#[cgp_provider(ChannelOpenConfirmMessageBuilderComponent)]
 impl<Chain, Counterparty> ChannelOpenConfirmMessageBuilder<Chain, Counterparty>
     for BuildStarknetToCosmosChannelHandshakeMessage
 where

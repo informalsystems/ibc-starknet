@@ -22,6 +22,7 @@ use crate::types::cosmos::height::Height;
 
 pub struct EncodePortId;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, PortId> for EncodePortId
 where
     Encoding: CanEncodeMut<Strategy, Product![String]>,
@@ -36,6 +37,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, PortId> for EncodePortId
 where
     Encoding: CanDecodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
@@ -50,6 +52,7 @@ where
 }
 pub struct EncodeAppVersion;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, AppVersion> for EncodeAppVersion
 where
     Encoding: CanEncodeMut<Strategy, Product![String]>,
@@ -64,6 +67,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, AppVersion> for EncodeAppVersion
 where
     Encoding: CanDecodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,

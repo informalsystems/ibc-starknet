@@ -4,6 +4,7 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_wasm_encoding_components::components::DecoderComponent;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
@@ -52,6 +53,7 @@ pub struct ConnOpenConfirmEvent {
 
 pub struct DecodeConnectionHandshakeEvents;
 
+#[cgp_provider(DecoderComponent)]
 impl<Encoding, Strategy> Decoder<Encoding, Strategy, ConnectionHandshakeEvents>
     for DecodeConnectionHandshakeEvents
 where
@@ -84,6 +86,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, ConnOpenInitEvent>
     for DecodeConnectionHandshakeEvents
 where
@@ -116,6 +119,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, ConnOpenTryEvent>
     for DecodeConnectionHandshakeEvents
 where
@@ -154,6 +158,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, ConnOpenAckEvent>
     for DecodeConnectionHandshakeEvents
 where
@@ -192,6 +197,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, ConnOpenConfirmEvent>
     for DecodeConnectionHandshakeEvents
 where

@@ -14,6 +14,7 @@ use super::messages::ibc::channel::{AppVersion, ChannelOrdering, PortId};
 
 pub struct EncodeChannelId;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChannelId> for EncodeChannelId
 where
     Encoding: CanEncodeMut<Strategy, Product![String]>,
@@ -28,6 +29,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChannelId> for EncodeChannelId
 where
     Encoding: CanDecodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
@@ -93,6 +95,7 @@ impl Transformer for EncodeChannelState {
 
 pub struct EncodeChannelCounterparty;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChannelCounterparty>
     for EncodeChannelCounterparty
 where
@@ -121,6 +124,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChannelCounterparty>
     for EncodeChannelCounterparty
 where
@@ -149,6 +153,7 @@ where
 
 pub struct EncodeChannelEnd;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChannelEnd> for EncodeChannelEnd
 where
     Encoding: CanEncodeMut<
@@ -185,6 +190,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChannelEnd> for EncodeChannelEnd
 where
     Encoding: CanDecodeMut<

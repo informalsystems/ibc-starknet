@@ -7,7 +7,7 @@ use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_chain_type_components::traits::fields::chain_id::HasChainId;
+use hermes_chain_type_components::traits::fields::chain_id::{ChainIdGetterComponent, HasChainId};
 use hermes_chain_type_components::traits::types::commitment_proof::HasCommitmentProofType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
@@ -18,7 +18,8 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientP
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_relayer::presets::chain::PacketCommitmentQuerierComponent;
 use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetter, EncodingGetter, HasDefaultEncoding, ProvideEncodingType,
+    DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
+    EncodingTypeComponent, HasDefaultEncoding, ProvideEncodingType,
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::ProvideHermesError;
@@ -140,7 +141,9 @@ use hermes_starknet_chain_components::impls::types::events::StarknetCreateClient
 use hermes_starknet_chain_components::traits::account::{
     HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeComponent,
 };
-use hermes_starknet_chain_components::traits::client::JsonRpcClientGetter;
+use hermes_starknet_chain_components::traits::client::{
+    JsonRpcClientGetter, JsonRpcClientGetterComponent,
+};
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
@@ -242,48 +245,57 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(EncodingTypeComponent)]
 impl ProvideEncodingType<StarknetChain, AsFelt> for StarknetChainContextComponents {
     type Encoding = StarknetCairoEncoding;
 }
 
+#[cgp_provider(EncodingTypeComponent)]
 impl ProvideEncodingType<StarknetChain, AsStarknetEvent> for StarknetChainContextComponents {
     type Encoding = StarknetEventEncoding;
 }
 
+#[cgp_provider(DefaultEncodingGetterComponent)]
 impl DefaultEncodingGetter<StarknetChain, AsFelt> for StarknetChainContextComponents {
     fn default_encoding() -> &'static StarknetCairoEncoding {
         &StarknetCairoEncoding
     }
 }
 
+#[cgp_provider(EncodingGetterComponent)]
 impl EncodingGetter<StarknetChain, AsFelt> for StarknetChainContextComponents {
     fn encoding(_chain: &StarknetChain) -> &StarknetCairoEncoding {
         &StarknetCairoEncoding
     }
 }
 
+#[cgp_provider(EncodingGetterComponent)]
 impl EncodingGetter<StarknetChain, AsStarknetEvent> for StarknetChainContextComponents {
     fn encoding(chain: &StarknetChain) -> &StarknetEventEncoding {
         &chain.event_encoding
     }
 }
 
+#[cgp_provider(EncodingTypeComponent)]
 impl ProvideEncodingType<StarknetChain, AsBytes> for StarknetChainContextComponents {
     type Encoding = StarknetProtobufEncoding;
 }
 
+#[cgp_provider(DefaultEncodingGetterComponent)]
 impl DefaultEncodingGetter<StarknetChain, AsBytes> for StarknetChainContextComponents {
     fn default_encoding() -> &'static StarknetProtobufEncoding {
         &StarknetProtobufEncoding
     }
 }
 
+#[cgp_provider(JsonRpcClientGetterComponent)]
 impl JsonRpcClientGetter<StarknetChain> for StarknetChainContextComponents {
     fn json_rpc_client(chain: &StarknetChain) -> &JsonRpcClient<HttpTransport> {
         &chain.rpc_client
     }
 }
 
+#[cgp_provider(ChainIdGetterComponent)]
 impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
     fn chain_id(chain: &StarknetChain) -> &ChainId {
         &chain.chain_id

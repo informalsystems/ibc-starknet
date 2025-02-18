@@ -1,8 +1,11 @@
-use cgp::core::Async;
+use cgp::prelude::*;
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_type_components::traits::fields::message_response_events::MessageResponseEventsGetter;
 use hermes_chain_type_components::traits::types::message_response::{
     HasMessageResponseType, ProvideMessageResponseType,
+};
+use hermes_cosmos_chain_components::components::client::{
+    MessageResponseEventsGetterComponent, MessageResponseTypeComponent,
 };
 use starknet::core::types::Felt;
 
@@ -16,10 +19,12 @@ pub struct StarknetMessageResponse {
 
 pub struct UseStarknetMessageResponse;
 
+#[cgp_provider(MessageResponseTypeComponent)]
 impl<Chain: Async> ProvideMessageResponseType<Chain> for UseStarknetMessageResponse {
     type MessageResponse = StarknetMessageResponse;
 }
 
+#[cgp_provider(MessageResponseEventsGetterComponent)]
 impl<Chain> MessageResponseEventsGetter<Chain> for UseStarknetMessageResponse
 where
     Chain: HasEventType<Event = StarknetEvent>
