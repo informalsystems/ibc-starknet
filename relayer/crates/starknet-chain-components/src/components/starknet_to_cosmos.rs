@@ -30,7 +30,6 @@ mod preset {
         ConsensusStateQuerierComponent, ConsensusStateWithProofsQuerierComponent,
     };
 
-    use crate::impls::starknet_to_cosmos::channel_message::BuildStarknetToCosmosChannelHandshakeMessage;
     use crate::impls::starknet_to_cosmos::connection_message::BuildStarknetToCosmosConnectionHandshake;
     use crate::impls::starknet_to_cosmos::counterparty_message_height::GetCosmosCounterpartyMessageStarknetHeight;
     use crate::impls::starknet_to_cosmos::create_client_message::BuildStarknetCreateClientMessage;
@@ -54,6 +53,9 @@ mod preset {
                 CreateClientPayloadBuilderComponent,
                 UpdateClientPayloadBuilderComponent,
                 ChannelOpenInitMessageBuilderComponent,
+                ChannelOpenTryMessageBuilderComponent,
+                ChannelOpenAckMessageBuilderComponent,
+                ChannelOpenConfirmMessageBuilderComponent,
             ]:
                 CosmosToCosmosComponents,
             CreateClientMessageBuilderComponent:
@@ -78,12 +80,6 @@ mod preset {
                 ConnectionOpenConfirmMessageBuilderComponent,
             ]:
                 BuildStarknetToCosmosConnectionHandshake,
-            [
-                ChannelOpenTryMessageBuilderComponent,
-                ChannelOpenAckMessageBuilderComponent,
-                ChannelOpenConfirmMessageBuilderComponent,
-            ]:
-                BuildStarknetToCosmosChannelHandshakeMessage,
             [
                 PacketSrcChannelIdGetterComponent,
                 PacketSrcPortIdGetterComponent,
