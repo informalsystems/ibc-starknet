@@ -1,5 +1,3 @@
-use std::net::SocketAddr;
-
 use hermes_cosmos_chain_components::impls::types::config::CosmosChainConfig;
 use serde::{Deserialize, Serialize};
 
@@ -13,6 +11,6 @@ pub struct StarknetRelayerConfig {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StarknetChainConfig {
-    pub json_rpc_url: SocketAddr,
+    pub json_rpc_url: String,
     pub relayer_wallet: StarknetWallet,
 }

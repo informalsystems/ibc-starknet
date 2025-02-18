@@ -173,7 +173,7 @@ impl StarknetBuilder {
         &self,
         expected_chain_id: &ChainId,
     ) -> Result<StarknetChain, HermesError> {
-        let json_rpc_url = Url::parse(&self.starknet_chain_config.json_rpc_url.to_string())?;
+        let json_rpc_url = Url::parse(&self.starknet_chain_config.json_rpc_url)?;
 
         let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
 
