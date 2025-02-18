@@ -101,8 +101,8 @@ pub enum Participant {
 impl Display for Participant {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Participant::Native(address) => write!(f, "{}", address),
-            Participant::External(address) => write!(f, "{}", address),
+            Self::Native(address) => write!(f, "{address}"),
+            Self::External(address) => write!(f, "{address}"),
         }
     }
 }

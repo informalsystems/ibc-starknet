@@ -7,7 +7,7 @@ use crate::ConsensusState;
 
 impl<'a, E> CwClientStateExecution<'a, E> for ClientState
 where
-    E: CwClientExecution<'a, ClientStateMut = ClientState, ConsensusStateRef = ConsensusState>
+    E: CwClientExecution<'a, ClientStateMut = Self, ConsensusStateRef = ConsensusState>
         + ExtClientValidationContext,
 {
     fn public_key(&self) -> Option<Vec<u8>> {

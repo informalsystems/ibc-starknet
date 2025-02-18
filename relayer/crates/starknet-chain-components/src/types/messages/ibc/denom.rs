@@ -22,8 +22,8 @@ pub enum Denom {
 impl Display for Denom {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Denom::Native(denom) => write!(f, "{}", denom),
-            Denom::Hosted(denom) => write!(f, "{}", denom),
+            Self::Native(denom) => write!(f, "{denom}"),
+            Self::Hosted(denom) => write!(f, "{denom}"),
         }
     }
 }

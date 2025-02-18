@@ -1,8 +1,8 @@
-use alloc::sync::Arc;
 use core::marker::PhantomData;
 use core::time::Duration;
 use std::io::Write;
 use std::path::PathBuf;
+use std::sync::Arc;
 use std::time::SystemTime;
 
 use cgp::extra::run::CanRun;

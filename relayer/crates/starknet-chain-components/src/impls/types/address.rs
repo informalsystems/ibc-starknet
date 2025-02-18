@@ -74,6 +74,6 @@ mod tests {
     #[test]
     fn test_starknet_address_display() {
         let address = StarknetAddress(Felt::from(0x12345678));
-        assert_eq!(format!("{}", address), "0x12345678");
+        assert_eq!(format!("{address}"), "0x12345678");
     }
 }

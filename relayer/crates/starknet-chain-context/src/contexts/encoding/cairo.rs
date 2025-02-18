@@ -99,7 +99,6 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, ()>
     + CanEncodeAndDecode<ViaCairo, Nil>
     + CanEncodeAndDecode<ViaCairo, Felt>
-    + CanEncodeAndDecode<ViaCairo, Felt>
     + CanEncodeAndDecode<ViaCairo, u128>
     + CanEncodeAndDecode<ViaCairo, U256>
     + CanEncodeAndDecode<ViaCairo, u64>

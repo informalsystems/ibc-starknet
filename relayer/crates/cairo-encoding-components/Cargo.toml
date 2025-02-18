@@ -9,6 +9,9 @@ authors      = { workspace = true }
 rust-version = { workspace = true }
 readme       = "README.md"
 
+[lints]
+workspace = true
+
 [dependencies]
 cgp                        = { workspace = true }
 hermes-relayer-components  = { workspace = true }

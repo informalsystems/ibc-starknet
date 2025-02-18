@@ -121,13 +121,7 @@ where
             .map_err(|_| Encoding::raise_error("invalid connection end"))?;
 
         encoding.encode_mut(
-            &product![
-                state,
-                client_id.clone(),
-                counterparty.clone(),
-                version.clone(),
-                delay_period,
-            ],
+            &product![state, client_id, counterparty, version, delay_period,],
             buffer,
         )?;
         Ok(())

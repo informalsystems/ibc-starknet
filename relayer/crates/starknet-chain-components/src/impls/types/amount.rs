@@ -10,9 +10,9 @@ use crate::types::amount::StarknetAmount;
 pub struct ProvideU256Amount;
 
 #[cgp_provider(AmountTypeComponent)]
-impl<Chain: Async> ProvideAmountType<Chain> for ProvideU256Amount
+impl<Chain> ProvideAmountType<Chain> for ProvideU256Amount
 where
-    Chain: HasDenomType<Denom = StarknetAddress>,
+    Chain: Async + HasDenomType<Denom = StarknetAddress>,
 {
     type Amount = StarknetAmount;
 

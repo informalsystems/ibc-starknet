@@ -9,10 +9,7 @@ repository    = { workspace = true }
 license       = { workspace = true }
 Readme        = { workspace = true }
 keywords      = { workspace = true }
-
-description = """
-    Provides a set of utility components used for integrating IBC protocol with Starknet.
-"""
+description   = "Utility components for integrating Starknet with IBC"
 
 [lib]
 

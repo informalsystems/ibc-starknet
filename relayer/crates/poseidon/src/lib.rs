@@ -18,7 +18,7 @@ pub struct Poseidon3Hasher {
 
 impl Default for Poseidon3Hasher {
     fn default() -> Self {
-        Poseidon3Hasher {
+        Self {
             state: [Felt::ZERO; 3],
             odd: false,
         }
@@ -63,7 +63,7 @@ impl Poseidon3Hasher {
         for chunk in span.chunks(2) {
             match chunk {
                 [x, y] => {
-                    state = HADES_PERM_3.hades_permutation([state[0] + x, state[1] + y, state[2]])
+                    state = HADES_PERM_3.hades_permutation([state[0] + x, state[1] + y, state[2]]);
                 }
                 [x] => {
                     return Self {
