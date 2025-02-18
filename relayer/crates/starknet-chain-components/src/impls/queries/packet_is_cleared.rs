@@ -20,6 +20,8 @@ where
         _channel_id: &Chain::ChannelId,
         _sequence: &Chain::Sequence,
     ) -> Result<bool, Chain::Error> {
+        // TODO: implement the method by querying the Cairo contract:
+        // https://github.com/informalsystems/ibc-starknet/issues/291
         Ok(false) // stub
     }
 }
