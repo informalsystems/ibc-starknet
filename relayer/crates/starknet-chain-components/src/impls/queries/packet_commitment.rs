@@ -58,7 +58,7 @@ where
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<Encoding::Error>,
     Encoding: CanEncode<ViaCairo, Product![CairoPortId, ChannelId, Sequence]>
-        + CanDecode<ViaCairo, Product![[u32; 8]]>
+        + CanDecode<ViaCairo, Product![Option<[u32; 8]>]>
         + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn query_packet_commitment(
@@ -67,7 +67,7 @@ where
         port_id: &IbcPortId,
         sequence: &IbcSequence,
         _height: &u64,
-    ) -> Result<(Vec<u8>, StarknetCommitmentProof), Chain::Error> {
+    ) -> Result<(Option<Vec<u8>>, StarknetCommitmentProof), Chain::Error> {
         let encoding = chain.encoding();
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
@@ -84,13 +84,15 @@ where
             )
             .await?;
 
-        let product![commitment,] = encoding.decode(&output).map_err(Chain::raise_error)?;
+        let product![maybe_commitment] = encoding.decode(&output).map_err(Chain::raise_error)?;
 
-        let commitment_bytes = commitment
-            .into_iter()
-            // TODO(rano): cairo uses [u32; 8], but in cosmos it's Vec<u8>
-            .flat_map(|felt| felt.to_be_bytes())
-            .collect::<Vec<_>>();
+        let commitment_bytes = maybe_commitment.map(|commitment| {
+            commitment
+                .into_iter()
+                // TODO(rano): cairo uses [u32; 8], but in cosmos it's Vec<u8>
+                .flat_map(|felt| felt.to_be_bytes())
+                .collect::<Vec<_>>()
+        });
 
         let chain_status = chain.query_chain_status().await?;
 
@@ -100,7 +102,7 @@ where
             path: Path::Commitment(CommitmentPath::new(port_id, channel_id, *sequence))
                 .to_string()
                 .into(),
-            value: Some(commitment_bytes.clone()),
+            value: commitment_bytes.clone(),
         }
         .canonical_bytes();
 

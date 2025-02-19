@@ -152,8 +152,14 @@ pub mod ChannelHandlerComponent {
             port_id: PortId,
             channel_id: ChannelId,
             sequence: Sequence,
-        ) -> Commitment {
-            self.read_packet_commitment(@port_id, @channel_id, @sequence)
+        ) -> Option<Commitment> {
+            let commitment = self.read_packet_commitment(@port_id, @channel_id, @sequence);
+
+            if commitment.is_non_zero() {
+                Option::Some(commitment)
+            } else {
+                Option::None
+            }
         }
 
         fn packet_receipt(
@@ -972,6 +978,8 @@ pub mod ChannelHandlerComponent {
             let packet_commitment = self
                 .read_packet_commitment(packet.port_id_on_a, packet.chan_id_on_a, packet.seq_on_a);
 
+            assert(packet_commitment.is_non_zero(), ChannelErrors::MISSING_PACKET_COMMITMENT);
+
             let expected_packet_commitment = compute_packet_commitment(
                 json_packet_data,
                 packet.timeout_height_on_b.clone(),
@@ -1194,13 +1202,7 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: @Sequence,
         ) -> Commitment {
-            let commitment = self
-                .packet_commitments
-                .read(commitment_key(port_id, channel_id, sequence));
-
-            assert(commitment.is_non_zero(), ChannelErrors::MISSING_PACKET_COMMITMENT);
-
-            commitment
+            self.packet_commitments.read(commitment_key(port_id, channel_id, sequence))
         }
 
         fn read_packet_receipt(

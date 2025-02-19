@@ -60,7 +60,7 @@ pub trait IChannelQuery<TContractState> {
     fn channel_end(self: @TContractState, port_id: PortId, channel_id: ChannelId) -> ChannelEnd;
     fn packet_commitment(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
-    ) -> Commitment;
+    ) -> Option<Commitment>;
     fn packet_receipt(
         self: @TContractState, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
     ) -> bool;
