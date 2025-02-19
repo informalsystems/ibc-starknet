@@ -1,7 +1,6 @@
 use core::num::traits::Zero;
 use core::starknet::SyscallResultTrait;
 use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
-use openzeppelin_utils::serde::SerializedAppend;
 use starknet::syscalls::deploy_syscall;
 use starknet::{ClassHash, ContractAddress};
 use starknet_ibc_utils::mintable::{IERC20MintableDispatcher, IERC20MintableDispatcherTrait};
@@ -49,7 +48,7 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
     ) -> ERC20Contract {
         let mut call_data = array![];
 
-        call_data.append_serde((name, symbol, decimals, amount, recipient, owner));
+        (name, symbol, decimals, amount, recipient, owner).serialize(ref call_data);
 
         let (address, _) = deploy_syscall(class_hash, salt, call_data.span(), false)
             .unwrap_syscall();
