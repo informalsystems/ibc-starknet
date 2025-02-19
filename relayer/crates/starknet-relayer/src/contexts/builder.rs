@@ -40,7 +40,7 @@ use starknet::signers::{LocalWallet, SigningKey};
 use url::Url;
 
 use super::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use crate::contexts::birelay::StarknetCosmosBiRelay;
+use crate::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
 use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 
 #[cgp_context(StarknetBuildComponents)]
