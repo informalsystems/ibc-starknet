@@ -757,15 +757,19 @@ pub mod TokenTransferComponent {
         ) -> ERC20Contract {
             let salt = self.read_salt();
 
+            // TODO: Determine what the symbol should be.
             let mut symbol: ByteArray = "IBC/";
-
             symbol.append(@name);
+
+            // TODO: Determine what the decimals should be.
+            let decimals = 0;
 
             let erc20_token = ERC20ContractTrait::create(
                 self.read_erc20_class_hash(),
                 salt,
                 name.clone(),
-                symbol.clone(), // TODO: Determine what the symbol should be.
+                symbol.clone(),
+                decimals,
                 amount.clone(),
                 get_contract_address(),
                 get_contract_address(),

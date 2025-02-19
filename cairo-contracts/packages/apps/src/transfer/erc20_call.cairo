@@ -42,6 +42,7 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
         salt: felt252,
         name: ByteArray,
         symbol: ByteArray,
+        decimals: u8,
         amount: u256,
         recipient: ContractAddress,
         owner: ContractAddress,
@@ -50,6 +51,7 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
 
         call_data.append_serde(name);
         call_data.append_serde(symbol);
+        call_data.append_serde(decimals);
         call_data.append_serde(amount);
         call_data.append_serde(recipient);
         call_data.append_serde(owner);
