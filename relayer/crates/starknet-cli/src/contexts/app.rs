@@ -179,7 +179,7 @@ delegate_components! {
         AllSubCommands: RunAllSubCommand,
         BootstrapSubCommand: RunBootstrapSubCommand,
 
-        StartRelayerArgs: RunStartRelayerCommand,
+        StartRelayerArgs: RunStartRelayerCommand<Index<0>, Index<1>>,
 
         QuerySubCommand: RunQuerySubCommand,
         QueryClientStateArgs: RunQueryClientStateCommand,

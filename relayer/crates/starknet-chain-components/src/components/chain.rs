@@ -130,6 +130,7 @@ mod preset {
                 HeightTypeComponent,
                 HeightFieldComponent,
                 HeightIncrementerComponent,
+                HeightAdjusterComponent,
             ]:
                 ProvideStarknetHeight,
             ChainStatusTypeComponent:

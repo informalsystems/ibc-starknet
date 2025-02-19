@@ -6,7 +6,7 @@ use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_relayer_components::components::default::relay::{
-    AutoRelayerComponent, AutoRelayerWithHeightsComponent, EventRelayerComponent, MainSink,
+    AutoRelayerWithHeightsComponent, EventRelayerComponent, MainSink, TargetAutoRelayerComponent,
 };
 use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeAtComponent,
@@ -138,8 +138,8 @@ pub trait CanUseStarknetToCosmosRelay:
     + CanRelayPacket
     + CanUseComponent<EventRelayerComponent, SourceTarget>
     + CanUseComponent<EventRelayerComponent, DestinationTarget>
-    + CanUseComponent<AutoRelayerComponent, SourceTarget>
-    + CanUseComponent<AutoRelayerComponent, DestinationTarget>
+    + CanUseComponent<TargetAutoRelayerComponent, SourceTarget>
+    + CanUseComponent<TargetAutoRelayerComponent, DestinationTarget>
     + CanUseComponent<AutoRelayerWithHeightsComponent, SourceTarget>
     + CanUseComponent<AutoRelayerWithHeightsComponent, DestinationTarget>
 {

@@ -16,7 +16,7 @@ use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapCha
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::impls::packet_lock::PacketMutexOf;
 use hermes_relayer_components::relay::impls::selector::SelectRelayAToB;
-use hermes_relayer_components::relay::traits::auto_relayer::CanAutoRelay;
+use hermes_relayer_components::relay::traits::auto_relayer::CanAutoRelayTarget;
 use hermes_relayer_components::relay::traits::chains::{
     CanRaiseRelayChainErrors, HasRelayChains, HasRelayClientIds,
 };
@@ -143,8 +143,8 @@ pub trait CanUseCosmosToStarknetRelay:
     + HasLogger
     + CanRelayEvent<SourceTarget>
     + CanRelayEvent<DestinationTarget>
-    + CanAutoRelay<SourceTarget>
-    + CanAutoRelay<DestinationTarget>
+    + CanAutoRelayTarget<SourceTarget>
+    + CanAutoRelayTarget<DestinationTarget>
     + CanUseComponent<IbcMessageSenderComponent<MainSink>, (MainSink, SourceTarget)>
     + CanUseComponent<IbcMessageSenderComponent<MainSink>, (MainSink, DestinationTarget)>
 {

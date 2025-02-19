@@ -6,8 +6,8 @@ use cgp::extra::run::RunnerComponent;
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::impls::ProvideHermesError;
-use hermes_relayer_components::birelay::traits::two_way::{
-    TwoWayRelayGetter, TwoWayRelayGetterComponent,
+use hermes_relayer_components::birelay::traits::{
+    AutoBiRelayerComponent, TwoWayRelayGetter, TwoWayRelayGetterComponent,
 };
 use hermes_relayer_components::components::default::birelay::{
     DefaultBiRelayComponents, IsDefaultBiRelayComponents,
@@ -56,6 +56,9 @@ impl TwoWayRelayGetter<StarknetCosmosBiRelay> for StarknetCosmosBiRelayComponent
     }
 }
 
-pub trait CanUseCosmosStarnetBiRelay: CanUseComponent<RunnerComponent> {}
+pub trait CanUseCosmosStarnetBiRelay:
+    CanUseComponent<RunnerComponent> + CanUseComponent<AutoBiRelayerComponent>
+{
+}
 
 impl CanUseCosmosStarnetBiRelay for StarknetCosmosBiRelay {}
