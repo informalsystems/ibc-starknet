@@ -66,11 +66,12 @@ pub impl TransferEventSpyExtImpl of TransferEventSpyExt {
         contract_address: ContractAddress,
         name: ByteArray,
         symbol: ByteArray,
+        decimals: u8,
         address: ContractAddress,
         initial_supply: u256,
     ) {
         let expected = Event::CreateTokenEvent(
-            CreateTokenEvent { name, symbol, address, initial_supply },
+            CreateTokenEvent { name, symbol, decimals, address, initial_supply },
         );
         self.assert_emitted_single(contract_address, expected);
     }
