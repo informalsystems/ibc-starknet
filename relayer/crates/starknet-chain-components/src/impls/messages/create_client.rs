@@ -9,6 +9,7 @@ use hermes_chain_components::traits::types::create_client::{
 };
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_cosmos_chain_components::components::client::CreateClientMessageBuilderComponent;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientPayload;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -26,6 +27,7 @@ use crate::types::cosmos::height::Height;
 
 pub struct BuildCreateCometClientMessage;
 
+#[cgp_provider(CreateClientMessageBuilderComponent)]
 impl<Chain, Counterparty, Encoding> CreateClientMessageBuilder<Chain, Counterparty>
     for BuildCreateCometClientMessage
 where

@@ -1,9 +1,15 @@
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 use starknet::core::types::Felt;
 
 pub struct EncodeByteArray;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Value> for EncodeByteArray
 where
     Encoding: CanEncodeMut<Strategy, Felt> + CanEncodeMut<Strategy, usize>,
@@ -37,6 +43,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Vec<u8>> for EncodeByteArray
 where
     Encoding: CanDecodeMut<Strategy, Felt> + CanDecodeMut<Strategy, usize>,

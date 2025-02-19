@@ -1,4 +1,4 @@
-use cgp::core::error::CanRaiseAsyncError;
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::traits::decode::CanDecode;
@@ -8,6 +8,7 @@ use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
+use crate::components::chain::TokenBalanceQuerierComponent;
 use crate::impls::types::address::StarknetAddress;
 use crate::traits::contract::call::CanCallContract;
 use crate::traits::queries::token_balance::TokenBalanceQuerier;
@@ -19,6 +20,7 @@ pub struct QueryErc20TokenBalance;
 
 pub const BALANCE_SELECTOR: Felt = selector!("balance_of");
 
+#[cgp_provider(TokenBalanceQuerierComponent)]
 impl<Chain, Encoding> TokenBalanceQuerier<Chain> for QueryErc20TokenBalance
 where
     Chain: HasAddressType<Address = StarknetAddress>

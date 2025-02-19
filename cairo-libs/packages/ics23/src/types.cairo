@@ -20,8 +20,9 @@ impl CommitmentProofAsProtoMessage of ProtoMessage<CommitmentProof> {
         context.encode_field(1, self.proof);
     }
 
-    fn decode_raw(ref self: CommitmentProof, ref context: DecodeContext) {
-        context.decode_field(1, ref self.proof)
+    fn decode_raw(ref context: DecodeContext) -> Option<CommitmentProof> {
+        let proof = context.decode_field(1)?;
+        Option::Some(CommitmentProof { proof })
     }
 
     fn wire_type() -> WireType {
@@ -47,17 +48,18 @@ impl ProofAsProtoMessage of ProtoMessage<Proof> {
         }
     }
 
-    fn decode_raw(ref self: Proof, ref context: DecodeContext) {
-        match self.clone() {
-            Proof::Exist(mut p) => {
-                p.decode_raw(ref context);
-                self = Proof::Exist(p);
-            },
-            Proof::NonExist(mut p) => {
-                p.decode_raw(ref context);
-                self = Proof::NonExist(p);
-            },
+    fn decode_raw(ref context: DecodeContext) -> Option<Proof> {
+        let exist: Option<ExistenceProof> = context.decode_raw();
+        if exist.is_some() {
+            return Option::Some(Proof::Exist(exist.unwrap()));
         }
+
+        let non_exist: Option<NonExistenceProof> = context.decode_raw();
+        if non_exist.is_some() {
+            return Option::Some(Proof::NonExist(non_exist.unwrap()));
+        }
+
+        Option::None
     }
 
     fn wire_type() -> WireType {
@@ -108,11 +110,12 @@ impl ExistenceProofAsProtoMessage of ProtoMessage<ExistenceProof> {
         context.encode_repeated_field(4, self.path);
     }
 
-    fn decode_raw(ref self: ExistenceProof, ref context: DecodeContext) {
-        context.decode_field(1, ref self.key);
-        context.decode_field(2, ref self.value);
-        context.decode_field(3, ref self.leaf);
-        context.decode_repeated_field(4, ref self.path);
+    fn decode_raw(ref context: DecodeContext) -> Option<ExistenceProof> {
+        let key = context.decode_field(1)?;
+        let value = context.decode_field(2)?;
+        let leaf = context.decode_field(3)?;
+        let path = context.decode_repeated_field(4)?;
+        Option::Some(ExistenceProof { key, value, leaf, path })
     }
 
     fn wire_type() -> WireType {
@@ -151,10 +154,11 @@ impl NonExistenceProofAsProtoMessage of ProtoMessage<NonExistenceProof> {
         context.encode_field(3, self.right);
     }
 
-    fn decode_raw(ref self: NonExistenceProof, ref context: DecodeContext) {
-        context.decode_field(1, ref self.key);
-        context.decode_field(2, ref self.left);
-        context.decode_field(3, ref self.right);
+    fn decode_raw(ref context: DecodeContext) -> Option<NonExistenceProof> {
+        let key = context.decode_field(1)?;
+        let left = context.decode_field(2)?;
+        let right = context.decode_field(3)?;
+        Option::Some(NonExistenceProof { key, left, right })
     }
 
     fn wire_type() -> WireType {
@@ -182,10 +186,11 @@ impl InnerOpAsProtoMessage of ProtoMessage<InnerOp> {
         context.encode_field(3, self.suffix);
     }
 
-    fn decode_raw(ref self: InnerOp, ref context: DecodeContext) {
-        context.decode_field(1, ref self.hash);
-        context.decode_field(2, ref self.prefix);
-        context.decode_field(3, ref self.suffix);
+    fn decode_raw(ref context: DecodeContext) -> Option<InnerOp> {
+        let hash = context.decode_field(1)?;
+        let prefix = context.decode_field(2)?;
+        let suffix = context.decode_field(3)?;
+        Option::Some(InnerOp { hash, prefix, suffix })
     }
 
     fn wire_type() -> WireType {
@@ -214,14 +219,14 @@ impl HashOpAsProtoMessage of ProtoMessage<HashOp> {
         }
     }
 
-    fn decode_raw(ref self: HashOp, ref context: DecodeContext) {
-        let mut var = Default::<u32>::default();
-        var.decode_raw(ref context);
-        match var {
-            0 => self = HashOp::NoOp,
-            1 => self = HashOp::Sha256,
-            _ => panic!("invalid hash op"),
-        }
+    fn decode_raw(ref context: DecodeContext) -> Option<HashOp> {
+        let var: u32 = context.decode_raw()?;
+        let value = match var {
+            0 => Option::Some(HashOp::NoOp),
+            1 => Option::Some(HashOp::Sha256),
+            _ => Option::None,
+        };
+        value
     }
 
     fn wire_type() -> WireType {
@@ -244,14 +249,14 @@ impl LengthOpAsProtoMessage of ProtoMessage<LengthOp> {
         }
     }
 
-    fn decode_raw(ref self: LengthOp, ref context: DecodeContext) {
-        let mut var = Default::<u32>::default();
-        var.decode_raw(ref context);
-        match var {
-            0 => self = LengthOp::NoPrefix,
-            1 => self = LengthOp::VarProto,
-            _ => panic!("invalid length op"),
-        }
+    fn decode_raw(ref context: DecodeContext) -> Option<LengthOp> {
+        let var: u32 = context.decode_raw()?;
+        let value = match var {
+            0 => Option::Some(LengthOp::NoPrefix),
+            1 => Option::Some(LengthOp::VarProto),
+            _ => Option::None,
+        };
+        value
     }
 
     fn wire_type() -> WireType {
@@ -279,13 +284,18 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
         context.encode_field(6, self.hash);
     }
 
-    fn decode_raw(ref self: InnerSpec, ref context: DecodeContext) {
-        context.decode_field(1, ref self.child_order);
-        context.decode_field(2, ref self.child_size);
-        context.decode_field(3, ref self.min_prefix_length);
-        context.decode_field(4, ref self.max_prefix_length);
-        context.decode_field(5, ref self.empty_child);
-        context.decode_field(6, ref self.hash);
+    fn decode_raw(ref context: DecodeContext) -> Option<InnerSpec> {
+        let child_order = context.decode_field(1)?;
+        let child_size = context.decode_field(2)?;
+        let min_prefix_length = context.decode_field(3)?;
+        let max_prefix_length = context.decode_field(4)?;
+        let empty_child = context.decode_field(5)?;
+        let hash = context.decode_field(6)?;
+        Option::Some(
+            InnerSpec {
+                child_order, child_size, min_prefix_length, max_prefix_length, empty_child, hash,
+            },
+        )
     }
 
     fn wire_type() -> WireType {
@@ -317,12 +327,13 @@ impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
         context.encode_field(5, self.prefix);
     }
 
-    fn decode_raw(ref self: LeafOp, ref context: DecodeContext) {
-        context.decode_field(1, ref self.hash);
-        context.decode_field(2, ref self.prehash_key);
-        context.decode_field(3, ref self.prehash_value);
-        context.decode_field(4, ref self.length);
-        context.decode_field(5, ref self.prefix);
+    fn decode_raw(ref context: DecodeContext) -> Option<LeafOp> {
+        let hash = context.decode_field(1)?;
+        let prehash_key = context.decode_field(2)?;
+        let prehash_value = context.decode_field(3)?;
+        let length = context.decode_field(4)?;
+        let prefix = context.decode_field(5)?;
+        Option::Some(LeafOp { hash, prehash_key, prehash_value, length, prefix })
     }
 
     fn wire_type() -> WireType {
@@ -368,12 +379,17 @@ impl ProofSpecAsProtoMessage of ProtoMessage<ProofSpec> {
         context.encode_field(5, self.prehash_key_before_comparison);
     }
 
-    fn decode_raw(ref self: ProofSpec, ref context: DecodeContext) {
-        context.decode_field(1, ref self.leaf_spec);
-        context.decode_field(2, ref self.inner_spec);
-        context.decode_field(3, ref self.max_depth);
-        context.decode_field(4, ref self.min_depth);
-        context.decode_field(5, ref self.prehash_key_before_comparison);
+    fn decode_raw(ref context: DecodeContext) -> Option<ProofSpec> {
+        let leaf_spec = context.decode_field(1)?;
+        let inner_spec = context.decode_field(2)?;
+        let max_depth = context.decode_field(3)?;
+        let min_depth = context.decode_field(4)?;
+        let prehash_key_before_comparison = context.decode_field(5)?;
+        Option::Some(
+            ProofSpec {
+                leaf_spec, inner_spec, max_depth, min_depth, prehash_key_before_comparison,
+            },
+        )
     }
 
     fn wire_type() -> WireType {

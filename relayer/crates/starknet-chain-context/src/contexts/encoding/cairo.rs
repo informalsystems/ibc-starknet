@@ -3,7 +3,7 @@ use core::slice::Iter;
 use core::time::Duration;
 
 use cgp::core::component::UseDelegate;
-use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
@@ -13,7 +13,8 @@ use hermes_encoding_components::traits::decode_mut::CanPeekDecodeBuffer;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetter, EncodingGetterComponent, HasEncodingType, ProvideEncodingType,
+    DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetterComponent,
+    EncodingTypeComponent, HasEncodingType, ProvideEncodingType,
 };
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
@@ -51,30 +52,15 @@ use starknet::core::types::{Felt, U256};
 
 use crate::impls::error::HandleStarknetChainError;
 
+#[cgp_context(StarknetCairoEncodingContextComponents: StarknetCairoEncodingComponents)]
 pub struct StarknetCairoEncoding;
-
-pub struct StarknetCairoEncodingContextComponents;
 
 pub struct StarknetEncodeMutComponents;
 
-impl HasComponents for StarknetCairoEncoding {
-    type Components = StarknetCairoEncodingContextComponents;
-}
-
 delegate_components! {
     StarknetCairoEncodingContextComponents {
-        ErrorTypeComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: ProvideHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
-    }
-}
-
-with_starknet_cairo_encoding_components! {
-    | Components | {
-        delegate_components! {
-            StarknetCairoEncodingContextComponents {
-                Components: StarknetCairoEncodingComponents,
-            }
-        }
     }
 }
 
@@ -86,6 +72,7 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(EncodingTypeComponent)]
 impl<Context> ProvideEncodingType<Context, AsFelt> for ProvideCairoEncoding
 where
     Context: Async,
@@ -93,6 +80,7 @@ where
     type Encoding = StarknetCairoEncoding;
 }
 
+#[cgp_provider(DefaultEncodingGetterComponent)]
 impl<Context> DefaultEncodingGetter<Context, AsFelt> for ProvideCairoEncoding
 where
     Context: HasEncodingType<AsFelt, Encoding = StarknetCairoEncoding>,
@@ -110,7 +98,6 @@ pub trait CanUseCairoEncoding:
     + CanPeekDecodeBuffer<Felt>
     + CanEncodeAndDecode<ViaCairo, ()>
     + CanEncodeAndDecode<ViaCairo, Nil>
-    + CanEncodeAndDecode<ViaCairo, Felt>
     + CanEncodeAndDecode<ViaCairo, Felt>
     + CanEncodeAndDecode<ViaCairo, u128>
     + CanEncodeAndDecode<ViaCairo, U256>

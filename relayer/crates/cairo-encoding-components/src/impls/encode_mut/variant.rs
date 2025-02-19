@@ -1,11 +1,12 @@
 use core::marker::PhantomData;
 
-use cgp::core::error::CanRaiseAsyncError;
 use cgp::prelude::*;
 use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, CanPeekDecodeBuffer, MutDecoder,
+    CanDecodeMut, CanPeekDecodeBuffer, MutDecoder, MutDecoderComponent,
 };
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 use starknet::core::types::Felt;
 
@@ -22,6 +23,7 @@ pub struct VariantIndexOutOfBound {
 
 pub struct SumEncoders<Index, Remain>(pub PhantomData<(Index, Remain)>);
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy, ValueA, ValueB, I, N>
     MutEncoder<Encoding, Strategy, Either<ValueA, ValueB>> for SumEncoders<I, S<N>>
 where
@@ -45,6 +47,7 @@ where
     }
 }
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy, Value, I> MutEncoder<Encoding, Strategy, Either<Value, Void>>
     for SumEncoders<I, Z>
 where
@@ -66,6 +69,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy, ValueA, ValueB, I, N>
     MutDecoder<Encoding, Strategy, Either<ValueA, ValueB>> for SumEncoders<I, S<N>>
 where
@@ -96,6 +100,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy, Value, I> MutDecoder<Encoding, Strategy, Either<Value, Void>>
     for SumEncoders<I, Z>
 where

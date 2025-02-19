@@ -1,8 +1,8 @@
-use alloc::sync::Arc;
 use core::marker::PhantomData;
 use core::time::Duration;
 use std::io::Write;
 use std::path::PathBuf;
+use std::sync::Arc;
 use std::time::SystemTime;
 
 use cgp::extra::run::CanRun;
@@ -33,7 +33,6 @@ use hermes_relayer_components::relay::traits::target::{DestinationTarget, Source
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::sleep::CanSleep;
-use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
@@ -316,12 +315,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             contract_address
         };
-
-        starknet_chain.event_subscription = Some(
-            starknet_chain
-                .clone()
-                .create_starknet_event_subscription(0, ibc_core_address),
-        );
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
             runtime.clone(),

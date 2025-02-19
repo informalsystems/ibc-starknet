@@ -1,7 +1,10 @@
 use core::time::Duration;
 
-use cgp::core::Async;
+use cgp::prelude::*;
 use hermes_chain_components::traits::types::chain_id::HasChainIdType;
+use hermes_cosmos_chain_components::components::client::{
+    ClientStateFieldsComponent, ClientStateTypeComponent, ConsensusStateTypeComponent,
+};
 use hermes_relayer_components::chain::traits::types::client_state::{
     ClientStateFieldsGetter, HasClientStateType, ProvideClientStateType,
 };
@@ -14,18 +17,21 @@ use crate::types::consensus_state::WasmStarknetConsensusState;
 
 pub struct ProvideStarknetIbcClientTypes;
 
+#[cgp_provider(ClientStateTypeComponent)]
 impl<Chain: Async, Counterparty> ProvideClientStateType<Chain, Counterparty>
     for ProvideStarknetIbcClientTypes
 {
     type ClientState = WasmStarknetClientState;
 }
 
+#[cgp_provider(ConsensusStateTypeComponent)]
 impl<Chain: Async, Counterparty> ProvideConsensusStateType<Chain, Counterparty>
     for ProvideStarknetIbcClientTypes
 {
     type ConsensusState = WasmStarknetConsensusState;
 }
 
+#[cgp_provider(ClientStateFieldsComponent)]
 impl<Chain, Counterparty> ClientStateFieldsGetter<Chain, Counterparty>
     for ProvideStarknetIbcClientTypes
 where

@@ -1,5 +1,6 @@
-use cgp::prelude::HasAsyncErrorType;
+use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::Converter;
+use hermes_wasm_encoding_components::components::ConverterComponent;
 use hermes_wasm_encoding_components::impls::strategies::consensus_state::{
     DecodeViaWasmConsensusState, EncodeViaWasmConsensusState,
 };
@@ -13,6 +14,7 @@ pub struct WasmStarknetConsensusState {
 
 pub struct ConvertWasmStarknetConsensusState;
 
+#[cgp_provider(ConverterComponent)]
 impl<Encoding> Converter<Encoding, WasmStarknetConsensusState, Any>
     for ConvertWasmStarknetConsensusState
 where
@@ -27,6 +29,7 @@ where
     }
 }
 
+#[cgp_provider(ConverterComponent)]
 impl<Encoding> Converter<Encoding, Any, WasmStarknetConsensusState>
     for ConvertWasmStarknetConsensusState
 where

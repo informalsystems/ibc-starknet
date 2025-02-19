@@ -9,10 +9,7 @@ repository    = { workspace = true }
 license       = { workspace = true }
 Readme        = { workspace = true }
 keywords      = { workspace = true }
-
-description = """
-    A set of IBC Cairo contracts that integrate IBC protocol with Starknet.
-"""
+description   = "All IBC contracts for Starknet"
 
 [lib]
 

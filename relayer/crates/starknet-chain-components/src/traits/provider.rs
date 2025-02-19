@@ -7,7 +7,7 @@ use starknet::providers::Provider;
   context: Chain,
 }]
 pub trait HasStarknetProviderType: Async {
-    type Provider: Async + Provider;
+    type StarknetProvider: Async + Provider;
 }
 
 #[cgp_component {
@@ -16,5 +16,5 @@ pub trait HasStarknetProviderType: Async {
   context: Chain,
 }]
 pub trait HasStarknetProvider: HasStarknetProviderType {
-    fn provider(&self) -> &Self::Provider;
+    fn provider(&self) -> &Self::StarknetProvider;
 }

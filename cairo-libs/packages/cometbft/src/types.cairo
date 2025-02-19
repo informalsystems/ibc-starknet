@@ -21,9 +21,10 @@ impl ConsensusAsProtoMessage of ProtoMessage<Consensus> {
         context.encode_field(2, self.app);
     }
 
-    fn decode_raw(ref self: Consensus, ref context: DecodeContext) {
-        context.decode_field(1, ref self.block);
-        context.decode_field(2, ref self.app);
+    fn decode_raw(ref context: DecodeContext) -> Option<Consensus> {
+        let block = context.decode_field(1)?;
+        let app = context.decode_field(2)?;
+        Option::Some(Consensus { block, app })
     }
 
     fn wire_type() -> WireType {
@@ -49,9 +50,10 @@ impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
         context.encode_field(2, self.hash);
     }
 
-    fn decode_raw(ref self: PartSetHeader, ref context: DecodeContext) {
-        context.decode_field(1, ref self.total);
-        context.decode_field(2, ref self.hash);
+    fn decode_raw(ref context: DecodeContext) -> Option<PartSetHeader> {
+        let total = context.decode_field(1)?;
+        let hash = context.decode_field(2)?;
+        Option::Some(PartSetHeader { total, hash })
     }
 
     fn wire_type() -> WireType {
@@ -77,9 +79,10 @@ impl BlockIdAsProtoMessage of ProtoMessage<BlockId> {
         context.encode_field(2, self.part_set_header);
     }
 
-    fn decode_raw(ref self: BlockId, ref context: DecodeContext) {
-        context.decode_field(1, ref self.hash);
-        context.decode_field(2, ref self.part_set_header);
+    fn decode_raw(ref context: DecodeContext) -> Option<BlockId> {
+        let hash = context.decode_field(1)?;
+        let part_set_header = context.decode_field(2)?;
+        Option::Some(BlockId { hash, part_set_header })
     }
 
     fn wire_type() -> WireType {
@@ -129,21 +132,39 @@ impl HeaderAsProtoMessage of ProtoMessage<Header> {
         context.encode_field(14, self.proposer_address);
     }
 
-    fn decode_raw(ref self: Header, ref context: DecodeContext) {
-        context.decode_field(1, ref self.version);
-        context.decode_field(2, ref self.chain_id);
-        context.decode_field(3, ref self.height);
-        context.decode_field(4, ref self.time);
-        context.decode_field(5, ref self.last_block_id);
-        context.decode_field(6, ref self.last_commit_hash);
-        context.decode_field(7, ref self.data_hash);
-        context.decode_field(8, ref self.validators_hash);
-        context.decode_field(9, ref self.next_validators_hash);
-        context.decode_field(10, ref self.consensus_hash);
-        context.decode_field(11, ref self.app_hash);
-        context.decode_field(12, ref self.last_results_hash);
-        context.decode_field(13, ref self.evidence_hash);
-        context.decode_field(14, ref self.proposer_address);
+    fn decode_raw(ref context: DecodeContext) -> Option<Header> {
+        let version = context.decode_field(1)?;
+        let chain_id = context.decode_field(2)?;
+        let height = context.decode_field(3)?;
+        let time = context.decode_field(4)?;
+        let last_block_id = context.decode_field(5)?;
+        let last_commit_hash = context.decode_field(6)?;
+        let data_hash = context.decode_field(7)?;
+        let validators_hash = context.decode_field(8)?;
+        let next_validators_hash = context.decode_field(9)?;
+        let consensus_hash = context.decode_field(10)?;
+        let app_hash = context.decode_field(11)?;
+        let last_results_hash = context.decode_field(12)?;
+        let evidence_hash = context.decode_field(13)?;
+        let proposer_address = context.decode_field(14)?;
+        Option::Some(
+            Header {
+                version,
+                chain_id,
+                height,
+                time,
+                last_block_id,
+                last_commit_hash,
+                data_hash,
+                validators_hash,
+                next_validators_hash,
+                consensus_hash,
+                app_hash,
+                last_results_hash,
+                evidence_hash,
+                proposer_address,
+            },
+        )
     }
 
     fn wire_type() -> WireType {
@@ -176,16 +197,16 @@ impl BlockIdFlagAsProtoMessage of ProtoMessage<BlockIdFlag> {
         }
     }
 
-    fn decode_raw(ref self: BlockIdFlag, ref context: DecodeContext) {
-        let mut var = Default::<u32>::default();
-        var.decode_raw(ref context);
-        match var {
-            0 => self = BlockIdFlag::Unknown,
-            1 => self = BlockIdFlag::Absent,
-            2 => self = BlockIdFlag::Commit,
-            3 => self = BlockIdFlag::Nil,
-            _ => panic!("invalid block Id flag"),
-        }
+    fn decode_raw(ref context: DecodeContext) -> Option<BlockIdFlag> {
+        let var: u32 = context.decode_raw()?;
+        let value = match var {
+            0 => Option::Some(BlockIdFlag::Unknown),
+            1 => Option::Some(BlockIdFlag::Absent),
+            2 => Option::Some(BlockIdFlag::Commit),
+            3 => Option::Some(BlockIdFlag::Nil),
+            _ => Option::None,
+        };
+        value
     }
 
     fn wire_type() -> WireType {
@@ -209,11 +230,12 @@ impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
         context.encode_field(4, self.signature);
     }
 
-    fn decode_raw(ref self: CommitSig, ref context: DecodeContext) {
-        context.decode_field(1, ref self.block_id_flag);
-        context.decode_field(2, ref self.validator_address);
-        context.decode_field(3, ref self.timestamp);
-        context.decode_field(4, ref self.signature);
+    fn decode_raw(ref context: DecodeContext) -> Option<CommitSig> {
+        let block_id_flag = context.decode_field(1)?;
+        let validator_address = context.decode_field(2)?;
+        let timestamp = context.decode_field(3)?;
+        let signature = context.decode_field(4)?;
+        Option::Some(CommitSig { block_id_flag, validator_address, timestamp, signature })
     }
 
     fn wire_type() -> WireType {
@@ -243,11 +265,12 @@ impl CommitAsProtoMessage of ProtoMessage<Commit> {
         context.encode_repeated_field(4, self.signatures);
     }
 
-    fn decode_raw(ref self: Commit, ref context: DecodeContext) {
-        context.decode_field(1, ref self.height);
-        context.decode_field(2, ref self.round);
-        context.decode_field(3, ref self.block_id);
-        context.decode_repeated_field(4, ref self.signatures);
+    fn decode_raw(ref context: DecodeContext) -> Option<Commit> {
+        let height = context.decode_field(1)?;
+        let round = context.decode_field(2)?;
+        let block_id = context.decode_field(3)?;
+        let signatures = context.decode_repeated_field(4)?;
+        Option::Some(Commit { height, round, block_id, signatures })
     }
 
     fn wire_type() -> WireType {
@@ -273,9 +296,10 @@ impl SignedHeaderAsProtoMessage of ProtoMessage<SignedHeader> {
         context.encode_field(2, self.commit);
     }
 
-    fn decode_raw(ref self: SignedHeader, ref context: DecodeContext) {
-        context.decode_field(1, ref self.header);
-        context.decode_field(2, ref self.commit);
+    fn decode_raw(ref context: DecodeContext) -> Option<SignedHeader> {
+        let header = context.decode_field(1)?;
+        let commit = context.decode_field(2)?;
+        Option::Some(SignedHeader { header, commit })
     }
 
     fn wire_type() -> WireType {
@@ -302,9 +326,10 @@ impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
         context.encode_field(2, self.secp256k1);
     }
 
-    fn decode_raw(ref self: PublicKey, ref context: DecodeContext) {
-        context.decode_field(1, ref self.ed25519);
-        context.decode_field(2, ref self.secp256k1);
+    fn decode_raw(ref context: DecodeContext) -> Option<PublicKey> {
+        let ed25519 = context.decode_field(1)?;
+        let secp256k1 = context.decode_field(2)?;
+        Option::Some(PublicKey { ed25519, secp256k1 })
     }
 
     fn wire_type() -> WireType {
@@ -334,11 +359,12 @@ impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
         context.encode_field(4, self.proposer_priority);
     }
 
-    fn decode_raw(ref self: Validator, ref context: DecodeContext) {
-        context.decode_field(1, ref self.address);
-        context.decode_field(2, ref self.pub_key);
-        context.decode_field(3, ref self.voting_power);
-        context.decode_field(4, ref self.proposer_priority);
+    fn decode_raw(ref context: DecodeContext) -> Option<Validator> {
+        let address = context.decode_field(1)?;
+        let pub_key = context.decode_field(2)?;
+        let voting_power = context.decode_field(3)?;
+        let proposer_priority = context.decode_field(4)?;
+        Option::Some(Validator { address, pub_key, voting_power, proposer_priority })
     }
 
     fn wire_type() -> WireType {
@@ -366,10 +392,11 @@ impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
         context.encode_field(3, self.total_voting_power);
     }
 
-    fn decode_raw(ref self: ValidatorSet, ref context: DecodeContext) {
-        context.decode_repeated_field(1, ref self.validators);
-        context.decode_field(2, ref self.proposer);
-        context.decode_field(3, ref self.total_voting_power);
+    fn decode_raw(ref context: DecodeContext) -> Option<ValidatorSet> {
+        let validators = context.decode_repeated_field(1)?;
+        let proposer = context.decode_field(2)?;
+        let total_voting_power = context.decode_field(3)?;
+        Option::Some(ValidatorSet { validators, proposer, total_voting_power })
     }
 
     fn wire_type() -> WireType {

@@ -1,5 +1,8 @@
+use cgp::prelude::*;
 use hermes_cli::commands::client::create::CreateClientArgs;
-use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
+use hermes_cli_components::traits::command::{
+    CanRunCommand, CommandRunner, CommandRunnerComponent,
+};
 
 #[derive(Debug, clap::Subcommand)]
 pub enum CreateSubCommand {
@@ -8,6 +11,7 @@ pub enum CreateSubCommand {
 
 pub struct RunCreateSubCommand;
 
+#[cgp_provider(CommandRunnerComponent)]
 impl<App> CommandRunner<App, CreateSubCommand> for RunCreateSubCommand
 where
     App: CanRunCommand<CreateClientArgs>,

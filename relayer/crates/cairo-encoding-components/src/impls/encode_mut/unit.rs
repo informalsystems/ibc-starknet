@@ -1,12 +1,12 @@
-use cgp::core::error::HasAsyncErrorType;
-use cgp::prelude::Nil;
-use hermes_encoding_components::traits::decode_mut::MutDecoder;
-use hermes_encoding_components::traits::encode_mut::MutEncoder;
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{MutDecoder, MutDecoderComponent};
+use hermes_encoding_components::traits::encode_mut::{MutEncoder, MutEncoderComponent};
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 
 pub struct EncodeNothing;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ()> for EncodeNothing
 where
     Encoding: HasEncodeBufferType + HasAsyncErrorType,
@@ -20,6 +20,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ()> for EncodeNothing
 where
     Encoding: HasDecodeBufferType + HasAsyncErrorType,
@@ -32,6 +33,7 @@ where
     }
 }
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Nil> for EncodeNothing
 where
     Encoding: HasEncodeBufferType + HasAsyncErrorType,
@@ -45,6 +47,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Nil> for EncodeNothing
 where
     Encoding: HasDecodeBufferType + HasAsyncErrorType,

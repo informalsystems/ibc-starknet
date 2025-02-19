@@ -1,5 +1,8 @@
+use cgp::prelude::*;
 use hermes_cli_components::impls::commands::client::update::UpdateClientArgs;
-use hermes_cli_components::traits::command::{CanRunCommand, CommandRunner};
+use hermes_cli_components::traits::command::{
+    CanRunCommand, CommandRunner, CommandRunnerComponent,
+};
 
 #[derive(Debug, clap::Subcommand)]
 pub enum UpdateSubCommand {
@@ -8,6 +11,7 @@ pub enum UpdateSubCommand {
 
 pub struct RunUpdateSubCommand;
 
+#[cgp_provider(CommandRunnerComponent)]
 impl<App> CommandRunner<App, UpdateSubCommand> for RunUpdateSubCommand
 where
     App: CanRunCommand<UpdateClientArgs>,

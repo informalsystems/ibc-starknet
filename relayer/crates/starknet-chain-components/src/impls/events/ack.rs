@@ -1,9 +1,9 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::CanRaiseAsyncError;
+use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_chain_components::traits::extract_data::EventExtractor;
+use hermes_chain_components::traits::extract_data::{EventExtractor, EventExtractorComponent};
 use hermes_chain_components::traits::packet::from_write_ack::PacketFromWriteAckEventBuilder;
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::ibc_events::write_ack::{
@@ -11,6 +11,9 @@ use hermes_chain_components::traits::types::ibc_events::write_ack::{
 };
 use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
 use hermes_chain_components::traits::types::packets::ack::HasAcknowledgementType;
+use hermes_cosmos_chain_components::components::client::{
+    PacketFromWriteAckEventBuilderComponent, WriteAckEventComponent,
+};
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
@@ -22,6 +25,7 @@ use ibc::core::host::types::error::IdentifierError;
 use crate::impls::events::UseStarknetEvents;
 use crate::types::events::packet::{PacketRelayEvents, WriteAcknowledgementEvent};
 
+#[cgp_provider(WriteAckEventComponent)]
 impl<Chain, Counterparty> ProvideWriteAckEvent<Chain, Counterparty> for UseStarknetEvents
 where
     Chain: HasAcknowledgementType<Counterparty, Acknowledgement = Vec<u8>>,
@@ -29,6 +33,7 @@ where
     type WriteAckEvent = WriteAcknowledgementEvent;
 }
 
+#[cgp_provider(EventExtractorComponent)]
 impl<Chain, Encoding> EventExtractor<Chain, WriteAcknowledgementEvent> for UseStarknetEvents
 where
     Chain: HasEventType + HasEncoding<AsStarknetEvent, Encoding = Encoding>,
@@ -49,6 +54,7 @@ where
     }
 }
 
+#[cgp_provider(PacketFromWriteAckEventBuilderComponent)]
 impl<Chain, Counterparty> PacketFromWriteAckEventBuilder<Chain, Counterparty> for UseStarknetEvents
 where
     Chain: HasWriteAckEvent<Counterparty, WriteAckEvent = WriteAcknowledgementEvent>

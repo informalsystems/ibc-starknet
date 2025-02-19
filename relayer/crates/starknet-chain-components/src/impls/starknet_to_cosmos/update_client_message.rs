@@ -1,4 +1,5 @@
 use cgp::prelude::*;
+use hermes_cosmos_chain_components::components::client::UpdateClientMessageBuilderComponent;
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_chain_components::types::messages::client::update::CosmosUpdateClientMessage;
 use hermes_encoding_components::traits::convert::CanConvert;
@@ -18,6 +19,7 @@ use crate::types::payloads::client::StarknetUpdateClientPayload;
 
 pub struct BuildStarknetUpdateClientMessage;
 
+#[cgp_provider(UpdateClientMessageBuilderComponent)]
 impl<Chain, Counterparty, Encoding> UpdateClientMessageBuilder<Chain, Counterparty>
     for BuildStarknetUpdateClientMessage
 where
@@ -42,7 +44,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let signed_header = SignedStarknetHeader {
-            header: encoded_header.clone(),
+            header: encoded_header,
             signature: payload.signature,
         };
 

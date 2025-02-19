@@ -1,5 +1,7 @@
-use cgp::prelude::DelegateComponent;
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use starknet::core::types::Felt;
 
@@ -7,6 +9,7 @@ use crate::impls::encode_mut::from_felt::EncodeFromFelt;
 
 pub struct EncodeU128;
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, u128> for EncodeU128
 where
     Encoding: CanDecodeMut<Strategy, Felt>,
@@ -22,8 +25,10 @@ where
     }
 }
 
-impl DelegateComponent<MutEncoderComponent> for EncodeU128 {
-    type Delegate = EncodeFromFelt;
+delegate_components! {
+    EncodeU128 {
+        MutEncoderComponent: EncodeFromFelt,
+    }
 }
 
 pub fn felt_to_u128(felt: Felt) -> u128 {

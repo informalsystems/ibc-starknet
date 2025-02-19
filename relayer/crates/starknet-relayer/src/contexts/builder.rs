@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use core::ops::Deref;
 
 use cgp::core::component::UseDelegate;
-use cgp::core::error::{ErrorRaiserComponent, ErrorTypeComponent};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
@@ -18,11 +18,16 @@ use hermes_relayer_components::build::traits::builders::birelay_builder::BiRelay
 use hermes_relayer_components::build::traits::builders::chain_builder::{
     CanBuildChain, ChainBuilder,
 };
+use hermes_relayer_components::components::default::build::{
+    BiRelayBuilderComponent, ChainBuilderComponent,
+};
 use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeAtComponent;
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
 use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::{RuntimeGetterComponent, RuntimeTypeComponent};
+use hermes_runtime_components::traits::runtime::{
+    RuntimeGetterComponent, RuntimeTypeProviderComponent,
+};
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
@@ -38,6 +43,7 @@ use super::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use crate::contexts::birelay::StarknetCosmosBiRelay;
 use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 
+#[cgp_context(StarknetBuildComponents)]
 #[derive(Clone)]
 pub struct StarknetBuilder {
     pub fields: Arc<dyn HasStarknetBuilderFields>,
@@ -70,19 +76,13 @@ impl HasStarknetBuilderFields for StarknetBuilderFields {
     }
 }
 
-pub struct StarknetBuildComponents;
-
-impl HasComponents for StarknetBuilder {
-    type Components = StarknetBuildComponents;
-}
-
 delegate_components! {
     StarknetBuildComponents {
-        ErrorTypeComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: ProvideHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         ChainTypeAtComponent<Index<0>>: WithType<StarknetChain>,
         ChainTypeAtComponent<Index<1>>: WithType<CosmosChain>,
-        RuntimeTypeComponent: WithType<HermesRuntime>,
+        RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
         RelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
         RelayTypeAtComponent<Index<1>, Index<0>>: WithType<CosmosToStarknetRelay>,
@@ -90,6 +90,7 @@ delegate_components! {
     }
 }
 
+#[cgp_provider(ChainBuilderComponent)]
 impl ChainBuilder<StarknetBuilder, Index<0>> for StarknetBuildComponents {
     async fn build_chain(
         build: &StarknetBuilder,
@@ -100,6 +101,7 @@ impl ChainBuilder<StarknetBuilder, Index<0>> for StarknetBuildComponents {
     }
 }
 
+#[cgp_provider(ChainBuilderComponent)]
 impl ChainBuilder<StarknetBuilder, Index<1>> for StarknetBuildComponents {
     async fn build_chain(
         build: &StarknetBuilder,
@@ -110,6 +112,7 @@ impl ChainBuilder<StarknetBuilder, Index<1>> for StarknetBuildComponents {
     }
 }
 
+#[cgp_provider(BiRelayBuilderComponent)]
 impl BiRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponents {
     async fn build_birelay(
         build: &StarknetBuilder,
@@ -170,7 +173,7 @@ impl StarknetBuilder {
         &self,
         expected_chain_id: &ChainId,
     ) -> Result<StarknetChain, HermesError> {
-        let json_rpc_url = Url::parse(&self.starknet_chain_config.json_rpc_url.to_string())?;
+        let json_rpc_url = Url::parse(&self.starknet_chain_config.json_rpc_url)?;
 
         let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
 
@@ -216,7 +219,6 @@ impl StarknetBuilder {
             ibc_client_contract_address: None,
             ibc_core_contract_address: None,
             event_encoding: Default::default(),
-            event_subscription: None,
             proof_signer,
         };
 

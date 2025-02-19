@@ -1,4 +1,5 @@
-use cgp::core::error::CanRaiseAsyncError;
+use cgp::prelude::*;
+use hermes_cosmos_chain_components::components::client::ConsensusStateHeightsQuerierComponent;
 use hermes_cosmos_chain_components::traits::grpc_address::HasGrpcAddress;
 use hermes_relayer_components::chain::traits::queries::consensus_state_height::ConsensusStateHeightsQuerier;
 use hermes_relayer_components::chain::traits::types::height::HasHeightType;
@@ -13,6 +14,7 @@ use tonic::Status;
 
 pub struct QueryStarknetConsensusStateHeightsFromGrpc;
 
+#[cgp_provider(ConsensusStateHeightsQuerierComponent)]
 impl<Chain, Counterparty> ConsensusStateHeightsQuerier<Chain, Counterparty>
     for QueryStarknetConsensusStateHeightsFromGrpc
 where
@@ -27,23 +29,21 @@ where
         chain: &Chain,
         client_id: &ClientId,
     ) -> Result<Vec<u64>, Chain::Error> {
-        let mut client = QueryClient::connect(
-            Uri::try_from(&chain.grpc_address().to_string()).map_err(Chain::raise_error)?,
-        )
-        .await
-        .map_err(Chain::raise_error)?
-        .max_decoding_message_size(33554432);
-
         let request = QueryConsensusStateHeightsRequest {
             client_id: client_id.to_string(),
             pagination: None,
         };
 
-        let response = client
-            .consensus_state_heights(tonic::Request::new(request))
-            .await
-            .map_err(Chain::raise_error)?
-            .into_inner();
+        let response = QueryClient::connect(
+            Uri::try_from(&chain.grpc_address().to_string()).map_err(Chain::raise_error)?,
+        )
+        .await
+        .map_err(Chain::raise_error)?
+        .max_decoding_message_size(1 << 25)
+        .consensus_state_heights(tonic::Request::new(request))
+        .await
+        .map_err(Chain::raise_error)?
+        .into_inner();
 
         let mut heights: Vec<u64> = response
             .consensus_state_heights

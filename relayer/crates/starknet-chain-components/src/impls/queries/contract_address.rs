@@ -3,6 +3,7 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 
+use crate::components::chain::ContractAddressQuerierComponent;
 use crate::traits::queries::address::ContractAddressQuerier;
 
 pub struct GetContractAddressFromField;
@@ -10,6 +11,7 @@ pub struct GetContractAddressFromField;
 #[derive(Debug)]
 pub struct ContractAddressNotFound;
 
+#[cgp_provider(ContractAddressQuerierComponent)]
 impl<Chain, Tag> ContractAddressQuerier<Chain, Tag> for GetContractAddressFromField
 where
     Chain: HasAddressType<Address: Clone>

@@ -1,8 +1,14 @@
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 
 pub struct EncodeList;
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Vec<Value>> for EncodeList
 where
     Encoding: CanEncodeMut<Strategy, Value> + CanEncodeMut<Strategy, usize>,
@@ -22,6 +28,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy, Value> MutDecoder<Encoding, Strategy, Vec<Value>> for EncodeList
 where
     Encoding: CanDecodeMut<Strategy, Value> + CanDecodeMut<Strategy, usize>,

@@ -1,8 +1,8 @@
 use core::marker::PhantomData;
 
-use cgp::core::error::HasAsyncErrorType;
-use hermes_encoding_components::traits::decode_mut::MutDecoder;
-use hermes_encoding_components::traits::encode_mut::MutEncoder;
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{MutDecoder, MutDecoderComponent};
+use hermes_encoding_components::traits::encode_mut::{MutEncoder, MutEncoderComponent};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
@@ -13,6 +13,7 @@ use crate::types::nat::{S, Z};
 
 pub struct EncodeVariantFrom<Transform>(pub PhantomData<Transform>);
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy, N, Transform> MutEncoder<Encoding, Strategy, Transform::From>
     for EncodeVariantFrom<Transform>
 where
@@ -31,6 +32,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy, N, Transform, Source, Target> MutDecoder<Encoding, Strategy, Target>
     for EncodeVariantFrom<Transform>
 where

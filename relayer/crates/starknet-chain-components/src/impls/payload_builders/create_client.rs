@@ -1,5 +1,6 @@
-use cgp::prelude::CanRaiseAsyncError;
+use cgp::prelude::*;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
+use hermes_cosmos_chain_components::components::client::CreateClientPayloadBuilderComponent;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CreateClientPayloadBuilder;
 use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
@@ -20,6 +21,7 @@ use crate::types::status::StarknetChainStatus;
 
 pub struct BuildStarknetCreateClientPayload;
 
+#[cgp_provider(CreateClientPayloadBuilderComponent)]
 impl<Chain, Counterparty> CreateClientPayloadBuilder<Chain, Counterparty>
     for BuildStarknetCreateClientPayload
 where

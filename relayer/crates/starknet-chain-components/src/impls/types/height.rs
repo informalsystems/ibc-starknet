@@ -1,16 +1,20 @@
-use cgp::core::Async;
-use cgp::prelude::CanRaiseAsyncError;
+use cgp::prelude::*;
 use hermes_chain_components::traits::types::height::HeightIncrementer;
+use hermes_cosmos_chain_components::components::client::{
+    HeightFieldComponent, HeightIncrementerComponent, HeightTypeComponent,
+};
 use hermes_relayer_components::chain::traits::types::height::{
     HasHeightType, HeightFieldGetter, ProvideHeightType,
 };
 
 pub struct ProvideStarknetHeight;
 
+#[cgp_provider(HeightTypeComponent)]
 impl<Chain: Async> ProvideHeightType<Chain> for ProvideStarknetHeight {
     type Height = u64;
 }
 
+#[cgp_provider(HeightFieldComponent)]
 impl<Chain> HeightFieldGetter<Chain> for ProvideStarknetHeight
 where
     Chain: HasHeightType<Height = u64>,
@@ -24,6 +28,7 @@ where
     }
 }
 
+#[cgp_provider(HeightIncrementerComponent)]
 impl<Chain> HeightIncrementer<Chain> for ProvideStarknetHeight
 where
     Chain: HasHeightType<Height = u64> + CanRaiseAsyncError<&'static str>,

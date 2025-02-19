@@ -19,6 +19,10 @@ use hermes_chain_components::types::payloads::packet::{
     AckPacketPayload, ReceivePacketPayload, TimeoutUnorderedPacketPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_cosmos_chain_components::components::client::{
+    AckPacketMessageBuilderComponent, ReceivePacketMessageBuilderComponent,
+    TimeoutUnorderedPacketMessageBuilderComponent,
+};
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
@@ -45,6 +49,7 @@ use crate::types::messages::ibc::packet::{
 
 pub struct BuildStarknetPacketMessages;
 
+#[cgp_provider(ReceivePacketMessageBuilderComponent)]
 impl<Chain, Counterparty, Encoding> ReceivePacketMessageBuilder<Chain, Counterparty>
     for BuildStarknetPacketMessages
 where
@@ -105,6 +110,7 @@ where
     }
 }
 
+#[cgp_provider(AckPacketMessageBuilderComponent)]
 impl<Chain, Counterparty, Encoding> AckPacketMessageBuilder<Chain, Counterparty>
     for BuildStarknetPacketMessages
 where
@@ -171,6 +177,7 @@ where
     }
 }
 
+#[cgp_provider(TimeoutUnorderedPacketMessageBuilderComponent)]
 impl<Chain, Counterparty, Encoding> TimeoutUnorderedPacketMessageBuilder<Chain, Counterparty>
     for BuildStarknetPacketMessages
 where

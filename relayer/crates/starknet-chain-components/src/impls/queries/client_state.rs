@@ -12,6 +12,9 @@ use hermes_chain_components::traits::types::client_state::HasClientStateType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::HasClientIdType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
+use hermes_cosmos_chain_components::components::client::{
+    ClientStateQuerierComponent, ClientStateWithProofsQuerierComponent,
+};
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -34,6 +37,7 @@ use crate::types::status::StarknetChainStatus;
 
 pub struct QueryCometClientState;
 
+#[cgp_provider(ClientStateQuerierComponent)]
 impl<Chain, Counterparty, Encoding> ClientStateQuerier<Chain, Counterparty>
     for QueryCometClientState
 where
@@ -88,6 +92,7 @@ where
     }
 }
 
+#[cgp_provider(ClientStateWithProofsQuerierComponent)]
 impl<Chain, Counterparty> ClientStateWithProofsQuerier<Chain, Counterparty>
     for QueryCometClientState
 where

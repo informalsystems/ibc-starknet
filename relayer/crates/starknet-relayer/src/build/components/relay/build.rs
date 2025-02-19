@@ -1,14 +1,17 @@
 use core::marker::PhantomData;
 
 use cgp::core::field::Index;
+use cgp::prelude::*;
 use hermes_error::HermesError;
 use hermes_relayer_components::build::traits::builders::relay_builder::RelayBuilder;
+use hermes_relayer_components::components::default::build::RelayBuilderComponent;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 
 use crate::contexts::builder::{StarknetBuildComponents, StarknetBuilder};
 use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 
+#[cgp_provider(RelayBuilderComponent)]
 impl RelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponents {
     async fn build_relay(
         build: &StarknetBuilder,

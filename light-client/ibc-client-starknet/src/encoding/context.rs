@@ -3,7 +3,9 @@ use core::convert::Infallible;
 use core::num::{ParseIntError, TryFromIntError};
 use core::str::Utf8Error;
 
-use cgp::core::error::{ErrorRaiser, ProvideErrorType};
+use cgp::core::error::{
+    ErrorRaiser, ErrorRaiserComponent, ErrorTypeProvider, ErrorTypeProviderComponent,
+};
 use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::{CanConvert, CanConvertBothWays};
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
@@ -25,30 +27,17 @@ use ibc_core::host::types::error::{DecodingError, IdentifierError};
 use ibc_core::primitives::{Timestamp, TimestampError};
 use prost::DecodeError;
 
+#[cgp_context(StarknetLightClientEncodingContextComponents: StarknetLightClientEncodingComponents)]
 pub struct StarknetLightClientEncoding;
 
-pub struct StarknetLightClientEncodingContextComponents;
-
-impl HasComponents for StarknetLightClientEncoding {
-    type Components = StarknetLightClientEncodingContextComponents;
-}
-
-with_starknet_light_client_encoding_components! {
-    | Components | {
-        delegate_components! {
-            StarknetLightClientEncodingContextComponents {
-                Components: StarknetLightClientEncodingComponents
-            }
-        }
-    }
-}
-
-impl ProvideErrorType<StarknetLightClientEncoding>
+#[cgp_provider(ErrorTypeProviderComponent)]
+impl ErrorTypeProvider<StarknetLightClientEncoding>
     for StarknetLightClientEncodingContextComponents
 {
     type Error = ClientError;
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, ClientError>
     for StarknetLightClientEncodingContextComponents
 {
@@ -57,6 +46,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, ClientError>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, Infallible>
     for StarknetLightClientEncodingContextComponents
 {
@@ -65,6 +55,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, Infallible>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, DecodeError>
     for StarknetLightClientEncodingContextComponents
 {
@@ -75,6 +66,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, DecodeError>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, Utf8Error>
     for StarknetLightClientEncodingContextComponents
 {
@@ -85,6 +77,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, Utf8Error>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, ParseIntError>
     for StarknetLightClientEncodingContextComponents
 {
@@ -95,6 +88,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, ParseIntError>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, TryFromIntError>
     for StarknetLightClientEncodingContextComponents
 {
@@ -105,6 +99,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, TryFromIntError>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, TryFromSliceError>
     for StarknetLightClientEncodingContextComponents
 {
@@ -115,6 +110,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, TryFromSliceError>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, TimestampError>
     for StarknetLightClientEncodingContextComponents
 {
@@ -125,6 +121,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, TimestampError>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, DecodingError>
     for StarknetLightClientEncodingContextComponents
 {
@@ -135,6 +132,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, DecodingError>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, UnsupportedWireType>
     for StarknetLightClientEncodingContextComponents
 {
@@ -145,6 +143,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, UnsupportedWireType>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, InvalidWireType>
     for StarknetLightClientEncodingContextComponents
 {
@@ -155,6 +154,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, InvalidWireType>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, RequiredFieldTagNotFound>
     for StarknetLightClientEncodingContextComponents
 {
@@ -165,6 +165,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, RequiredFieldTagNotFound>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, TypeUrlMismatchError>
     for StarknetLightClientEncodingContextComponents
 {
@@ -175,6 +176,7 @@ impl ErrorRaiser<StarknetLightClientEncoding, TypeUrlMismatchError>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
 impl ErrorRaiser<StarknetLightClientEncoding, IdentifierError>
     for StarknetLightClientEncodingContextComponents
 {

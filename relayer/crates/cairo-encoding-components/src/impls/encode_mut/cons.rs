@@ -1,14 +1,15 @@
 use core::marker::PhantomData;
 
 use cgp::core::error::HasAsyncErrorType;
-use cgp::prelude::Cons;
-use hermes_encoding_components::traits::decode_mut::MutDecoder;
-use hermes_encoding_components::traits::encode_mut::MutEncoder;
+use cgp::prelude::*;
+use hermes_encoding_components::traits::decode_mut::{MutDecoder, MutDecoderComponent};
+use hermes_encoding_components::traits::encode_mut::{MutEncoder, MutEncoderComponent};
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 
 pub struct EncoderCons<EncoderA, EncoderB>(pub PhantomData<(EncoderA, EncoderB)>);
 
+#[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy, EncoderA, EncoderB, ValueA, ValueB>
     MutEncoder<Encoding, Strategy, Cons<ValueA, ValueB>> for EncoderCons<EncoderA, EncoderB>
 where
@@ -28,6 +29,7 @@ where
     }
 }
 
+#[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy, EncoderA, EncoderB, ValueA, ValueB>
     MutDecoder<Encoding, Strategy, Cons<ValueA, ValueB>> for EncoderCons<EncoderA, EncoderB>
 where

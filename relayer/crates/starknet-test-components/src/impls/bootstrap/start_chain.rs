@@ -1,4 +1,5 @@
-use cgp::core::error::CanRaiseAsyncError;
+use cgp::prelude::*;
+use hermes_cosmos_test_components::bootstrap::components::cosmos_sdk::ChainFullNodeStarterComponent;
 use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::ChainFullNodeStarter;
 use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::HasChainCommandPath;
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
@@ -12,6 +13,7 @@ use crate::types::node_config::StarknetNodeConfig;
 
 pub struct StartStarknetDevnet;
 
+#[cgp_provider(ChainFullNodeStarterComponent)]
 impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartStarknetDevnet
 where
     Bootstrap: HasRuntime<Runtime = Runtime>

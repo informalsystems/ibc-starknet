@@ -36,7 +36,7 @@ impl From<ClientState> for Any {
             .convert(&client_state.0)
             .unwrap();
 
-        Any {
+        Self {
             type_url: any.type_url,
             value: any.value,
         }

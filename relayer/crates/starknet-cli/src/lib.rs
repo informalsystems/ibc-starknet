@@ -1,4 +1,4 @@
-extern crate alloc;
+#![recursion_limit = "256"]
 
 pub mod commands;
 pub mod contexts;

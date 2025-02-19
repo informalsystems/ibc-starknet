@@ -4,6 +4,7 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_wasm_encoding_components::components::DecoderComponent;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
@@ -76,6 +77,7 @@ pub struct CreateIbcTokenEvent {
 
 pub struct DecodeIbcTransferEvents;
 
+#[cgp_provider(DecoderComponent)]
 impl<Encoding, Strategy> Decoder<Encoding, Strategy, IbcTransferEvent> for DecodeIbcTransferEvents
 where
     Encoding: HasEncodedType<Encoded = StarknetEvent>
@@ -113,6 +115,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, SendIbcTransferEvent>
     for DecodeIbcTransferEvents
 where
@@ -147,6 +150,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy>
     Decoder<EventEncoding, Strategy, ReceiveIbcTransferEvent> for DecodeIbcTransferEvents
 where
@@ -182,6 +186,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, AckIbcTransferEvent>
     for DecodeIbcTransferEvents
 where
@@ -217,6 +222,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy>
     Decoder<EventEncoding, Strategy, AckStatusIbcTransferEvent> for DecodeIbcTransferEvents
 where
@@ -244,6 +250,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy>
     Decoder<EventEncoding, Strategy, TimeoutIbcTransferEvent> for DecodeIbcTransferEvents
 where
@@ -277,6 +284,7 @@ where
     }
 }
 
+#[cgp_provider(DecoderComponent)]
 impl<EventEncoding, CairoEncoding, Strategy> Decoder<EventEncoding, Strategy, CreateIbcTokenEvent>
     for DecodeIbcTransferEvents
 where

@@ -9,10 +9,7 @@ repository    = { workspace = true }
 license       = { workspace = true }
 Readme        = { workspace = true }
 keywords      = { workspace = true }
-
-description = """
-    Provides a set of common artifacts used for testing different IBC packages.
-"""
+description   = "Common artifacts for testing IBC packages"
 
 [lib]
 

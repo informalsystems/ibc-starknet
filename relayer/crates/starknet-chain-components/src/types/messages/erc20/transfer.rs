@@ -13,6 +13,7 @@ use starknet::accounts::Call;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
+use crate::components::chain::TransferTokenMessageBuilderComponent;
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::messages::transfer::TransferTokenMessageBuilder;
@@ -37,6 +38,7 @@ pub type EncodeTransferErc20TokenMessage = CombineEncoders<
     ],
 >;
 
+#[cgp_provider(TransferTokenMessageBuilderComponent)]
 impl<Chain, Encoding> TransferTokenMessageBuilder<Chain> for BuildTransferErc20TokenMessage
 where
     Chain: HasAddressType<Address = StarknetAddress>

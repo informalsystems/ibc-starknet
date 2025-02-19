@@ -1,4 +1,4 @@
-use cgp::core::error::CanRaiseAsyncError;
+use cgp::prelude::*;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::contract::ContractFactory;
@@ -6,6 +6,7 @@ use starknet::core::types::{Felt, RevertedInvocation};
 use starknet::macros::felt;
 use starknet::signers::SigningKey;
 
+use crate::components::chain::ContractDeployerComponent;
 use crate::impls::types::address::StarknetAddress;
 use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
 use crate::traits::contract::deploy::ContractDeployer;
@@ -18,6 +19,7 @@ pub struct DeployStarknetContract;
 const DEFAULT_UDC_ADDRESS: Felt =
     felt!("0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf");
 
+#[cgp_provider(ContractDeployerComponent)]
 impl<Chain> ContractDeployer<Chain> for DeployStarknetContract
 where
     Chain: HasContractClassHashType<ContractClassHash = Felt>

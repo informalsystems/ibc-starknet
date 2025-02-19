@@ -35,6 +35,7 @@ cgp_preset! {
 
 pub struct ProvideEncodedStarknetEventType;
 
+#[cgp_provider(EncodedTypeComponent)]
 impl<Encoding: Async> ProvideEncodedType<Encoding> for ProvideEncodedStarknetEventType {
     type Encoded = StarknetEvent;
 }
