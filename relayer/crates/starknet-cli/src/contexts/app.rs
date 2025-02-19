@@ -81,7 +81,7 @@ use toml::to_string_pretty;
 use crate::commands::all::{AllSubCommands, RunAllSubCommand};
 use crate::commands::create::subcommand::{CreateSubCommand, RunCreateSubCommand};
 use crate::commands::query::subcommand::{QuerySubCommand, RunQuerySubCommand};
-use crate::commands::start::{RunStartSubcommand, StartSubcommand};
+use crate::commands::start::{RunStartSubCommand, StartSubCommand};
 use crate::commands::update::subcommand::{RunUpdateSubCommand, UpdateSubCommand};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
 use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
@@ -181,7 +181,7 @@ delegate_components! {
         BootstrapSubCommand: RunBootstrapSubCommand,
 
         StartRelayerArgs: RunStartRelayerCommand<Index<0>, Index<1>>,
-        StartSubcommand: RunStartSubcommand,
+        StartSubCommand: RunStartSubCommand,
 
         QuerySubCommand: RunQuerySubCommand,
         QueryClientStateArgs: RunQueryClientStateCommand,
@@ -316,7 +316,7 @@ pub trait CanUseStarknetApp:
     + CanRunCommand<UpdateClientArgs>
     + CanRunCommand<CreateClientArgs>
     + CanRunCommand<StartRelayerArgs>
-    + CanUseComponent<CommandRunnerComponent, StartSubcommand>
+    + CanUseComponent<CommandRunnerComponent, StartSubCommand>
 {
 }
 

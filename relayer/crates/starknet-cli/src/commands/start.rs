@@ -5,13 +5,13 @@ use hermes_cli_components::traits::command::{CommandRunner, CommandRunnerCompone
 use hermes_cli_components::traits::output::HasOutputType;
 
 #[derive(Debug, clap::Subcommand)]
-pub enum StartSubcommand {
+pub enum StartSubCommand {
     CosmosWithStarknet(StartRelayerArgs),
     StarknetWithCosmos(StartRelayerArgs),
 }
 
 #[new_cgp_provider(CommandRunnerComponent)]
-impl<App> CommandRunner<App, StartSubcommand> for RunStartSubcommand
+impl<App> CommandRunner<App, StartSubCommand> for RunStartSubCommand
 where
     App: HasOutputType + HasAsyncErrorType,
     RunStartRelayerCommand<Index<0>, Index<1>>: CommandRunner<App, StartRelayerArgs>,
@@ -19,13 +19,13 @@ where
 {
     async fn run_command(
         app: &App,
-        subcommand: &StartSubcommand,
+        subcommand: &StartSubCommand,
     ) -> Result<App::Output, App::Error> {
         match subcommand {
-            StartSubcommand::CosmosWithStarknet(args) => {
+            StartSubCommand::CosmosWithStarknet(args) => {
                 <RunStartRelayerCommand<Index<0>, Index<1>>>::run_command(app, args).await
             }
-            StartSubcommand::StarknetWithCosmos(args) => {
+            StartSubCommand::StarknetWithCosmos(args) => {
                 <RunStartRelayerCommand<Index<1>, Index<0>>>::run_command(app, args).await
             }
         }
