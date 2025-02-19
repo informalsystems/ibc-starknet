@@ -80,7 +80,7 @@ fn test_update_client_with_valid_future_header() {
 
 // Tests with a future header with the elapsed timestamp exceeds the `max_clock_drift`.
 #[test]
-#[should_panic(expected: 'ICS07: header ts from future')]
+#[should_panic(expected: 'ICS07: inv header from future')]
 fn test_update_client_with_invalid_future_header() {
     simulate_update_client(3)
 }

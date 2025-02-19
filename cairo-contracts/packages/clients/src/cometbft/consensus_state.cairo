@@ -47,7 +47,7 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
 
         assert(
             host_timestamp + max_clock_drift >= self_timestamp,
-            CometErrors::HEADER_TIMESTAMP_FROM_FUTURE,
+            CometErrors::INVALID_HEADER_FROM_FUTURE,
         );
 
         // The header is in future but within the `max_clock_drift` period.
