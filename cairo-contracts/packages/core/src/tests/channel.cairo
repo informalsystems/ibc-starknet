@@ -69,10 +69,10 @@ fn test_missing_packet_receipt() {
 }
 
 #[test]
-#[should_panic(expected: 'ICS04: missing commitment')]
 fn test_missing_packet_commitment() {
     let state = setup();
-    state.read_packet_commitment(@PORT_ID(), @CHANNEL_ID(0), @SEQUENCE(0));
+    let commitment = state.read_packet_commitment(@PORT_ID(), @CHANNEL_ID(0), @SEQUENCE(0));
+    assert!(commitment.is_zero())
 }
 
 #[test]

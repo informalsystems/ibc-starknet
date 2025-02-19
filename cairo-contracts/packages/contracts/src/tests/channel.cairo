@@ -172,7 +172,8 @@ fn test_send_packet_ok() {
     let commitment = core
         .packet_commitment(
             packet.port_id_on_a.clone(), packet.chan_id_on_a.clone(), packet.seq_on_a.clone(),
-        );
+        )
+        .unwrap();
 
     assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
 
@@ -240,7 +241,6 @@ fn test_recv_packet_ok() {
 }
 
 #[test]
-#[should_panic(expected: 'ICS04: missing commitment')]
 fn test_successful_ack_packet_ok() {
     // -----------------------------------------------------------
     // Setup Essentials
@@ -275,7 +275,8 @@ fn test_successful_ack_packet_ok() {
     let commitment = core
         .packet_commitment(
             msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a.clone(),
-        );
+        )
+        .unwrap();
 
     assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
 
@@ -316,14 +317,15 @@ fn test_successful_ack_packet_ok() {
     // Check the balance of the sender.
     erc20.assert_balance(SN_USER(), SUPPLY - transfer_cfg.amount);
 
-    core
+    let commitment = core
         .packet_commitment(
             msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a,
         );
+
+    assert!(commitment.is_none(), "Expected packet commitment to be cleared")
 }
 
 #[test]
-#[should_panic(expected: 'ICS04: missing commitment')]
 fn test_failure_ack_packet_ok() {
     // -----------------------------------------------------------
     // Setup Essentials
@@ -358,7 +360,8 @@ fn test_failure_ack_packet_ok() {
     let commitment = core
         .packet_commitment(
             msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a.clone(),
-        );
+        )
+        .unwrap();
 
     assert_eq!(commitment, PACKET_COMMITMENT_ON_SN(erc20));
 
@@ -401,10 +404,12 @@ fn test_failure_ack_packet_ok() {
     // Check if the balance of the sender to ensure the refund.
     erc20.assert_balance(SN_USER(), SUPPLY);
 
-    core
+    let commitment = core
         .packet_commitment(
             msg_transfer.port_id_on_a.clone(), msg_transfer.chan_id_on_a.clone(), seq_on_a,
         );
+
+    assert!(commitment.is_none(), "Expected packet commitment to be cleared")
 }
 
 #[test]
@@ -495,20 +500,20 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
     // Check if the balance of the sender to ensure the refund.
     erc20.assert_balance(SN_USER(), SUPPLY);
 
-    core
+    let commitment = core
         .packet_commitment(
             packet.port_id_on_a.clone(), packet.chan_id_on_a.clone(), packet.seq_on_a,
         );
+
+    assert!(commitment.is_none(), "Expected packet commitment to be cleared")
 }
 
 #[test]
-#[should_panic(expected: 'ICS04: missing commitment')]
 fn test_timeout_packet_with_height() {
     try_timeout_packet(HEIGHT(11), TIMESTAMP(1000));
 }
 
 #[test]
-#[should_panic(expected: 'ICS04: missing commitment')]
 fn test_timeout_packet_with_timestamp() {
     try_timeout_packet(HEIGHT(1000), TIMESTAMP(11));
 }
