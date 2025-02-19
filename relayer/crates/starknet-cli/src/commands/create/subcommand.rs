@@ -9,9 +9,7 @@ pub enum CreateSubCommand {
     Client(CreateClientArgs),
 }
 
-pub struct RunCreateSubCommand;
-
-#[cgp_provider(CommandRunnerComponent)]
+#[new_cgp_provider(CommandRunnerComponent)]
 impl<App> CommandRunner<App, CreateSubCommand> for RunCreateSubCommand
 where
     App: CanRunCommand<CreateClientArgs>,
