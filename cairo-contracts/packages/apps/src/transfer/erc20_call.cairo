@@ -49,12 +49,7 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
     ) -> ERC20Contract {
         let mut call_data = array![];
 
-        call_data.append_serde(name);
-        call_data.append_serde(symbol);
-        call_data.append_serde(decimals);
-        call_data.append_serde(amount);
-        call_data.append_serde(recipient);
-        call_data.append_serde(owner);
+        call_data.append_serde((name, symbol, decimals, amount, recipient, owner));
 
         let (address, _) = deploy_syscall(class_hash, salt, call_data.span(), false)
             .unwrap_syscall();
