@@ -3,6 +3,7 @@ pub mod ERC20Mintable {
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl, interface::IERC20Metadata};
     use starknet::ContractAddress;
+    use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
     use starknet_ibc_utils::mintable::ERC20MintableComponent;
     use starknet_ibc_utils::mintable::ERC20MintableComponent::ERC20MintableInternalTrait;
 
@@ -33,6 +34,9 @@ pub mod ERC20Mintable {
         mintable: ERC20MintableComponent::Storage,
         #[substorage(v0)]
         erc20: ERC20Component::Storage,
+        // The decimals value is stored locally in the contract.
+        // ref: https://docs.openzeppelin.com/contracts-cairo/0.20.0/erc20#the_storage_approach
+        decimals: u8,
     }
 
     #[event]
@@ -51,6 +55,7 @@ pub mod ERC20Mintable {
         ref self: ContractState,
         name: ByteArray,
         symbol: ByteArray,
+        decimals: u8,
         initial_supply: u256,
         recipient: ContractAddress,
         owner: ContractAddress,
@@ -59,6 +64,8 @@ pub mod ERC20Mintable {
         self.mintable.initializer();
         self.erc20.initializer(name, symbol);
         self.erc20.mint(recipient, initial_supply);
+
+        self._set_decimals(decimals);
     }
 
 
@@ -73,7 +80,14 @@ pub mod ERC20Mintable {
         }
 
         fn decimals(self: @ContractState) -> u8 {
-            0
+            self.decimals.read()
+        }
+    }
+
+    #[generate_trait]
+    impl InternalImpl of InternalTrait {
+        fn _set_decimals(ref self: ContractState, decimals: u8) {
+            self.decimals.write(decimals);
         }
     }
 }
