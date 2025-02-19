@@ -70,6 +70,7 @@ use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence};
 use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
 use starknet::accounts::{Account, Call, ExecutionEncoding, SingleOwnerAccount};
+use starknet::core::types::U256;
 use starknet::macros::{selector, short_string};
 use starknet::providers::Provider;
 use starknet::signers::{LocalWallet, SigningKey};
@@ -541,6 +542,26 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
         relay_only_send(&cosmos_to_starknet_relay, &packet).await?;
 
         runtime.sleep(Duration::from_secs(2)).await;
+
+        // approve ics20 contract to spend the tokens for `address_starknet_b`
+        {
+            let call_data = cairo_encoding.encode(&product![
+                ics20_contract_address,
+                U256::from(transfer_quantity)
+            ])?;
+
+            let call = Call {
+                to: *ics20_token_address,
+                selector: selector!("approve"),
+                calldata: call_data,
+            };
+
+            let execution = starknet_account_b.execute_v3(vec![call]);
+
+            let tx_hash = execution.send().await?.transaction_hash;
+
+            starknet_chain.poll_tx_response(&tx_hash).await?;
+        }
 
         // Create Starknet to Cosmos transfer
         let starknet_ics20_send_message = {

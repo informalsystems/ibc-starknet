@@ -506,6 +506,26 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         assert_eq!(balance_starknet_b_step_1.quantity, transfer_quantity.into());
 
+        // approve ics20 contract to spend the tokens for `address_starknet_b`
+        {
+            let call_data = cairo_encoding.encode(&product![
+                ics20_contract_address,
+                U256::from(transfer_quantity)
+            ])?;
+
+            let call = Call {
+                to: *ics20_token_address,
+                selector: selector!("approve"),
+                calldata: call_data,
+            };
+
+            let execution = starknet_account_b.execute_v3(vec![call]);
+
+            let tx_hash = execution.send().await?.transaction_hash;
+
+            starknet_chain.poll_tx_response(&tx_hash).await?;
+        }
+
         // create ibc transfer message
 
         let starknet_ics20_send_message = {
