@@ -3,7 +3,7 @@ use openzeppelin_token::erc20::ERC20ABIDispatcherTrait;
 use snforge_std::{ContractClass, start_cheat_caller_address};
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait};
-use starknet_ibc_testkit::dummies::{NAME, OWNER, SN_USER, SUPPLY, SYMBOL};
+use starknet_ibc_testkit::dummies::{DECIMALS_18, NAME, OWNER, SN_USER, SUPPLY, SYMBOL};
 
 #[generate_trait]
 pub impl ERC20HandleImpl of ERC20Handle {
@@ -34,6 +34,7 @@ pub(crate) fn dummy_erc20_call_data() -> Array<felt252> {
     let mut call_data: Array<felt252> = array![];
     Serde::serialize(@NAME(), ref call_data);
     Serde::serialize(@SYMBOL(), ref call_data);
+    Serde::serialize(@DECIMALS_18, ref call_data);
     Serde::serialize(@SUPPLY, ref call_data);
     Serde::serialize(@SN_USER(), ref call_data);
     Serde::serialize(@OWNER(), ref call_data);

@@ -12,8 +12,8 @@ use starknet_ibc_core::router::{AppContract, AppContractTrait};
 use starknet_ibc_testkit::configs::{TransferAppConfig, TransferAppConfigTrait};
 use starknet_ibc_testkit::dummies::CLASS_HASH;
 use starknet_ibc_testkit::dummies::{
-    AMOUNT, COSMOS, CS_USER, EMPTY_MEMO, HOSTED_DENOM, NAME, OWNER, SN_USER, STARKNET, SUPPLY,
-    SYMBOL,
+    AMOUNT, COSMOS, CS_USER, DECIMAL_ZERO, EMPTY_MEMO, HOSTED_DENOM, NAME, OWNER, SN_USER, STARKNET,
+    SUPPLY, SYMBOL,
 };
 use starknet_ibc_testkit::event_spy::{ERC20EventSpyExt, TransferEventSpyExt};
 use starknet_ibc_testkit::handles::{AppHandle, ERC20Handle};
@@ -149,7 +149,10 @@ fn test_mint_ok() {
     let token_address = ics20.ibc_token_address(prefixed_denom.key());
 
     // Assert the `CreateTokenEvent` emitted.
-    spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), token_address, cfg.amount);
+    spy
+        .assert_create_token_event(
+            ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, token_address, cfg.amount,
+        );
 
     // Assert the `RecvEvent` emitted.
     spy

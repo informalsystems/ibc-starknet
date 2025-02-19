@@ -1,7 +1,9 @@
 use snforge_std::start_cheat_caller_address;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_testkit::configs::TransferAppConfigTrait;
-use starknet_ibc_testkit::dummies::{COSMOS, CS_USER, NAME, SN_USER, STARKNET, SUPPLY, SYMBOL};
+use starknet_ibc_testkit::dummies::{
+    COSMOS, CS_USER, DECIMAL_ZERO, NAME, SN_USER, STARKNET, SUPPLY, SYMBOL,
+};
 use starknet_ibc_testkit::event_spy::ERC20EventSpyExt;
 use starknet_ibc_testkit::event_spy::{ERC20EventSpyExtImpl, TransferEventSpyExt};
 use starknet_ibc_testkit::handles::{AppHandle, CoreHandle, ERC20Handle};
@@ -97,7 +99,7 @@ fn test_mint_burn_roundtrip() {
     // Assert the `CreateTokenEvent` emitted.
     spy
         .assert_create_token_event(
-            ics20.address, NAME(), SYMBOL(), token_address, transfer_cfg.amount,
+            ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, token_address, transfer_cfg.amount,
         );
 
     // Assert the `RecvEvent` emitted.
