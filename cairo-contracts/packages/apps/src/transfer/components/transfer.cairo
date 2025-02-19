@@ -694,7 +694,9 @@ pub mod TokenTransferComponent {
         ) {
             let token = self.get_token(denom.key());
 
-            token.burn(account, amount);
+            token.transfer_from(account, get_contract_address(), amount);
+
+            token.burn(get_contract_address(), amount);
         }
 
         fn refund_execute(

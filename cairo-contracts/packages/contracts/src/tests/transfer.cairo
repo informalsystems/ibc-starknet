@@ -106,7 +106,7 @@ fn test_mint_burn_roundtrip() {
             ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), transfer_cfg.amount, true,
         );
 
-    let erc20: ERC20Contract = token_address.into();
+    let mut erc20: ERC20Contract = token_address.into();
 
     // Assert if the transfer happens from the ICS20 address.
     spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), transfer_cfg.amount);
@@ -123,6 +123,9 @@ fn test_mint_burn_roundtrip() {
 
     start_cheat_caller_address(ics20.address, SN_USER());
 
+    // User approves the amount of burn allowance to the `TransferApp` contract.
+    erc20.approve(SN_USER(), ics20.address, transfer_cfg.amount);
+
     let msg_transfer = transfer_cfg.dummy_msg_transfer(prefixed_denom.clone(), CS_USER());
 
     // User approves the amount of allowance for the `TransferApp` contract.
@@ -130,6 +133,9 @@ fn test_mint_burn_roundtrip() {
 
     // Assert the `SendEvent` emitted.
     spy.assert_send_event(ics20.address, SN_USER(), CS_USER(), prefixed_denom, transfer_cfg.amount);
+
+    // Assert if the burn happens by the ICS20 contract.
+    spy.assert_transfer_event(erc20.address, SN_USER(), ics20.address, transfer_cfg.amount);
 
     // Check the balance of the sender.
     erc20.assert_balance(SN_USER(), 0);
