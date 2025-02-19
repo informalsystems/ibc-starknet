@@ -6,8 +6,8 @@ use hermes_cli_components::traits::output::HasOutputType;
 
 #[derive(Debug, clap::Subcommand)]
 pub enum StartSubCommand {
-    CosmosWithStarknet(StartRelayerArgs),
     StarknetWithCosmos(StartRelayerArgs),
+    CosmosWithStarknet(StartRelayerArgs),
 }
 
 #[new_cgp_provider(CommandRunnerComponent)]
@@ -22,10 +22,10 @@ where
         subcommand: &StartSubCommand,
     ) -> Result<App::Output, App::Error> {
         match subcommand {
-            StartSubCommand::CosmosWithStarknet(args) => {
+            StartSubCommand::StarknetWithCosmos(args) => {
                 <RunStartRelayerCommand<Index<0>, Index<1>>>::run_command(app, args).await
             }
-            StartSubCommand::StarknetWithCosmos(args) => {
+            StartSubCommand::CosmosWithStarknet(args) => {
                 <RunStartRelayerCommand<Index<1>, Index<0>>>::run_command(app, args).await
             }
         }
