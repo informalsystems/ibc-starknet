@@ -436,7 +436,7 @@ pub mod CometClientComponent {
             let host_timestamp = get_block_timestamp();
 
             let consensus_state_status = consensus_state
-                .status(host_timestamp, client_state.trusting_period);
+                .status(host_timestamp, client_state.trusting_period, client_state.max_clock_drift);
 
             if !consensus_state_status.is_active() {
                 return consensus_state_status;

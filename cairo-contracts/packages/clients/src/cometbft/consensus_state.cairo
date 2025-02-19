@@ -31,12 +31,31 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
         maybe_consensus_state.unwrap()
     }
 
-    fn status(self: @CometConsensusState, host_timestamp: u64, trusting_period: u64) -> Status {
-        assert(host_timestamp >= self.timestamp(), CometErrors::INVALID_HEADER_TIMESTAMP);
+    fn status(
+        self: @CometConsensusState, host_timestamp: u64, trusting_period: u64, max_clock_drift: u64,
+    ) -> Status {
+        // Consider `clock_drift` on Starknet with large `block_time`.
+        //
+        // `block_timestamp` is when the sequencer started building the block, which may be in the
+        // past. In that case, without the `clock_drift`, the untrusted consensus state would be
+        // considered from future and fail.
+        //
+        // PS. the following check is always successful once a consensus state is validated and
+        // accepted as trusted. Because the `block_timestamp` is always increasing.
 
-        let elapsed_time = host_timestamp - self.timestamp();
+        let self_timestamp = self.timestamp();
 
-        if elapsed_time < trusting_period {
+        assert(
+            host_timestamp + max_clock_drift >= self_timestamp,
+            CometErrors::INVALID_HEADER_FROM_FUTURE,
+        );
+
+        // The header is in future but within the `max_clock_drift` period.
+        if host_timestamp < self_timestamp {
+            return Status::Active;
+        }
+
+        if host_timestamp - self_timestamp < trusting_period {
             Status::Active
         } else {
             Status::Expired
