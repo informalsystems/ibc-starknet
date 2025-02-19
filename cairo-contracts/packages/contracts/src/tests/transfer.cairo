@@ -134,7 +134,7 @@ fn test_mint_burn_roundtrip() {
     // Assert the `SendEvent` emitted.
     spy.assert_send_event(ics20.address, SN_USER(), CS_USER(), prefixed_denom, transfer_cfg.amount);
 
-    // Assert if the burn happens from the ICS20 address.
+    // Assert if the burn happens by the ICS20 contract.
     spy.assert_transfer_event(erc20.address, SN_USER(), ics20.address, transfer_cfg.amount);
 
     // Check the balance of the sender.
