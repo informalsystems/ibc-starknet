@@ -32,6 +32,7 @@ pub impl EncodeContextImpl of EncodeContextTrait {
     fn new() -> EncodeContext {
         EncodeContext { buffer: "" }
     }
+
     fn encode_field<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Drop<T>>(
         ref self: EncodeContext, field_number: u8, value: @T,
     ) {
@@ -68,6 +69,15 @@ pub impl EncodeContextImpl of EncodeContextTrait {
         }
     }
 
+    /// Performs the Protobuf encoding for an enum field.
+    fn encode_enum<T, +Drop<T>, +Into<T, u32>>(
+        ref self: EncodeContext, field_number: u8, value: T,
+    ) {
+        let value_u32: u32 = value.into();
+        self.encode_field(field_number, @value_u32)
+    }
+
+    /// Performs the Protobuf encoding for a `Oneof` field.
     fn encode_oneof<T, +ProtoOneof<T>, +Drop<T>>(
         ref self: EncodeContext, field_number: u8, value: @T,
     ) {
@@ -167,14 +177,21 @@ pub impl DecodeContextImpl of DecodeContextTrait {
         Option::Some(field)
     }
 
-    fn decode_oneof<T, +ProtoOneof<T>, +Drop<T>>(
+    /// Performs the Protobuf decoding for an enum field.
+    fn decode_enum<T, +Drop<T>, +TryInto<u32, T>>(
         ref self: DecodeContext, field_number: u8,
     ) -> Option<T> {
-        let field_tag = ProtobufTagImpl::decode(self.buffer[self.index]);
-        if field_tag.wire_type != WireType::LengthDelimited {
+        let value: u32 = self.decode_field(field_number)?;
+        value.try_into()
+    }
+
+    /// Performs the Protobuf decoding for a `Oneof` field.
+    fn decode_oneof<T, +ProtoOneof<T>, +Drop<T>>(ref self: DecodeContext) -> Option<T> {
+        let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
+        if tag.wire_type != WireType::LengthDelimited {
             return Option::None;
         }
-        ProtoOneof::<T>::decode_raw(ref self, field_tag.field_number)
+        ProtoOneof::<T>::decode_raw(ref self, tag.field_number)
     }
 
     fn end_branch(ref self: DecodeContext) -> Option<()> {
