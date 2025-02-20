@@ -7,6 +7,11 @@ pub trait ProtoMessage<T> {
     fn wire_type() -> WireType;
 }
 
+pub trait ProtoOneof<T> {
+    fn encode_raw(self: @T, ref context: EncodeContext);
+    fn decode_raw(ref context: DecodeContext, tag: u8) -> Option<T>;
+}
+
 pub fn decode_raw<T, +Drop<T>, +Default<T>, +ProtoMessage<T>>(
     ref context: DecodeContext,
 ) -> Option<T> {
@@ -27,7 +32,6 @@ pub impl EncodeContextImpl of EncodeContextTrait {
     fn new() -> EncodeContext {
         EncodeContext { buffer: "" }
     }
-
     fn encode_field<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Drop<T>>(
         ref self: EncodeContext, field_number: u8, value: @T,
     ) {
@@ -62,6 +66,18 @@ pub impl EncodeContextImpl of EncodeContextTrait {
 
             i += 1;
         }
+    }
+
+    fn encode_oneof<T, +ProtoOneof<T>, +Drop<T>>(
+        ref self: EncodeContext, field_number: u8, value: @T,
+    ) {
+        self
+            .buffer
+            .append_byte(
+                ProtobufTag { field_number, wire_type: WireType::LengthDelimited }.encode(),
+            );
+        self.buffer.len().encode_raw(ref self);
+        value.encode_raw(ref self)
     }
 }
 
@@ -149,6 +165,16 @@ pub impl DecodeContextImpl of DecodeContextTrait {
             return Option::None;
         }
         Option::Some(field)
+    }
+
+    fn decode_oneof<T, +ProtoOneof<T>, +Drop<T>>(
+        ref self: DecodeContext, field_number: u8,
+    ) -> Option<T> {
+        let field_tag = ProtobufTagImpl::decode(self.buffer[self.index]);
+        if field_tag.wire_type != WireType::LengthDelimited {
+            return Option::None;
+        }
+        ProtoOneof::<T>::decode_raw(ref self, field_tag.field_number)
     }
 
     fn end_branch(ref self: DecodeContext) -> Option<()> {
