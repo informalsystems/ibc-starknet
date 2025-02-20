@@ -537,17 +537,25 @@ fn test_public_testnets() -> Result<(), Error> {
                 info!("IBC register client response: {:?}", response);
             }
 
+            // https://lcd.osmotest5.osmosis.zone/cosmos/staking/v1beta1/params
+            // in seconds; 5 days.
+            let osmosis_unbonding_period = 432000;
+
+            // https://docs.starknet.io/chain-info/#current_limits
+            // in seconds.
+            let starknet_block_time = 30;
+
             let starknet_client_id = StarknetToCosmosRelay::create_client(
                 SourceTarget,
                 &starknet_chain,
                 &cosmos_chain,
                 &CosmosCreateClientOptions {
                     // unbonding period is 5 days on osmo-test-5
-                    trusting_period: Duration::from_secs(3 * 24 * 60 * 60),
+                    trusting_period: Duration::from_secs(osmosis_unbonding_period * 2 / 3),
                     // starknet has 30 seconds block time
                     // block timestamp is when the sequencer started building the block
                     // which can be in the past
-                    max_clock_drift: Duration::from_secs(30),
+                    max_clock_drift: Duration::from_secs(starknet_block_time * 2),
 
                     ..Default::default()
                 },
