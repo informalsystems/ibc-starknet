@@ -1,6 +1,7 @@
+use protobuf::types::message::EncodeContextTrait;
 use protobuf::types::message::DecodeContextTrait;
 use protobuf::types::message::{
-    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    ProtoMessage, ProtoOneof, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
     DecodeContextImpl, ProtoName,
 };
 use protobuf::primitives::array::{
@@ -17,11 +18,11 @@ pub struct CommitmentProof {
 
 impl CommitmentProofAsProtoMessage of ProtoMessage<CommitmentProof> {
     fn encode_raw(self: @CommitmentProof, ref context: EncodeContext) {
-        context.encode_field(1, self.proof);
+        context.encode_oneof(1, self.proof)
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<CommitmentProof> {
-        let proof = context.decode_field(1)?;
+        let proof = context.decode_oneof(1)?;
         Option::Some(CommitmentProof { proof })
     }
 
@@ -40,7 +41,7 @@ pub enum Proof {
     NonExist: NonExistenceProof,
 }
 
-impl ProofAsProtoMessage of ProtoMessage<Proof> {
+impl ProofAsProtoOneof of ProtoOneof<Proof> {
     fn encode_raw(self: @Proof, ref context: EncodeContext) {
         match self {
             Proof::Exist(p) => p.encode_raw(ref context),
@@ -48,25 +49,18 @@ impl ProofAsProtoMessage of ProtoMessage<Proof> {
         }
     }
 
-    fn decode_raw(ref context: DecodeContext) -> Option<Proof> {
-        let exist: Option<ExistenceProof> = context.decode_raw();
-        if exist.is_some() {
-            return Option::Some(Proof::Exist(exist.unwrap()));
+    fn decode_raw(ref context: DecodeContext, tag: u8) -> Option<Proof> {
+        if tag == 1 {
+            let proof = context.decode_field(1)?;
+            Option::Some(Proof::Exist(proof))
+        } else if tag == 2 {
+            let proof = context.decode_field(2)?;
+            Option::Some(Proof::NonExist(proof))
+        } else {
+            Option::None
         }
-
-        let non_exist: Option<NonExistenceProof> = context.decode_raw();
-        if non_exist.is_some() {
-            return Option::Some(Proof::NonExist(non_exist.unwrap()));
-        }
-
-        Option::None
-    }
-
-    fn wire_type() -> WireType {
-        WireType::LengthDelimited
     }
 }
-
 
 #[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
 pub struct ExistenceProof {
