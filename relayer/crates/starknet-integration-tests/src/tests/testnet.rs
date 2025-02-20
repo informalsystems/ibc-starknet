@@ -7,7 +7,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
 
-use cgp::core::field::Index;
 use cgp::extra::run::CanRun;
 use cgp::prelude::*;
 use flate2::write::GzEncoder;
@@ -38,14 +37,12 @@ use hermes_cosmos_test_components::chain::types::wallet::CosmosTestWallet;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::Error;
-use hermes_relayer_components::build::traits::builders::chain_builder::CanBuildChain;
 use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapChannel;
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::sleep::CanSleep;
-use hermes_starknet_chain_components::impls::subscription::CanCreateStarknetEventSubscription;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
@@ -155,11 +152,11 @@ where
             Ok(value_str) => match std::fs::write(&self.path, &value_str) {
                 Ok(_) => info!("wrote config to file: {}", self.path),
                 Err(e) => {
-                    eprintln!("failed to write config to file: {:?}", e);
-                    eprintln!("config: {}", value_str);
+                    eprintln!("failed to write config to file: {e:?}");
+                    eprintln!("config: {value_str}");
                 }
             },
-            Err(e) => eprintln!("failed to serialize: {:?}", e),
+            Err(e) => eprintln!("failed to serialize: {e:?}"),
         }
     }
 }
@@ -416,10 +413,7 @@ pub async fn testnet_setup(
         };
 
         let starknet_chain: StarknetChain = starknet_builder
-            .build_chain(
-                PhantomData::<Index<0>>,
-                &STARKNET_TESTNET_CHAIN_ID.to_string().parse()?,
-            )
+            .build_chain(&STARKNET_TESTNET_CHAIN_ID.to_string().parse()?)
             .await
             .map_err(|e| eyre::eyre!("failed to build starknet chain: {:?}", e))?;
 
@@ -432,7 +426,8 @@ pub async fn testnet_setup(
         );
 
         let cosmos_chain: CosmosChain = starknet_builder
-            .build_chain(PhantomData::<Index<1>>, &OSMOSIS_TESTNET_CHAIN_ID.parse()?)
+            .cosmos_builder
+            .build_chain(&OSMOSIS_TESTNET_CHAIN_ID.parse()?)
             .await?;
 
         info!(
@@ -549,6 +544,10 @@ fn test_public_testnets() -> Result<(), Error> {
                 &CosmosCreateClientOptions {
                     // unbonding period is 5 days on osmo-test-5
                     trusting_period: Duration::from_secs(3 * 24 * 60 * 60),
+                    // starknet has 30 seconds block time
+                    // block timestamp is when the sequencer started building the block
+                    // which can be in the past
+                    max_clock_drift: Duration::from_secs(30),
 
                     ..Default::default()
                 },
@@ -606,12 +605,6 @@ fn test_public_testnets() -> Result<(), Error> {
             &client_state_on_cosmos.client_state.chain_id,
             starknet_chain.chain_id()
         );
-
-        starknet_chain.event_subscription =
-            Some(starknet_chain.clone().create_starknet_event_subscription(
-                starknet_chain.query_chain_height().await? - 5,
-                ibc_core_address,
-            ));
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
             runtime.clone(),
