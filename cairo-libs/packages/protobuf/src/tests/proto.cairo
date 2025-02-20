@@ -1,7 +1,7 @@
 use super::super::types::message::DecodeContextTrait;
 use protobuf::types::message::{
-    ProtoMessage, ProtoName, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl,
+    EncodeContextImpl, DecodeContextImpl, ProtoMessage, ProtoName, ProtoCodecImpl, EncodeContext,
+    DecodeContext,
 };
 use protobuf::types::wkt::Any;
 use protobuf::types::tag::WireType;
@@ -49,25 +49,22 @@ enum ValidatorType {
     Light,
 }
 
-impl ValidatorAsProtoMessage of ProtoMessage<ValidatorType> {
-    fn encode_raw(self: @ValidatorType, ref context: EncodeContext) {
+pub impl ValidatorTypeIntoU32 of Into<@ValidatorType, u32> {
+    fn into(self: @ValidatorType) -> u32 {
         match self {
-            ValidatorType::Full => 0_u32.encode_raw(ref context),
-            ValidatorType::Light => 1_u32.encode_raw(ref context),
+            ValidatorType::Full => 0,
+            ValidatorType::Light => 1,
         }
     }
+}
 
-    fn decode_raw(ref context: DecodeContext) -> Option<ValidatorType> {
-        let var: u32 = context.decode_raw()?;
-        match var {
+pub impl u32TryIntoValidatorType of TryInto<u32, ValidatorType> {
+    fn try_into(self: u32) -> Option<ValidatorType> {
+        match self {
             0 => Option::Some(ValidatorType::Full),
             1 => Option::Some(ValidatorType::Light),
             _ => Option::None,
         }
-    }
-
-    fn wire_type() -> WireType {
-        WireType::Varint
     }
 }
 
@@ -93,7 +90,7 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
         context.encode_field(5, self.hash);
         context.encode_field(6, self.indexes);
         context.encode_field(7, self.proposer);
-        context.encode_field(8, self.validator_type);
+        context.encode_enum(8, self.validator_type);
         context.encode_repeated_field(9, self.proposers);
     }
 
@@ -105,7 +102,7 @@ impl TmHeaderAsProtoMessage of ProtoMessage<TmHeader> {
         let hash = context.decode_field(5)?;
         let indexes = context.decode_field(6)?;
         let proposer = context.decode_field(7)?;
-        let validator_type = context.decode_field(8)?;
+        let validator_type = context.decode_enum(8)?;
         let proposers = context.decode_repeated_field(9)?;
         Option::Some(
             TmHeader {
