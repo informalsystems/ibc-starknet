@@ -64,6 +64,7 @@ fn test_erc20_transfer() -> Result<(), Error> {
             let deploy_message = DeployErc20TokenMessage {
                 name: "token".into(),
                 symbol: "token".into(),
+                decimals: 18,
                 fixed_supply: 1000u32.into(),
                 recipient: relayer_address,
                 owner: relayer_address,

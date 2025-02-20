@@ -7,7 +7,8 @@ use starknet_ibc_core::commitment::{Commitment, compute_packet_commitment};
 use starknet_ibc_testkit::dummies::{TIMEOUT_HEIGHT, TIMEOUT_TIMESTAMP};
 
 pub const SUPPLY: u256 = 2000;
-pub const DECIMALS: u8 = 18_u8;
+pub const DECIMALS_18: u8 = 18_u8;
+pub const DECIMAL_ZERO: u8 = 0_u8;
 pub const AMOUNT: u256 = 100;
 pub const SALT: felt252 = 'SALT';
 

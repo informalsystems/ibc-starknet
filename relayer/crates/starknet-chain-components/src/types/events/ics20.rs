@@ -70,6 +70,7 @@ pub struct TimeoutIbcTransferEvent {
 pub struct CreateIbcTokenEvent {
     pub name: String,
     pub symbol: String,
+    pub decimals: u8,
     pub address: StarknetAddress,
     pub initial_supply: U256,
 }
@@ -291,7 +292,7 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, Product![String, String, StarknetAddress]>
+        + CanDecode<ViaCairo, Product![String, String, u8, StarknetAddress]>
         + CanDecode<ViaCairo, Product![U256]>,
 {
     fn decode(
@@ -300,7 +301,7 @@ where
     ) -> Result<CreateIbcTokenEvent, EventEncoding::Error> {
         let cairo_encoding = event_encoding.encoding();
 
-        let product![name, symbol, address] = cairo_encoding
+        let product![name, symbol, decimals, address] = cairo_encoding
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
@@ -311,6 +312,7 @@ where
         Ok(CreateIbcTokenEvent {
             name,
             symbol,
+            decimals,
             address,
             initial_supply,
         })
