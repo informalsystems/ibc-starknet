@@ -78,14 +78,15 @@ use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 use toml::to_string_pretty;
 
+use crate::commands::all::{AllSubCommands, RunAllSubCommand};
 use crate::commands::create::subcommand::{CreateSubCommand, RunCreateSubCommand};
 use crate::commands::query::subcommand::{QuerySubCommand, RunQuerySubCommand};
+use crate::commands::start::{RunStartSubCommand, StartSubCommand};
 use crate::commands::update::subcommand::{RunUpdateSubCommand, UpdateSubCommand};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
 use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::impls::build::LoadStarknetBuilder;
 use crate::impls::error::ProvideCliError;
-use crate::impls::subcommand::{AllSubCommands, RunAllSubCommand};
 
 #[cgp_context(StarknetAppComponents)]
 #[derive(HasField)]
@@ -179,7 +180,8 @@ delegate_components! {
         AllSubCommands: RunAllSubCommand,
         BootstrapSubCommand: RunBootstrapSubCommand,
 
-        StartRelayerArgs: RunStartRelayerCommand,
+        StartRelayerArgs: RunStartRelayerCommand<Index<0>, Index<1>>,
+        StartSubCommand: RunStartSubCommand,
 
         QuerySubCommand: RunQuerySubCommand,
         QueryClientStateArgs: RunQueryClientStateCommand,
@@ -314,6 +316,7 @@ pub trait CanUseStarknetApp:
     + CanRunCommand<UpdateClientArgs>
     + CanRunCommand<CreateClientArgs>
     + CanRunCommand<StartRelayerArgs>
+    + CanUseComponent<CommandRunnerComponent, StartSubCommand>
 {
 }
 

@@ -40,7 +40,8 @@ use starknet::signers::{LocalWallet, SigningKey};
 use url::Url;
 
 use super::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use crate::contexts::birelay::StarknetCosmosBiRelay;
+use crate::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
+use crate::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
 use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 
 #[cgp_context(StarknetBuildComponents)]
@@ -87,6 +88,7 @@ delegate_components! {
         RelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
         RelayTypeAtComponent<Index<1>, Index<0>>: WithType<CosmosToStarknetRelay>,
         BiRelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetCosmosBiRelay>,
+        BiRelayTypeAtComponent<Index<1>, Index<0>>: WithType<CosmosStarknetBiRelay>,
     }
 }
 
@@ -141,6 +143,44 @@ impl BiRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildCompon
         );
 
         let birelay = StarknetCosmosBiRelay {
+            runtime: build.runtime.clone(),
+            relay_a_to_b,
+            relay_b_to_a,
+        };
+
+        Ok(birelay)
+    }
+}
+
+#[cgp_provider(BiRelayBuilderComponent)]
+impl BiRelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildComponents {
+    async fn build_birelay(
+        build: &StarknetBuilder,
+        chain_id_a: &ChainId,
+        chain_id_b: &ChainId,
+        client_id_a: &ClientId,
+        client_id_b: &ClientId,
+    ) -> Result<CosmosStarknetBiRelay, HermesError> {
+        let starknet_chain = build.build_chain(chain_id_a).await?;
+        let cosmos_chain = build.cosmos_builder.build_chain(chain_id_b).await?;
+
+        let relay_a_to_b = CosmosToStarknetRelay::new(
+            build.runtime.clone(),
+            cosmos_chain.clone(),
+            starknet_chain.clone(),
+            client_id_b.clone(),
+            client_id_a.clone(),
+        );
+
+        let relay_b_to_a = StarknetToCosmosRelay::new(
+            build.runtime.clone(),
+            starknet_chain,
+            cosmos_chain,
+            client_id_a.clone(),
+            client_id_b.clone(),
+        );
+
+        let birelay = CosmosStarknetBiRelay {
             runtime: build.runtime.clone(),
             relay_a_to_b,
             relay_b_to_a,

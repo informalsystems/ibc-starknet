@@ -1,4 +1,4 @@
-#![recursion_limit = "256"]
+#![recursion_limit = "512"]
 
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -7,8 +7,8 @@ use clap::Parser;
 use eyre::{eyre, Error};
 use hermes_cli_components::traits::command::CanRunCommand;
 use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_starknet_cli::commands::all::AllSubCommands;
 use hermes_starknet_cli::contexts::app::StarknetApp;
-use hermes_starknet_cli::impls::subcommand::AllSubCommands;
 use tokio::runtime::Builder;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::layer::SubscriberExt;

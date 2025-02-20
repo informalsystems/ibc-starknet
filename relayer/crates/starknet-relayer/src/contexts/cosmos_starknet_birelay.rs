@@ -6,8 +6,8 @@ use cgp::extra::run::RunnerComponent;
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::impls::ProvideHermesError;
-use hermes_relayer_components::birelay::traits::two_way::{
-    TwoWayRelayGetter, TwoWayRelayGetterComponent,
+use hermes_relayer_components::birelay::traits::{
+    AutoBiRelayerComponent, TwoWayRelayGetter, TwoWayRelayGetterComponent,
 };
 use hermes_relayer_components::components::default::birelay::{
     DefaultBiRelayComponents, IsDefaultBiRelayComponents,
@@ -26,10 +26,10 @@ use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 
 #[cgp_context(StarknetCosmosBiRelayComponents: DefaultBiRelayComponents)]
 #[derive(Clone, HasField)]
-pub struct StarknetCosmosBiRelay {
+pub struct CosmosStarknetBiRelay {
     pub runtime: HermesRuntime,
-    pub relay_a_to_b: StarknetToCosmosRelay,
-    pub relay_b_to_a: CosmosToStarknetRelay,
+    pub relay_a_to_b: CosmosToStarknetRelay,
+    pub relay_b_to_a: StarknetToCosmosRelay,
 }
 
 delegate_components! {
@@ -38,24 +38,27 @@ delegate_components! {
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
-        ChainTypeAtComponent<Index<0>>: WithType<StarknetChain>,
-        ChainTypeAtComponent<Index<1>>: WithType<CosmosChain>,
-        RelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
-        RelayTypeAtComponent<Index<1>, Index<0>>: WithType<CosmosToStarknetRelay>,
+        ChainTypeAtComponent<Index<0>>: WithType<CosmosChain>,
+        ChainTypeAtComponent<Index<1>>: WithType<StarknetChain>,
+        RelayTypeAtComponent<Index<0>, Index<1>>: WithType<CosmosToStarknetRelay>,
+        RelayTypeAtComponent<Index<1>, Index<0>>: WithType<StarknetToCosmosRelay>,
     }
 }
 
 #[cgp_provider(TwoWayRelayGetterComponent)]
-impl TwoWayRelayGetter<StarknetCosmosBiRelay> for StarknetCosmosBiRelayComponents {
-    fn relay_a_to_b(birelay: &StarknetCosmosBiRelay) -> &StarknetToCosmosRelay {
+impl TwoWayRelayGetter<CosmosStarknetBiRelay> for StarknetCosmosBiRelayComponents {
+    fn relay_a_to_b(birelay: &CosmosStarknetBiRelay) -> &CosmosToStarknetRelay {
         &birelay.relay_a_to_b
     }
 
-    fn relay_b_to_a(birelay: &StarknetCosmosBiRelay) -> &CosmosToStarknetRelay {
+    fn relay_b_to_a(birelay: &CosmosStarknetBiRelay) -> &StarknetToCosmosRelay {
         &birelay.relay_b_to_a
     }
 }
 
-pub trait CanUseCosmosStarnetBiRelay: CanUseComponent<RunnerComponent> {}
+pub trait CanUseCosmosStarnetBiRelay:
+    CanUseComponent<RunnerComponent> + CanUseComponent<AutoBiRelayerComponent>
+{
+}
 
-impl CanUseCosmosStarnetBiRelay for StarknetCosmosBiRelay {}
+impl CanUseCosmosStarnetBiRelay for CosmosStarknetBiRelay {}

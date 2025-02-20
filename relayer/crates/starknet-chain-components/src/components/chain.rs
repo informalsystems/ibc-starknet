@@ -79,7 +79,6 @@ mod preset {
     use crate::impls::queries::contract_address::GetContractAddressFromField;
     use crate::impls::queries::counterparty_chain_id::QueryCosmosChainIdFromStarknetChannelId;
     use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
-    use crate::impls::queries::packet_is_cleared::QueryStarknetPacketIsCleared;
     use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
     use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
     use crate::impls::queries::status::QueryStarknetChainStatus;
@@ -130,6 +129,7 @@ mod preset {
                 HeightTypeComponent,
                 HeightFieldComponent,
                 HeightIncrementerComponent,
+                HeightAdjusterComponent,
             ]:
                 ProvideStarknetHeight,
             ChainStatusTypeComponent:
@@ -404,7 +404,7 @@ mod preset {
             PacketIsReceivedQuerierComponent:
                 QueryPacketIsReceivedOnStarknet,
             PacketIsClearedQuerierComponent:
-                QueryStarknetPacketIsCleared,
+                QueryClearedPacketWithEmptyCommitment,
         }
     }
 }
