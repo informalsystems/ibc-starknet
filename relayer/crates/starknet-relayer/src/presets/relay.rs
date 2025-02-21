@@ -7,9 +7,9 @@ mod preset {
     use cgp::prelude::*;
     use hermes_cosmos_relayer::contexts::chain::CosmosChain;
     use hermes_error::impls::ProvideHermesError;
-    use hermes_logger::ProvideHermesLogger;
+    use hermes_logger::UseHermesLogger;
     use hermes_logging_components::traits::has_logger::{
-        GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeComponent,
+        GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
     };
     use hermes_relayer_components::components::default::relay::*;
     use hermes_relayer_components::multi::traits::chain_at::{
@@ -34,11 +34,11 @@ mod preset {
                     RuntimeTypeProviderComponent: WithType<HermesRuntime>,
                     RuntimeGetterComponent: WithField<symbol!("runtime")>,
                     [
-                        LoggerTypeComponent,
+                        LoggerTypeProviderComponent,
                         LoggerGetterComponent,
                         GlobalLoggerGetterComponent,
                     ]:
-                        ProvideHermesLogger,
+                        UseHermesLogger,
                     ChainTypeAtComponent<Index<0>>: WithType<CosmosChain>,
                     ChainTypeAtComponent<Index<1>>: WithType<StarknetChain>,
                     ChainGetterAtComponent<Index<0>>:

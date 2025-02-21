@@ -6,26 +6,16 @@ use std::sync::Arc;
 use clap::Parser;
 use eyre::{eyre, Error};
 use hermes_cli_components::traits::command::CanRunCommand;
+use hermes_logger::subscriber::init_tracing_subscriber;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_cli::commands::all::AllSubCommands;
 use hermes_starknet_cli::contexts::app::StarknetApp;
 use tokio::runtime::Builder;
-use tracing::level_filters::LevelFilter;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::{fmt, EnvFilter};
 
 fn main() {
     let _ = stable_eyre::install();
 
-    let env_filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::INFO.into())
-        .from_env_lossy();
-
-    tracing_subscriber::registry()
-        .with(fmt::layer())
-        .with(env_filter)
-        .init();
+    init_tracing_subscriber();
 
     let res = run_main();
 
@@ -68,20 +58,4 @@ pub fn run_main() -> Result<(), Error> {
     })?;
 
     Ok(())
-}
-
-pub fn install_logger() {
-    use tracing::level_filters::LevelFilter;
-    use tracing_subscriber::layer::SubscriberExt;
-    use tracing_subscriber::util::SubscriberInitExt;
-    use tracing_subscriber::{fmt, registry, EnvFilter};
-
-    // Use log level INFO by default if RUST_LOG is not set.
-    let env_filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::INFO.into())
-        .from_env_lossy();
-
-    let fmt_layer = fmt::layer().with_ansi(true).with_target(false).compact();
-
-    registry().with(env_filter).with(fmt_layer).init();
 }

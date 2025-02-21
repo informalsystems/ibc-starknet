@@ -23,9 +23,9 @@ use hermes_encoding_components::traits::has_encoding::{
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::ProvideHermesError;
-use hermes_logger::ProvideHermesLogger;
+use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
+    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
 };
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
@@ -214,11 +214,11 @@ delegate_components! {
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
         [
-            LoggerTypeComponent,
+            LoggerTypeProviderComponent,
             LoggerGetterComponent,
             GlobalLoggerGetterComponent,
         ]:
-            ProvideHermesLogger,
+            UseHermesLogger,
         [
             StarknetProviderTypeComponent,
             StarknetProviderGetterComponent,
