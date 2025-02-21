@@ -70,6 +70,14 @@ pub impl EncodeContextImpl of EncodeContextTrait {
         }
     }
 
+    fn encode_optional_field<T, +Drop<T>, +Default<T>, +PartialEq<T>, +ProtoMessage<T>>(
+        ref self: EncodeContext, field_number: u8, value: @Option<T>,
+    ) {
+        if let Option::Some(v) = value {
+            self.encode_field(field_number, v);
+        }
+    }
+
     /// Performs the Protobuf encoding for an enum field.
     fn encode_enum<T, +Drop<T>, +Into<T, u32>>(
         ref self: EncodeContext, field_number: u8, value: T,
@@ -174,6 +182,16 @@ pub impl DecodeContextImpl of DecodeContextTrait {
             return Option::None;
         }
         Option::Some(field)
+    }
+
+    fn decode_optional_field<T, +Drop<T>, +Default<T>, +PartialEq<T>, +ProtoMessage<T>>(
+        ref self: DecodeContext, field_number: u8,
+    ) -> Option<T> {
+        let value = self.decode_field(field_number)?;
+        if value == Default::default() {
+            return Option::None;
+        }
+        Option::Some(value)
     }
 
     /// Performs the Protobuf decoding for an enum field.

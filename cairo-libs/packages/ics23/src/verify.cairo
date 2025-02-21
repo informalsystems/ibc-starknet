@@ -11,6 +11,7 @@ pub fn verify_membership(
     root: RootBytes,
     keys: Array<KeyBytes>,
     value: ValueBytes,
+    index: u32,
 ) {
     let proofs_len = proofs.len();
     assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
@@ -20,7 +21,7 @@ pub fn verify_membership(
     assert(proofs_len == keys.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
     let mut subroot = [0; 8];
     let mut subvalue = value;
-    let mut i = 0;
+    let mut i = index;
     while i < proofs_len {
         if let Proof::Exist(p) = proofs[i] {
             subroot = p.calculate_root();
@@ -43,20 +44,18 @@ pub fn verify_non_membership(
     assert(proofs_len == specs.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
     assert(proofs_len == keys.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
     let mut subroot = [0; 8];
-    let mut i = 0;
-    while i < proofs_len {
-        if let Proof::NonExist(p) = proofs[i] {
-            subroot = p.calculate_root();
-            verify_non_existence(specs[i], p, @subroot, keys[proofs_len - 1 - i]);
 
-            verify_membership(
-                specs.clone(), proofs, root, keys.clone(), subroot.into(),
-            ) // TODO: add start_index
-        } else {
-            panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
-        }
-        i += 1;
-    };
+    // verify the absence of key in lowest subtree
+    let proof = proofs[0];
+    let spec = specs[0];
+    let key = keys[proofs_len - 1];
+    if let Proof::NonExist(p) = proof {
+        subroot = p.calculate_root();
+        verify_non_existence(spec, p, @subroot, key.clone());
+        verify_membership(specs.clone(), proofs, root, keys.clone(), subroot.into(), 1)
+    } else {
+        panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
+    }
 }
 
 pub fn verify_existence(
@@ -70,8 +69,16 @@ pub fn verify_existence(
 }
 
 pub fn verify_non_existence(
-    spec: @ProofSpec, proof: @NonExistenceProof, root: @RootBytes, key: @KeyBytes,
-) {}
+    spec: @ProofSpec, proof: @NonExistenceProof, root: @RootBytes, key: KeyBytes,
+) {
+    if let Option::Some(left) = proof.left {
+        verify_existence(spec, left, root, left.key, left.value);
+    } else if let Option::Some(right) = proof.right {
+        verify_existence(spec, right, root, right.key, right.value);
+    } else {
+        panic!("{}", ICS23Errors::MISSING_EXISTENCE_PROOFS);
+    }
+}
 
 fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {
     if spec.is_iavl() {

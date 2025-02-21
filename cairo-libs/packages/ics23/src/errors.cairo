@@ -4,6 +4,7 @@ pub mod ICS23Errors {
     pub const MISSING_VALUE: felt252 = 'ICS23: missing value';
     pub const MISSING_LEAF_DATA: felt252 = 'ICS23: missing leaf data';
     pub const MISSING_CHILD_HASH: felt252 = 'ICS23: missing child hash';
+    pub const MISSING_EXISTENCE_PROOFS: felt252 = 'ICS23: missing existence proofs';
     pub const MISMATCHED_KEY: felt252 = 'ICS23: mismatched key';
     pub const MISMATCHED_VALUE: felt252 = 'ICS23: mismatched value';
     pub const MISMATCHED_ROOT: felt252 = 'ICS23: mismatched root';

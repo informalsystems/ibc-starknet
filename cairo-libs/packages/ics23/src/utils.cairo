@@ -27,7 +27,6 @@ pub fn array_u8_into_array_u32(input: Array<u8>) -> (Array<u32>, u32, u32) {
     (result, last_word, last_word_len)
 }
 
-
 pub fn byte_array_to_slice_u32(input: ByteArray) -> [u32; 8] {
     let (b, word, word_len) = input.into_array_u32();
     assert(word == 0 && word_len == 0, 'invalid byte array');

@@ -7,9 +7,9 @@ use protobuf::primitives::array::{
 };
 use protobuf::primitives::numeric::{I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::{WireType, ProtobufTag};
-use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, iavl_spec};
+use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, iavl_spec, hash_u32_array};
 
-#[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct CommitmentProof {
     pub proof: Proof,
 }
@@ -32,7 +32,7 @@ impl CommitmentProofAsProtoMessage of ProtoMessage<CommitmentProof> {
 /// Contains nested proof types within a commitment proof. It currently supports
 /// existence and non-existence proofs to meet the core requirements of IBC. Batch
 /// and compressed proofs can be added in the future if necessary.
-#[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub enum Proof {
     #[default]
     Exist: ExistenceProof,
@@ -132,35 +132,37 @@ impl ExistenceProofAsProtoName of ProtoName<ExistenceProof> {
     }
 }
 
-#[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct NonExistenceProof {
     pub key: Array<u8>,
-    pub left: ExistenceProof,
-    pub right: ExistenceProof,
+    pub left: Option<ExistenceProof>,
+    pub right: Option<ExistenceProof>,
 }
 
 #[generate_trait]
 pub impl NonExistenceProofImpl of NonExistenceProofTrait {
     fn calculate_root(self: @NonExistenceProof) -> RootBytes {
-        self.calculate_root_for_spec(Option::None)
-    }
-
-    fn calculate_root_for_spec(self: @NonExistenceProof, spec: Option<ProofSpec>) -> RootBytes {
-        [0; 8]
+        if let Option::Some(left) = self.left {
+            left.calculate_root()
+        } else if let Option::Some(right) = self.right {
+            right.calculate_root()
+        } else {
+            panic!("{}", ICS23Errors::MISSING_EXISTENCE_PROOFS)
+        }
     }
 }
 
 impl NonExistenceProofAsProtoMessage of ProtoMessage<NonExistenceProof> {
     fn encode_raw(self: @NonExistenceProof, ref context: EncodeContext) {
         context.encode_field(1, self.key);
-        context.encode_field(2, self.left);
-        context.encode_field(3, self.right);
+        context.encode_optional_field(2, self.left);
+        context.encode_optional_field(3, self.right);
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<NonExistenceProof> {
         let key = context.decode_field(1)?;
-        let left = context.decode_field(2)?;
-        let right = context.decode_field(3)?;
+        let left = context.decode_optional_field(2);
+        let right = context.decode_optional_field(3);
         Option::Some(NonExistenceProof { key, left, right })
     }
 
@@ -362,6 +364,13 @@ pub impl ProofSpecImpl of ProofSpecTrait {
     fn is_iavl(self: @ProofSpec) -> bool {
         let iavl_spec = iavl_spec();
         @iavl_spec.leaf_spec == self.leaf_spec && @iavl_spec.inner_spec == self.inner_spec
+    }
+
+    fn key_for_comparison(self: @ProofSpec, key: Array<u8>) -> Array<u8> {
+        match self.prehash_key_before_comparison {
+            true => hash_u32_array(self.leaf_spec.prehash_key, key),
+            false => key,
+        }
     }
 }
 
