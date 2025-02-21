@@ -13,10 +13,10 @@ use protobuf::types::message::ProtoCodecImpl;
 use protobuf::hex::decode as decode_hex_byte_array;
 
 fn encoding_roundtrip_fixture(proof: @ByteArray) {
-    let serialized = decode_hex_byte_array(proof);
-    let decoded = ProtoCodecImpl::decode::<CommitmentProof>(@serialized).unwrap();
+    let proof_bytes = decode_hex_byte_array(proof);
+    let decoded = ProtoCodecImpl::decode::<CommitmentProof>(@proof_bytes).unwrap();
     let encoded = ProtoCodecImpl::encode(@decoded);
-    assert_eq!(serialized, encoded);
+    assert_eq!(proof_bytes, encoded);
 }
 
 fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
