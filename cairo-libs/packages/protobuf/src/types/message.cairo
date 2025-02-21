@@ -187,9 +187,6 @@ pub impl DecodeContextImpl of DecodeContextTrait {
     /// Performs the Protobuf decoding for a `Oneof` field.
     fn decode_oneof<T, +ProtoOneof<T>, +Drop<T>>(ref self: DecodeContext) -> Option<T> {
         let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
-        if tag.wire_type != WireType::LengthDelimited {
-            self.index += 1;
-        }
         let value = ProtoOneof::<T>::decode_raw(ref self, tag.field_number)?;
         Option::Some(value)
     }

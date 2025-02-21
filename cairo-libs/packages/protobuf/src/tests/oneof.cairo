@@ -51,10 +51,10 @@ pub impl BasicOneofAsProtoOneof of ProtoOneof<BasicOneof> {
 
     fn decode_raw(ref context: DecodeContext, tag: u8) -> Option<BasicOneof> {
         if tag == 1 {
-            let value = context.decode_raw()?;
+            let value = context.decode_field(1)?;
             Option::Some(BasicOneof::Int(value))
         } else if tag == 2 {
-            let value = context.decode_raw()?;
+            let value = context.decode_field(2)?;
             Option::Some(BasicOneof::String(value))
         } else {
             Option::None
@@ -75,7 +75,7 @@ fn test_oneof_roundtrip() {
     oneof_roundtrip_fixture(BasicOneof::Int(0));
     oneof_roundtrip_fixture(BasicOneof::Int(1));
     oneof_roundtrip_fixture(BasicOneof::Int(18446744073709551615));
-    // oneof_roundtrip_fixture(BasicOneof::String(""));
-// oneof_roundtrip_fixture(BasicOneof::String("0"));
-// oneof_roundtrip_fixture(BasicOneof::String("0x123456789abcdef"));
+    oneof_roundtrip_fixture(BasicOneof::String(""));
+    oneof_roundtrip_fixture(BasicOneof::String("0"));
+    oneof_roundtrip_fixture(BasicOneof::String("0x123456789abcdef"));
 }

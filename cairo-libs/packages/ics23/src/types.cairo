@@ -1,8 +1,6 @@
-use protobuf::types::message::EncodeContextTrait;
-use protobuf::types::message::DecodeContextTrait;
 use protobuf::types::message::{
     ProtoMessage, ProtoOneof, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName,
+    DecodeContextImpl, ProtoName, EncodeContextTrait, DecodeContextTrait,
 };
 use protobuf::primitives::array::{
     ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage,
