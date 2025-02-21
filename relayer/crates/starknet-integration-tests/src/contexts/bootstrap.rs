@@ -171,6 +171,8 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
             ibc_core_contract_address: None,
             event_encoding: Default::default(),
             proof_signer,
+            // TODO: Should we always use 200 ms as the poll interval for tests?
+            poll_interval: core::time::Duration::from_millis(200),
         };
 
         let chain_driver = StarknetChainDriver {

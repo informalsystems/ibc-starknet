@@ -28,6 +28,7 @@ hermes-cosmos-chain-components      = { workspace = true }
 hermes-wasm-client-components       = { workspace = true }
 hermes-wasm-encoding-components     = { workspace = true }
 hermes-starknet-chain-components    = { workspace = true }
+hermes-chain-components             = { workspace = true }
 hermes-chain-type-components        = { workspace = true }
 hermes-cairo-encoding-components    = { workspace = true }
 hermes-protobuf-encoding-components = { workspace = true }
