@@ -7,6 +7,7 @@ pub mod errors;
 
 #[cfg(test)]
 mod tests {
+    mod oneof;
     mod proto;
     mod varint;
 }
