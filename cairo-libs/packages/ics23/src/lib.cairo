@@ -26,4 +26,4 @@ pub use utils::{
     encode_hex, decode_hex,
 };
 pub use verify::{verify_membership, verify_non_membership, verify_existence, verify_non_existence};
-pub(crate) use ops::{apply_inner, apply_leaf};
+pub(crate) use ops::{apply_inner, apply_leaf, hash_u32_array};
