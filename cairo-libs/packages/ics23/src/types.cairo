@@ -44,24 +44,28 @@ impl ProofAsProtoOneof of ProtoOneof<Proof> {
         match self {
             Proof::Exist(p) => {
                 p.encode_raw(ref context);
-                ProtobufTag {
-                    field_number: 1, wire_type: ProtoMessage::<ExistenceProof>::wire_type(),
-                }
+                let wire_type = ProtoMessage::<ExistenceProof>::wire_type();
+                ProtobufTag { field_number: 1, wire_type }
             },
             Proof::NonExist(p) => {
                 p.encode_raw(ref context);
-                ProtobufTag {
-                    field_number: 2, wire_type: ProtoMessage::<NonExistenceProof>::wire_type(),
-                }
+                let wire_type = ProtoMessage::<NonExistenceProof>::wire_type();
+                ProtobufTag { field_number: 2, wire_type }
             },
         }
     }
 
-    fn decode_raw(ref context: DecodeContext, tag: u8) -> Option<Proof> {
-        if tag == 1 {
+    fn decode_raw(ref context: DecodeContext, tag: ProtobufTag) -> Option<Proof> {
+        if tag.field_number == 1 {
+            if tag.wire_type != ProtoMessage::<ExistenceProof>::wire_type() {
+                return Option::None;
+            }
             let proof = context.decode_field(1)?;
             Option::Some(Proof::Exist(proof))
-        } else if tag == 2 {
+        } else if tag.field_number == 2 {
+            if tag.wire_type != ProtoMessage::<NonExistenceProof>::wire_type() {
+                return Option::None;
+            }
             let proof = context.decode_field(2)?;
             Option::Some(Proof::NonExist(proof))
         } else {
