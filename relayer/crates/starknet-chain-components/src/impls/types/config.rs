@@ -1,3 +1,5 @@
+use core::time::Duration;
+
 use hermes_cosmos_chain_components::impls::types::config::CosmosChainConfig;
 use serde::{Deserialize, Serialize};
 
@@ -13,4 +15,6 @@ pub struct StarknetRelayerConfig {
 pub struct StarknetChainConfig {
     pub json_rpc_url: String,
     pub relayer_wallet: StarknetWallet,
+    #[serde(with = "humantime_serde")]
+    pub poll_interval: Duration,
 }
