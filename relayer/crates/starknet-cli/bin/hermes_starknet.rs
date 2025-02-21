@@ -59,19 +59,3 @@ pub fn run_main() -> Result<(), Error> {
 
     Ok(())
 }
-
-pub fn install_logger() {
-    use tracing::level_filters::LevelFilter;
-    use tracing_subscriber::layer::SubscriberExt;
-    use tracing_subscriber::util::SubscriberInitExt;
-    use tracing_subscriber::{fmt, registry, EnvFilter};
-
-    // Use log level INFO by default if RUST_LOG is not set.
-    let env_filter = EnvFilter::builder()
-        .with_default_directive(LevelFilter::INFO.into())
-        .from_env_lossy();
-
-    let fmt_layer = fmt::layer().with_ansi(true).with_target(false).compact();
-
-    registry().with(env_filter).with(fmt_layer).init();
-}
