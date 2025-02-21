@@ -126,7 +126,9 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
 
         logger
             .log(
-                "Arguments to send transaction using `starkli invoke` are: {call_data_str}",
+                &format!(
+                    "Arguments to send transaction using `starkli invoke` are: {call_data_str}"
+                ),
                 &LevelInfo,
             )
             .await;

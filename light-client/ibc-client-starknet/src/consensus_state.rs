@@ -10,7 +10,7 @@ use prost_types::Any as ProstAny;
 use crate::encoding::context::StarknetLightClientEncoding;
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Clone, Debug, PartialEq, derive_more::From)]
+#[derive(Clone, Debug, PartialEq, Eq, derive_more::From)]
 pub struct ConsensusState(pub ConsensusStateType);
 
 impl Protobuf<Any> for ConsensusState {}
