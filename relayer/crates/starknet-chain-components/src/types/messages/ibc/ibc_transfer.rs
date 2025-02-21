@@ -9,7 +9,7 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
-use starknet::core::types::{Felt, U256};
+use starknet::core::types::U256;
 
 use super::channel::PortId;
 use crate::impls::types::address::StarknetAddress;
@@ -120,23 +120,23 @@ delegate_components! {
 
 impl TransformerRef for EncodeParticipant {
     type From = Participant;
-    type To<'a> = Sum![Felt, &'a String];
+    type To<'a> = Sum![StarknetAddress, &'a String];
 
-    fn transform<'a>(from: &'a Participant) -> Sum![Felt, &'a String] {
+    fn transform<'a>(from: &'a Participant) -> Sum![StarknetAddress, &'a String] {
         match from {
-            Participant::Native(address) => Either::Left(**address),
+            Participant::Native(address) => Either::Left(*address),
             Participant::External(address) => Either::Right(Either::Left(address)),
         }
     }
 }
 
 impl Transformer for EncodeParticipant {
-    type From = Sum![Felt, String];
+    type From = Sum![StarknetAddress, String];
     type To = Participant;
 
-    fn transform(value: Sum![Felt, String]) -> Participant {
+    fn transform(value: Sum![StarknetAddress, String]) -> Participant {
         match value {
-            Either::Left(value) => Participant::Native(value.into()),
+            Either::Left(value) => Participant::Native(value),
             Either::Right(Either::Left(value)) => Participant::External(value),
             Either::Right(Either::Right(value)) => match value {},
         }
