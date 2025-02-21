@@ -8,7 +8,7 @@ use protobuf::primitives::array::{
     ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage,
 };
 use protobuf::primitives::numeric::{I32AsProtoMessage, BoolAsProtoMessage};
-use protobuf::types::tag::WireType;
+use protobuf::types::tag::{WireType, ProtobufTag};
 use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, iavl_spec};
 
 #[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
@@ -18,7 +18,7 @@ pub struct CommitmentProof {
 
 impl CommitmentProofAsProtoMessage of ProtoMessage<CommitmentProof> {
     fn encode_raw(self: @CommitmentProof, ref context: EncodeContext) {
-        context.encode_oneof(1, self.proof)
+        context.encode_oneof(self.proof)
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<CommitmentProof> {
@@ -42,10 +42,20 @@ pub enum Proof {
 }
 
 impl ProofAsProtoOneof of ProtoOneof<Proof> {
-    fn encode_raw(self: @Proof, ref context: EncodeContext) {
+    fn encode_raw(self: @Proof, ref context: EncodeContext) -> ProtobufTag {
         match self {
-            Proof::Exist(p) => p.encode_raw(ref context),
-            Proof::NonExist(p) => p.encode_raw(ref context),
+            Proof::Exist(p) => {
+                p.encode_raw(ref context);
+                ProtobufTag {
+                    field_number: 1, wire_type: ProtoMessage::<ExistenceProof>::wire_type(),
+                }
+            },
+            Proof::NonExist(p) => {
+                p.encode_raw(ref context);
+                ProtobufTag {
+                    field_number: 2, wire_type: ProtoMessage::<NonExistenceProof>::wire_type(),
+                }
+            },
         }
     }
 
