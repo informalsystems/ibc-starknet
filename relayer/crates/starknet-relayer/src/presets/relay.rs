@@ -22,10 +22,11 @@ mod preset {
         RuntimeGetterComponent, RuntimeTypeProviderComponent,
     };
     use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+    use DefaultRelayPreset::re_exports::*;
 
     use crate::impls::error::HandleStarknetRelayError;
 
-    with_default_relay_preset! {
+    DefaultRelayPreset::with_components! {
         | Components | {
             cgp_preset! {
                 StarknetCommonRelayContextPreset {
@@ -51,7 +52,7 @@ mod preset {
                         UseField<symbol!("client_id_b")>,
                     PacketMutexGetterComponent:
                         UseField<symbol!("packet_lock_mutex")>,
-                    Components: DefaultRelayPreset,
+                    Components: DefaultRelayPreset::Provider,
                 }
             }
         }

@@ -28,8 +28,8 @@ rust-version = "1.81"
 overflow-checks = true
 
 [workspace.dependencies]
-cgp            = { version = "0.3.1" }
-cgp-error-eyre = { version = "0.3.0" }
+cgp            = { version = "0.4.0" }
+cgp-error-eyre = { version = "0.4.0" }
 
 starknet                    = { version = "0.11.0" }
 starknet-types-core         = { version = "0.1.7" }
@@ -162,34 +162,34 @@ cgp-sync                = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-inner               = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-error-eyre          = { git = "https://github.com/contextgeneric/cgp.git" }
 
-hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-relayer-components-extra      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-runtime-components            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-async-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-tokio-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-runtime                       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-error                         = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-encoding-components           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-logger                        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cosmos-encoding-components    = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cosmos-integration-tests      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-comet-light-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-comet-light-client-context    = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-wasm-test-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-wasm-client-components        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-wasm-encoding-components      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cli-components                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cli                           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cli-framework                 = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-relayer-components-extra      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-runtime-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-async-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-tokio-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-runtime                       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-error                         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-encoding-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-logger                        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-cosmos-encoding-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-cosmos-integration-tests      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-comet-light-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-comet-light-client-context    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-wasm-test-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-wasm-client-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-wasm-encoding-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-cli-components                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-cli                           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }
+hermes-cli-framework                 = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/preset-module" }

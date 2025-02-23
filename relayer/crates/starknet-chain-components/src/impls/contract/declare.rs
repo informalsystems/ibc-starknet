@@ -14,9 +14,8 @@ use starknet::core::types::contract::{
 use starknet::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
 use starknet::providers::Provider;
 
-use crate::components::chain::ContractDeclarerComponent;
 use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
-use crate::traits::contract::declare::ContractDeclarer;
+use crate::traits::contract::declare::{ContractDeclarer, ContractDeclarerComponent};
 use crate::traits::provider::HasStarknetProvider;
 use crate::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
 use crate::types::tx_response::TxResponse;

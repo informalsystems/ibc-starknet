@@ -13,10 +13,11 @@ use starknet::accounts::Call;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::components::chain::TransferTokenMessageBuilderComponent;
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
-use crate::traits::messages::transfer::TransferTokenMessageBuilder;
+use crate::traits::messages::transfer::{
+    TransferTokenMessageBuilder, TransferTokenMessageBuilderComponent,
+};
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::amount::StarknetAmount;

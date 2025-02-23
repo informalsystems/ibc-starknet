@@ -1,6 +1,7 @@
 use cgp::prelude::*;
-use hermes_cosmos_test_components::bootstrap::components::cosmos_sdk::ChainFullNodeStarterComponent;
-use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::ChainFullNodeStarter;
+use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::{
+    ChainFullNodeStarter, ChainFullNodeStarterComponent,
+};
 use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::HasChainCommandPath;
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;

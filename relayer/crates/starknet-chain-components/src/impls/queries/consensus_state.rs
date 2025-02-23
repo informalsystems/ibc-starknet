@@ -6,15 +6,13 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::consensus_state::{
-    CanQueryConsensusState, ConsensusStateQuerier, ConsensusStateWithProofsQuerier,
+    CanQueryConsensusState, ConsensusStateQuerier, ConsensusStateQuerierComponent,
+    ConsensusStateWithProofsQuerier, ConsensusStateWithProofsQuerierComponent,
 };
 use hermes_chain_components::traits::types::consensus_state::HasConsensusStateType;
 use hermes_chain_components::traits::types::height::{HasHeightFields, HasHeightType};
 use hermes_chain_components::traits::types::ibc::HasClientIdType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_cosmos_chain_components::components::client::{
-    ConsensusStateQuerierComponent, ConsensusStateWithProofsQuerierComponent,
-};
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;

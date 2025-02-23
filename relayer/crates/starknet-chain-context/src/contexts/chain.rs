@@ -16,7 +16,6 @@ use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptio
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientPayload;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_cosmos_relayer::presets::chain::PacketCommitmentQuerierComponent;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
     EncodingTypeComponent, HasDefaultEncoding, ProvideEncodingType,
@@ -87,7 +86,9 @@ use hermes_relayer_components::chain::traits::queries::consensus_state_height::{
 };
 use hermes_relayer_components::chain::traits::queries::counterparty_chain_id::CanQueryCounterpartyChainId;
 use hermes_relayer_components::chain::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
-use hermes_relayer_components::chain::traits::queries::packet_commitment::CanQueryPacketCommitment;
+use hermes_relayer_components::chain::traits::queries::packet_commitment::{
+    CanQueryPacketCommitment, PacketCommitmentQuerierComponent,
+};
 use hermes_relayer_components::chain::traits::queries::packet_is_received::CanQueryPacketIsReceived;
 use hermes_relayer_components::chain::traits::queries::packet_receipt::CanQueryPacketReceipt;
 use hermes_relayer_components::chain::traits::send_message::{
@@ -129,9 +130,7 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_starknet_chain_components::components::chain::{
-    IsStarknetChainComponents, StarknetChainComponents,
-};
+use hermes_starknet_chain_components::components::chain::StarknetChainComponents;
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::proof_signer::GetStarknetProofSignerField;
@@ -241,7 +240,7 @@ delegate_components! {
 
 delegate_components! {
     DelegateCosmosChainComponents {
-        StarknetChain: StarknetToCosmosComponents,
+        StarknetChain: StarknetToCosmosComponents::Provider,
     }
 }
 

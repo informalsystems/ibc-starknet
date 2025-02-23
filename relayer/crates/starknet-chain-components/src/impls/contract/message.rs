@@ -4,10 +4,11 @@ use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
 
-use crate::components::chain::InvokeContractMessageBuilderComponent;
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
-use crate::traits::contract::message::InvokeContractMessageBuilder;
+use crate::traits::contract::message::{
+    InvokeContractMessageBuilder, InvokeContractMessageBuilderComponent,
+};
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 

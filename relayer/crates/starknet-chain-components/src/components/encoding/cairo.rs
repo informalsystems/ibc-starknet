@@ -4,7 +4,7 @@ mod preset {
 
     use cgp::core::component::{UseContext, UseDelegate};
     use cgp::prelude::*;
-    use hermes_cairo_encoding_components::components::encode_mut::*;
+    use hermes_cairo_encoding_components::components::encode_mut::CairoEncodeMutComponents;
     use hermes_cairo_encoding_components::components::encoding::*;
     use hermes_cairo_encoding_components::impls::encode_mut::cons::EncoderCons;
     use hermes_cairo_encoding_components::impls::encode_mut::option::EncodeOption;
@@ -12,10 +12,21 @@ mod preset {
     use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
     use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
     use hermes_cairo_encoding_components::strategy::ViaCairo;
-    use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
+    use hermes_encoding_components::traits::decode::DecoderComponent;
+    use hermes_encoding_components::traits::decode_mut::{
+        DecodeBufferPeekerComponent, MutDecoderComponent,
+    };
+    use hermes_encoding_components::traits::encode::EncoderComponent;
     use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
+    use hermes_encoding_components::traits::types::decode_buffer::{
+        DecodeBufferBuilderComponent, DecodeBufferTypeComponent,
+    };
+    use hermes_encoding_components::traits::types::encode_buffer::{
+        EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
+    };
+    use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent;
     use ibc::core::host::types::identifiers::ChainId;
-    use starknet::core::types::U256;
+    use starknet::core::types::{Felt, U256};
 
     use crate::impls::types::address::{EncodeStarknetAddress, StarknetAddress};
     use crate::types::channel_id::{
@@ -82,7 +93,7 @@ mod preset {
                 DecodeBufferPeekerComponent,
                 EncoderComponent,
                 DecoderComponent,
-            ]: CairoEncodingComponents,
+            ]: CairoEncodingComponents::Provider,
             [
                 MutEncoderComponent,
                 MutDecoderComponent,
@@ -93,11 +104,11 @@ mod preset {
 
     pub struct StarknetEncodeMutComponents;
 
-    with_cairo_encode_mut_components! {
+    CairoEncodeMutComponents::with_components! {
         | Components | {
             delegate_components! {
                 StarknetEncodeMutComponents {
-                    Components: UseDelegate<CairoEncodeMutComponents>,
+                    Components: UseDelegate<CairoEncodeMutComponents::Provider>,
                 }
             }
         }

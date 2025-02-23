@@ -1,7 +1,10 @@
 use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
-use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 pub use ibc::core::host::types::identifiers::ClientId;
 use starknet::core::types::Felt;
 

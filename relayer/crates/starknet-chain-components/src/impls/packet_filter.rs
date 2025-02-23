@@ -1,10 +1,10 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::packet::filter::{IncomingPacketFilter, OutgoingPacketFilter};
+use hermes_chain_components::traits::packet::filter::{
+    IncomingPacketFilter, IncomingPacketFilterComponent, OutgoingPacketFilter,
+    OutgoingPacketFilterComponent,
+};
 use hermes_chain_components::traits::types::packet::{
     HasIncomingPacketType, HasOutgoingPacketType,
-};
-use hermes_cosmos_chain_components::components::client::{
-    IncomingPacketFilterComponent, OutgoingPacketFilterComponent,
 };
 
 pub struct FilterStarknetPackets;

@@ -1,9 +1,10 @@
 use cgp::prelude::*;
-use hermes_cosmos_test_components::chain::components::WalletTypeComponent;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
-use hermes_test_components::chain::traits::types::wallet::ProvideWalletType;
+use hermes_test_components::chain::traits::types::wallet::{
+    ProvideWalletType, WalletTypeComponent,
+};
 
 pub struct ProvideStarknetWalletType;
 

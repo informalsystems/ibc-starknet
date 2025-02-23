@@ -1,8 +1,7 @@
 use cgp::prelude::*;
 use starknet::core::types::Felt;
 
-use crate::components::chain::SelectorTypeComponent;
-use crate::traits::types::method::ProvideSelectorType;
+use crate::traits::types::method::{ProvideSelectorType, SelectorTypeComponent};
 
 pub struct ProvideFeltSelector;
 

@@ -6,10 +6,11 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::extract_data::{
     MessageResponseExtractor, MessageResponseExtractorComponent,
 };
-use hermes_chain_components::traits::types::create_client::ProvideCreateClientEvent;
+use hermes_chain_components::traits::types::create_client::{
+    CreateClientEventComponent, ProvideCreateClientEvent,
+};
 use hermes_chain_components::traits::types::ibc::HasClientIdType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
-use hermes_cosmos_chain_components::components::client::CreateClientEventComponent;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;

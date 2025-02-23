@@ -6,19 +6,20 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_chain_components::traits::types::chain_id::HasChainIdType;
 use hermes_chain_components::traits::types::client_state::{
-    ClientStateFieldsGetter, HasClientStateType,
+    ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent,
+    HasClientStateType,
 };
 use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_cosmos_chain_components::components::client::{
-    ClientStateFieldsComponent, ClientStateTypeComponent,
-};
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
-use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use ibc::clients::tendermint::types::{
     AllowUpdate, ClientState as IbcCometClientState, TrustThreshold,
 };

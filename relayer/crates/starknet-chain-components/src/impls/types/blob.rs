@@ -1,8 +1,7 @@
 use cgp::prelude::*;
 use starknet::core::types::Felt;
 
-use crate::components::chain::BlobTypeComponent;
-use crate::traits::types::blob::ProvideBlobType;
+use crate::traits::types::blob::{BlobTypeComponent, ProvideBlobType};
 
 pub struct ProvideFeltBlobType;
 

@@ -1,6 +1,5 @@
 use cgp::prelude::*;
-use hermes_encoding_components::traits::convert::Converter;
-use hermes_wasm_encoding_components::components::ConverterComponent;
+use hermes_encoding_components::traits::convert::{Converter, ConverterComponent};
 use hermes_wasm_encoding_components::impls::strategies::consensus_state::{
     DecodeViaWasmConsensusState, EncodeViaWasmConsensusState,
 };

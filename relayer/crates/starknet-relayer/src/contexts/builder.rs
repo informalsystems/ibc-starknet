@@ -14,12 +14,11 @@ use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::Error;
 use hermes_error::HermesError;
-use hermes_relayer_components::build::traits::builders::birelay_builder::BiRelayBuilder;
-use hermes_relayer_components::build::traits::builders::chain_builder::{
-    CanBuildChain, ChainBuilder,
+use hermes_relayer_components::build::traits::builders::birelay_builder::{
+    BiRelayBuilder, BiRelayBuilderComponent,
 };
-use hermes_relayer_components::components::default::build::{
-    BiRelayBuilderComponent, ChainBuilderComponent,
+use hermes_relayer_components::build::traits::builders::chain_builder::{
+    CanBuildChain, ChainBuilder, ChainBuilderComponent,
 };
 use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeAtComponent;
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;

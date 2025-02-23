@@ -3,8 +3,9 @@ use cgp::prelude::*;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
+use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
+use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
-use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use starknet::core::types::Felt;
 
 use crate::impls::types::address::StarknetAddress;

@@ -2,9 +2,6 @@
 mod preset {
     use cgp::core::component::{UseContext, UseDelegate};
     use cgp::prelude::*;
-    use hermes_cosmos_chain_components::encoding::components::{
-        DecodeBufferTypeComponent, EncodeBufferTypeComponent,
-    };
     use hermes_encoding_components::impls::types::encoded::ProvideEncodedBytes;
     use hermes_encoding_components::impls::types::schema::ProvideStringSchema;
     use hermes_encoding_components::traits::convert::ConverterComponent;
@@ -13,6 +10,8 @@ mod preset {
     use hermes_encoding_components::traits::encode::EncoderComponent;
     use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
     use hermes_encoding_components::traits::schema::SchemaGetterComponent;
+    use hermes_encoding_components::traits::types::decode_buffer::DecodeBufferTypeComponent;
+    use hermes_encoding_components::traits::types::encode_buffer::EncodeBufferTypeComponent;
     use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent;
     use hermes_encoding_components::traits::types::schema::SchemaTypeComponent;
     use hermes_protobuf_encoding_components::impl_type_url;
@@ -94,7 +93,7 @@ mod preset {
                 (ViaAny, StarknetHeader),
                 (ViaAny, SignedStarknetHeader),
             ]:
-                StarknetLightClientEncodingComponents,
+                StarknetLightClientEncodingComponents::Provider,
 
             [
                 (ViaProtobuf, Any),
@@ -108,7 +107,7 @@ mod preset {
                 (ViaAny, WasmClientMessage),
                 (ViaProtobuf, WasmClientMessage),
             ]:
-                WasmEncodingComponents,
+                WasmEncodingComponents::Provider,
         }
     }
 
@@ -119,7 +118,7 @@ mod preset {
                 (ViaProtobuf, WasmClientState),
                 (ViaProtobuf, WasmConsensusState),
                 (ViaProtobuf, WasmClientMessage),
-            ]: WasmEncodingComponents,
+            ]: WasmEncodingComponents::Provider,
 
             [
                 (ViaProtobuf, StarknetClientState),
@@ -129,7 +128,7 @@ mod preset {
                 (ViaProtobuf, CommitmentRoot),
                 (ViaProtobuf, Timestamp),
             ]:
-                StarknetLightClientEncodingComponents,
+                StarknetLightClientEncodingComponents::Provider,
         }
     }
 
@@ -156,7 +155,7 @@ mod preset {
                 (StarknetConsensusState, Any),
                 (Any, StarknetConsensusState),
             ]:
-                StarknetLightClientEncodingComponents,
+                StarknetLightClientEncodingComponents::Provider,
 
             [
                 (WasmClientState, Any),
@@ -164,7 +163,7 @@ mod preset {
                 (WasmConsensusState, Any),
                 (Any, WasmConsensusState),
             ]:
-                WasmEncodingComponents,
+                WasmEncodingComponents::Provider,
 
             [
                 (Any, WasmStarknetClientState),
@@ -190,13 +189,13 @@ mod preset {
                 StarknetHeader,
                 SignedStarknetHeader,
             ]:
-                StarknetLightClientEncodingComponents,
+                StarknetLightClientEncodingComponents::Provider,
 
             [
                 WasmClientState,
                 WasmConsensusState,
             ]:
-                WasmEncodingComponents,
+                WasmEncodingComponents::Provider,
         }
     }
 

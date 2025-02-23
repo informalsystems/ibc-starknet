@@ -1,11 +1,12 @@
 use core::marker::PhantomData;
 
 use cgp::prelude::*;
-use hermes_chain_components::traits::queries::block_events::BlockEventsQuerier;
+use hermes_chain_components::traits::queries::block_events::{
+    BlockEventsQuerier, BlockEventsQuerierComponent,
+};
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::components::client::BlockEventsQuerierComponent;
 use starknet::core::types::{BlockId, EventFilter};
 use starknet::providers::{Provider, ProviderError};
 

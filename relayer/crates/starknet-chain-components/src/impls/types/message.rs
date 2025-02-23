@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_cosmos_chain_components::components::client::MessageTypeComponent;
+use hermes_chain_components::traits::types::message::MessageTypeComponent;
 use hermes_relayer_components::chain::traits::types::message::ProvideMessageType;
 use ibc::core::client::types::Height as CosmosHeight;
 use starknet::accounts::Call;

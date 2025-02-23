@@ -1,8 +1,7 @@
 use cgp::prelude::*;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 
-use crate::components::chain::ContractInvokerComponent;
-use crate::traits::contract::invoke::ContractInvoker;
+use crate::traits::contract::invoke::{ContractInvoker, ContractInvokerComponent};
 use crate::traits::contract::message::CanBuildInvokeContractMessage;
 
 pub struct InvokeStarknetContract;

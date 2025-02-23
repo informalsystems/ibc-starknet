@@ -1,8 +1,8 @@
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
+use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::transform::Transformer;
-use hermes_wasm_encoding_components::components::MutDecoderComponent;
 
 use crate::types::client_id::ClientId;
 use crate::types::cosmos::height::Height;

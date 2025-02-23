@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_cosmos_chain_components::components::client::CreateClientMessageBuilderComponent;
+use hermes_chain_components::traits::message_builders::create_client::CreateClientMessageBuilderComponent;
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_chain_components::types::messages::client::create::CosmosCreateClientMessage;
 use hermes_encoding_components::traits::convert::CanConvert;

@@ -2,9 +2,10 @@ use core::time::Duration;
 
 use cgp::prelude::*;
 use hermes_chain_components::traits::types::chain_id::HasChainIdType;
-use hermes_cosmos_chain_components::components::client::{
-    ClientStateFieldsComponent, ClientStateTypeComponent, ConsensusStateTypeComponent,
+use hermes_chain_components::traits::types::client_state::{
+    ClientStateFieldsComponent, ClientStateTypeComponent,
 };
+use hermes_chain_components::traits::types::consensus_state::ConsensusStateTypeComponent;
 use hermes_relayer_components::chain::traits::types::client_state::{
     ClientStateFieldsGetter, HasClientStateType, ProvideClientStateType,
 };

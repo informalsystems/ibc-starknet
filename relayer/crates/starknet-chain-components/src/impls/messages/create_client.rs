@@ -3,13 +3,14 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::message_builders::create_client::CreateClientMessageBuilder;
+use hermes_chain_components::traits::message_builders::create_client::{
+    CreateClientMessageBuilder, CreateClientMessageBuilderComponent,
+};
 use hermes_chain_components::traits::types::create_client::{
     HasCreateClientMessageOptionsType, HasCreateClientPayloadType,
 };
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::components::client::CreateClientMessageBuilderComponent;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientPayload;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;

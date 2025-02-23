@@ -1,6 +1,6 @@
 use cgp::prelude::*;
+use hermes_chain_components::traits::types::status::ChainStatusTypeComponent;
 use hermes_chain_type_components::traits::types::time::HasTimeType;
-use hermes_cosmos_chain_components::components::client::ChainStatusTypeComponent;
 use hermes_cosmos_chain_components::types::status::Time;
 use hermes_relayer_components::chain::traits::types::height::HasHeightType;
 use hermes_relayer_components::chain::traits::types::status::ProvideChainStatusType;

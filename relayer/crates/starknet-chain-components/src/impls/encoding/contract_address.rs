@@ -2,8 +2,7 @@ use core::marker::PhantomData;
 use std::collections::HashSet;
 
 use cgp::prelude::*;
-use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
-use hermes_wasm_encoding_components::components::DecoderComponent;
+use hermes_encoding_components::traits::decode::{CanDecode, Decoder, DecoderComponent};
 
 use crate::impls::types::address::StarknetAddress;
 use crate::types::event::StarknetEvent;

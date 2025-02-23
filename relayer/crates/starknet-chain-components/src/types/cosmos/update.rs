@@ -2,7 +2,7 @@ use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_wasm_encoding_components::components::MutEncoderComponent;
+use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use ibc::clients::tendermint::types::{
     ConsensusState as TendermintConsensusState, Header as TendermintHeader,
 };

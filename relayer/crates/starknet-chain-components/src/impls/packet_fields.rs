@@ -1,8 +1,9 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::packet::fields::PacketSrcChannelIdGetter;
+use hermes_chain_components::traits::packet::fields::{
+    PacketSrcChannelIdGetter, PacketSrcChannelIdGetterComponent,
+};
 use hermes_chain_components::traits::types::ibc::HasChannelIdType;
 use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
-use hermes_cosmos_chain_components::components::client::PacketSrcChannelIdGetterComponent;
 use ibc::core::channel::types::packet::Packet;
 
 use crate::types::channel_id::ChannelId;
