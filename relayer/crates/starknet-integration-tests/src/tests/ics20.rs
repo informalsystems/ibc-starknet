@@ -223,16 +223,24 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             contract_address
         };
 
-        starknet_chain.ibc_core_contract_address = Some(ibc_core_address);
-        starknet_chain.ibc_client_contract_address = Some(comet_client_address);
+        let starknet_chain = {
+            let mut fields = starknet_chain.fields.as_ref().clone();
 
-        let cairo_encoding = StarknetCairoEncoding;
+            fields.ibc_core_contract_address = Some(ibc_core_address);
+            fields.ibc_client_contract_address = Some(comet_client_address);
 
-        starknet_chain.event_encoding = StarknetEventEncoding {
-            erc20_hashes: [erc20_class_hash].into(),
-            ics20_hashes: [ics20_class_hash].into(),
-            ibc_client_hashes: [comet_client_class_hash].into(),
-            ibc_core_contract_addresses: [ibc_core_address].into(),
+            let cairo_encoding = StarknetCairoEncoding;
+
+            fields.event_encoding = StarknetEventEncoding {
+                erc20_hashes: [erc20_class_hash].into(),
+                ics20_hashes: [ics20_class_hash].into(),
+                ibc_client_hashes: [comet_client_class_hash].into(),
+                ibc_core_contract_addresses: [ibc_core_address].into(),
+            };
+
+            StarknetChain {
+                fields: Arc::new(fields),
+            }
         };
 
         {
@@ -260,7 +268,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            starknet_chain,
+            &starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),
@@ -272,7 +280,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            starknet_chain,
+            &starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )

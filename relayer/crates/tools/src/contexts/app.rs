@@ -25,9 +25,9 @@ use hermes_cli_components::traits::output::{
 };
 use hermes_cli_components::traits::types::config::{ConfigTypeComponent, HasConfigType};
 use hermes_error::traits::wrap::CanWrapError;
-use hermes_logger::ProvideHermesLogger;
+use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
+    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
 };
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
@@ -67,11 +67,11 @@ delegate_components! {
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
         [
-            LoggerTypeComponent,
+            LoggerTypeProviderComponent,
             LoggerGetterComponent,
             GlobalLoggerGetterComponent,
         ]:
-            ProvideHermesLogger,
+            UseHermesLogger,
         ConfigTypeComponent:
             WithType<StarknetRelayerConfig>,
         BootstrapTypeComponent:

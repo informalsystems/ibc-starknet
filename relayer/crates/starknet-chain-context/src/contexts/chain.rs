@@ -1,3 +1,4 @@
+use core::ops::Deref;
 use core::time::Duration;
 use std::sync::Arc;
 
@@ -25,9 +26,9 @@ use hermes_encoding_components::traits::has_encoding::{
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::ProvideHermesError;
-use hermes_logger::ProvideHermesLogger;
+use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
+    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
 };
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
@@ -196,8 +197,13 @@ use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use crate::impls::error::HandleStarknetChainError;
 
 #[cgp_context(StarknetChainContextComponents: StarknetChainComponents)]
-#[derive(HasField, Clone)]
+#[derive(Clone)]
 pub struct StarknetChain {
+    pub fields: Arc<StarknetChainFields>,
+}
+
+#[derive(HasField, Clone)]
+pub struct StarknetChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
@@ -210,6 +216,14 @@ pub struct StarknetChain {
     pub proof_signer: Secp256k1KeyPair,
 }
 
+impl Deref for StarknetChain {
+    type Target = StarknetChainFields;
+
+    fn deref(&self) -> &StarknetChainFields {
+        &self.fields
+    }
+}
+
 delegate_components! {
     StarknetChainContextComponents {
         ErrorTypeProviderComponent: ProvideHermesError,
@@ -219,11 +233,11 @@ delegate_components! {
         PollIntervalGetterComponent:
             UseField<symbol!("poll_interval")>,
         [
-            LoggerTypeComponent,
+            LoggerTypeProviderComponent,
             LoggerGetterComponent,
             GlobalLoggerGetterComponent,
         ]:
-            ProvideHermesLogger,
+            UseHermesLogger,
         [
             StarknetProviderTypeComponent,
             StarknetProviderGetterComponent,

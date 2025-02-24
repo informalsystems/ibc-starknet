@@ -8,9 +8,11 @@ mod preset {
     use hermes_chain_components::impls::types::payloads::channel::ProvideChannelPayloadTypes;
     use hermes_chain_components::impls::types::payloads::connection::ProvideConnectionPayloadTypes;
     use hermes_chain_components::impls::types::payloads::packet::ProvidePacketPayloadTypes;
+    use hermes_chain_components::impls::types::poll_interval::FixedPollIntervalMillis;
     use hermes_chain_components::impls::types::receipt::ProvideBytesPacketReceipt;
     use hermes_chain_components::traits::commitment_prefix::IbcCommitmentPrefixGetterComponent;
     use hermes_chain_components::traits::packet::from_send_packet::PacketFromSendPacketEventBuilderComponent;
+    use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
     use hermes_cosmos_chain_components::components::client::*;
     use hermes_cosmos_chain_components::components::transaction::FixedPollTimeoutSecs;
     use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;

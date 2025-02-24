@@ -54,9 +54,9 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientO
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::traits::wrap::CanWrapError;
 use hermes_error::types::HermesError;
-use hermes_logger::ProvideHermesLogger;
+use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeComponent,
+    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
 };
 use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
@@ -112,11 +112,11 @@ delegate_components! {
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
         [
-            LoggerTypeComponent,
+            LoggerTypeProviderComponent,
             LoggerGetterComponent,
             GlobalLoggerGetterComponent,
         ]:
-            ProvideHermesLogger,
+            UseHermesLogger,
         ConfigTypeComponent:
             WithType<StarknetRelayerConfig>,
         BootstrapTypeComponent:
