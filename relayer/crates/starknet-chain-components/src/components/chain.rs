@@ -17,7 +17,7 @@ mod preset {
     use hermes_chain_components::impls::types::payloads::channel::ProvideChannelPayloadTypes;
     use hermes_chain_components::impls::types::payloads::connection::ProvideConnectionPayloadTypes;
     use hermes_chain_components::impls::types::payloads::packet::ProvidePacketPayloadTypes;
-    use hermes_chain_components::impls::types::poll_interval::FixedPollIntervalMillis;
+    
     use hermes_chain_components::impls::types::receipt::ProvideBytesPacketReceipt;
     use hermes_chain_components::traits::commitment_prefix::{
         CommitmentPrefixTypeComponent, IbcCommitmentPrefixGetterComponent,
@@ -125,7 +125,7 @@ mod preset {
     use hermes_chain_components::traits::types::packets::timeout::{
         PacketReceiptTypeComponent, TimeoutUnorderedPacketPayloadTypeComponent,
     };
-    use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
+    
     use hermes_chain_components::traits::types::proof::{
         CommitmentProofBytesGetterComponent, CommitmentProofHeightGetterComponent,
         CommitmentProofTypeComponent,
