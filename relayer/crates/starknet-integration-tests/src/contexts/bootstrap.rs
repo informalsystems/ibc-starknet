@@ -29,7 +29,7 @@ use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::impls::bootstrap::bootstrap_chain::BootstrapStarknetDevnet;
 use hermes_starknet_test_components::impls::bootstrap::start_chain::StartStarknetDevnet;
@@ -162,14 +162,17 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
         .expect("valid key pair");
 
         let chain = StarknetChain {
-            runtime: runtime.clone(),
-            chain_id: chain_id.to_string().parse()?,
-            rpc_client,
-            account,
-            ibc_client_contract_address: None,
-            ibc_core_contract_address: None,
-            event_encoding: Default::default(),
-            proof_signer,
+            fields: Arc::new(StarknetChainFields {
+                runtime: runtime.clone(),
+                chain_id: chain_id.to_string().parse()?,
+                rpc_client,
+                account,
+                ibc_client_contract_address: None,
+                ibc_core_contract_address: None,
+                event_encoding: Default::default(),
+                proof_signer,
+                poll_interval: core::time::Duration::from_millis(200),
+            }),
         };
 
         let chain_driver = StarknetChainDriver {

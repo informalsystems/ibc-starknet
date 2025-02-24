@@ -9,7 +9,6 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
-use starknet::core::types::Felt;
 
 use crate::impls::types::address::StarknetAddress;
 
@@ -114,23 +113,23 @@ delegate_components! {
 
 impl TransformerRef for EncodeDenom {
     type From = Denom;
-    type To<'a> = Sum![Felt, &'a String];
+    type To<'a> = Sum![StarknetAddress, &'a String];
 
-    fn transform<'a>(from: &'a Denom) -> Sum![Felt, &'a String] {
+    fn transform<'a>(from: &'a Denom) -> Sum![StarknetAddress, &'a String] {
         match from {
-            Denom::Native(denom) => Either::Left(**denom),
+            Denom::Native(denom) => Either::Left(*denom),
             Denom::Hosted(denom) => Either::Right(Either::Left(denom)),
         }
     }
 }
 
 impl Transformer for EncodeDenom {
-    type From = Sum![Felt, String];
+    type From = Sum![StarknetAddress, String];
     type To = Denom;
 
-    fn transform(value: Sum![Felt, String]) -> Denom {
+    fn transform(value: Sum![StarknetAddress, String]) -> Denom {
         match value {
-            Either::Left(value) => Denom::Native(value.into()),
+            Either::Left(value) => Denom::Native(value),
             Either::Right(Either::Left(value)) => Denom::Hosted(value),
             Either::Right(Either::Right(value)) => match value {},
         }

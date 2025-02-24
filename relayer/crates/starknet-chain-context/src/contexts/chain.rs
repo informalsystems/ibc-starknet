@@ -1,3 +1,5 @@
+use core::ops::Deref;
+use core::time::Duration;
 use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
@@ -7,6 +9,7 @@ use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
+use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
 use hermes_chain_type_components::traits::fields::chain_id::{ChainIdGetterComponent, HasChainId};
 use hermes_chain_type_components::traits::types::commitment_proof::HasCommitmentProofType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
@@ -193,8 +196,13 @@ use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use crate::impls::error::HandleStarknetChainError;
 
 #[cgp_context(StarknetChainContextComponents: StarknetChainComponents)]
-#[derive(HasField, Clone)]
+#[derive(Clone)]
 pub struct StarknetChain {
+    pub fields: Arc<StarknetChainFields>,
+}
+
+#[derive(HasField, Clone)]
+pub struct StarknetChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
@@ -202,8 +210,17 @@ pub struct StarknetChain {
     pub ibc_client_contract_address: Option<StarknetAddress>,
     pub ibc_core_contract_address: Option<StarknetAddress>,
     pub event_encoding: StarknetEventEncoding,
+    pub poll_interval: Duration,
     // FIXME: only needed for demo2
     pub proof_signer: Secp256k1KeyPair,
+}
+
+impl Deref for StarknetChain {
+    type Target = StarknetChainFields;
+
+    fn deref(&self) -> &StarknetChainFields {
+        &self.fields
+    }
 }
 
 delegate_components! {
@@ -212,6 +229,8 @@ delegate_components! {
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
+        PollIntervalGetterComponent:
+            UseField<symbol!("poll_interval")>,
         [
             LoggerTypeProviderComponent,
             LoggerGetterComponent,

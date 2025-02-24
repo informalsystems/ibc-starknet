@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use derive_more::{Deref, Display, From, FromStr};
+use derive_more::{Constructor, Deref, Display, From, FromStr};
 use hermes_chain_type_components::traits::types::address::AddressTypeComponent;
 use hermes_test_components::chain::traits::types::address::ProvideAddressType;
 use serde::{Deserialize, Serialize};
@@ -27,6 +27,7 @@ impl<Chain: Async> ProvideAddressType<Chain> for ProvideFeltAddressType {
     Hash,
     Debug,
     Default,
+    Constructor,
     Deref,
     Display,
     From,
