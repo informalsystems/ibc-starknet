@@ -580,11 +580,15 @@ fn test_public_testnets() -> Result<(), Error> {
                 &cosmos_chain,
                 &CosmosCreateClientOptions {
                     // unbonding period is 5 days on osmo-test-5
-                    trusting_period: Duration::from_secs(osmosis_unbonding_period * 2 / 3),
+                    //
+                    // using (unbonading period - 1) as maximum allowed value.
+                    trusting_period: Duration::from_secs(osmosis_unbonding_period - 1),
                     // starknet has 30 seconds block time
                     // block timestamp is when the sequencer started building the block
                     // which can be in the past
-                    max_clock_drift: Duration::from_secs(starknet_block_time * 2),
+                    //
+                    // using 5 mins as max clock drift to be more permissive.
+                    max_clock_drift: Duration::from_secs(starknet_block_time * 10),
 
                     ..Default::default()
                 },
