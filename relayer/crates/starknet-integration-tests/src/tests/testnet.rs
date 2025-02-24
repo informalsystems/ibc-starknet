@@ -502,16 +502,9 @@ fn test_public_testnets() -> Result<(), Error> {
             )
             .await?;
 
-        starknet_chain.event_encoding = StarknetEventEncoding {
-            erc20_hashes: [erc20_class_hash].into(),
-            ics20_hashes: [ics20_class_hash].into(),
-            ibc_client_hashes: [comet_client_class_hash].into(),
-            ibc_core_contract_addresses: [ibc_core_address].into(),
-        };
+        {
+            // register contracts to ibc-core
 
-        let cairo_encoding = StarknetCairoEncoding;
-
-        if starknet_contract_db.starknet.client.is_none() {
             {
                 // register comet client contract with ibc-core
 
@@ -537,6 +530,40 @@ fn test_public_testnets() -> Result<(), Error> {
                 info!("IBC register client response: {:?}", response);
             }
 
+            {
+                // register the ICS20 contract with the IBC core contract
+
+                let register_app = MsgRegisterApp {
+                    port_id: ics20_port.clone(),
+                    contract_address: ics20_contract_address,
+                };
+
+                let register_call_data = cairo_encoding.encode(&register_app)?;
+
+                let call = Call {
+                    to: *ibc_core_address,
+                    selector: selector!("bind_port_id"),
+                    calldata: register_call_data,
+                };
+
+                let message = StarknetMessage::new(call);
+
+                let response = starknet_chain.send_message(message).await?;
+
+                info!("register ics20 response: {:?}", response);
+            }
+        }
+
+        starknet_chain.event_encoding = StarknetEventEncoding {
+            erc20_hashes: [erc20_class_hash].into(),
+            ics20_hashes: [ics20_class_hash].into(),
+            ibc_client_hashes: [comet_client_class_hash].into(),
+            ibc_core_contract_addresses: [ibc_core_address].into(),
+        };
+
+        let cairo_encoding = StarknetCairoEncoding;
+
+        if starknet_contract_db.starknet.client.is_none() {
             // https://lcd.osmotest5.osmosis.zone/cosmos/staking/v1beta1/params
             // in seconds; 5 days.
             let osmosis_unbonding_period = 432000;
@@ -701,29 +728,6 @@ fn test_public_testnets() -> Result<(), Error> {
         if starknet_contract_db.starknet.channel.is_none()
             || starknet_contract_db.osmosis.channel.is_none()
         {
-            {
-                // register the ICS20 contract with the IBC core contract
-
-                let register_app = MsgRegisterApp {
-                    port_id: ics20_port.clone(),
-                    contract_address: ics20_contract_address,
-                };
-
-                let register_call_data = cairo_encoding.encode(&register_app)?;
-
-                let call = Call {
-                    to: *ibc_core_address,
-                    selector: selector!("bind_port_id"),
-                    calldata: register_call_data,
-                };
-
-                let message = StarknetMessage::new(call);
-
-                let response = starknet_chain.send_message(message).await?;
-
-                info!("register ics20 response: {:?}", response);
-            }
-
             let init_channel_options =
                 CosmosInitChannelOptions::new(starknet_connection_id.clone());
 
