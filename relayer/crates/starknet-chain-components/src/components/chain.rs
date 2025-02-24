@@ -12,6 +12,7 @@ mod preset {
     use hermes_chain_components::traits::commitment_prefix::IbcCommitmentPrefixGetterComponent;
     use hermes_chain_components::traits::packet::from_send_packet::PacketFromSendPacketEventBuilderComponent;
     use hermes_cosmos_chain_components::components::client::*;
+    use hermes_cosmos_chain_components::components::transaction::FixedPollTimeoutSecs;
     use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
     use hermes_cosmos_chain_components::impls::types::create_client_options::ProvideNoCreateClientMessageOptionsType;
     use hermes_relayer_components::chain::traits::queries::chain_status::ChainStatusQuerierComponent;
@@ -86,7 +87,7 @@ mod preset {
     use crate::impls::send_message::SendCallMessages;
     use crate::impls::submit_tx::SubmitCallTransaction;
     use crate::impls::transfer::TransferErc20Token;
-    use crate::impls::tx_response::{DefaultPollTimeout, QueryTransactionReceipt};
+    use crate::impls::tx_response::QueryTransactionReceipt;
     use crate::impls::types::address::ProvideFeltAddressType;
     use crate::impls::types::amount::ProvideU256Amount;
     use crate::impls::types::blob::ProvideFeltBlobType;
@@ -245,7 +246,7 @@ mod preset {
             TxResponsePollerComponent:
                 PollTxResponse,
             PollTimeoutGetterComponent:
-                DefaultPollTimeout,
+                FixedPollTimeoutSecs<300>,
             ContractCallerComponent:
                 CallStarknetContract,
             ContractInvokerComponent:

@@ -37,6 +37,7 @@ url                         = { version = "2.4.0" }
 eyre                        = { version = "0.6.12" }
 tokio                       = { version = "1.38" }
 secp256k1                   = { version = "0.28.2" }
+humantime-serde             = { version = "1.0" }
 serde                       = { version = "1.0" }
 serde_json                  = { version = "1.0" }
 rand                        = { version = "0.8.5" }
