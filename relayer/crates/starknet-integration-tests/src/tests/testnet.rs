@@ -658,6 +658,8 @@ fn test_public_testnets() -> Result<(), Error> {
         );
 
         {
+            // auto-relay packets
+
             let starknet_to_cosmos_relay = starknet_to_cosmos_relay.clone();
 
             let cosmos_to_starknet_relay = cosmos_to_starknet_relay.clone();
@@ -670,6 +672,8 @@ fn test_public_testnets() -> Result<(), Error> {
                 let _ = cosmos_to_starknet_relay.run().await;
             });
         }
+
+        runtime.sleep(Duration::from_secs(3600)).await;
 
         // connection handshake
 
