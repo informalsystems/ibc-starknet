@@ -1,3 +1,4 @@
+use core::ops::Deref;
 use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
@@ -194,8 +195,13 @@ use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use crate::impls::error::HandleStarknetChainError;
 
 #[cgp_context(StarknetChainContextComponents: StarknetChainComponents)]
-#[derive(HasField, Clone)]
+#[derive(Clone)]
 pub struct StarknetChain {
+    pub fields: Arc<StarknetChainFields>,
+}
+
+#[derive(HasField, Clone)]
+pub struct StarknetChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
@@ -205,6 +211,14 @@ pub struct StarknetChain {
     pub event_encoding: StarknetEventEncoding,
     // FIXME: only needed for demo2
     pub proof_signer: Secp256k1KeyPair,
+}
+
+impl Deref for StarknetChain {
+    type Target = StarknetChainFields;
+
+    fn deref(&self) -> &StarknetChainFields {
+        &self.fields
+    }
 }
 
 delegate_components! {

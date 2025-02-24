@@ -30,7 +30,7 @@ use hermes_runtime_components::traits::runtime::{
 };
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use ibc::core::host::types::identifiers::{ChainId, ClientId, ClientId as CosmosClientId};
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
@@ -252,14 +252,16 @@ impl StarknetBuilder {
         .expect("valid key pair");
 
         let context = StarknetChain {
-            runtime: self.runtime.clone(),
-            chain_id,
-            rpc_client,
-            account,
-            ibc_client_contract_address: None,
-            ibc_core_contract_address: None,
-            event_encoding: Default::default(),
-            proof_signer,
+            fields: Arc::new(StarknetChainFields {
+                runtime: self.runtime.clone(),
+                chain_id,
+                rpc_client,
+                account,
+                ibc_client_contract_address: None,
+                ibc_core_contract_address: None,
+                event_encoding: Default::default(),
+                proof_signer,
+            }),
         };
 
         Ok(context)
