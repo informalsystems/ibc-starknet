@@ -679,7 +679,8 @@ fn test_public_testnets() -> Result<(), Error> {
             });
         }
 
-        runtime.sleep(Duration::from_secs(3600)).await;
+        // pause for bi-relay
+        // runtime.sleep(Duration::from_secs(3600)).await;
 
         // connection handshake
 
