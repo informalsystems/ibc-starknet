@@ -502,7 +502,11 @@ fn test_public_testnets() -> Result<(), Error> {
             )
             .await?;
 
-        {
+        let cairo_encoding = StarknetCairoEncoding;
+
+        let ics20_port = IbcPortId::transfer();
+
+        if false {
             // register contracts to ibc-core
 
             {
@@ -560,8 +564,6 @@ fn test_public_testnets() -> Result<(), Error> {
             ibc_client_hashes: [comet_client_class_hash].into(),
             ibc_core_contract_addresses: [ibc_core_address].into(),
         };
-
-        let cairo_encoding = StarknetCairoEncoding;
 
         if starknet_contract_db.starknet.client.is_none() {
             // https://lcd.osmotest5.osmosis.zone/cosmos/staking/v1beta1/params
@@ -726,8 +728,6 @@ fn test_public_testnets() -> Result<(), Error> {
         );
 
         // channel handshake
-
-        let ics20_port = IbcPortId::transfer();
 
         if starknet_contract_db.starknet.channel.is_none()
             || starknet_contract_db.osmosis.channel.is_none()
