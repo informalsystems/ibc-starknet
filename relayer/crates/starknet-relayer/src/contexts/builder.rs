@@ -261,6 +261,7 @@ impl StarknetBuilder {
                 ibc_core_contract_address: None,
                 event_encoding: Default::default(),
                 proof_signer,
+                poll_interval: self.starknet_chain_config.poll_interval,
             }),
         };
 

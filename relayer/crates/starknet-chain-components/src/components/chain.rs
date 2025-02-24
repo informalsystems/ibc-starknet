@@ -247,8 +247,6 @@ mod preset {
                 QueryTransactionReceipt,
             TxResponsePollerComponent:
                 PollTxResponse,
-            PollIntervalGetterComponent:
-                FixedPollIntervalMillis<200>,
             PollTimeoutGetterComponent:
                 FixedPollTimeoutSecs<300>,
             ContractCallerComponent:

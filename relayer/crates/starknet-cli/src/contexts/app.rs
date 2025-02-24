@@ -236,6 +236,7 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
                 chain_driver.node_config.rpc_addr, chain_driver.node_config.rpc_port
             ),
             relayer_wallet,
+            poll_interval: chain_driver.chain.poll_interval,
         };
 
         let chain_config_str = to_string_pretty(&chain_config)?;

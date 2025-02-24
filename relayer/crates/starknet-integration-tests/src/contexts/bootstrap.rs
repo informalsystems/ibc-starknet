@@ -172,6 +172,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
                 ibc_core_contract_address: None,
                 event_encoding: Default::default(),
                 proof_signer,
+                poll_interval: core::time::Duration::from_millis(200),
             }),
         };
 
