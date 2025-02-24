@@ -1,8 +1,8 @@
 use cgp::prelude::*;
-use hermes_cosmos_chain_components::components::client::{
+use hermes_chain_components::traits::types::create_client::{
     CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
-    UpdateClientPayloadTypeComponent,
 };
+use hermes_chain_components::traits::types::update_client::UpdateClientPayloadTypeComponent;
 use hermes_relayer_components::chain::traits::types::create_client::{
     ProvideCreateClientPayloadOptionsType, ProvideCreateClientPayloadType,
 };

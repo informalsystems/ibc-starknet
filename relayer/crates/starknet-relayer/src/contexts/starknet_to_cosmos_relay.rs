@@ -5,9 +5,6 @@ use core::ops::Deref;
 use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_relayer_components::components::default::relay::{
-    AutoRelayerWithHeightsComponent, EventRelayerComponent, MainSink, TargetAutoRelayerComponent,
-};
 use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeAtComponent,
 };
@@ -16,6 +13,9 @@ use hermes_relayer_components::multi::types::tags::{Dst, Src};
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::impls::packet_lock::PacketMutexOf;
 use hermes_relayer_components::relay::impls::selector::SelectRelayBToA;
+use hermes_relayer_components::relay::traits::auto_relayer::{
+    AutoRelayerWithHeightsComponent, TargetAutoRelayerComponent,
+};
 use hermes_relayer_components::relay::traits::chains::{
     CanRaiseRelayChainErrors, HasRelayChains, HasRelayClientIds,
 };
@@ -24,8 +24,9 @@ use hermes_relayer_components::relay::traits::connection::open_ack::CanRelayConn
 use hermes_relayer_components::relay::traits::connection::open_confirm::CanRelayConnectionOpenConfirm;
 use hermes_relayer_components::relay::traits::connection::open_init::CanInitConnection;
 use hermes_relayer_components::relay::traits::connection::open_try::CanRelayConnectionOpenTry;
+use hermes_relayer_components::relay::traits::event_relayer::EventRelayerComponent;
 use hermes_relayer_components::relay::traits::ibc_message_sender::{
-    CanSendIbcMessages, CanSendSingleIbcMessage,
+    CanSendIbcMessages, CanSendSingleIbcMessage, MainSink,
 };
 use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::target::{
@@ -40,7 +41,7 @@ use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClie
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
 
-use crate::presets::relay::{IsStarknetCommonRelayContextPreset, StarknetCommonRelayContextPreset};
+use crate::presets::relay::StarknetCommonRelayContextPreset;
 
 #[cgp_context(StarknetToCosmosRelayComponents: StarknetCommonRelayContextPreset)]
 #[derive(Clone)]

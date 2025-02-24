@@ -5,14 +5,15 @@ use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::channel_end::CanQueryChannelEnd;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientState;
 use hermes_chain_components::traits::queries::connection_end::CanQueryConnectionEnd;
-use hermes_chain_components::traits::queries::counterparty_chain_id::CounterpartyChainIdQuerier;
+use hermes_chain_components::traits::queries::counterparty_chain_id::{
+    CounterpartyChainIdQuerier, CounterpartyChainIdQuerierComponent,
+};
 use hermes_chain_components::traits::types::channel::HasChannelEndType;
 use hermes_chain_components::traits::types::client_state::HasClientStateFields;
 use hermes_chain_components::traits::types::connection::HasConnectionEndType;
 use hermes_chain_components::traits::types::ibc::{
     HasChannelIdType, HasClientIdType, HasConnectionIdType, HasPortIdType,
 };
-use hermes_cosmos_chain_components::components::client::CounterpartyChainIdQuerierComponent;
 
 use crate::types::channel_id::ChannelEnd;
 use crate::types::client_id::ClientId;

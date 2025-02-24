@@ -1,8 +1,9 @@
 use core::time::Duration;
 
 use cgp::prelude::*;
-use hermes_cosmos_chain_components::components::transaction::TxResponseQuerierComponent;
-use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerier;
+use hermes_relayer_components::transaction::traits::query_tx_response::{
+    TxResponseQuerier, TxResponseQuerierComponent,
+};
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
 use hermes_runtime_components::traits::runtime::HasRuntime;

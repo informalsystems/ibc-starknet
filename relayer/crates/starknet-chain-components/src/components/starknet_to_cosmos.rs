@@ -2,24 +2,38 @@
 mod preset {
     use cgp::core::types::WithType;
     use cgp::prelude::*;
-    use hermes_chain_components::traits::types::ibc::CounterpartyMessageHeightGetterComponent;
-    use hermes_cosmos_chain_components::components::client::{
-        AckPacketMessageBuilderComponent, ChannelOpenAckMessageBuilderComponent,
-        ChannelOpenConfirmMessageBuilderComponent, ChannelOpenInitMessageBuilderComponent,
-        ChannelOpenTryMessageBuilderComponent, ClientStateFieldsComponent,
-        ClientStateTypeComponent, ConnectionOpenAckMessageBuilderComponent,
-        ConnectionOpenConfirmMessageBuilderComponent, ConnectionOpenInitMessageBuilderComponent,
-        ConnectionOpenTryMessageBuilderComponent, ConsensusStateHeightsQuerierComponent,
-        ConsensusStateTypeComponent, CreateClientMessageBuilderComponent,
-        CreateClientMessageOptionsTypeComponent, CreateClientPayloadBuilderComponent,
-        CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
+    use hermes_chain_components::traits::message_builders::ack_packet::AckPacketMessageBuilderComponent;
+    use hermes_chain_components::traits::message_builders::channel_handshake::{
+        ChannelOpenAckMessageBuilderComponent, ChannelOpenConfirmMessageBuilderComponent,
+        ChannelOpenInitMessageBuilderComponent, ChannelOpenTryMessageBuilderComponent,
+    };
+    use hermes_chain_components::traits::message_builders::connection_handshake::{
+        ConnectionOpenAckMessageBuilderComponent, ConnectionOpenConfirmMessageBuilderComponent,
+        ConnectionOpenInitMessageBuilderComponent, ConnectionOpenTryMessageBuilderComponent,
+    };
+    use hermes_chain_components::traits::message_builders::create_client::CreateClientMessageBuilderComponent;
+    use hermes_chain_components::traits::message_builders::receive_packet::ReceivePacketMessageBuilderComponent;
+    use hermes_chain_components::traits::message_builders::timeout_unordered_packet::TimeoutUnorderedPacketMessageBuilderComponent;
+    use hermes_chain_components::traits::message_builders::update_client::UpdateClientMessageBuilderComponent;
+    use hermes_chain_components::traits::packet::fields::{
         PacketDstChannelIdGetterComponent, PacketDstPortIdGetterComponent,
         PacketSequenceGetterComponent, PacketSrcChannelIdGetterComponent,
         PacketSrcPortIdGetterComponent, PacketTimeoutHeightGetterComponent,
-        PacketTimeoutTimestampGetterComponent, ReceivePacketMessageBuilderComponent,
-        TimeoutUnorderedPacketMessageBuilderComponent, UpdateClientMessageBuilderComponent,
-        UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
+        PacketTimeoutTimestampGetterComponent,
     };
+    use hermes_chain_components::traits::payload_builders::create_client::CreateClientPayloadBuilderComponent;
+    use hermes_chain_components::traits::payload_builders::update_client::UpdateClientPayloadBuilderComponent;
+    use hermes_chain_components::traits::queries::consensus_state_height::ConsensusStateHeightsQuerierComponent;
+    use hermes_chain_components::traits::types::client_state::{
+        ClientStateFieldsComponent, ClientStateTypeComponent,
+    };
+    use hermes_chain_components::traits::types::consensus_state::ConsensusStateTypeComponent;
+    use hermes_chain_components::traits::types::create_client::{
+        CreateClientMessageOptionsTypeComponent, CreateClientPayloadOptionsTypeComponent,
+        CreateClientPayloadTypeComponent,
+    };
+    use hermes_chain_components::traits::types::ibc::CounterpartyMessageHeightGetterComponent;
+    use hermes_chain_components::traits::types::update_client::UpdateClientPayloadTypeComponent;
     use hermes_cosmos_chain_components::components::cosmos_to_cosmos::CosmosToCosmosComponents;
     use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
     use hermes_cosmos_chain_components::impls::packet::packet_message::BuildCosmosPacketMessages;
@@ -57,7 +71,7 @@ mod preset {
                 ChannelOpenAckMessageBuilderComponent,
                 ChannelOpenConfirmMessageBuilderComponent,
             ]:
-                CosmosToCosmosComponents,
+                CosmosToCosmosComponents::Provider,
             CreateClientMessageBuilderComponent:
                 BuildStarknetCreateClientMessage,
             [

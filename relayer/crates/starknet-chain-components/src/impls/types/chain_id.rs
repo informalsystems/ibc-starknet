@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_cosmos_chain_components::components::client::ChainIdTypeComponent;
+use hermes_chain_components::traits::types::chain_id::ChainIdTypeComponent;
 use hermes_relayer_components::chain::traits::types::chain_id::ProvideChainIdType;
 use ibc::core::host::types::identifiers::ChainId;
 

@@ -28,8 +28,8 @@ rust-version = "1.81"
 overflow-checks = true
 
 [workspace.dependencies]
-cgp            = { version = "0.3.1" }
-cgp-error-eyre = { version = "0.3.0" }
+cgp            = { version = "0.4.0" }
+cgp-error-eyre = { version = "0.4.0" }
 
 starknet                    = { version = "0.11.0" }
 starknet-types-core         = { version = "0.1.7" }
@@ -128,16 +128,16 @@ hermes-starknet-relayer           = { path = "./crates/starknet-relayer" }
 hermes-starknet-cli               = { path = "./crates/starknet-cli" }
 hermes-starknet-integration-tests = { path = "./crates/starknet-integration-tests" }
 
-ibc                         = { git = "https://github.com/cosmos/ibc-rs", branch = "main" }
-ibc-core                    = { git = "https://github.com/cosmos/ibc-rs", branch = "main" }
-ibc-core-client-types       = { git = "https://github.com/cosmos/ibc-rs", branch = "main" }
-ibc-core-host-cosmos        = { git = "https://github.com/cosmos/ibc-rs", branch = "main" }
-ibc-client-tendermint       = { git = "https://github.com/cosmos/ibc-rs", branch = "main" }
-ibc-client-tendermint-types = { git = "https://github.com/cosmos/ibc-rs", branch = "main" }
-ibc-client-wasm-types       = { git = "https://github.com/cosmos/ibc-rs", branch = "main" }
-ibc-core-client             = { git = "https://github.com/cosmos/ibc-rs", branch = "main" }
-ibc-core-channel-types      = { git = "https://github.com/cosmos/ibc-rs", branch = "main" }
-ibc-core-handler-types      = { git = "https://github.com/cosmos/ibc-rs", branch = "main" }
+ibc                         = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
+ibc-core                    = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
+ibc-core-client-types       = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
+ibc-core-host-cosmos        = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
+ibc-client-tendermint       = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
+ibc-client-tendermint-types = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
+ibc-client-wasm-types       = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
+ibc-core-client             = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
+ibc-core-channel-types      = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
+ibc-core-handler-types      = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
 
 ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types" }
 

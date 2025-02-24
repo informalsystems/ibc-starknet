@@ -3,8 +3,10 @@ use core::time::Duration;
 use cgp::prelude::*;
 use hermes_chain_components::traits::commitment_prefix::HasCommitmentPrefixType;
 use hermes_chain_components::traits::message_builders::connection_handshake::{
-    ConnectionOpenAckMessageBuilder, ConnectionOpenConfirmMessageBuilder,
-    ConnectionOpenInitMessageBuilder, ConnectionOpenTryMessageBuilder,
+    ConnectionOpenAckMessageBuilder, ConnectionOpenAckMessageBuilderComponent,
+    ConnectionOpenConfirmMessageBuilder, ConnectionOpenConfirmMessageBuilderComponent,
+    ConnectionOpenInitMessageBuilder, ConnectionOpenInitMessageBuilderComponent,
+    ConnectionOpenTryMessageBuilder, ConnectionOpenTryMessageBuilderComponent,
 };
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::types::client_state::HasClientStateType;
@@ -21,10 +23,6 @@ use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::connection::{
     ConnectionOpenAckPayload, ConnectionOpenConfirmPayload, ConnectionOpenInitPayload,
     ConnectionOpenTryPayload,
-};
-use hermes_cosmos_chain_components::components::client::{
-    ConnectionOpenAckMessageBuilderComponent, ConnectionOpenConfirmMessageBuilderComponent,
-    ConnectionOpenInitMessageBuilderComponent, ConnectionOpenTryMessageBuilderComponent,
 };
 use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;

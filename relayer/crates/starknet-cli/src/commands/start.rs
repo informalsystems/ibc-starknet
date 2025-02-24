@@ -10,7 +10,7 @@ pub enum StartSubCommand {
     CosmosWithStarknet(StartRelayerArgs),
 }
 
-#[new_cgp_provider(CommandRunnerComponent)]
+#[cgp_new_provider(CommandRunnerComponent)]
 impl<App> CommandRunner<App, StartSubCommand> for RunStartSubCommand
 where
     App: HasOutputType + HasAsyncErrorType,

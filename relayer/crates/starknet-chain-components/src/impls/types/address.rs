@@ -2,12 +2,15 @@ use cgp::prelude::*;
 use derive_more::{Constructor, Deref, Display, From, FromStr};
 use hermes_chain_type_components::traits::types::address::AddressTypeComponent;
 use hermes_test_components::chain::traits::types::address::ProvideAddressType;
-use hermes_wasm_encoding_components::components::{MutDecoderComponent, MutEncoderComponent};
 use serde::{Deserialize, Serialize};
 use starknet::core::types::Felt;
 pub struct ProvideFeltAddressType;
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use hermes_encoding_components::traits::encode_mut::{CanEncodeMut, MutEncoder};
+use hermes_encoding_components::traits::decode_mut::{
+    CanDecodeMut, MutDecoder, MutDecoderComponent,
+};
+use hermes_encoding_components::traits::encode_mut::{
+    CanEncodeMut, MutEncoder, MutEncoderComponent,
+};
 
 #[cgp_provider(AddressTypeComponent)]
 impl<Chain: Async> ProvideAddressType<Chain> for ProvideFeltAddressType {

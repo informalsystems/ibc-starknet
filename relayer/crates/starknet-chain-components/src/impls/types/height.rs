@@ -1,7 +1,7 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::types::height::{HeightAdjuster, HeightIncrementer};
-use hermes_cosmos_chain_components::components::client::{
-    HeightAdjusterComponent, HeightFieldComponent, HeightIncrementerComponent, HeightTypeComponent,
+use hermes_chain_components::traits::types::height::{
+    HeightAdjuster, HeightAdjusterComponent, HeightFieldComponent, HeightIncrementer,
+    HeightIncrementerComponent, HeightTypeComponent,
 };
 use hermes_relayer_components::chain::traits::types::height::{
     HasHeightType, HeightFieldGetter, ProvideHeightType,

@@ -8,9 +8,6 @@ use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
-use hermes_cosmos_test_components::bootstrap::components::cosmos_sdk::{
-    ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent,
-};
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
     ChainDriverBuilder, ChainDriverBuilderComponent,
 };
@@ -23,6 +20,8 @@ use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path
 use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::{
     ChainStoreDirGetter, ChainStoreDirGetterComponent,
 };
+use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::ChainNodeConfigTypeComponent;
+use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::ChainGenesisConfigTypeComponent;
 use hermes_error::impls::ProvideHermesError;
 use hermes_error::types::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;

@@ -8,10 +8,9 @@ use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::components::chain::TokenBalanceQuerierComponent;
 use crate::impls::types::address::StarknetAddress;
 use crate::traits::contract::call::CanCallContract;
-use crate::traits::queries::token_balance::TokenBalanceQuerier;
+use crate::traits::queries::token_balance::{TokenBalanceQuerier, TokenBalanceQuerierComponent};
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::amount::StarknetAmount;

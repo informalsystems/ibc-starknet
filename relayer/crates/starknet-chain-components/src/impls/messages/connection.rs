@@ -7,8 +7,10 @@ use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasCommitmentPrefixType;
 use hermes_chain_components::traits::message_builders::connection_handshake::{
-    ConnectionOpenAckMessageBuilder, ConnectionOpenConfirmMessageBuilder,
-    ConnectionOpenInitMessageBuilder, ConnectionOpenTryMessageBuilder,
+    ConnectionOpenAckMessageBuilder, ConnectionOpenAckMessageBuilderComponent,
+    ConnectionOpenConfirmMessageBuilder, ConnectionOpenConfirmMessageBuilderComponent,
+    ConnectionOpenInitMessageBuilder, ConnectionOpenInitMessageBuilderComponent,
+    ConnectionOpenTryMessageBuilder, ConnectionOpenTryMessageBuilderComponent,
 };
 use hermes_chain_components::traits::types::client_state::HasClientStateType;
 use hermes_chain_components::traits::types::connection::{
@@ -25,10 +27,6 @@ use hermes_chain_components::types::payloads::connection::{
     ConnectionOpenTryPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::components::client::{
-    ConnectionOpenAckMessageBuilderComponent, ConnectionOpenConfirmMessageBuilderComponent,
-    ConnectionOpenInitMessageBuilderComponent, ConnectionOpenTryMessageBuilderComponent,
-};
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;

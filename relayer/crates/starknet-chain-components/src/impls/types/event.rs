@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_cosmos_chain_components::components::client::EventTypeComponent;
+use hermes_chain_components::traits::types::event::EventTypeComponent;
 use hermes_relayer_components::chain::traits::types::event::ProvideEventType;
 
 use crate::types::event::StarknetEvent;

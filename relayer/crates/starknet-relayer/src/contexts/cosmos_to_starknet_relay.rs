@@ -6,7 +6,6 @@ use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_logging_components::traits::has_logger::HasLogger;
-use hermes_relayer_components::components::default::relay::{IbcMessageSenderComponent, MainSink};
 use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeAtComponent,
 };
@@ -29,6 +28,9 @@ use hermes_relayer_components::relay::traits::connection::open_confirm::CanRelay
 use hermes_relayer_components::relay::traits::connection::open_init::CanInitConnection;
 use hermes_relayer_components::relay::traits::connection::open_try::CanRelayConnectionOpenTry;
 use hermes_relayer_components::relay::traits::event_relayer::CanRelayEvent;
+use hermes_relayer_components::relay::traits::ibc_message_sender::{
+    IbcMessageSenderComponent, MainSink,
+};
 use hermes_relayer_components::relay::traits::packet_lock::HasPacketLock;
 use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::target::{
@@ -43,7 +45,7 @@ use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClie
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
 
-use crate::presets::relay::{IsStarknetCommonRelayContextPreset, StarknetCommonRelayContextPreset};
+use crate::presets::relay::StarknetCommonRelayContextPreset;
 
 #[cgp_context(CosmosToStarknetRelayComponents: StarknetCommonRelayContextPreset)]
 #[derive(Clone)]

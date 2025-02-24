@@ -2,9 +2,9 @@ use cgp::prelude::*;
 use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
 
-use crate::components::chain::{ContractClassHashTypeComponent, ContractClassTypeComponent};
 use crate::traits::types::contract_class::{
-    ProvideContractClassHashType, ProvideContractClassType,
+    ContractClassHashTypeComponent, ContractClassTypeComponent, ProvideContractClassHashType,
+    ProvideContractClassType,
 };
 
 pub struct ProvideStarknetContractTypes;

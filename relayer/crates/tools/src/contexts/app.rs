@@ -29,11 +29,11 @@ use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
 };
+use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_starknet_chain_components::components::chain::RetryableErrorComponent;
 use hermes_starknet_chain_components::impls::types::config::StarknetRelayerConfig;
 use hermes_starknet_cli::impls::bootstrap::starknet_chain::{
     BootstrapStarknetChainArgs, LoadStarknetBootstrap,

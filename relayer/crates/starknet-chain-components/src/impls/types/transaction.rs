@@ -1,6 +1,7 @@
 use cgp::prelude::*;
-use hermes_cosmos_chain_components::components::transaction::TransactionTypeComponent;
-use hermes_relayer_components::transaction::traits::types::transaction::ProvideTransactionType;
+use hermes_relayer_components::transaction::traits::types::transaction::{
+    ProvideTransactionType, TransactionTypeComponent,
+};
 use starknet::accounts::Call;
 
 pub struct ProvideCallTransaction;

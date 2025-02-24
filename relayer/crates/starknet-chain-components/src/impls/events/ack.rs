@@ -4,16 +4,15 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::extract_data::{EventExtractor, EventExtractorComponent};
-use hermes_chain_components::traits::packet::from_write_ack::PacketFromWriteAckEventBuilder;
+use hermes_chain_components::traits::packet::from_write_ack::{
+    PacketFromWriteAckEventBuilder, PacketFromWriteAckEventBuilderComponent,
+};
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::ibc_events::write_ack::{
-    HasWriteAckEvent, ProvideWriteAckEvent,
+    HasWriteAckEvent, ProvideWriteAckEvent, WriteAckEventComponent,
 };
 use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
 use hermes_chain_components::traits::types::packets::ack::HasAcknowledgementType;
-use hermes_cosmos_chain_components::components::client::{
-    PacketFromWriteAckEventBuilderComponent, WriteAckEventComponent,
-};
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;

@@ -4,8 +4,10 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::message_builders::channel_handshake::{
-    ChannelOpenAckMessageBuilder, ChannelOpenConfirmMessageBuilder, ChannelOpenInitMessageBuilder,
-    ChannelOpenTryMessageBuilder,
+    ChannelOpenAckMessageBuilder, ChannelOpenAckMessageBuilderComponent,
+    ChannelOpenConfirmMessageBuilder, ChannelOpenConfirmMessageBuilderComponent,
+    ChannelOpenInitMessageBuilder, ChannelOpenInitMessageBuilderComponent,
+    ChannelOpenTryMessageBuilder, ChannelOpenTryMessageBuilderComponent,
 };
 use hermes_chain_components::traits::types::channel::{
     HasChannelEndType, HasChannelOpenAckPayloadType, HasChannelOpenConfirmPayloadType,
@@ -21,10 +23,6 @@ use hermes_chain_components::types::payloads::channel::{
     ChannelOpenAckPayload, ChannelOpenConfirmPayload, ChannelOpenTryPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::components::client::{
-    ChannelOpenAckMessageBuilderComponent, ChannelOpenConfirmMessageBuilderComponent,
-    ChannelOpenInitMessageBuilderComponent, ChannelOpenTryMessageBuilderComponent,
-};
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;

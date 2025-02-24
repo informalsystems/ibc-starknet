@@ -5,15 +5,14 @@ use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::extract_data::{EventExtractor, EventExtractorComponent};
-use hermes_chain_components::traits::packet::from_send_packet::PacketFromSendPacketEventBuilder;
+use hermes_chain_components::traits::packet::from_send_packet::{
+    PacketFromSendPacketEventBuilder, PacketFromSendPacketEventBuilderComponent,
+};
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::ibc_events::send_packet::{
-    HasSendPacketEvent, ProvideSendPacketEvent,
+    HasSendPacketEvent, ProvideSendPacketEvent, SendPacketEventComponent,
 };
 use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
-use hermes_cosmos_chain_components::components::client::{
-    PacketFromSendPacketEventBuilderComponent, SendPacketEventComponent,
-};
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;

@@ -8,12 +8,10 @@ use hermes_chain_components::traits::extract_data::{
 };
 use hermes_chain_components::traits::types::ibc::HasChannelIdType;
 use hermes_chain_components::traits::types::ibc_events::channel::{
-    ProvideChannelOpenInitEvent, ProvideChannelOpenTryEvent,
+    ChannelOpenInitEventComponent, ChannelOpenTryEventComponent, ProvideChannelOpenInitEvent,
+    ProvideChannelOpenTryEvent,
 };
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
-use hermes_cosmos_chain_components::components::client::{
-    ChannelOpenInitEventComponent, ChannelOpenTryEventComponent,
-};
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;

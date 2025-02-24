@@ -1,10 +1,9 @@
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_encoding_components::traits::decode::{CanDecode, Decoder};
+use hermes_encoding_components::traits::decode::{CanDecode, Decoder, DecoderComponent};
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_wasm_encoding_components::components::DecoderComponent;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 

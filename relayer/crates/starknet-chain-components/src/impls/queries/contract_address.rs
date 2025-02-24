@@ -3,8 +3,7 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 
-use crate::components::chain::ContractAddressQuerierComponent;
-use crate::traits::queries::address::ContractAddressQuerier;
+use crate::traits::queries::address::{ContractAddressQuerier, ContractAddressQuerierComponent};
 
 pub struct GetContractAddressFromField;
 

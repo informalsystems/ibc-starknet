@@ -1,6 +1,7 @@
 use cgp::prelude::*;
-use hermes_cosmos_chain_components::components::transaction::TransactionHashTypeComponent;
-use hermes_relayer_components::transaction::traits::types::tx_hash::ProvideTransactionHashType;
+use hermes_relayer_components::transaction::traits::types::tx_hash::{
+    ProvideTransactionHashType, TransactionHashTypeComponent,
+};
 use starknet::core::types::Felt;
 
 pub struct ProvideFeltTxHash;

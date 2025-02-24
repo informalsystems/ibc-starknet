@@ -3,9 +3,15 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::message_builders::ack_packet::AckPacketMessageBuilder;
-use hermes_chain_components::traits::message_builders::receive_packet::ReceivePacketMessageBuilder;
-use hermes_chain_components::traits::message_builders::timeout_unordered_packet::TimeoutUnorderedPacketMessageBuilder;
+use hermes_chain_components::traits::message_builders::ack_packet::{
+    AckPacketMessageBuilder, AckPacketMessageBuilderComponent,
+};
+use hermes_chain_components::traits::message_builders::receive_packet::{
+    ReceivePacketMessageBuilder, ReceivePacketMessageBuilderComponent,
+};
+use hermes_chain_components::traits::message_builders::timeout_unordered_packet::{
+    TimeoutUnorderedPacketMessageBuilder, TimeoutUnorderedPacketMessageBuilderComponent,
+};
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
@@ -19,10 +25,6 @@ use hermes_chain_components::types::payloads::packet::{
     AckPacketPayload, ReceivePacketPayload, TimeoutUnorderedPacketPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::components::client::{
-    AckPacketMessageBuilderComponent, ReceivePacketMessageBuilderComponent,
-    TimeoutUnorderedPacketMessageBuilderComponent,
-};
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;

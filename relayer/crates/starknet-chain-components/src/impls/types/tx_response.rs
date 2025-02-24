@@ -1,6 +1,7 @@
 use cgp::prelude::*;
-use hermes_cosmos_chain_components::components::transaction::TxResponseTypeComponent;
-use hermes_relayer_components::transaction::traits::types::tx_response::ProvideTxResponseType;
+use hermes_relayer_components::transaction::traits::types::tx_response::{
+    ProvideTxResponseType, TxResponseTypeComponent,
+};
 
 use crate::types::tx_response::TxResponse;
 
