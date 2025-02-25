@@ -14,6 +14,7 @@ use starknet::core::types::{
 };
 
 use crate::impls::types::message::StarknetMessage;
+use crate::traits::account::HasStarknetAccount;
 use crate::types::event::StarknetEvent;
 use crate::types::message_response::StarknetMessageResponse;
 use crate::types::transaction::StarknetTransaction;
@@ -27,13 +28,15 @@ pub struct UnexpectedTransactionTraceType {
 impl<Chain> MessageSender<Chain> for SendCallMessages
 where
     Chain: HasMessageType<Message = StarknetMessage>
-        + CanSubmitTx<Transaction = StarknetTransaction>
+        + HasStarknetAccount
+        + CanSubmitTx<Transaction = StarknetTransaction<Chain::Account>>
         + HasTxResponseType<TxResponse = TxResponse>
         + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
         + CanPollTxResponse
         + CanExtractMessageResponsesFromTxResponse
         + CanRaiseAsyncError<RevertedInvocation>
         + CanRaiseAsyncError<UnexpectedTransactionTraceType>,
+    Chain::Account: Clone,
 {
     async fn send_messages(
         chain: &Chain,
@@ -44,7 +47,10 @@ where
             .map(|message| message.call.clone())
             .collect();
 
-        let transaction = StarknetTransaction { calls };
+        let transaction = StarknetTransaction {
+            calls,
+            account: chain.account().clone(),
+        };
 
         let tx_hash = chain.submit_tx(&transaction).await?;
 

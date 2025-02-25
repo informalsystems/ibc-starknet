@@ -7,24 +7,24 @@ use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransacti
 use starknet::accounts::Account;
 use starknet::core::types::Felt;
 
-use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
+use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccountType};
 use crate::traits::provider::HasStarknetProvider;
 use crate::types::transaction::StarknetTransaction;
 
 #[cgp_new_provider(TxSubmitterComponent)]
 impl<Chain> TxSubmitter<Chain> for SubmitCallTransaction
 where
-    Chain: HasTransactionType<Transaction = StarknetTransaction>
+    Chain: HasTransactionType<Transaction = StarknetTransaction<Chain::Account>>
         + HasTransactionHashType<TxHash = Felt>
         + HasStarknetProvider
-        + HasStarknetAccount
+        + HasStarknetAccountType
         + CanRaiseAccountErrors,
 {
     async fn submit_tx(
         chain: &Chain,
-        transcation: &StarknetTransaction,
+        transcation: &StarknetTransaction<Chain::Account>,
     ) -> Result<Felt, Chain::Error> {
-        let account = chain.account();
+        let account = &transcation.account;
 
         let execution = account.execute_v3(transcation.calls.clone());
 
