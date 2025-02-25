@@ -175,7 +175,6 @@ use hermes_starknet_chain_components::types::message_response::StarknetMessageRe
 use hermes_starknet_chain_components::types::payloads::client::{
     StarknetCreateClientPayloadOptions, StarknetUpdateClientPayload,
 };
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessage;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
@@ -331,7 +330,7 @@ pub trait CanUseStarknetChain:
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
     + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
-    + HasSignerType<Signer = StarknetWallet>
+    + HasSignerType
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
     + HasClientIdType<CosmosChain, ClientId = ClientId>

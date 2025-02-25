@@ -228,6 +228,7 @@ mod preset {
     use crate::impls::types::message::ProvideCallMessage;
     use crate::impls::types::method::ProvideFeltSelector;
     use crate::impls::types::payloads::ProvideStarknetPayloadTypes;
+    use crate::impls::types::signer::UseStarknetAccountSigner;
     use crate::impls::types::status::ProvideStarknetChainStatusType;
     use crate::impls::types::transaction::ProvideCallTransaction;
     use crate::impls::types::tx_hash::ProvideFeltTxHash;
@@ -249,7 +250,6 @@ mod preset {
     use crate::traits::types::method::SelectorTypeComponent;
     use crate::types::message_response::UseStarknetMessageResponse;
     use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
-    use crate::types::wallet::StarknetWallet;
 
     cgp_preset! {
         StarknetChainComponents {
@@ -286,7 +286,7 @@ mod preset {
             WalletTypeComponent:
                 UseStarknetWallet,
             SignerTypeProviderComponent:
-                UseType<StarknetWallet>,
+                UseStarknetAccountSigner,
             TokenIbcTransferrerComponent:
                 SendIbcTransferMessage,
             TransactionTypeComponent:
