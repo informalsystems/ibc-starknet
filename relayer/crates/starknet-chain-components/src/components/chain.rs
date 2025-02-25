@@ -156,6 +156,7 @@ mod preset {
     use hermes_relayer_components::transaction::impls::poll_tx_response::{
         PollTimeoutGetterComponent, PollTxResponse,
     };
+    use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
     use hermes_relayer_components::transaction::traits::poll_tx_response::TxResponsePollerComponent;
     use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerierComponent;
     use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterComponent;
@@ -208,6 +209,7 @@ mod preset {
     use crate::impls::queries::consensus_state::QueryCometConsensusState;
     use crate::impls::queries::contract_address::GetContractAddressFromField;
     use crate::impls::queries::counterparty_chain_id::QueryCosmosChainIdFromStarknetChannelId;
+    use crate::impls::queries::nonce::QueryStarknetNonce;
     use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
     use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
     use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
@@ -394,6 +396,8 @@ mod preset {
                 DeployStarknetContract,
             InvokeContractMessageBuilderComponent:
                 BuildInvokeContractCall,
+            NonceQuerierComponent:
+                QueryStarknetNonce,
             IbcCommitmentPrefixGetterComponent:
                 GetStarknetCommitmentPrefix,
             RetryableErrorComponent:

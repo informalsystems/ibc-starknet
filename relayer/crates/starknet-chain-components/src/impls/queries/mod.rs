@@ -7,6 +7,7 @@ pub mod connection_end;
 pub mod consensus_state;
 pub mod contract_address;
 pub mod counterparty_chain_id;
+pub mod nonce;
 pub mod packet_commitment;
 pub mod packet_receipt;
 pub mod packet_received;

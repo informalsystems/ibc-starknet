@@ -255,7 +255,7 @@ impl StarknetBuilder {
                 runtime: self.runtime.clone(),
                 chain_id,
                 rpc_client,
-                account,
+                account: Arc::new(account),
                 ibc_client_contract_address: None,
                 ibc_core_contract_address: None,
                 event_encoding: Default::default(),

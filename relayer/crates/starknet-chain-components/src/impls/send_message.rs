@@ -19,13 +19,11 @@ use crate::types::message_response::StarknetMessageResponse;
 use crate::types::transaction::StarknetTransaction;
 use crate::types::tx_response::TxResponse;
 
-pub struct SendCallMessages;
-
 pub struct UnexpectedTransactionTraceType {
     pub trace: TransactionTrace,
 }
 
-#[cgp_provider(MessageSenderComponent)]
+#[cgp_new_provider(MessageSenderComponent)]
 impl<Chain> MessageSender<Chain> for SendCallMessages
 where
     Chain: HasMessageType<Message = StarknetMessage>

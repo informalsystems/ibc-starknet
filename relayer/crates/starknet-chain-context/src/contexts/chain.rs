@@ -126,6 +126,7 @@ use hermes_relayer_components::chain::traits::types::packets::receive::HasPacket
 use hermes_relayer_components::chain::traits::types::packets::timeout::HasPacketReceiptType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
+use hermes_relayer_components::transaction::traits::nonce::query_nonce::CanQueryNonce;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
@@ -204,7 +205,7 @@ pub struct StarknetChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
-    pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
+    pub account: Arc<SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>>,
     pub ibc_client_contract_address: Option<StarknetAddress>,
     pub ibc_core_contract_address: Option<StarknetAddress>,
     pub event_encoding: StarknetEventEncoding,
@@ -392,6 +393,7 @@ pub trait CanUseStarknetChain:
     + CanQueryConnectionEndWithProofs<CosmosChain>
     + CanQueryChannelEnd<CosmosChain>
     + CanQueryChannelEndWithProofs<CosmosChain>
+    + CanQueryNonce
     + HasCounterpartyMessageHeight<CosmosChain>
     + HasInitConnectionOptionsType<CosmosChain>
     + CanBuildConnectionOpenInitPayload<CosmosChain>

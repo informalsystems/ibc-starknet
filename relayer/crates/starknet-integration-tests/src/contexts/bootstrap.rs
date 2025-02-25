@@ -166,7 +166,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
                 runtime: runtime.clone(),
                 chain_id: chain_id.to_string().parse()?,
                 rpc_client,
-                account,
+                account: Arc::new(account),
                 ibc_client_contract_address: None,
                 ibc_core_contract_address: None,
                 event_encoding: Default::default(),
