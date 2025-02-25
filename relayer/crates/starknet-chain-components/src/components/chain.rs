@@ -155,6 +155,7 @@ mod preset {
     use hermes_relayer_components::error::impls::retry::ReturnRetryable;
     use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
     use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeoutGetterComponent;
+    use hermes_relayer_components::transaction::traits::default_signer::DefaultSignerGetterComponent;
     use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::NonceAllocatorComponent;
     use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
     use hermes_relayer_components::transaction::traits::parse_events::TxMessageResponseParserComponent;
@@ -292,7 +293,10 @@ mod preset {
                 ProvideStringMemoType,
             WalletTypeComponent:
                 UseStarknetWallet,
-            SignerTypeProviderComponent:
+            [
+                SignerTypeProviderComponent,
+                DefaultSignerGetterComponent,
+            ]:
                 UseStarknetAccountSigner,
             NonceTypeProviderComponent:
                 UseType<Felt>,
@@ -380,12 +384,12 @@ mod preset {
                         GetStarknetBlockEvents
                     >>,
             [
-                MessageSenderComponent,
                 MessagesWithSignerAndNonceSenderComponent,
                 TxMessageResponseParserComponent,
             ]:
                 SendCallMessages,
             [
+                MessageSenderComponent,
                 MessagesWithSignerSenderComponent,
                 NonceAllocatorComponent,
                 TxResponsePollerComponent,
