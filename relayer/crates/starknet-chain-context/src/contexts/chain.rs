@@ -133,6 +133,7 @@ use hermes_relayer_components::transaction::traits::nonce::nonce_mutex::NonceAll
 use hermes_relayer_components::transaction::traits::nonce::query_nonce::CanQueryNonce;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
+use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
 use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::CanSendMessagesWithSignerAndNonce;
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
@@ -403,6 +404,7 @@ pub trait CanUseStarknetChain:
     + CanQueryChannelEndWithProofs<CosmosChain>
     + CanQueryNonce
     + CanAllocateNonce
+    + CanSendMessagesWithSigner
     + CanSendMessagesWithSignerAndNonce
     + HasCounterpartyMessageHeight<CosmosChain>
     + HasInitConnectionOptionsType<CosmosChain>

@@ -151,17 +151,16 @@ mod preset {
     };
     use hermes_relayer_components::chain::traits::types::message::MessageTypeComponent;
     use hermes_relayer_components::chain::traits::types::status::ChainStatusTypeComponent;
+    use hermes_relayer_components::components::default::transaction::DefaultTxComponents;
     use hermes_relayer_components::error::impls::retry::ReturnRetryable;
     use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
-    use hermes_relayer_components::transaction::impls::allocate_nonce_with_mutex::AllocateNonceWithMutex;
-    use hermes_relayer_components::transaction::impls::poll_tx_response::{
-        PollTimeoutGetterComponent, PollTxResponse,
-    };
+    use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeoutGetterComponent;
     use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::NonceAllocatorComponent;
     use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
     use hermes_relayer_components::transaction::traits::parse_events::TxMessageResponseParserComponent;
     use hermes_relayer_components::transaction::traits::poll_tx_response::TxResponsePollerComponent;
     use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerierComponent;
+    use hermes_relayer_components::transaction::traits::send_messages_with_signer::MessagesWithSignerSenderComponent;
     use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::MessagesWithSignerAndNonceSenderComponent;
     use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterComponent;
     use hermes_relayer_components::transaction::traits::types::nonce::NonceTypeProviderComponent;
@@ -386,12 +385,16 @@ mod preset {
                 TxMessageResponseParserComponent,
             ]:
                 SendCallMessages,
-            TxSubmitterComponent:
-                SubmitCallTransaction,
+            [
+                MessagesWithSignerSenderComponent,
+                NonceAllocatorComponent,
+                TxResponsePollerComponent,
+            ]:
+                DefaultTxComponents::Provider,
             TxResponseQuerierComponent:
                 QueryTransactionReceipt,
-            TxResponsePollerComponent:
-                PollTxResponse,
+            TxSubmitterComponent:
+                SubmitCallTransaction,
             PollTimeoutGetterComponent:
                 FixedPollTimeoutSecs<300>,
             ContractCallerComponent:
@@ -406,8 +409,6 @@ mod preset {
                 BuildInvokeContractCall,
             NonceQuerierComponent:
                 QueryStarknetNonce,
-            NonceAllocatorComponent:
-                AllocateNonceWithMutex,
             IbcCommitmentPrefixGetterComponent:
                 GetStarknetCommitmentPrefix,
             RetryableErrorComponent:
