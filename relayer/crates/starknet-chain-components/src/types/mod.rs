@@ -15,6 +15,7 @@ pub mod messages;
 pub mod payloads;
 pub mod register;
 pub mod status;
+pub mod transaction;
 pub mod tx_response;
 pub mod utils;
 pub mod wallet;

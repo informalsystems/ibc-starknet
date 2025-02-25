@@ -2,15 +2,16 @@ use cgp::prelude::*;
 use hermes_relayer_components::transaction::traits::types::transaction::{
     ProvideTransactionType, TransactionTypeComponent,
 };
-use starknet::accounts::Call;
 
-pub struct ProvideCallTransaction;
+use crate::types::transaction::StarknetTransaction;
+
+pub struct UseStarknetTransaction;
 
 #[cgp_provider(TransactionTypeComponent)]
-impl<Chain: Async> ProvideTransactionType<Chain> for ProvideCallTransaction {
-    type Transaction = Vec<Call>;
+impl<Chain: Async> ProvideTransactionType<Chain> for UseStarknetTransaction {
+    type Transaction = StarknetTransaction;
 
-    fn tx_size(tx: &Vec<Call>) -> usize {
-        tx.len() // stub
+    fn tx_size(tx: &StarknetTransaction) -> usize {
+        tx.calls.len() // stub
     }
 }

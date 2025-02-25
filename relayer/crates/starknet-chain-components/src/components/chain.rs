@@ -159,6 +159,7 @@ mod preset {
     use hermes_relayer_components::transaction::traits::poll_tx_response::TxResponsePollerComponent;
     use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerierComponent;
     use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterComponent;
+    use hermes_relayer_components::transaction::traits::types::nonce::NonceTypeProviderComponent;
     use hermes_relayer_components::transaction::traits::types::signer::SignerTypeProviderComponent;
     use hermes_relayer_components::transaction::traits::types::transaction::TransactionTypeComponent;
     use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
@@ -177,6 +178,7 @@ mod preset {
     use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
     use hermes_test_components::chain::traits::types::memo::MemoTypeComponent;
     use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
+    use starknet::core::types::Felt;
 
     use crate::components::types::StarknetChainTypes;
     use crate::impls::commitment_prefix::GetStarknetCommitmentPrefix;
@@ -230,7 +232,7 @@ mod preset {
     use crate::impls::types::payloads::ProvideStarknetPayloadTypes;
     use crate::impls::types::signer::UseStarknetAccountSigner;
     use crate::impls::types::status::ProvideStarknetChainStatusType;
-    use crate::impls::types::transaction::ProvideCallTransaction;
+    use crate::impls::types::transaction::UseStarknetTransaction;
     use crate::impls::types::tx_hash::ProvideFeltTxHash;
     use crate::impls::types::tx_response::ProvideStarknetTxResponse;
     use crate::impls::types::wallet::UseStarknetWallet;
@@ -287,10 +289,12 @@ mod preset {
                 UseStarknetWallet,
             SignerTypeProviderComponent:
                 UseStarknetAccountSigner,
+            NonceTypeProviderComponent:
+                UseType<Felt>,
             TokenIbcTransferrerComponent:
                 SendIbcTransferMessage,
             TransactionTypeComponent:
-                ProvideCallTransaction,
+                UseStarknetTransaction,
             TransactionHashTypeComponent:
                 ProvideFeltTxHash,
             TxResponseTypeComponent:

@@ -4,27 +4,31 @@ use hermes_relayer_components::transaction::traits::submit_tx::{
 };
 use hermes_relayer_components::transaction::traits::types::transaction::HasTransactionType;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
-use starknet::accounts::{Account, Call};
+use starknet::accounts::Account;
 use starknet::core::types::Felt;
 
 use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
 use crate::traits::provider::HasStarknetProvider;
+use crate::types::transaction::StarknetTransaction;
 
 pub struct SubmitCallTransaction;
 
 #[cgp_provider(TxSubmitterComponent)]
 impl<Chain> TxSubmitter<Chain> for SubmitCallTransaction
 where
-    Chain: HasTransactionType<Transaction = Vec<Call>>
+    Chain: HasTransactionType<Transaction = StarknetTransaction>
         + HasTransactionHashType<TxHash = Felt>
         + HasStarknetProvider
         + HasStarknetAccount
         + CanRaiseAccountErrors,
 {
-    async fn submit_tx(chain: &Chain, messages: &Vec<Call>) -> Result<Felt, Chain::Error> {
+    async fn submit_tx(
+        chain: &Chain,
+        transcation: &StarknetTransaction,
+    ) -> Result<Felt, Chain::Error> {
         let account = chain.account();
 
-        let execution = account.execute_v3(messages.clone());
+        let execution = account.execute_v3(transcation.calls.clone());
 
         let tx_hash = execution
             .send()
