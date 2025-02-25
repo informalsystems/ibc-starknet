@@ -135,7 +135,6 @@ use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxR
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
 use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
 use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::CanSendMessagesWithSignerAndNonce;
-use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
@@ -369,7 +368,6 @@ pub trait CanUseStarknetChain:
     + CanQueryBlockEvents
     + CanSendMessages
     + CanSendSingleMessage
-    + CanSubmitTx
     + CanQueryTxResponse
     + CanPollTxResponse
     + CanCallContract

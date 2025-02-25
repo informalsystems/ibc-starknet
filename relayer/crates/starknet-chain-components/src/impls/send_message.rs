@@ -1,18 +1,15 @@
 use core::fmt::Debug;
 
 use cgp::prelude::*;
-use hermes_chain_components::traits::send_message::MessageSenderComponent;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
-use hermes_relayer_components::chain::traits::send_message::MessageSender;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_relayer_components::transaction::traits::parse_events::{
-    CanParseTxMessageResponse, TxMessageResponseParser, TxMessageResponseParserComponent,
+    TxMessageResponseParser, TxMessageResponseParserComponent,
 };
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::{
     MessagesWithSignerAndNonceSender, MessagesWithSignerAndNonceSenderComponent,
 };
-use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
 use hermes_relayer_components::transaction::traits::types::nonce::HasNonceType;
 use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
@@ -23,10 +20,9 @@ use starknet::core::types::{
 };
 
 use crate::impls::types::message::StarknetMessage;
-use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount, HasStarknetAccountType};
+use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccountType};
 use crate::types::event::StarknetEvent;
 use crate::types::message_response::StarknetMessageResponse;
-use crate::types::transaction::StarknetTransaction;
 use crate::types::tx_response::TxResponse;
 
 pub struct UnexpectedTransactionTraceType {
@@ -34,42 +30,6 @@ pub struct UnexpectedTransactionTraceType {
 }
 
 pub struct SendCallMessages;
-
-#[cgp_provider(MessageSenderComponent)]
-impl<Chain> MessageSender<Chain> for SendCallMessages
-where
-    Chain: HasMessageType<Message = StarknetMessage>
-        + HasStarknetAccount
-        + CanSubmitTx<Transaction = StarknetTransaction<Chain::Account>>
-        + HasTxResponseType<TxResponse = TxResponse>
-        + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
-        + CanPollTxResponse
-        + CanParseTxMessageResponse
-        + CanRaiseAsyncError<RevertedInvocation>
-        + CanRaiseAsyncError<UnexpectedTransactionTraceType>,
-    Chain::Account: Clone,
-{
-    async fn send_messages(
-        chain: &Chain,
-        messages: Vec<StarknetMessage>,
-    ) -> Result<Vec<StarknetMessageResponse>, Chain::Error> {
-        let calls: Vec<Call> = messages
-            .iter()
-            .map(|message| message.call.clone())
-            .collect();
-
-        let transaction = StarknetTransaction {
-            calls,
-            account: chain.account().clone(),
-        };
-
-        let tx_hash = chain.submit_tx(&transaction).await?;
-
-        let tx_response = chain.poll_tx_response(&tx_hash).await?;
-
-        Chain::parse_tx_message_response(tx_response)
-    }
-}
 
 #[cgp_provider(MessagesWithSignerAndNonceSenderComponent)]
 impl<Chain> MessagesWithSignerAndNonceSender<Chain> for SendCallMessages

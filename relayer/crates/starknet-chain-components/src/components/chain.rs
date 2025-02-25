@@ -163,10 +163,8 @@ mod preset {
     use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerierComponent;
     use hermes_relayer_components::transaction::traits::send_messages_with_signer::MessagesWithSignerSenderComponent;
     use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::MessagesWithSignerAndNonceSenderComponent;
-    use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterComponent;
     use hermes_relayer_components::transaction::traits::types::nonce::NonceTypeProviderComponent;
     use hermes_relayer_components::transaction::traits::types::signer::SignerTypeProviderComponent;
-    use hermes_relayer_components::transaction::traits::types::transaction::TransactionTypeComponent;
     use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
     use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
     use hermes_test_components::chain::impls::assert::default_assert_duration::ProvideDefaultPollAssertDuration;
@@ -220,7 +218,6 @@ mod preset {
     use crate::impls::queries::status::QueryStarknetChainStatus;
     use crate::impls::queries::token_balance::QueryErc20TokenBalance;
     use crate::impls::send_message::SendCallMessages;
-    use crate::impls::submit_tx::SubmitCallTransaction;
     use crate::impls::transfer::TransferErc20Token;
     use crate::impls::tx_response::QueryTransactionReceipt;
     use crate::impls::types::address::ProvideFeltAddressType;
@@ -238,7 +235,6 @@ mod preset {
     use crate::impls::types::payloads::ProvideStarknetPayloadTypes;
     use crate::impls::types::signer::UseStarknetAccountSigner;
     use crate::impls::types::status::ProvideStarknetChainStatusType;
-    use crate::impls::types::transaction::UseStarknetTransaction;
     use crate::impls::types::tx_hash::ProvideFeltTxHash;
     use crate::impls::types::tx_response::ProvideStarknetTxResponse;
     use crate::impls::types::wallet::UseStarknetWallet;
@@ -302,8 +298,6 @@ mod preset {
                 UseType<Felt>,
             TokenIbcTransferrerComponent:
                 SendIbcTransferMessage,
-            TransactionTypeComponent:
-                UseStarknetTransaction,
             TransactionHashTypeComponent:
                 ProvideFeltTxHash,
             TxResponseTypeComponent:
@@ -397,8 +391,6 @@ mod preset {
                 DefaultTxComponents::Provider,
             TxResponseQuerierComponent:
                 QueryTransactionReceipt,
-            TxSubmitterComponent:
-                SubmitCallTransaction,
             PollTimeoutGetterComponent:
                 FixedPollTimeoutSecs<300>,
             ContractCallerComponent:
