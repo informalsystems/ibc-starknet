@@ -50,6 +50,7 @@ use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegis
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
+use hermes_starknet_chain_context::impls::error::SignError;
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
@@ -60,7 +61,7 @@ use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
-use starknet::accounts::{Account, Call, ExecutionEncoding, SingleOwnerAccount};
+use starknet::accounts::{Account, AccountError, Call, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::U256;
 use starknet::macros::{selector, short_string};
 use starknet::providers::Provider;
@@ -529,7 +530,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let execution = starknet_account_b.execute_v3(vec![call]);
 
-            let tx_hash = execution.send().await?.transaction_hash;
+            let tx_hash = execution
+                .send()
+                .await
+                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
+                .transaction_hash;
 
             starknet_chain.poll_tx_response(&tx_hash).await?;
         }
@@ -577,7 +582,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let execution = starknet_account_b.execute_v3(vec![call]);
 
-            let tx_hash = execution.send().await?.transaction_hash;
+            let tx_hash = execution
+                .send()
+                .await
+                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
+                .transaction_hash;
 
             starknet_chain.poll_tx_response(&tx_hash).await?;
         };
@@ -624,7 +633,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let execution = starknet_account_b.execute_v3(vec![call]);
 
-            let tx_hash = execution.send().await?.transaction_hash;
+            let tx_hash = execution
+                .send()
+                .await
+                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
+                .transaction_hash;
 
             starknet_chain.poll_tx_response(&tx_hash).await?;
         }
@@ -668,7 +681,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
             let execution = starknet_account_b.execute_v3(vec![call]);
 
-            let tx_hash = execution.send().await?.transaction_hash;
+            let tx_hash = execution
+                .send()
+                .await
+                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
+                .transaction_hash;
 
             starknet_chain.poll_tx_response(&tx_hash).await?;
         };
