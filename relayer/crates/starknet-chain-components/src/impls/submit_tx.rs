@@ -11,7 +11,9 @@ use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccountType};
 use crate::traits::provider::HasStarknetProvider;
 use crate::types::transaction::StarknetTransaction;
 
-#[cgp_new_provider(TxSubmitterComponent)]
+pub struct SubmitCallTransaction;
+
+#[cgp_provider(TxSubmitterComponent)]
 impl<Chain> TxSubmitter<Chain> for SubmitCallTransaction
 where
     Chain: HasTransactionType<Transaction = StarknetTransaction<Chain::Account>>

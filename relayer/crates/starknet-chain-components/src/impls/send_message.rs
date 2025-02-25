@@ -6,15 +6,21 @@ use hermes_chain_type_components::traits::types::message_response::HasMessageRes
 use hermes_relayer_components::chain::traits::send_message::MessageSender;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
+use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::{
+    MessagesWithSignerAndNonceSender, MessagesWithSignerAndNonceSenderComponent,
+};
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
+use hermes_relayer_components::transaction::traits::types::nonce::HasNonceType;
+use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
+use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
-use starknet::accounts::Call;
+use starknet::accounts::{Account, Call};
 use starknet::core::types::{
-    ExecuteInvocation, FunctionInvocation, RevertedInvocation, TransactionTrace,
+    ExecuteInvocation, Felt, FunctionInvocation, RevertedInvocation, TransactionTrace,
 };
 
 use crate::impls::types::message::StarknetMessage;
-use crate::traits::account::HasStarknetAccount;
+use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount, HasStarknetAccountType};
 use crate::types::event::StarknetEvent;
 use crate::types::message_response::StarknetMessageResponse;
 use crate::types::transaction::StarknetTransaction;
@@ -24,7 +30,9 @@ pub struct UnexpectedTransactionTraceType {
     pub trace: TransactionTrace,
 }
 
-#[cgp_new_provider(MessageSenderComponent)]
+pub struct SendCallMessages;
+
+#[cgp_provider(MessageSenderComponent)]
 impl<Chain> MessageSender<Chain> for SendCallMessages
 where
     Chain: HasMessageType<Message = StarknetMessage>
@@ -57,6 +65,41 @@ where
         let tx_response = chain.poll_tx_response(&tx_hash).await?;
 
         Chain::extract_message_responses_from_tx_response(tx_response)
+    }
+}
+
+#[cgp_provider(MessagesWithSignerAndNonceSenderComponent)]
+impl<Chain> MessagesWithSignerAndNonceSender<Chain> for SendCallMessages
+where
+    Chain: HasStarknetAccountType
+        + HasSignerType<Signer = Chain::Account>
+        + HasNonceType<Nonce = Felt>
+        + HasMessageType<Message = StarknetMessage>
+        + HasTransactionHashType<TxHash = Felt>
+        + CanPollTxResponse
+        + CanExtractMessageResponsesFromTxResponse
+        + CanRaiseAccountErrors,
+{
+    async fn send_messages_with_signer_and_nonce(
+        chain: &Chain,
+        account: &Chain::Account,
+        nonce: &Felt,
+        messages: &[StarknetMessage],
+    ) -> Result<Chain::TxResponse, Chain::Error> {
+        let calls: Vec<Call> = messages
+            .iter()
+            .map(|message| message.call.clone())
+            .collect();
+
+        let execution = account.execute_v3(calls).nonce(*nonce);
+
+        let tx_hash = execution
+            .send()
+            .await
+            .map_err(Chain::raise_error)?
+            .transaction_hash;
+
+        chain.poll_tx_response(&tx_hash).await
     }
 }
 

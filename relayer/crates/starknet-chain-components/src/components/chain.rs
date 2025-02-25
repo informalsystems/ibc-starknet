@@ -161,6 +161,7 @@ mod preset {
     use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
     use hermes_relayer_components::transaction::traits::poll_tx_response::TxResponsePollerComponent;
     use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerierComponent;
+    use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::MessagesWithSignerAndNonceSenderComponent;
     use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterComponent;
     use hermes_relayer_components::transaction::traits::types::nonce::NonceTypeProviderComponent;
     use hermes_relayer_components::transaction::traits::types::signer::SignerTypeProviderComponent;
@@ -378,7 +379,10 @@ mod preset {
                     WaitBlockHeightAndQueryEvents<
                         GetStarknetBlockEvents
                     >>,
-            MessageSenderComponent:
+            [
+                MessageSenderComponent,
+                MessagesWithSignerAndNonceSenderComponent,
+            ]:
                 SendCallMessages,
             TxSubmitterComponent:
                 SubmitCallTransaction,
