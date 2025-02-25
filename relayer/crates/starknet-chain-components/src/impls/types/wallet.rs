@@ -1,15 +1,16 @@
 use cgp::prelude::*;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::{
     ProvideWalletType, WalletTypeComponent,
 };
 
-pub struct ProvideStarknetWalletType;
+use crate::impls::types::address::StarknetAddress;
+use crate::types::wallet::StarknetWallet;
+
+pub struct UseStarknetWallet;
 
 #[cgp_provider(WalletTypeComponent)]
-impl<Bootstrap> ProvideWalletType<Bootstrap> for ProvideStarknetWalletType
+impl<Bootstrap> ProvideWalletType<Bootstrap> for UseStarknetWallet
 where
     Bootstrap: HasAddressType<Address = StarknetAddress>,
 {

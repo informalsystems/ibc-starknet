@@ -151,15 +151,20 @@ mod preset {
     };
     use hermes_relayer_components::chain::traits::types::message::MessageTypeComponent;
     use hermes_relayer_components::chain::traits::types::status::ChainStatusTypeComponent;
+    use hermes_relayer_components::components::default::transaction::DefaultTxComponents;
     use hermes_relayer_components::error::impls::retry::ReturnRetryable;
     use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
-    use hermes_relayer_components::transaction::impls::poll_tx_response::{
-        PollTimeoutGetterComponent, PollTxResponse,
-    };
+    use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeoutGetterComponent;
+    use hermes_relayer_components::transaction::traits::default_signer::DefaultSignerGetterComponent;
+    use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::NonceAllocatorComponent;
+    use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
+    use hermes_relayer_components::transaction::traits::parse_events::TxMessageResponseParserComponent;
     use hermes_relayer_components::transaction::traits::poll_tx_response::TxResponsePollerComponent;
     use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerierComponent;
-    use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterComponent;
-    use hermes_relayer_components::transaction::traits::types::transaction::TransactionTypeComponent;
+    use hermes_relayer_components::transaction::traits::send_messages_with_signer::MessagesWithSignerSenderComponent;
+    use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::MessagesWithSignerAndNonceSenderComponent;
+    use hermes_relayer_components::transaction::traits::types::nonce::NonceTypeProviderComponent;
+    use hermes_relayer_components::transaction::traits::types::signer::SignerTypeProviderComponent;
     use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
     use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
     use hermes_test_components::chain::impls::assert::default_assert_duration::ProvideDefaultPollAssertDuration;
@@ -175,6 +180,8 @@ mod preset {
     use hermes_test_components::chain::traits::types::amount::AmountTypeComponent;
     use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
     use hermes_test_components::chain::traits::types::memo::MemoTypeComponent;
+    use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
+    use starknet::core::types::Felt;
 
     use crate::components::types::StarknetChainTypes;
     use crate::impls::commitment_prefix::GetStarknetCommitmentPrefix;
@@ -204,13 +211,13 @@ mod preset {
     use crate::impls::queries::consensus_state::QueryCometConsensusState;
     use crate::impls::queries::contract_address::GetContractAddressFromField;
     use crate::impls::queries::counterparty_chain_id::QueryCosmosChainIdFromStarknetChannelId;
+    use crate::impls::queries::nonce::QueryStarknetNonce;
     use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
     use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
     use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
     use crate::impls::queries::status::QueryStarknetChainStatus;
     use crate::impls::queries::token_balance::QueryErc20TokenBalance;
-    use crate::impls::send_message::SendCallMessages;
-    use crate::impls::submit_tx::SubmitCallTransaction;
+    use crate::impls::send_message::SendStarknetMessages;
     use crate::impls::transfer::TransferErc20Token;
     use crate::impls::tx_response::QueryTransactionReceipt;
     use crate::impls::types::address::ProvideFeltAddressType;
@@ -226,10 +233,11 @@ mod preset {
     use crate::impls::types::message::ProvideCallMessage;
     use crate::impls::types::method::ProvideFeltSelector;
     use crate::impls::types::payloads::ProvideStarknetPayloadTypes;
+    use crate::impls::types::signer::UseStarknetAccountSigner;
     use crate::impls::types::status::ProvideStarknetChainStatusType;
-    use crate::impls::types::transaction::ProvideCallTransaction;
     use crate::impls::types::tx_hash::ProvideFeltTxHash;
     use crate::impls::types::tx_response::ProvideStarknetTxResponse;
+    use crate::impls::types::wallet::UseStarknetWallet;
     use crate::traits::contract::call::ContractCallerComponent;
     use crate::traits::contract::declare::ContractDeclarerComponent;
     use crate::traits::contract::deploy::ContractDeployerComponent;
@@ -279,10 +287,17 @@ mod preset {
                 ProvideTokenAddressDenom,
             MemoTypeComponent:
                 ProvideStringMemoType,
+            WalletTypeComponent:
+                UseStarknetWallet,
+            [
+                SignerTypeProviderComponent,
+                DefaultSignerGetterComponent,
+            ]:
+                UseStarknetAccountSigner,
+            NonceTypeProviderComponent:
+                UseType<Felt>,
             TokenIbcTransferrerComponent:
                 SendIbcTransferMessage,
-            TransactionTypeComponent:
-                ProvideCallTransaction,
             TransactionHashTypeComponent:
                 ProvideFeltTxHash,
             TxResponseTypeComponent:
@@ -362,14 +377,20 @@ mod preset {
                     WaitBlockHeightAndQueryEvents<
                         GetStarknetBlockEvents
                     >>,
-            MessageSenderComponent:
-                SendCallMessages,
-            TxSubmitterComponent:
-                SubmitCallTransaction,
+            [
+                MessagesWithSignerAndNonceSenderComponent,
+                TxMessageResponseParserComponent,
+            ]:
+                SendStarknetMessages,
+            [
+                MessageSenderComponent,
+                MessagesWithSignerSenderComponent,
+                NonceAllocatorComponent,
+                TxResponsePollerComponent,
+            ]:
+                DefaultTxComponents::Provider,
             TxResponseQuerierComponent:
                 QueryTransactionReceipt,
-            TxResponsePollerComponent:
-                PollTxResponse,
             PollTimeoutGetterComponent:
                 FixedPollTimeoutSecs<300>,
             ContractCallerComponent:
@@ -382,6 +403,8 @@ mod preset {
                 DeployStarknetContract,
             InvokeContractMessageBuilderComponent:
                 BuildInvokeContractCall,
+            NonceQuerierComponent:
+                QueryStarknetNonce,
             IbcCommitmentPrefixGetterComponent:
                 GetStarknetCommitmentPrefix,
             RetryableErrorComponent:

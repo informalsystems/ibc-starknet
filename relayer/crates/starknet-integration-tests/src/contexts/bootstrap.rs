@@ -7,6 +7,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
+use futures::lock::Mutex;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
     ChainDriverBuilder, ChainDriverBuilderComponent,
@@ -166,12 +167,13 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
                 runtime: runtime.clone(),
                 chain_id: chain_id.to_string().parse()?,
                 rpc_client,
-                account,
+                account: Arc::new(account),
                 ibc_client_contract_address: None,
                 ibc_core_contract_address: None,
                 event_encoding: Default::default(),
                 proof_signer,
                 poll_interval: core::time::Duration::from_millis(200),
+                nonce_mutex: Arc::new(Mutex::new(())),
             }),
         };
 

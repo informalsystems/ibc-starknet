@@ -7,6 +7,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
+use futures::lock::Mutex;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
@@ -126,22 +127,27 @@ use hermes_relayer_components::chain::traits::types::packets::receive::HasPacket
 use hermes_relayer_components::chain::traits::types::packets::timeout::HasPacketReceiptType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
+use hermes_relayer_components::transaction::impls::global_nonce_mutex::GetGlobalNonceMutex;
+use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::CanAllocateNonce;
+use hermes_relayer_components::transaction::traits::nonce::nonce_mutex::NonceAllocationMutexGetterComponent;
+use hermes_relayer_components::transaction::traits::nonce::query_nonce::CanQueryNonce;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
-use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
+use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
+use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::CanSendMessagesWithSignerAndNonce;
+use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::components::chain::StarknetChainComponents;
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
-use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::proof_signer::GetStarknetProofSignerField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
-    HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeComponent,
+    HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeProviderComponent,
 };
 use hermes_starknet_chain_components::traits::client::{
     JsonRpcClientGetter, JsonRpcClientGetterComponent,
@@ -175,13 +181,11 @@ use hermes_starknet_chain_components::types::message_response::StarknetMessageRe
 use hermes_starknet_chain_components::types::payloads::client::{
     StarknetCreateClientPayloadOptions, StarknetUpdateClientPayload,
 };
-use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessage;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
-use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::host::types::identifiers::{ChainId, PortId as IbcPortId, Sequence};
 use starknet::accounts::SingleOwnerAccount;
@@ -206,13 +210,14 @@ pub struct StarknetChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
-    pub account: SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>,
+    pub account: Arc<SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>>,
     pub ibc_client_contract_address: Option<StarknetAddress>,
     pub ibc_core_contract_address: Option<StarknetAddress>,
     pub event_encoding: StarknetEventEncoding,
     pub poll_interval: Duration,
     // FIXME: only needed for demo2
     pub proof_signer: Secp256k1KeyPair,
+    pub nonce_mutex: Arc<Mutex<()>>,
 }
 
 impl Deref for StarknetChain {
@@ -243,17 +248,17 @@ delegate_components! {
         ]:
             GetStarknetProviderField<symbol!("rpc_client")>,
         [
-            StarknetAccountTypeComponent,
+            StarknetAccountTypeProviderComponent,
             StarknetAccountGetterComponent,
         ]:
-            GetStarknetAccountField<symbol!("account")>,
+            WithField<symbol!("account")>,
         [
             StarknetProofSignerTypeComponent,
             StarknetProofSignerGetterComponent,
         ]:
             GetStarknetProofSignerField<symbol!("proof_signer")>,
-        WalletTypeComponent:
-            ProvideStarknetWalletType,
+        NonceAllocationMutexGetterComponent:
+            GetGlobalNonceMutex<symbol!("nonce_mutex")>,
     }
 }
 
@@ -334,7 +339,7 @@ pub trait CanUseStarknetChain:
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
     + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
-    + HasCommitmentProofType
+    + HasSignerType
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
     + HasClientIdType<CosmosChain, ClientId = ClientId>
@@ -363,7 +368,6 @@ pub trait CanUseStarknetChain:
     + CanQueryBlockEvents
     + CanSendMessages
     + CanSendSingleMessage
-    + CanSubmitTx
     + CanQueryTxResponse
     + CanPollTxResponse
     + CanCallContract
@@ -396,6 +400,10 @@ pub trait CanUseStarknetChain:
     + CanQueryConnectionEndWithProofs<CosmosChain>
     + CanQueryChannelEnd<CosmosChain>
     + CanQueryChannelEndWithProofs<CosmosChain>
+    + CanQueryNonce
+    + CanAllocateNonce
+    + CanSendMessagesWithSigner
+    + CanSendMessagesWithSignerAndNonce
     + HasCounterpartyMessageHeight<CosmosChain>
     + HasInitConnectionOptionsType<CosmosChain>
     + CanBuildConnectionOpenInitPayload<CosmosChain>

@@ -8,6 +8,7 @@ use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
 use eyre::eyre;
+use futures::lock::Mutex;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
@@ -255,12 +256,13 @@ impl StarknetBuilder {
                 runtime: self.runtime.clone(),
                 chain_id,
                 rpc_client,
-                account,
+                account: Arc::new(account),
                 ibc_client_contract_address: None,
                 ibc_core_contract_address: None,
                 event_encoding: Default::default(),
                 proof_signer,
                 poll_interval: self.starknet_chain_config.poll_interval,
+                nonce_mutex: Arc::new(Mutex::new(())),
             }),
         };
 
