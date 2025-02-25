@@ -39,6 +39,8 @@ pub mod TransferApp {
     impl TransferAppCallbackImpl =
         TokenTransferComponent::TransferAppCallback<ContractState>;
     #[abi(embed_v0)]
+    impl CreateIbcTokenImpl = TokenTransferComponent::CreateIbcToken<ContractState>;
+    #[abi(embed_v0)]
     impl TokenTransferQueryImpl =
         TokenTransferComponent::TokenTransferQuery<ContractState>;
     impl TransferValidationImpl = TokenTransferComponent::TransferValidationImpl<ContractState>;
