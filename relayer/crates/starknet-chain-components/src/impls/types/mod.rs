@@ -18,3 +18,4 @@ pub mod timestamp;
 pub mod transaction;
 pub mod tx_hash;
 pub mod tx_response;
+pub mod wallet;

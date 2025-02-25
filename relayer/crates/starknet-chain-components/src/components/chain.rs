@@ -159,6 +159,7 @@ mod preset {
     use hermes_relayer_components::transaction::traits::poll_tx_response::TxResponsePollerComponent;
     use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerierComponent;
     use hermes_relayer_components::transaction::traits::submit_tx::TxSubmitterComponent;
+    use hermes_relayer_components::transaction::traits::types::signer::SignerTypeProviderComponent;
     use hermes_relayer_components::transaction::traits::types::transaction::TransactionTypeComponent;
     use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
     use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
@@ -175,6 +176,7 @@ mod preset {
     use hermes_test_components::chain::traits::types::amount::AmountTypeComponent;
     use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
     use hermes_test_components::chain::traits::types::memo::MemoTypeComponent;
+    use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
 
     use crate::components::types::StarknetChainTypes;
     use crate::impls::commitment_prefix::GetStarknetCommitmentPrefix;
@@ -230,6 +232,7 @@ mod preset {
     use crate::impls::types::transaction::ProvideCallTransaction;
     use crate::impls::types::tx_hash::ProvideFeltTxHash;
     use crate::impls::types::tx_response::ProvideStarknetTxResponse;
+    use crate::impls::types::wallet::UseStarknetWallet;
     use crate::traits::contract::call::ContractCallerComponent;
     use crate::traits::contract::declare::ContractDeclarerComponent;
     use crate::traits::contract::deploy::ContractDeployerComponent;
@@ -246,6 +249,7 @@ mod preset {
     use crate::traits::types::method::SelectorTypeComponent;
     use crate::types::message_response::UseStarknetMessageResponse;
     use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
+    use crate::types::wallet::StarknetWallet;
 
     cgp_preset! {
         StarknetChainComponents {
@@ -279,6 +283,10 @@ mod preset {
                 ProvideTokenAddressDenom,
             MemoTypeComponent:
                 ProvideStringMemoType,
+            WalletTypeComponent:
+                UseStarknetWallet,
+            SignerTypeProviderComponent:
+                UseType<StarknetWallet>,
             TokenIbcTransferrerComponent:
                 SendIbcTransferMessage,
             TransactionTypeComponent:

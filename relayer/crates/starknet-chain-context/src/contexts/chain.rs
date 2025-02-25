@@ -129,19 +129,19 @@ use hermes_relayer_components::error::traits::retry::HasRetryableError;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
 use hermes_relayer_components::transaction::traits::submit_tx::CanSubmitTx;
+use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::components::chain::StarknetChainComponents;
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
-use hermes_starknet_chain_components::impls::account::GetStarknetAccountField;
 use hermes_starknet_chain_components::impls::proof_signer::GetStarknetProofSignerField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
-    HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeComponent,
+    HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeProviderComponent,
 };
 use hermes_starknet_chain_components::traits::client::{
     JsonRpcClientGetter, JsonRpcClientGetterComponent,
@@ -175,13 +175,12 @@ use hermes_starknet_chain_components::types::message_response::StarknetMessageRe
 use hermes_starknet_chain_components::types::payloads::client::{
     StarknetCreateClientPayloadOptions, StarknetUpdateClientPayload,
 };
-use hermes_starknet_test_components::impls::types::wallet::ProvideStarknetWalletType;
+use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessage;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
-use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::host::types::identifiers::{ChainId, PortId as IbcPortId, Sequence};
 use starknet::accounts::SingleOwnerAccount;
@@ -243,17 +242,15 @@ delegate_components! {
         ]:
             GetStarknetProviderField<symbol!("rpc_client")>,
         [
-            StarknetAccountTypeComponent,
+            StarknetAccountTypeProviderComponent,
             StarknetAccountGetterComponent,
         ]:
-            GetStarknetAccountField<symbol!("account")>,
+            WithField<symbol!("account")>,
         [
             StarknetProofSignerTypeComponent,
             StarknetProofSignerGetterComponent,
         ]:
             GetStarknetProofSignerField<symbol!("proof_signer")>,
-        WalletTypeComponent:
-            ProvideStarknetWalletType,
     }
 }
 
@@ -334,7 +331,7 @@ pub trait CanUseStarknetChain:
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
     + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
-    + HasCommitmentProofType
+    + HasSignerType<Signer = StarknetWallet>
     + HasClientStateType<CosmosChain, ClientState = WasmStarknetClientState>
     + HasConsensusStateType<CosmosChain, ConsensusState = WasmStarknetConsensusState>
     + HasClientIdType<CosmosChain, ClientId = ClientId>
