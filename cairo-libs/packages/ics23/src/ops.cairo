@@ -40,10 +40,10 @@ pub fn apply_leaf(leaf_op: @LeafOp, key: KeyBytes, value: ValueBytes) -> [u32; 8
 
 pub fn prepare_leaf_u32_array(prehash: @HashOp, length: @LengthOp, data: Array<u8>) -> Array<u8> {
     assert(data.len() > 0, ICS23Errors::MISSING_LEAF_DATA);
-    do_length(length, hash_u32_array(prehash, data))
+    do_length(length, do_hash(prehash, data))
 }
 
-pub fn hash_u32_array(hash_op: @HashOp, data: Array<u8>) -> Array<u8> {
+pub fn do_hash(hash_op: @HashOp, data: Array<u8>) -> Array<u8> {
     match hash_op {
         HashOp::NoOp => { data },
         HashOp::Sha256 => {

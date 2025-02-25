@@ -7,7 +7,7 @@ use protobuf::primitives::array::{
 };
 use protobuf::primitives::numeric::{I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::{WireType, ProtobufTag};
-use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, iavl_spec, hash_u32_array};
+use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, iavl_spec, do_hash};
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct CommitmentProof {
@@ -368,7 +368,7 @@ pub impl ProofSpecImpl of ProofSpecTrait {
 
     fn key_for_comparison(self: @ProofSpec, key: Array<u8>) -> Array<u8> {
         match self.prehash_key_before_comparison {
-            true => hash_u32_array(self.leaf_spec.prehash_key, key),
+            true => do_hash(self.leaf_spec.prehash_key, key),
             false => key,
         }
     }

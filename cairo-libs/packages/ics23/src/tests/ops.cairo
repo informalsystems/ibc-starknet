@@ -1,6 +1,7 @@
 use ics23::{
     InnerOp, LeafOp, LengthOp, HashOp, apply_leaf, apply_inner, encode_hex, decode_hex,
     SliceU32IntoArrayU8, ByteArrayIntoArrayU32, byte_array_to_array_u8, ByteArrayIntoArrayU8,
+    do_hash, do_length,
 };
 
 // https://github.com/cosmos/ics23/blob/c7c728879896fb260fe76b208ea6a17c2b0132a3/rust/src/ops.rs#L210
@@ -102,3 +103,28 @@ fn test_apply_inner_suffix_only() {
     );
 }
 
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/ops.rs#L169
+#[test]
+fn test_do_length() {
+    let food = byte_array_to_array_u8(@"food");
+    let prefix = do_length(@LengthOp::NoPrefix, food.clone());
+    let expected = decode_hex(@"666f6f64");
+    assert_eq!(prefix, expected, "no prefix modifies data");
+
+    let prefix = do_length(@LengthOp::VarProto, food);
+    let expected = decode_hex(@"04666f6f64");
+    assert_eq!(prefix, expected, "invalid do length");
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/ops.rs#L112
+#[test]
+fn test_do_hash() {
+    let food = byte_array_to_array_u8(@"food");
+    let hash = do_hash(@HashOp::NoOp, food.clone());
+    let expected = decode_hex(@"666f6f64");
+    assert_eq!(hash, expected, "no hash fails");
+
+    let hash = do_hash(@HashOp::Sha256, food);
+    let expected = decode_hex(@"c1f026582fe6e8cb620d0c85a72fe421ddded756662a8ec00ed4c297ad10676b");
+    assert_eq!(hash, expected, "sha256 hash fails");
+}
