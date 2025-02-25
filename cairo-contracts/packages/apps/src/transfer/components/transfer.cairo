@@ -815,7 +815,6 @@ pub mod TokenTransferComponent {
             token_address: ContractAddress,
         ) {
             let denom_key = denom.key();
-            println!("denom_key: {:?}", denom_key); // 🪚
 
             self.write_ibc_token_key_to_address(denom_key, token_address);
 
