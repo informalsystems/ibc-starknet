@@ -10,7 +10,7 @@ pub trait ProtoMessage<T> {
 
 pub trait ProtoOneof<T> {
     fn encode_raw(self: @T, ref context: EncodeContext) -> ProtobufTag;
-    fn decode_raw(ref context: DecodeContext, tag: ProtobufTag) -> Option<T>;
+    fn decode_raw(ref context: DecodeContext, tag: u8) -> Option<T>;
 }
 
 pub fn decode_raw<T, +Drop<T>, +Default<T>, +ProtoMessage<T>>(
@@ -187,7 +187,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
     /// Performs the Protobuf decoding for a `Oneof` field.
     fn decode_oneof<T, +ProtoOneof<T>, +Drop<T>>(ref self: DecodeContext) -> Option<T> {
         let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
-        let value = ProtoOneof::decode_raw(ref self, tag)?;
+        let value = ProtoOneof::decode_raw(ref self, tag.field_number)?;
         Option::Some(value)
     }
 

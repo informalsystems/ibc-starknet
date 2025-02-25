@@ -56,27 +56,22 @@ pub impl OneofAsProtoOneof of ProtoOneof<Oneof> {
         }
     }
 
-    fn decode_raw(ref context: DecodeContext, tag: ProtobufTag) -> Option<Oneof> {
-        if tag.field_number == 1 {
-            if tag.wire_type != ProtoMessage::<u64>::wire_type() {
-                return Option::None;
-            }
-            let value = context.decode_field(1)?;
-            Option::Some(Oneof::Int(value))
-        } else if tag.field_number == 2 {
-            if tag.wire_type != ProtoMessage::<ByteArray>::wire_type() {
-                return Option::None;
-            }
-            let value = context.decode_field(2)?;
-            Option::Some(Oneof::String(value))
-        } else if tag.field_number == 3 {
-            if tag.wire_type != ProtoMessage::<u32>::wire_type() {
-                return Option::None;
-            }
-            let value = context.decode_enum(3)?;
-            Option::Some(Oneof::Enum(value))
-        } else {
-            Option::None
+    fn decode_raw(ref context: DecodeContext, tag: u8) -> Option<Oneof> {
+        match tag {
+            0 => Option::None,
+            1 => {
+                let value = context.decode_field(1)?;
+                Option::Some(Oneof::Int(value))
+            },
+            2 => {
+                let value = context.decode_field(2)?;
+                Option::Some(Oneof::String(value))
+            },
+            3 => {
+                let value = context.decode_enum(3)?;
+                Option::Some(Oneof::Enum(value))
+            },
+            _ => Option::None,
         }
     }
 }

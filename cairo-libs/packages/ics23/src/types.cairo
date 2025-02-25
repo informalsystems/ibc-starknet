@@ -55,21 +55,18 @@ impl ProofAsProtoOneof of ProtoOneof<Proof> {
         }
     }
 
-    fn decode_raw(ref context: DecodeContext, tag: ProtobufTag) -> Option<Proof> {
-        if tag.field_number == 1 {
-            if tag.wire_type != ProtoMessage::<ExistenceProof>::wire_type() {
-                return Option::None;
-            }
-            let proof = context.decode_field(1)?;
-            Option::Some(Proof::Exist(proof))
-        } else if tag.field_number == 2 {
-            if tag.wire_type != ProtoMessage::<NonExistenceProof>::wire_type() {
-                return Option::None;
-            }
-            let proof = context.decode_field(2)?;
-            Option::Some(Proof::NonExist(proof))
-        } else {
-            Option::None
+    fn decode_raw(ref context: DecodeContext, tag: u8) -> Option<Proof> {
+        match tag {
+            0 => Option::None,
+            1 => {
+                let proof = context.decode_field(1)?;
+                Option::Some(Proof::Exist(proof))
+            },
+            2 => {
+                let proof = context.decode_field(2)?;
+                Option::Some(Proof::NonExist(proof))
+            },
+            _ => Option::None,
         }
     }
 }
