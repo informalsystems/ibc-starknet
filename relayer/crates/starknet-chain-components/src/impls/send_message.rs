@@ -29,10 +29,8 @@ pub struct UnexpectedTransactionTraceType {
     pub trace: TransactionTrace,
 }
 
-pub struct SendCallMessages;
-
-#[cgp_provider(MessagesWithSignerAndNonceSenderComponent)]
-impl<Chain> MessagesWithSignerAndNonceSender<Chain> for SendCallMessages
+#[cgp_new_provider(MessagesWithSignerAndNonceSenderComponent)]
+impl<Chain> MessagesWithSignerAndNonceSender<Chain> for SendStarknetMessages
 where
     Chain: HasStarknetAccountType
         + HasSignerType<Signer = Chain::Account>
@@ -66,7 +64,7 @@ where
 }
 
 #[cgp_provider(TxMessageResponseParserComponent)]
-impl<Chain> TxMessageResponseParser<Chain> for SendCallMessages
+impl<Chain> TxMessageResponseParser<Chain> for SendStarknetMessages
 where
     Chain: HasTxResponseType<TxResponse = TxResponse>
         + HasMessageResponseType<MessageResponse = StarknetMessageResponse>

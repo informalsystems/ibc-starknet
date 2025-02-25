@@ -217,7 +217,7 @@ mod preset {
     use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
     use crate::impls::queries::status::QueryStarknetChainStatus;
     use crate::impls::queries::token_balance::QueryErc20TokenBalance;
-    use crate::impls::send_message::SendCallMessages;
+    use crate::impls::send_message::SendStarknetMessages;
     use crate::impls::transfer::TransferErc20Token;
     use crate::impls::tx_response::QueryTransactionReceipt;
     use crate::impls::types::address::ProvideFeltAddressType;
@@ -381,7 +381,7 @@ mod preset {
                 MessagesWithSignerAndNonceSenderComponent,
                 TxMessageResponseParserComponent,
             ]:
-                SendCallMessages,
+                SendStarknetMessages,
             [
                 MessageSenderComponent,
                 MessagesWithSignerSenderComponent,
