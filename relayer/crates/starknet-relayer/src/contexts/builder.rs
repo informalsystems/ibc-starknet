@@ -31,6 +31,7 @@ use hermes_runtime_components::traits::runtime::{
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
+use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use ibc::core::host::types::identifiers::{ChainId, ClientId, ClientId as CosmosClientId};
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
@@ -251,15 +252,45 @@ impl StarknetBuilder {
         )
         .expect("valid key pair");
 
+        let event_encoding = StarknetEventEncoding {
+            erc20_hashes: self
+                .starknet_chain_config
+                .contract_classes
+                .erc20
+                .into_iter()
+                .collect(),
+            ics20_hashes: self
+                .starknet_chain_config
+                .contract_classes
+                .ics20
+                .into_iter()
+                .collect(),
+            ibc_client_hashes: self
+                .starknet_chain_config
+                .contract_classes
+                .ibc_client
+                .into_iter()
+                .collect(),
+            ibc_core_contract_addresses: self
+                .starknet_chain_config
+                .contract_addresses
+                .ibc_core
+                .into_iter()
+                .collect(),
+        };
+
         let context = StarknetChain {
             fields: Arc::new(StarknetChainFields {
                 runtime: self.runtime.clone(),
                 chain_id,
                 rpc_client,
                 account: Arc::new(account),
-                ibc_client_contract_address: None,
-                ibc_core_contract_address: None,
-                event_encoding: Default::default(),
+                ibc_client_contract_address: self
+                    .starknet_chain_config
+                    .contract_addresses
+                    .ibc_client,
+                ibc_core_contract_address: self.starknet_chain_config.contract_addresses.ibc_core,
+                event_encoding,
                 proof_signer,
                 poll_interval: self.starknet_chain_config.poll_interval,
                 nonce_mutex: Arc::new(Mutex::new(())),

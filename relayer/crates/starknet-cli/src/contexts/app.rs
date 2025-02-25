@@ -65,7 +65,7 @@ use hermes_runtime_components::traits::runtime::{
 };
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::config::{
-    StarknetChainConfig, StarknetRelayerConfig,
+    StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses, StarknetRelayerConfig,
 };
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
@@ -230,6 +230,35 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
             .ok_or_else(|| StarknetChainDriver::raise_error("expect relayer wallet to be present"))?
             .clone();
 
+        let contract_addresses = StarknetContractAddresses {
+            ibc_client: chain_driver.chain.ibc_client_contract_address,
+            ibc_core: chain_driver.chain.ibc_core_contract_address,
+        };
+
+        let contract_classes = StarknetContractClasses {
+            erc20: chain_driver
+                .chain
+                .event_encoding
+                .erc20_hashes
+                .iter()
+                .cloned()
+                .next(),
+            ics20: chain_driver
+                .chain
+                .event_encoding
+                .ics20_hashes
+                .iter()
+                .cloned()
+                .next(),
+            ibc_client: chain_driver
+                .chain
+                .event_encoding
+                .ibc_client_hashes
+                .iter()
+                .cloned()
+                .next(),
+        };
+
         let chain_config = StarknetChainConfig {
             json_rpc_url: format!(
                 "http://{}:{}/",
@@ -237,6 +266,8 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
             ),
             relayer_wallet,
             poll_interval: chain_driver.chain.poll_interval,
+            contract_addresses,
+            contract_classes,
         };
 
         let chain_config_str = to_string_pretty(&chain_config)?;
