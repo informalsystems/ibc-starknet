@@ -61,6 +61,7 @@ jobs:
       - name: Run Integration Tests
         env:
           RUST_BACKTRACE: 1
+          RUST_LOG: debug
         working-directory: ./relayer
         run: |
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
