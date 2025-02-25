@@ -36,6 +36,7 @@ hermes-starknet-test-components     = { workspace = true }
 hermes-cosmos-relayer               = { workspace = true }
 
 starknet                    = { workspace = true }
+futures                     = { workspace = true }
 url                         = { workspace = true }
 eyre                        = { workspace = true }
 prost                       = { workspace = true }

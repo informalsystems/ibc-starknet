@@ -38,6 +38,7 @@ ibc-proto      = { workspace = true }
 tendermint-rpc = { workspace = true }
 
 starknet    = { workspace = true }
+futures     = { workspace = true }
 url         = { workspace = true }
 eyre        = { workspace = true }
 tokio       = { workspace = true }

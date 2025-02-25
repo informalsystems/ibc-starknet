@@ -7,6 +7,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
+use futures::lock::Mutex;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
@@ -126,6 +127,9 @@ use hermes_relayer_components::chain::traits::types::packets::receive::HasPacket
 use hermes_relayer_components::chain::traits::types::packets::timeout::HasPacketReceiptType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_relayer_components::error::traits::retry::HasRetryableError;
+use hermes_relayer_components::transaction::impls::global_nonce_mutex::GetGlobalNonceMutex;
+use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::CanAllocateNonce;
+use hermes_relayer_components::transaction::traits::nonce::nonce_mutex::NonceAllocationMutexGetterComponent;
 use hermes_relayer_components::transaction::traits::nonce::query_nonce::CanQueryNonce;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::query_tx_response::CanQueryTxResponse;
@@ -212,6 +216,7 @@ pub struct StarknetChainFields {
     pub poll_interval: Duration,
     // FIXME: only needed for demo2
     pub proof_signer: Secp256k1KeyPair,
+    pub nonce_mutex: Arc<Mutex<()>>,
 }
 
 impl Deref for StarknetChain {
@@ -251,6 +256,8 @@ delegate_components! {
             StarknetProofSignerGetterComponent,
         ]:
             GetStarknetProofSignerField<symbol!("proof_signer")>,
+        NonceAllocationMutexGetterComponent:
+            GetGlobalNonceMutex<symbol!("nonce_mutex")>,
     }
 }
 
@@ -394,6 +401,7 @@ pub trait CanUseStarknetChain:
     + CanQueryChannelEnd<CosmosChain>
     + CanQueryChannelEndWithProofs<CosmosChain>
     + CanQueryNonce
+    + CanAllocateNonce
     + HasCounterpartyMessageHeight<CosmosChain>
     + HasInitConnectionOptionsType<CosmosChain>
     + CanBuildConnectionOpenInitPayload<CosmosChain>

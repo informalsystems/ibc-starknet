@@ -153,9 +153,11 @@ mod preset {
     use hermes_relayer_components::chain::traits::types::status::ChainStatusTypeComponent;
     use hermes_relayer_components::error::impls::retry::ReturnRetryable;
     use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
+    use hermes_relayer_components::transaction::impls::allocate_nonce_with_mutex::AllocateNonceWithMutex;
     use hermes_relayer_components::transaction::impls::poll_tx_response::{
         PollTimeoutGetterComponent, PollTxResponse,
     };
+    use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::NonceAllocatorComponent;
     use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
     use hermes_relayer_components::transaction::traits::poll_tx_response::TxResponsePollerComponent;
     use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerierComponent;
@@ -398,6 +400,8 @@ mod preset {
                 BuildInvokeContractCall,
             NonceQuerierComponent:
                 QueryStarknetNonce,
+            NonceAllocatorComponent:
+                AllocateNonceWithMutex,
             IbcCommitmentPrefixGetterComponent:
                 GetStarknetCommitmentPrefix,
             RetryableErrorComponent:
