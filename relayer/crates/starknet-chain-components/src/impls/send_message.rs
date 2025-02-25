@@ -5,6 +5,9 @@ use hermes_chain_components::traits::send_message::MessageSenderComponent;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_relayer_components::chain::traits::send_message::MessageSender;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
+use hermes_relayer_components::transaction::traits::parse_events::{
+    CanParseTxMessageResponse, TxMessageResponseParser, TxMessageResponseParserComponent,
+};
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::{
     MessagesWithSignerAndNonceSender, MessagesWithSignerAndNonceSenderComponent,
@@ -41,7 +44,7 @@ where
         + HasTxResponseType<TxResponse = TxResponse>
         + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
         + CanPollTxResponse
-        + CanExtractMessageResponsesFromTxResponse
+        + CanParseTxMessageResponse
         + CanRaiseAsyncError<RevertedInvocation>
         + CanRaiseAsyncError<UnexpectedTransactionTraceType>,
     Chain::Account: Clone,
@@ -64,7 +67,7 @@ where
 
         let tx_response = chain.poll_tx_response(&tx_hash).await?;
 
-        Chain::extract_message_responses_from_tx_response(tx_response)
+        Chain::parse_tx_message_response(tx_response)
     }
 }
 
@@ -77,7 +80,6 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasTransactionHashType<TxHash = Felt>
         + CanPollTxResponse
-        + CanExtractMessageResponsesFromTxResponse
         + CanRaiseAccountErrors,
 {
     async fn send_messages_with_signer_and_nonce(
@@ -103,22 +105,15 @@ where
     }
 }
 
-pub trait CanExtractMessageResponsesFromTxResponse:
-    HasTxResponseType + HasMessageResponseType + HasAsyncErrorType
-{
-    fn extract_message_responses_from_tx_response(
-        tx_response: Self::TxResponse,
-    ) -> Result<Vec<Self::MessageResponse>, Self::Error>;
-}
-
-impl<Chain> CanExtractMessageResponsesFromTxResponse for Chain
+#[cgp_provider(TxMessageResponseParserComponent)]
+impl<Chain> TxMessageResponseParser<Chain> for SendCallMessages
 where
     Chain: HasTxResponseType<TxResponse = TxResponse>
         + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
         + CanRaiseAsyncError<RevertedInvocation>
         + CanRaiseAsyncError<UnexpectedTransactionTraceType>,
 {
-    fn extract_message_responses_from_tx_response(
+    fn parse_tx_message_response(
         tx_response: TxResponse,
     ) -> Result<Vec<StarknetMessageResponse>, Chain::Error> {
         match tx_response.trace {

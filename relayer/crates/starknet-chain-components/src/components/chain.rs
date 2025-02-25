@@ -159,6 +159,7 @@ mod preset {
     };
     use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::NonceAllocatorComponent;
     use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
+    use hermes_relayer_components::transaction::traits::parse_events::TxMessageResponseParserComponent;
     use hermes_relayer_components::transaction::traits::poll_tx_response::TxResponsePollerComponent;
     use hermes_relayer_components::transaction::traits::query_tx_response::TxResponseQuerierComponent;
     use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::MessagesWithSignerAndNonceSenderComponent;
@@ -382,6 +383,7 @@ mod preset {
             [
                 MessageSenderComponent,
                 MessagesWithSignerAndNonceSenderComponent,
+                TxMessageResponseParserComponent,
             ]:
                 SendCallMessages,
             TxSubmitterComponent:
