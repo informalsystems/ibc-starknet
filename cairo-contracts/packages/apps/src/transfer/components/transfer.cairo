@@ -291,6 +291,9 @@ pub mod TokenTransferComponent {
         fn create_ibc_token(
             ref self: ComponentState<TContractState>, denom: PrefixedDenom,
         ) -> ContractAddress {
+            let mut token = self.get_token(denom.key());
+            assert(token.is_zero(), TransferErrors::TOKEN_ALREADY_EXISTS);
+
             let channel: ChannelContract = self.owner().into();
 
             let maybe_prefix = denom.first_prefix();

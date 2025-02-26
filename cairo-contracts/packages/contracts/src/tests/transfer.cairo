@@ -214,6 +214,17 @@ fn test_create_ibc_token_with_multihop() {
 }
 
 #[test]
+#[should_panic(expected: 'ICS20: token already exists')]
+fn test_recreate_existing_ibc_token() {
+    let (_, ics20, _, _, _, transfer_cfg, _) = setup(Mode::WithChannel);
+    let prefixed_denom = transfer_cfg.prefix_hosted_denom();
+    ics20.create_ibc_token(prefixed_denom.clone());
+
+    // The second time creation should panic.
+    ics20.create_ibc_token(prefixed_denom.clone());
+}
+
+#[test]
 #[should_panic(expected: 'ICS20: missing trace prefix')]
 fn test_create_ibc_token_without_prefix() {
     let (_, ics20, _, _, _, transfer_cfg, _) = setup(Mode::WithChannel);
