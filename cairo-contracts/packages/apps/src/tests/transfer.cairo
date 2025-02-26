@@ -79,8 +79,9 @@ fn test_missing_ibc_token_address() {
 
 #[test]
 fn test_create_ibc_token() {
-    let (mut ics20, _, cfg, _) = setup();
+    let (mut ics20, _, cfg, mut spy) = setup();
     let address = ics20.create_ibc_token(CHANNEL_ID(0), NAME());
+    spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, address, 0);
     let queried = ics20.ibc_token_address(cfg.prefix_hosted_denom().key());
     assert_eq!(address, queried);
 }
@@ -193,6 +194,33 @@ fn test_mint_ok() {
 
     // Check the total supply of the ERC20 contract.
     erc20.assert_total_supply(cfg.amount * 2);
+}
+
+#[test]
+fn test_mint_with_pre_created_ibc_token() {
+    let (ics20, _, cfg, mut spy) = setup();
+
+    let recv_packet = cfg.dummy_incoming_packet(cfg.hosted_denom.clone(), COSMOS(), STARKNET());
+
+    /// Pre-creates the IBC token
+    let token_address = ics20.create_ibc_token(CHANNEL_ID(0), NAME());
+
+    ics20.on_recv_packet(recv_packet.clone());
+
+    let prefixed_denom = cfg.prefix_hosted_denom();
+
+    spy
+        .assert_recv_event(
+            ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), cfg.amount, true,
+        );
+
+    let erc20: ERC20Contract = token_address.into();
+
+    spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), cfg.amount);
+    
+    erc20.assert_balance(SN_USER(), cfg.amount);
+
+    erc20.assert_total_supply(cfg.amount);
 }
 
 #[test]
