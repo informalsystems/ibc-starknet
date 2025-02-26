@@ -217,7 +217,7 @@ fn test_mint_with_pre_created_ibc_token() {
     let erc20: ERC20Contract = token_address.into();
 
     spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), cfg.amount);
-    
+
     erc20.assert_balance(SN_USER(), cfg.amount);
 
     erc20.assert_total_supply(cfg.amount);
