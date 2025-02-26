@@ -100,7 +100,10 @@ fn test_lexicographical_cmp() {
     assert!(array![1_u8, 2_u8, 3_u8] < array![1_u8, 2_u8, 3_u8, 0_u8]);
     assert!(array![1_u8, 2_u8, 3_u8, 0_u8] > array![1_u8, 2_u8, 3_u8]);
 
-    // 10. Arrays with different leading zeros
+    /// 10. Arrays of different lenghts but the longer one is smaller
+    assert!(array![0_u8, 1_u8, 2_u8, 5_u8, 10_u8] < array![0_u8, 1_u8, 3_u8, 4_u8]);
+
+    // 11. Arrays with different leading zeros
     assert!(array![0_u8, 1_u8, 2_u8] < array![1_u8, 2_u8, 3_u8]);
     assert!(array![1_u8, 2_u8, 3_u8] > array![0_u8, 1_u8, 2_u8]);
 }
