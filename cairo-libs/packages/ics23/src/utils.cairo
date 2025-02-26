@@ -246,11 +246,7 @@ pub enum Ordering {
 pub fn lexicographical_cmp(lhs: Array<u8>, rhs: Array<u8>) -> Ordering {
     let lhs_len = lhs.len();
     let rhs_len = rhs.len();
-    let min_len = if lhs_len < rhs_len {
-        lhs_len
-    } else {
-        rhs_len
-    };
+    let min_len = core::cmp::min(lhs_len, rhs_len);
 
     let mut ordering = Ordering::Equal;
 
