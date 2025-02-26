@@ -300,6 +300,8 @@ pub mod TokenTransferComponent {
             assert(maybe_prefix.is_some(), TransferErrors::MISSING_TRACE_PREFIX);
             let prefix = maybe_prefix.unwrap();
 
+            assert(prefix.port_id == @TRANSFER_PORT_ID(), TransferErrors::INVALID_PORT_ID);
+
             let chan_end_on_b = channel
                 .channel_end(prefix.port_id.clone(), prefix.channel_id.clone());
             assert(chan_end_on_b.is_open(), ChannelErrors::INVALID_CHANNEL_STATE);

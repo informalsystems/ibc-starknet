@@ -3,9 +3,7 @@ use core::fmt::{Display, Error, Formatter};
 use core::num::traits::Zero;
 use serde_json::{Serialize, SerializerTrait};
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::{
-    ERC20Contract, ERC20ContractTrait, TRANSFER_PORT_ID_HASH, TransferErrors,
-};
+use starknet_ibc_apps::transfer::{ERC20Contract, TRANSFER_PORT_ID_HASH, TransferErrors};
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{ChannelId, ChannelIdTrait, PortId, PortIdTrait};
 use starknet_ibc_utils::{ComputeKey, LocalKeyBuilderImpl, ValidateBasic};
