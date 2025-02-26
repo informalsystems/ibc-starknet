@@ -187,30 +187,26 @@ pub enum BlockIdFlag {
     Nil,
 }
 
-impl BlockIdFlagAsProtoMessage of ProtoMessage<BlockIdFlag> {
-    fn encode_raw(self: @BlockIdFlag, ref context: EncodeContext) {
+pub impl BlockIdFlagIntoU32 of Into<@BlockIdFlag, u32> {
+    fn into(self: @BlockIdFlag) -> u32 {
         match self {
-            BlockIdFlag::Unknown => 0_u32.encode_raw(ref context),
-            BlockIdFlag::Absent => 1_u32.encode_raw(ref context),
-            BlockIdFlag::Commit => 2_u32.encode_raw(ref context),
-            BlockIdFlag::Nil => 3_u32.encode_raw(ref context),
+            BlockIdFlag::Unknown => 0,
+            BlockIdFlag::Absent => 1,
+            BlockIdFlag::Commit => 2,
+            BlockIdFlag::Nil => 3,
         }
     }
+}
 
-    fn decode_raw(ref context: DecodeContext) -> Option<BlockIdFlag> {
-        let var: u32 = context.decode_raw()?;
-        let value = match var {
+pub impl U32TryIntoBlockIdFlag of TryInto<u32, BlockIdFlag> {
+    fn try_into(self: u32) -> Option<BlockIdFlag> {
+        match self {
             0 => Option::Some(BlockIdFlag::Unknown),
             1 => Option::Some(BlockIdFlag::Absent),
             2 => Option::Some(BlockIdFlag::Commit),
             3 => Option::Some(BlockIdFlag::Nil),
             _ => Option::None,
-        };
-        value
-    }
-
-    fn wire_type() -> WireType {
-        WireType::Varint
+        }
     }
 }
 
@@ -224,14 +220,14 @@ pub struct CommitSig {
 
 impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
     fn encode_raw(self: @CommitSig, ref context: EncodeContext) {
-        context.encode_field(1, self.block_id_flag);
+        context.encode_enum(1, self.block_id_flag);
         context.encode_field(2, self.validator_address);
         context.encode_field(3, self.timestamp);
         context.encode_field(4, self.signature);
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<CommitSig> {
-        let block_id_flag = context.decode_field(1)?;
+        let block_id_flag = context.decode_enum(1)?;
         let validator_address = context.decode_field(2)?;
         let timestamp = context.decode_field(3)?;
         let signature = context.decode_field(4)?;

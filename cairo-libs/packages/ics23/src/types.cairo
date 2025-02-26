@@ -1,13 +1,12 @@
-use protobuf::types::message::DecodeContextTrait;
 use protobuf::types::message::{
-    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName,
+    ProtoMessage, ProtoOneof, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    DecodeContextImpl, ProtoName, EncodeContextTrait, DecodeContextTrait,
 };
 use protobuf::primitives::array::{
     ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage,
 };
 use protobuf::primitives::numeric::{I32AsProtoMessage, BoolAsProtoMessage};
-use protobuf::types::tag::WireType;
+use protobuf::types::tag::{WireType, ProtobufTag};
 use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, iavl_spec};
 
 #[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
@@ -17,11 +16,11 @@ pub struct CommitmentProof {
 
 impl CommitmentProofAsProtoMessage of ProtoMessage<CommitmentProof> {
     fn encode_raw(self: @CommitmentProof, ref context: EncodeContext) {
-        context.encode_field(1, self.proof);
+        context.encode_oneof(self.proof)
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<CommitmentProof> {
-        let proof = context.decode_field(1)?;
+        let proof = context.decode_oneof()?;
         Option::Some(CommitmentProof { proof })
     }
 
@@ -40,33 +39,37 @@ pub enum Proof {
     NonExist: NonExistenceProof,
 }
 
-impl ProofAsProtoMessage of ProtoMessage<Proof> {
-    fn encode_raw(self: @Proof, ref context: EncodeContext) {
+impl ProofAsProtoOneof of ProtoOneof<Proof> {
+    fn encode_raw(self: @Proof, ref context: EncodeContext) -> ProtobufTag {
         match self {
-            Proof::Exist(p) => p.encode_raw(ref context),
-            Proof::NonExist(p) => p.encode_raw(ref context),
+            Proof::Exist(p) => {
+                p.encode_raw(ref context);
+                let wire_type = ProtoMessage::<ExistenceProof>::wire_type();
+                ProtobufTag { field_number: 1, wire_type }
+            },
+            Proof::NonExist(p) => {
+                p.encode_raw(ref context);
+                let wire_type = ProtoMessage::<NonExistenceProof>::wire_type();
+                ProtobufTag { field_number: 2, wire_type }
+            },
         }
     }
 
-    fn decode_raw(ref context: DecodeContext) -> Option<Proof> {
-        let exist: Option<ExistenceProof> = context.decode_raw();
-        if exist.is_some() {
-            return Option::Some(Proof::Exist(exist.unwrap()));
+    fn decode_raw(ref context: DecodeContext, tag: u8) -> Option<Proof> {
+        match tag {
+            0 => Option::None,
+            1 => {
+                let proof = context.decode_field(1)?;
+                Option::Some(Proof::Exist(proof))
+            },
+            2 => {
+                let proof = context.decode_field(2)?;
+                Option::Some(Proof::NonExist(proof))
+            },
+            _ => Option::None,
         }
-
-        let non_exist: Option<NonExistenceProof> = context.decode_raw();
-        if non_exist.is_some() {
-            return Option::Some(Proof::NonExist(non_exist.unwrap()));
-        }
-
-        Option::None
-    }
-
-    fn wire_type() -> WireType {
-        WireType::LengthDelimited
     }
 }
-
 
 #[derive(Clone, Default, Debug, Drop, PartialEq, Serde)]
 pub struct ExistenceProof {
@@ -181,13 +184,13 @@ pub struct InnerOp {
 
 impl InnerOpAsProtoMessage of ProtoMessage<InnerOp> {
     fn encode_raw(self: @InnerOp, ref context: EncodeContext) {
-        context.encode_field(1, self.hash);
+        context.encode_enum(1, self.hash);
         context.encode_field(2, self.prefix);
         context.encode_field(3, self.suffix);
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<InnerOp> {
-        let hash = context.decode_field(1)?;
+        let hash = context.decode_enum(1)?;
         let prefix = context.decode_field(2)?;
         let suffix = context.decode_field(3)?;
         Option::Some(InnerOp { hash, prefix, suffix })
@@ -211,26 +214,22 @@ pub enum HashOp {
     Sha256,
 }
 
-impl HashOpAsProtoMessage of ProtoMessage<HashOp> {
-    fn encode_raw(self: @HashOp, ref context: EncodeContext) {
+pub impl HashOpIntoU32 of Into<@HashOp, u32> {
+    fn into(self: @HashOp) -> u32 {
         match self {
-            HashOp::NoOp => 0_u32.encode_raw(ref context),
-            HashOp::Sha256 => 1_u32.encode_raw(ref context),
+            HashOp::NoOp => 0,
+            HashOp::Sha256 => 1,
         }
     }
+}
 
-    fn decode_raw(ref context: DecodeContext) -> Option<HashOp> {
-        let var: u32 = context.decode_raw()?;
-        let value = match var {
+pub impl U32TryIntoHashOp of TryInto<u32, HashOp> {
+    fn try_into(self: u32) -> Option<HashOp> {
+        match self {
             0 => Option::Some(HashOp::NoOp),
             1 => Option::Some(HashOp::Sha256),
             _ => Option::None,
-        };
-        value
-    }
-
-    fn wire_type() -> WireType {
-        WireType::Varint
+        }
     }
 }
 
@@ -241,26 +240,22 @@ pub enum LengthOp {
     VarProto,
 }
 
-impl LengthOpAsProtoMessage of ProtoMessage<LengthOp> {
-    fn encode_raw(self: @LengthOp, ref context: EncodeContext) {
+pub impl LengthOpIntoU32 of Into<@LengthOp, u32> {
+    fn into(self: @LengthOp) -> u32 {
         match self {
-            LengthOp::NoPrefix => 0_u32.encode_raw(ref context),
-            LengthOp::VarProto => 1_u32.encode_raw(ref context),
+            LengthOp::NoPrefix => 0,
+            LengthOp::VarProto => 1,
         }
     }
+}
 
-    fn decode_raw(ref context: DecodeContext) -> Option<LengthOp> {
-        let var: u32 = context.decode_raw()?;
-        let value = match var {
+pub impl U32TryIntoLegthOp of TryInto<u32, LengthOp> {
+    fn try_into(self: u32) -> Option<LengthOp> {
+        match self {
             0 => Option::Some(LengthOp::NoPrefix),
             1 => Option::Some(LengthOp::VarProto),
             _ => Option::None,
-        };
-        value
-    }
-
-    fn wire_type() -> WireType {
-        WireType::Varint
+        }
     }
 }
 
@@ -281,7 +276,7 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
         context.encode_field(3, self.min_prefix_length);
         context.encode_field(4, self.max_prefix_length);
         context.encode_field(5, self.empty_child);
-        context.encode_field(6, self.hash);
+        context.encode_enum(6, self.hash);
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<InnerSpec> {
@@ -290,7 +285,7 @@ impl InnerSpecAsProtoMessage of ProtoMessage<InnerSpec> {
         let min_prefix_length = context.decode_field(3)?;
         let max_prefix_length = context.decode_field(4)?;
         let empty_child = context.decode_field(5)?;
-        let hash = context.decode_field(6)?;
+        let hash = context.decode_enum(6)?;
         Option::Some(
             InnerSpec {
                 child_order, child_size, min_prefix_length, max_prefix_length, empty_child, hash,
@@ -320,18 +315,18 @@ pub struct LeafOp {
 
 impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
     fn encode_raw(self: @LeafOp, ref context: EncodeContext) {
-        context.encode_field(1, self.hash);
-        context.encode_field(2, self.prehash_key);
-        context.encode_field(3, self.prehash_value);
-        context.encode_field(4, self.length);
+        context.encode_enum(1, self.hash);
+        context.encode_enum(2, self.prehash_key);
+        context.encode_enum(3, self.prehash_value);
+        context.encode_enum(4, self.length);
         context.encode_field(5, self.prefix);
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<LeafOp> {
-        let hash = context.decode_field(1)?;
-        let prehash_key = context.decode_field(2)?;
-        let prehash_value = context.decode_field(3)?;
-        let length = context.decode_field(4)?;
+        let hash = context.decode_enum(1)?;
+        let prehash_key = context.decode_enum(2)?;
+        let prehash_value = context.decode_enum(3)?;
+        let length = context.decode_enum(4)?;
         let prefix = context.decode_field(5)?;
         Option::Some(LeafOp { hash, prehash_key, prehash_value, length, prefix })
     }

@@ -1,3 +1,4 @@
+use super::tag::ProtobufTagTrait;
 use protobuf::types::tag::{WireType, ProtobufTag, ProtobufTagImpl};
 use protobuf::primitives::numeric::U32AsProtoMessage;
 
@@ -5,6 +6,11 @@ pub trait ProtoMessage<T> {
     fn decode_raw(ref context: DecodeContext) -> Option<T>;
     fn encode_raw(self: @T, ref context: EncodeContext);
     fn wire_type() -> WireType;
+}
+
+pub trait ProtoOneof<T> {
+    fn encode_raw(self: @T, ref context: EncodeContext) -> ProtobufTag;
+    fn decode_raw(ref context: DecodeContext, tag: u8) -> Option<T>;
 }
 
 pub fn decode_raw<T, +Drop<T>, +Default<T>, +ProtoMessage<T>>(
@@ -62,6 +68,25 @@ pub impl EncodeContextImpl of EncodeContextTrait {
 
             i += 1;
         }
+    }
+
+    /// Performs the Protobuf encoding for an enum field.
+    fn encode_enum<T, +Drop<T>, +Into<T, u32>>(
+        ref self: EncodeContext, field_number: u8, value: T,
+    ) {
+        let value_u32: u32 = value.into();
+        self.encode_field(field_number, @value_u32)
+    }
+
+    /// Performs the Protobuf encoding for a `Oneof` field.
+    fn encode_oneof<T, +ProtoOneof<T>, +Drop<T>>(ref self: EncodeContext, value: @T) {
+        let mut context2 = Self::new();
+        let tag = value.encode_raw(ref context2);
+        self.buffer.append_byte(tag.encode());
+        if tag.wire_type == WireType::LengthDelimited {
+            context2.buffer.len().encode_raw(ref self);
+        }
+        self.buffer.append(@context2.buffer);
     }
 }
 
@@ -149,6 +174,21 @@ pub impl DecodeContextImpl of DecodeContextTrait {
             return Option::None;
         }
         Option::Some(field)
+    }
+
+    /// Performs the Protobuf decoding for an enum field.
+    fn decode_enum<T, +Drop<T>, +TryInto<u32, T>>(
+        ref self: DecodeContext, field_number: u8,
+    ) -> Option<T> {
+        let value: u32 = self.decode_field(field_number)?;
+        value.try_into()
+    }
+
+    /// Performs the Protobuf decoding for a `Oneof` field.
+    fn decode_oneof<T, +ProtoOneof<T>, +Drop<T>>(ref self: DecodeContext) -> Option<T> {
+        let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
+        let value = ProtoOneof::decode_raw(ref self, tag.field_number)?;
+        Option::Some(value)
     }
 
     fn end_branch(ref self: DecodeContext) -> Option<()> {
