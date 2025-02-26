@@ -102,6 +102,15 @@ pub impl PrefixedDenomImpl of PrefixedDenomTrait {
         }
     }
 
+    fn last_prefix(self: @PrefixedDenom) -> Option<@TracePrefix> {
+        let len = self.trace_path.len();
+        if len.is_zero() {
+            Option::None
+        } else {
+            Option::Some(self.trace_path.at(len - 1))
+        }
+    }
+
     fn as_byte_array(self: @PrefixedDenom) -> ByteArray {
         let mut denom_prefix: ByteArray = "";
         let mut trace_path_span = self.trace_path.span();
