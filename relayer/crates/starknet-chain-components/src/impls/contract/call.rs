@@ -26,7 +26,7 @@ where
         entry_point_selector: &Felt,
         calldata: &Vec<Felt>,
     ) -> Result<Vec<Felt>, Chain::Error> {
-        let block_id = BlockId::Tag(BlockTag::Pending);
+        let block_id = BlockId::Tag(BlockTag::Latest);
 
         let res = chain
             .provider()

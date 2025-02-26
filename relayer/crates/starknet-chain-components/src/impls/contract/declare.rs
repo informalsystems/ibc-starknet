@@ -47,7 +47,7 @@ where
         let class_hash = contract_class.class_hash().map_err(Chain::raise_error)?;
 
         let class_exist_result = provider
-            .get_class(BlockId::Tag(BlockTag::Pending), class_hash)
+            .get_class(BlockId::Tag(BlockTag::Latest), class_hash)
             .await;
 
         if class_exist_result.is_ok() {
