@@ -112,6 +112,6 @@ where
             proof_bytes: signed_bytes,
         };
 
-        Ok((Some(vec![]), dummy_proof))
+        Ok((None, dummy_proof))
     }
 }
