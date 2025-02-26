@@ -4,6 +4,7 @@ pub mod ICS23Errors {
     pub const MISSING_VALUE: felt252 = 'ICS23: missing value';
     pub const MISSING_LEAF_DATA: felt252 = 'ICS23: missing leaf data';
     pub const MISSING_CHILD_HASH: felt252 = 'ICS23: missing child hash';
+    pub const MISSING_EXISTENCE_PROOFS: felt252 = 'ICS23: missing existence proofs';
     pub const MISMATCHED_KEY: felt252 = 'ICS23: mismatched key';
     pub const MISMATCHED_VALUE: felt252 = 'ICS23: mismatched value';
     pub const MISMATCHED_ROOT: felt252 = 'ICS23: mismatched root';
@@ -22,6 +23,8 @@ pub mod ICS23Errors {
     pub const INVALID_DEPTH_RANGE: felt252 = 'ICS23: invalid depth range';
     pub const INVALID_LEAF_PREFIX: felt252 = 'ICS23: invalid leaf prefix';
     pub const INVALID_IAVL_HEIGHT_PREFIX: felt252 = 'ICS23: invalid height prefix';
+    pub const INVALID_LEFT_KEY_ORDER: felt252 = 'ICS23: invalid left key order';
+    pub const INVALID_RIGHT_KEY_ORDER: felt252 = 'ICS23: invalid right key order';
     pub const UNSUPPORTED_HASH_OP: felt252 = 'ICS23: unsupported hash op';
     pub const ZERO_MERKLE_ROOT: felt252 = 'ICS23: zero merkle root';
     pub const ZERO_CHILD_SIZE: felt252 = 'ICS23: zero child size';

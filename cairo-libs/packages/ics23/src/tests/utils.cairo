@@ -1,4 +1,4 @@
-use ics23::{array_u8_into_array_u32, u64_into_array_u32, encode_hex, decode_hex};
+use ics23::{array_u8_into_array_u32, u64_into_array_u32, encode_hex, decode_hex, ArrayU8PartialOrd};
 
 #[test]
 fn test_array_u8_into_array_u32() {
@@ -59,4 +59,48 @@ fn test_decode_hex() {
     check_hex_codec(@"fffe");
     check_hex_codec(@"0123456789abcdef");
     check_hex_codec(@"fedcba9876543210");
+}
+
+#[test]
+fn test_lexicographical_cmp() {
+    // 1. Empty arrays (Equal)
+    assert!(ArrayTrait::<u8>::new() == ArrayTrait::<u8>::new());
+
+    // 2. Left is empty, right is non-empty (Less)
+    assert!(array![] < array![0_u8]);
+    assert!(array![] < array![1_u8, 2_u8, 3_u8]);
+
+    // 3. Right is empty, left is non-empty (Greater)
+    assert!(array![0_u8] > array![]);
+    assert!(array![1_u8, 2_u8, 3_u8] > array![]);
+
+    // 4. Identical arrays (Equal)
+    assert!(array![0_u8] == array![0_u8]);
+    assert!(array![1_u8, 2_u8, 3_u8] == array![1_u8, 2_u8, 3_u8]);
+
+    // 5. Left is lexicographically smaller
+    assert!(array![0_u8] < array![1_u8]);
+    assert!(array![1_u8, 2_u8] < array![1_u8, 3_u8]);
+    assert!(array![1_u8, 2_u8, 3_u8] < array![1_u8, 2_u8, 4_u8]);
+
+    // 6. Right is lexicographically smaller
+    assert!(array![1_u8] > array![0_u8]);
+    assert!(array![1_u8, 3_u8] > array![1_u8, 2_u8]);
+    assert!(array![1_u8, 2_u8, 4_u8] > array![1_u8, 2_u8, 3_u8]);
+
+    // 7. One array is a strict prefix of the other (Shorter is Less)
+    assert!(array![1_u8, 2_u8] < array![1_u8, 2_u8, 3_u8]);
+    assert!(array![1_u8, 2_u8, 3_u8] > array![1_u8, 2_u8]);
+
+    // 8. Comparing large arrays with a single difference at the end
+    assert!(array![1_u8, 2_u8, 3_u8, 4_u8] < array![1_u8, 2_u8, 3_u8, 5_u8]);
+    assert!(array![1_u8, 2_u8, 3_u8, 5_u8] > array![1_u8, 2_u8, 3_u8, 4_u8]);
+
+    // 9. Arrays of different lengths but with the same starting elements
+    assert!(array![1_u8, 2_u8, 3_u8] < array![1_u8, 2_u8, 3_u8, 0_u8]);
+    assert!(array![1_u8, 2_u8, 3_u8, 0_u8] > array![1_u8, 2_u8, 3_u8]);
+
+    // 10. Arrays with different leading zeros
+    assert!(array![0_u8, 1_u8, 2_u8] < array![1_u8, 2_u8, 3_u8]);
+    assert!(array![1_u8, 2_u8, 3_u8] > array![0_u8, 1_u8, 2_u8]);
 }
