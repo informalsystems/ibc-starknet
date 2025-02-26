@@ -435,11 +435,16 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_cosmos_a_step_0
         );
 
+        let denom = PrefixedDenom {
+            trace_path: vec![TracePrefix {
+                port_id: ics20_port.to_string(),
+                channel_id: starknet_channel_id.to_string(),
+            }],
+            base: Denom::Hosted(denom_cosmos.to_string()),
+        };
+
         let ics20_token_address: StarknetAddress = {
-            let calldata = cairo_encoding.encode(&product![
-                starknet_channel_id.clone(),
-                denom_cosmos.to_string(),
-            ])?;
+            let calldata = cairo_encoding.encode(&product![denom.clone()])?;
 
             let message = StarknetMessage {
                 call: Call {
@@ -516,14 +521,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let starknet_ics20_send_message = {
             let current_starknet_time = starknet_chain.query_chain_status().await?.time;
-
-            let denom = PrefixedDenom {
-                trace_path: vec![TracePrefix {
-                    port_id: ics20_port.to_string(),
-                    channel_id: starknet_channel_id.to_string(),
-                }],
-                base: Denom::Hosted(denom_cosmos.to_string()),
-            };
 
             MsgTransfer {
                 port_id_on_a: ics20_port.clone(),

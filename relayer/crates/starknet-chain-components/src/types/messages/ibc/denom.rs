@@ -12,7 +12,7 @@ use hermes_encoding_components::traits::transform::{Transformer, TransformerRef}
 
 use crate::impls::types::address::StarknetAddress;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Denom {
     Native(StarknetAddress),
     Hosted(String),
@@ -27,7 +27,7 @@ impl Display for Denom {
     }
 }
 
-#[derive(Debug, HasField)]
+#[derive(Clone, Debug, HasField)]
 pub struct PrefixedDenom {
     pub trace_path: Vec<TracePrefix>,
     pub base: Denom,
@@ -45,7 +45,7 @@ impl Display for PrefixedDenom {
     }
 }
 
-#[derive(Debug, HasField)]
+#[derive(Clone, Debug, HasField)]
 pub struct TracePrefix {
     pub port_id: String,
     pub channel_id: String,

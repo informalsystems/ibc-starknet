@@ -24,7 +24,7 @@ pub mod TokenTransferComponent {
     };
     use starknet_ibc_core::channel::{
         AckStatus, AckStatusImpl, Acknowledgement, AppVersion, ChannelContract,
-        ChannelContractTrait, ChannelEndTrait, ChannelOrdering, IAppCallback, Packet,
+        ChannelContractTrait, ChannelEndTrait, ChannelErrors, ChannelOrdering, IAppCallback, Packet,
     };
 
     use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId};
@@ -283,19 +283,30 @@ pub mod TokenTransferComponent {
 
     #[embeddable_as(CreateIbcToken)]
     impl CreateTokenImpl<
-        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of ICreateIbcToken<ComponentState<TContractState>> {
         fn create_ibc_token(
-            ref self: ComponentState<TContractState>,
-            chan_id_on_b: ChannelId,
-            base_denom: ByteArray,
+            ref self: ComponentState<TContractState>, denom: PrefixedDenom,
         ) -> ContractAddress {
-            let token = self.create_token(base_denom.clone(), 0);
-            let trace_prefix = TracePrefixTrait::new(TRANSFER_PORT_ID(), chan_id_on_b);
-            let prefixed_denom = PrefixedDenom {
-                trace_path: array![trace_prefix], base: Denom::Hosted(base_denom),
-            };
-            self.record_ibc_token(prefixed_denom, token.address);
+            let channel: ChannelContract = self.owner().into();
+
+            let maybe_prefix = denom.last_prefix();
+            assert(maybe_prefix.is_some(), TransferErrors::MISSING_TRACE_PREFIX);
+            let prefix = maybe_prefix.unwrap();
+
+            let chan_end_on_b = channel
+                .channel_end(prefix.port_id.clone(), prefix.channel_id.clone());
+            assert(chan_end_on_b.is_open(), ChannelErrors::INVALID_CHANNEL_STATE);
+
+            let maybe_base = denom.base.hosted();
+            assert(maybe_base.is_some(), TransferErrors::INVALID_DENOM);
+            let base = maybe_base.unwrap();
+
+            let token = self.create_token(base, 0);
+            self.record_ibc_token(denom, token.address);
             token.address
         }
     }
