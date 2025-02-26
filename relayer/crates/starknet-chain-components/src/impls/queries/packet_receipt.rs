@@ -69,7 +69,7 @@ where
         port_id: &IbcPortId,
         sequence: &IbcSequence,
         _height: &u64,
-    ) -> Result<(Vec<u8>, StarknetCommitmentProof), Chain::Error> {
+    ) -> Result<(Option<Vec<u8>>, StarknetCommitmentProof), Chain::Error> {
         let encoding = chain.encoding();
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
@@ -112,6 +112,6 @@ where
             proof_bytes: signed_bytes,
         };
 
-        Ok((vec![], dummy_proof))
+        Ok((Some(vec![]), dummy_proof))
     }
 }
