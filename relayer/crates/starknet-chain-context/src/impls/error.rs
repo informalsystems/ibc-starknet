@@ -11,6 +11,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::bool::DecodeBoolError;
 use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::variant::VariantIndexOutOfBound;
+use hermes_chain_components::impls::payload_builders::packet::InvalidTimeoutReceipt;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_error::handlers::debug::DebugError;
@@ -29,6 +30,7 @@ use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_
 use hermes_relayer_components::chain::impls::queries::consensus_state_height::NoConsensusStateAtLessThanHeight;
 use hermes_relayer_components::chain::traits::send_message::EmptyMessageResponse;
 use hermes_relayer_components::chain::traits::types::ibc::HasClientIdType;
+use hermes_relayer_components::chain::traits::types::packet::HasOutgoingPacketType;
 use hermes_relayer_components::transaction::impls::poll_tx_response::TxNoResponseError;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_runtime::types::error::TokioRuntimeError;
@@ -105,6 +107,8 @@ delegate_components! {
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
             <'a, Chain: HasClientIdType<Counterparty>, Counterparty: HasHeightType>
                 NoConsensusStateAtLessThanHeight<'a, Chain, Counterparty>,
+            <'a, Chain: HasHeightType, Counterparty: HasOutgoingPacketType<Chain>>
+                InvalidTimeoutReceipt<'a, Chain, Counterparty>,
         ]:
             DebugError,
         [
