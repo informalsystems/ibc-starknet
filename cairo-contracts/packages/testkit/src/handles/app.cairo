@@ -5,10 +5,11 @@ use snforge_std::ContractClass;
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::types::MsgTransfer;
 use starknet_ibc_apps::transfer::{
-    ISendTransferDispatcher, ISendTransferDispatcherTrait, ITransferQueryDispatcher,
-    ITransferQueryDispatcherTrait,
+    ICreateIbcTokenDispatcher, ICreateIbcTokenDispatcherTrait, ISendTransferDispatcher,
+    ISendTransferDispatcherTrait, ITransferQueryDispatcher, ITransferQueryDispatcherTrait,
 };
 use starknet_ibc_core::channel::IAppCallbackDispatcher;
+use starknet_ibc_core::host::ChannelId;
 use starknet_ibc_core::router::AppContract;
 
 #[generate_trait]
@@ -40,5 +41,12 @@ pub impl AppHandleImpl of AppHandle {
 
     fn send_transfer(self: @AppContract, msg: MsgTransfer) {
         self.send_dispatcher().send_transfer(msg);
+    }
+
+    fn create_ibc_token(
+        self: @AppContract, chan_id_on_b: ChannelId, base_denom: ByteArray,
+    ) -> ContractAddress {
+        ICreateIbcTokenDispatcher { contract_address: *self.address }
+            .create_ibc_token(chan_id_on_b, base_denom)
     }
 }

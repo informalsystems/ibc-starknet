@@ -8,7 +8,8 @@ pub mod transfer {
     pub use erc20_call::{ERC20Contract, ERC20ContractTrait};
     pub use errors::TransferErrors;
     pub use interfaces::transfer::{
-        ISendTransfer, ISendTransferDispatcher, ISendTransferDispatcherTrait, ITransferQuery,
+        ICreateIbcToken, ICreateIbcTokenDispatcher, ICreateIbcTokenDispatcherTrait, ISendTransfer,
+        ISendTransferDispatcher, ISendTransferDispatcherTrait, ITransferQuery,
         ITransferQueryDispatcher, ITransferQueryDispatcherTrait,
     };
     pub use interfaces::transferrable::{

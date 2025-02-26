@@ -19,8 +19,8 @@ pub mod TokenTransferComponent {
         PrefixedDenom, PrefixedDenomTrait, TracePrefixTrait,
     };
     use starknet_ibc_apps::transfer::{
-        ERC20Contract, ERC20ContractTrait, ISendTransfer, ITransferQuery, ITransferrable,
-        SUCCESS_ACK, TRANSFER_PORT_ID, TransferErrors, VERSION,
+        ERC20Contract, ERC20ContractTrait, ICreateIbcToken, ISendTransfer, ITransferQuery,
+        ITransferrable, SUCCESS_ACK, TRANSFER_PORT_ID, TransferErrors, VERSION,
     };
     use starknet_ibc_core::channel::{
         AckStatus, AckStatusImpl, Acknowledgement, AppVersion, ChannelContract,
@@ -274,6 +274,29 @@ pub mod TokenTransferComponent {
             let packet_data: PacketData = raw_packet_data.into();
 
             serde_json::to_byte_array(packet_data)
+        }
+    }
+
+    // -----------------------------------------------------------
+    // ICreateToken
+    // -----------------------------------------------------------
+
+    #[embeddable_as(CreateIbcToken)]
+    impl CreateTokenImpl<
+        TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
+    > of ICreateIbcToken<ComponentState<TContractState>> {
+        fn create_ibc_token(
+            ref self: ComponentState<TContractState>,
+            chan_id_on_b: ChannelId,
+            base_denom: ByteArray,
+        ) -> ContractAddress {
+            let token = self.create_token(base_denom.clone(), 0);
+            let trace_prefix = TracePrefixTrait::new(TRANSFER_PORT_ID(), chan_id_on_b);
+            let prefixed_denom = PrefixedDenom {
+                trace_path: array![trace_prefix], base: Denom::Hosted(base_denom),
+            };
+            self.record_ibc_token(prefixed_denom, token.address);
+            token.address
         }
     }
 

@@ -1,9 +1,19 @@
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::types::MsgTransfer;
+use starknet_ibc_core::host::ChannelId;
 
 #[starknet::interface]
 pub trait ISendTransfer<TContractState> {
     fn send_transfer(ref self: TContractState, msg: MsgTransfer);
+}
+
+#[starknet::interface]
+pub trait ICreateIbcToken<TContractState> {
+    /// Allows the pre-creation of an IBC token using the expected channel ID on which it will be
+    /// received and the denomination from its originating chain.
+    fn create_ibc_token(
+        ref self: TContractState, chan_id_on_b: ChannelId, base_denom: ByteArray,
+    ) -> ContractAddress;
 }
 
 #[starknet::interface]
