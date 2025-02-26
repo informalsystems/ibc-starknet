@@ -32,13 +32,12 @@ use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
-use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
-use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
+use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
@@ -59,7 +58,6 @@ use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::PortId as IbcPortId;
-use poseidon::Poseidon3Hasher;
 use sha2::{Digest, Sha256};
 use starknet::accounts::{Account, AccountError, Call, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::U256;
@@ -437,6 +435,28 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_cosmos_a_step_0
         );
 
+        let ics20_token_address: StarknetAddress = {
+            let calldata = cairo_encoding.encode(&product![
+                starknet_channel_id.clone(),
+                denom_cosmos.to_string(),
+            ])?;
+
+            let message = StarknetMessage {
+                call: Call {
+                    to: *ics20_contract_address,
+                    selector: selector!("create_ibc_token"),
+                    calldata,
+                },
+                counterparty_height: None,
+            };
+
+            let message_response = starknet_chain.send_message(message).await?;
+
+            cairo_encoding.decode(&message_response.result)?
+        };
+
+        info!("ics20 token address: {:?}", ics20_token_address);
+
         let _packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
             cosmos_chain,
             &cosmos_channel_id,
@@ -461,59 +481,12 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             balance_cosmos_a_step_1.quantity + transfer_quantity
         );
 
-        // Wait for background relayer to relay packet.
-        // We cannot poll the balance here, because the IBC denom will only
-        // be relayed after the first token transfer.
-        runtime.sleep(Duration::from_secs(2)).await;
+        let balance_starknet_b_step_1 =
+            StarknetAmount::new(transfer_quantity.into(), ics20_token_address);
 
-        let ics20_token_address: StarknetAddress = {
-            let ibc_prefixed_denom = PrefixedDenom {
-                trace_path: vec![TracePrefix {
-                    port_id: ics20_port.to_string(),
-                    channel_id: starknet_channel_id.to_string(),
-                }],
-                base: Denom::Hosted(denom_cosmos.to_string()),
-            };
-
-            let mut denom_serialized = vec![];
-
-            {
-                // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/apps/src/transfer/types.cairo#L120-L130
-                for trace_prefix in &ibc_prefixed_denom.trace_path {
-                    denom_serialized.extend(cairo_encoding.encode(trace_prefix)?);
-                }
-
-                denom_serialized.extend(cairo_encoding.encode(&ibc_prefixed_denom.base)?);
-            }
-
-            // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/utils/src/utils.cairo#L35
-            let ibc_prefixed_denom_key = Poseidon3Hasher::digest(&denom_serialized);
-
-            let calldata = cairo_encoding.encode(&product![ibc_prefixed_denom_key])?;
-
-            let output = starknet_chain
-                .call_contract(
-                    &ics20_contract_address,
-                    &selector!("ibc_token_address"),
-                    &calldata,
-                )
-                .await?;
-
-            cairo_encoding.decode(&output)?
-        };
-
-        info!("ics20 token address: {:?}", ics20_token_address);
-
-        let balance_starknet_b_step_1 = starknet_chain
-            .query_token_balance(&ics20_token_address, address_starknet_b)
+        starknet_chain
+            .assert_eventual_amount(address_starknet_b, &balance_starknet_b_step_1)
             .await?;
-
-        info!(
-            "starknet balance after transfer: {}",
-            balance_starknet_b_step_1
-        );
-
-        assert_eq!(balance_starknet_b_step_1.quantity, transfer_quantity.into());
 
         // approve ics20 contract to spend the tokens for `address_starknet_b`
         {
