@@ -8,7 +8,7 @@ pub trait ISendTransfer<TContractState> {
 
 #[starknet::interface]
 pub trait ICreateIbcToken<TContractState> {
-    /// Allows the pre-creation of an IBC token using the expeced `PrefixedDenom` on Starknet.
+    /// Allows the pre-creation of an IBC token using the expected `PrefixedDenom` on Starknet.
     fn create_ibc_token(ref self: TContractState, denom: PrefixedDenom) -> ContractAddress;
 }
 
