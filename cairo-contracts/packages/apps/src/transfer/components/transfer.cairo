@@ -293,7 +293,7 @@ pub mod TokenTransferComponent {
         ) -> ContractAddress {
             let channel: ChannelContract = self.owner().into();
 
-            let maybe_prefix = denom.last_prefix();
+            let maybe_prefix = denom.first_prefix();
             assert(maybe_prefix.is_some(), TransferErrors::MISSING_TRACE_PREFIX);
             let prefix = maybe_prefix.unwrap();
 

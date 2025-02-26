@@ -102,7 +102,8 @@ pub impl PrefixedDenomImpl of PrefixedDenomTrait {
         }
     }
 
-    fn last_prefix(self: @PrefixedDenom) -> Option<@TracePrefix> {
+    /// Returns the outermost (first) prefix relevant to this chain (Starknet).
+    fn first_prefix(self: @PrefixedDenom) -> Option<@TracePrefix> {
         let len = self.trace_path.len();
         if len.is_zero() {
             Option::None
