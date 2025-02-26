@@ -1,8 +1,9 @@
 use snforge_std::start_cheat_caller_address;
 use starknet_ibc_apps::transfer::ERC20Contract;
+use starknet_ibc_apps::transfer::types::{PrefixedDenomTrait, TracePrefixTrait};
 use starknet_ibc_testkit::configs::TransferAppConfigTrait;
 use starknet_ibc_testkit::dummies::{
-    COSMOS, CS_USER, DECIMAL_ZERO, NAME, SN_USER, STARKNET, SUPPLY, SYMBOL,
+    CHANNEL_ID, COSMOS, CS_USER, DECIMAL_ZERO, NAME, PORT_ID, SN_USER, STARKNET, SUPPLY, SYMBOL,
 };
 use starknet_ibc_testkit::event_spy::ERC20EventSpyExt;
 use starknet_ibc_testkit::event_spy::{ERC20EventSpyExtImpl, TransferEventSpyExt};
@@ -196,6 +197,23 @@ fn test_create_ibc_token_ok() {
 }
 
 #[test]
+fn test_create_ibc_token_with_multihop() {
+    let (_, ics20, _, _, _, mut transfer_cfg, mut spy) = setup(Mode::WithChannel);
+
+    /// Prefix for the source chain with an arbitrary channel ID
+    let trace_prefix = TracePrefixTrait::new(PORT_ID(), CHANNEL_ID(10));
+    transfer_cfg.hosted_denom.add_prefix(trace_prefix);
+
+    /// Second prefix for the intermediate chain, right before coming into Starknet.
+    let prefixed_denom = transfer_cfg.prefix_hosted_denom();
+
+    let address = ics20.create_ibc_token(prefixed_denom.clone());
+    spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, address, 0);
+    let queried = ics20.ibc_token_address(prefixed_denom.key());
+    assert_eq!(address, queried);
+}
+
+#[test]
 #[should_panic(expected: 'ICS20: missing trace prefix')]
 fn test_create_ibc_token_without_prefix() {
     let (_, ics20, _, _, _, transfer_cfg, _) = setup(Mode::WithChannel);
@@ -215,5 +233,5 @@ fn test_create_ibc_token_with_wrong_base() {
 fn test_create_ibc_token_without_channel() {
     let (_, ics20, _, _, _, transfer_cfg, _) = setup(Mode::WithConnection);
     let prefixed_denom = transfer_cfg.prefix_hosted_denom();
-   ics20.create_ibc_token(prefixed_denom.clone());
+    ics20.create_ibc_token(prefixed_denom.clone());
 }
