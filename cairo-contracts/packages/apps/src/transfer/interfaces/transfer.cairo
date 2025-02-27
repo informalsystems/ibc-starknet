@@ -1,6 +1,5 @@
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::types::MsgTransfer;
-use starknet_ibc_core::host::ChannelId;
+use starknet_ibc_apps::transfer::types::{MsgTransfer, PrefixedDenom};
 
 #[starknet::interface]
 pub trait ISendTransfer<TContractState> {
@@ -9,11 +8,8 @@ pub trait ISendTransfer<TContractState> {
 
 #[starknet::interface]
 pub trait ICreateIbcToken<TContractState> {
-    /// Allows the pre-creation of an IBC token using the expected channel ID on which it will be
-    /// received and the denomination from its originating chain.
-    fn create_ibc_token(
-        ref self: TContractState, chan_id_on_b: ChannelId, base_denom: ByteArray,
-    ) -> ContractAddress;
+    /// Allows the pre-creation of an IBC token using the expected `PrefixedDenom` on Starknet.
+    fn create_ibc_token(ref self: TContractState, denom: PrefixedDenom) -> ContractAddress;
 }
 
 #[starknet::interface]

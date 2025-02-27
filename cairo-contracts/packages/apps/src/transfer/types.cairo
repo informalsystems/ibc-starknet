@@ -3,9 +3,7 @@ use core::fmt::{Display, Error, Formatter};
 use core::num::traits::Zero;
 use serde_json::{Serialize, SerializerTrait};
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::{
-    ERC20Contract, ERC20ContractTrait, TRANSFER_PORT_ID_HASH, TransferErrors,
-};
+use starknet_ibc_apps::transfer::{ERC20Contract, TRANSFER_PORT_ID_HASH, TransferErrors};
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{ChannelId, ChannelIdTrait, PortId, PortIdTrait};
 use starknet_ibc_utils::{ComputeKey, LocalKeyBuilderImpl, ValidateBasic};
@@ -99,6 +97,16 @@ pub impl PrefixedDenomImpl of PrefixedDenomTrait {
     fn remove_prefix(ref self: PrefixedDenom, prefix: @TracePrefix) {
         if self.starts_with(prefix) {
             self.trace_path.pop_front().unwrap();
+        }
+    }
+
+    /// Returns the outermost (first) prefix relevant to this chain (Starknet).
+    fn first_prefix(self: @PrefixedDenom) -> Option<@TracePrefix> {
+        let len = self.trace_path.len();
+        if len.is_zero() {
+            Option::None
+        } else {
+            Option::Some(self.trace_path.at(len - 1))
         }
     }
 

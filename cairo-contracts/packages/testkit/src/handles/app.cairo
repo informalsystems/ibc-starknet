@@ -3,13 +3,12 @@ use openzeppelin_testing::events::EventSpyExtImpl;
 use openzeppelin_utils::serde::SerializedAppend;
 use snforge_std::ContractClass;
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::types::MsgTransfer;
+use starknet_ibc_apps::transfer::types::{MsgTransfer, PrefixedDenom};
 use starknet_ibc_apps::transfer::{
     ICreateIbcTokenDispatcher, ICreateIbcTokenDispatcherTrait, ISendTransferDispatcher,
     ISendTransferDispatcherTrait, ITransferQueryDispatcher, ITransferQueryDispatcherTrait,
 };
 use starknet_ibc_core::channel::IAppCallbackDispatcher;
-use starknet_ibc_core::host::ChannelId;
 use starknet_ibc_core::router::AppContract;
 
 #[generate_trait]
@@ -43,10 +42,7 @@ pub impl AppHandleImpl of AppHandle {
         self.send_dispatcher().send_transfer(msg);
     }
 
-    fn create_ibc_token(
-        self: @AppContract, chan_id_on_b: ChannelId, base_denom: ByteArray,
-    ) -> ContractAddress {
-        ICreateIbcTokenDispatcher { contract_address: *self.address }
-            .create_ibc_token(chan_id_on_b, base_denom)
+    fn create_ibc_token(self: @AppContract, denom: PrefixedDenom) -> ContractAddress {
+        ICreateIbcTokenDispatcher { contract_address: *self.address }.create_ibc_token(denom)
     }
 }
