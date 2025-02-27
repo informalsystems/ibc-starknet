@@ -266,6 +266,7 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
             ),
             relayer_wallet,
             poll_interval: chain_driver.chain.poll_interval,
+            block_time: chain_driver.chain.block_time,
             contract_addresses,
             contract_classes,
         };

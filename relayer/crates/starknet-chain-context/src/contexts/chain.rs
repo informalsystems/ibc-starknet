@@ -10,6 +10,9 @@ use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
+use hermes_chain_components::traits::queries::block_time::{
+    BlockTimeQuerierComponent, CanQueryBlockTime,
+};
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
 use hermes_chain_type_components::traits::fields::chain_id::{ChainIdGetterComponent, HasChainId};
 use hermes_chain_type_components::traits::types::commitment_proof::HasCommitmentProofType;
@@ -215,6 +218,7 @@ pub struct StarknetChainFields {
     pub ibc_core_contract_address: Option<StarknetAddress>,
     pub event_encoding: StarknetEventEncoding,
     pub poll_interval: Duration,
+    pub block_time: Duration,
     // FIXME: only needed for demo2
     pub proof_signer: Secp256k1KeyPair,
     pub nonce_mutex: Arc<Mutex<()>>,
@@ -259,6 +263,8 @@ delegate_components! {
             GetStarknetProofSignerField<symbol!("proof_signer")>,
         NonceAllocationMutexGetterComponent:
             GetGlobalNonceMutex<symbol!("nonce_mutex")>,
+        BlockTimeQuerierComponent:
+            UseField<symbol!("block_time")>,
     }
 }
 
@@ -366,6 +372,7 @@ pub trait CanUseStarknetChain:
     + CanQueryChainStatus
     + CanQueryChainHeight
     + CanQueryBlockEvents
+    + CanQueryBlockTime
     + CanSendMessages
     + CanSendSingleMessage
     + CanQueryTxResponse
