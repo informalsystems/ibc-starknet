@@ -10,7 +10,7 @@ case "$OSTYPE" in
     *) echo "Unknown OS: $OSTYPE" && exit 1 ;;
 esac
 
-STARKLI_ARGS="--watch --strk --rpc $RPC_URL --account $ACCOUNT_SRC --keystore $KEYSTORE_SRC --keystore-password $KEYSTORE_PASS"
+STARKLI_ARGS="--watch --strk"
 
 version() {
     echo "starkli: $(starkli --version)"
