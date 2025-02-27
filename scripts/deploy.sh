@@ -157,3 +157,36 @@ echo "Contract addresses:"
 echo "  CORE: $core_contract_address"
 echo "  COMET: $comet_contract_address"
 echo "  ICS20: $ics20_contract_address"
+
+
+register_client() {
+    CORE_ADDRESS=$1
+    COMET_ADDRESS=$2
+
+    COMET_CLIENT_TYPE=$(starkli to-cairo-string 07-tendermint)
+
+    CALLDATA="$COMET_CLIENT_TYPE $COMET_ADDRESS"
+
+    starkli invoke \
+        $STARKLI_ARGS \
+        "$CORE_ADDRESS" \
+        "register_client" \
+        $CALLDATA
+}
+
+register_ics20() {
+    CORE_ADDRESS=$1
+    ICS20_ADDRESS=$2
+
+    # hardcoded `transfer`
+    CALLDATA="0x0 0x7472616e73666572 0x8 $ICS20_ADDRESS"
+
+    starkli invoke \
+        $STARKLI_ARGS \
+        "$CORE_ADDRESS" \
+        "bind_port_id" \
+        $CALLDATA
+}
+
+register_client "$core_contract_address" "$comet_contract_address"
+register_ics20 "$core_contract_address" "$ics20_contract_address"
