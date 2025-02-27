@@ -293,6 +293,7 @@ impl StarknetBuilder {
                 event_encoding,
                 proof_signer,
                 poll_interval: self.starknet_chain_config.poll_interval,
+                block_time: self.starknet_chain_config.block_time,
                 nonce_mutex: Arc::new(Mutex::new(())),
             }),
         };

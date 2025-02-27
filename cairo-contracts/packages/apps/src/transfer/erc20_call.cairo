@@ -2,7 +2,7 @@ use core::num::traits::Zero;
 use core::starknet::SyscallResultTrait;
 use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use starknet::syscalls::deploy_syscall;
-use starknet::{ClassHash, ContractAddress};
+use starknet::{ClassHash, ContractAddress, contract_address_const};
 use starknet_ibc_utils::mintable::{IERC20MintableDispatcher, IERC20MintableDispatcherTrait};
 
 #[derive(Copy, Debug, Drop, Serde)]
@@ -24,10 +24,6 @@ impl ERC20ContractIntoFelt252 of Into<ERC20Contract, felt252> {
 
 #[generate_trait]
 pub impl ERC20ContractImpl of ERC20ContractTrait {
-    fn is_non_zero(self: @ERC20Contract) -> bool {
-        self.address.is_non_zero()
-    }
-
     fn dispatcher(self: @ERC20Contract) -> ERC20ABIDispatcher {
         ERC20ABIDispatcher { contract_address: *self.address }
     }
@@ -80,5 +76,19 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
 
     fn total_supply(self: @ERC20Contract) -> u256 {
         self.dispatcher().total_supply()
+    }
+}
+
+impl ERC20ContractZero of Zero<ERC20Contract> {
+    fn zero() -> ERC20Contract {
+        ERC20Contract { address: contract_address_const::<0>() }
+    }
+
+    fn is_zero(self: @ERC20Contract) -> bool {
+        self.address.is_zero()
+    }
+
+    fn is_non_zero(self: @ERC20Contract) -> bool {
+        !self.is_zero()
     }
 }

@@ -19,6 +19,7 @@ pub struct StarknetChainConfig {
     pub relayer_wallet: StarknetWallet,
     #[serde(with = "humantime_serde")]
     pub poll_interval: Duration,
+    pub block_time: Duration,
     pub contract_addresses: StarknetContractAddresses,
     pub contract_classes: StarknetContractClasses,
 }

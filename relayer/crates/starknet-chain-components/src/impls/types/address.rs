@@ -36,7 +36,7 @@ impl<Chain: Async> ProvideAddressType<Chain> for ProvideFeltAddressType {
     Deserialize,
 )]
 #[display("0x{_0:x}")]
-pub struct StarknetAddress(Felt);
+pub struct StarknetAddress(pub Felt);
 
 pub struct EncodeStarknetAddress;
 

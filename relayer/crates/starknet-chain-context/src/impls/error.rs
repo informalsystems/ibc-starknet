@@ -12,6 +12,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::variant::VariantIndexOutOfBound;
 use hermes_chain_components::impls::payload_builders::packet::InvalidTimeoutReceipt;
+use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_error::handlers::debug::DebugError;

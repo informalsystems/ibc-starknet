@@ -5,11 +5,19 @@ use ics23::{
     tendermint_spec,
 };
 use ics23::tests::data::{
-    TestData, smt_exist_left, smt_exist_right, smt_exist_middle, iavl_exist_left, iavl_exist_right,
-    iavl_exist_middle, tendermint_exist_left, tendermint_exist_right, tendermint_exist_middle,
+    TestData, smt_exist_left, smt_exist_right, smt_exist_middle, iavl_exist_left,
+    iavl_nonexist_left, iavl_exist_right, iavl_nonexist_right, iavl_exist_middle,
+    iavl_nonexist_middle, tendermint_exist_left, tendermint_exist_right, tendermint_exist_middle,
 };
 use protobuf::types::message::ProtoCodecImpl;
 use protobuf::hex::decode as decode_hex_byte_array;
+
+fn encoding_roundtrip_fixture(proof: @ByteArray) {
+    let proof_bytes = decode_hex_byte_array(proof);
+    let decoded = ProtoCodecImpl::decode::<CommitmentProof>(@proof_bytes).unwrap();
+    let encoded = ProtoCodecImpl::encode(@decoded);
+    assert_eq!(proof_bytes, encoded);
+}
 
 fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
     let root = byte_array_to_slice_u32(decode_hex_byte_array(data.root));
@@ -23,6 +31,22 @@ fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
             verify_non_existence(spec, @p, @root, @key);
         },
     };
+}
+
+#[test]
+fn test_protobuf_encoding_roundtrip() {
+    encoding_roundtrip_fixture(@iavl_exist_left().proof);
+    encoding_roundtrip_fixture(@iavl_exist_right().proof);
+    encoding_roundtrip_fixture(@iavl_exist_middle().proof);
+    encoding_roundtrip_fixture(@iavl_nonexist_left().proof);
+    encoding_roundtrip_fixture(@iavl_nonexist_right().proof);
+    encoding_roundtrip_fixture(@iavl_nonexist_middle().proof);
+    encoding_roundtrip_fixture(@tendermint_exist_left().proof);
+    encoding_roundtrip_fixture(@tendermint_exist_right().proof);
+    encoding_roundtrip_fixture(@tendermint_exist_middle().proof);
+    encoding_roundtrip_fixture(@smt_exist_left().proof);
+    encoding_roundtrip_fixture(@smt_exist_right().proof);
+    encoding_roundtrip_fixture(@smt_exist_middle().proof);
 }
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L459

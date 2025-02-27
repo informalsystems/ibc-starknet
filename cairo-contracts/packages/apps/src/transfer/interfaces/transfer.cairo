@@ -1,9 +1,15 @@
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::types::MsgTransfer;
+use starknet_ibc_apps::transfer::types::{MsgTransfer, PrefixedDenom};
 
 #[starknet::interface]
 pub trait ISendTransfer<TContractState> {
     fn send_transfer(ref self: TContractState, msg: MsgTransfer);
+}
+
+#[starknet::interface]
+pub trait ICreateIbcToken<TContractState> {
+    /// Allows the pre-creation of an IBC token using the expected `PrefixedDenom` on Starknet.
+    fn create_ibc_token(ref self: TContractState, denom: PrefixedDenom) -> ContractAddress;
 }
 
 #[starknet::interface]

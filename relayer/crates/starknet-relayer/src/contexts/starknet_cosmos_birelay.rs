@@ -6,6 +6,10 @@ use cgp::extra::run::RunnerComponent;
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::impls::ProvideHermesError;
+use hermes_logger::UseHermesLogger;
+use hermes_logging_components::traits::has_logger::{
+    GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
+};
 use hermes_relayer_components::birelay::traits::{
     AutoBiRelayerComponent, TwoWayRelayGetter, TwoWayRelayGetterComponent,
 };
@@ -36,6 +40,12 @@ delegate_components! {
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
+        [
+            LoggerTypeProviderComponent,
+            LoggerGetterComponent,
+            GlobalLoggerGetterComponent,
+        ]:
+            UseHermesLogger,
         ChainTypeAtComponent<Index<0>>: WithType<StarknetChain>,
         ChainTypeAtComponent<Index<1>>: WithType<CosmosChain>,
         RelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,

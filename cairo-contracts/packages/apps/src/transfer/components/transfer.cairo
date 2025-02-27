@@ -19,12 +19,12 @@ pub mod TokenTransferComponent {
         PrefixedDenom, PrefixedDenomTrait, TracePrefixTrait,
     };
     use starknet_ibc_apps::transfer::{
-        ERC20Contract, ERC20ContractTrait, ISendTransfer, ITransferQuery, ITransferrable,
-        SUCCESS_ACK, TRANSFER_PORT_ID, TransferErrors, VERSION,
+        ERC20Contract, ERC20ContractTrait, ICreateIbcToken, ISendTransfer, ITransferQuery,
+        ITransferrable, SUCCESS_ACK, TRANSFER_PORT_ID, TransferErrors, VERSION,
     };
     use starknet_ibc_core::channel::{
         AckStatus, AckStatusImpl, Acknowledgement, AppVersion, ChannelContract,
-        ChannelContractTrait, ChannelEndTrait, ChannelOrdering, IAppCallback, Packet,
+        ChannelContractTrait, ChannelEndTrait, ChannelErrors, ChannelOrdering, IAppCallback, Packet,
     };
 
     use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId};
@@ -274,6 +274,45 @@ pub mod TokenTransferComponent {
             let packet_data: PacketData = raw_packet_data.into();
 
             serde_json::to_byte_array(packet_data)
+        }
+    }
+
+    // -----------------------------------------------------------
+    // ICreateToken
+    // -----------------------------------------------------------
+
+    #[embeddable_as(CreateIbcToken)]
+    impl CreateTokenImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
+    > of ICreateIbcToken<ComponentState<TContractState>> {
+        fn create_ibc_token(
+            ref self: ComponentState<TContractState>, denom: PrefixedDenom,
+        ) -> ContractAddress {
+            let mut token = self.get_token(denom.key());
+            assert(token.is_zero(), TransferErrors::TOKEN_ALREADY_EXISTS);
+
+            let channel: ChannelContract = self.owner().into();
+
+            let maybe_prefix = denom.first_prefix();
+            assert(maybe_prefix.is_some(), TransferErrors::MISSING_TRACE_PREFIX);
+            let prefix = maybe_prefix.unwrap();
+
+            assert(prefix.port_id == @TRANSFER_PORT_ID(), TransferErrors::INVALID_PORT_ID);
+
+            let chan_end_on_b = channel
+                .channel_end(prefix.port_id.clone(), prefix.channel_id.clone());
+            assert(chan_end_on_b.is_open(), ChannelErrors::INVALID_CHANNEL_STATE);
+
+            let maybe_base = denom.base.hosted();
+            assert(maybe_base.is_some(), TransferErrors::INVALID_DENOM);
+            let base = maybe_base.unwrap();
+
+            let token = self.create_token(base, 0);
+            self.record_ibc_token(denom, token.address);
+            token.address
         }
     }
 

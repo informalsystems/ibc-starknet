@@ -6,7 +6,8 @@ use starknet::class_hash::class_hash_const;
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::transfer::TokenTransferComponent;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
-    TokenTransferQuery, TransferInitializerImpl, TransferReaderImpl, TransferWriterImpl,
+    CreateIbcToken, TokenTransferQuery, TransferInitializerImpl, TransferReaderImpl,
+    TransferWriterImpl,
 };
 use starknet_ibc_core::router::{AppContract, AppContractTrait};
 use starknet_ibc_testkit::configs::{TransferAppConfig, TransferAppConfigTrait};
