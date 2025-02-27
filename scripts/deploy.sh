@@ -34,12 +34,12 @@ declare() {
     CONTRACT_SRC=$1
 
     output=$(
-        starkli declare --watch $CONTRACT_SRC \
-        --rpc $RPC_URL \
-        --compiler-version $COMPILER_VERSION \
-        --account $ACCOUNT_SRC \
-        --keystore $KEYSTORE_SRC \
-        --keystore-password $KEYSTORE_PASS \
+        starkli declare --watch "$CONTRACT_SRC" \
+        --rpc "$RPC_URL" \
+        --compiler-version "$COMPILER_VERSION" \
+        --account "$ACCOUNT_SRC" \
+        --keystore "$KEYSTORE_SRC" \
+        --keystore-password "$KEYSTORE_PASS" \
         2>&1 | tee /dev/tty
     )
 
@@ -50,7 +50,7 @@ declare() {
 
     address=$(echo -e "$output" | "$GREP" -oP '0x[0-9a-fA-F]+' | tail -n 1)
 
-    echo $address
+    echo "$address"
 }
 
 # deploy the contract
@@ -60,11 +60,11 @@ deploy() {
 
     output=$(
         starkli deploy --not-unique \
-        --watch $ICS20_CLASS_HASH '1' $ERC20_CLASS_HASH \
-        --rpc $RPC_URL \
-        --account $ACCOUNT_SRC \
-        --keystore $KEYSTORE_SRC \
-        --keystore-password $KEYSTORE_PASS \
+        --watch "$ICS20_CLASS_HASH" '1' "$ERC20_CLASS_HASH" \
+        --rpc "$RPC_URL" \
+        --account "$ACCOUNT_SRC" \
+        --keystore "$KEYSTORE_SRC" \
+        --keystore-password "$KEYSTORE_PASS" \
         2>&1 | tee /dev/tty
     )
 
@@ -75,21 +75,21 @@ deploy() {
 
     address=$(echo -e "$output" | "$GREP" -oP '0x[0-9a-fA-F]+' | tail -n 1)
 
-    echo $address
+    echo "$address"
 }
 
 build
 
 if [[ $ERC20_CLASS_HASH == "" ]]; then
-    erc20_class_hash=$(declare $ERC20_CONTRACT_SRC)
+    erc20_class_hash=$(declare "$ERC20_CONTRACT_SRC")
 else
     erc20_class_hash=$ERC20_CLASS_HASH
 fi
 
 if [[ $ICS20_CLASS_HASH == "" ]]; then
-    ics20_class_hash=$(declare $ICS20_CONTRACT_SRC)
+    ics20_class_hash=$(declare "$ICS20_CONTRACT_SRC")
 else
     ics20_class_hash=$ICS20_CLASS_HASH
 fi
 
-deploy $ics20_class_hash $erc20_class_hash
+deploy "$ics20_class_hash" "$erc20_class_hash"
