@@ -20,8 +20,6 @@ use hermes_error::handlers::display::DisplayError;
 use hermes_error::handlers::identity::ReturnError;
 use hermes_error::handlers::infallible::HandleInfallible;
 use hermes_error::handlers::report::ReportError;
-use hermes_error::handlers::wrap::WrapErrorDetail;
-use hermes_error::traits::wrap::WrapError;
 use hermes_error::types::Error;
 use hermes_protobuf_encoding_components::impls::any::TypeUrlMismatchError;
 use hermes_protobuf_encoding_components::impls::encode_mut::chunk::{
@@ -111,11 +109,6 @@ delegate_components! {
                 InvalidTimeoutReceipt<'a, Chain, Counterparty>,
         ]:
             DebugError,
-        [
-            WrapError<&'static str, Error>,
-            WrapError<String, Error>,
-        ]:
-            WrapErrorDetail,
         StarknetError: RaiseStarknetError,
         ProviderError: RaiseProviderError,
         AccountError<SignError>: RaiseAccountError,

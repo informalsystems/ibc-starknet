@@ -10,7 +10,7 @@ use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeComponent, HasEncoding,
 };
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_error::impls::ProvideHermesError;
+use hermes_error::impls::UseHermesError;
 use hermes_starknet_chain_components::components::encoding::event::*;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::types::event::StarknetEvent;
@@ -35,7 +35,7 @@ pub struct StarknetEventEncoding {
 
 delegate_components! {
     StarknetEventEncodingContextComponents{
-        ErrorTypeProviderComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         [
             EncodingTypeComponent,

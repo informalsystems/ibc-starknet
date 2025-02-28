@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
-use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
@@ -52,13 +52,12 @@ use hermes_cli_components::traits::parse::ArgParserComponent;
 use hermes_cli_components::traits::types::config::ConfigTypeComponent;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::traits::wrap::CanWrapError;
 use hermes_error::types::HermesError;
 use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
 };
-use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
+use hermes_relayer_components::error::traits::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -106,6 +105,7 @@ delegate_components! {
         [
             ErrorTypeProviderComponent,
             ErrorRaiserComponent,
+            ErrorWrapperComponent,
             RetryableErrorComponent,
         ]:
             ProvideCliError,

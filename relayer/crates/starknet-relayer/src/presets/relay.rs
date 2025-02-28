@@ -1,12 +1,14 @@
 #[cgp::re_export_imports]
 mod preset {
     use cgp::core::component::UseDelegate;
-    use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
+    use cgp::core::error::{
+        ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent,
+    };
     use cgp::core::field::{Index, UseField, WithField};
     use cgp::core::types::WithType;
     use cgp::prelude::*;
     use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-    use hermes_error::impls::ProvideHermesError;
+    use hermes_error::impls::UseHermesError;
     use hermes_logger::UseHermesLogger;
     use hermes_logging_components::traits::has_logger::{
         GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
@@ -30,7 +32,10 @@ mod preset {
         | Components | {
             cgp_preset! {
                 StarknetCommonRelayContextPreset {
-                    ErrorTypeProviderComponent: ProvideHermesError,
+                    [
+                        ErrorTypeProviderComponent,
+                        ErrorWrapperComponent,
+                    ]: UseHermesError,
                     ErrorRaiserComponent: UseDelegate<HandleStarknetRelayError>,
                     RuntimeTypeProviderComponent: WithType<HermesRuntime>,
                     RuntimeGetterComponent: WithField<symbol!("runtime")>,

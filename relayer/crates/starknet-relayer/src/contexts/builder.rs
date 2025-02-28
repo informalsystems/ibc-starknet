@@ -12,7 +12,7 @@ use futures::lock::Mutex;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::impls::ProvideHermesError;
+use hermes_error::impls::UseHermesError;
 use hermes_error::types::Error;
 use hermes_error::HermesError;
 use hermes_relayer_components::build::traits::builders::birelay_builder::{
@@ -80,7 +80,7 @@ impl HasStarknetBuilderFields for StarknetBuilderFields {
 
 delegate_components! {
     StarknetBuildComponents {
-        ErrorTypeProviderComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         ChainTypeAtComponent<Index<0>>: WithType<StarknetChain>,
         ChainTypeAtComponent<Index<1>>: WithType<CosmosChain>,

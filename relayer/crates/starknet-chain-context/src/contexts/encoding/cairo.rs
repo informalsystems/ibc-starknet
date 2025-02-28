@@ -19,7 +19,7 @@ use hermes_encoding_components::traits::has_encoding::{
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_error::impls::ProvideHermesError;
+use hermes_error::impls::UseHermesError;
 use hermes_error::types::HermesError;
 use hermes_starknet_chain_components::components::encoding::cairo::*;
 use hermes_starknet_chain_components::types::channel_id::{ChannelEnd, ChannelId};
@@ -59,7 +59,7 @@ pub struct StarknetEncodeMutComponents;
 
 delegate_components! {
     StarknetCairoEncodingContextComponents {
-        ErrorTypeProviderComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
     }
 }

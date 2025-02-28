@@ -1,11 +1,11 @@
 use cgp::core::component::UseDelegate;
-use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::extra::run::RunnerComponent;
 use cgp::prelude::*;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::impls::ProvideHermesError;
+use hermes_error::impls::UseHermesError;
 use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
@@ -36,7 +36,10 @@ pub struct CosmosStarknetBiRelay {
 
 delegate_components! {
     StarknetCosmosBiRelayComponents {
-        ErrorTypeProviderComponent: ProvideHermesError,
+        [
+            ErrorTypeProviderComponent,
+            ErrorWrapperComponent,
+        ]: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
