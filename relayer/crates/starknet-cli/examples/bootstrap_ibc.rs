@@ -1,8 +1,9 @@
 #![recursion_limit = "256"]
 
-use cgp::extra::run::CanRun;
 use core::marker::PhantomData;
 use core::time::Duration;
+
+use cgp::extra::run::CanRun;
 use hermes_chain_components::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
 };
