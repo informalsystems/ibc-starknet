@@ -16,8 +16,11 @@ use flate2::Compression;
 use hermes_chain_components::traits::packet::fields::{
     HasPacketTimeoutHeight, HasPacketTimeoutTimestamp,
 };
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_chain_components::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
+};
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
+use hermes_chain_components::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_chain_components::traits::types::timestamp::HasTimeoutType;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
@@ -672,9 +675,40 @@ fn test_packet_clearing() -> Result<(), Error> {
             balance_starknet_b_step_2.quantity
         );
 
-        panic!("fail test to output relaying ack error");
+        let cosmos_latest_height = cosmos_chain.query_chain_height().await?;
 
-        //Ok(())
+        let maybe_cosmos_ack1 = <CosmosChain as CanQueryPacketAcknowledgement<StarknetChain>>::query_packet_acknowledgement(
+            cosmos_chain,
+            &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(1),
+                &cosmos_latest_height,
+            )
+            .await;
+
+        let maybe_cosmos_ack2 = <CosmosChain as CanQueryPacketAcknowledgement<StarknetChain>>::query_packet_acknowledgement(
+            cosmos_chain,
+            &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(2),
+                &cosmos_latest_height,
+            )
+            .await;
+
+        let maybe_cosmos_ack3 = <CosmosChain as CanQueryPacketAcknowledgement<StarknetChain>>::query_packet_acknowledgement(
+            cosmos_chain,
+            &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(3),
+                &cosmos_latest_height,
+            )
+            .await;
+
+        assert!(maybe_cosmos_ack1.is_err(), "query_packet_acknowledgement should fail with error `ack not found at: acks/ports/transfer/channels/{cosmos_channel_id}/sequences/1`");
+        assert!(maybe_cosmos_ack2.is_err(), "query_packet_acknowledgement should fail with error `ack not found at: acks/ports/transfer/channels/{cosmos_channel_id}/sequences/2`");
+        assert!(maybe_cosmos_ack3.is_err(), "query_packet_acknowledgement should fail with error `ack not found at: acks/ports/transfer/channels/{cosmos_channel_id}/sequences/3`");
+
+        Ok(())
     })
 }
 
