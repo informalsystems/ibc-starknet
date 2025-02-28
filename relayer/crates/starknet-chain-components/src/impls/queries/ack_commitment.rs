@@ -4,7 +4,6 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::packet_acknowledgement::{
     PacketAcknowledgementQuerier, PacketAcknowledgementQuerierComponent,
 };
@@ -27,6 +26,7 @@ use starknet::macros::selector;
 use crate::traits::contract::call::CanCallContract;
 use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::traits::queries::address::CanQueryContractAddress;
+use crate::traits::queries::status_at_height::CanQueryChainStatusAtHeight;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::channel_id::ChannelId;
@@ -35,7 +35,6 @@ use crate::types::membership_proof_signer::MembershipVerifierContainer;
 use crate::types::messages::ibc::channel::PortId as CairoPortId;
 use crate::types::messages::ibc::packet::Sequence;
 use crate::types::status::StarknetChainStatus;
-
 pub struct QueryStarknetAckCommitment;
 
 #[cgp_provider(PacketAcknowledgementQuerierComponent)]
@@ -43,7 +42,7 @@ impl<Chain, Counterparty, Encoding> PacketAcknowledgementQuerier<Chain, Counterp
     for QueryStarknetAckCommitment
 where
     Chain: HasHeightType<Height = u64>
-        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + CanQueryChainStatusAtHeight<ChainStatus = StarknetChainStatus>
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
@@ -95,7 +94,7 @@ where
             .flat_map(|felt| felt.to_be_bytes())
             .collect::<Vec<_>>();
 
-        let chain_status = chain.query_chain_status().await?;
+        let chain_status = chain.query_chain_status_at_height(height).await?;
 
         let unsigned_membership_proof_bytes = MembershipVerifierContainer {
             state_root: chain_status.block_hash.to_bytes_be().to_vec(),

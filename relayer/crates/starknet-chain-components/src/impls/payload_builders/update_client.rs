@@ -6,18 +6,17 @@ use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
 use hermes_encoding_components::types::AsBytes;
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use hermes_relayer_components::chain::traits::payload_builders::update_client::UpdateClientPayloadBuilder;
-use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
 use hermes_relayer_components::chain::traits::types::height::HasHeightType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use ibc::core::client::types::Height;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::StarknetHeader;
-use starknet::core::types::{BlockId, MaybePendingBlockWithTxHashes};
-use starknet::providers::{Provider, ProviderError};
+use starknet::providers::ProviderError;
 
 use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::traits::provider::HasStarknetProvider;
+use crate::traits::queries::status_at_height::CanQueryChainStatusAtHeight;
 use crate::types::consensus_state::StarknetConsensusState;
 use crate::types::payloads::client::StarknetUpdateClientPayload;
 use crate::types::status::StarknetChainStatus;
@@ -31,7 +30,7 @@ where
     Chain: HasHeightType<Height = u64>
         + HasClientStateType<Counterparty>
         + HasUpdateClientPayloadType<Counterparty, UpdateClientPayload = StarknetUpdateClientPayload>
-        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + CanQueryChainStatusAtHeight<ChainStatus = StarknetChainStatus>
         + HasStarknetProvider
         + CanRaiseAsyncError<&'static str>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>
@@ -47,26 +46,15 @@ where
         target_height: &u64,
         _client_state: Chain::ClientState,
     ) -> Result<Chain::UpdateClientPayload, Chain::Error> {
-        let block_info = chain
-            .provider()
-            .get_block_with_tx_hashes(BlockId::Number(*target_height))
-            .await
-            .map_err(Chain::raise_error)?;
+        let chain_status = chain.query_chain_status_at_height(target_height).await?;
 
-        let block = match block_info {
-            MaybePendingBlockWithTxHashes::Block(block) => block,
-            MaybePendingBlockWithTxHashes::PendingBlock(_block) => {
-                return Err(Chain::raise_error("pending block is not supported"))
-            }
-        };
-
-        let block_hash = block.block_hash;
-
-        let root = Vec::from(block_hash.to_bytes_be());
+        let root = Vec::from(chain_status.block_hash.to_bytes_be());
 
         let consensus_state = StarknetConsensusState {
             root: root.into(),
-            time: Timestamp::from_nanoseconds(block.timestamp * 1_000_000_000),
+            time: Timestamp::from_nanoseconds(
+                u64::try_from(chain_status.time.unix_timestamp()).unwrap() * 1_000_000_000,
+            ),
         };
 
         let height = Height::new(0, *target_height).unwrap();

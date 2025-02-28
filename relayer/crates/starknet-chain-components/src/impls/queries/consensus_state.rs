@@ -4,7 +4,6 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::consensus_state::{
     CanQueryConsensusState, ConsensusStateQuerier, ConsensusStateQuerierComponent,
     ConsensusStateWithProofsQuerier, ConsensusStateWithProofsQuerierComponent,
@@ -26,6 +25,7 @@ use starknet::macros::selector;
 use crate::traits::contract::call::CanCallContract;
 use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::traits::queries::address::CanQueryContractAddress;
+use crate::traits::queries::status_at_height::CanQueryChainStatusAtHeight;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::client_id::ClientId;
@@ -126,7 +126,7 @@ impl<Chain, Counterparty> ConsensusStateWithProofsQuerier<Chain, Counterparty>
 where
     Chain: HasClientIdType<Counterparty, ClientId = ClientId>
         + HasHeightType<Height = u64>
-        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + CanQueryChainStatusAtHeight<ChainStatus = StarknetChainStatus>
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryConsensusState<Counterparty>
@@ -148,7 +148,7 @@ where
             .query_consensus_state(tag, client_id, consensus_height, query_height)
             .await?;
 
-        let chain_status = chain.query_chain_status().await?;
+        let chain_status = chain.query_chain_status_at_height(query_height).await?;
 
         // FIXME: CometConsensusState can't be encoded to protobuf
         let protobuf_encoded_consensus_state = Vec::new();
