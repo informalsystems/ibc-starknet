@@ -77,10 +77,7 @@ jobs:
             ..#rust \
             ..#cargo-nextest \
             -c \
-            cargo nextest run --test-threads=2
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
+            cargo nextest run --test-threads=1
 
   lint-relayer:
     name: Lint Relayer Code
