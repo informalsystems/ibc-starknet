@@ -63,6 +63,7 @@ jobs:
           RUST_BACKTRACE: 1
           RUST_LOG: debug
         working-directory: ./relayer
+        # Tests are run with a single thread to avoid Connection refused (os error 61) with macOS
         run: |
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
           export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json"
