@@ -520,7 +520,7 @@ fn test_packet_clearing() -> Result<(), Error> {
             relay_b_to_a: cosmos_to_starknet_relay.clone(),
         };
 
-        birelay.auto_bi_relay(Some(20), Some(0)).await?;
+        birelay.auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0))).await?;
 
         info!("ics20 token address: {:?}", ics20_token_address);
 
@@ -659,7 +659,7 @@ fn test_packet_clearing() -> Result<(), Error> {
             denom_cosmos.clone(),
         );
 
-        birelay.auto_bi_relay(Some(20), Some(0)).await?;
+        birelay.auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0))).await?;
 
         cosmos_chain
             .assert_eventual_amount(address_cosmos_a, eventual_cosmos_amount)
