@@ -1,0 +1,70 @@
+[starknet_chain_config]
+poll_interval = "40s"
+block_time    = { secs = 30, nanos = 0 }
+
+json_rpc_url = "https://starknet-sepolia.public.blastapi.io/rpc/v0_7"
+# json_rpc_url = "https://starknet-sepolia.reddio.com/rpc/v0_7"
+
+[starknet_chain_config.contract_addresses]
+ibc_client = "0x05d78cad8c0efc496d5ce0bdce66bbae7aa9d97860448a5af84019227383bb2a"
+ibc_core   = "0x04cf1183281f8e60abcb58466b0d01f3eb273e64799d8e6ad2cea1578ef5e91a"
+
+[starknet_chain_config.contract_classes]
+erc20      = "0x04570481e743c3fdd442c44d968030b375cce8ec1471ccfd1a1dc48613060c3c"
+ics20      = "0x04d2f862a3e23f094983b7e2df83f4875fbd6b8571c5a53478e0be8962f87b30"
+ibc_client = "0x0305e76f607a3c39f2955902a41d820a4b2559e9e3e8bed681f32c2e87831901"
+
+[starknet_chain_config.relayer_wallet]
+
+# -- to be filled
+# public information
+# fill this from `account.json` of relayer
+account_address = ""
+public_key      = ""
+
+# -- to be filled
+# private information
+# file containing the signing key as Felt
+signing_key     = { file = "" }
+
+[cosmos_chain_config]
+id             = 'osmo-test-5'
+account_prefix = 'osmo'
+store_prefix   = 'ibc'
+rpc_timeout    = { secs = 10, nanos = 0 }
+address_type   = 'cosmos'
+max_msg_num    = 4
+max_tx_size    = 1048576
+
+rpc_addr     = 'https://rpc.testnet.osmosis.zone'
+# rpc_addr     = 'https://rpc.osmotest5.osmosis.zone'
+grpc_addr    = 'https://grpc.testnet.osmosis.zone'
+event_source = { mode = 'push', url = 'wss://rpc.testnet.osmosis.zone/websocket' }
+
+# -- to be filled
+# private information
+# hermes-v1 key should be present at `<key_store_folder>/<key_name>.json`
+key_store_folder = ""
+key_name         = ''
+
+# https://www.mintscan.io/osmosis-testnet
+block_time        = { secs = 0, nanos = 520000000 }
+clock_drift       = { secs = 1, nanos = 0 }
+max_block_time    = { secs = 10, nanos = 0 }
+compat_mode       = "v0.37"
+extension_options = [  ]
+poll_interval     = { secs = 1, nanos = 0 }
+
+[cosmos_chain_config.gas_config]
+default_gas        = 200000
+max_gas            = 400000
+gas_multiplier     = 1.25
+gas_price          = { price = 0.0025, denom = 'uosmo' }
+fee_granter        = ''
+dynamic_gas_config = { multiplier = 1.1, max = 1.6, eip_query_type = "Osmosis", denom = "uosmo" }
+
+[cosmos_chain_config.gas_config.max_fee]
+amount    = [ { amount = "25000", denom = 'uosmo' } ]
+gas_limit = 400000
+payer     = ''
+granter   = ''

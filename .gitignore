@@ -8,6 +8,7 @@ target/
 .snfoundry_versioned_programs/
 
 .env
+relayer.toml
 
 # vscode
 .vscode/
