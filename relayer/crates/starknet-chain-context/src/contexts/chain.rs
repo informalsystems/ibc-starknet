@@ -166,6 +166,7 @@ use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
 use hermes_starknet_chain_components::traits::queries::address::CanQueryContractAddress;
+use hermes_starknet_chain_components::traits::queries::status_at_height::CanQueryChainStatusAtHeight;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
@@ -382,6 +383,7 @@ pub trait CanUseStarknetChain:
     + CanDeclareContract
     + CanDeployContract
     + CanQueryTokenBalance
+    + CanQueryChainStatusAtHeight
     + CanTransferToken
     + HasIbcCommitmentPrefix
     + HasRetryableError

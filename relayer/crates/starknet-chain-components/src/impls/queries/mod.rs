@@ -12,4 +12,5 @@ pub mod packet_commitment;
 pub mod packet_receipt;
 pub mod packet_received;
 pub mod status;
+pub mod status_at_height;
 pub mod token_balance;

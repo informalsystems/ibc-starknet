@@ -4,7 +4,6 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::connection_end::{
     ConnectionEndQuerier, ConnectionEndQuerierComponent, ConnectionEndWithProofsQuerier,
     ConnectionEndWithProofsQuerierComponent,
@@ -26,6 +25,7 @@ use starknet::macros::selector;
 use crate::traits::contract::call::CanCallContract;
 use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::traits::queries::address::CanQueryContractAddress;
+use crate::traits::queries::status_at_height::CanQueryChainStatusAtHeight;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::commitment_proof::StarknetCommitmentProof;
@@ -55,7 +55,7 @@ where
     async fn query_connection_end(
         chain: &Chain,
         connection_id: &Chain::ConnectionId,
-        _height: &Chain::Height,
+        height: &Chain::Height,
     ) -> Result<Chain::ConnectionEnd, Chain::Error> {
         // TODO(rano): how to query at a specific height?
 
@@ -66,7 +66,12 @@ where
         let calldata = encoding.encode(connection_id).map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("connection_end"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("connection_end"),
+                &calldata,
+                Some(height),
+            )
             .await?;
 
         encoding.decode(&output).map_err(Chain::raise_error)
@@ -78,7 +83,7 @@ impl<Chain, Counterparty, Encoding> ConnectionEndWithProofsQuerier<Chain, Counte
     for QueryConnectionEndFromStarknet
 where
     Chain: HasHeightType<Height = u64>
-        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + CanQueryChainStatusAtHeight<ChainStatus = StarknetChainStatus>
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + HasConnectionIdType<Counterparty, ConnectionId = ConnectionId>
@@ -98,7 +103,7 @@ where
     async fn query_connection_end_with_proofs(
         chain: &Chain,
         connection_id: &Chain::ConnectionId,
-        _height: &Chain::Height,
+        height: &Chain::Height,
     ) -> Result<(Chain::ConnectionEnd, Chain::CommitmentProof), Chain::Error> {
         // TODO(rano): how to query at a specific height?
 
@@ -109,12 +114,17 @@ where
         let calldata = encoding.encode(connection_id).map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("connection_end"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("connection_end"),
+                &calldata,
+                Some(height),
+            )
             .await?;
 
         let connection_end = encoding.decode(&output).map_err(Chain::raise_error)?;
 
-        let chain_status = chain.query_chain_status().await?;
+        let chain_status = chain.query_chain_status_at_height(height).await?;
 
         let unsigned_membership_proof_bytes = MembershipVerifierContainer {
             state_root: chain_status.block_hash.to_bytes_be().to_vec(),
