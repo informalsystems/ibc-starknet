@@ -1,7 +1,9 @@
+use core::num::traits::CheckedSub;
+use core::num::traits::Zero;
 use ics23::{
     Proof, ProofSpec, ProofSpecTrait, RootBytes, KeyBytes, ValueBytes, ICS23Errors,
     ExistenceProofImpl, NonExistenceProof, NonExistenceProofImpl, SliceU32IntoArrayU8,
-    ExistenceProof, LeafOp, HashOp, InnerOp, ArrayU8PartialOrd,
+    ExistenceProof, LeafOp, HashOp, InnerOp, ArrayU8PartialOrd, InnerSpec,
 };
 use protobuf::varint::decode_varint_from_u8_array;
 
@@ -83,8 +85,19 @@ pub fn verify_non_existence(
             spec.key_for_comparison(key) < spec.key_for_comparison(right.key.clone()),
             ICS23Errors::INVALID_RIGHT_KEY_ORDER,
         )
-    } else {
-        panic!("{}", ICS23Errors::MISSING_EXISTENCE_PROOFS);
+    }
+
+    match (proof.left, proof.right) {
+        (
+            Option::Some(left), Option::None,
+        ) => ensure_right_most(spec.inner_spec.clone(), left.path.clone()),
+        (
+            Option::None, Option::Some(right),
+        ) => ensure_left_most(spec.inner_spec.clone(), right.path.clone()),
+        (
+            Option::Some(left), Option::Some(right),
+        ) => ensure_left_neighbor(spec.inner_spec.clone(), left.path.clone(), right.path.clone()),
+        (Option::None, Option::None) => panic!("{}", ICS23Errors::MISSING_EXISTENCE_PROOFS),
     }
 }
 
@@ -174,3 +187,162 @@ fn has_prefix(proof_prefix: @Array<u8>, spec_prefix: @Array<u8>) -> bool {
     };
     spec_prefix == @expected
 }
+
+// Fails unless this is the left-most path in the tree, excluding placeholder (empty child) nodes.
+fn ensure_left_most(inner_spec: InnerSpec, path: Array<InnerOp>) {
+    let pad = get_padding(inner_spec.clone(), 0);
+    for step in path {
+        assert(
+            has_padding(@step, pad.clone()) || left_branches_are_empty(inner_spec.clone(), @step),
+            ICS23Errors::STEP_NOT_LEFT_MOST,
+        );
+    };
+}
+
+// Fails unless this is the right-most path in the tree, excluding placeholder (empty child) nodes.
+fn ensure_right_most(inner_spec: InnerSpec, path: Array<InnerOp>) {
+    let pad = get_padding(inner_spec.clone(), inner_spec.child_order.len() - 1);
+    for step in path {
+        assert(
+            has_padding(@step, pad.clone()) || right_branches_are_empty(@inner_spec, @step),
+            ICS23Errors::STEP_NOT_RIGHT_MOST,
+        );
+    };
+}
+
+fn ensure_left_neighbor(
+    inner_spec: InnerSpec, left_path: Array<InnerOp>, right_path: Array<InnerOp>,
+) {
+    let mut left_path_span = left_path.span();
+    let mut right_path_span = right_path.span();
+
+    let mut top_left = left_path_span.pop_back().unwrap();
+    let mut top_right = right_path_span.pop_back().unwrap();
+
+    while top_left.prefix == top_right.prefix && top_left.suffix == top_right.suffix {
+        top_left = left_path_span.pop_back().unwrap();
+        top_right = right_path_span.pop_back().unwrap();
+    };
+
+    assert(
+        is_left_step(inner_spec.clone(), top_left, top_right), ICS23Errors::INVALID_LEFT_NEIGHBOR,
+    );
+    ensure_right_most(inner_spec.clone(), left_path_span.into());
+    ensure_left_most(inner_spec, right_path_span.into());
+}
+
+fn is_left_step(inner_spec: InnerSpec, left_op: @InnerOp, right_op: @InnerOp) -> bool {
+    let left_idx = order_from_padding(inner_spec.clone(), left_op);
+    let right_idx = order_from_padding(inner_spec, right_op);
+    left_idx + 1 == right_idx
+}
+
+#[derive(Clone, Drop, Debug, Default, PartialEq)]
+pub struct Padding {
+    pub min_prefix: u32,
+    pub max_prefix: u32,
+    pub suffix: u32,
+}
+
+fn get_padding(inner_spec: InnerSpec, branch: u32) -> Padding {
+    let mut padding = Option::None;
+    for o in inner_spec.child_order.clone() {
+        if o == branch {
+            let prefix = o * inner_spec.child_size;
+            let suffix = inner_spec.child_size * (inner_spec.child_order.len() - 1 - o);
+            padding =
+                Option::Some(
+                    Padding {
+                        min_prefix: prefix + inner_spec.min_prefix_length,
+                        max_prefix: prefix + inner_spec.max_prefix_length,
+                        suffix,
+                    },
+                );
+            break;
+        }
+    };
+    assert(padding.is_some(), ICS23Errors::MISSING_BRANCH);
+    padding.unwrap()
+}
+
+fn has_padding(inner_op: @InnerOp, pad: Padding) -> bool {
+    inner_op.prefix.len() >= pad.min_prefix
+        && inner_op.prefix.len() <= pad.max_prefix
+        && inner_op.suffix.len() == pad.suffix
+}
+
+fn order_from_padding(inner_spec: InnerSpec, inner_op: @InnerOp) -> u32 {
+    let mut order = Option::None;
+    let len = inner_spec.child_order.len();
+    for branch in 0..len {
+        let padding = get_padding(inner_spec.clone(), branch);
+        if has_padding(inner_op, padding) {
+            order = Option::Some(branch);
+            break;
+        }
+    };
+    assert(order.is_some(), ICS23Errors::MISMATCHED_PADDING);
+    order.unwrap()
+}
+
+fn left_branches_are_empty(inner_spec: InnerSpec, inner_op: @InnerOp) -> bool {
+    let left_branches = order_from_padding(inner_spec.clone(), inner_op);
+    if left_branches.is_zero() {
+        return false;
+    }
+
+    let child_size = inner_spec.child_size.clone();
+    let actual_prefix = inner_op.prefix.len().checked_sub(left_branches * child_size);
+    if actual_prefix.is_none() {
+        return false;
+    }
+
+    let mut are_empty = true;
+    for lb in 0..left_branches {
+        for o in inner_spec.child_order.clone() {
+            if o == lb {
+                let from = actual_prefix.unwrap() + child_size * o;
+                let mut expected_prefix = ArrayTrait::new();
+                for i in from..from + child_size {
+                    expected_prefix.append(*inner_op.prefix[i]);
+                };
+                if inner_spec.empty_child != expected_prefix {
+                    are_empty = false;
+                    break;
+                }
+            }
+        };
+    };
+    are_empty
+}
+
+fn right_branches_are_empty(inner_spec: @InnerSpec, inner_op: @InnerOp) -> bool {
+    let right_branches = order_from_padding(inner_spec.clone(), inner_op);
+    if right_branches.is_zero() {
+        return false;
+    }
+
+    let child_size = inner_spec.child_size.clone();
+    if inner_op.suffix.len() != child_size {
+        return false;
+    }
+
+    let mut are_empty = true;
+    for rb in 0..right_branches {
+        for o in inner_spec.child_order.clone() {
+            if o == rb {
+                let from = child_size * o;
+                let mut expected_suffix = ArrayTrait::new();
+                for i in from..from + child_size {
+                    expected_suffix.append(*inner_op.suffix[i]);
+                };
+                if inner_spec.empty_child != @expected_suffix {
+                    are_empty = false;
+                    break;
+                }
+            }
+        };
+    };
+    are_empty
+}
+

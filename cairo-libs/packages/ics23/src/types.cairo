@@ -267,7 +267,7 @@ pub struct InnerSpec {
     pub child_size: u32,
     pub min_prefix_length: u32,
     pub max_prefix_length: u32,
-    pub empty_child: ByteArray, // TODO: determine the correct type!
+    pub empty_child: Array<u8>,
     pub hash: HashOp,
 }
 

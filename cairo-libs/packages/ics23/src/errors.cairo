@@ -5,10 +5,12 @@ pub mod ICS23Errors {
     pub const MISSING_LEAF_DATA: felt252 = 'ICS23: missing leaf data';
     pub const MISSING_CHILD_HASH: felt252 = 'ICS23: missing child hash';
     pub const MISSING_EXISTENCE_PROOFS: felt252 = 'ICS23: missing existence proofs';
+    pub const MISSING_BRANCH: felt252 = 'ICS23: missing branch';
     pub const MISMATCHED_KEY: felt252 = 'ICS23: mismatched key';
     pub const MISMATCHED_VALUE: felt252 = 'ICS23: mismatched value';
     pub const MISMATCHED_ROOT: felt252 = 'ICS23: mismatched root';
     pub const MISMATCHED_NUM_OF_PROOFS: felt252 = 'ICS23: mismatched num of proofs';
+    pub const MISMATCHED_PADDING: felt252 = 'ICS23: mismatched padding';
     pub const INVALID_MERKLE_PROOF: felt252 = 'ICS23: invalid merkle proof';
     pub const INVALID_PROOF_TYPE: felt252 = 'ICS23: invalid proof type';
     pub const INVALID_INNER_SPEC: felt252 = 'ICS23: invalid inner spec';
@@ -25,6 +27,9 @@ pub mod ICS23Errors {
     pub const INVALID_IAVL_HEIGHT_PREFIX: felt252 = 'ICS23: invalid height prefix';
     pub const INVALID_LEFT_KEY_ORDER: felt252 = 'ICS23: invalid left key order';
     pub const INVALID_RIGHT_KEY_ORDER: felt252 = 'ICS23: invalid right key order';
+    pub const INVALID_LEFT_NEIGHBOR: felt252 = 'ICS23: invalid left neighbor';
+    pub const STEP_NOT_LEFT_MOST: felt252 = 'ICS23: step not left most';
+    pub const STEP_NOT_RIGHT_MOST: felt252 = 'ICS23: step not right most';
     pub const UNSUPPORTED_HASH_OP: felt252 = 'ICS23: unsupported hash op';
     pub const ZERO_MERKLE_ROOT: felt252 = 'ICS23: zero merkle root';
     pub const ZERO_CHILD_SIZE: felt252 = 'ICS23: zero child size';

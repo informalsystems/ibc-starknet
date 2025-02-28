@@ -13,7 +13,7 @@ pub fn iavl_spec() -> ProofSpec {
         min_prefix_length: 4,
         max_prefix_length: 12,
         child_size: 33,
-        empty_child: "",
+        empty_child: array![],
         hash: HashOp::Sha256,
     };
     ProofSpec {
@@ -34,7 +34,7 @@ pub fn tendermint_spec() -> ProofSpec {
         min_prefix_length: 1,
         max_prefix_length: 1,
         child_size: 32,
-        empty_child: "",
+        empty_child: array![],
         hash: HashOp::Sha256,
     };
     ProofSpec {
@@ -55,7 +55,7 @@ pub fn smt_spec() -> ProofSpec {
         min_prefix_length: 1,
         max_prefix_length: 1,
         child_size: 32,
-        empty_child: "00000000000000000000000000000000",
+        empty_child: [0; 32].span().into(),
         hash: HashOp::Sha256,
     };
     ProofSpec {
