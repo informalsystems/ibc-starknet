@@ -5,7 +5,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_error::impls::ProvideHermesError;
+use hermes_error::impls::UseHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -39,7 +39,7 @@ pub struct StarknetChainDriver {
 
 delegate_components! {
     StarknetChainDriverComponents {
-        ErrorTypeProviderComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,

@@ -23,7 +23,7 @@ use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::{
 };
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::ChainNodeConfigTypeComponent;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::ChainGenesisConfigTypeComponent;
-use hermes_error::impls::ProvideHermesError;
+use hermes_error::impls::UseHermesError;
 use hermes_error::types::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
@@ -66,7 +66,7 @@ pub struct StarknetBootstrap {
 
 delegate_components! {
     StarknetBootstrapComponents {
-        ErrorTypeProviderComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,

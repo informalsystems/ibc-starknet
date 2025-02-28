@@ -3,7 +3,7 @@ use core::time::Duration;
 use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
-use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
+use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
@@ -28,7 +28,7 @@ use hermes_encoding_components::traits::has_encoding::{
     EncodingTypeComponent, HasDefaultEncoding, ProvideEncodingType,
 };
 use hermes_encoding_components::types::AsBytes;
-use hermes_error::impls::ProvideHermesError;
+use hermes_error::impls::UseHermesError;
 use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
@@ -129,7 +129,7 @@ use hermes_relayer_components::chain::traits::types::packets::ack::HasAcknowledg
 use hermes_relayer_components::chain::traits::types::packets::receive::HasPacketCommitmentType;
 use hermes_relayer_components::chain::traits::types::packets::timeout::HasPacketReceiptType;
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
-use hermes_relayer_components::error::traits::retry::HasRetryableError;
+use hermes_relayer_components::error::traits::HasRetryableError;
 use hermes_relayer_components::transaction::impls::global_nonce_mutex::GetGlobalNonceMutex;
 use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::CanAllocateNonce;
 use hermes_relayer_components::transaction::traits::nonce::nonce_mutex::NonceAllocationMutexGetterComponent;
@@ -234,7 +234,10 @@ impl Deref for StarknetChain {
 
 delegate_components! {
     StarknetChainContextComponents {
-        ErrorTypeProviderComponent: ProvideHermesError,
+        [
+            ErrorTypeProviderComponent,
+            ErrorWrapperComponent,
+        ]: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
