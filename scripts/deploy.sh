@@ -163,7 +163,8 @@ register_client() {
     CORE_ADDRESS=$1
     COMET_ADDRESS=$2
 
-    COMET_CLIENT_TYPE=$(starkli to-cairo-string 07-tendermint)
+    # client type uses cairo short-string
+    COMET_CLIENT_TYPE=$(starkli to-cairo-string "07-tendermint")
 
     CALLDATA="$COMET_CLIENT_TYPE $COMET_ADDRESS"
 
@@ -178,8 +179,11 @@ register_ics20() {
     CORE_ADDRESS=$1
     ICS20_ADDRESS=$2
 
-    # hardcoded `transfer`
-    CALLDATA="0x0 0x7472616e73666572 0x8 $ICS20_ADDRESS"
+    TRANSFER_PORT=$(starkli to-cairo-string "transfer")
+
+    # https://docs.starknet.io/architecture-and-concepts/smart-contracts/serialization-of-cairo-types/#serialization_of_byte_arrays
+    # there is 0 previous bytes, and `transfer` has 8 bytes
+    CALLDATA="0x0 $TRANSFER_PORT 0x8 $ICS20_ADDRESS"
 
     starkli invoke \
         $STARKLI_ARGS \
