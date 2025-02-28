@@ -100,7 +100,7 @@ where
                         "0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691"
                     )
                     .into(),
-                    signing_key: felt!("0x71d7bb07b9a64f6f78ac4c816aff4da9"),
+                    signing_key: felt!("0x71d7bb07b9a64f6f78ac4c816aff4da9").into(),
                     public_key: felt!(
                         "0x39d9e6ce352ad4530a0ef5d5a18fd3303c3606a7fa6ac5b620020ad681cc33b"
                     ),
@@ -113,7 +113,7 @@ where
                         "0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"
                     )
                     .into(),
-                    signing_key: felt!("0xe1406455b7d66b1690803be066cbe5e"),
+                    signing_key: felt!("0xe1406455b7d66b1690803be066cbe5e").into(),
                     public_key: felt!(
                         "0x7a1bb2744a7dd29bffd44341dbd78008adb4bc11733601e7eddff322ada9cb"
                     ),
@@ -126,7 +126,7 @@ where
                         "0x49dfb8ce986e21d354ac93ea65e6a11f639c1934ea253e5ff14ca62eca0f38e"
                     )
                     .into(),
-                    signing_key: felt!("0xa20a02f0ac53692d144b20cb371a60d7"),
+                    signing_key: felt!("0xa20a02f0ac53692d144b20cb371a60d7").into(),
                     public_key: felt!(
                         "0xb8fd4ddd415902d96f61b7ad201022d495997c2dff8eb9e0eb86253e30fabc"
                     ),
