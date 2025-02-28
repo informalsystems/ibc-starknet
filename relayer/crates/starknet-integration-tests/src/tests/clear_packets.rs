@@ -16,8 +16,11 @@ use flate2::Compression;
 use hermes_chain_components::traits::packet::fields::{
     HasPacketTimeoutHeight, HasPacketTimeoutTimestamp,
 };
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_chain_components::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
+};
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
+use hermes_chain_components::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_chain_components::traits::types::timestamp::HasTimeoutType;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
@@ -84,7 +87,7 @@ use crate::contexts::bootstrap::StarknetBootstrap;
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
 
 #[test]
-fn test_query_unreceived_packets() -> Result<(), Error> {
+fn test_packet_clearing() -> Result<(), Error> {
     // ### SETUP START ###
     let runtime = init_test_runtime();
 
@@ -415,6 +418,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
         let wallet_starknet_b = &starknet_chain_driver.user_wallet_b;
         let address_starknet_b = &wallet_starknet_b.account_address;
         let transfer_quantity = 1_000u128;
+        let transfer_back_quantity = 310u128;
         let denom_cosmos = &cosmos_chain_driver.genesis_config.transfer_denom;
 
         let starknet_account_b = SingleOwnerAccount::new(
@@ -510,6 +514,14 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
             cairo_encoding.decode(&output)?
         };
 
+        let birelay = StarknetCosmosBiRelay {
+            runtime: runtime.clone(),
+            relay_a_to_b: starknet_to_cosmos_relay,
+            relay_b_to_a: cosmos_to_starknet_relay.clone(),
+        };
+
+        birelay.auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0))).await?;
+
         info!("ics20 token address: {:?}", ics20_token_address);
 
         let balance_cosmos_a_step_0 = cosmos_chain
@@ -559,7 +571,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
         {
             let call_data = cairo_encoding.encode(&product![
                 ics20_contract_address,
-                U256::from(transfer_quantity)
+                U256::from(transfer_back_quantity)
             ])?;
 
             let call = Call {
@@ -595,7 +607,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
                 port_id_on_a: ics20_port.clone(),
                 chan_id_on_a: starknet_channel_id.clone(),
                 denom,
-                amount: transfer_quantity.into(),
+                amount: transfer_back_quantity.into(),
                 receiver: address_cosmos_a.clone(),
                 memo: String::new(),
                 timeout_height_on_b: Height {
@@ -642,17 +654,59 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
         )
         .await?;
 
-        // assert_eq!(pending_packets_starknet, vec![Sequence::from(3)]);
-        // TODO: Currently, querying for unreceived packets using commitment sequences that were never sent
-        // will always return them as unreceived. This assertion must be updated once the correct commitment-
-        // querying logic has been implemented.
-        // assert_eq!(pending_packets_cosmos, vec![Sequence::from(1), Sequence::from(2), Sequence::from(3)]);
-        // assert_eq!(pending_acks_starknet, vec![Sequence::from(1)]);
-        // assert_eq!(pending_acks_cosmos, vec![Sequence::from(2), Sequence::from(3)]);
+        let eventual_cosmos_amount = &Amount::new(
+            balance_cosmos_a_step_0.quantity - (transfer_quantity * 2) + transfer_back_quantity,
+            denom_cosmos.clone(),
+        );
 
-        // TODO: Call packet clearing
-        // TODO: Assert there are no pending packets or pending acks
-        // TODO: Assert tokens have been correctly transferred
+        birelay.auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0))).await?;
+
+        cosmos_chain
+            .assert_eventual_amount(address_cosmos_a, eventual_cosmos_amount)
+            .await?;
+
+        let balance_starknet_b_step_2 = starknet_chain
+            .query_token_balance(&ics20_token_address, address_starknet_b)
+            .await?;
+
+        assert_eq!(
+            balance_starknet_b_step_0.quantity + (transfer_quantity * 2).into()
+                - transfer_back_quantity.into(),
+            balance_starknet_b_step_2.quantity
+        );
+
+        let cosmos_latest_height = cosmos_chain.query_chain_height().await?;
+
+        let maybe_cosmos_ack1 = <CosmosChain as CanQueryPacketAcknowledgement<StarknetChain>>::query_packet_acknowledgement(
+            cosmos_chain,
+            &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(1),
+                &cosmos_latest_height,
+            )
+            .await;
+
+        let maybe_cosmos_ack2 = <CosmosChain as CanQueryPacketAcknowledgement<StarknetChain>>::query_packet_acknowledgement(
+            cosmos_chain,
+            &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(2),
+                &cosmos_latest_height,
+            )
+            .await;
+
+        let maybe_cosmos_ack3 = <CosmosChain as CanQueryPacketAcknowledgement<StarknetChain>>::query_packet_acknowledgement(
+            cosmos_chain,
+            &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(3),
+                &cosmos_latest_height,
+            )
+            .await;
+
+        assert!(maybe_cosmos_ack1.is_err(), "query_packet_acknowledgement should fail with error `ack not found at: acks/ports/transfer/channels/{cosmos_channel_id}/sequences/1`");
+        assert!(maybe_cosmos_ack2.is_err(), "query_packet_acknowledgement should fail with error `ack not found at: acks/ports/transfer/channels/{cosmos_channel_id}/sequences/2`");
+        assert!(maybe_cosmos_ack3.is_err(), "query_packet_acknowledgement should fail with error `ack not found at: acks/ports/transfer/channels/{cosmos_channel_id}/sequences/3`");
 
         Ok(())
     })
