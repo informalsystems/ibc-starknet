@@ -50,3 +50,7 @@ tokio              = { workspace = true }
 tracing            = { workspace = true }
 tracing-subscriber = { workspace = true }
 stable-eyre        = { workspace = true }
+
+[dev-dependencies]
+hex                     = { workspace = true }
+hermes-chain-components = { workspace = true }
