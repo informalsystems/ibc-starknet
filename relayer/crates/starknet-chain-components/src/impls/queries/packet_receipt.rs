@@ -68,7 +68,7 @@ where
         channel_id: &ChannelId,
         port_id: &IbcPortId,
         sequence: &IbcSequence,
-        _height: &u64,
+        height: &u64,
     ) -> Result<(Option<Vec<u8>>, StarknetCommitmentProof), Chain::Error> {
         let encoding = chain.encoding();
 
@@ -79,7 +79,12 @@ where
             .map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("packet_receipt"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("packet_receipt"),
+                &calldata,
+                Some(height),
+            )
             .await?;
 
         let receipt_status = encoding.decode(&output).map_err(Chain::raise_error)?;

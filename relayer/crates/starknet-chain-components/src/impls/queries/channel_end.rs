@@ -60,7 +60,7 @@ where
         chain: &Chain,
         channel_id: &ChannelId,
         port_id: &Chain::PortId,
-        _height: &Chain::Height,
+        height: &Chain::Height,
     ) -> Result<Chain::ChannelEnd, Chain::Error> {
         // TODO(rano): how to query at a specific height?
 
@@ -73,7 +73,12 @@ where
             .map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("channel_end"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("channel_end"),
+                &calldata,
+                Some(height),
+            )
             .await?;
 
         encoding.decode(&output).map_err(Chain::raise_error)
@@ -108,7 +113,7 @@ where
         chain: &Chain,
         channel_id: &ChannelId,
         port_id: &Chain::PortId,
-        _height: &Chain::Height,
+        height: &Chain::Height,
     ) -> Result<(Chain::ChannelEnd, Chain::CommitmentProof), Chain::Error> {
         // TODO(rano): how to query at a specific height?
 
@@ -121,7 +126,12 @@ where
             .map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("channel_end"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("channel_end"),
+                &calldata,
+                Some(height),
+            )
             .await?;
 
         let channel_end = encoding.decode(&output).map_err(Chain::raise_error)?;

@@ -66,7 +66,12 @@ where
             .map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("packet_receipt"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("packet_receipt"),
+                &calldata,
+                None,
+            )
             .await?;
 
         let is_received = encoding.decode(&output).map_err(Chain::raise_error)?;

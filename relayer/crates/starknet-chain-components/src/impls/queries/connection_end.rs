@@ -55,7 +55,7 @@ where
     async fn query_connection_end(
         chain: &Chain,
         connection_id: &Chain::ConnectionId,
-        _height: &Chain::Height,
+        height: &Chain::Height,
     ) -> Result<Chain::ConnectionEnd, Chain::Error> {
         // TODO(rano): how to query at a specific height?
 
@@ -66,7 +66,12 @@ where
         let calldata = encoding.encode(connection_id).map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("connection_end"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("connection_end"),
+                &calldata,
+                Some(height),
+            )
             .await?;
 
         encoding.decode(&output).map_err(Chain::raise_error)
@@ -98,7 +103,7 @@ where
     async fn query_connection_end_with_proofs(
         chain: &Chain,
         connection_id: &Chain::ConnectionId,
-        _height: &Chain::Height,
+        height: &Chain::Height,
     ) -> Result<(Chain::ConnectionEnd, Chain::CommitmentProof), Chain::Error> {
         // TODO(rano): how to query at a specific height?
 
@@ -109,7 +114,12 @@ where
         let calldata = encoding.encode(connection_id).map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("connection_end"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("connection_end"),
+                &calldata,
+                Some(height),
+            )
             .await?;
 
         let connection_end = encoding.decode(&output).map_err(Chain::raise_error)?;

@@ -58,7 +58,7 @@ where
         chain: &Chain,
         _tag: PhantomData<Counterparty>,
         client_id: &Chain::ClientId,
-        _height: &Chain::Height, // TODO: figure whether we can perform height specific queries on Starknet
+        height: &Chain::Height,
     ) -> Result<Counterparty::ClientState, Chain::Error> {
         let encoding = chain.encoding();
 
@@ -77,7 +77,12 @@ where
             .map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("client_state"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("client_state"),
+                &calldata,
+                Some(height),
+            )
             .await?;
 
         let raw_client_state: Vec<Felt> = encoding.decode(&output).map_err(Chain::raise_error)?;

@@ -68,7 +68,7 @@ where
         _tag: PhantomData<Counterparty>,
         client_id: &ClientId,
         consensus_height: &Counterparty::Height,
-        _query_height: &Chain::Height, // TODO: figure whether we can perform height specific queries on Starknet
+        query_height: &Chain::Height,
     ) -> Result<Counterparty::ConsensusState, Chain::Error> {
         let encoding = chain.encoding();
 
@@ -92,7 +92,12 @@ where
             .map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("consensus_state"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("consensus_state"),
+                &calldata,
+                Some(query_height),
+            )
             .await?;
 
         let raw_consensus_state: Vec<Felt> =

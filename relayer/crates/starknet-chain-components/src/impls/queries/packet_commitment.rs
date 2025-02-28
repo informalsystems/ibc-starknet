@@ -67,7 +67,7 @@ where
         channel_id: &ChannelId,
         port_id: &IbcPortId,
         sequence: &IbcSequence,
-        _height: &u64,
+        height: &u64,
     ) -> Result<(Option<Vec<u8>>, StarknetCommitmentProof), Chain::Error> {
         let encoding = chain.encoding();
 
@@ -82,6 +82,7 @@ where
                 &contract_address,
                 &selector!("packet_commitment"),
                 &calldata,
+                Some(height),
             )
             .await?;
 
