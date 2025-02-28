@@ -122,6 +122,11 @@ where
         // assert sha256 hash of SUCCESS_ACK is stored ack_bytes
         // asset_eq!(ack_bytes, SUCCESS_ACK);
 
+        // FIXME: we can't send `ack_bytes` as it is stored after hashing.
+        // We should query block event to get the original ack_bytes.
+        //
+        // For now, we just return the SUCCESS_ACK as ack_bytes.
+
         Ok((SUCCESS_ACK.to_vec(), dummy_proof))
     }
 }
