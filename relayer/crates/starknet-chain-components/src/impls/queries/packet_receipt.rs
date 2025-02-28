@@ -69,7 +69,7 @@ where
         port_id: &IbcPortId,
         sequence: &IbcSequence,
         _height: &u64,
-    ) -> Result<(Vec<u8>, StarknetCommitmentProof), Chain::Error> {
+    ) -> Result<(Option<Vec<u8>>, StarknetCommitmentProof), Chain::Error> {
         let encoding = chain.encoding();
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
@@ -84,11 +84,7 @@ where
 
         let receipt_status = encoding.decode(&output).map_err(Chain::raise_error)?;
 
-        if receipt_status {
-            return Err(Chain::raise_error(
-                "Packet is received. No non-membership proof.",
-            ));
-        }
+        let receipt = if receipt_status { Some(vec![1]) } else { None };
 
         let chain_status = chain.query_chain_status().await?;
 
@@ -98,7 +94,7 @@ where
             path: Path::Receipt(ReceiptPath::new(port_id, channel_id, *sequence))
                 .to_string()
                 .into(),
-            value: None,
+            value: receipt.clone(),
         }
         .canonical_bytes();
 
@@ -112,6 +108,6 @@ where
             proof_bytes: signed_bytes,
         };
 
-        Ok((vec![], dummy_proof))
+        Ok((receipt, dummy_proof))
     }
 }
