@@ -4,9 +4,10 @@ use starknet::core::types::Felt;
 use crate::impls::types::address::StarknetAddress;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
 pub enum SigningKey {
-    File(String),
-    Felt(Felt),
+    File { file: String },
+    Felt { felt: Felt },
 }
 
 impl TryFrom<SigningKey> for Felt {
@@ -14,19 +15,19 @@ impl TryFrom<SigningKey> for Felt {
 
     fn try_from(value: SigningKey) -> Result<Self, Self::Error> {
         match value {
-            SigningKey::File(path) => Ok(std::fs::read_to_string(path)
+            SigningKey::File { file } => Ok(std::fs::read_to_string(file)
                 .map_err(|e| format!("{e}"))?
                 .trim()
                 .parse()
                 .map_err(|e| format!("{e}"))?),
-            SigningKey::Felt(felt) => Ok(felt),
+            SigningKey::Felt { felt } => Ok(felt),
         }
     }
 }
 
 impl From<Felt> for SigningKey {
     fn from(felt: Felt) -> Self {
-        Self::Felt(felt)
+        Self::Felt { felt }
     }
 }
 
