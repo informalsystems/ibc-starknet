@@ -27,7 +27,6 @@ pub fn array_u8_into_array_u32(input: Array<u8>) -> (Array<u32>, u32, u32) {
     (result, last_word, last_word_len)
 }
 
-
 pub fn byte_array_to_slice_u32(input: ByteArray) -> [u32; 8] {
     let (b, word, word_len) = input.into_array_u32();
     assert(word == 0 && word_len == 0, 'invalid byte array');
@@ -216,3 +215,64 @@ pub fn array_u32_to_byte_array(array: Array<u32>) -> ByteArray {
     array_u8_to_byte_array(@array_u32_into_array_u8(array, 0, 0))
 }
 
+
+// ---------------------------------------------------------------
+// Implementation of partial ordering for `Array<u8>`
+// ---------------------------------------------------------------
+
+pub impl ArrayU8PartialOrd of PartialOrd<Array<u8>> {
+    fn le(lhs: Array<u8>, rhs: Array<u8>) -> bool {
+        lexicographical_cmp(lhs, rhs) != Ordering::Greater
+    }
+    fn ge(lhs: Array<u8>, rhs: Array<u8>) -> bool {
+        lexicographical_cmp(lhs, rhs) != Ordering::Less
+    }
+    fn lt(lhs: Array<u8>, rhs: Array<u8>) -> bool {
+        lexicographical_cmp(lhs, rhs) == Ordering::Less
+    }
+    fn gt(lhs: Array<u8>, rhs: Array<u8>) -> bool {
+        lexicographical_cmp(lhs, rhs) == Ordering::Greater
+    }
+}
+
+#[derive(Drop, Debug, PartialEq)]
+pub enum Ordering {
+    Equal,
+    Less,
+    Greater,
+}
+
+/// Lexicographical comparison of two `u8` arrays.
+pub fn lexicographical_cmp(lhs: Array<u8>, rhs: Array<u8>) -> Ordering {
+    let lhs_len = lhs.len();
+    let rhs_len = rhs.len();
+    let min_len = core::cmp::min(lhs_len, rhs_len);
+
+    let mut ordering = Ordering::Equal;
+
+    for i in 0..min_len {
+        let l = lhs.at(i);
+        let r = rhs.at(i);
+        if l < r {
+            ordering = Ordering::Less;
+            break;
+        } else if l > r {
+            ordering = Ordering::Greater;
+            break;
+        }
+    };
+
+    if ordering != Ordering::Equal {
+        return ordering;
+    }
+
+    if lhs_len < rhs_len {
+        ordering = Ordering::Less
+    }
+
+    if lhs_len > rhs_len {
+        ordering = Ordering::Greater
+    }
+
+    ordering
+}
