@@ -97,19 +97,19 @@ fn test_mint_burn_roundtrip() {
     // Fetch the token address.
     let token_address = ics20.ibc_token_address(prefixed_denom.key());
 
+    let mut erc20: ERC20Contract = token_address.into();
+
     // Assert the `CreateTokenEvent` emitted.
-    spy
-        .assert_create_token_event(
-            ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, token_address, transfer_cfg.amount,
-        );
+    spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, token_address);
+
+    // Assert if the ICS20 performs the mint.
+    spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), transfer_cfg.amount);
 
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
             ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), transfer_cfg.amount, true,
         );
-
-    let mut erc20: ERC20Contract = token_address.into();
 
     // Assert if the transfer happens from the ICS20 address.
     spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), transfer_cfg.amount);
@@ -191,7 +191,7 @@ fn test_create_ibc_token_ok() {
     let (_, ics20, _, _, _, transfer_cfg, mut spy) = setup(Mode::WithChannel);
     let prefixed_denom = transfer_cfg.prefix_hosted_denom();
     let address = ics20.create_ibc_token(prefixed_denom.clone());
-    spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, address, 0);
+    spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, address);
     let queried = ics20.ibc_token_address(prefixed_denom.key());
     assert_eq!(address, queried);
 }
@@ -208,7 +208,7 @@ fn test_create_ibc_token_with_multihop() {
     let prefixed_denom = transfer_cfg.prefix_hosted_denom();
 
     let address = ics20.create_ibc_token(prefixed_denom.clone());
-    spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, address, 0);
+    spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, address);
     let queried = ics20.ibc_token_address(prefixed_denom.key());
     assert_eq!(address, queried);
 }

@@ -71,7 +71,6 @@ pub struct CreateIbcTokenEvent {
     pub symbol: String,
     pub decimals: u8,
     pub address: StarknetAddress,
-    pub initial_supply: U256,
 }
 
 pub struct DecodeIbcTransferEvents;
@@ -291,8 +290,7 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, Product![String, String, u8, StarknetAddress]>
-        + CanDecode<ViaCairo, Product![U256]>,
+        + CanDecode<ViaCairo, Product![String, String, u8, StarknetAddress]>,
 {
     fn decode(
         event_encoding: &EventEncoding,
@@ -304,16 +302,11 @@ where
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
-        let product![initial_supply] = cairo_encoding
-            .decode(&event.data)
-            .map_err(EventEncoding::raise_error)?;
-
         Ok(CreateIbcTokenEvent {
             name,
             symbol,
             decimals,
             address,
-            initial_supply,
         })
     }
 }

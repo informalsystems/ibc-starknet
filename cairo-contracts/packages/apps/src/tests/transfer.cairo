@@ -149,19 +149,19 @@ fn test_mint_ok() {
 
     let token_address = ics20.ibc_token_address(prefixed_denom.key());
 
+    let erc20: ERC20Contract = token_address.into();
+
     // Assert the `CreateTokenEvent` emitted.
-    spy
-        .assert_create_token_event(
-            ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, token_address, cfg.amount,
-        );
+    spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, token_address);
+
+    // Assert if the ICS20 performs the mint.
+    spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), cfg.amount);
 
     // Assert the `RecvEvent` emitted.
     spy
         .assert_recv_event(
             ics20.address, CS_USER(), SN_USER(), prefixed_denom.clone(), cfg.amount, true,
         );
-
-    let erc20: ERC20Contract = token_address.into();
 
     // Assert if the transfer happens from the ICS20 address.
     spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), cfg.amount);

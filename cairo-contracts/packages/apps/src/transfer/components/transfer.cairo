@@ -113,7 +113,6 @@ pub mod TokenTransferComponent {
         pub decimals: u8,
         #[key]
         pub address: ContractAddress,
-        pub initial_supply: u256,
     }
 
     // -----------------------------------------------------------
@@ -817,7 +816,7 @@ pub mod TokenTransferComponent {
 
             self.write_salt(salt + 1);
 
-            self.emit_create_token_event(name, symbol, decimals, erc20_token.address, amount);
+            self.emit_create_token_event(name, symbol, decimals, erc20_token.address);
 
             erc20_token
         }
@@ -1012,9 +1011,8 @@ pub mod TokenTransferComponent {
             symbol: ByteArray,
             decimals: u8,
             address: ContractAddress,
-            initial_supply: u256,
         ) {
-            let event = CreateTokenEvent { name, symbol, decimals, address, initial_supply };
+            let event = CreateTokenEvent { name, symbol, decimals, address };
             self.emit(event);
         }
     }
