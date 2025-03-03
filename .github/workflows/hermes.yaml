@@ -40,13 +40,23 @@ jobs:
       - name: Install Scarb
         uses: software-mansion/setup-scarb@v1
         with:
-          tool-versions: cairo-libs/.tool-versions
-          scarb-lock: cairo-libs/Scarb.lock
+          tool-versions: cairo-contracts/.tool-versions
+          scarb-lock: cairo-contracts/Scarb.lock
+
+      - name: Install Universal Sierra Compiler
+        uses: software-mansion/setup-universal-sierra-compiler@v1
+        with:
+          tool-versions: cairo-contracts/.tool-versions
 
       - name: Install Starknet Foundry
         uses: foundry-rs/setup-snfoundry@v3
         with:
-          tool-versions: cairo-libs/.tool-versions
+          tool-versions: cairo-contracts/.tool-versions
+
+      - name: Build Cairo contracts
+        working-directory: ./cairo-contracts
+        run: |
+          scarb build -p starknet_ibc_contracts
 
       - name: Nix build
         run: |
@@ -64,11 +74,6 @@ jobs:
             .#ibc-starknet-cw \
             .#wasm-simapp \
             .#osmosis
-
-      - name: Build Cairo contracts
-        working-directory: ./cairo-contracts
-        run: |
-          scarb build -p starknet_ibc_contracts
 
       - uses: Swatinem/rust-cache@v2
         with:
