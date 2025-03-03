@@ -42,6 +42,11 @@ jobs:
           tool-versions: cairo-libs/.tool-versions
           scarb-lock: cairo-libs/Scarb.lock
 
+      - name: Install Starknet Foundry
+        uses: foundry-rs/setup-snfoundry@v3
+        with:
+          tool-versions: cairo-libs/.tool-versions
+
       - name: Nix build
         run: |
           sudo rm -rf /opt/homebrew/
