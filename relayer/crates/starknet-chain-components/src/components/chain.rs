@@ -155,7 +155,7 @@ mod preset {
     use hermes_relayer_components::chain::traits::types::status::ChainStatusTypeComponent;
     use hermes_relayer_components::components::default::transaction::DefaultTxComponents;
     use hermes_relayer_components::error::impls::retry::ReturnRetryable;
-    use hermes_relayer_components::error::traits::retry::RetryableErrorComponent;
+    use hermes_relayer_components::error::traits::RetryableErrorComponent;
     use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeoutGetterComponent;
     use hermes_relayer_components::transaction::traits::default_signer::DefaultSignerGetterComponent;
     use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::NonceAllocatorComponent;

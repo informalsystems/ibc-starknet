@@ -39,11 +39,18 @@ jobs:
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
+
       - uses: cachix/cachix-action@v15
         with:
           name: ibc-starknet
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Install Scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          tool-versions: cairo-libs/.tool-versions
+          scarb-lock: cairo-libs/Scarb.lock
 
       - name: Format Toml
         run: |
@@ -58,14 +65,12 @@ jobs:
       - name: Format Cairo Contracts
         working-directory: ./cairo-contracts
         run: |
-          nix shell ..#scarb -c \
-            scarb fmt -w --check
+          scarb fmt -w --check
 
       - name: Format Cairo Libraries
         working-directory: ./cairo-libs
         run: |
-          nix shell ..#scarb -c \
-            scarb fmt -w --check
+          scarb fmt -w --check
 
       - name: Format Light Client
         working-directory: ./light-client

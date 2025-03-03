@@ -9,8 +9,6 @@ use hermes_error::handlers::display::DisplayError;
 use hermes_error::handlers::identity::ReturnError;
 use hermes_error::handlers::infallible::HandleInfallible;
 use hermes_error::handlers::report::ReportError;
-use hermes_error::handlers::wrap::WrapErrorDetail;
-use hermes_error::traits::wrap::WrapError;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::EmptyMessageResponse;
 use hermes_relayer_components::chain::traits::types::chain_id::HasChainIdType;
@@ -53,10 +51,5 @@ delegate_components! {
                 MissingChannelTryEventError<'a, Relay>,
         ]:
             DebugError,
-        [
-            WrapError<&'static str, Error>,
-            WrapError<String, Error>,
-        ]:
-            WrapErrorDetail,
     }
 }

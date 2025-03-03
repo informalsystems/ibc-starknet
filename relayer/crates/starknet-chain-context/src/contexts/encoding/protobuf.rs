@@ -4,7 +4,7 @@ use cgp::prelude::*;
 use hermes_encoding_components::traits::convert::CanConvertBothWays;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_encoding_components::traits::encode_and_decode_mut::CanEncodeAndDecodeMut;
-use hermes_error::impls::ProvideHermesError;
+use hermes_error::impls::UseHermesError;
 use hermes_protobuf_encoding_components::types::any::Any;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use hermes_starknet_chain_components::components::encoding::protobuf::*;
@@ -28,7 +28,7 @@ pub struct StarknetProtobufEncoding;
 
 delegate_components! {
     StarknetProtobufEncodingContextComponents {
-        ErrorTypeProviderComponent: ProvideHermesError,
+        ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
     }
 }
