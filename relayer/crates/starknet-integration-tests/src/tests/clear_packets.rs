@@ -20,9 +20,8 @@ use hermes_chain_components::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
 };
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
-use hermes_chain_components::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
+use hermes_chain_components::traits::queries::packet_commitment::CanQueryPacketCommitment;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
-use hermes_chain_components::traits::types::timestamp::HasTimeoutType;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
 use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
@@ -520,7 +519,9 @@ fn test_packet_clearing() -> Result<(), Error> {
             relay_b_to_a: cosmos_to_starknet_relay.clone(),
         };
 
-        birelay.auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0))).await?;
+        birelay
+            .auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0)))
+            .await?;
 
         info!("ics20 token address: {:?}", ics20_token_address);
 
@@ -659,7 +660,9 @@ fn test_packet_clearing() -> Result<(), Error> {
             denom_cosmos.clone(),
         );
 
-        birelay.auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0))).await?;
+        birelay
+            .auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0)))
+            .await?;
 
         cosmos_chain
             .assert_eventual_amount(address_cosmos_a, eventual_cosmos_amount)
@@ -676,37 +679,64 @@ fn test_packet_clearing() -> Result<(), Error> {
         );
 
         let cosmos_latest_height = cosmos_chain.query_chain_height().await?;
+        let starknet_latest_height = starknet_chain.query_chain_height().await?;
 
-        let maybe_cosmos_ack1 = <CosmosChain as CanQueryPacketAcknowledgement<StarknetChain>>::query_packet_acknowledgement(
-            cosmos_chain,
-            &cosmos_channel_id,
+        let (cosmos_commitment1, _) =
+            <CosmosChain as CanQueryPacketCommitment<StarknetChain>>::query_packet_commitment(
+                cosmos_chain,
+                &cosmos_channel_id,
                 &IbcPortId::transfer(),
                 &Sequence::from(1),
                 &cosmos_latest_height,
             )
-            .await;
+            .await?;
 
-        let maybe_cosmos_ack2 = <CosmosChain as CanQueryPacketAcknowledgement<StarknetChain>>::query_packet_acknowledgement(
-            cosmos_chain,
-            &cosmos_channel_id,
+        let (cosmos_commitment2, _) =
+            <CosmosChain as CanQueryPacketCommitment<StarknetChain>>::query_packet_commitment(
+                cosmos_chain,
+                &cosmos_channel_id,
                 &IbcPortId::transfer(),
                 &Sequence::from(2),
                 &cosmos_latest_height,
             )
-            .await;
+            .await?;
 
-        let maybe_cosmos_ack3 = <CosmosChain as CanQueryPacketAcknowledgement<StarknetChain>>::query_packet_acknowledgement(
-            cosmos_chain,
-            &cosmos_channel_id,
+        let (cosmos_commitment3, _) =
+            <CosmosChain as CanQueryPacketCommitment<StarknetChain>>::query_packet_commitment(
+                cosmos_chain,
+                &cosmos_channel_id,
                 &IbcPortId::transfer(),
                 &Sequence::from(3),
                 &cosmos_latest_height,
             )
-            .await;
+            .await?;
 
-        assert!(maybe_cosmos_ack1.is_err(), "query_packet_acknowledgement should fail with error `ack not found at: acks/ports/transfer/channels/{cosmos_channel_id}/sequences/1`");
-        assert!(maybe_cosmos_ack2.is_err(), "query_packet_acknowledgement should fail with error `ack not found at: acks/ports/transfer/channels/{cosmos_channel_id}/sequences/2`");
-        assert!(maybe_cosmos_ack3.is_err(), "query_packet_acknowledgement should fail with error `ack not found at: acks/ports/transfer/channels/{cosmos_channel_id}/sequences/3`");
+        let (starknet_commitment1, _) =
+            <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
+                &starknet_chain,
+                &starknet_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(1),
+                &starknet_latest_height,
+            )
+            .await?;
+
+        assert!(
+            cosmos_commitment1.is_none(),
+            "cosmos_commitment1 expected to be None"
+        );
+        assert!(
+            cosmos_commitment2.is_none(),
+            "cosmos_commitment2 expected to be None"
+        );
+        assert!(
+            cosmos_commitment3.is_none(),
+            "cosmos_commitment3 expected to be None"
+        );
+        assert!(
+            starknet_commitment1.is_none(),
+            "starknet_commitment1 expected to be None"
+        );
 
         Ok(())
     })
@@ -1326,10 +1356,7 @@ where
     SrcChain: CanQueryChainStatus
         + HasPacketTimeoutHeight<DstChain>
         + HasPacketTimeoutTimestamp<DstChain>,
-    DstChain: CanQueryChainStatus
-        //+ HasChannelIdType<SrcChain>
-        //+ HasPortIdType<SrcChain>
-        + HasTimeoutType,
+    DstChain: CanQueryChainStatus,
 {
     let src_chain = relay.src_chain();
     let dst_chain = relay.dst_chain();
