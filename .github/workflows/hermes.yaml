@@ -38,6 +38,8 @@ jobs:
 
       - name: Nix build
         run: |
+          sudo rm -rf /opt/homebrew/
+
           nix build \
             .#starknet-devnet \
             .#scarb \
