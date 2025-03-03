@@ -4,6 +4,7 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
+use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_chain_components::traits::queries::client_state::{
     CanQueryClientState, ClientStateQuerier, ClientStateQuerierComponent,
     ClientStateWithProofsQuerier, ClientStateWithProofsQuerierComponent,
@@ -24,7 +25,6 @@ use starknet::macros::selector;
 use crate::traits::contract::call::CanCallContract;
 use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::traits::queries::address::CanQueryContractAddress;
-use crate::traits::queries::status_at_height::CanQueryChainStatusAtHeight;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::client_id::ClientId;
@@ -101,7 +101,7 @@ impl<Chain, Counterparty> ClientStateWithProofsQuerier<Chain, Counterparty>
 where
     Chain: HasClientIdType<Counterparty, ClientId = ClientId>
         + HasHeightType<Height = u64>
-        + CanQueryChainStatusAtHeight<ChainStatus = StarknetChainStatus>
+        + CanQueryBlock<Block = StarknetChainStatus>
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryClientState<Counterparty>
@@ -121,7 +121,7 @@ where
             .query_client_state(tag, client_id, query_height)
             .await?;
 
-        let chain_status = chain.query_chain_status_at_height(query_height).await?;
+        let chain_status = chain.query_block(query_height).await?;
 
         // FIXME: CometClientState can't be encoded to protobuf
         let protobuf_encoded_client_state = Vec::new();

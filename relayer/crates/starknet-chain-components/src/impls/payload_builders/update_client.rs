@@ -1,5 +1,6 @@
 use cgp::prelude::*;
 use hermes_chain_components::traits::payload_builders::update_client::UpdateClientPayloadBuilderComponent;
+use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
@@ -16,7 +17,6 @@ use starknet::providers::ProviderError;
 
 use crate::traits::proof_signer::HasStarknetProofSigner;
 use crate::traits::provider::HasStarknetProvider;
-use crate::traits::queries::status_at_height::CanQueryChainStatusAtHeight;
 use crate::types::consensus_state::StarknetConsensusState;
 use crate::types::payloads::client::StarknetUpdateClientPayload;
 use crate::types::status::StarknetChainStatus;
@@ -30,7 +30,7 @@ where
     Chain: HasHeightType<Height = u64>
         + HasClientStateType<Counterparty>
         + HasUpdateClientPayloadType<Counterparty, UpdateClientPayload = StarknetUpdateClientPayload>
-        + CanQueryChainStatusAtHeight<ChainStatus = StarknetChainStatus>
+        + CanQueryBlock<Block = StarknetChainStatus>
         + HasStarknetProvider
         + CanRaiseAsyncError<&'static str>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>
@@ -46,7 +46,7 @@ where
         target_height: &u64,
         _client_state: Chain::ClientState,
     ) -> Result<Chain::UpdateClientPayload, Chain::Error> {
-        let chain_status = chain.query_chain_status_at_height(target_height).await?;
+        let chain_status = chain.query_block(target_height).await?;
 
         let root = Vec::from(chain_status.block_hash.to_bytes_be());
 

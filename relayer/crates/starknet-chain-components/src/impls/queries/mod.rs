@@ -1,5 +1,6 @@
 pub mod ack_commitment;
 pub mod balance;
+pub mod block;
 pub mod block_events;
 pub mod channel_end;
 pub mod client_state;
@@ -12,5 +13,4 @@ pub mod packet_commitment;
 pub mod packet_receipt;
 pub mod packet_received;
 pub mod status;
-pub mod status_at_height;
 pub mod token_balance;
