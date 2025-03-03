@@ -4,7 +4,6 @@ pub mod ERC20Mintable {
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl, interface::IERC20Metadata};
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
     use starknet::{ContractAddress, get_caller_address};
-    use starknet_ibc_utils::mintable::ERC20MintableComponent;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
@@ -24,8 +23,6 @@ pub mod ERC20Mintable {
     struct Storage {
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
-        #[substorage(v0)]
-        mintable: ERC20MintableComponent::Storage,
         #[substorage(v0)]
         erc20: ERC20Component::Storage,
         // The decimals value is stored locally in the contract.
