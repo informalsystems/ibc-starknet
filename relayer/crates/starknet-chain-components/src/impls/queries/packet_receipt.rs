@@ -4,7 +4,7 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_chain_components::traits::queries::packet_receipt::{
     PacketReceiptQuerier, PacketReceiptQuerierComponent,
 };
@@ -43,7 +43,7 @@ impl<Chain, Counterparty, Encoding> PacketReceiptQuerier<Chain, Counterparty>
     for QueryStarknetPacketReceipt
 where
     Chain: HasHeightType<Height = u64>
-        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + CanQueryBlock<Block = StarknetChainStatus>
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
@@ -68,7 +68,7 @@ where
         channel_id: &ChannelId,
         port_id: &IbcPortId,
         sequence: &IbcSequence,
-        _height: &u64,
+        height: &u64,
     ) -> Result<(Option<Vec<u8>>, StarknetCommitmentProof), Chain::Error> {
         let encoding = chain.encoding();
 
@@ -79,17 +79,22 @@ where
             .map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("packet_receipt"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("packet_receipt"),
+                &calldata,
+                Some(height),
+            )
             .await?;
 
         let receipt_status = encoding.decode(&output).map_err(Chain::raise_error)?;
 
         let receipt = if receipt_status { Some(vec![1]) } else { None };
 
-        let chain_status = chain.query_chain_status().await?;
+        let block = chain.query_block(height).await?;
 
         let unsigned_membership_proof_bytes = MembershipVerifierContainer {
-            state_root: chain_status.block_hash.to_bytes_be().to_vec(),
+            state_root: block.block_hash.to_bytes_be().to_vec(),
             prefix: chain.ibc_commitment_prefix().clone(),
             path: Path::Receipt(ReceiptPath::new(port_id, channel_id, *sequence))
                 .to_string()
@@ -104,7 +109,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let dummy_proof = StarknetCommitmentProof {
-            proof_height: chain_status.height,
+            proof_height: block.height,
             proof_bytes: signed_bytes,
         };
 

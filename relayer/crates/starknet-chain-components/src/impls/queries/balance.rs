@@ -42,7 +42,7 @@ where
         denom: &Chain::Denom,
     ) -> Result<Chain::Amount, Chain::Error> {
         let output = chain
-            .call_contract(denom, &BALANCE_SELECTOR, &vec![**address])
+            .call_contract(denom, &BALANCE_SELECTOR, &vec![**address], None)
             .await?;
 
         let quantity = chain

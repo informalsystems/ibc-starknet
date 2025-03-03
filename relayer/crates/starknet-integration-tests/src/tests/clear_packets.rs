@@ -504,6 +504,7 @@ fn test_query_unreceived_packets() -> Result<(), Error> {
                     &ics20_contract_address,
                     &selector!("ibc_token_address"),
                     &calldata,
+                    None,
                 )
                 .await?;
 
@@ -1079,6 +1080,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                     &ics20_contract_address,
                     &selector!("ibc_token_address"),
                     &calldata,
+                    None,
                 )
                 .await?;
 

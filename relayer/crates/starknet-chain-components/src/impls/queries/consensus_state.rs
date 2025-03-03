@@ -4,7 +4,7 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_chain_components::traits::queries::consensus_state::{
     CanQueryConsensusState, ConsensusStateQuerier, ConsensusStateQuerierComponent,
     ConsensusStateWithProofsQuerier, ConsensusStateWithProofsQuerierComponent,
@@ -68,7 +68,7 @@ where
         _tag: PhantomData<Counterparty>,
         client_id: &ClientId,
         consensus_height: &Counterparty::Height,
-        _query_height: &Chain::Height, // TODO: figure whether we can perform height specific queries on Starknet
+        query_height: &Chain::Height,
     ) -> Result<Counterparty::ConsensusState, Chain::Error> {
         let encoding = chain.encoding();
 
@@ -92,7 +92,12 @@ where
             .map_err(Chain::raise_error)?;
 
         let output = chain
-            .call_contract(&contract_address, &selector!("consensus_state"), &calldata)
+            .call_contract(
+                &contract_address,
+                &selector!("consensus_state"),
+                &calldata,
+                Some(query_height),
+            )
             .await?;
 
         let raw_consensus_state: Vec<Felt> =
@@ -121,7 +126,7 @@ impl<Chain, Counterparty> ConsensusStateWithProofsQuerier<Chain, Counterparty>
 where
     Chain: HasClientIdType<Counterparty, ClientId = ClientId>
         + HasHeightType<Height = u64>
-        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + CanQueryBlock<Block = StarknetChainStatus>
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryConsensusState<Counterparty>
@@ -143,7 +148,7 @@ where
             .query_consensus_state(tag, client_id, consensus_height, query_height)
             .await?;
 
-        let chain_status = chain.query_chain_status().await?;
+        let block = chain.query_block(query_height).await?;
 
         // FIXME: CometConsensusState can't be encoded to protobuf
         let protobuf_encoded_consensus_state = Vec::new();
@@ -152,7 +157,7 @@ where
         //     .map_err(Chain::raise_error)?;
 
         let unsigned_membership_proof_bytes = MembershipVerifierContainer {
-            state_root: chain_status.block_hash.to_bytes_be().to_vec(),
+            state_root: block.block_hash.to_bytes_be().to_vec(),
             prefix: chain.ibc_commitment_prefix().clone(),
             path: Path::ClientConsensusState(ClientConsensusStatePath::new(
                 client_id.clone(),
@@ -171,7 +176,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let proof = StarknetCommitmentProof {
-            proof_height: chain_status.height,
+            proof_height: block.height,
             proof_bytes: signed_bytes,
         };
 
