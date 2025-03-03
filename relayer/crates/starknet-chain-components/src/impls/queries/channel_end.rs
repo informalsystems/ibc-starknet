@@ -4,8 +4,7 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
-use hermes_chain_components::traits::queries::block::CanQueryBlock;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
+use hermes_chain_components::traits::queries::block::{CanQueryBlock, CanQueryChainHeight};
 use hermes_chain_components::traits::queries::channel_end::{
     ChannelEndQuerier, ChannelEndQuerierComponent, ChannelEndWithProofsQuerier,
     ChannelEndWithProofsQuerierComponent,
@@ -135,10 +134,10 @@ where
 
         let channel_end = encoding.decode(&output).map_err(Chain::raise_error)?;
 
-        let chain_status = chain.query_block(height).await?;
+        let block = chain.query_block(height).await?;
 
         let unsigned_membership_proof_bytes = MembershipVerifierContainer {
-            state_root: chain_status.block_hash.to_bytes_be().to_vec(),
+            state_root: block.block_hash.to_bytes_be().to_vec(),
             prefix: chain.ibc_commitment_prefix().clone(),
             path: Path::ChannelEnd(ChannelEndPath::new(port_id, channel_id))
                 .to_string()
@@ -153,7 +152,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let dummy_proof = StarknetCommitmentProof {
-            proof_height: chain_status.height,
+            proof_height: block.height,
             proof_bytes: signed_bytes,
         };
 

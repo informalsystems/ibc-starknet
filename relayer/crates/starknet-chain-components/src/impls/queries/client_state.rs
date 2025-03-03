@@ -121,7 +121,7 @@ where
             .query_client_state(tag, client_id, query_height)
             .await?;
 
-        let chain_status = chain.query_block(query_height).await?;
+        let block = chain.query_block(query_height).await?;
 
         // FIXME: CometClientState can't be encoded to protobuf
         let protobuf_encoded_client_state = Vec::new();
@@ -130,7 +130,7 @@ where
         //     .map_err(Chain::raise_error)?;
 
         let unsigned_membership_proof_bytes = MembershipVerifierContainer {
-            state_root: chain_status.block_hash.to_bytes_be().to_vec(),
+            state_root: block.block_hash.to_bytes_be().to_vec(),
             prefix: chain.ibc_commitment_prefix().clone(),
             path: Path::ClientState(ClientStatePath::new(client_id.clone()))
                 .to_string()
@@ -145,7 +145,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let proof = StarknetCommitmentProof {
-            proof_height: chain_status.height,
+            proof_height: block.height,
             proof_bytes: signed_bytes,
         };
 

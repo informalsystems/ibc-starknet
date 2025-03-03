@@ -94,10 +94,10 @@ where
             .flat_map(|felt| felt.to_be_bytes())
             .collect::<Vec<_>>();
 
-        let chain_status = chain.query_block(height).await?;
+        let block = chain.query_block(height).await?;
 
         let unsigned_membership_proof_bytes = MembershipVerifierContainer {
-            state_root: chain_status.block_hash.to_bytes_be().to_vec(),
+            state_root: block.block_hash.to_bytes_be().to_vec(),
             prefix: chain.ibc_commitment_prefix().clone(),
             path: Path::Ack(AckPath::new(port_id, channel_id, *sequence))
                 .to_string()
@@ -113,7 +113,7 @@ where
 
         // TODO(rano): how to get the proof?
         let dummy_proof = StarknetCommitmentProof {
-            proof_height: chain_status.height,
+            proof_height: block.height,
             proof_bytes: signed_bytes,
         };
 

@@ -46,14 +46,14 @@ where
         target_height: &u64,
         _client_state: Chain::ClientState,
     ) -> Result<Chain::UpdateClientPayload, Chain::Error> {
-        let chain_status = chain.query_block(target_height).await?;
+        let block = chain.query_block(target_height).await?;
 
-        let root = Vec::from(chain_status.block_hash.to_bytes_be());
+        let root = Vec::from(block.block_hash.to_bytes_be());
 
         let consensus_state = StarknetConsensusState {
             root: root.into(),
             time: Timestamp::from_nanoseconds(
-                u64::try_from(chain_status.time.unix_timestamp()).unwrap() * 1_000_000_000,
+                u64::try_from(block.time.unix_timestamp()).unwrap() * 1_000_000_000,
             ),
         };
 
