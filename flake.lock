@@ -1706,7 +1706,6 @@
         "flake-utils": "flake-utils_8",
         "nixpkgs": "nixpkgs_6",
         "rust-overlay": "rust-overlay_2",
-        "scarb-src": "scarb-src",
         "starknet-devnet-src": "starknet-devnet-src",
         "starknet-foundry-src": "starknet-foundry-src",
         "universal-sierra-compiler-src": "universal-sierra-compiler-src"
@@ -1764,23 +1763,6 @@
       "original": {
         "owner": "zaninime",
         "repo": "sbt-derivation",
-        "type": "github"
-      }
-    },
-    "scarb-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1733946942,
-        "narHash": "sha256-GJKcXQrORjVNihTxC57HCXjIAgB9Ym3Tn7SMJ/bjuz8=",
-        "owner": "software-mansion",
-        "repo": "scarb",
-        "rev": "5070ff3749497c596dafd6263869a9cef49dbe91",
-        "type": "github"
-      },
-      "original": {
-        "owner": "software-mansion",
-        "ref": "v2.9.2",
-        "repo": "scarb",
         "type": "github"
       }
     },

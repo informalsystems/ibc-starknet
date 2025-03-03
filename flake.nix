@@ -18,11 +18,6 @@
       flake = false;
     };
 
-    scarb-src = {
-      url = "github:software-mansion/scarb/v2.9.2";
-      flake = false;
-    };
-
     universal-sierra-compiler-src = {
       url = "github:software-mansion/universal-sierra-compiler/v2.3.0";
       flake = false;
@@ -80,11 +75,6 @@
             inherit (inputs) cairo-src;
           };
 
-          scarb = import ./nix/scarb.nix {
-            inherit nixpkgs;
-            inherit (inputs) scarb-src cairo-src;
-          };
-
           universal-sierra-compiler = import ./nix/universal-sierra-compiler.nix {
             inherit nixpkgs;
             inherit (inputs) universal-sierra-compiler-src;
@@ -107,9 +97,7 @@
             inherit
               starknet-devnet
               cairo
-              scarb
               universal-sierra-compiler
-              # starknet-foundry
               wasm-simapp
               osmosis
               ;
@@ -141,7 +129,6 @@
               inherit
                 starknet-devnet
                 cairo
-                scarb
                 rust
                 rust-nightly
                 rust-wasm
