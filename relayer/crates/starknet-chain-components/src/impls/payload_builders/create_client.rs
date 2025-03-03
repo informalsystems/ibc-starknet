@@ -1,9 +1,10 @@
 use cgp::prelude::*;
 use hermes_chain_components::traits::payload_builders::create_client::CreateClientPayloadBuilderComponent;
+use hermes_chain_components::traits::queries::block::CanQueryBlock;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_relayer_components::chain::traits::payload_builders::create_client::CreateClientPayloadBuilder;
-use hermes_relayer_components::chain::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_relayer_components::chain::traits::types::create_client::{
     HasCreateClientPayloadOptionsType, HasCreateClientPayloadType,
 };
@@ -29,7 +30,8 @@ where
             Counterparty,
             CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
-        + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
+        + CanQueryBlock<Block = StarknetChainStatus>
+        + CanQueryChainHeight<Height = u64>
         + HasChainId<ChainId = ChainId>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<&'static str>
@@ -39,14 +41,16 @@ where
         chain: &Chain,
         create_client_options: &StarknetCreateClientPayloadOptions,
     ) -> Result<StarknetCreateClientPayload, Chain::Error> {
-        let chain_status = chain.query_chain_status().await?;
+        let height = chain.query_chain_height().await?;
 
-        let root = Vec::from(chain_status.block_hash.to_bytes_be());
+        let block = chain.query_block(&height).await?;
+
+        let root = Vec::from(block.block_hash.to_bytes_be());
 
         let consensus_state = WasmStarknetConsensusState {
             consensus_state: StarknetConsensusState {
                 root: root.into(),
-                time: u64::try_from(chain_status.time.unix_timestamp_nanos())
+                time: u64::try_from(block.time.unix_timestamp_nanos())
                     .ok()
                     .map(Timestamp::from_nanoseconds)
                     .ok_or_else(|| Chain::raise_error("invalid timestamp"))?,
@@ -54,7 +58,7 @@ where
         };
 
         Ok(StarknetCreateClientPayload {
-            latest_height: Height::new(0, chain_status.height).map_err(Chain::raise_error)?,
+            latest_height: Height::new(0, block.height).map_err(Chain::raise_error)?,
             chain_id: chain.chain_id().clone(),
             client_state_wasm_code_hash: create_client_options.wasm_code_hash.into(),
             consensus_state,

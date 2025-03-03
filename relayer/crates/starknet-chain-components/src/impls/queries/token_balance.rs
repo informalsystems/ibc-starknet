@@ -38,7 +38,12 @@ where
         account_address: &StarknetAddress,
     ) -> Result<StarknetAmount, Chain::Error> {
         let output = chain
-            .call_contract(token_address, &BALANCE_SELECTOR, &vec![**account_address])
+            .call_contract(
+                token_address,
+                &BALANCE_SELECTOR,
+                &vec![**account_address],
+                None,
+            )
             .await?;
 
         let quantity = chain

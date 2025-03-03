@@ -61,6 +61,7 @@ mod preset {
     use hermes_chain_components::traits::payload_builders::receive_packet::ReceivePacketPayloadBuilderComponent;
     use hermes_chain_components::traits::payload_builders::timeout_unordered_packet::TimeoutUnorderedPacketPayloadBuilderComponent;
     use hermes_chain_components::traits::payload_builders::update_client::UpdateClientPayloadBuilderComponent;
+    use hermes_chain_components::traits::queries::block::BlockQuerierComponent;
     use hermes_chain_components::traits::queries::block_events::BlockEventsQuerierComponent;
     use hermes_chain_components::traits::queries::channel_end::{
         ChannelEndQuerierComponent, ChannelEndWithProofsQuerierComponent,
@@ -84,6 +85,7 @@ mod preset {
     use hermes_chain_components::traits::queries::packet_is_cleared::PacketIsClearedQuerierComponent;
     use hermes_chain_components::traits::queries::packet_is_received::PacketIsReceivedQuerierComponent;
     use hermes_chain_components::traits::queries::packet_receipt::PacketReceiptQuerierComponent;
+    use hermes_chain_components::traits::types::block::BlockTypeComponent;
     use hermes_chain_components::traits::types::channel::{
         ChannelEndTypeComponent, ChannelOpenAckPayloadTypeComponent,
         ChannelOpenConfirmPayloadTypeComponent, ChannelOpenTryPayloadTypeComponent,
@@ -204,6 +206,7 @@ mod preset {
     use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
     use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
     use crate::impls::queries::balance::QueryStarknetWalletBalance;
+    use crate::impls::queries::block::QueryStarknetBlock;
     use crate::impls::queries::block_events::GetStarknetBlockEvents;
     use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
     use crate::impls::queries::client_state::QueryCometClientState;
@@ -223,6 +226,7 @@ mod preset {
     use crate::impls::types::address::ProvideFeltAddressType;
     use crate::impls::types::amount::ProvideU256Amount;
     use crate::impls::types::blob::ProvideFeltBlobType;
+    use crate::impls::types::block::ProvideStarknetBlockType;
     use crate::impls::types::chain_id::ProvideFeltChainId;
     use crate::impls::types::client::ProvideStarknetIbcClientTypes;
     use crate::impls::types::commitment_proof::UseStarknetCommitmentProof;
@@ -268,6 +272,8 @@ mod preset {
                 ProvideStarknetHeight,
             ChainStatusTypeComponent:
                 ProvideStarknetChainStatusType,
+            BlockTypeComponent:
+                ProvideStarknetBlockType,
             AddressTypeComponent:
                 ProvideFeltAddressType,
             BlobTypeComponent:
@@ -415,6 +421,8 @@ mod preset {
                 TransferErc20Token,
             TokenBalanceQuerierComponent:
                 QueryErc20TokenBalance,
+            BlockQuerierComponent:
+                QueryStarknetBlock,
             BalanceQuerierComponent:
                 QueryStarknetWalletBalance,
             [

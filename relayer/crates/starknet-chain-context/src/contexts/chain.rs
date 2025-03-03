@@ -10,10 +10,13 @@ use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
+use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_chain_components::traits::queries::block_time::{
     BlockTimeQuerierComponent, CanQueryBlockTime,
 };
+use hermes_chain_components::traits::types::block::HasBlockType;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
+use hermes_chain_components::traits::types::status::HasChainStatusType;
 use hermes_chain_type_components::traits::fields::chain_id::{ChainIdGetterComponent, HasChainId};
 use hermes_chain_type_components::traits::types::commitment_proof::HasCommitmentProofType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
@@ -184,6 +187,7 @@ use hermes_starknet_chain_components::types::message_response::StarknetMessageRe
 use hermes_starknet_chain_components::types::payloads::client::{
     StarknetCreateClientPayloadOptions, StarknetUpdateClientPayload,
 };
+use hermes_starknet_chain_components::types::status::StarknetChainStatus;
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessage;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
@@ -341,6 +345,8 @@ pub trait CanUseStarknetChain:
     + HasDefaultEncoding<AsFelt, Encoding = StarknetCairoEncoding>
     + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
     + HasAddressType<Address = StarknetAddress>
+    + HasChainStatusType<ChainStatus = StarknetChainStatus>
+    + HasBlockType<Block = StarknetChainStatus>
     + HasChainId<ChainId = ChainId>
     + HasSelectorType<Selector = Felt>
     + HasBlobType<Blob = Vec<Felt>>
@@ -370,6 +376,7 @@ pub trait CanUseStarknetChain:
     + HasStarknetProvider
     + HasStarknetAccount
     + CanQueryChainStatus
+    + CanQueryBlock
     + CanQueryChainHeight
     + CanQueryBlockEvents
     + CanQueryBlockTime
