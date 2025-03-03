@@ -72,7 +72,6 @@ deploy_core() {
     echo "$address"
 }
 
-
 deploy_comet() {
     COMET_CLASS_HASH=$1
     CORE_ADDRESS=$2
@@ -93,7 +92,6 @@ deploy_comet() {
 
     echo "$address"
 }
-
 
 deploy_ics20() {
     ICS20_CLASS_HASH=$1
