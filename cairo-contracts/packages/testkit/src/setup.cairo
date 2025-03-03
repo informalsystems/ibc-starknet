@@ -47,14 +47,16 @@ pub impl SetupImpl of SetupTrait {
     }
 
     /// Deploys an IBC-compatible ERC-20 token with an initial supply.
-    /// The specified `receiver` will receive `amount` tokens upon deployment.
+    /// The specified `receiver` will receive `amount` tokens after deployment.
     fn deploy_erc20_with_supply(
         self: @Setup, owner: ContractAddress, receiver: ContractAddress, amount: u256,
     ) -> ERC20Contract {
         let mut erc20 = self.deploy_erc20(owner);
         start_cheat_caller_address(erc20.address, owner);
-        erc20.mint(receiver, amount);
+        erc20.mint(amount);
         stop_cheat_caller_address(erc20.address);
+        erc20.approve(owner, receiver, amount);
+        erc20.transfer_from(owner, receiver, amount);
         erc20
     }
 

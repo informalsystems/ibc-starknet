@@ -21,10 +21,9 @@ fn test_deploy_erc20_ok() {
 fn test_erc20_mint_ok() {
     let (mut erc20, mut spy) = setup();
     start_cheat_caller_address(erc20.address, OWNER());
-    erc20.mint(SN_USER(), AMOUNT);
-    spy.assert_transfer_event(erc20.address, ZERO(), SN_USER(), AMOUNT);
-    erc20.assert_balance(OWNER(), 0);
-    erc20.assert_balance(SN_USER(), AMOUNT);
+    erc20.mint(AMOUNT);
+    spy.assert_transfer_event(erc20.address, ZERO(), OWNER(), AMOUNT);
+    erc20.assert_balance(OWNER(), AMOUNT);
     erc20.assert_total_supply(AMOUNT);
 }
 
@@ -32,14 +31,10 @@ fn test_erc20_mint_ok() {
 fn test_erc20_burn_ok() {
     let (mut erc20, mut spy) = setup();
     start_cheat_caller_address(erc20.address, OWNER());
-    erc20.mint(SN_USER(), AMOUNT);
-    erc20.approve(SN_USER(), OWNER(), AMOUNT);
-    erc20.transfer_from(SN_USER(), OWNER(), AMOUNT);
-    spy.assert_transfer_event(erc20.address, SN_USER(), OWNER(), AMOUNT);
+    erc20.mint(AMOUNT);
     erc20.burn(AMOUNT);
     spy.assert_transfer_event(erc20.address, OWNER(), ZERO(), AMOUNT);
     erc20.assert_balance(OWNER(), 0);
-    erc20.assert_balance(SN_USER(), 0);
     erc20.assert_total_supply(0);
 }
 
@@ -47,7 +42,7 @@ fn test_erc20_burn_ok() {
 #[should_panic(expected: 'Caller is not the owner')]
 fn test_erc20_unauthorized_mint() {
     let (mut erc20, _) = setup();
-    erc20.mint(SN_USER(), AMOUNT);
+    erc20.mint(AMOUNT);
 }
 
 #[test]
@@ -55,9 +50,7 @@ fn test_erc20_unauthorized_mint() {
 fn test_erc20_unauthorized_burn() {
     let (mut erc20, _) = setup();
     start_cheat_caller_address(erc20.address, OWNER());
-    erc20.mint(SN_USER(), AMOUNT);
-    erc20.approve(SN_USER(), OWNER(), AMOUNT);
-    erc20.transfer_from(SN_USER(), OWNER(), AMOUNT);
+    erc20.mint(AMOUNT);
     start_cheat_caller_address(erc20.address, SN_USER());
     erc20.burn(AMOUNT);
 }
@@ -67,7 +60,8 @@ fn test_erc20_unauthorized_burn() {
 fn test_erc20_transfer_without_user_approval() {
     let (mut erc20, _) = setup();
     start_cheat_caller_address(erc20.address, OWNER());
-    erc20.mint(SN_USER(), AMOUNT);
+    erc20.mint(AMOUNT);
+    erc20.transfer_from(OWNER(), SN_USER(), AMOUNT);
     erc20.transfer_from(SN_USER(), OWNER(), AMOUNT);
 }
 

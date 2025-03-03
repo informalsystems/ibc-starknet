@@ -82,9 +82,9 @@ pub mod ERC20Mintable {
         }
 
         #[external(v0)]
-        fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256) {
+        fn mint(ref self: ContractState, amount: u256) {
             self.ownable.assert_only_owner();
-            self.erc20.mint(recipient, amount);
+            self.erc20.mint(get_caller_address(), amount);
         }
     }
 

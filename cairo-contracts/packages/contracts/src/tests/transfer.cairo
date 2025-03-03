@@ -102,7 +102,7 @@ fn test_mint_burn_roundtrip() {
     // Assert the `CreateTokenEvent` emitted.
     spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, token_address);
 
-    // Assert if the ICS20 performs the mint.
+    // Assert if ICS20 performs the mint.
     spy.assert_transfer_event(erc20.address, ics20.address, SN_USER(), transfer_cfg.amount);
 
     // Assert the `RecvEvent` emitted.

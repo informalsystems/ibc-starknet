@@ -720,7 +720,7 @@ pub mod TokenTransferComponent {
 
                 self.record_ibc_token(denom, token.address);
             }
-            token.mint(get_contract_address(), amount);
+            token.mint(amount);
             token.transfer(account, amount);
         }
 

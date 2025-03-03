@@ -55,9 +55,9 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
         self.dispatcher().transfer_from(sender, recipient, amount)
     }
 
-    fn mint(self: @ERC20Contract, recipient: ContractAddress, amount: u256) {
+    fn mint(self: @ERC20Contract, amount: u256) {
         let mut calldata = array![];
-        (recipient, amount).serialize(ref calldata);
+        amount.serialize(ref calldata);
         call_contract_syscall(*self.address, selector!("mint"), calldata.span()).unwrap_syscall();
     }
 
