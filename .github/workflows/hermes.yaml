@@ -42,7 +42,6 @@ jobs:
 
           nix build \
             .#starknet-devnet \
-            .#scarb \
             .#universal-sierra-compiler \
             .#rust \
             .#rust-wasm \
@@ -53,6 +52,8 @@ jobs:
             .#ibc-starknet-cw \
             .#wasm-simapp \
             .#osmosis
+
+          nix build --cores 1 .#scarb
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
