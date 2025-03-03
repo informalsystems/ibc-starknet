@@ -10,6 +10,8 @@ case "$OSTYPE" in
     *) echo "Unknown OS: $OSTYPE" && exit 1 ;;
 esac
 
+STARKLI_ARGS="--watch --strk"
+
 version() {
     echo "starkli: $(starkli --version)"
     scarb --version 1>&2
@@ -34,12 +36,9 @@ declare() {
     CONTRACT_SRC=$1
 
     output=$(
-        starkli declare --watch $CONTRACT_SRC \
-        --rpc $RPC_URL \
-        --compiler-version $COMPILER_VERSION \
-        --account $ACCOUNT_SRC \
-        --keystore $KEYSTORE_SRC \
-        --keystore-password $KEYSTORE_PASS \
+        starkli declare --compiler-version "$COMPILER_VERSION" \
+        $STARKLI_ARGS \
+        "$CONTRACT_SRC" \
         2>&1 | tee /dev/tty
     )
 
@@ -50,21 +49,16 @@ declare() {
 
     address=$(echo -e "$output" | "$GREP" -oP '0x[0-9a-fA-F]+' | tail -n 1)
 
-    echo $address
+    echo "$address"
 }
 
-# deploy the contract
-deploy() {
-    ICS20_CLASS_HASH=$1
-    ERC20_CLASS_HASH=$2
+deploy_core() {
+    CORE_CLASS_HASH=$1
 
     output=$(
         starkli deploy --not-unique \
-        --watch $ICS20_CLASS_HASH '1' $ERC20_CLASS_HASH \
-        --rpc $RPC_URL \
-        --account $ACCOUNT_SRC \
-        --keystore $KEYSTORE_SRC \
-        --keystore-password $KEYSTORE_PASS \
+        $STARKLI_ARGS \
+        "$CORE_CLASS_HASH" \
         2>&1 | tee /dev/tty
     )
 
@@ -75,21 +69,131 @@ deploy() {
 
     address=$(echo -e "$output" | "$GREP" -oP '0x[0-9a-fA-F]+' | tail -n 1)
 
-    echo $address
+    echo "$address"
+}
+
+deploy_comet() {
+    COMET_CLASS_HASH=$1
+    CORE_ADDRESS=$2
+
+    output=$(
+        starkli deploy --not-unique \
+        $STARKLI_ARGS \
+        "$COMET_CLASS_HASH" "$CORE_ADDRESS" \
+        2>&1 | tee /dev/tty
+    )
+
+    if [[ $output == *"Error"* ]]; then
+        echo "Error: $output"
+        exit 1
+    fi
+
+    address=$(echo -e "$output" | "$GREP" -oP '0x[0-9a-fA-F]+' | tail -n 1)
+
+    echo "$address"
+}
+
+deploy_ics20() {
+    ICS20_CLASS_HASH=$1
+    CORE_ADDRESS=$2
+    ERC20_CLASS_HASH=$3
+
+    output=$(
+        starkli deploy --not-unique \
+        $STARKLI_ARGS \
+        "$ICS20_CLASS_HASH" "$CORE_ADDRESS" "$ERC20_CLASS_HASH" \
+        2>&1 | tee /dev/tty
+    )
+
+    if [[ $output == *"Error"* ]]; then
+        echo "Error: $output"
+        exit 1
+    fi
+
+    address=$(echo -e "$output" | "$GREP" -oP '0x[0-9a-fA-F]+' | tail -n 1)
+
+    echo "$address"
 }
 
 build
 
+if [[ $CORE_CLASS_HASH == "" ]]; then
+    core_class_hash=$(declare "$CORE_CONTRACT_SRC")
+else
+    core_class_hash=$CORE_CLASS_HASH
+fi
+
+if [[ $COMET_CLASS_HASH == "" ]]; then
+    comet_class_hash=$(declare "$COMET_CONTRACT_SRC")
+else
+    comet_class_hash=$COMET_CLASS_HASH
+fi
+
 if [[ $ERC20_CLASS_HASH == "" ]]; then
-    erc20_class_hash=$(declare $ERC20_CONTRACT_SRC)
+    erc20_class_hash=$(declare "$ERC20_CONTRACT_SRC")
 else
     erc20_class_hash=$ERC20_CLASS_HASH
 fi
 
 if [[ $ICS20_CLASS_HASH == "" ]]; then
-    ics20_class_hash=$(declare $ICS20_CONTRACT_SRC)
+    ics20_class_hash=$(declare "$ICS20_CONTRACT_SRC")
 else
     ics20_class_hash=$ICS20_CLASS_HASH
 fi
 
-deploy $ics20_class_hash $erc20_class_hash
+echo "Class hashes:"
+echo "  CORE: $core_class_hash"
+echo "  COMET: $comet_class_hash"
+echo "  ICS20: $ics20_class_hash"
+echo "  ERC20: $erc20_class_hash"
+
+core_contract_address=$(deploy_core "$core_class_hash")
+comet_contract_address=$(deploy_comet "$comet_class_hash" "$core_contract_address")
+ics20_contract_address=$(deploy_ics20 "$ics20_class_hash" "$core_contract_address" "$erc20_class_hash")
+
+echo "Contract addresses:"
+echo "  CORE: $core_contract_address"
+echo "  COMET: $comet_contract_address"
+echo "  ICS20: $ics20_contract_address"
+
+ICS20_CONTRACT_ADDRESS=$ics20_contract_address
+
+register_client() {
+    CORE_ADDRESS=$1
+    COMET_ADDRESS=$2
+
+    # client type uses cairo short-string
+    COMET_CLIENT_TYPE=$(starkli to-cairo-string "07-tendermint")
+
+    CALLDATA="$COMET_CLIENT_TYPE $COMET_ADDRESS"
+
+    starkli invoke \
+        $STARKLI_ARGS \
+        "$CORE_ADDRESS" \
+        "register_client" \
+        $CALLDATA
+
+    echo "Client type `07-tendermint` is registered with address $COMET_ADDRESS"
+}
+
+register_ics20() {
+    CORE_ADDRESS=$1
+    ICS20_ADDRESS=$2
+
+    TRANSFER_PORT=$(starkli to-cairo-string "transfer")
+
+    # https://docs.starknet.io/architecture-and-concepts/smart-contracts/serialization-of-cairo-types/#serialization_of_byte_arrays
+    # there is 0 previous bytes, and `transfer` has 8 bytes
+    CALLDATA="0x0 $TRANSFER_PORT 0x8 $ICS20_ADDRESS"
+
+    starkli invoke \
+        $STARKLI_ARGS \
+        "$CORE_ADDRESS" \
+        "bind_port_id" \
+        $CALLDATA
+
+    echo "Channel port `transfer` is bound with address $ICS20_ADDRESS"
+}
+
+register_client "$core_contract_address" "$comet_contract_address"
+register_ics20 "$core_contract_address" "$ics20_contract_address"
