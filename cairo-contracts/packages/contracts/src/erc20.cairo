@@ -2,23 +2,17 @@
 pub mod ERC20Mintable {
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl, interface::IERC20Metadata};
-    use starknet::ContractAddress;
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
+    use starknet::{ContractAddress, get_caller_address};
     use starknet_ibc_utils::mintable::ERC20MintableComponent;
-    use starknet_ibc_utils::mintable::ERC20MintableComponent::ERC20MintableInternalTrait;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
-    component!(path: ERC20MintableComponent, storage: mintable, event: MintableEvent);
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
 
     // Ownable Mixin
     #[abi(embed_v0)]
     impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
     impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
-
-    // ERC20 Mintable
-    #[abi(embed_v0)]
-    impl ERC20MintableImpl = ERC20MintableComponent::ERC20Mintable<ContractState>;
 
     #[abi(embed_v0)]
     impl ERC20Impl = ERC20Component::ERC20Impl<ContractState>;
@@ -45,8 +39,6 @@ pub mod ERC20Mintable {
         #[flat]
         OwnableEvent: OwnableComponent::Event,
         #[flat]
-        MintableEvent: ERC20MintableComponent::Event,
-        #[flat]
         ERC20Event: ERC20Component::Event,
     }
 
@@ -56,14 +48,10 @@ pub mod ERC20Mintable {
         name: ByteArray,
         symbol: ByteArray,
         decimals: u8,
-        initial_supply: u256,
-        recipient: ContractAddress,
         owner: ContractAddress,
     ) {
         self.ownable.initializer(owner);
-        self.mintable.initializer();
         self.erc20.initializer(name, symbol);
-        self.erc20.mint(recipient, initial_supply);
 
         self._set_decimals(decimals);
     }
@@ -81,6 +69,22 @@ pub mod ERC20Mintable {
 
         fn decimals(self: @ContractState) -> u8 {
             self.decimals.read()
+        }
+    }
+
+    #[generate_trait]
+    #[abi(per_item)]
+    impl DynamicSupplyImpl of DynamicSupplyTrait {
+        #[external(v0)]
+        fn burn(ref self: ContractState, value: u256) {
+            self.ownable.assert_only_owner();
+            self.erc20.burn(get_caller_address(), value);
+        }
+
+        #[external(v0)]
+        fn mint(ref self: ContractState, recipient: ContractAddress, amount: u256) {
+            self.ownable.assert_only_owner();
+            self.erc20.mint(recipient, amount);
         }
     }
 

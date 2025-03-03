@@ -1,9 +1,8 @@
 use core::num::traits::Zero;
 use core::starknet::SyscallResultTrait;
 use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
-use starknet::syscalls::deploy_syscall;
+use starknet::syscalls::{call_contract_syscall, deploy_syscall};
 use starknet::{ClassHash, ContractAddress, contract_address_const};
-use starknet_ibc_utils::mintable::{IERC20MintableDispatcher, IERC20MintableDispatcherTrait};
 
 #[derive(Copy, Debug, Drop, Serde)]
 pub struct ERC20Contract {
@@ -28,23 +27,17 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
         ERC20ABIDispatcher { contract_address: *self.address }
     }
 
-    fn mintable_dispatcher(self: @ERC20Contract) -> IERC20MintableDispatcher {
-        IERC20MintableDispatcher { contract_address: *self.address }
-    }
-
     fn create(
         class_hash: ClassHash,
         salt: felt252,
         name: ByteArray,
         symbol: ByteArray,
         decimals: u8,
-        amount: u256,
-        recipient: ContractAddress,
         owner: ContractAddress,
     ) -> ERC20Contract {
         let mut call_data = array![];
 
-        (name, symbol, decimals, amount, recipient, owner).serialize(ref call_data);
+        (name, symbol, decimals, owner).serialize(ref call_data);
 
         let (address, _) = deploy_syscall(class_hash, salt, call_data.span(), false)
             .unwrap_syscall();
@@ -63,11 +56,15 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
     }
 
     fn mint(self: @ERC20Contract, recipient: ContractAddress, amount: u256) {
-        self.mintable_dispatcher().permissioned_mint(recipient, amount)
+        let mut calldata = array![];
+        (recipient, amount).serialize(ref calldata);
+        call_contract_syscall(*self.address, selector!("mint"), calldata.span()).unwrap_syscall();
     }
 
     fn burn(self: @ERC20Contract, account: ContractAddress, amount: u256) {
-        self.mintable_dispatcher().permissioned_burn(account, amount)
+        let mut calldata = array![];
+        amount.serialize(ref calldata);
+        call_contract_syscall(*self.address, selector!("burn"), calldata.span()).unwrap_syscall();
     }
 
     fn balance_of(self: @ERC20Contract, from_account: ContractAddress) -> u256 {
