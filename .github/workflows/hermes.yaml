@@ -67,7 +67,8 @@ jobs:
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
-          scarb build -p starknet_ibc_contracts
+          nix shell .#rust-nightly \
+            scarb build -p starknet_ibc_contracts
 
       - name: Run Integration Tests
         env:
