@@ -36,6 +36,12 @@ jobs:
             relayer -> relayer/target
             light-client -> light-client/target
 
+      - name: Install Scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          tool-versions: cairo-libs/.tool-versions
+          scarb-lock: cairo-libs/Scarb.lock
+
       - name: Nix build
         run: |
           sudo rm -rf /opt/homebrew/
@@ -53,13 +59,10 @@ jobs:
             .#wasm-simapp \
             .#osmosis
 
-          nix build --cores 1 .#scarb
-
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
-          nix shell ..#scarb -c \
-            scarb build -p starknet_ibc_contracts
+          scarb build -p starknet_ibc_contracts
 
       - name: Run Integration Tests
         env:
