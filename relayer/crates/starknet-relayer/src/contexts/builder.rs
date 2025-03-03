@@ -226,27 +226,26 @@ impl StarknetBuilder {
             return Err(eyre!("Starknet chain has a different ID as configured. Expected: {expected_chain_id}, got: {chain_id}").into());
         }
 
+        let signing_key = self
+            .starknet_chain_config
+            .relayer_wallet
+            .signing_key
+            .clone()
+            .try_into()
+            .expect("valid signing key");
+
         let account = SingleOwnerAccount::new(
             rpc_client.clone(),
-            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
-                self.starknet_chain_config.relayer_wallet.signing_key,
-            )),
+            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(signing_key)),
             *self.starknet_chain_config.relayer_wallet.account_address,
             chain_id_felt,
             ExecutionEncoding::New,
         );
 
         let proof_signer = Secp256k1KeyPair::from_mnemonic(
-            bip39::Mnemonic::from_entropy(
-                &self
-                    .starknet_chain_config
-                    .relayer_wallet
-                    .signing_key
-                    .to_bytes_be(),
-                bip39::Language::English,
-            )
-            .expect("valid mnemonic")
-            .phrase(),
+            bip39::Mnemonic::from_entropy(&signing_key.to_bytes_be(), bip39::Language::English)
+                .expect("valid mnemonic")
+                .phrase(),
             &"m/84'/0'/0'/0/0".parse().expect("valid hdpath"),
             "strk",
         )
