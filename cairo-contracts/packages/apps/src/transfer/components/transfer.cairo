@@ -714,15 +714,14 @@ pub mod TokenTransferComponent {
             amount: u256,
         ) {
             let mut token = self.get_token(denom.key());
-            if token.is_non_zero() {
-                token.mint(get_contract_address(), amount);
-            } else {
+            if token.is_zero() {
                 let name = denom.base.hosted().unwrap();
 
                 token = self.create_token(name, amount);
 
                 self.record_ibc_token(denom, token.address);
             }
+            token.mint(get_contract_address(), amount);
             token.transfer(account, amount);
         }
 
@@ -813,8 +812,6 @@ pub mod TokenTransferComponent {
                 name.clone(),
                 symbol.clone(),
                 decimals,
-                amount.clone(),
-                get_contract_address(),
                 get_contract_address(),
             );
 
