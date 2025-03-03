@@ -1080,6 +1080,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                     &ics20_contract_address,
                     &selector!("ibc_token_address"),
                     &calldata,
+                    None,
                 )
                 .await?;
 
