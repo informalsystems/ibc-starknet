@@ -158,6 +158,7 @@ echo "  CORE: $core_contract_address"
 echo "  COMET: $comet_contract_address"
 echo "  ICS20: $ics20_contract_address"
 
+ICS20_CONTRACT_ADDRESS=$ics20_contract_address
 
 register_client() {
     CORE_ADDRESS=$1
