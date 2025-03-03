@@ -735,7 +735,7 @@ pub mod TokenTransferComponent {
 
             token.transfer_from(account, get_contract_address(), amount);
 
-            token.burn(get_contract_address(), amount);
+            token.burn(amount);
         }
 
         fn refund_execute(

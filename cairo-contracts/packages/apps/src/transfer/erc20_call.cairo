@@ -61,7 +61,7 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
         call_contract_syscall(*self.address, selector!("mint"), calldata.span()).unwrap_syscall();
     }
 
-    fn burn(self: @ERC20Contract, account: ContractAddress, amount: u256) {
+    fn burn(self: @ERC20Contract, amount: u256) {
         let mut calldata = array![];
         amount.serialize(ref calldata);
         call_contract_syscall(*self.address, selector!("burn"), calldata.span()).unwrap_syscall();
