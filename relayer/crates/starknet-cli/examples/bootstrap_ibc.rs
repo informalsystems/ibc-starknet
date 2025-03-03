@@ -79,7 +79,7 @@ fn main() -> Result<(), Error> {
                 starknet_chain
                     .query_chain_status()
                     .await
-                    .map_err(|e| eyre::eyre!("failed to build starknet chain: {:?}", e))?
+                    .map_err(|e| eyre::eyre!("failed to query starknet chain status: {:?}", e))?
             );
 
             let cosmos_chain: CosmosChain = starknet_builder
