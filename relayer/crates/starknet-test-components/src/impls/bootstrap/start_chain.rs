@@ -44,6 +44,8 @@ where
             &chain_node_config.rpc_port.to_string(),
             "--block-generation-on",
             "1",
+            "--state-archive-capacity",
+            "full",
             "--dump-on",
             "block",
             "--dump-path",
