@@ -4,7 +4,8 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
-use hermes_chain_components::traits::queries::block::{CanQueryBlock, CanQueryChainHeight};
+use hermes_chain_components::traits::queries::block::CanQueryBlock;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::channel_end::{
     ChannelEndQuerier, ChannelEndQuerierComponent, ChannelEndWithProofsQuerier,
     ChannelEndWithProofsQuerierComponent,
