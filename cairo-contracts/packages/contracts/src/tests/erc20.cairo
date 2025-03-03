@@ -65,3 +65,19 @@ fn test_erc20_transfer_without_user_approval() {
     erc20.transfer_from(SN_USER(), OWNER(), AMOUNT);
 }
 
+#[test]
+#[should_panic(expected: 'ERC20: minting amount is zero')]
+fn test_erc20_mint_zero_amount() {
+    let (mut erc20, _) = setup();
+    start_cheat_caller_address(erc20.address, OWNER());
+    erc20.mint(0);
+}
+
+#[test]
+#[should_panic(expected: 'ERC20: burning amount is zero')]
+fn test_erc20_burn_zero_amount() {
+    let (mut erc20, _) = setup();
+    start_cheat_caller_address(erc20.address, OWNER());
+    erc20.mint(AMOUNT);
+    erc20.burn(0);
+}

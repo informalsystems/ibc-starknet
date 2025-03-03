@@ -1,5 +1,6 @@
 #[starknet::contract]
 pub mod ERC20Mintable {
+    use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl, interface::IERC20Metadata};
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
@@ -73,14 +74,16 @@ pub mod ERC20Mintable {
     #[abi(per_item)]
     impl DynamicSupplyImpl of DynamicSupplyTrait {
         #[external(v0)]
-        fn burn(ref self: ContractState, value: u256) {
+        fn burn(ref self: ContractState, amount: u256) {
             self.ownable.assert_only_owner();
-            self.erc20.burn(get_caller_address(), value);
+            assert(amount.is_non_zero(), 'ERC20: burning amount is zero');
+            self.erc20.burn(get_caller_address(), amount);
         }
 
         #[external(v0)]
         fn mint(ref self: ContractState, amount: u256) {
             self.ownable.assert_only_owner();
+            assert(amount.is_non_zero(), 'ERC20: minting amount is zero');
             self.erc20.mint(get_caller_address(), amount);
         }
     }
