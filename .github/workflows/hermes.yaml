@@ -32,6 +32,11 @@ jobs:
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
+      - name: Install Rust nightly toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+
       - name: Install Scarb
         uses: software-mansion/setup-scarb@v1
         with:
@@ -63,8 +68,7 @@ jobs:
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
-          nix shell .#rust-nightly -c \
-            scarb build -p starknet_ibc_contracts
+          scarb build -p starknet_ibc_contracts
 
       - uses: Swatinem/rust-cache@v2
         with:
