@@ -5,6 +5,11 @@ block_time    = { secs = 30, nanos = 0 }
 json_rpc_url = "https://starknet-sepolia.public.blastapi.io/rpc/v0_7"
 # json_rpc_url = "https://starknet-sepolia.reddio.com/rpc/v0_7"
 
+# -- to be filled
+# private information
+# toml file containing the `account_address`, `public_key` and `signing_key` as Felt
+relayer_wallet = ""
+
 [starknet_chain_config.contract_addresses]
 ibc_client = "0x05d78cad8c0efc496d5ce0bdce66bbae7aa9d97860448a5af84019227383bb2a"
 ibc_core   = "0x04cf1183281f8e60abcb58466b0d01f3eb273e64799d8e6ad2cea1578ef5e91a"
@@ -13,19 +18,6 @@ ibc_core   = "0x04cf1183281f8e60abcb58466b0d01f3eb273e64799d8e6ad2cea1578ef5e91a
 erc20      = "0x04570481e743c3fdd442c44d968030b375cce8ec1471ccfd1a1dc48613060c3c"
 ics20      = "0x04d2f862a3e23f094983b7e2df83f4875fbd6b8571c5a53478e0be8962f87b30"
 ibc_client = "0x0305e76f607a3c39f2955902a41d820a4b2559e9e3e8bed681f32c2e87831901"
-
-[starknet_chain_config.relayer_wallet]
-
-# -- to be filled
-# public information
-# fill this from `account.json` of relayer
-account_address = ""
-public_key      = ""
-
-# -- to be filled
-# private information
-# file containing the signing key as Felt
-signing_key     = { file = "" }
 
 [cosmos_chain_config]
 id             = 'osmo-test-5'
