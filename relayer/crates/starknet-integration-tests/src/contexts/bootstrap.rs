@@ -26,6 +26,8 @@ use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::Cha
 use hermes_error::impls::UseHermesError;
 use hermes_error::types::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_runtime_components::traits::fs::create_dir::CanCreateDir;
+use hermes_runtime_components::traits::fs::write_file::CanWriteStringToFile;
 use hermes_runtime_components::traits::runtime::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
@@ -116,6 +118,19 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
     ) -> Result<StarknetChainDriver, HermesError> {
         let runtime = bootstrap.runtime.clone();
 
+        let chain_store_dir = bootstrap.chain_store_dir.clone();
+
+        runtime.create_dir(&chain_store_dir.join("wallets")).await?;
+
+        for (name, wallet) in wallets.iter() {
+            let wallet_str = toml::to_string_pretty(wallet)?;
+            let wallet_path = chain_store_dir.join(format!("wallets/{name}.toml"));
+
+            runtime
+                .write_string_to_file(&wallet_path, &wallet_str)
+                .await?;
+        }
+
         let relayer_wallet = wallets
             .get("relayer")
             .ok_or_else(|| StarknetBootstrap::raise_error("expect relayer wallet to be present"))?
@@ -181,6 +196,7 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
         let chain_driver = StarknetChainDriver {
             runtime,
             chain,
+            chain_store_dir,
             genesis_config,
             node_config,
             wallets,

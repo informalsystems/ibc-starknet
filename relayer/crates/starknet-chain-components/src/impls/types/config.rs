@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 use starknet::core::types::Felt;
 
 use crate::impls::types::address::StarknetAddress;
-use crate::types::wallet::StarknetWallet;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StarknetRelayerConfig {
@@ -16,7 +15,7 @@ pub struct StarknetRelayerConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StarknetChainConfig {
     pub json_rpc_url: String,
-    pub relayer_wallet: StarknetWallet,
+    pub relayer_wallet: String,
     #[serde(with = "humantime_serde")]
     pub poll_interval: Duration,
     pub block_time: Duration,

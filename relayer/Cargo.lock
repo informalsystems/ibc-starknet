@@ -2525,6 +2525,7 @@ dependencies = [
  "serde",
  "starknet",
  "tiny-bip39",
+ "toml",
  "url",
 ]
 

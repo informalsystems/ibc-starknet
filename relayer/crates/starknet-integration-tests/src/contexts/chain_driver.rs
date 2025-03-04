@@ -1,4 +1,5 @@
 use std::collections::BTreeMap;
+use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
@@ -28,6 +29,7 @@ use tokio::process::Child;
 pub struct StarknetChainDriver {
     pub runtime: HermesRuntime,
     pub chain: StarknetChain,
+    pub chain_store_dir: PathBuf,
     pub genesis_config: StarknetGenesisConfig,
     pub node_config: StarknetNodeConfig,
     pub wallets: BTreeMap<String, StarknetWallet>,

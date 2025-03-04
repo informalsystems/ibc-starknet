@@ -1,6 +1,7 @@
 use alloc::sync::Arc;
 use core::marker::PhantomData;
 use core::ops::Deref;
+use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
@@ -25,11 +26,13 @@ use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeAtComponent
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
 use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
+use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
@@ -226,23 +229,26 @@ impl StarknetBuilder {
             return Err(eyre!("Starknet chain has a different ID as configured. Expected: {expected_chain_id}, got: {chain_id}").into());
         }
 
+        let wallet_path = PathBuf::from(self.starknet_chain_config.relayer_wallet.clone());
+
+        let wallet_str = self.runtime.read_file_as_string(&wallet_path).await?;
+
+        let relayer_wallet: StarknetWallet = toml::from_str(&wallet_str)
+            .map_err(|e| eyre!("Failed to parse relayer wallet: {e}"))?;
+
         let account = SingleOwnerAccount::new(
             rpc_client.clone(),
             LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
-                self.starknet_chain_config.relayer_wallet.signing_key,
+                relayer_wallet.signing_key,
             )),
-            *self.starknet_chain_config.relayer_wallet.account_address,
+            *relayer_wallet.account_address,
             chain_id_felt,
             ExecutionEncoding::New,
         );
 
         let proof_signer = Secp256k1KeyPair::from_mnemonic(
             bip39::Mnemonic::from_entropy(
-                &self
-                    .starknet_chain_config
-                    .relayer_wallet
-                    .signing_key
-                    .to_bytes_be(),
+                &relayer_wallet.signing_key.to_bytes_be(),
                 bip39::Language::English,
             )
             .expect("valid mnemonic")
