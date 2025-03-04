@@ -13,5 +13,6 @@ mod tests {
     pub(crate) mod channel;
     pub(crate) mod client;
     pub(crate) mod connection;
+    pub(crate) mod erc20;
     pub(crate) mod transfer;
 }

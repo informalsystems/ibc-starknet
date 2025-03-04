@@ -113,7 +113,6 @@ pub mod TokenTransferComponent {
         pub decimals: u8,
         #[key]
         pub address: ContractAddress,
-        pub initial_supply: u256,
     }
 
     // -----------------------------------------------------------
@@ -714,15 +713,14 @@ pub mod TokenTransferComponent {
             amount: u256,
         ) {
             let mut token = self.get_token(denom.key());
-            if token.is_non_zero() {
-                token.mint(get_contract_address(), amount);
-            } else {
+            if token.is_zero() {
                 let name = denom.base.hosted().unwrap();
 
                 token = self.create_token(name, amount);
 
                 self.record_ibc_token(denom, token.address);
             }
+            token.mint(amount);
             token.transfer(account, amount);
         }
 
@@ -737,7 +735,7 @@ pub mod TokenTransferComponent {
 
             token.transfer_from(account, get_contract_address(), amount);
 
-            token.burn(get_contract_address(), amount);
+            token.burn(amount);
         }
 
         fn refund_execute(
@@ -813,14 +811,12 @@ pub mod TokenTransferComponent {
                 name.clone(),
                 symbol.clone(),
                 decimals,
-                amount.clone(),
-                get_contract_address(),
                 get_contract_address(),
             );
 
             self.write_salt(salt + 1);
 
-            self.emit_create_token_event(name, symbol, decimals, erc20_token.address, amount);
+            self.emit_create_token_event(name, symbol, decimals, erc20_token.address);
 
             erc20_token
         }
@@ -1015,9 +1011,8 @@ pub mod TokenTransferComponent {
             symbol: ByteArray,
             decimals: u8,
             address: ContractAddress,
-            initial_supply: u256,
         ) {
-            let event = CreateTokenEvent { name, symbol, decimals, address, initial_supply };
+            let event = CreateTokenEvent { name, symbol, decimals, address };
             self.emit(event);
         }
     }

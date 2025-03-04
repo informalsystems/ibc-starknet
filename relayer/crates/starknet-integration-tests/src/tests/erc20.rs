@@ -6,6 +6,7 @@ use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
+use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
@@ -16,6 +17,9 @@ use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc2
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
+use starknet::accounts::Call;
+use starknet::core::types::U256;
+use starknet::macros::selector;
 use tracing::info;
 
 use crate::contexts::bootstrap::StarknetBootstrap;
@@ -58,6 +62,8 @@ fn test_erc20_transfer() -> Result<(), Error> {
             class_hash
         };
 
+        let initial_supply = 1000u32;
+
         let token_address = {
             let relayer_address = chain_driver.relayer_wallet.account_address;
 
@@ -65,8 +71,6 @@ fn test_erc20_transfer() -> Result<(), Error> {
                 name: "token".into(),
                 symbol: "token".into(),
                 decimals: 18,
-                fixed_supply: 1000u32.into(),
-                recipient: relayer_address,
                 owner: relayer_address,
             };
 
@@ -78,13 +82,23 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             info!("deployed ERC20 contract to address: {:?}", token_address);
 
+            let calldata = StarknetCairoEncoding.encode(&U256::from(initial_supply))?;
+
+            let call = Call {
+                to: *token_address,
+                selector: selector!("mint"),
+                calldata,
+            };
+
+            chain.send_message(StarknetMessage::new(call)).await?;
+
+            info!("Mint {initial_supply} initial supply to address: {relayer_address}");
+
             let balance = chain
                 .query_token_balance(&token_address, &relayer_address)
                 .await?;
 
-            info!("initial balance: {}", balance);
-
-            assert_eq!(balance.quantity, 1000u32.into());
+            assert_eq!(balance.quantity, initial_supply.into());
 
             token_address
         };

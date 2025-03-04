@@ -1,24 +1,18 @@
 #[starknet::contract]
 pub mod ERC20Mintable {
+    use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl, interface::IERC20Metadata};
-    use starknet::ContractAddress;
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
-    use starknet_ibc_utils::mintable::ERC20MintableComponent;
-    use starknet_ibc_utils::mintable::ERC20MintableComponent::ERC20MintableInternalTrait;
+    use starknet::{ContractAddress, get_caller_address};
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
-    component!(path: ERC20MintableComponent, storage: mintable, event: MintableEvent);
     component!(path: ERC20Component, storage: erc20, event: ERC20Event);
 
     // Ownable Mixin
     #[abi(embed_v0)]
     impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
     impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
-
-    // ERC20 Mintable
-    #[abi(embed_v0)]
-    impl ERC20MintableImpl = ERC20MintableComponent::ERC20Mintable<ContractState>;
 
     #[abi(embed_v0)]
     impl ERC20Impl = ERC20Component::ERC20Impl<ContractState>;
@@ -30,8 +24,6 @@ pub mod ERC20Mintable {
     struct Storage {
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
-        #[substorage(v0)]
-        mintable: ERC20MintableComponent::Storage,
         #[substorage(v0)]
         erc20: ERC20Component::Storage,
         // The decimals value is stored locally in the contract.
@@ -45,8 +37,6 @@ pub mod ERC20Mintable {
         #[flat]
         OwnableEvent: OwnableComponent::Event,
         #[flat]
-        MintableEvent: ERC20MintableComponent::Event,
-        #[flat]
         ERC20Event: ERC20Component::Event,
     }
 
@@ -56,14 +46,10 @@ pub mod ERC20Mintable {
         name: ByteArray,
         symbol: ByteArray,
         decimals: u8,
-        initial_supply: u256,
-        recipient: ContractAddress,
         owner: ContractAddress,
     ) {
         self.ownable.initializer(owner);
-        self.mintable.initializer();
         self.erc20.initializer(name, symbol);
-        self.erc20.mint(recipient, initial_supply);
 
         self._set_decimals(decimals);
     }
@@ -81,6 +67,24 @@ pub mod ERC20Mintable {
 
         fn decimals(self: @ContractState) -> u8 {
             self.decimals.read()
+        }
+    }
+
+    #[generate_trait]
+    #[abi(per_item)]
+    impl DynamicSupplyImpl of DynamicSupplyTrait {
+        #[external(v0)]
+        fn burn(ref self: ContractState, amount: u256) {
+            self.ownable.assert_only_owner();
+            assert(amount.is_non_zero(), 'ERC20: burning amount is zero');
+            self.erc20.burn(get_caller_address(), amount);
+        }
+
+        #[external(v0)]
+        fn mint(ref self: ContractState, amount: u256) {
+            self.ownable.assert_only_owner();
+            assert(amount.is_non_zero(), 'ERC20: minting amount is zero');
+            self.erc20.mint(get_caller_address(), amount);
         }
     }
 

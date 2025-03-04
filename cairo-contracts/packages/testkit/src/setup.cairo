@@ -1,18 +1,18 @@
 use openzeppelin_testing::declare_class;
 use snforge_std::{
     ContractClass, start_cheat_block_number_global, start_cheat_block_timestamp_global,
-    start_cheat_caller_address,
+    start_cheat_caller_address, stop_cheat_caller_address,
 };
 use snforge_std::{EventSpy, spy_events};
 use starknet::ContractAddress;
-use starknet_ibc_apps::transfer::{ERC20Contract, TRANSFER_PORT_ID};
+use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait, TRANSFER_PORT_ID};
 use starknet_ibc_core::client::ClientContract;
 use starknet_ibc_core::router::AppContract;
 use starknet_ibc_testkit::configs::{
     CometClientConfig, CometClientConfigTrait, CoreConfig, CoreConfigTrait, TransferAppConfig,
     TransferAppConfigTrait,
 };
-use starknet_ibc_testkit::dummies::{CLIENT_TYPE, OWNER, RELAYER};
+use starknet_ibc_testkit::dummies::{CLIENT_TYPE, OWNER, RELAYER, SN_USER, SUPPLY};
 use starknet_ibc_testkit::handles::{AppHandle, ClientHandle, CoreContract, CoreHandle, ERC20Handle};
 
 #[derive(Drop, Serde)]
@@ -41,9 +41,23 @@ pub impl SetupImpl of SetupTrait {
         ClientHandle::deploy_client(contract_name, *self.owner)
     }
 
-    /// Deploys an instance of ERC20 contract.
-    fn deploy_erc20(self: @Setup) -> ERC20Contract {
-        ERC20Handle::deploy(*self.erc20_contract_class)
+    /// Deploys an instance of IBC-compatible ERC20 contract with `0` initial supply.
+    fn deploy_erc20(self: @Setup, owner: ContractAddress) -> ERC20Contract {
+        ERC20Handle::deploy(*self.erc20_contract_class, owner)
+    }
+
+    /// Deploys an IBC-compatible ERC-20 token with an initial supply.
+    /// The specified `receiver` will receive `amount` tokens after deployment.
+    fn deploy_erc20_with_supply(
+        self: @Setup, owner: ContractAddress, receiver: ContractAddress, amount: u256,
+    ) -> ERC20Contract {
+        let mut erc20 = self.deploy_erc20(owner);
+        start_cheat_caller_address(erc20.address, owner);
+        erc20.mint(amount);
+        stop_cheat_caller_address(erc20.address);
+        erc20.approve(owner, receiver, amount);
+        erc20.transfer_from(owner, receiver, amount);
+        erc20
     }
 
     /// Deploys an instance of ICS-20 Token Transfer contract.
@@ -82,12 +96,12 @@ pub impl SetupImpl of SetupTrait {
     fn setup_transfer(transfer_contract_name: ByteArray) -> (AppContract, ERC20Contract) {
         let mut setup = Self::default();
 
-        let mut erc20 = setup.deploy_erc20();
-
         let ics20 = setup.deploy_transfer(transfer_contract_name);
 
         // Set the caller address to `OWNER`, as ICS-20 callbacks are permissioned.
         start_cheat_caller_address(ics20.address, OWNER());
+
+        let erc20 = setup.deploy_erc20_with_supply(ics20.address, SN_USER(), SUPPLY);
 
         (ics20, erc20)
     }
@@ -117,9 +131,9 @@ pub impl SetupImpl of SetupTrait {
 
         core.register_client(CLIENT_TYPE(), comet.address);
 
-        let mut erc20 = setup.deploy_erc20();
-
         let mut ics20 = setup.deploy_transfer(transfer_contract_name);
+
+        let erc20 = setup.deploy_erc20_with_supply(ics20.address, SN_USER(), SUPPLY);
 
         core.register_app(TRANSFER_PORT_ID(), ics20.address);
 
