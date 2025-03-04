@@ -76,10 +76,12 @@ pub fn verify_non_existence(
     if let Option::Some(left) = proof.left {
         verify_existence(spec, left, root, left.key, left.value);
         assert(
-            spec.key_for_comparison(key) > spec.key_for_comparison(left.key.clone()),
+            spec.key_for_comparison(key.clone()) > spec.key_for_comparison(left.key.clone()),
             ICS23Errors::INVALID_LEFT_KEY_ORDER,
         )
-    } else if let Option::Some(right) = proof.right {
+    }
+
+    if let Option::Some(right) = proof.right {
         verify_existence(spec, right, root, right.key, right.value);
         assert(
             spec.key_for_comparison(key) < spec.key_for_comparison(right.key.clone()),
