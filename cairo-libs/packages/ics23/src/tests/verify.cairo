@@ -8,6 +8,8 @@ use ics23::tests::data::{
     TestData, smt_exist_left, smt_exist_right, smt_exist_middle, iavl_exist_left,
     iavl_nonexist_left, iavl_exist_right, iavl_nonexist_right, iavl_exist_middle,
     iavl_nonexist_middle, tendermint_exist_left, tendermint_exist_right, tendermint_exist_middle,
+    tendermint_nonexist_left, tendermint_nonexist_right, tendermint_nonexist_middle,
+    smt_nonexist_left, smt_nonexist_right, smt_nonexist_middle,
 };
 use protobuf::types::message::ProtoCodecImpl;
 use protobuf::hex::decode as decode_hex_byte_array;
@@ -28,7 +30,7 @@ fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
         Proof::Exist(p) => { verify_existence(spec, @p, @root, @key, @value); },
         Proof::NonExist(p) => {
             assert(value.len() == 0, 'value must not exist');
-            verify_non_existence(spec, @p, @root, @key);
+            verify_non_existence(spec, @p, @root, key);
         },
     };
 }
@@ -44,9 +46,15 @@ fn test_protobuf_encoding_roundtrip() {
     encoding_roundtrip_fixture(@tendermint_exist_left().proof);
     encoding_roundtrip_fixture(@tendermint_exist_right().proof);
     encoding_roundtrip_fixture(@tendermint_exist_middle().proof);
+    encoding_roundtrip_fixture(@tendermint_nonexist_left().proof);
+    encoding_roundtrip_fixture(@tendermint_nonexist_right().proof);
+    encoding_roundtrip_fixture(@tendermint_nonexist_middle().proof);
     encoding_roundtrip_fixture(@smt_exist_left().proof);
     encoding_roundtrip_fixture(@smt_exist_right().proof);
     encoding_roundtrip_fixture(@smt_exist_middle().proof);
+    encoding_roundtrip_fixture(@smt_nonexist_left().proof);
+    encoding_roundtrip_fixture(@smt_nonexist_right().proof);
+    encoding_roundtrip_fixture(@smt_nonexist_middle().proof);
 }
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L459
@@ -55,10 +63,22 @@ fn test_vector_iavl_left() {
     decode_and_verify(@iavl_exist_left(), @iavl_spec());
 }
 
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L480
+#[test]
+fn test_vector_iavl_left_non() {
+    decode_and_verify(@iavl_nonexist_left(), @iavl_spec());
+}
+
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L466
 #[test]
 fn test_vector_iavl_right() {
     decode_and_verify(@iavl_exist_right(), @iavl_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L487
+#[test]
+fn test_vector_iavl_right_non() {
+    decode_and_verify(@iavl_nonexist_right(), @iavl_spec());
 }
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L473
@@ -67,10 +87,22 @@ fn test_vector_iavl_middle() {
     decode_and_verify(@iavl_exist_middle(), @iavl_spec());
 }
 
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L494
+#[test]
+fn test_vector_iavl_middle_non() {
+    decode_and_verify(@iavl_nonexist_middle(), @iavl_spec());
+}
+
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L501
 #[test]
 fn test_vector_tendermint_left() {
     decode_and_verify(@tendermint_exist_left(), @tendermint_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L522
+#[test]
+fn test_vector_tendermint_left_non() {
+    decode_and_verify(@tendermint_nonexist_left(), @tendermint_spec());
 }
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L508
@@ -79,28 +111,58 @@ fn test_vector_tendermint_right() {
     decode_and_verify(@tendermint_exist_right(), @tendermint_spec());
 }
 
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L529
+#[test]
+fn test_vector_tendermint_right_non() {
+    decode_and_verify(@tendermint_nonexist_right(), @tendermint_spec());
+}
+
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L515
 #[test]
 fn test_vector_tendermint_middle() {
     decode_and_verify(@tendermint_exist_middle(), @tendermint_spec());
 }
 
-// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L543
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L536
+#[test]
+fn test_vector_tendermint_middle_non() {
+    decode_and_verify(@tendermint_nonexist_middle(), @tendermint_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#l543
 #[test]
 fn test_vector_smt_left() {
     decode_and_verify(@smt_exist_left(), @smt_spec());
 }
 
-// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L550
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L564
+#[test]
+fn test_vector_smt_left_non() {
+    decode_and_verify(@smt_nonexist_left(), @smt_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#l550
 #[test]
 fn test_vector_smt_right() {
     decode_and_verify(@smt_exist_right(), @smt_spec());
 }
 
-// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L557
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L571
+#[test]
+fn test_vector_smt_right_non() {
+    decode_and_verify(@smt_nonexist_right(), @smt_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#l557
 #[test]
 fn test_vector_smt_middle() {
     decode_and_verify(@smt_exist_middle(), @smt_spec());
+}
+
+// https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L578
+#[test]
+fn test_vector_smt_middle_non() {
+    decode_and_verify(@smt_nonexist_middle(), @smt_spec());
 }
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/verify.rs#L381
