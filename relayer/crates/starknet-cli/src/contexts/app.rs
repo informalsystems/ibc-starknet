@@ -259,12 +259,25 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
                 .next(),
         };
 
+        let relayer_wallet_file = {
+            // FIXME: This is a temporary solution to write the wallet to a file
+            // We should use a solution like how hermes-sdk does it for Cosmos-SDK
+            // https://github.com/informalsystems/hermes-sdk/blob/27168d1/crates/cosmos/cosmos-integration-tests/src/impls/bootstrap/relayer_chain_config.rs#L83-L105
+            let file_path = "./relayer_wallet.toml";
+
+            let relayer_wallet_str = to_string_pretty(&relayer_wallet)?;
+
+            std::fs::write(file_path, relayer_wallet_str)?;
+
+            file_path
+        };
+
         let chain_config = StarknetChainConfig {
             json_rpc_url: format!(
                 "http://{}:{}/",
                 chain_driver.node_config.rpc_addr, chain_driver.node_config.rpc_port
             ),
-            relayer_wallet,
+            relayer_wallet: relayer_wallet_file.to_string(),
             poll_interval: chain_driver.chain.poll_interval,
             block_time: chain_driver.chain.block_time,
             contract_addresses,

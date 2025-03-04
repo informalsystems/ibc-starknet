@@ -30,6 +30,7 @@ use hermes_runtime_components::traits::runtime::{
 };
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
+use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
@@ -226,26 +227,28 @@ impl StarknetBuilder {
             return Err(eyre!("Starknet chain has a different ID as configured. Expected: {expected_chain_id}, got: {chain_id}").into());
         }
 
-        let signing_key = self
-            .starknet_chain_config
-            .relayer_wallet
-            .signing_key
-            .clone()
-            .try_into()
-            .expect("valid signing key");
+        let relayer_wallet = toml::from_str::<StarknetWallet>(&std::fs::read_to_string(
+            &self.starknet_chain_config.relayer_wallet,
+        )?)
+        .map_err(|e| eyre!("Failed to parse relayer wallet: {e}"))?;
 
         let account = SingleOwnerAccount::new(
             rpc_client.clone(),
-            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(signing_key)),
-            *self.starknet_chain_config.relayer_wallet.account_address,
+            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
+                relayer_wallet.signing_key,
+            )),
+            *relayer_wallet.account_address,
             chain_id_felt,
             ExecutionEncoding::New,
         );
 
         let proof_signer = Secp256k1KeyPair::from_mnemonic(
-            bip39::Mnemonic::from_entropy(&signing_key.to_bytes_be(), bip39::Language::English)
-                .expect("valid mnemonic")
-                .phrase(),
+            bip39::Mnemonic::from_entropy(
+                &relayer_wallet.signing_key.to_bytes_be(),
+                bip39::Language::English,
+            )
+            .expect("valid mnemonic")
+            .phrase(),
             &"m/84'/0'/0'/0/0".parse().expect("valid hdpath"),
             "strk",
         )

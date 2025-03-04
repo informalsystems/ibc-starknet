@@ -421,7 +421,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let starknet_account_b = SingleOwnerAccount::new(
             starknet_chain.rpc_client.clone(),
             LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
-                wallet_starknet_b.signing_key.clone().try_into().unwrap(),
+                wallet_starknet_b.signing_key,
             )),
             *wallet_starknet_b.account_address,
             starknet_chain.rpc_client.chain_id().await?,
