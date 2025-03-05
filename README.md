@@ -132,7 +132,7 @@ For Osmosis wallet, you'll need to setup via `hermes-v1`.
 
 ```bash
 cd relayer
-RUST_LOG=trace RUST_BACKTRACE=1 cargo run --bin hermes-starknet -- -c ../config.toml \
+RUST_LOG=trace RUST_BACKTRACE=1 cargo run --bin hermes-starknet -- -c ../relayer.toml \
     start cosmos-with-starknet \
     --chain-id-a 393402133025997798000961 --client-id-a 07-tendermint-3 \
     --chain-id-b osmo-test-5 --client-id-b 08-wasm-4459
@@ -142,7 +142,7 @@ The pending packets in the past blocks can be cleared with `--clear-past-blocks`
 flag.
 
 ```bash
-RUST_LOG=trace RUST_BACKTRACE=1 cargo run --bin hermes-starknet -- -c ../config.toml \
+RUST_LOG=trace RUST_BACKTRACE=1 cargo run --bin hermes-starknet -- -c ../relayer.toml \
     start cosmos-with-starknet \
     --chain-id-a 393402133025997798000961 --client-id-a 07-tendermint-3 \
     --chain-id-b osmo-test-5 --client-id-b 08-wasm-4459 \
