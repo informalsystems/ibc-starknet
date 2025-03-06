@@ -1,4 +1,4 @@
-use TokenTransferComponent::TransferValidationTrait;
+use TokenTransferComponent::{TransferReaderTrait, TransferValidationTrait, TransferWriterTrait};
 use openzeppelin_testing::events::EventSpyExt;
 use snforge_std::cheatcodes::events::EventSpy;
 use snforge_std::{spy_events, start_cheat_caller_address};
@@ -9,12 +9,13 @@ use starknet_ibc_apps::transfer::TokenTransferComponent::{
     CreateIbcToken, TokenTransferQuery, TransferInitializerImpl, TransferReaderImpl,
     TransferWriterImpl,
 };
+use starknet_ibc_apps::transfer::types::PrefixedDenomTrait;
 use starknet_ibc_core::router::{AppContract, AppContractTrait};
 use starknet_ibc_testkit::configs::{TransferAppConfig, TransferAppConfigTrait};
 use starknet_ibc_testkit::dummies::CLASS_HASH;
 use starknet_ibc_testkit::dummies::{
-    AMOUNT, COSMOS, CS_USER, DECIMAL_ZERO, EMPTY_MEMO, HOSTED_DENOM, NAME, OWNER, SN_USER, STARKNET,
-    SUPPLY, SYMBOL,
+    AMOUNT, COSMOS, CS_USER, DECIMAL_ZERO, EMPTY_MEMO, ERC20, HOSTED_DENOM, NAME, OWNER, SN_USER,
+    STARKNET, SUPPLY, SYMBOL,
 };
 use starknet_ibc_testkit::event_spy::{ERC20EventSpyExt, TransferEventSpyExt};
 use starknet_ibc_testkit::handles::{AppHandle, ERC20Handle};
@@ -75,6 +76,23 @@ fn test_missing_salt() {
 fn test_missing_ibc_token_address() {
     let state = setup_component();
     state.ibc_token_address(0);
+}
+
+#[test]
+fn test_ibc_token_denom_ok() {
+    let mut state = setup_component();
+    let mut cfg = TransferAppConfigTrait::default();
+    let prefixed_denom = cfg.prefix_hosted_denom();
+    state.write_ibc_token_address_to_denom(ERC20().address, prefixed_denom.clone());
+    let denom_str = state.ibc_token_denom(ERC20().address);
+    assert_eq!(prefixed_denom.as_byte_array(), denom_str);
+}
+
+#[test]
+#[should_panic(expected: 'ICS20: missing token denom')]
+fn test_missing_ibc_token_denom() {
+    let mut state = setup_component();
+    state.ibc_token_denom(ERC20().address);
 }
 
 #[test]

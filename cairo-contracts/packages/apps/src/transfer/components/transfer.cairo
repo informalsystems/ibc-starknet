@@ -36,6 +36,7 @@ pub mod TokenTransferComponent {
         salt: felt252,
         ibc_token_key_to_address: Map<felt252, ContractAddress>,
         ibc_token_address_to_key: Map<ContractAddress, felt252>,
+        ibc_token_address_to_denom: Map<ContractAddress, ByteArray>,
     }
 
     #[event]
@@ -332,6 +333,16 @@ pub mod TokenTransferComponent {
 
             address
         }
+
+        fn ibc_token_denom(
+            self: @ComponentState<TContractState>, token_address: ContractAddress,
+        ) -> ByteArray {
+            let denom = self.read_ibc_token_denom(token_address);
+
+            assert(denom.len() > 0, TransferErrors::MISSING_TOKEN_DENOM);
+
+            denom
+        }
     }
 
     // -----------------------------------------------------------
@@ -458,7 +469,6 @@ pub mod TokenTransferComponent {
             packet.validate_basic();
 
             packet_data.validate_basic();
-
             assert(packet_data.sender.external().is_some(), TransferErrors::INVALID_SENDER);
             assert(packet_data.receiver.native().is_some(), TransferErrors::INVALID_RECEIVER);
 
@@ -831,6 +841,8 @@ pub mod TokenTransferComponent {
             self.write_ibc_token_key_to_address(denom_key, token_address);
 
             self.write_ibc_token_address_to_key(token_address, denom_key);
+
+            self.write_ibc_token_address_to_denom(token_address, denom);
         }
 
         fn assert_non_ibc_token(
@@ -896,6 +908,12 @@ pub mod TokenTransferComponent {
         ) -> felt252 {
             self.ibc_token_address_to_key.read(token_address)
         }
+
+        fn read_ibc_token_denom(
+            self: @ComponentState<TContractState>, token_address: ContractAddress,
+        ) -> ByteArray {
+            self.ibc_token_address_to_denom.read(token_address)
+        }
     }
 
     #[generate_trait]
@@ -926,6 +944,14 @@ pub mod TokenTransferComponent {
             token_key: felt252,
         ) {
             self.ibc_token_address_to_key.write(token_address, token_key);
+        }
+
+        fn write_ibc_token_address_to_denom(
+            ref self: ComponentState<TContractState>,
+            token_address: ContractAddress,
+            denom: PrefixedDenom,
+        ) {
+            self.ibc_token_address_to_denom.write(token_address, denom.as_byte_array())
         }
     }
 
