@@ -8,6 +8,7 @@ use crate::impls::bootstrap::starknet_chain::BootstrapStarknetChainArgs;
 #[derive(Debug, clap::Subcommand)]
 pub enum BootstrapSubCommand {
     StarknetChain(BootstrapStarknetChainArgs),
+    // CosmosChain(BootstrapChainArgs),
 }
 
 pub struct RunBootstrapSubCommand;

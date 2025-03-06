@@ -11,7 +11,6 @@ mod preset {
     use hermes_chain_components::impls::queries::consensus_state_height::QueryConsensusStateHeightsAndFindHeightBefore;
     use hermes_chain_components::impls::queries::consensus_state_heights::QueryLatestConsensusStateHeightAsHeights;
     use hermes_chain_components::impls::queries::packet_is_cleared::QueryClearedPacketWithEmptyCommitment;
-    use hermes_chain_components::impls::types::ack::ProvideBytesAcknowlegement;
     use hermes_chain_components::impls::types::commitment::ProvideBytesPacketCommitment;
     use hermes_chain_components::impls::types::commitment_prefix::ProvideCommitmentPrefixBytes;
     use hermes_chain_components::impls::types::payloads::channel::ProvideChannelPayloadTypes;
@@ -80,7 +79,7 @@ mod preset {
     };
     use hermes_chain_components::traits::queries::counterparty_chain_id::CounterpartyChainIdQuerierComponent;
     use hermes_chain_components::traits::queries::counterparty_connection_id::CounterpartyConnectionIdQuerierComponent;
-    use hermes_chain_components::traits::queries::packet_acknowledgement::PacketAcknowledgementQuerierComponent;
+    use hermes_chain_components::traits::queries::packet_acknowledgement::PacketAckCommitmentQuerierComponent;
     use hermes_chain_components::traits::queries::packet_commitment::PacketCommitmentQuerierComponent;
     use hermes_chain_components::traits::queries::packet_is_cleared::PacketIsClearedQuerierComponent;
     use hermes_chain_components::traits::queries::packet_is_received::PacketIsReceivedQuerierComponent;
@@ -118,7 +117,8 @@ mod preset {
     use hermes_chain_components::traits::types::ibc_events::write_ack::WriteAckEventComponent;
     use hermes_chain_components::traits::types::packet::OutgoingPacketTypeComponent;
     use hermes_chain_components::traits::types::packets::ack::{
-        AckPacketPayloadTypeComponent, AcknowledgementTypeComponent,
+        AckCommitmentHashTypeProviderComponent, AckPacketPayloadTypeProviderComponent,
+        AcknowledgementTypeProviderComponent,
     };
     use hermes_chain_components::traits::types::packets::receive::{
         PacketCommitmentTypeComponent, ReceivePacketPayloadTypeComponent,
@@ -358,8 +358,11 @@ mod preset {
                 ProvideCommitmentPrefixBytes,
             PacketCommitmentTypeComponent:
                 ProvideBytesPacketCommitment,
-            AcknowledgementTypeComponent:
-                ProvideBytesAcknowlegement,
+            [
+                AcknowledgementTypeProviderComponent,
+                AckCommitmentHashTypeProviderComponent,
+            ]:
+                UseType<Vec<u8>>,
             PacketReceiptTypeComponent:
                 ProvideBytesPacketReceipt,
             [
@@ -484,7 +487,7 @@ mod preset {
                 ProvideChannelPayloadTypes,
             [
                 ReceivePacketPayloadTypeComponent,
-                AckPacketPayloadTypeComponent,
+                AckPacketPayloadTypeProviderComponent,
                 TimeoutUnorderedPacketPayloadTypeComponent,
             ]:
                 ProvidePacketPayloadTypes,
@@ -539,7 +542,7 @@ mod preset {
                 QueryChannelEndFromStarknet,
             PacketCommitmentQuerierComponent:
                 QueryStarknetPacketCommitment,
-            PacketAcknowledgementQuerierComponent:
+            PacketAckCommitmentQuerierComponent:
                 QueryStarknetAckCommitment,
             PacketReceiptQuerierComponent:
                 QueryStarknetPacketReceipt,

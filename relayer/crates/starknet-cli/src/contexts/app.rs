@@ -1,10 +1,11 @@
 use std::path::PathBuf;
 
-use cgp::core::component::UseDelegate;
+use cgp::core::component::{UseContext, UseDelegate};
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
+use hermes_cli::commands::bootstrap::chain::BootstrapChainArgs;
 use hermes_cli::commands::client::create::CreateClientArgs;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
 use hermes_cli_components::impls::commands::client::create::{
@@ -34,7 +35,7 @@ use hermes_cli_components::traits::any_counterparty::{
     AnyCounterpartyComponent, ProvideAnyCounterparty,
 };
 use hermes_cli_components::traits::bootstrap::{
-    BootstrapLoaderComponent, BootstrapTypeComponent, CanLoadBootstrap,
+    BootstrapLoaderComponent, BootstrapTypeProviderComponent, CanLoadBootstrap,
 };
 use hermes_cli_components::traits::build::{
     BuilderLoaderComponent, BuilderTypeComponent, CanLoadBuilder,
@@ -119,7 +120,7 @@ delegate_components! {
             UseHermesLogger,
         ConfigTypeComponent:
             WithType<StarknetRelayerConfig>,
-        BootstrapTypeComponent:
+        BootstrapTypeProviderComponent:
             WithType<StarknetBootstrap>,
         OutputTypeComponent:
             WithType<()>,
@@ -195,7 +196,9 @@ delegate_components! {
         UpdateClientArgs: RunUpdateClientCommand,
         CreateClientArgs: RunCreateClientCommand,
 
-        BootstrapStarknetChainArgs: RunBootstrapChainCommand<UpdateStarknetConfig>,
+        BootstrapStarknetChainArgs: RunBootstrapChainCommand<(), UpdateStarknetConfig>,
+        BootstrapChainArgs: RunBootstrapChainCommand<(), UseContext>,
+
     }
 }
 
@@ -341,7 +344,7 @@ pub trait CanUseStarknetApp:
     + CanWriteConfig
     + CanWrapError<&'static str>
     + CanProduceOutput<()>
-    + CanLoadBootstrap<BootstrapStarknetChainArgs>
+    + CanLoadBootstrap<(), BootstrapStarknetChainArgs>
     + CanRunCommand<AllSubCommands>
     + CanRunCommand<BootstrapSubCommand>
     + CanRunCommand<BootstrapStarknetChainArgs>
@@ -360,3 +363,14 @@ pub trait CanUseStarknetApp:
 }
 
 impl CanUseStarknetApp for StarknetApp {}
+
+check_components! {
+    CanUseStarknetCli for StarknetApp {
+        CommandRunnerComponent: [
+            AllSubCommands,
+            BootstrapSubCommand,
+            BootstrapStarknetChainArgs,
+            // BootstrapChainArgs,
+        ],
+    }
+}

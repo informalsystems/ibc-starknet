@@ -9,7 +9,7 @@ use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField
 use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
 use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
 use hermes_cli_components::traits::bootstrap::{
-    BootstrapLoaderComponent, BootstrapTypeComponent, CanLoadBootstrap,
+    BootstrapLoaderComponent, BootstrapTypeProviderComponent, CanLoadBootstrap,
 };
 use hermes_cli_components::traits::build::{
     BuilderLoaderComponent, BuilderTypeComponent, CanLoadBuilder,
@@ -74,7 +74,7 @@ delegate_components! {
             UseHermesLogger,
         ConfigTypeComponent:
             WithType<StarknetRelayerConfig>,
-        BootstrapTypeComponent:
+        BootstrapTypeProviderComponent:
             WithType<StarknetBootstrap>,
         OutputTypeComponent:
             WithType<()>,
@@ -118,7 +118,7 @@ pub trait CanUseToolApp:
     + CanWriteConfig
     + CanWrapError<&'static str>
     + CanProduceOutput<()>
-    + CanLoadBootstrap<BootstrapStarknetChainArgs>
+    + CanLoadBootstrap<(), BootstrapStarknetChainArgs>
     + CanLoadBuilder<Builder = StarknetBuilder>
 {
 }

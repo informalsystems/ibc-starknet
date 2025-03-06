@@ -21,9 +21,9 @@ pub struct BootstrapStarknetChainArgs {
 pub struct LoadStarknetBootstrap;
 
 #[cgp_provider(BootstrapLoaderComponent)]
-impl<App> BootstrapLoader<App, BootstrapStarknetChainArgs> for LoadStarknetBootstrap
+impl<App, Tag> BootstrapLoader<App, Tag, BootstrapStarknetChainArgs> for LoadStarknetBootstrap
 where
-    App: HasBootstrapType<Bootstrap = StarknetBootstrap>
+    App: HasBootstrapType<Tag, Bootstrap = StarknetBootstrap>
         + HasRuntime<Runtime = HermesRuntime>
         + HasAsyncErrorType,
 {

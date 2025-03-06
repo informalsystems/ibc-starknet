@@ -14,6 +14,7 @@ use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_chain_components::traits::queries::block_time::{
     BlockTimeQuerierComponent, CanQueryBlockTime,
 };
+use hermes_chain_components::traits::queries::packet_acknowledgement::CanQueryPacketAckCommitment;
 use hermes_chain_components::traits::types::block::HasBlockType;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
 use hermes_chain_components::traits::types::status::HasChainStatusType;
@@ -95,7 +96,6 @@ use hermes_relayer_components::chain::traits::queries::consensus_state_height::{
     CanQueryConsensusStateHeight, CanQueryConsensusStateHeights,
 };
 use hermes_relayer_components::chain::traits::queries::counterparty_chain_id::CanQueryCounterpartyChainId;
-use hermes_relayer_components::chain::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
 use hermes_relayer_components::chain::traits::queries::packet_commitment::{
     CanQueryPacketCommitment, PacketCommitmentQuerierComponent,
 };
@@ -441,7 +441,7 @@ pub trait CanUseStarknetChain:
     + HasConnectionOpenTryEvent<CosmosChain>
     + HasChannelOpenTryEvent<CosmosChain>
     + CanQueryPacketCommitment<CosmosChain>
-    + CanQueryPacketAcknowledgement<CosmosChain>
+    + CanQueryPacketAckCommitment<CosmosChain>
     + CanQueryPacketReceipt<CosmosChain>
     + CanBuildReceivePacketPayload<CosmosChain>
     + CanBuildAckPacketPayload<CosmosChain>
