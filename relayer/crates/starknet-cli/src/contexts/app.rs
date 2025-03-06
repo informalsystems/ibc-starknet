@@ -1,11 +1,11 @@
 use std::path::PathBuf;
 
-use cgp::core::component::{UseContext, UseDelegate};
+use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_cli::commands::bootstrap::chain::BootstrapChainArgs;
+use hermes_cli::commands::bootstrap::chain::{BootstrapChainArgs, LoadCosmosBootstrap};
 use hermes_cli::commands::client::create::CreateClientArgs;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
 use hermes_cli_components::impls::commands::client::create::{
@@ -31,9 +31,7 @@ use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField
 use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
 use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
 use hermes_cli_components::impls::parse::string::{ParseFromOptionalString, ParseFromString};
-use hermes_cli_components::traits::any_counterparty::{
-    AnyCounterpartyComponent, ProvideAnyCounterparty,
-};
+use hermes_cli_components::traits::any_counterparty::AnyCounterpartyTypeProviderComponent;
 use hermes_cli_components::traits::bootstrap::{
     BootstrapLoaderComponent, BootstrapTypeProviderComponent,
 };
@@ -48,6 +46,8 @@ use hermes_cli_components::traits::output::{
 use hermes_cli_components::traits::parse::ArgParserComponent;
 use hermes_cli_components::traits::types::config::ConfigTypeComponent;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
+use hermes_cosmos_integration_tests::contexts::bootstrap::CosmosBootstrap;
+use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::types::HermesError;
 use hermes_logger::UseHermesLogger;
@@ -93,10 +93,6 @@ pub struct StarknetApp {
 
 pub struct StarknetParserComponents;
 
-pub struct StarknetCommandRunnerComponents;
-
-pub struct UpdateStarknetConfig;
-
 delegate_components! {
     StarknetAppComponents {
         [
@@ -114,14 +110,16 @@ delegate_components! {
             GlobalLoggerGetterComponent,
         ]:
             UseHermesLogger,
+        AnyCounterpartyTypeProviderComponent:
+            UseType<CosmosChain>,
         ConfigTypeComponent:
             WithType<StarknetRelayerConfig>,
         BootstrapTypeProviderComponent:
-            WithType<StarknetBootstrap>,
+            UseDelegate<StarknetBootstrapTypes>,
         OutputTypeComponent:
             WithType<()>,
         BootstrapLoaderComponent:
-            LoadStarknetBootstrap,
+            UseDelegate<StarknetBoostrapLoaders>,
         ConfigPathGetterComponent:
             GetDefaultConfigField,
         ConfigLoaderComponent:
@@ -168,9 +166,28 @@ delegate_components! {
         (StartRelayerArgs, symbol!("client_id_a")): ParseFromString<ClientId>,
         (StartRelayerArgs, symbol!("chain_id_b")): ParseFromString<ChainId>,
         (StartRelayerArgs, symbol!("client_id_b")): ParseFromString<ClientId>,
-
     }
 }
+
+pub struct StarknetBootstrapTypes;
+
+delegate_components! {
+    StarknetBootstrapTypes {
+        StarknetChain: UseType<StarknetBootstrap>,
+        CosmosChain: UseType<CosmosBootstrap>,
+    }
+}
+
+pub struct StarknetBoostrapLoaders;
+
+delegate_components! {
+    StarknetBoostrapLoaders {
+        StarknetChain: LoadStarknetBootstrap,
+        CosmosChain: LoadCosmosBootstrap,
+    }
+}
+
+pub struct StarknetCommandRunnerComponents;
 
 delegate_components! {
     StarknetCommandRunnerComponents {
@@ -192,24 +209,17 @@ delegate_components! {
         UpdateClientArgs: RunUpdateClientCommand,
         CreateClientArgs: RunCreateClientCommand,
 
-        BootstrapStarknetChainArgs: RunBootstrapChainCommand<(), UpdateStarknetConfig>,
-        BootstrapChainArgs: RunBootstrapChainCommand<(), UseContext>,
-
+        BootstrapStarknetChainArgs: RunBootstrapChainCommand<StarknetChain, UpdateStarknetConfig>,
+        BootstrapChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
     }
-}
-
-#[cgp_provider(AnyCounterpartyComponent)]
-impl<App> ProvideAnyCounterparty<App> for StarknetAppComponents
-where
-    App: Async,
-{
-    type AnyCounterparty = CosmosChain;
 }
 
 #[cgp_provider(OutputProducerComponent)]
 impl<Value> OutputProducer<StarknetApp, Value> for StarknetAppComponents {
     fn produce_output(_app: &StarknetApp, _value: Value) {}
 }
+
+pub struct UpdateStarknetConfig;
 
 #[cgp_provider(ConfigUpdaterComponent)]
 impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarknetConfig {
@@ -284,6 +294,16 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
     }
 }
 
+#[cgp_provider(ConfigUpdaterComponent)]
+impl ConfigUpdater<CosmosChainDriver, StarknetRelayerConfig> for UpdateStarknetConfig {
+    fn update_config(
+        chain_driver: &CosmosChainDriver,
+        config: &mut StarknetRelayerConfig,
+    ) -> Result<String, HermesError> {
+        todo!()
+    }
+}
+
 #[cgp_provider(CreateClientOptionsParserComponent)]
 impl CreateClientOptionsParser<StarknetApp, CreateClientArgs, Index<0>, Index<1>>
     for StarknetAppComponents
@@ -340,13 +360,14 @@ check_components! {
         ConfigLoaderComponent,
         ConfigWriterComponent,
         OutputProducerComponent: (),
-        BootstrapLoaderComponent: ((), BootstrapStarknetChainArgs),
+        BootstrapTypeProviderComponent: StarknetChain,
+        BootstrapLoaderComponent: (StarknetChain, BootstrapStarknetChainArgs),
         CommandRunnerComponent: [
             AllSubCommands,
             StartSubCommand,
             BootstrapSubCommand,
             BootstrapStarknetChainArgs,
-            // BootstrapChainArgs,
+            BootstrapChainArgs,
             QuerySubCommand,
             QueryClientStateArgs,
             QueryBalanceArgs,
