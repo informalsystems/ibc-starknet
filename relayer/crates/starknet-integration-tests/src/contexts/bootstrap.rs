@@ -35,10 +35,13 @@ use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::impls::bootstrap::bootstrap_chain::BootstrapStarknetDevnet;
-use hermes_starknet_test_components::impls::bootstrap::deploy_contracts::DeployIbcContracts;
+use hermes_starknet_test_components::impls::bootstrap::deploy_contracts::{
+    BuildChainAndDeployIbcContracts, DeployIbcContract,
+};
 use hermes_starknet_test_components::impls::bootstrap::start_chain::StartStarknetDevnet;
 use hermes_starknet_test_components::impls::types::genesis_config::ProvideStarknetGenesisConfigType;
 use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetNodeConfigType;
+use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
 use hermes_test_components::bootstrap::traits::chain::{
@@ -81,8 +84,10 @@ delegate_components! {
             BootstrapStarknetDevnet,
         ChainFullNodeStarterComponent:
             StartStarknetDevnet,
+        IbcContractsDeployerComponent:
+            DeployIbcContract,
         ChainDriverBuilderComponent:
-            DeployIbcContracts<BuildStarknetChainDriver>,
+            BuildChainAndDeployIbcContracts<BuildStarknetChainDriver>,
     }
 }
 

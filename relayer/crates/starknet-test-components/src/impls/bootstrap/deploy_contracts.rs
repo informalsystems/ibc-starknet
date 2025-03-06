@@ -9,16 +9,36 @@ use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
 use hermes_runtime_components::traits::os::child_process::{ChildProcessOf, HasChildProcessType};
 use hermes_test_components::chain::traits::types::wallet::HasWalletType;
-use hermes_test_components::chain_driver::traits::types::chain::HasChain;
+use hermes_test_components::chain_driver::traits::types::chain::{HasChain, HasChainType};
 use hermes_test_components::driver::traits::types::chain_driver::HasChainDriverType;
 
+use crate::traits::{CanDeployIbcContracts, IbcContractsDeployer, IbcContractsDeployerComponent};
+
+pub trait HasIbcContracts {}
+
+#[cgp_new_provider(IbcContractsDeployerComponent)]
+impl<Bootstrap, Chain> IbcContractsDeployer<Bootstrap> for DeployIbcContract
+where
+    Bootstrap: HasChainType<Chain = Chain> + CanRaiseAsyncError<Chain::Error>,
+    Chain: HasAsyncErrorType,
+{
+    async fn deploy_ibc_contracts(
+        bootstrap: &Bootstrap,
+        chain: &Chain,
+    ) -> Result<(), Bootstrap::Error> {
+        Ok(())
+    }
+}
+
 #[cgp_new_provider(ChainDriverBuilderComponent)]
-impl<Bootstrap, InBuilder, Chain> ChainDriverBuilder<Bootstrap> for DeployIbcContracts<InBuilder>
+impl<Bootstrap, InBuilder, Chain> ChainDriverBuilder<Bootstrap>
+    for BuildChainAndDeployIbcContracts<InBuilder>
 where
     Bootstrap: HasRuntimeType<Runtime: HasChildProcessType>
         + HasChainDriverType<Chain = Chain>
         + HasChainGenesisConfigType
         + HasChainNodeConfigType
+        + CanDeployIbcContracts
         + HasAsyncErrorType,
     Bootstrap::ChainDriver: HasChain<Chain = Chain>,
     Chain: HasWalletType,
@@ -40,7 +60,9 @@ where
         )
         .await?;
 
-        let _chain = chain_driver.chain();
+        let chain = chain_driver.chain();
+
+        bootstrap.deploy_ibc_contracts(chain).await?;
 
         Ok(chain_driver)
     }
