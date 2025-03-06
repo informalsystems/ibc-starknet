@@ -173,7 +173,7 @@ register_client() {
         "register_client" \
         $CALLDATA
 
-    echo "Client type `07-tendermint` is registered with address $COMET_ADDRESS"
+    echo "Client type \`07-tendermint\` is registered with address $COMET_ADDRESS"
 }
 
 register_ics20() {
@@ -192,7 +192,7 @@ register_ics20() {
         "bind_port_id" \
         $CALLDATA
 
-    echo "Channel port `transfer` is bound with address $ICS20_ADDRESS"
+    echo "Channel port \`transfer\` is bound with address $ICS20_ADDRESS"
 }
 
 register_client "$core_contract_address" "$comet_contract_address"
