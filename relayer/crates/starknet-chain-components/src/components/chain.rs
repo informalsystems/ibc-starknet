@@ -178,11 +178,14 @@ mod preset {
     use hermes_test_components::chain::traits::queries::balance::BalanceQuerierComponent;
     use hermes_test_components::chain::traits::transfer::ibc_transfer::TokenIbcTransferrerComponent;
     use hermes_test_components::chain::traits::transfer::string_memo::ProvideStringMemoType;
+    use hermes_test_components::chain::traits::transfer::timeout::IbcTransferTimeoutCalculatorComponent;
     use hermes_test_components::chain::traits::types::address::AddressTypeComponent;
     use hermes_test_components::chain::traits::types::amount::AmountTypeComponent;
     use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
     use hermes_test_components::chain::traits::types::memo::MemoTypeComponent;
-    use hermes_test_components::chain::traits::types::wallet::WalletTypeComponent;
+    use hermes_test_components::chain::traits::types::wallet::{
+        WalletSignerComponent, WalletTypeComponent,
+    };
     use starknet::core::types::Felt;
 
     use crate::components::types::StarknetChainTypes;
@@ -221,7 +224,7 @@ mod preset {
     use crate::impls::queries::status::QueryStarknetChainStatus;
     use crate::impls::queries::token_balance::QueryErc20TokenBalance;
     use crate::impls::send_message::SendStarknetMessages;
-    use crate::impls::transfer::TransferErc20Token;
+    use crate::impls::transfer::{IbcTransferTimeoutAfterSeconds, TransferErc20Token};
     use crate::impls::tx_response::QueryTransactionReceipt;
     use crate::impls::types::address::ProvideFeltAddressType;
     use crate::impls::types::amount::ProvideU256Amount;
@@ -241,7 +244,7 @@ mod preset {
     use crate::impls::types::status::ProvideStarknetChainStatusType;
     use crate::impls::types::tx_hash::ProvideFeltTxHash;
     use crate::impls::types::tx_response::ProvideStarknetTxResponse;
-    use crate::impls::types::wallet::UseStarknetWallet;
+    use crate::impls::types::wallet::ProvideStarknetWallet;
     use crate::traits::contract::call::ContractCallerComponent;
     use crate::traits::contract::declare::ContractDeclarerComponent;
     use crate::traits::contract::deploy::ContractDeployerComponent;
@@ -293,8 +296,11 @@ mod preset {
                 ProvideTokenAddressDenom,
             MemoTypeComponent:
                 ProvideStringMemoType,
-            WalletTypeComponent:
-                UseStarknetWallet,
+            [
+                WalletTypeComponent,
+                WalletSignerComponent,
+            ]:
+                ProvideStarknetWallet,
             [
                 SignerTypeProviderComponent,
                 DefaultSignerGetterComponent,
@@ -304,6 +310,8 @@ mod preset {
                 UseType<Felt>,
             TokenIbcTransferrerComponent:
                 SendIbcTransferMessage,
+            IbcTransferTimeoutCalculatorComponent:
+                IbcTransferTimeoutAfterSeconds<90>,
             TransactionHashTypeComponent:
                 ProvideFeltTxHash,
             TxResponseTypeComponent:

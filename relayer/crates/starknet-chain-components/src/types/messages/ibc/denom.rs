@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::str::FromStr;
 
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
@@ -9,6 +10,7 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
+use starknet::core::types::Felt;
 
 use crate::impls::types::address::StarknetAddress;
 
@@ -42,6 +44,38 @@ impl Display for PrefixedDenom {
         write!(f, "{}", self.base)?;
 
         Ok(())
+    }
+}
+
+impl FromStr for PrefixedDenom {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let split_str = s.split("/").collect::<Vec<&str>>();
+        let base_str = *split_str
+            .last()
+            .ok_or("Failed to convert string to PrefixedDenom. Empty string")?;
+        let base = if base_str.starts_with("0x") {
+            Denom::Native(
+                Felt::from_hex(base_str)
+                    .map_err(|e| format!("Failed to convert `{s}` to PrefixedDenom. {e}"))?
+                    .into(),
+            )
+        } else {
+            Denom::Hosted(base_str.to_string())
+        };
+        let trace_path = split_str[..split_str.len() - 1]
+            .chunks(2)
+            .map(|chunk| {
+                let port_id = chunk[0].to_string();
+                let channel_id = chunk[1].to_string();
+                TracePrefix {
+                    port_id,
+                    channel_id,
+                }
+            })
+            .collect();
+        Ok(Self { trace_path, base })
     }
 }
 

@@ -239,11 +239,29 @@ fn test_packet_clearing() -> Result<(), Error> {
             contract_address
         };
 
+        let ics20_contract_address = {
+            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
+            let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
+
+            let contract_address = starknet_chain
+                .deploy_contract(
+                    &ics20_class_hash,
+                    false,
+                    &[owner_call_data, erc20_call_data].concat(),
+                )
+                .await?;
+
+            info!("deployed ICS20 contract to address: {:?}", contract_address);
+
+            contract_address
+        };
+
         let starknet_chain = {
             let mut fields = starknet_chain.fields.as_ref().clone();
 
             fields.ibc_core_contract_address = Some(ibc_core_address);
             fields.ibc_client_contract_address = Some(comet_client_address);
+            fields.ibc_ics20_contract_address = Some(ics20_contract_address);
 
             let cairo_encoding = StarknetCairoEncoding;
 
@@ -516,7 +534,7 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let birelay = StarknetCosmosBiRelay {
             runtime: runtime.clone(),
-            relay_a_to_b: starknet_to_cosmos_relay,
+            relay_a_to_b: starknet_to_cosmos_relay.clone(),
             relay_b_to_a: cosmos_to_starknet_relay.clone(),
         };
 
@@ -644,6 +662,31 @@ fn test_packet_clearing() -> Result<(), Error> {
             starknet_chain.poll_tx_response(&tx_hash).await?;
         };
 
+        let denom = PrefixedDenom {
+            trace_path: vec![TracePrefix {
+                port_id: ics20_port.to_string(),
+                channel_id: starknet_channel_id.to_string(),
+            }],
+            base: Denom::Hosted(denom_cosmos.to_string()),
+        };
+
+        let packet = <StarknetChain as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token(
+            &starknet_chain,
+            &starknet_channel_id,
+            &IbcPortId::transfer(),
+            wallet_starknet_b,
+            address_cosmos_a,
+            &balance_starknet_b_step_0,
+            &None,
+        )
+        .await?;
+
+        runtime.sleep(Duration::from_secs(2)).await;
+
+        relay_only_send(&starknet_to_cosmos_relay, &packet).await?;
+
+        runtime.sleep(Duration::from_secs(2)).await;
+
         // Create a pending packet
         let _packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
             cosmos_chain,
@@ -722,6 +765,16 @@ fn test_packet_clearing() -> Result<(), Error> {
             )
             .await?;
 
+        let (starknet_commitment2, _) =
+            <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
+                &starknet_chain,
+                &starknet_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(2),
+                &starknet_latest_height,
+            )
+            .await?;
+
         assert!(
             cosmos_commitment1.is_none(),
             "cosmos_commitment1 expected to be None"
@@ -737,6 +790,10 @@ fn test_packet_clearing() -> Result<(), Error> {
         assert!(
             starknet_commitment1.is_none(),
             "starknet_commitment1 expected to be None"
+        );
+        assert!(
+            starknet_commitment2.is_none(),
+            "starknet_commitment2 expected to be None"
         );
 
         Ok(())
@@ -897,11 +954,29 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             contract_address
         };
 
+        let ics20_contract_address = {
+            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
+            let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
+
+            let contract_address = starknet_chain
+                .deploy_contract(
+                    &ics20_class_hash,
+                    false,
+                    &[owner_call_data, erc20_call_data].concat(),
+                )
+                .await?;
+
+            info!("deployed ICS20 contract to address: {:?}", contract_address);
+
+            contract_address
+        };
+
         let starknet_chain = {
             let mut fields = starknet_chain.fields.as_ref().clone();
 
             fields.ibc_core_contract_address = Some(ibc_core_address);
             fields.ibc_client_contract_address = Some(comet_client_address);
+            fields.ibc_ics20_contract_address = Some(ics20_contract_address);
 
             let cairo_encoding = StarknetCairoEncoding;
 
@@ -980,23 +1055,6 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             &client_state_on_cosmos.client_state.chain_id,
             starknet_chain.chain_id()
         );
-
-        let ics20_contract_address = {
-            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
-            let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
-
-            let contract_address = starknet_chain
-                .deploy_contract(
-                    &ics20_class_hash,
-                    false,
-                    &[owner_call_data, erc20_call_data].concat(),
-                )
-                .await?;
-
-            info!("deployed ICS20 contract to address: {:?}", contract_address);
-
-            contract_address
-        };
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
             runtime.clone(),
