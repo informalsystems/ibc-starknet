@@ -300,7 +300,11 @@ impl ConfigUpdater<CosmosChainDriver, StarknetRelayerConfig> for UpdateStarknetC
         chain_driver: &CosmosChainDriver,
         config: &mut StarknetRelayerConfig,
     ) -> Result<String, HermesError> {
-        todo!()
+        let chain_config = chain_driver.chain.chain_config.clone();
+        let chain_config_str = to_string_pretty(&chain_driver.chain.chain_config)?;
+        config.cosmos_chain_config = Some(chain_config);
+
+        Ok(chain_config_str)
     }
 }
 
