@@ -227,6 +227,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .ibc_core_contract_address
             .set(ibc_core_address)
             .unwrap();
+
         starknet_chain
             .ibc_client_contract_address
             .set(comet_client_address)

@@ -35,6 +35,7 @@ use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::impls::bootstrap::bootstrap_chain::BootstrapStarknetDevnet;
+use hermes_starknet_test_components::impls::bootstrap::deploy_contracts::DeployIbcContracts;
 use hermes_starknet_test_components::impls::bootstrap::start_chain::StartStarknetDevnet;
 use hermes_starknet_test_components::impls::types::genesis_config::ProvideStarknetGenesisConfigType;
 use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetNodeConfigType;
@@ -80,6 +81,8 @@ delegate_components! {
             BootstrapStarknetDevnet,
         ChainFullNodeStarterComponent:
             StartStarknetDevnet,
+        ChainDriverBuilderComponent:
+            DeployIbcContracts<BuildStarknetChainDriver>,
     }
 }
 
@@ -107,8 +110,8 @@ impl ChainStoreDirGetter<StarknetBootstrap> for StarknetBootstrapComponents {
     }
 }
 
-#[cgp_provider(ChainDriverBuilderComponent)]
-impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
+#[cgp_new_provider(ChainDriverBuilderComponent)]
+impl ChainDriverBuilder<StarknetBootstrap> for BuildStarknetChainDriver {
     async fn build_chain_driver(
         bootstrap: &StarknetBootstrap,
         genesis_config: StarknetGenesisConfig,
