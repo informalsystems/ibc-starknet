@@ -30,7 +30,8 @@ use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::contract_class::{
     ContractClassOf, HasContractClassHashType, HasContractClassType,
 };
-use hermes_starknet_chain_components::types::register::MsgRegisterClient;
+use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
+use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::HasWalletType;
 use hermes_test_components::chain_driver::traits::types::chain::{HasChain, HasChainType};
@@ -98,7 +99,8 @@ where
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanEncode<ViaCairo, Chain::Address>
         + CanEncode<ViaCairo, Chain::ContractClassHash>
-        + CanEncode<ViaCairo, MsgRegisterClient>,
+        + CanEncode<ViaCairo, MsgRegisterClient>
+        + CanEncode<ViaCairo, MsgRegisterApp>,
     EventEncoding: Async + HasEventContractFields<Chain>,
 {
     async fn deploy_ibc_contracts(
@@ -200,6 +202,7 @@ where
             let owner_call_data = cairo_encoding
                 .encode(&ibc_core_address)
                 .map_err(Bootstrap::raise_error)?;
+
             let erc20_call_data = cairo_encoding
                 .encode(&erc20_class_hash)
                 .map_err(Bootstrap::raise_error)?;
@@ -246,6 +249,43 @@ where
                 .send_message(message)
                 .await
                 .map_err(Bootstrap::raise_error)?;
+
+            logger
+                .log(
+                    &"registered comet client contract with ibc core",
+                    &LevelInfo,
+                )
+                .await;
+        }
+
+        {
+            // register the ICS20 contract with the IBC core contract
+
+            let register_app = MsgRegisterApp {
+                port_id: PortId::transfer(),
+                contract_address: ics20_contract_address,
+            };
+
+            let register_call_data = cairo_encoding
+                .encode(&register_app)
+                .map_err(Bootstrap::raise_error)?;
+
+            let call = Call {
+                to: *ibc_core_address,
+                selector: selector!("bind_port_id"),
+                calldata: register_call_data,
+            };
+
+            let message = StarknetMessage::new(call);
+
+            let response = chain
+                .send_message(message)
+                .await
+                .map_err(Bootstrap::raise_error)?;
+
+            logger
+                .log(&"registered ICS20 contract with ibc core", &LevelInfo)
+                .await;
         }
 
         chain
