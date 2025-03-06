@@ -97,6 +97,7 @@ where
     Bootstrap::Logger: CanLog<LevelInfo>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanEncode<ViaCairo, Chain::Address>
+        + CanEncode<ViaCairo, Chain::ContractClassHash>
         + CanEncode<ViaCairo, MsgRegisterClient>,
     EventEncoding: Async + HasEventContractFields<Chain>,
 {
@@ -190,6 +191,34 @@ where
                 &format!(
                     "deployed Comet IBC client contract to address: {:?}",
                     comet_client_address
+                ),
+                &LevelInfo,
+            )
+            .await;
+
+        let ics20_contract_address = {
+            let owner_call_data = cairo_encoding
+                .encode(&ibc_core_address)
+                .map_err(Bootstrap::raise_error)?;
+            let erc20_call_data = cairo_encoding
+                .encode(&erc20_class_hash)
+                .map_err(Bootstrap::raise_error)?;
+
+            chain
+                .deploy_contract(
+                    &ics20_class_hash,
+                    false,
+                    &[owner_call_data, erc20_call_data].concat(),
+                )
+                .await
+                .map_err(Bootstrap::raise_error)?
+        };
+
+        logger
+            .log(
+                &format!(
+                    "deployed ICS20 contract to address: {:?}",
+                    ics20_contract_address
                 ),
                 &LevelInfo,
             )
