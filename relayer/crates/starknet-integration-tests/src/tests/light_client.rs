@@ -198,7 +198,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            &starknet_chain,
+            starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )
@@ -208,7 +208,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
+            starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),

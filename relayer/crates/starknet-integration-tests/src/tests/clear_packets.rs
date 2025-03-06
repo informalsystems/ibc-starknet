@@ -293,7 +293,7 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
+            starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),
@@ -305,7 +305,7 @@ fn test_packet_clearing() -> Result<(), Error> {
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            &starknet_chain,
+            starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )
@@ -723,7 +723,7 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let (starknet_commitment1, _) =
             <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
-                &starknet_chain,
+                starknet_chain,
                 &starknet_channel_id,
                 &IbcPortId::transfer(),
                 &Sequence::from(1),
@@ -961,7 +961,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
+            starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),
@@ -973,7 +973,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            &starknet_chain,
+            starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )

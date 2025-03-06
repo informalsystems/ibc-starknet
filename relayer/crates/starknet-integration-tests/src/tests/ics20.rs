@@ -278,7 +278,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
+            starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),
@@ -290,7 +290,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            &starknet_chain,
+            starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )
