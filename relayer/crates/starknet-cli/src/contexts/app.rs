@@ -35,19 +35,15 @@ use hermes_cli_components::traits::any_counterparty::{
     AnyCounterpartyComponent, ProvideAnyCounterparty,
 };
 use hermes_cli_components::traits::bootstrap::{
-    BootstrapLoaderComponent, BootstrapTypeProviderComponent, CanLoadBootstrap,
+    BootstrapLoaderComponent, BootstrapTypeProviderComponent,
 };
-use hermes_cli_components::traits::build::{
-    BuilderLoaderComponent, BuilderTypeComponent, CanLoadBuilder,
-};
-use hermes_cli_components::traits::command::{CanRunCommand, CommandRunnerComponent};
-use hermes_cli_components::traits::config::config_path::{
-    ConfigPathGetterComponent, HasConfigPath,
-};
-use hermes_cli_components::traits::config::load_config::{CanLoadConfig, ConfigLoaderComponent};
-use hermes_cli_components::traits::config::write_config::{CanWriteConfig, ConfigWriterComponent};
+use hermes_cli_components::traits::build::{BuilderLoaderComponent, BuilderTypeComponent};
+use hermes_cli_components::traits::command::CommandRunnerComponent;
+use hermes_cli_components::traits::config::config_path::ConfigPathGetterComponent;
+use hermes_cli_components::traits::config::load_config::ConfigLoaderComponent;
+use hermes_cli_components::traits::config::write_config::ConfigWriterComponent;
 use hermes_cli_components::traits::output::{
-    CanProduceOutput, OutputProducer, OutputProducerComponent, OutputTypeComponent,
+    OutputProducer, OutputProducerComponent, OutputTypeComponent,
 };
 use hermes_cli_components::traits::parse::ArgParserComponent;
 use hermes_cli_components::traits::types::config::ConfigTypeComponent;
@@ -56,12 +52,12 @@ use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::types::HermesError;
 use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
+    GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
 };
 use hermes_relayer_components::error::traits::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
-    HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
+    RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::config::{
@@ -336,41 +332,29 @@ impl CreateClientOptionsParser<StarknetApp, CreateCosmosClientOnStarknetArgs, In
     }
 }
 
-pub trait CanUseStarknetApp:
-    HasRuntime
-    + HasLogger
-    + HasConfigPath
-    + CanLoadConfig
-    + CanWriteConfig
-    + CanWrapError<&'static str>
-    + CanProduceOutput<()>
-    + CanLoadBootstrap<(), BootstrapStarknetChainArgs>
-    + CanRunCommand<AllSubCommands>
-    + CanRunCommand<BootstrapSubCommand>
-    + CanRunCommand<BootstrapStarknetChainArgs>
-    + CanLoadBuilder<Builder = StarknetBuilder>
-    + CanRunCommand<QuerySubCommand>
-    + CanRunCommand<QueryClientStateArgs>
-    + CanRunCommand<QueryConsensusStateArgs>
-    + CanRunCommand<QueryBalanceArgs>
-    + CanRunCommand<CreateSubCommand>
-    + CanRunCommand<UpdateSubCommand>
-    + CanRunCommand<UpdateClientArgs>
-    + CanRunCommand<CreateClientArgs>
-    + CanRunCommand<StartRelayerArgs>
-    + CanUseComponent<CommandRunnerComponent, StartSubCommand>
-{
-}
-
-impl CanUseStarknetApp for StarknetApp {}
-
 check_components! {
-    CanUseStarknetCli for StarknetApp {
+    CanUseStarknetApp for StarknetApp {
+        RuntimeGetterComponent,
+        LoggerGetterComponent,
+        ConfigPathGetterComponent,
+        ConfigLoaderComponent,
+        ConfigWriterComponent,
+        OutputProducerComponent: (),
+        BootstrapLoaderComponent: ((), BootstrapStarknetChainArgs),
         CommandRunnerComponent: [
             AllSubCommands,
+            StartSubCommand,
             BootstrapSubCommand,
             BootstrapStarknetChainArgs,
             // BootstrapChainArgs,
+            QuerySubCommand,
+            QueryClientStateArgs,
+            QueryBalanceArgs,
+            CreateSubCommand,
+            UpdateSubCommand,
+            UpdateClientArgs,
+            CreateClientArgs,
+            StartRelayerArgs,
         ],
     }
 }
