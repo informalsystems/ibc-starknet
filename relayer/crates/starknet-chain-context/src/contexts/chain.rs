@@ -220,6 +220,7 @@ pub struct StarknetChainFields {
     pub account: Arc<SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>>,
     pub ibc_client_contract_address: OnceLock<StarknetAddress>,
     pub ibc_core_contract_address: OnceLock<StarknetAddress>,
+    pub ics20_contract_address: OnceLock<StarknetAddress>,
     pub event_encoding: StarknetEventEncoding,
     pub poll_interval: Duration,
     pub block_time: Duration,

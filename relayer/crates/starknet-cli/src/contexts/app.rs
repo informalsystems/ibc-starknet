@@ -248,6 +248,7 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
                 .get()
                 .cloned(),
             ibc_core: chain_driver.chain.ibc_core_contract_address.get().cloned(),
+            ics20: chain_driver.chain.ics20_contract_address.get().cloned(),
         };
 
         let event_encoding = &chain_driver.chain.event_encoding;
