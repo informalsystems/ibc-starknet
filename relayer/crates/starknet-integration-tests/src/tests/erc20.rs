@@ -103,12 +103,12 @@ fn test_erc20_transfer() -> Result<(), Error> {
             token_address
         };
 
-        let event_encoding = StarknetEventEncoding {
-            erc20_hashes: [erc20_class_hash].into(),
-            ics20_hashes: Default::default(),
-            ibc_client_hashes: Default::default(),
-            ibc_core_contract_addresses: Default::default(),
-        };
+        let event_encoding = StarknetEventEncoding::default();
+
+        event_encoding
+            .erc20_hashes
+            .set([erc20_class_hash].into())
+            .unwrap();
 
         {
             // Test local ERC20 token transfer

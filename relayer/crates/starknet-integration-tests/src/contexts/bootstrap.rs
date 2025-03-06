@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
@@ -183,8 +183,8 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
                 chain_id: chain_id.to_string().parse()?,
                 rpc_client,
                 account: Arc::new(account),
-                ibc_client_contract_address: None,
-                ibc_core_contract_address: None,
+                ibc_client_contract_address: OnceLock::new(),
+                ibc_core_contract_address: OnceLock::new(),
                 event_encoding: Default::default(),
                 proof_signer,
                 poll_interval: core::time::Duration::from_millis(200),

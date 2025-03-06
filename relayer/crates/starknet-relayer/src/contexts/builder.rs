@@ -1,7 +1,9 @@
 use alloc::sync::Arc;
 use core::marker::PhantomData;
 use core::ops::Deref;
+use std::collections::HashSet;
 use std::path::PathBuf;
+use std::sync::OnceLock;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
@@ -258,32 +260,40 @@ impl StarknetBuilder {
         )
         .expect("valid key pair");
 
-        let event_encoding = StarknetEventEncoding {
-            erc20_hashes: self
-                .starknet_chain_config
-                .contract_classes
-                .erc20
-                .into_iter()
-                .collect(),
-            ics20_hashes: self
-                .starknet_chain_config
-                .contract_classes
-                .ics20
-                .into_iter()
-                .collect(),
-            ibc_client_hashes: self
-                .starknet_chain_config
-                .contract_classes
-                .ibc_client
-                .into_iter()
-                .collect(),
-            ibc_core_contract_addresses: self
-                .starknet_chain_config
-                .contract_addresses
-                .ibc_core
-                .into_iter()
-                .collect(),
-        };
+        let contract_classes = &self.starknet_chain_config.contract_classes;
+
+        let contract_addresses = &self.starknet_chain_config.contract_addresses;
+
+        let event_encoding = StarknetEventEncoding::default();
+
+        event_encoding
+            .erc20_hashes
+            .set(HashSet::from_iter(contract_classes.erc20))
+            .unwrap();
+        event_encoding
+            .ics20_hashes
+            .set(HashSet::from_iter(contract_classes.ics20))
+            .unwrap();
+        event_encoding
+            .ibc_client_hashes
+            .set(HashSet::from_iter(contract_classes.ibc_client))
+            .unwrap();
+        event_encoding
+            .ibc_core_contract_addresses
+            .set(HashSet::from_iter(contract_addresses.ibc_core))
+            .unwrap();
+
+        let ibc_client_contract_address = OnceLock::new();
+
+        if let Some(address) = contract_addresses.ibc_client {
+            ibc_client_contract_address.set(address).unwrap();
+        }
+
+        let ibc_core_contract_address = OnceLock::new();
+
+        if let Some(address) = contract_addresses.ibc_core {
+            ibc_core_contract_address.set(address).unwrap();
+        }
 
         let context = StarknetChain {
             fields: Arc::new(StarknetChainFields {
@@ -291,11 +301,8 @@ impl StarknetBuilder {
                 chain_id,
                 rpc_client,
                 account: Arc::new(account),
-                ibc_client_contract_address: self
-                    .starknet_chain_config
-                    .contract_addresses
-                    .ibc_client,
-                ibc_core_contract_address: self.starknet_chain_config.contract_addresses.ibc_core,
+                ibc_client_contract_address,
+                ibc_core_contract_address,
                 event_encoding,
                 proof_signer,
                 poll_interval: self.starknet_chain_config.poll_interval,

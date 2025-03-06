@@ -169,16 +169,8 @@ fn test_starknet_light_client() -> Result<(), Error> {
             contract_address
         };
 
-        let starknet_chain = {
-            let mut fields = starknet_chain.fields.as_ref().clone();
-
-            fields.ibc_core_contract_address = Some(ibc_core_address);
-            fields.ibc_client_contract_address = Some(comet_client_address);
-
-            StarknetChain {
-                fields: Arc::new(fields),
-            }
-        };
+        starknet_chain.ibc_core_contract_address.set(ibc_core_address).unwrap();
+        starknet_chain.ibc_client_contract_address.set(comet_client_address).unwrap();
 
         {
             // register comet client contract with ibc-core

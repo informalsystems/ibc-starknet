@@ -242,32 +242,29 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
             .clone();
 
         let contract_addresses = StarknetContractAddresses {
-            ibc_client: chain_driver.chain.ibc_client_contract_address,
-            ibc_core: chain_driver.chain.ibc_core_contract_address,
-        };
-
-        let contract_classes = StarknetContractClasses {
-            erc20: chain_driver
-                .chain
-                .event_encoding
-                .erc20_hashes
-                .iter()
-                .cloned()
-                .next(),
-            ics20: chain_driver
-                .chain
-                .event_encoding
-                .ics20_hashes
-                .iter()
-                .cloned()
-                .next(),
             ibc_client: chain_driver
                 .chain
-                .event_encoding
+                .ibc_client_contract_address
+                .get()
+                .cloned(),
+            ibc_core: chain_driver.chain.ibc_core_contract_address.get().cloned(),
+        };
+
+        let event_encoding = &chain_driver.chain.event_encoding;
+
+        let contract_classes = StarknetContractClasses {
+            erc20: event_encoding
+                .erc20_hashes
+                .get()
+                .and_then(|hashes| hashes.iter().cloned().next()),
+            ics20: event_encoding
+                .ics20_hashes
+                .get()
+                .and_then(|hashes| hashes.iter().cloned().next()),
+            ibc_client: event_encoding
                 .ibc_client_hashes
-                .iter()
-                .cloned()
-                .next(),
+                .get()
+                .and_then(|hashes| hashes.iter().cloned().next()),
         };
 
         let relayer_wallet_path = chain_driver

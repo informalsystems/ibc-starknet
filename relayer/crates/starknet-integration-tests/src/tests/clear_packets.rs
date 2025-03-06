@@ -62,7 +62,6 @@ use hermes_starknet_chain_components::types::payloads::client::StarknetCreateCli
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
-use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::impls::error::SignError;
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
@@ -239,25 +238,35 @@ fn test_packet_clearing() -> Result<(), Error> {
             contract_address
         };
 
-        let starknet_chain = {
-            let mut fields = starknet_chain.fields.as_ref().clone();
+        starknet_chain
+            .ibc_core_contract_address
+            .set(ibc_core_address)
+            .unwrap();
+        starknet_chain
+            .ibc_client_contract_address
+            .set(comet_client_address)
+            .unwrap();
 
-            fields.ibc_core_contract_address = Some(ibc_core_address);
-            fields.ibc_client_contract_address = Some(comet_client_address);
-
-            let cairo_encoding = StarknetCairoEncoding;
-
-            fields.event_encoding = StarknetEventEncoding {
-                erc20_hashes: [erc20_class_hash].into(),
-                ics20_hashes: [ics20_class_hash].into(),
-                ibc_client_hashes: [comet_client_class_hash].into(),
-                ibc_core_contract_addresses: [ibc_core_address].into(),
-            };
-
-            StarknetChain {
-                fields: Arc::new(fields),
-            }
-        };
+        starknet_chain
+            .event_encoding
+            .erc20_hashes
+            .set([erc20_class_hash].into())
+            .unwrap();
+        starknet_chain
+            .event_encoding
+            .ics20_hashes
+            .set([ics20_class_hash].into())
+            .unwrap();
+        starknet_chain
+            .event_encoding
+            .ibc_client_hashes
+            .set([comet_client_class_hash].into())
+            .unwrap();
+        starknet_chain
+            .event_encoding
+            .ibc_core_contract_addresses
+            .set([ibc_core_address].into())
+            .unwrap();
 
         {
             // register comet client contract with ibc-core
@@ -897,25 +906,35 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             contract_address
         };
 
-        let starknet_chain = {
-            let mut fields = starknet_chain.fields.as_ref().clone();
+        starknet_chain
+            .ibc_core_contract_address
+            .set(ibc_core_address)
+            .unwrap();
+        starknet_chain
+            .ibc_client_contract_address
+            .set(comet_client_address)
+            .unwrap();
 
-            fields.ibc_core_contract_address = Some(ibc_core_address);
-            fields.ibc_client_contract_address = Some(comet_client_address);
-
-            let cairo_encoding = StarknetCairoEncoding;
-
-            fields.event_encoding = StarknetEventEncoding {
-                erc20_hashes: [erc20_class_hash].into(),
-                ics20_hashes: [ics20_class_hash].into(),
-                ibc_client_hashes: [comet_client_class_hash].into(),
-                ibc_core_contract_addresses: [ibc_core_address].into(),
-            };
-
-            StarknetChain {
-                fields: Arc::new(fields),
-            }
-        };
+        starknet_chain
+            .event_encoding
+            .erc20_hashes
+            .set([erc20_class_hash].into())
+            .unwrap();
+        starknet_chain
+            .event_encoding
+            .ics20_hashes
+            .set([ics20_class_hash].into())
+            .unwrap();
+        starknet_chain
+            .event_encoding
+            .ibc_client_hashes
+            .set([comet_client_class_hash].into())
+            .unwrap();
+        starknet_chain
+            .event_encoding
+            .ibc_core_contract_addresses
+            .set([ibc_core_address].into())
+            .unwrap();
 
         {
             // register comet client contract with ibc-core

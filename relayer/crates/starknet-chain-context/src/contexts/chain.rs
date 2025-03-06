@@ -1,6 +1,6 @@
 use core::ops::Deref;
 use core::time::Duration;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
@@ -218,8 +218,8 @@ pub struct StarknetChainFields {
     pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: Arc<SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>>,
-    pub ibc_client_contract_address: Option<StarknetAddress>,
-    pub ibc_core_contract_address: Option<StarknetAddress>,
+    pub ibc_client_contract_address: OnceLock<StarknetAddress>,
+    pub ibc_core_contract_address: OnceLock<StarknetAddress>,
     pub event_encoding: StarknetEventEncoding,
     pub poll_interval: Duration,
     pub block_time: Duration,

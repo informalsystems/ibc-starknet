@@ -1,4 +1,5 @@
 use std::collections::HashSet;
+use std::sync::OnceLock;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
@@ -27,10 +28,10 @@ use crate::impls::error::HandleStarknetChainError;
 #[cgp_context(StarknetEventEncodingContextComponents: StarknetEventEncodingComponents)]
 #[derive(HasField, Default, Clone)]
 pub struct StarknetEventEncoding {
-    pub erc20_hashes: HashSet<Felt>,
-    pub ics20_hashes: HashSet<Felt>,
-    pub ibc_client_hashes: HashSet<Felt>,
-    pub ibc_core_contract_addresses: HashSet<StarknetAddress>,
+    pub erc20_hashes: OnceLock<HashSet<Felt>>,
+    pub ics20_hashes: OnceLock<HashSet<Felt>>,
+    pub ibc_client_hashes: OnceLock<HashSet<Felt>>,
+    pub ibc_core_contract_addresses: OnceLock<HashSet<StarknetAddress>>,
 }
 
 delegate_components! {
