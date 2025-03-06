@@ -8,31 +8,22 @@ use std::time::SystemTime;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::queries::consensus_state::CanQueryConsensusStateWithLatestHeight;
-use hermes_chain_components::traits::send_message::CanSendSingleMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
-use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
-use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::sleep::CanSleep;
-use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
-use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
-use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
-use hermes_starknet_chain_components::types::register::MsgRegisterClient;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use ibc::core::client::types::Height as CosmosHeight;
 use sha2::{Digest, Sha256};
-use starknet::accounts::Call;
-use starknet::macros::{selector, short_string};
 use tracing::info;
 
 use crate::utils::init_starknet_bootstrap;
@@ -79,96 +70,13 @@ fn test_relay_update_clients() -> Result<(), Error> {
 
         let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
 
-        let starknet_chain = &mut starknet_chain_driver.chain;
+        let starknet_chain: &StarknetChain = &mut starknet_chain_driver.chain;
 
         let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
 
         let cosmos_chain = &cosmos_chain_driver.chain;
 
-        let ibc_core_class_hash = {
-            let contract_path = std::env::var("IBC_CORE_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared class for ibc-core: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ibc_core_address = starknet_chain
-            .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
-            .await?;
-
-        info!(
-            "deployed IBC core contract to address: {:?}",
-            ibc_core_address
-        );
-
-        let comet_client_class_hash = {
-            let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared class for cometbft: {:?}", class_hash);
-
-            class_hash
-        };
-
         let cairo_encoding = StarknetCairoEncoding;
-
-        let comet_client_address = {
-            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
-            let contract_address = starknet_chain
-                .deploy_contract(&comet_client_class_hash, false, &owner_call_data)
-                .await?;
-
-            info!(
-                "deployed Comet client contract to address: {:?}",
-                contract_address
-            );
-
-            contract_address
-        };
-
-        {
-            // register comet client contract with ibc-core
-
-            let register_client = MsgRegisterClient {
-                client_type: short_string!("07-tendermint"),
-                contract_address: comet_client_address,
-            };
-
-            let calldata = cairo_encoding.encode(&register_client)?;
-
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("register_client"),
-                calldata,
-            };
-
-            let message = StarknetMessage::new(call);
-
-            let response = starknet_chain.send_message(message).await?;
-
-            info!("IBC register client response: {:?}", response);
-        }
-
-        starknet_chain
-            .ibc_core_contract_address
-            .set(ibc_core_address)
-            .unwrap();
-        starknet_chain
-            .ibc_client_contract_address
-            .set(comet_client_address)
-            .unwrap();
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
