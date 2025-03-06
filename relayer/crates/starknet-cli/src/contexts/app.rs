@@ -5,7 +5,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWr
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_cli::commands::bootstrap::chain::{BootstrapChainArgs, LoadCosmosBootstrap};
+use hermes_cli::commands::bootstrap::chain::{BootstrapCosmosChainArgs, LoadCosmosBootstrap};
 use hermes_cli::commands::client::create::CreateClientArgs;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
 use hermes_cli_components::impls::commands::client::create::{
@@ -210,7 +210,7 @@ delegate_components! {
         CreateClientArgs: RunCreateClientCommand,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<StarknetChain, UpdateStarknetConfig>,
-        BootstrapChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
+        BootstrapCosmosChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
     }
 }
 
@@ -371,7 +371,7 @@ check_components! {
             StartSubCommand,
             BootstrapSubCommand,
             BootstrapStarknetChainArgs,
-            BootstrapChainArgs,
+            BootstrapCosmosChainArgs,
             QuerySubCommand,
             QueryClientStateArgs,
             QueryBalanceArgs,
