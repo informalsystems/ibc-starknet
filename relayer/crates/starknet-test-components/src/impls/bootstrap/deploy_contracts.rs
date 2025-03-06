@@ -104,6 +104,7 @@ where
         bootstrap: &Bootstrap,
         chain: &Chain,
     ) -> Result<(), Bootstrap::Error> {
+        let logger = bootstrap.logger();
         let cairo_encoding = <Chain as HasEncoding<AsFelt>>::encoding(chain);
         let event_encoding = <Chain as HasEncoding<AsStarknetEvent>>::encoding(chain);
 
@@ -112,25 +113,66 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
+        logger
+            .log(
+                &format!("declared ERC20 class: {:?}", erc20_class_hash),
+                &LevelInfo,
+            )
+            .await;
+
         let ics20_class_hash = chain
             .declare_contract(bootstrap.ics20_contract())
             .await
             .map_err(Bootstrap::raise_error)?;
+
+        logger
+            .log(
+                &format!("declared ICS20 class: {:?}", ics20_class_hash),
+                &LevelInfo,
+            )
+            .await;
 
         let ibc_core_class_hash = chain
             .declare_contract(bootstrap.ibc_core_contract())
             .await
             .map_err(Bootstrap::raise_error)?;
 
+        logger
+            .log(
+                &format!("declared IBC core class: {:?}", ibc_core_class_hash),
+                &LevelInfo,
+            )
+            .await;
+
         let comet_client_class_hash = chain
             .declare_contract(bootstrap.comet_client_contract())
             .await
             .map_err(Bootstrap::raise_error)?;
 
+        logger
+            .log(
+                &format!(
+                    "declared Comet IBC client class: {:?}",
+                    comet_client_class_hash
+                ),
+                &LevelInfo,
+            )
+            .await;
+
         let ibc_core_address = chain
             .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
             .await
             .map_err(Bootstrap::raise_error)?;
+
+        logger
+            .log(
+                &format!(
+                    "deployed IBC core contract to address: {:?}",
+                    ibc_core_address
+                ),
+                &LevelInfo,
+            )
+            .await;
 
         let comet_client_address = {
             let call_data = cairo_encoding
@@ -142,6 +184,16 @@ where
                 .await
                 .map_err(Bootstrap::raise_error)?
         };
+
+        logger
+            .log(
+                &format!(
+                    "deployed Comet IBC client contract to address: {:?}",
+                    comet_client_address
+                ),
+                &LevelInfo,
+            )
+            .await;
 
         {
             let register_client = MsgRegisterClient {
