@@ -253,7 +253,7 @@ mod preset {
     use crate::traits::transfer::TokenTransferComponent;
     use crate::traits::types::blob::BlobTypeComponent;
     use crate::traits::types::contract_class::{
-        ContractClassHashTypeComponent, ContractClassTypeComponent,
+        ContractClassHashTypeProviderComponent, ContractClassTypeProviderComponent,
     };
     use crate::traits::types::method::SelectorTypeComponent;
     use crate::types::message_response::UseStarknetMessageResponse;
@@ -311,8 +311,8 @@ mod preset {
             SelectorTypeComponent:
                 ProvideFeltSelector,
             [
-                ContractClassTypeComponent,
-                ContractClassHashTypeComponent,
+                ContractClassTypeProviderComponent,
+                ContractClassHashTypeProviderComponent,
             ]:
                 ProvideStarknetContractTypes,
             // FIXME: we may have to define our own chain types,

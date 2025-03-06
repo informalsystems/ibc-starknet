@@ -12,9 +12,7 @@ use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPai
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
     ChainDriverBuilder, ChainDriverBuilderComponent,
 };
-use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::{
-    CanStartChainFullNode, ChainFullNodeStarterComponent,
-};
+use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::ChainFullNodeStarterComponent;
 use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::{
     ChainCommandPathGetter, ChainCommandPathGetterComponent,
 };
@@ -29,7 +27,7 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::fs::create_dir::CanCreateDir;
 use hermes_runtime_components::traits::fs::write_file::CanWriteStringToFile;
 use hermes_runtime_components::traits::runtime::{
-    HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
+    RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
@@ -44,9 +42,7 @@ use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetN
 use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
-use hermes_test_components::bootstrap::traits::chain::{
-    CanBootstrapChain, ChainBootstrapperComponent,
-};
+use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
 use hermes_test_components::chain_driver::traits::types::chain::{
     ChainTypeComponent, ProvideChainType,
 };
@@ -54,6 +50,7 @@ use hermes_test_components::driver::traits::types::chain_driver::{
     ChainDriverTypeComponent, ProvideChainDriverType,
 };
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
+use starknet::core::types::contract::SierraClass;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
 use starknet::signers::{LocalWallet, SigningKey};
@@ -68,6 +65,7 @@ pub struct StarknetBootstrap {
     pub runtime: HermesRuntime,
     pub chain_command_path: PathBuf,
     pub chain_store_dir: PathBuf,
+    pub erc20_contract: SierraClass,
 }
 
 delegate_components! {
@@ -218,9 +216,11 @@ impl ChainDriverBuilder<StarknetBootstrap> for BuildStarknetChainDriver {
     }
 }
 
-pub trait CanUseStarknetBootstrap:
-    HasRuntime<Runtime = HermesRuntime> + CanStartChainFullNode + CanBootstrapChain
-{
+check_components! {
+    CanUseStarknetBootstrap for StarknetBootstrap {
+        ChainFullNodeStarterComponent,
+        ChainBootstrapperComponent,
+        ChainDriverBuilderComponent,
+        IbcContractsDeployerComponent,
+    }
 }
-
-impl CanUseStarknetBootstrap for StarknetBootstrap {}

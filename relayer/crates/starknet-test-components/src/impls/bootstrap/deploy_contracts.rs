@@ -8,18 +8,24 @@ use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver:
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
 use hermes_runtime_components::traits::os::child_process::{ChildProcessOf, HasChildProcessType};
+use hermes_starknet_chain_components::traits::types::contract_class::{
+    ContractClassOf, HasContractClassType,
+};
 use hermes_test_components::chain::traits::types::wallet::HasWalletType;
 use hermes_test_components::chain_driver::traits::types::chain::{HasChain, HasChainType};
 use hermes_test_components::driver::traits::types::chain_driver::HasChainDriverType;
 
 use crate::traits::{CanDeployIbcContracts, IbcContractsDeployer, IbcContractsDeployerComponent};
 
-pub trait HasIbcContracts {}
+#[cgp_auto_getter]
+pub trait HasIbcContracts: HasChainType<Chain: HasContractClassType> {
+    fn erc20_contract(&self) -> &ContractClassOf<Self::Chain>;
+}
 
 #[cgp_new_provider(IbcContractsDeployerComponent)]
 impl<Bootstrap, Chain> IbcContractsDeployer<Bootstrap> for DeployIbcContract
 where
-    Bootstrap: HasChainType<Chain = Chain> + CanRaiseAsyncError<Chain::Error>,
+    Bootstrap: HasChainType<Chain = Chain> + HasIbcContracts + CanRaiseAsyncError<Chain::Error>,
     Chain: HasAsyncErrorType,
 {
     async fn deploy_ibc_contracts(

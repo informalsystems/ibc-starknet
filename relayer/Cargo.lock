@@ -2451,6 +2451,7 @@ dependencies = [
  "hex",
  "ibc",
  "serde",
+ "serde_json",
  "stable-eyre",
  "starknet",
  "starknet-types-core",

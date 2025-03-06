@@ -37,10 +37,19 @@ fn test_erc20_transfer() -> Result<(), Error> {
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
+        let erc20_contract = {
+            let contract_path = std::env::var("ERC20_CONTRACT")?;
+
+            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+
+            serde_json::from_str(&contract_str)?
+        };
+
         let bootstrap = StarknetBootstrap {
             runtime: runtime.clone(),
             chain_command_path,
             chain_store_dir: format!("./test-data/{timestamp}").into(),
+            erc20_contract,
         };
 
         let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
@@ -48,7 +57,6 @@ fn test_erc20_transfer() -> Result<(), Error> {
         let chain = &chain_driver.chain;
 
         let erc20_class_hash = {
-            // Test deployment of ERC20 contract
             let contract_path = std::env::var("ERC20_CONTRACT")?;
 
             let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;

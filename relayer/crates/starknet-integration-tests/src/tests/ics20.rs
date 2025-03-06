@@ -88,10 +88,19 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
+        let erc20_contract = {
+            let contract_path = std::env::var("ERC20_CONTRACT")?;
+
+            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+
+            serde_json::from_str(&contract_str)?
+        };
+
         let starknet_bootstrap = StarknetBootstrap {
             runtime: runtime.clone(),
             chain_command_path,
             chain_store_dir: format!("./test-data/{timestamp}").into(),
+            erc20_contract,
         };
 
         let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
@@ -142,19 +151,11 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let cosmos_chain = &cosmos_chain_driver.chain;
 
-        let erc20_class_hash = {
-            let contract_path = std::env::var("ERC20_CONTRACT")?;
+        let erc20_class_hash = starknet_chain
+            .declare_contract(&starknet_bootstrap.erc20_contract)
+            .await?;
 
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared ERC20 class: {:?}", class_hash);
-
-            class_hash
-        };
+        info!("declared ERC20 class: {:?}", erc20_class_hash);
 
         let ics20_class_hash = {
             let contract_path = std::env::var("ICS20_CONTRACT")?;

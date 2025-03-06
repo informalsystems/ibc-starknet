@@ -55,10 +55,19 @@ fn test_relay_update_clients() -> Result<(), Error> {
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
+        let erc20_contract = {
+            let contract_path = std::env::var("ERC20_CONTRACT")?;
+
+            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
+
+            serde_json::from_str(&contract_str)?
+        };
+
         let starknet_bootstrap = StarknetBootstrap {
             runtime: runtime.clone(),
             chain_command_path: starknet_chain_command_path,
             chain_store_dir: format!("./test-data/{timestamp}/starknet").into(),
+            erc20_contract,
         };
 
         let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
