@@ -23,6 +23,10 @@ use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::ChainGenesisConfigTypeComponent;
 use hermes_error::impls::UseHermesError;
 use hermes_error::types::HermesError;
+use hermes_logger::UseHermesLogger;
+use hermes_logging_components::traits::has_logger::{
+    GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
+};
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::fs::create_dir::CanCreateDir;
 use hermes_runtime_components::traits::fs::write_file::CanWriteStringToFile;
@@ -68,6 +72,7 @@ pub struct StarknetBootstrap {
     pub erc20_contract: SierraClass,
     pub ics20_contract: SierraClass,
     pub ibc_core_contract: SierraClass,
+    pub comet_client_contract: SierraClass,
 }
 
 delegate_components! {
@@ -76,6 +81,12 @@ delegate_components! {
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
+        [
+            LoggerTypeProviderComponent,
+            LoggerGetterComponent,
+            GlobalLoggerGetterComponent,
+        ]:
+            UseHermesLogger,
         ChainNodeConfigTypeComponent:
             ProvideStarknetNodeConfigType,
         ChainGenesisConfigTypeComponent:

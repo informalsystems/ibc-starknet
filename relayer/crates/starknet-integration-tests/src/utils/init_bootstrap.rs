@@ -22,6 +22,8 @@ pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<Starknet
 
     let ibc_core_contract = load_contract_from_env(runtime, "IBC_CORE_CONTRACT").await?;
 
+    let comet_client_contract = load_contract_from_env(runtime, "COMET_CLIENT_CONTRACT").await?;
+
     let starknet_bootstrap = StarknetBootstrap {
         runtime: runtime.clone(),
         chain_command_path,
@@ -29,6 +31,7 @@ pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<Starknet
         erc20_contract,
         ics20_contract,
         ibc_core_contract,
+        comet_client_contract,
     };
 
     Ok(starknet_bootstrap)

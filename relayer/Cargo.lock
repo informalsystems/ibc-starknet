@@ -2477,6 +2477,8 @@ dependencies = [
  "hermes-cosmos-wasm-relayer",
  "hermes-encoding-components",
  "hermes-error",
+ "hermes-logger",
+ "hermes-logging-components",
  "hermes-relayer-components",
  "hermes-runtime",
  "hermes-runtime-components",
@@ -2534,7 +2536,10 @@ name = "hermes-starknet-test-components"
 version = "0.1.0"
 dependencies = [
  "cgp",
+ "hermes-cairo-encoding-components",
  "hermes-cosmos-test-components",
+ "hermes-encoding-components",
+ "hermes-logging-components",
  "hermes-relayer-components",
  "hermes-runtime-components",
  "hermes-starknet-chain-components",

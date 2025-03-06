@@ -2,22 +2,38 @@ use std::collections::BTreeMap;
 
 use cgp::extra::runtime::HasRuntimeType;
 use cgp::prelude::*;
+use hermes_cairo_encoding_components::strategy::ViaCairo;
+use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
     ChainDriverBuilder, ChainDriverBuilderComponent,
 };
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
+use hermes_encoding_components::traits::encode::CanEncode;
+use hermes_encoding_components::traits::has_encoding::HasEncoding;
+use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_logging_components::traits::has_logger::HasLogger;
+use hermes_logging_components::traits::logger::CanLog;
+use hermes_logging_components::types::level::LevelInfo;
+use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
+use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_runtime_components::traits::os::child_process::{ChildProcessOf, HasChildProcessType};
+use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
+use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::contract_class::{
     ContractClassOf, HasContractClassType,
 };
+use hermes_starknet_chain_components::types::register::MsgRegisterClient;
+use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::HasWalletType;
 use hermes_test_components::chain_driver::traits::types::chain::{HasChain, HasChainType};
 use hermes_test_components::driver::traits::types::chain_driver::HasChainDriverType;
+use starknet::accounts::Call;
 use starknet::core::types::Felt;
+use starknet::macros::{selector, short_string};
 
 use crate::traits::{CanDeployIbcContracts, IbcContractsDeployer, IbcContractsDeployerComponent};
 
@@ -28,19 +44,37 @@ pub trait HasIbcContracts: HasChainType<Chain: HasContractClassType> {
     fn ics20_contract(&self) -> &ContractClassOf<Self::Chain>;
 
     fn ibc_core_contract(&self) -> &ContractClassOf<Self::Chain>;
+
+    fn comet_client_contract(&self) -> &ContractClassOf<Self::Chain>;
 }
 
 #[cgp_new_provider(IbcContractsDeployerComponent)]
-impl<Bootstrap, Chain> IbcContractsDeployer<Bootstrap> for DeployIbcContract
+impl<Bootstrap, Chain, Encoding> IbcContractsDeployer<Bootstrap> for DeployIbcContract
 where
-    Bootstrap: HasChainType<Chain = Chain> + HasIbcContracts + CanRaiseAsyncError<Chain::Error>,
-    Chain:
-        CanDeployContract + CanDeclareContract + HasBlobType<Blob = Vec<Felt>> + HasAsyncErrorType,
+    Bootstrap: HasLogger
+        + HasChainType<Chain = Chain>
+        + HasIbcContracts
+        + CanRaiseAsyncError<Chain::Error>
+        + CanRaiseAsyncError<Encoding::Error>,
+    Chain: HasEncoding<AsFelt, Encoding = Encoding>
+        + CanDeployContract
+        + CanDeclareContract
+        + CanSendSingleMessage
+        + HasMessageType<Message = StarknetMessage>
+        + HasAddressType<Address = StarknetAddress>
+        + HasBlobType<Blob = Vec<Felt>>
+        + HasAsyncErrorType,
+    Bootstrap::Logger: CanLog<LevelInfo>,
+    Encoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanEncode<ViaCairo, Chain::Address>
+        + CanEncode<ViaCairo, MsgRegisterClient>,
 {
     async fn deploy_ibc_contracts(
         bootstrap: &Bootstrap,
         chain: &Chain,
     ) -> Result<(), Bootstrap::Error> {
+        let encoding = chain.encoding();
+
         let erc20_class_hash = chain
             .declare_contract(bootstrap.erc20_contract())
             .await
@@ -56,10 +90,50 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
+        let comet_client_class_hash = chain
+            .declare_contract(bootstrap.comet_client_contract())
+            .await
+            .map_err(Bootstrap::raise_error)?;
+
         let ibc_core_address = chain
             .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
             .await
             .map_err(Bootstrap::raise_error)?;
+
+        let comet_client_address = {
+            let call_data = encoding
+                .encode(&ibc_core_address)
+                .map_err(Bootstrap::raise_error)?;
+
+            chain
+                .deploy_contract(&comet_client_class_hash, false, &call_data)
+                .await
+                .map_err(Bootstrap::raise_error)?
+        };
+
+        {
+            let register_client = MsgRegisterClient {
+                client_type: short_string!("07-tendermint"),
+                contract_address: comet_client_address,
+            };
+
+            let calldata = encoding
+                .encode(&register_client)
+                .map_err(Bootstrap::raise_error)?;
+
+            let call = Call {
+                to: *ibc_core_address,
+                selector: selector!("register_client"),
+                calldata,
+            };
+
+            let message = StarknetMessage::new(call);
+
+            let response = chain
+                .send_message(message)
+                .await
+                .map_err(Bootstrap::raise_error)?;
+        }
 
         Ok(())
     }
