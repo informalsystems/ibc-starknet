@@ -97,7 +97,7 @@ starkli invoke $IBC_ICS20_CONTRACT \
 On block explorer ([Starkscan](https://sepolia.starkscan.co)), you'll soon
 receive a `packet_acknowledgement`.
 
-## Operator Setup
+## Relayer Operator Setup
 
 ### Prerequisites
 
@@ -246,5 +246,5 @@ cargo run --example bootstrap_ibc -- ../relayer.toml
 > operator and users.
 
 > [!CAUTION]
-> Don't destroy the Starknet wallet. We will need it for relaying with
+> Don't destroy the Starknet wallet. You will need it for relaying with
 > permissioned-wallet-setup.
