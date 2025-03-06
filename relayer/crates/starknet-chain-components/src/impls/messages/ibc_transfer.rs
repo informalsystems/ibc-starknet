@@ -89,6 +89,14 @@ where
             )
             .await;
 
+        chain
+            .logger()
+            .log(
+                &format!("will query denom with: address {}", amount.token_address),
+                &LevelInfo,
+            )
+            .await;
+
         let calldata = chain
             .encoding()
             .encode(&product![amount.token_address])
@@ -110,10 +118,7 @@ where
 
         chain
             .logger()
-            .log(
-                &format!("prefix_denom_str: {prefix_denom_str}"),
-                &LevelInfo,
-            )
+            .log(&format!("prefix_denom_str: {prefix_denom_str}"), &LevelInfo)
             .await;
 
         let denom = PrefixedDenom::from_str(&prefix_denom_str).map_err(Chain::raise_error)?;
