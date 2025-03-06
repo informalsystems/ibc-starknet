@@ -1,3 +1,4 @@
+use core::time::Duration;
 use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
@@ -70,6 +71,7 @@ use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::{ConfigUpdater, ConfigUpdaterComponent};
+use ibc::clients::tendermint::types::TrustThreshold;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 use toml::to_string_pretty;
@@ -328,11 +330,14 @@ impl CreateClientOptionsParser<StarknetApp, CreateClientArgs, Index<0>, Index<1>
 
         let settings = CosmosCreateClientOptions {
             max_clock_drift,
-            trusting_period: args.trusting_period.map(|d| d.into()).unwrap_or_default(),
+            trusting_period: args
+                .trusting_period
+                .map(|d| d.into())
+                .unwrap_or_else(|| Duration::from_secs(14 * 24 * 3600)),
             trust_threshold: args
                 .trust_threshold
-                .map(|threshold| threshold.into())
-                .unwrap_or_default(),
+                .unwrap_or(TrustThreshold::TWO_THIRDS)
+                .into(),
         };
 
         Ok(((), settings))

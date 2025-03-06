@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-cargo run --bin hermes -- \
+cargo run --bin hermes-starknet -- \
     --config test-data/config.toml \
-    client create \
-    --target-chain-id chain-a \
-    --counterparty-chain-id chain-b
+    create client \
+    --target-chain-id 393402133025997798000961 \
+    --counterparty-chain-id cosmos
