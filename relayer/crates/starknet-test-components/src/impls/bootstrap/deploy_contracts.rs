@@ -1,9 +1,11 @@
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 
 use cgp::extra::runtime::HasRuntimeType;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
     ChainDriverBuilder, ChainDriverBuilderComponent,
 };
@@ -48,24 +50,35 @@ pub trait HasIbcContracts: HasChainType<Chain: HasContractClassType> {
     fn comet_client_contract(&self) -> &ContractClassOf<Self::Chain>;
 }
 
+#[cgp_auto_getter]
+pub trait HasChainContractFields: HasAddressType {
+    fn ibc_core_contract_address(&self) -> &OnceLock<Self::Address>;
+
+    fn ibc_client_contract_address(&self) -> &OnceLock<Self::Address>;
+}
+
 #[cgp_new_provider(IbcContractsDeployerComponent)]
-impl<Bootstrap, Chain, Encoding> IbcContractsDeployer<Bootstrap> for DeployIbcContract
+impl<Bootstrap, Chain, CairoEncoding, EventEncoding> IbcContractsDeployer<Bootstrap>
+    for DeployIbcContract
 where
     Bootstrap: HasLogger
         + HasChainType<Chain = Chain>
         + HasIbcContracts
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Chain::Error>
-        + CanRaiseAsyncError<Encoding::Error>,
-    Chain: HasEncoding<AsFelt, Encoding = Encoding>
-        + CanDeployContract
-        + CanDeclareContract
-        + CanSendSingleMessage
+        + CanRaiseAsyncError<CairoEncoding::Error>,
+    Chain: HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + HasEncoding<AsStarknetEvent, Encoding = EventEncoding>
         + HasMessageType<Message = StarknetMessage>
         + HasAddressType<Address = StarknetAddress>
         + HasBlobType<Blob = Vec<Felt>>
+        + CanDeployContract
+        + CanDeclareContract
+        + CanSendSingleMessage
+        + HasChainContractFields
         + HasAsyncErrorType,
     Bootstrap::Logger: CanLog<LevelInfo>,
-    Encoding: HasEncodedType<Encoded = Vec<Felt>>
+    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanEncode<ViaCairo, Chain::Address>
         + CanEncode<ViaCairo, MsgRegisterClient>,
 {
@@ -73,7 +86,8 @@ where
         bootstrap: &Bootstrap,
         chain: &Chain,
     ) -> Result<(), Bootstrap::Error> {
-        let encoding = chain.encoding();
+        let cairo_encoding = <Chain as HasEncoding<AsFelt>>::encoding(chain);
+        let event_encoding = <Chain as HasEncoding<AsStarknetEvent>>::encoding(chain);
 
         let erc20_class_hash = chain
             .declare_contract(bootstrap.erc20_contract())
@@ -101,7 +115,7 @@ where
             .map_err(Bootstrap::raise_error)?;
 
         let comet_client_address = {
-            let call_data = encoding
+            let call_data = cairo_encoding
                 .encode(&ibc_core_address)
                 .map_err(Bootstrap::raise_error)?;
 
@@ -117,7 +131,7 @@ where
                 contract_address: comet_client_address,
             };
 
-            let calldata = encoding
+            let calldata = cairo_encoding
                 .encode(&register_client)
                 .map_err(Bootstrap::raise_error)?;
 
@@ -134,6 +148,20 @@ where
                 .await
                 .map_err(Bootstrap::raise_error)?;
         }
+
+        chain
+            .ibc_core_contract_address()
+            .set(ibc_core_address)
+            .map_err(|_| {
+                Bootstrap::raise_error("failed to set ibc_core_contract_address on chain")
+            })?;
+
+        chain
+            .ibc_client_contract_address()
+            .set(comet_client_address)
+            .map_err(|_| {
+                Bootstrap::raise_error("failed to set ibc_core_contract_address on chain")
+            })?;
 
         Ok(())
     }
