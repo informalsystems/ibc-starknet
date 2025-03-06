@@ -35,17 +35,13 @@ use starknet::accounts::Call;
 use starknet::macros::{selector, short_string};
 use tracing::info;
 
-use crate::contexts::bootstrap::StarknetBootstrap;
+use crate::utils::init_starknet_bootstrap;
 
 #[test]
 fn test_relay_update_clients() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let starknet_chain_command_path = std::env::var("STARKNET_BIN")
-            .unwrap_or("starknet-devnet".into())
-            .into();
-
         let wasm_client_code_path = PathBuf::from(
             var("STARKNET_WASM_CLIENT_PATH")
                 .expect("Wasm blob for Starknet light client is required"),
@@ -55,20 +51,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
-        let erc20_contract = {
-            let contract_path = std::env::var("ERC20_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            serde_json::from_str(&contract_str)?
-        };
-
-        let starknet_bootstrap = StarknetBootstrap {
-            runtime: runtime.clone(),
-            chain_command_path: starknet_chain_command_path,
-            chain_store_dir: format!("./test-data/{timestamp}/starknet").into(),
-            erc20_contract,
-        };
+        let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
 
         let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
 

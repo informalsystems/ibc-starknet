@@ -47,8 +47,8 @@ use starknet::accounts::Call;
 use starknet::macros::{selector, short_string};
 use tracing::info;
 
-use crate::contexts::bootstrap::StarknetBootstrap;
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
+use crate::utils::init_starknet_bootstrap;
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {
@@ -102,20 +102,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             }),
         });
 
-        let erc20_contract = {
-            let contract_path = std::env::var("ERC20_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            serde_json::from_str(&contract_str)?
-        };
-
-        let starknet_bootstrap = StarknetBootstrap {
-            runtime: runtime.clone(),
-            chain_command_path: "starknet-devnet".into(),
-            chain_store_dir: store_dir,
-            erc20_contract,
-        };
+        let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
 
         let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
 

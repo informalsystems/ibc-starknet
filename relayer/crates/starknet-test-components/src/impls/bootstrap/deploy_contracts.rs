@@ -8,6 +8,8 @@ use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver:
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
 use hermes_runtime_components::traits::os::child_process::{ChildProcessOf, HasChildProcessType};
+use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
+use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::types::contract_class::{
     ContractClassOf, HasContractClassType,
 };
@@ -26,12 +28,17 @@ pub trait HasIbcContracts: HasChainType<Chain: HasContractClassType> {
 impl<Bootstrap, Chain> IbcContractsDeployer<Bootstrap> for DeployIbcContract
 where
     Bootstrap: HasChainType<Chain = Chain> + HasIbcContracts + CanRaiseAsyncError<Chain::Error>,
-    Chain: HasAsyncErrorType,
+    Chain: CanDeployContract + CanDeclareContract + HasAsyncErrorType,
 {
     async fn deploy_ibc_contracts(
         bootstrap: &Bootstrap,
         chain: &Chain,
     ) -> Result<(), Bootstrap::Error> {
+        let erc20_class_hash = chain
+            .declare_contract(bootstrap.erc20_contract())
+            .await
+            .map_err(Bootstrap::raise_error)?;
+
         Ok(())
     }
 }

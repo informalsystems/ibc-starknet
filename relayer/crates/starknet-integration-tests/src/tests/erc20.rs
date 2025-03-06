@@ -22,35 +22,18 @@ use starknet::core::types::U256;
 use starknet::macros::selector;
 use tracing::info;
 
-use crate::contexts::bootstrap::StarknetBootstrap;
+use crate::utils::init_starknet_bootstrap;
 
 #[test]
 fn test_erc20_transfer() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let chain_command_path = std::env::var("STARKNET_BIN")
-            .unwrap_or("starknet-devnet".into())
-            .into();
-
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
-        let erc20_contract = {
-            let contract_path = std::env::var("ERC20_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            serde_json::from_str(&contract_str)?
-        };
-
-        let bootstrap = StarknetBootstrap {
-            runtime: runtime.clone(),
-            chain_command_path,
-            chain_store_dir: format!("./test-data/{timestamp}").into(),
-            erc20_contract,
-        };
+        let bootstrap = init_starknet_bootstrap(&runtime).await?;
 
         let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
 
