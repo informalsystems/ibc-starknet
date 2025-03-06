@@ -1,4 +1,6 @@
-use std::collections::BTreeMap;
+use core::fmt::Debug;
+use core::hash::Hash;
+use std::collections::{BTreeMap, HashSet};
 use std::sync::OnceLock;
 
 use cgp::extra::runtime::HasRuntimeType;
@@ -26,7 +28,7 @@ use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContr
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::contract_class::{
-    ContractClassOf, HasContractClassType,
+    ContractClassOf, HasContractClassHashType, HasContractClassType,
 };
 use hermes_starknet_chain_components::types::register::MsgRegisterClient;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
@@ -57,6 +59,20 @@ pub trait HasChainContractFields: HasAddressType {
     fn ibc_client_contract_address(&self) -> &OnceLock<Self::Address>;
 }
 
+#[cgp_auto_getter]
+pub trait HasEventContractFields<Chain>
+where
+    Chain: HasContractClassHashType + HasAddressType,
+{
+    fn erc20_hashes(&self) -> &OnceLock<HashSet<Chain::ContractClassHash>>;
+
+    fn ics20_hashes(&self) -> &OnceLock<HashSet<Chain::ContractClassHash>>;
+
+    fn ibc_client_hashes(&self) -> &OnceLock<HashSet<Chain::ContractClassHash>>;
+
+    fn ibc_core_contract_addresses(&self) -> &OnceLock<HashSet<Chain::Address>>;
+}
+
 #[cgp_new_provider(IbcContractsDeployerComponent)]
 impl<Bootstrap, Chain, CairoEncoding, EventEncoding> IbcContractsDeployer<Bootstrap>
     for DeployIbcContract
@@ -77,10 +93,12 @@ where
         + CanSendSingleMessage
         + HasChainContractFields
         + HasAsyncErrorType,
+    Chain::ContractClassHash: Eq + Debug + Hash,
     Bootstrap::Logger: CanLog<LevelInfo>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanEncode<ViaCairo, Chain::Address>
         + CanEncode<ViaCairo, MsgRegisterClient>,
+    EventEncoding: Async + HasEventContractFields<Chain>,
 {
     async fn deploy_ibc_contracts(
         bootstrap: &Bootstrap,
@@ -161,6 +179,34 @@ where
             .set(comet_client_address)
             .map_err(|_| {
                 Bootstrap::raise_error("failed to set ibc_core_contract_address on chain")
+            })?;
+
+        event_encoding
+            .erc20_hashes()
+            .set([erc20_class_hash].into())
+            .map_err(|_| {
+                Bootstrap::raise_error("failed to set erc20_class_hash on event encoding")
+            })?;
+
+        event_encoding
+            .ics20_hashes()
+            .set([ics20_class_hash].into())
+            .map_err(|_| {
+                Bootstrap::raise_error("failed to set ics20_class_hash on event encoding")
+            })?;
+
+        event_encoding
+            .ibc_client_hashes()
+            .set([comet_client_class_hash].into())
+            .map_err(|_| {
+                Bootstrap::raise_error("failed to set comet_client_class_hash on event encoding")
+            })?;
+
+        event_encoding
+            .ibc_core_contract_addresses()
+            .set([ibc_core_address].into())
+            .map_err(|_| {
+                Bootstrap::raise_error("failed to set ibc_core_address on event encoding")
             })?;
 
         Ok(())
