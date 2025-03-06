@@ -22,6 +22,8 @@ pub struct BootstrapStarknetChainArgs {
     pub erc20_contract_path: String,
 
     pub ics20_contract_path: String,
+
+    pub ibc_core_contract_path: String,
 }
 
 pub struct LoadStarknetBootstrap;
@@ -58,12 +60,22 @@ where
             serde_json::from_str(&contract_str).map_err(App::raise_error)?
         };
 
+        let ibc_core_contract = {
+            let contract_str = runtime
+                .read_file_as_string(&args.ibc_core_contract_path.clone().into())
+                .await
+                .map_err(App::raise_error)?;
+
+            serde_json::from_str(&contract_str).map_err(App::raise_error)?
+        };
+
         let bootstrap = StarknetBootstrap {
             runtime: runtime.clone(),
             chain_command_path: args.chain_command_path.clone().into(),
             chain_store_dir: args.chain_store_dir.clone().into(),
             erc20_contract,
             ics20_contract,
+            ibc_core_contract,
         };
 
         Ok(bootstrap)

@@ -67,6 +67,7 @@ pub struct StarknetBootstrap {
     pub chain_store_dir: PathBuf,
     pub erc20_contract: SierraClass,
     pub ics20_contract: SierraClass,
+    pub ibc_core_contract: SierraClass,
 }
 
 delegate_components! {
