@@ -76,13 +76,13 @@ use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 use toml::to_string_pretty;
 
 use crate::commands::all::{AllSubCommands, RunAllSubCommand};
+use crate::commands::bootstrap::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::commands::create::subcommand::{CreateSubCommand, RunCreateSubCommand};
 use crate::commands::query::subcommand::{QuerySubCommand, RunQuerySubCommand};
 use crate::commands::start::{RunStartSubCommand, StartSubCommand};
 use crate::commands::update::subcommand::{RunUpdateSubCommand, UpdateSubCommand};
 use crate::impls::bootstrap::osmosis_chain::{BootstrapOsmosisChainArgs, LoadOsmosisBootstrap};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
-use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::impls::build::LoadStarknetBuilder;
 use crate::impls::error::ProvideCliError;
 
