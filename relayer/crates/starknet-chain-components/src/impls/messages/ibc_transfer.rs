@@ -13,9 +13,6 @@ use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_logging_components::traits::has_logger::HasLogger;
-use hermes_logging_components::traits::logger::CanLog;
-use hermes_logging_components::types::level::LevelInfo;
 use hermes_test_components::chain::traits::messages::ibc_transfer::{
     IbcTokenTransferMessageBuilder, IbcTokenTransferMessageBuilderComponent,
 };
@@ -55,7 +52,6 @@ where
         + HasPortIdType<Counterparty, PortId = PortId>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + HasAddressType<Address = StarknetAddress>
-        + HasLogger
         + CanCallContract
         + HasBlobType<Blob = Vec<Felt>>
         + HasSelectorType<Selector = Felt>
@@ -67,7 +63,6 @@ where
         + CanEncode<ViaCairo, Product![StarknetAddress]>
         + HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, String>,
-    Chain::Logger: CanLog<LevelInfo>,
 {
     async fn build_ibc_token_transfer_message(
         chain: &Chain,
@@ -80,22 +75,6 @@ where
         timeout_time: Option<&Timestamp>,
     ) -> Result<Chain::Message, Chain::Error> {
         let ics20_contract_address = chain.query_contract_address(PhantomData).await?;
-
-        chain
-            .logger()
-            .log(
-                &format!("ics20_contract_address: {ics20_contract_address}"),
-                &LevelInfo,
-            )
-            .await;
-
-        chain
-            .logger()
-            .log(
-                &format!("will query denom with: address {}", amount.token_address),
-                &LevelInfo,
-            )
-            .await;
 
         let calldata = chain
             .encoding()
@@ -115,11 +94,6 @@ where
             .encoding()
             .decode(&output)
             .map_err(Chain::raise_error)?;
-
-        chain
-            .logger()
-            .log(&format!("prefix_denom_str: {prefix_denom_str}"), &LevelInfo)
-            .await;
 
         let denom = PrefixedDenom::from_str(&prefix_denom_str).map_err(Chain::raise_error)?;
 
