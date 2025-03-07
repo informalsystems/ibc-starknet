@@ -120,7 +120,7 @@ where
 
         logger
             .log(
-                &format!("declared ERC20 class: {:?}", erc20_class_hash),
+                &format!("declared ERC20 class: {erc20_class_hash:?}"),
                 &LevelInfo,
             )
             .await;
@@ -132,7 +132,7 @@ where
 
         logger
             .log(
-                &format!("declared ICS20 class: {:?}", ics20_class_hash),
+                &format!("declared ICS20 class: {ics20_class_hash:?}"),
                 &LevelInfo,
             )
             .await;
@@ -144,7 +144,7 @@ where
 
         logger
             .log(
-                &format!("declared IBC core class: {:?}", ibc_core_class_hash),
+                &format!("declared IBC core class: {ibc_core_class_hash:?}"),
                 &LevelInfo,
             )
             .await;
@@ -156,10 +156,7 @@ where
 
         logger
             .log(
-                &format!(
-                    "declared Comet IBC client class: {:?}",
-                    comet_client_class_hash
-                ),
+                &format!("declared Comet IBC client class: {comet_client_class_hash:?}"),
                 &LevelInfo,
             )
             .await;
@@ -171,10 +168,7 @@ where
 
         logger
             .log(
-                &format!(
-                    "deployed IBC core contract to address: {:?}",
-                    ibc_core_address
-                ),
+                &format!("deployed IBC core contract to address: {ibc_core_address:?}"),
                 &LevelInfo,
             )
             .await;
@@ -192,10 +186,7 @@ where
 
         logger
             .log(
-                &format!(
-                    "deployed Comet IBC client contract to address: {:?}",
-                    comet_client_address
-                ),
+                &format!("deployed Comet IBC client contract to address: {comet_client_address:?}"),
                 &LevelInfo,
             )
             .await;
@@ -221,10 +212,7 @@ where
 
         logger
             .log(
-                &format!(
-                    "deployed ICS20 contract to address: {:?}",
-                    ics20_contract_address
-                ),
+                &format!("deployed ICS20 contract to address: {ics20_contract_address:?}"),
                 &LevelInfo,
             )
             .await;
@@ -253,10 +241,7 @@ where
                 .map_err(Bootstrap::raise_error)?;
 
             logger
-                .log(
-                    &"registered comet client contract with ibc core",
-                    &LevelInfo,
-                )
+                .log("registered comet client contract with ibc core", &LevelInfo)
                 .await;
         }
 
@@ -286,7 +271,7 @@ where
                 .map_err(Bootstrap::raise_error)?;
 
             logger
-                .log(&"registered ICS20 contract with ibc core", &LevelInfo)
+                .log("registered ICS20 contract with ibc core", &LevelInfo)
                 .await;
         }
 
@@ -371,7 +356,7 @@ where
 
         let chain = chain_driver.chain();
 
-        bootstrap.deploy_ibc_contracts(&chain).await?;
+        bootstrap.deploy_ibc_contracts(chain).await?;
 
         Ok(chain_driver)
     }

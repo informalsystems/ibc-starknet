@@ -269,7 +269,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         };
 
         let cairo_encoding = StarknetCairoEncoding;
-        let ics20_contract_address = starknet_chain.ics20_contract_address.get().unwrap().clone();
+        let ics20_contract_address = *starknet_chain.ics20_contract_address.get().unwrap();
 
         let ics20_token_address: StarknetAddress = {
             let calldata = cairo_encoding.encode(&product![denom.clone()])?;
