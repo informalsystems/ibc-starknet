@@ -19,12 +19,16 @@ pub struct BootstrapStarknetChainArgs {
     #[clap(long = "chain-command-path", default_value = "starknet-devnet")]
     pub chain_command_path: String,
 
+    #[clap(long = "erc20-contract-path")]
     pub erc20_contract_path: String,
 
+    #[clap(long = "ics20-contract-path")]
     pub ics20_contract_path: String,
 
+    #[clap(long = "ibc-core-contract-path")]
     pub ibc_core_contract_path: String,
 
+    #[clap(long = "comet-client-contract-path")]
     pub comet_client_contract_path: String,
 }
 
