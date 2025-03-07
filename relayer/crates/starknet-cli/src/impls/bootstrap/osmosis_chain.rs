@@ -9,6 +9,7 @@ use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_error::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
+use hermes_starknet_integration_tests::utils::load_wasm_client;
 
 #[derive(Debug, clap::Parser, HasField)]
 pub struct BootstrapOsmosisChainArgs {
@@ -53,7 +54,7 @@ where
 
         let builder = CosmosBuilder::new_with_default(runtime.clone());
 
-        let wasm_client_byte_code = tokio::fs::read(&args.wasm_client_code_path)
+        let (_, wasm_client_byte_code) = load_wasm_client(&args.wasm_client_code_path)
             .await
             .map_err(App::raise_error)?;
 
