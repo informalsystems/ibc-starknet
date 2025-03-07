@@ -1,4 +1,5 @@
 use cgp::prelude::*;
+use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
 use starknet::accounts::{Account, AccountError, ConnectedAccount};
 
 #[cgp_type {
@@ -15,6 +16,14 @@ pub trait HasStarknetAccountType: Async {
 }]
 pub trait HasStarknetAccount: HasStarknetAccountType {
     fn account(&self) -> &Self::Account;
+}
+
+#[cgp_component {
+    provider: AccountFromSignerBuilder,
+    context: Chain
+}]
+pub trait CanBuildAccountFromSigner: HasStarknetAccountType + HasSignerType {
+    fn build_account_from_signer(&self, signer: &Self::Signer) -> Self::Account;
 }
 
 pub trait CanRaiseAccountErrors:

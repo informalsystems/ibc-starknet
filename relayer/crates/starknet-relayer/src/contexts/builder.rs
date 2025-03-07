@@ -296,11 +296,13 @@ impl StarknetBuilder {
                     .contract_addresses
                     .ibc_client,
                 ibc_core_contract_address: self.starknet_chain_config.contract_addresses.ibc_core,
+                ibc_ics20_contract_address: self.starknet_chain_config.contract_addresses.ibc_ics20,
                 event_encoding,
                 proof_signer,
                 poll_interval: self.starknet_chain_config.poll_interval,
                 block_time: self.starknet_chain_config.block_time,
                 nonce_mutex: Arc::new(Mutex::new(())),
+                signer: relayer_wallet,
             }),
         };
 

@@ -43,5 +43,6 @@ sha2                        = { workspace = true }
 starknet                    = { workspace = true }
 tonic                       = { workspace = true }
 futures                     = { workspace = true }
+time                        = { version = "0.3.36" }
 crypto-bigint               = "0.5.5"
 derive_more                 = { version = "2.0", features = [ "constructor", "deref", "display", "from", "from_str" ], default-features = false }

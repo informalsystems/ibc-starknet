@@ -185,11 +185,13 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
                 account: Arc::new(account),
                 ibc_client_contract_address: None,
                 ibc_core_contract_address: None,
+                ibc_ics20_contract_address: None,
                 event_encoding: Default::default(),
                 proof_signer,
                 poll_interval: core::time::Duration::from_millis(200),
                 block_time: core::time::Duration::from_secs(1),
                 nonce_mutex: Arc::new(Mutex::new(())),
+                signer: relayer_wallet.clone(),
             }),
         };
 

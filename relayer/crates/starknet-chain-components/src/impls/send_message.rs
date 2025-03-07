@@ -20,7 +20,9 @@ use starknet::core::types::{
 };
 
 use crate::impls::types::message::StarknetMessage;
-use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccountType};
+use crate::traits::account::{
+    CanBuildAccountFromSigner, CanRaiseAccountErrors, HasStarknetAccountType,
+};
 use crate::types::event::StarknetEvent;
 use crate::types::message_response::StarknetMessageResponse;
 use crate::types::tx_response::TxResponse;
@@ -33,7 +35,8 @@ pub struct UnexpectedTransactionTraceType {
 impl<Chain> MessagesWithSignerAndNonceSender<Chain> for SendStarknetMessages
 where
     Chain: HasStarknetAccountType
-        + HasSignerType<Signer = Chain::Account>
+        + HasSignerType
+        + CanBuildAccountFromSigner
         + HasNonceType<Nonce = Felt>
         + HasMessageType<Message = StarknetMessage>
         + HasTransactionHashType<TxHash = Felt>
@@ -42,7 +45,7 @@ where
 {
     async fn send_messages_with_signer_and_nonce(
         chain: &Chain,
-        account: &Chain::Account,
+        signer: &Chain::Signer,
         nonce: &Felt,
         messages: &[StarknetMessage],
     ) -> Result<Chain::TxResponse, Chain::Error> {
@@ -50,6 +53,8 @@ where
             .iter()
             .map(|message| message.call.clone())
             .collect();
+
+        let account = chain.build_account_from_signer(signer);
 
         let execution = account.execute_v3(calls).nonce(*nonce);
 

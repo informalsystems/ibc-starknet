@@ -8,17 +8,19 @@ use starknet::accounts::ConnectedAccount;
 use starknet::core::types::Felt;
 use starknet::providers::ProviderError;
 
-use crate::traits::account::HasStarknetAccountType;
+use crate::traits::account::{CanBuildAccountFromSigner, HasStarknetAccountType};
 
 #[cgp_new_provider(NonceQuerierComponent)]
 impl<Chain> NonceQuerier<Chain> for QueryStarknetNonce
 where
     Chain: HasStarknetAccountType
-        + HasSignerType<Signer = Chain::Account>
+        + HasSignerType
+        + CanBuildAccountFromSigner
         + HasNonceType<Nonce = Felt>
         + CanRaiseAsyncError<ProviderError>,
 {
-    async fn query_nonce(chain: &Chain, account: &Chain::Account) -> Result<Felt, Chain::Error> {
+    async fn query_nonce(chain: &Chain, signer: &Chain::Signer) -> Result<Felt, Chain::Error> {
+        let account = chain.build_account_from_signer(signer);
         let nonce = account.get_nonce().await.map_err(Chain::raise_error)?;
         Ok(nonce)
     }
