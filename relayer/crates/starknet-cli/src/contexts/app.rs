@@ -6,7 +6,6 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWr
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_cli::commands::bootstrap::chain::{BootstrapCosmosChainArgs, LoadCosmosBootstrap};
 use hermes_cli::commands::client::create::CreateClientArgs;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
 use hermes_cli_components::impls::commands::client::create::{
@@ -47,7 +46,6 @@ use hermes_cli_components::traits::output::{
 use hermes_cli_components::traits::parse::ArgParserComponent;
 use hermes_cli_components::traits::types::config::ConfigTypeComponent;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
-use hermes_cosmos_integration_tests::contexts::bootstrap::CosmosBootstrap;
 use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::types::HermesError;
@@ -68,6 +66,7 @@ use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
+use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::{ConfigUpdater, ConfigUpdaterComponent};
@@ -81,6 +80,7 @@ use crate::commands::create::subcommand::{CreateSubCommand, RunCreateSubCommand}
 use crate::commands::query::subcommand::{QuerySubCommand, RunQuerySubCommand};
 use crate::commands::start::{RunStartSubCommand, StartSubCommand};
 use crate::commands::update::subcommand::{RunUpdateSubCommand, UpdateSubCommand};
+use crate::impls::bootstrap::osmosis_chain::{BootstrapOsmosisChainArgs, LoadOsmosisBootstrap};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
 use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::impls::build::LoadStarknetBuilder;
@@ -176,7 +176,7 @@ pub struct StarknetBootstrapTypes;
 delegate_components! {
     StarknetBootstrapTypes {
         StarknetChain: UseType<StarknetBootstrap>,
-        CosmosChain: UseType<CosmosBootstrap>,
+        CosmosChain: UseType<OsmosisBootstrap>,
     }
 }
 
@@ -185,7 +185,7 @@ pub struct StarknetBoostrapLoaders;
 delegate_components! {
     StarknetBoostrapLoaders {
         StarknetChain: LoadStarknetBootstrap,
-        CosmosChain: LoadCosmosBootstrap,
+        CosmosChain: LoadOsmosisBootstrap,
     }
 }
 
@@ -212,7 +212,7 @@ delegate_components! {
         CreateClientArgs: RunCreateClientCommand,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<StarknetChain, UpdateStarknetConfig>,
-        BootstrapCosmosChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
+        BootstrapOsmosisChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
     }
 }
 
@@ -368,14 +368,14 @@ check_components! {
         BootstrapTypeProviderComponent: StarknetChain,
         BootstrapLoaderComponent: [
             (StarknetChain, BootstrapStarknetChainArgs),
-            (CosmosChain, BootstrapCosmosChainArgs),
+            (CosmosChain, BootstrapOsmosisChainArgs),
         ],
         CommandRunnerComponent: [
             AllSubCommands,
             StartSubCommand,
             BootstrapSubCommand,
             BootstrapStarknetChainArgs,
-            BootstrapCosmosChainArgs,
+            BootstrapOsmosisChainArgs,
             QuerySubCommand,
             QueryClientStateArgs,
             QueryBalanceArgs,
