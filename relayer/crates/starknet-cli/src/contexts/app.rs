@@ -67,8 +67,8 @@ use hermes_starknet_chain_components::impls::types::config::{
 use hermes_starknet_chain_components::types::client_id::ClientId;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
+use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::{ConfigUpdater, ConfigUpdaterComponent};
 use ibc::clients::tendermint::types::TrustThreshold;
@@ -221,9 +221,7 @@ impl<Value> OutputProducer<StarknetApp, Value> for StarknetAppComponents {
     fn produce_output(_app: &StarknetApp, _value: Value) {}
 }
 
-pub struct UpdateStarknetConfig;
-
-#[cgp_provider(ConfigUpdaterComponent)]
+#[cgp_new_provider(ConfigUpdaterComponent)]
 impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarknetConfig {
     fn update_config(
         chain_driver: &StarknetChainDriver,
@@ -368,7 +366,10 @@ check_components! {
         ConfigWriterComponent,
         OutputProducerComponent: (),
         BootstrapTypeProviderComponent: StarknetChain,
-        BootstrapLoaderComponent: (StarknetChain, BootstrapStarknetChainArgs),
+        BootstrapLoaderComponent: [
+            (StarknetChain, BootstrapStarknetChainArgs),
+            (CosmosChain, BootstrapCosmosChainArgs),
+        ],
         CommandRunnerComponent: [
             AllSubCommands,
             StartSubCommand,

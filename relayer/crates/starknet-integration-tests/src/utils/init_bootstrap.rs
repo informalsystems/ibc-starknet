@@ -5,7 +5,7 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use starknet::core::types::contract::SierraClass;
 
-use crate::contexts::bootstrap::StarknetBootstrap;
+use crate::contexts::starknet_bootstrap::StarknetBootstrap;
 
 pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<StarknetBootstrap, Error> {
     let chain_command_path = std::env::var("STARKNET_BIN")

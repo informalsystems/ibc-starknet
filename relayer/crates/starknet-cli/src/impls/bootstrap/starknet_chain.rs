@@ -6,7 +6,7 @@ use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::runtime::HasRuntime;
-use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
+use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 
 #[derive(Debug, clap::Parser, HasField)]
 pub struct BootstrapStarknetChainArgs {

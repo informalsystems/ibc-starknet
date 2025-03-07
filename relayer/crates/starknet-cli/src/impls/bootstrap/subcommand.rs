@@ -12,9 +12,7 @@ pub enum BootstrapSubCommand {
     CosmosChain(BootstrapCosmosChainArgs),
 }
 
-pub struct RunBootstrapSubCommand;
-
-#[cgp_provider(CommandRunnerComponent)]
+#[cgp_new_provider(CommandRunnerComponent)]
 impl<App> CommandRunner<App, BootstrapSubCommand> for RunBootstrapSubCommand
 where
     App: CanRunCommand<BootstrapStarknetChainArgs> + CanRunCommand<BootstrapCosmosChainArgs>,
