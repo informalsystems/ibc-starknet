@@ -66,7 +66,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code: wasm_client_byte_code,
+            wasm_client_byte_code,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
             dynamic_gas: Some(DynamicGasConfig {
                 multiplier: 1.1,
