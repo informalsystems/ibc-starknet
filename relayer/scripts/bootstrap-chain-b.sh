@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-nix shell .#wasm-simapp -c \
+nix shell .#osmosis -c \
     cargo run --bin hermes-starknet -- \
         --config test-data/config.toml \
-        bootstrap cosmos-chain \
+        bootstrap osmosis-chain \
         --chain-id cosmos \
         --chain-store-dir test-data/cosmos \
-        --chain-command-path simd
+        --wasm-client-code-path "$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm" \
+        --governance-proposal-authority osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp

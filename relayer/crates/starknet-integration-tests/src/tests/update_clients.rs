@@ -1,7 +1,6 @@
 use core::marker::PhantomData;
 use core::time::Duration;
 use std::env::var;
-use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
 
@@ -23,20 +22,17 @@ use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncod
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use ibc::core::client::types::Height as CosmosHeight;
-use sha2::{Digest, Sha256};
 use tracing::info;
 
-use crate::utils::init_starknet_bootstrap;
+use crate::utils::{init_starknet_bootstrap, load_wasm_client};
 
 #[test]
 fn test_relay_update_clients() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let wasm_client_code_path = PathBuf::from(
-            var("STARKNET_WASM_CLIENT_PATH")
-                .expect("Wasm blob for Starknet light client is required"),
-        );
+        let wasm_client_code_path = var("STARKNET_WASM_CLIENT_PATH")
+            .expect("Wasm blob for Starknet light client is required");
 
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
@@ -44,13 +40,8 @@ fn test_relay_update_clients() -> Result<(), Error> {
 
         let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
 
-        let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
-
-        let wasm_code_hash: [u8; 32] = {
-            let mut hasher = Sha256::new();
-            hasher.update(&wasm_client_byte_code);
-            hasher.finalize().into()
-        };
+        let (wasm_code_hash, wasm_client_byte_code) =
+            load_wasm_client(&wasm_client_code_path).await?;
 
         let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
 

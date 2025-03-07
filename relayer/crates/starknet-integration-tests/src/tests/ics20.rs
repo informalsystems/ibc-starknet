@@ -1,14 +1,10 @@
 use core::marker::PhantomData;
 use core::time::Duration;
-use std::io::Write;
-use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
 
 use cgp::extra::run::CanRun;
 use cgp::prelude::*;
-use flate2::write::GzEncoder;
-use flate2::Compression;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
@@ -55,7 +51,6 @@ use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransfe
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use poseidon::Poseidon3Hasher;
-use sha2::{Digest, Sha256};
 use starknet::accounts::{Account, AccountError, Call, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::U256;
 use starknet::macros::selector;
@@ -64,17 +59,15 @@ use starknet::signers::{LocalWallet, SigningKey};
 use tracing::info;
 
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
-use crate::utils::init_starknet_bootstrap;
+use crate::utils::{init_starknet_bootstrap, load_wasm_client};
 
 #[test]
 fn test_starknet_ics20_contract() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let wasm_client_code_path = PathBuf::from(
-            std::env::var("STARKNET_WASM_CLIENT_PATH")
-                .expect("Wasm blob for Starknet light client is required"),
-        );
+        let wasm_client_code_path = std::env::var("STARKNET_WASM_CLIENT_PATH")
+            .expect("Wasm blob for Starknet light client is required");
 
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
@@ -82,21 +75,10 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
 
-        let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
-
-        let wasm_code_hash: [u8; 32] = {
-            let mut hasher = Sha256::new();
-            hasher.update(&wasm_client_byte_code);
-            hasher.finalize().into()
-        };
+        let (wasm_code_hash, wasm_client_byte_code) =
+            load_wasm_client(&wasm_client_code_path).await?;
 
         let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
-
-        let wasm_client_byte_code_gzip = {
-            let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-            encoder.write_all(&wasm_client_byte_code)?;
-            encoder.finish()?
-        };
 
         let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
             runtime: runtime.clone(),
@@ -107,7 +89,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code: wasm_client_byte_code_gzip,
+            wasm_client_byte_code: wasm_client_byte_code,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
             dynamic_gas: Some(DynamicGasConfig {
                 multiplier: 1.1,

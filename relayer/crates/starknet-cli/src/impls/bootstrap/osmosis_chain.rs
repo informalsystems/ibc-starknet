@@ -18,7 +18,7 @@ pub struct BootstrapOsmosisChainArgs {
     #[clap(long = "chain-store-dir", required = true)]
     pub chain_store_dir: String,
 
-    #[clap(long = "chain-command-path", default_value = "gaiad")]
+    #[clap(long = "chain-command-path", default_value = "osmosisd")]
     pub chain_command_path: String,
 
     #[clap(long = "account-prefix", default_value = "cosmos")]

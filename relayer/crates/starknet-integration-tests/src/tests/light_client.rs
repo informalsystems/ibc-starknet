@@ -1,13 +1,9 @@
 use core::marker::PhantomData;
 use core::time::Duration;
 use std::env::var;
-use std::io::Write;
-use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use flate2::write::GzEncoder;
-use flate2::Compression;
 use hermes_chain_components::traits::extract_data::CanExtractFromMessageResponse;
 use hermes_cosmos_chain_components::impls::connection::connection_handshake_message::default_connection_version;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
@@ -36,11 +32,10 @@ use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmo
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::client::types::Height;
-use sha2::{Digest, Sha256};
 use tracing::info;
 
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
-use crate::utils::init_starknet_bootstrap;
+use crate::utils::{init_starknet_bootstrap, load_wasm_client};
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {
@@ -54,26 +49,13 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
     let store_dir = std::env::current_dir()?.join(format!("test-data/{store_postfix}"));
 
-    let wasm_client_code_path = PathBuf::from(
-        var("STARKNET_WASM_CLIENT_PATH").expect("Wasm blob for Starknet light client is required"),
-    );
+    let wasm_client_code_path =
+        var("STARKNET_WASM_CLIENT_PATH").expect("Wasm blob for Starknet light client is required");
 
     let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
 
     runtime.runtime.clone().block_on(async move {
-        let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
-
-        let wasm_code_hash: [u8; 32] = {
-            let mut hasher = Sha256::new();
-            hasher.update(&wasm_client_byte_code);
-            hasher.finalize().into()
-        };
-
-        let wasm_client_byte_code_gzip = {
-            let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-            encoder.write_all(&wasm_client_byte_code)?;
-            encoder.finish()?
-        };
+        let (wasm_code_hash, wasm_client_byte_code) = load_wasm_client(&wasm_client_code_path).await?;
 
         let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
             runtime: runtime.clone(),
@@ -84,7 +66,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code: wasm_client_byte_code_gzip,
+            wasm_client_byte_code: wasm_client_byte_code,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
             dynamic_gas: Some(DynamicGasConfig {
                 multiplier: 1.1,
