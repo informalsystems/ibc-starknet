@@ -9,7 +9,7 @@ use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField
 use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
 use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
 use hermes_cli_components::traits::bootstrap::{
-    BootstrapLoaderComponent, BootstrapTypeComponent, CanLoadBootstrap,
+    BootstrapLoaderComponent, BootstrapTypeProviderComponent, CanLoadBootstrap,
 };
 use hermes_cli_components::traits::build::{
     BuilderLoaderComponent, BuilderTypeComponent, CanLoadBuilder,
@@ -39,7 +39,7 @@ use hermes_starknet_cli::impls::bootstrap::starknet_chain::{
 };
 use hermes_starknet_cli::impls::build::LoadStarknetBuilder;
 use hermes_starknet_cli::impls::error::ProvideCliError;
-use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
+use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 
 use crate::commands::starknet::subcommand::{RunStarknetSubCommand, StarknetSubCommand};
@@ -74,7 +74,7 @@ delegate_components! {
             UseHermesLogger,
         ConfigTypeComponent:
             WithType<StarknetRelayerConfig>,
-        BootstrapTypeComponent:
+        BootstrapTypeProviderComponent:
             WithType<StarknetBootstrap>,
         OutputTypeComponent:
             WithType<()>,
@@ -118,7 +118,7 @@ pub trait CanUseToolApp:
     + CanWriteConfig
     + CanWrapError<&'static str>
     + CanProduceOutput<()>
-    + CanLoadBootstrap<BootstrapStarknetChainArgs>
+    + CanLoadBootstrap<(), BootstrapStarknetChainArgs>
     + CanLoadBuilder<Builder = StarknetBuilder>
 {
 }

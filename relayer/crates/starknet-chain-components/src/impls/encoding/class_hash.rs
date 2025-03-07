@@ -1,5 +1,6 @@
 use core::marker::PhantomData;
 use std::collections::HashSet;
+use std::sync::OnceLock;
 
 use cgp::prelude::*;
 use hermes_encoding_components::traits::decode::{CanDecode, Decoder, DecoderComponent};
@@ -13,25 +14,22 @@ pub struct DecodeOptionalByClassHash<Tag>(pub PhantomData<Tag>);
 impl<Encoding, Strategy, Value, Tag> Decoder<Encoding, Strategy, Option<Value>>
     for DecodeOptionalByClassHash<Tag>
 where
-    Encoding:
-        CanDecode<Strategy, Value, Encoded = StarknetEvent> + HasField<Tag, Value = HashSet<Felt>>,
+    Encoding: CanDecode<Strategy, Value, Encoded = StarknetEvent>
+        + HasField<Tag, Value = OnceLock<HashSet<Felt>>>,
 {
     fn decode(
         encoding: &Encoding,
         event: &StarknetEvent,
     ) -> Result<Option<Value>, Encoding::Error> {
-        let class_hashes = encoding.get_field(PhantomData);
-
-        match &event.class_hash {
-            Some(class_hash) => {
+        if let Some(class_hash) = &event.class_hash {
+            if let Some(class_hashes) = encoding.get_field(PhantomData).get() {
                 if class_hashes.contains(class_hash) {
                     let value = encoding.decode(event)?;
-                    Ok(Some(value))
-                } else {
-                    Ok(None)
+                    return Ok(Some(value));
                 }
             }
-            None => Ok(None),
         }
+
+        Ok(None)
     }
 }

@@ -27,6 +27,7 @@ pub struct StarknetChainConfig {
 pub struct StarknetContractAddresses {
     pub ibc_core: Option<StarknetAddress>,
     pub ibc_client: Option<StarknetAddress>,
+    pub ics20: Option<StarknetAddress>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
