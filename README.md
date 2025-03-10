@@ -81,7 +81,7 @@ SN_TRANSFER_ARGS=$(cd relayer; cargo run -q -p hermes-starknet-tools-cli \
 ```
 
 > [!IMPORTANT]
-> If you're sending a Cosmos token back, you have to pass the bash denom, e.g.
+> If you're sending a Cosmos token back, you have to pass the base denom, e.g.
 > `--denom "uosmo"`
 
 Submit the transaction on Starknet
