@@ -35,9 +35,11 @@ build() {
 declare() {
     CONTRACT_SRC=$1
 
+    # pay in eth to avoid `Error: fee calculation overflow`.
+
     output=$(
         starkli declare --compiler-version "$COMPILER_VERSION" \
-        $STARKLI_ARGS \
+        --watch --eth \
         "$CONTRACT_SRC" \
         2>&1 | tee /dev/tty
     )
