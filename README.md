@@ -47,8 +47,10 @@ osmosisd tx ibc-transfer transfer \
     --from "$OSMOSIS_ADDRESS"
 ```
 
-On block explorer ([Mintscan](https://www.mintscan.io/osmosis-testnet)), you'll
-soon receive a `packet_acknowledgement`.
+On [Starkscan](https://sepolia.starkscan.co), the receiver account's "Portfolio"
+tab will soon show the received tokens. On
+[Mintscan](https://www.mintscan.io/osmosis-testnet), the sender account will
+soon show an `IBC Acknowledgement` transaction.
 
 ### From Starknet to Osmosis via `channel-0`
 
@@ -94,8 +96,10 @@ starkli invoke $IBC_ICS20_CONTRACT \
     --strk --watch
 ```
 
-On block explorer ([Starkscan](https://sepolia.starkscan.co)), you'll soon
-receive a `packet_acknowledgement`.
+On [Starkscan](https://sepolia.starkscan.co), the receiver account's "Portfolio"
+tab will soon deduct the sent tokens. On
+[Mintscan](https://www.mintscan.io/osmosis-testnet), the sender account will
+soon receive a `IBC Received` transaction with received denom.
 
 ## Relayer Operator Setup
 
