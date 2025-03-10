@@ -297,6 +297,16 @@ fn main() -> Result<(), Error> {
             );
         }
 
+        info!(
+            "Osmosis: client {}, connection {}, channel {}",
+            cosmos_client_id, cosmos_connection_id, cosmos_channel_id
+        );
+
+        info!(
+            "Starknet: client {}, connection {}, channel {}",
+            starknet_client_id, starknet_connection_id, starknet_channel_id
+        );
+
         Ok(())
     })
 }
