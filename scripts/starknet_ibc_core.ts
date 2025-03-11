@@ -1,47 +1,73 @@
 #!/usr/bin/env -S deno run
 
 import "jsr:@std/dotenv/load";
+import { Command } from "jsr:@cliffy/command@^1.0.0-rc.7";
 import { Contract, RpcProvider } from "npm:starknet";
 import { QueryClient, setupIbcExtension } from "npm:@cosmjs/stargate";
 import { Tendermint34Client } from "npm:@cosmjs/tendermint-rpc";
 
-const OSMOSIS_RPC_ENDPOINT = Deno.env.get("OSMOSIS_RPC")!;
-const STARKNET_RPC_ENDPOINT = Deno.env.get("STARKNET_RPC")!;
-const IBC_CORE_CONTRACT = Deno.env.get("CORE_CONTRACT_ADDRESS")!;
-const IBC_CLIENT_CONTRACT = Deno.env.get("COMET_CONTRACT_ADDRESS")!;
-const CHANNEL_ID = "channel-2";
-const PORT_ID = "transfer";
+const {
+  options: {
+    starknetRpc,
+    osmosisRpc,
+    coreContractAddress,
+    cometContractAddress,
+  },
+  args: [portId, channelId],
+} = await new Command()
+  .env("STARKNET_RPC=<value:string>", "Starknet RPC endpoint", {
+    required: true,
+  })
+  .env("OSMOSIS_RPC=<value:string>", "Osmosis RPC endpoint", {
+    required: true,
+  })
+  .env(
+    "CORE_CONTRACT_ADDRESS=<value:string>",
+    "IBC Core contract address",
+    {
+      required: true,
+    },
+  )
+  .env(
+    "COMET_CONTRACT_ADDRESS=<value:string>",
+    "IBC Client contract address",
+    {
+      required: true,
+    },
+  )
+  .arguments("<portId:string> <channelId:string>")
+  .parse(Deno.args);
 
-console.log("Osmosis RPC Endpoint:", OSMOSIS_RPC_ENDPOINT);
-console.log("Starknet RPC Endpoint:", STARKNET_RPC_ENDPOINT);
-console.log("Starknet IBC Core Contract:", IBC_CORE_CONTRACT);
-console.log("Starknet IBC Client Contract:", IBC_CLIENT_CONTRACT);
+console.log("Osmosis RPC Endpoint:", osmosisRpc);
+console.log("Starknet RPC Endpoint:", starknetRpc);
+console.log("Starknet IBC Core Contract:", coreContractAddress);
+console.log("Starknet IBC Client Contract:", cometContractAddress);
 
-const starknetProvider = new RpcProvider({ nodeUrl: STARKNET_RPC_ENDPOINT });
+const starknetProvider = new RpcProvider({ nodeUrl: starknetRpc });
 
 async function queryStarknetIbc() {
   console.log("Querying Starknet IBC data...");
 
-  const ibcCoreClass = await starknetProvider.getClassAt(IBC_CORE_CONTRACT);
+  const ibcCoreClass = await starknetProvider.getClassAt(coreContractAddress);
   const ibcClientClass = await starknetProvider.getClassAt(
-    IBC_CLIENT_CONTRACT,
+    cometContractAddress,
   );
 
   const ibcCoreContract = new Contract(
     ibcCoreClass.abi,
-    IBC_CORE_CONTRACT,
+    coreContractAddress,
     starknetProvider,
   );
   const ibcClientContract = new Contract(
     ibcClientClass.abi,
-    IBC_CLIENT_CONTRACT,
+    cometContractAddress,
     starknetProvider,
   );
 
   const channelEnd = await ibcCoreContract.channel_end({
-    port_id: PORT_ID,
+    port_id: portId,
   }, {
-    channel_id: CHANNEL_ID,
+    channel_id: channelId,
   });
 
   const connectionId = channelEnd.connection_id;
@@ -75,8 +101,8 @@ async function queryStarknetIbc() {
     );
 
   return {
-    portId: PORT_ID,
-    channelId: CHANNEL_ID,
+    portId: portId,
+    channelId: channelId,
     connectionId: connectionId,
     clientId: clientId,
     clientSequence: clientSequence,
@@ -98,7 +124,7 @@ async function queryOsmosisIbc(
 ) {
   console.log("Querying Osmosis IBC data...");
 
-  const tmClient = await Tendermint34Client.connect(OSMOSIS_RPC_ENDPOINT);
+  const tmClient = await Tendermint34Client.connect(osmosisRpc);
   const queryClient = QueryClient.withExtensions(tmClient, setupIbcExtension);
 
   const channelEnd = await queryClient.ibc.channel.channel(

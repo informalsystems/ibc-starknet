@@ -1,6 +1,7 @@
 #!/usr/bin/env -S deno run
 
 import "jsr:@std/dotenv/load";
+import { Command } from "jsr:@cliffy/command@^1.0.0-rc.7";
 import {
   byteArray,
   CairoCustomEnum,
@@ -11,37 +12,45 @@ import {
   RpcProvider,
 } from "npm:starknet";
 
-const STARKNET_RPC_ENDPOINT = Deno.env.get("STARKNET_RPC")!;
-const ICS20_CONTRACT = Deno.env.get("ICS20_CONTRACT_ADDRESS")!;
+const {
+  options: { starknetRpc, ics20ContractAddress },
+  args: [portId, channelId, baseDenom],
+} = await new Command()
+  .env("STARKNET_RPC=<value:string>", "Starknet RPC endpoint", {
+    required: true,
+  })
+  .env("ICS20_CONTRACT_ADDRESS=<value:string>", "ICS20 contract address", {
+    required: true,
+  })
+  .arguments("<portId:string> <channelId:string> <baseDenom:string>")
+  .parse(Deno.args);
 
-console.log("Starknet RPC Endpoint:", STARKNET_RPC_ENDPOINT);
-console.log("ICS20 Contract Address:", ICS20_CONTRACT);
+console.log("Starknet RPC Endpoint:", starknetRpc);
+console.log("ICS20 Contract Address:", ics20ContractAddress);
 
-const CHANNEL_ID = "channel-2";
-const PORT_ID = "transfer";
-const OSMO_DENOM = "uosmo";
+const starknetProvider = new RpcProvider({
+  nodeUrl: starknetRpc,
+});
 
-const starknetProvider = new RpcProvider({ nodeUrl: STARKNET_RPC_ENDPOINT });
-
-const ics20Class = await starknetProvider.getClassAt(ICS20_CONTRACT);
+const ics20Class = await starknetProvider.getClassAt(ics20ContractAddress);
 const ics20Contract = new Contract(
   ics20Class.abi,
-  ICS20_CONTRACT,
+  ics20ContractAddress,
   starknetProvider,
 );
 
 const ibc_prefixed_denom = {
   trace_path: [{
     port_id: {
-      port_id: byteArray.byteArrayFromString(PORT_ID),
+      port_id: byteArray.byteArrayFromString(portId),
     },
     channel_id: {
-      channel_id: byteArray.byteArrayFromString(CHANNEL_ID),
+      channel_id: byteArray.byteArrayFromString(channelId),
     },
   }],
   base: new CairoCustomEnum({
     Native: undefined,
-    Hosted: byteArray.byteArrayFromString(OSMO_DENOM),
+    Hosted: byteArray.byteArrayFromString(baseDenom),
   }),
 };
 
