@@ -711,7 +711,7 @@ fn test_packet_clearing() -> Result<(), Error> {
         );
 
         birelay
-            .auto_bi_relay(Some(Duration::from_secs(20)), Some(Duration::from_secs(0)))
+            .auto_bi_relay(Some(Duration::from_secs(30)), Some(Duration::from_secs(0)))
             .await?;
 
         cosmos_chain
@@ -727,6 +727,11 @@ fn test_packet_clearing() -> Result<(), Error> {
                 - (transfer_back_quantity * 2).into(),
             balance_starknet_b_step_2.quantity
         );
+
+        // FIXME: Remove the second clearing once the lock issue has been fixed in Hermes SDK
+        birelay
+            .auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0)))
+            .await?;
 
         // Assert all packets have been cleared after auto relaying
         let cosmos_latest_height = cosmos_chain.query_chain_height().await?;

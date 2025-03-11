@@ -1,6 +1,6 @@
 #[cgp::re_export_imports]
 mod preset {
-    use cgp::core::types::UseDelegatedType;
+    use cgp::core::types::{UseDelegatedType, WithType};
     use cgp::prelude::*;
     use hermes_chain_components::impls::payload_builders::channel::BuildChannelHandshakePayload;
     use hermes_chain_components::impls::payload_builders::connection::BuildConnectionHandshakePayload;
@@ -118,7 +118,7 @@ mod preset {
     use hermes_chain_components::traits::types::ibc_events::write_ack::WriteAckEventComponent;
     use hermes_chain_components::traits::types::packet::OutgoingPacketTypeComponent;
     use hermes_chain_components::traits::types::packets::ack::{
-        AckPacketPayloadTypeComponent, AcknowledgementTypeComponent,
+        AckCommitmentHashTypeComponent, AckPacketPayloadTypeComponent, AcknowledgementTypeComponent,
     };
     use hermes_chain_components::traits::types::packets::receive::{
         PacketCommitmentTypeComponent, ReceivePacketPayloadTypeComponent,
@@ -368,6 +368,8 @@ mod preset {
                 ProvideBytesPacketCommitment,
             AcknowledgementTypeComponent:
                 ProvideBytesAcknowlegement,
+            AckCommitmentHashTypeComponent:
+                WithType<Vec<u8>>,
             PacketReceiptTypeComponent:
                 ProvideBytesPacketReceipt,
             [
