@@ -57,10 +57,10 @@ jobs:
           starknet-devnet --version
           cosmwasm-check --version
 
-      - name: Install Rust nightly toolchain
+      - name: Install Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: nightly
+          toolchain: stable,1.81
           target: wasm32-unknown-unknown
 
       - name: Install Scarb
@@ -87,7 +87,7 @@ jobs:
       - name: Build CW light client contract
         working-directory: ./light-client
         run: |
-          cargo +nightly build -p ibc-client-starknet-cw --target wasm32-unknown-unknown --release
+          cargo +1.81 build -p ibc-client-starknet-cw --target wasm32-unknown-unknown --release
           cosmwasm-check target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm
 
       - name: Run Integration Tests
