@@ -19,9 +19,8 @@ use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use ibc::apps::transfer::types::{Amount, BaseDenom, Memo, PrefixedDenom, TracePath};
-use ibc::core::channel::types::error::ChannelError;
 use ibc::core::channel::types::packet::Packet as IbcPacket;
-use ibc::core::host::types::error::IdentifierError;
+use ibc::core::host::types::error::{DecodingError, IdentifierError};
 use ibc::core::host::types::identifiers::{ChannelId, PortId};
 use ibc::primitives::Signer;
 use ibc_proto::ibc::core::client::v1::Height as RawHeight;
@@ -70,7 +69,8 @@ where
         + HasAcknowledgementType<Counterparty, Acknowledgement = Vec<u8>>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseAsyncError<IdentifierError>
-        + CanRaiseAsyncError<ChannelError>
+        + CanRaiseAsyncError<Encoding::Error>
+        + CanRaiseAsyncError<DecodingError>
         + CanRaiseAsyncError<serde_json::Error>,
     Counterparty: HasOutgoingPacketType<Chain, OutgoingPacket = IbcPacket>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>> + CanDecode<ViaCairo, CairoTransferPacketData>,
@@ -79,7 +79,7 @@ where
         chain: &Chain,
         event: &WriteAcknowledgementEvent,
     ) -> Result<IbcPacket, Chain::Error> {
-        let ibc_packet = from_cairo_to_cosmos_packet(chain, &event.packet, chain.encoding()).await;
+        let ibc_packet = from_cairo_to_cosmos_packet(chain, &event.packet, chain.encoding())?;
         Ok(ibc_packet)
     }
 
@@ -113,19 +113,23 @@ pub struct DummyTransferData {
     pub sender: String,
 }
 
-async fn from_cairo_to_cosmos_packet<Chain, Encoding>(
-    chain: &Chain,
+fn from_cairo_to_cosmos_packet<Chain, Encoding>(
+    _chain: &Chain,
     packet: &Packet,
     encoding: &Encoding,
-) -> IbcPacket
+) -> Result<IbcPacket, Chain::Error>
 where
+    Chain: CanRaiseAsyncError<IdentifierError>
+        + CanRaiseAsyncError<Encoding::Error>
+        + CanRaiseAsyncError<DecodingError>
+        + CanRaiseAsyncError<serde_json::Error>,
     Encoding: CanDecode<ViaCairo, CairoTransferPacketData> + HasEncodedType<Encoded = Vec<Felt>>,
 {
     let seq_on_a = packet.sequence.into();
-    let port_id_on_a = PortId::new(packet.src_port_id.clone()).unwrap();
-    let chan_id_on_a = ChannelId::from_str(&packet.src_channel_id).unwrap();
-    let port_id_on_b = PortId::new(packet.dst_port_id.clone()).unwrap();
-    let chan_id_on_b = ChannelId::from_str(&packet.dst_channel_id).unwrap();
+    let port_id_on_a = PortId::new(packet.src_port_id.clone()).map_err(Chain::raise_error)?;
+    let chan_id_on_a = ChannelId::from_str(&packet.src_channel_id).map_err(Chain::raise_error)?;
+    let port_id_on_b = PortId::new(packet.dst_port_id.clone()).map_err(Chain::raise_error)?;
+    let chan_id_on_b = ChannelId::from_str(&packet.dst_channel_id).map_err(Chain::raise_error)?;
 
     let timeout_height = RawHeight {
         revision_number: packet.timeout_height.revision_number,
@@ -134,7 +138,7 @@ where
 
     let timeout_timestamp_on_b = (packet.timeout_timestamp).into();
 
-    let cairo_transfer_packet_data = encoding.decode(&packet.data).unwrap();
+    let cairo_transfer_packet_data = encoding.decode(&packet.data).map_err(Chain::raise_error)?;
 
     let memo = Memo::from(cairo_transfer_packet_data.memo.to_string());
 
@@ -150,15 +154,16 @@ where
     }
     let trace_path_str = parts.join("/");
 
-    let trace_path = TracePath::from_str(&trace_path_str).unwrap();
+    let trace_path = TracePath::from_str(&trace_path_str).map_err(Chain::raise_error)?;
 
     let denom = PrefixedDenom {
         trace_path,
         base_denom: BaseDenom::from_str(&cairo_transfer_packet_data.denom.base.to_string())
-            .unwrap(),
+            .map_err(Chain::raise_error)?,
     };
 
-    let amount = Amount::from_str(&cairo_transfer_packet_data.amount.to_string()).unwrap();
+    let amount = Amount::from_str(&cairo_transfer_packet_data.amount.to_string())
+        .map_err(Chain::raise_error)?;
 
     let raw_data = DummyTransferData {
         denom: denom.to_string(),
@@ -168,16 +173,16 @@ where
         memo: memo.to_string(),
     };
 
-    let data = serde_json::to_vec(&raw_data).unwrap();
+    let data = serde_json::to_vec(&raw_data).map_err(Chain::raise_error)?;
 
-    IbcPacket {
+    Ok(IbcPacket {
         seq_on_a,
         port_id_on_a,
         chan_id_on_a,
         port_id_on_b,
         chan_id_on_b,
         data,
-        timeout_height_on_b: timeout_height.try_into().unwrap(),
+        timeout_height_on_b: timeout_height.try_into().map_err(Chain::raise_error)?,
         timeout_timestamp_on_b,
-    }
+    })
 }

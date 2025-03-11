@@ -132,7 +132,10 @@ where
             timeout_timestamp_on_b,
         };
 
-        let call_data = chain.encoding().encode(&ics20_transfer_message).unwrap();
+        let call_data = chain
+            .encoding()
+            .encode(&ics20_transfer_message)
+            .map_err(Chain::raise_error)?;
 
         let call = Call {
             to: ics20_contract_address.0,
