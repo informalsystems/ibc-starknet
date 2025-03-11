@@ -23,8 +23,8 @@ jobs:
             osmosis: osmosisd-28.0.1-linux-arm64.tar.gz
             starknet-devnet: starknet-devnet-aarch64-unknown-linux-gnu.tar.gz
           - os: macos-14
-            osmosis: osmosisd-28.0.1-darwin-amd64.tar.gz
-            starknet-devnet: starknet-devnet-x86_64-apple-darwin.tar.gz
+            osmosis: osmosisd-28.0.1-darwin-arm64.tar.gz
+            starknet-devnet: starknet-devnet-aarch64-apple-darwin.tar.gz
     runs-on: ${{ matrix.value.os }}
     timeout-minutes: 60
     steps:
