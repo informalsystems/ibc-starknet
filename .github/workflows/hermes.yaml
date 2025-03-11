@@ -15,23 +15,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-14]
-    runs-on: ${{ matrix.os }}
+        value:
+          - os: ubuntu-22.04
+            osmosis: osmosisd-28.0.0-linux-amd64.tar.gz
+            starknet-devnet: starknet-devnet-x86_64-unknown-linux-gnu.tar.gz
+          - os: ubuntu-22.04-arm
+            osmosis: osmosisd-28.0.0-linux-arm64.tar.gz
+            starknet-devnet: starknet-devnet-aarch64-unknown-linux-gnu.tar.gz
+          - os: macos-14
+            osmosis: osmosisd-28.0.0-darwin-amd64.tar.gz
+            starknet-devnet: starknet-devnet-x86_64-apple-darwin.tar.gz
+    runs-on: ${{ matrix.value.os }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 
       - name: Install osmosisd v28.0.0
-        uses: jaxxstorm/action-install-gh-release@v1.14.0
+        uses: jaxxstorm/action-install-gh-release@master
         with:
           repo: osmosis-labs/osmosis
+          asset-name: ${{ matrix.value.osmosis }}
           tag: v28.0.0
           cache: enable
 
       - name: Install starknet-devnet
-        uses: jaxxstorm/action-install-gh-release@v1.14.0
+        uses: jaxxstorm/action-install-gh-release@master
         with:
           repo: starknet/starknet-devnet
+          asset-name: ${{ matrix.value.starknet-devnet }}
           tag: v0.2.4
           cache: enable
 
