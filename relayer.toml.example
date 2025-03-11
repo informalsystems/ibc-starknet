@@ -20,6 +20,7 @@ ibc_client = ""
 # -- to be filled
 ibc_client = ""
 ibc_core   = ""
+ibc_ics201 = ""
 
 [cosmos_chain_config]
 id             = 'osmo-test-5'
