@@ -233,6 +233,7 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
         let contract_addresses = StarknetContractAddresses {
             ibc_client: chain_driver.chain.ibc_client_contract_address,
             ibc_core: chain_driver.chain.ibc_core_contract_address,
+            ibc_ics20: chain_driver.chain.ibc_ics20_contract_address,
         };
 
         let contract_classes = StarknetContractClasses {

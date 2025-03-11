@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use std::str::FromStr;
 
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
@@ -9,10 +10,11 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
+use starknet::core::types::Felt;
 
 use crate::impls::types::address::StarknetAddress;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Denom {
     Native(StarknetAddress),
     Hosted(String),
@@ -27,7 +29,7 @@ impl Display for Denom {
     }
 }
 
-#[derive(Clone, Debug, HasField)]
+#[derive(Clone, Debug, HasField, PartialEq)]
 pub struct PrefixedDenom {
     pub trace_path: Vec<TracePrefix>,
     pub base: Denom,
@@ -45,7 +47,39 @@ impl Display for PrefixedDenom {
     }
 }
 
-#[derive(Clone, Debug, HasField)]
+impl FromStr for PrefixedDenom {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let split_str = s.split("/").collect::<Vec<&str>>();
+        let base_str = *split_str
+            .last()
+            .ok_or("Failed to convert string to PrefixedDenom. Empty string")?;
+        let base = if base_str.starts_with("0x") {
+            Denom::Native(
+                Felt::from_hex(base_str)
+                    .map_err(|e| format!("Failed to convert `{s}` to PrefixedDenom. {e}"))?
+                    .into(),
+            )
+        } else {
+            Denom::Hosted(base_str.to_string())
+        };
+        let trace_path = split_str[..split_str.len() - 1]
+            .chunks(2)
+            .map(|chunk| {
+                let port_id = chunk[0].to_string();
+                let channel_id = chunk[1].to_string();
+                TracePrefix {
+                    port_id,
+                    channel_id,
+                }
+            })
+            .collect();
+        Ok(Self { trace_path, base })
+    }
+}
+
+#[derive(Clone, Debug, HasField, PartialEq)]
 pub struct TracePrefix {
     pub port_id: String,
     pub channel_id: String,
@@ -133,5 +167,48 @@ impl Transformer for EncodeDenom {
             Either::Right(Either::Left(value)) => Denom::Hosted(value),
             Either::Right(Either::Right(value)) => match value {},
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_single_trace_path() {
+        let input = "transfer/channel-0/coin";
+        let expected = PrefixedDenom {
+            trace_path: vec![TracePrefix {
+                port_id: "transfer".to_string(),
+                channel_id: "channel-0".to_string(),
+            }],
+            base: Denom::Hosted("coin".to_string()),
+        };
+
+        let result = PrefixedDenom::from_str(input);
+        assert!(result.is_ok(), "Parsing failed for single trace path");
+        assert_eq!(result.unwrap(), expected);
+    }
+
+    #[test]
+    fn test_multiple_trace_paths() {
+        let input = "transfer2/channel-1/transfer/channel-0/coin";
+        let expected = PrefixedDenom {
+            trace_path: vec![
+                TracePrefix {
+                    port_id: "transfer2".to_string(),
+                    channel_id: "channel-1".to_string(),
+                },
+                TracePrefix {
+                    port_id: "transfer".to_string(),
+                    channel_id: "channel-0".to_string(),
+                },
+            ],
+            base: Denom::Hosted("coin".to_string()),
+        };
+
+        let result = PrefixedDenom::from_str(input);
+        assert!(result.is_ok(), "Parsing failed for multiple trace paths");
+        assert_eq!(result.unwrap(), expected);
     }
 }

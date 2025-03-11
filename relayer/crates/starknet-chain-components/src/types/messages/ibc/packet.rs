@@ -16,7 +16,7 @@ use starknet::core::types::Felt;
 
 use crate::types::cosmos::height::Height;
 
-#[derive(HasField, Clone)]
+#[derive(HasField, Clone, Debug)]
 pub struct Packet {
     pub sequence: u64,
     pub src_port_id: String,
