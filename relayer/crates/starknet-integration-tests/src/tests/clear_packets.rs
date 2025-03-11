@@ -104,7 +104,7 @@ fn test_packet_clearing() -> Result<(), Error> {
             account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code: wasm_client_byte_code,
+            wasm_client_byte_code,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
             dynamic_gas: Some(DynamicGasConfig {
                 multiplier: 1.1,
@@ -131,7 +131,7 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
+            starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),
@@ -143,7 +143,7 @@ fn test_packet_clearing() -> Result<(), Error> {
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            &starknet_chain,
+            starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )
@@ -408,7 +408,7 @@ fn test_packet_clearing() -> Result<(), Error> {
         };
 
         let packet = <StarknetChain as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token(
-            &starknet_chain,
+            starknet_chain,
             &starknet_channel_id,
             &IbcPortId::transfer(),
             wallet_starknet_b,
@@ -427,7 +427,7 @@ fn test_packet_clearing() -> Result<(), Error> {
         runtime.sleep(Duration::from_secs(2)).await;
 
         let _packet = <StarknetChain as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token(
-            &starknet_chain,
+            starknet_chain,
             &starknet_channel_id,
             &IbcPortId::transfer(),
             wallet_starknet_b,
@@ -482,7 +482,7 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let (starknet_commitment1, _) =
             <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
-                &starknet_chain,
+                starknet_chain,
                 &starknet_channel_id,
                 &IbcPortId::transfer(),
                 &Sequence::from(1),
@@ -492,7 +492,7 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let (starknet_commitment2, _) =
             <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
-                &starknet_chain,
+                starknet_chain,
                 &starknet_channel_id,
                 &IbcPortId::transfer(),
                 &Sequence::from(2),
@@ -571,7 +571,7 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let (starknet_commitment1, _) =
             <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
-                &starknet_chain,
+                starknet_chain,
                 &starknet_channel_id,
                 &IbcPortId::transfer(),
                 &Sequence::from(1),
@@ -581,7 +581,7 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let (starknet_commitment2, _) =
             <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
-                &starknet_chain,
+                starknet_chain,
                 &starknet_channel_id,
                 &IbcPortId::transfer(),
                 &Sequence::from(2),
@@ -643,7 +643,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code: wasm_client_byte_code,
+            wasm_client_byte_code,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
             dynamic_gas: Some(DynamicGasConfig {
                 multiplier: 1.1,
@@ -670,7 +670,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
+            starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),
@@ -682,7 +682,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            &starknet_chain,
+            starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )
