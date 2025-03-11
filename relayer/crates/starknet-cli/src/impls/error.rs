@@ -55,8 +55,10 @@ delegate_components! {
             DecodingError,
             IdentifierError,
             TokioRuntimeError,
+            std::io::Error,
             toml::de::Error,
             toml::ser::Error,
+            serde_json::Error,
         ]: ReportError,
         [
             <'a> &'a str,

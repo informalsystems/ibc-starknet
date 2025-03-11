@@ -1,6 +1,7 @@
 use core::ops::Deref;
 use core::time::Duration;
-use std::sync::Arc;
+use std::str::FromStr;
+use std::sync::{Arc, OnceLock};
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
@@ -14,6 +15,7 @@ use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_chain_components::traits::queries::block_time::{
     BlockTimeQuerierComponent, CanQueryBlockTime,
 };
+use hermes_chain_components::traits::queries::packet_acknowledgement::CanQueryPacketAckCommitment;
 use hermes_chain_components::traits::types::block::HasBlockType;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
 use hermes_chain_components::traits::types::status::HasChainStatusType;
@@ -95,7 +97,6 @@ use hermes_relayer_components::chain::traits::queries::consensus_state_height::{
     CanQueryConsensusStateHeight, CanQueryConsensusStateHeights,
 };
 use hermes_relayer_components::chain::traits::queries::counterparty_chain_id::CanQueryCounterpartyChainId;
-use hermes_relayer_components::chain::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
 use hermes_relayer_components::chain::traits::queries::packet_commitment::{
     CanQueryPacketCommitment, PacketCommitmentQuerierComponent,
 };
@@ -153,7 +154,8 @@ use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
-    HasStarknetAccount, StarknetAccountGetterComponent, StarknetAccountTypeProviderComponent,
+    AccountFromSignerBuilder, AccountFromSignerBuilderComponent, HasStarknetAccount,
+    StarknetAccountGetterComponent, StarknetAccountTypeProviderComponent,
 };
 use hermes_starknet_chain_components::traits::client::{
     JsonRpcClientGetter, JsonRpcClientGetterComponent,
@@ -170,6 +172,7 @@ use hermes_starknet_chain_components::traits::provider::{
 };
 use hermes_starknet_chain_components::traits::queries::address::CanQueryContractAddress;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
+use hermes_starknet_chain_components::traits::signer::StarknetSignerGetterComponent;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
@@ -188,6 +191,7 @@ use hermes_starknet_chain_components::types::payloads::client::{
     StarknetCreateClientPayloadOptions, StarknetUpdateClientPayload,
 };
 use hermes_starknet_chain_components::types::status::StarknetChainStatus;
+use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessage;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
@@ -195,11 +199,11 @@ use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::host::types::identifiers::{ChainId, PortId as IbcPortId, Sequence};
-use starknet::accounts::SingleOwnerAccount;
+use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
-use starknet::signers::LocalWallet;
+use starknet::signers::{LocalWallet, SigningKey};
 
 use crate::contexts::encoding::cairo::StarknetCairoEncoding;
 use crate::contexts::encoding::event::StarknetEventEncoding;
@@ -218,14 +222,16 @@ pub struct StarknetChainFields {
     pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: Arc<SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>>,
-    pub ibc_client_contract_address: Option<StarknetAddress>,
-    pub ibc_core_contract_address: Option<StarknetAddress>,
+    pub ibc_client_contract_address: OnceLock<StarknetAddress>,
+    pub ibc_core_contract_address: OnceLock<StarknetAddress>,
+    pub ibc_ics20_contract_address: OnceLock<StarknetAddress>,
     pub event_encoding: StarknetEventEncoding,
     pub poll_interval: Duration,
     pub block_time: Duration,
     // FIXME: only needed for demo2
     pub proof_signer: Secp256k1KeyPair,
     pub nonce_mutex: Arc<Mutex<()>>,
+    pub signer: StarknetWallet,
 }
 
 impl Deref for StarknetChain {
@@ -268,6 +274,8 @@ delegate_components! {
             StarknetProofSignerGetterComponent,
         ]:
             GetStarknetProofSignerField<symbol!("proof_signer")>,
+        StarknetSignerGetterComponent:
+            WithField<symbol!("signer")>,
         NonceAllocationMutexGetterComponent:
             GetGlobalNonceMutex<symbol!("nonce_mutex")>,
         BlockTimeQuerierComponent:
@@ -335,6 +343,22 @@ impl JsonRpcClientGetter<StarknetChain> for StarknetChainContextComponents {
 impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
     fn chain_id(chain: &StarknetChain) -> &ChainId {
         &chain.chain_id
+    }
+}
+
+#[cgp_provider(AccountFromSignerBuilderComponent)]
+impl AccountFromSignerBuilder<StarknetChain> for StarknetChainContextComponents {
+    fn build_account_from_signer(
+        chain: &StarknetChain,
+        signer: &StarknetWallet,
+    ) -> Arc<SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>> {
+        Arc::new(SingleOwnerAccount::new(
+            chain.rpc_client.clone(),
+            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(signer.signing_key)),
+            *signer.account_address,
+            Felt::from_str(chain.chain_id.as_str()).unwrap(),
+            ExecutionEncoding::New,
+        ))
     }
 }
 
@@ -441,7 +465,7 @@ pub trait CanUseStarknetChain:
     + HasConnectionOpenTryEvent<CosmosChain>
     + HasChannelOpenTryEvent<CosmosChain>
     + CanQueryPacketCommitment<CosmosChain>
-    + CanQueryPacketAcknowledgement<CosmosChain>
+    + CanQueryPacketAckCommitment<CosmosChain>
     + CanQueryPacketReceipt<CosmosChain>
     + CanBuildReceivePacketPayload<CosmosChain>
     + CanBuildAckPacketPayload<CosmosChain>

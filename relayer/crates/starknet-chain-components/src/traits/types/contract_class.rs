@@ -1,19 +1,11 @@
 use cgp::prelude::*;
 
-#[cgp_component {
-  name: ContractClassTypeComponent,
-  provider: ProvideContractClassType,
-  context: Chain,
-}]
+#[cgp_type]
 pub trait HasContractClassType: Async {
     type ContractClass: Async;
 }
 
-#[cgp_component {
-  name: ContractClassHashTypeComponent,
-  provider: ProvideContractClassHashType,
-  context: Chain,
-}]
+#[cgp_type]
 pub trait HasContractClassHashType: Async {
     type ContractClassHash: Async;
 }

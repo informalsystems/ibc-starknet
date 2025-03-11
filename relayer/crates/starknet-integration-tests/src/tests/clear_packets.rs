@@ -5,14 +5,10 @@
 
 use core::marker::PhantomData;
 use core::time::Duration;
-use std::io::Write;
-use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
 
 use cgp::prelude::*;
-use flate2::write::GzEncoder;
-use flate2::Compression;
 use hermes_chain_components::traits::packet::fields::{
     HasPacketTimeoutHeight, HasPacketTimeoutTimestamp,
 };
@@ -34,7 +30,6 @@ use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_relayer_components::birelay::traits::CanAutoBiRelay;
-use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapChannel;
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::traits::chains::{HasRelayChains, HasRelayPacketType};
@@ -44,14 +39,11 @@ use hermes_relayer_components::relay::traits::packet_relayers::receive_packet::C
 use hermes_relayer_components::relay::traits::packet_relayers::timeout_unordered_packet::CanRelayTimeoutUnorderedPacket;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
-use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
-use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
-use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
+use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
@@ -59,10 +51,8 @@ use hermes_starknet_chain_components::types::messages::ibc::denom::{
 };
 use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::MsgTransfer;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
-use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
-use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::impls::error::SignError;
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
@@ -74,57 +64,36 @@ use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransfe
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence};
 use poseidon::Poseidon3Hasher;
-use sha2::{Digest, Sha256};
 use starknet::accounts::{Account, AccountError, Call, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::U256;
-use starknet::macros::{selector, short_string};
+use starknet::macros::selector;
 use starknet::providers::Provider;
 use starknet::signers::{LocalWallet, SigningKey};
 use tracing::info;
 
-use crate::contexts::bootstrap::StarknetBootstrap;
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
+use crate::utils::{init_starknet_bootstrap, load_wasm_client};
 
 #[test]
 fn test_packet_clearing() -> Result<(), Error> {
-    // ### SETUP START ###
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let chain_command_path = std::env::var("STARKNET_BIN")
-            .unwrap_or("starknet-devnet".into())
-            .into();
-
-        let wasm_client_code_path = PathBuf::from(
+        let wasm_client_code_path =
             std::env::var("STARKNET_WASM_CLIENT_PATH")
-                .expect("Wasm blob for Starknet light client is required"),
-        );
+                .expect("Wasm blob for Starknet light client is required")
+        ;
 
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
-        let starknet_bootstrap = StarknetBootstrap {
-            runtime: runtime.clone(),
-            chain_command_path,
-            chain_store_dir: format!("./test-data/{timestamp}").into(),
-        };
+        let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
 
-        let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
-
-        let wasm_code_hash: [u8; 32] = {
-            let mut hasher = Sha256::new();
-            hasher.update(&wasm_client_byte_code);
-            hasher.finalize().into()
-        };
+        let (wasm_code_hash, wasm_client_byte_code) =
+            load_wasm_client(&wasm_client_code_path).await?;
 
         let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
-
-        let wasm_client_byte_code_gzip = {
-            let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-            encoder.write_all(&wasm_client_byte_code)?;
-            encoder.finish()?
-        };
 
         let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
             runtime: runtime.clone(),
@@ -135,7 +104,7 @@ fn test_packet_clearing() -> Result<(), Error> {
             account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code: wasm_client_byte_code_gzip,
+            wasm_client_byte_code,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
             dynamic_gas: Some(DynamicGasConfig {
                 multiplier: 1.1,
@@ -158,133 +127,11 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let cosmos_chain = &cosmos_chain_driver.chain;
 
-        let erc20_class_hash = {
-            let contract_path = std::env::var("ERC20_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared ERC20 class: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ics20_class_hash = {
-            let contract_path = std::env::var("ICS20_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared ICS20 class: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ibc_core_class_hash = {
-            let contract_path = std::env::var("IBC_CORE_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared IBC core class: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ibc_core_address = starknet_chain
-            .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
-            .await?;
-
-        info!(
-            "deployed IBC core contract to address: {:?}",
-            ibc_core_address
-        );
-
-        let comet_client_class_hash = {
-            let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared class for cometbft: {:?}", class_hash);
-
-            class_hash
-        };
-
         let cairo_encoding = StarknetCairoEncoding;
-
-        let comet_client_address = {
-            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
-            let contract_address = starknet_chain
-                .deploy_contract(&comet_client_class_hash, false, &owner_call_data)
-                .await?;
-
-            info!(
-                "deployed Comet client contract to address: {:?}",
-                contract_address
-            );
-
-            contract_address
-        };
-
-        let starknet_chain = {
-            let mut fields = starknet_chain.fields.as_ref().clone();
-
-            fields.ibc_core_contract_address = Some(ibc_core_address);
-            fields.ibc_client_contract_address = Some(comet_client_address);
-
-            let cairo_encoding = StarknetCairoEncoding;
-
-            fields.event_encoding = StarknetEventEncoding {
-                erc20_hashes: [erc20_class_hash].into(),
-                ics20_hashes: [ics20_class_hash].into(),
-                ibc_client_hashes: [comet_client_class_hash].into(),
-                ibc_core_contract_addresses: [ibc_core_address].into(),
-            };
-
-            StarknetChain {
-                fields: Arc::new(fields),
-            }
-        };
-
-        {
-            // register comet client contract with ibc-core
-
-            let register_client = MsgRegisterClient {
-                client_type: short_string!("07-tendermint"),
-                contract_address: comet_client_address,
-            };
-
-            let calldata = cairo_encoding.encode(&register_client)?;
-
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("register_client"),
-                calldata,
-            };
-
-            let message = StarknetMessage::new(call);
-
-            let response = starknet_chain.send_message(message).await?;
-
-            info!("IBC register client response: {:?}", response);
-        }
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
+            starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),
@@ -296,7 +143,7 @@ fn test_packet_clearing() -> Result<(), Error> {
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            &starknet_chain,
+            starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )
@@ -322,23 +169,6 @@ fn test_packet_clearing() -> Result<(), Error> {
             &client_state_on_cosmos.client_state.chain_id,
             starknet_chain.chain_id()
         );
-
-        let ics20_contract_address = {
-            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
-            let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
-
-            let contract_address = starknet_chain
-                .deploy_contract(
-                    &ics20_class_hash,
-                    false,
-                    &[owner_call_data, erc20_call_data].concat(),
-                )
-                .await?;
-
-            info!("deployed ICS20 contract to address: {:?}", contract_address);
-
-            contract_address
-        };
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
             runtime.clone(),
@@ -373,29 +203,6 @@ fn test_packet_clearing() -> Result<(), Error> {
         // channel handshake
 
         let ics20_port = IbcPortId::transfer();
-
-        {
-            // register the ICS20 contract with the IBC core contract
-
-            let register_app = MsgRegisterApp {
-                port_id: ics20_port.clone(),
-                contract_address: ics20_contract_address,
-            };
-
-            let register_call_data = cairo_encoding.encode(&register_app)?;
-
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("bind_port_id"),
-                calldata: register_call_data,
-            };
-
-            let message = StarknetMessage::new(call);
-
-            let response = starknet_chain.send_message(message).await?;
-
-            info!("register ics20 response: {:?}", response);
-        }
 
         let init_channel_options = CosmosInitChannelOptions::new(starknet_connection_id);
 
@@ -477,6 +284,8 @@ fn test_packet_clearing() -> Result<(), Error> {
             balance_cosmos_a_step_1.quantity
         );
 
+        let ics20_contract_address = *starknet_chain.ibc_ics20_contract_address.get().unwrap();
+
         let ics20_token_address: StarknetAddress = {
             let ibc_prefixed_denom = PrefixedDenom {
                 trace_path: vec![TracePrefix {
@@ -516,7 +325,7 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let birelay = StarknetCosmosBiRelay {
             runtime: runtime.clone(),
-            relay_a_to_b: starknet_to_cosmos_relay,
+            relay_a_to_b: starknet_to_cosmos_relay.clone(),
             relay_b_to_a: cosmos_to_starknet_relay.clone(),
         };
 
@@ -540,16 +349,13 @@ fn test_packet_clearing() -> Result<(), Error> {
         );
 
         info!(
-            "starknet balance before transfer: {}",
+            "starknet balance before transfer: {} from token_address: {ics20_token_address} and account_address {address_starknet_b}",
             balance_starknet_b_step_0.quantity
         );
 
         // ### SETUP DONE ###
 
         // ### SETUP PENDING PACKETS AND ACKS ###
-
-        // TODO: Will be replaced by query commitments
-        let _commitment_sequences = [Sequence::from(1), Sequence::from(2), Sequence::from(3)];
 
         // Create Cosmos to Starknet transfer
         let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
@@ -565,6 +371,8 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         runtime.sleep(Duration::from_secs(2)).await;
 
+        info!("Will relay only relay the recv from Cosmos to Starknet");
+
         relay_only_send(&cosmos_to_starknet_relay, &packet).await?;
 
         runtime.sleep(Duration::from_secs(2)).await;
@@ -573,7 +381,7 @@ fn test_packet_clearing() -> Result<(), Error> {
         {
             let call_data = cairo_encoding.encode(&product![
                 ics20_contract_address,
-                U256::from(transfer_back_quantity)
+                U256::from(transfer_back_quantity*2)
             ])?;
 
             let call = Call {
@@ -594,55 +402,40 @@ fn test_packet_clearing() -> Result<(), Error> {
         }
 
         // Create Starknet to Cosmos transfer
-        let starknet_ics20_send_message = {
-            let current_starknet_time = starknet_chain.query_chain_status().await?.time;
-
-            let denom = PrefixedDenom {
-                trace_path: vec![TracePrefix {
-                    port_id: ics20_port.to_string(),
-                    channel_id: starknet_channel_id.to_string(),
-                }],
-                base: Denom::Hosted(denom_cosmos.to_string()),
-            };
-
-            MsgTransfer {
-                port_id_on_a: ics20_port.clone(),
-                chan_id_on_a: starknet_channel_id.clone(),
-                denom,
-                amount: transfer_back_quantity.into(),
-                receiver: address_cosmos_a.clone(),
-                memo: String::new(),
-                timeout_height_on_b: Height {
-                    revision_number: 0,
-                    revision_height: 0,
-                },
-                timeout_timestamp_on_b: Timestamp::from_nanoseconds(
-                    u64::try_from(current_starknet_time.unix_timestamp() + 1800).unwrap()
-                        * 1_000_000_000,
-                ),
-            }
+        let amount_back = StarknetAmount {
+            quantity: transfer_back_quantity.into(),
+            token_address: balance_starknet_b_step_0.token_address,
         };
 
-        // submit to ics20 contract
-        {
-            let call_data = cairo_encoding.encode(&starknet_ics20_send_message)?;
+        let packet = <StarknetChain as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token(
+            starknet_chain,
+            &starknet_channel_id,
+            &IbcPortId::transfer(),
+            wallet_starknet_b,
+            address_cosmos_a,
+            &amount_back,
+            &None,
+        )
+        .await?;
 
-            let call = Call {
-                to: *ics20_contract_address,
-                selector: selector!("send_transfer"),
-                calldata: call_data,
-            };
+        runtime.sleep(Duration::from_secs(2)).await;
 
-            let execution = starknet_account_b.execute_v3(vec![call]);
+        info!("Will relay only relay the recv from Starknet to Cosmos");
 
-            let tx_hash = execution
-                .send()
-                .await
-                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
-                .transaction_hash;
+        relay_only_send(&starknet_to_cosmos_relay, &packet).await?;
 
-            starknet_chain.poll_tx_response(&tx_hash).await?;
-        };
+        runtime.sleep(Duration::from_secs(2)).await;
+
+        let _packet = <StarknetChain as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token(
+            starknet_chain,
+            &starknet_channel_id,
+            &IbcPortId::transfer(),
+            wallet_starknet_b,
+            address_cosmos_a,
+            &amount_back,
+            &None,
+        )
+        .await?;
 
         // Create a pending packet
         let _packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
@@ -657,12 +450,75 @@ fn test_packet_clearing() -> Result<(), Error> {
         .await?;
 
         let eventual_cosmos_amount = &Amount::new(
-            balance_cosmos_a_step_0.quantity - (transfer_quantity * 2) + transfer_back_quantity,
+            balance_cosmos_a_step_0.quantity - (transfer_quantity * 2) + (transfer_back_quantity * 2),
             denom_cosmos.clone(),
         );
 
+        // Assert the following packets have not yet been cleared:
+        //   * Cosmos to Starknet sequences 2 & 3
+        //   * Starknet to Cosmos sequences 1 & 2
+        let cosmos_latest_height = cosmos_chain.query_chain_height().await?;
+        let starknet_latest_height = starknet_chain.query_chain_height().await?;
+
+        let (cosmos_commitment2, _) =
+            <CosmosChain as CanQueryPacketCommitment<StarknetChain>>::query_packet_commitment(
+                cosmos_chain,
+                &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(2),
+                &cosmos_latest_height,
+            )
+            .await?;
+
+        let (cosmos_commitment3, _) =
+            <CosmosChain as CanQueryPacketCommitment<StarknetChain>>::query_packet_commitment(
+                cosmos_chain,
+                &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(3),
+                &cosmos_latest_height,
+            )
+            .await?;
+
+        let (starknet_commitment1, _) =
+            <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
+                starknet_chain,
+                &starknet_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(1),
+                &starknet_latest_height,
+            )
+            .await?;
+
+        let (starknet_commitment2, _) =
+            <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
+                starknet_chain,
+                &starknet_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(2),
+                &starknet_latest_height,
+            )
+            .await?;
+
+        assert!(
+            cosmos_commitment2.is_some(),
+            "cosmos_commitment2 expected to be Some"
+        );
+        assert!(
+            cosmos_commitment3.is_some(),
+            "cosmos_commitment3 expected to be Some"
+        );
+        assert!(
+            starknet_commitment1.is_some(),
+            "starknet_commitment1 expected to be Some"
+        );
+        assert!(
+            starknet_commitment2.is_some(),
+            "starknet_commitment2 expected to be Some"
+        );
+
         birelay
-            .auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0)))
+            .auto_bi_relay(Some(Duration::from_secs(30)), Some(Duration::from_secs(0)))
             .await?;
 
         cosmos_chain
@@ -675,10 +531,11 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         assert_eq!(
             balance_starknet_b_step_0.quantity + (transfer_quantity * 2).into()
-                - transfer_back_quantity.into(),
+                - (transfer_back_quantity * 2).into(),
             balance_starknet_b_step_2.quantity
         );
 
+        // Assert all packets have been cleared after auto relaying
         let cosmos_latest_height = cosmos_chain.query_chain_height().await?;
         let starknet_latest_height = starknet_chain.query_chain_height().await?;
 
@@ -714,10 +571,20 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         let (starknet_commitment1, _) =
             <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
-                &starknet_chain,
+                starknet_chain,
                 &starknet_channel_id,
                 &IbcPortId::transfer(),
                 &Sequence::from(1),
+                &starknet_latest_height,
+            )
+            .await?;
+
+        let (starknet_commitment2, _) =
+            <StarknetChain as CanQueryPacketCommitment<CosmosChain>>::query_packet_commitment(
+                starknet_chain,
+                &starknet_channel_id,
+                &IbcPortId::transfer(),
+                &Sequence::from(2),
                 &starknet_latest_height,
             )
             .await?;
@@ -738,6 +605,10 @@ fn test_packet_clearing() -> Result<(), Error> {
             starknet_commitment1.is_none(),
             "starknet_commitment1 expected to be None"
         );
+        assert!(
+            starknet_commitment2.is_none(),
+            "starknet_commitment2 expected to be None"
+        );
 
         Ok(())
     })
@@ -749,40 +620,19 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let chain_command_path = std::env::var("STARKNET_BIN")
-            .unwrap_or("starknet-devnet".into())
-            .into();
-
-        let wasm_client_code_path = PathBuf::from(
-            std::env::var("STARKNET_WASM_CLIENT_PATH")
-                .expect("Wasm blob for Starknet light client is required"),
-        );
+        let wasm_client_code_path = std::env::var("STARKNET_WASM_CLIENT_PATH")
+            .expect("Wasm blob for Starknet light client is required");
 
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
-        let starknet_bootstrap = StarknetBootstrap {
-            runtime: runtime.clone(),
-            chain_command_path,
-            chain_store_dir: format!("./test-data/{timestamp}").into(),
-        };
+        let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
 
-        let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
-
-        let wasm_code_hash: [u8; 32] = {
-            let mut hasher = Sha256::new();
-            hasher.update(&wasm_client_byte_code);
-            hasher.finalize().into()
-        };
+        let (wasm_code_hash, wasm_client_byte_code) =
+            load_wasm_client(&wasm_client_code_path).await?;
 
         let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
-
-        let wasm_client_byte_code_gzip = {
-            let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-            encoder.write_all(&wasm_client_byte_code)?;
-            encoder.finish()?
-        };
 
         let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
             runtime: runtime.clone(),
@@ -793,7 +643,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code: wasm_client_byte_code_gzip,
+            wasm_client_byte_code,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
             dynamic_gas: Some(DynamicGasConfig {
                 multiplier: 1.1,
@@ -816,133 +666,11 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
 
         let cosmos_chain = &cosmos_chain_driver.chain;
 
-        let erc20_class_hash = {
-            let contract_path = std::env::var("ERC20_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared ERC20 class: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ics20_class_hash = {
-            let contract_path = std::env::var("ICS20_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared ICS20 class: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ibc_core_class_hash = {
-            let contract_path = std::env::var("IBC_CORE_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared IBC core class: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ibc_core_address = starknet_chain
-            .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
-            .await?;
-
-        info!(
-            "deployed IBC core contract to address: {:?}",
-            ibc_core_address
-        );
-
-        let comet_client_class_hash = {
-            let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared class for cometbft: {:?}", class_hash);
-
-            class_hash
-        };
-
         let cairo_encoding = StarknetCairoEncoding;
-
-        let comet_client_address = {
-            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
-            let contract_address = starknet_chain
-                .deploy_contract(&comet_client_class_hash, false, &owner_call_data)
-                .await?;
-
-            info!(
-                "deployed Comet client contract to address: {:?}",
-                contract_address
-            );
-
-            contract_address
-        };
-
-        let starknet_chain = {
-            let mut fields = starknet_chain.fields.as_ref().clone();
-
-            fields.ibc_core_contract_address = Some(ibc_core_address);
-            fields.ibc_client_contract_address = Some(comet_client_address);
-
-            let cairo_encoding = StarknetCairoEncoding;
-
-            fields.event_encoding = StarknetEventEncoding {
-                erc20_hashes: [erc20_class_hash].into(),
-                ics20_hashes: [ics20_class_hash].into(),
-                ibc_client_hashes: [comet_client_class_hash].into(),
-                ibc_core_contract_addresses: [ibc_core_address].into(),
-            };
-
-            StarknetChain {
-                fields: Arc::new(fields),
-            }
-        };
-
-        {
-            // register comet client contract with ibc-core
-
-            let register_client = MsgRegisterClient {
-                client_type: short_string!("07-tendermint"),
-                contract_address: comet_client_address,
-            };
-
-            let calldata = cairo_encoding.encode(&register_client)?;
-
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("register_client"),
-                calldata,
-            };
-
-            let message = StarknetMessage::new(call);
-
-            let response = starknet_chain.send_message(message).await?;
-
-            info!("IBC register client response: {:?}", response);
-        }
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
+            starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),
@@ -954,7 +682,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            &starknet_chain,
+            starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )
@@ -980,23 +708,6 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             &client_state_on_cosmos.client_state.chain_id,
             starknet_chain.chain_id()
         );
-
-        let ics20_contract_address = {
-            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
-            let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
-
-            let contract_address = starknet_chain
-                .deploy_contract(
-                    &ics20_class_hash,
-                    false,
-                    &[owner_call_data, erc20_call_data].concat(),
-                )
-                .await?;
-
-            info!("deployed ICS20 contract to address: {:?}", contract_address);
-
-            contract_address
-        };
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
             runtime.clone(),
@@ -1031,29 +742,6 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         // channel handshake
 
         let ics20_port = IbcPortId::transfer();
-
-        {
-            // register the ICS20 contract with the IBC core contract
-
-            let register_app = MsgRegisterApp {
-                port_id: ics20_port.clone(),
-                contract_address: ics20_contract_address,
-            };
-
-            let register_call_data = cairo_encoding.encode(&register_app)?;
-
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("bind_port_id"),
-                calldata: register_call_data,
-            };
-
-            let message = StarknetMessage::new(call);
-
-            let response = starknet_chain.send_message(message).await?;
-
-            info!("register ics20 response: {:?}", response);
-        }
 
         let init_channel_options = CosmosInitChannelOptions::new(starknet_connection_id);
 
@@ -1133,6 +821,8 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             balance_cosmos_a_step_0.quantity - transfer_quantity,
             balance_cosmos_a_step_1.quantity
         );
+
+        let ics20_contract_address = *starknet_chain.ibc_ics20_contract_address.get().unwrap();
 
         let ics20_token_address: StarknetAddress = {
             let ibc_prefixed_denom = PrefixedDenom {
@@ -1273,8 +963,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                     revision_height: 0,
                 },
                 timeout_timestamp_on_b: Timestamp::from_nanoseconds(
-                    u64::try_from(current_starknet_time.unix_timestamp() + 90).unwrap()
-                        * 1_000_000_000,
+                    u64::try_from(current_starknet_time.unix_timestamp() + 90).unwrap(),
                 ),
             }
         };

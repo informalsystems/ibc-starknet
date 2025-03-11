@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
@@ -12,9 +12,7 @@ use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPai
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
     ChainDriverBuilder, ChainDriverBuilderComponent,
 };
-use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::{
-    CanStartChainFullNode, ChainFullNodeStarterComponent,
-};
+use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::ChainFullNodeStarterComponent;
 use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::{
     ChainCommandPathGetter, ChainCommandPathGetterComponent,
 };
@@ -25,24 +23,30 @@ use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::ChainGenesisConfigTypeComponent;
 use hermes_error::impls::UseHermesError;
 use hermes_error::types::HermesError;
+use hermes_logger::UseHermesLogger;
+use hermes_logging_components::traits::has_logger::{
+    GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
+};
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::fs::create_dir::CanCreateDir;
 use hermes_runtime_components::traits::fs::write_file::CanWriteStringToFile;
 use hermes_runtime_components::traits::runtime::{
-    HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
+    RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::impls::bootstrap::bootstrap_chain::BootstrapStarknetDevnet;
+use hermes_starknet_test_components::impls::bootstrap::deploy_contracts::{
+    BuildChainAndDeployIbcContracts, DeployIbcContract,
+};
 use hermes_starknet_test_components::impls::bootstrap::start_chain::StartStarknetDevnet;
 use hermes_starknet_test_components::impls::types::genesis_config::ProvideStarknetGenesisConfigType;
 use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetNodeConfigType;
+use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
-use hermes_test_components::bootstrap::traits::chain::{
-    CanBootstrapChain, ChainBootstrapperComponent,
-};
+use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
 use hermes_test_components::chain_driver::traits::types::chain::{
     ChainTypeComponent, ProvideChainType,
 };
@@ -50,6 +54,7 @@ use hermes_test_components::driver::traits::types::chain_driver::{
     ChainDriverTypeComponent, ProvideChainDriverType,
 };
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
+use starknet::core::types::contract::SierraClass;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
 use starknet::signers::{LocalWallet, SigningKey};
@@ -64,6 +69,10 @@ pub struct StarknetBootstrap {
     pub runtime: HermesRuntime,
     pub chain_command_path: PathBuf,
     pub chain_store_dir: PathBuf,
+    pub erc20_contract: SierraClass,
+    pub ics20_contract: SierraClass,
+    pub ibc_core_contract: SierraClass,
+    pub comet_client_contract: SierraClass,
 }
 
 delegate_components! {
@@ -72,6 +81,12 @@ delegate_components! {
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
+        [
+            LoggerTypeProviderComponent,
+            LoggerGetterComponent,
+            GlobalLoggerGetterComponent,
+        ]:
+            UseHermesLogger,
         ChainNodeConfigTypeComponent:
             ProvideStarknetNodeConfigType,
         ChainGenesisConfigTypeComponent:
@@ -80,6 +95,10 @@ delegate_components! {
             BootstrapStarknetDevnet,
         ChainFullNodeStarterComponent:
             StartStarknetDevnet,
+        IbcContractsDeployerComponent:
+            DeployIbcContract,
+        ChainDriverBuilderComponent:
+            BuildChainAndDeployIbcContracts<BuildStarknetChainDriver>,
     }
 }
 
@@ -107,8 +126,8 @@ impl ChainStoreDirGetter<StarknetBootstrap> for StarknetBootstrapComponents {
     }
 }
 
-#[cgp_provider(ChainDriverBuilderComponent)]
-impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
+#[cgp_new_provider(ChainDriverBuilderComponent)]
+impl ChainDriverBuilder<StarknetBootstrap> for BuildStarknetChainDriver {
     async fn build_chain_driver(
         bootstrap: &StarknetBootstrap,
         genesis_config: StarknetGenesisConfig,
@@ -183,13 +202,15 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
                 chain_id: chain_id.to_string().parse()?,
                 rpc_client,
                 account: Arc::new(account),
-                ibc_client_contract_address: None,
-                ibc_core_contract_address: None,
+                ibc_client_contract_address: OnceLock::new(),
+                ibc_core_contract_address: OnceLock::new(),
+                ibc_ics20_contract_address: OnceLock::new(),
                 event_encoding: Default::default(),
                 proof_signer,
                 poll_interval: core::time::Duration::from_millis(200),
                 block_time: core::time::Duration::from_secs(1),
                 nonce_mutex: Arc::new(Mutex::new(())),
+                signer: relayer_wallet.clone(),
             }),
         };
 
@@ -210,9 +231,11 @@ impl ChainDriverBuilder<StarknetBootstrap> for StarknetBootstrapComponents {
     }
 }
 
-pub trait CanUseStarknetBootstrap:
-    HasRuntime<Runtime = HermesRuntime> + CanStartChainFullNode + CanBootstrapChain
-{
+check_components! {
+    CanUseStarknetBootstrap for StarknetBootstrap {
+        ChainFullNodeStarterComponent,
+        ChainBootstrapperComponent,
+        ChainDriverBuilderComponent,
+        IbcContractsDeployerComponent,
+    }
 }
-
-impl CanUseStarknetBootstrap for StarknetBootstrap {}

@@ -1,9 +1,19 @@
+use core::time::Duration;
+
 use cgp::prelude::*;
+use hermes_cosmos_chain_components::types::status::Time;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
+use hermes_relayer_components::chain::traits::types::height::HasHeightType;
+use hermes_relayer_components::chain::traits::types::timestamp::{HasTimeType, HasTimeoutType};
+use hermes_test_components::chain::traits::transfer::timeout::{
+    IbcTransferTimeoutCalculator, IbcTransferTimeoutCalculatorComponent,
+};
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
+use ibc::primitives::Timestamp;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
+use time::OffsetDateTime;
 
 use crate::traits::messages::transfer::CanBuildTransferTokenMessage;
 use crate::traits::transfer::{TokenTransferComponent, TokenTransferer};
@@ -34,5 +44,26 @@ where
         chain.send_message(message).await?;
 
         Ok(())
+    }
+}
+
+pub struct IbcTransferTimeoutAfterSeconds<const SECS: u64>;
+
+#[cgp_provider(IbcTransferTimeoutCalculatorComponent)]
+impl<Chain, const SECS: u64> IbcTransferTimeoutCalculator<Chain>
+    for IbcTransferTimeoutAfterSeconds<SECS>
+where
+    Chain: HasTimeType<Time = Time> + HasTimeoutType<Timeout = Timestamp> + HasHeightType,
+{
+    fn ibc_transfer_timeout_time(_chain: &Chain, current_time: &Time) -> Option<Timestamp> {
+        let time = (*current_time + Duration::from_secs(SECS)).unwrap();
+        OffsetDateTime::from(time).try_into().ok()
+    }
+
+    fn ibc_transfer_timeout_height(
+        _chain: &Chain,
+        _current_height: &Chain::Height,
+    ) -> Option<Chain::Height> {
+        None
     }
 }

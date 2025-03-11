@@ -6,13 +6,13 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
 use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_chain_components::traits::queries::packet_acknowledgement::{
-    PacketAcknowledgementQuerier, PacketAcknowledgementQuerierComponent,
+    PacketAckCommitmentQuerier, PacketAckCommitmentQuerierComponent,
 };
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{
     HasChannelIdType, HasPortIdType, HasSequenceType,
 };
-use hermes_chain_components::traits::types::packets::ack::HasAcknowledgementType;
+use hermes_chain_components::traits::types::packets::ack::HasAckCommitmentHashType;
 use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_encoding_components::traits::decode::CanDecode;
@@ -35,13 +35,10 @@ use crate::types::membership_proof_signer::MembershipVerifierContainer;
 use crate::types::messages::ibc::channel::PortId as CairoPortId;
 use crate::types::messages::ibc::packet::Sequence;
 use crate::types::status::StarknetChainStatus;
-
-const SUCCESS_ACK: &[u8] = br#"{"result":"AQ=="}"#;
-
 pub struct QueryStarknetAckCommitment;
 
-#[cgp_provider(PacketAcknowledgementQuerierComponent)]
-impl<Chain, Counterparty, Encoding> PacketAcknowledgementQuerier<Chain, Counterparty>
+#[cgp_provider(PacketAckCommitmentQuerierComponent)]
+impl<Chain, Counterparty, Encoding> PacketAckCommitmentQuerier<Chain, Counterparty>
     for QueryStarknetAckCommitment
 where
     Chain: HasHeightType<Height = u64>
@@ -49,7 +46,7 @@ where
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
         + HasPortIdType<Counterparty, PortId = IbcPortId>
-        + HasAcknowledgementType<Counterparty, Acknowledgement = Vec<u8>>
+        + HasAckCommitmentHashType<AckCommitmentHash = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + HasBlobType<Blob = Vec<Felt>>
         + HasSelectorType<Selector = Felt>
@@ -65,7 +62,7 @@ where
         + CanDecode<ViaCairo, Product![[u32; 8]]>
         + HasEncodedType<Encoded = Vec<Felt>>,
 {
-    async fn query_packet_acknowledgement(
+    async fn query_packet_ack_commitment_with_proof(
         chain: &Chain,
         channel_id: &ChannelId,
         port_id: &IbcPortId,
@@ -120,14 +117,9 @@ where
             proof_bytes: signed_bytes,
         };
 
-        // assert sha256 hash of SUCCESS_ACK is stored ack_bytes
-        // asset_eq!(ack_bytes, SUCCESS_ACK);
+        // `ack_bytes` is stored after hashing.
+        // query block event is required to get the original ack_bytes.
 
-        // FIXME: we can't send `ack_bytes` as it is stored after hashing.
-        // We should query block event to get the original ack_bytes.
-        //
-        // For now, we just return the SUCCESS_ACK as ack_bytes.
-
-        Ok((SUCCESS_ACK.to_vec(), dummy_proof))
+        Ok((ack_bytes, dummy_proof))
     }
 }
