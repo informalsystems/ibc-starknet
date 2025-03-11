@@ -78,6 +78,7 @@ use crate::commands::update::subcommand::{RunUpdateSubCommand, UpdateSubCommand}
 use crate::impls::bootstrap::osmosis_chain::{BootstrapOsmosisChainArgs, LoadOsmosisBootstrap};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
 use crate::impls::build::LoadStarknetBuilder;
+use crate::impls::create_client::CreateStarknetClientArgs;
 use crate::impls::error::ProvideCliError;
 
 #[cgp_context(StarknetAppComponents)]
@@ -158,6 +159,9 @@ delegate_components! {
         (CreateClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
         (CreateClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
 
+        (CreateStarknetClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateStarknetClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+
         (StartRelayerArgs, symbol!("chain_id_a")): ParseFromString<ChainId>,
         (StartRelayerArgs, symbol!("client_id_a")): ParseFromString<ClientId>,
         (StartRelayerArgs, symbol!("chain_id_b")): ParseFromString<ChainId>,
@@ -204,6 +208,7 @@ delegate_components! {
 
         UpdateClientArgs: RunUpdateClientCommand,
         CreateClientArgs: RunCreateClientCommand<Index<0>, Index<1>>,
+        CreateStarknetClientArgs: RunCreateClientCommand<Index<1>, Index<0>>,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<StarknetChain, UpdateStarknetConfig>,
         BootstrapOsmosisChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
@@ -326,6 +331,7 @@ check_components! {
             UpdateSubCommand,
             UpdateClientArgs,
             CreateClientArgs,
+            CreateStarknetClientArgs,
             StartRelayerArgs,
         ],
     }
