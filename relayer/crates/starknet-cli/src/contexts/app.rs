@@ -1,4 +1,3 @@
-use core::time::Duration;
 use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
@@ -8,9 +7,7 @@ use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cli::commands::client::create::CreateClientArgs;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
-use hermes_cli_components::impls::commands::client::create::{
-    CreateClientOptionsParser, CreateClientOptionsParserComponent, RunCreateClientCommand,
-};
+use hermes_cli_components::impls::commands::client::create::RunCreateClientCommand;
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
 };
@@ -45,7 +42,6 @@ use hermes_cli_components::traits::output::{
 };
 use hermes_cli_components::traits::parse::ArgParserComponent;
 use hermes_cli_components::traits::types::config::ConfigTypeComponent;
-use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
 use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::types::HermesError;
@@ -63,14 +59,12 @@ use hermes_starknet_chain_components::impls::types::config::{
     StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses, StarknetRelayerConfig,
 };
 use hermes_starknet_chain_components::types::client_id::ClientId;
-use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::{ConfigUpdater, ConfigUpdaterComponent};
-use ibc::clients::tendermint::types::TrustThreshold;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
 use toml::to_string_pretty;
@@ -209,7 +203,7 @@ delegate_components! {
         UpdateSubCommand: RunUpdateSubCommand,
 
         UpdateClientArgs: RunUpdateClientCommand,
-        CreateClientArgs: RunCreateClientCommand,
+        CreateClientArgs: RunCreateClientCommand<Index<0>, Index<1>>,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<StarknetChain, UpdateStarknetConfig>,
         BootstrapOsmosisChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
@@ -303,57 +297,6 @@ impl ConfigUpdater<CosmosChainDriver, StarknetRelayerConfig> for UpdateStarknetC
         config.cosmos_chain_config = Some(chain_config);
 
         Ok(chain_config_str)
-    }
-}
-
-#[cgp_provider(CreateClientOptionsParserComponent)]
-impl CreateClientOptionsParser<StarknetApp, CreateClientArgs, Index<0>, Index<1>>
-    for StarknetAppComponents
-{
-    async fn parse_create_client_options(
-        _app: &StarknetApp,
-        args: &CreateClientArgs,
-        _target_chain: &StarknetChain,
-        counterparty_chain: &CosmosChain,
-    ) -> Result<((), CosmosCreateClientOptions), HermesError> {
-        let max_clock_drift = match args.clock_drift.map(|d| d.into()) {
-            Some(input) => input,
-            None => {
-                counterparty_chain.chain_config.clock_drift
-                    + counterparty_chain.chain_config.max_block_time
-            }
-        };
-
-        let settings = CosmosCreateClientOptions {
-            max_clock_drift,
-            trusting_period: args
-                .trusting_period
-                .map(|d| d.into())
-                .unwrap_or_else(|| Duration::from_secs(14 * 24 * 3600)),
-            trust_threshold: args
-                .trust_threshold
-                .unwrap_or(TrustThreshold::TWO_THIRDS)
-                .into(),
-        };
-
-        Ok(((), settings))
-    }
-}
-
-// TODO(seanchen1991): Implement Cosmos-to-Starknet client creation
-pub struct CreateCosmosClientOnStarknetArgs;
-
-#[cgp_provider(CreateClientOptionsParserComponent)]
-impl CreateClientOptionsParser<StarknetApp, CreateCosmosClientOnStarknetArgs, Index<1>, Index<0>>
-    for StarknetAppComponents
-{
-    async fn parse_create_client_options(
-        _app: &StarknetApp,
-        _args: &CreateCosmosClientOnStarknetArgs,
-        _target_chain: &CosmosChain,
-        _counterparty_chain: &StarknetChain,
-    ) -> Result<((), StarknetCreateClientPayloadOptions), HermesError> {
-        todo!()
     }
 }
 
