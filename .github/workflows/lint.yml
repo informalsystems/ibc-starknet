@@ -52,6 +52,10 @@ jobs:
           tool-versions: cairo-libs/.tool-versions
           scarb-lock: cairo-libs/Scarb.lock
 
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
       - name: Format Toml
         run: |
           nix shell .#taplo -c \
@@ -61,6 +65,10 @@ jobs:
         run: |
           nix shell .#nixfmt -c \
             nixfmt --check .
+
+      - name: Format ts scripts
+        run: |
+          deno fmt --check scripts/*.ts
 
       - name: Format Cairo Contracts
         working-directory: ./cairo-contracts
