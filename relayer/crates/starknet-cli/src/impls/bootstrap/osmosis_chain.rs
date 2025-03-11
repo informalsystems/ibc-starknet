@@ -10,6 +10,7 @@ use hermes_error::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
 use hermes_starknet_integration_tests::utils::load_wasm_client;
+use tracing::info;
 
 #[derive(Debug, clap::Parser, HasField)]
 pub struct BootstrapOsmosisChainArgs {
@@ -54,9 +55,15 @@ where
 
         let builder = CosmosBuilder::new_with_default(runtime.clone());
 
-        let (_, wasm_client_byte_code) = load_wasm_client(&args.wasm_client_code_path)
+        let (wasm_code_hash, wasm_client_byte_code) = load_wasm_client(&args.wasm_client_code_path)
             .await
             .map_err(App::raise_error)?;
+
+        info!(
+            target: "hermes::cli",
+            wasm_code_hash = %hex::encode(wasm_code_hash),
+            "bootstrapping Osmosis chain with Starknet Wasm client",
+        );
 
         let bootstrap = OsmosisBootstrap {
             runtime: runtime.clone(),
