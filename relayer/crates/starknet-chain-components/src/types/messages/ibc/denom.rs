@@ -10,7 +10,7 @@ use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
 use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
-use starknet::core::types::Felt;
+use ibc::apps::transfer::types::PrefixedDenom as IbcPrefixedDenom;
 
 use crate::impls::types::address::StarknetAddress;
 
@@ -51,31 +51,35 @@ impl FromStr for PrefixedDenom {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let split_str = s.split("/").collect::<Vec<&str>>();
-        let base_str = *split_str
-            .last()
-            .ok_or("Failed to convert string to PrefixedDenom. Empty string")?;
-        let base = if base_str.starts_with("0x") {
-            Denom::Native(
-                Felt::from_hex(base_str)
-                    .map_err(|e| format!("Failed to convert `{s}` to PrefixedDenom. {e}"))?
-                    .into(),
-            )
-        } else {
-            Denom::Hosted(base_str.to_string())
-        };
-        let trace_path = split_str[..split_str.len() - 1]
-            .chunks(2)
-            .map(|chunk| {
-                let port_id = chunk[0].to_string();
-                let channel_id = chunk[1].to_string();
-                TracePrefix {
-                    port_id,
-                    channel_id,
-                }
-            })
-            .collect();
-        Ok(Self { trace_path, base })
+        let ibc_prefix_denom = IbcPrefixedDenom::from_str(s)
+            .map_err(|e| format!("failed to convert string to IbcPrefixDenom: {e}"))?;
+        let trace_path_json = serde_json::to_string(&ibc_prefix_denom.trace_path)
+            .map_err(|e| format!("failed to convert IbcPrefixDenom TracePath to string: {e}"))?;
+
+        #[derive(serde::Deserialize)]
+        struct DummyTracePath {
+            pub port_id: String,
+            pub channel_id: String,
+        }
+
+        let trace_path: Vec<DummyTracePath> = serde_json::from_str(&trace_path_json)
+            .map_err(|e| format!("failed to convert string to DummyTracePath: {e}"))?;
+
+        Ok(Self {
+            trace_path: trace_path
+                .into_iter()
+                .map(
+                    |DummyTracePath {
+                         port_id,
+                         channel_id,
+                     }| TracePrefix {
+                        port_id,
+                        channel_id,
+                    },
+                )
+                .collect(),
+            base: Denom::Hosted(ibc_prefix_denom.base_denom.as_str().to_string()),
+        })
     }
 }
 
@@ -196,15 +200,33 @@ mod tests {
         let expected = PrefixedDenom {
             trace_path: vec![
                 TracePrefix {
-                    port_id: "transfer2".to_string(),
-                    channel_id: "channel-1".to_string(),
-                },
-                TracePrefix {
                     port_id: "transfer".to_string(),
                     channel_id: "channel-0".to_string(),
                 },
+                TracePrefix {
+                    port_id: "transfer2".to_string(),
+                    channel_id: "channel-1".to_string(),
+                },
             ],
             base: Denom::Hosted("coin".to_string()),
+        };
+
+        let result = PrefixedDenom::from_str(input);
+        assert!(result.is_ok(), "Parsing failed for multiple trace paths");
+        assert_eq!(result.unwrap(), expected);
+    }
+
+    #[test]
+    fn test_starknet_trace_paths() {
+        let input = "transfer/channel-75/factory/stars16da2uus9zrsy83h23ur42v3lglg5rmyrpqnju4/dust";
+        let expected = PrefixedDenom {
+            trace_path: vec![TracePrefix {
+                port_id: "transfer".to_string(),
+                channel_id: "channel-75".to_string(),
+            }],
+            base: Denom::Hosted(
+                "factory/stars16da2uus9zrsy83h23ur42v3lglg5rmyrpqnju4/dust".to_string(),
+            ),
         };
 
         let result = PrefixedDenom::from_str(input);
