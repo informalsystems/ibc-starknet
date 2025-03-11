@@ -46,7 +46,7 @@ jobs:
           tag: v0.2.4
           extract: true
 
-      - uses: taiki-e/install-action@v2
+      - uses: taiki-e/cache-cargo-install-action@v2
         with:
           tool: cosmwasm-check
 
