@@ -5,8 +5,11 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWr
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
+use hermes_cli::commands::channel::CreateChannelArgs;
 use hermes_cli::commands::client::create::CreateCosmosClientArgs;
+use hermes_cli::impls::parse::ParseInitCosmosChannelOptions;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
+use hermes_cli_components::impls::commands::channel::create::RunCreateChannelCommand;
 use hermes_cli_components::impls::commands::client::create::RunCreateClientCommand;
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
@@ -69,7 +72,7 @@ use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBoo
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::{ConfigUpdater, ConfigUpdaterComponent};
 use ibc::core::client::types::Height;
-use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
+use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId, PortId};
 use toml::to_string_pretty;
 
 use crate::commands::all::{AllSubCommands, RunAllSubCommand};
@@ -170,6 +173,14 @@ delegate_components! {
         (CreateConnectionArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
         (CreateConnectionArgs, symbol!("counterparty_client_id")): ParseFromString<ClientId>,
 
+        (CreateChannelArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateChannelArgs, symbol!("target_client_id")): ParseFromString<ClientId>,
+        (CreateChannelArgs, symbol!("target_port_id")): ParseFromString<PortId>,
+        (CreateChannelArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateChannelArgs, symbol!("counterparty_client_id")): ParseFromString<ClientId>,
+        (CreateChannelArgs, symbol!("counterparty_port_id")): ParseFromString<PortId>,
+        (CreateChannelArgs, symbol!("init_channel_options")): ParseInitCosmosChannelOptions,
+
         (StartRelayerArgs, symbol!("chain_id_a")): ParseFromString<ChainId>,
         (StartRelayerArgs, symbol!("client_id_a")): ParseFromString<ClientId>,
         (StartRelayerArgs, symbol!("chain_id_b")): ParseFromString<ChainId>,
@@ -219,6 +230,7 @@ delegate_components! {
         CreateStarknetClientArgs: RunCreateClientCommand<Index<1>, Index<0>>,
 
         CreateConnectionArgs: RunCreateConnectionCommand,
+        CreateChannelArgs: RunCreateChannelCommand,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<StarknetChain, UpdateStarknetConfig>,
         BootstrapOsmosisChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
@@ -344,6 +356,7 @@ check_components! {
             CreateStarknetClientArgs,
             StartRelayerArgs,
             CreateConnectionArgs,
+            CreateChannelArgs,
         ],
     }
 }

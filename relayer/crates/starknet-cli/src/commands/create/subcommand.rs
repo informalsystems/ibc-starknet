@@ -1,4 +1,5 @@
 use cgp::prelude::*;
+use hermes_cli::commands::channel::CreateChannelArgs;
 use hermes_cli::commands::client::create::CreateCosmosClientArgs;
 use hermes_cli_components::impls::commands::connection::create::CreateConnectionArgs;
 use hermes_cli_components::traits::command::{
@@ -12,6 +13,7 @@ pub enum CreateSubCommand {
     CosmosClient(CreateCosmosClientArgs),
     StarknetClient(CreateStarknetClientArgs),
     Connection(CreateConnectionArgs),
+    Channel(CreateChannelArgs),
 }
 
 #[cgp_new_provider(CommandRunnerComponent)]
@@ -19,7 +21,8 @@ impl<App> CommandRunner<App, CreateSubCommand> for RunCreateSubCommand
 where
     App: CanRunCommand<CreateCosmosClientArgs>
         + CanRunCommand<CreateStarknetClientArgs>
-        + CanRunCommand<CreateConnectionArgs>,
+        + CanRunCommand<CreateConnectionArgs>
+        + CanRunCommand<CreateChannelArgs>,
 {
     async fn run_command(
         app: &App,
@@ -29,6 +32,7 @@ where
             CreateSubCommand::CosmosClient(args) => app.run_command(args).await,
             CreateSubCommand::StarknetClient(args) => app.run_command(args).await,
             CreateSubCommand::Connection(args) => app.run_command(args).await,
+            CreateSubCommand::Channel(args) => app.run_command(args).await,
         }
     }
 }

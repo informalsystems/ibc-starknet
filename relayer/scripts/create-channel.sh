@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-cargo run --bin hermes -- \
+cargo run --bin hermes-starknet -- \
     --config test-data/config.toml \
-    channel create \
-    --target-chain-id chain-b \
-    --counterparty-chain-id chain-a \
+    create channel \
+    --target-chain-id 393402133025997798000961 \
+    --counterparty-chain-id cosmos \
     --target-client-id 07-tendermint-0 \
-    --counterparty-client-id 07-tendermint-0 \
+    --counterparty-client-id 08-wasm-0 \
     --target-connection-id connection-0 \
     --target-port-id transfer \
     --counterparty-port-id transfer \
