@@ -21,16 +21,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cachix/install-nix-action@v30
+      - name: Install osmosisd v28.0.0
+        uses: jaxxstorm/action-install-gh-release@v1.14.0
         with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
+          repo: osmosis-labs/osmosis
+          tag: v28.0.0
+          cache: enable
 
-      - uses: cachix/cachix-action@v15
+      - name: Install starknet-devnet
+        uses: jaxxstorm/action-install-gh-release@v1.14.0
         with:
-          name: ibc-starknet
-          extraPullNames: hermes-sdk,cosmos-nix
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          repo: starknet/starknet-devnet
+          tag: v0.3.0-rc.0
+          cache: enable
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cosmwasm-check
+
+      - run: |
+          osmosisd version
+          starknet-devnet --version
+          cosmwasm-check --version
 
       - name: Install Rust nightly toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -58,28 +70,11 @@ jobs:
         run: |
           scarb build -p starknet_ibc_contracts
 
-      - name: Nix build
+      - name: Build CW light client contract
+        working-directory: ./light-client
         run: |
-          sudo rm -rf /opt/homebrew/
-
-          nix build \
-            .#starknet-devnet \
-            .#universal-sierra-compiler \
-            .#rust \
-            .#rust-wasm \
-            .#rust-nightly \
-            .#taplo \
-            .#nixfmt \
-            .#cargo-nextest \
-            .#ibc-starknet-cw \
-            .#wasm-simapp \
-            .#osmosis
-
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: |
-            relayer -> relayer/target
-            light-client -> light-client/target
+          cargo +nightly build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
+          cosmwasm-check target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm
 
       - name: Run Integration Tests
         env:
@@ -91,17 +86,10 @@ jobs:
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
           export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json"
           export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_CometClient.contract_class.json"
-          export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
+          export STARKNET_WASM_CLIENT_PATH="$(pwd)/../light-client/target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json"
 
-          nix shell \
-            ..#osmosis \
-            ..#wasm-simapp \
-            ..#starknet-devnet \
-            ..#rust \
-            ..#cargo-nextest \
-            -c \
-            cargo nextest run --test-threads=1
+          cargo nextest run --test-threads=1
 
   lint-relayer:
     name: Lint Relayer Code
