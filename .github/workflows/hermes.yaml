@@ -32,7 +32,7 @@ jobs:
         uses: jaxxstorm/action-install-gh-release@v1.14.0
         with:
           repo: starknet/starknet-devnet
-          tag: v0.3.0-rc.0
+          tag: v0.2.4
           cache: enable
 
       - uses: taiki-e/install-action@v2
