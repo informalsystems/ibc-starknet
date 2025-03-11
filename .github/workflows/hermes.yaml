@@ -37,6 +37,9 @@ jobs:
           asset-name: ${{ matrix.value.osmosis }}
           tag: v28.0.1
           cache: enable
+          rename-to: ${{ matrix.value.osmosis }}
+          chmod: 0755
+          extension-matching: disable
 
       - name: Install starknet-devnet
         uses: jaxxstorm/action-install-gh-release@master
@@ -45,6 +48,9 @@ jobs:
           asset-name: ${{ matrix.value.starknet-devnet }}
           tag: v0.2.4
           cache: enable
+          rename-to: ${{ matrix.value.starknet-devnet }}
+          chmod: 0755
+          extension-matching: disable
 
       - uses: taiki-e/install-action@v2
         with:
