@@ -5,7 +5,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWr
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_cli::commands::client::create::CreateClientArgs;
+use hermes_cli::commands::client::create::CreateCosmosClientArgs;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
 use hermes_cli_components::impls::commands::client::create::RunCreateClientCommand;
 use hermes_cli_components::impls::commands::client::update::{
@@ -156,8 +156,8 @@ delegate_components! {
         (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
         (UpdateClientArgs, symbol!("target_height")): ParseFromOptionalString<Height>,
 
-        (CreateClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
-        (CreateClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateCosmosClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateCosmosClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
 
         (CreateStarknetClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
         (CreateStarknetClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
@@ -207,7 +207,7 @@ delegate_components! {
         UpdateSubCommand: RunUpdateSubCommand,
 
         UpdateClientArgs: RunUpdateClientCommand,
-        CreateClientArgs: RunCreateClientCommand<Index<0>, Index<1>>,
+        CreateCosmosClientArgs: RunCreateClientCommand<Index<0>, Index<1>>,
         CreateStarknetClientArgs: RunCreateClientCommand<Index<1>, Index<0>>,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<StarknetChain, UpdateStarknetConfig>,
@@ -330,7 +330,7 @@ check_components! {
             CreateSubCommand,
             UpdateSubCommand,
             UpdateClientArgs,
-            CreateClientArgs,
+            CreateCosmosClientArgs,
             CreateStarknetClientArgs,
             StartRelayerArgs,
         ],

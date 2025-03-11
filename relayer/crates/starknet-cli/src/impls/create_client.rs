@@ -2,7 +2,7 @@ use core::time::Duration;
 
 use cgp::core::field::Index;
 use cgp::prelude::*;
-use hermes_cli::commands::client::create::CreateClientArgs;
+use hermes_cli::commands::client::create::CreateCosmosClientArgs;
 use hermes_cli_components::impls::commands::client::create::{
     CreateClientOptionsParser, CreateClientOptionsParserComponent,
 };
@@ -41,12 +41,12 @@ pub struct CreateStarknetClientArgs {
 }
 
 #[cgp_provider(CreateClientOptionsParserComponent)]
-impl CreateClientOptionsParser<StarknetApp, CreateClientArgs, Index<0>, Index<1>>
+impl CreateClientOptionsParser<StarknetApp, CreateCosmosClientArgs, Index<0>, Index<1>>
     for StarknetAppComponents
 {
     async fn parse_create_client_options(
         _app: &StarknetApp,
-        args: &CreateClientArgs,
+        args: &CreateCosmosClientArgs,
         _target_chain: &StarknetChain,
         counterparty_chain: &CosmosChain,
     ) -> Result<((), CosmosCreateClientOptions), HermesError> {
