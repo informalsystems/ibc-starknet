@@ -1,5 +1,6 @@
 #!/usr/bin/env -S deno run
 
+import "jsr:@std/dotenv/load";
 import {
   byteArray,
   CairoCustomEnum,
@@ -10,10 +11,11 @@ import {
   RpcProvider,
 } from "npm:starknet";
 
-const STARKNET_RPC_ENDPOINT =
-  "https://starknet-sepolia.public.blastapi.io/rpc/v0_7";
-const ICS20_CONTRACT =
-  "0x01bc3df6b90ea052fa965fceb983277f8bf1bc7d3484f80c67c219915c72c92e";
+const STARKNET_RPC_ENDPOINT = Deno.env.get("STARKNET_RPC")!;
+const ICS20_CONTRACT = Deno.env.get("ICS20_CONTRACT_ADDRESS")!;
+
+console.log("Starknet RPC Endpoint:", STARKNET_RPC_ENDPOINT);
+console.log("ICS20 Contract Address:", ICS20_CONTRACT);
 
 const CHANNEL_ID = "channel-2";
 const PORT_ID = "transfer";

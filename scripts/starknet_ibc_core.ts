@@ -1,18 +1,21 @@
 #!/usr/bin/env -S deno run
 
+import "jsr:@std/dotenv/load";
 import { Contract, RpcProvider } from "npm:starknet";
 import { QueryClient, setupIbcExtension } from "npm:@cosmjs/stargate";
 import { Tendermint34Client } from "npm:@cosmjs/tendermint-rpc";
 
-const OSMOSIS_RPC_ENDPOINT = "https://rpc.testnet.osmosis.zone";
-const STARKNET_RPC_ENDPOINT =
-  "https://starknet-sepolia.public.blastapi.io/rpc/v0_7";
-const IBC_CORE_CONTRACT =
-  "0x05083221904c1a0c9fa646230f54c9e130e498cdfa4ce8f7e82b63384893262d";
-const IBC_CLIENT_CONTRACT =
-  "0x007b3e3b54558145bedc6c9eb50bb27cb9b0a84973e1644d9f58be0d2be6b0b8";
+const OSMOSIS_RPC_ENDPOINT = Deno.env.get("OSMOSIS_RPC")!;
+const STARKNET_RPC_ENDPOINT = Deno.env.get("STARKNET_RPC")!;
+const IBC_CORE_CONTRACT = Deno.env.get("CORE_CONTRACT_ADDRESS")!;
+const IBC_CLIENT_CONTRACT = Deno.env.get("COMET_CONTRACT_ADDRESS")!;
 const CHANNEL_ID = "channel-2";
 const PORT_ID = "transfer";
+
+console.log("Osmosis RPC Endpoint:", OSMOSIS_RPC_ENDPOINT);
+console.log("Starknet RPC Endpoint:", STARKNET_RPC_ENDPOINT);
+console.log("Starknet IBC Core Contract:", IBC_CORE_CONTRACT);
+console.log("Starknet IBC Client Contract:", IBC_CLIENT_CONTRACT);
 
 const starknetProvider = new RpcProvider({ nodeUrl: STARKNET_RPC_ENDPOINT });
 
