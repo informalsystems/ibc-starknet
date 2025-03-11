@@ -41,7 +41,7 @@ jobs:
       - name: Install starknet-devnet
         uses: robinraju/release-downloader@v1
         with:
-          repository: starknet/starknet-devnet
+          repository: 0xSpaceShard/starknet-devnet
           fileName: ${{ matrix.value.starknet-devnet }}
           tag: v0.2.4
           extract: true
