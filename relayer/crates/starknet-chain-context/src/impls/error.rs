@@ -40,6 +40,7 @@ use hermes_starknet_chain_components::impls::queries::contract_address::Contract
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use hermes_starknet_chain_components::types::event::UnknownEvent;
 use hermes_test_components::chain::impls::assert::poll_assert_eventual_amount::EventualAmountTimeoutError;
+use hermes_test_components::chain::impls::ibc_transfer::MissingSendPacketEventError;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use ibc::core::channel::types::error::ChannelError;
 use ibc::core::client::types::error::ClientError;
@@ -100,6 +101,7 @@ delegate_components! {
             ContractAddressNotFound,
             EmptyMessageResponse,
             ConsensusStateNotFound,
+            MissingSendPacketEventError,
             <'a> UnknownEvent<'a>,
             <'a, Chain: HasAddressType + HasAmountType> EventualAmountTimeoutError<'a, Chain>,
             <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,

@@ -12,7 +12,7 @@ use crate::types::cosmos::height::Height;
 use crate::types::cosmos::timestamp::Timestamp;
 use crate::types::event::{StarknetEvent, UnknownEvent};
 use crate::types::messages::ibc::channel::{ChannelOrdering, PortId};
-use crate::types::messages::ibc::packet::{Acknowledgement, Sequence};
+use crate::types::messages::ibc::packet::{Acknowledgement, Packet, Sequence};
 
 #[derive(Debug)]
 pub enum PacketRelayEvents {
@@ -59,7 +59,7 @@ pub struct WriteAcknowledgementEvent {
     pub port_id_on_b: PortId,
     pub channel_id_on_b: ChannelId,
 
-    pub packet_data: Vec<Felt>,
+    pub packet: Packet,
     pub acknowledgement: Acknowledgement,
 }
 
@@ -255,7 +255,7 @@ where
         + CanRaiseAsyncError<CairoEncoding::Error>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Sequence, PortId, ChannelId, PortId, ChannelId]>
-        + CanDecode<ViaCairo, Product![Vec<Felt>, Acknowledgement]>,
+        + CanDecode<ViaCairo, Product![Packet, Acknowledgement]>,
 {
     fn decode(
         event_encoding: &EventEncoding,
@@ -273,7 +273,7 @@ where
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
-        let product![packet_data, acknowledgement,] = cairo_encoding
+        let product![packet, acknowledgement,] = cairo_encoding
             .decode(&event.data)
             .map_err(EventEncoding::raise_error)?;
 
@@ -283,7 +283,7 @@ where
             channel_id_on_a,
             port_id_on_b,
             channel_id_on_b,
-            packet_data,
+            packet,
             acknowledgement,
         })
     }

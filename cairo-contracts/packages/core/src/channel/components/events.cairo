@@ -133,7 +133,7 @@ pub mod ChannelEventEmitterComponent {
         pub port_id_on_b: PortId,
         #[key]
         pub channel_id_on_b: ChannelId,
-        pub packet_data: Array<felt252>,
+        pub packet: Packet,
         pub acknowledgement: Acknowledgement,
     }
 
@@ -306,6 +306,7 @@ pub mod ChannelEventEmitterComponent {
             packet: Packet,
             acknowledgement: Acknowledgement,
         ) {
+            let packet_clone = packet.clone();
             self
                 .emit(
                     WriteAcknowledgementEvent {
@@ -314,7 +315,7 @@ pub mod ChannelEventEmitterComponent {
                         channel_id_on_a: packet.chan_id_on_a,
                         port_id_on_b: packet.port_id_on_b,
                         channel_id_on_b: packet.chan_id_on_b,
-                        packet_data: packet.data,
+                        packet: packet_clone,
                         acknowledgement: acknowledgement,
                     },
                 );

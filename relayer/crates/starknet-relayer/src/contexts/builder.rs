@@ -295,10 +295,10 @@ impl StarknetBuilder {
             ibc_core_contract_address.set(address).unwrap();
         }
 
-        let ics20_contract_address = OnceLock::new();
+        let ibc_ics20_contract_address = OnceLock::new();
 
-        if let Some(address) = contract_addresses.ics20 {
-            ics20_contract_address.set(address).unwrap();
+        if let Some(address) = contract_addresses.ibc_ics20 {
+            ibc_ics20_contract_address.set(address).unwrap();
         }
 
         let context = StarknetChain {
@@ -309,12 +309,13 @@ impl StarknetBuilder {
                 account: Arc::new(account),
                 ibc_client_contract_address,
                 ibc_core_contract_address,
-                ics20_contract_address,
+                ibc_ics20_contract_address,
                 event_encoding,
                 proof_signer,
                 poll_interval: self.starknet_chain_config.poll_interval,
                 block_time: self.starknet_chain_config.block_time,
                 nonce_mutex: Arc::new(Mutex::new(())),
+                signer: relayer_wallet,
             }),
         };
 

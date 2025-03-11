@@ -59,7 +59,7 @@ pub trait HasChainContractFields: HasAddressType {
 
     fn ibc_client_contract_address(&self) -> &OnceLock<Self::Address>;
 
-    fn ics20_contract_address(&self) -> &OnceLock<Self::Address>;
+    fn ibc_ics20_contract_address(&self) -> &OnceLock<Self::Address>;
 }
 
 #[cgp_auto_getter]
@@ -288,7 +288,7 @@ where
             .map_err(|_| Bootstrap::raise_error("failed to set comet_client_address on chain"))?;
 
         chain
-            .ics20_contract_address()
+            .ibc_ics20_contract_address()
             .set(ics20_contract_address)
             .map_err(|_| Bootstrap::raise_error("failed to set ics20_contract_address on chain"))?;
 

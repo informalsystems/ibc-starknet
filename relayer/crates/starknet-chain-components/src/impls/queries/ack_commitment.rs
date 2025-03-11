@@ -35,9 +35,6 @@ use crate::types::membership_proof_signer::MembershipVerifierContainer;
 use crate::types::messages::ibc::channel::PortId as CairoPortId;
 use crate::types::messages::ibc::packet::Sequence;
 use crate::types::status::StarknetChainStatus;
-
-const SUCCESS_ACK: &[u8] = br#"{"result":"AQ=="}"#;
-
 pub struct QueryStarknetAckCommitment;
 
 #[cgp_provider(PacketAckCommitmentQuerierComponent)]
@@ -120,14 +117,9 @@ where
             proof_bytes: signed_bytes,
         };
 
-        // assert sha256 hash of SUCCESS_ACK is stored ack_bytes
-        // asset_eq!(ack_bytes, SUCCESS_ACK);
+        // `ack_bytes` is stored after hashing.
+        // query block event is required to get the original ack_bytes.
 
-        // FIXME: we can't send `ack_bytes` as it is stored after hashing.
-        // We should query block event to get the original ack_bytes.
-        //
-        // For now, we just return the SUCCESS_ACK as ack_bytes.
-
-        Ok((SUCCESS_ACK.to_vec(), dummy_proof))
+        Ok((ack_bytes, dummy_proof))
     }
 }
