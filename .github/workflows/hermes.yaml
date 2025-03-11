@@ -46,6 +46,9 @@ jobs:
         with:
           toolchain: 1.81,stable
           target: wasm32-unknown-unknown
+          cache-workspaces: |
+            relayer -> relayer/target
+            light-client -> light-client/target
 
       - name: Install osmosisd v28.0.1
         uses: robinraju/release-downloader@v1
