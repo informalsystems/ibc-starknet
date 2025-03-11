@@ -77,7 +77,6 @@ async function queryStarknetIbc() {
     connectionId: connectionId,
     clientId: clientId,
     clientSequence: clientSequence,
-
     channelEnd: channelEnd,
     connectionEnd: connectionEnd,
     clientType: clientType,
@@ -120,7 +119,6 @@ async function queryOsmosisIbc(
     channelId: channelId,
     connectionId: connectionId,
     clientId: clientId,
-
     channelEnd: channelEnd,
     connectionEnd: connectionEnd,
     clientState: clientState,
