@@ -51,6 +51,7 @@ jobs:
           tool: cosmwasm-check
 
       - run: |
+          ls -l
           osmosisd version
           starknet-devnet --version
           cosmwasm-check --version
