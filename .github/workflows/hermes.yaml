@@ -50,8 +50,9 @@ jobs:
         with:
           tool: cosmwasm-check
 
+      - run: echo "$PWD" >> $GITHUB_PATH
+
       - run: |
-          ls -l
           osmosisd version
           starknet-devnet --version
           cosmwasm-check --version
