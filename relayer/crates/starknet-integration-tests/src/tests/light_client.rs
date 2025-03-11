@@ -1,13 +1,9 @@
 use core::marker::PhantomData;
 use core::time::Duration;
 use std::env::var;
-use std::io::Write;
-use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use flate2::write::GzEncoder;
-use flate2::Compression;
 use hermes_chain_components::traits::extract_data::CanExtractFromMessageResponse;
 use hermes_cosmos_chain_components::impls::connection::connection_handshake_message::default_connection_version;
 use hermes_cosmos_chain_components::traits::message::ToCosmosMessage;
@@ -18,7 +14,6 @@ use hermes_cosmos_chain_components::types::messages::connection::open_init::Cosm
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
@@ -29,26 +24,18 @@ use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
-use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::sleep::CanSleep;
-use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
-use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
-use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
-use hermes_starknet_chain_components::types::register::MsgRegisterClient;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain_driver::traits::types::chain::HasChain;
 use ibc::core::client::types::Height;
-use sha2::{Digest, Sha256};
-use starknet::accounts::Call;
-use starknet::macros::{selector, short_string};
 use tracing::info;
 
-use crate::contexts::bootstrap::StarknetBootstrap;
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
+use crate::utils::{init_starknet_bootstrap, load_wasm_client};
 
 #[test]
 fn test_starknet_light_client() -> Result<(), Error> {
@@ -62,26 +49,13 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
     let store_dir = std::env::current_dir()?.join(format!("test-data/{store_postfix}"));
 
-    let wasm_client_code_path = PathBuf::from(
-        var("STARKNET_WASM_CLIENT_PATH").expect("Wasm blob for Starknet light client is required"),
-    );
+    let wasm_client_code_path =
+        var("STARKNET_WASM_CLIENT_PATH").expect("Wasm blob for Starknet light client is required");
 
     let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
 
     runtime.runtime.clone().block_on(async move {
-        let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
-
-        let wasm_code_hash: [u8; 32] = {
-            let mut hasher = Sha256::new();
-            hasher.update(&wasm_client_byte_code);
-            hasher.finalize().into()
-        };
-
-        let wasm_client_byte_code_gzip = {
-            let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-            encoder.write_all(&wasm_client_byte_code)?;
-            encoder.finish()?
-        };
+        let (wasm_code_hash, wasm_client_byte_code) = load_wasm_client(&wasm_client_code_path).await?;
 
         let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
             runtime: runtime.clone(),
@@ -92,7 +66,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code: wasm_client_byte_code_gzip,
+            wasm_client_byte_code,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
             dynamic_gas: Some(DynamicGasConfig {
                 multiplier: 1.1,
@@ -102,11 +76,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
             }),
         });
 
-        let starknet_bootstrap = StarknetBootstrap {
-            runtime: runtime.clone(),
-            chain_command_path: "starknet-devnet".into(),
-            chain_store_dir: store_dir,
-        };
+        let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
 
         let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
 
@@ -114,99 +84,14 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let cosmos_chain = cosmos_chain_driver.chain();
 
-        let starknet_chain = &mut starknet_chain_driver.chain;
-
-        let ibc_core_class_hash = {
-            let contract_path = std::env::var("IBC_CORE_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared IBC core class: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ibc_core_address = starknet_chain
-            .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
-            .await?;
-
-        info!(
-            "deployed IBC core contract to address: {:?}",
-            ibc_core_address
-        );
-
-        let comet_client_class_hash = {
-            let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared class: {:?}", class_hash);
-
-            class_hash
-        };
+        let starknet_chain: &StarknetChain = &mut starknet_chain_driver.chain;
 
         let cairo_encoding = StarknetCairoEncoding;
-
-        let comet_client_address = {
-            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
-            let contract_address = starknet_chain
-                .deploy_contract(&comet_client_class_hash, false, &owner_call_data)
-                .await?;
-
-            info!(
-                "deployed Comet client contract to address: {:?}",
-                contract_address
-            );
-
-            contract_address
-        };
-
-        let starknet_chain = {
-            let mut fields = starknet_chain.fields.as_ref().clone();
-
-            fields.ibc_core_contract_address = Some(ibc_core_address);
-            fields.ibc_client_contract_address = Some(comet_client_address);
-
-            StarknetChain {
-                fields: Arc::new(fields),
-            }
-        };
-
-        {
-            // register comet client contract with ibc-core
-
-            let register_client = MsgRegisterClient {
-                client_type: short_string!("07-tendermint"),
-                contract_address: comet_client_address,
-            };
-
-            let calldata = cairo_encoding.encode(&register_client)?;
-
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("register_client"),
-                calldata,
-            };
-
-            let message = StarknetMessage::new(call);
-
-            let response = starknet_chain.send_message(message).await?;
-
-            info!("IBC register client response: {:?}", response);
-        }
 
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            &starknet_chain,
+            starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )
@@ -216,7 +101,7 @@ fn test_starknet_light_client() -> Result<(), Error> {
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
+            starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),
