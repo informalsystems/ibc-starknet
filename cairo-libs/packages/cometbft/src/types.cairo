@@ -341,12 +341,12 @@ impl SumAsProtoOneof of ProtoOneof<Sum> {
         match self {
             Sum::Ed25519(k) => {
                 k.encode_raw(ref context);
-                let wire_type = ProtoMessage::<ByteArray>::wire_type();
+                let wire_type = ProtoMessage::<Array<u8>>::wire_type();
                 ProtobufTag { field_number: 1, wire_type }
             },
             Sum::Secp256k1(k) => {
                 k.encode_raw(ref context);
-                let wire_type = ProtoMessage::<ByteArray>::wire_type();
+                let wire_type = ProtoMessage::<Array<u8>>::wire_type();
                 ProtobufTag { field_number: 2, wire_type }
             },
         }
