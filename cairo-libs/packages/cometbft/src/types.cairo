@@ -1,13 +1,13 @@
 use protobuf::types::wkt::Timestamp;
 use protobuf::types::message::{
-    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    ProtoMessage, ProtoOneof, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
     DecodeContextImpl, ProtoName,
 };
-use protobuf::primitives::array::{ByteArrayAsProtoMessage};
+use protobuf::primitives::array::{BytesAsProtoMessage, ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{
     I32AsProtoMessage, I64AsProtoMessage, BoolAsProtoMessage, U64AsProtoMessage,
 };
-use protobuf::types::tag::WireType;
+use protobuf::types::tag::{WireType, ProtobufTag};
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub struct Consensus {
@@ -309,23 +309,19 @@ impl SignedHeaderAsProtoName of ProtoName<SignedHeader> {
     }
 }
 
-#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
+#[derive(Drop, Default, Debug, Clone, PartialEq, Serde)]
 pub struct PublicKey {
-    // TODO(rano): this is oneof
-    pub ed25519: ByteArray,
-    pub secp256k1: ByteArray,
+    pub sum: Sum,
 }
 
 impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
     fn encode_raw(self: @PublicKey, ref context: EncodeContext) {
-        context.encode_field(1, self.ed25519);
-        context.encode_field(2, self.secp256k1);
+        context.encode_oneof(self.sum)
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<PublicKey> {
-        let ed25519 = context.decode_field(1)?;
-        let secp256k1 = context.decode_field(2)?;
-        Option::Some(PublicKey { ed25519, secp256k1 })
+        let sum = context.decode_oneof()?;
+        Option::Some(PublicKey { sum })
     }
 
     fn wire_type() -> WireType {
@@ -333,9 +329,42 @@ impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
     }
 }
 
-impl PublicKeyAsProtoName of ProtoName<PublicKey> {
-    fn type_url() -> ByteArray {
-        "PublicKey"
+#[derive(Drop, Default, Debug, Clone, PartialEq, Serde)]
+pub enum Sum {
+    #[default]
+    Ed25519: Array<u8>,
+    Secp256k1: Array<u8>,
+}
+
+impl SumAsProtoOneof of ProtoOneof<Sum> {
+    fn encode_raw(self: @Sum, ref context: EncodeContext) -> ProtobufTag {
+        match self {
+            Sum::Ed25519(k) => {
+                k.encode_raw(ref context);
+                let wire_type = ProtoMessage::<ByteArray>::wire_type();
+                ProtobufTag { field_number: 1, wire_type }
+            },
+            Sum::Secp256k1(k) => {
+                k.encode_raw(ref context);
+                let wire_type = ProtoMessage::<ByteArray>::wire_type();
+                ProtobufTag { field_number: 2, wire_type }
+            },
+        }
+    }
+
+    fn decode_raw(ref context: DecodeContext, tag: u8) -> Option<Sum> {
+        match tag {
+            0 => Option::None,
+            1 => {
+                let sum = context.decode_field(1)?;
+                Option::Some(Sum::Ed25519(sum))
+            },
+            2 => {
+                let sum = context.decode_field(2)?;
+                Option::Some(Sum::Secp256k1(sum))
+            },
+            _ => Option::None,
+        }
     }
 }
 
