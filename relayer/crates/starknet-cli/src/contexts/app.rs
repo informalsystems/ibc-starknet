@@ -11,6 +11,9 @@ use hermes_cli_components::impls::commands::client::create::RunCreateClientComma
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
 };
+use hermes_cli_components::impls::commands::connection::create::{
+    CreateConnectionArgs, RunCreateConnectionCommand,
+};
 use hermes_cli_components::impls::commands::queries::balance::{
     QueryBalanceArgs, RunQueryBalanceCommand,
 };
@@ -162,6 +165,11 @@ delegate_components! {
         (CreateStarknetClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
         (CreateStarknetClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
 
+        (CreateConnectionArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateConnectionArgs, symbol!("target_client_id")): ParseFromString<ClientId>,
+        (CreateConnectionArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateConnectionArgs, symbol!("counterparty_client_id")): ParseFromString<ClientId>,
+
         (StartRelayerArgs, symbol!("chain_id_a")): ParseFromString<ChainId>,
         (StartRelayerArgs, symbol!("client_id_a")): ParseFromString<ClientId>,
         (StartRelayerArgs, symbol!("chain_id_b")): ParseFromString<ChainId>,
@@ -209,6 +217,8 @@ delegate_components! {
         UpdateClientArgs: RunUpdateClientCommand,
         CreateCosmosClientArgs: RunCreateClientCommand<Index<0>, Index<1>>,
         CreateStarknetClientArgs: RunCreateClientCommand<Index<1>, Index<0>>,
+
+        CreateConnectionArgs: RunCreateConnectionCommand,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<StarknetChain, UpdateStarknetConfig>,
         BootstrapOsmosisChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
@@ -333,6 +343,7 @@ check_components! {
             CreateCosmosClientArgs,
             CreateStarknetClientArgs,
             StartRelayerArgs,
+            CreateConnectionArgs,
         ],
     }
 }
