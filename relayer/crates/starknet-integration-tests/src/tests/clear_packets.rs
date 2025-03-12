@@ -1040,40 +1040,19 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let chain_command_path = std::env::var("STARKNET_BIN")
-            .unwrap_or("starknet-devnet".into())
-            .into();
-
-        let wasm_client_code_path = PathBuf::from(
-            std::env::var("STARKNET_WASM_CLIENT_PATH")
-                .expect("Wasm blob for Starknet light client is required"),
-        );
+        let wasm_client_code_path = std::env::var("STARKNET_WASM_CLIENT_PATH")
+            .expect("Wasm blob for Starknet light client is required");
 
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
-        let starknet_bootstrap = StarknetBootstrap {
-            runtime: runtime.clone(),
-            chain_command_path,
-            chain_store_dir: format!("./test-data/{timestamp}").into(),
-        };
+        let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
 
-        let wasm_client_byte_code = tokio::fs::read(&wasm_client_code_path).await?;
-
-        let wasm_code_hash: [u8; 32] = {
-            let mut hasher = Sha256::new();
-            hasher.update(&wasm_client_byte_code);
-            hasher.finalize().into()
-        };
+        let (wasm_code_hash, wasm_client_byte_code) =
+            load_wasm_client(&wasm_client_code_path).await?;
 
         let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
-
-        let wasm_client_byte_code_gzip = {
-            let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-            encoder.write_all(&wasm_client_byte_code)?;
-            encoder.finish()?
-        };
 
         let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
             runtime: runtime.clone(),
@@ -1084,7 +1063,7 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
             account_prefix: "osmo".into(),
             staking_denom_prefix: "stake".into(),
             transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code: wasm_client_byte_code_gzip,
+            wasm_client_byte_code,
             governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
             dynamic_gas: Some(DynamicGasConfig {
                 multiplier: 1.1,
@@ -1107,151 +1086,11 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
 
         let cosmos_chain = &cosmos_chain_driver.chain;
 
-        let erc20_class_hash = {
-            let contract_path = std::env::var("ERC20_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared ERC20 class: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ics20_class_hash = {
-            let contract_path = std::env::var("ICS20_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared ICS20 class: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ibc_core_class_hash = {
-            let contract_path = std::env::var("IBC_CORE_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared IBC core class: {:?}", class_hash);
-
-            class_hash
-        };
-
-        let ibc_core_address = starknet_chain
-            .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
-            .await?;
-
-        info!(
-            "deployed IBC core contract to address: {:?}",
-            ibc_core_address
-        );
-
-        let comet_client_class_hash = {
-            let contract_path = std::env::var("COMET_CLIENT_CONTRACT")?;
-
-            let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
-
-            let contract = serde_json::from_str(&contract_str)?;
-
-            let class_hash = starknet_chain.declare_contract(&contract).await?;
-
-            info!("declared class for cometbft: {:?}", class_hash);
-
-            class_hash
-        };
-
         let cairo_encoding = StarknetCairoEncoding;
-
-        let comet_client_address = {
-            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
-            let contract_address = starknet_chain
-                .deploy_contract(&comet_client_class_hash, false, &owner_call_data)
-                .await?;
-
-            info!(
-                "deployed Comet client contract to address: {:?}",
-                contract_address
-            );
-
-            contract_address
-        };
-
-        let ics20_contract_address = {
-            let owner_call_data = cairo_encoding.encode(&ibc_core_address)?;
-            let erc20_call_data = cairo_encoding.encode(&erc20_class_hash)?;
-
-            let contract_address = starknet_chain
-                .deploy_contract(
-                    &ics20_class_hash,
-                    false,
-                    &[owner_call_data, erc20_call_data].concat(),
-                )
-                .await?;
-
-            info!("deployed ICS20 contract to address: {:?}", contract_address);
-
-            contract_address
-        };
-
-        let starknet_chain = {
-            let mut fields = starknet_chain.fields.as_ref().clone();
-
-            fields.ibc_core_contract_address = Some(ibc_core_address);
-            fields.ibc_client_contract_address = Some(comet_client_address);
-            fields.ibc_ics20_contract_address = Some(ics20_contract_address);
-
-            let cairo_encoding = StarknetCairoEncoding;
-
-            fields.event_encoding = StarknetEventEncoding {
-                erc20_hashes: [erc20_class_hash].into(),
-                ics20_hashes: [ics20_class_hash].into(),
-                ibc_client_hashes: [comet_client_class_hash].into(),
-                ibc_core_contract_addresses: [ibc_core_address].into(),
-            };
-
-            StarknetChain {
-                fields: Arc::new(fields),
-            }
-        };
-
-        {
-            // register comet client contract with ibc-core
-
-            let register_client = MsgRegisterClient {
-                client_type: short_string!("07-tendermint"),
-                contract_address: comet_client_address,
-            };
-
-            let calldata = cairo_encoding.encode(&register_client)?;
-
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("register_client"),
-                calldata,
-            };
-
-            let message = StarknetMessage::new(call);
-
-            let response = starknet_chain.send_message(message).await?;
-
-            info!("IBC register client response: {:?}", response);
-        }
 
         let starknet_client_id = StarknetToCosmosRelay::create_client(
             SourceTarget,
-            &starknet_chain,
+            starknet_chain,
             cosmos_chain,
             &Default::default(),
             &(),
@@ -1263,7 +1102,7 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
         let cosmos_client_id = StarknetToCosmosRelay::create_client(
             DestinationTarget,
             cosmos_chain,
-            &starknet_chain,
+            starknet_chain,
             &StarknetCreateClientPayloadOptions { wasm_code_hash },
             &(),
         )
@@ -1323,29 +1162,6 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
         // channel handshake
 
         let ics20_port = IbcPortId::transfer();
-
-        {
-            // register the ICS20 contract with the IBC core contract
-
-            let register_app = MsgRegisterApp {
-                port_id: ics20_port.clone(),
-                contract_address: ics20_contract_address,
-            };
-
-            let register_call_data = cairo_encoding.encode(&register_app)?;
-
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("bind_port_id"),
-                calldata: register_call_data,
-            };
-
-            let message = StarknetMessage::new(call);
-
-            let response = starknet_chain.send_message(message).await?;
-
-            info!("register ics20 response: {:?}", response);
-        }
 
         let init_channel_options = CosmosInitChannelOptions::new(starknet_connection_id);
 
@@ -1426,6 +1242,8 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
             balance_cosmos_a_step_0.quantity - transfer_quantity,
             balance_cosmos_a_step_1.quantity
         );
+
+        let ics20_contract_address = *starknet_chain.ibc_ics20_contract_address.get().unwrap();
 
         let ics20_token_address: StarknetAddress = {
             let ibc_prefixed_denom = PrefixedDenom {
@@ -1522,7 +1340,7 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
         {
             let call_data = cairo_encoding.encode(&product![
                 ics20_contract_address,
-                U256::from(transfer_back_quantity)
+                U256::from(transfer_quantity)
             ])?;
 
             let call = Call {
@@ -1558,7 +1376,7 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
                 port_id_on_a: ics20_port.clone(),
                 chan_id_on_a: starknet_channel_id.clone(),
                 denom,
-                amount: transfer_back_quantity.into(),
+                amount: transfer_quantity.into(),
                 receiver: address_cosmos_a.clone(),
                 memo: String::new(),
                 timeout_height_on_b: Height {
@@ -1611,7 +1429,7 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
         );
 
         assert_eq!(
-            balance_starknet_b_step_0.quantity - transfer_back_quantity.into(),
+            balance_starknet_b_step_0.quantity - transfer_quantity.into(),
             balance_starknet_b_step_1.quantity
         );
 
