@@ -53,21 +53,10 @@ jobs:
             relayer
             light-client
 
-      - uses: taiki-e/cache-cargo-install-action@v2
-        with:
-          tool: cosmwasm-check
-
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
           scarb build -p starknet_ibc_contracts
-
-      - name: Build CW light client contract
-        working-directory: ./light-client
-        run: |
-          nix shell ..#rust-wasm -c \
-            cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown --release
-          cosmwasm-check target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm
 
       - name: Run Integration Tests
         env:
@@ -80,8 +69,9 @@ jobs:
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
           export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json"
           export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_CometClient.contract_class.json"
-          export STARKNET_WASM_CLIENT_PATH="$(pwd)/../light-client/target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json"
+
+          export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
 
           nix shell \
             ..#osmosis \
