@@ -50,8 +50,6 @@ jobs:
           scarb build -p starknet_ibc_contracts
 
       - name: Run Integration Tests
-        # don't run tests on macos during PRs
-        if: ${{ matrix.os != 'macos-14' || github.event_name != 'pull_request' }}
         env:
           RUST_BACKTRACE: 1
           RUST_LOG: debug
