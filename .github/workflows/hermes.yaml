@@ -66,6 +66,10 @@ jobs:
           tag: v0.2.4
           extract: true
 
+      - name: Install simd-ibc-go-v8-wasm
+        run: |
+          nix build .#wasm-simapp
+
       - uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest
