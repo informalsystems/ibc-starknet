@@ -68,6 +68,7 @@ impl FromStr for PrefixedDenom {
         Ok(Self {
             trace_path: trace_path
                 .into_iter()
+                .rev()
                 .map(
                     |DummyTracePath {
                          port_id,
@@ -200,12 +201,12 @@ mod tests {
         let expected = PrefixedDenom {
             trace_path: vec![
                 TracePrefix {
-                    port_id: "transfer".to_string(),
-                    channel_id: "channel-0".to_string(),
-                },
-                TracePrefix {
                     port_id: "transfer2".to_string(),
                     channel_id: "channel-1".to_string(),
+                },
+                TracePrefix {
+                    port_id: "transfer".to_string(),
+                    channel_id: "channel-0".to_string(),
                 },
             ],
             base: Denom::Hosted("coin".to_string()),

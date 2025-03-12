@@ -292,6 +292,7 @@ where
     let denom = PrefixedDenom {
         trace_path: trace_path
             .into_iter()
+            .rev()
             .map(
                 |DummyTracePath {
                      port_id,
