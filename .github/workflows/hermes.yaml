@@ -51,7 +51,7 @@ jobs:
 
       - name: Run Integration Tests
         # disable macos runner on PRs
-        if: ${{ matrix.os != 'macos-14' || github.event_name == 'push' }}
+        if: ${{ matrix.os != 'macos-14' || github.event_name != 'pull_request' }}
         env:
           RUST_BACKTRACE: 1
           RUST_LOG: debug
