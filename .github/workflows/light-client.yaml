@@ -39,7 +39,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
-            light-client -> light-client/target
+            light-client
 
       - name: Build CosmWasm light client contract
         working-directory: ./light-client
@@ -65,7 +65,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
-            light-client -> light-client/target
+            light-client
 
       - name: Run Clippy
         working-directory: ./light-client

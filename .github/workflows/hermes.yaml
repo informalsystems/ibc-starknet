@@ -47,8 +47,8 @@ jobs:
           toolchain: 1.81,stable
           target: wasm32-unknown-unknown
           cache-workspaces: |
-            relayer -> target
-            light-client -> target
+            relayer
+            light-client
 
       - name: Install osmosisd v28.0.1
         uses: robinraju/release-downloader@v1
@@ -144,7 +144,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
-            relayer -> relayer/target
+            relayer
 
       - name: Run Clippy
         working-directory: ./relayer
