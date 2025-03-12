@@ -1376,7 +1376,7 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
                 port_id_on_a: ics20_port.clone(),
                 chan_id_on_a: starknet_channel_id.clone(),
                 denom,
-                amount: transfer_quantity.into(),
+                amount: transfer_back_quantity.into(),
                 receiver: address_cosmos_a.clone(),
                 memo: String::new(),
                 timeout_height_on_b: Height {
