@@ -56,40 +56,9 @@ jobs:
             relayer
             light-client
 
-      - name: Install osmosisd v28.0.1
-        uses: robinraju/release-downloader@v1
-        with:
-          repository: osmosis-labs/osmosis
-          fileName: ${{ matrix.value.osmosis }}
-          tag: v28.0.1
-          extract: true
-
-      - name: Install starknet-devnet v0.2.4
-        uses: robinraju/release-downloader@v1
-        with:
-          repository: 0xSpaceShard/starknet-devnet
-          fileName: ${{ matrix.value.starknet-devnet }}
-          tag: v0.2.4
-          extract: true
-
-      - name: Install simd-ibc-go-v8-wasm
-        run: |
-          nix build .#wasm-simapp
-
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: cargo-nextest
-
       - uses: taiki-e/cache-cargo-install-action@v2
         with:
           tool: cosmwasm-check
-
-      - run: echo "$PWD" >> $GITHUB_PATH
-
-      - run: |
-          osmosisd version
-          starknet-devnet --version
-          cosmwasm-check --version
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
@@ -107,7 +76,7 @@ jobs:
           RUST_BACKTRACE: 1
           RUST_LOG: debug
           # Tests are run with a single thread to avoid Connection refused (os error 61) with macOS
-          TEST_THREADS: ${{ matrix.value.os == 'macos-14' && 1 || 4 }}
+          TEST_THREADS: 4
         working-directory: ./relayer
         run: |
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
@@ -116,7 +85,13 @@ jobs:
           export STARKNET_WASM_CLIENT_PATH="$(pwd)/../light-client/target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json"
 
-          nix shell ..#wasm-simapp -c \
+          nix shell \
+            ..#osmosis \
+            ..#wasm-simapp \
+            ..#starknet-devnet \
+            ..#rust \
+            ..#cargo-nextest \
+            -c \
             cargo nextest run --release \
             --test-threads=$TEST_THREADS
 
