@@ -34,7 +34,7 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
             chan_id_on_b: CHANNEL_ID(10),
             amount: AMOUNT,
             timeout_height: TIMEOUT_HEIGHT(1000),
-            timeout_timestamp: TIMEOUT_TIMESTAMP(1000),
+            timeout_timestamp: TIMEOUT_TIMESTAMP(1000 * 1_000_000_000),
         }
     }
 

@@ -79,6 +79,6 @@ pub fn PACKET_COMMITMENT_ON_SN(token: ERC20Contract) -> Commitment {
     compute_packet_commitment(
         @serde_json::to_byte_array(PACKET_DATA_FROM_SN(token)),
         TIMEOUT_HEIGHT(1000),
-        TIMEOUT_TIMESTAMP(1000),
+        TIMEOUT_TIMESTAMP(1000 * 1_000_000_000),
     )
 }

@@ -510,16 +510,16 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
 
 #[test]
 fn test_timeout_packet_with_height() {
-    try_timeout_packet(HEIGHT(11), TIMESTAMP(1000));
+    try_timeout_packet(HEIGHT(11), TIMESTAMP(1000 * 1_000_000_000));
 }
 
 #[test]
 fn test_timeout_packet_with_timestamp() {
-    try_timeout_packet(HEIGHT(1000), TIMESTAMP(11));
+    try_timeout_packet(HEIGHT(1000), TIMESTAMP(11 * 1_000_000_000));
 }
 
 #[test]
 #[should_panic(expected: 'ICS04: packet not timed out')]
 fn test_timeout_pending_packet() {
-    try_timeout_packet(HEIGHT(1000), TIMESTAMP(1000));
+    try_timeout_packet(HEIGHT(1000), TIMESTAMP(1000 * 1_000_000_000));
 }
