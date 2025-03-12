@@ -121,7 +121,7 @@ jobs:
           export STARKNET_WASM_CLIENT_PATH="$(pwd)/../light-client/target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json"
 
-          nix shell github:informalsystems/cosmos.nix#ibc-go-v8-wasm-simapp -c cargo nextest run
+          nix shell ..#wasm-simapp -c cargo nextest run
 
   lint-relayer:
     name: Lint Relayer Code
