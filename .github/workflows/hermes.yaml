@@ -32,67 +32,39 @@ jobs:
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: Install Rust nightly toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: nightly
-
       - name: Install Scarb
         uses: software-mansion/setup-scarb@v1
         with:
           tool-versions: cairo-contracts/.tool-versions
           scarb-lock: cairo-contracts/Scarb.lock
 
-      - name: Install Universal Sierra Compiler
-        uses: software-mansion/setup-universal-sierra-compiler@v1
+      - uses: Swatinem/rust-cache@v2
         with:
-          tool-versions: cairo-contracts/.tool-versions
-
-      - name: Install Starknet Foundry
-        uses: foundry-rs/setup-snfoundry@v3
-        with:
-          tool-versions: cairo-contracts/.tool-versions
+          workspaces: |
+            relayer
+            light-client
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
           scarb build -p starknet_ibc_contracts
 
-      - name: Nix build
-        run: |
-          sudo rm -rf /opt/homebrew/
-
-          nix build \
-            .#starknet-devnet \
-            .#universal-sierra-compiler \
-            .#rust \
-            .#rust-wasm \
-            .#rust-nightly \
-            .#taplo \
-            .#nixfmt \
-            .#cargo-nextest \
-            .#ibc-starknet-cw \
-            .#wasm-simapp \
-            .#osmosis
-
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: |
-            relayer -> relayer/target
-            light-client -> light-client/target
-
       - name: Run Integration Tests
+        # don't run tests on macos during PRs
+        if: ${{ matrix.os != 'macos-14' || github.event_name != 'pull_request' }}
         env:
           RUST_BACKTRACE: 1
           RUST_LOG: debug
+          # Tests are run with a single thread to avoid Connection refused (os error 61) with macOS
+          TEST_THREADS: ${{ matrix.os == 'macos-14' && 1 || 4 }}
         working-directory: ./relayer
-        # Tests are run with a single thread to avoid Connection refused (os error 61) with macOS
         run: |
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
           export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json"
           export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_CometClient.contract_class.json"
-          export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json"
+
+          export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
 
           nix shell \
             ..#osmosis \
@@ -101,7 +73,8 @@ jobs:
             ..#rust \
             ..#cargo-nextest \
             -c \
-            cargo nextest run --test-threads=1
+            cargo nextest run --release \
+            --test-threads=$TEST_THREADS
 
   lint-relayer:
     name: Lint Relayer Code
@@ -124,7 +97,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
-            relayer -> relayer/target
+            relayer
 
       - name: Run Clippy
         working-directory: ./relayer
