@@ -41,11 +41,16 @@ jobs:
           workspaces: |
             light-client
 
+      - uses: taiki-e/cache-cargo-install-action@v2
+        with:
+          tool: cosmwasm-check
+
       - name: Build CosmWasm light client contract
         working-directory: ./light-client
         run: |
           nix shell ..#rust-wasm -c \
-            cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown
+            cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown --release
+          cosmwasm-check target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm
 
   lint-light-client:
     name: Lint CosmWasm Light Client Contract
