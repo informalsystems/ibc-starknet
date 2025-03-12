@@ -123,9 +123,6 @@ jobs:
 
           nix shell github:informalsystems/cosmos.nix#ibc-go-v8-wasm-simapp -c cargo nextest run
 
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
   lint-relayer:
     name: Lint Relayer Code
     runs-on: ubuntu-latest
