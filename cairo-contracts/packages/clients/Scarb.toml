@@ -23,7 +23,6 @@ fmt = { workspace = true }
 alexandria_data_structures = { workspace = true }
 alexandria_sorting         = { workspace = true }
 openzeppelin_access        = { workspace = true }
-snforge_std                = { workspace = true }
 
 # external dependencies
 starknet = { workspace = true }
@@ -33,4 +32,5 @@ starknet_ibc_core  = { workspace = true }
 starknet_ibc_utils = { workspace = true }
 
 [dev-dependencies]
+snforge_std          = { workspace = true }
 starknet_ibc_testkit = { workspace = true }
