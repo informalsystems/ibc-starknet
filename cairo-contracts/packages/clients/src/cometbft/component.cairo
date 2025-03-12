@@ -127,7 +127,9 @@ pub mod CometClientComponent {
 
             let consensus_state = self.read_consensus_state(client_sequence, latest_height);
 
-            consensus_state.timestamp
+            Timestamp {
+                timestamp: consensus_state.timestamp.timestamp * 1_000_000_000,
+            }
         }
 
         fn status(self: @ComponentState<TContractState>, client_sequence: u64) -> Status {
@@ -433,7 +435,7 @@ pub mod CometClientComponent {
                 return client_state.status;
             }
 
-            let host_timestamp = get_block_timestamp();
+            let host_timestamp = get_block_timestamp()*1_000_000_000;
 
             let consensus_state_status = consensus_state
                 .status(host_timestamp, client_state.trusting_period, client_state.max_clock_drift);
@@ -465,7 +467,7 @@ pub mod CometClientComponent {
 
             self.write_client_processed_height(client_sequence, update_height.clone(), host_height);
 
-            let host_timestamp = get_block_timestamp();
+            let host_timestamp = get_block_timestamp()*1_000_000_000;
 
             self
                 .write_client_processed_time(

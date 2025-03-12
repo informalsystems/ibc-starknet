@@ -15,6 +15,7 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
         !(self.root.is_zero() && self.timestamp.is_zero())
     }
 
+    // Return the timestamp in seconds.
     fn timestamp(self: @CometConsensusState) -> u64 {
         *self.timestamp.timestamp
     }
@@ -43,10 +44,10 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
         // PS. the following check is always successful once a consensus state is validated and
         // accepted as trusted. Because the `block_timestamp` is always increasing.
 
-        let self_timestamp = self.timestamp();
+        let self_timestamp = self.timestamp()*1_000_000_000;
 
         assert(
-            host_timestamp + max_clock_drift >= self_timestamp,
+            host_timestamp + (max_clock_drift*1_000_000_000) >= self_timestamp,
             CometErrors::INVALID_HEADER_FROM_FUTURE,
         );
 
@@ -55,7 +56,7 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
             return Status::Active;
         }
 
-        if host_timestamp - self_timestamp < trusting_period {
+        if host_timestamp - self_timestamp < (trusting_period*1_000_000_000) {
             Status::Active
         } else {
             Status::Expired
