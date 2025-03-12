@@ -106,8 +106,9 @@ jobs:
         env:
           RUST_BACKTRACE: 1
           RUST_LOG: debug
+          # Tests are run with a single thread to avoid Connection refused (os error 61) with macOS
+          TEST_THREADS: ${{ matrix.value.os == 'macos-14' && 1 || 4 }}
         working-directory: ./relayer
-        # Tests are run with a single thread to avoid Connection refused (os error 61) with macOS
         run: |
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
           export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json"
@@ -115,7 +116,9 @@ jobs:
           export STARKNET_WASM_CLIENT_PATH="$(pwd)/../light-client/target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json"
 
-          nix shell ..#wasm-simapp -c cargo nextest run
+          nix shell ..#wasm-simapp -c \
+            cargo nextest run --release \
+            --test-threads=$TEST_THREADS
 
   lint-relayer:
     name: Lint Relayer Code
