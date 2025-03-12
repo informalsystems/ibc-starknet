@@ -2,6 +2,7 @@
 
 use core::marker::PhantomData;
 use core::time::Duration;
+use std::sync::Arc;
 
 use cgp::extra::run::CanRun;
 use hermes_chain_components::traits::queries::chain_status::{
@@ -15,13 +16,13 @@ use hermes_cli_components::traits::build::CanLoadBuilder;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
-use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::Error;
 use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapChannel;
 use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
+use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_cli::contexts::app::StarknetApp;
@@ -32,7 +33,8 @@ use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::PortId;
 use starknet::core::types::Felt;
 use starknet::macros::short_string;
-use tracing::info;
+use tokio::runtime::Builder;
+use tracing::{info, Level};
 
 pub const COSMOS_HD_PATH: &str = "m/44'/118'/0'/0/0";
 
@@ -54,14 +56,24 @@ pub const WASM_CODE_HASH_HEX: &str =
     "6be4d4cbb85ea2d7e0b17b7053e613af11e041617bdb163107dfd29f706318ef";
 
 fn main() -> Result<(), Error> {
+    let _ = stable_eyre::install();
+
+    let subscriber = tracing_subscriber::FmtSubscriber::builder()
+        .with_max_level(Level::INFO)
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+
     let config_file = std::env::args().nth(1).expect("config file path");
 
-    let runtime = init_test_runtime();
+    let tokio_runtime = Arc::new(Builder::new_multi_thread().enable_all().build().unwrap());
 
-    runtime.runtime.clone().block_on(async move {
+    let runtime = HermesRuntime::new(tokio_runtime);
+
+    info!("initialized Hermes runtime");
+
+    runtime.runtime.block_on(async {
         let (starknet_chain, cosmos_chain) = {
-            info!("local environment detected. using real testnets.");
-
             let starknet_app = StarknetApp {
                 config_path: config_file.into(),
                 runtime: runtime.clone(),
@@ -96,7 +108,7 @@ fn main() -> Result<(), Error> {
         };
 
         let starknet_client_id = {
-            // https://lcd.osmotest5.osmosis.zone/cosmos/staking/v1beta1/params
+            // https://lcd.testnet.osmosis.zone/cosmos/staking/v1beta1/params
             // in seconds; 5 days.
             let osmosis_unbonding_period = 432000;
 
@@ -296,6 +308,16 @@ fn main() -> Result<(), Error> {
                 cosmos_channel_id, cosmos_channel_end
             );
         }
+
+        info!(
+            "Osmosis: {}, {}, {}",
+            cosmos_client_id, cosmos_connection_id, cosmos_channel_id
+        );
+
+        info!(
+            "Starknet: {}, {}, {}",
+            starknet_client_id, starknet_connection_id, starknet_channel_id
+        );
 
         Ok(())
     })

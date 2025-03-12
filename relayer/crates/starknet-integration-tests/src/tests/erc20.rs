@@ -22,33 +22,24 @@ use starknet::core::types::U256;
 use starknet::macros::selector;
 use tracing::info;
 
-use crate::contexts::bootstrap::StarknetBootstrap;
+use crate::utils::init_starknet_bootstrap;
 
 #[test]
 fn test_erc20_transfer() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let chain_command_path = std::env::var("STARKNET_BIN")
-            .unwrap_or("starknet-devnet".into())
-            .into();
-
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
-        let bootstrap = StarknetBootstrap {
-            runtime: runtime.clone(),
-            chain_command_path,
-            chain_store_dir: format!("./test-data/{timestamp}").into(),
-        };
+        let bootstrap = init_starknet_bootstrap(&runtime).await?;
 
         let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
 
         let chain = &chain_driver.chain;
 
         let erc20_class_hash = {
-            // Test deployment of ERC20 contract
             let contract_path = std::env::var("ERC20_CONTRACT")?;
 
             let contract_str = runtime.read_file_as_string(&contract_path.into()).await?;
@@ -103,12 +94,12 @@ fn test_erc20_transfer() -> Result<(), Error> {
             token_address
         };
 
-        let event_encoding = StarknetEventEncoding {
-            erc20_hashes: [erc20_class_hash].into(),
-            ics20_hashes: Default::default(),
-            ibc_client_hashes: Default::default(),
-            ibc_core_contract_addresses: Default::default(),
-        };
+        let event_encoding = StarknetEventEncoding::default();
+
+        event_encoding
+            .erc20_hashes
+            .set([erc20_class_hash].into())
+            .unwrap();
 
         {
             // Test local ERC20 token transfer

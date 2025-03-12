@@ -1,7 +1,9 @@
 use alloc::sync::Arc;
 use core::marker::PhantomData;
 use core::ops::Deref;
+use std::collections::HashSet;
 use std::path::PathBuf;
+use std::sync::OnceLock;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
@@ -22,6 +24,9 @@ use hermes_relayer_components::build::traits::builders::birelay_builder::{
 use hermes_relayer_components::build::traits::builders::chain_builder::{
     CanBuildChain, ChainBuilder, ChainBuilderComponent,
 };
+use hermes_relayer_components::build::traits::builders::relay_builder::{
+    RelayBuilder, RelayBuilderComponent,
+};
 use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeAtComponent;
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
 use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
@@ -31,12 +36,11 @@ use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
-use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
-use ibc::core::host::types::identifiers::{ChainId, ClientId, ClientId as CosmosClientId};
+use ibc::core::host::types::identifiers::{ChainId, ClientId};
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
@@ -115,6 +119,56 @@ impl ChainBuilder<StarknetBuilder, Index<1>> for StarknetBuildComponents {
         chain_id: &ChainId,
     ) -> Result<CosmosChain, Error> {
         build.cosmos_builder.build_chain(chain_id).await
+    }
+}
+
+#[cgp_provider(RelayBuilderComponent)]
+impl RelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponents {
+    async fn build_relay(
+        build: &StarknetBuilder,
+        _index: PhantomData<(Index<0>, Index<1>)>,
+        src_chain_id: &ChainId,
+        dst_chain_id: &ChainId,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
+    ) -> Result<StarknetToCosmosRelay, HermesError> {
+        let src_chain = build.build_chain(src_chain_id).await?;
+
+        let dst_chain = build.cosmos_builder.build_chain(dst_chain_id).await?;
+
+        Ok(
+            build.build_starknet_to_cosmos_relay(
+                src_chain,
+                dst_chain,
+                src_client_id,
+                dst_client_id,
+            ),
+        )
+    }
+}
+
+#[cgp_provider(RelayBuilderComponent)]
+impl RelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildComponents {
+    async fn build_relay(
+        build: &StarknetBuilder,
+        _index: PhantomData<(Index<1>, Index<0>)>,
+        src_chain_id: &ChainId,
+        dst_chain_id: &ChainId,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
+    ) -> Result<CosmosToStarknetRelay, HermesError> {
+        let src_chain = build.cosmos_builder.build_chain(dst_chain_id).await?;
+
+        let dst_chain = build.build_chain(src_chain_id).await?;
+
+        Ok(
+            build.build_cosmos_to_starknet_relay(
+                src_chain,
+                dst_chain,
+                src_client_id,
+                dst_client_id,
+            ),
+        )
     }
 }
 
@@ -258,32 +312,46 @@ impl StarknetBuilder {
         )
         .expect("valid key pair");
 
-        let event_encoding = StarknetEventEncoding {
-            erc20_hashes: self
-                .starknet_chain_config
-                .contract_classes
-                .erc20
-                .into_iter()
-                .collect(),
-            ics20_hashes: self
-                .starknet_chain_config
-                .contract_classes
-                .ics20
-                .into_iter()
-                .collect(),
-            ibc_client_hashes: self
-                .starknet_chain_config
-                .contract_classes
-                .ibc_client
-                .into_iter()
-                .collect(),
-            ibc_core_contract_addresses: self
-                .starknet_chain_config
-                .contract_addresses
-                .ibc_core
-                .into_iter()
-                .collect(),
-        };
+        let contract_classes = &self.starknet_chain_config.contract_classes;
+
+        let contract_addresses = &self.starknet_chain_config.contract_addresses;
+
+        let event_encoding = StarknetEventEncoding::default();
+
+        event_encoding
+            .erc20_hashes
+            .set(HashSet::from_iter(contract_classes.erc20))
+            .unwrap();
+        event_encoding
+            .ics20_hashes
+            .set(HashSet::from_iter(contract_classes.ics20))
+            .unwrap();
+        event_encoding
+            .ibc_client_hashes
+            .set(HashSet::from_iter(contract_classes.ibc_client))
+            .unwrap();
+        event_encoding
+            .ibc_core_contract_addresses
+            .set(HashSet::from_iter(contract_addresses.ibc_core))
+            .unwrap();
+
+        let ibc_client_contract_address = OnceLock::new();
+
+        if let Some(address) = contract_addresses.ibc_client {
+            ibc_client_contract_address.set(address).unwrap();
+        }
+
+        let ibc_core_contract_address = OnceLock::new();
+
+        if let Some(address) = contract_addresses.ibc_core {
+            ibc_core_contract_address.set(address).unwrap();
+        }
+
+        let ibc_ics20_contract_address = OnceLock::new();
+
+        if let Some(address) = contract_addresses.ibc_ics20 {
+            ibc_ics20_contract_address.set(address).unwrap();
+        }
 
         let context = StarknetChain {
             fields: Arc::new(StarknetChainFields {
@@ -291,12 +359,9 @@ impl StarknetBuilder {
                 chain_id,
                 rpc_client,
                 account: Arc::new(account),
-                ibc_client_contract_address: self
-                    .starknet_chain_config
-                    .contract_addresses
-                    .ibc_client,
-                ibc_core_contract_address: self.starknet_chain_config.contract_addresses.ibc_core,
-                ibc_ics20_contract_address: self.starknet_chain_config.contract_addresses.ibc_ics20,
+                ibc_client_contract_address,
+                ibc_core_contract_address,
+                ibc_ics20_contract_address,
                 event_encoding,
                 proof_signer,
                 poll_interval: self.starknet_chain_config.poll_interval,
@@ -313,8 +378,8 @@ impl StarknetBuilder {
         &self,
         src_chain: StarknetChain,
         dst_chain: CosmosChain,
-        src_client_id: &StarknetClientId,
-        dst_client_id: &CosmosClientId,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
     ) -> StarknetToCosmosRelay {
         StarknetToCosmosRelay::new(
             self.runtime.clone(),
@@ -329,8 +394,8 @@ impl StarknetBuilder {
         &self,
         src_chain: CosmosChain,
         dst_chain: StarknetChain,
-        src_client_id: &CosmosClientId,
-        dst_client_id: &StarknetClientId,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
     ) -> CosmosToStarknetRelay {
         CosmosToStarknetRelay::new(
             self.runtime.clone(),

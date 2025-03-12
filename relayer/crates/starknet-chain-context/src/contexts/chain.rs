@@ -1,7 +1,7 @@
 use core::ops::Deref;
 use core::time::Duration;
 use std::str::FromStr;
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
@@ -15,7 +15,9 @@ use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_chain_components::traits::queries::block_time::{
     BlockTimeQuerierComponent, CanQueryBlockTime,
 };
+use hermes_chain_components::traits::queries::packet_acknowledgement::CanQueryPacketAckCommitment;
 use hermes_chain_components::traits::types::block::HasBlockType;
+use hermes_chain_components::traits::types::channel::HasInitChannelOptionsType;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
 use hermes_chain_components::traits::types::status::HasChainStatusType;
 use hermes_chain_type_components::traits::fields::chain_id::{ChainIdGetterComponent, HasChainId};
@@ -23,6 +25,7 @@ use hermes_chain_type_components::traits::types::commitment_proof::HasCommitment
 use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
+use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientPayload;
@@ -96,7 +99,6 @@ use hermes_relayer_components::chain::traits::queries::consensus_state_height::{
     CanQueryConsensusStateHeight, CanQueryConsensusStateHeights,
 };
 use hermes_relayer_components::chain::traits::queries::counterparty_chain_id::CanQueryCounterpartyChainId;
-use hermes_relayer_components::chain::traits::queries::packet_acknowledgement::CanQueryPacketAcknowledgement;
 use hermes_relayer_components::chain::traits::queries::packet_commitment::{
     CanQueryPacketCommitment, PacketCommitmentQuerierComponent,
 };
@@ -222,9 +224,9 @@ pub struct StarknetChainFields {
     pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
     pub account: Arc<SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>>,
-    pub ibc_client_contract_address: Option<StarknetAddress>,
-    pub ibc_core_contract_address: Option<StarknetAddress>,
-    pub ibc_ics20_contract_address: Option<StarknetAddress>,
+    pub ibc_client_contract_address: OnceLock<StarknetAddress>,
+    pub ibc_core_contract_address: OnceLock<StarknetAddress>,
+    pub ibc_ics20_contract_address: OnceLock<StarknetAddress>,
     pub event_encoding: StarknetEventEncoding,
     pub poll_interval: Duration,
     pub block_time: Duration,
@@ -388,6 +390,7 @@ pub trait CanUseStarknetChain:
     + HasChannelEndType<CosmosChain, ChannelEnd = ChannelEnd>
     + HasPortIdType<CosmosChain, PortId = IbcPortId>
     + HasInitConnectionOptionsType<CosmosChain, InitConnectionOptions = CosmosInitConnectionOptions>
+    + HasInitChannelOptionsType<CosmosChain, InitChannelOptions = CosmosInitChannelOptions>
     + HasConnectionOpenInitPayloadType<CosmosChain>
     + HasConnectionOpenTryPayloadType<CosmosChain>
     + HasConnectionOpenAckPayloadType<CosmosChain>
@@ -465,7 +468,7 @@ pub trait CanUseStarknetChain:
     + HasConnectionOpenTryEvent<CosmosChain>
     + HasChannelOpenTryEvent<CosmosChain>
     + CanQueryPacketCommitment<CosmosChain>
-    + CanQueryPacketAcknowledgement<CosmosChain>
+    + CanQueryPacketAckCommitment<CosmosChain>
     + CanQueryPacketReceipt<CosmosChain>
     + CanBuildReceivePacketPayload<CosmosChain>
     + CanBuildAckPacketPayload<CosmosChain>

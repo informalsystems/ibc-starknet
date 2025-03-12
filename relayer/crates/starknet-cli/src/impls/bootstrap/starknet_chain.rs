@@ -2,9 +2,11 @@ use cgp::prelude::*;
 use hermes_cli_components::traits::bootstrap::{
     BootstrapLoader, BootstrapLoaderComponent, HasBootstrapType,
 };
+use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::runtime::HasRuntime;
-use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
+use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 
 #[derive(Debug, clap::Parser, HasField)]
 pub struct BootstrapStarknetChainArgs {
@@ -16,16 +18,29 @@ pub struct BootstrapStarknetChainArgs {
 
     #[clap(long = "chain-command-path", default_value = "starknet-devnet")]
     pub chain_command_path: String,
+
+    #[clap(long = "erc20-contract-path")]
+    pub erc20_contract_path: String,
+
+    #[clap(long = "ics20-contract-path")]
+    pub ics20_contract_path: String,
+
+    #[clap(long = "ibc-core-contract-path")]
+    pub ibc_core_contract_path: String,
+
+    #[clap(long = "comet-client-contract-path")]
+    pub comet_client_contract_path: String,
 }
 
 pub struct LoadStarknetBootstrap;
 
 #[cgp_provider(BootstrapLoaderComponent)]
-impl<App> BootstrapLoader<App, BootstrapStarknetChainArgs> for LoadStarknetBootstrap
+impl<App, Tag> BootstrapLoader<App, Tag, BootstrapStarknetChainArgs> for LoadStarknetBootstrap
 where
-    App: HasBootstrapType<Bootstrap = StarknetBootstrap>
+    App: HasBootstrapType<Tag, Bootstrap = StarknetBootstrap>
         + HasRuntime<Runtime = HermesRuntime>
-        + HasAsyncErrorType,
+        + CanRaiseAsyncError<serde_json::Error>
+        + CanRaiseAsyncError<TokioRuntimeError>,
 {
     async fn load_bootstrap(
         app: &App,
@@ -33,10 +48,50 @@ where
     ) -> Result<App::Bootstrap, App::Error> {
         let runtime = app.runtime();
 
+        let erc20_contract = {
+            let contract_str = runtime
+                .read_file_as_string(&args.erc20_contract_path.clone().into())
+                .await
+                .map_err(App::raise_error)?;
+
+            serde_json::from_str(&contract_str).map_err(App::raise_error)?
+        };
+
+        let ics20_contract = {
+            let contract_str = runtime
+                .read_file_as_string(&args.ics20_contract_path.clone().into())
+                .await
+                .map_err(App::raise_error)?;
+
+            serde_json::from_str(&contract_str).map_err(App::raise_error)?
+        };
+
+        let ibc_core_contract = {
+            let contract_str = runtime
+                .read_file_as_string(&args.ibc_core_contract_path.clone().into())
+                .await
+                .map_err(App::raise_error)?;
+
+            serde_json::from_str(&contract_str).map_err(App::raise_error)?
+        };
+
+        let comet_client_contract = {
+            let contract_str = runtime
+                .read_file_as_string(&args.comet_client_contract_path.clone().into())
+                .await
+                .map_err(App::raise_error)?;
+
+            serde_json::from_str(&contract_str).map_err(App::raise_error)?
+        };
+
         let bootstrap = StarknetBootstrap {
             runtime: runtime.clone(),
             chain_command_path: args.chain_command_path.clone().into(),
             chain_store_dir: args.chain_store_dir.clone().into(),
+            erc20_contract,
+            ics20_contract,
+            ibc_core_contract,
+            comet_client_contract,
         };
 
         Ok(bootstrap)

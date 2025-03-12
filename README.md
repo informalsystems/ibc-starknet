@@ -47,8 +47,10 @@ osmosisd tx ibc-transfer transfer \
     --from "$OSMOSIS_ADDRESS"
 ```
 
-On block explorer ([Mintscan](https://www.mintscan.io/osmosis-testnet)), you'll
-soon receive a `packet_acknowledgement`.
+On [Starkscan](https://sepolia.starkscan.co), the receiver account's "Portfolio"
+tab will soon show the received tokens. On
+[Mintscan](https://www.mintscan.io/osmosis-testnet), the sender account will
+soon show an `IBC Acknowledgement` transaction.
 
 ### From Starknet to Osmosis via `channel-0`
 
@@ -71,7 +73,7 @@ Create the raw felt arguments to transfer tokens over IBC with timeout of 600
 seconds.
 
 ```bash
-SN_TRANSFER_ARGS=$(cargo run -q -p hermes-starknet-tools-cli \
+SN_TRANSFER_ARGS=$(cd relayer; cargo run -q -p hermes-starknet-tools-cli \
     starknet transfer-args \
     --amount "$AMOUNT" --denom "$ERC20_TOKEN_ON_STARKNET" \
     --receiver "$OSMOSIS_ADDRESS" \
@@ -81,8 +83,8 @@ SN_TRANSFER_ARGS=$(cargo run -q -p hermes-starknet-tools-cli \
 ```
 
 > [!IMPORTANT]
-> If you're sending a Cosmos token back, you have to pass the IBC prefixed
-> denom, e.g. `--denom "transfer/channel-0/uosmo"`
+> If you're sending a Cosmos token back, you have to pass the base denom, e.g.
+> `--denom "uosmo"`
 
 Submit the transaction on Starknet
 
@@ -94,8 +96,10 @@ starkli invoke $IBC_ICS20_CONTRACT \
     --strk --watch
 ```
 
-On block explorer ([Starkscan](https://sepolia.starkscan.co)), you'll soon
-receive a `packet_acknowledgement`.
+On [Starkscan](https://sepolia.starkscan.co), the receiver account's "Portfolio"
+tab will soon deduct the sent tokens. On
+[Mintscan](https://www.mintscan.io/osmosis-testnet), the sender account will
+soon receive a `IBC Received` transaction with received denom.
 
 ## Relayer Operator Setup
 
@@ -214,6 +218,11 @@ Then, call `./scripts/deploy.sh` to deploy the contracts.
 
 > [!IMPORTANT]
 > Make sure `.env` file is updated with the correct values.
+
+> [!IMPORTANT]
+> You will need some `ETH` to declare the class hashes on Starknet. Due to the
+> low `STRK` value and high gas usage, using `STRK` will result in
+> `Error: fee calculation overflow`.
 
 ```bash
 ./scripts/deploy.sh

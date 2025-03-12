@@ -5,13 +5,17 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWr
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_cli::commands::client::create::CreateClientArgs;
+use hermes_cli::commands::channel::CreateChannelArgs;
+use hermes_cli::commands::client::create::CreateCosmosClientArgs;
+use hermes_cli::impls::parse::ParseInitCosmosChannelOptions;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
-use hermes_cli_components::impls::commands::client::create::{
-    CreateClientOptionsParser, CreateClientOptionsParserComponent, RunCreateClientCommand,
-};
+use hermes_cli_components::impls::commands::channel::create::RunCreateChannelCommand;
+use hermes_cli_components::impls::commands::client::create::RunCreateClientCommand;
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
+};
+use hermes_cli_components::impls::commands::connection::create::{
+    CreateConnectionArgs, RunCreateConnectionCommand,
 };
 use hermes_cli_components::impls::commands::queries::balance::{
     QueryBalanceArgs, RunQueryBalanceCommand,
@@ -30,61 +34,57 @@ use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField
 use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
 use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
 use hermes_cli_components::impls::parse::string::{ParseFromOptionalString, ParseFromString};
-use hermes_cli_components::traits::any_counterparty::{
-    AnyCounterpartyComponent, ProvideAnyCounterparty,
-};
+use hermes_cli_components::traits::any_counterparty::AnyCounterpartyTypeProviderComponent;
 use hermes_cli_components::traits::bootstrap::{
-    BootstrapLoaderComponent, BootstrapTypeComponent, CanLoadBootstrap,
+    BootstrapLoaderComponent, BootstrapTypeProviderComponent,
 };
-use hermes_cli_components::traits::build::{
-    BuilderLoaderComponent, BuilderTypeComponent, CanLoadBuilder,
-};
-use hermes_cli_components::traits::command::{CanRunCommand, CommandRunnerComponent};
-use hermes_cli_components::traits::config::config_path::{
-    ConfigPathGetterComponent, HasConfigPath,
-};
-use hermes_cli_components::traits::config::load_config::{CanLoadConfig, ConfigLoaderComponent};
-use hermes_cli_components::traits::config::write_config::{CanWriteConfig, ConfigWriterComponent};
+use hermes_cli_components::traits::build::{BuilderLoaderComponent, BuilderTypeComponent};
+use hermes_cli_components::traits::command::CommandRunnerComponent;
+use hermes_cli_components::traits::config::config_path::ConfigPathGetterComponent;
+use hermes_cli_components::traits::config::load_config::ConfigLoaderComponent;
+use hermes_cli_components::traits::config::write_config::ConfigWriterComponent;
 use hermes_cli_components::traits::output::{
-    CanProduceOutput, OutputProducer, OutputProducerComponent, OutputTypeComponent,
+    OutputProducer, OutputProducerComponent, OutputTypeComponent,
 };
 use hermes_cli_components::traits::parse::ArgParserComponent;
 use hermes_cli_components::traits::types::config::ConfigTypeComponent;
-use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
+use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::types::HermesError;
 use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
+    GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
 };
 use hermes_relayer_components::error::traits::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
-    HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
+    RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::config::{
     StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses, StarknetRelayerConfig,
 };
 use hermes_starknet_chain_components::types::client_id::ClientId;
-use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_integration_tests::contexts::bootstrap::StarknetBootstrap;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
+use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
+use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::{ConfigUpdater, ConfigUpdaterComponent};
 use ibc::core::client::types::Height;
-use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
+use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId, PortId};
 use toml::to_string_pretty;
 
 use crate::commands::all::{AllSubCommands, RunAllSubCommand};
+use crate::commands::bootstrap::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::commands::create::subcommand::{CreateSubCommand, RunCreateSubCommand};
 use crate::commands::query::subcommand::{QuerySubCommand, RunQuerySubCommand};
 use crate::commands::start::{RunStartSubCommand, StartSubCommand};
 use crate::commands::update::subcommand::{RunUpdateSubCommand, UpdateSubCommand};
+use crate::impls::bootstrap::osmosis_chain::{BootstrapOsmosisChainArgs, LoadOsmosisBootstrap};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
-use crate::impls::bootstrap::subcommand::{BootstrapSubCommand, RunBootstrapSubCommand};
 use crate::impls::build::LoadStarknetBuilder;
+use crate::impls::create_client::CreateStarknetClientArgs;
 use crate::impls::error::ProvideCliError;
 
 #[cgp_context(StarknetAppComponents)]
@@ -95,10 +95,6 @@ pub struct StarknetApp {
 }
 
 pub struct StarknetParserComponents;
-
-pub struct StarknetCommandRunnerComponents;
-
-pub struct UpdateStarknetConfig;
 
 delegate_components! {
     StarknetAppComponents {
@@ -117,14 +113,16 @@ delegate_components! {
             GlobalLoggerGetterComponent,
         ]:
             UseHermesLogger,
+        AnyCounterpartyTypeProviderComponent:
+            UseType<CosmosChain>,
         ConfigTypeComponent:
             WithType<StarknetRelayerConfig>,
-        BootstrapTypeComponent:
-            WithType<StarknetBootstrap>,
+        BootstrapTypeProviderComponent:
+            UseDelegate<StarknetBootstrapTypes>,
         OutputTypeComponent:
             WithType<()>,
         BootstrapLoaderComponent:
-            LoadStarknetBootstrap,
+            UseDelegate<StarknetBoostrapLoaders>,
         ConfigPathGetterComponent:
             GetDefaultConfigField,
         ConfigLoaderComponent:
@@ -164,16 +162,51 @@ delegate_components! {
         (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
         (UpdateClientArgs, symbol!("target_height")): ParseFromOptionalString<Height>,
 
-        (CreateClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
-        (CreateClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateCosmosClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateCosmosClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+
+        (CreateStarknetClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateStarknetClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+
+        (CreateConnectionArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateConnectionArgs, symbol!("target_client_id")): ParseFromString<ClientId>,
+        (CreateConnectionArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateConnectionArgs, symbol!("counterparty_client_id")): ParseFromString<ClientId>,
+
+        (CreateChannelArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateChannelArgs, symbol!("target_client_id")): ParseFromString<ClientId>,
+        (CreateChannelArgs, symbol!("target_port_id")): ParseFromString<PortId>,
+        (CreateChannelArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateChannelArgs, symbol!("counterparty_client_id")): ParseFromString<ClientId>,
+        (CreateChannelArgs, symbol!("counterparty_port_id")): ParseFromString<PortId>,
+        (CreateChannelArgs, symbol!("init_channel_options")): ParseInitCosmosChannelOptions,
 
         (StartRelayerArgs, symbol!("chain_id_a")): ParseFromString<ChainId>,
         (StartRelayerArgs, symbol!("client_id_a")): ParseFromString<ClientId>,
         (StartRelayerArgs, symbol!("chain_id_b")): ParseFromString<ChainId>,
         (StartRelayerArgs, symbol!("client_id_b")): ParseFromString<ClientId>,
-
     }
 }
+
+pub struct StarknetBootstrapTypes;
+
+delegate_components! {
+    StarknetBootstrapTypes {
+        StarknetChain: UseType<StarknetBootstrap>,
+        CosmosChain: UseType<OsmosisBootstrap>,
+    }
+}
+
+pub struct StarknetBoostrapLoaders;
+
+delegate_components! {
+    StarknetBoostrapLoaders {
+        StarknetChain: LoadStarknetBootstrap,
+        CosmosChain: LoadOsmosisBootstrap,
+    }
+}
+
+pub struct StarknetCommandRunnerComponents;
 
 delegate_components! {
     StarknetCommandRunnerComponents {
@@ -193,18 +226,15 @@ delegate_components! {
         UpdateSubCommand: RunUpdateSubCommand,
 
         UpdateClientArgs: RunUpdateClientCommand,
-        CreateClientArgs: RunCreateClientCommand,
+        CreateCosmosClientArgs: RunCreateClientCommand<Index<0>, Index<1>>,
+        CreateStarknetClientArgs: RunCreateClientCommand<Index<1>, Index<0>>,
 
-        BootstrapStarknetChainArgs: RunBootstrapChainCommand<UpdateStarknetConfig>,
+        CreateConnectionArgs: RunCreateConnectionCommand,
+        CreateChannelArgs: RunCreateChannelCommand,
+
+        BootstrapStarknetChainArgs: RunBootstrapChainCommand<StarknetChain, UpdateStarknetConfig>,
+        BootstrapOsmosisChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
     }
-}
-
-#[cgp_provider(AnyCounterpartyComponent)]
-impl<App> ProvideAnyCounterparty<App> for StarknetAppComponents
-where
-    App: Async,
-{
-    type AnyCounterparty = CosmosChain;
 }
 
 #[cgp_provider(OutputProducerComponent)]
@@ -212,7 +242,7 @@ impl<Value> OutputProducer<StarknetApp, Value> for StarknetAppComponents {
     fn produce_output(_app: &StarknetApp, _value: Value) {}
 }
 
-#[cgp_provider(ConfigUpdaterComponent)]
+#[cgp_new_provider(ConfigUpdaterComponent)]
 impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarknetConfig {
     fn update_config(
         chain_driver: &StarknetChainDriver,
@@ -231,33 +261,30 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
             .clone();
 
         let contract_addresses = StarknetContractAddresses {
-            ibc_client: chain_driver.chain.ibc_client_contract_address,
-            ibc_core: chain_driver.chain.ibc_core_contract_address,
-            ibc_ics20: chain_driver.chain.ibc_ics20_contract_address,
-        };
-
-        let contract_classes = StarknetContractClasses {
-            erc20: chain_driver
-                .chain
-                .event_encoding
-                .erc20_hashes
-                .iter()
-                .cloned()
-                .next(),
-            ics20: chain_driver
-                .chain
-                .event_encoding
-                .ics20_hashes
-                .iter()
-                .cloned()
-                .next(),
             ibc_client: chain_driver
                 .chain
-                .event_encoding
+                .ibc_client_contract_address
+                .get()
+                .cloned(),
+            ibc_core: chain_driver.chain.ibc_core_contract_address.get().cloned(),
+            ibc_ics20: chain_driver.chain.ibc_ics20_contract_address.get().cloned(),
+        };
+
+        let event_encoding = &chain_driver.chain.event_encoding;
+
+        let contract_classes = StarknetContractClasses {
+            erc20: event_encoding
+                .erc20_hashes
+                .get()
+                .and_then(|hashes| hashes.iter().cloned().next()),
+            ics20: event_encoding
+                .ics20_hashes
+                .get()
+                .and_then(|hashes| hashes.iter().cloned().next()),
+            ibc_client: event_encoding
                 .ibc_client_hashes
-                .iter()
-                .cloned()
-                .next(),
+                .get()
+                .and_then(|hashes| hashes.iter().cloned().next()),
         };
 
         let relayer_wallet_path = chain_driver
@@ -286,78 +313,50 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
     }
 }
 
-#[cgp_provider(CreateClientOptionsParserComponent)]
-impl CreateClientOptionsParser<StarknetApp, CreateClientArgs, Index<0>, Index<1>>
-    for StarknetAppComponents
-{
-    async fn parse_create_client_options(
-        _app: &StarknetApp,
-        args: &CreateClientArgs,
-        _target_chain: &StarknetChain,
-        counterparty_chain: &CosmosChain,
-    ) -> Result<((), CosmosCreateClientOptions), HermesError> {
-        let max_clock_drift = match args.clock_drift.map(|d| d.into()) {
-            Some(input) => input,
-            None => {
-                counterparty_chain.chain_config.clock_drift
-                    + counterparty_chain.chain_config.max_block_time
-            }
-        };
+#[cgp_provider(ConfigUpdaterComponent)]
+impl ConfigUpdater<CosmosChainDriver, StarknetRelayerConfig> for UpdateStarknetConfig {
+    fn update_config(
+        chain_driver: &CosmosChainDriver,
+        config: &mut StarknetRelayerConfig,
+    ) -> Result<String, HermesError> {
+        let chain_config = chain_driver.chain.chain_config.clone();
+        let chain_config_str = to_string_pretty(&chain_driver.chain.chain_config)?;
+        config.cosmos_chain_config = Some(chain_config);
 
-        let settings = CosmosCreateClientOptions {
-            max_clock_drift,
-            trusting_period: args.trusting_period.map(|d| d.into()).unwrap_or_default(),
-            trust_threshold: args
-                .trust_threshold
-                .map(|threshold| threshold.into())
-                .unwrap_or_default(),
-        };
-
-        Ok(((), settings))
+        Ok(chain_config_str)
     }
 }
 
-// TODO(seanchen1991): Implement Cosmos-to-Starknet client creation
-pub struct CreateCosmosClientOnStarknetArgs;
-
-#[cgp_provider(CreateClientOptionsParserComponent)]
-impl CreateClientOptionsParser<StarknetApp, CreateCosmosClientOnStarknetArgs, Index<1>, Index<0>>
-    for StarknetAppComponents
-{
-    async fn parse_create_client_options(
-        _app: &StarknetApp,
-        _args: &CreateCosmosClientOnStarknetArgs,
-        _target_chain: &CosmosChain,
-        _counterparty_chain: &StarknetChain,
-    ) -> Result<((), StarknetCreateClientPayloadOptions), HermesError> {
-        todo!()
+check_components! {
+    CanUseStarknetApp for StarknetApp {
+        RuntimeGetterComponent,
+        LoggerGetterComponent,
+        ConfigPathGetterComponent,
+        ConfigLoaderComponent,
+        ConfigWriterComponent,
+        OutputProducerComponent: (),
+        BootstrapTypeProviderComponent: StarknetChain,
+        BootstrapLoaderComponent: [
+            (StarknetChain, BootstrapStarknetChainArgs),
+            (CosmosChain, BootstrapOsmosisChainArgs),
+        ],
+        CommandRunnerComponent: [
+            AllSubCommands,
+            StartSubCommand,
+            BootstrapSubCommand,
+            BootstrapStarknetChainArgs,
+            BootstrapOsmosisChainArgs,
+            QuerySubCommand,
+            QueryClientStateArgs,
+            QueryBalanceArgs,
+            CreateSubCommand,
+            UpdateSubCommand,
+            UpdateClientArgs,
+            CreateCosmosClientArgs,
+            CreateStarknetClientArgs,
+            StartRelayerArgs,
+            CreateConnectionArgs,
+            CreateChannelArgs,
+        ],
     }
 }
-
-pub trait CanUseStarknetApp:
-    HasRuntime
-    + HasLogger
-    + HasConfigPath
-    + CanLoadConfig
-    + CanWriteConfig
-    + CanWrapError<&'static str>
-    + CanProduceOutput<()>
-    + CanLoadBootstrap<BootstrapStarknetChainArgs>
-    + CanRunCommand<AllSubCommands>
-    + CanRunCommand<BootstrapSubCommand>
-    + CanRunCommand<BootstrapStarknetChainArgs>
-    + CanLoadBuilder<Builder = StarknetBuilder>
-    + CanRunCommand<QuerySubCommand>
-    + CanRunCommand<QueryClientStateArgs>
-    + CanRunCommand<QueryConsensusStateArgs>
-    + CanRunCommand<QueryBalanceArgs>
-    + CanRunCommand<CreateSubCommand>
-    + CanRunCommand<UpdateSubCommand>
-    + CanRunCommand<UpdateClientArgs>
-    + CanRunCommand<CreateClientArgs>
-    + CanRunCommand<StartRelayerArgs>
-    + CanUseComponent<CommandRunnerComponent, StartSubCommand>
-{
-}
-
-impl CanUseStarknetApp for StarknetApp {}

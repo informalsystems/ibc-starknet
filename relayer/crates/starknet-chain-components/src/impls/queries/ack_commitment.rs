@@ -6,7 +6,7 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
 use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_chain_components::traits::queries::packet_acknowledgement::{
-    PacketAcknowledgementQuerier, PacketAcknowledgementQuerierComponent,
+    PacketAckCommitmentQuerier, PacketAckCommitmentQuerierComponent,
 };
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::ibc::{
@@ -37,8 +37,8 @@ use crate::types::messages::ibc::packet::Sequence;
 use crate::types::status::StarknetChainStatus;
 pub struct QueryStarknetAckCommitment;
 
-#[cgp_provider(PacketAcknowledgementQuerierComponent)]
-impl<Chain, Counterparty, Encoding> PacketAcknowledgementQuerier<Chain, Counterparty>
+#[cgp_provider(PacketAckCommitmentQuerierComponent)]
+impl<Chain, Counterparty, Encoding> PacketAckCommitmentQuerier<Chain, Counterparty>
     for QueryStarknetAckCommitment
 where
     Chain: HasHeightType<Height = u64>
@@ -62,7 +62,7 @@ where
         + CanDecode<ViaCairo, Product![[u32; 8]]>
         + HasEncodedType<Encoded = Vec<Felt>>,
 {
-    async fn query_packet_acknowledgement_with_proof(
+    async fn query_packet_ack_commitment_with_proof(
         chain: &Chain,
         channel_id: &ChannelId,
         port_id: &IbcPortId,

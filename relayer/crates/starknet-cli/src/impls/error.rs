@@ -15,6 +15,7 @@ use hermes_error::impls::UseHermesError;
 use hermes_error::types::Error;
 use hermes_relayer_components::error::traits::RetryableErrorComponent;
 use hermes_runtime::types::error::TokioRuntimeError;
+use ibc::core::channel::types::error::ChannelError;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};
 use starknet_types_core::felt::FromStrError;
 
@@ -54,9 +55,12 @@ delegate_components! {
             ParseIntError,
             DecodingError,
             IdentifierError,
+            ChannelError,
             TokioRuntimeError,
+            std::io::Error,
             toml::de::Error,
             toml::ser::Error,
+            serde_json::Error,
         ]: ReportError,
         [
             <'a> &'a str,
