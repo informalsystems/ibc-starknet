@@ -24,6 +24,9 @@ use hermes_relayer_components::build::traits::builders::birelay_builder::{
 use hermes_relayer_components::build::traits::builders::chain_builder::{
     CanBuildChain, ChainBuilder, ChainBuilderComponent,
 };
+use hermes_relayer_components::build::traits::builders::relay_builder::{
+    RelayBuilder, RelayBuilderComponent,
+};
 use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeAtComponent;
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
 use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
@@ -33,12 +36,11 @@ use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
-use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
-use ibc::core::host::types::identifiers::{ChainId, ClientId, ClientId as CosmosClientId};
+use ibc::core::host::types::identifiers::{ChainId, ClientId};
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
@@ -117,6 +119,56 @@ impl ChainBuilder<StarknetBuilder, Index<1>> for StarknetBuildComponents {
         chain_id: &ChainId,
     ) -> Result<CosmosChain, Error> {
         build.cosmos_builder.build_chain(chain_id).await
+    }
+}
+
+#[cgp_provider(RelayBuilderComponent)]
+impl RelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponents {
+    async fn build_relay(
+        build: &StarknetBuilder,
+        _index: PhantomData<(Index<0>, Index<1>)>,
+        src_chain_id: &ChainId,
+        dst_chain_id: &ChainId,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
+    ) -> Result<StarknetToCosmosRelay, HermesError> {
+        let src_chain = build.build_chain(src_chain_id).await?;
+
+        let dst_chain = build.cosmos_builder.build_chain(dst_chain_id).await?;
+
+        Ok(
+            build.build_starknet_to_cosmos_relay(
+                src_chain,
+                dst_chain,
+                src_client_id,
+                dst_client_id,
+            ),
+        )
+    }
+}
+
+#[cgp_provider(RelayBuilderComponent)]
+impl RelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildComponents {
+    async fn build_relay(
+        build: &StarknetBuilder,
+        _index: PhantomData<(Index<1>, Index<0>)>,
+        src_chain_id: &ChainId,
+        dst_chain_id: &ChainId,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
+    ) -> Result<CosmosToStarknetRelay, HermesError> {
+        let src_chain = build.cosmos_builder.build_chain(dst_chain_id).await?;
+
+        let dst_chain = build.build_chain(src_chain_id).await?;
+
+        Ok(
+            build.build_cosmos_to_starknet_relay(
+                src_chain,
+                dst_chain,
+                src_client_id,
+                dst_client_id,
+            ),
+        )
     }
 }
 
@@ -326,8 +378,8 @@ impl StarknetBuilder {
         &self,
         src_chain: StarknetChain,
         dst_chain: CosmosChain,
-        src_client_id: &StarknetClientId,
-        dst_client_id: &CosmosClientId,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
     ) -> StarknetToCosmosRelay {
         StarknetToCosmosRelay::new(
             self.runtime.clone(),
@@ -342,8 +394,8 @@ impl StarknetBuilder {
         &self,
         src_chain: CosmosChain,
         dst_chain: StarknetChain,
-        src_client_id: &CosmosClientId,
-        dst_client_id: &StarknetClientId,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
     ) -> CosmosToStarknetRelay {
         CosmosToStarknetRelay::new(
             self.runtime.clone(),

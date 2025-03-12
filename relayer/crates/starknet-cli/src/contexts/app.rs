@@ -1,4 +1,3 @@
-use core::time::Duration;
 use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
@@ -6,13 +5,17 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWr
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_cli::commands::client::create::CreateClientArgs;
+use hermes_cli::commands::channel::CreateChannelArgs;
+use hermes_cli::commands::client::create::CreateCosmosClientArgs;
+use hermes_cli::impls::parse::ParseInitCosmosChannelOptions;
 use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
-use hermes_cli_components::impls::commands::client::create::{
-    CreateClientOptionsParser, CreateClientOptionsParserComponent, RunCreateClientCommand,
-};
+use hermes_cli_components::impls::commands::channel::create::RunCreateChannelCommand;
+use hermes_cli_components::impls::commands::client::create::RunCreateClientCommand;
 use hermes_cli_components::impls::commands::client::update::{
     RunUpdateClientCommand, UpdateClientArgs,
+};
+use hermes_cli_components::impls::commands::connection::create::{
+    CreateConnectionArgs, RunCreateConnectionCommand,
 };
 use hermes_cli_components::impls::commands::queries::balance::{
     QueryBalanceArgs, RunQueryBalanceCommand,
@@ -45,7 +48,6 @@ use hermes_cli_components::traits::output::{
 };
 use hermes_cli_components::traits::parse::ArgParserComponent;
 use hermes_cli_components::traits::types::config::ConfigTypeComponent;
-use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
 use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::types::HermesError;
@@ -63,16 +65,14 @@ use hermes_starknet_chain_components::impls::types::config::{
     StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses, StarknetRelayerConfig,
 };
 use hermes_starknet_chain_components::types::client_id::ClientId;
-use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::{ConfigUpdater, ConfigUpdaterComponent};
-use ibc::clients::tendermint::types::TrustThreshold;
 use ibc::core::client::types::Height;
-use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId};
+use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId, PortId};
 use toml::to_string_pretty;
 
 use crate::commands::all::{AllSubCommands, RunAllSubCommand};
@@ -84,6 +84,7 @@ use crate::commands::update::subcommand::{RunUpdateSubCommand, UpdateSubCommand}
 use crate::impls::bootstrap::osmosis_chain::{BootstrapOsmosisChainArgs, LoadOsmosisBootstrap};
 use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
 use crate::impls::build::LoadStarknetBuilder;
+use crate::impls::create_client::CreateStarknetClientArgs;
 use crate::impls::error::ProvideCliError;
 
 #[cgp_context(StarknetAppComponents)]
@@ -161,8 +162,24 @@ delegate_components! {
         (UpdateClientArgs, symbol!("counterparty_client_id")): ParseFromString<CosmosClientId>,
         (UpdateClientArgs, symbol!("target_height")): ParseFromOptionalString<Height>,
 
-        (CreateClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
-        (CreateClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateCosmosClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateCosmosClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+
+        (CreateStarknetClientArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateStarknetClientArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+
+        (CreateConnectionArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateConnectionArgs, symbol!("target_client_id")): ParseFromString<ClientId>,
+        (CreateConnectionArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateConnectionArgs, symbol!("counterparty_client_id")): ParseFromString<ClientId>,
+
+        (CreateChannelArgs, symbol!("target_chain_id")): ParseFromString<ChainId>,
+        (CreateChannelArgs, symbol!("target_client_id")): ParseFromString<ClientId>,
+        (CreateChannelArgs, symbol!("target_port_id")): ParseFromString<PortId>,
+        (CreateChannelArgs, symbol!("counterparty_chain_id")): ParseFromString<ChainId>,
+        (CreateChannelArgs, symbol!("counterparty_client_id")): ParseFromString<ClientId>,
+        (CreateChannelArgs, symbol!("counterparty_port_id")): ParseFromString<PortId>,
+        (CreateChannelArgs, symbol!("init_channel_options")): ParseInitCosmosChannelOptions,
 
         (StartRelayerArgs, symbol!("chain_id_a")): ParseFromString<ChainId>,
         (StartRelayerArgs, symbol!("client_id_a")): ParseFromString<ClientId>,
@@ -209,7 +226,11 @@ delegate_components! {
         UpdateSubCommand: RunUpdateSubCommand,
 
         UpdateClientArgs: RunUpdateClientCommand,
-        CreateClientArgs: RunCreateClientCommand,
+        CreateCosmosClientArgs: RunCreateClientCommand<Index<0>, Index<1>>,
+        CreateStarknetClientArgs: RunCreateClientCommand<Index<1>, Index<0>>,
+
+        CreateConnectionArgs: RunCreateConnectionCommand,
+        CreateChannelArgs: RunCreateChannelCommand,
 
         BootstrapStarknetChainArgs: RunBootstrapChainCommand<StarknetChain, UpdateStarknetConfig>,
         BootstrapOsmosisChainArgs: RunBootstrapChainCommand<CosmosChain, UpdateStarknetConfig>,
@@ -306,57 +327,6 @@ impl ConfigUpdater<CosmosChainDriver, StarknetRelayerConfig> for UpdateStarknetC
     }
 }
 
-#[cgp_provider(CreateClientOptionsParserComponent)]
-impl CreateClientOptionsParser<StarknetApp, CreateClientArgs, Index<0>, Index<1>>
-    for StarknetAppComponents
-{
-    async fn parse_create_client_options(
-        _app: &StarknetApp,
-        args: &CreateClientArgs,
-        _target_chain: &StarknetChain,
-        counterparty_chain: &CosmosChain,
-    ) -> Result<((), CosmosCreateClientOptions), HermesError> {
-        let max_clock_drift = match args.clock_drift.map(|d| d.into()) {
-            Some(input) => input,
-            None => {
-                counterparty_chain.chain_config.clock_drift
-                    + counterparty_chain.chain_config.max_block_time
-            }
-        };
-
-        let settings = CosmosCreateClientOptions {
-            max_clock_drift,
-            trusting_period: args
-                .trusting_period
-                .map(|d| d.into())
-                .unwrap_or_else(|| Duration::from_secs(14 * 24 * 3600)),
-            trust_threshold: args
-                .trust_threshold
-                .unwrap_or(TrustThreshold::TWO_THIRDS)
-                .into(),
-        };
-
-        Ok(((), settings))
-    }
-}
-
-// TODO(seanchen1991): Implement Cosmos-to-Starknet client creation
-pub struct CreateCosmosClientOnStarknetArgs;
-
-#[cgp_provider(CreateClientOptionsParserComponent)]
-impl CreateClientOptionsParser<StarknetApp, CreateCosmosClientOnStarknetArgs, Index<1>, Index<0>>
-    for StarknetAppComponents
-{
-    async fn parse_create_client_options(
-        _app: &StarknetApp,
-        _args: &CreateCosmosClientOnStarknetArgs,
-        _target_chain: &CosmosChain,
-        _counterparty_chain: &StarknetChain,
-    ) -> Result<((), StarknetCreateClientPayloadOptions), HermesError> {
-        todo!()
-    }
-}
-
 check_components! {
     CanUseStarknetApp for StarknetApp {
         RuntimeGetterComponent,
@@ -382,8 +352,11 @@ check_components! {
             CreateSubCommand,
             UpdateSubCommand,
             UpdateClientArgs,
-            CreateClientArgs,
+            CreateCosmosClientArgs,
+            CreateStarknetClientArgs,
             StartRelayerArgs,
+            CreateConnectionArgs,
+            CreateChannelArgs,
         ],
     }
 }
