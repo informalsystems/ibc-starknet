@@ -87,16 +87,6 @@ jobs:
           tool-versions: cairo-contracts/.tool-versions
           scarb-lock: cairo-contracts/Scarb.lock
 
-      - name: Install Universal Sierra Compiler
-        uses: software-mansion/setup-universal-sierra-compiler@v1
-        with:
-          tool-versions: cairo-contracts/.tool-versions
-
-      - name: Install Starknet Foundry
-        uses: foundry-rs/setup-snfoundry@v3
-        with:
-          tool-versions: cairo-contracts/.tool-versions
-
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
