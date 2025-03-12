@@ -11,6 +11,7 @@ pub mod ClientErrors {
     pub const INVALID_SUBSTITUTE_CLIENT_ID: felt252 = 'ICS02: invalid subs client id';
     pub const OVERFLOWED_HEIGHT: felt252 = 'ICS02: overflowed height';
     pub const OVERFLOWED_TIMESTAMP: felt252 = 'ICS02: overflowed timestamp';
+    pub const OVERFLOWED_DURATION: felt252 = 'ICS02: overflowed duration';
     pub const RELAYER_ALREADY_REGISTERED: felt252 = 'ICS02: rly already registered';
     pub const UNAUTHORIZED_RELAYER: felt252 = 'ICS02: unauthorized relayer';
 }

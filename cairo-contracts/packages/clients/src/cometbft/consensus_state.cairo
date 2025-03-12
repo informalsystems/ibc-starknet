@@ -1,6 +1,8 @@
 use core::num::traits::Zero;
 use starknet_ibc_clients::cometbft::CometErrors;
-use starknet_ibc_core::client::{Status, Timestamp};
+use starknet_ibc_core::client::{
+    Duration, DurationTrait, Status, Timestamp, TimestampImpl, TimestampIntoU128,
+};
 use starknet_ibc_core::commitment::StateRoot;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
@@ -31,8 +33,10 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
         maybe_consensus_state.unwrap()
     }
 
+    /// Returns the status of this consensus state given a host timestamp in nanoseconds, trusting
+    /// period, and max clock drift between chains.
     fn status(
-        self: @CometConsensusState, host_timestamp: u64, trusting_period: u64, max_clock_drift: u64,
+        self: @CometConsensusState, trusting_period: Duration, max_clock_drift: Duration,
     ) -> Status {
         // Consider `clock_drift` on Starknet with large `block_time`.
         //
@@ -43,10 +47,11 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
         // PS. the following check is always successful once a consensus state is validated and
         // accepted as trusted. Because the `block_timestamp` is always increasing.
 
-        let self_timestamp = self.timestamp();
+        let self_timestamp: u128 = self.timestamp().into();
+        let host_timestamp: u128 = TimestampImpl::host().into();
 
         assert(
-            host_timestamp + max_clock_drift >= self_timestamp,
+            host_timestamp + max_clock_drift.as_nanos() >= self_timestamp,
             CometErrors::INVALID_HEADER_FROM_FUTURE,
         );
 
@@ -55,7 +60,7 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
             return Status::Active;
         }
 
-        if host_timestamp - self_timestamp < trusting_period {
+        if host_timestamp - self_timestamp < trusting_period.as_nanos() {
             Status::Active
         } else {
             Status::Expired
