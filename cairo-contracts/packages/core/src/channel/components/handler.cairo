@@ -676,7 +676,8 @@ pub mod ChannelHandlerComponent {
                 !msg
                     .packet
                     .is_timed_out(
-                        @HeightImpl::new(0, get_block_number()), @(get_block_timestamp()*1_000_000_000).into(),
+                        @HeightImpl::new(0, get_block_number()),
+                        @(get_block_timestamp() * 1_000_000_000).into(),
                     ),
                 ChannelErrors::TIMED_OUT_PACKET,
             );
