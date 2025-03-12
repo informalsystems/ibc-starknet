@@ -33,7 +33,7 @@ use crate::traits::types::method::HasSelectorType;
 use crate::types::amount::StarknetAmount;
 use crate::types::channel_id::ChannelId;
 use crate::types::cosmos::height::Height;
-use crate::types::messages::ibc::denom::PrefixedDenom;
+use crate::types::messages::ibc::denom::{Denom, PrefixedDenom};
 use crate::types::messages::ibc::ibc_transfer::MsgTransfer;
 
 pub struct BuildStarknetIbcTransferMessage;
@@ -88,14 +88,26 @@ where
                 &calldata,
                 None,
             )
-            .await?;
+            .await;
 
-        let prefix_denom_str = chain
-            .encoding()
-            .decode(&output)
-            .map_err(Chain::raise_error)?;
+        let denom = match output {
+            Ok(output) => {
+                let prefix_denom_str = chain
+                    .encoding()
+                    .decode(&output)
+                    .map_err(Chain::raise_error)?;
 
-        let denom = PrefixedDenom::from_str(&prefix_denom_str).map_err(Chain::raise_error)?;
+                PrefixedDenom::from_str(&prefix_denom_str).map_err(Chain::raise_error)?
+            }
+            Err(_) => {
+                // FIXME: check and verify error is "ICS20: missing token denom", which means
+                // this is a native token
+                PrefixedDenom {
+                    trace_path: vec![],
+                    base: Denom::Native(amount.token_address),
+                }
+            }
+        };
 
         let timeout_height_on_b = if let Some(timeout_height) = timeout_height {
             Height {
