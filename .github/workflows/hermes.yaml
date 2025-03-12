@@ -41,6 +41,12 @@ jobs:
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
+      - name: Install Scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          tool-versions: cairo-contracts/.tool-versions
+          scarb-lock: cairo-contracts/Scarb.lock
+
       - name: Install Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -58,7 +64,7 @@ jobs:
           tag: v28.0.1
           extract: true
 
-      - name: Install starknet-devnet
+      - name: Install starknet-devnet v0.2.4
         uses: robinraju/release-downloader@v1
         with:
           repository: 0xSpaceShard/starknet-devnet
@@ -84,12 +90,6 @@ jobs:
           osmosisd version
           starknet-devnet --version
           cosmwasm-check --version
-
-      - name: Install Scarb
-        uses: software-mansion/setup-scarb@v1
-        with:
-          tool-versions: cairo-contracts/.tool-versions
-          scarb-lock: cairo-contracts/Scarb.lock
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
