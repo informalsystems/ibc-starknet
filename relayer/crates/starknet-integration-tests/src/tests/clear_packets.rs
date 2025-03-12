@@ -1340,7 +1340,7 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
         {
             let call_data = cairo_encoding.encode(&product![
                 ics20_contract_address,
-                U256::from(transfer_quantity)
+                U256::from(transfer_back_quantity)
             ])?;
 
             let call = Call {
@@ -1429,7 +1429,7 @@ fn test_relay_timeout_packet_no_sleep() -> Result<(), Error> {
         );
 
         assert_eq!(
-            balance_starknet_b_step_0.quantity - transfer_quantity.into(),
+            balance_starknet_b_step_0.quantity - transfer_back_quantity.into(),
             balance_starknet_b_step_1.quantity
         );
 
