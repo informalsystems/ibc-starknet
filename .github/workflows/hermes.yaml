@@ -15,17 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        value:
-          - os: ubuntu-22.04
-            osmosis: osmosisd-28.0.1-linux-amd64.tar.gz
-            starknet-devnet: starknet-devnet-x86_64-unknown-linux-gnu.tar.gz
-          - os: ubuntu-22.04-arm
-            osmosis: osmosisd-28.0.1-linux-arm64.tar.gz
-            starknet-devnet: starknet-devnet-aarch64-unknown-linux-gnu.tar.gz
-          - os: macos-14
-            osmosis: osmosisd-28.0.1-darwin-arm64.tar.gz
-            starknet-devnet: starknet-devnet-aarch64-apple-darwin.tar.gz
-    runs-on: ${{ matrix.value.os }}
+        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-14]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -63,7 +54,7 @@ jobs:
           RUST_BACKTRACE: 1
           RUST_LOG: debug
           # Tests are run with a single thread to avoid Connection refused (os error 61) with macOS
-          TEST_THREADS: ${{ matrix.value.os == 'macos-14' && 1 || 4 }}
+          TEST_THREADS: ${{ matrix.os == 'macos-14' && 1 || 4 }}
         working-directory: ./relayer
         run: |
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
