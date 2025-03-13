@@ -1,7 +1,7 @@
 {
   nixpkgs,
   rust,
- starknet-foundry-src,
+  starknet-foundry-src,
 }:
 let
   rust-platform = nixpkgs.makeRustPlatform {
