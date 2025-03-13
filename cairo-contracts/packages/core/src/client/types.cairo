@@ -299,7 +299,17 @@ pub impl DurationAdd of Add<Duration> {
         assert(seconds.is_some(), ClientErrors::OVERFLOWED_DURATION);
         let nanos = lhs.nanos.checked_add(rhs.nanos);
         assert(nanos.is_some(), ClientErrors::OVERFLOWED_DURATION);
-        Duration { seconds: seconds.unwrap(), nanos: nanos.unwrap() }
+
+        // nanos can overflow into seconds
+        let (seconds, nanos) = if nanos.unwrap() >= NANOS_PER_SEC {
+            let quotient = nanos.unwrap() / NANOS_PER_SEC;
+            let remainder = nanos.unwrap() % NANOS_PER_SEC;
+            (seconds.unwrap() + quotient.into(), remainder)
+        } else {
+            (seconds.unwrap(), nanos.unwrap())
+        };
+
+        Duration { seconds, nanos }
     }
 }
 
@@ -312,5 +322,27 @@ impl DurationZero of Zero<Duration> {
     }
     fn is_non_zero(self: @Duration) -> bool {
         !self.is_zero()
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_duration_simple_add() {
+        let duration1 = Duration { seconds: 1, nanos: 1 };
+        let duration2 = Duration { seconds: 2, nanos: 2 };
+        let duration3 = Duration { seconds: 3, nanos: 3 };
+        assert_eq!(duration1 + duration2, duration3);
+    }
+
+    #[test]
+    fn test_duration_add_nano_overflow() {
+        let duration1 = Duration { seconds: 1, nanos: 999_999_999 };
+        let duration2 = Duration { seconds: 2, nanos: 999_999_999 };
+        let duration3 = Duration { seconds: 4, nanos: 999_999_998 };
+        assert_eq!(duration1 + duration2, duration3);
     }
 }
