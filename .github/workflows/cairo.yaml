@@ -40,6 +40,7 @@ jobs:
         working-directory: ./cairo-libs
         run: |
           scarb build -w
+          scarb lint -w
           scarb test -w
 
   test-cairo-contracts:
@@ -74,5 +75,6 @@ jobs:
         working-directory: ./cairo-contracts
         run: |
           scarb build
+          scarb lint -w
           scarb build -p starknet_ibc_contracts
           scarb test -w
