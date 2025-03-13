@@ -70,7 +70,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         let mut serialized_header: Array<felt252> = ArrayTrait::new();
 
         let signed_header = SignedHeader {
-            height: latest_height, time: latest_timestamp.timestamp, root: STATE_ROOT(),
+            height: latest_height, timestamp: latest_timestamp, root: STATE_ROOT(),
         };
 
         let header = CometHeader { trusted_height, signed_header };
