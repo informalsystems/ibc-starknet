@@ -11,6 +11,7 @@ use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
 use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
+use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
@@ -109,7 +110,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             SourceTarget,
             starknet_chain,
             cosmos_chain,
-            &Default::default(),
+            &CosmosCreateClientOptions::default(),
             &(),
         )
         .await?;

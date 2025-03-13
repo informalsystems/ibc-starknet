@@ -19,8 +19,8 @@ where
         value: &Timestamp,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
-        let unix_secs = value.nanoseconds();
-        encoding.encode_mut(&product![unix_secs], buffer)?;
+        let unix_nanos = value.nanoseconds();
+        encoding.encode_mut(&product![unix_nanos], buffer)?;
         Ok(())
     }
 }
@@ -34,7 +34,7 @@ where
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<Timestamp, Encoding::Error> {
-        let product![unix_secs] = encoding.decode_mut(buffer)?;
-        Ok(Timestamp::from_nanoseconds(unix_secs))
+        let product![unix_nanos] = encoding.decode_mut(buffer)?;
+        Ok(Timestamp::from_nanoseconds(unix_nanos))
     }
 }

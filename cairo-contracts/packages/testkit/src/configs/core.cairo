@@ -6,7 +6,7 @@ use starknet_ibc_core::connection::{
     MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry, VersionImpl,
 };
 use starknet_ibc_testkit::dummies::{
-    CHANNEL_ID, CLIENT_ID, CONNECTION_ID, HEIGHT, IBC_PREFIX, PORT_ID, STATE_PROOF,
+    CHANNEL_ID, CLIENT_ID, CONNECTION_ID, DURATION, HEIGHT, IBC_PREFIX, PORT_ID, STATE_PROOF,
     VERSION_PROPOSAL,
 };
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
@@ -40,7 +40,7 @@ pub impl CoreConfigImpl of CoreConfigTrait {
             client_id_on_b: CLIENT_ID(),
             prefix_on_b: IBC_PREFIX(),
             version: VersionImpl::supported(),
-            delay_period: 0,
+            delay_period: DURATION(0),
         }
     }
 
@@ -53,7 +53,7 @@ pub impl CoreConfigImpl of CoreConfigTrait {
             version_on_a: VersionImpl::supported(),
             proof_conn_end_on_a: STATE_PROOF(),
             proof_height_on_a: HEIGHT(10),
-            delay_period: 0,
+            delay_period: DURATION(0),
         }
     }
 

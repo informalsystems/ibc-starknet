@@ -2,7 +2,7 @@ use starknet::{ContractAddress, contract_address_const};
 use starknet_ibc_core::channel::{
     AppVersion, ChannelEnd, ChannelOrdering, ChannelState, Counterparty as ChanCounterparty,
 };
-use starknet_ibc_core::client::{Height, Timestamp};
+use starknet_ibc_core::client::{Duration, Height, Timestamp, TimestampImpl};
 use starknet_ibc_core::commitment::{StateProof, StateRoot};
 use starknet_ibc_core::connection::{
     ConnectionEnd, ConnectionState, Counterparty as ConnCounterparty, VersionImpl,
@@ -13,8 +13,12 @@ pub fn HEIGHT(revision_height: u64) -> Height {
     Height { revision_number: 0, revision_height }
 }
 
-pub fn TIMESTAMP(timestamp: u64) -> Timestamp {
-    Timestamp { timestamp }
+pub fn TIMESTAMP(seconds: u64) -> Timestamp {
+    TimestampImpl::from_unix_secs(seconds)
+}
+
+pub fn DURATION(seconds: u64) -> Duration {
+    Duration { seconds, nanos: 0 }
 }
 
 pub fn TIMEOUT_HEIGHT(height: u64) -> Height {
@@ -55,7 +59,7 @@ pub fn CONNECTION_END(counterparty_connection_sequence: u64) -> ConnectionEnd {
             prefix: BasePrefix { prefix: "" },
         },
         version: VersionImpl::supported(),
-        delay_period: 0,
+        delay_period: DURATION(0),
     }
 }
 

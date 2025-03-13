@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 use core::num::ParseIntError;
 use core::str::Utf8Error;
+use core::time::Duration;
 
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
@@ -90,7 +91,7 @@ where
             client_id_on_b: counterparty_client_id.clone(),
             prefix_on_b: counterparty_payload.commitment_prefix.into(),
             version: init_connection_options.connection_version.clone(),
-            delay_period: init_connection_options.delay_period.as_secs(),
+            delay_period: init_connection_options.delay_period,
         };
 
         let ibc_core_address = chain.query_contract_address(PhantomData).await?;
@@ -159,7 +160,7 @@ where
             revision_height: counterparty_payload.update_height.revision_height(),
         };
 
-        let conn_open_init_msg: MsgConnOpenTry = MsgConnOpenTry {
+        let conn_open_init_msg = MsgConnOpenTry {
             client_id_on_a: counterparty_client_id.clone(),
             client_id_on_b: client_id.clone(),
             conn_id_on_a: counterparty_connection_id.clone(),
@@ -167,7 +168,7 @@ where
             version_on_a: connection_version,
             proof_conn_end_on_a: commitment_proof,
             proof_height_on_a: proof_height,
-            delay_period: 0,
+            delay_period: Duration::from_secs(0),
         };
 
         let ibc_core_address = chain.query_contract_address(PhantomData).await?;

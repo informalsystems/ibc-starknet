@@ -444,7 +444,7 @@ fn try_timeout_packet(timeout_height: Height, timeout_timestamp: Timestamp) {
 
     let updating_height = HEIGHT(11); // Set to 11 as client is created at height 10.
 
-    let updating_timestamp: u64 = 11; // Set to 11 as client is created at timestamp 10.
+    let updating_timestamp = TIMESTAMP(11); // Set to 11 as client is created at timestamp 10.
 
     transfer_cfg.set_timeout_height(timeout_height);
 
