@@ -1,4 +1,4 @@
-use core::num::traits::{CheckedAdd, Zero};
+use core::num::traits::{CheckedAdd, OverflowingMul, Zero};
 use core::traits::PartialOrd;
 use ics23::IntoArrayU32;
 use starknet::SyscallResult;
@@ -6,6 +6,8 @@ use starknet::storage_access::{StorageBaseAddress, Store};
 use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::commitment::U32CollectorImpl;
 use starknet_ibc_core::host::ClientId;
+
+const NANOS_PER_SEC: u32 = 1_000_000_000;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct CreateResponse {
@@ -192,9 +194,34 @@ pub impl StoreHeightArray of Store<Array<Height>> {
     }
 }
 
-#[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
+/// Represents Unix timestamp in nanoseconds.
+#[derive(Copy, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct Timestamp {
     pub timestamp: u64,
+}
+
+#[generate_trait]
+pub impl TimestampImpl of TimestampTrait {
+    /// Constructs a `Timestamp` given a Unix seconds.
+    ///
+    /// NOTE: `u64` can represent times up to about year 2554, thus normally it shouldn't
+    /// overflow.
+    fn from_unix_secs(seconds: u64) -> Timestamp {
+        let (unix_nanos, overflowed) = seconds.overflowing_mul(NANOS_PER_SEC.into());
+        assert(!overflowed, ClientErrors::OVERFLOWED_TIMESTAMP);
+        Timestamp { timestamp: unix_nanos }
+    }
+
+    /// Returns the timestamp in seconds, truncating the nanoseconds.
+    fn as_secs(self: Timestamp) -> u64 {
+        self.timestamp / NANOS_PER_SEC.into()
+    }
+
+    /// Returns the timestamp of the latest block in Starknet, which serves as the host timestamp in
+    /// the IBC implementation.
+    fn host() -> Timestamp {
+        Self::from_unix_secs(starknet::get_block_timestamp())
+    }
 }
 
 pub impl TimestampZero of Zero<Timestamp> {
@@ -242,9 +269,93 @@ pub impl U64IntoTimestamp of Into<u64, Timestamp> {
     }
 }
 
+pub impl TimestampIntoU128 of Into<Timestamp, u128> {
+    fn into(self: Timestamp) -> u128 {
+        self.timestamp.into()
+    }
+}
+
 pub impl TimestampIntoArrayU32 of IntoArrayU32<Timestamp> {
     fn into_array_u32(self: Timestamp) -> (Array<u32>, u32, u32) {
         self.timestamp.into_array_u32()
     }
 }
 
+#[derive(Default, Debug, Copy, Drop, PartialEq, Serde, starknet::Store)]
+pub struct Duration {
+    pub seconds: u64,
+    pub nanos: u32,
+}
+
+#[generate_trait]
+pub impl DurationImpl of DurationTrait {
+    fn as_nanos(self: Duration) -> u128 {
+        self.seconds.into() * NANOS_PER_SEC.into() + self.nanos.into()
+    }
+}
+
+pub impl DurationAdd of Add<Duration> {
+    fn add(lhs: Duration, rhs: Duration) -> Duration {
+        let seconds = lhs.seconds.checked_add(rhs.seconds);
+        assert(seconds.is_some(), ClientErrors::OVERFLOWED_DURATION);
+        let nanos = lhs.nanos.checked_add(rhs.nanos);
+        assert(nanos.is_some(), ClientErrors::OVERFLOWED_DURATION);
+
+        // nanos can overflow into seconds
+        let (seconds, nanos) = if nanos.unwrap() >= NANOS_PER_SEC {
+            let quotient = nanos.unwrap() / NANOS_PER_SEC;
+            let remainder = nanos.unwrap() % NANOS_PER_SEC;
+            (seconds.unwrap() + quotient.into(), remainder)
+        } else {
+            (seconds.unwrap(), nanos.unwrap())
+        };
+
+        Duration { seconds, nanos }
+    }
+}
+
+impl DurationZero of Zero<Duration> {
+    fn zero() -> Duration {
+        Duration { seconds: 0, nanos: 0 }
+    }
+    fn is_zero(self: @Duration) -> bool {
+        self == @Self::zero()
+    }
+    fn is_non_zero(self: @Duration) -> bool {
+        !self.is_zero()
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_timestamp() {
+        let timestamp = TimestampImpl::from_unix_secs(29);
+        assert_eq!(timestamp.into(), 29_000_000_000_u128);
+    }
+
+    #[test]
+    fn test_duration_simple_add() {
+        let duration1 = Duration { seconds: 1, nanos: 1 };
+        let duration2 = Duration { seconds: 2, nanos: 2 };
+        let duration3 = Duration { seconds: 3, nanos: 3 };
+        assert_eq!(duration1 + duration2, duration3);
+    }
+
+    #[test]
+    fn test_duration_add_nano_overflow() {
+        let duration1 = Duration { seconds: 1, nanos: 999_999_999 };
+        let duration2 = Duration { seconds: 2, nanos: 999_999_999 };
+        let duration3 = Duration { seconds: 4, nanos: 999_999_998 };
+        assert_eq!(duration1 + duration2, duration3);
+    }
+
+    #[test]
+    fn test_duration_as_nanos() {
+        let duration = Duration { seconds: 1, nanos: 1 };
+        assert_eq!(duration.as_nanos(), 1_000_000_001);
+    }
+}

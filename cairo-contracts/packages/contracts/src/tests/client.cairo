@@ -1,7 +1,7 @@
 use snforge_std::spy_events;
 use starknet_ibc_core::client::{ClientContractTrait, StatusTrait, UpdateResponse};
 use starknet_ibc_testkit::configs::CometClientConfigTrait;
-use starknet_ibc_testkit::dummies::HEIGHT;
+use starknet_ibc_testkit::dummies::{HEIGHT, TIMESTAMP};
 use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
 use starknet_ibc_testkit::handles::CoreHandle;
 use starknet_ibc_testkit::setup::SetupImpl;
@@ -60,7 +60,7 @@ fn test_update_comet_client_ok() {
 
     // Update the client to a new height and time.
     let updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_time = cfg.latest_timestamp.clone() + 1;
+    let updating_time = cfg.latest_timestamp.clone() + TIMESTAMP(1);
 
     // Create a `MsgUpdateClient` message.
     let msg = cfg

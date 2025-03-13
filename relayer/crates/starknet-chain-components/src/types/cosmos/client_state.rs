@@ -33,9 +33,9 @@ use crate::types::cosmos::height::Height;
 #[derive(Debug, HasField)]
 pub struct CometClientState {
     pub latest_height: Height,
-    pub trusting_period: u64,
-    pub unbonding_period: u64,
-    pub max_clock_drift: u64,
+    pub trusting_period: Duration,
+    pub unbonding_period: Duration,
+    pub max_clock_drift: Duration,
     pub status: ClientStatus,
     pub chain_id: ChainId,
 }
@@ -105,7 +105,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeCometClientState {
-    type From = Product![Height, u64, u64, u64, ClientStatus, ChainId];
+    type From = Product![Height, Duration, Duration, Duration, ClientStatus, ChainId];
     type To = CometClientState;
 
     fn transform(
@@ -170,9 +170,9 @@ impl From<CometClientState> for IbcCometClientState {
         Self::new(
             client_state.chain_id,
             TrustThreshold::ONE_THIRD,
-            Duration::from_secs(client_state.trusting_period),
-            Duration::from_secs(client_state.unbonding_period),
-            Duration::from_secs(client_state.max_clock_drift),
+            client_state.trusting_period,
+            client_state.unbonding_period,
+            client_state.max_clock_drift,
             CosmosHeight::new(
                 client_state.latest_height.revision_number,
                 client_state.latest_height.revision_height,

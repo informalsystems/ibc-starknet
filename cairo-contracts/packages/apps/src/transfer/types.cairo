@@ -300,8 +300,9 @@ impl MemoValidateBasic of ValidateBasic<Memo> {
 #[cfg(test)]
 pub mod tests {
     use serde_json::to_byte_array;
-    use starknet_ibc_testkit::dummies::{ERC20, PACKET_DATA_FROM_SN};
+    use starknet_ibc_testkit::dummies::{CHANNEL_ID, ERC20, PACKET_DATA_FROM_SN, PORT_ID};
     use starknet_ibc_utils::{ComputeKey, LocalKeyBuilderImpl, LocalKeyBuilderTrait};
+    use super::{Denom, PrefixedDenom, TracePrefix};
 
     // Snapshot test to ensure serialization stays consistent.
     #[test]
@@ -324,5 +325,18 @@ pub mod tests {
         let expected: felt252 = 0x2e74acb5f5dfbbc9cddcd69d5ee307713735fe038880606804515cf078fc1ee;
         assert_eq!(prefixed_key, expected);
         assert_eq!(base_key, expected);
+    }
+
+    #[test]
+    fn test_prefixed_denom_as_byte_array() {
+        let prefixed_denom = PrefixedDenom {
+            trace_path: array![
+                TracePrefix { port_id: PORT_ID(), channel_id: CHANNEL_ID(0) },
+                TracePrefix { port_id: PORT_ID(), channel_id: CHANNEL_ID(1) },
+            ],
+            base: Denom::Hosted("coin"),
+        };
+        let expected: ByteArray = "transfer/channel-0/transfer/channel-1/coin";
+        assert_eq!(format!("{}", prefixed_denom), expected);
     }
 }

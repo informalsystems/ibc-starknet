@@ -53,7 +53,7 @@ where
         let consensus_state = StarknetConsensusState {
             root: root.into(),
             time: Timestamp::from_nanoseconds(
-                u64::try_from(block.time.unix_timestamp()).unwrap() * 1_000_000_000,
+                u64::try_from(block.time.unix_timestamp_nanos()).unwrap(),
             ),
         };
 

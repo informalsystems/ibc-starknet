@@ -25,9 +25,9 @@ test = "snforge test"
 
 [workspace.dependencies]
 # external dependencies
-alexandria_data_structures = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "162bed1" }
-alexandria_numeric         = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "162bed1" }
-alexandria_sorting         = { git = "https://github.com/keep-starknet-strange/alexandria.git", rev = "162bed1" }
+alexandria_data_structures = "0.4.0"
+alexandria_numeric         = "0.4.0"
+alexandria_sorting         = "0.4.0"
 assert_macros              = "2.9.2"
 starknet                   = "2.9.2"
 openzeppelin_access        = "0.20.0"

@@ -20,12 +20,11 @@ test = { workspace = true }
 fmt = { workspace = true }
 
 [dependencies]
+# external dependencies
 alexandria_data_structures = { workspace = true }
 alexandria_sorting         = { workspace = true }
 openzeppelin_access        = { workspace = true }
-
-# external dependencies
-starknet = { workspace = true }
+starknet                   = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_core  = { workspace = true }

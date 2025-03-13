@@ -37,6 +37,7 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + CanRaiseAsyncError<core::num::TryFromIntError>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
         HasCreateClientPayloadType<Chain, CreateClientPayload = CosmosCreateClientPayload>,
@@ -65,15 +66,16 @@ where
 
         let client_state = CometClientState {
             latest_height: height,
-            trusting_period: payload.client_state.trusting_period.as_secs(),
-            unbonding_period: payload.client_state.unbonding_period.as_secs(),
-            max_clock_drift: payload.client_state.max_clock_drift.as_secs(),
+            trusting_period: payload.client_state.trusting_period,
+            unbonding_period: payload.client_state.unbonding_period,
+            max_clock_drift: payload.client_state.max_clock_drift,
             status: ClientStatus::Active,
             chain_id: payload.client_state.chain_id,
         };
 
         let consensus_state = CometConsensusState {
-            timestamp: payload.consensus_state.timestamp.unix_timestamp() as u64,
+            timestamp: u64::try_from(payload.consensus_state.timestamp.unix_timestamp_nanos())
+                .map_err(Chain::raise_error)?,
             root,
         };
 

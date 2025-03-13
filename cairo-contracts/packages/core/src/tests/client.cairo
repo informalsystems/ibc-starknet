@@ -1,9 +1,12 @@
+use core::num::traits::Bounded;
 use snforge_std::{spy_events, start_cheat_caller_address_global, test_address};
 use starknet_ibc_core::client::ClientHandlerComponent::{
     ClientInitializerImpl, ClientInternalImpl, ClientReaderTrait, ClientWriterTrait,
     CoreClientHandlerImpl, CoreRegisterClientImpl, EventEmitterImpl,
 };
-use starknet_ibc_core::client::{ClientHandlerComponent, CreateResponse, MsgUpdateClient};
+use starknet_ibc_core::client::{
+    ClientHandlerComponent, CreateResponse, Duration, DurationImpl, MsgUpdateClient,
+};
 use starknet_ibc_testkit::dummies::{CLIENT, CLIENT_ID, CLIENT_TYPE, HEIGHT, RELAYER};
 use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
 use starknet_ibc_testkit::mocks::MockClientHandler;
@@ -79,3 +82,8 @@ fn test_emit_update_client() {
     spy.assert_update_client_event(test_address(), CLIENT_ID(), heights, header);
 }
 
+// Must not overflow.
+#[test]
+fn test_duration_max() {
+    Duration { seconds: Bounded::MAX, nanos: Bounded::MAX }.as_nanos();
+}

@@ -1,3 +1,5 @@
+use core::time::Duration;
+
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
@@ -124,7 +126,7 @@ pub struct MsgConnOpenInit {
     pub client_id_on_b: ClientId,
     pub prefix_on_b: BasePrefix,
     pub version: ConnectionVersion,
-    pub delay_period: u64,
+    pub delay_period: Duration,
 }
 
 pub struct EncodeMsgConnOpenInit;
@@ -143,7 +145,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeMsgConnOpenInit {
-    type From = Product![ClientId, ClientId, BasePrefix, ConnectionVersion, u64];
+    type From = Product![ClientId, ClientId, BasePrefix, ConnectionVersion, Duration];
     type To = MsgConnOpenInit;
 
     fn transform(
@@ -227,7 +229,7 @@ pub struct MsgConnOpenTry {
     pub version_on_a: ConnectionVersion,
     pub proof_conn_end_on_a: StateProof,
     pub proof_height_on_a: Height,
-    pub delay_period: u64,
+    pub delay_period: Duration,
 }
 
 pub struct EncodeMsgConnOpenTry;
@@ -257,7 +259,7 @@ impl Transformer for EncodeMsgConnOpenTry {
         ConnectionVersion,
         StateProof,
         Height,
-        u64
+        Duration
     ];
     type To = MsgConnOpenTry;
 

@@ -1,12 +1,12 @@
 use CometClientComponent::ClientWriterTrait;
 use snforge_std::start_cheat_block_timestamp_global;
+use starknet_ibc_clients::cometbft::CometClientComponent;
 use starknet_ibc_clients::cometbft::CometClientComponent::{
     ClientReaderImpl, CometClientHandler, CometClientQuery,
 };
-use starknet_ibc_clients::cometbft::{CometClientComponent, CometConsensusStateTrait};
-use starknet_ibc_core::client::StatusTrait;
+use starknet_ibc_core::client::{StatusTrait, TimestampTrait};
 use starknet_ibc_testkit::configs::CometClientConfigTrait;
-use starknet_ibc_testkit::dummies::HEIGHT;
+use starknet_ibc_testkit::dummies::{HEIGHT, TIMESTAMP};
 use starknet_ibc_testkit::mocks::MockCometClient;
 
 type ComponentState = CometClientComponent::ComponentState<MockCometClient::ContractState>;
@@ -24,21 +24,24 @@ fn setup() -> ComponentState {
 fn simulate_update_client(elapsed_timestamp: u64) {
     let mut state = setup();
     let mut cfg = CometClientConfigTrait::default();
-    start_cheat_block_timestamp_global(cfg.latest_timestamp.clone() + 1);
+    start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
     let msg = cfg.dummy_msg_create_client();
     let create_resp = state.create_client(msg);
     let updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_timestamp = cfg.latest_timestamp + elapsed_timestamp;
+    let updating_timestamp = cfg.latest_timestamp.clone() + TIMESTAMP(elapsed_timestamp);
     let msg = cfg
         .dummy_msg_update_client(
-            create_resp.client_id, create_resp.height, updating_height.clone(), updating_timestamp,
+            create_resp.client_id,
+            create_resp.height,
+            updating_height.clone(),
+            updating_timestamp.clone(),
         );
     state.update_client(msg);
     assert_eq!(state.client_type(), cfg.client_type);
     assert!(state.status(0).is_active());
     assert_eq!(state.latest_height(0), updating_height);
     let consensus_state = state.read_consensus_state(0, updating_height);
-    assert_eq!(consensus_state.timestamp(), updating_timestamp);
+    assert_eq!(consensus_state.timestamp, updating_timestamp);
     state.read_client_processed_time(0, updating_height);
     state.read_client_processed_height(0, updating_height);
 }
@@ -47,7 +50,7 @@ fn simulate_update_client(elapsed_timestamp: u64) {
 fn test_create_client_ok() {
     let mut state = setup();
     let mut cfg = CometClientConfigTrait::default();
-    start_cheat_block_timestamp_global(cfg.latest_timestamp + 1);
+    start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
     let msg = cfg.dummy_msg_create_client();
     state.create_client(msg);
     assert_eq!(state.client_type(), cfg.client_type);
@@ -60,7 +63,7 @@ fn test_create_client_ok() {
 fn test_client_sequence_ok() {
     let mut state = setup();
     let mut cfg = CometClientConfigTrait::default();
-    start_cheat_block_timestamp_global(cfg.latest_timestamp + 1);
+    start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
     let msg = cfg.dummy_msg_create_client();
     state.create_client(msg.clone());
     state.create_client(msg);
@@ -89,13 +92,13 @@ fn test_update_client_with_invalid_future_header() {
 fn test_update_client_with_older_header() {
     let mut state = setup();
     let mut cfg = CometClientConfigTrait::default();
-    start_cheat_block_timestamp_global(cfg.latest_timestamp + 2);
+    start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 2);
     let msg = cfg.dummy_msg_create_client();
     let create_resp = state.create_client(msg);
 
     // First update client to height = 12.
     let updating_height_1 = cfg.latest_height.clone() + HEIGHT(2);
-    let updating_timestamp_1 = cfg.latest_timestamp + 2;
+    let updating_timestamp_1 = cfg.latest_timestamp.clone() + TIMESTAMP(2);
     let msg = cfg
         .dummy_msg_update_client(
             create_resp.client_id.clone(),
@@ -106,14 +109,14 @@ fn test_update_client_with_older_header() {
 
     // Second update client with an older height = 11.
     let updating_height_2 = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_timestamp_2 = cfg.latest_timestamp + 1;
+    let updating_timestamp_2 = cfg.latest_timestamp.clone() + TIMESTAMP(1);
     state.update_client(msg);
     let msg = cfg
         .dummy_msg_update_client(
             create_resp.client_id,
             updating_height_1,
             updating_height_2.clone(),
-            updating_timestamp_2,
+            updating_timestamp_2.clone(),
         );
 
     state.update_client(msg);
@@ -123,7 +126,7 @@ fn test_update_client_with_older_header() {
     let heights = state.read_update_heights(0);
     assert_eq!(heights, array![cfg.latest_height, updating_height_2, updating_height_1]);
     let consensus_state = state.read_consensus_state(0, updating_height_2);
-    assert_eq!(consensus_state.timestamp(), updating_timestamp_2);
+    assert_eq!(consensus_state.timestamp, updating_timestamp_2);
     state.read_client_processed_time(0, updating_height_2); // It panics if not exist. 
     state.read_client_processed_height(0, updating_height_2); // It panics if not exist. 
 }

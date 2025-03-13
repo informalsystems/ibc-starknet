@@ -108,9 +108,10 @@ pub mod client {
     };
     pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient};
     pub use types::{
-        CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightTrait,
-        HeightZero, HeightsIntoUpdateResponse, Status, StatusImpl, StatusTrait, StoreHeightArray,
-        Timestamp, TimestampPartialOrd, TimestampZero, U64IntoTimestamp, UpdateResponse,
+        CreateResponse, CreateResponseImpl, Duration, DurationImpl, DurationTrait, Height,
+        HeightImpl, HeightPartialOrd, HeightTrait, HeightZero, HeightsIntoUpdateResponse, Status,
+        StatusImpl, StatusTrait, StoreHeightArray, Timestamp, TimestampImpl, TimestampIntoU128,
+        TimestampPartialOrd, TimestampTrait, TimestampZero, U64IntoTimestamp, UpdateResponse,
     };
     mod components {
         pub mod events;

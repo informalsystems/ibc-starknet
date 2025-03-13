@@ -1,20 +1,21 @@
 use starknet_ibc_clients::cometbft::{
     CometClientState, CometConsensusState, CometHeader, SignedHeader,
 };
-use starknet_ibc_core::client::CreateResponse;
-use starknet_ibc_core::client::{Height, MsgCreateClient, MsgUpdateClient, Status};
+use starknet_ibc_core::client::{
+    CreateResponse, Duration, Height, MsgCreateClient, MsgUpdateClient, Status, Timestamp,
+};
 use starknet_ibc_core::host::ClientId;
-use starknet_ibc_testkit::dummies::{CLIENT_TYPE, HEIGHT, STATE_ROOT};
+use starknet_ibc_testkit::dummies::{CLIENT_TYPE, DURATION, HEIGHT, STATE_ROOT, TIMESTAMP};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
 
 #[derive(Clone, Debug, Drop, Serde)]
 pub struct CometClientConfig {
     pub client_type: felt252,
     pub latest_height: Height,
-    pub latest_timestamp: u64,
-    pub trusting_period: u64,
-    pub unbonding_period: u64,
-    pub max_clock_drift: u64,
+    pub latest_timestamp: Timestamp,
+    pub trusting_period: Duration,
+    pub unbonding_period: Duration,
+    pub max_clock_drift: Duration,
 }
 
 #[generate_trait]
@@ -23,10 +24,10 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         CometClientConfig {
             client_type: CLIENT_TYPE(),
             latest_height: HEIGHT(10),
-            latest_timestamp: 10,
-            trusting_period: 100,
-            unbonding_period: 200,
-            max_clock_drift: 1,
+            latest_timestamp: TIMESTAMP(10),
+            trusting_period: DURATION(100),
+            unbonding_period: DURATION(200),
+            max_clock_drift: DURATION(1),
         }
     }
 
@@ -64,12 +65,12 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         client_id: ClientId,
         trusted_height: Height,
         latest_height: Height,
-        latest_timestamp: u64,
+        latest_timestamp: Timestamp,
     ) -> MsgUpdateClient {
         let mut serialized_header: Array<felt252> = ArrayTrait::new();
 
         let signed_header = SignedHeader {
-            height: latest_height, time: latest_timestamp, root: STATE_ROOT(),
+            height: latest_height, timestamp: latest_timestamp, root: STATE_ROOT(),
         };
 
         let header = CometHeader { trusted_height, signed_header };
