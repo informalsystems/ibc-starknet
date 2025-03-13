@@ -200,7 +200,6 @@ mod tests {
     fn test_multiple_trace_paths() {
         let input = "transfer2/channel-1/transfer/channel-0/coin";
         let expected = PrefixedDenom {
-            // trace_path is stored in reverse order for appending convenience
             trace_path: vec![
                 TracePrefix {
                     port_id: "transfer2".to_string(),
