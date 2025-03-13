@@ -38,7 +38,7 @@ declare() {
     # pay in eth to avoid `Error: fee calculation overflow`.
 
     output=$(
-        starkli declare --compiler-version "$COMPILER_VERSION" \
+        starkli declare \
         --watch --eth \
         "$CONTRACT_SRC" \
         2>&1 | tee /dev/tty

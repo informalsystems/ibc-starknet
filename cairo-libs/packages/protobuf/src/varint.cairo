@@ -14,7 +14,7 @@ pub fn encode_varint_to_u8_array(value: u32) -> Array<u8> {
             result.append(remaining.try_into().unwrap());
             value /= 0x80;
         };
-    };
+    }
     result
 }
 
@@ -31,7 +31,7 @@ pub fn encode_varint_to_byte_array(value: u64) -> ByteArray {
             result.append_byte(remaining.try_into().unwrap());
             value /= 0x80;
         };
-    };
+    }
     result
 }
 
@@ -53,7 +53,7 @@ pub fn decode_varint_from_u8_array(ref bytes: Array<u8>) -> (u64, u32) {
         if num_of_read == 1 && byte < 0x80 {
             value = byte.clone().try_into().unwrap();
             break;
-        };
+        }
 
         value = value | ((byte & 0x7F).into() * shift); // 0x7F == 0x0111_1111
         shift *= 0x80; // 0x80 == 0x1000_0000
@@ -61,7 +61,7 @@ pub fn decode_varint_from_u8_array(ref bytes: Array<u8>) -> (u64, u32) {
         if byte & 0x80 == 0 {
             break;
         }
-    };
+    }
 
     (value, num_of_read)
 }
@@ -82,10 +82,10 @@ pub fn decode_varint_from_byte_array(bytes: @ByteArray, ref index: usize) -> Res
         }
         // 0x80 == 0x1000_0000
         shift *= 0x80;
-    };
+    }
     if !done {
         return Result::Err(ProtobufErrors::INVALID_VARINT);
-    };
+    }
     Result::Ok(value)
 }
 

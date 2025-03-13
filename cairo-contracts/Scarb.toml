@@ -11,8 +11,8 @@ members = [
 [workspace.package]
 version       = "0.1.0"
 edition       = "2024_07"
-cairo-version = "2.9.2"
-scarb-version = "2.9.2"
+cairo-version = "2.11.2"
+scarb-version = "2.11.3"
 license       = "Apache-2.0"
 authors       = [ "Informal Systems <hello@informal.systems>" ]
 repository    = "https://github.com/informalsystems/ibc-starknet"
@@ -25,16 +25,16 @@ test = "snforge test"
 
 [workspace.dependencies]
 # external dependencies
-alexandria_data_structures = "0.4.0"
-alexandria_numeric         = "0.4.0"
-alexandria_sorting         = "0.4.0"
-assert_macros              = "2.9.2"
-starknet                   = "2.9.2"
-openzeppelin_access        = "0.20.0"
-openzeppelin_token         = "0.20.0"
-openzeppelin_testing       = "0.20.0"
-openzeppelin_utils         = "0.20.0"
-snforge_std                = "0.34.0"
+alexandria_data_structures = "0.5.0"
+alexandria_numeric         = "0.5.0"
+alexandria_sorting         = "0.5.0"
+assert_macros              = "2.9.4"
+starknet                   = "2.9.4"
+openzeppelin_access        = "1.0.0"
+openzeppelin_token         = "1.0.0"
+openzeppelin_testing       = "2.0.0"
+openzeppelin_utils         = "1.0.0"
+snforge_std                = "0.38.3"
 
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }
@@ -50,6 +50,9 @@ starknet_ibc_utils     = { path = "packages/utils" }
 
 [workspace.tool.fmt]
 sort-module-level-items = true
+
+[workspace.tool.scarb]
+allow-prebuilt-plugins = [ "snforge_std" ]
 
 [package]
 name          = "starknet_ibc"
@@ -71,6 +74,9 @@ test = { workspace = true }
 
 [tool]
 fmt = { workspace = true }
+
+[tool.scarb]
+allow-prebuilt-plugins = [ "snforge_std" ]
 
 [dependencies]
 starknet_ibc_apps      = { workspace = true }

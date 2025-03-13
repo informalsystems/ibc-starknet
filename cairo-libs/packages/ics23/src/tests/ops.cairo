@@ -1,7 +1,7 @@
 use ics23::{
-    InnerOp, LeafOp, LengthOp, HashOp, apply_leaf, apply_inner, encode_hex, decode_hex,
-    SliceU32IntoArrayU8, ByteArrayIntoArrayU32, byte_array_to_array_u8, ByteArrayIntoArrayU8,
-    do_hash, do_length,
+    ByteArrayIntoArrayU32, ByteArrayIntoArrayU8, HashOp, InnerOp, LeafOp, LengthOp,
+    SliceU32IntoArrayU8, apply_inner, apply_leaf, byte_array_to_array_u8, decode_hex, do_hash,
+    do_length, encode_hex,
 };
 
 // https://github.com/cosmos/ics23/blob/c7c728879896fb260fe76b208ea6a17c2b0132a3/rust/src/ops.rs#L210

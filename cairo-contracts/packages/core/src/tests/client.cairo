@@ -1,5 +1,6 @@
 use core::num::traits::Bounded;
-use snforge_std::{spy_events, start_cheat_caller_address_global, test_address};
+use openzeppelin_testing::spy_events;
+use snforge_std::{start_cheat_caller_address_global, test_address};
 use starknet_ibc_core::client::ClientHandlerComponent::{
     ClientInitializerImpl, ClientInternalImpl, ClientReaderTrait, ClientWriterTrait,
     CoreClientHandlerImpl, CoreRegisterClientImpl, EventEmitterImpl,

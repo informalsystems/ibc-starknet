@@ -1,9 +1,8 @@
-use openzeppelin_testing::declare_class;
+use openzeppelin_testing::{EventSpyQueue, declare_class, spy_events};
 use snforge_std::{
     ContractClass, start_cheat_block_number_global, start_cheat_block_timestamp_global,
     start_cheat_caller_address, stop_cheat_caller_address,
 };
-use snforge_std::{EventSpy, spy_events};
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait, TRANSFER_PORT_ID};
 use starknet_ibc_core::client::ClientContract;
@@ -158,7 +157,7 @@ pub fn setup(
     CoreConfig,
     CometClientConfig,
     TransferAppConfig,
-    EventSpy,
+    EventSpyQueue,
 ) {
     let mut core_cfg = CoreConfigTrait::default();
 

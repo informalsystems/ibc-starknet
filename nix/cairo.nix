@@ -2,7 +2,7 @@
 let
   cairo = nixpkgs.rustPlatform.buildRustPackage {
     name = "cairo";
-    version = "2.9.2";
+    version = "2.11.2";
 
     doCheck = false;
 

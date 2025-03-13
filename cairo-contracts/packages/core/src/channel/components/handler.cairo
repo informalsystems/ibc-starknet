@@ -193,7 +193,7 @@ pub mod ChannelHandlerComponent {
                     send_sequences.append(sequence.clone());
                 }
                 send_seq = send_seq.unwrap().decrement();
-            };
+            }
             send_sequences
         }
 
@@ -209,7 +209,7 @@ pub mod ChannelHandlerComponent {
                 if self.packet_acks.read(ack_key(@port_id, @channel_id, @seq)).is_non_zero() {
                     ack_sequences.append(seq);
                 }
-            };
+            }
             ack_sequences
         }
 
@@ -225,7 +225,7 @@ pub mod ChannelHandlerComponent {
                 if self.read_packet_receipt(@port_id, @channel_id, @seq).is_none() {
                     unreceived_sequences.append(seq);
                 }
-            };
+            }
             unreceived_sequences
         }
 
@@ -244,7 +244,7 @@ pub mod ChannelHandlerComponent {
                     .is_non_zero() {
                     unreceived_sequences.append(seq)
                 };
-            };
+            }
             unreceived_sequences
         }
 
@@ -766,7 +766,7 @@ pub mod ChannelHandlerComponent {
                             msg.packet.seq_on_a.clone(),
                         );
                 },
-            };
+            }
 
             self
                 .write_packet_ack(

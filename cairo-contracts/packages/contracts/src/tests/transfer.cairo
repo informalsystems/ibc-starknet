@@ -5,8 +5,7 @@ use starknet_ibc_testkit::configs::TransferAppConfigTrait;
 use starknet_ibc_testkit::dummies::{
     CHANNEL_ID, COSMOS, CS_USER, DECIMAL_ZERO, NAME, PORT_ID, SN_USER, STARKNET, SUPPLY, SYMBOL,
 };
-use starknet_ibc_testkit::event_spy::ERC20EventSpyExt;
-use starknet_ibc_testkit::event_spy::{ERC20EventSpyExtImpl, TransferEventSpyExt};
+use starknet_ibc_testkit::event_spy::{ERC20EventSpyExt, ERC20EventSpyExtImpl, TransferEventSpyExt};
 use starknet_ibc_testkit::handles::{AppHandle, CoreHandle, ERC20Handle};
 use starknet_ibc_testkit::setup::{Mode, setup};
 use starknet_ibc_utils::ComputeKey;

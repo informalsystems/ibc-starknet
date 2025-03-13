@@ -1,12 +1,11 @@
-use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
+use openzeppelin_testing::{EventSpyExt, EventSpyQueue};
 use openzeppelin_token::erc20::erc20::ERC20Component::{Event, Transfer};
-use snforge_std::EventSpy;
 use starknet::ContractAddress;
 
 #[generate_trait]
 pub impl ERC20EventSpyExtImpl of ERC20EventSpyExt {
     fn assert_transfer_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         from: ContractAddress,
         to: ContractAddress,

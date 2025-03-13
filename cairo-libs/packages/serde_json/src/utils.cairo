@@ -5,6 +5,6 @@ pub fn byte_array_to_array_u8(input: @ByteArray) -> Array<u8> {
     while i < input.len() {
         output.append(input[i]);
         i += 1;
-    };
+    }
     output
 }

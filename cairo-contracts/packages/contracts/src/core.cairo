@@ -1,11 +1,10 @@
 #[starknet::contract]
 pub mod IBCCore {
-    use starknet_ibc_core::channel::ChannelEventEmitterComponent;
-    use starknet_ibc_core::channel::ChannelHandlerComponent;
-    use starknet_ibc_core::client::ClientEventEmitterComponent;
-    use starknet_ibc_core::client::ClientHandlerComponent;
-    use starknet_ibc_core::connection::ConnectionEventEmitterComponent;
-    use starknet_ibc_core::connection::ConnectionHandlerComponent;
+    use starknet_ibc_core::channel::{ChannelEventEmitterComponent, ChannelHandlerComponent};
+    use starknet_ibc_core::client::{ClientEventEmitterComponent, ClientHandlerComponent};
+    use starknet_ibc_core::connection::{
+        ConnectionEventEmitterComponent, ConnectionHandlerComponent,
+    };
     use starknet_ibc_core::router::RouterHandlerComponent;
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 

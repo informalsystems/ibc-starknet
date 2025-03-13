@@ -118,7 +118,7 @@ pub impl PrefixedDenomImpl of PrefixedDenomTrait {
             denom_prefix.append(@"/");
             denom_prefix.append(path.channel_id.channel_id);
             denom_prefix.append(@"/");
-        };
+        }
         denom_prefix.append(@format!("{}", self.base));
         denom_prefix
     }
@@ -147,7 +147,7 @@ impl PrefixedDenomKeyImpl of ComputeKey<PrefixedDenom> {
         let mut trace_path_span = self.trace_path.span();
         while let Option::Some(path) = trace_path_span.pop_front() {
             key_builder.append_serde(path);
-        };
+        }
         key_builder.append_serde(self.base);
         key_builder.key()
     }

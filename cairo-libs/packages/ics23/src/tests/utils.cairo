@@ -1,4 +1,4 @@
-use ics23::{array_u8_into_array_u32, u64_into_array_u32, encode_hex, decode_hex, ArrayU8PartialOrd};
+use ics23::{ArrayU8PartialOrd, array_u8_into_array_u32, decode_hex, encode_hex, u64_into_array_u32};
 
 #[test]
 fn test_array_u8_into_array_u32() {

@@ -1,13 +1,13 @@
-use protobuf::types::message::{
-    ProtoMessage, ProtoOneof, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName, EncodeContextTrait, DecodeContextTrait,
-};
+use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, do_hash, iavl_spec};
 use protobuf::primitives::array::{
-    ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage,
+    ArrayAsProtoMessage, ByteArrayAsProtoMessage, BytesAsProtoMessage,
 };
-use protobuf::primitives::numeric::{I32AsProtoMessage, BoolAsProtoMessage};
-use protobuf::types::tag::{WireType, ProtobufTag};
-use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, iavl_spec, do_hash};
+use protobuf::primitives::numeric::{BoolAsProtoMessage, I32AsProtoMessage};
+use protobuf::types::message::{
+    DecodeContext, DecodeContextImpl, DecodeContextTrait, EncodeContext, EncodeContextImpl,
+    EncodeContextTrait, ProtoCodecImpl, ProtoMessage, ProtoName, ProtoOneof,
+};
+use protobuf::types::tag::{ProtobufTag, WireType};
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct CommitmentProof {
@@ -100,7 +100,7 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
                     ICS23Errors::INVALID_INNER_SPEC,
                 );
             }
-        };
+        }
         hash
     }
 }
