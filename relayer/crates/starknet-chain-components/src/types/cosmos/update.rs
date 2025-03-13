@@ -6,6 +6,7 @@ use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use ibc::clients::tendermint::types::{
     ConsensusState as TendermintConsensusState, Header as TendermintHeader,
 };
+use ibc::core::primitives::Timestamp;
 
 use crate::types::cosmos::height::Height;
 
@@ -13,7 +14,7 @@ use crate::types::cosmos::height::Height;
 pub struct CometUpdateHeader {
     pub trusted_height: Height,
     pub target_height: Height,
-    pub time: u64,
+    pub time: Timestamp,
     pub root: Vec<u8>,
 }
 
@@ -48,7 +49,7 @@ impl From<TendermintHeader> for CometUpdateHeader {
             }
         };
 
-        let time = header.timestamp().expect("valid timestamp").nanoseconds();
+        let time = header.timestamp().expect("header timestamp is missing");
 
         let root = TendermintConsensusState::from(header).root.into_vec();
 
