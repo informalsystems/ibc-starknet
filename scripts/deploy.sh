@@ -35,11 +35,9 @@ build() {
 declare() {
     CONTRACT_SRC=$1
 
-    # pay in eth to avoid `Error: fee calculation overflow`.
-
     output=$(
         starkli declare \
-        --watch --eth \
+        $STARKLI_ARGS \
         "$CONTRACT_SRC" \
         2>&1 | tee /dev/tty
     )
