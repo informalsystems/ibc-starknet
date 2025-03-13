@@ -5,6 +5,7 @@ use std::time::SystemTime;
 
 use cgp::extra::run::CanRun;
 use cgp::prelude::*;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
@@ -314,6 +315,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 address_starknet_b,
                 &Amount::new(transfer_quantity, denom_cosmos.clone()),
                 &None,
+                &starknet_chain.query_chain_status().await?,
             )
             .await?;
 
@@ -346,6 +348,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 address_cosmos_a,
                 &StarknetAmount::new(transfer_quantity.into(), ics20_token_address),
                 &None,
+                &cosmos_chain.query_chain_status().await?,
             )
             .await?;
 
@@ -385,6 +388,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 address_cosmos_a,
                 &StarknetAmount::new(transfer_quantity.into(), *erc20_token_address),
                 &None,
+                &cosmos_chain.query_chain_status().await?,
             )
             .await?;
 
@@ -428,6 +432,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 address_starknet_b,
                 &Amount::new(transfer_quantity, cosmos_ibc_denom.clone()),
                 &None,
+                &starknet_chain.query_chain_status().await?,
             )
             .await?;
 

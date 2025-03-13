@@ -4,7 +4,7 @@ use std::str::FromStr;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::types::height::HasHeightType;
+use hermes_chain_components::traits::types::height::HasHeightFields;
 use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::timestamp::HasTimeoutType;
@@ -46,8 +46,6 @@ where
         + HasAmountType<Amount = StarknetAmount>
         + HasMemoType<Memo = Option<String>>
         + HasMessageType<Message = StarknetMessage>
-        + HasHeightType<Height = u64>
-        + HasTimeoutType<Timeout = Timestamp>
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>
         + HasPortIdType<Counterparty, PortId = PortId>
         + HasEncoding<AsFelt, Encoding = Encoding>
@@ -58,7 +56,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_ics20_contract_address")>
         + CanRaiseAsyncError<Encoding::Error>
         + CanRaiseAsyncError<String>,
-    Counterparty: HasAddressType,
+    Counterparty: HasAddressType + HasHeightFields + HasTimeoutType<Timeout = Timestamp>,
     Encoding: CanEncode<ViaCairo, MsgTransfer>
         + CanEncode<ViaCairo, Product![StarknetAddress]>
         + CanEncode<ViaCairo, Product![StarknetAddress, U256]>
@@ -67,12 +65,13 @@ where
 {
     async fn build_ibc_token_transfer_message(
         chain: &Chain,
+        _counterparty: PhantomData<Counterparty>,
         channel_id: &ChannelId,
         port_id: &PortId,
         recipient_address: &Counterparty::Address,
         amount: &StarknetAmount,
         memo: &Option<String>,
-        timeout_height: Option<&u64>,
+        timeout_height: Option<&Counterparty::Height>,
         timeout_time: Option<&Timestamp>,
     ) -> Result<Vec<Chain::Message>, Chain::Error> {
         let encoding = chain.encoding();
@@ -128,8 +127,8 @@ where
 
             let timeout_height_on_b = if let Some(timeout_height) = timeout_height {
                 Height {
-                    revision_number: 0,
-                    revision_height: *timeout_height,
+                    revision_number: Counterparty::revision_number(timeout_height),
+                    revision_height: Counterparty::revision_height(timeout_height),
                 }
             } else {
                 Height {

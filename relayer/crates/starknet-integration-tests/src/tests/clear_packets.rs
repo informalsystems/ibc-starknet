@@ -248,6 +248,7 @@ fn test_packet_clearing() -> Result<(), Error> {
             address_starknet_b,
             &Amount::new(transfer_quantity, denom_cosmos.clone()),
             &None,
+            &starknet_chain.query_chain_status().await?,
         )
         .await?;
 
@@ -360,6 +361,7 @@ fn test_packet_clearing() -> Result<(), Error> {
             address_starknet_b,
             &Amount::new(transfer_quantity, denom_cosmos.clone()),
             &None,
+            &starknet_chain.query_chain_status().await?,
         )
         .await?;
 
@@ -385,6 +387,7 @@ fn test_packet_clearing() -> Result<(), Error> {
             address_cosmos_a,
             &amount_back,
             &None,
+            &cosmos_chain.query_chain_status().await?,
         )
         .await?;
 
@@ -404,6 +407,7 @@ fn test_packet_clearing() -> Result<(), Error> {
             address_cosmos_a,
             &amount_back,
             &None,
+            &cosmos_chain.query_chain_status().await?,
         )
         .await?;
 
@@ -416,6 +420,7 @@ fn test_packet_clearing() -> Result<(), Error> {
             address_starknet_b,
             &Amount::new(transfer_quantity, denom_cosmos.clone()),
             &None,
+            &starknet_chain.query_chain_status().await?,
         )
         .await?;
 
@@ -763,6 +768,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                 address_starknet_b,
                 &Amount::new(transfer_quantity, denom_cosmos.clone()),
                 &None,
+                &starknet_chain.query_chain_status().await?,
             )
             .await?;
 
@@ -875,7 +881,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         info!("send IBC transfer from Cosmos to Starknet");
 
         // Create Cosmos to Starknet transfer
-        let packet = cosmos_chain
+        let _packet = cosmos_chain
             .ibc_transfer_token(
                 PhantomData::<StarknetChain>,
                 &cosmos_channel_id,
@@ -884,8 +890,26 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                 address_starknet_b,
                 &Amount::new(transfer_quantity, denom_cosmos.clone()),
                 &None,
+                &starknet_chain.query_chain_status().await?,
             )
             .await?;
+
+        // {
+        //     let current_starknet_time = starknet_chain.query_chain_status().await?.time;
+
+        //     let message = starknet_chain
+        //         .build_ibc_token_transfer_message(
+        //             PhantomData::<CosmosChain>,
+        //             &starknet_channel_id,
+        //             &IbcPortId::transfer(),
+        //             address_cosmos_a,
+        //             &StarknetAmount::new(transfer_quantity.into(), ics20_token_address),
+        //             &None,
+        //             Some(&0),
+        //             Some(&Timestamp::from_nanoseconds(u64::try_from(current_starknet_time.unix_timestamp() + 90).unwrap()
+        //                 * 1_000_000_000,))
+        //         ).await?;
+        // }
 
         let _packet = starknet_chain
             .ibc_transfer_token(
@@ -896,6 +920,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                 address_cosmos_a,
                 &StarknetAmount::new(transfer_quantity.into(), ics20_token_address),
                 &None,
+                &cosmos_chain.query_chain_status().await?,
             )
             .await?;
 
