@@ -351,4 +351,10 @@ mod tests {
         let duration3 = Duration { seconds: 4, nanos: 999_999_998 };
         assert_eq!(duration1 + duration2, duration3);
     }
+
+    #[test]
+    fn test_duration_as_nanos() {
+        let duration = Duration { seconds: 1, nanos: 1 };
+        assert_eq!(duration.as_nanos(), 1_000_000_001);
+    }
 }
