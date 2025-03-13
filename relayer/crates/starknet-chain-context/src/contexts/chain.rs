@@ -20,15 +20,18 @@ use hermes_chain_components::traits::types::block::HasBlockType;
 use hermes_chain_components::traits::types::channel::HasInitChannelOptionsType;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
 use hermes_chain_components::traits::types::status::HasChainStatusType;
+use hermes_chain_components::traits::types::timestamp::HasTimeoutType;
 use hermes_chain_type_components::traits::fields::chain_id::{ChainIdGetterComponent, HasChainId};
 use hermes_chain_type_components::traits::types::commitment_proof::HasCommitmentProofType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
+use hermes_chain_type_components::traits::types::time::HasTimeType;
 use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientPayload;
+use hermes_cosmos_chain_components::types::status::Time;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
@@ -201,6 +204,7 @@ use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::host::types::identifiers::{ChainId, PortId as IbcPortId, Sequence};
+use ibc::primitives::Timestamp;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
@@ -368,6 +372,8 @@ pub trait CanUseStarknetChain:
     HasRuntime
     + HasLogger
     + HasHeightType<Height = u64>
+    + HasTimeType<Time = Time>
+    + HasTimeoutType<Timeout = Timestamp>
     + HasEventType<Event = StarknetEvent>
     + HasMessageResponseType<MessageResponse = StarknetMessageResponse>
     + HasDefaultEncoding<AsBytes, Encoding = StarknetProtobufEncoding>
