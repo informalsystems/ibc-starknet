@@ -79,7 +79,7 @@ SN_TRANSFER_ARGS=$(cd relayer; cargo run -q -p hermes-starknet-tools-cli \
     --receiver "$OSMOSIS_ADDRESS" \
     --channel-id channel-0 \
     --timeout-timestamp "$((`date +%s` + 600))" \
-    | cut -d: -f9)
+    | cut -d: -f5-)
 ```
 
 > [!IMPORTANT]
