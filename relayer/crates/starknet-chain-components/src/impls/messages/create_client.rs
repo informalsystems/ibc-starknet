@@ -73,7 +73,7 @@ where
         };
 
         let consensus_state = CometConsensusState {
-            timestamp: payload.consensus_state.timestamp.unix_timestamp() as u64,
+            timestamp: payload.consensus_state.timestamp.unix_timestamp_nanos() as u64,
             root,
         };
 

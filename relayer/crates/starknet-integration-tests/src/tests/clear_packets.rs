@@ -963,7 +963,8 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                     revision_height: 0,
                 },
                 timeout_timestamp_on_b: Timestamp::from_nanoseconds(
-                    u64::try_from(current_starknet_time.unix_timestamp() + 90).unwrap(),
+                    u64::try_from(current_starknet_time.unix_timestamp() + 90).unwrap()
+                        * 1_000_000_000,
                 ),
             }
         };
