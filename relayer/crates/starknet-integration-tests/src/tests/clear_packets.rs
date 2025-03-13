@@ -921,7 +921,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                 .await?;
 
             starknet_chain
-                .send_messages_with_signer(&wallet_starknet_b, &messages)
+                .send_messages_with_signer(wallet_starknet_b, &messages)
                 .await?;
         }
 
