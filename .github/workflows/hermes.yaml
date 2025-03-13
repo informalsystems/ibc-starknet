@@ -50,13 +50,10 @@ jobs:
           scarb build -p starknet_ibc_contracts
 
       - name: Run Integration Tests
-        # don't run tests on macos during PRs
-        if: ${{ matrix.os != 'macos-14' || github.event_name != 'pull_request' }}
         env:
           RUST_BACKTRACE: 1
           RUST_LOG: debug
-          # Tests are run with a single thread to avoid Connection refused (os error 61) with macOS
-          TEST_THREADS: ${{ matrix.os == 'macos-14' && 1 || 4 }}
+          TEST_THREADS: 4
         working-directory: ./relayer
         run: |
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
