@@ -17,7 +17,6 @@ use hermes_chain_components::traits::queries::chain_status::{
 };
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::queries::packet_commitment::CanQueryPacketCommitment;
-use hermes_chain_components::traits::send_message::CanSendMessages;
 use hermes_chain_components::traits::types::chain_id::HasChainId;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
@@ -39,6 +38,7 @@ use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::packet_relayers::receive_packet::CanRelayReceivePacket;
 use hermes_relayer_components::relay::traits::packet_relayers::timeout_unordered_packet::CanRelayTimeoutUnorderedPacket;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
+use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
@@ -883,24 +883,30 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
 
         info!("send IBC transfer from Cosmos to Starknet");
 
-        // Create Cosmos to Starknet transfer
-        let _packet = cosmos_chain
-            .ibc_transfer_token(
-                PhantomData::<StarknetChain>,
-                &cosmos_channel_id,
-                &IbcPortId::transfer(),
-                wallet_cosmos_a,
-                address_starknet_b,
-                &Amount::new(transfer_quantity, denom_cosmos.clone()),
-                &None,
-                &starknet_chain.query_chain_status().await?,
-            )
-            .await?;
+        // build packets with fast timeout
+        let timeout = (Timestamp::now() + Duration::from_secs(5))?;
 
         {
-            // build a packet with fast timeout
-            let timeout = (Timestamp::now() + Duration::from_secs(5))?;
+            // Create Cosmos to Starknet transfer
+            let messages = cosmos_chain
+                .build_ibc_token_transfer_message(
+                    PhantomData::<StarknetChain>,
+                    &cosmos_channel_id,
+                    &IbcPortId::transfer(),
+                    address_starknet_b,
+                    &Amount::new(transfer_quantity, denom_cosmos.clone()),
+                    &None,
+                    None,
+                    Some(&timeout),
+                )
+                .await?;
 
+            cosmos_chain
+                .send_messages_with_signer(&wallet_cosmos_a.keypair, &messages)
+                .await?;
+        }
+
+        {
             let messages = starknet_chain
                 .build_ibc_token_transfer_message(
                     PhantomData::<CosmosChain>,
@@ -914,7 +920,9 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                 )
                 .await?;
 
-            starknet_chain.send_messages(messages).await?;
+            starknet_chain
+                .send_messages_with_signer(&wallet_starknet_b, &messages)
+                .await?;
         }
 
         let balance_cosmos_a_step_1 = cosmos_chain
@@ -944,7 +952,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         info!("will relay timeout packets");
 
         birelay
-            .auto_bi_relay(Some(Duration::from_secs(120)), Some(Duration::from_secs(0)))
+            .auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0)))
             .await?;
 
         cosmos_chain
