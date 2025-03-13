@@ -1,6 +1,15 @@
-{ nixpkgs, starknet-foundry-src }:
+{
+  nixpkgs,
+  rust,
+ starknet-foundry-src,
+}:
 let
-  starknet-foundry = nixpkgs.rustPlatform.buildRustPackage {
+  rust-platform = nixpkgs.makeRustPlatform {
+    cargo = rust;
+    rustc = rust;
+  };
+
+  starknet-foundry = rust-platform.buildRustPackage {
     pname = "starknet-foundry";
     version = "0.38.3";
 
@@ -9,6 +18,7 @@ let
     cargoLock = {
       lockFile = starknet-foundry-src + "/Cargo.lock";
       outputHashes = {
+        "blockifier-0.14.0-rc.1" = "sha256-5BsLlwTJeRkAeO3o8bOqb2FEcRiOy1Nvf1dQ78qRP58=";
         "starknet-0.11.0" = "sha256-Dgx5Czrzj2JKwmSJ5EvqpikRFwpWwEydkhZl0pnjfWE=";
       };
     };

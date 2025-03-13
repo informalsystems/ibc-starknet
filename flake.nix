@@ -85,6 +85,8 @@
           starknet-foundry = import ./nix/starknet-foundry.nix {
             inherit nixpkgs;
             inherit (inputs) starknet-foundry-src;
+
+            inherit rust;
           };
 
           ibc-starknet-cw = import ./nix/ibc-starknet-cw.nix {

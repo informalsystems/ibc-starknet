@@ -87,16 +87,16 @@
     "cairo-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1733902425,
-        "narHash": "sha256-zjgCOrTlIPN4aU0+FCohJmISPiwpppj3zO/7unVi/iU=",
+        "lastModified": 1741617592,
+        "narHash": "sha256-VOyqKeiPJ3/VOqcdQXC/rZnTriC2ScmAQ4IlouHjvpI=",
         "owner": "starkware-libs",
         "repo": "cairo",
-        "rev": "35b299291fd7819f75409fb303ece7d30e4adb19",
+        "rev": "69807a18ee53d32e3ee12d714d9c1f7abc88279b",
         "type": "github"
       },
       "original": {
         "owner": "starkware-libs",
-        "ref": "v2.9.2",
+        "ref": "v2.11.2",
         "repo": "cairo",
         "type": "github"
       }
@@ -1864,16 +1864,16 @@
     "starknet-foundry-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1732634552,
-        "narHash": "sha256-+QnHejOGH/8rGVULFr49BN2gRAY7iuXZGvJr5ple6YY=",
+        "lastModified": 1741351137,
+        "narHash": "sha256-1Qb0w6cVQ0YtRlY8oz5+dviDXdKr+YICFDpdS0V10ZU=",
         "owner": "foundry-rs",
         "repo": "starknet-foundry",
-        "rev": "d6976d4635cbe69bd199fd502788c469d408ed2d",
+        "rev": "c845b1d5c63cc1b4480a8935fa98aad843595f1d",
         "type": "github"
       },
       "original": {
         "owner": "foundry-rs",
-        "ref": "v0.34.0",
+        "ref": "v0.38.3",
         "repo": "starknet-foundry",
         "type": "github"
       }
@@ -2032,16 +2032,16 @@
     "universal-sierra-compiler-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1727279641,
-        "narHash": "sha256-ynHbY+xei4iYkCxTbDov7RhlZpXIbDtfdGedGXAvjKs=",
+        "lastModified": 1739889452,
+        "narHash": "sha256-aoxT/SSotz40Y2q/oLWBR2ZYzFmwHAzw6PUm72Hi0+E=",
         "owner": "software-mansion",
         "repo": "universal-sierra-compiler",
-        "rev": "fb5dd26e9e18b4f22f02fb6398d787d3b69240a4",
+        "rev": "37f897e8a7f055e9dcf2dc5e182713df4c25f766",
         "type": "github"
       },
       "original": {
         "owner": "software-mansion",
-        "ref": "v2.3.0",
+        "ref": "v2.4.0",
         "repo": "universal-sierra-compiler",
         "type": "github"
       }
