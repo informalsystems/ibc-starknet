@@ -311,16 +311,17 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         assert_eq!(ics20_token_address, expected_ics20_token_address);
 
-        let _packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
-            cosmos_chain,
-            &cosmos_channel_id,
-            &IbcPortId::transfer(),
-            wallet_cosmos_a,
-            address_starknet_b,
-            &Amount::new(transfer_quantity, denom_cosmos.clone()),
-            &None,
-        )
-        .await?;
+        let _packet = cosmos_chain
+            .ibc_transfer_token(
+                PhantomData::<StarknetChain>,
+                &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                wallet_cosmos_a,
+                address_starknet_b,
+                &Amount::new(transfer_quantity, denom_cosmos.clone()),
+                &None,
+            )
+            .await?;
 
         // cosmos_to_starknet_relay.relay_packet(&packet).await?;
 
@@ -540,16 +541,17 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         // send the tokens back to starknet
 
-        let _packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
-            cosmos_chain,
-            &cosmos_channel_id,
-            &IbcPortId::transfer(),
-            wallet_cosmos_a,
-            address_starknet_b,
-            &Amount::new(transfer_quantity, cosmos_ibc_denom.clone()),
-            &None,
-        )
-        .await?;
+        let _packet = cosmos_chain
+            .ibc_transfer_token(
+                PhantomData::<StarknetChain>,
+                &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                wallet_cosmos_a,
+                address_starknet_b,
+                &Amount::new(transfer_quantity, cosmos_ibc_denom.clone()),
+                &None,
+            )
+            .await?;
 
         let balance_cosmos_a_step_4 = cosmos_chain
             .query_balance(address_cosmos_a, &cosmos_ibc_denom)

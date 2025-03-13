@@ -246,8 +246,8 @@ fn test_packet_clearing() -> Result<(), Error> {
             balance_cosmos_a_step_0
         );
 
-        let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
-            cosmos_chain,
+        let packet = cosmos_chain.ibc_transfer_token(
+            PhantomData::<StarknetChain>,
             &cosmos_channel_id,
             &IbcPortId::transfer(),
             wallet_cosmos_a,
@@ -358,8 +358,8 @@ fn test_packet_clearing() -> Result<(), Error> {
         // ### SETUP PENDING PACKETS AND ACKS ###
 
         // Create Cosmos to Starknet transfer
-        let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
-            cosmos_chain,
+        let packet = cosmos_chain.ibc_transfer_token(
+            PhantomData::<StarknetChain>,
             &cosmos_channel_id,
             &IbcPortId::transfer(),
             wallet_cosmos_a,
@@ -407,8 +407,8 @@ fn test_packet_clearing() -> Result<(), Error> {
             token_address: balance_starknet_b_step_0.token_address,
         };
 
-        let packet = <StarknetChain as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token(
-            starknet_chain,
+        let packet = starknet_chain.ibc_transfer_token(
+            PhantomData::<CosmosChain>,
             &starknet_channel_id,
             &IbcPortId::transfer(),
             wallet_starknet_b,
@@ -426,8 +426,8 @@ fn test_packet_clearing() -> Result<(), Error> {
 
         runtime.sleep(Duration::from_secs(2)).await;
 
-        let _packet = <StarknetChain as CanIbcTransferToken<CosmosChain>>::ibc_transfer_token(
-            starknet_chain,
+        let _packet = starknet_chain.ibc_transfer_token(
+            PhantomData::<CosmosChain>,
             &starknet_channel_id,
             &IbcPortId::transfer(),
             wallet_starknet_b,
@@ -438,8 +438,8 @@ fn test_packet_clearing() -> Result<(), Error> {
         .await?;
 
         // Create a pending packet
-        let _packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
-            cosmos_chain,
+        let _packet = cosmos_chain.ibc_transfer_token(
+            PhantomData::<StarknetChain>,
             &cosmos_channel_id,
             &IbcPortId::transfer(),
             wallet_cosmos_a,
@@ -784,16 +784,17 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             balance_cosmos_a_step_0
         );
 
-        let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
-            cosmos_chain,
-            &cosmos_channel_id,
-            &IbcPortId::transfer(),
-            wallet_cosmos_a,
-            address_starknet_b,
-            &Amount::new(transfer_quantity, denom_cosmos.clone()),
-            &None,
-        )
-        .await?;
+        let packet = cosmos_chain
+            .ibc_transfer_token(
+                PhantomData::<StarknetChain>,
+                &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                wallet_cosmos_a,
+                address_starknet_b,
+                &Amount::new(transfer_quantity, denom_cosmos.clone()),
+                &None,
+            )
+            .await?;
 
         runtime.sleep(Duration::from_secs(2)).await;
 
@@ -904,16 +905,17 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         info!("send IBC transfer from Cosmos to Starknet");
 
         // Create Cosmos to Starknet transfer
-        let packet = <CosmosChain as CanIbcTransferToken<StarknetChain>>::ibc_transfer_token(
-            cosmos_chain,
-            &cosmos_channel_id,
-            &IbcPortId::transfer(),
-            wallet_cosmos_a,
-            address_starknet_b,
-            &Amount::new(transfer_quantity, denom_cosmos.clone()),
-            &None,
-        )
-        .await?;
+        let packet = cosmos_chain
+            .ibc_transfer_token(
+                PhantomData::<StarknetChain>,
+                &cosmos_channel_id,
+                &IbcPortId::transfer(),
+                wallet_cosmos_a,
+                address_starknet_b,
+                &Amount::new(transfer_quantity, denom_cosmos.clone()),
+                &None,
+            )
+            .await?;
 
         // approve ics20 contract to spend the tokens for `address_starknet_b`
         {
