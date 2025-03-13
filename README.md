@@ -219,11 +219,6 @@ Then, call `./scripts/deploy.sh` to deploy the contracts.
 > [!IMPORTANT]
 > Make sure `.env` file is updated with the correct values.
 
-> [!IMPORTANT]
-> You will need some `ETH` to declare the class hashes on Starknet. Due to the
-> low `STRK` value and high gas usage, using `STRK` will result in
-> `Error: fee calculation overflow`.
-
 ```bash
 ./scripts/deploy.sh
 ```
