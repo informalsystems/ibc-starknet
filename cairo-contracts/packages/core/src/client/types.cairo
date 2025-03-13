@@ -195,7 +195,7 @@ pub impl StoreHeightArray of Store<Array<Height>> {
 }
 
 /// Represents Unix timestamp in nanoseconds.
-#[derive(Clone, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
+#[derive(Copy, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct Timestamp {
     pub timestamp: u64,
 }

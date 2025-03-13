@@ -17,8 +17,8 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
         !(self.root.is_zero() && self.timestamp.is_zero())
     }
 
-    fn timestamp(self: @CometConsensusState) -> u64 {
-        *self.timestamp.timestamp
+    fn timestamp(self: @CometConsensusState) -> Timestamp {
+        *self.timestamp
     }
 
     fn deserialize(consensus_state: Array<felt252>) -> CometConsensusState {
