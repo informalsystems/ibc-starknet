@@ -1848,15 +1848,16 @@
     "starknet-devnet-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1737710043,
-        "narHash": "sha256-/XOsWJnA7Qt4Qmy2bACt4iGfynsJlIsh61nVyWDL4vc=",
+        "lastModified": 1741256806,
+        "narHash": "sha256-Gk3L/PEQc3YF9WihTgUCvqsn7Zsjb2tCwHkhYxlDC3o=",
         "owner": "0xSpaceShard",
         "repo": "starknet-devnet-rs",
-        "rev": "d2d5f6f13e58aadb41fa10de70ee782d177b62c6",
+        "rev": "c657668906e0186b8b570520e371ac89f247a40f",
         "type": "github"
       },
       "original": {
         "owner": "0xSpaceShard",
+        "ref": "starknet-0.13.4",
         "repo": "starknet-devnet-rs",
         "type": "github"
       }

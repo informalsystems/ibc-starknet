@@ -9,7 +9,7 @@
     cosmos-nix.url = "github:informalsystems/cosmos.nix";
 
     starknet-devnet-src = {
-      url = "github:0xSpaceShard/starknet-devnet-rs";
+      url = "github:0xSpaceShard/starknet-devnet-rs/starknet-0.13.4";
       flake = false;
     };
 
@@ -67,7 +67,7 @@
             inherit nixpkgs;
             inherit (inputs) starknet-devnet-src;
 
-            rust = rust-1_79;
+            inherit rust;
           };
 
           cairo = import ./nix/cairo.nix {
