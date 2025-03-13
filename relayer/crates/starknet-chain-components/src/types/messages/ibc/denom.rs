@@ -53,8 +53,8 @@ impl PrefixedDenom {
     /// This function returns the trace path in the correct order.
     ///
     /// PrefixedDenom: transfer/channel-1/transfer/channel-2/coin
-    /// TracePath: [(transfer, channel-2), (transfer, channel-1)]
-    /// iter_trace_path: [(transfer, channel-1), (transfer, channel-2)]
+    /// .trace_path repr: [(transfer, channel-2), (transfer, channel-1)]
+    /// .iter_trace_path(): (transfer, channel-1), (transfer, channel-2)
     pub fn iter_trace_path(&self) -> impl Iterator<Item = &TracePrefix> {
         self.trace_path.iter().rev()
     }
