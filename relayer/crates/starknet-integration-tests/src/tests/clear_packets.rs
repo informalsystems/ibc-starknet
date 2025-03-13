@@ -299,7 +299,7 @@ fn test_packet_clearing() -> Result<(), Error> {
 
             {
                 // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/apps/src/transfer/types.cairo#L120-L130
-                for trace_prefix in ibc_prefixed_denom.iter_trace_path() {
+                for trace_prefix in &ibc_prefixed_denom.trace_path {
                     denom_serialized.extend(cairo_encoding.encode(trace_prefix)?);
                 }
 
@@ -837,7 +837,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
 
             {
                 // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/apps/src/transfer/types.cairo#L120-L130
-                for trace_prefix in ibc_prefixed_denom.iter_trace_path() {
+                for trace_prefix in &ibc_prefixed_denom.trace_path {
                     denom_serialized.extend(cairo_encoding.encode(trace_prefix)?);
                 }
 

@@ -37,26 +37,13 @@ pub struct PrefixedDenom {
 
 impl Display for PrefixedDenom {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for prefix in self.iter_trace_path() {
+        for prefix in &self.trace_path {
             write!(f, "{}/{}/", prefix.port_id, prefix.channel_id)?;
         }
 
         write!(f, "{}", self.base)?;
 
         Ok(())
-    }
-}
-
-impl PrefixedDenom {
-    /// TracePath is stored in reverse order for appending convenience.
-    ///
-    /// This function returns the trace path in the correct order.
-    ///
-    /// PrefixedDenom: transfer/channel-1/transfer/channel-2/coin
-    /// .trace_path repr: [(transfer, channel-2), (transfer, channel-1)]
-    /// .iter_trace_path(): (transfer, channel-1), (transfer, channel-2)
-    pub fn iter_trace_path(&self) -> impl Iterator<Item = &TracePrefix> {
-        self.trace_path.iter().rev()
     }
 }
 
@@ -81,6 +68,8 @@ impl FromStr for PrefixedDenom {
         Ok(Self {
             trace_path: trace_path
                 .into_iter()
+                // ibc-rs and cairo has different order of trace path
+                .rev()
                 .map(
                     |DummyTracePath {
                          port_id,
@@ -209,7 +198,7 @@ mod tests {
 
     #[test]
     fn test_multiple_trace_paths() {
-        let input = "transfer/channel-0/transfer2/channel-1/coin";
+        let input = "transfer2/channel-1/transfer/channel-0/coin";
         let expected = PrefixedDenom {
             // trace_path is stored in reverse order for appending convenience
             trace_path: vec![
@@ -228,6 +217,7 @@ mod tests {
         let result = PrefixedDenom::from_str(input);
         assert!(result.is_ok(), "Parsing failed for multiple trace paths");
         assert_eq!(result.unwrap(), expected);
+        assert_eq!(expected.to_string(), input);
     }
 
     #[test]
@@ -246,5 +236,6 @@ mod tests {
         let result = PrefixedDenom::from_str(input);
         assert!(result.is_ok(), "Parsing failed for multiple trace paths");
         assert_eq!(result.unwrap(), expected);
+        assert_eq!(expected.to_string(), input);
     }
 }
