@@ -14,7 +14,7 @@
     };
 
     cairo-src = {
-      url = "github:starkware-libs/cairo/v2.11.3";
+      url = "github:starkware-libs/cairo/v2.11.2";
       flake = false;
     };
 
