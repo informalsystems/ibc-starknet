@@ -212,6 +212,11 @@ pub impl TimestampImpl of TimestampTrait {
         Timestamp { timestamp: unix_nanos }
     }
 
+    /// Returns the timestamp in seconds, truncating the nanoseconds.
+    fn as_secs(self: Timestamp) -> u64 {
+        self.timestamp / NANOS_PER_SEC.into()
+    }
+
     /// Returns the timestamp of the latest block in Starknet, which serves as the host timestamp in
     /// the IBC implementation.
     fn host() -> Timestamp {
