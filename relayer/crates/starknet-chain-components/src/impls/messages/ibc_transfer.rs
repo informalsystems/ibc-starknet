@@ -73,7 +73,7 @@ where
         memo: &Option<String>,
         timeout_height: Option<&u64>,
         timeout_time: Option<&Timestamp>,
-    ) -> Result<Chain::Message, Chain::Error> {
+    ) -> Result<Vec<Chain::Message>, Chain::Error> {
         let ics20_contract_address = chain.query_contract_address(PhantomData).await?;
 
         let calldata = chain
@@ -143,6 +143,8 @@ where
             calldata: call_data,
         };
 
-        Ok(StarknetMessage::new(call))
+        let messages = vec![StarknetMessage::new(call)];
+
+        Ok(messages)
     }
 }
