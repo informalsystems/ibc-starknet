@@ -59,7 +59,7 @@ pub fn CONNECTION_END(counterparty_connection_sequence: u64) -> ConnectionEnd {
             prefix: BasePrefix { prefix: "" },
         },
         version: VersionImpl::supported(),
-        delay_period: 0,
+        delay_period: DURATION(0),
     }
 }
 

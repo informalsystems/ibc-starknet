@@ -1,4 +1,5 @@
 use core::num::traits::Zero;
+use starknet_ibc_core::client::Duration;
 use starknet_ibc_core::client::Height;
 use starknet_ibc_core::commitment::StateProof;
 use starknet_ibc_core::connection::ConnectionErrors;
@@ -13,7 +14,7 @@ pub struct MsgConnOpenInit {
     pub client_id_on_b: ClientId,
     pub prefix_on_b: BasePrefix,
     pub version: Version,
-    pub delay_period: u64,
+    pub delay_period: Duration,
 }
 
 #[generate_trait]
@@ -42,7 +43,7 @@ pub struct MsgConnOpenTry {
     pub version_on_a: Version,
     pub proof_conn_end_on_a: StateProof,
     pub proof_height_on_a: Height,
-    pub delay_period: u64,
+    pub delay_period: Duration,
 }
 
 #[generate_trait]

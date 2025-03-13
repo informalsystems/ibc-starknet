@@ -1,5 +1,6 @@
 use alexandria_data_structures::span_ext::SpanTraitExt;
 use core::num::traits::Zero;
+use starknet_ibc_core::client::Duration;
 use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::connection::ConnectionErrors;
 use starknet_ibc_core::host::{
@@ -14,7 +15,7 @@ pub struct ConnectionEnd {
     pub client_id: ClientId,
     pub counterparty: Counterparty,
     pub version: Version,
-    pub delay_period: u64,
+    pub delay_period: Duration,
 }
 
 #[generate_trait]
@@ -26,7 +27,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         counterparty_connection_id: ConnectionId,
         counterparty_prefix: BasePrefix,
         version: Version,
-        delay_period: u64,
+        delay_period: Duration,
     ) -> ConnectionEnd {
         ConnectionEnd {
             state,
@@ -46,7 +47,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         client_id: ClientId,
         counterparty_client_id: ClientId,
         counterparty_prefix: BasePrefix,
-        delay_period: u64,
+        delay_period: Duration,
     ) -> ConnectionEnd {
         Self::new(
             ConnectionState::Init,
@@ -65,7 +66,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         counterparty_client_id: ClientId,
         counterparty_connection_id: ConnectionId,
         counterparty_prefix: BasePrefix,
-        delay_period: u64,
+        delay_period: Duration,
     ) -> ConnectionEnd {
         Self::new(
             ConnectionState::TryOpen,
@@ -85,7 +86,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
         counterparty_connection_id: ConnectionId,
         counterparty_prefix: BasePrefix,
         version: Version,
-        delay_period: u64,
+        delay_period: Duration,
     ) -> ConnectionEnd {
         Self::new(
             ConnectionState::Open,
@@ -152,7 +153,7 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
             && self.client_id.is_zero()
             && self.counterparty.is_zero()
             && self.version.is_zero()
-            && self.delay_period == @0
+            && self.delay_period.is_zero()
     }
 }
 
