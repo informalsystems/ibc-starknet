@@ -331,6 +331,12 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_timestamp() {
+        let timestamp = TimestampImpl::from_unix_secs(29);
+        assert_eq!(timestamp.into(), 29_000_000_000_u128);
+    }
+
+    #[test]
     fn test_duration_simple_add() {
         let duration1 = Duration { seconds: 1, nanos: 1 };
         let duration2 = Duration { seconds: 2, nanos: 2 };
