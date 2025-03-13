@@ -55,14 +55,14 @@ pub struct EncodeDuration;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Duration> for EncodeDuration
 where
-    Encoding: CanEncodeMut<Strategy, Product![u64]>,
+    Encoding: CanEncodeMut<Strategy, Product![u64, u32]>,
 {
     fn encode_mut(
         encoding: &Encoding,
         value: &Duration,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
-        encoding.encode_mut(&product![value.as_secs()], buffer)?;
+        encoding.encode_mut(&product![value.as_secs(), value.subsec_nanos()], buffer)?;
         Ok(())
     }
 }
@@ -70,14 +70,14 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Duration> for EncodeDuration
 where
-    Encoding: CanDecodeMut<Strategy, Product![u64]>,
+    Encoding: CanDecodeMut<Strategy, Product![u64, u32]>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<Duration, Encoding::Error> {
-        let product![secs] = encoding.decode_mut(buffer)?;
-        Ok(Duration::from_secs(secs))
+        let product![secs, nanos] = encoding.decode_mut(buffer)?;
+        Ok(Duration::new(secs, nanos))
     }
 }
 
