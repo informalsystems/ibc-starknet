@@ -31,7 +31,8 @@ overflow-checks = true
 cgp            = { version = "0.4.0" }
 cgp-error-eyre = { version = "0.4.0" }
 
-starknet                    = { version = "0.11.0" }
+# starknet                    = { version = "0.13.0" }
+starknet                    = { git = "https://github.com/xJonathanLEI/starknet-rs", branch = "dev/jsonrpc_0_8_0" }
 starknet-types-core         = { version = "0.1.7" }
 url                         = { version = "2.4.0" }
 eyre                        = { version = "0.6.12" }

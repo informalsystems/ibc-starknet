@@ -1,8 +1,7 @@
 use cgp::prelude::*;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
-use starknet::accounts::Call;
-use starknet::core::types::Felt;
+use starknet::core::types::{Call, Felt};
 
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;

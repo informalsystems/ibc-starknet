@@ -14,9 +14,9 @@ use hermes_relayer_components::transaction::traits::types::nonce::HasNonceType;
 use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
-use starknet::accounts::{Account, Call};
+use starknet::accounts::Account;
 use starknet::core::types::{
-    ExecuteInvocation, Felt, FunctionInvocation, RevertedInvocation, TransactionTrace,
+    Call, ExecuteInvocation, Felt, FunctionInvocation, RevertedInvocation, TransactionTrace,
 };
 
 use crate::impls::types::message::StarknetMessage;
