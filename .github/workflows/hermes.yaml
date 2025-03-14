@@ -44,10 +44,6 @@ jobs:
             relayer
             light-client
 
-      - uses: taiki-e/cache-cargo-install-action@v2
-        with:
-          tool: starknet-sierra-compile
-
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
         run: |
