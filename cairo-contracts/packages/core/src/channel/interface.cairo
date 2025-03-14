@@ -1,8 +1,7 @@
 use starknet_ibc_core::channel::{
-    Acknowledgement, ChannelEnd, MsgAckPacket, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit,
-    MsgChanOpenTry, MsgRecvPacket, MsgTimeoutPacket, Packet,
+    Acknowledgement, AppVersion, ChannelEnd, ChannelOrdering, MsgAckPacket, MsgChanOpenAck,
+    MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry, MsgRecvPacket, MsgTimeoutPacket, Packet,
 };
-use starknet_ibc_core::channel::{AppVersion, ChannelOrdering};
 use starknet_ibc_core::commitment::Commitment;
 use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId, Sequence};
 

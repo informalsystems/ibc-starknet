@@ -1,5 +1,4 @@
-use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
-use snforge_std::EventSpy;
+use openzeppelin_testing::{EventSpyExt, EventSpyQueue};
 use starknet::ContractAddress;
 use starknet_ibc_core::client::ClientEventEmitterComponent::{
     CreateClientEvent, Event, UpdateClientEvent,
@@ -10,7 +9,7 @@ use starknet_ibc_core::host::ClientId;
 #[generate_trait]
 pub impl ClientEventSpyExtImpl of ClientEventSpyExt {
     fn assert_create_client_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         client_id: ClientId,
         consensus_height: Height,
@@ -20,7 +19,7 @@ pub impl ClientEventSpyExtImpl of ClientEventSpyExt {
     }
 
     fn assert_update_client_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         client_id: ClientId,
         consensus_heights: Array<Height>,

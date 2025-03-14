@@ -1,6 +1,6 @@
 #[starknet::contract]
 pub mod MockRouterHandler {
-    use starknet_ibc_core::router::{RouterHandlerComponent};
+    use starknet_ibc_core::router::RouterHandlerComponent;
 
     component!(path: RouterHandlerComponent, storage: router_handler, event: RouterHandlerEvent);
 

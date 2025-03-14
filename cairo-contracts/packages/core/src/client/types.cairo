@@ -169,7 +169,7 @@ pub impl StoreHeightArray of Store<Array<Height>> {
             let value = Store::<Height>::read_at_offset(address_domain, base, offset).unwrap();
             arr.append(value);
             offset += Store::<Height>::size();
-        };
+        }
 
         Result::Ok(arr)
     }
@@ -184,7 +184,7 @@ pub impl StoreHeightArray of Store<Array<Height>> {
         while let Option::Some(element) = value.pop_front() {
             Store::<Height>::write_at_offset(address_domain, base, offset, element).unwrap();
             offset += Store::<Height>::size();
-        };
+        }
 
         Result::Ok(())
     }

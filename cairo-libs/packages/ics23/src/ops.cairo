@@ -1,7 +1,7 @@
 use core::sha256::compute_sha256_u32_array;
 use ics23::{
-    InnerOp, LeafOp, HashOp, ICS23Errors, LengthOp, ArrayU32IntoArrayU8, SliceU32IntoArrayU8,
-    IntoArrayU32, KeyBytes, ValueBytes,
+    ArrayU32IntoArrayU8, HashOp, ICS23Errors, InnerOp, IntoArrayU32, KeyBytes, LeafOp, LengthOp,
+    SliceU32IntoArrayU8, ValueBytes,
 };
 use protobuf::varint::encode_varint_to_u8_array;
 

@@ -1,9 +1,9 @@
-use super::super::types::message::DecodeContextTrait;
 use protobuf::types::message::{
-    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, decode_raw,
+    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
+    ProtoMessage, decode_raw,
 };
 use protobuf::types::tag::WireType;
+use super::super::types::message::DecodeContextTrait;
 
 pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
     fn encode_raw(self: @ByteArray, ref context: EncodeContext) {
@@ -15,7 +15,7 @@ pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
         while context.can_read_branch() {
             value.append_byte(context.buffer[context.index]);
             context.index += 1;
-        };
+        }
         Option::Some(value)
     }
 
@@ -107,7 +107,7 @@ pub impl BytesAsProtoMessage of ProtoMessage<Array<u8>> {
         while context.can_read_branch() {
             bytes.append(context.buffer[context.index]);
             context.index += 1;
-        };
+        }
         Option::Some(bytes)
     }
 

@@ -2,11 +2,9 @@
 pub mod ConnectionHandlerComponent {
     use ClientHandlerComponent::ClientInternalTrait;
     use ConnectionEventEmitterComponent::ConnectionEventEmitterTrait;
-    use starknet::storage::StoragePathEntry;
-    use starknet::storage::{Map, MutableVecTrait, Vec, VecTrait};
     use starknet::storage::{
-        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
-        StoragePointerWriteAccess,
+        Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess, StoragePathEntry,
+        StoragePointerReadAccess, StoragePointerWriteAccess, Vec, VecTrait,
     };
     use starknet_ibc_core::client::{ClientContract, ClientContractTrait, ClientHandlerComponent};
     use starknet_ibc_core::connection::{
@@ -411,7 +409,7 @@ pub mod ConnectionHandlerComponent {
             while i < entry.len() {
                 conn_ids.append(entry.at(i).read());
                 i += 1;
-            };
+            }
 
             conn_ids
         }
@@ -442,11 +440,7 @@ pub mod ConnectionHandlerComponent {
             client_id: @ClientId,
             connection_id: ConnectionId,
         ) {
-            self
-                .client_to_connections
-                .entry(client_connection_key(client_id))
-                .append()
-                .write(connection_id);
+            self.client_to_connections.entry(client_connection_key(client_id)).push(connection_id);
         }
 
         fn write_connection_end(

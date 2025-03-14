@@ -1,6 +1,6 @@
-use super::tag::ProtobufTagTrait;
-use protobuf::types::tag::{WireType, ProtobufTag, ProtobufTagImpl};
 use protobuf::primitives::numeric::U32AsProtoMessage;
+use protobuf::types::tag::{ProtobufTag, ProtobufTagImpl, WireType};
+use super::tag::ProtobufTagTrait;
 
 pub trait ProtoMessage<T> {
     fn decode_raw(ref context: DecodeContext) -> Option<T>;
@@ -177,7 +177,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
                 failed = true;
                 break;
             }
-        };
+        }
         if failed {
             return Option::None;
         }
@@ -232,7 +232,7 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
             context.end_branch()?;
         } else {
             value = context.decode_raw()?;
-        };
+        }
         Option::Some(value)
     }
 

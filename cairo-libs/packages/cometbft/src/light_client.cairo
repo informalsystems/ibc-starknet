@@ -1,16 +1,15 @@
 use cometbft::ibc::{Height, MerkleRoot};
-use ics23::ProofSpec;
-use protobuf::types::wkt::{Timestamp, Duration};
-use cometbft::utils::Fraction;
 use cometbft::types::{SignedHeader, ValidatorSet};
-
+use cometbft::utils::Fraction;
+use ics23::ProofSpec;
+use protobuf::primitives::array::ByteArrayAsProtoMessage;
+use protobuf::primitives::numeric::{BoolAsProtoMessage, I32AsProtoMessage};
 use protobuf::types::message::{
-    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName,
+    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
+    ProtoMessage, ProtoName,
 };
-use protobuf::primitives::array::{ByteArrayAsProtoMessage};
-use protobuf::primitives::numeric::{I32AsProtoMessage, BoolAsProtoMessage};
 use protobuf::types::tag::WireType;
+use protobuf::types::wkt::{Duration, Timestamp};
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ClientState {

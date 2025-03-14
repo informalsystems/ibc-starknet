@@ -1,12 +1,12 @@
+use protobuf::primitives::utils::{
+    decode_2_complement_32, decode_2_complement_64, encode_2_complement_32, encode_2_complement_64,
+};
 use protobuf::types::message::{
-    ProtoMessage, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, decode_raw,
+    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
+    ProtoMessage, decode_raw,
 };
 use protobuf::types::tag::WireType;
-use protobuf::primitives::utils::{
-    encode_2_complement_64, decode_2_complement_64, encode_2_complement_32, decode_2_complement_32,
-};
-use protobuf::varint::{encode_varint_to_byte_array, decode_varint_from_byte_array};
+use protobuf::varint::{decode_varint_from_byte_array, encode_varint_to_byte_array};
 
 pub impl U64AsProtoMessage of ProtoMessage<u64> {
     fn encode_raw(self: @u64, ref context: EncodeContext) {

@@ -3,15 +3,15 @@ pub mod ClientHandlerComponent {
     use core::num::traits::Zero;
     use starknet::storage::{
         Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
-        StoragePointerWriteAccess, Vec, VecTrait,
+        Vec, VecTrait,
     };
     use starknet::{ContractAddress, get_caller_address, get_tx_info};
-    use starknet_ibc_core::client::ClientEventEmitterComponent;
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
     use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient, IRegisterRelayer};
     use starknet_ibc_core::client::{
-        ClientContract, ClientContractHandlerTrait, ClientErrors, CreateResponse, Height,
-        MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient, UpdateResponse,
+        ClientContract, ClientContractHandlerTrait, ClientErrors, ClientEventEmitterComponent,
+        CreateResponse, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient,
+        MsgUpgradeClient, UpdateResponse,
     };
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
@@ -192,7 +192,7 @@ pub mod ClientHandlerComponent {
                     break;
                 }
                 i += 1;
-            };
+            }
             allowed
         }
 
@@ -214,7 +214,7 @@ pub mod ClientHandlerComponent {
         fn write_allowed_relayer(
             ref self: ComponentState<TContractState>, relayer_address: ContractAddress,
         ) {
-            self.allowed_relayers.append().write(relayer_address);
+            self.allowed_relayers.push(relayer_address);
         }
 
         fn write_supported_client(

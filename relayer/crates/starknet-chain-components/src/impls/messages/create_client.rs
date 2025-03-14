@@ -15,8 +15,7 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientP
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use starknet::accounts::Call;
-use starknet::core::types::Felt;
+use starknet::core::types::{Call, Felt};
 use starknet::macros::{selector, short_string};
 
 use crate::impls::types::address::StarknetAddress;

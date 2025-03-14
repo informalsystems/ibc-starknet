@@ -1,6 +1,5 @@
 use core::byte_array::ByteArrayTrait;
-use core::num::traits::Zero;
-use core::num::traits::{CheckedAdd, CheckedSub};
+use core::num::traits::{CheckedAdd, CheckedSub, Zero};
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
 use ics23::{ArrayU32IntoArrayU8, u64_into_array_u32};
@@ -68,7 +67,7 @@ pub impl ConnectionIdImpl of ConnectionIdTrait {
 
             i -= 1;
             multiplier *= 10;
-        };
+        }
 
         sequence.try_into().unwrap()
     }
@@ -142,7 +141,7 @@ pub impl ChannelIdImpl of ChannelIdTrait {
 
             i -= 1;
             multiplier *= 10;
-        };
+        }
 
         sequence.try_into().unwrap()
     }

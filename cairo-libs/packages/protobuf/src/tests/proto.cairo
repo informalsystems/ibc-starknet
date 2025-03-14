@@ -1,16 +1,16 @@
-use super::super::types::message::DecodeContextTrait;
-use protobuf::types::message::{
-    EncodeContextImpl, DecodeContextImpl, ProtoMessage, ProtoName, ProtoCodecImpl, EncodeContext,
-    DecodeContext,
-};
-use protobuf::types::wkt::Any;
-use protobuf::types::tag::WireType;
+use protobuf::base64::decode as base64_decode;
+use protobuf::hex::decode as hex_decode;
 use protobuf::primitives::array::{
-    ByteArrayAsProtoMessage, ArrayAsProtoMessage, BytesAsProtoMessage,
+    ArrayAsProtoMessage, ByteArrayAsProtoMessage, BytesAsProtoMessage,
 };
 use protobuf::primitives::numeric::{BoolAsProtoMessage, I64AsProtoMessage, U64AsProtoMessage};
-use protobuf::hex::decode as hex_decode;
-use protobuf::base64::decode as base64_decode;
+use protobuf::types::message::{
+    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
+    ProtoMessage, ProtoName,
+};
+use protobuf::types::tag::WireType;
+use protobuf::types::wkt::Any;
+use super::super::types::message::DecodeContextTrait;
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 struct Proposer {
@@ -129,7 +129,7 @@ fn test_proto_u64() {
     let num = ProtoCodecImpl::decode::<u64>(@bytes).unwrap();
     assert_eq!(num, 0xab54a98ceb1f0ad2, "number decode failed");
     let bytes2 = ProtoCodecImpl::encode(@num);
-    assert_eq!(bytes, bytes2, "num encode failed");
+    assert_eq!(@bytes, @bytes2, "num encode failed");
 }
 
 #[test]
@@ -137,9 +137,9 @@ fn test_proto_byte_array() {
     let hex = "48656C6C6F2C20576F726C6421";
     let bytes = hex_decode(@hex);
     let byte_array = ProtoCodecImpl::decode::<ByteArray>(@bytes).unwrap();
-    assert_eq!(byte_array, "Hello, World!", "byte array decode failed");
+    assert_eq!(@byte_array, @"Hello, World!", "byte array decode failed");
     let bytes2 = ProtoCodecImpl::encode(@byte_array);
-    assert_eq!(bytes, bytes2, "byte array encode failed");
+    assert_eq!(@bytes, @bytes2, "byte array encode failed");
 }
 
 #[test]
@@ -159,9 +159,9 @@ fn test_proto_to_cairo_struct() {
         validator_type: ValidatorType::Light,
         proposers: array![],
     };
-    assert_eq!(header2, header, "tm header decode failed");
+    assert_eq!(@header2, @header, "tm header decode failed");
     let bytes2 = ProtoCodecImpl::encode(@header);
-    assert_eq!(bytes, bytes2, "tm header encode failed");
+    assert_eq!(@bytes, @bytes2, "tm header encode failed");
 }
 
 #[test]
@@ -180,9 +180,9 @@ fn test_proto_to_cairo_struct_absent_field() {
         validator_type: ValidatorType::Full,
         proposers: array![],
     };
-    assert_eq!(header2, header, "tmh decode wo field failed");
+    assert_eq!(@header2, @header, "tmh decode wo field failed");
     let bytes2 = ProtoCodecImpl::encode(@header);
-    assert_eq!(bytes, bytes2, "tmh encode wo field failed");
+    assert_eq!(@bytes, @bytes2, "tmh encode wo field failed");
 }
 
 #[test]
@@ -214,9 +214,9 @@ fn test_repeated_default_value() {
             Proposer { address: "cosmos1hafptm4zxy6", pub_key: "cosmosvalpub1234" },
         ],
     };
-    assert_eq!(header2, header, "repeated default value failed");
+    assert_eq!(@header2, @header, "repeated default value failed");
     let bytes2 = ProtoCodecImpl::encode(@header);
-    assert_eq!(bytes, bytes2, "repeated default value failed");
+    assert_eq!(@bytes, @bytes2, "repeated default value failed");
 }
 
 #[test]
@@ -237,5 +237,5 @@ fn test_proto_to_any() {
     };
     let any: Any = header.clone().into();
     let header2: TmHeader = any.try_into().unwrap();
-    assert_eq!(header2, header, "any conversion failed");
+    assert_eq!(@header2, @header, "any conversion failed");
 }

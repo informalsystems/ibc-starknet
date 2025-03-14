@@ -1,18 +1,17 @@
-use ics23::{
-    LeafOp, LengthOp, HashOp, InnerOp, ExistenceProof, ExistenceProofImpl, SliceU32IntoArrayU8,
-    Proof, encode_hex, decode_hex, ProofSpec, ByteArrayIntoArrayU8, CommitmentProof,
-    verify_existence, verify_non_existence, byte_array_to_slice_u32, smt_spec, iavl_spec,
-    tendermint_spec,
-};
 use ics23::tests::data::{
-    TestData, smt_exist_left, smt_exist_right, smt_exist_middle, iavl_exist_left,
-    iavl_nonexist_left, iavl_exist_right, iavl_nonexist_right, iavl_exist_middle,
-    iavl_nonexist_middle, tendermint_exist_left, tendermint_exist_right, tendermint_exist_middle,
-    tendermint_nonexist_left, tendermint_nonexist_right, tendermint_nonexist_middle,
-    smt_nonexist_left, smt_nonexist_right, smt_nonexist_middle,
+    TestData, iavl_exist_left, iavl_exist_middle, iavl_exist_right, iavl_nonexist_left,
+    iavl_nonexist_middle, iavl_nonexist_right, smt_exist_left, smt_exist_middle, smt_exist_right,
+    smt_nonexist_left, smt_nonexist_middle, smt_nonexist_right, tendermint_exist_left,
+    tendermint_exist_middle, tendermint_exist_right, tendermint_nonexist_left,
+    tendermint_nonexist_middle, tendermint_nonexist_right,
 };
-use protobuf::types::message::ProtoCodecImpl;
+use ics23::{
+    ByteArrayIntoArrayU8, CommitmentProof, ExistenceProof, ExistenceProofImpl, HashOp, InnerOp,
+    LeafOp, LengthOp, Proof, ProofSpec, SliceU32IntoArrayU8, byte_array_to_slice_u32, decode_hex,
+    encode_hex, iavl_spec, smt_spec, tendermint_spec, verify_existence, verify_non_existence,
+};
 use protobuf::hex::decode as decode_hex_byte_array;
+use protobuf::types::message::ProtoCodecImpl;
 
 fn encoding_roundtrip_fixture(proof: @ByteArray) {
     let proof_bytes = decode_hex_byte_array(proof);

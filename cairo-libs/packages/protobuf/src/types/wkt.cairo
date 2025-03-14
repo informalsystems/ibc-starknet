@@ -1,10 +1,10 @@
+use protobuf::primitives::array::ByteArrayAsProtoMessage;
+use protobuf::primitives::numeric::{I32AsProtoMessage, I64AsProtoMessage};
 use protobuf::types::message::{
-    ProtoMessage, ProtoName, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl,
+    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
+    ProtoMessage, ProtoName,
 };
 use protobuf::types::tag::WireType;
-use protobuf::primitives::numeric::{I32AsProtoMessage, I64AsProtoMessage};
-use protobuf::primitives::array::ByteArrayAsProtoMessage;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub struct Duration {

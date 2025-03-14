@@ -35,7 +35,7 @@ between Starknet and Cosmos.
 ### Prerequisites
 
 - `osmosisd`
-- `starkli`
+- `starkli 0.3.8`
 - `cargo` (to run Rust binaries from this project)
 
 ### From Osmosis to Starknet via `channel-10185`
@@ -79,7 +79,7 @@ SN_TRANSFER_ARGS=$(cd relayer; cargo run -q -p hermes-starknet-tools-cli \
     --receiver "$OSMOSIS_ADDRESS" \
     --channel-id channel-0 \
     --timeout-timestamp "$((`date +%s` + 600))" \
-    | cut -d: -f9)
+    | cut -d: -f5-)
 ```
 
 > [!IMPORTANT]
@@ -105,7 +105,7 @@ soon receive a `IBC Received` transaction with received denom.
 
 ### Prerequisites
 
-- `starkli`
+- `starkli 0.3.8`
 - `hermes` v1
 - `cargo`
 
@@ -202,8 +202,8 @@ cargo run --bin hermes-starknet -- -c ../relayer.toml \
 
 ### Prerequisites
 
-- `scarb 2.9.2`
-- `starkli`
+- `scarb 2.11.3`
+- `starkli 0.3.8`
 - `cargo`
 
 ### Deploying the contracts
@@ -218,11 +218,6 @@ Then, call `./scripts/deploy.sh` to deploy the contracts.
 
 > [!IMPORTANT]
 > Make sure `.env` file is updated with the correct values.
-
-> [!IMPORTANT]
-> You will need some `ETH` to declare the class hashes on Starknet. Due to the
-> low `STRK` value and high gas usage, using `STRK` will result in
-> `Error: fee calculation overflow`.
 
 ```bash
 ./scripts/deploy.sh

@@ -1,4 +1,4 @@
-use serde_json::{FormatterTrait, CompactFormatter, byte_array_to_array_u8};
+use serde_json::{CompactFormatter, FormatterTrait, byte_array_to_array_u8};
 
 pub trait Serialize<T> {
     fn serialize<S, +Drop<S>, +SerializerTrait<S>>(self: T, ref serializer: S);

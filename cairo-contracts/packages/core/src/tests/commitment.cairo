@@ -1,4 +1,4 @@
-use starknet_ibc_core::commitment::compute_ack_commitment;
+use starknet_ibc_core::commitment::{FixedU32ArrayIntoCommitment, compute_ack_commitment};
 use starknet_ibc_testkit::dummies::{ERC20, PACKET_COMMITMENT_ON_SN};
 
 // Snapshot test to ensure the computation of packet commitment stays

@@ -9,8 +9,7 @@ use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::amount::HasAmountType;
-use starknet::accounts::Call;
-use starknet::core::types::{Felt, U256};
+use starknet::core::types::{Call, Felt, U256};
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;

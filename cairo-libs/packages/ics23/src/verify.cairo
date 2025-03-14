@@ -1,9 +1,8 @@
-use core::num::traits::CheckedSub;
-use core::num::traits::Zero;
+use core::num::traits::{CheckedSub, Zero};
 use ics23::{
-    Proof, ProofSpec, ProofSpecTrait, RootBytes, KeyBytes, ValueBytes, ICS23Errors,
-    ExistenceProofImpl, NonExistenceProof, NonExistenceProofImpl, SliceU32IntoArrayU8,
-    ExistenceProof, LeafOp, HashOp, InnerOp, ArrayU8PartialOrd, InnerSpec,
+    ArrayU8PartialOrd, ExistenceProof, ExistenceProofImpl, HashOp, ICS23Errors, InnerOp, InnerSpec,
+    KeyBytes, LeafOp, NonExistenceProof, NonExistenceProofImpl, Proof, ProofSpec, ProofSpecTrait,
+    RootBytes, SliceU32IntoArrayU8, ValueBytes,
 };
 use protobuf::varint::decode_varint_from_u8_array;
 
@@ -33,7 +32,7 @@ pub fn verify_membership(
         }
         subvalue = subroot.into();
         i += 1;
-    };
+    }
     assert(root == subroot, ICS23Errors::INVALID_MERKLE_PROOF);
 }
 
@@ -186,7 +185,7 @@ fn has_prefix(proof_prefix: @Array<u8>, spec_prefix: @Array<u8>) -> bool {
     while i < spec_prefix.len() {
         expected.append(*proof_prefix[i]);
         i += 1;
-    };
+    }
     spec_prefix == @expected
 }
 
@@ -224,7 +223,7 @@ fn ensure_left_neighbor(
     while top_left.prefix == top_right.prefix && top_left.suffix == top_right.suffix {
         top_left = left_path_span.pop_back().unwrap();
         top_right = right_path_span.pop_back().unwrap();
-    };
+    }
 
     assert(
         is_left_step(inner_spec.clone(), top_left, top_right), ICS23Errors::INVALID_LEFT_NEIGHBOR,
@@ -262,7 +261,7 @@ fn get_padding(inner_spec: InnerSpec, branch: u32) -> Padding {
                 );
             break;
         }
-    };
+    }
     assert(padding.is_some(), ICS23Errors::MISSING_BRANCH);
     padding.unwrap()
 }
@@ -282,7 +281,7 @@ fn order_from_padding(inner_spec: InnerSpec, inner_op: @InnerOp) -> u32 {
             order = Option::Some(branch);
             break;
         }
-    };
+    }
     assert(order.is_some(), ICS23Errors::MISMATCHED_PADDING);
     order.unwrap()
 }
@@ -307,14 +306,14 @@ fn left_branches_are_empty(inner_spec: InnerSpec, inner_op: @InnerOp) -> bool {
                 let mut expected_prefix = ArrayTrait::new();
                 for i in from..from + child_size {
                     expected_prefix.append(*inner_op.prefix[i]);
-                };
+                }
                 if inner_spec.empty_child != expected_prefix {
                     are_empty = false;
                     break;
                 }
             }
         };
-    };
+    }
     are_empty
 }
 
@@ -337,14 +336,14 @@ fn right_branches_are_empty(inner_spec: @InnerSpec, inner_op: @InnerOp) -> bool 
                 let mut expected_suffix = ArrayTrait::new();
                 for i in from..from + child_size {
                     expected_suffix.append(*inner_op.suffix[i]);
-                };
+                }
                 if inner_spec.empty_child != @expected_suffix {
                     are_empty = false;
                     break;
                 }
             }
         };
-    };
+    }
     are_empty
 }
 

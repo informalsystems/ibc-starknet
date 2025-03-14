@@ -2,13 +2,13 @@
 let
   cairo = nixpkgs.rustPlatform.buildRustPackage {
     name = "cairo";
-    version = "2.9.2";
+    version = "2.11.2";
 
     doCheck = false;
 
     src = cairo-src;
 
-    cargoHash = "sha256-1SGbhusL5Ig+/8oVRxicVkdLfuLwK1Z0Bq4oR7Tei3A=";
+    cargoHash = "sha256-dOC3TUFetJ1uHf1AmgA4Qv0uxDNtbLibaj3qEDqjJ5g=";
 
     OPENSSL_NO_VENDOR = 1;
     PKG_CONFIG_PATH = "${nixpkgs.openssl.dev}/lib/pkgconfig";

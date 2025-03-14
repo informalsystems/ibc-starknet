@@ -1,4 +1,4 @@
-use starknet::{ContractAddress, contract_address_const};
+use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
     AppVersion, ChannelEnd, ChannelOrdering, ChannelState, Counterparty as ChanCounterparty,
 };
@@ -29,12 +29,12 @@ pub fn TIMEOUT_TIMESTAMP(timestamp: u64) -> Timestamp {
     TIMESTAMP(timestamp)
 }
 
-pub fn RELAYER() -> ContractAddress {
-    contract_address_const::<'RELAYER'>()
+pub const fn RELAYER() -> ContractAddress {
+    'RELAYER'.try_into().unwrap()
 }
 
-pub fn CLIENT() -> ContractAddress {
-    contract_address_const::<'COMETBFT'>()
+pub const fn CLIENT() -> ContractAddress {
+    'COMETBFT'.try_into().unwrap()
 }
 
 pub fn CLIENT_TYPE() -> felt252 {

@@ -1,9 +1,7 @@
 use core::num::traits::Zero;
-use starknet_ibc_core::client::Duration;
-use starknet_ibc_core::client::Height;
+use starknet_ibc_core::client::{Duration, Height};
 use starknet_ibc_core::commitment::StateProof;
-use starknet_ibc_core::connection::ConnectionErrors;
-use starknet_ibc_core::connection::Version;
+use starknet_ibc_core::connection::{ConnectionErrors, Version};
 use starknet_ibc_core::host::{BasePrefix, ClientId, ClientIdImpl, ConnectionId};
 use starknet_ibc_utils::ValidateBasic;
 use super::VersionTrait;

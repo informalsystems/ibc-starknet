@@ -1,5 +1,3 @@
-use starknet::class_hash::class_hash_const;
-use starknet::contract_address_const;
 use starknet::{ClassHash, ContractAddress};
 use starknet_ibc_apps::transfer::ERC20Contract;
 use starknet_ibc_apps::transfer::types::{Denom, Memo, PacketData, Participant, PrefixedDenom};
@@ -20,25 +18,28 @@ pub fn SYMBOL() -> ByteArray {
     "IBC/UATOM"
 }
 
-pub fn CLASS_HASH() -> ClassHash {
-    class_hash_const::<'ERC20Mintable'>()
+pub const fn CLASS_HASH() -> ClassHash {
+    'ERC20Mintable'.try_into().unwrap()
 }
 
-pub fn ZERO() -> ContractAddress {
-    contract_address_const::<0>()
+pub const fn ZERO() -> ContractAddress {
+    0.try_into().unwrap()
 }
 
-pub fn ERC20() -> ERC20Contract {
-    contract_address_const::<0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7>()
-        .into()
+pub const fn ERC20() -> ERC20Contract {
+    ERC20Contract {
+        address: 0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7
+            .try_into()
+            .unwrap(),
+    }
 }
 
-pub fn OWNER() -> ContractAddress {
-    contract_address_const::<'OWNER'>()
+pub const fn OWNER() -> ContractAddress {
+    'OWNER'.try_into().unwrap()
 }
 
-pub fn SN_USER() -> ContractAddress {
-    contract_address_const::<'USER'>()
+pub const fn SN_USER() -> ContractAddress {
+    'USER'.try_into().unwrap()
 }
 
 pub fn CS_USER() -> ByteArray {

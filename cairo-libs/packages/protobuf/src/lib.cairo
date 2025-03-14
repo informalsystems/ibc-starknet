@@ -1,9 +1,9 @@
+pub mod base64;
+pub mod errors;
+pub mod hex;
 pub mod primitives;
 pub mod types;
-pub mod base64;
-pub mod hex;
 pub mod varint;
-pub mod errors;
 
 #[cfg(test)]
 mod tests {

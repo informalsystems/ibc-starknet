@@ -22,8 +22,9 @@ pub mod commitment {
     mod utils;
 
     pub use types::{
-        Commitment, CommitmentZero, StateProof, StateProofZero, StateRoot, StateRootZero,
-        StateValue, StateValueZero, compute_ack_commitment, compute_packet_commitment,
+        Commitment, CommitmentZero, FixedU32ArrayIntoCommitment, StateProof, StateProofZero,
+        StateRoot, StateRootZero, StateValue, StateValueZero, compute_ack_commitment,
+        compute_packet_commitment,
     };
     pub use utils::{U32Collector, U32CollectorImpl, U32CollectorTrait};
 }

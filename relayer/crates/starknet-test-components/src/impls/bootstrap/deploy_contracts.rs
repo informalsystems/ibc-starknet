@@ -36,8 +36,7 @@ use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::HasWalletType;
 use hermes_test_components::chain_driver::traits::types::chain::{HasChain, HasChainType};
 use hermes_test_components::driver::traits::types::chain_driver::HasChainDriverType;
-use starknet::accounts::Call;
-use starknet::core::types::Felt;
+use starknet::core::types::{Call, Felt};
 use starknet::macros::{selector, short_string};
 
 use crate::traits::{CanDeployIbcContracts, IbcContractsDeployer, IbcContractsDeployerComponent};

@@ -3,8 +3,7 @@ use starknet_ibc_core::channel::ChannelHandlerComponent::{ChannelReaderTrait, Ch
 use starknet_ibc_core::channel::{ChannelHandlerComponent, IChannelQuery, Receipt, ReceiptTrait};
 use starknet_ibc_core::commitment::compute_packet_commitment;
 use starknet_ibc_core::host::SequenceImpl;
-use starknet_ibc_testkit::configs::TransferAppConfigImpl;
-use starknet_ibc_testkit::configs::TransferAppConfigTrait;
+use starknet_ibc_testkit::configs::{TransferAppConfigImpl, TransferAppConfigTrait};
 use starknet_ibc_testkit::dummies::{
     CHANNEL_END, CHANNEL_ID, COSMOS, NATIVE_DENOM, PORT_ID, SEQUENCE, STARKNET, TIMEOUT_HEIGHT,
     TIMEOUT_TIMESTAMP,

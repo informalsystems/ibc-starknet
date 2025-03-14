@@ -1,10 +1,10 @@
-use protobuf::types::message::{
-    ProtoMessage, ProtoOneof, DecodeContext, EncodeContext, EncodeContextTrait, DecodeContextTrait,
-    ProtoCodecImpl,
-};
-use protobuf::types::tag::{WireType, ProtobufTag};
-use protobuf::primitives::numeric::U64AsProtoMessage;
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
+use protobuf::primitives::numeric::U64AsProtoMessage;
+use protobuf::types::message::{
+    DecodeContext, DecodeContextTrait, EncodeContext, EncodeContextTrait, ProtoCodecImpl,
+    ProtoMessage, ProtoOneof,
+};
+use protobuf::types::tag::{ProtobufTag, WireType};
 
 #[derive(Drop, Debug, Default, PartialEq)]
 pub struct MessageWithOneof {

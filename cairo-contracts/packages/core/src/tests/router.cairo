@@ -1,4 +1,3 @@
-use starknet::contract_address_const;
 use starknet_ibc_core::router::RouterHandlerComponent;
 use starknet_ibc_core::router::RouterHandlerComponent::{CoreRouterHandler, RouterInitializerImpl};
 use starknet_ibc_testkit::dummies::PORT_ID;
@@ -27,7 +26,7 @@ fn test_missing_app_address() {
 #[should_panic(expected: 'ICS26: unsupported port id')]
 fn test_bind_release_port_id_ok() {
     let mut state = setup();
-    let app_address = contract_address_const::<'transfer'>();
+    let app_address = 'transfer'.try_into().unwrap();
 
     state.bind_port_id(PORT_ID(), app_address);
     let stored_app_address = state.app_address(PORT_ID());

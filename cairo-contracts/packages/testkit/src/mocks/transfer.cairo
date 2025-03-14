@@ -3,10 +3,9 @@ pub mod MockTransferApp {
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::{ClassHash, ContractAddress, get_caller_address};
-    use starknet_ibc_apps::transfer::ERC20Contract;
     use starknet_ibc_apps::transfer::types::{Memo, MsgTransfer, PrefixedDenom};
     use starknet_ibc_apps::transfer::{
-        TokenTransferComponent, TransferErrors, TransferrableComponent,
+        ERC20Contract, TokenTransferComponent, TransferErrors, TransferrableComponent,
     };
     use starknet_ibc_core::host::{ChannelId, PortId};
 

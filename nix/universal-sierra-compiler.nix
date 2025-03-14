@@ -12,7 +12,7 @@ let
 
   universal-sierra-compiler = rust-platform.buildRustPackage {
     pname = "universal-sierra-compiler";
-    version = "2.3.0";
+    version = "2.4.0";
 
     src = universal-sierra-compiler-src;
 

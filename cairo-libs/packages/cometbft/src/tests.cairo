@@ -1,9 +1,9 @@
-use protobuf::types::message::ProtoCodecImpl;
-use protobuf::types::wkt::Any;
-use protobuf::base64::decode as base64_decode;
-use cometbft::types::{ValidatorSet, SignedHeader, Header as TmHeader, Commit, CommitSig, Consensus};
 use cometbft::ibc::Height;
 use cometbft::light_client::Header;
+use cometbft::types::{Commit, CommitSig, Consensus, Header as TmHeader, SignedHeader, ValidatorSet};
+use protobuf::base64::decode as base64_decode;
+use protobuf::types::message::ProtoCodecImpl;
+use protobuf::types::wkt::Any;
 
 #[test]
 fn test_height_decode() {

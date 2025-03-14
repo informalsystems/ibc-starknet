@@ -1,5 +1,4 @@
-use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
-use snforge_std::EventSpy;
+use openzeppelin_testing::{EventSpyExt, EventSpyQueue};
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::ChannelEventEmitterComponent::{
     AcknowledgePacketEvent, ChanOpenAckEvent, ChanOpenConfirmEvent, ChanOpenInitEvent,
@@ -14,7 +13,7 @@ use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId};
 #[generate_trait]
 pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
     fn assert_chan_open_init_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         channel_id_on_a: ChannelId,
         version_on_a: AppVersion,
@@ -33,7 +32,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
     }
 
     fn assert_chan_open_try_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         channel_id_on_b: ChannelId,
         version_on_b: AppVersion,
@@ -53,7 +52,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
     }
 
     fn assert_chan_open_ack_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         port_id_on_b: PortId,
         connection_id_on_a: ConnectionId,
@@ -72,7 +71,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
     }
 
     fn assert_chan_open_confirm_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         port_id_on_a: PortId,
         channel_id_on_a: ChannelId,
@@ -92,7 +91,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
     }
 
     fn assert_send_packet_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         channel_ordering: ChannelOrdering,
         packet: Packet,
@@ -114,7 +113,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
     }
 
     fn assert_recv_packet_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         channel_ordering: ChannelOrdering,
         packet: Packet,
@@ -136,7 +135,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
     }
 
     fn assert_ack_packet_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         channel_ordering: ChannelOrdering,
         packet: Packet,
@@ -157,7 +156,7 @@ pub impl ChannelEventSpyExtImpl of ChannelEventSpyExt {
     }
 
     fn assert_timeout_packet_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         channel_ordering: ChannelOrdering,
         packet: Packet,

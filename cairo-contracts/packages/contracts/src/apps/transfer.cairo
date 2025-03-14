@@ -2,8 +2,7 @@
 pub mod TransferApp {
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
-    use starknet::ClassHash;
-    use starknet::ContractAddress;
+    use starknet::{ClassHash, ContractAddress};
     use starknet_ibc_apps::transfer::{
         TokenTransferComponent, TransferErrors, TransferrableComponent,
     };

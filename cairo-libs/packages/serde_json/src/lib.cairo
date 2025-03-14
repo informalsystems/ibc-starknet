@@ -1,11 +1,11 @@
-mod ser;
 mod fmt;
+mod ser;
 mod utils;
+pub use fmt::{CompactFormatter, FormatterTrait};
 
 pub use ser::{
-    Serialize, DefaultSerializer, Serializer, SerializerTrait, to_byte_array, to_array_u8,
+    DefaultSerializer, Serialize, Serializer, SerializerTrait, to_array_u8, to_byte_array,
 };
-pub use fmt::{FormatterTrait, CompactFormatter};
 pub use utils::byte_array_to_array_u8;
 
 #[cfg(test)]

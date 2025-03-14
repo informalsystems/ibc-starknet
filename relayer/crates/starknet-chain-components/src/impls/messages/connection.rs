@@ -37,8 +37,7 @@ use ibc::core::connection::types::ConnectionEnd;
 use ibc::core::host::types::identifiers::{
     ClientId as CosmosClientId, ConnectionId as CosmosConnectionId,
 };
-use starknet::accounts::Call;
-use starknet::core::types::Felt;
+use starknet::core::types::{Call, Felt};
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
