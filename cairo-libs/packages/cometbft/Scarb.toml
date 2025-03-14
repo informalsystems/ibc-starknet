@@ -9,8 +9,9 @@ edition = { workspace = true }
 test = { workspace = true }
 
 [dependencies]
-protobuf = { workspace = true }
-ics23    = { workspace = true }
+alexandria_math = { workspace = true }
+protobuf        = { workspace = true }
+ics23           = { workspace = true }
 
 [dev-dependencies]
 assert_macros = { workspace = true }

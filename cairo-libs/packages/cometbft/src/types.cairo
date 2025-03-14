@@ -1,3 +1,6 @@
+use alexandria_math::ed25519::verify_signature;
+use cometbft::utils::SpanU8TryIntoU256;
+use cometbft::errors::CometErrors;
 use protobuf::types::wkt::Timestamp;
 use protobuf::types::message::{
     ProtoMessage, ProtoOneof, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
@@ -314,6 +317,34 @@ pub struct PublicKey {
     pub sum: Sum,
 }
 
+#[generate_trait]
+pub impl PublicKeyImpl of PublicKeyTrait {
+    fn verify(self: @PublicKey, msg: Span<u8>, signature: Span<u8>) {
+        match self.sum {
+            Sum::Ed25519(pk) => {
+                assert(signature.len() == 64, CometErrors::INVALID_SIGNATURE_LENGTH);
+                let r_sign = signature
+                    .slice(0, 32)
+                    .try_into()
+                    .unwrap(); // Never fails as length is 32.
+                let s_sign = signature
+                    .slice(32, 32)
+                    .try_into()
+                    .unwrap(); // Never fails as length is 32.
+
+                assert(pk.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
+                let pubkey = pk.span().try_into().unwrap(); // Never fails as length is 32.
+
+                assert(
+                    verify_signature(msg, array![r_sign, s_sign].span(), pubkey),
+                    CometErrors::INVALID_ED25519_SIGNATURE,
+                );
+            },
+            _ => assert(false, CometErrors::UNSUPPORTED_PUBKEY_TYPE),
+        }
+    }
+}
+
 impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
     fn encode_raw(self: @PublicKey, ref context: EncodeContext) {
         context.encode_oneof(self.sum)
@@ -374,6 +405,13 @@ pub struct Validator {
     pub pub_key: PublicKey,
     pub voting_power: i64,
     pub proposer_priority: i64,
+}
+
+#[generate_trait]
+pub impl ValidatorImpl of ValidatorTrait {
+    fn verify_signature(self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>) {
+        self.pub_key.verify(sign_bytes, signature);
+    }
 }
 
 impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
