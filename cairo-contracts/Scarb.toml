@@ -73,10 +73,8 @@ description   = { workspace = true }
 test = { workspace = true }
 
 [tool]
-fmt = { workspace = true }
-
-[tool.scarb]
-allow-prebuilt-plugins = [ "snforge_std" ]
+fmt   = { workspace = true }
+scarb = { workspace = true }
 
 [dependencies]
 starknet_ibc_apps      = { workspace = true }
