@@ -43,7 +43,6 @@ pub impl SpanU8TryIntoU256 of TryInto<Span<u8>, u256> {
         }
 
         // Precomputed powers to remove the overhead of repeated multiplications.
-        let mut ret: u256 = 0;
         let two_pow_0 = 0x1;
         let two_pow_1 = 0x100;
         let two_pow_2 = 0x10000;
@@ -62,6 +61,7 @@ pub impl SpanU8TryIntoU256 of TryInto<Span<u8>, u256> {
         let two_pow_15 = 0x1000000000000000000000000000000;
 
         // No loop overhead with manual unrolling.
+        let mut ret: u256 = 0;
         ret.low += (*self[31]).into() * two_pow_0;
         ret.low += (*self[30]).into() * two_pow_1;
         ret.low += (*self[29]).into() * two_pow_2;
