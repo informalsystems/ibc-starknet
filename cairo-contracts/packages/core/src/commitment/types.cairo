@@ -4,6 +4,7 @@ use ics23::{IntoArrayU32, array_u32_into_array_u8};
 use starknet_ibc_core::channel::Acknowledgement;
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::commitment::U32CollectorImpl;
+use starknet::storage::{Vec, VecTrait};
 
 // -----------------------------------------------------------
 // Commitment Value
@@ -133,25 +134,19 @@ pub impl StateProofZero of Zero<StateProof> {
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct StateRoot {
-    pub root: ByteArray // TODO: Determine the correct type (ByteArray or Array<u8>) once implemented membership proof verification.
-}
-
-pub impl ByteArrayIntoRoot of Into<ByteArray, StateRoot> {
-    fn into(self: ByteArray) -> StateRoot {
-        StateRoot { root: self }
-    }
+    pub root: Vec<u8>,
 }
 
 pub impl StateRootZero of Zero<StateRoot> {
     fn zero() -> StateRoot {
-        StateRoot { root: "" }
+        StateRoot { root: VecTrait::new() }
     }
 
     fn is_zero(self: @StateRoot) -> bool {
-        self.root.len() == 0
+        VecTrait::len(self.root) == 0
     }
 
     fn is_non_zero(self: @StateRoot) -> bool {
-        self.root.len() > 0
+        VecTrait::len(self.root) > 0
     }
 }
