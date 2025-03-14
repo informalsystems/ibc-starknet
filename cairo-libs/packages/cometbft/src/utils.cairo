@@ -34,7 +34,6 @@ impl FractionAsProtoName of ProtoName<Fraction> {
     }
 }
 
-const N256_POW_1: u128 = 0x100;
 
 pub impl SpanU8TryIntoU256 of TryInto<Span<u8>, u256> {
     /// Decodes as big endian.
@@ -43,6 +42,8 @@ pub impl SpanU8TryIntoU256 of TryInto<Span<u8>, u256> {
         if (self.len() != 32) {
             return Option::None;
         }
+
+        const N256_POW_1: u128 = 0x100;
 
         // No loop overhead with manual unrolling.
         let mut ret: u256 = 0;
