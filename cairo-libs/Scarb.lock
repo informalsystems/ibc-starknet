@@ -11,6 +11,7 @@ checksum = "sha256:0ad256055661ed5b29ccef7bddbb44136995641cf537a6b259b94b6b6df14
 name = "cometbft"
 version = "0.1.0"
 dependencies = [
+ "alexandria_math",
  "ics23",
  "protobuf",
  "snforge_std",
