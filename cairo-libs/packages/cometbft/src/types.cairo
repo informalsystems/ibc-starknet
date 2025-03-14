@@ -340,7 +340,7 @@ pub impl PublicKeyImpl of PublicKeyTrait {
                     CometErrors::INVALID_ED25519_SIGNATURE,
                 );
             },
-            _ => assert(false, CometErrors::UNSUPPORTED_PUBKEY_TYPE),
+            _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
         }
     }
 }
