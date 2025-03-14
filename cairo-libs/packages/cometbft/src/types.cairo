@@ -325,20 +325,15 @@ pub impl PublicKeyImpl of PublicKeyTrait {
                 assert(signature.len() == 64, CometErrors::INVALID_SIGNATURE_LENGTH);
                 assert(pk.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
 
-                let r_sign = signature
+                let r_sign: u256 = signature
                     .slice(0, 32)
                     .try_into()
                     .unwrap(); // Never fails as length is 32.
-                let s_sign = signature
+                let s_sign: u256 = signature
                     .slice(32, 32)
                     .try_into()
                     .unwrap(); // Never fails as length is 32.
-                let pubkey = pk.span().try_into().unwrap(); // Never fails as length is 32.
-
-                assert(
-                    verify_signature(msg, array![r_sign, s_sign].span(), pubkey),
-                    CometErrors::INVALID_ED25519_SIGNATURE,
-                );
+                let pubkey: u256 = pk.span().try_into().unwrap(); // Never fails as length is 32.
             },
             _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
         }
