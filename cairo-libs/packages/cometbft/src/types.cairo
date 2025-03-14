@@ -323,6 +323,8 @@ pub impl PublicKeyImpl of PublicKeyTrait {
         match self.sum {
             Sum::Ed25519(pk) => {
                 assert(signature.len() == 64, CometErrors::INVALID_SIGNATURE_LENGTH);
+                assert(pk.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
+
                 let r_sign = signature
                     .slice(0, 32)
                     .try_into()
@@ -331,8 +333,6 @@ pub impl PublicKeyImpl of PublicKeyTrait {
                     .slice(32, 32)
                     .try_into()
                     .unwrap(); // Never fails as length is 32.
-
-                assert(pk.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
                 let pubkey = pk.span().try_into().unwrap(); // Never fails as length is 32.
 
                 assert(
