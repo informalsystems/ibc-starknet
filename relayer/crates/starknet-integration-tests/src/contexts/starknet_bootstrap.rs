@@ -9,6 +9,7 @@ use cgp::core::types::WithType;
 use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
+use hermes_cosmos_test_components::bootstrap::impls::chain::build_wait::BuildAndWaitChainDriver;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
     ChainDriverBuilder, ChainDriverBuilderComponent,
 };
@@ -98,7 +99,7 @@ delegate_components! {
         IbcContractsDeployerComponent:
             DeployIbcContract,
         ChainDriverBuilderComponent:
-            BuildChainAndDeployIbcContracts<BuildStarknetChainDriver>,
+            BuildChainAndDeployIbcContracts<BuildAndWaitChainDriver<BuildStarknetChainDriver>>,
     }
 }
 
