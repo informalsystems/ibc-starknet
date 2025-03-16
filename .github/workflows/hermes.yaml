@@ -72,6 +72,15 @@ jobs:
 
           export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
 
+          nix shell \
+            ..#osmosis \
+            ..#wasm-simapp \
+            ..#rust \
+            ..#cargo-nextest \
+            -c \
+            cargo nextest run --release \
+            --test-threads=$TEST_THREADS
+
   lint-relayer:
     name: Lint Relayer Code
     runs-on: ubuntu-latest
