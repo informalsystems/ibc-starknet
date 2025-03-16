@@ -5416,7 +5416,6 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 [[package]]
 name = "starknet"
 version = "0.13.0"
-source = "git+https://github.com/xJonathanLEI/starknet-rs?branch=dev/jsonrpc_0_8_0#92e3ed951e1afe6defc7d43197a6a434ef4e8817"
 dependencies = [
  "starknet-accounts",
  "starknet-contract",
@@ -5431,7 +5430,6 @@ dependencies = [
 [[package]]
 name = "starknet-accounts"
 version = "0.12.0"
-source = "git+https://github.com/xJonathanLEI/starknet-rs?branch=dev/jsonrpc_0_8_0#92e3ed951e1afe6defc7d43197a6a434ef4e8817"
 dependencies = [
  "async-trait",
  "auto_impl",
@@ -5445,7 +5443,6 @@ dependencies = [
 [[package]]
 name = "starknet-contract"
 version = "0.12.0"
-source = "git+https://github.com/xJonathanLEI/starknet-rs?branch=dev/jsonrpc_0_8_0#92e3ed951e1afe6defc7d43197a6a434ef4e8817"
 dependencies = [
  "serde",
  "serde_json",
@@ -5459,7 +5456,6 @@ dependencies = [
 [[package]]
 name = "starknet-core"
 version = "0.12.1"
-source = "git+https://github.com/xJonathanLEI/starknet-rs?branch=dev/jsonrpc_0_8_0#92e3ed951e1afe6defc7d43197a6a434ef4e8817"
 dependencies = [
  "base64 0.21.7",
  "crypto-bigint",
@@ -5481,7 +5477,6 @@ dependencies = [
 [[package]]
 name = "starknet-core-derive"
 version = "0.1.0"
-source = "git+https://github.com/xJonathanLEI/starknet-rs?branch=dev/jsonrpc_0_8_0#92e3ed951e1afe6defc7d43197a6a434ef4e8817"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5491,7 +5486,6 @@ dependencies = [
 [[package]]
 name = "starknet-crypto"
 version = "0.7.4"
-source = "git+https://github.com/xJonathanLEI/starknet-rs?branch=dev/jsonrpc_0_8_0#92e3ed951e1afe6defc7d43197a6a434ef4e8817"
 dependencies = [
  "crypto-bigint",
  "hex",
@@ -5509,7 +5503,6 @@ dependencies = [
 [[package]]
 name = "starknet-curve"
 version = "0.5.1"
-source = "git+https://github.com/xJonathanLEI/starknet-rs?branch=dev/jsonrpc_0_8_0#92e3ed951e1afe6defc7d43197a6a434ef4e8817"
 dependencies = [
  "starknet-types-core",
 ]
@@ -5517,7 +5510,6 @@ dependencies = [
 [[package]]
 name = "starknet-macros"
 version = "0.2.1"
-source = "git+https://github.com/xJonathanLEI/starknet-rs?branch=dev/jsonrpc_0_8_0#92e3ed951e1afe6defc7d43197a6a434ef4e8817"
 dependencies = [
  "starknet-core",
  "syn 2.0.98",
@@ -5526,7 +5518,6 @@ dependencies = [
 [[package]]
 name = "starknet-providers"
 version = "0.12.1"
-source = "git+https://github.com/xJonathanLEI/starknet-rs?branch=dev/jsonrpc_0_8_0#92e3ed951e1afe6defc7d43197a6a434ef4e8817"
 dependencies = [
  "async-trait",
  "auto_impl",
@@ -5546,7 +5537,6 @@ dependencies = [
 [[package]]
 name = "starknet-signers"
 version = "0.10.2"
-source = "git+https://github.com/xJonathanLEI/starknet-rs?branch=dev/jsonrpc_0_8_0#92e3ed951e1afe6defc7d43197a6a434ef4e8817"
 dependencies = [
  "async-trait",
  "auto_impl",
