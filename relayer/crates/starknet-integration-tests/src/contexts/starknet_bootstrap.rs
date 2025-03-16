@@ -34,6 +34,7 @@ use hermes_runtime_components::traits::fs::write_file::CanWriteStringToFile;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
+use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
@@ -172,6 +173,9 @@ impl ChainDriverBuilder<StarknetBootstrap> for BuildStarknetChainDriver {
         ))?;
 
         let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
+
+        // FIXME: `BuildAndWaitChainDriver`` doesn't help as this call doesn't wait for the chain to start
+        runtime.sleep(core::time::Duration::from_secs(5)).await;
 
         let chain_id = rpc_client.chain_id().await?;
 
