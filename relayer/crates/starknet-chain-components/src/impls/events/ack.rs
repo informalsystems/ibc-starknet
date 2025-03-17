@@ -87,9 +87,6 @@ where
         _chain: &Chain,
         ack: &WriteAcknowledgementEvent,
     ) -> Result<Vec<u8>, Chain::Error> {
-        // FIXME: Fix the Cairo contract to return ByteArray acknowledgement inside event.
-        // The Cairo encoding for ByteArray is different from Array<u8>
-
         let ack_bytes = ack.acknowledgement.ack.clone();
 
         Ok(ack_bytes)

@@ -77,7 +77,6 @@ where
         packet: &IbcPacket,
         counterparty_payload: ReceivePacketPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         let proof_commitment_on_a = StateProof {
             proof: counterparty_payload.proof_commitment.proof_bytes.clone(),
         };
@@ -137,7 +136,6 @@ where
         packet: &IbcPacket,
         counterparty_payload: AckPacketPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         let proof_ack_on_b = StateProof {
             proof: counterparty_payload.proof_ack.proof_bytes.clone(),
         };
@@ -202,7 +200,6 @@ where
         packet: &IbcPacket,
         counterparty_payload: TimeoutUnorderedPacketPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         let proof_unreceived_on_b = StateProof {
             proof: counterparty_payload.proof_unreceived.proof_bytes.clone(),
         };

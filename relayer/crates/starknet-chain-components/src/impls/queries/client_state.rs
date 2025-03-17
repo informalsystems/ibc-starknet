@@ -18,9 +18,6 @@ use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_logging_components::traits::has_logger::HasLogger;
-use hermes_logging_components::traits::logger::CanLog;
-use hermes_logging_components::types::level::LevelInfo;
 use ibc::core::host::types::path::{ClientStatePath, Path};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
@@ -48,7 +45,6 @@ where
         + HasSelectorType<Selector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
         + HasEncoding<AsFelt, Encoding = Encoding>
-        + HasLogger
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
@@ -57,7 +53,6 @@ where
         + CanDecode<ViaCairo, Vec<Felt>>
         + CanDecode<ViaCairo, CometClientState>
         + HasEncodedType<Encoded = Vec<Felt>>,
-    Chain::Logger: CanLog<LevelInfo>,
 {
     async fn query_client_state(
         chain: &Chain,
@@ -92,19 +87,9 @@ where
 
         let raw_client_state: Vec<Felt> = encoding.decode(&output).map_err(Chain::raise_error)?;
 
-        chain
-            .logger()
-            .log("will decode client state", &LevelInfo)
-            .await;
-
         let client_state: CometClientState = encoding
             .decode(&raw_client_state)
             .map_err(Chain::raise_error)?;
-
-        chain
-            .logger()
-            .log("decoding client state successful", &LevelInfo)
-            .await;
 
         Ok(client_state)
     }
