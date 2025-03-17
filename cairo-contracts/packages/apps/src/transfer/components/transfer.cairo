@@ -336,12 +336,14 @@ pub mod TokenTransferComponent {
 
         fn ibc_token_denom(
             self: @ComponentState<TContractState>, token_address: ContractAddress,
-        ) -> ByteArray {
+        ) -> Option<ByteArray> {
             let denom = self.read_ibc_token_denom(token_address);
 
-            assert(denom.len() > 0, TransferErrors::MISSING_TOKEN_DENOM);
-
-            denom
+            if denom.len() > 0 {
+                Option::Some(denom)
+            } else {
+                Option::None
+            }
         }
     }
 
@@ -1043,4 +1045,3 @@ pub mod TokenTransferComponent {
         }
     }
 }
-

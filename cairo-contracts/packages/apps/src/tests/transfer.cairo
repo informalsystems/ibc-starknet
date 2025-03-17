@@ -84,15 +84,15 @@ fn test_ibc_token_denom_ok() {
     let mut cfg = TransferAppConfigTrait::default();
     let prefixed_denom = cfg.prefix_hosted_denom();
     state.write_ibc_token_address_to_denom(ERC20().address, prefixed_denom.clone());
-    let denom_str = state.ibc_token_denom(ERC20().address);
+    let denom_str = state.ibc_token_denom(ERC20().address).unwrap();
     assert_eq!(prefixed_denom.as_byte_array(), denom_str);
 }
 
 #[test]
-#[should_panic(expected: 'ICS20: missing token denom')]
+#[should_panic]
 fn test_missing_ibc_token_denom() {
     let mut state = setup_component();
-    state.ibc_token_denom(ERC20().address);
+    state.ibc_token_denom(ERC20().address).unwrap();
 }
 
 #[test]

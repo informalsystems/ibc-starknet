@@ -33,6 +33,5 @@ pub trait ITransferQuery<TContractState> {
     fn ibc_token_address(self: @TContractState, token_key: felt252) -> ContractAddress;
 
     /// Returns the full denomination string of an IBC token given its address.
-    fn ibc_token_denom(self: @TContractState, token_address: ContractAddress) -> ByteArray;
+    fn ibc_token_denom(self: @TContractState, token_address: ContractAddress) -> Option<ByteArray>;
 }
-
