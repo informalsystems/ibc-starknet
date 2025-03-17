@@ -60,7 +60,7 @@ where
 
         let fee_estimation = execution.estimate_fee().await.map_err(Chain::raise_error)?;
 
-        // starknet 0.14.3 requires all fee bound present.
+        // starknet v0.13.4 requires all fee bound present.
         let l1_gas = core::cmp::max(1, fee_estimation.l1_gas_consumed.try_into().unwrap());
         let l1_data_gas =
             core::cmp::max(1, fee_estimation.l1_data_gas_consumed.try_into().unwrap());
