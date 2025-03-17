@@ -57,8 +57,6 @@
 
           rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
 
-          rust-1_83 = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-1.83.toml;
-
           wasm-simapp = cosmos-nix.ibc-go-v8-wasm-simapp;
 
           osmosis = cosmos-nix.osmosis;
@@ -79,7 +77,7 @@
             inherit nixpkgs;
             inherit (inputs) universal-sierra-compiler-src;
 
-            rust = rust-1_83;
+            inherit rust;
           };
 
           starknet-foundry = import ./nix/starknet-foundry.nix {
