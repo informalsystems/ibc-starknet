@@ -216,7 +216,7 @@ fn test_burn_ok() {
 
     let prefixed_denom = cfg.prefix_hosted_denom();
 
-    let token_address = ics20.ibc_token_address(prefixed_denom.key());
+    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
 
     let mut erc20: ERC20Contract = token_address.into();
 
