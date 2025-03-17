@@ -61,7 +61,7 @@ where
         + CanEncode<ViaCairo, Product![StarknetAddress]>
         + CanEncode<ViaCairo, Product![StarknetAddress, U256]>
         + HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, String>,
+        + CanDecode<ViaCairo, Option<String>>,
 {
     async fn build_ibc_token_transfer_messages(
         chain: &Chain,
@@ -105,23 +105,19 @@ where
                         &calldata,
                         None,
                     )
-                    .await;
+                    .await?;
 
-                match output {
-                    Ok(output) => {
-                        let prefix_denom_str =
-                            encoding.decode(&output).map_err(Chain::raise_error)?;
+                let prefix_denom_str: Option<String> =
+                    encoding.decode(&output).map_err(Chain::raise_error)?;
 
+                match prefix_denom_str {
+                    Some(prefix_denom_str) => {
                         PrefixedDenom::from_str(&prefix_denom_str).map_err(Chain::raise_error)?
                     }
-                    Err(_) => {
-                        // FIXME: check and verify error is "ICS20: missing token denom", which means
-                        // this is a native token
-                        PrefixedDenom {
-                            trace_path: vec![],
-                            base: Denom::Native(amount.token_address),
-                        }
-                    }
+                    None => PrefixedDenom {
+                        trace_path: vec![],
+                        base: Denom::Native(amount.token_address),
+                    },
                 }
             };
 
