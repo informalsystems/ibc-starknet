@@ -55,7 +55,7 @@ use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBi
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
-use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessage;
+use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessages;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
@@ -889,7 +889,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         {
             // Create Cosmos to Starknet transfer
             let messages = cosmos_chain
-                .build_ibc_token_transfer_message(
+                .build_ibc_token_transfer_messages(
                     PhantomData::<StarknetChain>,
                     &cosmos_channel_id,
                     &IbcPortId::transfer(),
@@ -908,7 +908,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
 
         {
             let messages = starknet_chain
-                .build_ibc_token_transfer_message(
+                .build_ibc_token_transfer_messages(
                     PhantomData::<CosmosChain>,
                     &starknet_channel_id,
                     &IbcPortId::transfer(),
