@@ -38,7 +38,6 @@ use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::relay::traits::packet_relayers::receive_packet::CanRelayReceivePacket;
 use hermes_relayer_components::relay::traits::packet_relayers::timeout_unordered_packet::CanRelayTimeoutUnorderedPacket;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
-use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
@@ -55,7 +54,6 @@ use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::MsgTra
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
-use hermes_starknet_chain_context::impls::error::SignError;
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
@@ -66,11 +64,8 @@ use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransfe
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence};
 use poseidon::Poseidon3Hasher;
-use starknet::accounts::{Account, AccountError, ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::{Call, U256};
 use starknet::macros::selector;
-use starknet::providers::Provider;
-use starknet::signers::{LocalWallet, SigningKey};
 use tracing::info;
 
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
@@ -228,16 +223,6 @@ fn test_packet_clearing() -> Result<(), Error> {
         let transfer_quantity = 1_000u128;
         let transfer_back_quantity = 310u128;
         let denom_cosmos = &cosmos_chain_driver.genesis_config.transfer_denom;
-
-        let starknet_account_b = SingleOwnerAccount::new(
-            starknet_chain.rpc_client.clone(),
-            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
-                wallet_starknet_b.signing_key,
-            )),
-            *wallet_starknet_b.account_address,
-            starknet_chain.rpc_client.chain_id().await?,
-            ExecutionEncoding::New,
-        );
 
         let balance_cosmos_a_step_0 = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)
@@ -760,16 +745,6 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         let address_starknet_b = &wallet_starknet_b.account_address;
         let transfer_quantity = 1_000u128;
         let denom_cosmos = &cosmos_chain_driver.genesis_config.transfer_denom;
-
-        let starknet_account_b = SingleOwnerAccount::new(
-            starknet_chain.rpc_client.clone(),
-            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
-                wallet_starknet_b.signing_key,
-            )),
-            *wallet_starknet_b.account_address,
-            starknet_chain.rpc_client.chain_id().await?,
-            ExecutionEncoding::New,
-        );
 
         let balance_cosmos_a_step_0 = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)
