@@ -318,7 +318,9 @@ fn test_packet_clearing() -> Result<(), Error> {
                 )
                 .await?;
 
-            cairo_encoding.decode(&output)?
+            let token_address: Option<StarknetAddress> = cairo_encoding.decode(&output)?;
+
+            token_address.unwrap()
         };
 
         let birelay = StarknetCosmosBiRelay {
@@ -838,7 +840,9 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                 )
                 .await?;
 
-            cairo_encoding.decode(&output)?
+            let token_address: Option<StarknetAddress> = cairo_encoding.decode(&output)?;
+
+            token_address.unwrap()
         };
 
         info!("ics20 token address: {:?}", ics20_token_address);

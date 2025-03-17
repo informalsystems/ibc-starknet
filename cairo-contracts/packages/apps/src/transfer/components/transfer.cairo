@@ -326,12 +326,14 @@ pub mod TokenTransferComponent {
     > of ITransferQuery<ComponentState<TContractState>> {
         fn ibc_token_address(
             self: @ComponentState<TContractState>, token_key: felt252,
-        ) -> ContractAddress {
+        ) -> Option<ContractAddress> {
             let address = self.read_ibc_token_address(token_key);
 
-            assert(address.is_non_zero(), TransferErrors::ZERO_TOKEN_ADDRESS);
-
-            address
+            if address.is_non_zero() {
+                Option::Some(address)
+            } else {
+                Option::None
+            }
         }
 
         fn ibc_token_denom(

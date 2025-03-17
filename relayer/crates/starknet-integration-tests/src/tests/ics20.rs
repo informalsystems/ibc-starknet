@@ -301,7 +301,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 )
                 .await?;
 
-            cairo_encoding.decode(&output)?
+            let token_address: Option<StarknetAddress> = cairo_encoding.decode(&output)?;
+
+            token_address.unwrap()
         };
 
         assert_eq!(ics20_token_address, expected_ics20_token_address);
