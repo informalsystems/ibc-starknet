@@ -28,10 +28,14 @@ use hermes_chain_components::types::payloads::connection::{
     ConnectionOpenTryPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_cosmos_chain_components::types::commitment_proof::CosmosCommitmentProof;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_logging_components::traits::has_logger::HasLogger;
+use hermes_logging_components::traits::logger::CanLog;
+use hermes_logging_components::types::level::LevelInfo;
 use ibc::core::client::types::Height;
 use ibc::core::connection::types::ConnectionEnd;
 use ibc::core::host::types::identifiers::{
@@ -124,13 +128,14 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasLogger
         + CanRaiseAsyncError<ParseIntError>
         + CanRaiseAsyncError<Utf8Error>
         + CanRaiseAsyncError<Encoding::Error>
         + CanRaiseAsyncError<&'static str>,
     Counterparty: HasHeightType<Height = Height>
         + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasClientIdType<Chain, ClientId = CosmosClientId>
         + HasConnectionIdType<Chain, ConnectionId = CosmosConnectionId>
         + HasConnectionEndType<Chain, ConnectionEnd = ConnectionEnd>
@@ -139,6 +144,7 @@ where
             ConnectionOpenTryPayload = ConnectionOpenTryPayload<Counterparty, Chain>,
         >,
     Encoding: CanEncode<ViaCairo, MsgConnOpenTry> + HasEncodedType<Encoded = Vec<Felt>>,
+    Chain::Logger: CanLog<LevelInfo>,
 {
     async fn build_connection_open_try_message(
         chain: &Chain,
@@ -152,7 +158,7 @@ where
 
         // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         let commitment_proof = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_init.proof_bytes.clone(),
         };
 
         let proof_height = CairoHeight {
@@ -187,6 +193,11 @@ where
         let message =
             StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
 
+        chain
+            .logger()
+            .log("built Starknet ConnectionOpenTry message", &LevelInfo)
+            .await;
+
         Ok(message)
     }
 }
@@ -202,9 +213,10 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasLogger
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasHeightType<Height = Height>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasConnectionIdType<Chain, ConnectionId = CosmosConnectionId>
         + HasConnectionEndType<Chain, ConnectionEnd = ConnectionEnd>
         + HasConnectionOpenAckPayloadType<
@@ -212,6 +224,7 @@ where
             ConnectionOpenAckPayload = ConnectionOpenAckPayload<Counterparty, Chain>,
         >,
     Encoding: CanEncode<ViaCairo, MsgConnOpenAck> + HasEncodedType<Encoded = Vec<Felt>>,
+    Chain::Logger: CanLog<LevelInfo>,
 {
     async fn build_connection_open_ack_message(
         chain: &Chain,
@@ -226,7 +239,7 @@ where
         // TODO(rano): submitting dummy proofs
         // proof can't be empty
         let commitment_proof = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_try.proof_bytes.clone(),
         };
 
         let proof_height = CairoHeight {
@@ -258,6 +271,11 @@ where
         let message =
             StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
 
+        chain
+            .logger()
+            .log("built Starknet ConnectionOpenAck message", &LevelInfo)
+            .await;
+
         Ok(message)
     }
 }
@@ -271,14 +289,16 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasLogger
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasHeightType<Height = Height>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasConnectionOpenConfirmPayloadType<
             Chain,
             ConnectionOpenConfirmPayload = ConnectionOpenConfirmPayload<Counterparty>,
         >,
     Encoding: CanEncode<ViaCairo, MsgConnOpenConfirm> + HasEncodedType<Encoded = Vec<Felt>>,
+    Chain::Logger: CanLog<LevelInfo>,
 {
     async fn build_connection_open_confirm_message(
         chain: &Chain,
@@ -289,7 +309,7 @@ where
         // TODO(rano): submitting dummy proofs
         // proof can't be empty
         let commitment_proof = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_ack.proof_bytes.clone(),
         };
 
         let proof_height = CairoHeight {
@@ -318,6 +338,11 @@ where
 
         let message =
             StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+
+        chain
+            .logger()
+            .log("built Starknet ConnectionOpenConfirm message", &LevelInfo)
+            .await;
 
         Ok(message)
     }

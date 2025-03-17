@@ -23,13 +23,10 @@ use crate::types::message_response::StarknetMessageResponse;
 use crate::types::message_responses::create_client::CreateClientResponse;
 
 #[cgp_provider(CreateClientEventComponent)]
-impl<Chain, Counterparty, Encoding> ProvideCreateClientEvent<Chain, Counterparty>
-    for UseStarknetEvents
+impl<Chain, Counterparty> ProvideCreateClientEvent<Chain, Counterparty> for UseStarknetEvents
 where
     Chain: HasMessageResponseType<MessageResponse = StarknetMessageResponse>
-        + HasClientIdType<Counterparty, ClientId = ClientId>
-        + HasDefaultEncoding<AsFelt, Encoding = Encoding>,
-    Encoding: HasEncodedType<Encoded = Vec<Felt>> + CanDecode<ViaCairo, CreateClientResponse>,
+        + HasClientIdType<Counterparty, ClientId = ClientId>,
 {
     type CreateClientEvent = StarknetCreateClientEvent;
 

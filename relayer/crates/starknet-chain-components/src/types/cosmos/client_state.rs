@@ -216,13 +216,14 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChainId> for EncodeChainId
 where
-    Encoding: CanDecodeMut<Strategy, String> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, String> + CanRaiseAsyncError<String>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<ChainId, Encoding::Error> {
         let chain_id_str = encoding.decode_mut(buffer)?;
-        ChainId::new(&chain_id_str).map_err(|_| Encoding::raise_error("invalid chain id"))
+        ChainId::new(&chain_id_str)
+            .map_err(|_| Encoding::raise_error(format!("invalid chain id: {chain_id_str}")))
     }
 }

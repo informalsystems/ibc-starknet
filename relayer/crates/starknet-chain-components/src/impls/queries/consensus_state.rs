@@ -18,6 +18,9 @@ use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_logging_components::traits::has_logger::HasLogger;
+use hermes_logging_components::traits::logger::CanLog;
+use hermes_logging_components::types::level::LevelInfo;
 use ibc::core::client::types::Height as IbcHeight;
 use ibc::core::host::types::path::{ClientConsensusStatePath, Path};
 use starknet::core::types::Felt;
@@ -52,6 +55,7 @@ where
         + HasSelectorType<Selector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
         + HasEncoding<AsFelt, Encoding = Encoding>
+        + HasLogger
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
         + CanRaiseAsyncError<ConsensusStateNotFound>
         + CanRaiseAsyncError<&'static str>
@@ -62,6 +66,7 @@ where
         + CanDecode<ViaCairo, Vec<Felt>>
         + CanDecode<ViaCairo, CometConsensusState>
         + HasEncodedType<Encoded = Vec<Felt>>,
+    Chain::Logger: CanLog<LevelInfo>,
 {
     async fn query_consensus_state(
         chain: &Chain,
@@ -103,9 +108,19 @@ where
         let raw_consensus_state: Vec<Felt> =
             encoding.decode(&output).map_err(Chain::raise_error)?;
 
+        chain
+            .logger()
+            .log("will decode comet consensus state", &LevelInfo)
+            .await;
+
         let consensus_state: CometConsensusState = encoding
             .decode(&raw_consensus_state)
             .map_err(Chain::raise_error)?;
+
+        chain
+            .logger()
+            .log("decoding comet consensus state successful", &LevelInfo)
+            .await;
 
         // FIXME: Temporary workaround, as the current Cairo contract returns
         // default value when the entry is not found.

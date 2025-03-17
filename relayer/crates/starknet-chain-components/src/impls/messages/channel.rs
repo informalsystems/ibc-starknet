@@ -24,6 +24,7 @@ use hermes_chain_components::types::payloads::channel::{
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
+use hermes_cosmos_chain_components::types::commitment_proof::CosmosCommitmentProof;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
@@ -125,7 +126,7 @@ where
         + HasHeightType<Height = Height>
         + HasPortIdType<Chain, PortId = IbcPortId>
         + HasChannelEndType<Chain, ChannelEnd = ChannelEnd>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasChannelOpenTryPayloadType<
             Chain,
             ChannelOpenTryPayload = ChannelOpenTryPayload<Counterparty, Chain>,
@@ -148,7 +149,7 @@ where
         let conn_id_on_b = payload.counterparty_connection_id;
 
         let proof_chan_end_on_a = StateProof {
-            proof: vec![Felt::ONE],
+            proof: payload.proof_init.proof_bytes.clone(),
         };
 
         let proof_height_on_a = CairoHeight {
@@ -211,7 +212,7 @@ where
         > + HasChannelIdType<Chain, ChannelId = ChannelId>
         + HasHeightType<Height = Height>
         + HasPortIdType<Chain, PortId = IbcPortId>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasChannelEndType<Chain, ChannelEnd = ChannelEnd>,
     Encoding: CanEncode<ViaCairo, MsgChanOpenAck> + HasEncodedType<Encoded = Vec<Felt>>,
 {
@@ -223,7 +224,7 @@ where
         counterparty_payload: ChannelOpenAckPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
         let proof_chan_end_on_b = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_try.proof_bytes.clone(),
         };
 
         let proof_height_on_b = CairoHeight {
@@ -272,7 +273,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasHeightType<Height = Height>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasChannelOpenConfirmPayloadType<
             Chain,
             ChannelOpenConfirmPayload = ChannelOpenConfirmPayload<Counterparty>,
@@ -286,7 +287,7 @@ where
         counterparty_payload: ChannelOpenConfirmPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
         let proof_chan_end_on_a = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_ack.proof_bytes.clone(),
         };
 
         let proof_height_on_a = CairoHeight {

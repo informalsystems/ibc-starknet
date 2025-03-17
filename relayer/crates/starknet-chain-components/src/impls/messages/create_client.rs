@@ -15,6 +15,9 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientP
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_logging_components::traits::has_logger::HasLogger;
+use hermes_logging_components::traits::logger::CanLog;
+use hermes_logging_components::types::level::LevelInfo;
 use starknet::accounts::Call;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
@@ -37,6 +40,7 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasLogger
         + CanRaiseAsyncError<core::num::TryFromIntError>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
@@ -45,6 +49,7 @@ where
         + CanEncode<ViaCairo, CometClientState>
         + CanEncode<ViaCairo, CometConsensusState>
         + CanEncode<ViaCairo, Product![Felt, Vec<Felt>, Vec<Felt>]>,
+    Chain::Logger: CanLog<LevelInfo>,
 {
     async fn build_create_client_message(
         chain: &Chain,
@@ -99,6 +104,11 @@ where
         };
 
         let message = StarknetMessage::new(call);
+
+        chain
+            .logger()
+            .log("built Starknet CreateClient message", &LevelInfo)
+            .await;
 
         Ok(message)
     }
