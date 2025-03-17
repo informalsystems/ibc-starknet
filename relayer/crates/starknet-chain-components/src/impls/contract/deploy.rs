@@ -45,7 +45,20 @@ where
 
         let deployed_address = contract_deployment.deployed_address();
 
+        let fee_estimation = contract_deployment
+            .estimate_fee()
+            .await
+            .map_err(Chain::raise_error)?;
+
+        let l1_gas = core::cmp::max(1, fee_estimation.l1_gas_consumed.try_into().unwrap());
+        let l1_data_gas =
+            core::cmp::max(1, fee_estimation.l1_data_gas_consumed.try_into().unwrap());
+        let l2_gas = core::cmp::max(1, fee_estimation.l2_gas_consumed.try_into().unwrap());
+
         let tx_hash = contract_deployment
+            .l1_gas(l1_gas)
+            .l1_data_gas(l1_data_gas)
+            .l2_gas(l2_gas)
             .send()
             .await
             .map_err(Chain::raise_error)?

@@ -39,8 +39,10 @@ use hermes_relayer_components::relay::traits::packet_relayers::receive_packet::C
 use hermes_relayer_components::relay::traits::packet_relayers::timeout_unordered_packet::CanRelayTimeoutUnorderedPacket;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
+use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
+use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
@@ -390,15 +392,9 @@ fn test_packet_clearing() -> Result<(), Error> {
                 calldata: call_data,
             };
 
-            let execution = starknet_account_b.execute_v3(vec![call]);
-
-            let tx_hash = execution
-                .send()
-                .await
-                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
-                .transaction_hash;
-
-            starknet_chain.poll_tx_response(&tx_hash).await?;
+            let _ = starknet_chain
+                .send_messages_with_signer(wallet_starknet_b, &[StarknetMessage::new(call)])
+                .await?;
         }
 
         // Create Starknet to Cosmos transfer
@@ -928,15 +924,9 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                 calldata: call_data,
             };
 
-            let execution = starknet_account_b.execute_v3(vec![call]);
-
-            let tx_hash = execution
-                .send()
-                .await
-                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
-                .transaction_hash;
-
-            starknet_chain.poll_tx_response(&tx_hash).await?;
+            let _ = starknet_chain
+                .send_messages_with_signer(wallet_starknet_b, &[StarknetMessage::new(call)])
+                .await?;
         }
 
         // Create Starknet to Cosmos transfer
@@ -979,15 +969,9 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                 calldata: call_data,
             };
 
-            let execution = starknet_account_b.execute_v3(vec![call]);
-
-            let tx_hash = execution
-                .send()
-                .await
-                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
-                .transaction_hash;
-
-            starknet_chain.poll_tx_response(&tx_hash).await?;
+            let _ = starknet_chain
+                .send_messages_with_signer(wallet_starknet_b, &[StarknetMessage::new(call)])
+                .await?;
         };
 
         runtime.sleep(Duration::from_secs(5)).await;

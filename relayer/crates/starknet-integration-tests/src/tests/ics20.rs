@@ -28,6 +28,7 @@ use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrap
 use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
+use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
@@ -356,15 +357,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: call_data,
             };
 
-            let execution = starknet_account_b.execute_v3(vec![call]);
-
-            let tx_hash = execution
-                .send()
-                .await
-                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
-                .transaction_hash;
-
-            starknet_chain.poll_tx_response(&tx_hash).await?;
+            let _ = starknet_chain
+                .send_messages_with_signer(wallet_starknet_b, &[StarknetMessage::new(call)])
+                .await?;
         }
 
         // create ibc transfer message
@@ -400,15 +395,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: call_data,
             };
 
-            let execution = starknet_account_b.execute_v3(vec![call]);
-
-            let tx_hash = execution
-                .send()
-                .await
-                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
-                .transaction_hash;
-
-            starknet_chain.poll_tx_response(&tx_hash).await?;
+            let _ = starknet_chain
+                .send_messages_with_signer(wallet_starknet_b, &[StarknetMessage::new(call)])
+                .await?;
         };
 
         cosmos_chain
@@ -451,15 +440,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: call_data,
             };
 
-            let execution = starknet_account_b.execute_v3(vec![call]);
-
-            let tx_hash = execution
-                .send()
-                .await
-                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
-                .transaction_hash;
-
-            starknet_chain.poll_tx_response(&tx_hash).await?;
+            let _ = starknet_chain
+                .send_messages_with_signer(wallet_starknet_b, &[StarknetMessage::new(call)])
+                .await?;
         }
 
         // submit ics20 transfer from Starknet to Cosmos
@@ -499,15 +482,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 calldata: call_data,
             };
 
-            let execution = starknet_account_b.execute_v3(vec![call]);
-
-            let tx_hash = execution
-                .send()
-                .await
-                .map_err(<StarknetChain as CanRaiseError<AccountError<SignError>>>::raise_error)?
-                .transaction_hash;
-
-            starknet_chain.poll_tx_response(&tx_hash).await?;
+            let _ = starknet_chain
+                .send_messages_with_signer(wallet_starknet_b, &[StarknetMessage::new(call)])
+                .await?;
         };
 
         let cosmos_ibc_denom = derive_ibc_denom(
