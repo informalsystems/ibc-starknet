@@ -76,11 +76,9 @@ where
 
         // Convert Vec<u8> to a slice of 8 u32 values.
         let mut root_u32: Vec<u32> = Vec::new();
-        for chunk_u8 in root.chunks_exact(4) {
-            let value_u32 = (chunk_u8[0] as u32)
-                | ((chunk_u8[1] as u32) << 8)
-                | ((chunk_u8[2] as u32) << 16)
-                | ((chunk_u8[3] as u32) << 24);
+        for chunk in root.chunks_exact(4) {
+            let chunk_u8: [u8; 4] = chunk.try_into().expect("Chunks must have 4 elements");
+            let value_u32 = u32::from_le_bytes(chunk_u8);
             root_u32.push(value_u32);
         }
         let root_slice: [u32; 8] = root_u32.try_into().map_err(|e| {
