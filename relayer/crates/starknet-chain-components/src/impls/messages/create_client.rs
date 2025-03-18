@@ -37,6 +37,7 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<core::num::TryFromIntError>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
@@ -73,10 +74,29 @@ where
             chain_id: payload.client_state.chain_id,
         };
 
+        // Assert that the root is 32 bytes long and then
+        // convert it to a slice of 8 u32 values.
+        assert!(
+            root.len() == 32,
+            "expected root to be length 32, got length {}",
+            root.len()
+        );
+        let mut root_u32: Vec<u32> = Vec::new();
+        for chunk_u8 in root.chunks_exact(4) {
+            let value_u32 = (chunk_u8[0] as u32)
+                | ((chunk_u8[1] as u32) << 8)
+                | ((chunk_u8[2] as u32) << 16)
+                | ((chunk_u8[3] as u32) << 24);
+            root_u32.push(value_u32);
+        }
+        let root_slice: [u32; 8] = root_u32.try_into().map_err(|e| {
+            Chain::raise_error(format!("failed to convert Vec<u32> to [u32; 8]: {e:?}"))
+        })?;
+
         let consensus_state = CometConsensusState {
             timestamp: u64::try_from(payload.consensus_state.timestamp.unix_timestamp_nanos())
                 .map_err(Chain::raise_error)?,
-            root,
+            root: root_slice,
         };
 
         let raw_client_state = encoding.encode(&client_state).map_err(Chain::raise_error)?;

@@ -135,72 +135,19 @@ pub impl StateProofZero of Zero<StateProof> {
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct StateRoot {
-    pub root: Array<u8>,
+    pub root: [u32; 8],
 }
 
 pub impl StateRootZero of Zero<StateRoot> {
     fn zero() -> StateRoot {
-        StateRoot { root: ArrayTrait::new() }
+        StateRoot { root: [0; 8] }
     }
 
     fn is_zero(self: @StateRoot) -> bool {
-        self.root.len() == 0
+        self.root == @[0; 8]
     }
 
     fn is_non_zero(self: @StateRoot) -> bool {
-        self.root.len() > 0
-    }
-}
-
-pub impl StoreU8Array of Store<Array<u8>> {
-    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Array<u8>> {
-        Self::read_at_offset(address_domain, base, 0)
-    }
-
-    fn write(address_domain: u32, base: StorageBaseAddress, value: Array<u8>) -> SyscallResult<()> {
-        Self::write_at_offset(address_domain, base, 0, value)
-    }
-
-    fn read_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8,
-    ) -> SyscallResult<Array<u8>> {
-        let mut arr: Array<u8> = array![];
-
-        let len: u8 = Store::<u8>::read_at_offset(address_domain, base, offset)
-            .expect('Storage Span too large');
-        offset += 1;
-
-        let exit = 2 * len + offset;
-        loop {
-            if offset >= exit {
-                break;
-            }
-
-            let value = Store::<u8>::read_at_offset(address_domain, base, offset).unwrap();
-            arr.append(value);
-            offset += Store::<u8>::size();
-        };
-
-        Result::Ok(arr)
-    }
-
-    fn write_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<u8>,
-    ) -> SyscallResult<()> {
-        let len: u8 = value.len().try_into().expect('Storage - Span too large');
-        Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();
-        offset += 1;
-
-        while let Option::Some(element) = value.pop_front() {
-            Store::<u8>::write_at_offset(address_domain, base, offset, element).unwrap();
-            offset += Store::<u8>::size();
-        };
-
-        Result::Ok(())
-    }
-
-    fn size() -> u8 {
-        // StateRoot proof contains 32 u8 elements
-        32 * Store::<u8>::size()
+        !self.is_zero()
     }
 }

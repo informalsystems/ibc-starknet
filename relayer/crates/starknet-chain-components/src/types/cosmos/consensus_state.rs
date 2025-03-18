@@ -10,7 +10,7 @@ use hermes_encoding_components::traits::transform::Transformer;
 #[derive(Debug, HasField)]
 pub struct CometConsensusState {
     pub timestamp: u64,
-    pub root: Vec<u8>,
+    pub root: [u32; 8],
 }
 
 pub struct EncodeCometConsensusState;
@@ -28,7 +28,7 @@ delegate_components! {
 }
 
 impl Transformer for EncodeCometConsensusState {
-    type From = Product![u64, Vec<u8>];
+    type From = Product![u64, [u32; 8]];
     type To = CometConsensusState;
 
     fn transform(product![timestamp, root]: Self::From) -> CometConsensusState {
