@@ -31,13 +31,13 @@ directory that includes:
 
 ## How to build
 
-Install `scarb v2.9.2` with the instruction provided in the [Scarb
-Documentation](https://docs.swmansion.com/scarb/download.html). Then, to build
-the contracts, you simply need to run the following command:
+Install `scarb v2.11.3` with the instruction provided in the
+[Scarb Documentation](https://docs.swmansion.com/scarb/download.html). Then, to
+build the contracts, you simply need to run the following command:
 
 ```bash
 cd cairo-contracts
-scarb build -p starknet_ibc_contracts
+scarb --profile release build -p starknet_ibc_contracts
 ```
 
 The command will compile the contracts and output the compiled contracts as JSON
@@ -45,20 +45,23 @@ files in the `cairo-contracts/target/dev` directory, which you can then deploy
 to Starknet.
 
 - IBC Core contract: `starknet_ibc_contracts_IBCCore.contract_class.json`
-- CometBFT client contract: `starknet_ibc_contracts_CometClient.contract_class.json`
-- ERC20 Mintable contract: `starknet_ibc_contracts_ERC20Mintable.contract_class.json`
-- Token Transfer contract: `starknet_ibc_contracts_TransferApp.contract_class.json`
+- CometBFT client contract:
+  `starknet_ibc_contracts_CometClient.contract_class.json`
+- ERC20 Mintable contract:
+  `starknet_ibc_contracts_ERC20Mintable.contract_class.json`
+- Token Transfer contract:
+  `starknet_ibc_contracts_TransferApp.contract_class.json`
 
 ## How to deploy
 
 ### Create Starknet account
 
 To deploy the contracts, you first need to setup a Starknet account locally. You
-can find the details in the [Starknet
-documentation](https://docs.starknet.io/quick-start/set-up-an-account/), but
-briefly you have to create a signer and an account descriptor. The signer is a
-smart contract with a private key for signing transactions, which can be created
-as follows:
+can find the details in the
+[Starknet documentation](https://docs.starknet.io/quick-start/set-up-an-account/),
+but briefly you have to create a signer and an account descriptor. The signer is
+a smart contract with a private key for signing transactions, which can be
+created as follows:
 
 ```bash
 # Create the default directory
@@ -95,14 +98,13 @@ Next, create an `.env` file in the root directory of the project. You can use
 the `.env.example` file as a template, which contains the following content:
 
 ```bash
-CORE_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_contracts_IBCCore.contract_class.json}
-COMET_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_contracts_CometClient.contract_class.json}
-ERC20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_contracts_ERC20Mintable.contract_class.json}
-ICS20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/dev/starknet_ibc_contracts_TransferApp.contract_class.json}
+CORE_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/release/starknet_ibc_contracts_IBCCore.contract_class.json}
+COMET_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/release/starknet_ibc_contracts_CometClient.contract_class.json}
+ERC20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/release/starknet_ibc_contracts_ERC20Mintable.contract_class.json}
+ICS20_CONTRACT_SRC=${CONTRACT_SRC:-$(pwd)/cairo-contracts/target/release/starknet_ibc_contracts_TransferApp.contract_class.json}
 RPC_URL=https://starknet-sepolia.public.blastapi.io/rpc/v0_7
 ACCOUNT_SRC="${HOME}/.starkli-wallets/deployer/account.json"
 KEYSTORE_SRC="${HOME}/.starkli-wallets/deployer/keystore.json"
-COMPILER_VERSION=2.7.1
 KEYSTORE_PASS=<KEYSTORE_PASSWORD>
 ERC20_CLASS_HASH=""
 ICS20_CLASS_HASH=""
@@ -129,11 +131,11 @@ running the following command:
 The script will deploy a single instance of the ICS20 contract to the Starknet
 network and return the contract address.
 
->[!NOTE]
->The deployment will, by default, occur on the Starknet Sepolia testnet. To
->ensure compatibility, verify that your current Scarb version is supported by
->the Starknet testnet by reviewing the [Starknet release
->notes.](https://docs.starknet.io/starknet-versions/version-notes/#starknet_environments)
+> [!NOTE]
+> The deployment will, by default, occur on the Starknet Sepolia testnet. To
+> ensure compatibility, verify that your current Scarb version is supported by
+> the Starknet testnet by reviewing the
+> [Starknet release notes.](https://docs.starknet.io/starknet-versions/version-notes/#starknet_environments)
 
 ## How to invoke
 

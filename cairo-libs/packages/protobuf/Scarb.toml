@@ -8,6 +8,10 @@ edition = { workspace = true }
 [scripts]
 test = { workspace = true }
 
+[tool]
+fmt   = { workspace = true }
+scarb = { workspace = true }
+
 [dependencies]
 
 [dev-dependencies]

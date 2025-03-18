@@ -14,9 +14,9 @@ use hermes_relayer_components::transaction::traits::types::nonce::HasNonceType;
 use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
-use starknet::accounts::{Account, Call};
+use starknet::accounts::Account;
 use starknet::core::types::{
-    ExecuteInvocation, Felt, FunctionInvocation, RevertedInvocation, TransactionTrace,
+    Call, ExecuteInvocation, Felt, FunctionInvocation, RevertedInvocation, TransactionTrace,
 };
 
 use crate::impls::types::message::StarknetMessage;
@@ -41,6 +41,7 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasTransactionHashType<TxHash = Felt>
         + CanPollTxResponse
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAccountErrors,
 {
     async fn send_messages_with_signer_and_nonce(
@@ -58,7 +59,35 @@ where
 
         let execution = account.execute_v3(calls).nonce(*nonce);
 
+        let fee_estimation = execution.estimate_fee().await.map_err(Chain::raise_error)?;
+
+        // starknet v0.13.4 requires all fee bound present.
+        let l1_gas = core::cmp::max(
+            1,
+            fee_estimation
+                .l1_gas_consumed
+                .try_into()
+                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
+        );
+        let l1_data_gas = core::cmp::max(
+            1,
+            fee_estimation
+                .l1_data_gas_consumed
+                .try_into()
+                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
+        );
+        let l2_gas = core::cmp::max(
+            1,
+            fee_estimation
+                .l2_gas_consumed
+                .try_into()
+                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
+        );
+
         let tx_hash = execution
+            .l1_gas(l1_gas)
+            .l1_data_gas(l1_data_gas)
+            .l2_gas(l2_gas)
             .send()
             .await
             .map_err(Chain::raise_error)?

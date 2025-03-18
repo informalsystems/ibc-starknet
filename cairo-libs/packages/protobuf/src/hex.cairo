@@ -29,7 +29,7 @@ pub fn encode(input: @ByteArray) -> ByteArray {
         output.append_byte(u4_to_digit(value / 0x10));
         output.append_byte(u4_to_digit(value & 0x0F));
         i += 1;
-    };
+    }
     output
 }
 
@@ -41,13 +41,13 @@ pub fn decode(input: @ByteArray) -> ByteArray {
         let value = (digit_to_u4(input[i]) * 0x10) | digit_to_u4(input[i + 1]);
         output.append_byte(value);
         i += 2;
-    };
+    }
     output
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{digit_to_u4, u4_to_digit, encode, decode};
+    use super::{decode, digit_to_u4, encode, u4_to_digit};
 
     #[test]
     fn test_digit_to_u4() {

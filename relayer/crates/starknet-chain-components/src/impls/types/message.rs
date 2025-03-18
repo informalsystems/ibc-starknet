@@ -2,7 +2,7 @@ use cgp::prelude::*;
 use hermes_chain_components::traits::types::message::MessageTypeComponent;
 use hermes_relayer_components::chain::traits::types::message::ProvideMessageType;
 use ibc::core::client::types::Height as CosmosHeight;
-use starknet::accounts::Call;
+use starknet::core::types::Call;
 
 #[derive(Clone)]
 pub struct StarknetMessage {

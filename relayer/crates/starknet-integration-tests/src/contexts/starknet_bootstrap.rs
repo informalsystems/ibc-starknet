@@ -9,6 +9,7 @@ use cgp::core::types::WithType;
 use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
+use hermes_cosmos_test_components::bootstrap::impls::chain::build_wait::BuildAndWaitChainDriver;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
     ChainDriverBuilder, ChainDriverBuilderComponent,
 };
@@ -33,6 +34,7 @@ use hermes_runtime_components::traits::fs::write_file::CanWriteStringToFile;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
+use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
@@ -98,7 +100,7 @@ delegate_components! {
         IbcContractsDeployerComponent:
             DeployIbcContract,
         ChainDriverBuilderComponent:
-            BuildChainAndDeployIbcContracts<BuildStarknetChainDriver>,
+            BuildChainAndDeployIbcContracts<BuildAndWaitChainDriver<BuildStarknetChainDriver>>,
     }
 }
 
@@ -171,6 +173,14 @@ impl ChainDriverBuilder<StarknetBootstrap> for BuildStarknetChainDriver {
         ))?;
 
         let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
+
+        // Wait for the chain to be ready.
+        for _ in 0..10 {
+            match rpc_client.block_number().await {
+                Ok(_) => break,
+                Err(_) => runtime.sleep(core::time::Duration::from_secs(1)).await,
+            }
+        }
 
         let chain_id = rpc_client.chain_id().await?;
 

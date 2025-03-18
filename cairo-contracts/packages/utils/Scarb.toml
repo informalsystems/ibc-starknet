@@ -17,7 +17,8 @@ description   = "Utility components for integrating Starknet with IBC"
 test = { workspace = true }
 
 [tool]
-fmt = { workspace = true }
+fmt   = { workspace = true }
+scarb = { workspace = true }
 
 [dependencies]
 # external dependencies

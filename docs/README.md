@@ -176,7 +176,7 @@ This will compile the contract classes at:
 ## Declare and deploy the contract
 
 ```bash
-starkli declare --compiler-version 2.6.2 contracts/target/dev/starknet_ibc_simple_storage.contract_class.json
+starkli declare contracts/target/dev/starknet_ibc_simple_storage.contract_class.json
 ```
 
 This will declare the contract class on the _Starknet_. Note down the

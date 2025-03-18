@@ -16,12 +16,14 @@ use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
+use hermes_test_components::chain_driver::impls::wait::WaitChainReachHeight;
 use hermes_test_components::chain_driver::traits::chain_process::{
     ChainProcessTaker, ChainProcessTakerComponent,
 };
 use hermes_test_components::chain_driver::traits::types::chain::{
     ChainGetter, ChainGetterComponent, ChainTypeComponent, HasChain, ProvideChainType,
 };
+use hermes_test_components::chain_driver::traits::wait::ChainStartupWaiterComponent;
 use tokio::process::Child;
 
 #[cgp_context(StarknetChainDriverComponents)]
@@ -45,6 +47,7 @@ delegate_components! {
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
+        ChainStartupWaiterComponent: WaitChainReachHeight<1>,
     }
 }
 

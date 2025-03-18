@@ -10,11 +10,11 @@ pub fn array_u8_into_array_u32(input: Array<u8>) -> (Array<u32>, u32, u32) {
         while j < 4 {
             if i + j >= input.len() {
                 break;
-            };
+            }
             value *= 0x100;
             value = value + (*input.at(i + j)).into();
             j += 1;
-        };
+        }
         if j % 4 == 0 {
             result.append(value);
         } else {
@@ -22,7 +22,7 @@ pub fn array_u8_into_array_u32(input: Array<u8>) -> (Array<u32>, u32, u32) {
             last_word_len = j.try_into().unwrap();
         }
         i += 4;
-    };
+    }
 
     (result, last_word, last_word_len)
 }
@@ -107,10 +107,10 @@ pub fn array_u32_into_array_u8(input: Array<u32>, last_word: u32, last_word_len:
     for i in input {
         let a = u32_to_bytes(i, ConvMode::FixedSize);
         result.append_span(a);
-    };
+    }
     if last_word_len > 0 && last_word != 0 {
         result.append_span(u32_to_bytes(last_word, ConvMode::Compact));
-    };
+    }
     result
 }
 
@@ -120,7 +120,7 @@ pub fn byte_array_to_array_u8(input: @ByteArray) -> Array<u8> {
     while i < input.len() {
         output.append(input[i]);
         i += 1;
-    };
+    }
     output
 }
 
@@ -149,7 +149,7 @@ pub fn array_u8_to_byte_array(input: @Array<u8>) -> ByteArray {
     while i < input.len() {
         output.append_byte(*input[i]);
         i += 1;
-    };
+    }
     output
 }
 
@@ -175,7 +175,7 @@ pub fn decode_hex(hex: @ByteArray) -> Array<u8> {
         };
         output.append(high * 16 + low);
         i += 2;
-    };
+    }
     output
 }
 
@@ -192,7 +192,7 @@ pub fn encode_hex(bytes: Array<u8>) -> ByteArray {
         let low: u32 = (b % 16).try_into().unwrap();
         output.append_byte(hex_chars[high]);
         output.append_byte(hex_chars[low]);
-    };
+    }
     output
 }
 
@@ -260,7 +260,7 @@ pub fn lexicographical_cmp(lhs: Array<u8>, rhs: Array<u8>) -> Ordering {
             ordering = Ordering::Greater;
             break;
         }
-    };
+    }
 
     if ordering != Ordering::Equal {
         return ordering;

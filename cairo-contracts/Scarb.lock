@@ -3,21 +3,21 @@ version = 1
 
 [[package]]
 name = "alexandria_data_structures"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:72bdee057923061f6719c82ac9d92c9c9bb39f3fbb9c369f64aa9e6d5b0b2425"
+checksum = "sha256:ead928134d8ba7207a3523ab20d865a4d121a8a6a496e1628c438fb8b264d9dc"
 
 [[package]]
 name = "alexandria_math"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:0ad256055661ed5b29ccef7bddbb44136995641cf537a6b259b94b6b6df14133"
+checksum = "sha256:cfa321a7258aa4ff659d962755833e69ad11330799ad426252c76d1e2b25c95c"
 
 [[package]]
 name = "alexandria_numeric"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:4404ef7dad3e2c05bc9130802f91869e05d3a9f36dc9e4d2d0e29c1d568258e2"
+checksum = "sha256:96d8e55878a7a88caa01a9b2b1b5e4ff87fd8af446fa28bd4461d076071e9d81"
 dependencies = [
  "alexandria_math",
  "alexandria_searching",
@@ -25,18 +25,18 @@ dependencies = [
 
 [[package]]
 name = "alexandria_searching"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:d678ddd9a637afeffe0047c5b6ce10268796dd75e2070952e0f6602c538d2fc1"
+checksum = "sha256:63a5aa4df3fb7474bd9c64541789a6413c698a982e19048ce6b865d91c70822c"
 dependencies = [
  "alexandria_data_structures",
 ]
 
 [[package]]
 name = "alexandria_sorting"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:ae0e89fe3ae9d6ef613f882ab3d0b47ae8b6dc7b6aeea3b2f02f83505e5a4104"
+checksum = "sha256:be772b56d264a8c90aef918ade1724830cc1300ff2925eb566c073381a93f78c"
 dependencies = [
  "alexandria_data_structures",
 ]
@@ -50,18 +50,19 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_access"
-version = "0.20.0"
+version = "1.0.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:7734901a0ca7a7065e69416fea615dd1dc586c8dc9e76c032f25ee62e8b2a06c"
+checksum = "sha256:a39a4ea1582916c637bf7e3aee0832c3fe1ea3a3e39191955e8dc39d08327f9b"
 dependencies = [
  "openzeppelin_introspection",
+ "openzeppelin_utils",
 ]
 
 [[package]]
 name = "openzeppelin_account"
-version = "0.20.0"
+version = "1.0.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:1aa3a71e2f40f66f98d96aa9bf9f361f53db0fd20fa83ef7df04426a3c3a926a"
+checksum = "sha256:7e943a2de32ddca4d48e467e52790e380ab1f49c4daddbbbc4634dd930d0243f"
 dependencies = [
  "openzeppelin_introspection",
  "openzeppelin_utils",
@@ -69,24 +70,24 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_introspection"
-version = "0.20.0"
+version = "1.0.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:13e04a2190684e6804229a77a6c56de7d033db8b9ef519e5e8dee400a70d8a3d"
+checksum = "sha256:34e088ecf19e0b3012481a29f1fbb20e600540cb9a5db1c3002a97ebb7f5a32a"
 
 [[package]]
 name = "openzeppelin_testing"
-version = "0.20.0"
+version = "2.0.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:2fa9aaadacffd6a95754781ed18f6ee660f52a30d27b024efcde2b4b5648e0b3"
+checksum = "sha256:6a93b9b191c5fac6be31ca680a8ee27d0ff55649db4fa7c5f553f8a11a78dd77"
 dependencies = [
  "snforge_std",
 ]
 
 [[package]]
 name = "openzeppelin_token"
-version = "0.20.0"
+version = "1.0.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:4452f449dc6c1ea97cf69d1d9182749abd40e85bd826cd79652c06a627eafd91"
+checksum = "sha256:33fcb84a1a76d2d3fff9302094ff564f78d45b743548fd7568c130b272473f66"
 dependencies = [
  "openzeppelin_access",
  "openzeppelin_account",
@@ -96,9 +97,9 @@ dependencies = [
 
 [[package]]
 name = "openzeppelin_utils"
-version = "0.20.0"
+version = "1.0.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:44f32d242af1e43982decc49c563e613a9b67ade552f5c3d5cde504e92f74607"
+checksum = "sha256:fd348b31c4a4407add33adc3c2b8f26dca71dbd7431faaf726168f37a91db0c1"
 
 [[package]]
 name = "protobuf"
@@ -110,15 +111,15 @@ version = "0.1.0"
 
 [[package]]
 name = "snforge_scarb_plugin"
-version = "0.34.0"
+version = "0.38.3"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:56f2b06ff2f0d8bbdfb7fb6c211fba7e4da6e5334ea70ba849af329a739faf11"
+checksum = "sha256:0cd914b547acd96b4cad99a78e95c0eda001d0c280da4969b2161e286079cf46"
 
 [[package]]
 name = "snforge_std"
-version = "0.34.0"
+version = "0.38.3"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:bd20964bde07e6fd0f7adb50d41216f05d66abd422ed82241030369333385876"
+checksum = "sha256:d376526fbbe22535ad89ed630b11d6e209f22c50168de6c6430c0591c81c3174"
 dependencies = [
  "snforge_scarb_plugin",
 ]

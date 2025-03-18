@@ -2,7 +2,8 @@
 pub mod ERC20Mintable {
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
-    use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl, interface::IERC20Metadata};
+    use openzeppelin_token::erc20::interface::IERC20Metadata;
+    use openzeppelin_token::erc20::{ERC20Component, ERC20HooksEmptyImpl};
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
     use starknet::{ContractAddress, get_caller_address};
 

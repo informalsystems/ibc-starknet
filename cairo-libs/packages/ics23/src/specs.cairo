@@ -1,4 +1,4 @@
-use ics23::{ProofSpec, InnerSpec, LeafOp, HashOp, LengthOp};
+use ics23::{HashOp, InnerSpec, LeafOp, LengthOp, ProofSpec};
 
 // https://github.com/cosmos/ics23/blob/a324422529b8c00ead00b4dcee825867c494cddd/rust/src/api.rs#L198
 pub fn iavl_spec() -> ProofSpec {

@@ -17,7 +17,8 @@ description   = "IBC client components for Starknet"
 test = { workspace = true }
 
 [tool]
-fmt = { workspace = true }
+fmt   = { workspace = true }
+scarb = { workspace = true }
 
 [dependencies]
 # external dependencies
@@ -33,3 +34,4 @@ starknet_ibc_utils = { workspace = true }
 [dev-dependencies]
 snforge_std          = { workspace = true }
 starknet_ibc_testkit = { workspace = true }
+assert_macros        = { workspace = true }

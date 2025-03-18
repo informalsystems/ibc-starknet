@@ -20,8 +20,7 @@ use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
 use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
-use starknet::accounts::Call;
-use starknet::core::types::{Felt, U256};
+use starknet::core::types::{Call, Felt, U256};
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;

@@ -1,8 +1,8 @@
 use starknet_ibc_core::host::{
-    ACKS_PREFIX, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, COMMITMENTS_PREFIX, CONNECTIONS_PREFIX,
-    NEXT_SEQ_RECV_PREFIX, PORTS_PREFIX, RECEIPTS_PREFIX, SEQUENCES_PREFIX,
+    ACKS_PREFIX, BasePrefix, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, COMMITMENTS_PREFIX,
+    CONNECTIONS_PREFIX, ChannelId, ConnectionId, NEXT_SEQ_RECV_PREFIX, PORTS_PREFIX, PortId,
+    RECEIPTS_PREFIX, SEQUENCES_PREFIX, Sequence,
 };
-use starknet_ibc_core::host::{BasePrefix, ChannelId, ConnectionId, PortId, Sequence};
 use starknet_ibc_utils::{RemotePathBuilder, RemotePathBuilderImpl};
 
 pub fn connection_path(base: BasePrefix, connection_id: ConnectionId) -> ByteArray {

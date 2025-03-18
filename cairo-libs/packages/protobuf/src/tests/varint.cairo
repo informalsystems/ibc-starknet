@@ -1,8 +1,8 @@
 use alexandria_math::pow;
-use protobuf::varint::{
-    encode_varint_to_byte_array, decode_varint_from_byte_array, encode_varint_to_u8_array,
-};
 use protobuf::hex::decode as hex_decode;
+use protobuf::varint::{
+    decode_varint_from_byte_array, encode_varint_to_byte_array, encode_varint_to_u8_array,
+};
 
 fn assert_encode_varint(value: u32, expected: Array<u8>) {
     assert_eq!(encode_varint_to_u8_array(value), expected);
@@ -40,7 +40,7 @@ fn test_encode_decode_varint_u64() {
     let bytes = encode_varint_to_byte_array(value);
     let hex = "ef9baf8589cf959a12";
     let bytes2 = hex_decode(@hex);
-    assert_eq!(bytes, bytes2, "invalid encoded bytes");
+    assert_eq!(@bytes, @bytes2, "invalid encoded bytes");
     let mut index = 0;
     let decoded = decode_varint_from_byte_array(@bytes, ref index).unwrap();
     assert_eq!(decoded, value, "invalid decoded value");

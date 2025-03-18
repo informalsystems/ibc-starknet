@@ -30,8 +30,7 @@ use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use ibc::core::channel::types::channel::{ChannelEnd, Order as IbcOrder};
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChannelId, ConnectionId, PortId as IbcPortId};
-use starknet::accounts::Call;
-use starknet::core::types::Felt;
+use starknet::core::types::{Call, Felt};
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;

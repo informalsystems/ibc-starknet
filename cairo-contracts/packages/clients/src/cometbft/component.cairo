@@ -115,7 +115,7 @@ pub mod CometClientComponent {
                     break;
                 }
                 len -= 1;
-            };
+            }
 
             height
         }

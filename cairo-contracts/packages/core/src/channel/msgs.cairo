@@ -4,8 +4,7 @@ use starknet_ibc_core::channel::{
 };
 use starknet_ibc_core::client::{Height, HeightPartialOrd};
 use starknet_ibc_core::commitment::StateProof;
-use starknet_ibc_core::host::Sequence;
-use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId, PortIdTrait};
+use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId, PortIdTrait, Sequence};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]

@@ -1,11 +1,12 @@
-use snforge_std::{EventSpy, spy_events, start_cheat_caller_address};
+use openzeppelin_testing::{EventSpyQueue, spy_events};
+use snforge_std::start_cheat_caller_address;
 use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait};
 use starknet_ibc_testkit::dummies::{AMOUNT, OWNER, SN_USER, ZERO};
 use starknet_ibc_testkit::event_spy::{ERC20EventSpyExt, ERC20EventSpyExtImpl};
 use starknet_ibc_testkit::handles::ERC20Handle;
 use starknet_ibc_testkit::setup::SetupImpl;
 
-fn setup() -> (ERC20Contract, EventSpy) {
+fn setup() -> (ERC20Contract, EventSpyQueue) {
     let setup = SetupImpl::default();
     let erc20 = SetupImpl::deploy_erc20(@setup, OWNER());
     let spy = spy_events();
