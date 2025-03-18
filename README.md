@@ -171,7 +171,7 @@ key_name = "osmosis_wallet"
 
 ```bash
 cd relayer
-cargo run --bin hermes-starknet -- -c ../relayer.toml \
+cargo run --release --bin hermes-starknet -- -c ../relayer.toml \
     start cosmos-with-starknet \
     --chain-id-a 393402133025997798000961 --client-id-a 07-tendermint-3 \
     --chain-id-b osmo-test-5 --client-id-b 08-wasm-4459
@@ -185,7 +185,7 @@ The pending packets in the past blocks can be cleared with `--clear-past-blocks`
 flag.
 
 ```bash
-cargo run --bin hermes-starknet -- -c ../relayer.toml \
+cargo run --release --bin hermes-starknet -- -c ../relayer.toml \
     start cosmos-with-starknet \
     --chain-id-a 393402133025997798000961 --client-id-a 07-tendermint-3 \
     --chain-id-b osmo-test-5 --client-id-b 08-wasm-4459 \
@@ -234,7 +234,7 @@ the details.
 
 ```bash
 cd relayer
-cargo run --example bootstrap_ibc -- ../relayer.toml
+cargo run --release --example bootstrap_ibc -- ../relayer.toml
 ```
 
 > [!IMPORTANT]

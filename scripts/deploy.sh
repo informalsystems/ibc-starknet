@@ -23,7 +23,7 @@ build() {
 
     cd "$(dirname "$0")/../cairo-contracts"
 
-    output=$(scarb build -p starknet_ibc_contracts 1>&2)
+    output=$(scarb --profile release build -p starknet_ibc_contracts 1>&2)
 
     if [[ $output == *"Error"* ]]; then
         echo "Error: $output"
