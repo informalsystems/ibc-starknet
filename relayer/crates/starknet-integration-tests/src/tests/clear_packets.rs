@@ -41,7 +41,6 @@ use hermes_relayer_components::relay::traits::target::{DestinationTarget, Source
 use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
@@ -63,7 +62,6 @@ use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence};
 use ibc::primitives::Timestamp;
 use poseidon::Poseidon3Hasher;
-use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::macros::selector;
 use tracing::info;
 

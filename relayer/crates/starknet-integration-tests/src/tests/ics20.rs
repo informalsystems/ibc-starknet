@@ -47,7 +47,7 @@ use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransfe
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use poseidon::Poseidon3Hasher;
-use starknet::accounts::{Call, ExecutionEncoding, SingleOwnerAccount, U256};
+use starknet::core::types::Call;
 use starknet::macros::selector;
 use tracing::info;
 
