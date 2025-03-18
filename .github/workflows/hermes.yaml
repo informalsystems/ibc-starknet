@@ -56,7 +56,7 @@ jobs:
           git: https://github.com/0xspaceShard/starknet-devnet
           # branch: starknet-0.13.4
           # https://github.com/0xSpaceShard/starknet-devnet/tree/starknet-0.13.4
-          rev: db44e77
+          rev: 43c5f25
 
       - name: Run Integration Tests
         env:
