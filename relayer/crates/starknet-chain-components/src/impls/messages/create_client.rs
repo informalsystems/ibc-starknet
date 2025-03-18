@@ -74,13 +74,7 @@ where
             chain_id: payload.client_state.chain_id,
         };
 
-        // Assert that the root is 32 bytes long and then
-        // convert it to a slice of 8 u32 values.
-        assert!(
-            root.len() == 32,
-            "expected root to be length 32, got length {}",
-            root.len()
-        );
+        // Convert Vec<u8> to a slice of 8 u32 values.
         let mut root_u32: Vec<u32> = Vec::new();
         for chunk_u8 in root.chunks_exact(4) {
             let value_u32 = (chunk_u8[0] as u32)

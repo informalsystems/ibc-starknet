@@ -19,8 +19,6 @@ mod preset {
             (ViaCairo, Felt): EncodeFelt,
             (ViaCairo, u128): EncodeU128,
             (ViaCairo, U256): EncodeU256,
-            // TODO(rano): ByteArray and Array<u8> are different types in Cairo
-            // for now, we CANNOT use Vec<u8> to deserialize to Array<u8>
             (ViaCairo, Vec<u8>): EncodeList,
             (ViaCairo, Vec<Felt>): EncodeList,
             (ViaCairo, bool): EncodeBool,
