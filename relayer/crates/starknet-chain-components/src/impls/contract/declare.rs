@@ -35,6 +35,7 @@ where
         + CanRaiseAsyncError<JsonError>
         + CanRaiseAsyncError<ComputeClassHashError>
         + CanRaiseAsyncError<RevertedInvocation>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<StarknetSierraCompilationError>,
 {
     async fn declare_contract(

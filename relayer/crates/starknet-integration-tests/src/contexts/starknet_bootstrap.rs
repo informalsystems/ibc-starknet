@@ -174,8 +174,13 @@ impl ChainDriverBuilder<StarknetBootstrap> for BuildStarknetChainDriver {
 
         let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
 
-        // FIXME: `BuildAndWaitChainDriver`` doesn't help as this call doesn't wait for the chain to start
-        runtime.sleep(core::time::Duration::from_secs(5)).await;
+        // Wait for the chain to be ready.
+        for _ in 0..10 {
+            match rpc_client.block_number().await {
+                Ok(_) => break,
+                Err(_) => runtime.sleep(core::time::Duration::from_secs(1)).await,
+            }
+        }
 
         let chain_id = rpc_client.chain_id().await?;
 

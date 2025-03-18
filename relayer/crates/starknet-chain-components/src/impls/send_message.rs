@@ -41,6 +41,7 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasTransactionHashType<TxHash = Felt>
         + CanPollTxResponse
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAccountErrors,
 {
     async fn send_messages_with_signer_and_nonce(

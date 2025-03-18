@@ -27,6 +27,7 @@ where
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>
         + HasStarknetAccount
         + CanRaiseAccountErrors
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<RevertedInvocation>,
 {
     async fn deploy_contract(
