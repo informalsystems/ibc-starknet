@@ -30,9 +30,8 @@ pub trait ITransferQuery<TContractState> {
     /// }
     /// ```
     /// Hashing the denom is delegated to the client as it is more cost-efficient.
-    fn ibc_token_address(self: @TContractState, token_key: felt252) -> ContractAddress;
+    fn ibc_token_address(self: @TContractState, token_key: felt252) -> Option<ContractAddress>;
 
     /// Returns the full denomination string of an IBC token given its address.
-    fn ibc_token_denom(self: @TContractState, token_address: ContractAddress) -> ByteArray;
+    fn ibc_token_denom(self: @TContractState, token_address: ContractAddress) -> Option<ByteArray>;
 }
-

@@ -95,7 +95,7 @@ fn test_mint_burn_roundtrip() {
     let prefixed_denom = transfer_cfg.prefix_hosted_denom();
 
     // Fetch the token address.
-    let token_address = ics20.ibc_token_address(prefixed_denom.key());
+    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
 
     let mut erc20: ERC20Contract = token_address.into();
 
@@ -192,7 +192,7 @@ fn test_create_ibc_token_ok() {
     let prefixed_denom = transfer_cfg.prefix_hosted_denom();
     let address = ics20.create_ibc_token(prefixed_denom.clone());
     spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, address);
-    let queried = ics20.ibc_token_address(prefixed_denom.key());
+    let queried = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
     assert_eq!(address, queried);
 }
 
@@ -209,7 +209,7 @@ fn test_create_ibc_token_with_multihop() {
 
     let address = ics20.create_ibc_token(prefixed_denom.clone());
     spy.assert_create_token_event(ics20.address, NAME(), SYMBOL(), DECIMAL_ZERO, address);
-    let queried = ics20.ibc_token_address(prefixed_denom.key());
+    let queried = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
     assert_eq!(address, queried);
 }
 

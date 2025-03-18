@@ -72,10 +72,10 @@ fn test_missing_salt() {
 }
 
 #[test]
-#[should_panic(expected: 'ICS20: missing token address')]
+#[should_panic]
 fn test_missing_ibc_token_address() {
     let state = setup_component();
-    state.ibc_token_address(0);
+    state.ibc_token_address(0).unwrap();
 }
 
 #[test]
@@ -84,15 +84,15 @@ fn test_ibc_token_denom_ok() {
     let mut cfg = TransferAppConfigTrait::default();
     let prefixed_denom = cfg.prefix_hosted_denom();
     state.write_ibc_token_address_to_denom(ERC20().address, prefixed_denom.clone());
-    let denom_str = state.ibc_token_denom(ERC20().address);
+    let denom_str = state.ibc_token_denom(ERC20().address).unwrap();
     assert_eq!(prefixed_denom.as_byte_array(), denom_str);
 }
 
 #[test]
-#[should_panic(expected: 'ICS20: missing token denom')]
+#[should_panic]
 fn test_missing_ibc_token_denom() {
     let mut state = setup_component();
-    state.ibc_token_denom(ERC20().address);
+    state.ibc_token_denom(ERC20().address).unwrap();
 }
 
 #[test]
@@ -165,7 +165,7 @@ fn test_mint_ok() {
 
     let prefixed_denom = cfg.prefix_hosted_denom();
 
-    let token_address = ics20.ibc_token_address(prefixed_denom.key());
+    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
 
     let erc20: ERC20Contract = token_address.into();
 
@@ -216,7 +216,7 @@ fn test_burn_ok() {
 
     let prefixed_denom = cfg.prefix_hosted_denom();
 
-    let token_address = ics20.ibc_token_address(prefixed_denom.key());
+    let token_address = ics20.ibc_token_address(prefixed_denom.key()).unwrap();
 
     let mut erc20: ERC20Contract = token_address.into();
 
