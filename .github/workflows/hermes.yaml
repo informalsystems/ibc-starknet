@@ -6,6 +6,7 @@ on:
       - cairo-contracts/**
       - relayer/**
       - light-client/**
+      - .github/workflows/hermes.yaml
   push:
     branches: main
 
