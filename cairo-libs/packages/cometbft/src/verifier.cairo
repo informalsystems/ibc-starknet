@@ -1,13 +1,11 @@
-use core::num::traits::CheckedAdd;
-use cometbft::types::{
-    UntrustedBlockState, UntrustedBlockStateTrait, TrustedBlockState, Options, VotingPowerTally,
-    VotingPowerTallyTrait,
-};
-use cometbft::types::{
-    SignedHeader, ValidatorSet, ValidatorSetTrait, NonAbsentCommitVotes, NonAbsentCommitVotesTrait,
-};
 use cometbft::errors::CometErrors;
+use cometbft::types::{
+    NonAbsentCommitVotes, NonAbsentCommitVotesTrait, Options, SignedHeader, TrustedBlockState,
+    UntrustedBlockState, UntrustedBlockStateTrait, ValidatorSet, ValidatorSetTrait,
+    VotingPowerTally, VotingPowerTallyTrait,
+};
 use cometbft::utils::{Fraction, TWO_THIRDS};
+use core::num::traits::CheckedAdd;
 use protobuf::types::wkt::Timestamp;
 
 /// Verifies an update header received as the `header` field of `MsgUpdateClient`.
@@ -129,6 +127,6 @@ fn voting_power_in_impl(
                 break;
             }
         }
-    };
+    }
     power
 }

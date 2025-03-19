@@ -1,13 +1,8 @@
-use core::num::traits::OverflowingMul;
 use alexandria_math::ed25519::verify_signature;
-use cometbft::utils::{SpanU8TryIntoU256, Fraction};
 use cometbft::errors::CometErrors;
-use protobuf::types::wkt::{Duration, Timestamp};
-use protobuf::types::message::{
-    ProtoMessage, ProtoOneof, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName,
-};
-use protobuf::primitives::array::{BytesAsProtoMessage, ByteArrayAsProtoMessage};
+use cometbft::utils::{Fraction, SpanU8TryIntoU256};
+use core::num::traits::OverflowingMul;
+use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{
     BoolAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, U64AsProtoMessage,
 };
@@ -16,7 +11,7 @@ use protobuf::types::message::{
     ProtoMessage, ProtoName, ProtoOneof,
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
-use protobuf::types::wkt::Timestamp;
+use protobuf::types::wkt::{Duration, Timestamp};
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub struct Consensus {
@@ -463,7 +458,7 @@ pub impl ValidatorSetImpl of ValidatorSetTrait {
         let mut power = 0;
         for v in self.validators.span() {
             power += v.voting_power.deref();
-        };
+        }
         power
     }
 }
@@ -544,9 +539,9 @@ impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
             if lhs_span.at(i) != rhs_span.at(i) {
                 eq = false;
                 break;
-            };
+            }
             i += 1;
-        };
+        }
         eq
     }
 }
@@ -607,7 +602,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
                 idx = Option::Some(i);
                 break;
             }
-        };
+        }
 
         match idx {
             Option::None => false,
