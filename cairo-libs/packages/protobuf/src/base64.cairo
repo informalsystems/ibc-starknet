@@ -73,7 +73,7 @@ pub fn encode(input: @ByteArray) -> ByteArray {
         output.append_byte(c3);
 
         i += 3;
-    };
+    }
     output
 }
 
@@ -117,13 +117,13 @@ pub fn decode(input: @ByteArray) -> ByteArray {
         }
 
         i += 4;
-    };
+    }
     output
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{u6_to_base64_char, base64_char_to_u6, encode, decode};
+    use super::{base64_char_to_u6, decode, encode, u6_to_base64_char};
 
     #[test]
     fn test_u6_to_base64_char() {
@@ -169,10 +169,10 @@ mod tests {
 
         for (input, expected_encoded) in test_cases {
             let encoded = encode(@input);
-            assert_eq!(encoded, expected_encoded, "Encoding failed for input: '{}'", input);
+            assert_eq!(@encoded, @expected_encoded, "Encoding failed for input: '{}'", input);
 
             let decoded = decode(@encoded);
-            assert_eq!(decoded, input, "Decoding failed for encoded string: '{}'", encoded);
+            assert_eq!(@decoded, @input, "Decoding failed for encoded string: '{}'", encoded);
         }
     }
 }

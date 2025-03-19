@@ -47,10 +47,8 @@ use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransfe
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use poseidon::Poseidon3Hasher;
-use starknet::accounts::{Call, ExecutionEncoding, SingleOwnerAccount};
+use starknet::core::types::Call;
 use starknet::macros::selector;
-use starknet::providers::Provider;
-use starknet::signers::{LocalWallet, SigningKey};
 use tracing::info;
 
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
@@ -217,16 +215,6 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let address_starknet_b = &wallet_starknet_b.account_address;
         let transfer_quantity = 1_000u128;
         let denom_cosmos = &cosmos_chain_driver.genesis_config.transfer_denom;
-
-        let starknet_account_b = SingleOwnerAccount::new(
-            starknet_chain.rpc_client.clone(),
-            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
-                wallet_starknet_b.signing_key,
-            )),
-            *wallet_starknet_b.account_address,
-            starknet_chain.rpc_client.chain_id().await?,
-            ExecutionEncoding::New,
-        );
 
         let balance_cosmos_a_step_0 = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)

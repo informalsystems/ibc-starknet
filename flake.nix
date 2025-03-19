@@ -9,22 +9,22 @@
     cosmos-nix.url = "github:informalsystems/cosmos.nix";
 
     starknet-devnet-src = {
-      url = "github:0xSpaceShard/starknet-devnet-rs";
+      url = "github:0xSpaceShard/starknet-devnet-rs/starknet-0.13.4";
       flake = false;
     };
 
     cairo-src = {
-      url = "github:starkware-libs/cairo/v2.9.2";
+      url = "github:starkware-libs/cairo/v2.11.2";
       flake = false;
     };
 
     universal-sierra-compiler-src = {
-      url = "github:software-mansion/universal-sierra-compiler/v2.3.0";
+      url = "github:software-mansion/universal-sierra-compiler/v2.4.0";
       flake = false;
     };
 
     starknet-foundry-src = {
-      url = "github:foundry-rs/starknet-foundry/v0.34.0";
+      url = "github:foundry-rs/starknet-foundry/v0.38.3";
       flake = false;
     };
   };
@@ -57,8 +57,6 @@
 
           rust-nightly = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-nightly.toml;
 
-          rust-1_79 = nixpkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain-1.79.toml;
-
           wasm-simapp = cosmos-nix.ibc-go-v8-wasm-simapp;
 
           osmosis = cosmos-nix.osmosis;
@@ -67,7 +65,7 @@
             inherit nixpkgs;
             inherit (inputs) starknet-devnet-src;
 
-            rust = rust-1_79;
+            inherit rust;
           };
 
           cairo = import ./nix/cairo.nix {
@@ -79,12 +77,14 @@
             inherit nixpkgs;
             inherit (inputs) universal-sierra-compiler-src;
 
-            rust = rust-1_79;
+            inherit rust;
           };
 
           starknet-foundry = import ./nix/starknet-foundry.nix {
             inherit nixpkgs;
             inherit (inputs) starknet-foundry-src;
+
+            inherit rust;
           };
 
           ibc-starknet-cw = import ./nix/ibc-starknet-cw.nix {

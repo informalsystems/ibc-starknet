@@ -1,21 +1,17 @@
 use TokenTransferComponent::{TransferReaderTrait, TransferValidationTrait, TransferWriterTrait};
-use openzeppelin_testing::events::EventSpyExt;
-use snforge_std::cheatcodes::events::EventSpy;
-use snforge_std::{spy_events, start_cheat_caller_address};
-use starknet::class_hash::class_hash_const;
-use starknet_ibc_apps::transfer::ERC20Contract;
-use starknet_ibc_apps::transfer::TokenTransferComponent;
+use openzeppelin_testing::{EventSpyExt, EventSpyQueue, spy_events};
+use snforge_std::start_cheat_caller_address;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
     CreateIbcToken, TokenTransferQuery, TransferInitializerImpl, TransferReaderImpl,
     TransferWriterImpl,
 };
 use starknet_ibc_apps::transfer::types::PrefixedDenomTrait;
+use starknet_ibc_apps::transfer::{ERC20Contract, TokenTransferComponent};
 use starknet_ibc_core::router::{AppContract, AppContractTrait};
 use starknet_ibc_testkit::configs::{TransferAppConfig, TransferAppConfigTrait};
-use starknet_ibc_testkit::dummies::CLASS_HASH;
 use starknet_ibc_testkit::dummies::{
-    AMOUNT, COSMOS, CS_USER, DECIMAL_ZERO, EMPTY_MEMO, ERC20, HOSTED_DENOM, NAME, OWNER, SN_USER,
-    STARKNET, SUPPLY, SYMBOL,
+    AMOUNT, CLASS_HASH, COSMOS, CS_USER, DECIMAL_ZERO, EMPTY_MEMO, ERC20, HOSTED_DENOM, NAME, OWNER,
+    SN_USER, STARKNET, SUPPLY, SYMBOL,
 };
 use starknet_ibc_testkit::event_spy::{ERC20EventSpyExt, TransferEventSpyExt};
 use starknet_ibc_testkit::handles::{AppHandle, ERC20Handle};
@@ -36,7 +32,7 @@ fn setup_component() -> ComponentState {
     state
 }
 
-fn setup() -> (AppContract, ERC20Contract, TransferAppConfig, EventSpy) {
+fn setup() -> (AppContract, ERC20Contract, TransferAppConfig, EventSpyQueue) {
     let mut cfg = TransferAppConfigTrait::default();
 
     let (ics20, erc20) = SetupImpl::setup_transfer("MockTransferApp");
@@ -59,7 +55,7 @@ fn test_init_state() {
 #[should_panic(expected: 'ICS20: erc20 class hash is 0')]
 fn test_missing_class_hash() {
     let mut state = setup_component();
-    state.write_erc20_class_hash(class_hash_const::<0>());
+    state.write_erc20_class_hash(0.try_into().unwrap());
     state.read_erc20_class_hash();
 }
 

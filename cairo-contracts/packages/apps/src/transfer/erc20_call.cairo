@@ -1,8 +1,7 @@
 use core::num::traits::Zero;
-use core::starknet::SyscallResultTrait;
 use openzeppelin_token::erc20::{ERC20ABIDispatcher, ERC20ABIDispatcherTrait};
 use starknet::syscalls::{call_contract_syscall, deploy_syscall};
-use starknet::{ClassHash, ContractAddress, contract_address_const};
+use starknet::{ClassHash, ContractAddress, SyscallResultTrait};
 
 #[derive(Copy, Debug, Drop, Serde)]
 pub struct ERC20Contract {
@@ -78,7 +77,7 @@ pub impl ERC20ContractImpl of ERC20ContractTrait {
 
 impl ERC20ContractZero of Zero<ERC20Contract> {
     fn zero() -> ERC20Contract {
-        ERC20Contract { address: contract_address_const::<0>() }
+        ERC20Contract { address: 0.try_into().unwrap() }
     }
 
     fn is_zero(self: @ERC20Contract) -> bool {

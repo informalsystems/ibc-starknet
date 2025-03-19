@@ -23,7 +23,7 @@ build() {
 
     cd "$(dirname "$0")/../cairo-contracts"
 
-    output=$(scarb build -p starknet_ibc_contracts 1>&2)
+    output=$(scarb --profile release build -p starknet_ibc_contracts 1>&2)
 
     if [[ $output == *"Error"* ]]; then
         echo "Error: $output"
@@ -35,11 +35,9 @@ build() {
 declare() {
     CONTRACT_SRC=$1
 
-    # pay in eth to avoid `Error: fee calculation overflow`.
-
     output=$(
-        starkli declare --compiler-version "$COMPILER_VERSION" \
-        --watch --eth \
+        starkli declare \
+        $STARKLI_ARGS \
         "$CONTRACT_SRC" \
         2>&1 | tee /dev/tty
     )

@@ -2,8 +2,8 @@
 poll_interval = "40s"
 block_time    = { secs = 30, nanos = 0 }
 
-json_rpc_url = "https://starknet-sepolia.public.blastapi.io/rpc/v0_7"
-# json_rpc_url = "https://starknet-sepolia.reddio.com/rpc/v0_7"
+json_rpc_url = "https://starknet-sepolia.public.blastapi.io/rpc/v0_8"
+# json_rpc_url = "https://starknet-sepolia.reddio.com/rpc/v0_8"
 
 # -- to be filled
 # private information

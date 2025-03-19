@@ -213,7 +213,7 @@ fn test_update_heights_max_size() {
     while i < 101 {
         state.write_update_height(0, HEIGHT(i));
         i += 1;
-    };
+    }
     let heights = state.read_update_heights(0);
     assert_eq!(heights.len(), 100);
     assert_eq!(heights.at(99), @HEIGHT(100));

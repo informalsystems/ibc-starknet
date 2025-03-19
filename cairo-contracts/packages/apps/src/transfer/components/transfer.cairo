@@ -7,13 +7,11 @@ pub mod TokenTransferComponent {
     use core::traits::TryInto;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
-    use starknet::ClassHash;
-    use starknet::ContractAddress;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,
     };
-    use starknet::{get_caller_address, get_contract_address};
+    use starknet::{ClassHash, ContractAddress, get_caller_address, get_contract_address};
     use starknet_ibc_apps::transfer::types::{
         Denom, DenomTrait, Memo, MsgTransfer, PacketData, Participant, ParticipantTrait,
         PrefixedDenom, PrefixedDenomTrait, TracePrefixTrait,
@@ -26,7 +24,6 @@ pub mod TokenTransferComponent {
         AckStatus, AckStatusImpl, Acknowledgement, AppVersion, ChannelContract,
         ChannelContractTrait, ChannelEndTrait, ChannelErrors, ChannelOrdering, IAppCallback, Packet,
     };
-
     use starknet_ibc_core::host::{ChannelId, ConnectionId, PortId};
     use starknet_ibc_utils::{ComputeKey, ValidateBasic};
 
@@ -519,7 +516,7 @@ pub mod TokenTransferComponent {
 
                     self.mint_execute(receiver, packet_data.denom.clone(), packet_data.amount)
                 },
-            };
+            }
 
             self.emit_recv_event(packet_data.clone(), true);
         }

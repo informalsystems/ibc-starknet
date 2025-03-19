@@ -33,8 +33,7 @@ use ibc::apps::transfer::types::packet::PacketData as IbcIcs20PacketData;
 use ibc::core::channel::types::packet::Packet as IbcPacket;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
 use ibc::core::client::types::Height;
-use starknet::accounts::Call;
-use starknet::core::types::Felt;
+use starknet::core::types::{Call, Felt};
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;

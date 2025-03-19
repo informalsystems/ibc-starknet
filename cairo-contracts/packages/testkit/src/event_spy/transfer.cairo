@@ -1,5 +1,4 @@
-use openzeppelin_testing::events::{EventSpyExt, EventSpyExtImpl};
-use snforge_std::EventSpy;
+use openzeppelin_testing::{EventSpyExt, EventSpyQueue};
 use starknet::ContractAddress;
 use starknet_ibc_apps::transfer::TokenTransferComponent::{
     AckEvent, AckStatusEvent, CreateTokenEvent, Event, RecvEvent, SendEvent,
@@ -11,7 +10,7 @@ use starknet_ibc_testkit::dummies::EMPTY_MEMO;
 #[generate_trait]
 pub impl TransferEventSpyExtImpl of TransferEventSpyExt {
     fn assert_send_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         sender: ContractAddress,
         receiver: ByteArray,
@@ -25,7 +24,7 @@ pub impl TransferEventSpyExtImpl of TransferEventSpyExt {
     }
 
     fn assert_recv_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         sender: ByteArray,
         receiver: ContractAddress,
@@ -40,7 +39,7 @@ pub impl TransferEventSpyExtImpl of TransferEventSpyExt {
     }
 
     fn assert_ack_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         sender: ContractAddress,
         receiver: ByteArray,
@@ -55,14 +54,14 @@ pub impl TransferEventSpyExtImpl of TransferEventSpyExt {
     }
 
     fn assert_ack_status_event(
-        ref self: EventSpy, contract_address: ContractAddress, ack_status: AckStatus,
+        ref self: EventSpyQueue, contract_address: ContractAddress, ack_status: AckStatus,
     ) {
         let expected = Event::AckStatusEvent(AckStatusEvent { ack_status });
         self.assert_emitted_single(contract_address, expected);
     }
 
     fn assert_create_token_event(
-        ref self: EventSpy,
+        ref self: EventSpyQueue,
         contract_address: ContractAddress,
         name: ByteArray,
         symbol: ByteArray,

@@ -1,5 +1,4 @@
 use openzeppelin_testing::declare_and_deploy;
-use openzeppelin_testing::events::EventSpyExtImpl;
 use openzeppelin_utils::serde::SerializedAppend;
 use snforge_std::ContractClass;
 use starknet::ContractAddress;

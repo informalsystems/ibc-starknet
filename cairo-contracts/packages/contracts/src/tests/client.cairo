@@ -1,4 +1,4 @@
-use snforge_std::spy_events;
+use openzeppelin_testing::spy_events;
 use starknet_ibc_core::client::{ClientContractTrait, StatusTrait, UpdateResponse};
 use starknet_ibc_testkit::configs::CometClientConfigTrait;
 use starknet_ibc_testkit::dummies::{HEIGHT, TIMESTAMP};

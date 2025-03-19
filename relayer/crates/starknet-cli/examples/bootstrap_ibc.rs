@@ -44,7 +44,7 @@ pub const OSMOSIS_TESTNET_CHAIN_ID: &str = "osmo-test-5";
 pub const OSMOSIS_TOKEN: &str = "uosmo";
 
 // https://docs.starknet.io/tools/fullnodes-rpc-providers/#open_endpoints
-pub const STARKNET_TESTNET_URL: &str = "https://starknet-sepolia.public.blastapi.io/rpc/v0_7";
+pub const STARKNET_TESTNET_URL: &str = "https://starknet-sepolia.public.blastapi.io/rpc/v0_8";
 pub const STARKNET_TESTNET_CHAIN_ID: Felt = short_string!("SN_SEPOLIA");
 // https://docs.starknet.io/chain-info
 pub const STARKNET_STRK: Felt =

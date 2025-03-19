@@ -35,7 +35,7 @@ between Starknet and Cosmos.
 ### Prerequisites
 
 - `osmosisd`
-- `starkli`
+- `starkli 0.3.8`
 - `cargo` (to run Rust binaries from this project)
 
 ### From Osmosis to Starknet via `channel-10185`
@@ -79,7 +79,7 @@ SN_TRANSFER_ARGS=$(cd relayer; cargo run -q -p hermes-starknet-tools-cli \
     --receiver "$OSMOSIS_ADDRESS" \
     --channel-id channel-0 \
     --timeout-timestamp "$((`date +%s` + 600))" \
-    | cut -d: -f9)
+    | cut -d: -f5-)
 ```
 
 > [!IMPORTANT]
@@ -105,7 +105,7 @@ soon receive a `IBC Received` transaction with received denom.
 
 ### Prerequisites
 
-- `starkli`
+- `starkli 0.3.8`
 - `hermes` v1
 - `cargo`
 
@@ -171,7 +171,7 @@ key_name = "osmosis_wallet"
 
 ```bash
 cd relayer
-cargo run --bin hermes-starknet -- -c ../relayer.toml \
+cargo run --release --bin hermes-starknet -- -c ../relayer.toml \
     start cosmos-with-starknet \
     --chain-id-a 393402133025997798000961 --client-id-a 07-tendermint-3 \
     --chain-id-b osmo-test-5 --client-id-b 08-wasm-4459
@@ -185,7 +185,7 @@ The pending packets in the past blocks can be cleared with `--clear-past-blocks`
 flag.
 
 ```bash
-cargo run --bin hermes-starknet -- -c ../relayer.toml \
+cargo run --release --bin hermes-starknet -- -c ../relayer.toml \
     start cosmos-with-starknet \
     --chain-id-a 393402133025997798000961 --client-id-a 07-tendermint-3 \
     --chain-id-b osmo-test-5 --client-id-b 08-wasm-4459 \
@@ -202,8 +202,8 @@ cargo run --bin hermes-starknet -- -c ../relayer.toml \
 
 ### Prerequisites
 
-- `scarb 2.9.2`
-- `starkli`
+- `scarb 2.11.3`
+- `starkli 0.3.8`
 - `cargo`
 
 ### Deploying the contracts
@@ -218,11 +218,6 @@ Then, call `./scripts/deploy.sh` to deploy the contracts.
 
 > [!IMPORTANT]
 > Make sure `.env` file is updated with the correct values.
-
-> [!IMPORTANT]
-> You will need some `ETH` to declare the class hashes on Starknet. Due to the
-> low `STRK` value and high gas usage, using `STRK` will result in
-> `Error: fee calculation overflow`.
 
 ```bash
 ./scripts/deploy.sh
@@ -239,7 +234,7 @@ the details.
 
 ```bash
 cd relayer
-cargo run --example bootstrap_ibc -- ../relayer.toml
+cargo run --release --example bootstrap_ibc -- ../relayer.toml
 ```
 
 > [!IMPORTANT]

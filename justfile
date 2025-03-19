@@ -13,7 +13,7 @@ build-optimized-cw-contract:
 # Builds the Cairo contracts
 build-cairo-contracts:
   cd ./cairo-contracts && \
-  scarb build -p starknet_ibc_contracts
+  scarb --profile release build -p starknet_ibc_contracts
 
 # Tests the Cairo contracts
 test-cairo-contracts:

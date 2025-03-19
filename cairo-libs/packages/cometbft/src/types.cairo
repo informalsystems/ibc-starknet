@@ -1,16 +1,16 @@
 use alexandria_math::ed25519::verify_signature;
-use cometbft::utils::SpanU8TryIntoU256;
 use cometbft::errors::CometErrors;
-use protobuf::types::wkt::Timestamp;
-use protobuf::types::message::{
-    ProtoMessage, ProtoOneof, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
-    DecodeContextImpl, ProtoName,
-};
-use protobuf::primitives::array::{BytesAsProtoMessage, ByteArrayAsProtoMessage};
+use cometbft::utils::SpanU8TryIntoU256;
+use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{
-    I32AsProtoMessage, I64AsProtoMessage, BoolAsProtoMessage, U64AsProtoMessage,
+    BoolAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, U64AsProtoMessage,
 };
-use protobuf::types::tag::{WireType, ProtobufTag};
+use protobuf::types::message::{
+    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
+    ProtoMessage, ProtoName, ProtoOneof,
+};
+use protobuf::types::tag::{ProtobufTag, WireType};
+use protobuf::types::wkt::Timestamp;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub struct Consensus {
