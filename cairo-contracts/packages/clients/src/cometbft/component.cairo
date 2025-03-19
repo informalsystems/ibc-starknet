@@ -241,6 +241,51 @@ pub mod CometClientComponent {
     > of RecoverClientTrait<TContractState> {
         fn recover_validate(self: @ComponentState<TContractState>, msg: MsgRecoverClient) {
             msg.validate_basic();
+
+            let mut subject_client_state = self.read_client_state(msg.subject_client_id.sequence);
+            let subject_consensus_state = self
+                .read_consensus_state(
+                    msg.subject_client_id.sequence, subject_client_state.latest_height,
+                );
+
+            let subject_status = self
+                ._status(
+                    subject_client_state.clone(),
+                    subject_consensus_state,
+                    msg.subject_client_id.sequence,
+                );
+
+            // subject client must be inactive: expired or frozen
+            assert(!subject_status.is_active(), CometErrors::ACTIVE_CLIENT);
+
+            let substitute_client_state = self.read_client_state(msg.substitute_client_id.sequence);
+            let substitute_consensus_state = self
+                .read_consensus_state(
+                    msg.substitute_client_id.sequence, substitute_client_state.latest_height,
+                );
+
+            // subject client must be behind the substitute client
+            assert(
+                subject_client_state.latest_height < substitute_client_state.latest_height,
+                CometErrors::INVALID_CLIENT_STATE,
+            );
+
+            // subject client must be equal to the substitute client;
+            // except latest_height and status
+            subject_client_state.latest_height = substitute_client_state.latest_height;
+            subject_client_state.status = substitute_client_state.status;
+            assert(
+                subject_client_state == substitute_client_state, CometErrors::INVALID_CLIENT_STATE,
+            );
+
+            let status = self
+                ._status(
+                    substitute_client_state,
+                    substitute_consensus_state,
+                    msg.subject_client_id.sequence,
+                );
+
+            assert(status.is_active(), CometErrors::INACTIVE_CLIENT);
         }
 
         fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {}
