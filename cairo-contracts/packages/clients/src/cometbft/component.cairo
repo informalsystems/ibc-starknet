@@ -68,6 +68,8 @@ pub mod CometClientComponent {
 
         fn recover_client(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
             self.assert_owner();
+            self.recover_validate(msg.clone());
+            self.recover_execute(msg);
         }
 
         fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
