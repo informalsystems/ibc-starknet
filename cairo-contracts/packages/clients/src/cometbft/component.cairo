@@ -288,7 +288,25 @@ pub mod CometClientComponent {
             assert(status.is_active(), CometErrors::INACTIVE_CLIENT);
         }
 
-        fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {}
+        fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
+            let subject_client_sequence = msg.subject_client_id.sequence;
+            let substitute_client_state = self.read_client_state(msg.substitute_client_id.sequence);
+            let substitute_consensus_state = self
+                .read_consensus_state(
+                    msg.substitute_client_id.sequence, substitute_client_state.latest_height,
+                );
+
+            let mut serialized_client_state = array![];
+            substitute_client_state.serialize(ref serialized_client_state);
+
+            let mut serialized_consensus_state = array![];
+            substitute_consensus_state.serialize(ref serialized_consensus_state);
+
+            self
+                .update_on_recover(
+                    subject_client_sequence, serialized_client_state, serialized_consensus_state,
+                );
+        }
     }
 
     #[generate_trait]
