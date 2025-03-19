@@ -1,6 +1,9 @@
 name: Cairo Libs and Contracts
 on:
-  pull_request: {}
+  pull_request:
+    paths:
+      - cairo-libs/**
+      - cairo-contracts/**
   push:
     tags:
       - v[0-9]+.*

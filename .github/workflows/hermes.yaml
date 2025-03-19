@@ -1,6 +1,11 @@
 name: Hermes Relayer
 on:
-  pull_request: {}
+  pull_request:
+    paths:
+      - cairo-libs/**
+      - cairo-contracts/**
+      - relayer/**
+      - light-client/**
   push:
     branches: main
 
