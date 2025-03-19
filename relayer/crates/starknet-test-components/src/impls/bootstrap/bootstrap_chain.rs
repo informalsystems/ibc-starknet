@@ -95,42 +95,24 @@ where
         let wallets = BTreeMap::from([
             (
                 "relayer".into(),
-                StarknetWallet {
-                    account_address: felt!(
-                        "0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691"
-                    )
-                    .into(),
-                    signing_key: felt!("0x71d7bb07b9a64f6f78ac4c816aff4da9"),
-                    public_key: felt!(
-                        "0x39d9e6ce352ad4530a0ef5d5a18fd3303c3606a7fa6ac5b620020ad681cc33b"
-                    ),
-                },
+                StarknetWallet::from_signing_key(
+                    felt!("0x055be462e718c4166d656d11f89e341115b8bc82389c3762a10eade04fcb225d"),
+                    felt!("0x077e56c6dc32d40a67f6f7e6625c8dc5e570abe49c0a24e9202e4ae906abcc07"),
+                ),
             ),
             (
                 "user-a".into(),
-                StarknetWallet {
-                    account_address: felt!(
-                        "0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1"
-                    )
-                    .into(),
-                    signing_key: felt!("0xe1406455b7d66b1690803be066cbe5e"),
-                    public_key: felt!(
-                        "0x7a1bb2744a7dd29bffd44341dbd78008adb4bc11733601e7eddff322ada9cb"
-                    ),
-                },
+                StarknetWallet::from_signing_key(
+                    felt!("0x008a1719e7ca19f3d91e8ef50a48fc456575f645497a1d55f30e3781f786afe4"),
+                    felt!("0x00177100ae65c71074126963e695e17adf5b360146f960378b5cdfd9ed69870b"),
+                ),
             ),
             (
                 "user-b".into(),
-                StarknetWallet {
-                    account_address: felt!(
-                        "0x49dfb8ce986e21d354ac93ea65e6a11f639c1934ea253e5ff14ca62eca0f38e"
-                    )
-                    .into(),
-                    signing_key: felt!("0xa20a02f0ac53692d144b20cb371a60d7"),
-                    public_key: felt!(
-                        "0xb8fd4ddd415902d96f61b7ad201022d495997c2dff8eb9e0eb86253e30fabc"
-                    ),
-                },
+                StarknetWallet::from_signing_key(
+                    felt!("0x0733a8e2bcced14dcc2608462bd96524fb64eef061689b6d976708efc2c8ddfd"),
+                    felt!("0x00177100ae65c71074126963e695e17adf5b360146f960378b5cdfd9ed69870b"),
+                ),
             ),
         ]);
 
