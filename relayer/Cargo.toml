@@ -57,6 +57,7 @@ http                        = { version = "1.0.0" }
 futures                     = { version = "0.3.30", default-features = false }
 tiny-bip39                  = { version = "1.0.0" }
 hex                         = { version = "0.4.3" }
+sha256                      = { version = "1.6.0" }
 
 ibc                       = { version = "0.56.0" }
 ibc-proto                 = { version = "0.51.1" }
