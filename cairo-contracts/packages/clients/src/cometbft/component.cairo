@@ -448,7 +448,25 @@ pub mod CometClientComponent {
             subject_client_sequence: u64,
             substitute_client_state: Array<felt252>,
             substitute_consensus_state: Array<felt252>,
-        ) {}
+        ) {
+            // FIXME: prune the old expired consensus states and update metadata
+            // old consensus states are not trusted anymore, so they shouldn't be used.
+            // delete metadata of old consensus states: heights, processed times, processed heights
+
+            let comet_client_state = CometClientStateImpl::deserialize(substitute_client_state);
+
+            let comet_consensus_state = CometConsensusStateImpl::deserialize(
+                substitute_consensus_state,
+            );
+
+            self
+                ._update_state(
+                    subject_client_sequence,
+                    comet_client_state.latest_height,
+                    comet_client_state.clone(),
+                    comet_consensus_state,
+                );
+        }
 
         fn update_on_upgrade(
             ref self: ComponentState<TContractState>,
