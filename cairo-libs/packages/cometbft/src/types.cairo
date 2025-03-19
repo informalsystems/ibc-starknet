@@ -1,7 +1,13 @@
+use core::num::traits::OverflowingMul;
 use alexandria_math::ed25519::verify_signature;
+use cometbft::utils::{SpanU8TryIntoU256, Fraction};
 use cometbft::errors::CometErrors;
-use cometbft::utils::SpanU8TryIntoU256;
-use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
+use protobuf::types::wkt::{Duration, Timestamp};
+use protobuf::types::message::{
+    ProtoMessage, ProtoOneof, ProtoCodecImpl, EncodeContext, DecodeContext, EncodeContextImpl,
+    DecodeContextImpl, ProtoName,
+};
+use protobuf::primitives::array::{BytesAsProtoMessage, ByteArrayAsProtoMessage};
 use protobuf::primitives::numeric::{
     BoolAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, U64AsProtoMessage,
 };
@@ -72,7 +78,7 @@ impl PartSetHeaderAsProtoName of ProtoName<PartSetHeader> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct BlockId {
-    pub hash: ByteArray,
+    pub hash: Array<u8>,
     pub part_set_header: PartSetHeader,
 }
 
@@ -103,7 +109,7 @@ impl BlockIdAsProtoName of ProtoName<BlockId> {
 pub struct Header {
     pub version: Consensus,
     pub chain_id: ByteArray,
-    pub height: i64,
+    pub height: u64,
     pub time: Timestamp,
     pub last_block_id: BlockId,
     pub last_commit_hash: ByteArray,
@@ -401,10 +407,11 @@ impl SumAsProtoOneof of ProtoOneof<Sum> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Validator {
-    pub address: ByteArray,
+    pub address: AccountId,
     pub pub_key: PublicKey,
-    pub voting_power: i64,
-    pub proposer_priority: i64,
+    pub voting_power: u64,
+    pub name: ByteArray, // TODO: optoinal field?
+    pub proposer_priority: u64,
 }
 
 #[generate_trait]
@@ -419,15 +426,17 @@ impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
         context.encode_field(1, self.address);
         context.encode_field(2, self.pub_key);
         context.encode_field(3, self.voting_power);
-        context.encode_field(4, self.proposer_priority);
+        context.encode_field(4, self.name);
+        context.encode_field(5, self.proposer_priority);
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<Validator> {
         let address = context.decode_field(1)?;
         let pub_key = context.decode_field(2)?;
         let voting_power = context.decode_field(3)?;
-        let proposer_priority = context.decode_field(4)?;
-        Option::Some(Validator { address, pub_key, voting_power, proposer_priority })
+        let name = context.decode_field(4)?;
+        let proposer_priority = context.decode_field(5)?;
+        Option::Some(Validator { address, pub_key, voting_power, name, proposer_priority })
     }
 
     fn wire_type() -> WireType {
@@ -445,7 +454,18 @@ impl ValidatorAsProtoName of ProtoName<Validator> {
 pub struct ValidatorSet {
     pub validators: Array<Validator>,
     pub proposer: Validator,
-    pub total_voting_power: i64,
+    pub total_voting_power: u64,
+}
+
+#[generate_trait]
+pub impl ValidatorSetImpl of ValidatorSetTrait {
+    fn total_power(self: @ValidatorSet) -> u64 {
+        let mut power = 0;
+        for v in self.validators.span() {
+            power += v.voting_power.deref();
+        };
+        power
+    }
 }
 
 impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
@@ -472,3 +492,237 @@ impl ValidatorSetAsProtoName of ProtoName<ValidatorSet> {
         "ValidatorSet"
     }
 }
+
+/// Size of an account ID in bytes.
+pub const LENGTH: u32 = 20;
+
+#[derive(Drop, Clone)]
+pub struct AccountId {
+    id: [u8; LENGTH],
+}
+
+pub impl ArrayU8TryIntoAccountId of TryInto<Array<u8>, AccountId> {
+    fn try_into(self: Array<u8>) -> Option<AccountId> {
+        if self.len() != LENGTH {
+            return Option::None;
+        }
+        let id = [
+            *self[0], *self[1], *self[2], *self[3], *self[4], *self[5], *self[6], *self[7],
+            *self[8], *self[9], *self[10], *self[11], *self[12], *self[13], *self[14], *self[15],
+            *self[16], *self[17], *self[18], *self[19],
+        ];
+        Option::Some(AccountId { id })
+    }
+}
+
+impl AccountIdDebug of core::fmt::Debug<AccountId> {
+    fn fmt(self: @AccountId, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let id: Array<u8> = self.id.span().into();
+        f.buffer.append(@format!("{id:?}"));
+        Result::Ok(())
+    }
+}
+
+impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
+    fn eq(lhs: @AccountId, rhs: @AccountId) -> bool {
+        let lhs_span = lhs.id.span();
+        let rhs_span = rhs.id.span();
+
+        if lhs_span.len() != rhs_span.len() {
+            return false;
+        }
+
+        if lhs_span.len() == 0 {
+            return true;
+        }
+
+        let mut eq = true;
+        let mut i = 0;
+        let len = lhs_span.len();
+
+        while i < len {
+            if lhs_span.at(i) != rhs_span.at(i) {
+                eq = false;
+                break;
+            };
+            i += 1;
+        };
+        eq
+    }
+}
+
+impl AccountIdDefault of core::traits::Default<AccountId> {
+    fn default() -> AccountId {
+        AccountId { id: [0_u8; LENGTH] }
+    }
+}
+
+impl AccountIdasProtoMessage of ProtoMessage<AccountId> {
+    fn encode_raw(self: @AccountId, ref context: EncodeContext) {
+        context.encode_field(1, self.id.span().into());
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<AccountId> {
+        let id_bytes: Array<u8> = context.decode_field(1)?;
+        id_bytes.try_into()
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+// TODO: impelement Serde
+impl AccountIdSerde of Serde<AccountId> {
+    fn serialize(self: @AccountId, ref output: Array<felt252>) {}
+    fn deserialize(ref serialized: Span<felt252>) -> Option<AccountId> {
+        Option::None
+    }
+}
+
+#[derive(Default, Debug, Drop, Clone, PartialEq, Serde)]
+pub enum Hash {
+    #[default]
+    NoHash,
+    Sha256: Array<u8>,
+}
+
+#[derive(Drop, Debug, Clone, PartialEq)]
+pub struct NonAbsentCommitVotes {
+    votes: Array<NonAbsentCommitVote>,
+    sign_bytes: Array<u8>,
+}
+
+#[generate_trait]
+pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
+    fn new(signed_header: SignedHeader) -> NonAbsentCommitVotes {
+        NonAbsentCommitVotes { votes: array![], sign_bytes: array![] }
+    }
+
+    fn has_voted(self: @NonAbsentCommitVotes, validator: @Validator) -> bool {
+        let mut idx = Option::None;
+        for i in 0..self.votes.len() {
+            let ith_vote = self.votes.at(i);
+            if ith_vote.validator_id() == validator.address {
+                idx = Option::Some(i);
+                break;
+            }
+        };
+
+        match idx {
+            Option::None => false,
+            Option::Some(i) => {
+                let signature = self.votes.at(i).signed_vote.signature;
+                validator.verify_signature(self.sign_bytes.span(), signature.span());
+                true
+            },
+        }
+    }
+}
+
+#[derive(Drop, Debug, Clone, PartialEq)]
+pub struct NonAbsentCommitVote {
+    signed_vote: SignedVote,
+    /// Flag indicating whether the signature has already been verified.
+    verified: bool,
+}
+
+#[generate_trait]
+pub impl NonAbsentCommitVoteImpl of NonAbsentCommitVoteTrait {
+    fn validator_id(self: @NonAbsentCommitVote) -> @AccountId {
+        self.signed_vote.validator_address
+    }
+}
+
+#[derive(Drop, Debug, Clone, PartialEq)]
+pub struct SignedVote {
+    vote: CanonicalVote,
+    validator_address: AccountId,
+    signature: Array<u8> // TODO: whether to define a Signature type?
+}
+
+#[derive(Drop, Debug, Clone, PartialEq)]
+pub struct CanonicalVote {
+    /// Type of vote (prevote or precommit)
+    pub vote_type: VoteType,
+    /// Block height
+    pub height: u64,
+    /// Round
+    pub round: u32,
+    pub block_id: BlockId,
+    /// Timestamp
+    pub timestamp: Timestamp,
+    /// Chain ID
+    pub chain_id: ByteArray,
+}
+
+/// Type of votes
+#[derive(Drop, Debug, Clone, PartialEq)]
+pub enum VoteType {
+    /// Votes for blocks which validators observe are valid for a given round
+    Prevote,
+    /// Votes to commit to a particular block for a given round
+    Precommit,
+}
+
+#[derive(Drop, Debug, Clone)]
+pub struct UntrustedBlockState {
+    pub signed_header: SignedHeader,
+    pub validators: ValidatorSet,
+    pub nex_validators: ValidatorSet,
+}
+
+#[generate_trait]
+pub impl UntrustedBlockStateImpl of UntrustedBlockStateTrait {
+    fn height(self: @UntrustedBlockState) -> @u64 {
+        self.signed_header.header.height
+    }
+}
+
+#[derive(Drop, Debug, Clone)]
+pub struct TrustedBlockState {
+    pub chain_id: ByteArray,
+    pub header_time: Timestamp,
+    pub height: u64,
+    pub next_validators: ValidatorSet,
+    pub next_validators_hash: Hash,
+}
+
+#[derive(Drop, Debug, Clone)]
+pub struct Options {
+    pub trust_threshold: Fraction,
+    pub trusting_period: Duration,
+    pub clock_drift: Duration,
+}
+
+#[derive(Drop, Debug, Clone, PartialEq, Serde)]
+pub struct VotingPowerTally {
+    /// Total voting power
+    pub total: u64,
+    /// Tallied voting power
+    pub tallied: u64,
+    /// Trust threshold for voting power
+    pub trust_threshold: Fraction,
+}
+
+#[generate_trait]
+pub impl VotingPowerTallyImpl of VotingPowerTallyTrait {
+    fn new(total: u64, trust_threshold: Fraction) -> VotingPowerTally {
+        VotingPowerTally { total, tallied: 0, trust_threshold }
+    }
+
+    fn tally(ref self: VotingPowerTally, power: u64) {
+        self.tallied += power;
+    }
+
+    fn has_enough_power(self: VotingPowerTally) -> bool {
+        let (tallied_fraction, overflow) = self
+            .tallied
+            .overflowing_mul(self.trust_threshold.denominator);
+        assert(!overflow, CometErrors::OVERFLOWED_VOTING_CALC);
+        let (total_fraction, overflow) = self.total.overflowing_mul(self.trust_threshold.numerator);
+        assert(!overflow, CometErrors::OVERFLOWED_VOTING_CALC);
+        tallied_fraction > total_fraction
+    }
+}
+
