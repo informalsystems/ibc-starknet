@@ -137,7 +137,7 @@ pub struct StateRoot {
     // implementation of `starknet::Store` and for Tendermint clients
     //
     // In addition, Array<u8> would require a conversion to [u32; 8] when
-    // verifying membership, since Cairo's sha256 hasher output [u32; 8]
+    // verifying membership, since Cairo's sha256 hasher output is [u32; 8]
     pub root: [u32; 8],
 }
 
