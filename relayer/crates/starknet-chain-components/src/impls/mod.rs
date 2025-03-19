@@ -16,3 +16,4 @@ pub mod starknet_to_cosmos;
 pub mod transfer;
 pub mod tx_response;
 pub mod types;
+pub mod utils;

@@ -20,6 +20,7 @@ use starknet::macros::{selector, short_string};
 
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
+use crate::impls::utils::array::from_vec_u8_to_be_u32_slice;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::cosmos::client_state::{ClientStatus, CometClientState};
 use crate::types::cosmos::consensus_state::CometConsensusState;
@@ -36,6 +37,7 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<core::num::TryFromIntError>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
@@ -61,6 +63,8 @@ where
 
         let root = payload.consensus_state.root.into_vec();
 
+        let root_slice = from_vec_u8_to_be_u32_slice(root).map_err(Chain::raise_error)?;
+
         let client_type = short_string!("07-tendermint");
 
         let client_state = CometClientState {
@@ -75,7 +79,7 @@ where
         let consensus_state = CometConsensusState {
             timestamp: u64::try_from(payload.consensus_state.timestamp.unix_timestamp_nanos())
                 .map_err(Chain::raise_error)?,
-            root,
+            root: root_slice,
         };
 
         let raw_client_state = encoding.encode(&client_state).map_err(Chain::raise_error)?;

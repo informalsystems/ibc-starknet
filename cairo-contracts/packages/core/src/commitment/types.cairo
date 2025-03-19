@@ -133,25 +133,27 @@ pub impl StateProofZero of Zero<StateProof> {
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct StateRoot {
-    pub root: ByteArray // TODO: Determine the correct type (ByteArray or Array<u8>) once implemented membership proof verification.
-}
-
-pub impl ByteArrayIntoRoot of Into<ByteArray, StateRoot> {
-    fn into(self: ByteArray) -> StateRoot {
-        StateRoot { root: self }
-    }
+    // [u32; 8] is used over Array<u8> as it doesn't require manual
+    // implementation of `starknet::Store` and for Tendermint clients.
+    //
+    // In future, we may consider using Array<u8> to support non-Tendermint
+    // clients -- not using [u8; 32] for their state roots.
+    //
+    // In addition, Array<u8> would require a conversion to [u32; 8] when
+    // verifying membership, since Cairo's sha256 hasher output is [u32; 8]
+    pub root: [u32; 8],
 }
 
 pub impl StateRootZero of Zero<StateRoot> {
     fn zero() -> StateRoot {
-        StateRoot { root: "" }
+        StateRoot { root: [0; 8] }
     }
 
     fn is_zero(self: @StateRoot) -> bool {
-        self.root.len() == 0
+        self.root == @[0; 8]
     }
 
     fn is_non_zero(self: @StateRoot) -> bool {
-        self.root.len() > 0
+        !self.is_zero()
     }
 }

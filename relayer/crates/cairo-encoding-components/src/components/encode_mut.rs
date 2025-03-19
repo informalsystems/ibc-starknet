@@ -5,7 +5,6 @@ mod preset {
 
     use crate::impls::encode_mut::array::EncodeArray;
     use crate::impls::encode_mut::bool::EncodeBool;
-    use crate::impls::encode_mut::byte_array::EncodeByteArray;
     use crate::impls::encode_mut::felt::EncodeFelt;
     use crate::impls::encode_mut::from_u128::EncodeFromU128;
     use crate::impls::encode_mut::string::EncodeUtf8String;
@@ -20,9 +19,7 @@ mod preset {
             (ViaCairo, Felt): EncodeFelt,
             (ViaCairo, u128): EncodeU128,
             (ViaCairo, U256): EncodeU256,
-            // TODO(rano): ByteArray and Array<u8> are different types in Cairo
-            // for now, we CANNOT use Vec<u8> to deserialize to Array<u8>
-            (ViaCairo, Vec<u8>): EncodeByteArray,
+            (ViaCairo, Vec<u8>): EncodeList,
             (ViaCairo, Vec<Felt>): EncodeList,
             (ViaCairo, bool): EncodeBool,
             (ViaCairo, u8): EncodeFromU128,

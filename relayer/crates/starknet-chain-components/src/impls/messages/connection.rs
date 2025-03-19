@@ -28,6 +28,7 @@ use hermes_chain_components::types::payloads::connection::{
     ConnectionOpenTryPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_cosmos_chain_components::types::commitment_proof::CosmosCommitmentProof;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -129,7 +130,7 @@ where
         + CanRaiseAsyncError<&'static str>,
     Counterparty: HasHeightType<Height = Height>
         + HasCommitmentPrefixType<CommitmentPrefix = Vec<u8>>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasClientIdType<Chain, ClientId = CosmosClientId>
         + HasConnectionIdType<Chain, ConnectionId = CosmosConnectionId>
         + HasConnectionEndType<Chain, ConnectionEnd = ConnectionEnd>
@@ -149,9 +150,8 @@ where
         // TODO(rano): use the connection version from the payload
         let connection_version = ConnectionVersion::compatibles()[0].clone();
 
-        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         let commitment_proof = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_init.proof_bytes.clone(),
         };
 
         let proof_height = CairoHeight {
@@ -203,7 +203,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasHeightType<Height = Height>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasConnectionIdType<Chain, ConnectionId = CosmosConnectionId>
         + HasConnectionEndType<Chain, ConnectionEnd = ConnectionEnd>
         + HasConnectionOpenAckPayloadType<
@@ -221,11 +221,8 @@ where
         // TODO(rano): use the connection version from the payload
         let connection_version = ConnectionVersion::compatibles()[0].clone();
 
-        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
-        // TODO(rano): submitting dummy proofs
-        // proof can't be empty
         let commitment_proof = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_try.proof_bytes.clone(),
         };
 
         let proof_height = CairoHeight {
@@ -272,7 +269,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasHeightType<Height = Height>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasConnectionOpenConfirmPayloadType<
             Chain,
             ConnectionOpenConfirmPayload = ConnectionOpenConfirmPayload<Counterparty>,
@@ -284,11 +281,8 @@ where
         connection_id: &StarknetConnectionId,
         counterparty_payload: ConnectionOpenConfirmPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
-        // TODO(rano): submitting dummy proofs
-        // proof can't be empty
         let commitment_proof = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_ack.proof_bytes.clone(),
         };
 
         let proof_height = CairoHeight {

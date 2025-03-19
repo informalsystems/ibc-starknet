@@ -25,6 +25,7 @@ use hermes_chain_components::types::payloads::packet::{
     AckPacketPayload, ReceivePacketPayload, TimeoutUnorderedPacketPayload,
 };
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_cosmos_chain_components::types::commitment_proof::CosmosCommitmentProof;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
@@ -61,7 +62,7 @@ where
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasOutgoingPacketType<Chain, OutgoingPacket = IbcPacket>
         + HasHeightType<Height = Height>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasReceivePacketPayloadType<
             Chain,
             ReceivePacketPayload = ReceivePacketPayload<Counterparty>,
@@ -75,9 +76,8 @@ where
         packet: &IbcPacket,
         counterparty_payload: ReceivePacketPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         let proof_commitment_on_a = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_commitment.proof_bytes.clone(),
         };
 
         let proof_height_on_a = CairoHeight {
@@ -124,7 +124,7 @@ where
         + HasAsyncErrorType,
     Counterparty: HasAckPacketPayloadType<Chain, AckPacketPayload = AckPacketPayload<Counterparty, Chain>>
         + HasHeightType<Height = Height>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasAcknowledgementType<Chain, Acknowledgement = Vec<u8>>,
     Encoding: CanEncode<ViaCairo, MsgAckPacket>
         + CanEncode<ViaCairo, CairoTransferPacketData>
@@ -135,9 +135,8 @@ where
         packet: &IbcPacket,
         counterparty_payload: AckPacketPayload<Counterparty, Chain>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         let proof_ack_on_b = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_ack.proof_bytes.clone(),
         };
 
         let proof_height_on_b = CairoHeight {
@@ -148,11 +147,7 @@ where
         let ack_packet_msg = MsgAckPacket {
             packet: from_cosmos_to_cairo_packet(packet, chain.encoding()),
             acknowledgement: CairoAck {
-                ack: counterparty_payload
-                    .ack
-                    .into_iter()
-                    .map(Felt::from)
-                    .collect(),
+                ack: counterparty_payload.ack,
             },
             proof_ack_on_b,
             proof_height_on_b,
@@ -190,7 +185,7 @@ where
         + HasOutgoingPacketType<Counterparty, OutgoingPacket = IbcPacket>
         + HasAsyncErrorType,
     Counterparty: HasHeightType<Height = Height>
-        + HasCommitmentProofType
+        + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasTimeoutUnorderedPacketPayloadType<
             Chain,
             TimeoutUnorderedPacketPayload = TimeoutUnorderedPacketPayload<Counterparty>,
@@ -204,9 +199,8 @@ where
         packet: &IbcPacket,
         counterparty_payload: TimeoutUnorderedPacketPayload<Counterparty>,
     ) -> Result<Chain::Message, Chain::Error> {
-        // FIXME: commitment proof should be in the ByteArray format, not Vec<Felt>
         let proof_unreceived_on_b = StateProof {
-            proof: vec![Felt::ONE],
+            proof: counterparty_payload.proof_unreceived.proof_bytes.clone(),
         };
 
         let proof_height_on_b = CairoHeight {

@@ -96,7 +96,7 @@ pub fn STATE_PROOF() -> StateProof {
 }
 
 pub fn STATE_ROOT() -> StateRoot {
-    StateRoot { root: "1" }
+    StateRoot { root: [1; 8] }
 }
 
 pub fn IBC_PREFIX() -> BasePrefix {
