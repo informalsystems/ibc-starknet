@@ -145,7 +145,7 @@ ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types"
 
 poseidon = { path = "./crates/poseidon" }
 
-starknet = { git = "https://github.com/xJonathanLEI/starknet-rs", branch = "dev/jsonrpc_0_8_0" }
+# starknet = { git = "https://github.com/xJonathanLEI/starknet-rs", branch = "dev/jsonrpc_0_8_0" }
 
 cgp                     = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-core                = { git = "https://github.com/contextgeneric/cgp.git" }

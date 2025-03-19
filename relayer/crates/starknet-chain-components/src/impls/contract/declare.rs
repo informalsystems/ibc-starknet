@@ -90,36 +90,7 @@ where
             .await
             .map_err(Chain::raise_error)?;
 
-        // starknet v0.13.4 requires all fee bound present.
-        let l1_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .l1_gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-        let l1_data_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .l1_data_gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-        let l2_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .l2_gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-
-        let declare_result = declaration
-            .l1_gas(l1_gas)
-            .l1_data_gas(l1_data_gas)
-            .l2_gas(l2_gas)
-            .send()
-            .await
-            .map_err(Chain::raise_error)?;
+        let declare_result = declaration.send().await.map_err(Chain::raise_error)?;
 
         let tx_response = chain
             .poll_tx_response(&declare_result.transaction_hash)
