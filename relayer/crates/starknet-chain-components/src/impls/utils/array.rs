@@ -20,3 +20,29 @@ pub fn from_vec_u8_to_be_u32_slice(u8_values: Vec<u8>) -> Result<[u32; 8], Strin
 
     Ok(u32_slice)
 }
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+
+    /// Tests that the retrieved Vec<u8> value from Cosmos is correctly converted to
+    /// the expected [u32; 8] value for Cairo.
+    #[test]
+    fn test_convert_cairo_sha() {
+        // "Hello" is used to match the example from the Scarb documentation:
+        // https://docs.swmansion.com/scarb/corelib/core-sha256.html
+        let input_bytes: Vec<_> = "Hello".bytes().collect();
+        let hash = sha256::digest(input_bytes);
+        let u8_array: Vec<u8> = hex::decode(hash).expect("Invalid hex string");
+        // Expected value retrieved from the Scarb documentation:
+        // https://docs.swmansion.com/scarb/corelib/core-sha256.html
+        let expected: [u32; 8] = [
+            0x185f8db3, 0x2271fe25, 0xf561a6fc, 0x938b2e26, 0x4306ec30, 0x4eda5180, 0x7d17648,
+            0x26381969,
+        ];
+
+        let u32_slice = from_vec_u8_to_be_u32_slice(u8_array).unwrap();
+
+        assert_eq!(u32_slice, expected);
+    }
+}
