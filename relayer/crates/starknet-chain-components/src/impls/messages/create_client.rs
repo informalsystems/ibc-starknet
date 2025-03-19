@@ -21,6 +21,7 @@ use starknet::macros::{selector, short_string};
 
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
+use crate::impls::utils::array::from_vec_u8_to_be_u32_slice;
 use crate::traits::queries::address::CanQueryContractAddress;
 use crate::types::cosmos::client_state::{ClientStatus, CometClientState};
 use crate::types::cosmos::consensus_state::CometConsensusState;
@@ -63,6 +64,8 @@ where
 
         let root = payload.consensus_state.root.into_vec();
 
+        let root_slice = from_vec_u8_to_be_u32_slice(root).map_err(Chain::raise_error)?;
+
         let client_type = short_string!("07-tendermint");
 
         let client_state = CometClientState {
@@ -73,17 +76,6 @@ where
             status: ClientStatus::Active,
             chain_id: payload.client_state.chain_id,
         };
-
-        // Convert Vec<u8> to a slice of 8 u32 values.
-        let mut root_u32: Vec<u32> = Vec::new();
-        for chunk in root.chunks_exact(4) {
-            let chunk_u8: [u8; 4] = chunk.try_into().expect("Chunks must have 4 elements");
-            let value_u32 = u32::from_le_bytes(chunk_u8);
-            root_u32.push(value_u32);
-        }
-        let root_slice: [u32; 8] = root_u32.try_into().map_err(|e| {
-            Chain::raise_error(format!("failed to convert Vec<u32> to [u32; 8]: {e:?}"))
-        })?;
 
         let consensus_state = CometConsensusState {
             timestamp: u64::try_from(payload.consensus_state.timestamp.unix_timestamp_nanos())
