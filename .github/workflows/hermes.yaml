@@ -1,6 +1,12 @@
 name: Hermes Relayer
 on:
-  pull_request: {}
+  pull_request:
+    paths:
+      - cairo-libs/**
+      - cairo-contracts/**
+      - relayer/**
+      - light-client/**
+      - .github/workflows/hermes.yaml
   push:
     branches: main
 
