@@ -134,7 +134,10 @@ pub impl StateProofZero of Zero<StateProof> {
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct StateRoot {
     // [u32; 8] is used over Array<u8> as it doesn't require manual
-    // implementation of `starknet::Store` and for Tendermint clients
+    // implementation of `starknet::Store` and for Tendermint clients.
+    //
+    // In future, we may consider using Array<u8> to support non-Tendermint
+    // clients -- not using [u8; 32] for their state roots.
     //
     // In addition, Array<u8> would require a conversion to [u32; 8] when
     // verifying membership, since Cairo's sha256 hasher output is [u32; 8]

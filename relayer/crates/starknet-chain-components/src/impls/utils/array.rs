@@ -29,20 +29,19 @@ pub mod tests {
     /// the expected [u32; 8] value for Cairo.
     #[test]
     fn test_convert_cairo_sha() {
-        // "Hello" is used to match the example from the Scarb documentation:
+        // `data` and `expected` are picked from the Scarb documentation to match its implementation:
         // https://docs.swmansion.com/scarb/corelib/core-sha256.html
-        let input_bytes: Vec<_> = "Hello".bytes().collect();
-        let hash = sha256::digest(input_bytes);
-        let u8_array: Vec<u8> = hex::decode(hash).expect("Invalid hex string");
-        // Expected value retrieved from the Scarb documentation:
-        // https://docs.swmansion.com/scarb/corelib/core-sha256.html
+        let data = "Hello";
         let expected: [u32; 8] = [
             0x185f8db3, 0x2271fe25, 0xf561a6fc, 0x938b2e26, 0x4306ec30, 0x4eda5180, 0x7d17648,
             0x26381969,
         ];
 
-        let u32_slice = from_vec_u8_to_be_u32_slice(u8_array).unwrap();
+        let hash = sha256::digest(data.as_bytes());
+        let hash_u8_array: Vec<u8> = hex::decode(hash).expect("Invalid hex string");
 
-        assert_eq!(u32_slice, expected);
+        let hash_u32_slice = from_vec_u8_to_be_u32_slice(hash_u8_array).unwrap();
+
+        assert_eq!(hash_u32_slice, expected);
     }
 }
