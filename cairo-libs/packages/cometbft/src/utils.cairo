@@ -5,6 +5,8 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::WireType;
 
+pub const TWO_THIRDS: Fraction = Fraction { numerator: 2, denominator: 3 };
+
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub struct Fraction {
     pub numerator: u64,
@@ -33,7 +35,6 @@ impl FractionAsProtoName of ProtoName<Fraction> {
         "Fraction"
     }
 }
-
 
 pub impl SpanU8TryIntoU256 of TryInto<Span<u8>, u256> {
     /// Decodes as big endian.
