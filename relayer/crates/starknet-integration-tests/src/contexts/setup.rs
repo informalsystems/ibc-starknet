@@ -16,24 +16,33 @@ use hermes_relayer_components::multi::traits::relay_at::RelayTypeProviderAtCompo
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
+use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use hermes_test_components::driver::traits::types::builder_at::BuilderAtTypeProviderComponent;
 use hermes_test_components::driver::traits::types::chain_driver_at::ChainDriverTypeProviderAtComponent;
 use hermes_test_components::setup::binary_channel::components::BinaryChannelTestComponents;
+use hermes_test_components::setup::traits::birelay::BiRelaySetupComponent;
 use hermes_test_components::setup::traits::bootstrap_at::{
     BootstrapGetterAtComponent, BootstrapTypeProviderAtComponent,
 };
 use hermes_test_components::setup::traits::builder_at::BuilderAtGetterComponent;
+use hermes_test_components::setup::traits::chain::ChainSetupComponent;
+use hermes_test_components::setup::traits::channel::ChannelSetupComponent;
+use hermes_test_components::setup::traits::clients::ClientSetupComponent;
+use hermes_test_components::setup::traits::connection::ConnectionSetupComponent;
 use hermes_test_components::setup::traits::create_client_options_at::{
     CreateClientMessageOptionsGetterAtComponent, CreateClientPayloadOptionsGetterAtComponent,
 };
-use hermes_test_components::setup::traits::driver::TestDriverTypeProviderComponent;
+use hermes_test_components::setup::traits::driver::{
+    DriverBuilderComponent, TestDriverTypeProviderComponent,
+};
 use hermes_test_components::setup::traits::drivers::binary_channel::BinaryChannelDriverBuilderComponent;
 use hermes_test_components::setup::traits::init_channel_options_at::InitChannelOptionsGetterAtComponent;
 use hermes_test_components::setup::traits::init_connection_options_at::InitConnectionOptionsGetterAtComponent;
 use hermes_test_components::setup::traits::port_id_at::PortIdGetterAtComponent;
+use hermes_test_components::setup::traits::relay::RelaySetupComponent;
 use ibc::core::host::types::identifiers::PortId;
 
 use crate::contexts::chain_driver::StarknetChainDriver;
@@ -43,7 +52,7 @@ use crate::contexts::test_driver::{BuildStarknetTestDriver, StarknetTestDriver};
 
 #[cgp_context(StarknetBinaryChannelSetupComponents: BinaryChannelTestComponents)]
 #[derive(HasField)]
-pub struct StarknetBinaryChannelSetup {
+pub struct StarknetTestSetup {
     pub starknet_bootstrap: StarknetBootstrap,
     pub osmosis_bootstrap: OsmosisBootstrap,
     pub cosmos_builder: CosmosBuilder,
@@ -92,6 +101,8 @@ delegate_components! {
             UseType<CosmosToStarknetRelay>,
         BiRelayTypeProviderAtComponent<Index<0>, Index<1>>:
             UseType<StarknetCosmosBiRelay>,
+        BiRelayTypeProviderAtComponent<Index<1>, Index<0>>:
+            UseType<CosmosStarknetBiRelay>,
         [
             PortIdGetterAtComponent<Index<0>, Index<1>>,
             PortIdGetterAtComponent<Index<1>, Index<0>>,
@@ -116,5 +127,34 @@ delegate_components! {
             UseCosmosInitChannelOptions<symbol!("init_channel_options")>,
         BinaryChannelDriverBuilderComponent:
             BuildStarknetTestDriver,
+    }
+}
+
+check_components! {
+    CanUseStarketTestSetup for StarknetTestSetup {
+        ChainSetupComponent: [
+            Index<0>,
+            Index<1>,
+        ],
+        // RelaySetupComponent: [
+        //     (Index<0>, Index<1>),
+        //     (Index<1>, Index<0>),
+        // ],
+        // BiRelaySetupComponent: [
+        //     (Index<0>, Index<1>),
+        // ],
+        // ClientSetupComponent: [
+        //     (Index<0>, Index<1>),
+        //     (Index<1>, Index<0>),
+        // ],
+        ConnectionSetupComponent: [
+            (Index<0>, Index<1>),
+            (Index<1>, Index<0>),
+        ],
+        ChannelSetupComponent: [
+            (Index<0>, Index<1>),
+            (Index<1>, Index<0>),
+        ],
+        // DriverBuilderComponent,
     }
 }
