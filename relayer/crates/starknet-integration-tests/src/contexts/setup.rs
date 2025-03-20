@@ -39,6 +39,7 @@ use ibc::core::host::types::identifiers::PortId;
 use crate::contexts::chain_driver::StarknetChainDriver;
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
 use crate::contexts::starknet_bootstrap::StarknetBootstrap;
+use crate::contexts::test_driver::{BuildStarknetTestDriver, StarknetTestDriver};
 
 #[cgp_context(StarknetBinaryChannelSetupComponents: BinaryChannelTestComponents)]
 #[derive(HasField)]
@@ -60,7 +61,7 @@ delegate_components! {
         ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: DebugError,
         TestDriverTypeProviderComponent:
-            UseType<()>,
+            UseType<StarknetTestDriver>,
         BootstrapTypeProviderAtComponent<Index<0>>:
             UseType<StarknetBootstrap>,
         BootstrapGetterAtComponent<Index<0>>:
@@ -114,6 +115,6 @@ delegate_components! {
         ]:
             UseCosmosInitChannelOptions<symbol!("init_channel_options")>,
         BinaryChannelDriverBuilderComponent:
-            (),
+            BuildStarknetTestDriver,
     }
 }
