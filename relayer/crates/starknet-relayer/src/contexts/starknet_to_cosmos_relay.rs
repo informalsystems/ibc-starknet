@@ -6,7 +6,7 @@ use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_relayer_components::multi::traits::chain_at::{
-    ChainGetterAtComponent, ChainTypeAtComponent,
+    ChainGetterAtComponent, ChainTypeProviderAtComponent,
 };
 use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
 use hermes_relayer_components::multi::types::tags::{Dst, Src};
@@ -101,8 +101,8 @@ impl StarknetToCosmosRelay {
 delegate_components! {
     StarknetToCosmosRelayComponents {
         [
-            ChainTypeAtComponent<Src>,
-            ChainTypeAtComponent<Dst>,
+            ChainTypeProviderAtComponent<Src>,
+            ChainTypeProviderAtComponent<Dst>,
             ChainGetterAtComponent<Src>,
             ChainGetterAtComponent<Dst>,
             ClientIdAtGetterComponent<Src, Dst>,

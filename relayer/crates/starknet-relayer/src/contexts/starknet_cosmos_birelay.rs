@@ -14,8 +14,8 @@ use hermes_relayer_components::birelay::traits::{
     AutoBiRelayerComponent, TwoWayRelayGetter, TwoWayRelayGetterComponent,
 };
 use hermes_relayer_components::components::default::birelay::DefaultBiRelayComponents;
-use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
-use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
+use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
+use hermes_relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -49,10 +49,10 @@ delegate_components! {
             GlobalLoggerGetterComponent,
         ]:
             UseHermesLogger,
-        ChainTypeAtComponent<Index<0>>: WithType<StarknetChain>,
-        ChainTypeAtComponent<Index<1>>: WithType<CosmosChain>,
-        RelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
-        RelayTypeAtComponent<Index<1>, Index<0>>: WithType<CosmosToStarknetRelay>,
+        ChainTypeProviderAtComponent<Index<0>>: WithType<StarknetChain>,
+        ChainTypeProviderAtComponent<Index<1>>: WithType<CosmosChain>,
+        RelayTypeProviderAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
+        RelayTypeProviderAtComponent<Index<1>, Index<0>>: WithType<CosmosToStarknetRelay>,
     }
 }
 

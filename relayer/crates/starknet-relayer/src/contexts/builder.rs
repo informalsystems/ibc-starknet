@@ -27,9 +27,9 @@ use hermes_relayer_components::build::traits::builders::chain_builder::{
 use hermes_relayer_components::build::traits::builders::relay_builder::{
     RelayBuilder, RelayBuilderComponent,
 };
-use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeAtComponent;
-use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
-use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
+use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
+use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
+use hermes_relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::runtime::{
@@ -89,14 +89,14 @@ delegate_components! {
     StarknetBuildComponents {
         ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
-        ChainTypeAtComponent<Index<0>>: WithType<StarknetChain>,
-        ChainTypeAtComponent<Index<1>>: WithType<CosmosChain>,
+        ChainTypeProviderAtComponent<Index<0>>: WithType<StarknetChain>,
+        ChainTypeProviderAtComponent<Index<1>>: WithType<CosmosChain>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
-        RelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
-        RelayTypeAtComponent<Index<1>, Index<0>>: WithType<CosmosToStarknetRelay>,
-        BiRelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetCosmosBiRelay>,
-        BiRelayTypeAtComponent<Index<1>, Index<0>>: WithType<CosmosStarknetBiRelay>,
+        RelayTypeProviderAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
+        RelayTypeProviderAtComponent<Index<1>, Index<0>>: WithType<CosmosToStarknetRelay>,
+        BiRelayTypeProviderAtComponent<Index<0>, Index<1>>: WithType<StarknetCosmosBiRelay>,
+        BiRelayTypeProviderAtComponent<Index<1>, Index<0>>: WithType<CosmosStarknetBiRelay>,
     }
 }
 
