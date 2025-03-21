@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 use std::time::SystemTime;
 
+use cgp::extra::run::CanRun;
 use cgp::prelude::*;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
@@ -103,6 +104,14 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let starknet_channel_id = &test_driver.channel_id_a;
 
         let cosmos_channel_id = &test_driver.channel_id_b;
+
+        {
+            let birelay = test_driver.relay_driver.birelay.clone();
+
+            runtime.runtime.spawn(async move {
+                let _ = birelay.run().await;
+            });
+        }
 
         // submit ics20 transfer to Cosmos
 
