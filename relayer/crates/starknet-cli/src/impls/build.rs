@@ -39,7 +39,7 @@ where
             App::raise_error("missing Starknet chain config in Starknet relayer config")
         })?;
 
-        let builder = StarknetBuilder::new(cosmos_builder, runtime, Some(starknet_chain_config));
+        let builder = StarknetBuilder::new(runtime, cosmos_builder, Some(starknet_chain_config));
 
         Ok(builder)
     }

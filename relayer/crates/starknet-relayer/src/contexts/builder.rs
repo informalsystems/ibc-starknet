@@ -315,8 +315,8 @@ impl BiRelayFromRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBu
 
 impl StarknetBuilder {
     pub fn new(
-        cosmos_builder: CosmosBuilder,
         runtime: HermesRuntime,
+        cosmos_builder: CosmosBuilder,
         starknet_chain_config: Option<StarknetChainConfig>,
     ) -> Self {
         Self {

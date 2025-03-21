@@ -1,18 +1,10 @@
 use core::marker::PhantomData;
-use core::time::Duration;
-use std::sync::Arc;
 use std::time::SystemTime;
 
-use cgp::extra::run::CanRun;
 use cgp::prelude::*;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
-use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
-use hermes_chain_components::traits::types::chain_id::HasChainId;
-use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
 use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
-use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
-use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
@@ -23,10 +15,6 @@ use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
-use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapChannel;
-use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
-use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
-use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
@@ -35,16 +23,13 @@ use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
     Denom, PrefixedDenom, TracePrefix,
 };
-use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
-use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
-use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
+use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
-use ibc::core::connection::types::version::Version as IbcConnectionVersion;
+use hermes_test_components::setup::traits::driver::CanBuildTestDriver;
 use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use poseidon::Poseidon3Hasher;
 use starknet::core::types::Call;
@@ -52,6 +37,8 @@ use starknet::macros::selector;
 use tracing::info;
 
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
+use crate::contexts::setup::StarknetTestSetup;
+use crate::contexts::test_driver::StarknetTestDriver;
 use crate::utils::{init_starknet_bootstrap, load_wasm_client};
 
 #[test]
@@ -73,7 +60,9 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
 
         let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
 
-        let cosmos_bootstrap = Arc::new(OsmosisBootstrap {
+        let starknet_builder = StarknetBuilder::new(runtime.clone(), cosmos_builder.clone(), None);
+
+        let cosmos_bootstrap = OsmosisBootstrap {
             runtime: runtime.clone(),
             cosmos_builder,
             should_randomize_identifiers: true,
@@ -90,122 +79,30 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
                 eip_query_type: EipQueryType::Osmosis,
                 denom: "stake".to_owned(),
             }),
-        });
+        };
 
-        let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
-
-        let starknet_chain: &StarknetChain = &mut starknet_chain_driver.chain;
-
-        info!(
-            "started starknet chain at port {}",
-            starknet_chain_driver.node_config.rpc_port
+        let setup = StarknetTestSetup::new_with_defaults(
+            starknet_bootstrap,
+            cosmos_bootstrap,
+            starknet_builder,
+            wasm_code_hash,
         );
 
-        let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
+        let test_driver: StarknetTestDriver = setup.build_driver().await?;
+
+        let starknet_chain_driver = &test_driver.starknet_chain_driver;
+
+        let cosmos_chain_driver = &test_driver.cosmos_chain_driver;
+
+        let starknet_chain = &starknet_chain_driver.chain;
 
         let cosmos_chain = &cosmos_chain_driver.chain;
 
-        let starknet_client_id = StarknetToCosmosRelay::create_client(
-            SourceTarget,
-            starknet_chain,
-            cosmos_chain,
-            &CosmosCreateClientOptions::default(),
-            &(),
-        )
-        .await?;
+        let ics20_port = &test_driver.port_id_a;
 
-        info!("created client on Starknet: {:?}", starknet_client_id);
+        let starknet_channel_id = &test_driver.channel_id_a;
 
-        let cosmos_client_id = StarknetToCosmosRelay::create_client(
-            DestinationTarget,
-            cosmos_chain,
-            starknet_chain,
-            &StarknetCreateClientPayloadOptions { wasm_code_hash },
-            &(),
-        )
-        .await?;
-
-        info!("created client on Cosmos: {:?}", cosmos_client_id);
-
-        let client_state_on_starknet = starknet_chain
-            .query_client_state_with_latest_height(PhantomData::<CosmosChain>, &starknet_client_id)
-            .await?;
-
-        info!("client state on Starknet: {:?}", client_state_on_starknet);
-
-        assert_eq!(&client_state_on_starknet.chain_id, cosmos_chain.chain_id());
-
-        let client_state_on_cosmos = cosmos_chain
-            .query_client_state_with_latest_height(PhantomData::<StarknetChain>, &cosmos_client_id)
-            .await?;
-
-        info!("client state on Cosmos: {:?}", client_state_on_cosmos);
-
-        assert_eq!(
-            &client_state_on_cosmos.client_state.chain_id,
-            starknet_chain.chain_id()
-        );
-
-        let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
-            runtime.clone(),
-            starknet_chain.clone(),
-            cosmos_chain.clone(),
-            starknet_client_id.clone(),
-            cosmos_client_id.clone(),
-        );
-
-        let cosmos_to_starknet_relay = CosmosToStarknetRelay::new(
-            runtime.clone(),
-            cosmos_chain.clone(),
-            starknet_chain.clone(),
-            cosmos_client_id.clone(),
-            starknet_client_id.clone(),
-        );
-
-        {
-            let starknet_to_cosmos_relay = starknet_to_cosmos_relay.clone();
-
-            let cosmos_to_starknet_relay = cosmos_to_starknet_relay.clone();
-
-            runtime.runtime.spawn(async move {
-                let _ = starknet_to_cosmos_relay.run().await;
-            });
-
-            runtime.runtime.spawn(async move {
-                let _ = cosmos_to_starknet_relay.run().await;
-            });
-        }
-
-        // connection handshake
-
-        let conn_init_option = CosmosInitConnectionOptions {
-            delay_period: Duration::from_secs(0),
-            connection_version: IbcConnectionVersion::compatibles().first().unwrap().clone(),
-        };
-
-        let (starknet_connection_id, cosmos_connection_id) = starknet_to_cosmos_relay
-            .bootstrap_connection(&conn_init_option)
-            .await?;
-
-        info!("starknet_connection_id: {:?}", starknet_connection_id);
-        info!("cosmos_connection_id: {:?}", cosmos_connection_id);
-
-        // channel handshake
-
-        let ics20_port = IbcPortId::transfer();
-
-        let init_channel_options = CosmosInitChannelOptions::new(starknet_connection_id);
-
-        let (starknet_channel_id, cosmos_channel_id) = starknet_to_cosmos_relay
-            .bootstrap_channel(
-                &ics20_port.clone(),
-                &ics20_port.clone(),
-                &init_channel_options,
-            )
-            .await?;
-
-        info!("starknet_channel_id: {:?}", starknet_channel_id);
-        info!("cosmos_channel_id: {:?}", cosmos_channel_id);
+        let cosmos_channel_id = &test_driver.channel_id_b;
 
         // submit ics20 transfer to Cosmos
 
