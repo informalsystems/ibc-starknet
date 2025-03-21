@@ -27,6 +27,9 @@ use hermes_relayer_components::build::traits::builders::chain_builder::{
 use hermes_relayer_components::build::traits::builders::relay_builder::{
     RelayBuilder, RelayBuilderComponent,
 };
+use hermes_relayer_components::build::traits::builders::relay_from_chains_builder::{
+    RelayFromChainsBuilder, RelayFromChainsBuilderComponent,
+};
 use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
 use hermes_relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
@@ -161,6 +164,48 @@ impl RelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildComponen
 
         let dst_chain = build.build_chain(src_chain_id).await?;
 
+        Ok(
+            build.build_cosmos_to_starknet_relay(
+                src_chain,
+                dst_chain,
+                src_client_id,
+                dst_client_id,
+            ),
+        )
+    }
+}
+
+#[cgp_provider(RelayFromChainsBuilderComponent)]
+impl RelayFromChainsBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponents {
+    async fn build_relay_from_chains(
+        build: &StarknetBuilder,
+        _index: PhantomData<(Index<0>, Index<1>)>,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
+        src_chain: StarknetChain,
+        dst_chain: CosmosChain,
+    ) -> Result<StarknetToCosmosRelay, HermesError> {
+        Ok(
+            build.build_starknet_to_cosmos_relay(
+                src_chain,
+                dst_chain,
+                src_client_id,
+                dst_client_id,
+            ),
+        )
+    }
+}
+
+#[cgp_provider(RelayFromChainsBuilderComponent)]
+impl RelayFromChainsBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildComponents {
+    async fn build_relay_from_chains(
+        build: &StarknetBuilder,
+        _index: PhantomData<(Index<1>, Index<0>)>,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
+        src_chain: CosmosChain,
+        dst_chain: StarknetChain,
+    ) -> Result<CosmosToStarknetRelay, HermesError> {
         Ok(
             build.build_cosmos_to_starknet_relay(
                 src_chain,

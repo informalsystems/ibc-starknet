@@ -6,7 +6,6 @@ use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptio
 use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
 use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
 use hermes_cosmos_integration_tests::impls::init_channel_options::UseCosmosInitChannelOptions;
-use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::handlers::debug::DebugError;
 use hermes_error::impls::UseHermesError;
@@ -23,7 +22,6 @@ use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmo
 use hermes_test_components::driver::traits::types::builder_at::BuilderAtTypeProviderComponent;
 use hermes_test_components::driver::traits::types::chain_driver_at::ChainDriverTypeProviderAtComponent;
 use hermes_test_components::setup::binary_channel::components::BinaryChannelTestComponents;
-use hermes_test_components::setup::traits::birelay::BiRelaySetupComponent;
 use hermes_test_components::setup::traits::bootstrap_at::{
     BootstrapGetterAtComponent, BootstrapTypeProviderAtComponent,
 };
@@ -55,7 +53,6 @@ use crate::contexts::test_driver::{BuildStarknetTestDriver, StarknetTestDriver};
 pub struct StarknetTestSetup {
     pub starknet_bootstrap: StarknetBootstrap,
     pub osmosis_bootstrap: OsmosisBootstrap,
-    pub cosmos_builder: CosmosBuilder,
     pub starknet_builder: StarknetBuilder,
     pub port_id: PortId,
     pub init_channel_options: CosmosInitChannelOptions,
@@ -87,14 +84,16 @@ delegate_components! {
             UseType<StarknetChainDriver>,
         ChainDriverTypeProviderAtComponent<Index<1>>:
             UseType<CosmosChainDriver>,
-        BuilderAtTypeProviderComponent<Index<0>, Index<1>>:
+        [
+            BuilderAtTypeProviderComponent<Index<0>, Index<1>>,
+            BuilderAtTypeProviderComponent<Index<1>, Index<0>>,
+        ]:
             UseType<StarknetBuilder>,
-        BuilderAtTypeProviderComponent<Index<1>, Index<0>>:
-            UseType<CosmosBuilder>,
-        BuilderAtGetterComponent<Index<0>, Index<1>>:
+        [
+            BuilderAtGetterComponent<Index<0>, Index<1>>,
+            BuilderAtGetterComponent<Index<1>, Index<0>>,
+        ]:
             UseField<symbol!("starknet_builder")>,
-        BuilderAtGetterComponent<Index<1>, Index<0>>:
-            UseField<symbol!("cosmos_builder")>,
         RelayTypeProviderAtComponent<Index<0>, Index<1>>:
             UseType<StarknetToCosmosRelay>,
         RelayTypeProviderAtComponent<Index<1>, Index<0>>:
@@ -136,10 +135,10 @@ check_components! {
             Index<0>,
             Index<1>,
         ],
-        // RelaySetupComponent: [
-        //     (Index<0>, Index<1>),
-        //     (Index<1>, Index<0>),
-        // ],
+        RelaySetupComponent: [
+            (Index<0>, Index<1>),
+            (Index<1>, Index<0>),
+        ],
         // BiRelaySetupComponent: [
         //     (Index<0>, Index<1>),
         // ],
