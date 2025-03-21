@@ -15,7 +15,7 @@ mod preset {
     };
     use hermes_relayer_components::components::default::relay::*;
     use hermes_relayer_components::multi::traits::chain_at::{
-        ChainGetterAtComponent, ChainTypeAtComponent,
+        ChainGetterAtComponent, ChainTypeProviderAtComponent,
     };
     use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
     use hermes_relayer_components::relay::impls::packet_lock::PacketMutexGetterComponent;
@@ -45,8 +45,8 @@ mod preset {
                         GlobalLoggerGetterComponent,
                     ]:
                         UseHermesLogger,
-                    ChainTypeAtComponent<Index<0>>: WithType<CosmosChain>,
-                    ChainTypeAtComponent<Index<1>>: WithType<StarknetChain>,
+                    ChainTypeProviderAtComponent<Index<0>>: WithType<CosmosChain>,
+                    ChainTypeProviderAtComponent<Index<1>>: WithType<StarknetChain>,
                     ChainGetterAtComponent<Index<0>>:
                         UseField<symbol!("chain_a")>,
                     ChainGetterAtComponent<Index<1>>:
