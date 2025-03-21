@@ -21,6 +21,9 @@ use hermes_error::HermesError;
 use hermes_relayer_components::build::traits::builders::birelay_builder::{
     BiRelayBuilder, BiRelayBuilderComponent,
 };
+use hermes_relayer_components::build::traits::builders::birelay_from_relay_builder::{
+    BiRelayFromRelayBuilder, BiRelayFromRelayBuilderComponent,
+};
 use hermes_relayer_components::build::traits::builders::chain_builder::{
     CanBuildChain, ChainBuilder, ChainBuilderComponent,
 };
@@ -284,6 +287,23 @@ impl BiRelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildCompon
         );
 
         let birelay = CosmosStarknetBiRelay {
+            runtime: build.runtime.clone(),
+            relay_a_to_b,
+            relay_b_to_a,
+        };
+
+        Ok(birelay)
+    }
+}
+
+#[cgp_provider(BiRelayFromRelayBuilderComponent)]
+impl BiRelayFromRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponents {
+    async fn build_birelay_from_relays(
+        build: &StarknetBuilder,
+        relay_a_to_b: StarknetToCosmosRelay,
+        relay_b_to_a: CosmosToStarknetRelay,
+    ) -> Result<StarknetCosmosBiRelay, HermesError> {
+        let birelay = StarknetCosmosBiRelay {
             runtime: build.runtime.clone(),
             relay_a_to_b,
             relay_b_to_a,

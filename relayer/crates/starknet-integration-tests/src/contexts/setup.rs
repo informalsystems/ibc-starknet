@@ -22,6 +22,7 @@ use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmo
 use hermes_test_components::driver::traits::types::builder_at::BuilderAtTypeProviderComponent;
 use hermes_test_components::driver::traits::types::chain_driver_at::ChainDriverTypeProviderAtComponent;
 use hermes_test_components::setup::binary_channel::components::BinaryChannelTestComponents;
+use hermes_test_components::setup::traits::birelay::BiRelaySetupComponent;
 use hermes_test_components::setup::traits::bootstrap_at::{
     BootstrapGetterAtComponent, BootstrapTypeProviderAtComponent,
 };
@@ -139,9 +140,9 @@ check_components! {
             (Index<0>, Index<1>),
             (Index<1>, Index<0>),
         ],
-        // BiRelaySetupComponent: [
-        //     (Index<0>, Index<1>),
-        // ],
+        BiRelaySetupComponent: [
+            (Index<0>, Index<1>),
+        ],
         // ClientSetupComponent: [
         //     (Index<0>, Index<1>),
         //     (Index<1>, Index<0>),
