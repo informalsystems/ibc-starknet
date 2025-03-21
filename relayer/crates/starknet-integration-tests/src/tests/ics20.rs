@@ -196,7 +196,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let _packet = cosmos_chain
             .ibc_transfer_token(
                 PhantomData::<StarknetChain>,
-                &cosmos_channel_id,
+                cosmos_channel_id,
                 &IbcPortId::transfer(),
                 wallet_cosmos_a,
                 address_starknet_b,
@@ -229,7 +229,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let _packet = starknet_chain
             .ibc_transfer_token(
                 PhantomData::<CosmosChain>,
-                &starknet_channel_id,
+                starknet_channel_id,
                 &IbcPortId::transfer(),
                 wallet_starknet_b,
                 address_cosmos_a,
@@ -269,7 +269,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let packet = starknet_chain
             .ibc_transfer_token(
                 PhantomData::<CosmosChain>,
-                &starknet_channel_id,
+                starknet_channel_id,
                 &IbcPortId::transfer(),
                 wallet_starknet_b,
                 address_cosmos_a,
@@ -280,8 +280,8 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
             .await?;
 
         let cosmos_ibc_denom = derive_ibc_denom(
-            &ics20_port,
-            &cosmos_channel_id,
+            ics20_port,
+            cosmos_channel_id,
             &IbcDenom::base(&erc20_token_address.to_string()),
         )?;
 
@@ -313,7 +313,7 @@ fn test_starknet_ics20_contract() -> Result<(), Error> {
         let _packet = cosmos_chain
             .ibc_transfer_token(
                 PhantomData::<StarknetChain>,
-                &cosmos_channel_id,
+                cosmos_channel_id,
                 &IbcPortId::transfer(),
                 wallet_cosmos_a,
                 address_starknet_b,
