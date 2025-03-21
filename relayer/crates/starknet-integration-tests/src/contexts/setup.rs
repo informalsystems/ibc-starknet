@@ -116,10 +116,10 @@ delegate_components! {
             CreateClientMessageOptionsGetterAtComponent<Index<0>, Index<1>>,
             CreateClientMessageOptionsGetterAtComponent<Index<1>, Index<0>>,
         ]: UseField<symbol!("create_client_message_options")>,
-        [
-            CreateClientPayloadOptionsGetterAtComponent<Index<0>, Index<1>>,
-            CreateClientPayloadOptionsGetterAtComponent<Index<1>, Index<0>>,
-        ]: UseField<symbol!("create_client_payload_options")>,
+        CreateClientPayloadOptionsGetterAtComponent<Index<0>, Index<1>>:
+            UseField<symbol!("starknet_create_client_payload_options")>,
+        CreateClientPayloadOptionsGetterAtComponent<Index<1>, Index<0>>:
+            UseField<symbol!("cosmos_create_client_payload_options")>,
         [
             InitChannelOptionsGetterAtComponent<Index<0>, Index<1>>,
             InitChannelOptionsGetterAtComponent<Index<1>, Index<0>>,
@@ -143,10 +143,10 @@ check_components! {
         BiRelaySetupComponent: [
             (Index<0>, Index<1>),
         ],
-        // ClientSetupComponent: [
-        //     (Index<0>, Index<1>),
-        //     (Index<1>, Index<0>),
-        // ],
+        ClientSetupComponent: [
+            (Index<0>, Index<1>),
+            (Index<1>, Index<0>),
+        ],
         ConnectionSetupComponent: [
             (Index<0>, Index<1>),
             (Index<1>, Index<0>),
@@ -155,6 +155,6 @@ check_components! {
             (Index<0>, Index<1>),
             (Index<1>, Index<0>),
         ],
-        // DriverBuilderComponent,
+        DriverBuilderComponent,
     }
 }
