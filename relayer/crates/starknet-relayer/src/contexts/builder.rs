@@ -70,7 +70,7 @@ pub struct StarknetBuilderFields {
     pub cosmos_builder: CosmosBuilder,
     pub runtime: HermesRuntime,
     // Fields for StarknetChain
-    pub starknet_chain_config: StarknetChainConfig,
+    pub starknet_chain_config: Option<StarknetChainConfig>,
 }
 
 impl Deref for StarknetBuilder {
@@ -317,7 +317,7 @@ impl StarknetBuilder {
     pub fn new(
         cosmos_builder: CosmosBuilder,
         runtime: HermesRuntime,
-        starknet_chain_config: StarknetChainConfig,
+        starknet_chain_config: Option<StarknetChainConfig>,
     ) -> Self {
         Self {
             fields: Arc::new(StarknetBuilderFields {
@@ -336,7 +336,12 @@ impl StarknetBuilder {
         &self,
         expected_chain_id: &ChainId,
     ) -> Result<StarknetChain, HermesError> {
-        let json_rpc_url = Url::parse(&self.starknet_chain_config.json_rpc_url)?;
+        let chain_config = self
+            .starknet_chain_config
+            .as_ref()
+            .ok_or_else(|| Self::raise_error("starknet chain config not found"))?;
+
+        let json_rpc_url = Url::parse(&chain_config.json_rpc_url)?;
 
         let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
 
@@ -348,7 +353,7 @@ impl StarknetBuilder {
             return Err(eyre!("Starknet chain has a different ID as configured. Expected: {expected_chain_id}, got: {chain_id}").into());
         }
 
-        let wallet_path = PathBuf::from(self.starknet_chain_config.relayer_wallet.clone());
+        let wallet_path = PathBuf::from(chain_config.relayer_wallet.clone());
 
         let wallet_str = self.runtime.read_file_as_string(&wallet_path).await?;
 
@@ -377,9 +382,9 @@ impl StarknetBuilder {
         )
         .expect("valid key pair");
 
-        let contract_classes = &self.starknet_chain_config.contract_classes;
+        let contract_classes = &chain_config.contract_classes;
 
-        let contract_addresses = &self.starknet_chain_config.contract_addresses;
+        let contract_addresses = &chain_config.contract_addresses;
 
         let event_encoding = StarknetEventEncoding::default();
 
@@ -429,8 +434,8 @@ impl StarknetBuilder {
                 ibc_ics20_contract_address,
                 event_encoding,
                 proof_signer,
-                poll_interval: self.starknet_chain_config.poll_interval,
-                block_time: self.starknet_chain_config.block_time,
+                poll_interval: chain_config.poll_interval,
+                block_time: chain_config.block_time,
                 nonce_mutex: Arc::new(Mutex::new(())),
                 signer: relayer_wallet,
             }),

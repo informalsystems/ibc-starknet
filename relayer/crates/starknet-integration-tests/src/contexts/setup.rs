@@ -63,6 +63,29 @@ pub struct StarknetTestSetup {
     pub create_client_message_options: (),
 }
 
+impl StarknetTestSetup {
+    pub fn new_with_defaults(
+        starknet_bootstrap: StarknetBootstrap,
+        osmosis_bootstrap: OsmosisBootstrap,
+        starknet_builder: StarknetBuilder,
+        wasm_code_hash: [u8; 32],
+    ) -> Self {
+        Self {
+            starknet_bootstrap,
+            osmosis_bootstrap,
+            starknet_builder,
+            starknet_create_client_payload_options: StarknetCreateClientPayloadOptions {
+                wasm_code_hash,
+            },
+            port_id: PortId::transfer(),
+            init_channel_options: Default::default(),
+            init_connection_options: Default::default(),
+            cosmos_create_client_payload_options: Default::default(),
+            create_client_message_options: (),
+        }
+    }
+}
+
 delegate_components! {
     StarknetBinaryChannelSetupComponents {
         ErrorTypeProviderComponent: UseHermesError,
