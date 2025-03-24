@@ -1,3 +1,4 @@
+use ics23::tendermint_spec;
 use starknet_ibc_clients::cometbft::{
     CometClientState, CometConsensusState, CometHeader, SignedHeader,
 };
@@ -41,6 +42,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
             max_clock_drift: *self.max_clock_drift,
             status: Status::Active,
             chain_id: "dummy_chain",
+            proof_spec: array![tendermint_spec()],
         };
 
         Serde::serialize(@client_state, ref serialized_client_state);

@@ -28,6 +28,9 @@ openzeppelin_utils   = { workspace = true }
 openzeppelin_token   = { workspace = true }
 starknet             = { workspace = true }
 
+# internal dependencies
+ics23 = { workspace = true }
+
 # ibc dependencies
 starknet_ibc_core    = { workspace = true }
 starknet_ibc_clients = { workspace = true }

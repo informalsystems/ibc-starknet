@@ -4,7 +4,7 @@ pub mod CometClientComponent {
     use alexandria_sorting::MergeSort;
     use core::num::traits::Zero;
     use ics23::{
-        CommitmentProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
+        CommitmentProof, array_u8_to_byte_array, byte_array_to_array_u8,
         verify_membership as ics23_verify_membership,
     };
     use openzeppelin_access::ownable::OwnableComponent;
@@ -109,7 +109,7 @@ pub mod CometClientComponent {
 
             let mut height = HeightZero::zero();
 
-            while len > 0 {
+            while len != 0 {
                 let update_height = update_heights.at(len - 1);
                 if @target_height >= update_height {
                     height = *update_height;

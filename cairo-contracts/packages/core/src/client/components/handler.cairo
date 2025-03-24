@@ -186,7 +186,7 @@ pub mod ClientHandlerComponent {
         ) -> bool {
             let mut allowed = false;
             let mut i = 0;
-            while i < self.allowed_relayers.len() {
+            while i != self.allowed_relayers.len() {
                 if self.allowed_relayers.at(i).read() == caller {
                     allowed = true;
                     break;

@@ -37,11 +37,7 @@ pub impl StoreProofSpecArray of Store<Array<ProofSpec>> {
         offset += 1;
 
         let exit = len + offset;
-        loop {
-            if offset >= exit {
-                break;
-            }
-
+        while offset < exit {
             let value = Store::<ProofSpec>::read_at_offset(address_domain, base, offset).unwrap();
             arr.append(value);
             offset += Store::<ProofSpec>::size();

@@ -199,6 +199,7 @@ dependencies = [
 name = "starknet_ibc_testkit"
 version = "0.1.0"
 dependencies = [
+ "ics23",
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",
