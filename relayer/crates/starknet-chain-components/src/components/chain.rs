@@ -176,6 +176,7 @@ mod preset {
     use hermes_test_components::chain::traits::assert::poll_assert::PollAssertDurationGetterComponent;
     use hermes_test_components::chain::traits::messages::ibc_transfer::IbcTokenTransferMessageBuilderComponent;
     use hermes_test_components::chain::traits::queries::balance::BalanceQuerierComponent;
+    use hermes_test_components::chain::traits::transfer::amount::IbcTransferredAmountConverterComponent;
     use hermes_test_components::chain::traits::transfer::ibc_transfer::TokenIbcTransferrerComponent;
     use hermes_test_components::chain::traits::transfer::string_memo::ProvideStringMemoType;
     use hermes_test_components::chain::traits::transfer::timeout::IbcTransferTimeoutCalculatorComponent;
@@ -199,6 +200,7 @@ mod preset {
     use crate::impls::contract::message::BuildInvokeContractCall;
     use crate::impls::counterparty_message_height::GetCounterpartyCosmosHeightFromStarknetMessage;
     use crate::impls::events::UseStarknetEvents;
+    use crate::impls::ibc_amount::ConvertStarknetTokenAddressFromCosmos;
     use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
     use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
     use crate::impls::messages::create_client::BuildCreateCometClientMessage;
@@ -317,6 +319,8 @@ mod preset {
                 SendIbcTransferMessage,
             IbcTransferTimeoutCalculatorComponent:
                 IbcTransferTimeoutAfterSeconds<90>,
+            IbcTransferredAmountConverterComponent:
+                ConvertStarknetTokenAddressFromCosmos,
             TransactionHashTypeComponent:
                 ProvideFeltTxHash,
             TxResponseTypeComponent:

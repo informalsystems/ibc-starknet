@@ -202,7 +202,9 @@ use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessages;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
-use hermes_test_components::chain::traits::transfer::amount::CanConvertIbcTransferredAmount;
+use hermes_test_components::chain::traits::transfer::amount::{
+    CanConvertIbcTransferredAmount, IbcTransferredAmountConverterComponent,
+};
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use hermes_test_components::chain::traits::transfer::timeout::{
     CanCalculateIbcTransferTimeout, IbcTransferTimeoutCalculatorComponent,
@@ -524,6 +526,7 @@ check_components! {
         BlockTimeQuerierComponent,
         [
             IbcTransferTimeoutCalculatorComponent,
+            IbcTransferredAmountConverterComponent,
         ]:
             CosmosChain,
     }
