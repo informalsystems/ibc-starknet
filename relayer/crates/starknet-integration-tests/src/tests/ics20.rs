@@ -15,7 +15,6 @@ use hermes_cosmos_test_components::chain::types::denom::Denom as IbcDenom;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
-use hermes_ibc_test_suite::tests::transfer::TestIbcTransfer;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
@@ -32,7 +31,6 @@ use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEve
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use hermes_test_components::setup::traits::driver::CanBuildTestDriver;
-use hermes_test_components::test_case::traits::test_case::TestCase;
 use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use poseidon::Poseidon3Hasher;
 use starknet::core::types::Call;

@@ -180,7 +180,9 @@ mod preset {
     use hermes_test_components::chain::traits::transfer::string_memo::ProvideStringMemoType;
     use hermes_test_components::chain::traits::transfer::timeout::IbcTransferTimeoutCalculatorComponent;
     use hermes_test_components::chain::traits::types::address::AddressTypeComponent;
-    use hermes_test_components::chain::traits::types::amount::AmountTypeComponent;
+    use hermes_test_components::chain::traits::types::amount::{
+        AmountMethodsComponent, AmountTypeComponent,
+    };
     use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
     use hermes_test_components::chain::traits::types::memo::MemoTypeComponent;
     use hermes_test_components::chain::traits::types::wallet::{
@@ -290,7 +292,10 @@ mod preset {
                 MessageResponseEventsGetterComponent,
             ]:
                 UseStarknetMessageResponse,
-            AmountTypeComponent:
+            [
+                AmountTypeComponent,
+                AmountMethodsComponent,
+            ]:
                 ProvideU256Amount,
             DenomTypeComponent:
                 ProvideTokenAddressDenom,
