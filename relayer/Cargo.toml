@@ -77,6 +77,7 @@ hermes-tracing-logging-components   = { version = "0.1.0" }
 hermes-logger                       = { version = "0.1.0" }
 hermes-relayer-components           = { version = "0.1.0" }
 hermes-cosmos-chain-components      = { version = "0.1.0" }
+hermes-cosmos-chain-preset          = { version = "0.1.0" }
 hermes-cosmos-encoding-components   = { version = "0.1.0" }
 hermes-cosmos-relayer               = { version = "0.1.0" }
 hermes-cosmos-wasm-relayer          = { version = "0.1.0" }
@@ -186,6 +187,7 @@ hermes-test-components               = { git = "https://github.com/informalsyste
 hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/test-improvements" }
 hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/test-improvements" }
 hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/test-improvements" }
+hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/test-improvements" }
 hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/test-improvements" }
 hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/test-improvements" }
 hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/test-improvements" }

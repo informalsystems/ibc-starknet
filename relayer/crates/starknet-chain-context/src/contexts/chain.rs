@@ -11,10 +11,12 @@ use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_chain_components::traits::queries::block::CanQueryBlock;
+use hermes_chain_components::traits::queries::block::{BlockQuerierComponent, CanQueryBlock};
+use hermes_chain_components::traits::queries::block_events::BlockEventsQuerierComponent;
 use hermes_chain_components::traits::queries::block_time::{
     BlockTimeQuerierComponent, CanQueryBlockTime,
 };
+use hermes_chain_components::traits::queries::chain_status::ChainStatusQuerierComponent;
 use hermes_chain_components::traits::queries::packet_acknowledgement::CanQueryPacketAckCommitment;
 use hermes_chain_components::traits::types::block::HasBlockType;
 use hermes_chain_components::traits::types::channel::HasInitChannelOptionsType;
@@ -26,12 +28,12 @@ use hermes_chain_type_components::traits::types::commitment_proof::HasCommitment
 use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
 use hermes_chain_type_components::traits::types::time::HasTimeType;
-use hermes_cosmos_chain_components::components::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
 use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientPayload;
 use hermes_cosmos_chain_components::types::status::Time;
+use hermes_cosmos_chain_preset::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
@@ -200,7 +202,11 @@ use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessages;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
+use hermes_test_components::chain::traits::transfer::amount::CanConvertIbcTransferredAmount;
 use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
+use hermes_test_components::chain::traits::transfer::timeout::{
+    CanCalculateIbcTransferTimeout, IbcTransferTimeoutCalculatorComponent,
+};
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
 use ibc::core::channel::types::packet::Packet;
@@ -510,6 +516,19 @@ pub trait CanUseStarknetChain:
 
 impl CanUseStarknetChain for StarknetChain {}
 
+check_components! {
+    CanUseStarknetChain2 for StarknetChain {
+        ChainStatusQuerierComponent,
+        BlockQuerierComponent,
+        BlockEventsQuerierComponent,
+        BlockTimeQuerierComponent,
+        [
+            IbcTransferTimeoutCalculatorComponent,
+        ]:
+            CosmosChain,
+    }
+}
+
 pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, ClientState = CometClientState>
     + HasConsensusStateType<StarknetChain, ConsensusState = CometConsensusState>
     + HasUpdateClientPayloadType<StarknetChain, UpdateClientPayload = CosmosUpdateClientPayload>
@@ -560,6 +579,8 @@ pub trait CanUseCosmosChainWithStarknet: HasClientStateType<StarknetChain, Clien
     + CanBuildPacketFromWriteAck<StarknetChain>
     + CanQueryCounterpartyChainId<StarknetChain>
     + CanUseComponent<PacketCommitmentQuerierComponent, StarknetChain>
+    + CanCalculateIbcTransferTimeout<StarknetChain>
+    + CanConvertIbcTransferredAmount<StarknetChain>
 {
 }
 
