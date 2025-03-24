@@ -8,8 +8,8 @@ use protobuf::types::message::{
     EncodeContextTrait, ProtoCodecImpl, ProtoMessage, ProtoName, ProtoOneof,
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
-use starknet::storage_access::{StorageBaseAddress, Store};
 use starknet::SyscallResult;
+use starknet::storage_access::{StorageBaseAddress, Store};
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct CommitmentProof {
@@ -314,7 +314,7 @@ pub struct LeafOp {
     pub prehash_key: HashOp,
     pub prehash_value: HashOp,
     pub length: LengthOp,
-    pub prefix: Array<u8>, // TODO: Can be ByteArray?
+    pub prefix: Array<u8> // TODO: Can be ByteArray?
 }
 
 pub impl StoreU8Array of Store<Array<u8>> {
@@ -322,9 +322,7 @@ pub impl StoreU8Array of Store<Array<u8>> {
         Self::read_at_offset(address_domain, base, 0)
     }
 
-    fn write(
-        address_domain: u32, base: StorageBaseAddress, value: Array<u8>,
-    ) -> SyscallResult<()> {
+    fn write(address_domain: u32, base: StorageBaseAddress, value: Array<u8>) -> SyscallResult<()> {
         Self::write_at_offset(address_domain, base, 0, value)
     }
 
