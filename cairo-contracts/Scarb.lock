@@ -204,6 +204,7 @@ dependencies = [
  "openzeppelin_testing",
  "openzeppelin_token",
  "openzeppelin_utils",
+ "protobuf",
  "serde_json",
  "snforge_std",
  "starknet_ibc_apps",
