@@ -124,7 +124,7 @@ impl RandomAmountGenerator<StarknetChainDriver> for StarknetChainDriverComponent
 
         StarknetAmount {
             quantity: quantity.into(),
-            token_address: max.token_address.clone(),
+            token_address: max.token_address,
         }
     }
 }

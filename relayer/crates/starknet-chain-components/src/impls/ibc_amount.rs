@@ -117,7 +117,7 @@ where
     ) -> Result<StarknetAmount, Chain::Error> {
         Ok(StarknetAmount {
             quantity: cosmos_amount.quantity.into(),
-            token_address: token_address.clone(),
+            token_address: *token_address,
         })
     }
 }
