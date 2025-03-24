@@ -27,6 +27,8 @@ use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::commitment_types::specs::ProofSpecs;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::proto::Any;
+use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
+use tracing::info;
 
 use crate::types::cosmos::height::Height;
 
@@ -38,6 +40,7 @@ pub struct CometClientState {
     pub max_clock_drift: Duration,
     pub status: ClientStatus,
     pub chain_id: ChainId,
+    pub proof_specs: ProofSpecs,
 }
 
 #[derive(Debug)]
@@ -98,6 +101,7 @@ delegate_components! {
                 EncodeField<symbol!("max_clock_drift"), UseContext>,
                 EncodeField<symbol!("status"), UseContext>,
                 EncodeField<symbol!("chain_id"), UseContext>,
+                EncodeField<symbol!("proof_specs"), UseContext>,
             ],
         >,
         MutDecoderComponent: DecodeFrom<Self, UseContext>,
@@ -105,7 +109,15 @@ delegate_components! {
 }
 
 impl Transformer for EncodeCometClientState {
-    type From = Product![Height, Duration, Duration, Duration, ClientStatus, ChainId];
+    type From = Product![
+        Height,
+        Duration,
+        Duration,
+        Duration,
+        ClientStatus,
+        ChainId,
+        ProofSpecs
+    ];
     type To = CometClientState;
 
     fn transform(
@@ -115,17 +127,22 @@ impl Transformer for EncodeCometClientState {
             unbonding_period,
             max_clock_drift,
             status,
-            chain_id
+            chain_id,
+            proof_specs
         ]: Self::From,
     ) -> CometClientState {
-        CometClientState {
+        info!("will transform CometClientState");
+        let t = CometClientState {
             latest_height,
             trusting_period,
             unbonding_period,
             max_clock_drift,
             status,
             chain_id,
-        }
+            proof_specs,
+        };
+        info!("done: {t:#?}");
+        t
     }
 }
 
@@ -224,5 +241,250 @@ where
     ) -> Result<ChainId, Encoding::Error> {
         let chain_id_str = encoding.decode_mut(buffer)?;
         ChainId::new(&chain_id_str).map_err(|_| Encoding::raise_error("invalid chain id"))
+    }
+}
+
+pub struct EncodeLeafOp;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, LeafOp> for EncodeLeafOp
+where
+    Encoding: CanEncodeMut<Strategy, Product![u32, u32, u32, u32, Vec<u8>]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        proof_specs: &LeafOp,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        let LeafOp {
+            hash,
+            prehash_key,
+            prehash_value,
+            length,
+            prefix,
+        } = serde_json::to_value(proof_specs)
+            .and_then(serde_json::from_value)
+            .unwrap();
+        //.map_err(|_| Encoding::raise_error("invalid connection end"))?;
+        let hash = hash as u32;
+        let prehash_key = prehash_key as u32;
+        let prehash_value = prehash_value as u32;
+        let length = length as u32;
+
+        encoding.encode_mut(
+            &product![hash, prehash_key, prehash_value, length, prefix,],
+            buffer,
+        )?;
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, LeafOp> for EncodeLeafOp
+where
+    Encoding: CanDecodeMut<Strategy, Product![u32, u32, u32, u32, Vec<u8>]>
+        + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<LeafOp, Encoding::Error> {
+        info!("will decode LeafOp");
+        let product![hash, prehash_key, prehash_value, length, prefix] =
+            encoding.decode_mut(buffer)?;
+        Ok(LeafOp {
+            hash: hash as i32,
+            prehash_key: prehash_key as i32,
+            prehash_value: prehash_value as i32,
+            length: length as i32,
+            prefix,
+        })
+    }
+}
+
+pub struct EncodeInnerSpec;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, InnerSpec> for EncodeInnerSpec
+where
+    Encoding: CanEncodeMut<Strategy, Product![Vec<u32>, u32, u32, u32, Vec<u8>, u32]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        proof_specs: &InnerSpec,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        let InnerSpec {
+            child_order,
+            child_size,
+            min_prefix_length,
+            max_prefix_length,
+            empty_child,
+            hash,
+        } = serde_json::to_value(proof_specs)
+            .and_then(serde_json::from_value)
+            .unwrap();
+        //.map_err(|_| Encoding::raise_error("invalid connection end"))?;
+        let child_order = child_order.iter().map(|x| *x as u32).collect();
+        let child_size = child_size as u32;
+        let min_prefix_length = min_prefix_length as u32;
+        let max_prefix_length = max_prefix_length as u32;
+        let hash = hash as u32;
+
+        encoding.encode_mut(
+            &product![
+                child_order,
+                child_size,
+                min_prefix_length,
+                max_prefix_length,
+                empty_child,
+                hash,
+            ],
+            buffer,
+        )?;
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, InnerSpec> for EncodeInnerSpec
+where
+    Encoding: CanDecodeMut<Strategy, Product![Vec<u32>, u32, u32, u32, Vec<u8>, u32]>
+        + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<InnerSpec, Encoding::Error> {
+        info!("will decode InnerSpec");
+        let product![
+            child_order,
+            child_size,
+            min_prefix_length,
+            max_prefix_length,
+            empty_child,
+            hash
+        ] = encoding.decode_mut(buffer)?;
+        let child_order = child_order.iter().map(|x| *x as i32).collect();
+        Ok(InnerSpec {
+            child_order,
+            child_size: child_size as i32,
+            min_prefix_length: min_prefix_length as i32,
+            max_prefix_length: max_prefix_length as i32,
+            empty_child,
+            hash: hash as i32,
+        })
+    }
+}
+
+pub struct EncodeProofSpec;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ProofSpec> for EncodeProofSpec
+where
+    Encoding: CanEncodeMut<Strategy, Product![LeafOp, InnerSpec, u32, u32, bool]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        proof_specs: &ProofSpec,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        let ProofSpec {
+            leaf_spec,
+            inner_spec,
+            max_depth,
+            min_depth,
+            prehash_key_before_comparison,
+        } = serde_json::to_value(proof_specs)
+            .and_then(serde_json::from_value)
+            .unwrap();
+        //.map_err(|_| Encoding::raise_error("invalid connection end"))?;
+
+        let leaf_spec = leaf_spec.unwrap();
+        let inner_spec = inner_spec.unwrap();
+        let max_depth = max_depth as u32;
+        let min_depth = min_depth as u32;
+
+        encoding.encode_mut(
+            &product![
+                leaf_spec,
+                inner_spec,
+                max_depth,
+                min_depth,
+                prehash_key_before_comparison,
+            ],
+            buffer,
+        )?;
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ProofSpec> for EncodeProofSpec
+where
+    Encoding: CanDecodeMut<Strategy, Product![LeafOp, InnerSpec, u32, u32, bool]>
+        + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ProofSpec, Encoding::Error> {
+        info!("will decode ProofSpec");
+        let product![
+            leaf_spec,
+            inner_spec,
+            max_depth,
+            min_depth,
+            prehash_key_before_comparison
+        ] = encoding.decode_mut(buffer)?;
+        Ok(ProofSpec {
+            leaf_spec: Some(leaf_spec),
+            inner_spec: Some(inner_spec),
+            max_depth: max_depth as i32,
+            min_depth: min_depth as i32,
+            prehash_key_before_comparison,
+        })
+    }
+}
+pub struct EncodeProofSpecs;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ProofSpecs> for EncodeProofSpecs
+where
+    Encoding: CanEncodeMut<Strategy, Vec<ProofSpec>>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        proof_specs: &ProofSpecs,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        // FIXME: ibc-rs type doesn't have public fields
+
+        #[derive(serde::Deserialize)]
+        struct DummyProofSpecs(pub Vec<ProofSpec>);
+
+        let DummyProofSpecs(specs) = serde_json::to_value(proof_specs)
+            .and_then(serde_json::from_value)
+            .unwrap();
+        //.map_err(|_| Encoding::raise_error("invalid connection end"))?;
+
+        encoding.encode_mut(&specs, buffer)?;
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ProofSpecs> for EncodeProofSpecs
+where
+    Encoding: CanDecodeMut<Strategy, Vec<ProofSpec>> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<ProofSpecs, Encoding::Error> {
+        info!("will decode ProofSpecs");
+        let proof_spec_vec = encoding.decode_mut(buffer)?;
+        ProofSpecs::try_from(proof_spec_vec)
+            .map_err(|e| Encoding::raise_error("failed to convert Vec<ProofSpec> to ProofSpecs"))
     }
 }

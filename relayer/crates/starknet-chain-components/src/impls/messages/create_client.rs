@@ -15,6 +15,10 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientP
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_logging_components::traits::has_logger::HasLogger;
+use hermes_logging_components::traits::logger::CanLog;
+use hermes_logging_components::types::level::LevelInfo;
+use ibc::core::commitment_types::specs::ProofSpecs;
 use starknet::core::types::{Call, Felt};
 use starknet::macros::{selector, short_string};
 
@@ -37,6 +41,7 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasLogger
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<core::num::TryFromIntError>
         + CanRaiseAsyncError<Encoding::Error>,
@@ -46,6 +51,7 @@ where
         + CanEncode<ViaCairo, CometClientState>
         + CanEncode<ViaCairo, CometConsensusState>
         + CanEncode<ViaCairo, Product![Felt, Vec<Felt>, Vec<Felt>]>,
+    Chain::Logger: CanLog<LevelInfo>,
 {
     async fn build_create_client_message(
         chain: &Chain,
@@ -67,6 +73,14 @@ where
 
         let client_type = short_string!("07-tendermint");
 
+        chain
+            .logger()
+            .log(
+                &format!("proof spec: {:#?}", ProofSpecs::cosmos()),
+                &LevelInfo,
+            )
+            .await;
+
         let client_state = CometClientState {
             latest_height: height,
             trusting_period: payload.client_state.trusting_period,
@@ -74,6 +88,7 @@ where
             max_clock_drift: payload.client_state.max_clock_drift,
             status: ClientStatus::Active,
             chain_id: payload.client_state.chain_id,
+            proof_specs: ProofSpecs::cosmos(),
         };
 
         let consensus_state = CometConsensusState {
