@@ -2376,6 +2376,7 @@ dependencies = [
  "ibc",
  "ibc-client-starknet-types",
  "ibc-proto",
+ "poseidon",
  "prost-types",
  "secp256k1",
  "serde",
