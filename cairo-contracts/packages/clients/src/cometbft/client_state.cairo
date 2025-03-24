@@ -1,4 +1,7 @@
 use core::num::traits::Zero;
+use ics23::ProofSpec;
+use starknet::SyscallResult;
+use starknet::storage_access::{StorageBaseAddress, Store};
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Duration, Height, HeightPartialOrd, Status, StatusTrait};
 
@@ -10,6 +13,62 @@ pub struct CometClientState {
     pub max_clock_drift: Duration,
     pub status: Status,
     pub chain_id: ByteArray,
+    pub proof_spec: Array<ProofSpec>,
+}
+
+pub impl StoreProofSpecArray of Store<Array<ProofSpec>> {
+    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Array<ProofSpec>> {
+        Self::read_at_offset(address_domain, base, 0)
+    }
+
+    fn write(
+        address_domain: u32, base: StorageBaseAddress, value: Array<ProofSpec>,
+    ) -> SyscallResult<()> {
+        Self::write_at_offset(address_domain, base, 0, value)
+    }
+
+    fn read_at_offset(
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8,
+    ) -> SyscallResult<Array<ProofSpec>> {
+        let mut arr: Array<ProofSpec> = array![];
+
+        let len: u8 = Store::<u8>::read_at_offset(address_domain, base, offset)
+            .expect('Storage Span too large');
+        offset += 1;
+
+        let exit = len + offset;
+        loop {
+            if offset >= exit {
+                break;
+            }
+
+            let value = Store::<ProofSpec>::read_at_offset(address_domain, base, offset).unwrap();
+            arr.append(value);
+            offset += Store::<ProofSpec>::size();
+        }
+
+        Result::Ok(arr)
+    }
+
+    fn write_at_offset(
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<ProofSpec>,
+    ) -> SyscallResult<()> {
+        let len: u8 = value.len().try_into().expect('Storage - Span too large');
+        Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();
+        offset += 1;
+
+        while let Option::Some(element) = value.pop_front() {
+            Store::<ProofSpec>::write_at_offset(address_domain, base, offset, element).unwrap();
+            offset += Store::<ProofSpec>::size();
+        }
+
+        Result::Ok(())
+    }
+
+    // FIXME: Use correct size
+    fn size() -> u8 {
+        100 * Store::<ProofSpec>::size()
+    }
 }
 
 #[generate_trait]

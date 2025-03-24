@@ -3,8 +3,13 @@ pub mod CometClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
     use alexandria_sorting::MergeSort;
     use core::num::traits::Zero;
+    use ics23::{
+        CommitmentProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
+        verify_membership as ics23_verify_membership,
+    };
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
+    use protobuf::types::message::ProtoCodecImpl;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,
@@ -272,7 +277,17 @@ pub mod CometClientComponent {
             value: StateValue,
             proof: StateProof,
             root: StateRoot,
-        ) {}
+        ) {
+            let byte_array_proof = array_u8_to_byte_array(@proof.proof);
+            let decoded_proof = ProtoCodecImpl::decode::<CommitmentProof>(@byte_array_proof)
+                .unwrap();
+            let specs = self.read_client_state(client_sequence).proof_spec;
+            let proofs = array![decoded_proof.proof];
+            let root = root.root;
+            let keys = array![byte_array_to_array_u8(@path)];
+            let value = value.value;
+            ics23_verify_membership(specs, @proofs, root, keys, value, 0);
+        }
 
         fn verify_non_membership(
             self: @ComponentState<TContractState>,

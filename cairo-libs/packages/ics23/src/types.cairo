@@ -8,6 +8,8 @@ use protobuf::types::message::{
     EncodeContextTrait, ProtoCodecImpl, ProtoMessage, ProtoName, ProtoOneof,
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
+use starknet::storage_access::{StorageBaseAddress, Store};
+use starknet::SyscallResult;
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct CommitmentProof {
@@ -209,7 +211,7 @@ impl InnerOpAsProtoName of ProtoName<InnerOp> {
     }
 }
 
-#[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Copy, Drop, PartialEq, Serde, starknet::Store)]
 pub enum HashOp {
     #[default]
     NoOp,
@@ -235,7 +237,7 @@ pub impl U32TryIntoHashOp of TryInto<u32, HashOp> {
     }
 }
 
-#[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Copy, Drop, PartialEq, Serde, starknet::Store)]
 pub enum LengthOp {
     #[default]
     NoPrefix,
@@ -261,7 +263,7 @@ pub impl U32TryIntoLegthOp of TryInto<u32, LengthOp> {
     }
 }
 
-#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde, starknet::Store)]
 pub struct InnerSpec {
     pub child_order: Array<u32>,
     pub child_size: u32,
@@ -306,13 +308,123 @@ impl InnerSpecAsProtoName of ProtoName<InnerSpec> {
     }
 }
 
-#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde, starknet::Store)]
 pub struct LeafOp {
     pub hash: HashOp,
     pub prehash_key: HashOp,
     pub prehash_value: HashOp,
     pub length: LengthOp,
-    pub prefix: Array<u8>,
+    pub prefix: Array<u8>, // TODO: Can be ByteArray?
+}
+
+pub impl StoreU8Array of Store<Array<u8>> {
+    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Array<u8>> {
+        Self::read_at_offset(address_domain, base, 0)
+    }
+
+    fn write(
+        address_domain: u32, base: StorageBaseAddress, value: Array<u8>,
+    ) -> SyscallResult<()> {
+        Self::write_at_offset(address_domain, base, 0, value)
+    }
+
+    fn read_at_offset(
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8,
+    ) -> SyscallResult<Array<u8>> {
+        let mut arr: Array<u8> = array![];
+
+        let len: u8 = Store::<u8>::read_at_offset(address_domain, base, offset)
+            .expect('Storage Span too large');
+        offset += 1;
+
+        let exit = len + offset;
+        loop {
+            if offset >= exit {
+                break;
+            }
+
+            let value = Store::<u8>::read_at_offset(address_domain, base, offset).unwrap();
+            arr.append(value);
+            offset += Store::<u8>::size();
+        }
+
+        Result::Ok(arr)
+    }
+
+    fn write_at_offset(
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<u8>,
+    ) -> SyscallResult<()> {
+        let len: u8 = value.len().try_into().expect('Storage - Span too large');
+        Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();
+        offset += 1;
+
+        while let Option::Some(element) = value.pop_front() {
+            Store::<u8>::write_at_offset(address_domain, base, offset, element).unwrap();
+            offset += Store::<u8>::size();
+        }
+
+        Result::Ok(())
+    }
+
+    // FIXME: Use correct size
+    fn size() -> u8 {
+        10 * Store::<u8>::size()
+    }
+}
+
+pub impl StoreU32Array of Store<Array<u32>> {
+    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Array<u32>> {
+        Self::read_at_offset(address_domain, base, 0)
+    }
+
+    fn write(
+        address_domain: u32, base: StorageBaseAddress, value: Array<u32>,
+    ) -> SyscallResult<()> {
+        Self::write_at_offset(address_domain, base, 0, value)
+    }
+
+    fn read_at_offset(
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8,
+    ) -> SyscallResult<Array<u32>> {
+        let mut arr: Array<u32> = array![];
+
+        let len: u8 = Store::<u8>::read_at_offset(address_domain, base, offset)
+            .expect('Storage Span too large');
+        offset += 1;
+
+        let exit = len + offset;
+        loop {
+            if offset >= exit {
+                break;
+            }
+
+            let value = Store::<u32>::read_at_offset(address_domain, base, offset).unwrap();
+            arr.append(value);
+            offset += Store::<u32>::size();
+        }
+
+        Result::Ok(arr)
+    }
+
+    fn write_at_offset(
+        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<u32>,
+    ) -> SyscallResult<()> {
+        let len: u8 = value.len().try_into().expect('Storage - Span too large');
+        Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();
+        offset += 1;
+
+        while let Option::Some(element) = value.pop_front() {
+            Store::<u32>::write_at_offset(address_domain, base, offset, element).unwrap();
+            offset += Store::<u32>::size();
+        }
+
+        Result::Ok(())
+    }
+
+    // FIXME: Use correct size
+    fn size() -> u8 {
+        10 * Store::<u32>::size()
+    }
 }
 
 impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
@@ -344,7 +456,7 @@ impl LeafOpAsProtoName of ProtoName<LeafOp> {
     }
 }
 
-#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ProofSpec {
     pub leaf_spec: LeafOp,
     pub inner_spec: InnerSpec,

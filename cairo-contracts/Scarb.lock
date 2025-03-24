@@ -157,7 +157,9 @@ version = "0.1.0"
 dependencies = [
  "alexandria_data_structures",
  "alexandria_sorting",
+ "ics23",
  "openzeppelin_access",
+ "protobuf",
  "snforge_std",
  "starknet_ibc_core",
  "starknet_ibc_testkit",
