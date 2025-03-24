@@ -38,6 +38,7 @@ snforge_std                = "0.38.3"
 
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }
+protobuf   = { path = "../cairo-libs/packages/protobuf" }
 serde_json = { path = "../cairo-libs/packages/serde_json" }
 
 # ibc dependencies
