@@ -28,8 +28,8 @@ hermes-protobuf-encoding-components = { workspace = true }
 hermes-cosmos-encoding-components   = { workspace = true }
 hermes-wasm-encoding-components     = { workspace = true }
 
-hermes-logging-components           = { workspace = true }
-tracing                             = { workspace = true }
+hermes-logging-components = { workspace = true }
+tracing                   = { workspace = true }
 
 ibc       = { workspace = true }
 ibc-proto = { workspace = true }
