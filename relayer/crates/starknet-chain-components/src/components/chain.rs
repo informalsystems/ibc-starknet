@@ -171,6 +171,7 @@ mod preset {
     use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
     use hermes_test_components::chain::impls::assert::default_assert_duration::ProvideDefaultPollAssertDuration;
     use hermes_test_components::chain::impls::assert::poll_assert_eventual_amount::PollAssertEventualAmount;
+    use hermes_test_components::chain::impls::default_memo::ProvideDefaultMemo;
     use hermes_test_components::chain::impls::ibc_transfer::SendIbcTransferMessage;
     use hermes_test_components::chain::traits::assert::eventual_amount::EventualAmountAsserterComponent;
     use hermes_test_components::chain::traits::assert::poll_assert::PollAssertDurationGetterComponent;
@@ -185,7 +186,9 @@ mod preset {
         AmountMethodsComponent, AmountTypeComponent,
     };
     use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
-    use hermes_test_components::chain::traits::types::memo::MemoTypeComponent;
+    use hermes_test_components::chain::traits::types::memo::{
+        DefaultMemoGetterComponent, MemoTypeComponent,
+    };
     use hermes_test_components::chain::traits::types::wallet::{
         WalletSignerComponent, WalletTypeComponent,
     };
@@ -303,6 +306,8 @@ mod preset {
                 ProvideTokenAddressDenom,
             MemoTypeComponent:
                 ProvideStringMemoType,
+            DefaultMemoGetterComponent:
+                ProvideDefaultMemo,
             [
                 WalletTypeComponent,
                 WalletSignerComponent,
