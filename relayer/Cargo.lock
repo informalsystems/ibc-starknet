@@ -2458,6 +2458,7 @@ dependencies = [
  "hermes-cosmos-wasm-relayer",
  "hermes-encoding-components",
  "hermes-error",
+ "hermes-ibc-test-suite",
  "hermes-logger",
  "hermes-logging-components",
  "hermes-relayer-components",

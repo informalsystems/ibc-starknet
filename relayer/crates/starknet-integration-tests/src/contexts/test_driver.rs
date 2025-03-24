@@ -29,7 +29,9 @@ use hermes_test_components::driver::traits::channel_at::ChannelIdGetterAtCompone
 use hermes_test_components::driver::traits::types::chain_driver_at::{
     ChainDriverGetterAtComponent, ChainDriverTypeProviderAtComponent, HasChainDriverTypeAt,
 };
-use hermes_test_components::driver::traits::types::relay_driver_at::RelayDriverGetterAtComponent;
+use hermes_test_components::driver::traits::types::relay_driver_at::{
+    RelayDriverGetterAtComponent, RelayDriverTypeProviderAtComponent,
+};
 use hermes_test_components::setup::traits::driver::HasTestDriverType;
 use hermes_test_components::setup::traits::drivers::binary_channel::{
     BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent,
@@ -68,10 +70,6 @@ delegate_components! {
             UseType<StarknetChain>,
         ChainTypeProviderAtComponent<Index<1>>:
             UseType<CosmosChain>,
-        ChainDriverTypeProviderAtComponent<Index<0>>:
-            UseType<StarknetChainDriver>,
-        ChainDriverTypeProviderAtComponent<Index<1>>:
-            UseType<CosmosChainDriver>,
         RelayTypeProviderAtComponent<Index<0>, Index<1>>:
             UseType<StarknetToCosmosRelay>,
         RelayTypeProviderAtComponent<Index<1>, Index<0>>:
@@ -80,10 +78,16 @@ delegate_components! {
             UseType<StarknetCosmosBiRelay>,
         BiRelayTypeProviderAtComponent<Index<1>, Index<0>>:
             UseType<CosmosStarknetBiRelay>,
+        ChainDriverTypeProviderAtComponent<Index<0>>:
+            UseType<StarknetChainDriver>,
+        ChainDriverTypeProviderAtComponent<Index<1>>:
+            UseType<CosmosChainDriver>,
+        RelayDriverTypeProviderAtComponent<Index<0>, Index<1>>:
+            UseType<StarknetRelayDriver>,
         ChainDriverGetterAtComponent<Index<0>>:
-            UseField<symbol!("chain_driver_a")>,
+            UseField<symbol!("starknet_chain_driver")>,
         ChainDriverGetterAtComponent<Index<1>>:
-            UseField<symbol!("chain_driver_b")>,
+            UseField<symbol!("cosmos_chain_driver")>,
         RelayDriverGetterAtComponent<Index<0>, Index<1>>:
             UseField<symbol!("relay_driver")>,
         ChannelIdGetterAtComponent<Index<0>, Index<1>>:
