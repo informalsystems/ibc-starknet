@@ -150,7 +150,7 @@ pub impl MerkleHashImpl of MerkleHashTrait {
             _ => {
                 let split = next_power_of_two(length) / 2;
                 let left = Self::hash_byte_vectors(byte_vecs.slice(0, split));
-                let right = Self::hash_byte_vectors(byte_vecs.slice(split, length));
+                let right = Self::hash_byte_vectors(byte_vecs.slice(split, length - split));
                 Self::inner_hash(left, right)
             },
         }
