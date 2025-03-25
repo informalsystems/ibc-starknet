@@ -87,7 +87,6 @@ pub impl SpanU8TryIntoU256 of TryInto<Span<u8>, u256> {
     }
 }
 
-
 pub fn u32_8_to_byte_array(u32_8: [u32; 8]) -> ByteArray {
     let mut byte_array = "";
     let mut span = u32_8.span();
@@ -114,16 +113,12 @@ pub fn u32_8_to_array_u8(u32_8: [u32; 8]) -> Array<u8> {
     array_u8
 }
 
-pub fn next_power_of_two(mut length: u32) -> u32 {
+pub fn next_power_of_two(num: u32) -> u32 {
     let mut two_power = 1;
-    while length != two_power {
-        // if the bit is set, make it unset
-        if length & two_power != 0 {
-            length = length ^ two_power;
-        }
+    while two_power < num {
         two_power *= 2;
     }
-    length
+    two_power
 }
 
 #[generate_trait]
