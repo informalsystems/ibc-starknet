@@ -1,11 +1,13 @@
 use alexandria_data_structures::span_ext::SpanTraitExt;
 use core::num::traits::Zero;
+use ics23::ByteArrayIntoArrayU8;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::U128AsProtoMessage;
 use protobuf::types::message::{
-    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoMessage, ProtoName,
+    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
+    ProtoMessage, ProtoName,
 };
-use protobuf::types::tag::{ProtobufTag, WireType};
+use protobuf::types::tag::WireType;
 use starknet_ibc_core::client::{Duration, DurationTrait};
 use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::connection::ConnectionErrors;
@@ -191,8 +193,8 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
 
 pub impl ConnectionEndIntoStateValue of Into<ConnectionEnd, StateValue> {
     fn into(self: ConnectionEnd) -> StateValue {
-        // TODO: Implement once membership proof verification is implemented.
-        StateValueZero::zero()
+        let encoded_connection_end = ProtoCodecImpl::encode(@self);
+        StateValue { value: encoded_connection_end.into() }
     }
 }
 

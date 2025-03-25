@@ -1,8 +1,8 @@
 use core::num::traits::Zero;
-use ics23::{IntoArrayU32, array_u8_into_array_u32};
+use ics23::{ByteArrayIntoArrayU8, IntoArrayU32, array_u8_into_array_u32};
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
 use protobuf::types::message::{
-    DecodeContext, EncodeContext, EncodeContextTrait, ProtoMessage, ProtoName,
+    DecodeContext, EncodeContext, EncodeContextTrait, ProtoCodecImpl, ProtoMessage, ProtoName,
 };
 use protobuf::types::tag::WireType;
 use starknet_ibc_core::channel::ChannelErrors;
@@ -246,8 +246,8 @@ pub impl ChannelEndImpl of ChannelEndTrait {
 
 pub impl ChannelEndIntoStateValue of Into<ChannelEnd, StateValue> {
     fn into(self: ChannelEnd) -> StateValue {
-        // TODO: Implement once membership proof verification is implemented.
-        StateValueZero::zero()
+        let encoded_channel_end = ProtoCodecImpl::encode(@self);
+        StateValue { value: encoded_channel_end.into() }
     }
 }
 
