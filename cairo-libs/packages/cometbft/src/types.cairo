@@ -12,6 +12,7 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
 use protobuf::types::wkt::{Duration, Timestamp};
+use crate::light_client::Header as LcHeader;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub struct Consensus {
@@ -701,6 +702,12 @@ pub struct UntrustedBlockState {
 pub impl UntrustedBlockStateImpl of UntrustedBlockStateTrait {
     fn height(self: @UntrustedBlockState) -> @u64 {
         self.signed_header.header.height
+    }
+}
+
+impl HeaderToUntrustedBlockState of Into<LcHeader, UntrustedBlockState> {
+    fn into(self: LcHeader) -> UntrustedBlockState {
+        UntrustedBlockState { signed_header: self.signed_header, validators: self.validator_set }
     }
 }
 
