@@ -25,16 +25,16 @@ test = "snforge test"
 
 [workspace.dependencies]
 # external dependencies
+assert_macros              = "2.11.2"
+starknet                   = "2.11.2"
+snforge_std                = "0.38.3"
 alexandria_data_structures = "0.5.0"
 alexandria_numeric         = "0.5.0"
 alexandria_sorting         = "0.5.0"
-assert_macros              = "2.9.4"
-starknet                   = "2.9.4"
 openzeppelin_access        = "1.0.0"
 openzeppelin_token         = "1.0.0"
 openzeppelin_testing       = "2.0.0"
 openzeppelin_utils         = "1.0.0"
-snforge_std                = "0.38.3"
 
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }
