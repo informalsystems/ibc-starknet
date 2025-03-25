@@ -40,12 +40,14 @@ use hermes_test_components::setup::traits::port_id_at::PortIdGetterAtComponent;
 use ibc::core::host::types::identifiers::PortId;
 
 use crate::contexts::chain_driver::StarknetChainDriver;
+use crate::contexts::cosmos_starknet_relay_driver::CosmosStarknetRelayDriver;
 use crate::contexts::starknet_cosmos_relay_driver::StarknetCosmosRelayDriver;
 
 #[cgp_context(StarknetTestDriverComponents)]
 #[derive(HasField)]
 pub struct StarknetTestDriver {
-    pub relay_driver: StarknetCosmosRelayDriver,
+    pub relay_driver_a_b: StarknetCosmosRelayDriver,
+    pub relay_driver_b_a: CosmosStarknetRelayDriver,
     pub starknet_chain_driver: StarknetChainDriver,
     pub cosmos_chain_driver: CosmosChainDriver,
     pub connection_id_a: ConnectionId,
@@ -84,12 +86,16 @@ delegate_components! {
             UseType<CosmosChainDriver>,
         RelayDriverTypeProviderAtComponent<Index<0>, Index<1>>:
             UseType<StarknetCosmosRelayDriver>,
+        RelayDriverTypeProviderAtComponent<Index<1>, Index<0>>:
+            UseType<CosmosStarknetRelayDriver>,
         ChainDriverGetterAtComponent<Index<0>>:
             UseField<symbol!("starknet_chain_driver")>,
         ChainDriverGetterAtComponent<Index<1>>:
             UseField<symbol!("cosmos_chain_driver")>,
         RelayDriverGetterAtComponent<Index<0>, Index<1>>:
-            UseField<symbol!("relay_driver")>,
+            UseField<symbol!("relay_driver_a_b")>,
+        RelayDriverGetterAtComponent<Index<1>, Index<0>>:
+            UseField<symbol!("relay_driver_b_a")>,
         ChannelIdGetterAtComponent<Index<0>, Index<1>>:
             UseField<symbol!("channel_id_a")>,
         ChannelIdGetterAtComponent<Index<1>, Index<0>>:
@@ -126,10 +132,19 @@ where
         port_id_a: PortId,
         port_id_b: PortId,
     ) -> Result<StarknetTestDriver, Setup::Error> {
-        let relay_driver = StarknetCosmosRelayDriver { birelay };
+        let relay_driver_b_a = CosmosStarknetRelayDriver {
+            birelay: CosmosStarknetBiRelay {
+                runtime: birelay.runtime.clone(),
+                relay_a_to_b: birelay.relay_b_to_a.clone(),
+                relay_b_to_a: birelay.relay_a_to_b.clone(),
+            },
+        };
+
+        let relay_driver_a_b = StarknetCosmosRelayDriver { birelay };
 
         let driver = StarknetTestDriver {
-            relay_driver,
+            relay_driver_a_b,
+            relay_driver_b_a,
             starknet_chain_driver,
             cosmos_chain_driver,
             connection_id_a,

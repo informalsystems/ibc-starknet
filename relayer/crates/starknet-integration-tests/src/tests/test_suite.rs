@@ -1,3 +1,4 @@
+use cgp::core::field::Index;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::types::Error;
 use hermes_ibc_test_suite::tests::clearing::TestPacketClearing;
@@ -13,7 +14,9 @@ fn test_ibc_transfer() -> Result<(), Error> {
     runtime.runtime.clone().block_on(async move {
         let test_driver = init_starknet_test_driver(&runtime).await?;
 
-        TestIbcTransfer::default().run_test(&test_driver).await?;
+        <TestIbcTransfer<Index<0>, Index<1>>>::default()
+            .run_test(&test_driver)
+            .await?;
 
         <Result<(), Error>>::Ok(())
     })?;
@@ -28,7 +31,9 @@ fn test_packet_clearing() -> Result<(), Error> {
     runtime.runtime.clone().block_on(async move {
         let test_driver = init_starknet_test_driver(&runtime).await?;
 
-        TestPacketClearing::default().run_test(&test_driver).await?;
+        <TestPacketClearing<Index<0>, Index<1>>>::default()
+            .run_test(&test_driver)
+            .await?;
 
         <Result<(), Error>>::Ok(())
     })?;
