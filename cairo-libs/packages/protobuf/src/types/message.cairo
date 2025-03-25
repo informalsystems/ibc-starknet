@@ -241,5 +241,14 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
         value.encode_raw(ref context);
         context.buffer
     }
+
+    fn encode_as_msg<T, +ProtoMessage<T>, +Default<T>, +Drop<T>, +PartialEq<T>>(
+        value: @T,
+    ) -> ByteArray {
+        // TODO(rano): can we avoid this?
+        let mut context = EncodeContextImpl::new();
+        context.encode_field(1, value);
+        context.buffer
+    }
 }
 

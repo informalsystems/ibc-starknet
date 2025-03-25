@@ -90,19 +90,19 @@ pub fn validator_sets_match(validator_set: @ValidatorSet, header_validator_hash:
 pub fn header_matches_commit(header: @Header, commit_hash: @Array<u8>) {
     let header_bytes = array![
         ProtoCodecImpl::encode(header.version),
-        ProtoCodecImpl::encode(header.chain_id),
-        ProtoCodecImpl::encode(header.height),
+        ProtoCodecImpl::encode_as_msg(header.chain_id),
+        ProtoCodecImpl::encode_as_msg(header.height),
         ProtoCodecImpl::encode(header.time),
         ProtoCodecImpl::encode(header.last_block_id),
-        ProtoCodecImpl::encode(header.last_commit_hash),
-        ProtoCodecImpl::encode(header.data_hash),
-        ProtoCodecImpl::encode(header.validators_hash),
-        ProtoCodecImpl::encode(header.next_validators_hash),
-        ProtoCodecImpl::encode(header.consensus_hash),
-        ProtoCodecImpl::encode(header.app_hash),
-        ProtoCodecImpl::encode(header.last_results_hash),
-        ProtoCodecImpl::encode(header.evidence_hash),
-        ProtoCodecImpl::encode(header.proposer_address),
+        ProtoCodecImpl::encode_as_msg(header.last_commit_hash),
+        ProtoCodecImpl::encode_as_msg(header.data_hash),
+        ProtoCodecImpl::encode_as_msg(header.validators_hash),
+        ProtoCodecImpl::encode_as_msg(header.next_validators_hash),
+        ProtoCodecImpl::encode_as_msg(header.consensus_hash),
+        ProtoCodecImpl::encode_as_msg(header.app_hash),
+        ProtoCodecImpl::encode_as_msg(header.last_results_hash),
+        ProtoCodecImpl::encode_as_msg(header.evidence_hash),
+        ProtoCodecImpl::encode_as_msg(header.proposer_address),
     ];
 
     let hash_bytes = MerkleHashImpl::hash_byte_vectors(header_bytes.span());
