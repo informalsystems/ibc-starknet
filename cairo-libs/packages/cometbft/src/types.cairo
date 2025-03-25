@@ -590,14 +590,15 @@ impl AccountIdDefault of core::traits::Default<AccountId> {
     }
 }
 
-impl AccountIdasProtoMessage of ProtoMessage<AccountId> {
+impl AccountIdAsProtoMessage of ProtoMessage<AccountId> {
     fn encode_raw(self: @AccountId, ref context: EncodeContext) {
-        context.encode_field(1, self.id.span().into());
+        let bytes: Array<u8> = self.id.span().into();
+        BytesAsProtoMessage::encode_raw(@bytes, ref context);
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<AccountId> {
-        let id_bytes: Array<u8> = context.decode_field(1)?;
-        id_bytes.try_into()
+        let bytes = BytesAsProtoMessage::decode_raw(ref context)?;
+        bytes.try_into()
     }
 
     fn wire_type() -> WireType {
