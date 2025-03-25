@@ -28,7 +28,7 @@ impl ConnectionEndAsProtoMessage of ProtoMessage<ConnectionEnd> {
     fn encode_raw(self: @ConnectionEnd, ref context: EncodeContext) {
         let client_id_ba = self.client_id.to_byte_array();
         context.encode_field(1, @client_id_ba);
-        context.encode_field(2, self.version);
+        context.encode_repeated_field(2, @array![self.version.clone()]);
         context.encode_enum(3, self.state);
         context.encode_field(4, self.counterparty);
         context.encode_field(5, @self.delay_period.as_nanos());
