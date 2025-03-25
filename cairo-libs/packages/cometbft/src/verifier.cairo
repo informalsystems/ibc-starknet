@@ -6,6 +6,8 @@ use cometbft::types::{
 };
 use cometbft::utils::{Fraction, TWO_THIRDS};
 use core::num::traits::CheckedAdd;
+use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
+use protobuf::primitives::numeric::U64AsProtoMessage;
 use protobuf::types::message::ProtoCodecImpl;
 use protobuf::types::wkt::{Duration, Timestamp};
 use crate::utils::{MerkleHashImpl, u32_8_to_array_u8};
@@ -70,24 +72,43 @@ pub fn verify_header_is_from_past(
 }
 
 pub fn validator_sets_match(validator_set: @ValidatorSet, header_validator_hash: @Array<u8>) {
-    let mut validator_hash_bytes = array![];
+    let mut validator_bytes = array![];
 
     for validator in validator_set.validators {
         let simple_validator: SimpleValidator = validator.clone().into();
-        let hash_bytes = ProtoCodecImpl::encode(@simple_validator);
-        validator_hash_bytes.append(hash_bytes);
+        let bytes = ProtoCodecImpl::encode(@simple_validator);
+        validator_bytes.append(bytes);
     }
 
-    let actual_hash = MerkleHashImpl::hash_byte_vectors(validator_hash_bytes.span());
+    let hash = MerkleHashImpl::hash_byte_vectors(validator_bytes.span());
 
     assert(
-        header_validator_hash == @u32_8_to_array_u8(actual_hash),
-        CometErrors::INVALID_VALIDATOR_SET_HASH,
+        header_validator_hash == @u32_8_to_array_u8(hash), CometErrors::INVALID_VALIDATOR_SET_HASH,
     );
 }
 
-// TODO(rano): hash header and check equality
-pub fn header_matches_commit(header: @Header, commit_hash: @Array<u8>) {}
+pub fn header_matches_commit(header: @Header, commit_hash: @Array<u8>) {
+    let header_bytes = array![
+        ProtoCodecImpl::encode(header.version),
+        ProtoCodecImpl::encode(header.chain_id),
+        ProtoCodecImpl::encode(header.height),
+        ProtoCodecImpl::encode(header.time),
+        ProtoCodecImpl::encode(header.last_block_id),
+        ProtoCodecImpl::encode(header.last_commit_hash),
+        ProtoCodecImpl::encode(header.data_hash),
+        ProtoCodecImpl::encode(header.validators_hash),
+        ProtoCodecImpl::encode(header.next_validators_hash),
+        ProtoCodecImpl::encode(header.consensus_hash),
+        ProtoCodecImpl::encode(header.app_hash),
+        ProtoCodecImpl::encode(header.last_results_hash),
+        ProtoCodecImpl::encode(header.evidence_hash),
+        ProtoCodecImpl::encode(header.proposer_address),
+    ];
+
+    let hash_bytes = MerkleHashImpl::hash_byte_vectors(header_bytes.span());
+
+    assert(commit_hash == @u32_8_to_array_u8(hash_bytes), CometErrors::INVALID_VALIDATOR_SET_HASH);
+}
 
 pub fn valid_commit(signed_header: @SignedHeader, validators: @ValidatorSet) {
     valid_commit_validate(signed_header, validators);
