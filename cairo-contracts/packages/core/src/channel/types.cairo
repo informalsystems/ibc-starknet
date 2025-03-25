@@ -1,5 +1,10 @@
 use core::num::traits::Zero;
 use ics23::{IntoArrayU32, array_u8_into_array_u32};
+use protobuf::primitives::array::ByteArrayAsProtoMessage;
+use protobuf::types::message::{
+    DecodeContext, EncodeContext, EncodeContextTrait, ProtoMessage, ProtoName,
+};
+use protobuf::types::tag::WireType;
 use starknet_ibc_core::channel::ChannelErrors;
 use starknet_ibc_core::client::{Height, HeightPartialOrd, Timestamp, TimestampPartialOrd};
 use starknet_ibc_core::commitment::{StateValue, StateValueZero};
@@ -46,6 +51,31 @@ pub struct ChannelEnd {
     pub remote: Counterparty,
     pub connection_id: ConnectionId,
     pub version: AppVersion,
+}
+
+impl ChannelEndAsProtoMessage of ProtoMessage<ChannelEnd> {
+    fn encode_raw(self: @ChannelEnd, ref context: EncodeContext) {
+        context.encode_enum(1, self.state);
+        context.encode_enum(2, self.ordering);
+        context.encode_field(3, self.remote);
+        context.encode_repeated_field(4, @array![self.connection_id.connection_id.clone()]);
+        context.encode_field(5, self.version.version);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<ChannelEnd> {
+        // FIXME: Implement decode when required
+        None
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl ChannelEndAsProtoName of ProtoName<ChannelEnd> {
+    fn type_url() -> ByteArray {
+        "ChannelEnd"
+    }
 }
 
 #[generate_trait]
@@ -231,11 +261,32 @@ pub enum ChannelState {
     Closed,
 }
 
+pub impl ChannelStateIntoU32 of Into<@ChannelState, u32> {
+    fn into(self: @ChannelState) -> u32 {
+        match self {
+            ChannelState::Uninitialized => 0,
+            ChannelState::Init => 1,
+            ChannelState::TryOpen => 2,
+            ChannelState::Open => 3,
+            ChannelState::Closed => 4,
+        }
+    }
+}
+
 #[derive(Copy, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub enum ChannelOrdering {
     #[default]
     Unordered,
     Ordered,
+}
+
+pub impl ChannelOrderingIntoU32 of Into<@ChannelOrdering, u32> {
+    fn into(self: @ChannelOrdering) -> u32 {
+        match self {
+            ChannelOrdering::Unordered => 1,
+            ChannelOrdering::Ordered => 2,
+        }
+    }
 }
 
 pub impl ChannelOrderingIntoByteArray of Into<ChannelOrdering, ByteArray> {
@@ -266,11 +317,34 @@ pub impl AppVersionZero of Zero<AppVersion> {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Counterparty {
     pub port_id: PortId,
     pub channel_id: ChannelId,
 }
+
+impl CounterpartyAsProtoMessage of ProtoMessage<Counterparty> {
+    fn encode_raw(self: @Counterparty, ref context: EncodeContext) {
+        context.encode_field(1, self.port_id.port_id);
+        context.encode_field(2, self.channel_id.channel_id);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<Counterparty> {
+        // FIXME: Implement decode when required
+        None
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl CounterpartyAsProtoName of ProtoName<Counterparty> {
+    fn type_url() -> ByteArray {
+        "Counterparty"
+    }
+}
+
 
 #[generate_trait]
 pub impl CounterpartyImpl of CounterpartyTrait {

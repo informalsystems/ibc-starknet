@@ -111,7 +111,7 @@ pub impl ConnectionIdIntoByteArray of Into<ConnectionId, ByteArray> {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ChannelId {
     pub channel_id: ByteArray,
 }
@@ -182,7 +182,7 @@ pub impl ChannelIdIntoByteArray of Into<ChannelId, ByteArray> {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct PortId {
     pub port_id: ByteArray,
 }
