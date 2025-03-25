@@ -14,9 +14,9 @@ fn test_ibc_transfer() -> Result<(), Error> {
     runtime.runtime.clone().block_on(async move {
         let test_driver = init_starknet_test_driver(&runtime).await?;
 
-        // <TestIbcTransfer<Index<0>, Index<1>>>::default()
-        //     .run_test(&test_driver)
-        //     .await?;
+        <TestIbcTransfer<Index<0>, Index<1>>>::default()
+            .run_test(&test_driver)
+            .await?;
 
         <TestIbcTransfer<Index<1>, Index<0>>>::default()
             .run_test(&test_driver)
