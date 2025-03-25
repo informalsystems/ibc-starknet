@@ -13,7 +13,7 @@ fn test_ibc_transfer() -> Result<(), Error> {
     runtime.runtime.clone().block_on(async move {
         let test_driver = init_starknet_test_driver(&runtime).await?;
 
-        TestIbcTransfer.run_test(&test_driver).await?;
+        TestIbcTransfer::default().run_test(&test_driver).await?;
 
         <Result<(), Error>>::Ok(())
     })?;
@@ -28,7 +28,7 @@ fn test_packet_clearing() -> Result<(), Error> {
     runtime.runtime.clone().block_on(async move {
         let test_driver = init_starknet_test_driver(&runtime).await?;
 
-        TestPacketClearing.run_test(&test_driver).await?;
+        TestPacketClearing::default().run_test(&test_driver).await?;
 
         <Result<(), Error>>::Ok(())
     })?;

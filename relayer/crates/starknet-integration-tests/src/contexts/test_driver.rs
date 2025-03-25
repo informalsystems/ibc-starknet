@@ -40,12 +40,12 @@ use hermes_test_components::setup::traits::port_id_at::PortIdGetterAtComponent;
 use ibc::core::host::types::identifiers::PortId;
 
 use crate::contexts::chain_driver::StarknetChainDriver;
-use crate::contexts::relay_driver::StarknetRelayDriver;
+use crate::contexts::starknet_cosmos_relay_driver::StarknetCosmosRelayDriver;
 
 #[cgp_context(StarknetTestDriverComponents)]
 #[derive(HasField)]
 pub struct StarknetTestDriver {
-    pub relay_driver: StarknetRelayDriver,
+    pub relay_driver: StarknetCosmosRelayDriver,
     pub starknet_chain_driver: StarknetChainDriver,
     pub cosmos_chain_driver: CosmosChainDriver,
     pub connection_id_a: ConnectionId,
@@ -83,7 +83,7 @@ delegate_components! {
         ChainDriverTypeProviderAtComponent<Index<1>>:
             UseType<CosmosChainDriver>,
         RelayDriverTypeProviderAtComponent<Index<0>, Index<1>>:
-            UseType<StarknetRelayDriver>,
+            UseType<StarknetCosmosRelayDriver>,
         ChainDriverGetterAtComponent<Index<0>>:
             UseField<symbol!("starknet_chain_driver")>,
         ChainDriverGetterAtComponent<Index<1>>:
@@ -126,7 +126,7 @@ where
         port_id_a: PortId,
         port_id_b: PortId,
     ) -> Result<StarknetTestDriver, Setup::Error> {
-        let relay_driver = StarknetRelayDriver { birelay };
+        let relay_driver = StarknetCosmosRelayDriver { birelay };
 
         let driver = StarknetTestDriver {
             relay_driver,
