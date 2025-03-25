@@ -266,6 +266,6 @@ mod tests {
         array.append(0xDE);
         array.append(0xF0);
 
-        assert_eq!(u32_8_to_array_u8(u32_8), array);
+        assert_eq!(array, u32_8_to_array_u8(u32_8));
     }
 }
