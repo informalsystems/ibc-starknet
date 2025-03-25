@@ -1,12 +1,14 @@
 use cometbft::errors::CometErrors;
 use cometbft::types::{
-    NonAbsentCommitVotes, NonAbsentCommitVotesTrait, Options, SignedHeader, TrustedBlockState,
-    UntrustedBlockState, UntrustedBlockStateTrait, ValidatorSet, ValidatorSetTrait,
-    VotingPowerTally, VotingPowerTallyTrait,
+    BlockIdFlag, Header, NonAbsentCommitVotes, NonAbsentCommitVotesTrait, Options, SignedHeader,
+    SimpleValidator, TrustedBlockState, UntrustedBlockState, UntrustedBlockStateTrait, ValidatorSet,
+    ValidatorSetTrait, VotingPowerTally, VotingPowerTallyTrait,
 };
 use cometbft::utils::{Fraction, TWO_THIRDS};
 use core::num::traits::CheckedAdd;
-use protobuf::types::wkt::Timestamp;
+use protobuf::types::message::ProtoCodecImpl;
+use protobuf::types::wkt::{Duration, Timestamp};
+use crate::utils::{MerkleHashImpl, u32_8_to_array_u8};
 
 /// Verifies an update header received as the `header` field of `MsgUpdateClient`.
 ///
@@ -33,15 +35,168 @@ pub fn verify_misbehaviour_header(
     verify_commit_against_trusted(untrusted, trusted, options)
 }
 
-pub fn verify_validator_sets(untrusted: @UntrustedBlockState) {}
+pub fn verify_validator_sets(untrusted: @UntrustedBlockState) {
+    validator_sets_match(untrusted.validators, untrusted.signed_header.header.validators_hash);
+    validator_sets_match(
+        untrusted.nex_validators, untrusted.signed_header.header.next_validators_hash,
+    );
+    header_matches_commit(
+        untrusted.signed_header.header, untrusted.signed_header.commit.block_id.hash,
+    );
+    valid_commit(untrusted.signed_header, untrusted.validators);
+}
 
 pub fn validate_against_trusted(
     untrusted: @UntrustedBlockState, trusted: @TrustedBlockState, options: @Options, now: Timestamp,
-) {}
+) {
+    is_within_trust_period(trusted.header_time, options.trusting_period, now);
+    is_monotonic_bft_time(untrusted.signed_header.header.time, trusted.header_time);
+    is_matching_chain_id(untrusted.signed_header.header.chain_id, trusted.chain_id);
+    let trusted_next_height = trusted.height.checked_add(1);
+    assert(trusted_next_height.is_some(), CometErrors::OVERFLOWED_BLOCK_HEIGHT);
+    if untrusted.height() == @trusted_next_height.unwrap() {
+        valid_next_validator_set(
+            untrusted.signed_header.header.validators_hash, trusted.next_validators_hash,
+        );
+    } else {
+        is_monotonic_height(untrusted.signed_header.header.height, trusted.height);
+    }
+}
 
 pub fn verify_header_is_from_past(
     untrusted: @UntrustedBlockState, options: @Options, now: Timestamp,
-) {}
+) {
+    is_header_from_past(untrusted.signed_header.header.time, options.clock_drift, now);
+}
+
+pub fn validator_sets_match(validator_set: @ValidatorSet, header_validator_hash: @Array<u8>) {
+    let mut validator_hash_bytes = array![];
+
+    for validator in validator_set.validators {
+        let simple_validator: SimpleValidator = validator.clone().into();
+        let hash_bytes = ProtoCodecImpl::encode(@simple_validator);
+        validator_hash_bytes.append(hash_bytes);
+    }
+
+    let actual_hash = MerkleHashImpl::hash_byte_vectors(validator_hash_bytes.span());
+
+    assert(
+        header_validator_hash == @u32_8_to_array_u8(actual_hash),
+        CometErrors::INVALID_VALIDATOR_SET_HASH,
+    );
+}
+
+// TODO(rano): hash header and check equality
+pub fn header_matches_commit(header: @Header, commit_hash: @Array<u8>) {}
+
+pub fn valid_commit(signed_header: @SignedHeader, validators: @ValidatorSet) {
+    valid_commit_validate(signed_header, validators);
+    valid_commit_validate_full(signed_header, validators);
+}
+
+pub fn valid_commit_validate(signed_header: @SignedHeader, validators: @ValidatorSet) {
+    assert(
+        signed_header.commit.signatures.len() == validators.validators.len(),
+        CometErrors::INVALID_SIGNATURE_COUNT,
+    );
+
+    let mut count_absent_votes = 0;
+
+    let mut signatures = signed_header.commit.signatures.span();
+    while let Some(elem) = signatures.pop_front() {
+        let block_id_flag = elem.block_id_flag;
+        if (block_id_flag != @BlockIdFlag::Commit && block_id_flag != @BlockIdFlag::Nil) {
+            count_absent_votes += 1;
+        }
+    }
+
+    // requires at least one non-absent vote
+    assert(count_absent_votes < validators.validators.len(), CometErrors::INVALID_SIGNATURE_COUNT);
+}
+
+pub fn valid_commit_validate_full(signed_header: @SignedHeader, validators: @ValidatorSet) {
+    let mut signatures = signed_header.commit.signatures.span();
+    while let Some(elem) = signatures.pop_front() {
+        if elem.block_id_flag == @BlockIdFlag::Unknown
+            || elem.block_id_flag == @BlockIdFlag::Absent {
+            continue;
+        }
+
+        let validator_address = elem.validator_address;
+
+        let mut validators_span = validators.validators.span();
+
+        let mut found = false;
+
+        while let Some(elem) = validators_span.pop_front() {
+            if elem.address == validator_address {
+                found = true;
+                break;
+            }
+        }
+
+        assert(found, CometErrors::INVALID_SIGNATURE_LENGTH);
+    }
+}
+
+pub fn is_within_trust_period(
+    trusted_header_time: @Timestamp, trusting_period: @Duration, now: Timestamp,
+) {
+    let mut expires_at = trusted_header_time.clone();
+    expires_at.seconds += *trusting_period.seconds;
+    expires_at.nanos += *trusting_period.nanos;
+
+    if expires_at.nanos >= 1_000_000_000 {
+        let quo = expires_at.nanos / 1_000_000_000;
+        let rem = expires_at.nanos % 1_000_000_000;
+
+        expires_at.seconds += quo.into();
+        expires_at.nanos = rem;
+    }
+
+    assert(now < expires_at, CometErrors::TRUSTED_HEADER_EXPIRED);
+}
+
+pub fn is_monotonic_bft_time(untrusted_time: @Timestamp, trusted_time: @Timestamp) {
+    assert(untrusted_time > trusted_time, CometErrors::NON_MONOTONIC_BFT_TIME);
+}
+
+pub fn is_matching_chain_id(untrusted_chain_id: @ByteArray, trusted_chain_id: @ByteArray) {
+    assert(untrusted_chain_id == trusted_chain_id, CometErrors::CHAIN_ID_MISMATCH);
+}
+
+pub fn valid_next_validator_set(
+    untrusted_validator_hash: @Array<u8>, trusted_next_validator_hash: @Array<u8>,
+) {
+    assert(
+        untrusted_validator_hash == trusted_next_validator_hash,
+        CometErrors::INVALID_NEXT_VALIDATOR_SET,
+    );
+}
+
+pub fn is_monotonic_height(untrusted_height: @u64, trusted_height: @u64) {
+    assert(untrusted_height > trusted_height, CometErrors::NON_MONOTONIC_HEIGHT);
+}
+
+pub fn is_header_from_past(
+    untrusted_header_time: @Timestamp, clock_drift: @Duration, now: Timestamp,
+) {
+    let mut drifted = now.clone();
+
+    drifted.seconds += *clock_drift.seconds;
+    drifted.nanos += *clock_drift.nanos;
+
+    if drifted.nanos >= 1_000_000_000 {
+        let quo = drifted.nanos / 1_000_000_000;
+        let rem = drifted.nanos % 1_000_000_000;
+
+        drifted.seconds += quo.into();
+        drifted.nanos = rem;
+    }
+
+    assert(untrusted_header_time < @drifted, CometErrors::NON_MONOTONIC_BFT_TIME);
+}
+
 
 /// Verify that a) there is enough overlap between the validator sets of the
 /// trusted and untrusted blocks and b) more than 2/3 of the validators
@@ -51,15 +206,15 @@ pub fn verify_commit_against_trusted(
 ) {
     let trusted_next_height = trusted.height.checked_add(1);
     assert(trusted_next_height.is_some(), CometErrors::OVERFLOWED_BLOCK_HEIGHT);
-    if untrusted.height() != @trusted_next_height.unwrap() {
+    if untrusted.height() == @trusted_next_height.unwrap() {
+        check_signers_overlap(untrusted.signed_header.clone(), untrusted.validators.clone());
+    } else {
         check_enough_trust_and_signers(
             untrusted.signed_header.clone(),
             untrusted.validators.clone(),
             trusted.next_validators,
             options.trust_threshold,
         );
-    } else {
-        check_signers_overlap(untrusted.signed_header.clone(), untrusted.validators.clone());
     }
 }
 

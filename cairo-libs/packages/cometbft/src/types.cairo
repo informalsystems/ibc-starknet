@@ -100,6 +100,7 @@ impl BlockIdAsProtoName of ProtoName<BlockId> {
     }
 }
 
+
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Header {
     pub version: Consensus,
@@ -107,15 +108,15 @@ pub struct Header {
     pub height: u64,
     pub time: Timestamp,
     pub last_block_id: BlockId,
-    pub last_commit_hash: ByteArray,
-    pub data_hash: ByteArray,
-    pub validators_hash: ByteArray,
-    pub next_validators_hash: ByteArray,
-    pub consensus_hash: ByteArray,
-    pub app_hash: ByteArray,
-    pub last_results_hash: ByteArray,
-    pub evidence_hash: ByteArray,
-    pub proposer_address: ByteArray,
+    pub last_commit_hash: Array<u8>,
+    pub data_hash: Array<u8>,
+    pub validators_hash: Array<u8>,
+    pub next_validators_hash: Array<u8>,
+    pub consensus_hash: Array<u8>,
+    pub app_hash: Array<u8>,
+    pub last_results_hash: Array<u8>,
+    pub evidence_hash: Array<u8>,
+    pub proposer_address: Array<u8>,
 }
 
 impl HeaderAsProtoMessage of ProtoMessage<Header> {
@@ -217,7 +218,7 @@ pub impl U32TryIntoBlockIdFlag of TryInto<u32, BlockIdFlag> {
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct CommitSig {
     pub block_id_flag: BlockIdFlag,
-    pub validator_address: ByteArray,
+    pub validator_address: AccountId,
     pub timestamp: Timestamp,
     pub signature: ByteArray,
 }
@@ -445,6 +446,43 @@ impl ValidatorAsProtoName of ProtoName<Validator> {
     }
 }
 
+
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
+pub struct SimpleValidator {
+    pub pub_key: PublicKey,
+    pub voting_power: u64,
+}
+
+impl SimpleValidatorAsProtoMessage of ProtoMessage<SimpleValidator> {
+    fn encode_raw(self: @SimpleValidator, ref context: EncodeContext) {
+        context.encode_field(1, self.pub_key);
+        context.encode_field(2, self.voting_power);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<SimpleValidator> {
+        let pub_key = context.decode_field(1)?;
+        let voting_power = context.decode_field(2)?;
+        Option::Some(SimpleValidator { pub_key, voting_power })
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl SimpleValidatorAsProtoName of ProtoName<SimpleValidator> {
+    fn type_url() -> ByteArray {
+        "SimpleValidator"
+    }
+}
+
+impl ValidatorToSimpleValidator of Into<Validator, SimpleValidator> {
+    fn into(self: Validator) -> SimpleValidator {
+        SimpleValidator { pub_key: self.pub_key, voting_power: self.voting_power }
+    }
+}
+
+
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ValidatorSet {
     pub validators: Array<Validator>,
@@ -575,13 +613,6 @@ impl AccountIdSerde of Serde<AccountId> {
     }
 }
 
-#[derive(Default, Debug, Drop, Clone, PartialEq, Serde)]
-pub enum Hash {
-    #[default]
-    NoHash,
-    Sha256: Array<u8>,
-}
-
 #[derive(Drop, Debug, Clone, PartialEq)]
 pub struct NonAbsentCommitVotes {
     votes: Array<NonAbsentCommitVote>,
@@ -680,7 +711,7 @@ pub struct TrustedBlockState {
     pub header_time: Timestamp,
     pub height: u64,
     pub next_validators: ValidatorSet,
-    pub next_validators_hash: Hash,
+    pub next_validators_hash: Array<u8>,
 }
 
 #[derive(Drop, Debug, Clone)]

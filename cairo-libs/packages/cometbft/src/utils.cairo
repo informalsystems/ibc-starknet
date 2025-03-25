@@ -1,3 +1,4 @@
+use core::sha256::compute_sha256_byte_array;
 use protobuf::primitives::numeric::U64AsProtoMessage;
 use protobuf::types::message::{
     DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
@@ -83,5 +84,80 @@ pub impl SpanU8TryIntoU256 of TryInto<Span<u8>, u256> {
         ret.low = ret.low * N256 + (*self[31]).into();
 
         Option::Some(ret)
+    }
+}
+
+
+pub fn u32_8_to_byte_array(u32_8: [u32; 8]) -> ByteArray {
+    let mut byte_array = "";
+    let mut span = u32_8.span();
+    while let Some(elem) = span.pop_front() {
+        let word = *elem;
+        byte_array.append_byte(((word / 0x1000000) & 0xFF).try_into().unwrap());
+        byte_array.append_byte(((word / 0x10000) & 0xFF).try_into().unwrap());
+        byte_array.append_byte(((word / 0x100) & 0xFF).try_into().unwrap());
+        byte_array.append_byte((word & 0xFF).try_into().unwrap());
+    }
+    byte_array
+}
+
+pub fn u32_8_to_array_u8(u32_8: [u32; 8]) -> Array<u8> {
+    let mut array_u8 = ArrayTrait::new();
+    let mut span = u32_8.span();
+    while let Some(elem) = span.pop_front() {
+        let word = *elem;
+        array_u8.append(((word / 0x1000000) & 0xFF).try_into().unwrap());
+        array_u8.append(((word / 0x10000) & 0xFF).try_into().unwrap());
+        array_u8.append(((word / 0x100) & 0xFF).try_into().unwrap());
+        array_u8.append((word & 0xFF).try_into().unwrap());
+    }
+    array_u8
+}
+
+pub fn next_power_of_two(mut length: u32) -> u32 {
+    let mut two_power = 1;
+    while length != two_power {
+        // if the bit is set, make it unset
+        if length & two_power != 0 {
+            length = length ^ two_power;
+        }
+        two_power *= 2;
+    }
+    length
+}
+
+#[generate_trait]
+pub impl MerkleHashImpl of MerkleHashTrait {
+    fn empty_hash() -> [u32; 8] {
+        compute_sha256_byte_array(@"")
+    }
+
+    fn leaf_hash(leaf: @ByteArray) -> [u32; 8] {
+        let mut hash_bytes = "";
+        hash_bytes.append_byte(0x00);
+        hash_bytes.append(leaf);
+        compute_sha256_byte_array(@hash_bytes)
+    }
+
+    fn inner_hash(left: [u32; 8], right: [u32; 8]) -> [u32; 8] {
+        let mut hash_bytes = "";
+        hash_bytes.append_byte(0x01);
+        hash_bytes.append(@u32_8_to_byte_array(left));
+        hash_bytes.append(@u32_8_to_byte_array(right));
+        compute_sha256_byte_array(@hash_bytes)
+    }
+
+    fn hash_byte_vectors(byte_vecs: Span<ByteArray>) -> [u32; 8] {
+        let length: u32 = byte_vecs.len();
+        match length {
+            0 => Self::empty_hash(),
+            1 => Self::leaf_hash(byte_vecs[0]),
+            _ => {
+                let split = next_power_of_two(length) / 2;
+                let left = Self::hash_byte_vectors(byte_vecs.slice(0, split));
+                let right = Self::hash_byte_vectors(byte_vecs.slice(split, length));
+                Self::inner_hash(left, right)
+            },
+        }
     }
 }

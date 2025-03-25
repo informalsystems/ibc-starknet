@@ -1,4 +1,11 @@
 pub mod CometErrors {
+    pub const INVALID_SIGNATURE_COUNT: felt252 = 'ICS07: invalid sig count';
+    pub const INVALID_VALIDATOR_SET_HASH: felt252 = 'ICS07: invalid val set hash';
+    pub const NON_MONOTONIC_BFT_TIME: felt252 = 'ICS07: non-monotonic bft time';
+    pub const TRUSTED_HEADER_EXPIRED: felt252 = 'ICS07: trusted header expired';
+    pub const CHAIN_ID_MISMATCH: felt252 = 'ICS07: chain id mismatch';
+    pub const NON_MONOTONIC_HEIGHT: felt252 = 'ICS07: non-monotonic height';
+    pub const INVALID_NEXT_VALIDATOR_SET: felt252 = 'ICS07: invalid next val set';
     pub const INVALID_SIGNATURE_LENGTH: felt252 = 'ICS07: invalid signature length';
     pub const INVALID_PUBKEY_LENGTH: felt252 = 'ICS07: invalid pubkey length';
     pub const INVALID_ED25519_SIGNATURE: felt252 = 'ICS07: invalid ed25519 sig';
