@@ -1,4 +1,5 @@
 pub mod CometErrors {
+    pub const INVALID_COMMIT_HASH: felt252 = 'ICS07: invalid commit hash';
     pub const INVALID_SIGNATURE_COUNT: felt252 = 'ICS07: invalid sig count';
     pub const INVALID_VALIDATOR_SET_HASH: felt252 = 'ICS07: invalid val set hash';
     pub const NON_MONOTONIC_BFT_TIME: felt252 = 'ICS07: non-monotonic bft time';

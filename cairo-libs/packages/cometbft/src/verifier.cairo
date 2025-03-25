@@ -107,7 +107,7 @@ pub fn header_matches_commit(header: @Header, commit_hash: @Array<u8>) {
 
     let hash_bytes = MerkleHashImpl::hash_byte_vectors(header_bytes.span());
 
-    assert(commit_hash == @u32_8_to_array_u8(hash_bytes), CometErrors::INVALID_VALIDATOR_SET_HASH);
+    assert(commit_hash == @u32_8_to_array_u8(hash_bytes), CometErrors::INVALID_COMMIT_HASH);
 }
 
 pub fn valid_commit(signed_header: @SignedHeader, validators: @ValidatorSet) {
