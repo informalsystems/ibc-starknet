@@ -694,7 +694,7 @@ pub enum VoteType {
 pub struct UntrustedBlockState {
     pub signed_header: SignedHeader,
     pub validators: ValidatorSet,
-    pub nex_validators: ValidatorSet,
+    pub next_validators: ValidatorSet,
 }
 
 #[generate_trait]
