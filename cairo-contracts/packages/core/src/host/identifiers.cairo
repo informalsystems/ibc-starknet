@@ -7,7 +7,7 @@ use starknet_ibc_core::commitment::StateValue;
 use starknet_ibc_core::host::errors::HostErrors;
 use starknet_ibc_utils::{ComputeKey, ValidateBasic, poseidon_hash};
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ClientId {
     pub client_type: felt252,
     pub sequence: u64,
@@ -20,6 +20,10 @@ pub impl ClientIdImpl of ClientIdTrait {
     }
 
     fn validate(self: @ClientId, client_id_hash: felt252) {}
+
+    fn to_byte_array(self: @ClientId) -> ByteArray {
+        format!("{}-{}", self.client_type, self.sequence)
+    }
 }
 
 pub impl ClientIdZero of Zero<ClientId> {
@@ -36,7 +40,7 @@ pub impl ClientIdZero of Zero<ClientId> {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ConnectionId {
     pub connection_id: ByteArray,
 }

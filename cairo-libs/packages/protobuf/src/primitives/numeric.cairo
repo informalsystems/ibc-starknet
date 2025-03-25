@@ -6,7 +6,27 @@ use protobuf::types::message::{
     ProtoMessage, decode_raw,
 };
 use protobuf::types::tag::WireType;
-use protobuf::varint::{decode_varint_from_byte_array, encode_varint_to_byte_array};
+use protobuf::varint::{
+    decode_varint_from_byte_array, decode_varintu128_from_byte_array, encode_varint_to_byte_array,
+    encode_varintu128_to_byte_array,
+};
+
+pub impl U128AsProtoMessage of ProtoMessage<u128> {
+    fn encode_raw(self: @u128, ref context: EncodeContext) {
+        let num = (*self).into();
+
+        let bytes = encode_varintu128_to_byte_array(num);
+        context.buffer.append(@bytes);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<u128> {
+        decode_varintu128_from_byte_array(context.buffer, ref context.index).ok()
+    }
+
+    fn wire_type() -> WireType {
+        WireType::Varint
+    }
+}
 
 pub impl U64AsProtoMessage of ProtoMessage<u64> {
     fn encode_raw(self: @u64, ref context: EncodeContext) {
