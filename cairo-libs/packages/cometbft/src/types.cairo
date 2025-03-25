@@ -406,8 +406,8 @@ pub struct Validator {
     pub address: AccountId,
     pub pub_key: PublicKey,
     pub voting_power: u64,
-    pub name: ByteArray, // TODO: optoinal field?
     pub proposer_priority: u64,
+    // pub name: Option<ByteArray>, // not present in protobuf
 }
 
 #[generate_trait]
@@ -422,17 +422,15 @@ impl ValidatorAsProtoMessage of ProtoMessage<Validator> {
         context.encode_field(1, self.address);
         context.encode_field(2, self.pub_key);
         context.encode_field(3, self.voting_power);
-        context.encode_field(4, self.name);
-        context.encode_field(5, self.proposer_priority);
+        context.encode_field(4, self.proposer_priority);
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<Validator> {
         let address = context.decode_field(1)?;
         let pub_key = context.decode_field(2)?;
         let voting_power = context.decode_field(3)?;
-        let name = context.decode_field(4)?;
-        let proposer_priority = context.decode_field(5)?;
-        Option::Some(Validator { address, pub_key, voting_power, name, proposer_priority })
+        let proposer_priority = context.decode_field(4)?;
+        Option::Some(Validator { address, pub_key, voting_power, proposer_priority })
     }
 
     fn wire_type() -> WireType {
