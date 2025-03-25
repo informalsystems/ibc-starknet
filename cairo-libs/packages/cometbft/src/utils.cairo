@@ -156,3 +156,116 @@ pub impl MerkleHashImpl of MerkleHashTrait {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_next_power_of_two() {
+        assert_eq!(next_power_of_two(0), 1);
+        assert_eq!(next_power_of_two(1), 1);
+        assert_eq!(next_power_of_two(2), 2);
+        assert_eq!(next_power_of_two(3), 4);
+        assert_eq!(next_power_of_two(4), 4);
+        assert_eq!(next_power_of_two(5), 8);
+        assert_eq!(next_power_of_two(6), 8);
+        assert_eq!(next_power_of_two(7), 8);
+        assert_eq!(next_power_of_two(8), 8);
+        assert_eq!(next_power_of_two(9), 16);
+    }
+
+    #[test]
+    fn test_u32_8_to_byte_array() {
+        let u32_8 = [
+            0x12345678, 0x9ABCDEF0, 0x12345678, 0x9ABCDEF0, 0x12345678, 0x9ABCDEF0, 0x12345678,
+            0x9ABCDEF0,
+        ];
+        let mut byte_array = "";
+
+        byte_array.append_byte(0x12);
+        byte_array.append_byte(0x34);
+        byte_array.append_byte(0x56);
+        byte_array.append_byte(0x78);
+        byte_array.append_byte(0x9A);
+        byte_array.append_byte(0xBC);
+        byte_array.append_byte(0xDE);
+        byte_array.append_byte(0xF0);
+
+        byte_array.append_byte(0x12);
+        byte_array.append_byte(0x34);
+        byte_array.append_byte(0x56);
+        byte_array.append_byte(0x78);
+        byte_array.append_byte(0x9A);
+        byte_array.append_byte(0xBC);
+        byte_array.append_byte(0xDE);
+        byte_array.append_byte(0xF0);
+
+        byte_array.append_byte(0x12);
+        byte_array.append_byte(0x34);
+        byte_array.append_byte(0x56);
+        byte_array.append_byte(0x78);
+        byte_array.append_byte(0x9A);
+        byte_array.append_byte(0xBC);
+        byte_array.append_byte(0xDE);
+        byte_array.append_byte(0xF0);
+
+        byte_array.append_byte(0x12);
+        byte_array.append_byte(0x34);
+        byte_array.append_byte(0x56);
+        byte_array.append_byte(0x78);
+        byte_array.append_byte(0x9A);
+        byte_array.append_byte(0xBC);
+        byte_array.append_byte(0xDE);
+        byte_array.append_byte(0xF0);
+
+        assert_eq!(byte_array, u32_8_to_byte_array(u32_8));
+    }
+
+    #[test]
+    fn test_u32_8_to_array_u8() {
+        let u32_8 = [
+            0x12345678, 0x9ABCDEF0, 0x12345678, 0x9ABCDEF0, 0x12345678, 0x9ABCDEF0, 0x12345678,
+            0x9ABCDEF0,
+        ];
+        let mut array = array![];
+
+        array.append(0x12);
+        array.append(0x34);
+        array.append(0x56);
+        array.append(0x78);
+        array.append(0x9A);
+        array.append(0xBC);
+        array.append(0xDE);
+        array.append(0xF0);
+
+        array.append(0x12);
+        array.append(0x34);
+        array.append(0x56);
+        array.append(0x78);
+        array.append(0x9A);
+        array.append(0xBC);
+        array.append(0xDE);
+        array.append(0xF0);
+
+        array.append(0x12);
+        array.append(0x34);
+        array.append(0x56);
+        array.append(0x78);
+        array.append(0x9A);
+        array.append(0xBC);
+        array.append(0xDE);
+        array.append(0xF0);
+
+        array.append(0x12);
+        array.append(0x34);
+        array.append(0x56);
+        array.append(0x78);
+        array.append(0x9A);
+        array.append(0xBC);
+        array.append(0xDE);
+        array.append(0xF0);
+
+        assert_eq!(u32_8_to_array_u8(u32_8), array);
+    }
+}
