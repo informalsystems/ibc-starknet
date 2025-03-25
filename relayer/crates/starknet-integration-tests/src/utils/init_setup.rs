@@ -38,7 +38,7 @@ pub async fn init_starknet_setup(runtime: &HermesRuntime) -> Result<StarknetTest
 pub async fn init_starknet_test_driver(
     runtime: &HermesRuntime,
 ) -> Result<StarknetTestDriver, Error> {
-    let setup = init_starknet_setup(&runtime).await?;
+    let setup = init_starknet_setup(runtime).await?;
 
     let test_driver: StarknetTestDriver = setup.build_driver().await?;
 
