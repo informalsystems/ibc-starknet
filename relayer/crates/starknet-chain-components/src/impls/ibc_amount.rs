@@ -23,7 +23,7 @@ use starknet::macros::selector;
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::contract::call::CanCallContract;
-use crate::traits::queries::address::CanQueryContractAddress;
+use crate::traits::queries::contract_address::CanQueryContractAddress;
 use crate::types::amount::StarknetAmount;
 use crate::types::message_response::StarknetMessageResponse;
 use crate::types::messages::ibc::denom::{Denom, PrefixedDenom, TracePrefix};

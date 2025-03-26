@@ -229,6 +229,7 @@ mod preset {
     use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
     use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
     use crate::impls::queries::status::QueryStarknetChainStatus;
+    use crate::impls::queries::token_address::GetOrCreateCosmosTokenAddressOnStarknet;
     use crate::impls::queries::token_balance::QueryErc20TokenBalance;
     use crate::impls::send_message::SendStarknetMessages;
     use crate::impls::transfer::{IbcTransferTimeoutAfterSeconds, TransferErc20Token};
@@ -258,7 +259,8 @@ mod preset {
     use crate::traits::contract::invoke::ContractInvokerComponent;
     use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
     use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
-    use crate::traits::queries::address::ContractAddressQuerierComponent;
+    use crate::traits::queries::contract_address::ContractAddressQuerierComponent;
+    use crate::traits::queries::token_address::CosmosTokenAddressOnStarknetQuerierComponent;
     use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
     use crate::traits::transfer::TokenTransferComponent;
     use crate::traits::types::blob::BlobTypeComponent;
@@ -326,6 +328,8 @@ mod preset {
                 IbcTransferTimeoutAfterSeconds<90>,
             IbcTransferredAmountConverterComponent:
                 ConvertStarknetTokenAddressFromCosmos,
+            CosmosTokenAddressOnStarknetQuerierComponent:
+                GetOrCreateCosmosTokenAddressOnStarknet,
             TransactionHashTypeComponent:
                 ProvideFeltTxHash,
             TxResponseTypeComponent:

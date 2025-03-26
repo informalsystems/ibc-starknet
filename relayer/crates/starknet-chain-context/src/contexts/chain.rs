@@ -177,7 +177,8 @@ use hermes_starknet_chain_components::traits::proof_signer::{
 use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
-use hermes_starknet_chain_components::traits::queries::address::CanQueryContractAddress;
+use hermes_starknet_chain_components::traits::queries::contract_address::CanQueryContractAddress;
+use hermes_starknet_chain_components::traits::queries::token_address::CosmosTokenAddressOnStarknetQuerierComponent;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::traits::signer::StarknetSignerGetterComponent;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
@@ -524,6 +525,7 @@ check_components! {
         BlockQuerierComponent,
         BlockEventsQuerierComponent,
         BlockTimeQuerierComponent,
+        CosmosTokenAddressOnStarknetQuerierComponent,
         [
             IbcTransferTimeoutCalculatorComponent,
             IbcTransferredAmountConverterComponent,
