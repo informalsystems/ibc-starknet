@@ -45,7 +45,7 @@ where
         let ics20_contract_address = chain.query_contract_address(PhantomData).await?;
 
         let calldata = encoding
-            .encode(&prefixed_denom)
+            .encode(prefixed_denom)
             .map_err(Chain::raise_error)?;
 
         let message = StarknetMessage {

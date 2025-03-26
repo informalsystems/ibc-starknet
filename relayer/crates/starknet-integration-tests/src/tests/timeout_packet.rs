@@ -83,7 +83,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         let packet = cosmos_chain
             .ibc_transfer_token(
                 PhantomData::<StarknetChain>,
-                &cosmos_channel_id,
+                cosmos_channel_id,
                 &PortId::transfer(),
                 wallet_cosmos_a,
                 address_starknet_b,
@@ -181,7 +181,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             let messages = cosmos_chain
                 .build_ibc_token_transfer_messages(
                     PhantomData::<StarknetChain>,
-                    &cosmos_channel_id,
+                    cosmos_channel_id,
                     &PortId::transfer(),
                     address_starknet_b,
                     &Amount::new(transfer_quantity, denom_cosmos.clone()),
@@ -200,7 +200,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             let messages = starknet_chain
                 .build_ibc_token_transfer_messages(
                     PhantomData::<CosmosChain>,
-                    &starknet_channel_id,
+                    starknet_channel_id,
                     &PortId::transfer(),
                     address_cosmos_a,
                     &StarknetAmount::new(transfer_quantity.into(), ics20_token_address),

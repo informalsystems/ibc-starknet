@@ -41,7 +41,7 @@ where
         let ics20_contract_address = chain.query_contract_address(PhantomData).await?;
 
         let denom_serialized = encoding
-            .encode(&prefixed_denom)
+            .encode(prefixed_denom)
             .map_err(Chain::raise_error)?;
 
         let ibc_prefixed_denom_key = Poseidon3Hasher::digest(&denom_serialized);
