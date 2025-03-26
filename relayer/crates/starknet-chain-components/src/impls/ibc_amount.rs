@@ -71,33 +71,17 @@ where
             base: Denom::Hosted(cosmos_denom.to_string()),
         };
 
-        let mut denom_serialized = vec![];
-
-        {
-            // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/apps/src/transfer/types.cairo#L120-L130
-            for trace_prefix in &ibc_prefixed_denom.trace_path {
-                denom_serialized.extend(encoding.encode(trace_prefix).map_err(Chain::raise_error)?);
-            }
-
-            denom_serialized.extend(
-                encoding
-                    .encode(&ibc_prefixed_denom.base)
-                    .map_err(Chain::raise_error)?,
-            );
-        }
-
-        // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/utils/src/utils.cairo#L35
-        let ibc_prefixed_denom_key = Poseidon3Hasher::digest(&denom_serialized);
-
-        let calldata = encoding
-            .encode(&ibc_prefixed_denom_key)
+        let denom_serialized = encoding
+            .encode(&ibc_prefixed_denom)
             .map_err(Chain::raise_error)?;
+
+        let ibc_prefixed_denom_key = Poseidon3Hasher::digest(&denom_serialized);
 
         let output = chain
             .call_contract(
                 &ics20_contract_address,
                 &selector!("ibc_token_address"),
-                &calldata,
+                &vec![ibc_prefixed_denom_key],
                 None,
             )
             .await?;

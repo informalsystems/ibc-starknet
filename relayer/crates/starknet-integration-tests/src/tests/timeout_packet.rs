@@ -6,7 +6,7 @@
 use core::marker::PhantomData;
 use core::time::Duration;
 
-use cgp::prelude::*;
+use hermes_chain_components::traits::send_message::CanSendSingleMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_test_components::chain::types::amount::Amount;
@@ -17,7 +17,7 @@ use hermes_relayer_components::birelay::traits::CanAutoBiRelay;
 use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
+use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
@@ -30,7 +30,7 @@ use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTo
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
 use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
-use poseidon::Poseidon3Hasher;
+use starknet::core::types::Call;
 use starknet::macros::selector;
 use tracing::info;
 
@@ -79,34 +79,20 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                 base: Denom::Hosted(denom_cosmos.to_string()),
             };
 
-            let mut denom_serialized = vec![];
+            let calldata = cairo_encoding.encode(&ibc_prefixed_denom)?;
 
-            {
-                // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/apps/src/transfer/types.cairo#L120-L130
-                for trace_prefix in &ibc_prefixed_denom.trace_path {
-                    denom_serialized.extend(cairo_encoding.encode(trace_prefix)?);
-                }
+            let message = StarknetMessage {
+                call: Call {
+                    to: ics20_contract_address.0,
+                    selector: selector!("create_ibc_token"),
+                    calldata,
+                },
+                counterparty_height: None,
+            };
 
-                denom_serialized.extend(cairo_encoding.encode(&ibc_prefixed_denom.base)?);
-            }
+            let message_response = starknet_chain.send_message(message).await?;
 
-            // https://github.com/informalsystems/ibc-starknet/blob/06cb7587557e6f3bef323abe7b5d9c3ab35bd97a/cairo-contracts/packages/utils/src/utils.cairo#L35
-            let ibc_prefixed_denom_key = Poseidon3Hasher::digest(&denom_serialized);
-
-            let calldata = cairo_encoding.encode(&product![ibc_prefixed_denom_key])?;
-
-            let output = starknet_chain
-                .call_contract(
-                    ics20_contract_address,
-                    &selector!("ibc_token_address"),
-                    &calldata,
-                    None,
-                )
-                .await?;
-
-            let token_address: Option<StarknetAddress> = cairo_encoding.decode(&output)?;
-
-            token_address.unwrap()
+            cairo_encoding.decode(&message_response.result)?
         };
 
         let transfer_quantity = 1_000u128;
