@@ -25,7 +25,7 @@ use starknet::macros::selector;
 
 use crate::traits::contract::call::CanCallContract;
 use crate::traits::proof_signer::HasStarknetProofSigner;
-use crate::traits::queries::address::CanQueryContractAddress;
+use crate::traits::queries::contract_address::CanQueryContractAddress;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 use crate::types::commitment_proof::StarknetCommitmentProof;

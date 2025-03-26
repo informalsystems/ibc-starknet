@@ -12,7 +12,7 @@ use starknet::providers::{Provider, ProviderError};
 
 use crate::impls::types::address::StarknetAddress;
 use crate::traits::provider::HasStarknetProvider;
-use crate::traits::queries::address::CanQueryContractAddress;
+use crate::traits::queries::contract_address::CanQueryContractAddress;
 use crate::types::event::StarknetEvent;
 
 pub struct GetStarknetBlockEvents;

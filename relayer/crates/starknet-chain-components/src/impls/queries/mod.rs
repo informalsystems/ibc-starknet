@@ -13,4 +13,5 @@ pub mod packet_commitment;
 pub mod packet_receipt;
 pub mod packet_received;
 pub mod status;
+pub mod token_address;
 pub mod token_balance;
