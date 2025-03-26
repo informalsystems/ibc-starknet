@@ -10,9 +10,7 @@ use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
 };
-use hermes_relayer_components::birelay::traits::{
-    AutoBiRelayerComponent, TwoWayRelayGetter, TwoWayRelayGetterComponent,
-};
+use hermes_relayer_components::birelay::traits::AutoBiRelayerComponent;
 use hermes_relayer_components::components::default::birelay::DefaultBiRelayComponents;
 use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
 use hermes_relayer_components::multi::traits::relay_at::{
@@ -59,17 +57,6 @@ delegate_components! {
             UseField<symbol!("relay_a_to_b")>,
         RelayGetterAtComponent<Index<1>, Index<0>>:
             UseField<symbol!("relay_b_to_a")>,
-    }
-}
-
-#[cgp_provider(TwoWayRelayGetterComponent)]
-impl TwoWayRelayGetter<StarknetCosmosBiRelay> for StarknetCosmosBiRelayComponents {
-    fn relay_a_to_b(birelay: &StarknetCosmosBiRelay) -> &StarknetToCosmosRelay {
-        &birelay.relay_a_to_b
-    }
-
-    fn relay_b_to_a(birelay: &StarknetCosmosBiRelay) -> &CosmosToStarknetRelay {
-        &birelay.relay_b_to_a
     }
 }
 
