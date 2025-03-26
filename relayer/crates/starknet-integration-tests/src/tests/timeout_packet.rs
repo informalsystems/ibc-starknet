@@ -6,18 +6,17 @@
 use core::marker::PhantomData;
 use core::time::Duration;
 
-use hermes_chain_components::traits::send_message::CanSendSingleMessage;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_test_components::chain::types::amount::Amount;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::types::Error;
 use hermes_relayer_components::birelay::traits::CanAutoBiRelay;
+use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
 use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
+use hermes_starknet_chain_components::traits::queries::token_address::CanQueryCosmosTokenAddressOnStarknet;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::messages::ibc::denom::{
@@ -28,10 +27,9 @@ use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncod
 use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
 use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessages;
 use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
+use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
-use starknet::core::types::Call;
-use starknet::macros::selector;
 use tracing::info;
 
 use crate::utils::init_starknet_test_driver;
@@ -70,6 +68,60 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         let starknet_to_cosmos_relay = &birelay.relay_a_to_b;
         let cosmos_to_starknet_relay = &birelay.relay_b_to_a;
 
+        let transfer_quantity = 1_000u128;
+        let transfer_back_quantity = 310u128;
+
+        let balance_cosmos_a_step_0 = cosmos_chain
+            .query_balance(address_cosmos_a, denom_cosmos)
+            .await?;
+
+        info!(
+            "cosmos balance before transfer: {}",
+            balance_cosmos_a_step_0
+        );
+
+        let packet = cosmos_chain
+            .ibc_transfer_token(
+                PhantomData::<StarknetChain>,
+                &cosmos_channel_id,
+                &PortId::transfer(),
+                wallet_cosmos_a,
+                address_starknet_b,
+                &Amount::new(transfer_quantity, denom_cosmos.clone()),
+                &None,
+                &starknet_chain.query_chain_status().await?,
+            )
+            .await?;
+
+        runtime.sleep(Duration::from_secs(2)).await;
+
+        let balance_cosmos_a_step_1_pre = cosmos_chain
+            .query_balance(address_cosmos_a, denom_cosmos)
+            .await?;
+
+        // Assert tokens have been escrowed from the wallet
+        assert_eq!(
+            balance_cosmos_a_step_0.quantity - transfer_quantity,
+            balance_cosmos_a_step_1_pre.quantity
+        );
+
+        cosmos_to_starknet_relay.relay_packet(&packet).await?;
+
+        runtime.sleep(Duration::from_secs(2)).await;
+
+        let balance_cosmos_a_step_1 = cosmos_chain
+            .query_balance(address_cosmos_a, denom_cosmos)
+            .await?;
+
+        info!("cosmos balance after transfer: {}", balance_cosmos_a_step_1);
+
+        assert_eq!(
+            balance_cosmos_a_step_0.quantity - transfer_quantity,
+            balance_cosmos_a_step_1.quantity
+        );
+
+        let ics20_contract_address = *starknet_chain.ibc_ics20_contract_address.get().unwrap();
+
         let ics20_token_address: StarknetAddress = {
             let ibc_prefixed_denom = PrefixedDenom {
                 trace_path: vec![TracePrefix {
@@ -79,24 +131,13 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
                 base: Denom::Hosted(denom_cosmos.to_string()),
             };
 
-            let calldata = cairo_encoding.encode(&ibc_prefixed_denom)?;
-
-            let message = StarknetMessage {
-                call: Call {
-                    to: ics20_contract_address.0,
-                    selector: selector!("create_ibc_token"),
-                    calldata,
-                },
-                counterparty_height: None,
-            };
-
-            let message_response = starknet_chain.send_message(message).await?;
-
-            cairo_encoding.decode(&message_response.result)?
+            starknet_chain
+                .query_cosmos_token_address_on_starknet(&ibc_prefixed_denom)
+                .await?
+                .unwrap()
         };
 
-        let transfer_quantity = 1_000u128;
-        let transfer_back_quantity = 310u128;
+        info!("ics20 token address: {:?}", ics20_token_address);
 
         let balance_cosmos_a_step_0 = cosmos_chain
             .query_balance(address_cosmos_a, denom_cosmos)
@@ -140,7 +181,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             let messages = cosmos_chain
                 .build_ibc_token_transfer_messages(
                     PhantomData::<StarknetChain>,
-                    cosmos_channel_id,
+                    &cosmos_channel_id,
                     &PortId::transfer(),
                     address_starknet_b,
                     &Amount::new(transfer_quantity, denom_cosmos.clone()),
@@ -159,7 +200,7 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
             let messages = starknet_chain
                 .build_ibc_token_transfer_messages(
                     PhantomData::<CosmosChain>,
-                    starknet_channel_id,
+                    &starknet_channel_id,
                     &PortId::transfer(),
                     address_cosmos_a,
                     &StarknetAmount::new(transfer_quantity.into(), ics20_token_address),
