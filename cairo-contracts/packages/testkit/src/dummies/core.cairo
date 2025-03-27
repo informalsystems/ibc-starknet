@@ -1,3 +1,8 @@
+use ics23::{
+    ByteArrayIntoArrayU8, CommitmentProof, ExistenceProof, HashOp, LeafOp, LengthOp, Proof,
+    byte_array_to_array_u8,
+};
+use protobuf::types::message::ProtoCodecImpl;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
     AppVersion, ChannelEnd, ChannelOrdering, ChannelState, Counterparty as ChanCounterparty,
@@ -8,8 +13,6 @@ use starknet_ibc_core::connection::{
     ConnectionEnd, ConnectionState, Counterparty as ConnCounterparty, VersionImpl,
 };
 use starknet_ibc_core::host::{BasePrefix, ChannelId, ClientId, ConnectionId, PortId, Sequence};
-use protobuf::types::message::ProtoCodecImpl;
-use ics23::{ByteArrayIntoArrayU8, CommitmentProof, ExistenceProof, HashOp, LeafOp, LengthOp, byte_array_to_array_u8, Proof};
 
 pub fn HEIGHT(revision_height: u64) -> Height {
     Height { revision_number: 0, revision_height }

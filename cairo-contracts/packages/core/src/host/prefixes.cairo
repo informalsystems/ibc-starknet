@@ -1,8 +1,16 @@
 use core::num::traits::Zero;
+use ics23::byte_array_to_array_u8;
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct BasePrefix {
     pub prefix: ByteArray,
+}
+
+#[generate_trait]
+pub impl BasePrefixImpl of BasePrefixTrait {
+    fn to_array_u8(self: @BasePrefix) -> Array<u8> {
+        byte_array_to_array_u8(self.prefix)
+    }
 }
 
 pub impl BasePrefixZero of Zero<BasePrefix> {

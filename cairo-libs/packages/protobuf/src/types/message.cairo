@@ -214,7 +214,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
         let mut span = self.limits.span();
         let limit = span.pop_back()?;
         self.limits = span.into();
-        if limit != @self.index {
+        if limit < @self.index {
             return Option::None;
         }
         Option::Some(())
