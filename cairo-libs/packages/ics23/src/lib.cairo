@@ -7,6 +7,7 @@ mod verify;
 #[cfg(test)]
 mod tests {
     mod data;
+    mod decode;
     mod ops;
     mod utils;
     mod verify;
