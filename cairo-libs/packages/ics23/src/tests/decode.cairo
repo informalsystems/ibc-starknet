@@ -1,4 +1,7 @@
-use ics23::{CommitmentProof, Proof, array_u8_to_byte_array};
+use ics23::{
+    ByteArrayIntoArrayU8, CommitmentProof, ExistenceProof, HashOp, LeafOp, LengthOp, Proof,
+    array_u8_to_byte_array, byte_array_to_array_u8,
+};
 use protobuf::types::message::ProtoCodecImpl;
 
 #[test]
@@ -618,6 +621,39 @@ fn test_commitment_decode() {
     let maybe_decoded_proof: Option<CommitmentProof> = ProtoCodecImpl::decode::<
         CommitmentProof,
     >(@byte_array_proof);
+    assert(maybe_decoded_proof.is_some(), 'expected proof to be non zero');
+    let decoded_proof: CommitmentProof = maybe_decoded_proof.unwrap();
+    match decoded_proof.proof {
+        Proof::Exist(p) => { assert(p.value.len() > 0, 'decoded proof has empty value'); },
+        Proof::NonExist(_p) => {},
+    }
+}
+
+#[test]
+fn test_encode_and_decode_commitment_proof() {
+    // Create dummy CommitmentProof
+    let key: ByteArray = "key";
+    let value: ByteArray = "some longer text for value";
+    let leaf = LeafOp {
+        hash: HashOp::Sha256,
+        prehash_key: HashOp::NoOp,
+        prehash_value: HashOp::NoOp,
+        length: LengthOp::VarProto,
+        prefix: array![],
+    };
+    let proof = ExistenceProof { key: key.into(), value: value.into(), leaf, path: array![] };
+    let commitment = CommitmentProof { proof: Proof::Exist(proof) };
+    // Encode CommitmentProof to ByteArray
+    let commitment_bytes_ba = ProtoCodecImpl::encode(@commitment);
+    // Convert CommitmentProof ByteArray to Array<u8>
+    let byte_array_proof = byte_array_to_array_u8(@commitment_bytes_ba);
+    // Convert back CommitmentProof Array<u8> to ByteArray
+    let commitment_bytes = array_u8_to_byte_array(@byte_array_proof);
+    // Decode CommitmentProof from ByteArray
+    let maybe_decoded_proof: Option<CommitmentProof> = ProtoCodecImpl::decode::<
+        CommitmentProof,
+    >(@commitment_bytes);
+
     assert(maybe_decoded_proof.is_some(), 'expected proof to be non zero');
     let decoded_proof: CommitmentProof = maybe_decoded_proof.unwrap();
     match decoded_proof.proof {
