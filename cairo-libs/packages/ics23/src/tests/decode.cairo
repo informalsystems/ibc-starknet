@@ -1,4 +1,4 @@
-use ics23::{CommitmentProof, array_u8_to_byte_array, Proof};
+use ics23::{CommitmentProof, Proof, array_u8_to_byte_array};
 use protobuf::types::message::ProtoCodecImpl;
 
 #[test]
@@ -621,11 +621,7 @@ fn test_commitment_decode() {
     assert(maybe_decoded_proof.is_some(), 'expected proof to be non zero');
     let decoded_proof: CommitmentProof = maybe_decoded_proof.unwrap();
     match decoded_proof.proof {
-        Proof::Exist(p) => {
-            assert(p.value.len() > 0, 'decoded proof has empty value');
-        },
-        Proof::NonExist(_p) => {
-
-        },
+        Proof::Exist(p) => { assert(p.value.len() > 0, 'decoded proof has empty value'); },
+        Proof::NonExist(_p) => {},
     }
 }
