@@ -6,6 +6,7 @@ pub mod end;
 pub mod felt;
 pub mod from_felt;
 pub mod from_u128;
+pub mod i32;
 pub mod iter;
 pub mod option;
 pub mod pair;
