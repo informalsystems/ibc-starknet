@@ -1,6 +1,7 @@
 use alexandria_math::ed25519::verify_signature;
 use cometbft::errors::CometErrors;
-use cometbft::utils::SpanU8TryIntoU256;
+use cometbft::utils::{Fraction, SpanU8TryIntoU256};
+use core::num::traits::OverflowingMul;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{
     BoolAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, U64AsProtoMessage,
@@ -10,7 +11,8 @@ use protobuf::types::message::{
     ProtoMessage, ProtoName, ProtoOneof,
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
-use protobuf::types::wkt::Timestamp;
+use protobuf::types::wkt::{Duration, Timestamp};
+use crate::light_client::Header as LcHeader;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
 pub struct Consensus {
@@ -72,7 +74,7 @@ impl PartSetHeaderAsProtoName of ProtoName<PartSetHeader> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct BlockId {
-    pub hash: ByteArray,
+    pub hash: Array<u8>,
     pub part_set_header: PartSetHeader,
 }
 
@@ -99,22 +101,23 @@ impl BlockIdAsProtoName of ProtoName<BlockId> {
     }
 }
 
+
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Header {
     pub version: Consensus,
     pub chain_id: ByteArray,
-    pub height: i64,
+    pub height: u64,
     pub time: Timestamp,
     pub last_block_id: BlockId,
-    pub last_commit_hash: ByteArray,
-    pub data_hash: ByteArray,
-    pub validators_hash: ByteArray,
-    pub next_validators_hash: ByteArray,
-    pub consensus_hash: ByteArray,
-    pub app_hash: ByteArray,
-    pub last_results_hash: ByteArray,
-    pub evidence_hash: ByteArray,
-    pub proposer_address: ByteArray,
+    pub last_commit_hash: Array<u8>,
+    pub data_hash: Array<u8>,
+    pub validators_hash: Array<u8>,
+    pub next_validators_hash: Array<u8>,
+    pub consensus_hash: Array<u8>,
+    pub app_hash: Array<u8>,
+    pub last_results_hash: Array<u8>,
+    pub evidence_hash: Array<u8>,
+    pub proposer_address: Array<u8>,
 }
 
 impl HeaderAsProtoMessage of ProtoMessage<Header> {
@@ -216,7 +219,7 @@ pub impl U32TryIntoBlockIdFlag of TryInto<u32, BlockIdFlag> {
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct CommitSig {
     pub block_id_flag: BlockIdFlag,
-    pub validator_address: ByteArray,
+    pub validator_address: AccountId,
     pub timestamp: Timestamp,
     pub signature: ByteArray,
 }
@@ -401,10 +404,11 @@ impl SumAsProtoOneof of ProtoOneof<Sum> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Validator {
-    pub address: ByteArray,
+    pub address: AccountId,
     pub pub_key: PublicKey,
-    pub voting_power: i64,
-    pub proposer_priority: i64,
+    pub voting_power: u64,
+    pub proposer_priority: u64,
+    // pub name: Option<ByteArray>, // not present in protobuf
 }
 
 #[generate_trait]
@@ -441,11 +445,59 @@ impl ValidatorAsProtoName of ProtoName<Validator> {
     }
 }
 
+
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
+pub struct SimpleValidator {
+    pub pub_key: PublicKey,
+    pub voting_power: u64,
+}
+
+impl SimpleValidatorAsProtoMessage of ProtoMessage<SimpleValidator> {
+    fn encode_raw(self: @SimpleValidator, ref context: EncodeContext) {
+        context.encode_field(1, self.pub_key);
+        context.encode_field(2, self.voting_power);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<SimpleValidator> {
+        let pub_key = context.decode_field(1)?;
+        let voting_power = context.decode_field(2)?;
+        Option::Some(SimpleValidator { pub_key, voting_power })
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl SimpleValidatorAsProtoName of ProtoName<SimpleValidator> {
+    fn type_url() -> ByteArray {
+        "SimpleValidator"
+    }
+}
+
+impl ValidatorToSimpleValidator of Into<Validator, SimpleValidator> {
+    fn into(self: Validator) -> SimpleValidator {
+        SimpleValidator { pub_key: self.pub_key, voting_power: self.voting_power }
+    }
+}
+
+
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ValidatorSet {
     pub validators: Array<Validator>,
     pub proposer: Validator,
-    pub total_voting_power: i64,
+    pub total_voting_power: u64,
+}
+
+#[generate_trait]
+pub impl ValidatorSetImpl of ValidatorSetTrait {
+    fn total_power(self: @ValidatorSet) -> u64 {
+        let mut power = 0;
+        for v in self.validators.span() {
+            power += v.voting_power.deref();
+        }
+        power
+    }
 }
 
 impl ValidatorSetAsProtoMessage of ProtoMessage<ValidatorSet> {
@@ -472,3 +524,237 @@ impl ValidatorSetAsProtoName of ProtoName<ValidatorSet> {
         "ValidatorSet"
     }
 }
+
+/// Size of an account ID in bytes.
+pub const LENGTH: u32 = 20;
+
+#[derive(Drop, Clone)]
+pub struct AccountId {
+    id: [u8; LENGTH],
+}
+
+pub impl ArrayU8TryIntoAccountId of TryInto<Array<u8>, AccountId> {
+    fn try_into(self: Array<u8>) -> Option<AccountId> {
+        if self.len() != LENGTH {
+            return Option::None;
+        }
+        let id = [
+            *self[0], *self[1], *self[2], *self[3], *self[4], *self[5], *self[6], *self[7],
+            *self[8], *self[9], *self[10], *self[11], *self[12], *self[13], *self[14], *self[15],
+            *self[16], *self[17], *self[18], *self[19],
+        ];
+        Option::Some(AccountId { id })
+    }
+}
+
+impl AccountIdDebug of core::fmt::Debug<AccountId> {
+    fn fmt(self: @AccountId, ref f: core::fmt::Formatter) -> Result<(), core::fmt::Error> {
+        let id: Array<u8> = self.id.span().into();
+        f.buffer.append(@format!("{id:?}"));
+        Result::Ok(())
+    }
+}
+
+impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
+    fn eq(lhs: @AccountId, rhs: @AccountId) -> bool {
+        let lhs_span = lhs.id.span();
+        let rhs_span = rhs.id.span();
+
+        if lhs_span.len() != rhs_span.len() {
+            return false;
+        }
+
+        if lhs_span.len() == 0 {
+            return true;
+        }
+
+        let mut eq = true;
+        let mut i = 0;
+        let len = lhs_span.len();
+
+        while i < len {
+            if lhs_span.at(i) != rhs_span.at(i) {
+                eq = false;
+                break;
+            }
+            i += 1;
+        }
+        eq
+    }
+}
+
+impl AccountIdDefault of core::traits::Default<AccountId> {
+    fn default() -> AccountId {
+        AccountId { id: [0_u8; LENGTH] }
+    }
+}
+
+impl AccountIdAsProtoMessage of ProtoMessage<AccountId> {
+    fn encode_raw(self: @AccountId, ref context: EncodeContext) {
+        let bytes: Array<u8> = self.id.span().into();
+        BytesAsProtoMessage::encode_raw(@bytes, ref context);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<AccountId> {
+        let bytes = BytesAsProtoMessage::decode_raw(ref context)?;
+        bytes.try_into()
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+// TODO: impelement Serde
+impl AccountIdSerde of Serde<AccountId> {
+    fn serialize(self: @AccountId, ref output: Array<felt252>) {}
+    fn deserialize(ref serialized: Span<felt252>) -> Option<AccountId> {
+        Option::None
+    }
+}
+
+#[derive(Drop, Debug, Clone, PartialEq)]
+pub struct NonAbsentCommitVotes {
+    votes: Array<NonAbsentCommitVote>,
+    sign_bytes: Array<u8>,
+}
+
+#[generate_trait]
+pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
+    fn new(signed_header: SignedHeader) -> NonAbsentCommitVotes {
+        NonAbsentCommitVotes { votes: array![], sign_bytes: array![] }
+    }
+
+    fn has_voted(self: @NonAbsentCommitVotes, validator: @Validator) -> bool {
+        let mut idx = Option::None;
+        for i in 0..self.votes.len() {
+            let ith_vote = self.votes.at(i);
+            if ith_vote.validator_id() == validator.address {
+                idx = Option::Some(i);
+                break;
+            }
+        }
+
+        match idx {
+            Option::None => false,
+            Option::Some(i) => {
+                let signature = self.votes.at(i).signed_vote.signature;
+                validator.verify_signature(self.sign_bytes.span(), signature.span());
+                true
+            },
+        }
+    }
+}
+
+#[derive(Drop, Debug, Clone, PartialEq)]
+pub struct NonAbsentCommitVote {
+    signed_vote: SignedVote,
+    /// Flag indicating whether the signature has already been verified.
+    verified: bool,
+}
+
+#[generate_trait]
+pub impl NonAbsentCommitVoteImpl of NonAbsentCommitVoteTrait {
+    fn validator_id(self: @NonAbsentCommitVote) -> @AccountId {
+        self.signed_vote.validator_address
+    }
+}
+
+#[derive(Drop, Debug, Clone, PartialEq)]
+pub struct SignedVote {
+    vote: CanonicalVote,
+    validator_address: AccountId,
+    signature: Array<u8> // TODO: whether to define a Signature type?
+}
+
+#[derive(Drop, Debug, Clone, PartialEq)]
+pub struct CanonicalVote {
+    /// Type of vote (prevote or precommit)
+    pub vote_type: VoteType,
+    /// Block height
+    pub height: u64,
+    /// Round
+    pub round: u32,
+    pub block_id: BlockId,
+    /// Timestamp
+    pub timestamp: Timestamp,
+    /// Chain ID
+    pub chain_id: ByteArray,
+}
+
+/// Type of votes
+#[derive(Drop, Debug, Clone, PartialEq)]
+pub enum VoteType {
+    /// Votes for blocks which validators observe are valid for a given round
+    Prevote,
+    /// Votes to commit to a particular block for a given round
+    Precommit,
+}
+
+#[derive(Drop, Debug, Clone)]
+pub struct UntrustedBlockState {
+    pub signed_header: SignedHeader,
+    pub validators: ValidatorSet,
+    // pub next_validators: Option<ValidatorSet>,
+}
+
+#[generate_trait]
+pub impl UntrustedBlockStateImpl of UntrustedBlockStateTrait {
+    fn height(self: @UntrustedBlockState) -> @u64 {
+        self.signed_header.header.height
+    }
+}
+
+impl HeaderToUntrustedBlockState of Into<LcHeader, UntrustedBlockState> {
+    fn into(self: LcHeader) -> UntrustedBlockState {
+        UntrustedBlockState { signed_header: self.signed_header, validators: self.validator_set }
+    }
+}
+
+#[derive(Drop, Debug, Clone)]
+pub struct TrustedBlockState {
+    pub chain_id: ByteArray,
+    pub header_time: Timestamp,
+    pub height: u64,
+    pub next_validators: ValidatorSet,
+    pub next_validators_hash: Array<u8>,
+}
+
+#[derive(Drop, Debug, Clone)]
+pub struct Options {
+    pub trust_threshold: Fraction,
+    pub trusting_period: Duration,
+    pub clock_drift: Duration,
+}
+
+#[derive(Drop, Debug, Clone, PartialEq, Serde)]
+pub struct VotingPowerTally {
+    /// Total voting power
+    pub total: u64,
+    /// Tallied voting power
+    pub tallied: u64,
+    /// Trust threshold for voting power
+    pub trust_threshold: Fraction,
+}
+
+#[generate_trait]
+pub impl VotingPowerTallyImpl of VotingPowerTallyTrait {
+    fn new(total: u64, trust_threshold: Fraction) -> VotingPowerTally {
+        VotingPowerTally { total, tallied: 0, trust_threshold }
+    }
+
+    fn tally(ref self: VotingPowerTally, power: u64) {
+        self.tallied += power;
+    }
+
+    fn has_enough_power(self: VotingPowerTally) -> bool {
+        let (tallied_fraction, overflow) = self
+            .tallied
+            .overflowing_mul(self.trust_threshold.denominator);
+        assert(!overflow, CometErrors::OVERFLOWED_VOTING_CALC);
+        let (total_fraction, overflow) = self.total.overflowing_mul(self.trust_threshold.numerator);
+        assert(!overflow, CometErrors::OVERFLOWED_VOTING_CALC);
+        tallied_fraction > total_fraction
+    }
+}
+

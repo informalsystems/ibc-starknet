@@ -41,6 +41,21 @@ pub struct Timestamp {
     pub nanos: i32,
 }
 
+impl TimestampPartialOrd of PartialOrd<Timestamp> {
+    fn lt(lhs: Timestamp, rhs: Timestamp) -> bool {
+        (lhs.seconds < rhs.seconds) || (lhs.seconds == rhs.seconds && lhs.nanos < rhs.nanos)
+    }
+    fn le(lhs: Timestamp, rhs: Timestamp) -> bool {
+        (lhs.seconds < rhs.seconds) || (lhs.seconds == rhs.seconds && lhs.nanos <= rhs.nanos)
+    }
+    fn gt(lhs: Timestamp, rhs: Timestamp) -> bool {
+        (lhs.seconds > rhs.seconds) || (lhs.seconds == rhs.seconds && lhs.nanos > rhs.nanos)
+    }
+    fn ge(lhs: Timestamp, rhs: Timestamp) -> bool {
+        (lhs.seconds > rhs.seconds) || (lhs.seconds == rhs.seconds && lhs.nanos >= rhs.nanos)
+    }
+}
+
 impl TimestampAsProtoMessage of ProtoMessage<Timestamp> {
     fn encode_raw(self: @Timestamp, ref context: EncodeContext) {
         context.encode_field(1, self.seconds);
