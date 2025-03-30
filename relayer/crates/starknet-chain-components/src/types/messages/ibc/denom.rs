@@ -14,7 +14,7 @@ use ibc::apps::transfer::types::PrefixedDenom as IbcPrefixedDenom;
 
 use crate::impls::types::address::StarknetAddress;
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, HasFields)]
 pub enum Denom {
     Native(StarknetAddress),
     Hosted(String),
@@ -29,7 +29,7 @@ impl Display for Denom {
     }
 }
 
-#[derive(Clone, Debug, HasField, PartialEq)]
+#[derive(Clone, Debug, HasField, HasFields, PartialEq)]
 pub struct PrefixedDenom {
     pub trace_path: Vec<TracePrefix>,
     pub base: Denom,
@@ -85,7 +85,7 @@ impl FromStr for PrefixedDenom {
     }
 }
 
-#[derive(Clone, Debug, HasField, PartialEq)]
+#[derive(Clone, Debug, HasField, HasFields, PartialEq)]
 pub struct TracePrefix {
     pub port_id: String,
     pub channel_id: String,
