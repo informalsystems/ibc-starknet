@@ -12,6 +12,8 @@ mod preset {
     use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
     use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
     use hermes_cairo_encoding_components::strategy::ViaCairo;
+    use hermes_encoding_components::impls::fields::EncodeFields;
+    use hermes_encoding_components::impls::tagged::EncodeTaggedField;
     use hermes_encoding_components::traits::decode::DecoderComponent;
     use hermes_encoding_components::traits::decode_mut::{
         DecodeBufferPeekerComponent, MutDecoderComponent,
@@ -65,9 +67,7 @@ mod preset {
         EncodeMsgConnOpenAck, EncodeMsgConnOpenConfirm, EncodeMsgConnOpenInit,
         EncodeMsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
     };
-    use crate::types::messages::ibc::denom::{
-        Denom, EncodeDenom, EncodePrefixedDenom, EncodeTracePrefix, PrefixedDenom, TracePrefix,
-    };
+    use crate::types::messages::ibc::denom::{Denom, EncodeDenom, PrefixedDenom, TracePrefix};
     use crate::types::messages::ibc::ibc_transfer::{
         EncodeMsgTransfer, EncodeParticipant, EncodeTransferPacketData, MsgTransfer, Participant,
         TransferPacketData,
@@ -120,12 +120,10 @@ mod preset {
             <V> (ViaCairo, Option<V>): EncodeOption<V>,
             <A, B> (ViaCairo, (A, B)): EncoderPair<UseContext, UseContext>,
             <A, B> (ViaCairo, Cons<A, B>): EncoderCons<UseContext, UseContext>,
+            <Tag, Value> (ViaCairo, Field<Tag, Value>): EncodeTaggedField,
             (ViaCairo, TransferErc20TokenMessage): EncodeTransferErc20TokenMessage,
             (ViaCairo, DeployErc20TokenMessage): EncodeDeployErc20TokenMessage,
-            (ViaCairo, Denom): EncodeDenom,
-            (ViaCairo, TracePrefix): EncodeTracePrefix,
             (ViaCairo, Vec<TracePrefix>): EncodeList,
-            (ViaCairo, PrefixedDenom): EncodePrefixedDenom,
             (ViaCairo, Participant): EncodeParticipant,
             (ViaCairo, TransferPacketData): EncodeTransferPacketData,
             (ViaCairo, MsgTransfer): EncodeMsgTransfer,
@@ -172,6 +170,12 @@ mod preset {
             (ViaCairo, MsgChanOpenTry): EncodeMsgChanOpenTry,
             (ViaCairo, MsgChanOpenAck): EncodeMsgChanOpenAck,
             (ViaCairo, MsgChanOpenConfirm): EncodeMsgChanOpenConfirm,
+            (ViaCairo, Denom): EncodeDenom,
+            [
+                // (ViaCairo, Denom),
+                (ViaCairo, TracePrefix),
+                (ViaCairo, PrefixedDenom),
+            ]: EncodeFields,
         }
     }
 }
