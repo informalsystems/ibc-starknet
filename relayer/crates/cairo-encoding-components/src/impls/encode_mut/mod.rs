@@ -3,6 +3,7 @@ pub mod bool;
 pub mod byte_array;
 pub mod cons;
 pub mod end;
+pub mod enum_fields;
 pub mod felt;
 pub mod from_felt;
 pub mod from_u128;

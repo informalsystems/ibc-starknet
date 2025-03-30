@@ -7,6 +7,7 @@ mod preset {
     use hermes_cairo_encoding_components::components::encode_mut::CairoEncodeMutComponents;
     use hermes_cairo_encoding_components::components::encoding::*;
     use hermes_cairo_encoding_components::impls::encode_mut::cons::EncoderCons;
+    use hermes_cairo_encoding_components::impls::encode_mut::enum_fields::EncodeEnumFields;
     use hermes_cairo_encoding_components::impls::encode_mut::option::EncodeOption;
     use hermes_cairo_encoding_components::impls::encode_mut::pair::EncoderPair;
     use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
@@ -67,7 +68,7 @@ mod preset {
         EncodeMsgConnOpenAck, EncodeMsgConnOpenConfirm, EncodeMsgConnOpenInit,
         EncodeMsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
     };
-    use crate::types::messages::ibc::denom::{Denom, EncodeDenom, PrefixedDenom, TracePrefix};
+    use crate::types::messages::ibc::denom::{Denom, PrefixedDenom, TracePrefix};
     use crate::types::messages::ibc::ibc_transfer::{
         EncodeMsgTransfer, EncodeParticipant, EncodeTransferPacketData, MsgTransfer, Participant,
         TransferPacketData,
@@ -170,12 +171,14 @@ mod preset {
             (ViaCairo, MsgChanOpenTry): EncodeMsgChanOpenTry,
             (ViaCairo, MsgChanOpenAck): EncodeMsgChanOpenAck,
             (ViaCairo, MsgChanOpenConfirm): EncodeMsgChanOpenConfirm,
-            (ViaCairo, Denom): EncodeDenom,
             [
-                // (ViaCairo, Denom),
                 (ViaCairo, TracePrefix),
                 (ViaCairo, PrefixedDenom),
             ]: EncodeFields,
+            [
+                (ViaCairo, Denom),
+            ]:
+                EncodeEnumFields,
         }
     }
 }
