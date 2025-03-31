@@ -2,13 +2,14 @@ use alexandria_math::ed25519::verify_signature;
 use cometbft::errors::CometErrors;
 use cometbft::utils::{Fraction, SpanU8TryIntoU256};
 use core::num::traits::OverflowingMul;
+use ics23::byte_array_to_array_u8;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{
     BoolAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, U64AsProtoMessage,
 };
 use protobuf::types::message::{
-    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
-    ProtoMessage, ProtoName, ProtoOneof,
+    DecodeContext, DecodeContextImpl, DecodeContextTrait, EncodeContext, EncodeContextImpl,
+    ProtoCodecImpl, ProtoMessage, ProtoName, ProtoOneof,
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
 use protobuf::types::wkt::{Duration, Timestamp};
@@ -253,8 +254,8 @@ impl CommitSigAsProtoName of ProtoName<CommitSig> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Commit {
-    pub height: i64,
-    pub round: i32,
+    pub height: u64,
+    pub round: u32,
     pub block_id: BlockId,
     pub signatures: Array<CommitSig>,
 }
@@ -616,13 +617,40 @@ impl AccountIdSerde of Serde<AccountId> {
 #[derive(Drop, Debug, Clone, PartialEq)]
 pub struct NonAbsentCommitVotes {
     votes: Array<NonAbsentCommitVote>,
-    sign_bytes: Array<u8>,
 }
 
 #[generate_trait]
 pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
     fn new(signed_header: SignedHeader) -> NonAbsentCommitVotes {
-        NonAbsentCommitVotes { votes: array![], sign_bytes: array![] }
+        let mut votes = ArrayTrait::new();
+
+        let commit = signed_header.commit;
+
+        let mut signatures = commit.clone().signatures.span();
+
+        while let Some(signature) = signatures.pop_front() {
+            let block_id_flag = signature.block_id_flag;
+            if block_id_flag == @BlockIdFlag::Commit {
+                let signed_vote = SignedVote {
+                    vote: CanonicalVote {
+                        vote_type: VoteType::Precommit,
+                        height: commit.height.clone(),
+                        round: commit.round.clone(),
+                        block_id: commit.block_id.clone(),
+                        timestamp: signature.timestamp.clone(),
+                        chain_id: signed_header.header.chain_id.clone(),
+                    },
+                    validator_address: signature.validator_address.clone(),
+                    signature: byte_array_to_array_u8(signature.signature),
+                };
+
+                let verified = false;
+                let non_absent_commit_vote = NonAbsentCommitVote { signed_vote, verified };
+                votes.append(non_absent_commit_vote);
+            }
+        }
+
+        NonAbsentCommitVotes { votes }
     }
 
     fn has_voted(self: @NonAbsentCommitVotes, validator: @Validator) -> bool {
@@ -638,8 +666,25 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
         match idx {
             Option::None => false,
             Option::Some(i) => {
-                let signature = self.votes.at(i).signed_vote.signature;
-                validator.verify_signature(self.sign_bytes.span(), signature.span());
+                let vote = self.votes[i];
+
+                if *(vote.verified) {
+                    return false;
+                }
+
+                let signed_vote = vote.signed_vote;
+
+                let signature = signed_vote.signature;
+                let canonical_vote = signed_vote.vote;
+
+                let signed_bytes = ProtoCodecImpl::encode_with_length(canonical_vote);
+
+                let signed_array_u8 = byte_array_to_array_u8(@signed_bytes);
+
+                validator.verify_signature(signed_array_u8.span(), signature.span());
+
+                // TODO: set verified field to true
+
                 true
             },
         }
@@ -667,7 +712,7 @@ pub struct SignedVote {
     signature: Array<u8> // TODO: whether to define a Signature type?
 }
 
-#[derive(Drop, Debug, Clone, PartialEq)]
+#[derive(Drop, Debug, Clone, PartialEq, Default)]
 pub struct CanonicalVote {
     /// Type of vote (prevote or precommit)
     pub vote_type: VoteType,
@@ -682,13 +727,58 @@ pub struct CanonicalVote {
     pub chain_id: ByteArray,
 }
 
+impl HeaderAsCanonicalVote of ProtoMessage<CanonicalVote> {
+    fn encode_raw(self: @CanonicalVote, ref context: EncodeContext) {
+        context.encode_enum(1, self.vote_type);
+        context.encode_field(2, self.height);
+        context.encode_field(3, self.round);
+        context.encode_field(4, self.block_id);
+        context.encode_field(5, self.timestamp);
+        context.encode_field(6, self.chain_id);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<CanonicalVote> {
+        let vote_type = context.decode_enum(1)?;
+        let height = context.decode_field(2)?;
+        let round = context.decode_field(3)?;
+        let block_id = context.decode_field(4)?;
+        let timestamp = context.decode_field(5)?;
+        let chain_id = context.decode_field(6)?;
+        Option::Some(CanonicalVote { vote_type, height, round, block_id, timestamp, chain_id })
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
 /// Type of votes
-#[derive(Drop, Debug, Clone, PartialEq)]
+#[derive(Drop, Debug, Clone, PartialEq, Default)]
 pub enum VoteType {
     /// Votes for blocks which validators observe are valid for a given round
+    #[default]
     Prevote,
     /// Votes to commit to a particular block for a given round
     Precommit,
+}
+
+pub impl VoteTypeIntoU32 of Into<@VoteType, u32> {
+    fn into(self: @VoteType) -> u32 {
+        match self {
+            VoteType::Prevote => 0,
+            VoteType::Precommit => 1,
+        }
+    }
+}
+
+pub impl U32TryIntoVoteType of TryInto<u32, VoteType> {
+    fn try_into(self: u32) -> Option<VoteType> {
+        match self {
+            0 => Option::Some(VoteType::Prevote),
+            1 => Option::Some(VoteType::Precommit),
+            _ => Option::None,
+        }
+    }
 }
 
 #[derive(Drop, Debug, Clone)]
