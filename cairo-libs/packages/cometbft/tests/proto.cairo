@@ -1,6 +1,8 @@
 use cometbft::ibc::Height;
 use cometbft::light_client::Header as LcHeader;
-use cometbft::types::{Commit, CommitSig, Consensus, Header as TmHeader, SignedHeader, ValidatorSet};
+use cometbft::types::{
+    CanonicalVote, Commit, CommitSig, Consensus, Header as TmHeader, SignedHeader, ValidatorSet,
+};
 use protobuf::base64::decode as base64_decode;
 use protobuf::types::message::ProtoCodecImpl;
 use protobuf::types::wkt::Any;
@@ -89,4 +91,14 @@ fn test_tm_lc_header_decode() {
     let any: Any = header.clone().into();
     let header2: LcHeader = any.try_into().unwrap();
     assert_eq!(header2, header, "header any encode/decode mismatch");
+}
+
+#[test]
+fn test_canonical_vote() {
+    let base64 =
+        "CAIRAQAAAAAAAAAZAQAAAAAAAAAiSAogjHwR/FIjItuiXdxkDR6P1ljc5MdXvpImRwuHJgaa9UcSJAgBEiCMfBH8UiMi26Jd3GQNHo/WWNzkx1e+kiZHC4cmBpr1RyoMCPaeq78GEKryhdsCMgp0ZXN0LWNoYWlu";
+    let bytes = base64_decode(@base64);
+    let canonical_vote = ProtoCodecImpl::decode::<CanonicalVote>(@bytes).unwrap();
+    let bytes2 = ProtoCodecImpl::encode(@canonical_vote);
+    assert_eq!(bytes, bytes2, "canonical_vote encode/decode mismatch");
 }

@@ -1,4 +1,5 @@
 use alexandria_math::ed25519::verify_signature;
+pub use canonical_vote_impl::CanonicalVoteAsProtoMessage;
 use cometbft::errors::CometErrors;
 use cometbft::utils::{Fraction, SpanU8TryIntoU256};
 use core::num::traits::OverflowingMul;
@@ -254,8 +255,8 @@ impl CommitSigAsProtoName of ProtoName<CommitSig> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Commit {
-    pub height: u64,
-    pub round: u32,
+    pub height: i64,
+    pub round: i32,
     pub block_id: BlockId,
     pub signatures: Array<CommitSig>,
 }
@@ -634,8 +635,8 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
                 let signed_vote = SignedVote {
                     vote: CanonicalVote {
                         vote_type: VoteType::Precommit,
-                        height: commit.height.clone(),
-                        round: commit.round.clone(),
+                        height: commit.height.clone().try_into().unwrap(),
+                        round: commit.round.clone().try_into().unwrap(),
                         block_id: commit.block_id.clone(),
                         timestamp: signature.timestamp.clone(),
                         chain_id: signed_header.header.chain_id.clone(),
@@ -717,9 +718,9 @@ pub struct CanonicalVote {
     /// Type of vote (prevote or precommit)
     pub vote_type: VoteType,
     /// Block height
-    pub height: u64,
+    pub height: i64,
     /// Round
-    pub round: u32,
+    pub round: i64,
     pub block_id: BlockId,
     /// Timestamp
     pub timestamp: Timestamp,
@@ -727,56 +728,41 @@ pub struct CanonicalVote {
     pub chain_id: ByteArray,
 }
 
-impl HeaderAsCanonicalVote of ProtoMessage<CanonicalVote> {
-    fn encode_raw(self: @CanonicalVote, ref context: EncodeContext) {
-        context.encode_enum(1, self.vote_type);
-        context.encode_field(2, self.height);
-        context.encode_field(3, self.round);
-        context.encode_field(4, self.block_id);
-        context.encode_field(5, self.timestamp);
-        context.encode_field(6, self.chain_id);
-    }
-
-    fn decode_raw(ref context: DecodeContext) -> Option<CanonicalVote> {
-        let vote_type = context.decode_enum(1)?;
-        let height = context.decode_field(2)?;
-        let round = context.decode_field(3)?;
-        let block_id = context.decode_field(4)?;
-        let timestamp = context.decode_field(5)?;
-        let chain_id = context.decode_field(6)?;
-        Option::Some(CanonicalVote { vote_type, height, round, block_id, timestamp, chain_id })
-    }
-
-    fn wire_type() -> WireType {
-        WireType::LengthDelimited
-    }
-}
-
 /// Type of votes
 #[derive(Drop, Debug, Clone, PartialEq, Default)]
 pub enum VoteType {
-    /// Votes for blocks which validators observe are valid for a given round
     #[default]
+    Unknown,
+    /// Votes for blocks which validators observe are valid for a given round
     Prevote,
     /// Votes to commit to a particular block for a given round
     Precommit,
+    Proposal,
 }
 
 pub impl VoteTypeIntoU32 of Into<@VoteType, u32> {
     fn into(self: @VoteType) -> u32 {
         match self {
-            VoteType::Prevote => 0,
-            VoteType::Precommit => 1,
+            VoteType::Unknown => 0,
+            VoteType::Prevote => 1,
+            VoteType::Precommit => 2,
+            VoteType::Proposal => 32,
         }
     }
 }
 
 pub impl U32TryIntoVoteType of TryInto<u32, VoteType> {
     fn try_into(self: u32) -> Option<VoteType> {
-        match self {
-            0 => Option::Some(VoteType::Prevote),
-            1 => Option::Some(VoteType::Precommit),
-            _ => Option::None,
+        if self == 0 {
+            return Option::Some(VoteType::Unknown);
+        } else if self == 1 {
+            return Option::Some(VoteType::Prevote);
+        } else if self == 2 {
+            return Option::Some(VoteType::Precommit);
+        } else if self == 32 {
+            return Option::Some(VoteType::Proposal);
+        } else {
+            return Option::None;
         }
     }
 }
@@ -848,3 +834,40 @@ pub impl VotingPowerTallyImpl of VotingPowerTallyTrait {
     }
 }
 
+pub mod canonical_vote_impl {
+    // hack to avoid multiple impls for i64 - I64AsProtoMessage and SFixed64AsProtoMessage
+
+    use protobuf::primitives::array::ByteArrayAsProtoMessage;
+    use protobuf::primitives::numeric::SFixed64AsProtoMessage;
+    use protobuf::types::message::{
+        DecodeContext, DecodeContextImpl, DecodeContextTrait, EncodeContext, EncodeContextImpl,
+        ProtoCodecImpl, ProtoMessage,
+    };
+    use protobuf::types::tag::WireType;
+    use super::CanonicalVote;
+
+    pub impl CanonicalVoteAsProtoMessage of ProtoMessage<CanonicalVote> {
+        fn encode_raw(self: @CanonicalVote, ref context: EncodeContext) {
+            context.encode_enum(1, self.vote_type);
+            context.encode_field(2, self.height);
+            context.encode_field(3, self.round);
+            context.encode_field(4, self.block_id);
+            context.encode_field(5, self.timestamp);
+            context.encode_field(6, self.chain_id);
+        }
+
+        fn decode_raw(ref context: DecodeContext) -> Option<CanonicalVote> {
+            let vote_type = context.decode_enum(1)?;
+            let height = context.decode_field(2)?;
+            let round = context.decode_field(3)?;
+            let block_id = context.decode_field(4)?;
+            let timestamp = context.decode_field(5)?;
+            let chain_id = context.decode_field(6)?;
+            Option::Some(CanonicalVote { vote_type, height, round, block_id, timestamp, chain_id })
+        }
+
+        fn wire_type() -> WireType {
+            WireType::LengthDelimited
+        }
+    }
+}

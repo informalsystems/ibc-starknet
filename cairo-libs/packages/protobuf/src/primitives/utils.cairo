@@ -35,6 +35,63 @@ pub fn decode_2_complement_32(value: @u32) -> i32 {
     }
 }
 
+pub fn u64_to_little_endian(value: @u64) -> [u8; 8] {
+    let mut value = *value;
+
+    let byte0 = (value % 0x100).try_into().unwrap();
+
+    value = value / 0x100;
+    let byte1 = (value % 0x100).try_into().unwrap();
+
+    value = value / 0x100;
+    let byte2 = (value % 0x100).try_into().unwrap();
+
+    value = value / 0x100;
+    let byte3 = (value % 0x100).try_into().unwrap();
+
+    value = value / 0x100;
+    let byte4 = (value % 0x100).try_into().unwrap();
+
+    value = value / 0x100;
+    let byte5 = (value % 0x100).try_into().unwrap();
+
+    value = value / 0x100;
+    let byte6 = (value % 0x100).try_into().unwrap();
+
+    value = value / 0x100;
+    let byte7 = (value % 0x100).try_into().unwrap();
+
+    [byte0, byte1, byte2, byte3, byte4, byte5, byte6, byte7]
+}
+
+pub fn little_endian_to_u64(value: Span<u8>) -> u64 {
+    let mut result: u64 = 0;
+
+    result = result | ((*value[7]).into());
+
+    result = result * 0x100;
+    result = result | ((*value[6]).into());
+
+    result = result * 0x100;
+    result = result | ((*value[5]).into());
+
+    result = result * 0x100;
+    result = result | ((*value[4]).into());
+
+    result = result * 0x100;
+    result = result | ((*value[3]).into());
+
+    result = result * 0x100;
+    result = result | ((*value[2]).into());
+
+    result = result * 0x100;
+    result = result | ((*value[1]).into());
+
+    result = result * 0x100;
+    result = result | ((*value[0]).into());
+
+    result
+}
 
 #[cfg(test)]
 mod tests {
