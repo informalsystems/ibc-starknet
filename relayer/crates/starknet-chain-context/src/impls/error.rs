@@ -52,6 +52,7 @@ use starknet::core::types::contract::{ComputeClassHashError, JsonError};
 use starknet::core::types::{RevertedInvocation, StarknetError};
 use starknet::providers::ProviderError;
 use starknet::signers::local_wallet;
+use url::ParseError;
 
 pub struct HandleStarknetChainError;
 
@@ -71,9 +72,11 @@ delegate_components! {
             TryFromSliceError,
             TokioRuntimeError,
             serde_json::error::Error,
+            toml::ser::Error,
             JsonError,
             EncodeError,
             DecodeError,
+            ParseError,
             DecodingError,
             ClientError,
             ChannelError,
