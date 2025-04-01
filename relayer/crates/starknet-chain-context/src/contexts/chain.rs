@@ -162,7 +162,6 @@ use hermes_starknet_chain_components::impls::types::events::StarknetCreateClient
 use hermes_starknet_chain_components::traits::account::{
     AccountFromSignerBuilderComponent, StarknetAccountTypeProviderComponent,
 };
-use hermes_starknet_chain_components::traits::client::JsonRpcClientGetterComponent;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
@@ -279,8 +278,6 @@ delegate_components! {
             UseType<StarknetAccount>,
         StarknetProofSignerTypeProviderComponent:
             UseType<Secp256k1KeyPair>,
-        JsonRpcClientGetterComponent:
-            UseField<symbol!("rpc_client")>,
         StarknetProofSignerGetterComponent:
             UseField<symbol!("proof_signer")>,
         DefaultSignerGetterComponent:
