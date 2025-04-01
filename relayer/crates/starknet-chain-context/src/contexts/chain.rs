@@ -142,6 +142,7 @@ use hermes_relayer_components::chain::traits::types::packets::timeout::HasPacket
 use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
 use hermes_relayer_components::error::traits::HasRetryableError;
 use hermes_relayer_components::transaction::impls::global_nonce_mutex::GetGlobalNonceMutex;
+use hermes_relayer_components::transaction::traits::default_signer::DefaultSignerGetterComponent;
 use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::CanAllocateNonce;
 use hermes_relayer_components::transaction::traits::nonce::nonce_mutex::NonceAllocationMutexGetterComponent;
 use hermes_relayer_components::transaction::traits::nonce::query_nonce::CanQueryNonce;
@@ -180,7 +181,6 @@ use hermes_starknet_chain_components::traits::provider::{
 use hermes_starknet_chain_components::traits::queries::contract_address::CanQueryContractAddress;
 use hermes_starknet_chain_components::traits::queries::token_address::CosmosTokenAddressOnStarknetQuerierComponent;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
-use hermes_starknet_chain_components::traits::signer::StarknetSignerGetterComponent;
 use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
@@ -290,8 +290,8 @@ delegate_components! {
             StarknetProofSignerGetterComponent,
         ]:
             GetStarknetProofSignerField<symbol!("proof_signer")>,
-        StarknetSignerGetterComponent:
-            WithField<symbol!("signer")>,
+        DefaultSignerGetterComponent:
+            UseField<symbol!("signer")>,
         NonceAllocationMutexGetterComponent:
             GetGlobalNonceMutex<symbol!("nonce_mutex")>,
         BlockTimeQuerierComponent:

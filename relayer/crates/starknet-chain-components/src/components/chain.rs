@@ -157,7 +157,6 @@ mod preset {
     use hermes_relayer_components::error::impls::retry::ReturnRetryable;
     use hermes_relayer_components::error::traits::RetryableErrorComponent;
     use hermes_relayer_components::transaction::impls::poll_tx_response::PollTimeoutGetterComponent;
-    use hermes_relayer_components::transaction::traits::default_signer::DefaultSignerGetterComponent;
     use hermes_relayer_components::transaction::traits::nonce::allocate_nonce::NonceAllocatorComponent;
     use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
     use hermes_relayer_components::transaction::traits::parse_events::TxMessageResponseParserComponent;
@@ -248,7 +247,6 @@ mod preset {
     use crate::impls::types::message::ProvideCallMessage;
     use crate::impls::types::method::ProvideFeltSelector;
     use crate::impls::types::payloads::ProvideStarknetPayloadTypes;
-    use crate::impls::types::signer::UseStarknetAccountSigner;
     use crate::impls::types::status::ProvideStarknetChainStatusType;
     use crate::impls::types::tx_hash::ProvideFeltTxHash;
     use crate::impls::types::tx_response::ProvideStarknetTxResponse;
@@ -270,6 +268,7 @@ mod preset {
     use crate::traits::types::method::SelectorTypeComponent;
     use crate::types::message_response::UseStarknetMessageResponse;
     use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
+    use crate::types::wallet::StarknetWallet;
 
     cgp_preset! {
         StarknetChainComponents {
@@ -315,11 +314,8 @@ mod preset {
                 WalletSignerComponent,
             ]:
                 ProvideStarknetWallet,
-            [
-                SignerTypeProviderComponent,
-                DefaultSignerGetterComponent,
-            ]:
-                UseStarknetAccountSigner,
+            SignerTypeProviderComponent:
+                UseType<StarknetWallet>,
             NonceTypeProviderComponent:
                 UseType<Felt>,
             TokenIbcTransferrerComponent:
