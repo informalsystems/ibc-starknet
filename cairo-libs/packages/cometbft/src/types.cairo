@@ -871,3 +871,53 @@ pub mod canonical_vote_impl {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_enough_power() {
+        let mut tailled_power = VotingPowerTallyImpl::new(
+            100, Fraction { numerator: 1, denominator: 2 },
+        );
+
+        tailled_power.tally(50);
+
+        assert!(tailled_power.has_enough_power());
+    }
+
+    #[test]
+    fn test_not_enough_power() {
+        let mut tailled_power = VotingPowerTallyImpl::new(
+            100, Fraction { numerator: 1, denominator: 3 },
+        );
+
+        tailled_power.tally(33);
+
+        assert!(!tailled_power.has_enough_power());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_big_numbers() {
+        let mut tallied_power = VotingPowerTallyImpl::new(
+            0xFFFFFFFFFFFFFFFF, Fraction { numerator: 13, denominator: 37 },
+        );
+        tallied_power.tally(0xFFFFFFFFFFFFFFF0);
+
+        assert!(tallied_power.has_enough_power());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_enough_power_with_overflow() {
+        let mut tailled_power = VotingPowerTallyImpl::new(
+            100, Fraction { numerator: 1, denominator: 0 },
+        );
+
+        tailled_power.tally(50);
+
+        assert!(!tailled_power.has_enough_power());
+    }
+}
