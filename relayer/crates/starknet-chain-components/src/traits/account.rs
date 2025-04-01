@@ -10,14 +10,6 @@ pub trait HasStarknetAccountType: Async {
     type Account: Async + ConnectedAccount;
 }
 
-#[cgp_getter {
-    provider: StarknetAccountGetter,
-    context: Chain,
-}]
-pub trait HasStarknetAccount: HasStarknetAccountType {
-    fn account(&self) -> &Self::Account;
-}
-
 #[cgp_component {
     provider: AccountFromSignerBuilder,
     context: Chain

@@ -157,13 +157,12 @@ use hermes_runtime_components::traits::runtime::{
 };
 use hermes_starknet_chain_components::components::chain::StarknetChainComponents;
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
-use hermes_starknet_chain_components::impls::proof_signer::GetStarknetProofSignerField;
 use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
-    AccountFromSignerBuilder, AccountFromSignerBuilderComponent, HasStarknetAccount,
-    StarknetAccountGetterComponent, StarknetAccountTypeProviderComponent,
+    AccountFromSignerBuilder, AccountFromSignerBuilderComponent,
+    StarknetAccountTypeProviderComponent,
 };
 use hermes_starknet_chain_components::traits::client::{
     JsonRpcClientGetter, JsonRpcClientGetterComponent,
@@ -173,7 +172,8 @@ use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContr
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
 use hermes_starknet_chain_components::traits::proof_signer::{
-    HasStarknetProofSigner, StarknetProofSignerGetterComponent, StarknetProofSignerTypeComponent,
+    HasStarknetProofSigner, StarknetProofSignerGetterComponent,
+    StarknetProofSignerTypeProviderComponent,
 };
 use hermes_starknet_chain_components::traits::provider::{
     HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
@@ -282,14 +282,12 @@ delegate_components! {
             GetStarknetProviderField<symbol!("rpc_client")>,
         [
             StarknetAccountTypeProviderComponent,
-            StarknetAccountGetterComponent,
         ]:
             WithField<symbol!("account")>,
-        [
-            StarknetProofSignerTypeComponent,
-            StarknetProofSignerGetterComponent,
-        ]:
-            GetStarknetProofSignerField<symbol!("proof_signer")>,
+        StarknetProofSignerTypeProviderComponent:
+            UseType<Secp256k1KeyPair>,
+        StarknetProofSignerGetterComponent:
+            UseField<symbol!("proof_signer")>,
         DefaultSignerGetterComponent:
             UseField<symbol!("signer")>,
         NonceAllocationMutexGetterComponent:
@@ -420,7 +418,6 @@ pub trait CanUseStarknetChain:
     + HasPacketTimeoutHeight<CosmosChain>
     + HasPacketTimeoutTimestamp<CosmosChain>
     + HasStarknetProvider
-    + HasStarknetAccount
     + CanQueryChainStatus
     + CanQueryBlock
     + CanQueryChainHeight
