@@ -6,8 +6,7 @@ use protobuf::types::message::ProtoCodecImpl;
 use protobuf::types::wkt::{Duration, Timestamp};
 use protobuf::{base64, hex};
 
-#[test]
-fn test_verify_update_header() {
+fn header_fixture() -> (LcHeader, LcHeader) {
     // the base64 data is grabbed from e2e tests
 
     let header_31_data =
@@ -32,16 +31,23 @@ fn test_verify_update_header() {
         @header_43.signed_header.header.validators_hash,
     );
 
+    (header_31, header_43)
+}
+
+#[test]
+fn test_verify_update_header() {
+    let (header_a, header_b) = header_fixture();
+
     let trusted_block_state = TrustedBlockState {
-        chain_id: header_31.signed_header.header.chain_id.clone(),
-        header_time: header_31.signed_header.header.time.clone(),
-        height: header_31.signed_header.header.height,
-        next_validators: header_43.validator_set.clone(), // full validator_set is in future header
-        next_validators_hash: header_31.signed_header.header.next_validators_hash.clone(),
+        chain_id: header_a.signed_header.header.chain_id.clone(),
+        header_time: header_a.signed_header.header.time.clone(),
+        height: header_a.signed_header.header.height,
+        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
+        next_validators_hash: header_a.signed_header.header.next_validators_hash.clone(),
     };
 
     let untrusted_block_state = UntrustedBlockState {
-        signed_header: header_43.signed_header.clone(), validators: header_43.validator_set,
+        signed_header: header_b.signed_header.clone(), validators: header_b.validator_set,
     };
 
     let trusting_period = Duration { seconds: 1209600, nanos: 0 };
@@ -49,8 +55,44 @@ fn test_verify_update_header() {
     let clock_drift = Duration { seconds: 3, nanos: 0 };
 
     let now = Timestamp {
-        seconds: header_43.signed_header.header.time.seconds + 30,
-        nanos: header_43.signed_header.header.time.nanos,
+        // header is submitted 30 seconds later
+        seconds: header_b.signed_header.header.time.seconds + 30,
+        nanos: header_b.signed_header.header.time.nanos,
+    };
+
+    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
+
+    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+}
+
+#[test]
+#[should_panic(expected: 'ICS07: invalid commit hash')]
+fn test_verify_update_header_forged_header() {
+    let (header_a, header_b) = header_fixture();
+
+    let trusted_block_state = TrustedBlockState {
+        chain_id: header_a.signed_header.header.chain_id.clone(),
+        header_time: header_a.signed_header.header.time.clone(),
+        height: header_a.signed_header.header.height,
+        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
+        next_validators_hash: header_a.signed_header.header.next_validators_hash.clone(),
+    };
+
+    let mut untrusted_block_state = UntrustedBlockState {
+        signed_header: header_b.signed_header.clone(), validators: header_b.validator_set,
+    };
+
+    // forged header
+    untrusted_block_state.signed_header.header.next_validators_hash = array![0x1, 0x2];
+
+    let trusting_period = Duration { seconds: 1209600, nanos: 0 };
+
+    let clock_drift = Duration { seconds: 3, nanos: 0 };
+
+    let now = Timestamp {
+        // header is submitted 30 seconds later
+        seconds: header_b.signed_header.header.time.seconds + 30,
+        nanos: header_b.signed_header.header.time.nanos,
     };
 
     let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
