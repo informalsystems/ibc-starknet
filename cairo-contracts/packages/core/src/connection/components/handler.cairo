@@ -159,7 +159,7 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
 
-            let path = connection_path(msg.prefix_on_a.clone(), msg.conn_id_on_a.clone());
+            let paths = connection_path(msg.prefix_on_a.clone(), msg.conn_id_on_a.clone());
 
             let expected_conn_end_on_a = ConnectionEndTrait::init(
                 msg.client_id_on_a.clone(),
@@ -174,7 +174,7 @@ pub mod ConnectionHandlerComponent {
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    paths,
                     expected_conn_end_on_a.into(),
                     msg.proof_conn_end_on_a,
                     root_on_b,
@@ -237,15 +237,18 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
-            let path = connection_path(
-                conn_end_on_a.counterparty.prefix.clone(),
-                conn_end_on_a.counterparty.connection_id.clone(),
+            // Counterparty ConnectionID is taken from the MsgConnOpenAck since the channel has
+            // only gone through the Init step, so the counterparty is not correctly set
+            let paths = connection_path(
+                conn_end_on_a.counterparty.prefix.clone(), msg.conn_id_on_b.clone(),
             );
 
+            // Counterparty ConnectionID is taken from the MsgConnOpenAck since the channel has
+            // only gone through the Init step, so the counterparty is not correctly set
             let expected_conn_end_on_b = ConnectionEndTrait::try_open(
-                conn_end_on_a.client_id.clone(),
                 conn_end_on_a.counterparty.client_id.clone(),
-                conn_end_on_a.counterparty.connection_id.clone(),
+                conn_end_on_a.client_id.clone(),
+                msg.conn_id_on_b.clone(),
                 conn_end_on_a.counterparty.prefix.clone(),
                 conn_end_on_a.delay_period,
             );
@@ -256,7 +259,7 @@ pub mod ConnectionHandlerComponent {
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    paths,
                     expected_conn_end_on_b.into(),
                     msg.proof_conn_end_on_b,
                     root_on_a,
@@ -311,7 +314,7 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
 
-            let path = connection_path(
+            let paths = connection_path(
                 conn_end_on_b.counterparty.prefix, conn_end_on_b.counterparty.connection_id.clone(),
             );
 
@@ -330,7 +333,7 @@ pub mod ConnectionHandlerComponent {
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    paths,
                     expected_conn_end_on_a.into(),
                     msg.proof_conn_end_on_a,
                     root_on_b,

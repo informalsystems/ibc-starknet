@@ -963,8 +963,11 @@ pub mod ChannelHandlerComponent {
 
             let root = client.consensus_state_root(client_sequence, proof_height.clone());
 
+            // TODO: FIX path
             client
-                .verify_membership(client_sequence, path, expected_channel_end.into(), proof, root);
+                .verify_membership(
+                    client_sequence, array![path], expected_channel_end.into(), proof, root,
+                );
         }
 
         /// Verifies if the packet commitment matches the one stored earlier
@@ -1033,10 +1036,11 @@ pub mod ChannelHandlerComponent {
             let root_on_a = client
                 .consensus_state_root(client_sequence, msg.proof_height_on_a.clone());
 
+            // TODO fix path
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    array![path],
                     packet_commitment_on_a.into(),
                     msg.proof_commitment_on_a.clone(),
                     root_on_a,
@@ -1065,10 +1069,11 @@ pub mod ChannelHandlerComponent {
             let root_on_b = client
                 .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
 
+            // TODO fix path
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    array![path],
                     ack_commitment_on_a.into(),
                     msg.proof_ack_on_b.clone(),
                     root_on_b,
@@ -1118,10 +1123,11 @@ pub mod ChannelHandlerComponent {
             let root_on_b = client
                 .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
 
+            // TODO fix path
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    array![path],
                     msg.packet.seq_on_a.clone().into(),
                     msg.proof_unreceived_on_b,
                     root_on_b,

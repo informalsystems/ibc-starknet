@@ -1,9 +1,36 @@
 use core::num::traits::Zero;
 use ics23::byte_array_to_array_u8;
+use protobuf::primitives::array::BytesAsProtoMessage;
+use protobuf::types::message::{
+    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoMessage, ProtoName,
+};
+use protobuf::types::tag::WireType;
 
 #[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct BasePrefix {
     pub prefix: ByteArray,
+}
+
+impl BasePrefixAsProtoMessage of ProtoMessage<BasePrefix> {
+    fn encode_raw(self: @BasePrefix, ref context: EncodeContext) {
+        let prefix = self.to_array_u8();
+        context.encode_field(1, @prefix);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<BasePrefix> {
+        // FIXME: Implement decode when required
+        None
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl BasePrefixAsProtoName of ProtoName<BasePrefix> {
+    fn type_url() -> ByteArray {
+        "BasePrefix"
+    }
 }
 
 #[generate_trait]

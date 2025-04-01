@@ -33,7 +33,9 @@ impl ConnectionEndAsProtoMessage of ProtoMessage<ConnectionEnd> {
         context.encode_repeated_field(2, @array![self.version.clone()]);
         context.encode_enum(3, self.state);
         context.encode_field(4, self.counterparty);
-        context.encode_field(5, @self.delay_period.as_nanos());
+        if self.delay_period.is_non_zero() {
+            context.encode_field(5, @self.delay_period.as_nanos());
+        }
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<ConnectionEnd> {
@@ -232,8 +234,7 @@ impl CounterpartyAsProtoMessage of ProtoMessage<Counterparty> {
 
         context.encode_field(2, self.connection_id.connection_id);
 
-        let prefix = self.prefix.to_array_u8();
-        context.encode_field(3, @prefix);
+        context.encode_field(3, self.prefix);
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<Counterparty> {

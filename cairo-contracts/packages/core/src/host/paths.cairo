@@ -5,11 +5,16 @@ use starknet_ibc_core::host::{
 };
 use starknet_ibc_utils::{RemotePathBuilder, RemotePathBuilderImpl};
 
-pub fn connection_path(base: BasePrefix, connection_id: ConnectionId) -> ByteArray {
-    let mut builder = RemotePathBuilderImpl::init(base);
-    append_prefix(ref builder, CONNECTIONS_PREFIX());
+pub fn connection_path(base: BasePrefix, connection_id: ConnectionId) -> Array<ByteArray> {
+    let mut paths = array![];
+    let mut builder_prefix = RemotePathBuilderImpl::init(base);
+    let prefix = builder_prefix.path();
+    let mut builder = RemotePathBuilderImpl::init(CONNECTIONS_PREFIX());
     builder.append(connection_id);
-    builder.path()
+    let path = builder.path();
+    paths.append(prefix);
+    paths.append(path);
+    paths
 }
 
 pub fn channel_end_path(base: BasePrefix, port_id: PortId, channel_id: ChannelId) -> ByteArray {
@@ -92,9 +97,20 @@ pub fn append_sequence(ref path_builder: RemotePathBuilder, sequence: Sequence) 
 #[cfg(test)]
 mod tests {
     use starknet_ibc_core::host::{BasePrefixZero, ChannelId, PortId, Sequence};
-    use starknet_ibc_testkit::dummies::IBC_PREFIX;
+    use starknet_ibc_testkit::dummies::{CONNECTION_END, IBC_PREFIX};
     use starknet_ibc_utils::RemotePathBuilderImpl;
-    use super::commitment_path;
+    use super::{commitment_path, connection_path};
+
+    #[test]
+    fn test_connection_path() {
+        let connection_end = CONNECTION_END(0);
+
+        let paths = connection_path(
+            connection_end.counterparty.prefix.clone(),
+            connection_end.counterparty.connection_id.clone(),
+        );
+        assert_eq!(paths, array!["ibc", "connections/connection-0"]);
+    }
 
     #[test]
     fn test_commitment_path() {

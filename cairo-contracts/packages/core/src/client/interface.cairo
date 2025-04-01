@@ -33,7 +33,7 @@ pub trait IClientStateValidation<TContractState> {
     fn verify_membership(
         self: @TContractState,
         client_sequence: u64,
-        path: ByteArray,
+        paths: Array<ByteArray>,
         value: StateValue,
         proof: StateProof,
         root: StateRoot,
