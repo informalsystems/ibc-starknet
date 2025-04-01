@@ -97,7 +97,9 @@ pub fn little_endian_to_u64(value: @[u8; 8]) -> u64 {
 
 #[cfg(test)]
 mod tests {
-    use super::{decode_2_complement_64, encode_2_complement_64};
+    use super::{
+        decode_2_complement_64, encode_2_complement_64, little_endian_to_u64, u64_to_little_endian,
+    };
 
     #[test]
     fn test_encode_decode_2_complement_zero() {
@@ -124,5 +126,38 @@ mod tests {
         assert_eq!(encoded, 0xFFFFFFFFFFFFFFFF, "invalid encoded value");
         let decoded = decode_2_complement_64(@encoded);
         assert_eq!(decoded, value, "invalid decoded value");
+    }
+
+    #[test]
+    fn test_little_endian_encode() {
+        let value = 0x123456789ABCDEF0;
+        let encoded = u64_to_little_endian(@value);
+        assert_eq!(
+            encoded, [0xF0, 0xDE, 0xBC, 0x9A, 0x78, 0x56, 0x34, 0x12], "invalid encoded value",
+        );
+    }
+
+    #[test]
+    fn test_little_endian_decode() {
+        let bytes = [0xF0, 0xDE, 0xBC, 0x9A, 0x78, 0x56, 0x34, 0x12];
+        let decoded = little_endian_to_u64(@bytes);
+        assert_eq!(decoded, 0x123456789ABCDEF0, "invalid decoded value");
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_little_endian_encode(x: u64) {
+        let encoded = u64_to_little_endian(@x);
+        let decoded = little_endian_to_u64(@encoded);
+        assert_eq!(decoded, x, "invalid decoded value");
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_little_endian_decode(b1: u8, b2: u8, b3: u8, b4: u8, b5: u8, b6: u8, b7: u8, b8: u8) {
+        let bytes = [b1, b2, b3, b4, b5, b6, b7, b8];
+        let decoded = little_endian_to_u64(@bytes);
+        let encoded = u64_to_little_endian(@decoded);
+        assert_eq!(encoded, bytes, "invalid encoded value");
     }
 }
