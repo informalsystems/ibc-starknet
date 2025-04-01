@@ -24,9 +24,10 @@ description   = "Cairo components and contracts for integrating Starknet with IB
 test = "snforge test"
 
 [workspace.dependencies]
+assert_macros = "2.11.2"
+starknet      = "2.11.2"
+
 # external dependencies
-assert_macros              = "2.11.2"
-starknet                   = "2.11.2"
 snforge_std                = "0.38.3"
 alexandria_data_structures = "0.5.0"
 alexandria_numeric         = "0.5.0"

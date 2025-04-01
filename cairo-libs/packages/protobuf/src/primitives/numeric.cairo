@@ -78,6 +78,9 @@ pub impl I64AsProtoMessage of ProtoMessage<i64> {
 }
 
 pub impl SFixed64AsProtoMessage of ProtoMessage<i64> {
+    // number is encoded as little-ending chunks
+    // https://protobuf.dev/programming-guides/encoding/#cheat-sheet
+
     fn encode_raw(self: @i64, ref context: EncodeContext) {
         let num: u64 = encode_2_complement_64(@(*self).into());
         let mut bytes = u64_to_little_endian(@num).span();
