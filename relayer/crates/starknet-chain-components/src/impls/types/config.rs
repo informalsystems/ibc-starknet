@@ -23,7 +23,7 @@ pub struct StarknetChainConfig {
     pub contract_classes: StarknetContractClasses,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct StarknetContractAddresses {
     pub ibc_core: Option<StarknetAddress>,
     pub ibc_client: Option<StarknetAddress>,

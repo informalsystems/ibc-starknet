@@ -25,6 +25,7 @@ hermes-logger                       = { workspace = true }
 hermes-relayer-components           = { workspace = true }
 hermes-test-components              = { workspace = true }
 hermes-cosmos-chain-components      = { workspace = true }
+hermes-cosmos-chain-preset          = { workspace = true }
 hermes-wasm-client-components       = { workspace = true }
 hermes-wasm-encoding-components     = { workspace = true }
 hermes-starknet-chain-components    = { workspace = true }

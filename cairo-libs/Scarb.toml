@@ -24,9 +24,9 @@ test = "snforge test"
 [workspace.dependencies]
 starknet      = "2.11.2"
 assert_macros = "2.11.2"
+snforge_std   = "0.40.0"
 
 # external dependencies
-snforge_std     = "0.40.0"
 alexandria_math = "0.5.0"
 
 # internal dependencies

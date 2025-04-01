@@ -31,7 +31,7 @@ overflow-checks = true
 cgp            = { version = "0.4.0" }
 cgp-error-eyre = { version = "0.4.0" }
 
-starknet                    = { version = "0.13.0" }
+starknet                    = { version = "0.14.0" }
 starknet-types-core         = { version = "0.1.7" }
 url                         = { version = "2.4.0" }
 eyre                        = { version = "0.6.12" }
@@ -77,6 +77,7 @@ hermes-tracing-logging-components   = { version = "0.1.0" }
 hermes-logger                       = { version = "0.1.0" }
 hermes-relayer-components           = { version = "0.1.0" }
 hermes-cosmos-chain-components      = { version = "0.1.0" }
+hermes-cosmos-chain-preset          = { version = "0.1.0" }
 hermes-cosmos-encoding-components   = { version = "0.1.0" }
 hermes-cosmos-relayer               = { version = "0.1.0" }
 hermes-cosmos-wasm-relayer          = { version = "0.1.0" }
@@ -90,6 +91,7 @@ hermes-cli-components               = { version = "0.1.0" }
 hermes-cli                          = { version = "0.1.0" }
 hermes-starknet-cli                 = { version = "0.1.0" }
 hermes-test-components              = { version = "0.1.0" }
+hermes-ibc-test-suite               = { version = "0.1.0" }
 hermes-cairo-encoding-components    = { version = "0.1.0" }
 hermes-protobuf-encoding-components = { version = "0.1.0" }
 hermes-starknet-chain-components    = { version = "0.1.0" }
@@ -145,8 +147,6 @@ ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types"
 
 poseidon = { path = "./crates/poseidon" }
 
-starknet = { git = "https://github.com/xJonathanLEI/starknet-rs", branch = "dev/jsonrpc_0_8_0" }
-
 cgp                     = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-core                = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-extra               = { git = "https://github.com/contextgeneric/cgp.git" }
@@ -185,6 +185,7 @@ hermes-test-components               = { git = "https://github.com/informalsyste
 hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git" }

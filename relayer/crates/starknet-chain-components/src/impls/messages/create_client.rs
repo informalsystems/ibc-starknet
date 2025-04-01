@@ -21,7 +21,7 @@ use starknet::macros::{selector, short_string};
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::impls::utils::array::from_vec_u8_to_be_u32_slice;
-use crate::traits::queries::address::CanQueryContractAddress;
+use crate::traits::queries::contract_address::CanQueryContractAddress;
 use crate::types::cosmos::client_state::{ClientStatus, CometClientState};
 use crate::types::cosmos::consensus_state::CometConsensusState;
 use crate::types::cosmos::height::Height;

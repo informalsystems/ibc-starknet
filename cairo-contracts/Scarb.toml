@@ -26,9 +26,9 @@ test = "snforge test"
 [workspace.dependencies]
 assert_macros = "2.11.2"
 starknet      = "2.11.2"
+snforge_std   = "0.38.3" # can't bump because of oz testing
 
 # external dependencies
-snforge_std                = "0.38.3"
 alexandria_data_structures = "0.5.0"
 alexandria_numeric         = "0.5.0"
 alexandria_sorting         = "0.5.0"
