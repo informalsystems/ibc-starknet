@@ -47,10 +47,8 @@ use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChai
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use ibc::core::host::types::identifiers::{ChainId, ClientId};
-use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
-use starknet::signers::{LocalWallet, SigningKey};
 use url::Url;
 
 use super::cosmos_to_starknet_relay::CosmosToStarknetRelay;
@@ -360,16 +358,6 @@ impl StarknetBuilder {
         let relayer_wallet: StarknetWallet = toml::from_str(&wallet_str)
             .map_err(|e| eyre!("Failed to parse relayer wallet: {e}"))?;
 
-        let account = SingleOwnerAccount::new(
-            rpc_client.clone(),
-            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
-                relayer_wallet.signing_key,
-            )),
-            *relayer_wallet.account_address,
-            chain_id_felt,
-            ExecutionEncoding::New,
-        );
-
         let proof_signer = Secp256k1KeyPair::from_mnemonic(
             bip39::Mnemonic::from_entropy(
                 &relayer_wallet.signing_key.to_bytes_be(),
@@ -428,7 +416,6 @@ impl StarknetBuilder {
                 runtime: self.runtime.clone(),
                 chain_id,
                 rpc_client,
-                account: Arc::new(account),
                 ibc_client_contract_address,
                 ibc_core_contract_address,
                 ibc_ics20_contract_address,

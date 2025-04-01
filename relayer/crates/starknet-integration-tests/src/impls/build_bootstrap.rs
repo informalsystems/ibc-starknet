@@ -143,7 +143,6 @@ where
                     .parse()
                     .map_err(Bootstrap::raise_error)?,
                 rpc_client,
-                account: Arc::new(account),
                 ibc_client_contract_address: OnceLock::new(),
                 ibc_core_contract_address: OnceLock::new(),
                 ibc_ics20_contract_address: OnceLock::new(),

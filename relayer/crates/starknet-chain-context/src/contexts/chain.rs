@@ -225,6 +225,7 @@ use crate::contexts::encoding::cairo::StarknetCairoEncoding;
 use crate::contexts::encoding::event::StarknetEventEncoding;
 use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use crate::impls::error::HandleStarknetChainError;
+use crate::types::StarknetAccount;
 
 #[cgp_context(StarknetChainContextComponents: StarknetChainComponents)]
 #[derive(Clone)]
@@ -237,7 +238,6 @@ pub struct StarknetChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
     pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
-    pub account: Arc<SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>>,
     pub ibc_client_contract_address: OnceLock<StarknetAddress>,
     pub ibc_core_contract_address: OnceLock<StarknetAddress>,
     pub ibc_ics20_contract_address: OnceLock<StarknetAddress>,
@@ -280,10 +280,8 @@ delegate_components! {
             StarknetProviderGetterComponent,
         ]:
             GetStarknetProviderField<symbol!("rpc_client")>,
-        [
-            StarknetAccountTypeProviderComponent,
-        ]:
-            WithField<symbol!("account")>,
+        StarknetAccountTypeProviderComponent:
+            UseType<StarknetAccount>,
         StarknetProofSignerTypeProviderComponent:
             UseType<Secp256k1KeyPair>,
         StarknetProofSignerGetterComponent:
