@@ -328,7 +328,8 @@ impl<Bootstrap, InBuilder, Chain> ChainDriverBuilder<Bootstrap>
     for BuildChainAndDeployIbcContracts<InBuilder>
 where
     Bootstrap: HasRuntimeType<Runtime: HasChildProcessType>
-        + HasChainDriverType<Chain = Chain>
+        + HasChainDriverType
+        + HasChainType<Chain = Chain>
         + HasChainGenesisConfigType
         + HasChainNodeConfigType
         + CanDeployIbcContracts

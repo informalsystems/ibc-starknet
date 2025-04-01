@@ -50,10 +50,10 @@ use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfi
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
 use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
 use hermes_test_components::chain_driver::traits::types::chain::{
-    ChainTypeComponent, ProvideChainType,
+    ChainTypeProvider, ChainTypeProviderComponent,
 };
 use hermes_test_components::driver::traits::types::chain_driver::{
-    ChainDriverTypeComponent, ProvideChainDriverType,
+    ChainDriverTypeProvider, ChainDriverTypeProviderComponent,
 };
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::contract::SierraClass;
@@ -104,13 +104,13 @@ delegate_components! {
     }
 }
 
-#[cgp_provider(ChainTypeComponent)]
-impl ProvideChainType<StarknetBootstrap> for StarknetBootstrapComponents {
+#[cgp_provider(ChainTypeProviderComponent)]
+impl ChainTypeProvider<StarknetBootstrap> for StarknetBootstrapComponents {
     type Chain = StarknetChain;
 }
 
-#[cgp_provider(ChainDriverTypeComponent)]
-impl ProvideChainDriverType<StarknetBootstrap> for StarknetBootstrapComponents {
+#[cgp_provider(ChainDriverTypeProviderComponent)]
+impl ChainDriverTypeProvider<StarknetBootstrap> for StarknetBootstrapComponents {
     type ChainDriver = StarknetChainDriver;
 }
 
