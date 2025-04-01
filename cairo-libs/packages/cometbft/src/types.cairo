@@ -824,8 +824,8 @@ pub impl VotingPowerTallyImpl of VotingPowerTallyTrait {
 
     fn has_enough_power(self: VotingPowerTally) -> bool {
         // 0 < numerator < denominator
-        assert_lt!(0, self.trust_threshold.numerator);
-        assert_lt!(self.trust_threshold.numerator, self.trust_threshold.denominator);
+        assert!(0 < self.trust_threshold.numerator);
+        assert!(self.trust_threshold.numerator < self.trust_threshold.denominator);
 
         // cast to u128 to avoid overflow
         let tally: u128 = self.tallied.into();
