@@ -5,7 +5,6 @@ pub mod CometErrors {
     pub const UNSUPPORTED_PUBKEY_TYPE: felt252 = 'ICS07: unsupported pubkey type';
     pub const INSUFFICIENT_VOTING_POWER: felt252 = 'ICS07: not enough voting power';
     pub const OVERFLOWED_BLOCK_HEIGHT: felt252 = 'ICS07: overflowed block height';
-    pub const OVERFLOWED_VOTING_CALC: felt252 = 'ICS07: overflowed voting calc';
     pub const INVALID_COMMIT_HASH: felt252 = 'ICS07: invalid commit hash';
     pub const INVALID_SIGNATURE_COUNT: felt252 = 'ICS07: invalid sig count';
     pub const INVALID_VALIDATOR_SET_HASH: felt252 = 'ICS07: invalid val set hash';

@@ -2,7 +2,6 @@ use alexandria_math::ed25519::verify_signature;
 pub use canonical_vote_impl::CanonicalVoteAsProtoMessage;
 use cometbft::errors::CometErrors;
 use cometbft::utils::{Fraction, SpanU8TryIntoU256};
-use core::num::traits::OverflowingMul;
 use ics23::byte_array_to_array_u8;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{
@@ -824,13 +823,18 @@ pub impl VotingPowerTallyImpl of VotingPowerTallyTrait {
     }
 
     fn has_enough_power(self: VotingPowerTally) -> bool {
-        let (tallied_fraction, overflow) = self
-            .tallied
-            .overflowing_mul(self.trust_threshold.denominator);
-        assert(!overflow, CometErrors::OVERFLOWED_VOTING_CALC);
-        let (total_fraction, overflow) = self.total.overflowing_mul(self.trust_threshold.numerator);
-        assert(!overflow, CometErrors::OVERFLOWED_VOTING_CALC);
-        tallied_fraction > total_fraction
+        // 0 < numerator < denominator
+        assert_lt!(0, self.trust_threshold.numerator);
+        assert_lt!(self.trust_threshold.numerator, self.trust_threshold.denominator);
+
+        // cast to u128 to avoid overflow
+        let tally: u128 = self.tallied.into();
+        let total: u128 = self.total.into();
+        let numerator: u128 = self.trust_threshold.numerator.into();
+        let denominator: u128 = self.trust_threshold.denominator.into();
+
+        // tally / total >= numerator / denominator
+        tally * denominator >= total * numerator
     }
 }
 
@@ -899,7 +903,6 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn test_big_numbers() {
         let mut tallied_power = VotingPowerTallyImpl::new(
             0xFFFFFFFFFFFFFFFF, Fraction { numerator: 13, denominator: 37 },
