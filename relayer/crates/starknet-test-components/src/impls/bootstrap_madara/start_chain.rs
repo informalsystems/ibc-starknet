@@ -13,7 +13,7 @@ use crate::types::genesis_config::StarknetGenesisConfig;
 use crate::types::node_config::StarknetNodeConfig;
 
 #[cgp_new_provider(ChainFullNodeStarterComponent)]
-impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartStarknetDevnet
+impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartMadaraDevnet
 where
     Bootstrap: HasRuntime<Runtime = Runtime>
         + HasChainNodeConfigType<ChainNodeConfig = StarknetNodeConfig>
@@ -30,25 +30,14 @@ where
     ) -> Result<Runtime::ChildProcess, Bootstrap::Error> {
         let chain_command = bootstrap.chain_command_path();
 
-        let chain_state_path = Runtime::join_file_path(
-            chain_home_dir,
-            &Runtime::file_path_from_string("chain-state.json"),
-        );
-
         let args = [
-            "--seed",
-            &chain_genesis_config.seed.to_string(),
-            "--port",
+            "--devnet",
+            "--rpc-port",
             &chain_node_config.rpc_port.to_string(),
-            "--block-generation-on",
-            "1",
-            "--state-archive-capacity",
-            "full",
-            "--dump-on",
-            "block",
-            "--request-body-size-limit=3000000", // 3M; ibc-core contract class is too large
-            "--dump-path",
-            &Runtime::file_path_to_string(&chain_state_path),
+            "--base-path",
+            &Runtime::file_path_to_string(&chain_home_dir),
+            "--chain-config-override",
+            "block_time=1s,pending_block_update_time=1s",
         ];
 
         let stdout_path = Runtime::join_file_path(
