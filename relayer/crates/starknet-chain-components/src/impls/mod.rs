@@ -4,6 +4,7 @@ pub mod counterparty_message_height;
 pub mod encoding;
 pub mod error;
 pub mod events;
+pub mod ibc_amount;
 pub mod messages;
 pub mod packet_fields;
 pub mod packet_filter;

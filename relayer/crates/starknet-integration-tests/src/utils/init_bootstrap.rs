@@ -1,10 +1,14 @@
 use std::time::SystemTime;
 
+use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
+use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
+use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_error::Error;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use starknet::core::types::contract::SierraClass;
 
+use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
 use crate::contexts::starknet_bootstrap::StarknetBootstrap;
 
 pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<StarknetBootstrap, Error> {
@@ -35,6 +39,38 @@ pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<Starknet
     };
 
     Ok(starknet_bootstrap)
+}
+
+pub async fn init_osmosis_bootstrap(
+    runtime: &HermesRuntime,
+    wasm_client_byte_code: Vec<u8>,
+) -> Result<OsmosisBootstrap, Error> {
+    let timestamp = SystemTime::now()
+        .duration_since(SystemTime::UNIX_EPOCH)?
+        .as_secs();
+
+    let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
+
+    let osmosis_bootstrap = OsmosisBootstrap {
+        runtime: runtime.clone(),
+        cosmos_builder,
+        should_randomize_identifiers: true,
+        chain_store_dir: format!("./test-data/{timestamp}/osmosis").into(),
+        chain_command_path: "osmosisd".into(),
+        account_prefix: "osmo".into(),
+        staking_denom_prefix: "stake".into(),
+        transfer_denom_prefix: "coin".into(),
+        wasm_client_byte_code,
+        governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
+        dynamic_gas: Some(DynamicGasConfig {
+            multiplier: 1.1,
+            max: 1.6,
+            eip_query_type: EipQueryType::Osmosis,
+            denom: "stake".to_owned(),
+        }),
+    };
+
+    Ok(osmosis_bootstrap)
 }
 
 pub async fn load_contract_from_env(

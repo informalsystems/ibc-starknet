@@ -1,95 +1,51 @@
 use core::marker::PhantomData;
 use core::time::Duration;
-use std::env::var;
-use std::sync::Arc;
-use std::time::SystemTime;
 
+use cgp::core::field::Index;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
 use hermes_chain_components::traits::queries::consensus_state::CanQueryConsensusStateWithLatestHeight;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
-use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_cosmos_wasm_relayer::context::cosmos_bootstrap::CosmosWithWasmClientBootstrap;
 use hermes_error::types::Error;
-use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
 use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
 use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
 use hermes_runtime_components::traits::sleep::CanSleep;
-use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
-use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
+use hermes_test_components::setup::traits::chain::CanSetupChain;
+use hermes_test_components::setup::traits::clients::CanSetupClients;
 use ibc::core::client::types::Height as CosmosHeight;
 use tracing::info;
 
-use crate::utils::{init_starknet_bootstrap, load_wasm_client};
+use crate::contexts::setup::StarknetTestSetup;
+use crate::utils::init_starknet_setup;
 
 #[test]
 fn test_relay_update_clients() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let wasm_client_code_path = var("STARKNET_WASM_CLIENT_PATH")
-            .expect("Wasm blob for Starknet light client is required");
+        let setup = init_starknet_setup(&runtime).await?;
 
-        let timestamp = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)?
-            .as_secs();
+        let starknet_chain_driver = setup.setup_chain(PhantomData::<Index<0>>).await?;
 
-        let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
+        let cosmos_chain_driver = setup.setup_chain(PhantomData::<Index<1>>).await?;
 
-        let (wasm_code_hash, wasm_client_byte_code) =
-            load_wasm_client(&wasm_client_code_path).await?;
-
-        let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
-
-        let cosmos_bootstrap = Arc::new(CosmosWithWasmClientBootstrap {
-            runtime: runtime.clone(),
-            cosmos_builder,
-            should_randomize_identifiers: true,
-            chain_store_dir: format!("./test-data/{timestamp}/cosmos").into(),
-            chain_command_path: "simd".into(),
-            account_prefix: "cosmos".into(),
-            staking_denom_prefix: "stake".into(),
-            transfer_denom_prefix: "coin".into(),
-            wasm_client_byte_code,
-            governance_proposal_authority: "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn".into(), // TODO: don't hard code this
-            dynamic_gas: None,
-        });
-
-        let mut starknet_chain_driver = starknet_bootstrap.bootstrap_chain("starknet").await?;
-
-        let starknet_chain: &StarknetChain = &mut starknet_chain_driver.chain;
-
-        let cosmos_chain_driver = cosmos_bootstrap.bootstrap_chain("cosmos").await?;
+        let starknet_chain = &starknet_chain_driver.chain;
 
         let cosmos_chain = &cosmos_chain_driver.chain;
 
+        let (starknet_client_id, cosmos_client_id) = <StarknetTestSetup as CanSetupClients<
+            Index<0>,
+            Index<1>,
+        >>::setup_clients(
+            &setup, starknet_chain, cosmos_chain
+        )
+        .await?;
+
         let cairo_encoding = StarknetCairoEncoding;
-
-        let starknet_client_id = StarknetToCosmosRelay::create_client(
-            SourceTarget,
-            starknet_chain,
-            cosmos_chain,
-            &Default::default(),
-            &(),
-        )
-        .await?;
-
-        info!("created client on Starknet: {:?}", starknet_client_id);
-
-        let cosmos_client_id = StarknetToCosmosRelay::create_client(
-            DestinationTarget,
-            cosmos_chain,
-            starknet_chain,
-            &StarknetCreateClientPayloadOptions { wasm_code_hash },
-            &(),
-        )
-        .await?;
-
-        info!("created client on Cosmos: {:?}", cosmos_client_id);
 
         let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
             runtime.clone(),
