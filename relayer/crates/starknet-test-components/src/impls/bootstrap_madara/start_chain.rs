@@ -35,7 +35,7 @@ where
             "--rpc-port",
             &chain_node_config.rpc_port.to_string(),
             "--base-path",
-            &Runtime::file_path_to_string(&chain_home_dir),
+            &Runtime::file_path_to_string(chain_home_dir),
             "--chain-config-override",
             "block_time=1s,pending_block_update_time=1s",
         ];
