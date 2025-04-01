@@ -4,8 +4,6 @@ use std::sync::{Arc, OnceLock};
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
-use cgp::core::field::WithField;
-use cgp::core::types::WithType;
 use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
@@ -14,12 +12,8 @@ use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver:
     ChainDriverBuilder, ChainDriverBuilderComponent,
 };
 use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::ChainFullNodeStarterComponent;
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::{
-    ChainCommandPathGetter, ChainCommandPathGetterComponent,
-};
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::{
-    ChainStoreDirGetter, ChainStoreDirGetterComponent,
-};
+use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::ChainCommandPathGetterComponent;
+use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::ChainStoreDirGetterComponent;
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::ChainNodeConfigTypeComponent;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::ChainGenesisConfigTypeComponent;
 use hermes_error::impls::UseHermesError;
@@ -49,12 +43,8 @@ use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
 use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
-use hermes_test_components::chain_driver::traits::types::chain::{
-    ChainTypeProvider, ChainTypeProviderComponent,
-};
-use hermes_test_components::driver::traits::types::chain_driver::{
-    ChainDriverTypeProvider, ChainDriverTypeProviderComponent,
-};
+use hermes_test_components::chain_driver::traits::types::chain::ChainTypeProviderComponent;
+use hermes_test_components::driver::traits::types::chain_driver::ChainDriverTypeProviderComponent;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::contract::SierraClass;
 use starknet::providers::jsonrpc::HttpTransport;
@@ -79,10 +69,14 @@ pub struct StarknetBootstrap {
 
 delegate_components! {
     StarknetBootstrapComponents {
-        ErrorTypeProviderComponent: UseHermesError,
-        ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
-        RuntimeTypeProviderComponent: WithType<HermesRuntime>,
-        RuntimeGetterComponent: WithField<symbol!("runtime")>,
+        ErrorTypeProviderComponent:
+            UseHermesError,
+        ErrorRaiserComponent:
+            UseDelegate<HandleStarknetChainError>,
+        RuntimeTypeProviderComponent:
+            UseType<HermesRuntime>,
+        RuntimeGetterComponent:
+            UseField<symbol!("runtime")>,
         [
             LoggerTypeProviderComponent,
             LoggerGetterComponent,
@@ -101,30 +95,14 @@ delegate_components! {
             DeployIbcContract,
         ChainDriverBuilderComponent:
             BuildChainAndDeployIbcContracts<BuildAndWaitChainDriver<BuildStarknetChainDriver>>,
-    }
-}
-
-#[cgp_provider(ChainTypeProviderComponent)]
-impl ChainTypeProvider<StarknetBootstrap> for StarknetBootstrapComponents {
-    type Chain = StarknetChain;
-}
-
-#[cgp_provider(ChainDriverTypeProviderComponent)]
-impl ChainDriverTypeProvider<StarknetBootstrap> for StarknetBootstrapComponents {
-    type ChainDriver = StarknetChainDriver;
-}
-
-#[cgp_provider(ChainCommandPathGetterComponent)]
-impl ChainCommandPathGetter<StarknetBootstrap> for StarknetBootstrapComponents {
-    fn chain_command_path(bootstrap: &StarknetBootstrap) -> &PathBuf {
-        &bootstrap.chain_command_path
-    }
-}
-
-#[cgp_provider(ChainStoreDirGetterComponent)]
-impl ChainStoreDirGetter<StarknetBootstrap> for StarknetBootstrapComponents {
-    fn chain_store_dir(bootstrap: &StarknetBootstrap) -> &PathBuf {
-        &bootstrap.chain_store_dir
+        ChainTypeProviderComponent:
+            UseType<StarknetChain>,
+        ChainDriverTypeProviderComponent:
+            UseType<StarknetChainDriver>,
+        ChainCommandPathGetterComponent:
+            UseField<symbol!("chain_command_path")>,
+        ChainStoreDirGetterComponent:
+            UseField<symbol!("chain_store_dir")>,
     }
 }
 
