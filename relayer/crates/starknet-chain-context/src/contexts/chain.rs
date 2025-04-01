@@ -1,6 +1,5 @@
 use core::ops::Deref;
 use core::time::Duration;
-use std::str::FromStr;
 use std::sync::{Arc, OnceLock};
 
 use cgp::core::component::UseDelegate;
@@ -161,12 +160,9 @@ use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
-    AccountFromSignerBuilder, AccountFromSignerBuilderComponent,
-    StarknetAccountTypeProviderComponent,
+    AccountFromSignerBuilderComponent, StarknetAccountTypeProviderComponent,
 };
-use hermes_starknet_chain_components::traits::client::{
-    JsonRpcClientGetter, JsonRpcClientGetterComponent,
-};
+use hermes_starknet_chain_components::traits::client::JsonRpcClientGetterComponent;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
@@ -215,15 +211,14 @@ use hermes_test_components::chain::traits::types::memo::HasMemoType;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::host::types::identifiers::{ChainId, PortId as IbcPortId, Sequence};
 use ibc::primitives::Timestamp;
-use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
-use starknet::signers::{LocalWallet, SigningKey};
 
 use crate::contexts::encoding::cairo::StarknetCairoEncoding;
 use crate::contexts::encoding::event::StarknetEventEncoding;
 use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
+use crate::impls::build_account::BuildStarknetAccount;
 use crate::impls::error::HandleStarknetChainError;
 use crate::types::StarknetAccount;
 
@@ -284,6 +279,8 @@ delegate_components! {
             UseType<StarknetAccount>,
         StarknetProofSignerTypeProviderComponent:
             UseType<Secp256k1KeyPair>,
+        JsonRpcClientGetterComponent:
+            UseField<symbol!("rpc_client")>,
         StarknetProofSignerGetterComponent:
             UseField<symbol!("proof_signer")>,
         DefaultSignerGetterComponent:
@@ -292,6 +289,8 @@ delegate_components! {
             GetGlobalNonceMutex<symbol!("nonce_mutex")>,
         BlockTimeQuerierComponent:
             UseField<symbol!("block_time")>,
+        AccountFromSignerBuilderComponent:
+            BuildStarknetAccount,
     }
 }
 
@@ -344,33 +343,10 @@ impl DefaultEncodingGetter<StarknetChain, AsBytes> for StarknetChainContextCompo
     }
 }
 
-#[cgp_provider(JsonRpcClientGetterComponent)]
-impl JsonRpcClientGetter<StarknetChain> for StarknetChainContextComponents {
-    fn json_rpc_client(chain: &StarknetChain) -> &JsonRpcClient<HttpTransport> {
-        &chain.rpc_client
-    }
-}
-
 #[cgp_provider(ChainIdGetterComponent)]
 impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
     fn chain_id(chain: &StarknetChain) -> &ChainId {
         &chain.chain_id
-    }
-}
-
-#[cgp_provider(AccountFromSignerBuilderComponent)]
-impl AccountFromSignerBuilder<StarknetChain> for StarknetChainContextComponents {
-    fn build_account_from_signer(
-        chain: &StarknetChain,
-        signer: &StarknetWallet,
-    ) -> Arc<SingleOwnerAccount<Arc<JsonRpcClient<HttpTransport>>, LocalWallet>> {
-        Arc::new(SingleOwnerAccount::new(
-            chain.rpc_client.clone(),
-            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(signer.signing_key)),
-            *signer.account_address,
-            Felt::from_str(chain.chain_id.as_str()).unwrap(),
-            ExecutionEncoding::New,
-        ))
     }
 }
 
