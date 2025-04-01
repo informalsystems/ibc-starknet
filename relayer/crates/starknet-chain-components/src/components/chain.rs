@@ -132,7 +132,9 @@ mod preset {
     };
     use hermes_chain_components::traits::types::timestamp::TimeoutTypeComponent;
     use hermes_chain_components::traits::types::update_client::UpdateClientPayloadTypeComponent;
+    use hermes_chain_type_components::traits::fields::amount::denom::AmountDenomGetterComponent;
     use hermes_chain_type_components::traits::fields::message_response_events::MessageResponseEventsGetterComponent;
+    use hermes_chain_type_components::traits::types::amount::AmountTypeProviderComponent;
     use hermes_chain_type_components::traits::types::message_response::MessageResponseTypeComponent;
     use hermes_chain_type_components::traits::types::time::TimeTypeComponent;
     use hermes_cosmos_chain_components::impls::channel::init_channel_options::ProvideCosmosInitChannelOptionsType;
@@ -144,14 +146,14 @@ mod preset {
     use hermes_cosmos_chain_components::impls::types::create_client_options::ProvideNoCreateClientMessageOptionsType;
     use hermes_relayer_components::chain::traits::queries::chain_status::ChainStatusQuerierComponent;
     use hermes_relayer_components::chain::traits::send_message::MessageSenderComponent;
-    use hermes_relayer_components::chain::traits::types::chain_id::ChainIdTypeComponent;
+    use hermes_relayer_components::chain::traits::types::chain_id::ChainIdTypeProviderComponent;
     use hermes_relayer_components::chain::traits::types::client_state::ClientStateTypeComponent;
     use hermes_relayer_components::chain::traits::types::consensus_state::ConsensusStateTypeComponent;
-    use hermes_relayer_components::chain::traits::types::event::EventTypeComponent;
+    use hermes_relayer_components::chain::traits::types::event::EventTypeProviderComponent;
     use hermes_relayer_components::chain::traits::types::height::{
-        HeightFieldComponent, HeightTypeComponent,
+        HeightFieldComponent, HeightTypeProviderComponent,
     };
-    use hermes_relayer_components::chain::traits::types::message::MessageTypeComponent;
+    use hermes_relayer_components::chain::traits::types::message::MessageTypeProviderComponent;
     use hermes_relayer_components::chain::traits::types::status::ChainStatusTypeComponent;
     use hermes_relayer_components::components::default::transaction::DefaultTxComponents;
     use hermes_relayer_components::error::impls::retry::ReturnRetryable;
@@ -181,9 +183,7 @@ mod preset {
     use hermes_test_components::chain::traits::transfer::string_memo::ProvideStringMemoType;
     use hermes_test_components::chain::traits::transfer::timeout::IbcTransferTimeoutCalculatorComponent;
     use hermes_test_components::chain::traits::types::address::AddressTypeComponent;
-    use hermes_test_components::chain::traits::types::amount::{
-        AmountMethodsComponent, AmountTypeComponent,
-    };
+    use hermes_test_components::chain::traits::types::amount::AmountMethodsComponent;
     use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
     use hermes_test_components::chain::traits::types::memo::{
         DefaultMemoGetterComponent, MemoTypeComponent,
@@ -191,6 +191,7 @@ mod preset {
     use hermes_test_components::chain::traits::types::wallet::{
         WalletSignerComponent, WalletTypeComponent,
     };
+    use ibc::core::host::types::identifiers::ChainId;
     use starknet::core::types::Felt;
 
     use crate::components::types::StarknetChainTypes;
@@ -237,14 +238,12 @@ mod preset {
     use crate::impls::types::amount::ProvideU256Amount;
     use crate::impls::types::blob::ProvideFeltBlobType;
     use crate::impls::types::block::ProvideStarknetBlockType;
-    use crate::impls::types::chain_id::ProvideFeltChainId;
     use crate::impls::types::client::ProvideStarknetIbcClientTypes;
     use crate::impls::types::commitment_proof::UseStarknetCommitmentProof;
     use crate::impls::types::contract::ProvideStarknetContractTypes;
     use crate::impls::types::denom::ProvideTokenAddressDenom;
-    use crate::impls::types::event::ProvideStarknetEvent;
     use crate::impls::types::height::ProvideStarknetHeight;
-    use crate::impls::types::message::ProvideCallMessage;
+    use crate::impls::types::message::StarknetMessage;
     use crate::impls::types::method::ProvideFeltSelector;
     use crate::impls::types::payloads::ProvideStarknetPayloadTypes;
     use crate::impls::types::status::ProvideStarknetChainStatusType;
@@ -266,16 +265,17 @@ mod preset {
         ContractClassHashTypeProviderComponent, ContractClassTypeProviderComponent,
     };
     use crate::traits::types::method::SelectorTypeComponent;
+    use crate::types::event::StarknetEvent;
     use crate::types::message_response::UseStarknetMessageResponse;
     use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
     use crate::types::wallet::StarknetWallet;
 
     cgp_preset! {
         StarknetChainComponents {
-            ChainIdTypeComponent:
-                ProvideFeltChainId,
+            ChainIdTypeProviderComponent:
+                UseType<ChainId>,
             [
-                HeightTypeComponent,
+                HeightTypeProviderComponent,
                 HeightFieldComponent,
                 HeightIncrementerComponent,
                 HeightAdjusterComponent,
@@ -289,17 +289,18 @@ mod preset {
                 ProvideFeltAddressType,
             BlobTypeComponent:
                 ProvideFeltBlobType,
-            MessageTypeComponent:
-                ProvideCallMessage,
-            EventTypeComponent:
-                ProvideStarknetEvent,
+            MessageTypeProviderComponent:
+                UseType<StarknetMessage>,
+            EventTypeProviderComponent:
+                UseType<StarknetEvent>,
             [
                 MessageResponseTypeComponent,
                 MessageResponseEventsGetterComponent,
             ]:
                 UseStarknetMessageResponse,
             [
-                AmountTypeComponent,
+                AmountTypeProviderComponent,
+                AmountDenomGetterComponent,
                 AmountMethodsComponent,
             ]:
                 ProvideU256Amount,

@@ -14,6 +14,7 @@ use hermes_cairo_encoding_components::impls::encode_mut::variant::VariantIndexOu
 use hermes_chain_components::impls::payload_builders::packet::InvalidTimeoutReceipt;
 use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_chain_type_components::traits::types::amount::HasAmountType;
 use hermes_chain_type_components::traits::types::height::HasHeightType;
 use hermes_error::handlers::debug::DebugError;
 use hermes_error::handlers::display::DisplayError;
@@ -41,7 +42,6 @@ use hermes_starknet_chain_components::impls::send_message::UnexpectedTransaction
 use hermes_starknet_chain_components::types::event::UnknownEvent;
 use hermes_test_components::chain::impls::assert::poll_assert_eventual_amount::EventualAmountTimeoutError;
 use hermes_test_components::chain::impls::ibc_transfer::MissingSendPacketEventError;
-use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use ibc::core::channel::types::error::ChannelError;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};

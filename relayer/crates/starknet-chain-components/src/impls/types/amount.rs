@@ -1,7 +1,12 @@
 use cgp::prelude::*;
+use hermes_chain_type_components::traits::fields::amount::denom::{
+    AmountDenomGetter, AmountDenomGetterComponent,
+};
+use hermes_chain_type_components::traits::types::amount::{
+    AmountTypeProviderComponent, HasAmountType,
+};
 use hermes_test_components::chain::traits::types::amount::{
-    AmountMethodsComponent, AmountTypeComponent, HasAmountType, ProvideAmountMethods,
-    ProvideAmountType,
+    AmountMethodsComponent, ProvideAmountMethods,
 };
 use hermes_test_components::chain::traits::types::denom::HasDenomType;
 
@@ -10,13 +15,17 @@ use crate::types::amount::StarknetAmount;
 
 pub struct ProvideU256Amount;
 
-#[cgp_provider(AmountTypeComponent)]
-impl<Chain> ProvideAmountType<Chain> for ProvideU256Amount
-where
-    Chain: Async + HasDenomType<Denom = StarknetAddress>,
-{
-    type Amount = StarknetAmount;
+delegate_components! {
+    ProvideU256Amount {
+        AmountTypeProviderComponent: UseType<StarknetAmount>
+    }
+}
 
+#[cgp_provider(AmountDenomGetterComponent)]
+impl<Chain> AmountDenomGetter<Chain> for ProvideU256Amount
+where
+    Chain: HasAmountType<Amount = StarknetAmount> + HasDenomType<Denom = StarknetAddress>,
+{
     fn amount_denom(amount: &StarknetAmount) -> &StarknetAddress {
         &amount.token_address
     }

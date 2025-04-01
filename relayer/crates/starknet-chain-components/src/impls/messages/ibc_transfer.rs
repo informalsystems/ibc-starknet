@@ -9,6 +9,7 @@ use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdTyp
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::timestamp::HasTimeoutType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_chain_type_components::traits::types::amount::HasAmountType;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -16,7 +17,6 @@ use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_test_components::chain::traits::messages::ibc_transfer::{
     IbcTokenTransferMessageBuilder, IbcTokenTransferMessageBuilderComponent,
 };
-use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
 use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
