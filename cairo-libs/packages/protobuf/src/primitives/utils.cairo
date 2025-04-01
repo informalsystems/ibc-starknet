@@ -64,7 +64,9 @@ pub fn u64_to_little_endian(value: @u64) -> [u8; 8] {
     [byte0, byte1, byte2, byte3, byte4, byte5, byte6, byte7]
 }
 
-pub fn little_endian_to_u64(value: Span<u8>) -> u64 {
+pub fn little_endian_to_u64(value: @[u8; 8]) -> u64 {
+    let value = value.span();
+
     let mut result: u64 = 0;
 
     result = result | ((*value[7]).into());

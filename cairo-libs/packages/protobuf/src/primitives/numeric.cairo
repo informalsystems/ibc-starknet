@@ -97,7 +97,7 @@ pub impl SFixed64AsProtoMessage of ProtoMessage<i64> {
             context.buffer[context.index + 6], context.buffer[context.index + 7],
         ];
         context.index += 8;
-        let num = little_endian_to_u64(bytes.span());
+        let num = little_endian_to_u64(@bytes);
         Option::Some(decode_2_complement_64(@num))
     }
 
