@@ -31,7 +31,7 @@ overflow-checks = true
 cgp            = { version = "0.4.0" }
 cgp-error-eyre = { version = "0.4.0" }
 
-starknet                    = { version = "0.13.0" }
+starknet                    = { version = "0.14.0" }
 starknet-types-core         = { version = "0.1.7" }
 url                         = { version = "2.4.0" }
 eyre                        = { version = "0.6.12" }
@@ -146,8 +146,6 @@ ibc-core-handler-types      = { git = "https://github.com/cosmos/ibc-rs", rev = 
 ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types" }
 
 poseidon = { path = "./crates/poseidon" }
-
-starknet = { git = "https://github.com/xJonathanLEI/starknet-rs", branch = "dev/jsonrpc_0_8_0" }
 
 cgp                     = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-core                = { git = "https://github.com/contextgeneric/cgp.git" }
