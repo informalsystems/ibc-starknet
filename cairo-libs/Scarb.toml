@@ -22,11 +22,12 @@ description   = "Cairo libraries for integrating Starknet with IBC"
 test = "snforge test"
 
 [workspace.dependencies]
+starknet      = "2.11.2"
+assert_macros = "2.11.2"
+snforge_std   = "0.40.0"
+
 # external dependencies
 alexandria_math = "0.5.0"
-assert_macros   = "2.9.4"
-starknet        = "2.9.4"
-snforge_std     = "0.38.3"
 
 # internal dependencies
 protobuf = { path = "packages/protobuf" }

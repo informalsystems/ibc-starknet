@@ -35,7 +35,7 @@ between Starknet and Cosmos.
 ### Prerequisites
 
 - `osmosisd`
-- `starkli 0.3.8`
+- `starkli 0.4.0`
 - `cargo` (to run Rust binaries from this project)
 
 ### From Osmosis to Starknet via `channel-10185`
@@ -105,7 +105,7 @@ soon receive a `IBC Received` transaction with received denom.
 
 ### Prerequisites
 
-- `starkli 0.3.8`
+- `starkli 0.4.0`
 - `hermes` v1
 - `cargo`
 
@@ -203,7 +203,7 @@ cargo run --release --bin hermes-starknet -- -c ../relayer.toml \
 ### Prerequisites
 
 - `scarb 2.11.3`
-- `starkli 0.3.8`
+- `starkli 0.4.0`
 - `cargo`
 
 ### Deploying the contracts
