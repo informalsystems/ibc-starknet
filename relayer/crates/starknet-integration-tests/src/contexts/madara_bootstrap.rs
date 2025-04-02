@@ -1,4 +1,5 @@
-use std::path::PathBuf;
+use core::ops::Deref;
+use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
@@ -31,21 +32,22 @@ use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
 use hermes_test_components::chain_driver::traits::types::chain::ChainTypeProviderComponent;
 use hermes_test_components::driver::traits::types::chain_driver::ChainDriverTypeProviderComponent;
-use starknet::core::types::contract::SierraClass;
 
 use crate::contexts::chain_driver::StarknetChainDriver;
+use crate::contexts::starknet_bootstrap::StarknetBootstrapFields;
 use crate::impls::BuildStarknetChainDriver;
 
 #[cgp_context(MadaraBootstrapComponents)]
-#[derive(HasField)]
 pub struct MadaraBootstrap {
-    pub runtime: HermesRuntime,
-    pub chain_command_path: PathBuf,
-    pub chain_store_dir: PathBuf,
-    pub erc20_contract: SierraClass,
-    pub ics20_contract: SierraClass,
-    pub ibc_core_contract: SierraClass,
-    pub comet_client_contract: SierraClass,
+    pub fields: Arc<StarknetBootstrapFields>,
+}
+
+impl Deref for MadaraBootstrap {
+    type Target = StarknetBootstrapFields;
+
+    fn deref(&self) -> &Self::Target {
+        &self.fields
+    }
 }
 
 delegate_components! {

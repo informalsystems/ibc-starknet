@@ -1,4 +1,6 @@
+use core::ops::Deref;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
@@ -38,8 +40,13 @@ use crate::contexts::chain_driver::StarknetChainDriver;
 use crate::impls::BuildStarknetChainDriver;
 
 #[cgp_context(StarknetBootstrapComponents)]
-#[derive(HasField)]
+#[derive(Clone)]
 pub struct StarknetBootstrap {
+    pub fields: Arc<StarknetBootstrapFields>,
+}
+
+#[derive(HasField)]
+pub struct StarknetBootstrapFields {
     pub runtime: HermesRuntime,
     pub chain_command_path: PathBuf,
     pub chain_store_dir: PathBuf,
@@ -47,6 +54,14 @@ pub struct StarknetBootstrap {
     pub ics20_contract: SierraClass,
     pub ibc_core_contract: SierraClass,
     pub comet_client_contract: SierraClass,
+}
+
+impl Deref for StarknetBootstrap {
+    type Target = StarknetBootstrapFields;
+
+    fn deref(&self) -> &Self::Target {
+        &self.fields
+    }
 }
 
 delegate_components! {
