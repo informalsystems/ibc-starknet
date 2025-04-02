@@ -149,10 +149,10 @@ impl MisbehaviourAsProtoName of ProtoName<Misbehaviour> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Header {
-    signed_header: SignedHeader,
-    validator_set: ValidatorSet,
-    trusted_height: Height,
-    trusted_validator_set: ValidatorSet,
+    pub signed_header: SignedHeader,
+    pub validator_set: ValidatorSet,
+    pub trusted_height: Height,
+    pub trusted_validator_set: ValidatorSet,
 }
 
 impl HeaderAsProtoMessage of ProtoMessage<Header> {
