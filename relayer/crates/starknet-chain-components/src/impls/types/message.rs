@@ -1,16 +1,20 @@
 use ibc::core::client::types::Height as CosmosHeight;
-use starknet::core::types::Call;
+use starknet::core::types::Felt;
 
 #[derive(Clone)]
 pub struct StarknetMessage {
-    pub call: Call,
+    pub to: Felt,
+    pub selector: Felt,
+    pub calldata: Vec<Felt>,
     pub counterparty_height: Option<CosmosHeight>,
 }
 
 impl StarknetMessage {
-    pub fn new(call: Call) -> Self {
+    pub fn new(to: Felt, selector: Felt, calldata: Vec<Felt>) -> Self {
         Self {
-            call,
+            to,
+            selector,
+            calldata,
             counterparty_height: None,
         }
     }

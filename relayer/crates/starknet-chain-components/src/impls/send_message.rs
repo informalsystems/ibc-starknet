@@ -52,7 +52,11 @@ where
     ) -> Result<Chain::TxResponse, Chain::Error> {
         let calls: Vec<Call> = messages
             .iter()
-            .map(|message| message.call.clone())
+            .map(|message| Call {
+                to: message.to,
+                selector: message.selector,
+                calldata: message.calldata.clone(),
+            })
             .collect();
 
         let account = chain.build_account_from_signer(signer);
