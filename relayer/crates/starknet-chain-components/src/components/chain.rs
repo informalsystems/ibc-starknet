@@ -169,7 +169,6 @@ mod preset {
     use hermes_relayer_components::transaction::traits::types::signer::SignerTypeProviderComponent;
     use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
     use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
-    use hermes_test_components::chain::impls::assert::default_assert_duration::ProvideDefaultPollAssertDuration;
     use hermes_test_components::chain::impls::assert::poll_assert_eventual_amount::PollAssertEventualAmount;
     use hermes_test_components::chain::impls::default_memo::ProvideDefaultMemo;
     use hermes_test_components::chain::impls::ibc_transfer::SendIbcTransferMessage;
@@ -195,6 +194,7 @@ mod preset {
     use starknet::core::types::Felt;
 
     use crate::components::types::StarknetChainTypes;
+    use crate::impls::assert::assert_duration::ProvidePollAssertDuration;
     use crate::impls::commitment_prefix::GetStarknetCommitmentPrefix;
     use crate::impls::contract::call::CallStarknetContract;
     use crate::impls::contract::declare::DeclareSierraContract;
@@ -584,7 +584,7 @@ mod preset {
             EventualAmountAsserterComponent:
                 PollAssertEventualAmount,
             PollAssertDurationGetterComponent:
-                ProvideDefaultPollAssertDuration,
+                ProvidePollAssertDuration<1, 600>,
             IbcTokenTransferMessageBuilderComponent:
                 BuildStarknetIbcTransferMessage,
             PacketIsReceivedQuerierComponent:
