@@ -47,13 +47,13 @@ use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEn
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
-use hermes_starknet_chain_context::types::StarknetAccount;
 use ibc::core::host::types::identifiers::ChainId;
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
 
 use crate::impls::BuildStarknetAccount;
 use crate::presets::MadaraChainPreset;
+use crate::types::StarknetAccount;
 
 #[cgp_context(MadaraChainComponents: MadaraChainPreset)]
 #[derive(Clone)]
@@ -122,8 +122,6 @@ delegate_components! {
             StarknetClientGetterComponent,
         ]:
             WithField<symbol!("starknet_client")>,
-        StarknetAccountTypeProviderComponent:
-            UseType<StarknetAccount>,
         StarknetProofSignerTypeProviderComponent:
             UseType<Secp256k1KeyPair>,
         StarknetProofSignerGetterComponent:
@@ -134,6 +132,8 @@ delegate_components! {
             GetGlobalNonceMutex<symbol!("nonce_mutex")>,
         BlockTimeQuerierComponent:
             UseField<symbol!("block_time")>,
+        StarknetAccountTypeProviderComponent:
+            UseType<StarknetAccount>,
         AccountFromSignerBuilderComponent:
             BuildStarknetAccount,
     }

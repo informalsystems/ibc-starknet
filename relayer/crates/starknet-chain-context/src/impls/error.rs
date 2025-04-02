@@ -31,7 +31,7 @@ use hermes_relayer_components::chain::impls::queries::consensus_state_height::No
 use hermes_relayer_components::chain::traits::send_message::EmptyMessageResponse;
 use hermes_relayer_components::chain::traits::types::ibc::HasClientIdType;
 use hermes_relayer_components::transaction::impls::poll_tx_response::TxNoResponseError;
-use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
+use hermes_relayer_components::transaction::traits::types::tx_hash::HasTxHashType;
 use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_starknet_chain_components::impls::error::account::RaiseAccountError;
 use hermes_starknet_chain_components::impls::error::provider::RaiseProviderError;
@@ -107,7 +107,7 @@ delegate_components! {
             MissingSendPacketEventError,
             <'a> UnknownEvent<'a>,
             <'a, Chain: HasAddressType + HasAmountType> EventualAmountTimeoutError<'a, Chain>,
-            <'a, Chain: HasTransactionHashType> TxNoResponseError<'a, Chain>,
+            <'a, Chain: HasTxHashType> TxNoResponseError<'a, Chain>,
             <'a, Chain: HasClientIdType<Counterparty>, Counterparty: HasHeightType>
                 NoConsensusStateAtLessThanHeight<'a, Chain, Counterparty>,
             <'a, Chain: HasHeightType, Counterparty: HasOutgoingPacketType<Chain>>

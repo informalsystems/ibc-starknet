@@ -12,7 +12,7 @@ use hermes_relayer_components::transaction::traits::send_messages_with_signer_an
 };
 use hermes_relayer_components::transaction::traits::types::nonce::HasNonceType;
 use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
-use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
+use hermes_relayer_components::transaction::traits::types::tx_hash::HasTxHashType;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
 use starknet::accounts::Account;
 use starknet::core::types::{
@@ -39,7 +39,7 @@ where
         + CanBuildAccountFromSigner
         + HasNonceType<Nonce = Felt>
         + HasMessageType<Message = StarknetMessage>
-        + HasTransactionHashType<TxHash = Felt>
+        + HasTxHashType<TxHash = Felt>
         + CanPollTxResponse
         + CanRaiseAsyncError<&'static str>
         + CanUseStarknetAccount,

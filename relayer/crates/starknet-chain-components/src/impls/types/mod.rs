@@ -14,6 +14,4 @@ pub mod method;
 pub mod payloads;
 pub mod status;
 pub mod timestamp;
-pub mod tx_hash;
-pub mod tx_response;
 pub mod wallet;

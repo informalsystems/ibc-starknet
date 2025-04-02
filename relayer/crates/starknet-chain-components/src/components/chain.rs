@@ -168,8 +168,8 @@ mod preset {
     use hermes_relayer_components::transaction::traits::send_messages_with_signer_and_nonce::MessagesWithSignerAndNonceSenderComponent;
     use hermes_relayer_components::transaction::traits::types::nonce::NonceTypeProviderComponent;
     use hermes_relayer_components::transaction::traits::types::signer::SignerTypeProviderComponent;
-    use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
-    use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
+    use hermes_relayer_components::transaction::traits::types::tx_hash::TxHashTypeProviderComponent;
+    use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeProviderComponent;
     use hermes_test_components::chain::impls::assert::poll_assert_eventual_amount::PollAssertEventualAmount;
     use hermes_test_components::chain::impls::default_memo::ProvideDefaultMemo;
     use hermes_test_components::chain::impls::ibc_transfer::SendIbcTransferMessage;
@@ -247,8 +247,6 @@ mod preset {
     use crate::impls::types::method::ProvideFeltSelector;
     use crate::impls::types::payloads::ProvideStarknetPayloadTypes;
     use crate::impls::types::status::ProvideStarknetChainStatusType;
-    use crate::impls::types::tx_hash::ProvideFeltTxHash;
-    use crate::impls::types::tx_response::ProvideStarknetTxResponse;
     use crate::impls::types::wallet::ProvideStarknetWallet;
     use crate::traits::contract::call::ContractCallerComponent;
     use crate::traits::contract::declare::ContractDeclarerComponent;
@@ -268,6 +266,7 @@ mod preset {
     use crate::types::event::StarknetEvent;
     use crate::types::message_response::UseStarknetMessageResponse;
     use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
+    use crate::types::tx_response::TxResponse;
     use crate::types::wallet::StarknetWallet;
 
     cgp_preset! {
@@ -327,10 +326,10 @@ mod preset {
                 ConvertStarknetTokenAddressFromCosmos,
             CosmosTokenAddressOnStarknetQuerierComponent:
                 GetOrCreateCosmosTokenAddressOnStarknet,
-            TransactionHashTypeComponent:
-                ProvideFeltTxHash,
-            TxResponseTypeComponent:
-                ProvideStarknetTxResponse,
+            TxHashTypeProviderComponent:
+                UseType<Felt>,
+            TxResponseTypeProviderComponent:
+                UseType<TxResponse>,
             SelectorTypeComponent:
                 ProvideFeltSelector,
             [

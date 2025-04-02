@@ -5,9 +5,12 @@ mod preset {
     use StarknetChainComponents::re_exports::*;
 
     use crate::impls;
+    use crate::types::{StarknetMessage, TxResponse};
 
     StarknetChainComponents::with_components! {
         [
+            MessageTypeProviderComponent,
+            TxResponseTypeProviderComponent,
             ContractCallerComponent,
             ContractDeclarerComponent,
             ContractDeployerComponent,
@@ -22,7 +25,12 @@ mod preset {
         | Components | {
             cgp_preset! {
                 MadaraChainPreset {
-                    Components: StarknetChainComponents::Provider,
+                    Components:
+                        StarknetChainComponents::Provider,
+                    MessageTypeProviderComponent:
+                        UseType<StarknetMessage>,
+                    TxResponseTypeProviderComponent:
+                        UseType<TxResponse>,
                     ContractCallerComponent:
                         impls::CallStarknetContract,
                     ContractDeclarerComponent:
