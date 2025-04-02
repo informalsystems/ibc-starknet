@@ -28,7 +28,7 @@ impl<Chain> ContractDeclarer<Chain> for DeclareSierraContract
 where
     Chain: HasContractClassType<ContractClass = SierraClass>
         + HasContractClassHashType<ContractClassHash = Felt>
-        + HasStarknetProvider
+        + HasStarknetProvider<StarknetProvider: Provider>
         + HasDefaultSigner
         + CanBuildAccountFromSigner
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>

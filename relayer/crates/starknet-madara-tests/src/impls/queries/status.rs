@@ -1,29 +1,27 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::queries::block::{BlockQuerier, BlockQuerierComponent};
-use hermes_chain_components::traits::types::block::HasBlockType;
-use hermes_chain_components::traits::types::height::HasHeightType;
+use hermes_chain_components::traits::queries::chain_status::ChainStatusQuerierComponent;
 use hermes_cosmos_chain_components::types::status::Time;
-use starknet::core::types::{BlockId, MaybePendingBlockWithTxHashes};
-use starknet::providers::{Provider, ProviderError};
+use hermes_relayer_components::chain::traits::queries::chain_status::ChainStatusQuerier;
+use hermes_relayer_components::chain::traits::types::status::HasChainStatusType;
+use hermes_starknet_chain_components::traits::provider::HasStarknetProvider;
+use hermes_starknet_chain_components::types::status::StarknetChainStatus;
+use starknet_v13::core::types::{BlockId, BlockTag, MaybePendingBlockWithTxHashes};
+use starknet_v13::providers::{Provider, ProviderError};
 
-use crate::traits::provider::HasStarknetProvider;
-use crate::types::status::StarknetChainStatus;
+pub struct QueryStarknetChainStatus;
 
-pub struct QueryStarknetBlock;
-
-#[cgp_provider(BlockQuerierComponent)]
-impl<Chain> BlockQuerier<Chain> for QueryStarknetBlock
+#[cgp_provider(ChainStatusQuerierComponent)]
+impl<Chain> ChainStatusQuerier<Chain> for QueryStarknetChainStatus
 where
-    Chain: HasBlockType<Block = StarknetChainStatus>
-        + HasHeightType<Height = u64>
+    Chain: HasChainStatusType<ChainStatus = StarknetChainStatus>
         + HasStarknetProvider<StarknetProvider: Provider>
         + CanRaiseAsyncError<ProviderError>
         + CanRaiseAsyncError<&'static str>,
 {
-    async fn query_block(chain: &Chain, height: &u64) -> Result<StarknetChainStatus, Chain::Error> {
+    async fn query_chain_status(chain: &Chain) -> Result<StarknetChainStatus, Chain::Error> {
         let block = chain
             .provider()
-            .get_block_with_tx_hashes(BlockId::Number(*height))
+            .get_block_with_tx_hashes(BlockId::Tag(BlockTag::Latest))
             .await
             .map_err(Chain::raise_error)?;
 

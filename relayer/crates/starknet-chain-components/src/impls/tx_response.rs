@@ -21,7 +21,7 @@ impl<Chain> TxResponseQuerier<Chain> for QueryTransactionReceipt
 where
     Chain: HasTransactionHashType<TxHash = Felt>
         + HasTxResponseType<TxResponse = TxResponse>
-        + HasStarknetProvider
+        + HasStarknetProvider<StarknetProvider: Provider>
         + HasRuntime<Runtime: CanSleep>
         + CanRaiseAsyncError<ProviderError>,
 {

@@ -15,7 +15,7 @@ pub struct QueryStarknetChainStatus;
 impl<Chain> ChainStatusQuerier<Chain> for QueryStarknetChainStatus
 where
     Chain: HasChainStatusType<ChainStatus = StarknetChainStatus>
-        + HasStarknetProvider
+        + HasStarknetProvider<StarknetProvider: Provider>
         + CanRaiseAsyncError<ProviderError>
         + CanRaiseAsyncError<&'static str>,
 {

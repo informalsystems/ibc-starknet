@@ -24,7 +24,7 @@ where
         + HasEventType<Event = StarknetEvent>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasAddressType<Address = StarknetAddress>
-        + HasStarknetProvider
+        + HasStarknetProvider<StarknetProvider: Provider>
         + CanRaiseAsyncError<ProviderError>,
 {
     async fn query_block_events(
