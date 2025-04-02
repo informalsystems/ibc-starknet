@@ -99,6 +99,10 @@ pub fn STATE_ROOT() -> StateRoot {
     StateRoot { root: [1; 8] }
 }
 
+pub fn NEXT_VALIDATOR_HASH() -> ByteArray {
+    "ABCD1234"
+}
+
 pub fn IBC_PREFIX() -> BasePrefix {
     BasePrefix { prefix: "Ibc" }
 }

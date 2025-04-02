@@ -1,3 +1,4 @@
+use cometbft::utils::ONE_THIRD;
 use starknet_ibc_clients::cometbft::{
     CometClientState, CometConsensusState, CometHeader, SignedHeader,
 };
@@ -5,7 +6,9 @@ use starknet_ibc_core::client::{
     CreateResponse, Duration, Height, MsgCreateClient, MsgUpdateClient, Status, Timestamp,
 };
 use starknet_ibc_core::host::ClientId;
-use starknet_ibc_testkit::dummies::{CLIENT_TYPE, DURATION, HEIGHT, STATE_ROOT, TIMESTAMP};
+use starknet_ibc_testkit::dummies::{
+    CLIENT_TYPE, DURATION, HEIGHT, NEXT_VALIDATOR_HASH, STATE_ROOT, TIMESTAMP,
+};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -39,6 +42,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
             trusting_period: *self.trusting_period,
             unbonding_period: *self.unbonding_period,
             max_clock_drift: *self.max_clock_drift,
+            trust_level: ONE_THIRD,
             status: Status::Active,
             chain_id: "dummy_chain",
         };
@@ -48,7 +52,9 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         let mut serialized_consensus_state: Array<felt252> = ArrayTrait::new();
 
         let consensus_state = CometConsensusState {
-            timestamp: self.latest_timestamp.clone().into(), root: STATE_ROOT(),
+            timestamp: self.latest_timestamp.clone().into(),
+            root: STATE_ROOT(),
+            next_validators_hash: NEXT_VALIDATOR_HASH(),
         };
 
         Serde::serialize(@consensus_state, ref serialized_consensus_state);
@@ -70,7 +76,10 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         let mut serialized_header: Array<felt252> = ArrayTrait::new();
 
         let signed_header = SignedHeader {
-            height: latest_height, timestamp: latest_timestamp, root: STATE_ROOT(),
+            height: latest_height,
+            timestamp: latest_timestamp,
+            root: STATE_ROOT(),
+            next_validators_hash: NEXT_VALIDATOR_HASH(),
         };
 
         let header = CometHeader { trusted_height, signed_header };
