@@ -21,12 +21,14 @@ hermes-test-components              = { workspace = true }
 hermes-ibc-test-suite               = { workspace = true }
 hermes-runtime-components           = { workspace = true }
 hermes-encoding-components          = { workspace = true }
+hermes-cairo-encoding-components    = { workspace = true }
 hermes-starknet-chain-components    = { workspace = true }
 hermes-starknet-test-components     = { workspace = true }
 hermes-starknet-chain-context       = { workspace = true }
 hermes-starknet-integration-tests   = { workspace = true }
 hermes-starknet-relayer             = { workspace = true }
 hermes-cosmos-test-components       = { workspace = true }
+hermes-cosmos-chain-preset          = { workspace = true }
 hermes-wasm-test-components         = { workspace = true }
 hermes-chain-components             = { workspace = true }
 hermes-cosmos-chain-components      = { workspace = true }
