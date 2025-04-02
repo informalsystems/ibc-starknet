@@ -8,9 +8,7 @@ use hermes_starknet_chain_components::types::status::StarknetChainStatus;
 use starknet_v13::core::types::{BlockId, BlockTag, MaybePendingBlockWithTxHashes};
 use starknet_v13::providers::{Provider, ProviderError};
 
-pub struct QueryStarknetChainStatus;
-
-#[cgp_provider(ChainStatusQuerierComponent)]
+#[cgp_new_provider(ChainStatusQuerierComponent)]
 impl<Chain> ChainStatusQuerier<Chain> for QueryStarknetChainStatus
 where
     Chain: HasChainStatusType<ChainStatus = StarknetChainStatus>

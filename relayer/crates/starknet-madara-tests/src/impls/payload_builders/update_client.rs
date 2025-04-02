@@ -20,9 +20,7 @@ use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::StarknetHeader;
 use starknet_v13::providers::ProviderError;
 
-pub struct BuildStarknetUpdateClientPayload;
-
-#[cgp_provider(UpdateClientPayloadBuilderComponent)]
+#[cgp_new_provider(UpdateClientPayloadBuilderComponent)]
 impl<Chain, Counterparty, Encoding> UpdateClientPayloadBuilder<Chain, Counterparty>
     for BuildStarknetUpdateClientPayload
 where

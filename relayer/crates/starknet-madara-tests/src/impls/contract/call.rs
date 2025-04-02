@@ -11,9 +11,7 @@ use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet_v13::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet_v13::providers::{Provider, ProviderError};
 
-pub struct CallStarknetContract;
-
-#[cgp_provider(ContractCallerComponent)]
+#[cgp_new_provider(ContractCallerComponent)]
 impl<Chain> ContractCaller<Chain> for CallStarknetContract
 where
     Chain: HasAddressType<Address = StarknetAddress>

@@ -14,9 +14,7 @@ use starknet_v13::providers::{Provider, ProviderError};
 
 use crate::types::TxResponse;
 
-pub struct QueryTransactionReceipt;
-
-#[cgp_provider(TxResponseQuerierComponent)]
+#[cgp_new_provider(TxResponseQuerierComponent)]
 impl<Chain> TxResponseQuerier<Chain> for QueryTransactionReceipt
 where
     Chain: HasTransactionHashType<TxHash = Felt>

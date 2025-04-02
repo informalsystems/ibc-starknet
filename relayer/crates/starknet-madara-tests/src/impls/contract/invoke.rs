@@ -5,9 +5,7 @@ use hermes_starknet_chain_components::traits::contract::invoke::{
 };
 use hermes_starknet_chain_components::traits::contract::message::CanBuildInvokeContractMessage;
 
-pub struct InvokeStarknetContract;
-
-#[cgp_provider(ContractInvokerComponent)]
+#[cgp_new_provider(ContractInvokerComponent)]
 impl<Chain> ContractInvoker<Chain> for InvokeStarknetContract
 where
     Chain: CanBuildInvokeContractMessage + CanSendSingleMessage,

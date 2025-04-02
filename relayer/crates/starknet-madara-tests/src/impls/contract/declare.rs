@@ -26,9 +26,7 @@ use starknet_v13::providers::Provider;
 use crate::traits::CanUseStarknetAccount;
 use crate::types::TxResponse;
 
-pub struct DeclareSierraContract;
-
-#[cgp_provider(ContractDeclarerComponent)]
+#[cgp_new_provider(ContractDeclarerComponent)]
 impl<Chain> ContractDeclarer<Chain> for DeclareSierraContract
 where
     Chain: HasContractClassType<ContractClass = SierraClass>
