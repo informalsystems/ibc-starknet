@@ -39,6 +39,7 @@ openzeppelin_utils         = "1.0.0"
 
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }
+cometbft   = { path = "../cairo-libs/packages/cometbft" }
 serde_json = { path = "../cairo-libs/packages/serde_json" }
 
 # ibc dependencies

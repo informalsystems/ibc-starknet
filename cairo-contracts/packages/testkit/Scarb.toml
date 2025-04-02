@@ -33,6 +33,8 @@ starknet_ibc_core    = { workspace = true }
 starknet_ibc_clients = { workspace = true }
 starknet_ibc_apps    = { workspace = true }
 
+cometbft = { workspace = true }
+
 serde_json  = { workspace = true }
 snforge_std = { workspace = true }
 

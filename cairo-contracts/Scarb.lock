@@ -42,6 +42,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "cometbft"
+version = "0.1.0"
+dependencies = [
+ "alexandria_math",
+ "ics23",
+ "protobuf",
+]
+
+[[package]]
 name = "ics23"
 version = "0.1.0"
 dependencies = [
@@ -157,6 +166,7 @@ version = "0.1.0"
 dependencies = [
  "alexandria_data_structures",
  "alexandria_sorting",
+ "cometbft",
  "openzeppelin_access",
  "snforge_std",
  "starknet_ibc_core",
@@ -197,6 +207,7 @@ dependencies = [
 name = "starknet_ibc_testkit"
 version = "0.1.0"
 dependencies = [
+ "cometbft",
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",
