@@ -45,7 +45,7 @@ pub struct StarknetBootstrap {
     pub fields: Arc<StarknetBootstrapFields>,
 }
 
-#[derive(HasField)]
+#[derive(HasField, Clone)]
 pub struct StarknetBootstrapFields {
     pub runtime: HermesRuntime,
     pub chain_command_path: PathBuf,
