@@ -19,11 +19,7 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
-use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrapFields;
-use hermes_starknet_integration_tests::impls::BuildStarknetChainDriver;
 use hermes_starknet_test_components::impls::bootstrap::deploy_contracts::DeployIbcContract;
 use hermes_starknet_test_components::impls::bootstrap_madara::{
     BootstrapMadara, StartMadaraDevnet,
@@ -34,6 +30,9 @@ use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
 use hermes_test_components::chain_driver::traits::types::chain::ChainTypeProviderComponent;
 use hermes_test_components::driver::traits::types::chain_driver::ChainDriverTypeProviderComponent;
+
+use crate::contexts::{MadaraChain, MadaraChainDriver};
+use crate::impls::{BuildMadaraChainDriver, HandleMadaraChainError};
 
 #[cgp_context(MadaraBootstrapComponents)]
 pub struct MadaraBootstrap {
@@ -53,7 +52,7 @@ delegate_components! {
         ErrorTypeProviderComponent:
             UseHermesError,
         ErrorRaiserComponent:
-            UseDelegate<HandleStarknetChainError>,
+            UseDelegate<HandleMadaraChainError>,
         RuntimeTypeProviderComponent:
             UseType<HermesRuntime>,
         RuntimeGetterComponent:
@@ -75,11 +74,11 @@ delegate_components! {
         IbcContractsDeployerComponent:
             DeployIbcContract,
         ChainDriverBuilderComponent:
-            BuildStarknetChainDriver,
+            BuildMadaraChainDriver,
         ChainTypeProviderComponent:
-            UseType<StarknetChain>,
+            UseType<MadaraChain>,
         ChainDriverTypeProviderComponent:
-            UseType<StarknetChainDriver>,
+            UseType<MadaraChainDriver>,
         ChainCommandPathGetterComponent:
             UseField<symbol!("chain_command_path")>,
         ChainStoreDirGetterComponent:
@@ -92,6 +91,6 @@ check_components! {
         ChainFullNodeStarterComponent,
         ChainBootstrapperComponent,
         ChainDriverBuilderComponent,
-        IbcContractsDeployerComponent,
+        // IbcContractsDeployerComponent,
     }
 }

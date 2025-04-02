@@ -13,8 +13,6 @@ use hermes_runtime_components::traits::runtime::{
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::amount::UseU256Amount;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
 use hermes_test_components::chain_driver::impls::wait::WaitChainReachHeight;
@@ -29,16 +27,19 @@ use hermes_test_components::chain_driver::traits::fields::wallet::{
     RelayerWallet, UserWallet, WalletGetterComponent,
 };
 use hermes_test_components::chain_driver::traits::types::chain::{
-    ChainGetterComponent, ChainTypeProviderComponent, HasChain,
+    ChainGetterComponent, ChainTypeProviderComponent,
 };
 use hermes_test_components::chain_driver::traits::wait::ChainStartupWaiterComponent;
 use tokio::process::Child;
 
-#[cgp_context(StarknetChainDriverComponents)]
+use crate::contexts::MadaraChain;
+use crate::impls::HandleMadaraChainError;
+
+#[cgp_context(MadaraChainDriverComponents)]
 #[derive(HasField)]
-pub struct StarknetChainDriver {
+pub struct MadaraChainDriver {
     pub runtime: HermesRuntime,
-    pub chain: StarknetChain,
+    pub chain: MadaraChain,
     pub chain_store_dir: PathBuf,
     pub genesis_config: StarknetGenesisConfig,
     pub node_config: StarknetNodeConfig,
@@ -50,17 +51,17 @@ pub struct StarknetChainDriver {
 }
 
 delegate_components! {
-    StarknetChainDriverComponents {
+    MadaraChainDriverComponents {
         ErrorTypeProviderComponent:
             UseHermesError,
         ErrorRaiserComponent:
-            UseDelegate<HandleStarknetChainError>,
+            UseDelegate<HandleMadaraChainError>,
         RuntimeTypeProviderComponent:
             UseType<HermesRuntime>,
         RuntimeGetterComponent:
             UseField<symbol!("runtime")>,
         ChainTypeProviderComponent:
-            UseType<StarknetChain>,
+            UseType<MadaraChain>,
         ChainGetterComponent:
             UseField<symbol!("chain")>,
         WalletGetterComponent<RelayerWallet>:
@@ -77,26 +78,22 @@ delegate_components! {
 }
 
 #[cgp_provider(DenomGetterComponent<TransferDenom>)]
-impl DenomGetter<StarknetChainDriver, TransferDenom> for StarknetChainDriverComponents {
-    fn denom(driver: &StarknetChainDriver, _index: PhantomData<TransferDenom>) -> &StarknetAddress {
+impl DenomGetter<MadaraChainDriver, TransferDenom> for MadaraChainDriverComponents {
+    fn denom(driver: &MadaraChainDriver, _index: PhantomData<TransferDenom>) -> &StarknetAddress {
         &driver.genesis_config.transfer_denom
     }
 }
 
 #[cgp_provider(DenomGetterComponent<StakingDenom>)]
-impl DenomGetter<StarknetChainDriver, StakingDenom> for StarknetChainDriverComponents {
-    fn denom(driver: &StarknetChainDriver, _index: PhantomData<StakingDenom>) -> &StarknetAddress {
+impl DenomGetter<MadaraChainDriver, StakingDenom> for MadaraChainDriverComponents {
+    fn denom(driver: &MadaraChainDriver, _index: PhantomData<StakingDenom>) -> &StarknetAddress {
         &driver.genesis_config.staking_denom
     }
 }
 
 #[cgp_provider(ChainProcessTakerComponent)]
-impl ChainProcessTaker<StarknetChainDriver> for StarknetChainDriverComponents {
-    fn take_chain_process(chain_driver: &mut StarknetChainDriver) -> Option<Child> {
+impl ChainProcessTaker<MadaraChainDriver> for MadaraChainDriverComponents {
+    fn take_chain_process(chain_driver: &mut MadaraChainDriver) -> Option<Child> {
         chain_driver.chain_process.take()
     }
 }
-
-pub trait CanUseStarknetChainDriver: HasChain<Chain = StarknetChain> {}
-
-impl CanUseStarknetChainDriver for StarknetChainDriver {}

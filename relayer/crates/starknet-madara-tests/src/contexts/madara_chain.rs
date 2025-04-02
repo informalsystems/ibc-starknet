@@ -11,11 +11,14 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::queries::block_time::BlockTimeQuerierComponent;
 use hermes_chain_components::traits::queries::chain_status::ChainStatusQuerierComponent;
+use hermes_chain_components::traits::queries::client_state::ClientStateQuerierComponent;
+use hermes_chain_components::traits::queries::consensus_state::ConsensusStateQuerierComponent;
 use hermes_chain_components::traits::send_message::MessageSenderComponent;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
 use hermes_chain_type_components::traits::fields::chain_id::ChainIdGetterComponent;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
 use hermes_cosmos_chain_preset::delegate::DelegateCosmosChainComponents;
+use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
     EncodingTypeProviderComponent,
@@ -176,5 +179,20 @@ check_components! {
         MessageSenderComponent,
         NonceQuerierComponent,
         ChainStatusQuerierComponent,
+        [
+            ClientStateQuerierComponent,
+            ConsensusStateQuerierComponent,
+        ]:
+            CosmosChain,
+    }
+}
+
+check_components! {
+    CanUseCosmosChainWithMadara for CosmosChain {
+        [
+            ClientStateQuerierComponent,
+            ConsensusStateQuerierComponent,
+        ]:
+            MadaraChain,
     }
 }

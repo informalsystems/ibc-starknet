@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::Error;
-use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_integration_tests::utils::init_starknet_bootstrap;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet_v13::core::types::{BlockId, BlockTag};
@@ -11,7 +10,7 @@ use starknet_v13::providers::{JsonRpcClient, Provider};
 use tracing::info;
 use url::Url;
 
-use crate::contexts::MadaraBootstrap;
+use crate::contexts::{MadaraBootstrap, MadaraChainDriver};
 
 #[test]
 fn test_madara_bootstrap() -> Result<(), Error> {
@@ -28,7 +27,7 @@ fn test_madara_bootstrap() -> Result<(), Error> {
             fields: Arc::new(bootstrap_fields),
         };
 
-        let chain_driver: StarknetChainDriver = madara_bootstrap.bootstrap_chain("madara").await?;
+        let chain_driver: MadaraChainDriver = madara_bootstrap.bootstrap_chain("madara").await?;
 
         let json_rpc_url = Url::parse(&format!(
             "http://{}:{}/",

@@ -235,7 +235,7 @@ mod preset {
     use crate::impls::transfer::{IbcTransferTimeoutAfterSeconds, TransferErc20Token};
     use crate::impls::tx_response::QueryTransactionReceipt;
     use crate::impls::types::address::ProvideFeltAddressType;
-    use crate::impls::types::amount::ProvideU256Amount;
+    use crate::impls::types::amount::UseU256Amount;
     use crate::impls::types::blob::ProvideFeltBlobType;
     use crate::impls::types::block::ProvideStarknetBlockType;
     use crate::impls::types::client::ProvideStarknetIbcClientTypes;
@@ -302,7 +302,7 @@ mod preset {
                 AmountDenomGetterComponent,
                 AmountMethodsComponent,
             ]:
-                ProvideU256Amount,
+                UseU256Amount,
             DenomTypeComponent:
                 ProvideTokenAddressDenom,
             MemoTypeComponent:
