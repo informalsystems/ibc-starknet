@@ -415,7 +415,7 @@ impl StarknetBuilder {
             fields: Arc::new(StarknetChainFields {
                 runtime: self.runtime.clone(),
                 chain_id,
-                rpc_client,
+                starknet_client: rpc_client,
                 ibc_client_contract_address,
                 ibc_core_contract_address,
                 ibc_ics20_contract_address,

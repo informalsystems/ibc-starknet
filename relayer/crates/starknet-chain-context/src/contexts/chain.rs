@@ -4,6 +4,7 @@ use std::sync::{Arc, OnceLock};
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
+use cgp::core::field::WithField;
 use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
@@ -154,7 +155,6 @@ use hermes_runtime_components::traits::runtime::{
 };
 use hermes_starknet_chain_components::components::chain::StarknetChainComponents;
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
-use hermes_starknet_chain_components::impls::provider::GetStarknetProviderField;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
 use hermes_starknet_chain_components::traits::account::{
@@ -229,7 +229,7 @@ pub struct StarknetChain {
 pub struct StarknetChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
-    pub rpc_client: Arc<JsonRpcClient<HttpTransport>>,
+    pub starknet_client: Arc<JsonRpcClient<HttpTransport>>,
     pub ibc_client_contract_address: OnceLock<StarknetAddress>,
     pub ibc_core_contract_address: OnceLock<StarknetAddress>,
     pub ibc_ics20_contract_address: OnceLock<StarknetAddress>,
@@ -273,7 +273,7 @@ delegate_components! {
             StarknetClientTypeProviderComponent,
             StarknetClientGetterComponent,
         ]:
-            GetStarknetProviderField<symbol!("rpc_client")>,
+            WithField<symbol!("starknet_client")>,
         StarknetAccountTypeProviderComponent:
             UseType<StarknetAccount>,
         StarknetProofSignerTypeProviderComponent:

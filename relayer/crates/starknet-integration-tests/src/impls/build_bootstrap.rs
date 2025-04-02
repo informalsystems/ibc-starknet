@@ -98,23 +98,23 @@ where
         ))
         .map_err(Bootstrap::raise_error)?;
 
-        let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
+        let starknet_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
 
         // Wait for the chain to be ready.
         for _ in 0..10 {
-            match rpc_client.block_number().await {
+            match starknet_client.block_number().await {
                 Ok(_) => break,
                 Err(_) => runtime.sleep(core::time::Duration::from_secs(1)).await,
             }
         }
 
-        let chain_id = rpc_client
+        let chain_id = starknet_client
             .chain_id()
             .await
             .map_err(Bootstrap::raise_error)?;
 
         let account = SingleOwnerAccount::new(
-            rpc_client.clone(),
+            starknet_client.clone(),
             LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
                 relayer_wallet.signing_key,
             )),
@@ -142,7 +142,7 @@ where
                     .to_string()
                     .parse()
                     .map_err(Bootstrap::raise_error)?,
-                rpc_client,
+                starknet_client,
                 ibc_client_contract_address: OnceLock::new(),
                 ibc_core_contract_address: OnceLock::new(),
                 ibc_ics20_contract_address: OnceLock::new(),
