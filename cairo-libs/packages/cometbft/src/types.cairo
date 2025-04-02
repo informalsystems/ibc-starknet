@@ -409,7 +409,6 @@ pub struct Validator {
     pub pub_key: PublicKey,
     pub voting_power: u64,
     pub proposer_priority: u64,
-    // pub name: Option<ByteArray>, // not present in protobuf
 }
 
 #[generate_trait]
