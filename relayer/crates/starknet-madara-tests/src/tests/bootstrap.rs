@@ -11,7 +11,7 @@ use starknet_v13::providers::{JsonRpcClient, Provider};
 use tracing::info;
 use url::Url;
 
-use crate::contexts::madara_bootstrap::MadaraBootstrap;
+use crate::contexts::MadaraBootstrap;
 
 #[test]
 fn test_madara_bootstrap() -> Result<(), Error> {

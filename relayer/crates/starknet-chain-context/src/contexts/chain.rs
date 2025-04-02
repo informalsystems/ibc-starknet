@@ -35,7 +35,7 @@ use hermes_cosmos_chain_preset::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
-    EncodingTypeComponent, HasDefaultEncoding, ProvideEncodingType,
+    EncodingTypeProviderComponent, HasDefaultEncoding,
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::UseHermesError;
@@ -110,7 +110,6 @@ use hermes_relayer_components::chain::traits::queries::packet_receipt::CanQueryP
 use hermes_relayer_components::chain::traits::send_message::{
     CanSendMessages, CanSendSingleMessage,
 };
-use hermes_relayer_components::chain::traits::types::chain_id::ChainIdGetter;
 use hermes_relayer_components::chain::traits::types::channel::HasChannelEndType;
 use hermes_relayer_components::chain::traits::types::client_state::{
     HasClientStateFields, HasClientStateType,
@@ -212,7 +211,7 @@ use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 
-use crate::contexts::encoding::cairo::StarknetCairoEncoding;
+use crate::contexts::encoding::cairo::{StarknetCairoEncoding, UseStarknetCairoEncoding};
 use crate::contexts::encoding::event::StarknetEventEncoding;
 use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use crate::impls::build_account::BuildStarknetAccount;
@@ -256,9 +255,22 @@ delegate_components! {
             ErrorTypeProviderComponent,
             ErrorWrapperComponent,
         ]: UseHermesError,
-        ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
+        ErrorRaiserComponent:
+            UseDelegate<HandleStarknetChainError>,
         RuntimeTypeProviderComponent:
             UseType<HermesRuntime>,
+        [
+            EncodingTypeProviderComponent<AsFelt>,
+            EncodingGetterComponent<AsFelt>,
+            DefaultEncodingGetterComponent<AsFelt>,
+        ]:
+            UseStarknetCairoEncoding,
+        EncodingTypeProviderComponent<AsStarknetEvent>:
+            UseType<StarknetEventEncoding>,
+        EncodingTypeProviderComponent<AsBytes>:
+            UseType<StarknetProtobufEncoding>,
+        ChainIdGetterComponent:
+            UseField<symbol!("chain_id")>,
         RuntimeGetterComponent:
             UseField<symbol!("runtime")>,
         PollIntervalGetterComponent:
@@ -297,53 +309,17 @@ delegate_components! {
     }
 }
 
-#[cgp_provider(EncodingTypeComponent)]
-impl ProvideEncodingType<StarknetChain, AsFelt> for StarknetChainContextComponents {
-    type Encoding = StarknetCairoEncoding;
-}
-
-#[cgp_provider(EncodingTypeComponent)]
-impl ProvideEncodingType<StarknetChain, AsStarknetEvent> for StarknetChainContextComponents {
-    type Encoding = StarknetEventEncoding;
-}
-
-#[cgp_provider(DefaultEncodingGetterComponent)]
-impl DefaultEncodingGetter<StarknetChain, AsFelt> for StarknetChainContextComponents {
-    fn default_encoding() -> &'static StarknetCairoEncoding {
-        &StarknetCairoEncoding
-    }
-}
-
-#[cgp_provider(EncodingGetterComponent)]
-impl EncodingGetter<StarknetChain, AsFelt> for StarknetChainContextComponents {
-    fn encoding(_chain: &StarknetChain) -> &StarknetCairoEncoding {
-        &StarknetCairoEncoding
-    }
-}
-
-#[cgp_provider(EncodingGetterComponent)]
+#[cgp_provider(EncodingGetterComponent<AsStarknetEvent>)]
 impl EncodingGetter<StarknetChain, AsStarknetEvent> for StarknetChainContextComponents {
     fn encoding(chain: &StarknetChain) -> &StarknetEventEncoding {
         &chain.event_encoding
     }
 }
 
-#[cgp_provider(EncodingTypeComponent)]
-impl ProvideEncodingType<StarknetChain, AsBytes> for StarknetChainContextComponents {
-    type Encoding = StarknetProtobufEncoding;
-}
-
-#[cgp_provider(DefaultEncodingGetterComponent)]
+#[cgp_provider(DefaultEncodingGetterComponent<AsBytes>)]
 impl DefaultEncodingGetter<StarknetChain, AsBytes> for StarknetChainContextComponents {
     fn default_encoding() -> &'static StarknetProtobufEncoding {
         &StarknetProtobufEncoding
-    }
-}
-
-#[cgp_provider(ChainIdGetterComponent)]
-impl ChainIdGetter<StarknetChain> for StarknetChainContextComponents {
-    fn chain_id(chain: &StarknetChain) -> &ChainId {
-        &chain.chain_id
     }
 }
 
