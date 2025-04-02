@@ -240,7 +240,7 @@ mod preset {
     use crate::impls::types::block::ProvideStarknetBlockType;
     use crate::impls::types::client::ProvideStarknetIbcClientTypes;
     use crate::impls::types::commitment_proof::UseStarknetCommitmentProof;
-    use crate::impls::types::contract::ProvideStarknetContractTypes;
+    use crate::impls::types::contract::UseStarknetContractTypes;
     use crate::impls::types::denom::ProvideTokenAddressDenom;
     use crate::impls::types::height::ProvideStarknetHeight;
     use crate::impls::types::message::StarknetMessage;
@@ -336,7 +336,7 @@ mod preset {
                 ContractClassTypeProviderComponent,
                 ContractClassHashTypeProviderComponent,
             ]:
-                ProvideStarknetContractTypes,
+                UseStarknetContractTypes,
             // FIXME: we may have to define our own chain types,
             // or implement Cairo encoding for the Cosmos types
             [

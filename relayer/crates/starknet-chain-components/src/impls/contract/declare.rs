@@ -21,9 +21,7 @@ use crate::traits::contract::declare::{ContractDeclarer, ContractDeclarerCompone
 use crate::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
 use crate::types::tx_response::TxResponse;
 
-pub struct DeclareSierraContract;
-
-#[cgp_provider(ContractDeclarerComponent)]
+#[cgp_new_provider(ContractDeclarerComponent)]
 impl<Chain> ContractDeclarer<Chain> for DeclareSierraContract
 where
     Chain: HasContractClassType<ContractClass = SierraClass>
