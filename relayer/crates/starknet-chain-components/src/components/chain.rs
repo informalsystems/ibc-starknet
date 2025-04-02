@@ -325,7 +325,7 @@ mod preset {
             TokenIbcTransferrerComponent:
                 SendIbcTransferMessage,
             IbcTransferTimeoutCalculatorComponent:
-                IbcTransferTimeoutAfterSeconds<90>,
+                IbcTransferTimeoutAfterSeconds<600>,
             IbcTransferredAmountConverterComponent:
                 ConvertStarknetTokenAddressFromCosmos,
             CosmosTokenAddressOnStarknetQuerierComponent:
