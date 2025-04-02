@@ -88,6 +88,9 @@ delegate_components! {
             DeployIbcContract,
         ChainDriverBuilderComponent:
             BuildAndWaitChainDriver<BuildMadaraChainDriver>,
+            // FIXME: Deploying Cairo contracts with Madara fails with 500 Internal server error
+            // Note: This might be caused by the contracts built with newer versions of Cairo
+            // BuildChainAndDeployIbcContracts<BuildAndWaitChainDriver<BuildMadaraChainDriver>>,
         ChainTypeProviderComponent:
             UseType<MadaraChain>,
         ChainDriverTypeProviderComponent:
