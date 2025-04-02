@@ -36,6 +36,7 @@ pub struct CometClientState {
     pub trusting_period: Duration,
     pub unbonding_period: Duration,
     pub max_clock_drift: Duration,
+    pub trust_level: TrustThreshold,
     pub status: ClientStatus,
     pub chain_id: ChainId,
 }
@@ -96,6 +97,7 @@ delegate_components! {
                 EncodeField<symbol!("trusting_period"), UseContext>,
                 EncodeField<symbol!("unbonding_period"), UseContext>,
                 EncodeField<symbol!("max_clock_drift"), UseContext>,
+                EncodeField<symbol!("trust_level"), UseContext>,
                 EncodeField<symbol!("status"), UseContext>,
                 EncodeField<symbol!("chain_id"), UseContext>,
             ],
@@ -105,7 +107,15 @@ delegate_components! {
 }
 
 impl Transformer for EncodeCometClientState {
-    type From = Product![Height, Duration, Duration, Duration, ClientStatus, ChainId];
+    type From = Product![
+        Height,
+        Duration,
+        Duration,
+        Duration,
+        TrustThreshold,
+        ClientStatus,
+        ChainId
+    ];
     type To = CometClientState;
 
     fn transform(
@@ -114,6 +124,7 @@ impl Transformer for EncodeCometClientState {
             trusting_period,
             unbonding_period,
             max_clock_drift,
+            trust_level,
             status,
             chain_id
         ]: Self::From,
@@ -123,6 +134,7 @@ impl Transformer for EncodeCometClientState {
             trusting_period,
             unbonding_period,
             max_clock_drift,
+            trust_level,
             status,
             chain_id,
         }
@@ -224,5 +236,37 @@ where
     ) -> Result<ChainId, Encoding::Error> {
         let chain_id_str = encoding.decode_mut(buffer)?;
         ChainId::new(&chain_id_str).map_err(|_| Encoding::raise_error("invalid chain id"))
+    }
+}
+
+pub struct EncodeTrustThreshold;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, TrustThreshold> for EncodeTrustThreshold
+where
+    Encoding: CanEncodeMut<Strategy, Product![u64, u64]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &TrustThreshold,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&product![value.numerator(), value.denominator()], buffer)?;
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, TrustThreshold> for EncodeTrustThreshold
+where
+    Encoding: CanDecodeMut<Strategy, Product![u64, u64]> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<TrustThreshold, Encoding::Error> {
+        let product![numerator, denominator] = encoding.decode_mut(buffer)?;
+        TrustThreshold::new(numerator, denominator)
+            .map_err(|_| Encoding::raise_error("invalid trust level"))
     }
 }
