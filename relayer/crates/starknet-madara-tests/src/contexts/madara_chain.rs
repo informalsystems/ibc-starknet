@@ -46,13 +46,13 @@ use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
-use hermes_starknet_chain_context::impls::build_account::BuildStarknetAccount;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_chain_context::types::StarknetAccount;
 use ibc::core::host::types::identifiers::ChainId;
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
 
+use crate::impls::BuildStarknetAccount;
 use crate::presets::MadaraChainPreset;
 
 #[cgp_context(MadaraChainComponents: MadaraChainPreset)]
