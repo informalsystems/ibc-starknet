@@ -11,9 +11,7 @@ use starknet_v13::core::types::{Call, Felt};
 
 use crate::types::StarknetMessage;
 
-pub struct BuildInvokeContractCall;
-
-#[cgp_provider(InvokeContractMessageBuilderComponent)]
+#[cgp_new_provider(InvokeContractMessageBuilderComponent)]
 impl<Chain> InvokeContractMessageBuilder<Chain> for BuildInvokeContractCall
 where
     Chain: HasAddressType<Address = StarknetAddress>

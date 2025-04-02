@@ -10,6 +10,8 @@ use futures::lock::Mutex;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::queries::block_time::BlockTimeQuerierComponent;
+use hermes_chain_components::traits::queries::chain_status::ChainStatusQuerierComponent;
+use hermes_chain_components::traits::send_message::MessageSenderComponent;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
 use hermes_chain_type_components::traits::fields::chain_id::ChainIdGetterComponent;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
@@ -27,6 +29,7 @@ use hermes_logging_components::traits::has_logger::{
 use hermes_relayer_components::transaction::impls::global_nonce_mutex::GetGlobalNonceMutex;
 use hermes_relayer_components::transaction::traits::default_signer::DefaultSignerGetterComponent;
 use hermes_relayer_components::transaction::traits::nonce::nonce_mutex::NonceAllocationMutexGetterComponent;
+use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -39,6 +42,11 @@ use hermes_starknet_chain_components::traits::account::{
 use hermes_starknet_chain_components::traits::client::{
     StarknetClientGetterComponent, StarknetClientTypeProviderComponent,
 };
+use hermes_starknet_chain_components::traits::contract::call::ContractCallerComponent;
+use hermes_starknet_chain_components::traits::contract::declare::ContractDeclarerComponent;
+use hermes_starknet_chain_components::traits::contract::deploy::ContractDeployerComponent;
+use hermes_starknet_chain_components::traits::contract::invoke::ContractInvokerComponent;
+use hermes_starknet_chain_components::traits::contract::message::InvokeContractMessageBuilderComponent;
 use hermes_starknet_chain_components::traits::proof_signer::{
     StarknetProofSignerGetterComponent, StarknetProofSignerTypeProviderComponent,
 };
@@ -46,12 +54,11 @@ use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
-use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use ibc::core::host::types::identifiers::ChainId;
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
 
-use crate::impls::BuildStarknetAccount;
+use crate::impls::{BuildStarknetAccount, HandleMadaraChainError};
 use crate::presets::MadaraChainPreset;
 use crate::types::StarknetAccount;
 
@@ -92,7 +99,7 @@ delegate_components! {
             ErrorWrapperComponent,
         ]: UseHermesError,
         ErrorRaiserComponent:
-            UseDelegate<HandleStarknetChainError>,
+            UseDelegate<HandleMadaraChainError>,
         RuntimeTypeProviderComponent:
             UseType<HermesRuntime>,
         [
@@ -156,5 +163,18 @@ impl EncodingGetter<MadaraChain, AsStarknetEvent> for MadaraChainComponents {
 impl DefaultEncodingGetter<MadaraChain, AsBytes> for MadaraChainComponents {
     fn default_encoding() -> &'static StarknetProtobufEncoding {
         &StarknetProtobufEncoding
+    }
+}
+
+check_components! {
+    CanUseMadaraChain for MadaraChain {
+        ContractCallerComponent,
+        ContractDeclarerComponent,
+        ContractDeployerComponent,
+        ContractInvokerComponent,
+        InvokeContractMessageBuilderComponent,
+        MessageSenderComponent,
+        NonceQuerierComponent,
+        ChainStatusQuerierComponent,
     }
 }

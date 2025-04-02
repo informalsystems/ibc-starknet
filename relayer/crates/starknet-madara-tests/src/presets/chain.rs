@@ -2,6 +2,7 @@
 mod preset {
     use cgp::prelude::*;
     use hermes_starknet_chain_components::components::chain::StarknetChainComponents;
+    use starknet_v13::core::types::contract::SierraClass;
     use StarknetChainComponents::re_exports::*;
 
     use crate::impls;
@@ -11,6 +12,7 @@ mod preset {
         [
             MessageTypeProviderComponent,
             TxResponseTypeProviderComponent,
+            ContractClassTypeProviderComponent,
             ContractCallerComponent,
             ContractDeclarerComponent,
             ContractDeployerComponent,
@@ -19,7 +21,10 @@ mod preset {
             UpdateClientPayloadBuilderComponent,
             BlockEventsQuerierComponent,
             BlockQuerierComponent,
+            NonceQuerierComponent,
             ChainStatusQuerierComponent,
+            MessagesWithSignerAndNonceSenderComponent,
+            TxMessageResponseParserComponent,
             TxResponseQuerierComponent,
         ],
         | Components | {
@@ -31,6 +36,8 @@ mod preset {
                         UseType<StarknetMessage>,
                     TxResponseTypeProviderComponent:
                         UseType<TxResponse>,
+                    ContractClassTypeProviderComponent:
+                        UseType<SierraClass>,
                     ContractCallerComponent:
                         impls::CallStarknetContract,
                     ContractDeclarerComponent:
@@ -47,8 +54,15 @@ mod preset {
                         impls::GetStarknetBlockEvents,
                     BlockQuerierComponent:
                         impls::QueryStarknetBlock,
+                    NonceQuerierComponent:
+                        impls::QueryStarknetNonce,
                     ChainStatusQuerierComponent:
                         impls::QueryStarknetChainStatus,
+                    [
+                        MessagesWithSignerAndNonceSenderComponent,
+                        TxMessageResponseParserComponent,
+                    ]:
+                        impls::SendStarknetMessages,
                     TxResponseQuerierComponent:
                         impls::QueryTransactionReceipt,
                 }
