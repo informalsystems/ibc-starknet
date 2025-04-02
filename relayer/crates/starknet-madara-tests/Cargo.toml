@@ -36,10 +36,13 @@ hermes-cosmos-wasm-relayer          = { workspace = true }
 hermes-logger                       = { workspace = true }
 hermes-logging-components           = { workspace = true }
 poseidon                            = { workspace = true }
+hermes-protobuf-encoding-components = { workspace = true }
+hermes-chain-type-components        = { workspace = true }
 
-ibc            = { workspace = true }
-ibc-proto      = { workspace = true }
-tendermint-rpc = { workspace = true }
+ibc                         = { workspace = true }
+ibc-proto                   = { workspace = true }
+tendermint-rpc              = { workspace = true }
+ibc-client-starknet-types   = { workspace = true }
 
 cairo-lang-starknet-classes     = { workspace = true }
 starknet-v13                    = { workspace = true }

@@ -1,4 +1,5 @@
 use core::marker::PhantomData;
+use std::sync::Arc;
 
 use cgp::prelude::*;
 use hermes_chain_components::traits::queries::block_events::{
@@ -7,13 +8,12 @@ use hermes_chain_components::traits::queries::block_events::{
 use hermes_chain_components::traits::types::event::HasEventType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
-use starknet::core::types::{BlockId, EventFilter};
-use starknet::providers::{Provider, ProviderError};
-
-use crate::impls::types::address::StarknetAddress;
-use crate::traits::client::HasStarknetClient;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::types::event::StarknetEvent;
+use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
+use hermes_starknet_chain_components::traits::client::HasStarknetClient;
+use hermes_starknet_chain_components::traits::queries::contract_address::CanQueryContractAddress;
+use hermes_starknet_chain_components::types::event::{StarknetEvent, StarknetEventFields};
+use starknet_v13::core::types::{BlockId, EmittedEvent, EventFilter};
+use starknet_v13::providers::{Provider, ProviderError};
 
 #[cgp_new_provider(BlockEventsQuerierComponent)]
 impl<Chain> BlockEventsQuerier<Chain> for GetStarknetBlockEvents
@@ -49,9 +49,24 @@ where
         let events = raw_events
             .events
             .into_iter()
-            .map(StarknetEvent::from)
+            .map(parse_emitted_events)
             .collect();
 
         Ok(events)
+    }
+}
+
+fn parse_emitted_events(event: EmittedEvent) -> StarknetEvent {
+    let mut keys = event.keys.into_iter();
+    let selector = keys.next();
+
+    StarknetEvent {
+        fields: Arc::new(StarknetEventFields {
+            contract_address: event.from_address.into(),
+            class_hash: None,
+            selector,
+            keys: keys.collect(),
+            data: event.data,
+        }),
     }
 }

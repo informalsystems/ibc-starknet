@@ -3,11 +3,10 @@ use hermes_chain_components::traits::queries::block::{BlockQuerier, BlockQuerier
 use hermes_chain_components::traits::types::block::HasBlockType;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_cosmos_chain_components::types::status::Time;
-use starknet::core::types::{BlockId, MaybePendingBlockWithTxHashes};
-use starknet::providers::{Provider, ProviderError};
-
-use crate::traits::client::HasStarknetClient;
-use crate::types::status::StarknetChainStatus;
+use hermes_starknet_chain_components::traits::client::HasStarknetClient;
+use hermes_starknet_chain_components::types::status::StarknetChainStatus;
+use starknet_v13::core::types::{BlockId, MaybePendingBlockWithTxHashes};
+use starknet_v13::providers::{Provider, ProviderError};
 
 #[cgp_new_provider(BlockQuerierComponent)]
 impl<Chain> BlockQuerier<Chain> for QueryStarknetBlock
