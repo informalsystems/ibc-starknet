@@ -12,7 +12,8 @@ pub mod CometClientComponent {
     use starknet::{ContractAddress, get_block_number, get_block_timestamp, get_caller_address};
     use starknet_ibc_clients::cometbft::{
         CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
-        CometErrors, CometHeader, CometHeaderImpl,
+        CometConsensusStateStore, CometConsensusStateToStore, CometErrors, CometHeader,
+        CometHeaderImpl, StoreToCometConsensusState,
     };
     use starknet_ibc_core::client::{
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
@@ -29,7 +30,7 @@ pub mod CometClientComponent {
         next_client_sequence: u64,
         update_heights: Map<u64, Array<Height>>,
         client_states: Map<u64, CometClientState>,
-        consensus_states: Map<(u64, Height), CometConsensusState>,
+        consensus_states: Map<(u64, Height), CometConsensusStateStore>,
         client_processed_times: Map<(u64, Height), u64>,
         client_processed_heights: Map<(u64, Height), u64>,
     }
@@ -152,11 +153,15 @@ pub mod CometClientComponent {
         fn consensus_state(
             self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) -> Array<felt252> {
-            let mut consensus_state: Array<felt252> = ArrayTrait::new();
+            let mut serialized: Array<felt252> = ArrayTrait::new();
 
-            self.read_consensus_state(client_sequence, height).serialize(ref consensus_state);
+            let consensus_state: CometConsensusState = self
+                .read_consensus_state(client_sequence, height)
+                .into();
 
-            consensus_state
+            consensus_state.serialize(ref serialized);
+
+            serialized
         }
 
         fn consensus_state_root(
@@ -499,7 +504,10 @@ pub mod CometClientComponent {
         fn read_consensus_state(
             self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) -> CometConsensusState {
-            let consensus_state = self.consensus_states.read((client_sequence, height));
+            let consensus_state: CometConsensusState = self
+                .consensus_states
+                .read((client_sequence, height))
+                .into();
 
             assert(consensus_state.is_non_zero(), CometErrors::MISSING_CONSENSUS_STATE);
 
@@ -509,7 +517,12 @@ pub mod CometClientComponent {
         fn consensus_state_exists(
             self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) -> bool {
-            self.consensus_states.read((client_sequence, height)).is_non_zero()
+            let consensus_state: CometConsensusState = self
+                .consensus_states
+                .read((client_sequence, height))
+                .into();
+
+            consensus_state.is_non_zero()
         }
 
         fn read_client_processed_time(
@@ -590,7 +603,7 @@ pub mod CometClientComponent {
             height: Height,
             consensus_state: CometConsensusState,
         ) {
-            self.consensus_states.write((client_sequence, height), consensus_state);
+            self.consensus_states.write((client_sequence, height), consensus_state.into());
         }
 
         fn write_client_processed_time(
