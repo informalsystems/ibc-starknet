@@ -8,7 +8,7 @@ use starknet::macros::felt;
 use starknet::signers::SigningKey;
 
 use crate::impls::types::address::StarknetAddress;
-use crate::traits::account::{CanBuildAccountFromSigner, CanRaiseAccountErrors};
+use crate::traits::account::{CanBuildAccountFromSigner, CanUseStarknetAccount};
 use crate::traits::contract::deploy::{ContractDeployer, ContractDeployerComponent};
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::contract_class::HasContractClassHashType;
@@ -28,7 +28,7 @@ where
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>
         + HasDefaultSigner
         + CanBuildAccountFromSigner
-        + CanRaiseAccountErrors
+        + CanUseStarknetAccount
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<RevertedInvocation>,
 {

@@ -15,7 +15,7 @@ use starknet::core::types::contract::{
 use starknet::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
 use starknet::providers::Provider;
 
-use crate::traits::account::{CanBuildAccountFromSigner, CanRaiseAccountErrors};
+use crate::traits::account::{CanBuildAccountFromSigner, CanUseStarknetAccount};
 use crate::traits::client::HasStarknetClient;
 use crate::traits::contract::declare::{ContractDeclarer, ContractDeclarerComponent};
 use crate::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
@@ -32,7 +32,7 @@ where
         + HasDefaultSigner
         + CanBuildAccountFromSigner
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>
-        + CanRaiseAccountErrors
+        + CanUseStarknetAccount
         + CanRaiseAsyncError<serde_json::error::Error>
         + CanRaiseAsyncError<JsonError>
         + CanRaiseAsyncError<ComputeClassHashError>

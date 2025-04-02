@@ -2,25 +2,28 @@ use cgp::prelude::*;
 use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::account::{
-    CanBuildAccountFromSigner, CanRaiseAccountErrors,
-};
+use hermes_starknet_chain_components::traits::account::CanBuildAccountFromSigner;
 use hermes_starknet_chain_components::traits::contract::deploy::{
     ContractDeployer, ContractDeployerComponent,
 };
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::contract_class::HasContractClassHashType;
-use hermes_starknet_chain_components::types::tx_response::TxResponse;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet_v13::contract::ContractFactory;
 use starknet_v13::core::types::{Felt, RevertedInvocation};
-use starknet_v13::macros::felt;
 use starknet_v13::signers::SigningKey;
+
+use crate::traits::CanUseStarknetAccount;
+use crate::types::TxResponse;
 
 pub struct DeployStarknetContract;
 
-const DEFAULT_UDC_ADDRESS: Felt =
-    felt!("0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf");
+const DEFAULT_UDC_ADDRESS: Felt = Felt::from_raw([
+    121672436446604875,
+    9333317513348225193,
+    15685625669053253235,
+    15144800532519055890,
+]);
 
 #[cgp_provider(ContractDeployerComponent)]
 impl<Chain> ContractDeployer<Chain> for DeployStarknetContract
@@ -31,7 +34,7 @@ where
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>
         + HasDefaultSigner
         + CanBuildAccountFromSigner
-        + CanRaiseAccountErrors
+        + CanUseStarknetAccount
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<RevertedInvocation>,
 {
@@ -57,33 +60,7 @@ where
             .await
             .map_err(Chain::raise_error)?;
 
-        // starknet v3 transactions requires all fee bound present.
-        let l1_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .l1_gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-        let l1_data_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .l1_data_gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-        let l2_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .l2_gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-
         let tx_hash = contract_deployment
-            .l1_gas(l1_gas)
-            .l1_data_gas(l1_data_gas)
-            .l2_gas(l2_gas)
             .send()
             .await
             .map_err(Chain::raise_error)?

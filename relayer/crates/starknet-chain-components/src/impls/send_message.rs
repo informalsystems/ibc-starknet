@@ -21,7 +21,7 @@ use starknet::core::types::{
 
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::account::{
-    CanBuildAccountFromSigner, CanRaiseAccountErrors, HasStarknetAccountType,
+    CanBuildAccountFromSigner, CanUseStarknetAccount, HasStarknetAccountType,
 };
 use crate::types::event::StarknetEvent;
 use crate::types::message_response::StarknetMessageResponse;
@@ -42,7 +42,7 @@ where
         + HasTransactionHashType<TxHash = Felt>
         + CanPollTxResponse
         + CanRaiseAsyncError<&'static str>
-        + CanRaiseAccountErrors,
+        + CanUseStarknetAccount,
 {
     async fn send_messages_with_signer_and_nonce(
         chain: &Chain,

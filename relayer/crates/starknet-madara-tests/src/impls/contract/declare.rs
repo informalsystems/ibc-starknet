@@ -8,6 +8,14 @@ use cgp::core::error::CanRaiseAsyncError;
 use cgp::prelude::*;
 use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
+use hermes_starknet_chain_components::traits::account::CanBuildAccountFromSigner;
+use hermes_starknet_chain_components::traits::client::HasStarknetClient;
+use hermes_starknet_chain_components::traits::contract::declare::{
+    ContractDeclarer, ContractDeclarerComponent,
+};
+use hermes_starknet_chain_components::traits::types::contract_class::{
+    HasContractClassHashType, HasContractClassType,
+};
 use starknet_v13::accounts::Account;
 use starknet_v13::core::types::contract::{
     CompiledClass, ComputeClassHashError, JsonError, SierraClass,
@@ -15,11 +23,8 @@ use starknet_v13::core::types::contract::{
 use starknet_v13::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
 use starknet_v13::providers::Provider;
 
-use hermes_starknet_chain_components::traits::account::{CanBuildAccountFromSigner, CanRaiseAccountErrors};
-use hermes_starknet_chain_components::traits::client::HasStarknetClient;
-use hermes_starknet_chain_components::traits::contract::declare::{ContractDeclarer, ContractDeclarerComponent};
-use hermes_starknet_chain_components::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
-use hermes_starknet_chain_components::types::tx_response::TxResponse;
+use crate::traits::CanUseStarknetAccount;
+use crate::types::TxResponse;
 
 pub struct DeclareSierraContract;
 
@@ -32,7 +37,7 @@ where
         + HasDefaultSigner
         + CanBuildAccountFromSigner
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>
-        + CanRaiseAccountErrors
+        + CanUseStarknetAccount
         + CanRaiseAsyncError<serde_json::error::Error>
         + CanRaiseAsyncError<JsonError>
         + CanRaiseAsyncError<ComputeClassHashError>
@@ -93,36 +98,7 @@ where
             .await
             .map_err(Chain::raise_error)?;
 
-        // starknet v3 transactions requires all fee bound present.
-        let l1_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .l1_gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-        let l1_data_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .l1_data_gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-        let l2_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .l2_gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-
-        let declare_result = declaration
-            .l1_gas(l1_gas)
-            .l1_data_gas(l1_data_gas)
-            .l2_gas(l2_gas)
-            .send()
-            .await
-            .map_err(Chain::raise_error)?;
+        let declare_result = declaration.send().await.map_err(Chain::raise_error)?;
 
         let tx_response = chain
             .poll_tx_response(&declare_result.transaction_hash)
