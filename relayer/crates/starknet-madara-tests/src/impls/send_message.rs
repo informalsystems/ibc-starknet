@@ -16,6 +16,7 @@ use hermes_relayer_components::transaction::traits::types::signer::HasSignerType
 use hermes_relayer_components::transaction::traits::types::tx_hash::HasTxHashType;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
+use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::account::{
     CanBuildAccountFromSigner, HasStarknetAccountType,
 };
@@ -28,7 +29,7 @@ use starknet_v13::core::types::{
 };
 
 use crate::traits::CanUseStarknetAccount;
-use crate::types::{StarknetMessage, TxResponse};
+use crate::types::TxResponse;
 
 pub struct UnexpectedTransactionTraceType {
     pub trace: TransactionTrace,
@@ -55,7 +56,11 @@ where
     ) -> Result<Chain::TxResponse, Chain::Error> {
         let calls: Vec<Call> = messages
             .iter()
-            .map(|message| message.call.clone())
+            .map(|message| Call {
+                to: message.to,
+                selector: message.selector,
+                calldata: message.calldata.clone(),
+            })
             .collect();
 
         let account = chain.build_account_from_signer(signer);

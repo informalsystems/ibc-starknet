@@ -6,18 +6,15 @@ mod preset {
     use StarknetChainComponents::re_exports::*;
 
     use crate::impls;
-    use crate::types::{StarknetMessage, TxResponse};
+    use crate::types::TxResponse;
 
     StarknetChainComponents::with_components! {
         [
-            MessageTypeProviderComponent,
             TxResponseTypeProviderComponent,
             ContractClassTypeProviderComponent,
             ContractCallerComponent,
             ContractDeclarerComponent,
             ContractDeployerComponent,
-            ContractInvokerComponent,
-            InvokeContractMessageBuilderComponent,
             UpdateClientPayloadBuilderComponent,
             BlockEventsQuerierComponent,
             BlockQuerierComponent,
@@ -32,8 +29,6 @@ mod preset {
                 MadaraChainPreset {
                     Components:
                         StarknetChainComponents::Provider,
-                    MessageTypeProviderComponent:
-                        UseType<StarknetMessage>,
                     TxResponseTypeProviderComponent:
                         UseType<TxResponse>,
                     ContractClassTypeProviderComponent:
@@ -44,10 +39,6 @@ mod preset {
                         impls::DeclareSierraContract,
                     ContractDeployerComponent:
                         impls::DeployStarknetContract,
-                    ContractInvokerComponent:
-                        impls::InvokeStarknetContract,
-                    InvokeContractMessageBuilderComponent:
-                        impls::BuildInvokeContractCall,
                     UpdateClientPayloadBuilderComponent:
                         impls::BuildStarknetUpdateClientPayload,
                     BlockEventsQuerierComponent:
