@@ -1,5 +1,5 @@
-mod status;
+mod message;
 mod tx_response;
 
-pub use status::*;
+pub use message::*;
 pub use tx_response::*;

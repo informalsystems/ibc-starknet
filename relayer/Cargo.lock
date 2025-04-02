@@ -2517,6 +2517,7 @@ dependencies = [
 name = "hermes-starknet-madara-tests"
 version = "0.1.0"
 dependencies = [
+ "cairo-lang-starknet-classes",
  "cgp",
  "eyre",
  "flate2",
