@@ -16,8 +16,8 @@ use starknet::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
 use starknet::providers::Provider;
 
 use crate::traits::account::{CanBuildAccountFromSigner, CanRaiseAccountErrors};
+use crate::traits::client::HasStarknetClient;
 use crate::traits::contract::declare::{ContractDeclarer, ContractDeclarerComponent};
-use crate::traits::provider::HasStarknetProvider;
 use crate::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
 use crate::types::tx_response::TxResponse;
 
@@ -28,7 +28,7 @@ impl<Chain> ContractDeclarer<Chain> for DeclareSierraContract
 where
     Chain: HasContractClassType<ContractClass = SierraClass>
         + HasContractClassHashType<ContractClassHash = Felt>
-        + HasStarknetProvider<StarknetProvider: Provider>
+        + HasStarknetClient<Client: Provider>
         + HasDefaultSigner
         + CanBuildAccountFromSigner
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>

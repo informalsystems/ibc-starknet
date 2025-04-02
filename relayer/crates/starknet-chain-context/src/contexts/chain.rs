@@ -160,6 +160,9 @@ use hermes_starknet_chain_components::impls::types::events::StarknetCreateClient
 use hermes_starknet_chain_components::traits::account::{
     AccountFromSignerBuilderComponent, StarknetAccountTypeProviderComponent,
 };
+use hermes_starknet_chain_components::traits::client::{
+    HasStarknetClient, StarknetClientGetterComponent, StarknetClientTypeProviderComponent,
+};
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
@@ -167,9 +170,6 @@ use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContrac
 use hermes_starknet_chain_components::traits::proof_signer::{
     HasStarknetProofSigner, StarknetProofSignerGetterComponent,
     StarknetProofSignerTypeProviderComponent,
-};
-use hermes_starknet_chain_components::traits::provider::{
-    HasStarknetProvider, StarknetProviderGetterComponent, StarknetProviderTypeComponent,
 };
 use hermes_starknet_chain_components::traits::queries::contract_address::CanQueryContractAddress;
 use hermes_starknet_chain_components::traits::queries::token_address::CosmosTokenAddressOnStarknetQuerierComponent;
@@ -270,8 +270,8 @@ delegate_components! {
         ]:
             UseHermesLogger,
         [
-            StarknetProviderTypeComponent,
-            StarknetProviderGetterComponent,
+            StarknetClientTypeProviderComponent,
+            StarknetClientGetterComponent,
         ]:
             GetStarknetProviderField<symbol!("rpc_client")>,
         StarknetAccountTypeProviderComponent:
@@ -388,7 +388,7 @@ pub trait CanUseStarknetChain:
     + HasPacketSequence<CosmosChain>
     + HasPacketTimeoutHeight<CosmosChain>
     + HasPacketTimeoutTimestamp<CosmosChain>
-    + HasStarknetProvider
+    + HasStarknetClient
     + CanQueryChainStatus
     + CanQueryBlock
     + CanQueryChainHeight

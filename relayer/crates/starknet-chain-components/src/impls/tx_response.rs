@@ -11,7 +11,7 @@ use hermes_runtime_components::traits::sleep::CanSleep;
 use starknet::core::types::{Felt, StarknetError};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::traits::provider::HasStarknetProvider;
+use crate::traits::client::HasStarknetClient;
 use crate::types::tx_response::TxResponse;
 
 pub struct QueryTransactionReceipt;
@@ -21,7 +21,7 @@ impl<Chain> TxResponseQuerier<Chain> for QueryTransactionReceipt
 where
     Chain: HasTransactionHashType<TxHash = Felt>
         + HasTxResponseType<TxResponse = TxResponse>
-        + HasStarknetProvider<StarknetProvider: Provider>
+        + HasStarknetClient<Client: Provider>
         + HasRuntime<Runtime: CanSleep>
         + CanRaiseAsyncError<ProviderError>,
 {

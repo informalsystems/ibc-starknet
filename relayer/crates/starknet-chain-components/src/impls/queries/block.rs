@@ -6,7 +6,7 @@ use hermes_cosmos_chain_components::types::status::Time;
 use starknet::core::types::{BlockId, MaybePendingBlockWithTxHashes};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::traits::provider::HasStarknetProvider;
+use crate::traits::client::HasStarknetClient;
 use crate::types::status::StarknetChainStatus;
 
 pub struct QueryStarknetBlock;
@@ -16,7 +16,7 @@ impl<Chain> BlockQuerier<Chain> for QueryStarknetBlock
 where
     Chain: HasBlockType<Block = StarknetChainStatus>
         + HasHeightType<Height = u64>
-        + HasStarknetProvider<StarknetProvider: Provider>
+        + HasStarknetClient<Client: Provider>
         + CanRaiseAsyncError<ProviderError>
         + CanRaiseAsyncError<&'static str>,
 {

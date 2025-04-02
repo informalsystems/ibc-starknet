@@ -5,8 +5,8 @@ use starknet::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet::providers::{Provider, ProviderError};
 
 use crate::impls::types::address::StarknetAddress;
+use crate::traits::client::HasStarknetClient;
 use crate::traits::contract::call::{ContractCaller, ContractCallerComponent};
-use crate::traits::provider::HasStarknetProvider;
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;
 
@@ -18,7 +18,7 @@ where
     Chain: HasAddressType<Address = StarknetAddress>
         + HasSelectorType<Selector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
-        + HasStarknetProvider<StarknetProvider: Provider>
+        + HasStarknetClient<Client: Provider>
         + HasHeightType<Height = u64>
         + CanRaiseAsyncError<ProviderError>,
 {

@@ -6,7 +6,7 @@ use hermes_relayer_components::chain::traits::types::status::HasChainStatusType;
 use starknet::core::types::{BlockId, BlockTag, MaybePendingBlockWithTxHashes};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::traits::provider::HasStarknetProvider;
+use crate::traits::client::HasStarknetClient;
 use crate::types::status::StarknetChainStatus;
 
 pub struct QueryStarknetChainStatus;
@@ -15,7 +15,7 @@ pub struct QueryStarknetChainStatus;
 impl<Chain> ChainStatusQuerier<Chain> for QueryStarknetChainStatus
 where
     Chain: HasChainStatusType<ChainStatus = StarknetChainStatus>
-        + HasStarknetProvider<StarknetProvider: Provider>
+        + HasStarknetClient<Client: Provider>
         + CanRaiseAsyncError<ProviderError>
         + CanRaiseAsyncError<&'static str>,
 {

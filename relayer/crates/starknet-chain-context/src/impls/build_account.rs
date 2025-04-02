@@ -7,7 +7,7 @@ use hermes_relayer_components::transaction::traits::types::signer::HasSignerType
 use hermes_starknet_chain_components::traits::account::{
     AccountFromSignerBuilder, AccountFromSignerBuilderComponent, HasStarknetAccountType,
 };
-use hermes_starknet_chain_components::traits::provider::HasStarknetProvider;
+use hermes_starknet_chain_components::traits::client::HasStarknetClient;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use ibc::core::host::types::identifiers::ChainId;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
@@ -21,7 +21,7 @@ use crate::types::StarknetAccount;
 #[cgp_new_provider(AccountFromSignerBuilderComponent)]
 impl<Chain> AccountFromSignerBuilder<Chain> for BuildStarknetAccount
 where
-    Chain: HasStarknetProvider<StarknetProvider = Arc<JsonRpcClient<HttpTransport>>>
+    Chain: HasStarknetClient<Client = Arc<JsonRpcClient<HttpTransport>>>
         + HasChainId<ChainId = ChainId>
         + HasStarknetAccountType<Account = StarknetAccount>
         + HasSignerType<Signer = StarknetWallet>,

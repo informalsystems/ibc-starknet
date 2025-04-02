@@ -15,8 +15,8 @@ use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::StarknetHeader;
 use starknet::providers::ProviderError;
 
+use crate::traits::client::HasStarknetClient;
 use crate::traits::proof_signer::HasStarknetProofSigner;
-use crate::traits::provider::HasStarknetProvider;
 use crate::types::consensus_state::StarknetConsensusState;
 use crate::types::payloads::client::StarknetUpdateClientPayload;
 use crate::types::status::StarknetChainStatus;
@@ -31,7 +31,7 @@ where
         + HasClientStateType<Counterparty>
         + HasUpdateClientPayloadType<Counterparty, UpdateClientPayload = StarknetUpdateClientPayload>
         + CanQueryBlock<Block = StarknetChainStatus>
-        + HasStarknetProvider
+        + HasStarknetClient
         + CanRaiseAsyncError<&'static str>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
