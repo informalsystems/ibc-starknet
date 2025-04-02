@@ -9,6 +9,7 @@ use starknet_ibc_core::commitment::StateRoot;
 pub struct CometConsensusState {
     pub timestamp: Timestamp,
     pub root: StateRoot,
+    pub next_validators_hash: ByteArray,
 }
 
 #[generate_trait]

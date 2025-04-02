@@ -26,12 +26,15 @@ pub struct SignedHeader {
     pub height: Height,
     pub timestamp: Timestamp,
     pub root: StateRoot,
+    pub next_validators_hash: ByteArray,
 }
 
 pub impl CometHeaderIntoConsensusState of Into<CometHeader, CometConsensusState> {
     fn into(self: CometHeader) -> CometConsensusState {
         CometConsensusState {
-            timestamp: self.signed_header.timestamp, root: self.signed_header.root,
+            timestamp: self.signed_header.timestamp,
+            root: self.signed_header.root,
+            next_validators_hash: self.signed_header.next_validators_hash,
         }
     }
 }
