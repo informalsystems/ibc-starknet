@@ -565,22 +565,21 @@ impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
             return false;
         }
 
-        if lhs_span.len() == 0 {
+        let len = lhs_span.len();
+
+        if len == 0 {
             return true;
         }
 
-        let mut eq = true;
         let mut i = 0;
-        let len = lhs_span.len();
 
         while i < len {
             if lhs_span.at(i) != rhs_span.at(i) {
-                eq = false;
-                break;
+                return false;
             }
             i += 1;
         }
-        eq
+        return true;
     }
 }
 
