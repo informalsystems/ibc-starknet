@@ -325,7 +325,7 @@ mod preset {
             TokenIbcTransferrerComponent:
                 SendIbcTransferMessage,
             IbcTransferTimeoutCalculatorComponent:
-                IbcTransferTimeoutAfterSeconds<600>,
+                IbcTransferTimeoutAfterSeconds<300>,
             IbcTransferredAmountConverterComponent:
                 ConvertStarknetTokenAddressFromCosmos,
             CosmosTokenAddressOnStarknetQuerierComponent:
@@ -584,7 +584,7 @@ mod preset {
             EventualAmountAsserterComponent:
                 PollAssertEventualAmount,
             PollAssertDurationGetterComponent:
-                ProvidePollAssertDuration<1, 600>,
+                ProvidePollAssertDuration<1, 300>,
             IbcTokenTransferMessageBuilderComponent:
                 BuildStarknetIbcTransferMessage,
             PacketIsReceivedQuerierComponent:
