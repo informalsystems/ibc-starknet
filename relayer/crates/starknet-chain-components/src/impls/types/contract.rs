@@ -3,18 +3,16 @@ use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
 
 use crate::traits::types::contract_class::{
-    ContractClassHashTypeProvider, ContractClassHashTypeProviderComponent,
-    ContractClassTypeProvider, ContractClassTypeProviderComponent,
+    ContractClassHashTypeProviderComponent, ContractClassTypeProviderComponent,
 };
 
-pub struct ProvideStarknetContractTypes;
+pub struct UseStarknetContractTypes;
 
-#[cgp_provider(ContractClassTypeProviderComponent)]
-impl<Chain: Async> ContractClassTypeProvider<Chain> for ProvideStarknetContractTypes {
-    type ContractClass = SierraClass;
-}
-
-#[cgp_provider(ContractClassHashTypeProviderComponent)]
-impl<Chain: Async> ContractClassHashTypeProvider<Chain> for ProvideStarknetContractTypes {
-    type ContractClassHash = Felt;
+delegate_components! {
+    UseStarknetContractTypes {
+        ContractClassTypeProviderComponent:
+            UseType<SierraClass>,
+        ContractClassHashTypeProviderComponent:
+            UseType<Felt>,
+    }
 }

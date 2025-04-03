@@ -8,7 +8,8 @@ use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeComponent, HasEncoding,
+    DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeProviderComponent,
+    HasEncoding,
 };
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_error::impls::UseHermesError;
@@ -22,7 +23,7 @@ use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
 use hermes_starknet_chain_components::types::events::packet::PacketRelayEvents;
 use starknet::core::types::Felt;
 
-use crate::contexts::encoding::cairo::{ProvideCairoEncoding, StarknetCairoEncoding};
+use crate::contexts::encoding::cairo::{StarknetCairoEncoding, UseStarknetCairoEncoding};
 use crate::impls::error::HandleStarknetChainError;
 
 #[cgp_context(StarknetEventEncodingContextComponents: StarknetEventEncodingComponents)]
@@ -39,11 +40,11 @@ delegate_components! {
         ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
         [
-            EncodingTypeComponent,
-            EncodingGetterComponent,
-            DefaultEncodingGetterComponent
+            EncodingTypeProviderComponent<AsFelt>,
+            EncodingGetterComponent<AsFelt>,
+            DefaultEncodingGetterComponent<AsFelt>,
         ]:
-            ProvideCairoEncoding,
+            UseStarknetCairoEncoding,
     }
 }
 

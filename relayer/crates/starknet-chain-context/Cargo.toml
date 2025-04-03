@@ -42,5 +42,6 @@ url                         = { workspace = true }
 eyre                        = { workspace = true }
 prost                       = { workspace = true }
 serde_json                  = { workspace = true }
+toml                        = { workspace = true }
 cairo-lang-starknet-classes = { workspace = true }
 ibc-client-starknet-types   = { workspace = true }

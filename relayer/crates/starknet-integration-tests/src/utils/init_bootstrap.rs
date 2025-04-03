@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use std::time::SystemTime;
 
 use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
@@ -9,7 +10,7 @@ use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use starknet::core::types::contract::SierraClass;
 
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
-use crate::contexts::starknet_bootstrap::StarknetBootstrap;
+use crate::contexts::starknet_bootstrap::{StarknetBootstrap, StarknetBootstrapFields};
 
 pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<StarknetBootstrap, Error> {
     let chain_command_path = std::env::var("STARKNET_BIN")
@@ -29,13 +30,15 @@ pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<Starknet
     let comet_client_contract = load_contract_from_env(runtime, "COMET_CLIENT_CONTRACT").await?;
 
     let starknet_bootstrap = StarknetBootstrap {
-        runtime: runtime.clone(),
-        chain_command_path,
-        chain_store_dir: format!("./test-data/{timestamp}").into(),
-        erc20_contract,
-        ics20_contract,
-        ibc_core_contract,
-        comet_client_contract,
+        fields: Arc::new(StarknetBootstrapFields {
+            runtime: runtime.clone(),
+            chain_command_path,
+            chain_store_dir: format!("./test-data/{timestamp}").into(),
+            erc20_contract,
+            ics20_contract,
+            ibc_core_contract,
+            comet_client_contract,
+        }),
     };
 
     Ok(starknet_bootstrap)

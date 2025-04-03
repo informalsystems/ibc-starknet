@@ -1,17 +1,16 @@
 use cgp::prelude::*;
 use hermes_chain_components::traits::types::height::{
     HeightAdjuster, HeightAdjusterComponent, HeightFieldComponent, HeightIncrementer,
-    HeightIncrementerComponent, HeightTypeComponent,
+    HeightIncrementerComponent, HeightTypeProviderComponent,
 };
-use hermes_relayer_components::chain::traits::types::height::{
-    HasHeightType, HeightFieldGetter, ProvideHeightType,
-};
+use hermes_relayer_components::chain::traits::types::height::{HasHeightType, HeightFieldGetter};
 
 pub struct ProvideStarknetHeight;
 
-#[cgp_provider(HeightTypeComponent)]
-impl<Chain: Async> ProvideHeightType<Chain> for ProvideStarknetHeight {
-    type Height = u64;
+delegate_components! {
+    ProvideStarknetHeight {
+        HeightTypeProviderComponent: UseType<u64>
+    }
 }
 
 #[cgp_provider(HeightFieldComponent)]

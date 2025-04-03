@@ -7,12 +7,11 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
 use hermes_error::impls::UseHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::random::CanGenerateRandom;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::types::amount::StarknetAmount;
+use hermes_starknet_chain_components::impls::types::amount::UseU256Amount;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
@@ -22,9 +21,7 @@ use hermes_test_components::chain_driver::impls::wait::WaitChainReachHeight;
 use hermes_test_components::chain_driver::traits::chain_process::{
     ChainProcessTaker, ChainProcessTakerComponent,
 };
-use hermes_test_components::chain_driver::traits::fields::amount::{
-    RandomAmountGenerator, RandomAmountGeneratorComponent,
-};
+use hermes_test_components::chain_driver::traits::fields::amount::RandomAmountGeneratorComponent;
 use hermes_test_components::chain_driver::traits::fields::denom::{
     DenomGetter, DenomGetterComponent, StakingDenom, TransferDenom,
 };
@@ -32,7 +29,7 @@ use hermes_test_components::chain_driver::traits::fields::wallet::{
     RelayerWallet, UserWallet, WalletGetterComponent,
 };
 use hermes_test_components::chain_driver::traits::types::chain::{
-    ChainGetter, ChainGetterComponent, ChainTypeComponent, HasChain, ProvideChainType,
+    ChainGetterComponent, ChainTypeProviderComponent, HasChain,
 };
 use hermes_test_components::chain_driver::traits::wait::ChainStartupWaiterComponent;
 use tokio::process::Child;
@@ -62,6 +59,10 @@ delegate_components! {
             UseType<HermesRuntime>,
         RuntimeGetterComponent:
             UseField<symbol!("runtime")>,
+        ChainTypeProviderComponent:
+            UseType<StarknetChain>,
+        ChainGetterComponent:
+            UseField<symbol!("chain")>,
         WalletGetterComponent<RelayerWallet>:
             UseField<symbol!("relayer_wallet")>,
         WalletGetterComponent<UserWallet<0>>:
@@ -70,18 +71,8 @@ delegate_components! {
             UseField<symbol!("user_wallet_b")>,
         ChainStartupWaiterComponent:
             WaitChainReachHeight<1>,
-    }
-}
-
-#[cgp_provider(ChainTypeComponent)]
-impl ProvideChainType<StarknetChainDriver> for StarknetChainDriverComponents {
-    type Chain = StarknetChain;
-}
-
-#[cgp_provider(ChainGetterComponent)]
-impl ChainGetter<StarknetChainDriver> for StarknetChainDriverComponents {
-    fn chain(driver: &StarknetChainDriver) -> &StarknetChain {
-        &driver.chain
+        RandomAmountGeneratorComponent:
+            UseU256Amount,
     }
 }
 
@@ -103,29 +94,6 @@ impl DenomGetter<StarknetChainDriver, StakingDenom> for StarknetChainDriverCompo
 impl ChainProcessTaker<StarknetChainDriver> for StarknetChainDriverComponents {
     fn take_chain_process(chain_driver: &mut StarknetChainDriver) -> Option<Child> {
         chain_driver.chain_process.take()
-    }
-}
-
-#[cgp_provider(RandomAmountGeneratorComponent)]
-impl RandomAmountGenerator<StarknetChainDriver> for StarknetChainDriverComponents {
-    async fn random_amount(
-        chain_driver: &StarknetChainDriver,
-        min: usize,
-        max: &StarknetAmount,
-    ) -> StarknetAmount {
-        // FIXME: figure how to generate random U256 amount
-
-        let max_quantity = max.quantity.low();
-
-        let quantity = chain_driver
-            .runtime
-            .random_range(min as u128, max_quantity)
-            .await;
-
-        StarknetAmount {
-            quantity: quantity.into(),
-            token_address: max.token_address,
-        }
     }
 }
 
