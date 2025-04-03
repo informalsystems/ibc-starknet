@@ -49,6 +49,7 @@ where
             "--dump-on",
             "block",
             "--request-body-size-limit=3000000", // 3M; ibc-core contract class is too large
+            "--initial-balance=1000000000000000000000000000000", // need large balance
             "--dump-path",
             &Runtime::file_path_to_string(&chain_state_path),
         ];
