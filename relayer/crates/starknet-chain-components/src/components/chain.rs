@@ -128,7 +128,7 @@ mod preset {
     };
     use hermes_chain_components::traits::types::proof::{
         CommitmentProofBytesGetterComponent, CommitmentProofHeightGetterComponent,
-        CommitmentProofTypeComponent,
+        CommitmentProofTypeProviderComponent,
     };
     use hermes_chain_components::traits::types::timestamp::TimeoutTypeComponent;
     use hermes_chain_components::traits::types::update_client::UpdateClientPayloadTypeComponent;
@@ -371,7 +371,7 @@ mod preset {
             InitChannelOptionsTypeComponent:
                 ProvideCosmosInitChannelOptionsType,
             [
-                CommitmentProofTypeComponent,
+                CommitmentProofTypeProviderComponent,
                 CommitmentProofHeightGetterComponent,
                 CommitmentProofBytesGetterComponent,
             ]:
