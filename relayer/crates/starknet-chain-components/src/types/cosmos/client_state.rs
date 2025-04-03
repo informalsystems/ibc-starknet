@@ -28,7 +28,6 @@ use ibc::core::commitment_types::specs::ProofSpecs;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::proto::Any;
 use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
-use tracing::info;
 
 use crate::types::cosmos::height::Height;
 
@@ -131,8 +130,7 @@ impl Transformer for EncodeCometClientState {
             proof_specs
         ]: Self::From,
     ) -> CometClientState {
-        info!("will transform CometClientState");
-        let t = CometClientState {
+        CometClientState {
             latest_height,
             trusting_period,
             unbonding_period,
@@ -140,9 +138,7 @@ impl Transformer for EncodeCometClientState {
             status,
             chain_id,
             proof_specs,
-        };
-        info!("done: {t:#?}");
-        t
+        }
     }
 }
 
@@ -289,7 +285,6 @@ where
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<LeafOp, Encoding::Error> {
-        info!("will decode LeafOp");
         let product![hash, prehash_key, prehash_value, length, prefix] =
             encoding.decode_mut(buffer)?;
         Ok(LeafOp {
@@ -356,7 +351,6 @@ where
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<InnerSpec, Encoding::Error> {
-        info!("will decode InnerSpec");
         let product![
             child_order,
             child_size,
@@ -429,7 +423,6 @@ where
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<ProofSpec, Encoding::Error> {
-        info!("will decode ProofSpec");
         let product![
             leaf_spec,
             inner_spec,
@@ -482,7 +475,6 @@ where
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<ProofSpecs, Encoding::Error> {
-        info!("will decode ProofSpecs");
         let proof_spec_vec = encoding.decode_mut(buffer)?;
         ProofSpecs::try_from(proof_spec_vec)
             .map_err(|e| Encoding::raise_error("failed to convert Vec<ProofSpec> to ProofSpecs"))
