@@ -22,8 +22,7 @@ pub mod ChannelHandlerComponent {
         HeightImpl,
     };
     use starknet_ibc_core::commitment::{
-        Commitment, CommitmentZero, StateProof, StateValue, compute_ack_commitment,
-        compute_packet_commitment,
+        Commitment, CommitmentZero, StateProof, compute_ack_commitment, compute_packet_commitment,
     };
     use starknet_ibc_core::connection::{
         ConnectionEnd, ConnectionEndTrait, ConnectionErrors, ConnectionHandlerComponent,
@@ -1035,8 +1034,6 @@ pub mod ChannelHandlerComponent {
 
             let root_on_a = client
                 .consensus_state_root(client_sequence, msg.proof_height_on_a.clone());
-
-            let state_val: StateValue = packet_commitment_on_a.clone().into();
 
             client
                 .verify_membership(

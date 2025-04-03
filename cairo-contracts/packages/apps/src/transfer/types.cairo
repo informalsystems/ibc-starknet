@@ -311,7 +311,7 @@ pub mod tests {
     fn test_json_serialized_packet_data() {
         let json = to_byte_array(PACKET_DATA_FROM_SN(ERC20()));
         let expected: ByteArray =
-            "{\"denom\":\"0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7\",\"amount\":\"100\",\"sender\":\"0x55534552\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"memo\":\"\"}";
+            "{\"amount\":\"100\",\"denom\":\"0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"sender\":\"0x55534552\"}";
         assert_eq!(json, expected);
     }
 

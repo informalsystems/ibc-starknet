@@ -6,7 +6,9 @@ pub mod apps {
 }
 pub mod clients {
     mod cometbft;
+    mod mock;
     pub use cometbft::CometClient;
+    pub use mock::MockClient;
 }
 #[cfg(test)]
 mod tests {

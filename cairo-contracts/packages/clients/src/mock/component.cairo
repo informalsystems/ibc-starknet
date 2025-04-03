@@ -269,7 +269,7 @@ pub mod MockClientComponent {
         fn verify_membership(
             self: @ComponentState<TContractState>,
             client_sequence: u64,
-            path: ByteArray,
+            paths: Array<ByteArray>,
             value: StateValue,
             proof: StateProof,
             root: StateRoot,

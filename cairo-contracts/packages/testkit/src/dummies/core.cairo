@@ -1,7 +1,4 @@
-use ics23::{
-    ByteArrayIntoArrayU8, CommitmentProof, ExistenceProof, HashOp, LeafOp, LengthOp, Proof,
-    byte_array_to_array_u8,
-};
+use ics23::ByteArrayIntoArrayU8;
 use protobuf::types::message::ProtoCodecImpl;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
@@ -97,20 +94,7 @@ pub fn VERSION_PROPOSAL() -> AppVersion {
 }
 
 pub fn STATE_PROOF() -> StateProof {
-    let key: ByteArray = "food";
-    let value: ByteArray = "some longer text";
-    let leaf = LeafOp {
-        hash: HashOp::Sha256,
-        prehash_key: HashOp::NoOp,
-        prehash_value: HashOp::NoOp,
-        length: LengthOp::VarProto,
-        prefix: array![],
-    };
-    let proof = ExistenceProof { key: key.into(), value: value.into(), leaf, path: array![] };
-    let commitment_proof = CommitmentProof { proof: Proof::Exist(proof) };
-    let commitment_proof_serialised = ProtoCodecImpl::encode(@commitment_proof);
-    let commitment_proof_bytes = byte_array_to_array_u8(@commitment_proof_serialised);
-    StateProof { proof: commitment_proof_bytes }
+    StateProof { proof: array![1] }
 }
 
 pub fn STATE_ROOT() -> StateRoot {
