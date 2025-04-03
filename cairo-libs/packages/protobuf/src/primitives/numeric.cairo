@@ -1,5 +1,6 @@
 use protobuf::primitives::utils::{
     decode_2_complement_32, decode_2_complement_64, encode_2_complement_32, encode_2_complement_64,
+    little_endian_to_u64, u64_to_little_endian,
 };
 use protobuf::types::message::{
     DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
@@ -93,6 +94,35 @@ pub impl I64AsProtoMessage of ProtoMessage<i64> {
 
     fn wire_type() -> WireType {
         WireType::Varint
+    }
+}
+
+pub impl SFixed64AsProtoMessage of ProtoMessage<i64> {
+    // number is encoded as little-ending chunks
+    // https://protobuf.dev/programming-guides/encoding/#cheat-sheet
+
+    fn encode_raw(self: @i64, ref context: EncodeContext) {
+        let num: u64 = encode_2_complement_64(@(*self).into());
+        let mut bytes = u64_to_little_endian(@num).span();
+        while let Some(byte) = bytes.pop_front() {
+            context.buffer.append_byte(*byte);
+        }
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<i64> {
+        let bytes = [
+            context.buffer[context.index], context.buffer[context.index + 1],
+            context.buffer[context.index + 2], context.buffer[context.index + 3],
+            context.buffer[context.index + 4], context.buffer[context.index + 5],
+            context.buffer[context.index + 6], context.buffer[context.index + 7],
+        ];
+        context.index += 8;
+        let num = little_endian_to_u64(@bytes);
+        Option::Some(decode_2_complement_64(@num))
+    }
+
+    fn wire_type() -> WireType {
+        WireType::Fixed64
     }
 }
 

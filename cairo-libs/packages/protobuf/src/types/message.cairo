@@ -96,6 +96,15 @@ pub impl EncodeContextImpl of EncodeContextTrait {
         }
         self.buffer.append(@context2.buffer);
     }
+
+    fn encode_with_length<T, +ProtoMessage<T>, +Default<T>, +Drop<T>, +PartialEq<T>>(
+        ref self: EncodeContext, value: @T,
+    ) {
+        let mut context2 = Self::new();
+        value.encode_raw(ref context2);
+        context2.buffer.len().encode_raw(ref self);
+        self.buffer.append(@context2.buffer);
+    }
 }
 
 #[derive(Drop, Debug)]
@@ -239,6 +248,23 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
     fn encode<T, +ProtoMessage<T>>(value: @T) -> ByteArray {
         let mut context = EncodeContextImpl::new();
         value.encode_raw(ref context);
+        context.buffer
+    }
+
+    fn encode_as_msg<T, +ProtoMessage<T>, +Default<T>, +Drop<T>, +PartialEq<T>>(
+        value: @T,
+    ) -> ByteArray {
+        // TODO(rano): can we avoid this?
+        let mut context = EncodeContextImpl::new();
+        context.encode_field(1, value);
+        context.buffer
+    }
+
+    fn encode_with_length<T, +ProtoMessage<T>, +Default<T>, +Drop<T>, +PartialEq<T>>(
+        value: @T,
+    ) -> ByteArray {
+        let mut context = EncodeContextImpl::new();
+        context.encode_with_length(value);
         context.buffer
     }
 }
