@@ -20,5 +20,4 @@ pub mod TransferErrors {
     pub const INSUFFICIENT_BALANCE: felt252 = 'ICS20: insufficient balance';
     pub const NO_SEND_CAPABILITY: felt252 = 'ICS20: No send capability';
     pub const NO_RECEIVE_CAPABILITY: felt252 = 'ICS20: No receive capability';
-    pub const TOKEN_ALREADY_EXISTS: felt252 = 'ICS20: token already exists';
 }

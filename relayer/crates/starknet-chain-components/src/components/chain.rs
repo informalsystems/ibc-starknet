@@ -169,26 +169,32 @@ mod preset {
     use hermes_relayer_components::transaction::traits::types::signer::SignerTypeProviderComponent;
     use hermes_relayer_components::transaction::traits::types::tx_hash::TransactionHashTypeComponent;
     use hermes_relayer_components::transaction::traits::types::tx_response::TxResponseTypeComponent;
-    use hermes_test_components::chain::impls::assert::default_assert_duration::ProvideDefaultPollAssertDuration;
     use hermes_test_components::chain::impls::assert::poll_assert_eventual_amount::PollAssertEventualAmount;
+    use hermes_test_components::chain::impls::default_memo::ProvideDefaultMemo;
     use hermes_test_components::chain::impls::ibc_transfer::SendIbcTransferMessage;
     use hermes_test_components::chain::traits::assert::eventual_amount::EventualAmountAsserterComponent;
     use hermes_test_components::chain::traits::assert::poll_assert::PollAssertDurationGetterComponent;
     use hermes_test_components::chain::traits::messages::ibc_transfer::IbcTokenTransferMessageBuilderComponent;
     use hermes_test_components::chain::traits::queries::balance::BalanceQuerierComponent;
+    use hermes_test_components::chain::traits::transfer::amount::IbcTransferredAmountConverterComponent;
     use hermes_test_components::chain::traits::transfer::ibc_transfer::TokenIbcTransferrerComponent;
     use hermes_test_components::chain::traits::transfer::string_memo::ProvideStringMemoType;
     use hermes_test_components::chain::traits::transfer::timeout::IbcTransferTimeoutCalculatorComponent;
     use hermes_test_components::chain::traits::types::address::AddressTypeComponent;
-    use hermes_test_components::chain::traits::types::amount::AmountTypeComponent;
+    use hermes_test_components::chain::traits::types::amount::{
+        AmountMethodsComponent, AmountTypeComponent,
+    };
     use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
-    use hermes_test_components::chain::traits::types::memo::MemoTypeComponent;
+    use hermes_test_components::chain::traits::types::memo::{
+        DefaultMemoGetterComponent, MemoTypeComponent,
+    };
     use hermes_test_components::chain::traits::types::wallet::{
         WalletSignerComponent, WalletTypeComponent,
     };
     use starknet::core::types::Felt;
 
     use crate::components::types::StarknetChainTypes;
+    use crate::impls::assert::assert_duration::ProvidePollAssertDuration;
     use crate::impls::commitment_prefix::GetStarknetCommitmentPrefix;
     use crate::impls::contract::call::CallStarknetContract;
     use crate::impls::contract::declare::DeclareSierraContract;
@@ -197,6 +203,7 @@ mod preset {
     use crate::impls::contract::message::BuildInvokeContractCall;
     use crate::impls::counterparty_message_height::GetCounterpartyCosmosHeightFromStarknetMessage;
     use crate::impls::events::UseStarknetEvents;
+    use crate::impls::ibc_amount::ConvertStarknetTokenAddressFromCosmos;
     use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
     use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
     use crate::impls::messages::create_client::BuildCreateCometClientMessage;
@@ -222,6 +229,7 @@ mod preset {
     use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
     use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
     use crate::impls::queries::status::QueryStarknetChainStatus;
+    use crate::impls::queries::token_address::GetOrCreateCosmosTokenAddressOnStarknet;
     use crate::impls::queries::token_balance::QueryErc20TokenBalance;
     use crate::impls::send_message::SendStarknetMessages;
     use crate::impls::transfer::{IbcTransferTimeoutAfterSeconds, TransferErc20Token};
@@ -251,7 +259,8 @@ mod preset {
     use crate::traits::contract::invoke::ContractInvokerComponent;
     use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
     use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
-    use crate::traits::queries::address::ContractAddressQuerierComponent;
+    use crate::traits::queries::contract_address::ContractAddressQuerierComponent;
+    use crate::traits::queries::token_address::CosmosTokenAddressOnStarknetQuerierComponent;
     use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
     use crate::traits::transfer::TokenTransferComponent;
     use crate::traits::types::blob::BlobTypeComponent;
@@ -290,12 +299,17 @@ mod preset {
                 MessageResponseEventsGetterComponent,
             ]:
                 UseStarknetMessageResponse,
-            AmountTypeComponent:
+            [
+                AmountTypeComponent,
+                AmountMethodsComponent,
+            ]:
                 ProvideU256Amount,
             DenomTypeComponent:
                 ProvideTokenAddressDenom,
             MemoTypeComponent:
                 ProvideStringMemoType,
+            DefaultMemoGetterComponent:
+                ProvideDefaultMemo,
             [
                 WalletTypeComponent,
                 WalletSignerComponent,
@@ -311,7 +325,11 @@ mod preset {
             TokenIbcTransferrerComponent:
                 SendIbcTransferMessage,
             IbcTransferTimeoutCalculatorComponent:
-                IbcTransferTimeoutAfterSeconds<90>,
+                IbcTransferTimeoutAfterSeconds<300>,
+            IbcTransferredAmountConverterComponent:
+                ConvertStarknetTokenAddressFromCosmos,
+            CosmosTokenAddressOnStarknetQuerierComponent:
+                GetOrCreateCosmosTokenAddressOnStarknet,
             TransactionHashTypeComponent:
                 ProvideFeltTxHash,
             TxResponseTypeComponent:
@@ -566,7 +584,7 @@ mod preset {
             EventualAmountAsserterComponent:
                 PollAssertEventualAmount,
             PollAssertDurationGetterComponent:
-                ProvideDefaultPollAssertDuration,
+                ProvidePollAssertDuration<1, 300>,
             IbcTokenTransferMessageBuilderComponent:
                 BuildStarknetIbcTransferMessage,
             PacketIsReceivedQuerierComponent:

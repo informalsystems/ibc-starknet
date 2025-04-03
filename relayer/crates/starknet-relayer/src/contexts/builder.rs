@@ -21,15 +21,21 @@ use hermes_error::HermesError;
 use hermes_relayer_components::build::traits::builders::birelay_builder::{
     BiRelayBuilder, BiRelayBuilderComponent,
 };
+use hermes_relayer_components::build::traits::builders::birelay_from_relay_builder::{
+    BiRelayFromRelayBuilder, BiRelayFromRelayBuilderComponent,
+};
 use hermes_relayer_components::build::traits::builders::chain_builder::{
     CanBuildChain, ChainBuilder, ChainBuilderComponent,
 };
 use hermes_relayer_components::build::traits::builders::relay_builder::{
     RelayBuilder, RelayBuilderComponent,
 };
-use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeAtComponent;
-use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
-use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
+use hermes_relayer_components::build::traits::builders::relay_from_chains_builder::{
+    RelayFromChainsBuilder, RelayFromChainsBuilderComponent,
+};
+use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
+use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
+use hermes_relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::runtime::{
@@ -64,7 +70,7 @@ pub struct StarknetBuilderFields {
     pub cosmos_builder: CosmosBuilder,
     pub runtime: HermesRuntime,
     // Fields for StarknetChain
-    pub starknet_chain_config: StarknetChainConfig,
+    pub starknet_chain_config: Option<StarknetChainConfig>,
 }
 
 impl Deref for StarknetBuilder {
@@ -89,14 +95,14 @@ delegate_components! {
     StarknetBuildComponents {
         ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: UseDelegate<HandleStarknetChainError>,
-        ChainTypeAtComponent<Index<0>>: WithType<StarknetChain>,
-        ChainTypeAtComponent<Index<1>>: WithType<CosmosChain>,
+        ChainTypeProviderAtComponent<Index<0>>: WithType<StarknetChain>,
+        ChainTypeProviderAtComponent<Index<1>>: WithType<CosmosChain>,
         RuntimeTypeProviderComponent: WithType<HermesRuntime>,
         RuntimeGetterComponent: WithField<symbol!("runtime")>,
-        RelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
-        RelayTypeAtComponent<Index<1>, Index<0>>: WithType<CosmosToStarknetRelay>,
-        BiRelayTypeAtComponent<Index<0>, Index<1>>: WithType<StarknetCosmosBiRelay>,
-        BiRelayTypeAtComponent<Index<1>, Index<0>>: WithType<CosmosStarknetBiRelay>,
+        RelayTypeProviderAtComponent<Index<0>, Index<1>>: WithType<StarknetToCosmosRelay>,
+        RelayTypeProviderAtComponent<Index<1>, Index<0>>: WithType<CosmosToStarknetRelay>,
+        BiRelayTypeProviderAtComponent<Index<0>, Index<1>>: WithType<StarknetCosmosBiRelay>,
+        BiRelayTypeProviderAtComponent<Index<1>, Index<0>>: WithType<CosmosStarknetBiRelay>,
     }
 }
 
@@ -161,6 +167,48 @@ impl RelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildComponen
 
         let dst_chain = build.build_chain(src_chain_id).await?;
 
+        Ok(
+            build.build_cosmos_to_starknet_relay(
+                src_chain,
+                dst_chain,
+                src_client_id,
+                dst_client_id,
+            ),
+        )
+    }
+}
+
+#[cgp_provider(RelayFromChainsBuilderComponent)]
+impl RelayFromChainsBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponents {
+    async fn build_relay_from_chains(
+        build: &StarknetBuilder,
+        _index: PhantomData<(Index<0>, Index<1>)>,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
+        src_chain: StarknetChain,
+        dst_chain: CosmosChain,
+    ) -> Result<StarknetToCosmosRelay, HermesError> {
+        Ok(
+            build.build_starknet_to_cosmos_relay(
+                src_chain,
+                dst_chain,
+                src_client_id,
+                dst_client_id,
+            ),
+        )
+    }
+}
+
+#[cgp_provider(RelayFromChainsBuilderComponent)]
+impl RelayFromChainsBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildComponents {
+    async fn build_relay_from_chains(
+        build: &StarknetBuilder,
+        _index: PhantomData<(Index<1>, Index<0>)>,
+        src_client_id: &ClientId,
+        dst_client_id: &ClientId,
+        src_chain: CosmosChain,
+        dst_chain: StarknetChain,
+    ) -> Result<CosmosToStarknetRelay, HermesError> {
         Ok(
             build.build_cosmos_to_starknet_relay(
                 src_chain,
@@ -248,11 +296,28 @@ impl BiRelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildCompon
     }
 }
 
+#[cgp_provider(BiRelayFromRelayBuilderComponent)]
+impl BiRelayFromRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponents {
+    async fn build_birelay_from_relays(
+        build: &StarknetBuilder,
+        relay_a_to_b: StarknetToCosmosRelay,
+        relay_b_to_a: CosmosToStarknetRelay,
+    ) -> Result<StarknetCosmosBiRelay, HermesError> {
+        let birelay = StarknetCosmosBiRelay {
+            runtime: build.runtime.clone(),
+            relay_a_to_b,
+            relay_b_to_a,
+        };
+
+        Ok(birelay)
+    }
+}
+
 impl StarknetBuilder {
     pub fn new(
-        cosmos_builder: CosmosBuilder,
         runtime: HermesRuntime,
-        starknet_chain_config: StarknetChainConfig,
+        cosmos_builder: CosmosBuilder,
+        starknet_chain_config: Option<StarknetChainConfig>,
     ) -> Self {
         Self {
             fields: Arc::new(StarknetBuilderFields {
@@ -271,7 +336,12 @@ impl StarknetBuilder {
         &self,
         expected_chain_id: &ChainId,
     ) -> Result<StarknetChain, HermesError> {
-        let json_rpc_url = Url::parse(&self.starknet_chain_config.json_rpc_url)?;
+        let chain_config = self
+            .starknet_chain_config
+            .as_ref()
+            .ok_or_else(|| Self::raise_error("starknet chain config not found"))?;
+
+        let json_rpc_url = Url::parse(&chain_config.json_rpc_url)?;
 
         let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
 
@@ -283,7 +353,7 @@ impl StarknetBuilder {
             return Err(eyre!("Starknet chain has a different ID as configured. Expected: {expected_chain_id}, got: {chain_id}").into());
         }
 
-        let wallet_path = PathBuf::from(self.starknet_chain_config.relayer_wallet.clone());
+        let wallet_path = PathBuf::from(chain_config.relayer_wallet.clone());
 
         let wallet_str = self.runtime.read_file_as_string(&wallet_path).await?;
 
@@ -312,9 +382,9 @@ impl StarknetBuilder {
         )
         .expect("valid key pair");
 
-        let contract_classes = &self.starknet_chain_config.contract_classes;
+        let contract_classes = &chain_config.contract_classes;
 
-        let contract_addresses = &self.starknet_chain_config.contract_addresses;
+        let contract_addresses = &chain_config.contract_addresses;
 
         let event_encoding = StarknetEventEncoding::default();
 
@@ -364,8 +434,8 @@ impl StarknetBuilder {
                 ibc_ics20_contract_address,
                 event_encoding,
                 proof_signer,
-                poll_interval: self.starknet_chain_config.poll_interval,
-                block_time: self.starknet_chain_config.block_time,
+                poll_interval: chain_config.poll_interval,
+                block_time: chain_config.block_time,
                 nonce_mutex: Arc::new(Mutex::new(())),
                 signer: relayer_wallet,
             }),

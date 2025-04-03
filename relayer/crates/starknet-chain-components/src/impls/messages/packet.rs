@@ -38,7 +38,7 @@ use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
-use crate::traits::queries::address::CanQueryContractAddress;
+use crate::traits::queries::contract_address::CanQueryContractAddress;
 use crate::types::cosmos::height::Height as CairoHeight;
 use crate::types::messages::ibc::denom::{Denom, PrefixedDenom, TracePrefix};
 use crate::types::messages::ibc::ibc_transfer::{

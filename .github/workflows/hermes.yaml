@@ -40,6 +40,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
+          cache-on-failure: true
           workspaces: |
             relayer
             light-client
@@ -49,14 +50,10 @@ jobs:
         run: |
           scarb --profile release build -p starknet_ibc_contracts
 
-      - name: Install starknet-devnet with starknet 0.13.4
-        uses: taiki-e/cache-cargo-install-action@v2
+      - name: Install starknet-devnet
+        uses: taiki-e/install-action@v2
         with:
           tool: starknet-devnet
-          git: https://github.com/0xspaceShard/starknet-devnet
-          # branch: starknet-0.13.4
-          # https://github.com/0xSpaceShard/starknet-devnet/tree/starknet-0.13.4
-          rev: 43c5f25
 
       - name: Run Integration Tests
         env:
@@ -102,6 +99,7 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
+          cache-on-failure: true
           workspaces: |
             relayer
 
