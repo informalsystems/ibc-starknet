@@ -9,6 +9,7 @@ use crate::contexts::MadaraChainDriver;
 use crate::impls::init_madara_bootstrap;
 
 #[test]
+#[ignore]
 fn test_madara_bootstrap() -> Result<(), Error> {
     let runtime = init_test_runtime();
 

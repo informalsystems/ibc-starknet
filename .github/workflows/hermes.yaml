@@ -76,7 +76,6 @@ jobs:
             ..#cargo-nextest \
             -c \
             cargo nextest run --release \
-            -p hermes-starknet-integration-tests \
             --retries 2 \
             --test-threads=$TEST_THREADS
 
