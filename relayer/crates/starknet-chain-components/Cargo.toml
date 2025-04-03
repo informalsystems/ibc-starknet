@@ -31,9 +31,6 @@ hermes-cosmos-encoding-components   = { workspace = true }
 hermes-wasm-encoding-components     = { workspace = true }
 poseidon                            = { workspace = true }
 
-hermes-logging-components = { workspace = true }
-tracing                   = { workspace = true }
-
 ibc       = { workspace = true }
 ibc-proto = { workspace = true }
 

@@ -2365,7 +2365,6 @@ dependencies = [
  "hermes-cosmos-encoding-components",
  "hermes-cosmos-test-components",
  "hermes-encoding-components",
- "hermes-logging-components",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
  "hermes-runtime-components",
@@ -2388,7 +2387,6 @@ dependencies = [
  "starknet",
  "time",
  "tonic",
- "tracing",
 ]
 
 [[package]]
