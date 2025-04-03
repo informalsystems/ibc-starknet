@@ -6,9 +6,10 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::WireType;
 
+pub const ONE_THIRD: Fraction = Fraction { numerator: 1, denominator: 3 };
 pub const TWO_THIRDS: Fraction = Fraction { numerator: 2, denominator: 3 };
 
-#[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
+#[derive(Default, Debug, Copy, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Fraction {
     pub numerator: u64,
     pub denominator: u64,

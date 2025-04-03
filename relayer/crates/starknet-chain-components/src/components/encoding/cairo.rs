@@ -25,6 +25,7 @@ mod preset {
         EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
     };
     use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent;
+    use ibc::clients::tendermint::types::TrustThreshold;
     use ibc::core::host::types::identifiers::ChainId;
     use starknet::core::types::{Felt, U256};
 
@@ -41,6 +42,7 @@ mod preset {
     };
     use crate::types::cosmos::client_state::{
         ClientStatus, CometClientState, EncodeChainId, EncodeClientStatus, EncodeCometClientState,
+        EncodeTrustThreshold,
     };
     use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsensusState};
     use crate::types::cosmos::height::{EncodeHeight, Height};
@@ -146,6 +148,7 @@ mod preset {
             (ViaCairo, CometConsensusState): EncodeCometConsensusState,
             (ViaCairo, ClientId): EncodeClientId,
             (ViaCairo, ChainId): EncodeChainId,
+            (ViaCairo, TrustThreshold): EncodeTrustThreshold,
             (ViaCairo, ConnectionId): EncodeConnectionId,
             (ViaCairo, Duration): EncodeDuration,
             (ViaCairo, ConnectionCounterparty): EncodeConnectionCounterparty,
