@@ -25,9 +25,7 @@ use starknet::macros::felt;
 use crate::types::genesis_config::StarknetGenesisConfig;
 use crate::types::node_config::StarknetNodeConfig;
 
-pub struct BootstrapStarknetDevnet;
-
-#[cgp_provider(ChainBootstrapperComponent)]
+#[cgp_new_provider(ChainBootstrapperComponent)]
 impl<Bootstrap, Runtime> ChainBootstrapper<Bootstrap> for BootstrapStarknetDevnet
 where
     Bootstrap: HasRuntime<Runtime = Runtime>

@@ -13,7 +13,7 @@ use crate::traits::account::{CanBuildAccountFromSigner, HasStarknetAccountType};
 #[cgp_new_provider(NonceQuerierComponent)]
 impl<Chain> NonceQuerier<Chain> for QueryStarknetNonce
 where
-    Chain: HasStarknetAccountType
+    Chain: HasStarknetAccountType<Account: ConnectedAccount>
         + HasSignerType
         + CanBuildAccountFromSigner
         + HasNonceType<Nonce = Felt>

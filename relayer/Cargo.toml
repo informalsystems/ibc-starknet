@@ -9,6 +9,7 @@ members = [
   "crates/starknet-relayer",
   "crates/starknet-test-components",
   "crates/starknet-integration-tests",
+  "crates/starknet-madara-tests",
   "crates/starknet-cli",
   "crates/poseidon",
   "crates/tools",
@@ -32,6 +33,7 @@ cgp            = { version = "0.4.0" }
 cgp-error-eyre = { version = "0.4.0" }
 
 starknet                    = { version = "0.14.0" }
+starknet-v13                = { version = "0.13.0", package = "starknet" }
 starknet-types-core         = { version = "0.1.7" }
 url                         = { version = "2.4.0" }
 eyre                        = { version = "0.6.12" }

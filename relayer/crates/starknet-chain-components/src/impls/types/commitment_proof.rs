@@ -2,17 +2,19 @@ use cgp::prelude::*;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_components::traits::types::proof::{
     CommitmentProofBytesGetter, CommitmentProofBytesGetterComponent, CommitmentProofHeightGetter,
-    CommitmentProofHeightGetterComponent, CommitmentProofTypeComponent, HasCommitmentProofType,
-    ProvideCommitmentProofType,
+    CommitmentProofHeightGetterComponent, CommitmentProofTypeProviderComponent,
+    HasCommitmentProofType,
 };
 
 use crate::types::commitment_proof::StarknetCommitmentProof;
 
 pub struct UseStarknetCommitmentProof;
 
-#[cgp_provider(CommitmentProofTypeComponent)]
-impl<Chain: Async> ProvideCommitmentProofType<Chain> for UseStarknetCommitmentProof {
-    type CommitmentProof = StarknetCommitmentProof;
+delegate_components! {
+    UseStarknetCommitmentProof {
+        CommitmentProofTypeProviderComponent:
+            UseType<StarknetCommitmentProof>,
+    }
 }
 
 #[cgp_provider(CommitmentProofHeightGetterComponent)]

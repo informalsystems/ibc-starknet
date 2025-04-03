@@ -2,14 +2,14 @@ use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
+use hermes_chain_type_components::traits::types::amount::HasAmountType;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
-use hermes_test_components::chain::traits::types::amount::HasAmountType;
-use starknet::core::types::{Call, Felt, U256};
+use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
@@ -65,13 +65,7 @@ where
             .encode(&message)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *amount.token_address,
-            selector: TRANSFER_SELECTOR,
-            calldata,
-        };
-
-        let message = StarknetMessage::new(call);
+        let message = StarknetMessage::new(*amount.token_address, TRANSFER_SELECTOR, calldata);
 
         Ok(message)
     }
