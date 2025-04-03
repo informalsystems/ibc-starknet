@@ -289,7 +289,10 @@ pub mod TokenTransferComponent {
             ref self: ComponentState<TContractState>, denom: PrefixedDenom,
         ) -> ContractAddress {
             let mut token = self.get_token(denom.key());
-            assert(token.is_zero(), TransferErrors::TOKEN_ALREADY_EXISTS);
+
+            if !token.is_zero() {
+                return token.address;
+            }
 
             let channel: ChannelContract = self.owner().into();
 

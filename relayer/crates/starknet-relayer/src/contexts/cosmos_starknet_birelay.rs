@@ -10,12 +10,12 @@ use hermes_logger::UseHermesLogger;
 use hermes_logging_components::traits::has_logger::{
     GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
 };
-use hermes_relayer_components::birelay::traits::{
-    AutoBiRelayerComponent, TwoWayRelayGetter, TwoWayRelayGetterComponent,
-};
+use hermes_relayer_components::birelay::traits::AutoBiRelayerComponent;
 use hermes_relayer_components::components::default::birelay::DefaultBiRelayComponents;
-use hermes_relayer_components::multi::traits::chain_at::ChainTypeAtComponent;
-use hermes_relayer_components::multi::traits::relay_at::RelayTypeAtComponent;
+use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
+use hermes_relayer_components::multi::traits::relay_at::{
+    RelayGetterAtComponent, RelayTypeProviderAtComponent,
+};
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -49,21 +49,14 @@ delegate_components! {
             GlobalLoggerGetterComponent,
         ]:
             UseHermesLogger,
-        ChainTypeAtComponent<Index<0>>: WithType<CosmosChain>,
-        ChainTypeAtComponent<Index<1>>: WithType<StarknetChain>,
-        RelayTypeAtComponent<Index<0>, Index<1>>: WithType<CosmosToStarknetRelay>,
-        RelayTypeAtComponent<Index<1>, Index<0>>: WithType<StarknetToCosmosRelay>,
-    }
-}
-
-#[cgp_provider(TwoWayRelayGetterComponent)]
-impl TwoWayRelayGetter<CosmosStarknetBiRelay> for StarknetCosmosBiRelayComponents {
-    fn relay_a_to_b(birelay: &CosmosStarknetBiRelay) -> &CosmosToStarknetRelay {
-        &birelay.relay_a_to_b
-    }
-
-    fn relay_b_to_a(birelay: &CosmosStarknetBiRelay) -> &StarknetToCosmosRelay {
-        &birelay.relay_b_to_a
+        ChainTypeProviderAtComponent<Index<0>>: WithType<CosmosChain>,
+        ChainTypeProviderAtComponent<Index<1>>: WithType<StarknetChain>,
+        RelayTypeProviderAtComponent<Index<0>, Index<1>>: WithType<CosmosToStarknetRelay>,
+        RelayTypeProviderAtComponent<Index<1>, Index<0>>: WithType<StarknetToCosmosRelay>,
+        RelayGetterAtComponent<Index<0>, Index<1>>:
+            UseField<symbol!("relay_a_to_b")>,
+        RelayGetterAtComponent<Index<1>, Index<0>>:
+            UseField<symbol!("relay_b_to_a")>,
     }
 }
 
