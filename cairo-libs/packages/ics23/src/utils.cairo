@@ -276,3 +276,34 @@ pub fn lexicographical_cmp(lhs: Array<u8>, rhs: Array<u8>) -> Ordering {
 
     ordering
 }
+
+pub fn felt252_to_u8_array(value: felt252) -> ByteArray {
+    let mut value_bytes: Array<u8> = array![];
+    let mut i = 0;
+    let mut current_value: u256 = value.into();
+    loop {
+        if current_value == 0 || i == 31 {
+            break;
+        }
+        let low = current_value % 256;
+        let lsb_u8: u8 = low.try_into().unwrap();
+        value_bytes.append(lsb_u8);
+        i += 1;
+        current_value = current_value / 256;
+    }
+    let reversed_value_bytes = reverse_array(value_bytes);
+    array_u8_to_byte_array(@reversed_value_bytes)
+}
+
+fn reverse_array(input: Array<u8>) -> Array<u8> {
+    let mut reverse: Array<u8> = array![];
+    let mut i = input.len();
+    loop {
+        if i == 0 {
+            break;
+        }
+        i -= 1;
+        reverse.append(input.at(i).clone());
+    }
+    reverse
+}

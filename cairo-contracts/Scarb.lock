@@ -189,6 +189,7 @@ dependencies = [
  "alexandria_numeric",
  "ics23",
  "openzeppelin_testing",
+ "protobuf",
  "serde_json",
  "snforge_std",
  "starknet_ibc_testkit",

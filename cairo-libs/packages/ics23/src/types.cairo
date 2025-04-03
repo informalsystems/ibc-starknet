@@ -12,6 +12,26 @@ use starknet::SyscallResult;
 use starknet::storage_access::{StorageBaseAddress, Store};
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
+pub struct MerkleProof {
+    pub proofs: Array<CommitmentProof>,
+}
+
+impl MerkleProofAsProtoMessage of ProtoMessage<MerkleProof> {
+    fn encode_raw(self: @MerkleProof, ref context: EncodeContext) {
+        context.encode_repeated_field(1, self.proofs)
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<MerkleProof> {
+        let proofs = context.decode_repeated_field(1)?;
+        Option::Some(MerkleProof { proofs })
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+#[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct CommitmentProof {
     pub proof: Proof,
 }

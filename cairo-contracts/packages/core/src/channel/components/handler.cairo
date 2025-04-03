@@ -955,7 +955,7 @@ pub mod ChannelHandlerComponent {
 
             client.verify_proof_height(@proof_height, client_sequence);
 
-            let path = channel_end_path(
+            let paths = channel_end_path(
                 connection_end.counterparty.prefix.clone(),
                 expected_channel_end.remote.port_id.clone(),
                 counterparty_channel_id,
@@ -964,7 +964,9 @@ pub mod ChannelHandlerComponent {
             let root = client.consensus_state_root(client_sequence, proof_height.clone());
 
             client
-                .verify_membership(client_sequence, path, expected_channel_end.into(), proof, root);
+                .verify_membership(
+                    client_sequence, paths, expected_channel_end.into(), proof, root,
+                );
         }
 
         /// Verifies if the packet commitment matches the one stored earlier
@@ -1017,7 +1019,7 @@ pub mod ChannelHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
 
-            let path = commitment_path(
+            let paths = commitment_path(
                 connection_end.counterparty.prefix.clone(),
                 msg.packet.port_id_on_a.clone(),
                 msg.packet.chan_id_on_a.clone(),
@@ -1036,7 +1038,7 @@ pub mod ChannelHandlerComponent {
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    paths,
                     packet_commitment_on_a.into(),
                     msg.proof_commitment_on_a.clone(),
                     root_on_a,
@@ -1053,7 +1055,7 @@ pub mod ChannelHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
-            let path = ack_path(
+            let paths = ack_path(
                 connection_end.counterparty.prefix.clone(),
                 msg.packet.port_id_on_a.clone(),
                 msg.packet.chan_id_on_a.clone(),
@@ -1068,7 +1070,7 @@ pub mod ChannelHandlerComponent {
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    paths,
                     ack_commitment_on_a.into(),
                     msg.proof_ack_on_b.clone(),
                     root_on_b,
@@ -1085,7 +1087,7 @@ pub mod ChannelHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
-            let path = receipt_path(
+            let paths = receipt_path(
                 connection_end.counterparty.prefix.clone(),
                 msg.packet.port_id_on_b.clone(),
                 msg.packet.chan_id_on_b.clone(),
@@ -1096,7 +1098,9 @@ pub mod ChannelHandlerComponent {
                 .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
 
             client
-                .verify_non_membership(client_sequence, path, msg.proof_unreceived_on_b, root_on_b);
+                .verify_non_membership(
+                    client_sequence, paths, msg.proof_unreceived_on_b, root_on_b,
+                );
         }
 
         fn verify_next_sequence_recv(
@@ -1109,7 +1113,7 @@ pub mod ChannelHandlerComponent {
 
             client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
-            let path = next_sequence_recv_path(
+            let paths = next_sequence_recv_path(
                 connection_end.counterparty.prefix.clone(),
                 msg.packet.port_id_on_b.clone(),
                 msg.packet.chan_id_on_b.clone(),
@@ -1121,7 +1125,7 @@ pub mod ChannelHandlerComponent {
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    paths,
                     msg.packet.seq_on_a.clone().into(),
                     msg.proof_unreceived_on_b,
                     root_on_b,

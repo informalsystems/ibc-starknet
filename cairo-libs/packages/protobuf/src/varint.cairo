@@ -35,6 +35,23 @@ pub fn encode_varint_to_byte_array(value: u64) -> ByteArray {
     result
 }
 
+#[inline]
+pub fn encode_varintu128_to_byte_array(value: u128) -> ByteArray {
+    let mut result: ByteArray = "";
+    let mut value = value;
+    for _ in 0..19_u32 {
+        if value < 0x80 {
+            result.append_byte(value.try_into().unwrap());
+            break;
+        } else {
+            let remaining = (value & 0x7F) | 0x80;
+            result.append_byte(remaining.try_into().unwrap());
+            value /= 0x80;
+        };
+    }
+    result
+}
+
 /// Decodes a LEB128-encoded variable length integer from a slice that might contain a number of
 /// ints, returning the list of values + number of bytes read.
 #[inline]
@@ -89,3 +106,27 @@ pub fn decode_varint_from_byte_array(bytes: @ByteArray, ref index: usize) -> Res
     Result::Ok(value)
 }
 
+#[inline]
+pub fn decode_varintu128_from_byte_array(
+    bytes: @ByteArray, ref index: usize,
+) -> Result<u128, felt252> {
+    let mut value: u128 = 0;
+    let mut shift: u128 = 1;
+    let mut done = false;
+    while index < bytes.len() {
+        let byte = bytes[index];
+        index += 1;
+        // 0x7F == 0x0111_1111
+        value = value | ((byte & 0x7F).into() * shift);
+        if byte & 0x80 == 0 {
+            done = true;
+            break;
+        }
+        // 0x80 == 0x1000_0000
+        shift *= 0x80;
+    }
+    if !done {
+        return Result::Err(ProtobufErrors::INVALID_VARINT);
+    }
+    Result::Ok(value)
+}
