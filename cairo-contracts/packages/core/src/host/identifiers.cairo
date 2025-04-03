@@ -55,10 +55,7 @@ pub impl ConnectionIdImpl of ConnectionIdTrait {
         let mut sequence: u256 = 0;
         let mut multiplier: u256 = 1;
 
-        loop {
-            if i == 11 {
-                break;
-            }
+        while i != 11 {
             let char_byte = self.connection_id.at(i - 1).unwrap();
 
             assert_numeric(char_byte);
@@ -129,10 +126,7 @@ pub impl ChannelIdImpl of ChannelIdTrait {
         let mut sequence: u256 = 0;
         let mut multiplier: u256 = 1;
 
-        loop {
-            if i == 8 {
-                break;
-            }
+        while i != 8 {
             let char_byte = self.channel_id.at(i - 1).unwrap();
 
             assert_numeric(char_byte);

@@ -406,7 +406,7 @@ pub mod ConnectionHandlerComponent {
 
             let mut i = 0;
 
-            while i < entry.len() {
+            while i != entry.len() {
                 conn_ids.append(entry.at(i).read());
                 i += 1;
             }
