@@ -32,6 +32,7 @@ starknet_ibc_core  = { workspace = true }
 starknet_ibc_utils = { workspace = true }
 
 cometbft = { workspace = true }
+protobuf = { workspace = true }
 
 [dev-dependencies]
 snforge_std          = { workspace = true }

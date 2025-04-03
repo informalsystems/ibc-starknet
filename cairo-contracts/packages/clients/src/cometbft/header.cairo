@@ -27,6 +27,7 @@ pub struct SignedHeader {
     pub timestamp: Timestamp,
     pub root: StateRoot,
     pub next_validators_hash: Array<u8>,
+    pub protobuf_bytes: Array<u8>,
 }
 
 pub impl CometHeaderIntoConsensusState of Into<CometHeader, CometConsensusState> {

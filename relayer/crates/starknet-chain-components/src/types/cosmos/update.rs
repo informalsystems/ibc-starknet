@@ -7,6 +7,8 @@ use ibc::clients::tendermint::types::{
     ConsensusState as TendermintConsensusState, Header as TendermintHeader,
 };
 use ibc::core::primitives::Timestamp;
+use ibc_proto::ibc::lightclients::tendermint::v1::Header as RawHeader;
+use ibc_proto::Protobuf;
 
 use crate::impls::utils::array::from_vec_u8_to_be_u32_slice;
 use crate::types::cosmos::height::Height;
@@ -18,6 +20,7 @@ pub struct CometUpdateHeader {
     pub time: Timestamp,
     pub root: [u32; 8],
     pub next_validators_hash: Vec<u8>,
+    pub protobuf_bytes: Vec<u8>,
 }
 
 pub struct EncodeCometUpdateHeader;
@@ -31,6 +34,7 @@ delegate_components! {
                 EncodeField<symbol!("time"), UseContext>,
                 EncodeField<symbol!("root"), UseContext>,
                 EncodeField<symbol!("next_validators_hash"), UseContext>,
+                EncodeField<symbol!("protobuf_bytes"), UseContext>,
             ],
         >,
     }
@@ -54,6 +58,8 @@ impl From<TendermintHeader> for CometUpdateHeader {
 
         let time = header.timestamp().expect("header timestamp is missing");
 
+        let protobuf_bytes = Protobuf::<RawHeader>::encode_vec(header.clone());
+
         let tm_cons_state = TendermintConsensusState::from(header);
 
         let root = tm_cons_state.root.into_vec();
@@ -67,6 +73,7 @@ impl From<TendermintHeader> for CometUpdateHeader {
             time,
             root: root_slice,
             next_validators_hash,
+            protobuf_bytes,
         }
     }
 }

@@ -80,6 +80,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
             timestamp: latest_timestamp,
             root: STATE_ROOT(),
             next_validators_hash: NEXT_VALIDATOR_HASH(),
+            protobuf_bytes: ArrayTrait::new(),
         };
 
         let header = CometHeader { trusted_height, signed_header };
