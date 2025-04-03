@@ -46,11 +46,13 @@ pub struct PacketData {
 
 pub impl PacketDataJsonSerialize of Serialize<PacketData> {
     fn serialize<S, +Drop<S>, +SerializerTrait<S>>(self: PacketData, ref serializer: S) {
-        serializer.serialize_field("denom", format!("{}", self.denom));
         serializer.serialize_field("amount", format!("{}", self.amount));
-        serializer.serialize_field("sender", format!("{}", self.sender));
+        serializer.serialize_field("denom", format!("{}", self.denom));
+        if self.memo.memo != "" {
+            serializer.serialize_field("memo", format!("{}", self.memo));
+        }
         serializer.serialize_field("receiver", format!("{}", self.receiver));
-        serializer.serialize_field("memo", format!("{}", self.memo));
+        serializer.serialize_field("sender", format!("{}", self.sender));
         serializer.end();
     }
 }

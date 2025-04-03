@@ -75,12 +75,12 @@ pub impl ClientContractImpl of ClientContractTrait {
     fn verify_non_membership(
         self: @ClientContract,
         client_sequence: u64,
-        path: ByteArray,
+        paths: Array<ByteArray>,
         proof: StateProof,
         root: StateRoot,
     ) {
         IClientStateValidationDispatcher { contract_address: *self.address }
-            .verify_non_membership(client_sequence, path, proof, root)
+            .verify_non_membership(client_sequence, paths, proof, root)
     }
 }
 

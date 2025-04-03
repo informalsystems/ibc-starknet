@@ -12,8 +12,8 @@ use starknet_ibc_core::client::{Duration, DurationTrait};
 use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::connection::ConnectionErrors;
 use starknet_ibc_core::host::{
-    BasePrefix, BasePrefixTrait, BasePrefixZero, ClientId, ClientIdImpl, ClientIdTrait,
-    ClientIdZero, ConnectionId, ConnectionIdZero,
+    BasePrefix, BasePrefixZero, ClientId, ClientIdImpl, ClientIdTrait, ClientIdZero, ConnectionId,
+    ConnectionIdZero,
 };
 use starknet_ibc_utils::ValidateBasic;
 

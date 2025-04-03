@@ -61,7 +61,7 @@ pub fn CONNECTION_END(counterparty_connection_sequence: u64) -> ConnectionEnd {
         counterparty: ConnCounterparty {
             client_id: CLIENT_ID(),
             connection_id: CONNECTION_ID(counterparty_connection_sequence),
-            prefix: BasePrefix { prefix: "" },
+            prefix: BasePrefix { prefix: "ibc" },
         },
         version: VersionImpl::supported(),
         delay_period: DURATION(0),
@@ -118,5 +118,5 @@ pub fn STATE_ROOT() -> StateRoot {
 }
 
 pub fn IBC_PREFIX() -> BasePrefix {
-    BasePrefix { prefix: "Ibc" }
+    BasePrefix { prefix: "ibc" }
 }

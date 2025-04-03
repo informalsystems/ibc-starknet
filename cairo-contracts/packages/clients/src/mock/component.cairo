@@ -278,7 +278,7 @@ pub mod MockClientComponent {
         fn verify_non_membership(
             self: @ComponentState<TContractState>,
             client_sequence: u64,
-            path: ByteArray,
+            paths: Array<ByteArray>,
             proof: StateProof,
             root: StateRoot,
         ) {}
