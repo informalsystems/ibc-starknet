@@ -1,4 +1,5 @@
 use core::marker::PhantomData;
+use std::str::FromStr;
 
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
@@ -16,12 +17,13 @@ use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use ibc::apps::transfer::types::packet::PacketData;
-use ibc::apps::transfer::types::PrefixedCoin;
+use ibc::apps::transfer::types::{Amount, BaseDenom, Memo, PrefixedDenom, TracePath};
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
 use ibc::core::client::types::Height;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};
+use ibc::primitives::Signer;
+use serde::{Deserialize, Serialize};
 use starknet::core::types::Felt;
 
 use crate::impls::events::UseStarknetEvents;
@@ -34,6 +36,18 @@ where
     Chain: HasOutgoingPacketType<Counterparty, OutgoingPacket = Packet> + HasEventType,
 {
     type SendPacketEvent = SendPacketEvent;
+}
+
+// FIXME: Fix conversion from Cairo to Cosmos packet
+#[derive(Serialize, Deserialize)]
+pub struct DummyTransferData {
+    pub amount: String,
+    pub denom: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    #[serde(default)]
+    pub memo: String,
+    pub receiver: String,
+    pub sender: String,
 }
 
 #[cgp_provider(PacketFromSendPacketEventBuilderComponent)]
@@ -72,12 +86,7 @@ where
             A proper fix to this is to fix the Cairo contract encode the data using JSON or
             Protobuf into Vec<u8>.
 
-            As a workaround, the relayer assume that the packet data is always from Cairo ICS20,
-            and perform the re-encoding before submitting to Cosmos.
-            Note that this will NOT work once we implement membership proof verification,
-            because there is no way the Cosmos client can verify that the re-encoding by the
-            relayer is correct. This approach also does not support relaying multiple IBC
-            applications with different packet data format.
+            As a workaround, is using Dummy Transfer Data which has the correct order.
         */
 
         let starknet_transfer_packet_data = chain
@@ -85,26 +94,40 @@ where
             .decode(&event.packet_data)
             .map_err(Chain::raise_error)?;
 
-        let cosmos_ibc_transfer_packet_data = PacketData {
-            token: PrefixedCoin {
-                denom: starknet_transfer_packet_data
-                    .denom
-                    .to_string()
-                    .parse()
-                    .map_err(Chain::raise_error)?,
-                amount: starknet_transfer_packet_data
-                    .amount
-                    .to_string()
-                    .parse()
-                    .map_err(Chain::raise_error)?,
-            },
-            sender: starknet_transfer_packet_data.sender.to_string().into(),
-            receiver: starknet_transfer_packet_data.receiver.to_string().into(),
-            memo: starknet_transfer_packet_data.memo.into(),
+        let memo = Memo::from(starknet_transfer_packet_data.memo.to_string());
+
+        let sender = Signer::from(starknet_transfer_packet_data.sender.to_string());
+
+        let receiver = Signer::from(starknet_transfer_packet_data.receiver.to_string());
+
+        let raw_denom = starknet_transfer_packet_data.denom.to_string();
+
+        let mut parts: Vec<&str> = raw_denom.split('/').collect();
+        if !parts.is_empty() {
+            parts.pop();
+        }
+        let trace_path_str = parts.join("/");
+
+        let trace_path = TracePath::from_str(&trace_path_str).map_err(Chain::raise_error)?;
+
+        let denom = PrefixedDenom {
+            trace_path,
+            base_denom: BaseDenom::from_str(&starknet_transfer_packet_data.denom.base.to_string())
+                .map_err(Chain::raise_error)?,
         };
 
-        let cosmos_packet_data =
-            serde_json::to_vec(&cosmos_ibc_transfer_packet_data).map_err(Chain::raise_error)?;
+        let amount = Amount::from_str(&starknet_transfer_packet_data.amount.to_string())
+            .map_err(Chain::raise_error)?;
+
+        let raw_data = DummyTransferData {
+            denom: denom.to_string(),
+            amount: amount.to_string(),
+            sender: sender.to_string(),
+            receiver: receiver.to_string(),
+            memo: memo.to_string(),
+        };
+
+        let cosmos_packet_data = serde_json::to_vec(&raw_data).map_err(Chain::raise_error)?;
 
         let packet = Packet {
             seq_on_a: event.sequence_on_a,
