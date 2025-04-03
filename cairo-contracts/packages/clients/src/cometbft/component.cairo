@@ -1,10 +1,15 @@
 #[starknet::component]
 pub mod CometClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
+    use alexandria_data_structures::byte_array_ext::SpanU8IntoBytearray;
     use alexandria_sorting::MergeSort;
+    use cometbft::light_client::Header as LcHeader;
+    use cometbft::types::{Options, TrustedBlockState, UntrustedBlockState};
+    use cometbft::verifier::verify_update_header;
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
+    use protobuf::types::message::ProtoCodecImpl;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,
@@ -19,7 +24,7 @@ pub mod CometClientComponent {
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
         IClientHandler, IClientQuery, IClientStateExecution, IClientStateValidation,
         MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient, Status, StatusTrait,
-        StoreHeightArray, Timestamp, UpdateResponse,
+        StoreHeightArray, Timestamp, TimestampImpl, TimestampToProto, UpdateResponse,
     };
     use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
     use starknet_ibc_core::host::ClientIdImpl;
@@ -291,7 +296,41 @@ pub mod CometClientComponent {
             self: @ComponentState<TContractState>,
             client_sequence: u64,
             client_message: Array<felt252>,
-        ) {}
+        ) {
+            let local_header: CometHeader = CometHeaderImpl::deserialize(client_message);
+            let trusted_height = local_header.trusted_height;
+
+            let untrusted_header = ProtoCodecImpl::decode::<
+                LcHeader,
+            >(@local_header.signed_header.protobuf_bytes.span().into())
+                .unwrap();
+
+            let client_state = self.read_client_state(client_sequence);
+
+            let trusted_consensus_state = self
+                .read_consensus_state(client_sequence, trusted_height.clone());
+
+            let trusted_block_state = TrustedBlockState {
+                chain_id: client_state.chain_id,
+                header_time: trusted_consensus_state.timestamp.try_into().unwrap(),
+                height: trusted_height.revision_height,
+                next_validators: untrusted_header.trusted_validator_set,
+                next_validators_hash: trusted_consensus_state.next_validators_hash,
+            };
+
+            let untrusted_block_state = UntrustedBlockState {
+                signed_header: untrusted_header.signed_header,
+                validators: untrusted_header.validator_set,
+            };
+
+            let trust_threshold = client_state.trust_level;
+            let trusting_period = client_state.trusting_period.try_into().unwrap();
+            let clock_drift = client_state.max_clock_drift.try_into().unwrap();
+            let now = TimestampImpl::host().try_into().unwrap();
+
+            let options = Options { trust_threshold, trusting_period, clock_drift };
+            verify_update_header(untrusted_block_state, trusted_block_state, options, now)
+        }
 
         fn verify_misbehaviour(
             self: @ComponentState<TContractState>,
