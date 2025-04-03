@@ -7,7 +7,6 @@ mod preset {
     use crate::impls::encode_mut::bool::EncodeBool;
     use crate::impls::encode_mut::felt::EncodeFelt;
     use crate::impls::encode_mut::from_u128::EncodeFromU128;
-    use crate::impls::encode_mut::i32::EncodeI32;
     use crate::impls::encode_mut::string::EncodeUtf8String;
     use crate::impls::encode_mut::u128::EncodeU128;
     use crate::impls::encode_mut::u256::EncodeU256;
@@ -21,14 +20,12 @@ mod preset {
             (ViaCairo, u128): EncodeU128,
             (ViaCairo, U256): EncodeU256,
             (ViaCairo, Vec<u8>): EncodeList,
-            (ViaCairo, Vec<i32>): EncodeList,
             (ViaCairo, Vec<u32>): EncodeList,
             (ViaCairo, Vec<Felt>): EncodeList,
             (ViaCairo, bool): EncodeBool,
             (ViaCairo, u8): EncodeFromU128,
             (ViaCairo, u64): EncodeFromU128,
             (ViaCairo, u32): EncodeFromU128,
-            (ViaCairo, i32): EncodeI32,
             (ViaCairo, usize): EncodeFromU128,
             (ViaCairo, String): EncodeUtf8String,
             (ViaCairo, ()): EncodeNothing,
