@@ -183,8 +183,6 @@ pub mod TokenTransferComponent {
             version_proposal: AppVersion,
             ordering: ChannelOrdering,
         ) -> AppVersion {
-            self.assert_owner();
-
             assert(port_id_on_a == TRANSFER_PORT_ID(), TransferErrors::INVALID_PORT_ID);
 
             if version_proposal.is_non_zero() {
@@ -205,8 +203,6 @@ pub mod TokenTransferComponent {
             version_on_a: AppVersion,
             ordering: ChannelOrdering,
         ) -> AppVersion {
-            self.assert_owner();
-
             assert(version_on_a == VERSION(), TransferErrors::INVALID_APP_VERSION);
 
             VERSION()
@@ -218,22 +214,16 @@ pub mod TokenTransferComponent {
             chan_id_on_a: ChannelId,
             version_on_b: AppVersion,
         ) {
-            self.assert_owner();
-
             assert(version_on_b == VERSION(), TransferErrors::INVALID_APP_VERSION);
         }
 
         fn on_chan_open_confirm(
             ref self: ComponentState<TContractState>, port_id_on_b: PortId, chan_id_on_b: ChannelId,
-        ) {
-            self.assert_owner();
-        }
+        ) {}
 
         fn on_recv_packet(
             ref self: ComponentState<TContractState>, packet: Packet,
         ) -> Acknowledgement {
-            self.assert_owner();
-
             let (mut packet_data, receiver) = self.recv_deserialize(packet.clone());
 
             self.recv_validate(packet.clone(), packet_data.clone(), receiver);
@@ -246,8 +236,6 @@ pub mod TokenTransferComponent {
         fn on_ack_packet(
             ref self: ComponentState<TContractState>, packet: Packet, ack: Acknowledgement,
         ) {
-            self.assert_owner();
-
             let (packet_data, ack_status) = self.ack_deserialize(packet.clone(), ack);
 
             self.ack_validate(@packet, @packet_data, @ack_status);
@@ -256,8 +244,6 @@ pub mod TokenTransferComponent {
         }
 
         fn on_timeout_packet(ref self: ComponentState<TContractState>, packet: Packet) {
-            self.assert_owner();
-
             let packet_data = packet.data.clone().into();
 
             self.timeout_validate(@packet, @packet_data);
@@ -788,10 +774,6 @@ pub mod TokenTransferComponent {
     > of TransferOwnerTrait<TContractState> {
         fn owner(self: @ComponentState<TContractState>) -> ContractAddress {
             get_dep_component!(self, Ownable).owner()
-        }
-
-        fn assert_owner(self: @ComponentState<TContractState>) {
-            assert(self.owner() == get_caller_address(), TransferErrors::INVALID_OWNER);
         }
     }
 
