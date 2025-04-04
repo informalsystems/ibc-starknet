@@ -58,11 +58,14 @@ use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEn
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use ibc::core::host::types::identifiers::ChainId;
+use reqwest::Client;
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
+use url::Url;
 
 use crate::impls::{BuildStarknetAccount, HandleMadaraChainError};
 use crate::presets::MadaraChainPreset;
+use crate::traits::{JsonRpcUrlGetterComponent, RpcClientGetterComponent};
 use crate::types::StarknetAccount;
 
 #[cgp_context(MadaraChainComponents: MadaraChainPreset)]
@@ -76,6 +79,8 @@ pub struct MadaraChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
     pub starknet_client: Arc<JsonRpcClient<HttpTransport>>,
+    pub rpc_client: Client,
+    pub json_rpc_url: Url,
     pub ibc_client_contract_address: OnceLock<StarknetAddress>,
     pub ibc_core_contract_address: OnceLock<StarknetAddress>,
     pub ibc_ics20_contract_address: OnceLock<StarknetAddress>,
@@ -121,6 +126,11 @@ delegate_components! {
             UseField<symbol!("runtime")>,
         PollIntervalGetterComponent:
             UseField<symbol!("poll_interval")>,
+        [
+            RpcClientGetterComponent,
+            JsonRpcUrlGetterComponent,
+        ]:
+            UseFields,
         [
             LoggerTypeProviderComponent,
             LoggerGetterComponent,
