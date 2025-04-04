@@ -1,10 +1,6 @@
 use cgp::prelude::*;
 
-#[cgp_component {
-  name: BlobTypeComponent,
-  provider: ProvideBlobType,
-  context: Chain,
-}]
+#[cgp_type]
 pub trait HasBlobType: Async {
     type Blob: Async;
 }

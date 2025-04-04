@@ -1,6 +1,5 @@
 pub mod address;
 pub mod amount;
-pub mod blob;
 pub mod block;
 pub mod client;
 pub mod commitment_proof;
