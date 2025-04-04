@@ -179,13 +179,12 @@ mod preset {
     use hermes_test_components::chain::traits::queries::balance::BalanceQuerierComponent;
     use hermes_test_components::chain::traits::transfer::amount::IbcTransferredAmountConverterComponent;
     use hermes_test_components::chain::traits::transfer::ibc_transfer::TokenIbcTransferrerComponent;
-    use hermes_test_components::chain::traits::transfer::string_memo::ProvideStringMemoType;
     use hermes_test_components::chain::traits::transfer::timeout::IbcTransferTimeoutCalculatorComponent;
-    use hermes_test_components::chain::traits::types::address::AddressTypeComponent;
+    use hermes_test_components::chain::traits::types::address::AddressTypeProviderComponent;
     use hermes_test_components::chain::traits::types::amount::AmountMethodsComponent;
     use hermes_test_components::chain::traits::types::denom::DenomTypeComponent;
     use hermes_test_components::chain::traits::types::memo::{
-        DefaultMemoGetterComponent, MemoTypeComponent,
+        DefaultMemoGetterComponent, MemoTypeProviderComponent,
     };
     use hermes_test_components::chain::traits::types::wallet::{
         WalletSignerComponent, WalletTypeComponent,
@@ -234,9 +233,8 @@ mod preset {
     use crate::impls::send_message::SendStarknetMessages;
     use crate::impls::transfer::{IbcTransferTimeoutAfterSeconds, TransferErc20Token};
     use crate::impls::tx_response::QueryTransactionReceipt;
-    use crate::impls::types::address::ProvideFeltAddressType;
+    use crate::impls::types::address::StarknetAddress;
     use crate::impls::types::amount::UseU256Amount;
-    use crate::impls::types::blob::ProvideFeltBlobType;
     use crate::impls::types::block::ProvideStarknetBlockType;
     use crate::impls::types::client::ProvideStarknetIbcClientTypes;
     use crate::impls::types::commitment_proof::UseStarknetCommitmentProof;
@@ -258,7 +256,7 @@ mod preset {
     use crate::traits::queries::token_address::CosmosTokenAddressOnStarknetQuerierComponent;
     use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
     use crate::traits::transfer::TokenTransferComponent;
-    use crate::traits::types::blob::BlobTypeComponent;
+    use crate::traits::types::blob::BlobTypeProviderComponent;
     use crate::traits::types::contract_class::{
         ContractClassHashTypeProviderComponent, ContractClassTypeProviderComponent,
     };
@@ -284,10 +282,10 @@ mod preset {
                 ProvideStarknetChainStatusType,
             BlockTypeComponent:
                 ProvideStarknetBlockType,
-            AddressTypeComponent:
-                ProvideFeltAddressType,
-            BlobTypeComponent:
-                ProvideFeltBlobType,
+            AddressTypeProviderComponent:
+                UseType<StarknetAddress>,
+            BlobTypeProviderComponent:
+                UseType<Vec<Felt>>,
             MessageTypeProviderComponent:
                 UseType<StarknetMessage>,
             EventTypeProviderComponent:
@@ -305,8 +303,8 @@ mod preset {
                 UseU256Amount,
             DenomTypeComponent:
                 ProvideTokenAddressDenom,
-            MemoTypeComponent:
-                ProvideStringMemoType,
+            MemoTypeProviderComponent:
+                UseType<Option<String>>,
             DefaultMemoGetterComponent:
                 ProvideDefaultMemo,
             [

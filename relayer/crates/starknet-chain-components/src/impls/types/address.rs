@@ -1,16 +1,7 @@
 use cgp::prelude::*;
 use derive_more::{Constructor, Deref, Display, From, FromStr};
-use hermes_chain_type_components::traits::types::address::AddressTypeComponent;
-use hermes_test_components::chain::traits::types::address::ProvideAddressType;
 use serde::{Deserialize, Serialize};
 use starknet::core::types::Felt;
-
-pub struct ProvideFeltAddressType;
-
-#[cgp_provider(AddressTypeComponent)]
-impl<Chain: Async> ProvideAddressType<Chain> for ProvideFeltAddressType {
-    type Address = StarknetAddress;
-}
 
 #[derive(
     Clone,
