@@ -28,7 +28,8 @@ where
         + HasJsonRpcUrl
         + HasRuntime<Runtime: CanSleep>
         + CanRaiseAsyncError<ProviderError>
-        + CanRaiseAsyncError<serde_json::Error>,
+        + CanRaiseAsyncError<serde_json::Error>
+        + CanRaiseAsyncError<reqwest::Error>,
 {
     async fn query_tx_response(
         chain: &Chain,
@@ -60,18 +61,14 @@ where
                     .body(request_body)
                     .header("Content-Type", "application/json");
 
-                let response = request.send().await.unwrap();
+                let response = request.send().await.map_err(Chain::raise_error)?;
 
-                let response_body = response.text().await.unwrap();
-
-                // info!("response body: {response_body}");
+                let response_body = response.text().await.map_err(Chain::raise_error)?;
 
                 let rpc_response: JsonRpcResponse<TraceTransactionResponse> =
                     serde_json::from_str(&response_body).map_err(Chain::raise_error)?;
 
                 let trace = rpc_response.result.trace_root;
-
-                // info!("transaction trace: {trace:?}");
 
                 // Wait for a second for the starknet-devnet chain to progress.
                 // We may not need this when we transition to a production chain.

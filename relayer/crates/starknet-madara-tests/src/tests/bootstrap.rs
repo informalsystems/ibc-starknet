@@ -1,10 +1,15 @@
+use cgp::prelude::*;
 use hermes_chain_components::traits::queries::block::CanQueryBlock;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
+use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
+use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
+use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
+use starknet_v14::core::types::U256;
 use tracing::info;
 
 use crate::contexts::MadaraChainDriver;
@@ -42,6 +47,25 @@ fn test_madara_bootstrap() -> Result<(), Error> {
             info!("declared class: {:?}", class_hash);
 
             class_hash
+        };
+
+        let initial_supply = 1000u32;
+
+        {
+            let relayer_address = chain_driver.relayer_wallet.account_address;
+
+            let calldata = StarknetCairoEncoding.encode(&product![
+                "token".to_owned(),
+                "token".to_owned(),
+                U256::from(initial_supply),
+                relayer_address,
+            ])?;
+
+            let token_address = chain
+                .deploy_contract(&erc20_class_hash, false, &calldata)
+                .await?;
+
+            info!("deployed ERC20 contract to address: {:?}", token_address);
         };
 
         Ok(())

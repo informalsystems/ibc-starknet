@@ -22,9 +22,10 @@ use hermes_starknet_chain_components::traits::account::{
 };
 use hermes_starknet_chain_components::types::event::{StarknetEvent, StarknetEventFields};
 use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
-use starknet_v13::accounts::{Account, Call};
+use starknet_v13::accounts::Account;
 use starknet_v13::core::types::{
-    ExecuteInvocation, Felt, FunctionInvocation, OrderedEvent, RevertedInvocation, TransactionTrace,
+    Call, ExecuteInvocation, Felt, FunctionInvocation, OrderedEvent, RevertedInvocation,
+    TransactionTrace,
 };
 
 use crate::traits::CanUseStarknetAccount;
