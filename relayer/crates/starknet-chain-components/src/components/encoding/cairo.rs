@@ -31,7 +31,7 @@ mod preset {
     use ibc::core::host::types::identifiers::ChainId;
     use starknet::core::types::{Felt, U256};
 
-    use crate::impls::types::address::{EncodeStarknetAddress, StarknetAddress};
+    use crate::impls::types::address::StarknetAddress;
     use crate::types::channel_id::{
         ChannelCounterparty, ChannelEnd, ChannelId, ChannelState, EncodeChannelCounterparty,
         EncodeChannelEnd, EncodeChannelId, EncodeChannelState,
@@ -42,22 +42,14 @@ mod preset {
         EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionId,
         EncodeConnectionState, EncodeDuration,
     };
-    use crate::types::cosmos::client_state::{
-        ClientStatus, CometClientState, EncodeChainId, EncodeClientStatus, EncodeCometClientState,
-    };
-    use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsensusState};
+    use crate::types::cosmos::client_state::{ClientStatus, CometClientState, EncodeChainId};
+    use crate::types::cosmos::consensus_state::CometConsensusState;
     use crate::types::cosmos::height::{EncodeHeight, Height};
     use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
-    use crate::types::cosmos::update::{CometUpdateHeader, EncodeCometUpdateHeader};
-    use crate::types::message_responses::create_client::{
-        CreateClientResponse, DecodeCreateClientResponse,
-    };
-    use crate::types::messages::erc20::deploy::{
-        DeployErc20TokenMessage, EncodeDeployErc20TokenMessage,
-    };
-    use crate::types::messages::erc20::transfer::{
-        EncodeTransferErc20TokenMessage, TransferErc20TokenMessage,
-    };
+    use crate::types::cosmos::update::CometUpdateHeader;
+    use crate::types::message_responses::create_client::CreateClientResponse;
+    use crate::types::messages::erc20::deploy::DeployErc20TokenMessage;
+    use crate::types::messages::erc20::transfer::TransferErc20TokenMessage;
     use crate::types::messages::ibc::channel::{
         AppVersion, ChannelOrdering, EncodeAppVersion, EncodeChannelOrdering, EncodePortId,
         MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry, PortId,
@@ -67,19 +59,12 @@ mod preset {
         MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
     };
     use crate::types::messages::ibc::denom::{Denom, PrefixedDenom, TracePrefix};
-    use crate::types::messages::ibc::ibc_transfer::{
-        EncodeMsgTransfer, EncodeParticipant, EncodeTransferPacketData, MsgTransfer, Participant,
-        TransferPacketData,
-    };
+    use crate::types::messages::ibc::ibc_transfer::{MsgTransfer, Participant, TransferPacketData};
     use crate::types::messages::ibc::packet::{
-        AckStatus, Acknowledgement, EncodeAckStatus, EncodeAcknowledgement, EncodeMsgAckPacket,
-        EncodeMsgRecvPacket, EncodeMsgTimeoutPacket, EncodePacket, EncodeSequence,
-        EncodeStateProof, MsgAckPacket, MsgRecvPacket, MsgTimeoutPacket, Packet, Sequence,
-        StateProof,
+        AckStatus, Acknowledgement, EncodePacket, EncodeSequence, MsgAckPacket, MsgRecvPacket,
+        MsgTimeoutPacket, Packet, Sequence, StateProof,
     };
-    use crate::types::register::{
-        EncodeRegisterApp, EncodeRegisterClient, MsgRegisterApp, MsgRegisterClient,
-    };
+    use crate::types::register::{MsgRegisterApp, MsgRegisterClient};
 
     cgp_preset! {
         StarknetCairoEncodingComponents {
@@ -120,27 +105,12 @@ mod preset {
             <A, B> (ViaCairo, (A, B)): EncoderPair<UseContext, UseContext>,
             <A, B> (ViaCairo, Cons<A, B>): EncoderCons<UseContext, UseContext>,
             <Tag, Value> (ViaCairo, Field<Tag, Value>): EncodeTaggedField,
-            (ViaCairo, TransferErc20TokenMessage): EncodeTransferErc20TokenMessage,
-            (ViaCairo, DeployErc20TokenMessage): EncodeDeployErc20TokenMessage,
             (ViaCairo, Vec<TracePrefix>): EncodeList,
-            (ViaCairo, Participant): EncodeParticipant,
-            (ViaCairo, TransferPacketData): EncodeTransferPacketData,
-            (ViaCairo, MsgTransfer): EncodeMsgTransfer,
             (ViaCairo, Height): EncodeHeight,
             (ViaCairo, Timestamp): EncodeTimestamp,
-            (ViaCairo, StarknetAddress): EncodeStarknetAddress,
             (ViaCairo, Packet): EncodePacket,
-            (ViaCairo, StateProof): EncodeStateProof,
-            (ViaCairo, MsgRecvPacket): EncodeMsgRecvPacket,
-            (ViaCairo, Acknowledgement): EncodeAcknowledgement,
-            (ViaCairo, MsgAckPacket): EncodeMsgAckPacket,
-            (ViaCairo, AckStatus): EncodeAckStatus,
             (ViaCairo, Sequence): EncodeSequence,
             (ViaCairo, Vec<Sequence>): EncodeList,
-            (ViaCairo, MsgTimeoutPacket): EncodeMsgTimeoutPacket,
-            (ViaCairo, ClientStatus): EncodeClientStatus,
-            (ViaCairo, CometClientState): EncodeCometClientState,
-            (ViaCairo, CometConsensusState): EncodeCometConsensusState,
             (ViaCairo, ClientId): EncodeClientId,
             (ViaCairo, ChainId): EncodeChainId,
             (ViaCairo, ConnectionId): EncodeConnectionId,
@@ -152,18 +122,18 @@ mod preset {
             (ViaCairo, ChannelState): EncodeChannelState,
             (ViaCairo, ChannelCounterparty): EncodeChannelCounterparty,
             (ViaCairo, ChannelEnd): EncodeChannelEnd,
-            (ViaCairo, CometUpdateHeader): EncodeCometUpdateHeader,
-            (ViaCairo, CreateClientResponse): DecodeCreateClientResponse,
-            (ViaCairo, MsgRegisterClient): EncodeRegisterClient,
-            (ViaCairo, MsgRegisterApp): EncodeRegisterApp,
             (ViaCairo, BasePrefix): EncodeBasePrefix,
             (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
             (ViaCairo, PortId): EncodePortId,
             (ViaCairo, AppVersion): EncodeAppVersion,
             (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
             [
+                (ViaCairo, MsgRegisterClient),
+                (ViaCairo, MsgRegisterApp),
                 (ViaCairo, TracePrefix),
                 (ViaCairo, PrefixedDenom),
+                (ViaCairo, CometClientState),
+                (ViaCairo, CometConsensusState),
                 (ViaCairo, MsgConnOpenInit),
                 (ViaCairo, MsgConnOpenTry),
                 (ViaCairo, MsgConnOpenAck),
@@ -172,9 +142,24 @@ mod preset {
                 (ViaCairo, MsgChanOpenTry),
                 (ViaCairo, MsgChanOpenAck),
                 (ViaCairo, MsgChanOpenConfirm),
+                (ViaCairo, MsgRecvPacket),
+                (ViaCairo, MsgTimeoutPacket),
+                (ViaCairo, MsgAckPacket),
+                (ViaCairo, Acknowledgement),
+                (ViaCairo, MsgTransfer),
+                (ViaCairo, TransferPacketData),
+                (ViaCairo, CometUpdateHeader),
+                (ViaCairo, DeployErc20TokenMessage),
+                (ViaCairo, TransferErc20TokenMessage),
+                (ViaCairo, CreateClientResponse),
+                (ViaCairo, StateProof),
+                (ViaCairo, StarknetAddress),
             ]: EncodeFields,
             [
                 (ViaCairo, Denom),
+                (ViaCairo, AckStatus),
+                (ViaCairo, Participant),
+                (ViaCairo, ClientStatus),
             ]:
                 EncodeEnumFields,
         }

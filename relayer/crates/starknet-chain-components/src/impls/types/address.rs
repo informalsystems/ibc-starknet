@@ -4,13 +4,8 @@ use hermes_chain_type_components::traits::types::address::AddressTypeComponent;
 use hermes_test_components::chain::traits::types::address::ProvideAddressType;
 use serde::{Deserialize, Serialize};
 use starknet::core::types::Felt;
+
 pub struct ProvideFeltAddressType;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
-};
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
 
 #[cgp_provider(AddressTypeComponent)]
 impl<Chain: Async> ProvideAddressType<Chain> for ProvideFeltAddressType {
@@ -34,40 +29,10 @@ impl<Chain: Async> ProvideAddressType<Chain> for ProvideFeltAddressType {
     FromStr,
     Serialize,
     Deserialize,
+    HasFields,
 )]
 #[display("0x{_0:x}")]
 pub struct StarknetAddress(pub Felt);
-
-pub struct EncodeStarknetAddress;
-
-#[cgp_provider(MutEncoderComponent)]
-impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, StarknetAddress> for EncodeStarknetAddress
-where
-    Encoding: CanEncodeMut<Strategy, Felt>,
-{
-    fn encode_mut(
-        encoding: &Encoding,
-        value: &StarknetAddress,
-        buffer: &mut Encoding::EncodeBuffer,
-    ) -> Result<(), Encoding::Error> {
-        encoding.encode_mut(value, buffer)?;
-        Ok(())
-    }
-}
-
-#[cgp_provider(MutDecoderComponent)]
-impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, StarknetAddress> for EncodeStarknetAddress
-where
-    Encoding: CanDecodeMut<Strategy, Felt>,
-{
-    fn decode_mut<'a>(
-        encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer<'a>,
-    ) -> Result<StarknetAddress, Encoding::Error> {
-        let value = encoding.decode_mut(buffer)?;
-        Ok(value.into())
-    }
-}
 
 #[cfg(test)]
 mod tests {
