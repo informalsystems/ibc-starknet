@@ -34,8 +34,8 @@ mod preset {
 
     use crate::impls::types::address::StarknetAddress;
     use crate::types::channel_id::{
-        ChannelCounterparty, ChannelEnd, ChannelId, ChannelState, EncodeChannelCounterparty,
-        EncodeChannelEnd, EncodeChannelState,
+        ChannelEnd, ChannelId, EncodeChannelEnd, RawChannelCounterparty, RawChannelEnd,
+        RawChannelState,
     };
     use crate::types::client_id::{ClientId, EncodeClientId};
     use crate::types::connection_id::{
@@ -114,12 +114,10 @@ mod preset {
             (ViaCairo, ConnectionCounterparty): EncodeConnectionCounterparty,
             (ViaCairo, ConnectionState): EncodeConnectionState,
             (ViaCairo, ConnectionEnd): EncodeConnectionEnd,
-            (ViaCairo, ChannelState): EncodeChannelState,
-            (ViaCairo, ChannelCounterparty): EncodeChannelCounterparty,
-            (ViaCairo, ChannelEnd): EncodeChannelEnd,
             (ViaCairo, BasePrefix): EncodeBasePrefix,
             (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
             (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
+            (ViaCairo, ChannelEnd): EncodeChannelEnd,
             [
                 (ViaCairo, Vec<Sequence>),
                 (ViaCairo, Vec<TracePrefix>),
@@ -158,12 +156,15 @@ mod preset {
                 (ViaCairo, CreateClientResponse),
                 (ViaCairo, StateProof),
                 (ViaCairo, StarknetAddress),
+                (ViaCairo, RawChannelCounterparty),
+                (ViaCairo, RawChannelEnd),
             ]: EncodeFields,
             [
                 (ViaCairo, Denom),
                 (ViaCairo, AckStatus),
                 (ViaCairo, Participant),
                 (ViaCairo, ClientStatus),
+                (ViaCairo, RawChannelState),
             ]:
                 EncodeEnumFields,
         }

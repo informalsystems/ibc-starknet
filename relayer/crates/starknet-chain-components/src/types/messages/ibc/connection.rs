@@ -84,7 +84,7 @@ pub struct EncodeBasePrefix;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, BasePrefix> for EncodeBasePrefix
 where
-    Encoding: CanEncodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanEncodeMut<Strategy, String> + CanRaiseAsyncError<&'static str>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -92,8 +92,8 @@ where
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
         encoding.encode_mut(
-            &product![String::from_utf8(value.clone().into_vec())
-                .map_err(|_| Encoding::raise_error("invalid utf8 string for commitment prefix"))?],
+            &String::from_utf8(value.clone().into_vec())
+                .map_err(|_| Encoding::raise_error("invalid utf8 string for commitment prefix"))?,
             buffer,
         )?;
 
@@ -104,13 +104,13 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, BasePrefix> for EncodeBasePrefix
 where
-    Encoding: CanDecodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, String> + CanRaiseAsyncError<&'static str>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<BasePrefix, Encoding::Error> {
-        let product![value_str] = encoding.decode_mut(buffer)?;
+        let value_str = encoding.decode_mut(buffer)?;
         Ok(BasePrefix::from_bytes(value_str.as_bytes()))
     }
 }

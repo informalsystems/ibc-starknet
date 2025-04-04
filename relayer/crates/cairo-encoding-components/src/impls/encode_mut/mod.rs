@@ -6,6 +6,7 @@ pub mod display;
 pub mod end;
 pub mod enum_fields;
 pub mod felt;
+pub mod from;
 pub mod from_felt;
 pub mod from_u128;
 pub mod iter;

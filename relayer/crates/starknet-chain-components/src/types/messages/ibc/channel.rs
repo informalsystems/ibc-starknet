@@ -12,6 +12,13 @@ use crate::types::channel_id::ChannelId;
 use crate::types::connection_id::ConnectionId;
 use crate::types::cosmos::height::Height;
 
+#[derive(HasFields)]
+pub enum SerializeOrdering {
+    None,
+    Unordered,
+    Ordered,
+}
+
 pub struct EncodeChannelOrdering;
 
 delegate_components! {
