@@ -44,14 +44,14 @@ impl<'a> From<&'a ChannelState> for RawChannelState {
     }
 }
 
-impl Into<ChannelState> for RawChannelState {
-    fn into(self) -> ChannelState {
-        match self {
-            Self::Uninitialized => ChannelState::Uninitialized,
-            Self::Init => ChannelState::Init,
-            Self::TryOpen => ChannelState::TryOpen,
-            Self::Open => ChannelState::Open,
-            Self::Closed => ChannelState::Closed,
+impl From<RawChannelState> for ChannelState {
+    fn from(val: RawChannelState) -> Self {
+        match val {
+            RawChannelState::Uninitialized => Self::Uninitialized,
+            RawChannelState::Init => Self::Init,
+            RawChannelState::TryOpen => Self::TryOpen,
+            RawChannelState::Open => Self::Open,
+            RawChannelState::Closed => Self::Closed,
         }
     }
 }
@@ -71,11 +71,11 @@ impl<'a> From<&'a ChannelCounterparty> for RawChannelCounterparty {
     }
 }
 
-impl Into<ChannelCounterparty> for RawChannelCounterparty {
-    fn into(self) -> ChannelCounterparty {
-        ChannelCounterparty {
-            port_id: self.port_id,
-            channel_id: self.channel_id,
+impl From<RawChannelCounterparty> for ChannelCounterparty {
+    fn from(val: RawChannelCounterparty) -> Self {
+        Self {
+            port_id: val.port_id,
+            channel_id: val.channel_id,
         }
     }
 }
