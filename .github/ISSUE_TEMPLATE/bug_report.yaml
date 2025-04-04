@@ -1,0 +1,55 @@
+name: Bug Report
+description: Create a report to help us improve.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the following information.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of the Bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: Reproduction Steps
+      description: If you don't have exact steps, explain why this is a bug. Add reference to relevant codes from the project.
+
+  - type: textarea
+    id: logs-errors
+    attributes:
+      label: Logs
+      description: Share any error messages.
+      placeholder: |
+        - For Rust, use `RUST_LOG=trace` and `RUST_BACKTRACE=1`.
+        - Rust Cairo, use `panic!("debug message: {}", suspected_data)`.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Specify development environment details.
+      placeholder: |
+        - Cairo Version (`scarb --version`):
+        - Cosmos-SDK/Osmosis Version:
+        - Starknet Version:
+        - OS and Architecture:
+        - Relevant Library/Framework and version (e.g. `starknet-devnet`, `starkli`):
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other details about the problem here.
