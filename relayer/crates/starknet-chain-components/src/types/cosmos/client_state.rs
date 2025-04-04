@@ -8,12 +8,6 @@ use hermes_chain_components::traits::types::client_state::{
     HasClientStateType,
 };
 use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
-};
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
 use ibc::clients::tendermint::types::{
     AllowUpdate, ClientState as IbcCometClientState, TrustThreshold,
 };
@@ -105,37 +99,5 @@ impl From<CometClientState> for IbcCometClientState {
 impl From<CometClientState> for Any {
     fn from(client_state: CometClientState) -> Self {
         IbcCometClientState::from(client_state).into()
-    }
-}
-
-pub struct EncodeChainId;
-
-#[cgp_provider(MutEncoderComponent)]
-impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ChainId> for EncodeChainId
-where
-    Encoding: CanEncodeMut<Strategy, String>,
-{
-    fn encode_mut(
-        encoding: &Encoding,
-        chain_id: &ChainId,
-        buffer: &mut Encoding::EncodeBuffer,
-    ) -> Result<(), Encoding::Error> {
-        let chain_id_str = chain_id.as_str().to_string();
-        encoding.encode_mut(&chain_id_str, buffer)?;
-        Ok(())
-    }
-}
-
-#[cgp_provider(MutDecoderComponent)]
-impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChainId> for EncodeChainId
-where
-    Encoding: CanDecodeMut<Strategy, String> + CanRaiseAsyncError<&'static str>,
-{
-    fn decode_mut<'a>(
-        encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer<'a>,
-    ) -> Result<ChainId, Encoding::Error> {
-        let chain_id_str = encoding.decode_mut(buffer)?;
-        ChainId::new(&chain_id_str).map_err(|_| Encoding::raise_error("invalid chain id"))
     }
 }

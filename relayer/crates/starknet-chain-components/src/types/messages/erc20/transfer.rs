@@ -20,15 +20,13 @@ use crate::types::amount::StarknetAmount;
 
 pub const TRANSFER_SELECTOR: Felt = selector!("transfer");
 
-pub struct BuildTransferErc20TokenMessage;
-
 #[derive(Debug, HasField, HasFields)]
 pub struct TransferErc20TokenMessage {
     pub recipient: StarknetAddress,
     pub amount: U256,
 }
 
-#[cgp_provider(TransferTokenMessageBuilderComponent)]
+#[cgp_new_provider(TransferTokenMessageBuilderComponent)]
 impl<Chain, Encoding> TransferTokenMessageBuilder<Chain> for BuildTransferErc20TokenMessage
 where
     Chain: HasAddressType<Address = StarknetAddress>

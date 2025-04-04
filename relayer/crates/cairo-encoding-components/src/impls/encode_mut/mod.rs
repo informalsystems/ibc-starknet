@@ -2,6 +2,7 @@ pub mod array;
 pub mod bool;
 pub mod byte_array;
 pub mod cons;
+pub mod display;
 pub mod end;
 pub mod enum_fields;
 pub mod felt;

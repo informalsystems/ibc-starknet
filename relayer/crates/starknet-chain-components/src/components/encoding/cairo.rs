@@ -7,6 +7,7 @@ mod preset {
     use hermes_cairo_encoding_components::components::encode_mut::CairoEncodeMutComponents;
     use hermes_cairo_encoding_components::components::encoding::*;
     use hermes_cairo_encoding_components::impls::encode_mut::cons::EncoderCons;
+    use hermes_cairo_encoding_components::impls::encode_mut::display::EncodeDisplay;
     use hermes_cairo_encoding_components::impls::encode_mut::enum_fields::EncodeEnumFields;
     use hermes_cairo_encoding_components::impls::encode_mut::option::EncodeOption;
     use hermes_cairo_encoding_components::impls::encode_mut::pair::EncoderPair;
@@ -34,15 +35,14 @@ mod preset {
     use crate::impls::types::address::StarknetAddress;
     use crate::types::channel_id::{
         ChannelCounterparty, ChannelEnd, ChannelId, ChannelState, EncodeChannelCounterparty,
-        EncodeChannelEnd, EncodeChannelId, EncodeChannelState,
+        EncodeChannelEnd, EncodeChannelState,
     };
     use crate::types::client_id::{ClientId, EncodeClientId};
     use crate::types::connection_id::{
         ConnectionCounterparty, ConnectionEnd, ConnectionId, ConnectionState,
-        EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionId,
-        EncodeConnectionState, EncodeDuration,
+        EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionState, EncodeDuration,
     };
-    use crate::types::cosmos::client_state::{ClientStatus, CometClientState, EncodeChainId};
+    use crate::types::cosmos::client_state::{ClientStatus, CometClientState};
     use crate::types::cosmos::consensus_state::CometConsensusState;
     use crate::types::cosmos::height::{EncodeHeight, Height};
     use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
@@ -51,8 +51,8 @@ mod preset {
     use crate::types::messages::erc20::deploy::DeployErc20TokenMessage;
     use crate::types::messages::erc20::transfer::TransferErc20TokenMessage;
     use crate::types::messages::ibc::channel::{
-        AppVersion, ChannelOrdering, EncodeAppVersion, EncodeChannelOrdering, EncodePortId,
-        MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry, PortId,
+        AppVersion, ChannelOrdering, EncodeChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm,
+        MsgChanOpenInit, MsgChanOpenTry, PortId,
     };
     use crate::types::messages::ibc::connection::{
         BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion, MsgConnOpenAck,
@@ -105,28 +105,32 @@ mod preset {
             <A, B> (ViaCairo, (A, B)): EncoderPair<UseContext, UseContext>,
             <A, B> (ViaCairo, Cons<A, B>): EncoderCons<UseContext, UseContext>,
             <Tag, Value> (ViaCairo, Field<Tag, Value>): EncodeTaggedField,
-            (ViaCairo, Vec<TracePrefix>): EncodeList,
             (ViaCairo, Height): EncodeHeight,
             (ViaCairo, Timestamp): EncodeTimestamp,
             (ViaCairo, Packet): EncodePacket,
             (ViaCairo, Sequence): EncodeSequence,
-            (ViaCairo, Vec<Sequence>): EncodeList,
             (ViaCairo, ClientId): EncodeClientId,
-            (ViaCairo, ChainId): EncodeChainId,
-            (ViaCairo, ConnectionId): EncodeConnectionId,
             (ViaCairo, Duration): EncodeDuration,
             (ViaCairo, ConnectionCounterparty): EncodeConnectionCounterparty,
             (ViaCairo, ConnectionState): EncodeConnectionState,
             (ViaCairo, ConnectionEnd): EncodeConnectionEnd,
-            (ViaCairo, ChannelId): EncodeChannelId,
             (ViaCairo, ChannelState): EncodeChannelState,
             (ViaCairo, ChannelCounterparty): EncodeChannelCounterparty,
             (ViaCairo, ChannelEnd): EncodeChannelEnd,
             (ViaCairo, BasePrefix): EncodeBasePrefix,
             (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
-            (ViaCairo, PortId): EncodePortId,
-            (ViaCairo, AppVersion): EncodeAppVersion,
             (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
+            [
+                (ViaCairo, Vec<Sequence>),
+                (ViaCairo, Vec<TracePrefix>),
+            ]: EncodeList,
+            [
+                (ViaCairo, ChainId),
+                (ViaCairo, ConnectionId),
+                (ViaCairo, ChannelId),
+                (ViaCairo, PortId),
+                (ViaCairo, AppVersion),
+            ]: EncodeDisplay,
             [
                 (ViaCairo, MsgRegisterClient),
                 (ViaCairo, MsgRegisterApp),
