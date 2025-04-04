@@ -1,9 +1,5 @@
-use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
-use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
-use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
 use hermes_encoding_components::traits::decode_mut::{
     CanDecodeMut, MutDecoder, MutDecoderComponent,
 };
@@ -118,7 +114,7 @@ impl Transformer for EncodeChannelOrdering {
     }
 }
 
-#[derive(HasField)]
+#[derive(HasField, HasFields)]
 pub struct MsgChanOpenInit {
     pub port_id_on_a: PortId,
     pub conn_id_on_a: ConnectionId,
@@ -127,45 +123,7 @@ pub struct MsgChanOpenInit {
     pub ordering: ChannelOrdering,
 }
 
-pub struct EncodeMsgChanOpenInit;
-
-delegate_components! {
-    EncodeMsgChanOpenInit {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("port_id_on_a"), UseContext>,
-            EncodeField<symbol!("conn_id_on_a"), UseContext>,
-            EncodeField<symbol!("port_id_on_b"), UseContext>,
-            EncodeField<symbol!("version_proposal"), UseContext>,
-            EncodeField<symbol!("ordering"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
-
-impl Transformer for EncodeMsgChanOpenInit {
-    type From = Product![PortId, ConnectionId, PortId, AppVersion, ChannelOrdering];
-    type To = MsgChanOpenInit;
-
-    fn transform(
-        product![
-            port_id_on_a,
-            conn_id_on_a,
-            port_id_on_b,
-            version_proposal,
-            ordering
-        ]: Self::From,
-    ) -> MsgChanOpenInit {
-        MsgChanOpenInit {
-            port_id_on_a,
-            conn_id_on_a,
-            port_id_on_b,
-            version_proposal,
-            ordering,
-        }
-    }
-}
-
-#[derive(HasField)]
+#[derive(HasField, HasFields)]
 pub struct MsgChanOpenTry {
     pub port_id_on_b: PortId,
     pub conn_id_on_b: ConnectionId,
@@ -179,61 +137,7 @@ pub struct MsgChanOpenTry {
 
 pub struct EncodeMsgChanOpenTry;
 
-delegate_components! {
-    EncodeMsgChanOpenTry {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("port_id_on_b"), UseContext>,
-            EncodeField<symbol!("conn_id_on_b"), UseContext>,
-            EncodeField<symbol!("port_id_on_a"), UseContext>,
-            EncodeField<symbol!("chan_id_on_a"), UseContext>,
-            EncodeField<symbol!("version_on_a"), UseContext>,
-            EncodeField<symbol!("proof_chan_end_on_a"), UseContext>,
-            EncodeField<symbol!("proof_height_on_a"), UseContext>,
-            EncodeField<symbol!("ordering"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
-
-impl Transformer for EncodeMsgChanOpenTry {
-    type From = Product![
-        PortId,
-        ConnectionId,
-        PortId,
-        ChannelId,
-        AppVersion,
-        StateProof,
-        Height,
-        ChannelOrdering
-    ];
-    type To = MsgChanOpenTry;
-
-    fn transform(
-        product![
-            port_id_on_b,
-            conn_id_on_b,
-            port_id_on_a,
-            chan_id_on_a,
-            version_on_a,
-            proof_chan_end_on_a,
-            proof_height_on_a,
-            ordering
-        ]: Self::From,
-    ) -> MsgChanOpenTry {
-        MsgChanOpenTry {
-            port_id_on_b,
-            conn_id_on_b,
-            port_id_on_a,
-            chan_id_on_a,
-            version_on_a,
-            proof_chan_end_on_a,
-            proof_height_on_a,
-            ordering,
-        }
-    }
-}
-
-#[derive(HasField)]
+#[derive(HasField, HasFields)]
 pub struct MsgChanOpenAck {
     pub port_id_on_a: PortId,
     pub chan_id_on_a: ChannelId,
@@ -243,86 +147,10 @@ pub struct MsgChanOpenAck {
     pub proof_height_on_b: Height,
 }
 
-pub struct EncodeMsgChanOpenAck;
-
-delegate_components! {
-    EncodeMsgChanOpenAck {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("port_id_on_a"), UseContext>,
-            EncodeField<symbol!("chan_id_on_a"), UseContext>,
-            EncodeField<symbol!("chan_id_on_b"), UseContext>,
-            EncodeField<symbol!("version_on_b"), UseContext>,
-            EncodeField<symbol!("proof_chan_end_on_b"), UseContext>,
-            EncodeField<symbol!("proof_height_on_b"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
-
-impl Transformer for EncodeMsgChanOpenAck {
-    type From = Product![PortId, ChannelId, ChannelId, AppVersion, StateProof, Height];
-    type To = MsgChanOpenAck;
-
-    fn transform(
-        product![
-            port_id_on_a,
-            chan_id_on_a,
-            chan_id_on_b,
-            version_on_b,
-            proof_chan_end_on_b,
-            proof_height_on_b
-        ]: Self::From,
-    ) -> MsgChanOpenAck {
-        MsgChanOpenAck {
-            port_id_on_a,
-            chan_id_on_a,
-            chan_id_on_b,
-            version_on_b,
-            proof_chan_end_on_b,
-            proof_height_on_b,
-        }
-    }
-}
-
-#[derive(HasField)]
+#[derive(HasField, HasFields)]
 pub struct MsgChanOpenConfirm {
     pub port_id_on_b: PortId,
     pub chan_id_on_b: ChannelId,
     pub proof_chan_end_on_a: StateProof,
     pub proof_height_on_a: Height,
-}
-
-pub struct EncodeMsgChanOpenConfirm;
-
-delegate_components! {
-    EncodeMsgChanOpenConfirm {
-        MutEncoderComponent: CombineEncoders<Product![
-            EncodeField<symbol!("port_id_on_b"), UseContext>,
-            EncodeField<symbol!("chan_id_on_b"), UseContext>,
-            EncodeField<symbol!("proof_chan_end_on_a"), UseContext>,
-            EncodeField<symbol!("proof_height_on_a"), UseContext>,
-        ]>,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
-
-impl Transformer for EncodeMsgChanOpenConfirm {
-    type From = Product![PortId, ChannelId, StateProof, Height];
-    type To = MsgChanOpenConfirm;
-
-    fn transform(
-        product![
-            port_id_on_b,
-            chan_id_on_b,
-            proof_chan_end_on_a,
-            proof_height_on_a
-        ]: Self::From,
-    ) -> MsgChanOpenConfirm {
-        MsgChanOpenConfirm {
-            port_id_on_b,
-            chan_id_on_b,
-            proof_chan_end_on_a,
-            proof_height_on_a,
-        }
-    }
 }

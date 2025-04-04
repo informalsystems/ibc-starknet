@@ -59,14 +59,12 @@ mod preset {
         EncodeTransferErc20TokenMessage, TransferErc20TokenMessage,
     };
     use crate::types::messages::ibc::channel::{
-        AppVersion, ChannelOrdering, EncodeAppVersion, EncodeChannelOrdering, EncodeMsgChanOpenAck,
-        EncodeMsgChanOpenConfirm, EncodeMsgChanOpenInit, EncodeMsgChanOpenTry, EncodePortId,
+        AppVersion, ChannelOrdering, EncodeAppVersion, EncodeChannelOrdering, EncodePortId,
         MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry, PortId,
     };
     use crate::types::messages::ibc::connection::{
-        BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion,
-        EncodeMsgConnOpenAck, EncodeMsgConnOpenConfirm, EncodeMsgConnOpenInit,
-        EncodeMsgConnOpenTry, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
+        BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion, MsgConnOpenAck,
+        MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
     };
     use crate::types::messages::ibc::denom::{Denom, PrefixedDenom, TracePrefix};
     use crate::types::messages::ibc::ibc_transfer::{
@@ -160,20 +158,20 @@ mod preset {
             (ViaCairo, MsgRegisterApp): EncodeRegisterApp,
             (ViaCairo, BasePrefix): EncodeBasePrefix,
             (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
-            (ViaCairo, MsgConnOpenInit): EncodeMsgConnOpenInit,
-            (ViaCairo, MsgConnOpenTry): EncodeMsgConnOpenTry,
-            (ViaCairo, MsgConnOpenAck): EncodeMsgConnOpenAck,
-            (ViaCairo, MsgConnOpenConfirm): EncodeMsgConnOpenConfirm,
             (ViaCairo, PortId): EncodePortId,
             (ViaCairo, AppVersion): EncodeAppVersion,
             (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
-            (ViaCairo, MsgChanOpenInit): EncodeMsgChanOpenInit,
-            (ViaCairo, MsgChanOpenTry): EncodeMsgChanOpenTry,
-            (ViaCairo, MsgChanOpenAck): EncodeMsgChanOpenAck,
-            (ViaCairo, MsgChanOpenConfirm): EncodeMsgChanOpenConfirm,
             [
                 (ViaCairo, TracePrefix),
                 (ViaCairo, PrefixedDenom),
+                (ViaCairo, MsgConnOpenInit),
+                (ViaCairo, MsgConnOpenTry),
+                (ViaCairo, MsgConnOpenAck),
+                (ViaCairo, MsgConnOpenConfirm),
+                (ViaCairo, MsgChanOpenInit),
+                (ViaCairo, MsgChanOpenTry),
+                (ViaCairo, MsgChanOpenAck),
+                (ViaCairo, MsgChanOpenConfirm),
             ]: EncodeFields,
             [
                 (ViaCairo, Denom),
