@@ -15,6 +15,7 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientP
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use ibc::clients::tendermint::types::Header as TendermintHeader;
 use starknet::core::types::{Call, Felt};
 use starknet::macros::selector;
 
@@ -22,7 +23,6 @@ use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::contract_address::CanQueryContractAddress;
 use crate::types::client_id::ClientId;
-use crate::types::cosmos::update::CometUpdateHeader;
 
 pub struct BuildUpdateCometClientMessage;
 
@@ -40,7 +40,7 @@ where
     Counterparty:
         HasUpdateClientPayloadType<Chain, UpdateClientPayload = CosmosUpdateClientPayload>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanEncode<ViaCairo, CometUpdateHeader>
+        + CanEncode<ViaCairo, TendermintHeader>
         + CanEncode<ViaCairo, (ClientId, Vec<Felt>)>,
 {
     async fn build_update_client_message(
@@ -51,15 +51,11 @@ where
         let mut messages = Vec::with_capacity(counterparty_payload.headers.len());
 
         for header in counterparty_payload.headers {
-            let update_header = CometUpdateHeader::from(header);
-
             let encoding = chain.encoding();
 
             let contract_address = chain.query_contract_address(PhantomData).await?;
 
-            let raw_header = encoding
-                .encode(&update_header)
-                .map_err(Chain::raise_error)?;
+            let raw_header = encoding.encode(&header).map_err(Chain::raise_error)?;
 
             let calldata = encoding
                 .encode(&(client_id.clone(), raw_header))
