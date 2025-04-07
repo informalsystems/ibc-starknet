@@ -2386,7 +2386,6 @@ dependencies = [
  "serde_json",
  "sha2 0.10.8",
  "sha256",
- "starknet",
  "starknet 0.14.0",
  "tendermint",
  "time",
