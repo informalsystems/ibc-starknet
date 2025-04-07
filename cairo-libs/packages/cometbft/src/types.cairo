@@ -557,8 +557,8 @@ impl AccountIdDebug of core::fmt::Debug<AccountId> {
 
 impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
     fn eq(lhs: @AccountId, rhs: @AccountId) -> bool {
-        let lhs_span = lhs.id.span();
-        let rhs_span = rhs.id.span();
+        let mut lhs_span = lhs.id.span();
+        let mut rhs_span = rhs.id.span();
 
         if lhs_span.len() != rhs_span.len() {
             return false;
@@ -570,14 +570,13 @@ impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
             return true;
         }
 
-        let mut i = 0;
-
-        while i < len {
-            if lhs_span.at(i) != rhs_span.at(i) {
+        // lengths are guaranteed to be the same
+        while let (Some(lhs_val), Some(rhs_val)) = (lhs_span.pop_front(), rhs_span.pop_front()) {
+            if lhs_val != rhs_val {
                 return false;
             }
-            i += 1;
         }
+
         return true;
     }
 }
