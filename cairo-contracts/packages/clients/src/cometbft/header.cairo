@@ -3,7 +3,6 @@ use starknet_ibc_clients::cometbft::{CometConsensusState, CometErrors};
 use starknet_ibc_core::client::{TimestampImpl, U64IntoTimestamp};
 use starknet_ibc_core::commitment::StateRoot;
 
-
 fn from_u8Array_to_u32Array(mut data: Span<u8>) -> Array<u32> {
     let mut result = array![];
     while let Option::Some(val1) = data.pop_front() {
