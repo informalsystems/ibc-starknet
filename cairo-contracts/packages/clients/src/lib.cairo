@@ -6,15 +6,14 @@ pub mod cometbft {
     mod header;
 
     pub use client_state::{CometClientState, CometClientStateImpl, CometClientStateTrait};
+    pub use cometbft::light_client::Header as CometHeader;
     pub use component::CometClientComponent;
     pub use consensus_state::{
         CometConsensusState, CometConsensusStateImpl, CometConsensusStateStore,
         CometConsensusStateToStore, CometConsensusStateTrait, StoreToCometConsensusState,
     };
     pub use errors::CometErrors;
-    pub use header::{
-        CometHeader, CometHeaderImpl, CometHeaderIntoConsensusState, CometHeaderTrait, SignedHeader,
-    };
+    pub use header::{CometHeaderImpl, CometHeaderIntoConsensusState, CometHeaderTrait};
 }
 
 #[cfg(test)]

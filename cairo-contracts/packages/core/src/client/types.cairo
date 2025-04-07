@@ -213,6 +213,13 @@ pub impl TimestampImpl of TimestampTrait {
         Timestamp { timestamp: unix_nanos }
     }
 
+    fn from_seconds_and_nanos(seconds: u64, nanos: u32) -> Timestamp {
+        let (unix_nanos, overflowed) = seconds.overflowing_mul(NANOS_PER_SEC.into());
+        assert(!overflowed, ClientErrors::OVERFLOWED_TIMESTAMP);
+        let timestamp = unix_nanos.checked_add(nanos.into()).unwrap();
+        Timestamp { timestamp }
+    }
+
     /// Returns the timestamp in seconds, truncating the nanoseconds.
     fn as_secs(self: Timestamp) -> u64 {
         self.timestamp / NANOS_PER_SEC.into()

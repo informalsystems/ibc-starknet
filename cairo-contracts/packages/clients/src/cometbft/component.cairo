@@ -3,7 +3,6 @@ pub mod CometClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
     use alexandria_data_structures::byte_array_ext::SpanU8IntoBytearray;
     use alexandria_sorting::MergeSort;
-    use cometbft::light_client::Header as LcHeader;
     use cometbft::types::{Options, TrustedBlockState, UntrustedBlockState};
     use cometbft::verifier::verify_update_header;
     use core::num::traits::Zero;
@@ -18,7 +17,7 @@ pub mod CometClientComponent {
     use starknet_ibc_clients::cometbft::{
         CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
         CometConsensusStateStore, CometConsensusStateToStore, CometErrors, CometHeader,
-        CometHeaderImpl, StoreToCometConsensusState,
+        CometHeaderImpl, CometHeaderIntoConsensusState, StoreToCometConsensusState,
     };
     use starknet_ibc_core::client::{
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
@@ -297,30 +296,28 @@ pub mod CometClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) {
-            let local_header: CometHeader = CometHeaderImpl::deserialize(client_message);
-            let trusted_height = local_header.trusted_height;
+            let header: CometHeader = CometHeaderImpl::deserialize(client_message);
+            let trusted_height = header.trusted_height;
 
-            let untrusted_header = ProtoCodecImpl::decode::<
-                LcHeader,
-            >(@local_header.signed_header.protobuf_bytes.span().into())
-                .unwrap();
+            let ibc_trusted_height = HeightImpl::new(
+                trusted_height.revision_number, trusted_height.revision_height,
+            );
 
             let client_state = self.read_client_state(client_sequence);
 
             let trusted_consensus_state = self
-                .read_consensus_state(client_sequence, trusted_height.clone());
+                .read_consensus_state(client_sequence, ibc_trusted_height.clone());
 
             let trusted_block_state = TrustedBlockState {
                 chain_id: client_state.chain_id,
                 header_time: trusted_consensus_state.timestamp.try_into().unwrap(),
                 height: trusted_height.revision_height,
-                next_validators: untrusted_header.trusted_validator_set,
+                next_validators: header.trusted_validator_set,
                 next_validators_hash: trusted_consensus_state.next_validators_hash,
             };
 
             let untrusted_block_state = UntrustedBlockState {
-                signed_header: untrusted_header.signed_header,
-                validators: untrusted_header.validator_set,
+                signed_header: header.signed_header, validators: header.validator_set,
             };
 
             let trust_threshold = client_state.trust_level;
@@ -386,9 +383,13 @@ pub mod CometClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> UpdateResponse {
+            let latest_height = self.latest_height(client_sequence);
+
             let header: CometHeader = CometHeaderImpl::deserialize(client_message);
 
-            let header_height = header.clone().signed_header.height;
+            let tm_header_height = header.clone().signed_header.header.height;
+
+            let header_height = HeightImpl::new(latest_height.revision_number, tm_header_height);
 
             // TODO: Implement consensus state pruning mechanism.
 
@@ -417,7 +418,12 @@ pub mod CometClientComponent {
 
             let mut client_state = self.read_client_state(client_sequence);
 
-            client_state.freeze(header.trusted_height);
+            let frozen_height = Height {
+                revision_number: header.trusted_height.revision_number,
+                revision_height: header.trusted_height.revision_height,
+            };
+
+            client_state.freeze(frozen_height);
 
             self.write_client_state(client_sequence, client_state);
 

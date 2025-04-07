@@ -1,11 +1,22 @@
+use cometbft::light_client::Header as CometHeader;
 use starknet_ibc_clients::cometbft::{CometConsensusState, CometErrors};
-use starknet_ibc_core::client::{Height, Timestamp, U64IntoTimestamp};
+use starknet_ibc_core::client::{TimestampImpl, U64IntoTimestamp};
 use starknet_ibc_core::commitment::StateRoot;
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
-pub struct CometHeader {
-    pub trusted_height: Height,
-    pub signed_header: SignedHeader,
+
+fn from_u8Array_to_u32Array(mut data: Span<u8>) -> Array<u32> {
+    let mut result = array![];
+    while let Option::Some(val1) = data.pop_front() {
+        let val2 = data.pop_front().unwrap();
+        let val3 = data.pop_front().unwrap();
+        let val4 = data.pop_front().unwrap();
+        let mut value = (*val1).into() * 0x1000000;
+        value = value + (*val2).into() * 0x10000;
+        value = value + (*val3).into() * 0x100;
+        value = value + (*val4).into();
+        result.append(value);
+    }
+    result
 }
 
 #[generate_trait]
@@ -21,21 +32,23 @@ pub impl CometHeaderImpl of CometHeaderTrait {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde)]
-pub struct SignedHeader {
-    pub height: Height,
-    pub timestamp: Timestamp,
-    pub root: StateRoot,
-    pub next_validators_hash: Array<u8>,
-    pub protobuf_bytes: Array<u8>,
-}
-
 pub impl CometHeaderIntoConsensusState of Into<CometHeader, CometConsensusState> {
     fn into(self: CometHeader) -> CometConsensusState {
-        CometConsensusState {
-            timestamp: self.signed_header.timestamp,
-            root: self.signed_header.root,
-            next_validators_hash: self.signed_header.next_validators_hash,
-        }
+        let proto_ts = self.signed_header.header.time;
+        let root_u8 = self.signed_header.header.app_hash;
+        let next_validators_hash = self.signed_header.header.next_validators_hash;
+
+        let timestamp = TimestampImpl::from_seconds_and_nanos(
+            proto_ts.seconds.try_into().unwrap(), proto_ts.nanos.try_into().unwrap(),
+        );
+
+        let root_u32 = from_u8Array_to_u32Array(root_u8.span());
+
+        let root = [
+            *root_u32[0], *root_u32[1], *root_u32[2], *root_u32[3], *root_u32[4], *root_u32[5],
+            *root_u32[6], *root_u32[7],
+        ];
+
+        CometConsensusState { timestamp, root: StateRoot { root }, next_validators_hash }
     }
 }
