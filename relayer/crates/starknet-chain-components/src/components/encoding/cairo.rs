@@ -25,9 +25,15 @@ mod preset {
         EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
     };
     use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent;
-    use ibc::clients::tendermint::types::TrustThreshold;
+    use ibc::clients::tendermint::types::{Header as TendermintLcHeader, TrustThreshold};
     use ibc::core::host::types::identifiers::ChainId;
+    use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
     use starknet::core::types::{Felt, U256};
+    use tendermint::block::parts::Header as PartSetHeader;
+    use tendermint::block::signed_header::SignedHeader;
+    use tendermint::hash::Hash as TmHash;
+    use tendermint::validator::ProposerPriority;
+    use tendermint::{account, block, validator, vote, PublicKey, Signature};
 
     use crate::impls::types::address::{EncodeStarknetAddress, StarknetAddress};
     use crate::types::channel_id::{
