@@ -29,11 +29,13 @@ mod preset {
     use ibc::core::host::types::identifiers::ChainId;
     use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
     use starknet::core::types::{Felt, U256};
+    use tendermint::block::header::Version as HeaderVersion;
     use tendermint::block::parts::Header as PartSetHeader;
     use tendermint::block::signed_header::SignedHeader;
+    use tendermint::block::Header as TmHeader;
     use tendermint::hash::Hash as TmHash;
     use tendermint::validator::ProposerPriority;
-    use tendermint::{account, block, validator, vote, PublicKey, Signature};
+    use tendermint::{account, block, validator, vote, AppHash, PublicKey, Signature};
 
     use crate::impls::types::address::{EncodeStarknetAddress, StarknetAddress};
     use crate::types::channel_id::{
@@ -54,10 +56,10 @@ mod preset {
     use crate::types::cosmos::height::{EncodeHeight, Height};
     use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
     use crate::types::cosmos::update::{
-        EncodeAccountId, EncodeBlockId, EncodeCommit, EncodeCommitSig, EncodePartSetHeader,
-        EncodeProposerPriority, EncodeProtoTimestamp, EncodePublicKey, EncodeSignature,
-        EncodeSignedHeader, EncodeTendermintLcHeader, EncodeTmHash, EncodeValidator,
-        EncodeValidatorSet, EncodeVotePower,
+        EncodeAccountId, EncodeAppHash, EncodeBlockId, EncodeCommit, EncodeCommitSig,
+        EncodeHeaderVersion, EncodePartSetHeader, EncodeProposerPriority, EncodeProtoTimestamp,
+        EncodePublicKey, EncodeSignature, EncodeSignedHeader, EncodeTendermintLcHeader,
+        EncodeTmHash, EncodeTmHeader, EncodeValidator, EncodeValidatorSet, EncodeVotePower,
     };
     use crate::types::message_responses::create_client::{
         CreateClientResponse, DecodeCreateClientResponse,
@@ -171,6 +173,9 @@ mod preset {
             (ViaCairo, ChannelEnd): EncodeChannelEnd,
             (ViaCairo, TendermintLcHeader): EncodeTendermintLcHeader,
             (ViaCairo, SignedHeader): EncodeSignedHeader,
+            (ViaCairo, HeaderVersion): EncodeHeaderVersion,
+            (ViaCairo, AppHash): EncodeAppHash,
+            (ViaCairo, TmHeader): EncodeTmHeader,
             (ViaCairo, block::Commit): EncodeCommit,
             (ViaCairo, TmHash): EncodeTmHash,
             (ViaCairo, block::Id): EncodeBlockId,

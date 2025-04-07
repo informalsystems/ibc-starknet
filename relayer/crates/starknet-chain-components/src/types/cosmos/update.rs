@@ -10,12 +10,13 @@ use hermes_encoding_components::traits::transform::{Transformer, TransformerRef}
 use ibc::clients::tendermint::types::Header as TendermintLcHeader;
 use ibc::core::client::types::Height as IbcHeight;
 use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
+use tendermint::block::header::Version as HeaderVersion;
 use tendermint::block::parts::Header as PartSetHeader;
 use tendermint::block::signed_header::SignedHeader;
 use tendermint::block::{Commit, CommitSig, Header as TmHeader};
 use tendermint::hash::Hash as TmHash;
 use tendermint::validator::ProposerPriority;
-use tendermint::{account, block, validator, vote, PublicKey, Signature};
+use tendermint::{account, block, validator, vote, AppHash, PublicKey, Signature};
 
 use crate::types::cosmos::height::Height;
 
@@ -121,6 +122,194 @@ where
         let product![header, commit] = encoding.decode_mut(buffer)?;
         SignedHeader::new(header, commit)
             .map_err(|_| Encoding::raise_error("invalid signed header"))
+    }
+}
+
+pub struct EncodeHeaderVersion;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, HeaderVersion> for EncodeHeaderVersion
+where
+    Encoding: CanEncodeMut<Strategy, Product![u64, u64]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &HeaderVersion,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&product![value.block, value.app], buffer)?;
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, HeaderVersion> for EncodeHeaderVersion
+where
+    Encoding: CanDecodeMut<Strategy, Product![u64, u64]> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<HeaderVersion, Encoding::Error> {
+        let product![block, app] = encoding.decode_mut(buffer)?;
+        Ok(HeaderVersion { block, app })
+    }
+}
+
+pub struct EncodeAppHash;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, AppHash> for EncodeAppHash
+where
+    Encoding: CanEncodeMut<Strategy, Vec<u8>>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &AppHash,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&value.as_bytes().to_vec(), buffer)?;
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, AppHash> for EncodeAppHash
+where
+    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<AppHash, Encoding::Error> {
+        let value = encoding.decode_mut(buffer)?;
+        value
+            .try_into()
+            .map_err(|_| Encoding::raise_error("invalid app hash"))
+    }
+}
+
+pub struct EncodeTmHeader;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, TmHeader> for EncodeTmHeader
+where
+    Encoding: CanEncodeMut<
+        Strategy,
+        Product![
+            HeaderVersion,
+            String,
+            u64,
+            ProtoTimestamp,
+            block::Id,
+            TmHash,
+            TmHash,
+            TmHash,
+            TmHash,
+            TmHash,
+            AppHash,
+            TmHash,
+            TmHash,
+            account::Id
+        ],
+    >,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &TmHeader,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(
+            &product![
+                value.version,
+                value.chain_id.clone().into(),
+                value.height.value(),
+                value.time.into(),
+                value.last_block_id.unwrap(),
+                value.last_commit_hash.unwrap(),
+                value.data_hash.unwrap(),
+                value.validators_hash,
+                value.next_validators_hash,
+                value.consensus_hash,
+                value.app_hash.clone(),
+                value.last_results_hash.unwrap(),
+                value.evidence_hash.unwrap(),
+                value.proposer_address
+            ],
+            buffer,
+        )?;
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, TmHeader> for EncodeTmHeader
+where
+    Encoding: CanDecodeMut<
+            Strategy,
+            Product![
+                HeaderVersion,
+                String,
+                u64,
+                ProtoTimestamp,
+                block::Id,
+                TmHash,
+                TmHash,
+                TmHash,
+                TmHash,
+                TmHash,
+                AppHash,
+                TmHash,
+                TmHash,
+                account::Id,
+            ],
+        > + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<TmHeader, Encoding::Error> {
+        let product![
+            version,
+            chain_id,
+            height,
+            proto_timestamp,
+            last_block_id,
+            last_commit_hash,
+            data_hash,
+            validators_hash,
+            next_validators_hash,
+            consensus_hash,
+            app_hash,
+            last_results_hash,
+            evidence_hash,
+            proposer_address
+        ] = encoding.decode_mut(buffer)?;
+
+        let header = TmHeader {
+            version,
+            chain_id: chain_id
+                .try_into()
+                .map_err(|_| Encoding::raise_error("invalid chain id"))?,
+            height: height
+                .try_into()
+                .map_err(|_| Encoding::raise_error("invalid height"))?,
+            time: proto_timestamp
+                .try_into()
+                .map_err(|_| Encoding::raise_error("invalid timestamp"))?,
+            last_block_id: Some(last_block_id),
+            last_commit_hash: Some(last_commit_hash),
+            data_hash: Some(data_hash),
+            validators_hash,
+            next_validators_hash,
+            consensus_hash,
+            app_hash,
+            last_results_hash: Some(last_results_hash),
+            evidence_hash: Some(evidence_hash),
+            proposer_address,
+        };
+
+        Ok(header)
     }
 }
 
