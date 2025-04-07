@@ -13,7 +13,7 @@ use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
 use tendermint::block::header::Version as HeaderVersion;
 use tendermint::block::parts::Header as PartSetHeader;
 use tendermint::block::signed_header::SignedHeader;
-use tendermint::block::{Commit, CommitSig, Header as TmHeader};
+use tendermint::block::{BlockIdFlag, Commit, CommitSig, Header as TmHeader};
 use tendermint::hash::Hash as TmHash;
 use tendermint::validator::ProposerPriority;
 use tendermint::{account, block, validator, vote, AppHash, PublicKey, Signature};
@@ -527,15 +527,52 @@ where
     }
 }
 
+pub struct EncodeCommitBlockIdFlag;
+
+delegate_components! {
+    EncodeCommitBlockIdFlag {
+        [
+            MutEncoderComponent,
+            MutDecoderComponent,
+        ]: EncodeVariantFrom<Self>,
+    }
+}
+
+impl TransformerRef for EncodeCommitBlockIdFlag {
+    type From = BlockIdFlag;
+    type To<'a> = Sum![(), (), (), ()];
+
+    fn transform<'a>(from: &'a BlockIdFlag) -> Self::To<'a> {
+        match from {
+            BlockIdFlag::Absent => Either::Right(Either::Left(())),
+            BlockIdFlag::Commit => Either::Right(Either::Right(Either::Left(()))),
+            BlockIdFlag::Nil => Either::Right(Either::Right(Either::Right(Either::Left(())))),
+        }
+    }
+}
+
+impl Transformer for EncodeCommitBlockIdFlag {
+    type From = Sum![(), (), (), ()];
+    type To = BlockIdFlag;
+
+    fn transform(from: Self::From) -> Self::To {
+        match from {
+            Either::Left(()) => unreachable!(),
+            Either::Right(Either::Left(())) => BlockIdFlag::Absent,
+            Either::Right(Either::Right(Either::Left(()))) => BlockIdFlag::Commit,
+            Either::Right(Either::Right(Either::Right(Either::Left(())))) => BlockIdFlag::Nil,
+            Either::Right(Either::Right(Either::Right(Either::Right(v)))) => match v {},
+        }
+    }
+}
+
 pub struct EncodeCommitSig;
 
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, CommitSig> for EncodeCommitSig
 where
-    Encoding: CanEncodeMut<
-            Strategy,
-            Product![Sum![(), (), (), ()], account::Id, ProtoTimestamp, Signature],
-        > + CanEncodeMut<Strategy, Product![Sum![(), (), (), ()], Vec<u8>, ProtoTimestamp, Vec<u8>]>,
+    Encoding: CanEncodeMut<Strategy, Product![BlockIdFlag, account::Id, ProtoTimestamp, Signature]>
+        + CanEncodeMut<Strategy, Product![BlockIdFlag, Vec<u8>, ProtoTimestamp, Vec<u8>]>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -544,12 +581,7 @@ where
     ) -> Result<(), Encoding::Error> {
         match value {
             CommitSig::BlockIdFlagAbsent => encoding.encode_mut(
-                &product![
-                    Either::Right(Either::Left(())),
-                    Vec::new(),
-                    ZERO_TIMESTAMP,
-                    Vec::new()
-                ],
+                &product![BlockIdFlag::Absent, Vec::new(), ZERO_TIMESTAMP, Vec::new()],
                 buffer,
             )?,
             CommitSig::BlockIdFlagCommit {
@@ -558,7 +590,7 @@ where
                 signature,
             } => encoding.encode_mut(
                 &product![
-                    Either::Right(Either::Right(Either::Left(()))),
+                    BlockIdFlag::Commit,
                     *validator_address,
                     (*timestamp).into(),
                     signature.clone().unwrap()
@@ -571,7 +603,7 @@ where
                 signature,
             } => encoding.encode_mut(
                 &product![
-                    Either::Right(Either::Right(Either::Right(Either::Left(())))),
+                    BlockIdFlag::Nil,
                     *validator_address,
                     (*timestamp).into(),
                     signature.clone().unwrap()
@@ -587,10 +619,8 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, CommitSig> for EncodeCommitSig
 where
-    Encoding: CanDecodeMut<
-            Strategy,
-            Product![Sum![(), (), (), ()], account::Id, ProtoTimestamp, Signature],
-        > + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Product![BlockIdFlag, account::Id, ProtoTimestamp, Signature]>
+        + CanRaiseAsyncError<&'static str>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
@@ -604,21 +634,17 @@ where
             .map_err(|_| Encoding::raise_error("invalid timestamp"))?;
 
         let value = match block_id_flag {
-            Either::Left(()) => unreachable!(),
-            Either::Right(Either::Left(())) => CommitSig::BlockIdFlagAbsent,
-            Either::Right(Either::Right(Either::Left(()))) => CommitSig::BlockIdFlagCommit {
+            BlockIdFlag::Absent => CommitSig::BlockIdFlagAbsent,
+            BlockIdFlag::Commit => CommitSig::BlockIdFlagCommit {
                 validator_address,
                 timestamp,
                 signature: Some(signature),
             },
-            Either::Right(Either::Right(Either::Right(Either::Left(())))) => {
-                CommitSig::BlockIdFlagNil {
-                    validator_address,
-                    timestamp,
-                    signature: Some(signature),
-                }
-            }
-            Either::Right(Either::Right(Either::Right(Either::Right(v)))) => match v {},
+            BlockIdFlag::Nil => CommitSig::BlockIdFlagNil {
+                validator_address,
+                timestamp,
+                signature: Some(signature),
+            },
         };
 
         Ok(value)
@@ -709,7 +735,8 @@ pub struct EncodeValidator;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, validator::Info> for EncodeValidator
 where
-    Encoding: CanEncodeMut<Strategy, (account::Id, PublicKey, vote::Power, ProposerPriority)>,
+    Encoding:
+        CanEncodeMut<Strategy, Product![account::Id, PublicKey, vote::Power, ProposerPriority]>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -717,12 +744,12 @@ where
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
         encoding.encode_mut(
-            &(
+            &product![
                 value.address,
                 value.pub_key,
                 value.power,
                 value.proposer_priority,
-            ),
+            ],
             buffer,
         )?;
         Ok(())
@@ -732,14 +759,14 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, validator::Info> for EncodeValidator
 where
-    Encoding: CanDecodeMut<Strategy, (account::Id, PublicKey, vote::Power, ProposerPriority)>
+    Encoding: CanDecodeMut<Strategy, Product![account::Id, PublicKey, vote::Power, ProposerPriority]>
         + CanRaiseAsyncError<&'static str>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<validator::Info, Encoding::Error> {
-        let (address, pub_key, power, proposer_priority) = encoding.decode_mut(buffer)?;
+        let product![address, pub_key, power, proposer_priority] = encoding.decode_mut(buffer)?;
         Ok(validator::Info {
             address,
             pub_key,
