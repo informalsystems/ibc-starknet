@@ -59,25 +59,7 @@ impl From<RawChannelState> for ChannelState {
 #[derive(HasFields)]
 pub struct RawChannelCounterparty {
     pub port_id: PortId,
-    pub channel_id: Option<ChannelId>,
-}
-
-impl<'a> From<&'a ChannelCounterparty> for RawChannelCounterparty {
-    fn from(value: &'a ChannelCounterparty) -> Self {
-        Self {
-            port_id: value.port_id.clone(),
-            channel_id: value.channel_id.clone(),
-        }
-    }
-}
-
-impl From<RawChannelCounterparty> for ChannelCounterparty {
-    fn from(val: RawChannelCounterparty) -> Self {
-        Self {
-            port_id: val.port_id,
-            channel_id: val.channel_id,
-        }
-    }
+    pub channel_id: ChannelId,
 }
 
 pub struct EncodeChannelEnd;
@@ -96,10 +78,19 @@ where
             return Err(Encoding::raise_error("invalid connection hops"));
         }
 
+        let counterparty = value.counterparty();
+        let channel_id = counterparty
+            .channel_id
+            .clone()
+            .ok_or_else(|| Encoding::raise_error("expect counterparty channel id to exist"))?;
+
         let raw = RawChannelEnd {
             state: (&value.state).into(),
             ordering: value.ordering,
-            remote: value.counterparty().into(),
+            remote: RawChannelCounterparty {
+                port_id: counterparty.port_id.clone(),
+                channel_id,
+            },
             connection_id: value.connection_hops[0].clone(),
             version: value.version.clone(),
         };
@@ -122,7 +113,10 @@ where
         ChannelEnd::new(
             raw.state.into(),
             raw.ordering,
-            raw.remote.into(),
+            ChannelCounterparty {
+                port_id: raw.remote.port_id,
+                channel_id: Some(raw.remote.channel_id),
+            },
             vec![raw.connection_id],
             raw.version,
         )
