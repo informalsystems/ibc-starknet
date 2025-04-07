@@ -570,14 +570,17 @@ impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
             return true;
         }
 
+        let mut rt = true;
+
         // lengths are guaranteed to be the same
         while let (Some(lhs_val), Some(rhs_val)) = (lhs_span.pop_front(), rhs_span.pop_front()) {
             if lhs_val != rhs_val {
-                return false;
+                rt = false;
+                break;
             }
         }
 
-        return true;
+        return rt;
     }
 }
 
