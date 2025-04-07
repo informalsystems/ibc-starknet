@@ -53,7 +53,12 @@ mod preset {
     use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsensusState};
     use crate::types::cosmos::height::{EncodeHeight, Height};
     use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
-    use crate::types::cosmos::update::{CometUpdateHeader, EncodeCometUpdateHeader};
+    use crate::types::cosmos::update::{
+        EncodeAccountId, EncodeBlockId, EncodeCommit, EncodeCommitSig, EncodePartSetHeader,
+        EncodeProposerPriority, EncodeProtoTimestamp, EncodePublicKey, EncodeSignature,
+        EncodeSignedHeader, EncodeTendermintLcHeader, EncodeTmHash, EncodeValidator,
+        EncodeValidatorSet, EncodeVotePower,
+    };
     use crate::types::message_responses::create_client::{
         CreateClientResponse, DecodeCreateClientResponse,
     };
@@ -164,7 +169,21 @@ mod preset {
             (ViaCairo, ChannelState): EncodeChannelState,
             (ViaCairo, ChannelCounterparty): EncodeChannelCounterparty,
             (ViaCairo, ChannelEnd): EncodeChannelEnd,
-            (ViaCairo, CometUpdateHeader): EncodeCometUpdateHeader,
+            (ViaCairo, TendermintLcHeader): EncodeTendermintLcHeader,
+            (ViaCairo, SignedHeader): EncodeSignedHeader,
+            (ViaCairo, block::Commit): EncodeCommit,
+            (ViaCairo, TmHash): EncodeTmHash,
+            (ViaCairo, block::Id): EncodeBlockId,
+            (ViaCairo, PartSetHeader): EncodePartSetHeader,
+            (ViaCairo, Signature): EncodeSignature,
+            (ViaCairo, ProtoTimestamp): EncodeProtoTimestamp,
+            (ViaCairo, block::CommitSig): EncodeCommitSig,
+            (ViaCairo, validator::Set): EncodeValidatorSet,
+            (ViaCairo, vote::Power): EncodeVotePower,
+            (ViaCairo, validator::Info): EncodeValidator,
+            (ViaCairo, account::Id): EncodeAccountId,
+            (ViaCairo, ProposerPriority): EncodeProposerPriority,
+            (ViaCairo, PublicKey): EncodePublicKey,
             (ViaCairo, CreateClientResponse): DecodeCreateClientResponse,
             (ViaCairo, MsgRegisterClient): EncodeRegisterClient,
             (ViaCairo, MsgRegisterApp): EncodeRegisterApp,
