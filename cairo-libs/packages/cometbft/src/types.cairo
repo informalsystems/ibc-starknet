@@ -47,7 +47,7 @@ impl ConsensusAsProtoName of ProtoName<Consensus> {
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct PartSetHeader {
     pub total: u32,
-    pub hash: ByteArray,
+    pub hash: Array<u8>,
 }
 
 impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
@@ -222,7 +222,7 @@ pub struct CommitSig {
     pub block_id_flag: BlockIdFlag,
     pub validator_address: AccountId,
     pub timestamp: Timestamp,
-    pub signature: ByteArray,
+    pub signature: Array<u8>,
 }
 
 impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
@@ -408,7 +408,7 @@ pub struct Validator {
     pub address: AccountId,
     pub pub_key: PublicKey,
     pub voting_power: u64,
-    pub proposer_priority: u64,
+    pub proposer_priority: i64,
 }
 
 #[generate_trait]
@@ -604,7 +604,7 @@ impl AccountIdAsProtoMessage of ProtoMessage<AccountId> {
     }
 }
 
-// TODO: impelement Serde
+// TODO: implement Serde
 impl AccountIdSerde of Serde<AccountId> {
     fn serialize(self: @AccountId, ref output: Array<felt252>) {}
     fn deserialize(ref serialized: Span<felt252>) -> Option<AccountId> {
@@ -639,7 +639,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
                         chain_id: signed_header.header.chain_id.clone(),
                     },
                     validator_address: signature.validator_address.clone(),
-                    signature: byte_array_to_array_u8(signature.signature),
+                    signature: signature.signature.clone(),
                 };
 
                 let verified = false;
