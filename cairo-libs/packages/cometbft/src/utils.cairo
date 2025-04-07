@@ -119,11 +119,14 @@ pub fn next_power_of_two(num: u32) -> u32 {
         return 1;
     }
     let mut n = num - 1;
-    n = n | (n / 2);
-    n = n | (n / 4);
-    n = n | (n / 16);
-    n = n | (n / 256);
-    n = n | (n / 65536);
+    n = n | (n / 2); // n |= n >> 1;
+    n = n | (n / 4); // n |= n >> 2;
+    n = n | (n / 16); // n |= n >> 4;
+    n = n | (n / 256); // n |= n >> 8;
+    n = n | (n / 65536); // n |= n >> 16;
+
+    // we can stop, as `num` is u32.
+
     n + 1
 }
 
