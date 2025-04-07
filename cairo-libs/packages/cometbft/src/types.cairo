@@ -606,11 +606,14 @@ impl AccountIdAsProtoMessage of ProtoMessage<AccountId> {
     }
 }
 
-// TODO: implement Serde
 impl AccountIdSerde of Serde<AccountId> {
-    fn serialize(self: @AccountId, ref output: Array<felt252>) {}
+    fn serialize(self: @AccountId, ref output: Array<felt252>) {
+        let mut id = self.id.span().into();
+        Serde::<Array<u8>>::serialize(@id, ref output);
+    }
+
     fn deserialize(ref serialized: Span<felt252>) -> Option<AccountId> {
-        Option::None
+        Serde::<Array<u8>>::deserialize(ref serialized)?.try_into()
     }
 }
 

@@ -782,14 +782,14 @@ pub struct EncodeAccountId;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, account::Id> for EncodeAccountId
 where
-    Encoding: CanEncodeMut<Strategy, [u8; account::LENGTH]>,
+    Encoding: CanEncodeMut<Strategy, Vec<u8>>,
 {
     fn encode_mut(
         encoding: &Encoding,
         value: &account::Id,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
-        encoding.encode_mut(&value.as_bytes().to_vec().try_into().unwrap(), buffer)?;
+        encoding.encode_mut(&value.as_bytes().to_vec(), buffer)?;
         Ok(())
     }
 }
@@ -797,14 +797,16 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, account::Id> for EncodeAccountId
 where
-    Encoding: CanDecodeMut<Strategy, [u8; account::LENGTH]> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<&'static str>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<account::Id, Encoding::Error> {
         let value = encoding.decode_mut(buffer)?;
-        Ok(account::Id::new(value))
+        Ok(account::Id::new(value.try_into().map_err(|_| {
+            Encoding::raise_error("invalid account id")
+        })?))
     }
 }
 
