@@ -24,6 +24,7 @@ use hermes_test_components::chain::traits::types::wallet::HasWalletType;
 use hermes_test_components::chain_driver::traits::types::chain::HasChainType;
 use hermes_test_components::driver::traits::types::chain_driver::HasChainDriverType;
 use ibc::core::host::types::error::IdentifierError;
+use reqwest::Client;
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::{JsonRpcClient, Provider, ProviderError};
 use tokio::process::Child;
@@ -95,7 +96,10 @@ where
         ))
         .map_err(Bootstrap::raise_error)?;
 
-        let starknet_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
+        let starknet_client =
+            Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url.clone())));
+
+        let rpc_client = Client::new();
 
         // Wait for the chain to be ready.
         for _ in 0..10 {
@@ -130,6 +134,8 @@ where
                     .parse()
                     .map_err(Bootstrap::raise_error)?,
                 starknet_client,
+                rpc_client,
+                json_rpc_url,
                 ibc_client_contract_address: OnceLock::new(),
                 ibc_core_contract_address: OnceLock::new(),
                 ibc_ics20_contract_address: OnceLock::new(),

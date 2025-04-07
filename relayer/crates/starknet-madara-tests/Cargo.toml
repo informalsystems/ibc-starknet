@@ -45,12 +45,14 @@ ibc-proto                 = { workspace = true }
 tendermint-rpc            = { workspace = true }
 ibc-client-starknet-types = { workspace = true }
 
+starknet-v14                = { version = "0.14.0", package = "starknet" }
+starknet-v13                = { version = "0.13.0", package = "starknet" }
 cairo-lang-starknet-classes = { workspace = true }
-starknet-v13                = { workspace = true }
 futures                     = { workspace = true }
 url                         = { workspace = true }
 eyre                        = { workspace = true }
 tokio                       = { workspace = true }
+serde                       = { workspace = true }
 serde_json                  = { workspace = true }
 rand                        = { workspace = true }
 sha2                        = { workspace = true }
@@ -60,3 +62,4 @@ prost-types                 = { workspace = true }
 tracing                     = { workspace = true }
 flate2                      = { workspace = true }
 tiny-bip39                  = { workspace = true }
+reqwest                     = { workspace = true }
