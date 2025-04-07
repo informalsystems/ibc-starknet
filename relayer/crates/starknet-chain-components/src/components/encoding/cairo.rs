@@ -56,10 +56,11 @@ mod preset {
     use crate::types::cosmos::height::{EncodeHeight, Height};
     use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
     use crate::types::cosmos::update::{
-        EncodeAccountId, EncodeAppHash, EncodeBlockId, EncodeCommit, EncodeCommitSig,
-        EncodeHeaderVersion, EncodePartSetHeader, EncodeProposerPriority, EncodeProtoTimestamp,
-        EncodePublicKey, EncodeSignature, EncodeSignedHeader, EncodeTendermintLcHeader,
-        EncodeTmHash, EncodeTmHeader, EncodeValidator, EncodeValidatorSet, EncodeVotePower,
+        EncodeAccountId, EncodeAppHash, EncodeBlockId, EncodeCommit, EncodeCommitBlockIdFlag,
+        EncodeCommitSig, EncodeHeaderVersion, EncodePartSetHeader, EncodeProposerPriority,
+        EncodeProtoTimestamp, EncodePublicKey, EncodeSignature, EncodeSignedHeader,
+        EncodeTendermintLcHeader, EncodeTmHash, EncodeTmHeader, EncodeValidator,
+        EncodeValidatorSet, EncodeVotePower,
     };
     use crate::types::message_responses::create_client::{
         CreateClientResponse, DecodeCreateClientResponse,
@@ -182,10 +183,13 @@ mod preset {
             (ViaCairo, PartSetHeader): EncodePartSetHeader,
             (ViaCairo, Signature): EncodeSignature,
             (ViaCairo, ProtoTimestamp): EncodeProtoTimestamp,
+            (ViaCairo, block::BlockIdFlag): EncodeCommitBlockIdFlag,
             (ViaCairo, block::CommitSig): EncodeCommitSig,
+            (ViaCairo, Vec<block::CommitSig>): EncodeList,
             (ViaCairo, validator::Set): EncodeValidatorSet,
             (ViaCairo, vote::Power): EncodeVotePower,
             (ViaCairo, validator::Info): EncodeValidator,
+            (ViaCairo, Vec<validator::Info>): EncodeList,
             (ViaCairo, account::Id): EncodeAccountId,
             (ViaCairo, ProposerPriority): EncodeProposerPriority,
             (ViaCairo, PublicKey): EncodePublicKey,
