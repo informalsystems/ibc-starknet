@@ -1,19 +1,20 @@
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::message::MessageTypeComponent;
-use hermes_relayer_components::chain::traits::types::message::ProvideMessageType;
 use ibc::core::client::types::Height as CosmosHeight;
-use starknet::core::types::Call;
+use starknet::core::types::Felt;
 
 #[derive(Clone)]
 pub struct StarknetMessage {
-    pub call: Call,
+    pub to: Felt,
+    pub selector: Felt,
+    pub calldata: Vec<Felt>,
     pub counterparty_height: Option<CosmosHeight>,
 }
 
 impl StarknetMessage {
-    pub fn new(call: Call) -> Self {
+    pub fn new(to: Felt, selector: Felt, calldata: Vec<Felt>) -> Self {
         Self {
-            call,
+            to,
+            selector,
+            calldata,
             counterparty_height: None,
         }
     }
@@ -27,11 +28,4 @@ impl StarknetMessage {
         self.counterparty_height = None;
         self
     }
-}
-
-pub struct ProvideCallMessage;
-
-#[cgp_provider(MessageTypeComponent)]
-impl<Chain: Async> ProvideMessageType<Chain> for ProvideCallMessage {
-    type Message = StarknetMessage;
 }

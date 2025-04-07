@@ -1,12 +1,17 @@
 use cgp::prelude::*;
-use starknet::providers::jsonrpc::HttpTransport;
-use starknet::providers::JsonRpcClient;
 
-#[cgp_component {
-  name: JsonRpcClientGetterComponent,
-  provider: JsonRpcClientGetter,
-  context: Chain,
+#[cgp_type {
+    provider: StarknetClientTypeProvider,
+    context: Chain,
 }]
-pub trait HasJsonRpcClient: Async {
-    fn json_rpc_client(&self) -> &JsonRpcClient<HttpTransport>;
+pub trait HasStarknetClientType: Async {
+    type Client: Async;
+}
+
+#[cgp_getter {
+    provider: StarknetClientGetter,
+    context: Chain,
+}]
+pub trait HasStarknetClient: HasStarknetClientType {
+    fn provider(&self) -> &Self::Client;
 }

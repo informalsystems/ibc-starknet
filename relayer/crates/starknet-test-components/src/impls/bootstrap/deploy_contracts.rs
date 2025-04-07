@@ -36,7 +36,7 @@ use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::HasWalletType;
 use hermes_test_components::chain_driver::traits::types::chain::{HasChain, HasChainType};
 use hermes_test_components::driver::traits::types::chain_driver::HasChainDriverType;
-use starknet::core::types::{Call, Felt};
+use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
 use crate::traits::{CanDeployIbcContracts, IbcContractsDeployer, IbcContractsDeployerComponent};
@@ -226,13 +226,8 @@ where
                 .encode(&register_client)
                 .map_err(Bootstrap::raise_error)?;
 
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("register_client"),
-                calldata,
-            };
-
-            let message = StarknetMessage::new(call);
+            let message =
+                StarknetMessage::new(*ibc_core_address, selector!("register_client"), calldata);
 
             let response = chain
                 .send_message(message)
@@ -256,13 +251,11 @@ where
                 .encode(&register_app)
                 .map_err(Bootstrap::raise_error)?;
 
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("bind_port_id"),
-                calldata: register_call_data,
-            };
-
-            let message = StarknetMessage::new(call);
+            let message = StarknetMessage::new(
+                *ibc_core_address,
+                selector!("bind_port_id"),
+                register_call_data,
+            );
 
             let response = chain
                 .send_message(message)
@@ -328,7 +321,8 @@ impl<Bootstrap, InBuilder, Chain> ChainDriverBuilder<Bootstrap>
     for BuildChainAndDeployIbcContracts<InBuilder>
 where
     Bootstrap: HasRuntimeType<Runtime: HasChildProcessType>
-        + HasChainDriverType<Chain = Chain>
+        + HasChainDriverType
+        + HasChainType<Chain = Chain>
         + HasChainGenesisConfigType
         + HasChainNodeConfigType
         + CanDeployIbcContracts

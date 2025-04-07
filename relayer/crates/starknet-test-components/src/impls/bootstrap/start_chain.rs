@@ -12,9 +12,7 @@ use hermes_runtime_components::traits::runtime::HasRuntime;
 use crate::types::genesis_config::StarknetGenesisConfig;
 use crate::types::node_config::StarknetNodeConfig;
 
-pub struct StartStarknetDevnet;
-
-#[cgp_provider(ChainFullNodeStarterComponent)]
+#[cgp_new_provider(ChainFullNodeStarterComponent)]
 impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartStarknetDevnet
 where
     Bootstrap: HasRuntime<Runtime = Runtime>

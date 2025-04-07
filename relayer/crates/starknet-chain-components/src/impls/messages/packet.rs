@@ -33,7 +33,7 @@ use ibc::apps::transfer::types::packet::PacketData as IbcIcs20PacketData;
 use ibc::core::channel::types::packet::Packet as IbcPacket;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};
 use ibc::core::client::types::Height;
-use starknet::core::types::{Call, Felt};
+use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
@@ -98,14 +98,8 @@ where
             .encode(&receive_packet_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("recv_packet"),
-            calldata,
-        };
-
-        let message =
-            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+        let message = StarknetMessage::new(*ibc_core_address, selector!("recv_packet"), calldata)
+            .with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }
@@ -160,14 +154,8 @@ where
             .encode(&ack_packet_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("ack_packet"),
-            calldata,
-        };
-
-        let message =
-            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+        let message = StarknetMessage::new(*ibc_core_address, selector!("ack_packet"), calldata)
+            .with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }
@@ -224,14 +212,9 @@ where
             .encode(&timeout_packet_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("timeout_packet"),
-            calldata,
-        };
-
         let message =
-            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+            StarknetMessage::new(*ibc_core_address, selector!("timeout_packet"), calldata)
+                .with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }

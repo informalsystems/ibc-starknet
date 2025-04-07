@@ -17,7 +17,7 @@ use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc2
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
-use starknet::core::types::{Call, U256};
+use starknet::core::types::U256;
 use starknet::macros::selector;
 use tracing::info;
 
@@ -74,13 +74,13 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             let calldata = StarknetCairoEncoding.encode(&U256::from(initial_supply))?;
 
-            let call = Call {
-                to: *token_address,
-                selector: selector!("mint"),
-                calldata,
-            };
-
-            chain.send_message(StarknetMessage::new(call)).await?;
+            chain
+                .send_message(StarknetMessage::new(
+                    *token_address,
+                    selector!("mint"),
+                    calldata,
+                ))
+                .await?;
 
             info!("Mint {initial_supply} initial supply to address: {relayer_address}");
 

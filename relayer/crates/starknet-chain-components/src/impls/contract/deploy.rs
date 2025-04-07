@@ -1,4 +1,5 @@
 use cgp::prelude::*;
+use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet::contract::ContractFactory;
@@ -7,7 +8,7 @@ use starknet::macros::felt;
 use starknet::signers::SigningKey;
 
 use crate::impls::types::address::StarknetAddress;
-use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
+use crate::traits::account::{CanBuildAccountFromSigner, CanUseStarknetAccount};
 use crate::traits::contract::deploy::{ContractDeployer, ContractDeployerComponent};
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::contract_class::HasContractClassHashType;
@@ -25,8 +26,9 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasBlobType<Blob = Vec<Felt>>
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>
-        + HasStarknetAccount
-        + CanRaiseAccountErrors
+        + HasDefaultSigner
+        + CanBuildAccountFromSigner
+        + CanUseStarknetAccount
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<RevertedInvocation>,
 {
@@ -36,7 +38,8 @@ where
         unique: bool,
         constructor_call_data: &Vec<Felt>,
     ) -> Result<StarknetAddress, Chain::Error> {
-        let account = chain.account();
+        let signer = chain.get_default_signer();
+        let account = chain.build_account_from_signer(signer);
 
         let factory = ContractFactory::new_with_udc(*class_hash, account, DEFAULT_UDC_ADDRESS);
 

@@ -10,8 +10,6 @@ pub mod messages;
 pub mod packet_fields;
 pub mod packet_filter;
 pub mod payload_builders;
-pub mod proof_signer;
-pub mod provider;
 pub mod queries;
 pub mod send_message;
 pub mod starknet_to_cosmos;

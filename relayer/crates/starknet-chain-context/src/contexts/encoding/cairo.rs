@@ -14,7 +14,7 @@ use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetterComponent,
-    EncodingTypeComponent, HasEncodingType, ProvideEncodingType,
+    EncodingTypeProviderComponent, HasEncodingType,
 };
 use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
@@ -64,24 +64,19 @@ delegate_components! {
     }
 }
 
-pub struct ProvideCairoEncoding;
+pub struct UseStarknetCairoEncoding;
 
 delegate_components! {
-    ProvideCairoEncoding {
-        EncodingGetterComponent: GetDefaultEncoding,
+    UseStarknetCairoEncoding {
+        EncodingTypeProviderComponent<AsFelt>:
+            UseType<StarknetCairoEncoding>,
+        EncodingGetterComponent<AsFelt>:
+            GetDefaultEncoding,
     }
 }
 
-#[cgp_provider(EncodingTypeComponent)]
-impl<Context> ProvideEncodingType<Context, AsFelt> for ProvideCairoEncoding
-where
-    Context: Async,
-{
-    type Encoding = StarknetCairoEncoding;
-}
-
-#[cgp_provider(DefaultEncodingGetterComponent)]
-impl<Context> DefaultEncodingGetter<Context, AsFelt> for ProvideCairoEncoding
+#[cgp_provider(DefaultEncodingGetterComponent<AsFelt>)]
+impl<Context> DefaultEncodingGetter<Context, AsFelt> for UseStarknetCairoEncoding
 where
     Context: HasEncodingType<AsFelt, Encoding = StarknetCairoEncoding>,
 {

@@ -6,6 +6,7 @@ use cairo_lang_starknet_classes::casm_contract_class::{
 use cairo_lang_starknet_classes::contract_class::ContractClass;
 use cgp::core::error::CanRaiseAsyncError;
 use cgp::prelude::*;
+use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
 use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
 use starknet::accounts::Account;
 use starknet::core::types::contract::{
@@ -14,23 +15,22 @@ use starknet::core::types::contract::{
 use starknet::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
 use starknet::providers::Provider;
 
-use crate::traits::account::{CanRaiseAccountErrors, HasStarknetAccount};
+use crate::traits::account::{CanBuildAccountFromSigner, CanUseStarknetAccount};
+use crate::traits::client::HasStarknetClient;
 use crate::traits::contract::declare::{ContractDeclarer, ContractDeclarerComponent};
-use crate::traits::provider::HasStarknetProvider;
 use crate::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
 use crate::types::tx_response::TxResponse;
 
-pub struct DeclareSierraContract;
-
-#[cgp_provider(ContractDeclarerComponent)]
+#[cgp_new_provider(ContractDeclarerComponent)]
 impl<Chain> ContractDeclarer<Chain> for DeclareSierraContract
 where
     Chain: HasContractClassType<ContractClass = SierraClass>
         + HasContractClassHashType<ContractClassHash = Felt>
-        + HasStarknetProvider
-        + HasStarknetAccount
+        + HasStarknetClient<Client: Provider>
+        + HasDefaultSigner
+        + CanBuildAccountFromSigner
         + CanPollTxResponse<TxHash = Felt, TxResponse = TxResponse>
-        + CanRaiseAccountErrors
+        + CanUseStarknetAccount
         + CanRaiseAsyncError<serde_json::error::Error>
         + CanRaiseAsyncError<JsonError>
         + CanRaiseAsyncError<ComputeClassHashError>
@@ -43,7 +43,8 @@ where
         contract_class: &SierraClass,
     ) -> Result<Felt, Chain::Error> {
         let provider = chain.provider();
-        let account = chain.account();
+        let signer = chain.get_default_signer();
+        let account = chain.build_account_from_signer(signer);
 
         let class_hash = contract_class.class_hash().map_err(Chain::raise_error)?;
 

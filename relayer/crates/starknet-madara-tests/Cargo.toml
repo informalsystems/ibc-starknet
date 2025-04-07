@@ -1,0 +1,62 @@
+[package]
+name         = "hermes-starknet-madara-tests"
+version      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
+keywords     = { workspace = true }
+repository   = { workspace = true }
+authors      = { workspace = true }
+rust-version = { workspace = true }
+
+[lints]
+workspace = true
+
+[dependencies]
+cgp                                 = { workspace = true }
+hermes-error                        = { workspace = true }
+hermes-runtime                      = { workspace = true }
+hermes-relayer-components           = { workspace = true }
+hermes-test-components              = { workspace = true }
+hermes-ibc-test-suite               = { workspace = true }
+hermes-runtime-components           = { workspace = true }
+hermes-encoding-components          = { workspace = true }
+hermes-cairo-encoding-components    = { workspace = true }
+hermes-starknet-chain-components    = { workspace = true }
+hermes-starknet-test-components     = { workspace = true }
+hermes-starknet-chain-context       = { workspace = true }
+hermes-starknet-integration-tests   = { workspace = true }
+hermes-starknet-relayer             = { workspace = true }
+hermes-cosmos-test-components       = { workspace = true }
+hermes-cosmos-chain-preset          = { workspace = true }
+hermes-wasm-test-components         = { workspace = true }
+hermes-chain-components             = { workspace = true }
+hermes-cosmos-chain-components      = { workspace = true }
+hermes-cosmos-integration-tests     = { workspace = true }
+hermes-cosmos-relayer               = { workspace = true }
+hermes-cosmos-wasm-relayer          = { workspace = true }
+hermes-logger                       = { workspace = true }
+hermes-logging-components           = { workspace = true }
+poseidon                            = { workspace = true }
+hermes-protobuf-encoding-components = { workspace = true }
+hermes-chain-type-components        = { workspace = true }
+
+ibc                       = { workspace = true }
+ibc-proto                 = { workspace = true }
+tendermint-rpc            = { workspace = true }
+ibc-client-starknet-types = { workspace = true }
+
+cairo-lang-starknet-classes = { workspace = true }
+starknet-v13                = { workspace = true }
+futures                     = { workspace = true }
+url                         = { workspace = true }
+eyre                        = { workspace = true }
+tokio                       = { workspace = true }
+serde_json                  = { workspace = true }
+rand                        = { workspace = true }
+sha2                        = { workspace = true }
+toml                        = { workspace = true }
+prost                       = { workspace = true }
+prost-types                 = { workspace = true }
+tracing                     = { workspace = true }
+flate2                      = { workspace = true }
+tiny-bip39                  = { workspace = true }
