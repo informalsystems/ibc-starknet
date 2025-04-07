@@ -656,10 +656,8 @@ pub struct EncodeValidatorSet;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, validator::Set> for EncodeValidatorSet
 where
-    Encoding: CanEncodeMut<
-        Strategy,
-        Product![Vec<validator::Info>, Option<validator::Info>, vote::Power],
-    >,
+    Encoding: CanEncodeMut<Strategy, Product![Vec<validator::Info>, validator::Info, vote::Power]>
+        + CanRaiseAsyncError<&'static str>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -669,7 +667,9 @@ where
         encoding.encode_mut(
             &product![
                 value.validators().clone(),
-                value.proposer().clone(),
+                value.proposer().clone().ok_or_else(|| {
+                    Encoding::raise_error("proposer not found in validator set")
+                })?,
                 value.total_voting_power()
             ],
             buffer,
@@ -681,7 +681,7 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, validator::Set> for EncodeValidatorSet
 where
-    Encoding: CanDecodeMut<Strategy, Product![Vec<validator::Info>, Option<validator::Info>, vote::Power]>
+    Encoding: CanDecodeMut<Strategy, Product![Vec<validator::Info>, validator::Info, vote::Power]>
         + CanRaiseAsyncError<&'static str>,
 {
     fn decode_mut<'a>(
@@ -690,7 +690,7 @@ where
     ) -> Result<validator::Set, Encoding::Error> {
         let product![validators, proposer, total_voting_power] = encoding.decode_mut(buffer)?;
 
-        let validator_set = validator::Set::new(validators, proposer);
+        let validator_set = validator::Set::new(validators, Some(proposer));
 
         assert!(validator_set.total_voting_power() == total_voting_power);
 
