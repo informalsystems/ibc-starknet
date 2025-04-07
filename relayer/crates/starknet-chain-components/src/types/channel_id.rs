@@ -79,10 +79,17 @@ where
         }
 
         let counterparty = value.counterparty();
+
         let channel_id = counterparty
             .channel_id
             .clone()
             .ok_or_else(|| Encoding::raise_error("expect counterparty channel id to exist"))?;
+
+        let [connection_id]: [ConnectionId; 1] = value
+            .connection_hops
+            .clone()
+            .try_into()
+            .map_err(|_| Encoding::raise_error("expect exactly one connection id to exist"))?;
 
         let raw = RawChannelEnd {
             state: (&value.state).into(),
