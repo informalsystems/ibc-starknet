@@ -9,6 +9,7 @@ pub use ibc::core::channel::types::channel::{
     ChannelEnd, Counterparty as ChannelCounterparty, State as ChannelState,
 };
 use ibc::core::channel::types::error::ChannelError;
+use ibc::core::host::types::error::IdentifierError;
 pub use ibc::core::host::types::identifiers::ChannelId;
 
 use super::connection_id::ConnectionId;
@@ -59,7 +60,7 @@ impl From<RawChannelState> for ChannelState {
 #[derive(HasFields)]
 pub struct RawChannelCounterparty {
     pub port_id: PortId,
-    pub channel_id: ChannelId,
+    pub channel_id: String,
 }
 
 pub struct EncodeChannelEnd;
@@ -74,16 +75,13 @@ where
         value: &ChannelEnd,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
-        if value.connection_hops.len() != 1 {
-            return Err(Encoding::raise_error("invalid connection hops"));
-        }
-
         let counterparty = value.counterparty();
 
         let channel_id = counterparty
             .channel_id
-            .clone()
-            .ok_or_else(|| Encoding::raise_error("expect counterparty channel id to exist"))?;
+            .as_ref()
+            .map(ToString::to_string)
+            .unwrap_or_else(String::new);
 
         let [connection_id]: [ConnectionId; 1] = value
             .connection_hops
@@ -98,7 +96,7 @@ where
                 port_id: counterparty.port_id.clone(),
                 channel_id,
             },
-            connection_id: value.connection_hops[0].clone(),
+            connection_id,
             version: value.version.clone(),
         };
 
@@ -109,7 +107,9 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ChannelEnd> for EncodeChannelEnd
 where
-    Encoding: CanDecodeMut<Strategy, RawChannelEnd> + CanRaiseAsyncError<ChannelError>,
+    Encoding: CanDecodeMut<Strategy, RawChannelEnd>
+        + CanRaiseAsyncError<ChannelError>
+        + CanRaiseAsyncError<IdentifierError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
@@ -117,12 +117,19 @@ where
     ) -> Result<ChannelEnd, Encoding::Error> {
         let raw = encoding.decode_mut(buffer)?;
 
+        let raw_channel_id = raw.remote.channel_id;
+        let channel_id = if raw_channel_id.is_empty() {
+            None
+        } else {
+            Some(raw_channel_id.parse().map_err(Encoding::raise_error)?)
+        };
+
         ChannelEnd::new(
             raw.state.into(),
             raw.ordering,
             ChannelCounterparty {
                 port_id: raw.remote.port_id,
-                channel_id: Some(raw.remote.channel_id),
+                channel_id,
             },
             vec![raw.connection_id],
             raw.version,

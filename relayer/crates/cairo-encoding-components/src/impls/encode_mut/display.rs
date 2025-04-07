@@ -36,6 +36,7 @@ where
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<Value, Encoding::Error> {
         let value_str = encoding.decode_mut(buffer)?;
+
         let value = Value::from_str(&value_str).map_err(Encoding::raise_error)?;
 
         Ok(value)
