@@ -81,7 +81,7 @@ where
             .channel_id
             .as_ref()
             .map(ToString::to_string)
-            .unwrap_or_else(String::new);
+            .unwrap_or_default();
 
         let [connection_id]: [ConnectionId; 1] = value
             .connection_hops
