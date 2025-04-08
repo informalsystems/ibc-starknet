@@ -1,4 +1,5 @@
 use cometbft::light_client::Header as CometHeader;
+use protobuf::types::message::ProtoCodecImpl;
 use starknet_ibc_clients::cometbft::{CometConsensusState, CometErrors};
 use starknet_ibc_core::client::{TimestampImpl, U64IntoTimestamp};
 use starknet_ibc_core::commitment::StateRoot;
@@ -22,7 +23,11 @@ pub impl CometHeaderImpl of CometHeaderTrait {
     fn deserialize(header: Array<felt252>) -> CometHeader {
         let mut header_span = header.span();
 
-        let maybe_header = Serde::<CometHeader>::deserialize(ref header_span);
+        let maybe_byte_array = Serde::<ByteArray>::deserialize(ref header_span);
+
+        assert(maybe_byte_array.is_some(), CometErrors::INVALID_HEADER);
+
+        let maybe_header = ProtoCodecImpl::decode::<CometHeader>(@maybe_byte_array.unwrap());
 
         assert(maybe_header.is_some(), CometErrors::INVALID_HEADER);
 

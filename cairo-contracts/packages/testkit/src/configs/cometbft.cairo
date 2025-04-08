@@ -1,7 +1,5 @@
 use cometbft::utils::ONE_THIRD;
-use starknet_ibc_clients::cometbft::{
-    CometClientState, CometConsensusState, CometHeader, SignedHeader,
-};
+use starknet_ibc_clients::cometbft::{CometClientState, CometConsensusState, CometHeader};
 use starknet_ibc_core::client::{
     CreateResponse, Duration, Height, MsgCreateClient, MsgUpdateClient, Status, Timestamp,
 };
