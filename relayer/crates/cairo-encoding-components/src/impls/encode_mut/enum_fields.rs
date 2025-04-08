@@ -5,18 +5,16 @@ use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferTyp
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 
 use crate::impls::encode_mut::variant::SumEncoders;
-use crate::traits::size::HasSize;
-use crate::types::nat::{S, Z};
+use crate::types::nat::Z;
 
 pub struct EncodeEnumFields;
 
 #[cgp_provider(MutEncoderComponent)]
-impl<Encoding, Strategy, Value, N> MutEncoder<Encoding, Strategy, Value> for EncodeEnumFields
+impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Value> for EncodeEnumFields
 where
     Encoding: HasEncodeBufferType + HasAsyncErrorType,
     Value: ToFieldsRef,
-    SumEncoders<Z, N>: for<'a> MutEncoder<Encoding, Strategy, Value::FieldsRef<'a>>,
-    for<'a> Value::FieldsRef<'a>: HasSize<Size = S<N>>,
+    SumEncoders<Z>: for<'a> MutEncoder<Encoding, Strategy, Value::FieldsRef<'a>>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -29,12 +27,11 @@ where
 }
 
 #[cgp_provider(MutDecoderComponent)]
-impl<Encoding, Strategy, Value, N> MutDecoder<Encoding, Strategy, Value> for EncodeEnumFields
+impl<Encoding, Strategy, Value> MutDecoder<Encoding, Strategy, Value> for EncodeEnumFields
 where
     Encoding: HasDecodeBufferType + HasAsyncErrorType,
     Value: FromFields,
-    SumEncoders<Z, N>: MutDecoder<Encoding, Strategy, Value::Fields>,
-    Value::Fields: HasSize<Size = S<N>>,
+    SumEncoders<Z>: MutDecoder<Encoding, Strategy, Value::Fields>,
 {
     fn decode_mut(
         encoding: &Encoding,
