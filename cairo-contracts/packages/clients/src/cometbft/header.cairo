@@ -4,15 +4,14 @@ use starknet_ibc_core::client::{TimestampImpl, U64IntoTimestamp};
 use starknet_ibc_core::commitment::StateRoot;
 
 fn from_u8Array_to_u32Array(mut data: Span<u8>) -> Array<u32> {
+    assert!(data.len() % 4 == 0);
     let mut result = array![];
-    while let Option::Some(val1) = data.pop_front() {
-        let val2 = data.pop_front().unwrap();
-        let val3 = data.pop_front().unwrap();
-        let val4 = data.pop_front().unwrap();
-        let mut value = (*val1).into() * 0x1000000;
-        value = value + (*val2).into() * 0x10000;
-        value = value + (*val3).into() * 0x100;
-        value = value + (*val4).into();
+    while let Option::Some(vals) = data.multi_pop_front() {
+        let [val1, val2, val3, val4] = (*vals).unbox();
+        let mut value = val1.into() * 0x1000000;
+        value = value + val2.into() * 0x10000;
+        value = value + val3.into() * 0x100;
+        value = value + val4.into();
         result.append(value);
     }
     result
