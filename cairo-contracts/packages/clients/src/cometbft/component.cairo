@@ -68,6 +68,8 @@ pub mod CometClientComponent {
 
         fn recover_client(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
             self.assert_owner();
+            self.recover_validate(msg.clone());
+            self.recover_execute(msg)
         }
 
         fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
@@ -241,9 +243,86 @@ pub mod CometClientComponent {
     > of RecoverClientTrait<TContractState> {
         fn recover_validate(self: @ComponentState<TContractState>, msg: MsgRecoverClient) {
             msg.validate_basic();
+            // TODO: validate signer
+
+            let subject_client_sequence = self.read_next_client_sequence();
+
+            assert(
+                subject_client_sequence == msg.subject_client_id.sequence,
+                CometErrors::INVALID_RECOVER_MESSAGE,
+            );
+
+            let substitute_client_sequence = msg.substitute_client_id.sequence;
+
+            let subject_client_state: CometClientState = self
+                .read_client_state(subject_client_sequence);
+            let substitute_client_state: CometClientState = self
+                .read_client_state(substitute_client_sequence);
+
+            let subject_consensus_state = self
+                .read_consensus_state(
+                    subject_client_sequence, subject_client_state.latest_height.clone(),
+                );
+            let substitute_consensus_state = self
+                .read_consensus_state(
+                    substitute_client_sequence, substitute_client_state.latest_height.clone(),
+                );
+
+            let subject_status = self
+                ._status(subject_client_state, subject_consensus_state, subject_client_sequence);
+            let substitute_status = self
+                ._status(
+                    substitute_client_state, substitute_consensus_state, substitute_client_sequence,
+                );
+
+            assert(
+                subject_client_state.latest_height < substitute_client_state.latest_height,
+                CometErrors::INVALID_CLIENT_SUBSTITUTE,
+            );
+
+            assert(
+                subject_status.is_expired() | subject_status.is_frozen(),
+                CometErrors::INACTIVE_CLIENT,
+            );
+            assert(substitute_status.is_active(), CometErrors::INACTIVE_CLIENT);
+
+            assert(
+                subject_client_state.unbonding_period == substitute_client_state.unbonding_period,
+                CometErrors::INVALID_CLIENT_SUBSTITUTE,
+            );
+            assert(
+                subject_client_state.max_clock_drift == substitute_client_state.max_clock_drift,
+                CometErrors::INVALID_CLIENT_SUBSTITUTE,
+            );
         }
 
-        fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {}
+        fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
+            let subject_client_sequence = self.read_next_client_sequence();
+            let substitute_client_sequence = msg.subject_client_id.sequence;
+
+            let substitute_client_state: CometClientState = self
+                .read_client_state(substitute_client_sequence);
+
+            let substitute_consensus_state = self
+                .read_consensus_state(
+                    substitute_client_sequence, substitute_client_state.latest_height.clone(),
+                );
+
+            let substitute_status = self
+                ._status(
+                    substitute_client_state, substitute_consensus_state, substitute_client_sequence,
+                );
+
+            let mut serialised_client_state = array![];
+            let mut serialised_consensus_state = array![];
+            substitute_client_state.serialize(ref serialised_client_state);
+            substitute_consensus_state.serialize(ref serialised_consensus_state);
+
+            self
+                .update_on_recover(
+                    subject_client_sequence, serialised_client_state, serialised_consensus_state,
+                );
+        }
     }
 
     #[generate_trait]
@@ -385,7 +464,21 @@ pub mod CometClientComponent {
             subject_client_sequence: u64,
             substitute_client_state: Array<felt252>,
             substitute_consensus_state: Array<felt252>,
-        ) {}
+        ) {
+            let substitute_client_state = CometClientStateImpl::deserialize(
+                substitute_client_state,
+            );
+            let substitute_consensus_state = CometConsensusStateImpl::deserialize(
+                substitute_consensus_state,
+            );
+            self
+                ._update_state(
+                    subject_client_sequence,
+                    substitute_client_state.latest_height,
+                    substitute_client_state,
+                    substitute_consensus_state,
+                );
+        }
 
         fn update_on_upgrade(
             ref self: ComponentState<TContractState>,

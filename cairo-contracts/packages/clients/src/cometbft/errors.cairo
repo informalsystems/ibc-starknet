@@ -6,6 +6,8 @@ pub mod CometErrors {
     pub const INVALID_HEADER: felt252 = 'ICS07: invalid header';
     pub const INVALID_HEADER_FROM_FUTURE: felt252 = 'ICS07: inv header from future';
     pub const INVALID_OWNER: felt252 = 'ICS07: invalid owner';
+    pub const INVALID_CLIENT_SUBSTITUTE: felt252 = 'ICS07: invalid substitute';
+    pub const INVALID_RECOVER_MESSAGE: felt252 = 'ICS07: invalid recover message';
     pub const MISSING_CLIENT_STATE: felt252 = 'ICS07: missing client state';
     pub const MISSING_CONSENSUS_STATE: felt252 = 'ICS07: missing consensus state';
     pub const MISSING_CLIENT_PROCESSED_TIME: felt252 = 'ICS07: missing processed time';
