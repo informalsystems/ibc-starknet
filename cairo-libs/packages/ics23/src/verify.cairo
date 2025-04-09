@@ -23,10 +23,11 @@ pub fn verify_membership(
     let mut subroot = [0; 8];
     let mut subvalue = value;
     let mut i = index;
-    while i < proofs_len {
+    while i != proofs_len {
         if let Proof::Exist(p) = proofs[i] {
-            subroot = p.calculate_root();
-            verify_existence(specs[i], p, @subroot, keys[proofs_len - 1 - i], @subvalue);
+            let spec = specs[i];
+            subroot = p.calculate_root_for_spec(Option::Some(spec));
+            verify_existence(spec, p, keys[proofs_len - 1 - i], @subvalue);
         } else {
             panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
         }
@@ -52,7 +53,7 @@ pub fn verify_non_membership(
     let key = keys[proofs_len - 1];
     if let Proof::NonExist(p) = proof {
         subroot = p.calculate_root();
-        verify_non_existence(spec, p, @subroot, key.clone());
+        verify_non_existence(spec, p, key.clone());
         verify_membership(specs.clone(), proofs, root, keys.clone(), subroot.into(), 1)
     } else {
         panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
@@ -60,20 +61,16 @@ pub fn verify_non_membership(
 }
 
 pub fn verify_existence(
-    spec: @ProofSpec, proof: @ExistenceProof, root: @RootBytes, key: @KeyBytes, value: @ValueBytes,
+    spec: @ProofSpec, proof: @ExistenceProof, key: @KeyBytes, value: @ValueBytes,
 ) {
     check_existence_spec(spec, proof);
     assert(proof.key == key, ICS23Errors::MISMATCHED_KEY);
     assert(proof.value == value, ICS23Errors::MISMATCHED_VALUE);
-    let calc = proof.calculate_root_for_spec(Option::Some(spec));
-    assert(@calc == root, ICS23Errors::MISMATCHED_ROOT)
 }
 
-pub fn verify_non_existence(
-    spec: @ProofSpec, proof: @NonExistenceProof, root: @RootBytes, key: KeyBytes,
-) {
+pub fn verify_non_existence(spec: @ProofSpec, proof: @NonExistenceProof, key: KeyBytes) {
     if let Option::Some(left) = proof.left {
-        verify_existence(spec, left, root, left.key, left.value);
+        verify_existence(spec, left, left.key, left.value);
         assert(
             spec.key_for_comparison(key.clone()) > spec.key_for_comparison(left.key.clone()),
             ICS23Errors::INVALID_LEFT_KEY_ORDER,
@@ -81,7 +78,7 @@ pub fn verify_non_existence(
     }
 
     if let Option::Some(right) = proof.right {
-        verify_existence(spec, right, root, right.key, right.value);
+        verify_existence(spec, right, right.key, right.value);
         assert(
             spec.key_for_comparison(key) < spec.key_for_comparison(right.key.clone()),
             ICS23Errors::INVALID_RIGHT_KEY_ORDER,
@@ -89,12 +86,10 @@ pub fn verify_non_existence(
     }
 
     match (proof.left, proof.right) {
-        (
-            Option::Some(left), Option::None,
-        ) => ensure_right_most(spec.inner_spec.clone(), left.path.clone()),
+        (Option::Some(left), Option::None) => ensure_right_most(spec.inner_spec.clone(), left.path),
         (
             Option::None, Option::Some(right),
-        ) => ensure_left_most(spec.inner_spec.clone(), right.path.clone()),
+        ) => ensure_left_most(spec.inner_spec.clone(), right.path),
         (
             Option::Some(left), Option::Some(right),
         ) => ensure_left_neighbor(spec.inner_spec.clone(), left.path.clone(), right.path.clone()),
@@ -103,28 +98,32 @@ pub fn verify_non_existence(
 }
 
 fn check_existence_spec(spec: @ProofSpec, proof: @ExistenceProof) {
-    if spec.is_iavl() {
-        ensure_leaf_prefix(proof.leaf.prefix.clone());
+    let is_iavl = spec.is_iavl();
+
+    if is_iavl {
+        ensure_leaf_prefix(proof.leaf.prefix);
     }
     ensure_leaf(proof.leaf, spec.leaf_spec);
 
-    let inner_len = proof.path.len();
+    let path = proof.path;
+    let inner_len = path.len();
+
     if spec.min_depth != @0 {
         assert(@inner_len >= spec.min_depth, ICS23Errors::INVALID_INNER_OP_SIZE);
         assert(@inner_len <= spec.max_depth, ICS23Errors::INVALID_INNER_OP_SIZE);
     }
 
-    for i in 0..inner_len {
-        if spec.is_iavl() {
-            ensure_inner_prefix(
-                proof.path.at(i).prefix, i.try_into().unwrap(), proof.path.at(i).hash,
-            );
+    let mut i = 0;
+    for inner_op in @path {
+        if is_iavl {
+            ensure_inner_prefix(inner_op.prefix, i, inner_op.hash);
         }
-        ensure_inner(proof.path.at(i), spec.clone());
+        ensure_inner(inner_op, spec);
+        i += 1;
     }
 }
 
-fn ensure_leaf_prefix(prefix: Array<u8>) {
+fn ensure_leaf_prefix(prefix: @Array<u8>) {
     let mut prefix = prefix.clone();
     let rem = ensure_iavl_prefix(ref prefix, 0);
     assert(rem == 0, ICS23Errors::INVALID_LEAF_PREFIX);
@@ -155,14 +154,13 @@ fn ensure_inner_prefix(prefix: @Array<u8>, min_height: u64, hash_op: @HashOp) {
     assert(hash_op == @HashOp::Sha256, ICS23Errors::INVALID_HASH_OP);
 }
 
-fn ensure_inner(inner: @InnerOp, spec: ProofSpec) {
-    let inner_spec = spec.inner_spec;
+fn ensure_inner(inner: @InnerOp, spec: @ProofSpec) {
+    let inner_spec = spec.inner_spec.clone();
     let inner_p_len = inner.prefix.len();
     let max_left_child_bytes = (inner_spec.child_order.len() - 1) * inner_spec.child_size;
-    inner_spec.child_size;
 
     assert(inner.hash == @inner_spec.hash, ICS23Errors::INVALID_HASH_OP);
-    assert(!has_prefix(inner.prefix, @spec.leaf_spec.prefix), ICS23Errors::INVALID_INNER_PREFIX);
+    assert(!has_prefix(inner.prefix, spec.leaf_spec.prefix), ICS23Errors::INVALID_INNER_PREFIX);
     assert(inner_p_len >= inner_spec.min_prefix_length, ICS23Errors::INVALID_INNER_PREFIX_LEN);
     assert(
         inner_p_len <= inner_spec.max_prefix_length + max_left_child_bytes,
@@ -177,35 +175,45 @@ fn ensure_inner(inner: @InnerOp, spec: ProofSpec) {
 }
 
 fn has_prefix(proof_prefix: @Array<u8>, spec_prefix: @Array<u8>) -> bool {
-    if spec_prefix.len() > proof_prefix.len() {
+    let spec_prefix_len = spec_prefix.len();
+    let proof_prefix_len = proof_prefix.len();
+
+    if spec_prefix_len > proof_prefix_len {
         return false;
     }
-    let mut expected: Array<u8> = ArrayTrait::new();
-    let mut i = 0;
-    while i < spec_prefix.len() {
-        expected.append(*proof_prefix[i]);
-        i += 1;
+
+    let mut proof_prefix_span = proof_prefix.span();
+    let mut spec_prefix_span = spec_prefix.span();
+
+    let mut has_prefix = true;
+
+    while let Option::Some(s_prefix) = spec_prefix_span.pop_front() {
+        if proof_prefix_span.pop_front().unwrap() != s_prefix {
+            has_prefix = false;
+            break;
+        }
     }
-    spec_prefix == @expected
+
+    return has_prefix;
 }
 
 // Fails unless this is the left-most path in the tree, excluding placeholder (empty child) nodes.
-fn ensure_left_most(inner_spec: InnerSpec, path: Array<InnerOp>) {
+fn ensure_left_most(inner_spec: InnerSpec, path: @Array<InnerOp>) {
     let pad = get_padding(inner_spec.clone(), 0);
     for step in path {
         assert(
-            has_padding(@step, pad.clone()) || left_branches_are_empty(inner_spec.clone(), @step),
+            has_padding(step, @pad) || left_branches_are_empty(inner_spec.clone(), step),
             ICS23Errors::STEP_NOT_LEFT_MOST,
         );
     };
 }
 
 // Fails unless this is the right-most path in the tree, excluding placeholder (empty child) nodes.
-fn ensure_right_most(inner_spec: InnerSpec, path: Array<InnerOp>) {
+fn ensure_right_most(inner_spec: InnerSpec, path: @Array<InnerOp>) {
     let pad = get_padding(inner_spec.clone(), inner_spec.child_order.len() - 1);
     for step in path {
         assert(
-            has_padding(@step, pad.clone()) || right_branches_are_empty(@inner_spec, @step),
+            has_padding(step, @pad) || right_branches_are_empty(@inner_spec, step),
             ICS23Errors::STEP_NOT_RIGHT_MOST,
         );
     };
@@ -228,8 +236,8 @@ fn ensure_left_neighbor(
     assert(
         is_left_step(inner_spec.clone(), top_left, top_right), ICS23Errors::INVALID_LEFT_NEIGHBOR,
     );
-    ensure_right_most(inner_spec.clone(), left_path_span.into());
-    ensure_left_most(inner_spec, right_path_span.into());
+    ensure_right_most(inner_spec.clone(), @left_path_span.into());
+    ensure_left_most(inner_spec, @right_path_span.into());
 }
 
 fn is_left_step(inner_spec: InnerSpec, left_op: @InnerOp, right_op: @InnerOp) -> bool {
@@ -247,10 +255,11 @@ pub struct Padding {
 
 fn get_padding(inner_spec: InnerSpec, branch: u32) -> Padding {
     let mut padding = Option::None;
-    for o in inner_spec.child_order.clone() {
+    let child_order_len = inner_spec.child_order.len();
+    for o in inner_spec.child_order {
         if o == branch {
             let prefix = o * inner_spec.child_size;
-            let suffix = inner_spec.child_size * (inner_spec.child_order.len() - 1 - o);
+            let suffix = inner_spec.child_size * (child_order_len - 1 - o);
             padding =
                 Option::Some(
                     Padding {
@@ -266,10 +275,10 @@ fn get_padding(inner_spec: InnerSpec, branch: u32) -> Padding {
     padding.unwrap()
 }
 
-fn has_padding(inner_op: @InnerOp, pad: Padding) -> bool {
-    inner_op.prefix.len() >= pad.min_prefix
-        && inner_op.prefix.len() <= pad.max_prefix
-        && inner_op.suffix.len() == pad.suffix
+fn has_padding(inner_op: @InnerOp, pad: @Padding) -> bool {
+    inner_op.prefix.len() >= *pad.min_prefix
+        && inner_op.prefix.len() <= *pad.max_prefix
+        && inner_op.suffix.len() == *pad.suffix
 }
 
 fn order_from_padding(inner_spec: InnerSpec, inner_op: @InnerOp) -> u32 {
@@ -277,7 +286,7 @@ fn order_from_padding(inner_spec: InnerSpec, inner_op: @InnerOp) -> u32 {
     let len = inner_spec.child_order.len();
     for branch in 0..len {
         let padding = get_padding(inner_spec.clone(), branch);
-        if has_padding(inner_op, padding) {
+        if has_padding(inner_op, @padding) {
             order = Option::Some(branch);
             break;
         }
@@ -287,34 +296,34 @@ fn order_from_padding(inner_spec: InnerSpec, inner_op: @InnerOp) -> u32 {
 }
 
 fn left_branches_are_empty(inner_spec: InnerSpec, inner_op: @InnerOp) -> bool {
-    let left_branches = order_from_padding(inner_spec.clone(), inner_op);
+    let inner_spec_child_order = inner_spec.child_order.clone();
+    let child_size = inner_spec.child_size.clone();
+    let inner_spec_empty_child = inner_spec.empty_child.clone();
+    let left_branches = order_from_padding(inner_spec, inner_op);
     if left_branches.is_zero() {
         return false;
     }
 
-    let child_size = inner_spec.child_size.clone();
     let actual_prefix = inner_op.prefix.len().checked_sub(left_branches * child_size);
     if actual_prefix.is_none() {
         return false;
     }
 
-    let mut are_empty = true;
     for lb in 0..left_branches {
-        for o in inner_spec.child_order.clone() {
-            if o == lb {
-                let from = actual_prefix.unwrap() + child_size * o;
+        for o in @inner_spec_child_order {
+            if o == @lb {
+                let from = actual_prefix.unwrap() + child_size * o.clone();
                 let mut expected_prefix = ArrayTrait::new();
                 for i in from..from + child_size {
                     expected_prefix.append(*inner_op.prefix[i]);
                 }
-                if inner_spec.empty_child != expected_prefix {
-                    are_empty = false;
-                    break;
+                if inner_spec_empty_child != expected_prefix {
+                    return false;
                 }
             }
         };
     }
-    are_empty
+    return true;
 }
 
 fn right_branches_are_empty(inner_spec: @InnerSpec, inner_op: @InnerOp) -> bool {

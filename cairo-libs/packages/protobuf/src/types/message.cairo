@@ -54,10 +54,10 @@ pub impl EncodeContextImpl of EncodeContextTrait {
     fn encode_repeated_field<T, +ProtoMessage<T>>(
         ref self: EncodeContext, field_number: u8, value: @Array<T>,
     ) {
-        let mut i = 0;
-        while i < value.len() {
+        let mut value_span = value.span();
+        while let Option::Some(v) = value_span.pop_front() {
             let mut context2 = Self::new();
-            (value[i]).encode_raw(ref context2);
+            v.encode_raw(ref context2);
             // do not ignore default values
             let wire_type = ProtoMessage::<T>::wire_type();
             self.buffer.append_byte(ProtobufTag { field_number, wire_type }.encode());
@@ -65,8 +65,6 @@ pub impl EncodeContextImpl of EncodeContextTrait {
                 context2.buffer.len().encode_raw(ref self);
             }
             self.buffer.append(@context2.buffer);
-
-            i += 1;
         }
     }
 

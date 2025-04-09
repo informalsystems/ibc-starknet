@@ -22,9 +22,10 @@ pub fn u4_to_digit(value: u8) -> u8 {
 }
 
 pub fn encode(input: @ByteArray) -> ByteArray {
+    let input_len = input.len();
     let mut output = "";
     let mut i = 0;
-    while i < input.len() {
+    while i != input_len {
         let value = input[i];
         output.append_byte(u4_to_digit(value / 0x10));
         output.append_byte(u4_to_digit(value & 0x0F));
@@ -34,10 +35,13 @@ pub fn encode(input: @ByteArray) -> ByteArray {
 }
 
 pub fn decode(input: @ByteArray) -> ByteArray {
-    assert(input.len() % 2 == 0, 'Invalid hex string length');
+    let input_len = input.len();
+    assert(input_len % 2 == 0, 'Invalid hex string length');
     let mut output = "";
     let mut i = 0;
-    while i < input.len() {
+    // Since input_len % 2 == 0, we know i += 2 will eventually be
+    // equal to input_len
+    while i != input_len {
         let value = (digit_to_u4(input[i]) * 0x10) | digit_to_u4(input[i + 1]);
         output.append_byte(value);
         i += 2;

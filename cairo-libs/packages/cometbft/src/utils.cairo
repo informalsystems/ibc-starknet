@@ -114,11 +114,18 @@ pub fn u32_8_to_array_u8(u32_8: [u32; 8]) -> Array<u8> {
 }
 
 pub fn next_power_of_two(num: u32) -> u32 {
-    let mut two_power = 1;
-    while two_power < num {
-        two_power *= 2;
+    let mut power = 1;
+    let mut i = 0;
+
+    while i != 32 {
+        if power >= num {
+            break;
+        }
+        power *= 2;
+        i += 1;
     }
-    two_power
+
+    power
 }
 
 #[generate_trait]

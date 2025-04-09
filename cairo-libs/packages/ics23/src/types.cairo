@@ -111,8 +111,13 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
         assert(self.key.len() > 0, ICS23Errors::MISSING_KEY);
         assert(self.value.len() > 0, ICS23Errors::MISSING_VALUE);
         let mut hash = apply_leaf(self.leaf, self.key.clone(), self.value.clone());
-        for i in 0..self.path.len() {
-            hash = apply_inner(self.path[i], hash.into());
+
+        println!("path len: {}", self.path.len());
+
+        let mut path_span = self.path.span();
+
+        while let Option::Some(path) = path_span.pop_front() {
+            hash = apply_inner(path, hash.into());
             if let Option::Some(s) = spec {
                 // NOTE: Multiplied by 4 since the hash is a u32 array, but the
                 // child size is in u8 bytes.
