@@ -36,7 +36,7 @@ hermes-starknet-relayer           = { workspace = true }
 hermes-starknet-integration-tests = { workspace = true }
 hermes-starknet-test-components   = { workspace = true }
 hermes-test-components            = { workspace = true }
-hermes-tracing-logging-components   = { workspace = true }
+hermes-tracing-logging-components = { workspace = true }
 
 ibc                 = { workspace = true }
 starknet            = { workspace = true }
