@@ -59,7 +59,7 @@ pub mod CometClientComponent {
         ) -> CreateResponse {
             self.assert_owner();
             let client_sequence = self.read_next_client_sequence();
-            self.create_validate(client_sequence, msg.clone());
+            self.create_validate(client_sequence, @msg);
             self.create_execute(client_sequence, msg)
         }
 
@@ -67,7 +67,7 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>, msg: MsgUpdateClient,
         ) -> UpdateResponse {
             self.assert_owner();
-            self.update_validate(msg.clone());
+            self.update_validate(@msg);
             self.update_execute(msg)
         }
 
@@ -107,19 +107,15 @@ pub mod CometClientComponent {
 
             assert(len > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
 
-            let mut height = HeightZero::zero();
+            let mut height = target_height;
 
-            while len != 0 {
-                let update_height = update_heights.at(len - 1);
+            let mut update_heights_span = update_heights.span();
+
+            while let Option::Some(update_height) = update_heights_span.pop_back() {
                 if @target_height >= update_height {
                     height = *update_height;
                     break;
                 }
-                if len == 1 && height.is_zero() {
-                    height = target_height;
-                    break;
-                }
-                len -= 1;
             }
 
             height
@@ -180,15 +176,17 @@ pub mod CometClientComponent {
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of CreateClientTrait<TContractState> {
         fn create_validate(
-            self: @ComponentState<TContractState>, client_sequence: u64, msg: MsgCreateClient,
+            self: @ComponentState<TContractState>, client_sequence: u64, msg: @MsgCreateClient,
         ) {
             msg.validate_basic();
 
-            assert(msg.client_type == self.client_type(), CometErrors::INVALID_CLIENT_TYPE);
+            assert(msg.client_type == @self.client_type(), CometErrors::INVALID_CLIENT_TYPE);
 
-            let comet_client_state = CometClientStateImpl::deserialize(msg.client_state);
+            let comet_client_state = CometClientStateImpl::deserialize(msg.client_state.clone());
 
-            let comet_consensus_state = CometConsensusStateImpl::deserialize(msg.consensus_state);
+            let comet_consensus_state = CometConsensusStateImpl::deserialize(
+                msg.consensus_state.clone(),
+            );
 
             let status = self._status(comet_client_state, comet_consensus_state, client_sequence);
 
@@ -206,14 +204,14 @@ pub mod CometClientComponent {
     pub(crate) impl UpdateClientImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of UpdateClientTrait<TContractState> {
-        fn update_validate(self: @ComponentState<TContractState>, msg: MsgUpdateClient) {
+        fn update_validate(self: @ComponentState<TContractState>, msg: @MsgUpdateClient) {
             msg.validate_basic();
 
             assert(
-                msg.client_id.client_type == self.client_type(), CometErrors::INVALID_CLIENT_TYPE,
+                msg.client_id.client_type == @self.client_type(), CometErrors::INVALID_CLIENT_TYPE,
             );
 
-            let client_sequence = msg.client_id.sequence;
+            let client_sequence = *msg.client_id.sequence;
 
             let comet_client_state: CometClientState = self.read_client_state(client_sequence);
 
@@ -224,7 +222,7 @@ pub mod CometClientComponent {
 
             assert(status.is_active(), CometErrors::INACTIVE_CLIENT);
 
-            self.verify_client_message(client_sequence, msg.client_message);
+            self.verify_client_message(client_sequence, msg.client_message.clone());
         }
 
         fn update_execute(
@@ -236,7 +234,7 @@ pub mod CometClientComponent {
                 return self.update_on_misbehaviour(client_sequence, msg.client_message.clone());
             }
 
-            self.update_state(client_sequence, msg.client_message.clone())
+            self.update_state(client_sequence, msg.client_message)
         }
     }
 
@@ -345,17 +343,19 @@ pub mod CometClientComponent {
 
             let comet_consensus_state = CometConsensusStateImpl::deserialize(consensus_state);
 
+            let comet_client_state_latest_height = comet_client_state.latest_height.clone();
+
             self
                 ._update_state(
                     client_sequence,
                     comet_client_state.latest_height,
-                    comet_client_state.clone(),
+                    comet_client_state,
                     comet_consensus_state,
                 );
 
             let client_id = ClientIdImpl::new(self.client_type(), client_sequence);
 
-            CreateResponseImpl::new(client_id, comet_client_state.latest_height)
+            CreateResponseImpl::new(client_id, comet_client_state_latest_height)
         }
 
         fn update_state(
@@ -365,7 +365,7 @@ pub mod CometClientComponent {
         ) -> UpdateResponse {
             let header: CometHeader = CometHeaderImpl::deserialize(client_message);
 
-            let header_height = header.clone().signed_header.height;
+            let header_height = header.signed_header.height.clone();
 
             // TODO: Implement consensus state pruning mechanism.
 
@@ -471,14 +471,11 @@ pub mod CometClientComponent {
             client_state: CometClientState,
             consensus_state: CometConsensusState,
         ) {
-            self.write_client_state(client_sequence, client_state.clone());
+            self.write_client_state(client_sequence, client_state);
 
             self.write_update_height(client_sequence, update_height.clone());
 
-            self
-                .write_consensus_state(
-                    client_sequence, update_height.clone(), consensus_state.clone(),
-                );
+            self.write_consensus_state(client_sequence, update_height.clone(), consensus_state);
 
             let host_height = get_block_number();
 
@@ -486,10 +483,7 @@ pub mod CometClientComponent {
 
             let host_timestamp = get_block_timestamp();
 
-            self
-                .write_client_processed_time(
-                    client_sequence, update_height.clone(), host_timestamp,
-                );
+            self.write_client_processed_time(client_sequence, update_height, host_timestamp);
 
             self.write_next_client_sequence(client_sequence + 1);
         }

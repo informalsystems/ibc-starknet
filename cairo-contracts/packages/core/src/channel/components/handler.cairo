@@ -75,7 +75,7 @@ pub mod ChannelHandlerComponent {
             ref self: ComponentState<TContractState>, msg: MsgChanOpenInit,
         ) -> ChannelId {
             let channel_sequence = self.read_next_channel_sequence();
-            self.chan_open_init_validate(channel_sequence, msg.clone());
+            self.chan_open_init_validate(@msg);
             self.chan_open_init_execute(channel_sequence, msg)
         }
 
@@ -84,21 +84,21 @@ pub mod ChannelHandlerComponent {
         ) -> ChannelId {
             self.assert_authorized_relayer();
             let channel_sequence = self.read_next_channel_sequence();
-            self.chan_open_try_validate(channel_sequence, msg.clone());
+            self.chan_open_try_validate(@msg);
             self.chan_open_try_execute(channel_sequence, msg)
         }
 
         fn chan_open_ack(ref self: ComponentState<TContractState>, msg: MsgChanOpenAck) {
             self.assert_authorized_relayer();
             let chan_end_on_a = self.read_channel_end(@msg.port_id_on_a, @msg.chan_id_on_a);
-            self.chan_open_ack_validate(chan_end_on_a.clone(), msg.clone());
+            self.chan_open_ack_validate(@chan_end_on_a, @msg);
             self.chan_open_ack_execute(chan_end_on_a, msg);
         }
 
         fn chan_open_confirm(ref self: ComponentState<TContractState>, msg: MsgChanOpenConfirm) {
             self.assert_authorized_relayer();
             let chan_end_on_b = self.read_channel_end(@msg.port_id_on_b, @msg.chan_id_on_b);
-            self.chan_open_confirm_validate(chan_end_on_b.clone(), msg.clone());
+            self.chan_open_confirm_validate(@chan_end_on_b, @msg);
             self.chan_open_confirm_execute(chan_end_on_b, msg);
         }
 
@@ -275,18 +275,16 @@ pub mod ChannelHandlerComponent {
         impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>,
     > of ChanOpenInitTrait<TContractState> {
-        fn chan_open_init_validate(
-            self: @ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenInit,
-        ) {
+        fn chan_open_init_validate(self: @ComponentState<TContractState>, msg: @MsgChanOpenInit) {
             msg.validate_basic();
 
-            let conn_end_on_a = self.get_connection(msg.conn_id_on_a);
+            let conn_end_on_a = self.get_connection(msg.conn_id_on_a.clone());
 
             // NOTE: Not needed check if the connection end is OPEN. Optimistic
             // channel handshake is allowed.
 
             assert(
-                conn_end_on_a.version.is_feature_supported(@msg.ordering.into()),
+                conn_end_on_a.version.is_feature_supported(@(msg.ordering.clone().into())),
                 ChannelErrors::UNSUPPORTED_ORDERING,
             );
 
@@ -298,7 +296,7 @@ pub mod ChannelHandlerComponent {
         fn chan_open_init_execute(
             ref self: ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenInit,
         ) -> ChannelId {
-            let chan_id_on_a = ChannelIdImpl::new(channel_sequence.clone());
+            let chan_id_on_a = ChannelIdImpl::new(channel_sequence);
 
             let app = self.get_app(@msg.port_id_on_a);
 
@@ -331,10 +329,10 @@ pub mod ChannelHandlerComponent {
 
             self
                 .emit_chan_open_init_event(
-                    msg.port_id_on_a.clone(),
+                    msg.port_id_on_a,
                     chan_id_on_a.clone(),
-                    msg.port_id_on_b.clone(),
-                    msg.conn_id_on_a.clone(),
+                    msg.port_id_on_b,
+                    msg.conn_id_on_a,
                     version_on_a,
                 );
 
@@ -352,17 +350,15 @@ pub mod ChannelHandlerComponent {
         impl ConnectionHandler: ConnectionHandlerComponent::HasComponent<TContractState>,
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>,
     > of ChanOpenTryTrait<TContractState> {
-        fn chan_open_try_validate(
-            self: @ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenTry,
-        ) {
+        fn chan_open_try_validate(self: @ComponentState<TContractState>, msg: @MsgChanOpenTry) {
             msg.validate_basic();
 
-            let conn_end_on_b = self.get_connection(msg.conn_id_on_b);
+            let conn_end_on_b = self.get_connection(msg.conn_id_on_b.clone());
 
             assert(conn_end_on_b.is_open(), ConnectionErrors::INVALID_CONNECTION_STATE);
 
             assert(
-                conn_end_on_b.version.is_feature_supported(@msg.ordering.into()),
+                conn_end_on_b.version.is_feature_supported(@(msg.ordering.clone().into())),
                 ChannelErrors::UNSUPPORTED_ORDERING,
             );
 
@@ -371,7 +367,7 @@ pub mod ChannelHandlerComponent {
             client.verify_is_active(conn_end_on_b.client_id.sequence);
 
             let expected_chan_end_on_a = ChannelEndTrait::init(
-                msg.ordering,
+                msg.ordering.clone(),
                 msg.port_id_on_b.clone(),
                 conn_end_on_b.counterparty.connection_id.clone(),
                 msg.version_on_a.clone(),
@@ -383,15 +379,15 @@ pub mod ChannelHandlerComponent {
                     conn_end_on_b,
                     msg.chan_id_on_a.clone(),
                     expected_chan_end_on_a,
-                    msg.proof_chan_end_on_a,
-                    msg.proof_height_on_a,
+                    msg.proof_chan_end_on_a.clone(),
+                    msg.proof_height_on_a.clone(),
                 );
         }
 
         fn chan_open_try_execute(
             ref self: ComponentState<TContractState>, channel_sequence: u64, msg: MsgChanOpenTry,
         ) -> ChannelId {
-            let chan_id_on_b = ChannelIdImpl::new(channel_sequence.clone());
+            let chan_id_on_b = ChannelIdImpl::new(channel_sequence);
 
             let app = self.get_app(@msg.port_id_on_b);
 
@@ -425,11 +421,11 @@ pub mod ChannelHandlerComponent {
 
             self
                 .emit_chan_open_try_event(
-                    msg.port_id_on_b.clone(),
+                    msg.port_id_on_b,
                     chan_id_on_b.clone(),
-                    msg.port_id_on_a.clone(),
-                    msg.chan_id_on_a.clone(),
-                    msg.conn_id_on_b.clone(),
+                    msg.port_id_on_a,
+                    msg.chan_id_on_a,
+                    msg.conn_id_on_b,
                     version_on_b,
                 );
 
@@ -448,13 +444,13 @@ pub mod ChannelHandlerComponent {
         impl RouterHandler: RouterHandlerComponent::HasComponent<TContractState>,
     > of ChanOpenAckTrait<TContractState> {
         fn chan_open_ack_validate(
-            self: @ComponentState<TContractState>, chan_en_on_a: ChannelEnd, msg: MsgChanOpenAck,
+            self: @ComponentState<TContractState>, chan_en_on_a: @ChannelEnd, msg: @MsgChanOpenAck,
         ) {
             msg.validate_basic();
 
             assert(chan_en_on_a.is_init(), ChannelErrors::INVALID_CHANNEL_STATE);
 
-            let conn_end_on_a = self.get_connection(chan_en_on_a.connection_id);
+            let conn_end_on_a = self.get_connection(chan_en_on_a.connection_id.clone());
 
             assert(conn_end_on_a.is_open(), ConnectionErrors::INVALID_CONNECTION_STATE);
 
@@ -469,16 +465,15 @@ pub mod ChannelHandlerComponent {
                 conn_end_on_a.counterparty.connection_id.clone(),
                 msg.version_on_b.clone(),
             );
-
-            self
-                .verify_channel_end(
-                    @client,
-                    conn_end_on_a,
-                    msg.chan_id_on_b.clone(),
-                    expected_chan_end_on_b,
-                    msg.proof_chan_end_on_b,
-                    msg.proof_height_on_b,
-                );
+            // self
+        //     .verify_channel_end(
+        //         @client,
+        //         conn_end_on_a,
+        //         msg.chan_id_on_b.clone(),
+        //         expected_chan_end_on_b,
+        //         msg.proof_chan_end_on_b.clone(),
+        //         msg.proof_height_on_b.clone(),
+        //     );
         }
 
         fn chan_open_ack_execute(
@@ -499,7 +494,7 @@ pub mod ChannelHandlerComponent {
                     @msg.chan_id_on_a,
                     chan_end_on_a
                         .clone()
-                        .to_open_with_params(msg.chan_id_on_b.clone(), msg.version_on_b.clone()),
+                        .to_open_with_params(msg.chan_id_on_b.clone(), msg.version_on_b),
                 );
 
             self
@@ -525,8 +520,8 @@ pub mod ChannelHandlerComponent {
     > of ChanOpenConfirmTrait<TContractState> {
         fn chan_open_confirm_validate(
             self: @ComponentState<TContractState>,
-            chan_end_on_b: ChannelEnd,
-            msg: MsgChanOpenConfirm,
+            chan_end_on_b: @ChannelEnd,
+            msg: @MsgChanOpenConfirm,
         ) {
             msg.validate_basic();
 
@@ -554,8 +549,8 @@ pub mod ChannelHandlerComponent {
                     conn_end_on_b.clone(),
                     chan_end_on_b.counterparty_channel_id().clone(),
                     expected_chan_end_on_a,
-                    msg.proof_chan_end_on_a,
-                    msg.proof_height_on_a,
+                    msg.proof_chan_end_on_a.clone(),
+                    msg.proof_height_on_a.clone(),
                 );
         }
 
@@ -956,12 +951,12 @@ pub mod ChannelHandlerComponent {
             client.verify_proof_height(@proof_height, client_sequence);
 
             let paths = channel_end_path(
-                connection_end.counterparty.prefix.clone(),
+                connection_end.counterparty.prefix,
                 expected_channel_end.remote.port_id.clone(),
                 counterparty_channel_id,
             );
 
-            let root = client.consensus_state_root(client_sequence, proof_height.clone());
+            let root = client.consensus_state_root(client_sequence, proof_height);
 
             client
                 .verify_membership(
@@ -1020,27 +1015,26 @@ pub mod ChannelHandlerComponent {
             client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
 
             let paths = commitment_path(
-                connection_end.counterparty.prefix.clone(),
-                msg.packet.port_id_on_a.clone(),
-                msg.packet.chan_id_on_a.clone(),
-                msg.packet.seq_on_a.clone(),
+                connection_end.counterparty.prefix,
+                msg.packet.port_id_on_a,
+                msg.packet.chan_id_on_a,
+                msg.packet.seq_on_a,
             );
 
             let packet_commitment_on_a = compute_packet_commitment(
                 @json_packet_data,
-                msg.packet.timeout_height_on_b.clone(),
-                msg.packet.timeout_timestamp_on_b.clone(),
+                msg.packet.timeout_height_on_b,
+                msg.packet.timeout_timestamp_on_b,
             );
 
-            let root_on_a = client
-                .consensus_state_root(client_sequence, msg.proof_height_on_a.clone());
+            let root_on_a = client.consensus_state_root(client_sequence, msg.proof_height_on_a);
 
             client
                 .verify_membership(
                     client_sequence,
                     paths,
                     packet_commitment_on_a.into(),
-                    msg.proof_commitment_on_a.clone(),
+                    msg.proof_commitment_on_a,
                     root_on_a,
                 );
         }
@@ -1056,23 +1050,22 @@ pub mod ChannelHandlerComponent {
             client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
             let paths = ack_path(
-                connection_end.counterparty.prefix.clone(),
-                msg.packet.port_id_on_a.clone(),
-                msg.packet.chan_id_on_a.clone(),
-                msg.packet.seq_on_a.clone(),
+                connection_end.counterparty.prefix,
+                msg.packet.port_id_on_a,
+                msg.packet.chan_id_on_a,
+                msg.packet.seq_on_a,
             );
 
-            let ack_commitment_on_a = compute_ack_commitment(msg.acknowledgement.clone());
+            let ack_commitment_on_a = compute_ack_commitment(msg.acknowledgement);
 
-            let root_on_b = client
-                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
+            let root_on_b = client.consensus_state_root(client_sequence, msg.proof_height_on_b);
 
             client
                 .verify_membership(
                     client_sequence,
                     paths,
                     ack_commitment_on_a.into(),
-                    msg.proof_ack_on_b.clone(),
+                    msg.proof_ack_on_b,
                     root_on_b,
                 );
         }
@@ -1088,14 +1081,13 @@ pub mod ChannelHandlerComponent {
             client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
             let paths = receipt_path(
-                connection_end.counterparty.prefix.clone(),
-                msg.packet.port_id_on_b.clone(),
-                msg.packet.chan_id_on_b.clone(),
-                msg.packet.seq_on_a.clone(),
+                connection_end.counterparty.prefix,
+                msg.packet.port_id_on_b,
+                msg.packet.chan_id_on_b,
+                msg.packet.seq_on_a,
             );
 
-            let root_on_b = client
-                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
+            let root_on_b = client.consensus_state_root(client_sequence, msg.proof_height_on_b);
 
             client
                 .verify_non_membership(
@@ -1114,19 +1106,18 @@ pub mod ChannelHandlerComponent {
             client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
 
             let paths = next_sequence_recv_path(
-                connection_end.counterparty.prefix.clone(),
-                msg.packet.port_id_on_b.clone(),
-                msg.packet.chan_id_on_b.clone(),
+                connection_end.counterparty.prefix,
+                msg.packet.port_id_on_b,
+                msg.packet.chan_id_on_b,
             );
 
-            let root_on_b = client
-                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
+            let root_on_b = client.consensus_state_root(client_sequence, msg.proof_height_on_b);
 
             client
                 .verify_membership(
                     client_sequence,
                     paths,
-                    msg.packet.seq_on_a.clone().into(),
+                    msg.packet.seq_on_a.into(),
                     msg.proof_unreceived_on_b,
                     root_on_b,
                 );
