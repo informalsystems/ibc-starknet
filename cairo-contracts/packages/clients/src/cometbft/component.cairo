@@ -243,15 +243,10 @@ pub mod CometClientComponent {
     > of RecoverClientTrait<TContractState> {
         fn recover_validate(self: @ComponentState<TContractState>, msg: MsgRecoverClient) {
             msg.validate_basic();
-            // TODO: validate signer
 
-            let subject_client_sequence = self.read_next_client_sequence();
+            // TODO: validate signer once assert_owner() has been removed
 
-            assert(
-                subject_client_sequence == msg.subject_client_id.sequence,
-                CometErrors::INVALID_RECOVER_MESSAGE,
-            );
-
+            let subject_client_sequence = msg.subject_client_id.sequence;
             let substitute_client_sequence = msg.substitute_client_id.sequence;
 
             let subject_client_state: CometClientState = self
@@ -269,10 +264,14 @@ pub mod CometClientComponent {
                 );
 
             let subject_status = self
-                ._status(subject_client_state, subject_consensus_state, subject_client_sequence);
+                ._status(
+                    subject_client_state.clone(), subject_consensus_state, subject_client_sequence,
+                );
             let substitute_status = self
                 ._status(
-                    substitute_client_state, substitute_consensus_state, substitute_client_sequence,
+                    substitute_client_state.clone(),
+                    substitute_consensus_state,
+                    substitute_client_sequence,
                 );
 
             assert(
@@ -297,8 +296,8 @@ pub mod CometClientComponent {
         }
 
         fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
-            let subject_client_sequence = self.read_next_client_sequence();
-            let substitute_client_sequence = msg.subject_client_id.sequence;
+            let subject_client_sequence = msg.subject_client_id.sequence;
+            let substitute_client_sequence = msg.substitute_client_id.sequence;
 
             let substitute_client_state: CometClientState = self
                 .read_client_state(substitute_client_sequence);
@@ -306,11 +305,6 @@ pub mod CometClientComponent {
             let substitute_consensus_state = self
                 .read_consensus_state(
                     substitute_client_sequence, substitute_client_state.latest_height.clone(),
-                );
-
-            let substitute_status = self
-                ._status(
-                    substitute_client_state, substitute_consensus_state, substitute_client_sequence,
                 );
 
             let mut serialised_client_state = array![];
