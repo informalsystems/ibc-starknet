@@ -23,11 +23,7 @@ pub impl CometHeaderImpl of CometHeaderTrait {
     fn deserialize(header: Array<felt252>) -> CometHeader {
         let mut header_span = header.span();
 
-        let maybe_byte_array = Serde::<ByteArray>::deserialize(ref header_span);
-
-        assert(maybe_byte_array.is_some(), CometErrors::INVALID_HEADER);
-
-        let maybe_header = ProtoCodecImpl::decode::<CometHeader>(@maybe_byte_array.unwrap());
+        let maybe_header = Serde::<CometHeader>::deserialize(ref header_span);
 
         assert(maybe_header.is_some(), CometErrors::INVALID_HEADER);
 
@@ -38,8 +34,8 @@ pub impl CometHeaderImpl of CometHeaderTrait {
 pub impl CometHeaderIntoConsensusState of Into<CometHeader, CometConsensusState> {
     fn into(self: CometHeader) -> CometConsensusState {
         let proto_ts = self.signed_header.header.time;
-        let root_u8 = self.signed_header.header.app_hash;
-        let next_validators_hash = self.signed_header.header.next_validators_hash;
+        let root_u8 = self.signed_header.header.app_hash.inner;
+        let next_validators_hash = self.signed_header.header.next_validators_hash.inner;
 
         let timestamp = TimestampImpl::from_seconds_and_nanos(
             proto_ts.seconds.try_into().unwrap(), proto_ts.nanos.try_into().unwrap(),
