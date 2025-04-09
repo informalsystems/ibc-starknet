@@ -13,6 +13,7 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
 use protobuf::types::wkt::{Duration, Timestamp};
+use crate::array::{TendermintByteArray, TendermintByteArraySerde};
 use crate::light_client::Header as LcHeader;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
@@ -47,7 +48,7 @@ impl ConsensusAsProtoName of ProtoName<Consensus> {
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct PartSetHeader {
     pub total: u32,
-    pub hash: Array<u8>,
+    pub hash: TendermintByteArray,
 }
 
 impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
@@ -75,7 +76,7 @@ impl PartSetHeaderAsProtoName of ProtoName<PartSetHeader> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct BlockId {
-    pub hash: Array<u8>,
+    pub hash: TendermintByteArray,
     pub part_set_header: PartSetHeader,
 }
 
@@ -102,7 +103,6 @@ impl BlockIdAsProtoName of ProtoName<BlockId> {
     }
 }
 
-
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Header {
     pub version: Consensus,
@@ -110,15 +110,15 @@ pub struct Header {
     pub height: u64,
     pub time: Timestamp,
     pub last_block_id: BlockId,
-    pub last_commit_hash: Array<u8>,
-    pub data_hash: Array<u8>,
-    pub validators_hash: Array<u8>,
-    pub next_validators_hash: Array<u8>,
-    pub consensus_hash: Array<u8>,
-    pub app_hash: Array<u8>,
-    pub last_results_hash: Array<u8>,
-    pub evidence_hash: Array<u8>,
-    pub proposer_address: Array<u8>,
+    pub last_commit_hash: TendermintByteArray,
+    pub data_hash: TendermintByteArray,
+    pub validators_hash: TendermintByteArray,
+    pub next_validators_hash: TendermintByteArray,
+    pub consensus_hash: TendermintByteArray,
+    pub app_hash: TendermintByteArray,
+    pub last_results_hash: TendermintByteArray,
+    pub evidence_hash: TendermintByteArray,
+    pub proposer_address: TendermintByteArray,
 }
 
 impl HeaderAsProtoMessage of ProtoMessage<Header> {
@@ -222,7 +222,7 @@ pub struct CommitSig {
     pub block_id_flag: BlockIdFlag,
     pub validator_address: AccountId,
     pub timestamp: Timestamp,
-    pub signature: Array<u8>,
+    pub signature: TendermintByteArray,
 }
 
 impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
@@ -327,7 +327,7 @@ pub impl PublicKeyImpl of PublicKeyTrait {
         match self.sum {
             Sum::Ed25519(pk) => {
                 assert(signature.len() == 64, CometErrors::INVALID_SIGNATURE_LENGTH);
-                assert(pk.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
+                assert(pk.inner.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
 
                 let r_sign = signature
                     .slice(0, 32)
@@ -337,7 +337,7 @@ pub impl PublicKeyImpl of PublicKeyTrait {
                     .slice(32, 32)
                     .try_into()
                     .unwrap(); // Never fails as length is 32.
-                let pubkey = pk.span().try_into().unwrap(); // Never fails as length is 32.
+                let pubkey = pk.inner.span().try_into().unwrap(); // Never fails as length is 32.
 
                 assert(
                     verify_signature(msg, array![r_sign, s_sign].span(), pubkey),
@@ -367,8 +367,8 @@ impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
 #[derive(Drop, Default, Debug, Clone, PartialEq, Serde)]
 pub enum Sum {
     #[default]
-    Ed25519: Array<u8>,
-    Secp256k1: Array<u8>,
+    Ed25519: TendermintByteArray,
+    Secp256k1: TendermintByteArray,
 }
 
 impl SumAsProtoOneof of ProtoOneof<Sum> {
@@ -609,11 +609,13 @@ impl AccountIdAsProtoMessage of ProtoMessage<AccountId> {
 impl AccountIdSerde of Serde<AccountId> {
     fn serialize(self: @AccountId, ref output: Array<felt252>) {
         let mut id = self.id.span().into();
-        Serde::<Array<u8>>::serialize(@id, ref output);
+        let tendermint_byte_array = TendermintByteArray { inner: id };
+        Serde::<TendermintByteArray>::serialize(@tendermint_byte_array, ref output);
     }
 
     fn deserialize(ref serialized: Span<felt252>) -> Option<AccountId> {
-        Serde::<Array<u8>>::deserialize(ref serialized)?.try_into()
+        let tendermint_byte_array = Serde::<TendermintByteArray>::deserialize(ref serialized)?;
+        tendermint_byte_array.inner.try_into()
     }
 }
 
@@ -644,7 +646,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
                         chain_id: signed_header.header.chain_id.clone(),
                     },
                     validator_address: signature.validator_address.clone(),
-                    signature: signature.signature.clone(),
+                    signature: signature.signature.inner.clone(),
                 };
 
                 let verified = false;
@@ -795,7 +797,7 @@ pub struct TrustedBlockState {
     pub header_time: Timestamp,
     pub height: u64,
     pub next_validators: ValidatorSet,
-    pub next_validators_hash: Array<u8>,
+    pub next_validators_hash: TendermintByteArray,
 }
 
 #[derive(Drop, Debug, Clone)]

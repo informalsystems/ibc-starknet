@@ -110,7 +110,7 @@ fn test_verify_update_header_forged_header() {
     let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
 
     // forged header
-    untrusted_block_state.signed_header.header.next_validators_hash = array![0x1, 0x2];
+    untrusted_block_state.signed_header.header.next_validators_hash = array![0x1, 0x2].into();
 
     verify_update_header(untrusted_block_state, trusted_block_state, options, now);
 }

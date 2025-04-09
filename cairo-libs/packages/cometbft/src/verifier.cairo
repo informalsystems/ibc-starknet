@@ -38,12 +38,14 @@ pub fn verify_misbehaviour_header(
 }
 
 pub fn verify_validator_sets(untrusted: @UntrustedBlockState) {
-    validator_sets_match(untrusted.validators, untrusted.signed_header.header.validators_hash);
+    validator_sets_match(
+        untrusted.validators, untrusted.signed_header.header.validators_hash.inner,
+    );
     // validator_sets_match(
-    //     untrusted.next_validators, untrusted.signed_header.header.next_validators_hash,
+    //     untrusted.next_validators, untrusted.signed_header.header.next_validators_hash.inner,
     // );
     header_matches_commit(
-        untrusted.signed_header.header, untrusted.signed_header.commit.block_id.hash,
+        untrusted.signed_header.header, untrusted.signed_header.commit.block_id.hash.inner,
     );
     valid_commit(untrusted.signed_header, untrusted.validators);
 }
@@ -58,7 +60,8 @@ pub fn validate_against_trusted(
     assert(trusted_next_height.is_some(), CometErrors::OVERFLOWED_BLOCK_HEIGHT);
     if untrusted.height() == @trusted_next_height.unwrap() {
         valid_next_validator_set(
-            untrusted.signed_header.header.validators_hash, trusted.next_validators_hash,
+            untrusted.signed_header.header.validators_hash.inner,
+            trusted.next_validators_hash.inner,
         );
     } else {
         is_monotonic_height(untrusted.signed_header.header.height, trusted.height);
@@ -94,15 +97,15 @@ pub fn header_matches_commit(header: @Header, commit_hash: @Array<u8>) {
         ProtoCodecImpl::encode_as_msg(header.height),
         ProtoCodecImpl::encode(header.time),
         ProtoCodecImpl::encode(header.last_block_id),
-        ProtoCodecImpl::encode_as_msg(header.last_commit_hash),
-        ProtoCodecImpl::encode_as_msg(header.data_hash),
-        ProtoCodecImpl::encode_as_msg(header.validators_hash),
-        ProtoCodecImpl::encode_as_msg(header.next_validators_hash),
-        ProtoCodecImpl::encode_as_msg(header.consensus_hash),
-        ProtoCodecImpl::encode_as_msg(header.app_hash),
-        ProtoCodecImpl::encode_as_msg(header.last_results_hash),
-        ProtoCodecImpl::encode_as_msg(header.evidence_hash),
-        ProtoCodecImpl::encode_as_msg(header.proposer_address),
+        ProtoCodecImpl::encode_as_msg(header.last_commit_hash.inner),
+        ProtoCodecImpl::encode_as_msg(header.data_hash.inner),
+        ProtoCodecImpl::encode_as_msg(header.validators_hash.inner),
+        ProtoCodecImpl::encode_as_msg(header.next_validators_hash.inner),
+        ProtoCodecImpl::encode_as_msg(header.consensus_hash.inner),
+        ProtoCodecImpl::encode_as_msg(header.app_hash.inner),
+        ProtoCodecImpl::encode_as_msg(header.last_results_hash.inner),
+        ProtoCodecImpl::encode_as_msg(header.evidence_hash.inner),
+        ProtoCodecImpl::encode_as_msg(header.proposer_address.inner),
     ];
 
     let hash_bytes = MerkleHashImpl::hash_byte_vectors(header_bytes.span());
