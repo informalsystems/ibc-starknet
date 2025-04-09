@@ -453,7 +453,7 @@ pub struct Validator {
 #[generate_trait]
 pub impl ValidatorImpl of ValidatorTrait {
     fn validate_id(self: @Validator) {
-        assert_eq!(self.address, @self.pub_key.address());
+        assert!(self.address == @self.pub_key.address());
     }
 
     fn verify_signature(self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>) {
