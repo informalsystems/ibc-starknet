@@ -1,4 +1,5 @@
 use cgp::prelude::*;
+use derive_more::From;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_encoding_components::traits::decode_mut::{
     CanDecodeMut, MutDecoder, MutDecoderComponent,
@@ -20,6 +21,48 @@ use tendermint::{account, block, validator, vote, AppHash, PublicKey, Signature}
 
 use crate::types::cosmos::height::Height;
 
+#[derive(From)]
+pub struct TendermintByteArray(pub Vec<u8>);
+
+impl TendermintByteArray {
+    fn inner(self) -> Vec<u8> {
+        self.0
+    }
+}
+
+pub struct EncodeTendermintByteArray;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, TendermintByteArray>
+    for EncodeTendermintByteArray
+where
+    Encoding: CanEncodeMut<Strategy, String>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &TendermintByteArray,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        let st = unsafe { String::from_utf8_unchecked(value.0.clone()) };
+        encoding.encode_mut(&st, buffer)?;
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, TendermintByteArray>
+    for EncodeTendermintByteArray
+where
+    Encoding: CanDecodeMut<Strategy, String> + CanRaiseAsyncError<&'static str>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<TendermintByteArray, Encoding::Error> {
+        let value = encoding.decode_mut(buffer)?;
+        Ok(TendermintByteArray(value.into_bytes()))
+    }
+}
 pub struct EncodeTendermintLcHeader;
 
 const ZERO_TIMESTAMP: ProtoTimestamp = ProtoTimestamp {
