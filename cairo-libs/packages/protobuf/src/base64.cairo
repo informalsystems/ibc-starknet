@@ -83,7 +83,9 @@ pub fn decode(input: @ByteArray) -> ByteArray {
     let mut output = "";
     let mut i = 0;
 
-    while i < input_len {
+    // Since input_len % 4 == 0, we know i += 4 will eventually be
+    // equal to input_len
+    while i != input_len {
         let c0 = input[i];
         let c1 = input[i + 1];
         let c2 = input[i + 2];

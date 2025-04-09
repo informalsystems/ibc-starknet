@@ -557,8 +557,8 @@ impl AccountIdDebug of core::fmt::Debug<AccountId> {
 
 impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
     fn eq(lhs: @AccountId, rhs: @AccountId) -> bool {
-        let lhs_span = lhs.id.span();
-        let rhs_span = rhs.id.span();
+        let mut lhs_span = lhs.id.span();
+        let mut rhs_span = rhs.id.span();
 
         if lhs_span.len() != rhs_span.len() {
             return false;
@@ -570,13 +570,10 @@ impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
             return true;
         }
 
-        let mut i = 0;
-
-        while i < len {
-            if lhs_span.at(i) != rhs_span.at(i) {
+        while let Option::Some(lhs) = lhs_span.pop_front() {
+            if lhs != rhs_span.pop_front().unwrap() {
                 return false;
             }
-            i += 1;
         }
         return true;
     }
@@ -652,25 +649,16 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
     }
 
     fn has_voted(self: @NonAbsentCommitVotes, validator: @Validator) -> bool {
-        let mut idx = Option::None;
-        for i in 0..self.votes.len() {
-            let ith_vote = self.votes.at(i);
+        let mut votes_span = self.votes.span();
+        let mut result = false;
+        while let Option::Some(ith_vote) = votes_span.pop_front() {
             if ith_vote.validator_id() == validator.address {
-                idx = Option::Some(i);
-                break;
-            }
-        }
-
-        match idx {
-            Option::None => false,
-            Option::Some(i) => {
-                let vote = self.votes[i];
-
-                if *(vote.verified) {
-                    return false;
+                if *(ith_vote.verified) {
+                    result = false;
+                    break;
                 }
 
-                let signed_vote = vote.signed_vote;
+                let signed_vote = ith_vote.signed_vote;
 
                 let signature = signed_vote.signature;
                 let canonical_vote = signed_vote.vote;
@@ -683,9 +671,11 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
                 // TODO: set verified field to true
 
-                true
-            },
+                result = true;
+                break;
+            }
         }
+        return result;
     }
 }
 

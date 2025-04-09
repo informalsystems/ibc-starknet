@@ -165,7 +165,7 @@ pub fn setup(
 
     let mut transfer_cfg = TransferAppConfigTrait::default();
 
-    let (core, ics20, erc20) = SetupImpl::setup_full("IBCCore", "CometClient", "TransferApp");
+    let (core, ics20, erc20) = SetupImpl::setup_full("IBCCore", "MockClient", "TransferApp");
 
     transfer_cfg.set_native_denom(erc20.address);
 

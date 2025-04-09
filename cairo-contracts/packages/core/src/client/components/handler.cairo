@@ -77,12 +77,15 @@ pub mod ClientHandlerComponent {
 
             let mut client = self.get_client(msg.client_id.client_type);
 
-            let update_result = client.update(msg.clone());
+            let client_id = msg.client_id.clone();
+            let client_message = msg.client_message.clone();
+
+            let update_result = client.update(msg);
 
             match update_result.clone() {
                 UpdateResponse::Success(heights) => self
-                    .emit_update_client_event(msg.client_id, heights, msg.client_message),
-                UpdateResponse::Misbehaviour => self.emit_misbehaviour_event(msg.client_id),
+                    .emit_update_client_event(client_id, heights, client_message),
+                UpdateResponse::Misbehaviour => self.emit_misbehaviour_event(client_id),
             }
 
             update_result
@@ -186,6 +189,7 @@ pub mod ClientHandlerComponent {
         ) -> bool {
             let mut allowed = false;
             let mut i = 0;
+            // Can't use span() as self.allowed_relayers is a Vec
             while i != self.allowed_relayers.len() {
                 if self.allowed_relayers.at(i).read() == caller {
                     allowed = true;

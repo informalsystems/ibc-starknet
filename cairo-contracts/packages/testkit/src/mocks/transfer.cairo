@@ -74,7 +74,7 @@ pub mod MockTransferApp {
     #[external(v0)]
     fn send_transfer_internal(ref self: ContractState, msg: MsgTransfer) {
         let sender = get_caller_address();
-        self.transfer.send_validate(msg.clone(), sender);
+        self.transfer.send_validate(@msg, sender);
         self.transfer.send_execute(msg, sender);
     }
 

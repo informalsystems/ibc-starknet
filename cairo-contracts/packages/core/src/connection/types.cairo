@@ -1,10 +1,18 @@
 use alexandria_data_structures::span_ext::SpanTraitExt;
 use core::num::traits::Zero;
-use starknet_ibc_core::client::Duration;
+use ics23::ByteArrayIntoArrayU8;
+use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
+use protobuf::primitives::numeric::U128AsProtoMessage;
+use protobuf::types::message::{
+    DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
+    ProtoMessage, ProtoName,
+};
+use protobuf::types::tag::WireType;
+use starknet_ibc_core::client::{Duration, DurationTrait};
 use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::connection::ConnectionErrors;
 use starknet_ibc_core::host::{
-    BasePrefix, BasePrefixZero, ClientId, ClientIdImpl, ClientIdZero, ConnectionId,
+    BasePrefix, BasePrefixZero, ClientId, ClientIdImpl, ClientIdTrait, ClientIdZero, ConnectionId,
     ConnectionIdZero,
 };
 use starknet_ibc_utils::ValidateBasic;
@@ -16,6 +24,34 @@ pub struct ConnectionEnd {
     pub counterparty: Counterparty,
     pub version: Version,
     pub delay_period: Duration,
+}
+
+impl ConnectionEndAsProtoMessage of ProtoMessage<ConnectionEnd> {
+    fn encode_raw(self: @ConnectionEnd, ref context: EncodeContext) {
+        let client_id_ba = self.client_id.to_byte_array();
+        context.encode_field(1, @client_id_ba);
+        context.encode_repeated_field(2, @array![self.version.clone()]);
+        context.encode_enum(3, self.state);
+        context.encode_field(4, self.counterparty);
+        if self.delay_period.is_non_zero() {
+            context.encode_field(5, @self.delay_period.as_nanos());
+        }
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<ConnectionEnd> {
+        // FIXME: Implement decode when required
+        None
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl ConnectionEndAsProtoName of ProtoName<ConnectionEnd> {
+    fn type_url() -> ByteArray {
+        "ConnectionEnd"
+    }
 }
 
 #[generate_trait]
@@ -159,8 +195,8 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
 
 pub impl ConnectionEndIntoStateValue of Into<ConnectionEnd, StateValue> {
     fn into(self: ConnectionEnd) -> StateValue {
-        // TODO: Implement once membership proof verification is implemented.
-        StateValueZero::zero()
+        let encoded_connection_end = ProtoCodecImpl::encode(@self);
+        StateValue { value: encoded_connection_end.into() }
     }
 }
 
@@ -173,11 +209,48 @@ pub enum ConnectionState {
     Open,
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+pub impl ConnectionStateIntoU32 of Into<@ConnectionState, u32> {
+    fn into(self: @ConnectionState) -> u32 {
+        match self {
+            ConnectionState::Uninitialized => 0,
+            ConnectionState::Init => 1,
+            ConnectionState::TryOpen => 2,
+            ConnectionState::Open => 3,
+        }
+    }
+}
+
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Counterparty {
     pub client_id: ClientId,
     pub connection_id: ConnectionId,
     pub prefix: BasePrefix,
+}
+
+impl CounterpartyAsProtoMessage of ProtoMessage<Counterparty> {
+    fn encode_raw(self: @Counterparty, ref context: EncodeContext) {
+        let client_id_ba = self.client_id.to_byte_array();
+        context.encode_field(1, @client_id_ba);
+
+        context.encode_field(2, self.connection_id.connection_id);
+
+        context.encode_field(3, self.prefix);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<Counterparty> {
+        // FIXME: Implement decode when required
+        None
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl CounterpartyAsProtoName of ProtoName<Counterparty> {
+    fn type_url() -> ByteArray {
+        "Counterparty"
+    }
 }
 
 pub impl CounterpartyValidateBasic of ValidateBasic<Counterparty> {
@@ -205,10 +278,38 @@ pub impl CounterpartyZero of Zero<Counterparty> {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Version {
     pub identifier: ByteArray,
     pub features: [ByteArray; 2],
+}
+
+impl VersionAsProtoMessage of ProtoMessage<Version> {
+    fn encode_raw(self: @Version, ref context: EncodeContext) {
+        context.encode_field(1, self.identifier);
+
+        let [feature0, feature1] = self.features;
+        let mut features_array: Array<ByteArray> = ArrayTrait::new();
+        features_array.append(feature0.clone());
+        features_array.append(feature1.clone());
+
+        context.encode_repeated_field(2, @features_array);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<Version> {
+        // FIXME: Implement decode when required
+        None
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+impl VersionAsProtoName of ProtoName<Version> {
+    fn type_url() -> ByteArray {
+        "Version"
+    }
 }
 
 #[generate_trait]
