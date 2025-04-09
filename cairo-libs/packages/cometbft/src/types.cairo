@@ -797,7 +797,7 @@ pub struct TrustedBlockState {
     pub header_time: Timestamp,
     pub height: u64,
     pub next_validators: ValidatorSet,
-    pub next_validators_hash: TendermintByteArray,
+    pub next_validators_hash: Array<u8>,
 }
 
 #[derive(Drop, Debug, Clone)]

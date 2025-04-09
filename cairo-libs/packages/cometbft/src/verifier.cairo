@@ -60,8 +60,7 @@ pub fn validate_against_trusted(
     assert(trusted_next_height.is_some(), CometErrors::OVERFLOWED_BLOCK_HEIGHT);
     if untrusted.height() == @trusted_next_height.unwrap() {
         valid_next_validator_set(
-            untrusted.signed_header.header.validators_hash.inner,
-            trusted.next_validators_hash.inner,
+            untrusted.signed_header.header.validators_hash.inner, trusted.next_validators_hash,
         );
     } else {
         is_monotonic_height(untrusted.signed_header.header.height, trusted.height);
