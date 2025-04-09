@@ -2,7 +2,6 @@ use cgp::prelude::*;
 use hermes_cli_components::traits::command::{CommandRunner, CommandRunnerComponent};
 use hermes_cli_components::traits::output::HasOutputType;
 use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_logging_components::traits::has_logger::HasLogger;
 use hermes_logging_components::traits::logger::CanLog;
 use hermes_logging_components::types::level::LevelInfo;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
@@ -75,8 +74,6 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
         app: &ToolApp,
         args: &TransferArgs,
     ) -> Result<<ToolApp as HasOutputType>::Output, <ToolApp as HasErrorType>::Error> {
-        let logger = app.logger();
-
         let ics20_port = IbcPortId::transfer();
 
         // If the passed denom starts with 0x this means it is an ERC20 token
@@ -124,14 +121,11 @@ impl CommandRunner<ToolApp, TransferArgs> for RunTransferArgs {
             .collect::<Vec<String>>()
             .join(" ");
 
-        logger
-            .log(
-                &format!(
-                    "Arguments to send transaction using `starkli invoke` are: {call_data_str}"
-                ),
-                &LevelInfo,
-            )
-            .await;
+        app.log(
+            &format!("Arguments to send transaction using `starkli invoke` are: {call_data_str}"),
+            &LevelInfo,
+        )
+        .await;
 
         Ok(())
     }

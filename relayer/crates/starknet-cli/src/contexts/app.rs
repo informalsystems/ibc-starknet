@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
-use cgp::core::field::{Index, WithField};
+use cgp::core::field::Index;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cli::commands::channel::CreateChannelArgs;
@@ -51,10 +51,7 @@ use hermes_cli_components::traits::types::config::ConfigTypeComponent;
 use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::types::HermesError;
-use hermes_logger::UseHermesLogger;
-use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
-};
+use hermes_logging_components::traits::logger::LoggerComponent;
 use hermes_relayer_components::error::traits::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
@@ -71,6 +68,7 @@ use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBoots
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_test_components::chain_driver::traits::config::{ConfigUpdater, ConfigUpdaterComponent};
+use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId, PortId};
 use toml::to_string_pretty;
@@ -105,14 +103,12 @@ delegate_components! {
             RetryableErrorComponent,
         ]:
             ProvideCliError,
-        RuntimeTypeProviderComponent: WithType<HermesRuntime>,
-        RuntimeGetterComponent: WithField<symbol!("runtime")>,
-        [
-            LoggerTypeProviderComponent,
-            LoggerGetterComponent,
-            GlobalLoggerGetterComponent,
-        ]:
-            UseHermesLogger,
+        RuntimeTypeProviderComponent:
+            UseType<HermesRuntime>,
+        RuntimeGetterComponent:
+            UseField<symbol!("runtime")>,
+        LoggerComponent:
+            TracingLogger,
         AnyCounterpartyTypeProviderComponent:
             UseType<CosmosChain>,
         ConfigTypeComponent:
@@ -330,7 +326,6 @@ impl ConfigUpdater<CosmosChainDriver, StarknetRelayerConfig> for UpdateStarknetC
 check_components! {
     CanUseStarknetApp for StarknetApp {
         RuntimeGetterComponent,
-        LoggerGetterComponent,
         ConfigPathGetterComponent,
         ConfigLoaderComponent,
         ConfigWriterComponent,

@@ -4,15 +4,11 @@ mod preset {
     use cgp::core::error::{
         ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent,
     };
-    use cgp::core::field::{Index, UseField, WithField};
-    use cgp::core::types::WithType;
+    use cgp::core::field::{Index, UseField};
     use cgp::prelude::*;
     use hermes_cosmos_relayer::contexts::chain::CosmosChain;
     use hermes_error::impls::UseHermesError;
-    use hermes_logger::UseHermesLogger;
-    use hermes_logging_components::traits::has_logger::{
-        GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
-    };
+    use hermes_logging_components::traits::logger::LoggerComponent;
     use hermes_relayer_components::components::default::relay::*;
     use hermes_relayer_components::multi::traits::chain_at::{
         ChainGetterAtComponent, ChainTypeProviderAtComponent,
@@ -24,6 +20,7 @@ mod preset {
         RuntimeGetterComponent, RuntimeTypeProviderComponent,
     };
     use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+    use hermes_tracing_logging_components::contexts::logger::TracingLogger;
     use DefaultRelayPreset::re_exports::*;
 
     use crate::impls::error::HandleStarknetRelayError;
@@ -37,16 +34,16 @@ mod preset {
                         ErrorWrapperComponent,
                     ]: UseHermesError,
                     ErrorRaiserComponent: UseDelegate<HandleStarknetRelayError>,
-                    RuntimeTypeProviderComponent: WithType<HermesRuntime>,
-                    RuntimeGetterComponent: WithField<symbol!("runtime")>,
-                    [
-                        LoggerTypeProviderComponent,
-                        LoggerGetterComponent,
-                        GlobalLoggerGetterComponent,
-                    ]:
-                        UseHermesLogger,
-                    ChainTypeProviderAtComponent<Index<0>>: WithType<CosmosChain>,
-                    ChainTypeProviderAtComponent<Index<1>>: WithType<StarknetChain>,
+                    RuntimeTypeProviderComponent:
+                        UseType<HermesRuntime>,
+                    RuntimeGetterComponent:
+                        UseField<symbol!("runtime")>,
+                    LoggerComponent:
+                        TracingLogger,
+                    ChainTypeProviderAtComponent<Index<0>>:
+                        UseType<CosmosChain>,
+                    ChainTypeProviderAtComponent<Index<1>>:
+                        UseType<StarknetChain>,
                     ChainGetterAtComponent<Index<0>>:
                         UseField<symbol!("chain_a")>,
                     ChainGetterAtComponent<Index<1>>:

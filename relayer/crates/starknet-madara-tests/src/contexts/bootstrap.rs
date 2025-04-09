@@ -13,10 +13,7 @@ use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::C
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::ChainNodeConfigTypeComponent;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::ChainGenesisConfigTypeComponent;
 use hermes_error::impls::UseHermesError;
-use hermes_logger::UseHermesLogger;
-use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
-};
+use hermes_logging_components::traits::logger::LoggerComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -31,6 +28,7 @@ use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
 use hermes_test_components::chain_driver::traits::types::chain::ChainTypeProviderComponent;
 use hermes_test_components::driver::traits::types::chain_driver::ChainDriverTypeProviderComponent;
+use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use starknet_v13::core::types::contract::SierraClass;
 
 use crate::contexts::{MadaraChain, MadaraChainDriver};
@@ -70,12 +68,8 @@ delegate_components! {
             UseType<HermesRuntime>,
         RuntimeGetterComponent:
             UseField<symbol!("runtime")>,
-        [
-            LoggerTypeProviderComponent,
-            LoggerGetterComponent,
-            GlobalLoggerGetterComponent,
-        ]:
-            UseHermesLogger,
+        LoggerComponent:
+            TracingLogger,
         ChainNodeConfigTypeComponent:
             ProvideStarknetNodeConfigType,
         ChainGenesisConfigTypeComponent:

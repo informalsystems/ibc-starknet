@@ -32,9 +32,9 @@ hermes-cosmos-chain-components   = { workspace = true }
 hermes-cosmos-integration-tests  = { workspace = true }
 hermes-cosmos-relayer            = { workspace = true }
 hermes-cosmos-wasm-relayer       = { workspace = true }
-hermes-logger                    = { workspace = true }
 hermes-logging-components        = { workspace = true }
 poseidon                         = { workspace = true }
+hermes-tracing-logging-components   = { workspace = true }
 
 ibc            = { workspace = true }
 ibc-proto      = { workspace = true }
