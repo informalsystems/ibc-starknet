@@ -204,14 +204,14 @@ pub struct EncodeAppHash;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, AppHash> for EncodeAppHash
 where
-    Encoding: CanEncodeMut<Strategy, Vec<u8>>,
+    Encoding: CanEncodeMut<Strategy, TendermintByteArray>,
 {
     fn encode_mut(
         encoding: &Encoding,
         value: &AppHash,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
-        encoding.encode_mut(&value.as_bytes().to_vec(), buffer)?;
+        encoding.encode_mut(&value.as_bytes().to_vec().into(), buffer)?;
         Ok(())
     }
 }
@@ -219,13 +219,13 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, AppHash> for EncodeAppHash
 where
-    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, TendermintByteArray> + CanRaiseAsyncError<&'static str>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<AppHash, Encoding::Error> {
-        let value = encoding.decode_mut(buffer)?;
+        let value = encoding.decode_mut(buffer)?.inner();
         value
             .try_into()
             .map_err(|_| Encoding::raise_error("invalid app hash"))
@@ -410,14 +410,14 @@ pub struct EncodeTmHash;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, TmHash> for EncodeTmHash
 where
-    Encoding: CanEncodeMut<Strategy, Vec<u8>>,
+    Encoding: CanEncodeMut<Strategy, TendermintByteArray>,
 {
     fn encode_mut(
         encoding: &Encoding,
         value: &TmHash,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
-        encoding.encode_mut(&value.as_bytes().to_vec(), buffer)?;
+        encoding.encode_mut(&value.as_bytes().to_vec().into(), buffer)?;
         Ok(())
     }
 }
@@ -425,13 +425,13 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, TmHash> for EncodeTmHash
 where
-    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, TendermintByteArray> + CanRaiseAsyncError<&'static str>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<TmHash, Encoding::Error> {
-        let value = encoding.decode_mut(buffer)?;
+        let value = encoding.decode_mut(buffer)?.inner();
         value
             .try_into()
             .map_err(|_| Encoding::raise_error("invalid hash"))
@@ -510,14 +510,14 @@ pub struct EncodeSignature;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, Signature> for EncodeSignature
 where
-    Encoding: CanEncodeMut<Strategy, Vec<u8>>,
+    Encoding: CanEncodeMut<Strategy, TendermintByteArray>,
 {
     fn encode_mut(
         encoding: &Encoding,
         value: &Signature,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
-        encoding.encode_mut(&value.clone().into_bytes(), buffer)?;
+        encoding.encode_mut(&value.clone().into_bytes().into(), buffer)?;
         Ok(())
     }
 }
@@ -525,13 +525,13 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Signature> for EncodeSignature
 where
-    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, TendermintByteArray> + CanRaiseAsyncError<&'static str>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<Signature, Encoding::Error> {
-        let value = encoding.decode_mut(buffer)?;
+        let value = encoding.decode_mut(buffer)?.inner();
         value
             .try_into()
             .map_err(|_| Encoding::raise_error("invalid signature"))
@@ -615,7 +615,15 @@ pub struct EncodeCommitSig;
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, CommitSig> for EncodeCommitSig
 where
     Encoding: CanEncodeMut<Strategy, Product![BlockIdFlag, account::Id, ProtoTimestamp, Signature]>
-        + CanEncodeMut<Strategy, Product![BlockIdFlag, Vec<u8>, ProtoTimestamp, Vec<u8>]>,
+        + CanEncodeMut<
+            Strategy,
+            Product![
+                BlockIdFlag,
+                TendermintByteArray,
+                ProtoTimestamp,
+                TendermintByteArray
+            ],
+        >,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -624,7 +632,12 @@ where
     ) -> Result<(), Encoding::Error> {
         match value {
             CommitSig::BlockIdFlagAbsent => encoding.encode_mut(
-                &product![BlockIdFlag::Absent, Vec::new(), ZERO_TIMESTAMP, Vec::new()],
+                &product![
+                    BlockIdFlag::Absent,
+                    TendermintByteArray(Vec::new()),
+                    ZERO_TIMESTAMP,
+                    TendermintByteArray(Vec::new()),
+                ],
                 buffer,
             )?,
             CommitSig::BlockIdFlagCommit {
@@ -825,14 +838,14 @@ pub struct EncodeAccountId;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, account::Id> for EncodeAccountId
 where
-    Encoding: CanEncodeMut<Strategy, Vec<u8>>,
+    Encoding: CanEncodeMut<Strategy, TendermintByteArray>,
 {
     fn encode_mut(
         encoding: &Encoding,
         value: &account::Id,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
-        encoding.encode_mut(&value.as_bytes().to_vec(), buffer)?;
+        encoding.encode_mut(&value.as_bytes().to_vec().into(), buffer)?;
         Ok(())
     }
 }
@@ -840,13 +853,13 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, account::Id> for EncodeAccountId
 where
-    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, TendermintByteArray> + CanRaiseAsyncError<&'static str>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<account::Id, Encoding::Error> {
-        let value = encoding.decode_mut(buffer)?;
+        let value = encoding.decode_mut(buffer)?.inner();
         Ok(account::Id::new(value.try_into().map_err(|_| {
             Encoding::raise_error("invalid account id")
         })?))
@@ -898,11 +911,11 @@ delegate_components! {
 
 impl TransformerRef for EncodePublicKey {
     type From = PublicKey;
-    type To<'a> = Sum![Vec<u8>, Vec<u8>];
+    type To<'a> = Sum![TendermintByteArray, TendermintByteArray];
 
     fn transform<'a>(from: &'a PublicKey) -> Self::To<'a> {
         match from {
-            PublicKey::Ed25519(key) => Either::Left(key.as_bytes().to_vec()),
+            PublicKey::Ed25519(key) => Either::Left(key.as_bytes().to_vec().into()),
             PublicKey::Secp256k1(key) => unimplemented!(),
             &_ => unimplemented!(),
         }
@@ -910,12 +923,12 @@ impl TransformerRef for EncodePublicKey {
 }
 
 impl Transformer for EncodePublicKey {
-    type From = Sum![Vec<u8>, Vec<u8>];
+    type From = Sum![TendermintByteArray, TendermintByteArray];
     type To = PublicKey;
 
     fn transform(value: Self::From) -> PublicKey {
         match value {
-            Either::Left(key) => PublicKey::Ed25519(key.as_slice().try_into().unwrap()),
+            Either::Left(key) => PublicKey::Ed25519(key.inner().as_slice().try_into().unwrap()),
             Either::Right(Either::Left(key)) => unimplemented!(),
             Either::Right(Either::Right(v)) => match v {},
         }
