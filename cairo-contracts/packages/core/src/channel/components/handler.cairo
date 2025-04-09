@@ -465,15 +465,16 @@ pub mod ChannelHandlerComponent {
                 conn_end_on_a.counterparty.connection_id.clone(),
                 msg.version_on_b.clone(),
             );
-            // self
-        //     .verify_channel_end(
-        //         @client,
-        //         conn_end_on_a,
-        //         msg.chan_id_on_b.clone(),
-        //         expected_chan_end_on_b,
-        //         msg.proof_chan_end_on_b.clone(),
-        //         msg.proof_height_on_b.clone(),
-        //     );
+
+            self
+                .verify_channel_end(
+                    @client,
+                    conn_end_on_a,
+                    msg.chan_id_on_b.clone(),
+                    expected_chan_end_on_b,
+                    msg.proof_chan_end_on_b.clone(),
+                    msg.proof_height_on_b.clone(),
+                );
         }
 
         fn chan_open_ack_execute(

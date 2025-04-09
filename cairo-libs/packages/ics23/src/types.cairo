@@ -112,8 +112,6 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
         assert(self.value.len() > 0, ICS23Errors::MISSING_VALUE);
         let mut hash = apply_leaf(self.leaf, self.key.clone(), self.value.clone());
 
-        println!("path len: {}", self.path.len());
-
         let mut path_span = self.path.span();
 
         while let Option::Some(path) = path_span.pop_front() {
