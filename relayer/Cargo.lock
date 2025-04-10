@@ -523,7 +523,7 @@ dependencies = [
  "const-fnv1a-hash",
  "convert_case 0.7.1",
  "derivative",
- "itertools 0.14.0",
+ "itertools",
  "lalrpop",
  "lalrpop-util",
  "num-bigint",
@@ -549,7 +549,7 @@ dependencies = [
  "cairo-lang-sierra",
  "cairo-lang-sierra-type-size",
  "cairo-lang-utils",
- "itertools 0.14.0",
+ "itertools",
  "num-bigint",
  "num-traits",
  "thiserror 2.0.12",
@@ -565,7 +565,7 @@ dependencies = [
  "cairo-lang-sierra",
  "cairo-lang-sierra-type-size",
  "cairo-lang-utils",
- "itertools 0.14.0",
+ "itertools",
  "num-bigint",
  "num-traits",
  "thiserror 2.0.12",
@@ -585,7 +585,7 @@ dependencies = [
  "cairo-lang-sierra-type-size",
  "cairo-lang-utils",
  "indoc",
- "itertools 0.14.0",
+ "itertools",
  "num-bigint",
  "num-traits",
  "starknet-types-core",
@@ -613,7 +613,7 @@ dependencies = [
  "cairo-lang-sierra-to-casm",
  "cairo-lang-utils",
  "convert_case 0.7.1",
- "itertools 0.14.0",
+ "itertools",
  "num-bigint",
  "num-integer",
  "num-traits",
@@ -633,7 +633,7 @@ checksum = "e621368454b62603ae035d04864770a70952e6ca8341b78c1ac50a0088939e3f"
 dependencies = [
  "hashbrown 0.15.2",
  "indexmap 2.8.0",
- "itertools 0.14.0",
+ "itertools",
  "num-bigint",
  "num-traits",
  "schemars",
@@ -663,31 +663,12 @@ checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
 
 [[package]]
 name = "cgp"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1cf6008adf1725d51be8a8e6e93c83b5cf19fb2e7f2061328af663aa97c306a1"
-dependencies = [
- "cgp-core 0.1.0",
- "cgp-extra 0.1.0",
-]
-
-[[package]]
-name = "cgp"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-async 0.4.0",
- "cgp-core 0.4.0",
- "cgp-extra 0.4.0",
-]
-
-[[package]]
-name = "cgp-async"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d071d4e97afc6ce344786d52f513204e271032e1dc51e59408b6ea545fd270b7"
-dependencies = [
- "cgp-async-macro 0.1.0",
+ "cgp-async",
+ "cgp-core",
+ "cgp-extra",
 ]
 
 [[package]]
@@ -695,23 +676,12 @@ name = "cgp-async"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-async-macro 0.4.0",
+ "cgp-async-macro",
  "cgp-sync",
 ]
 
 [[package]]
 name = "cgp-async-macro"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f4eeae095965f957262c70b7b3d52eeb7859c5a7f24db7e4330e02ba4e500d7"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.100",
-]
-
-[[package]]
-name = "cgp-async-macro"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
@@ -722,85 +692,29 @@ dependencies = [
 
 [[package]]
 name = "cgp-component"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2622c229c16df5194795974fe869c875371ac526398f35b9f42853e73123e4dc"
-dependencies = [
- "cgp-async 0.1.0",
- "cgp-component-macro",
-]
-
-[[package]]
-name = "cgp-component"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
-
-[[package]]
-name = "cgp-component-macro"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9b293063f328ce024cce876357dbaf4e0341cd202c32ad02d182c00b894d8a1"
-dependencies = [
- "cgp-component-macro-lib",
- "proc-macro2",
-]
-
-[[package]]
-name = "cgp-component-macro-lib"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2505f365511950fec58adb513a8307b11ffea1a06f10b647aa51162de217b424"
-dependencies = [
- "itertools 0.11.0",
- "prettyplease",
- "proc-macro2",
- "quote",
- "syn 2.0.100",
-]
-
-[[package]]
-name = "cgp-core"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff5a8db0975e0efa7bb1b8295a0b582059552d0228d441e47c5f4196914f3bd4"
-dependencies = [
- "cgp-async 0.1.0",
- "cgp-component 0.1.0",
- "cgp-error 0.1.0",
- "cgp-field 0.1.0",
- "cgp-inner 0.1.0",
-]
 
 [[package]]
 name = "cgp-core"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-async 0.4.0",
- "cgp-component 0.4.0",
- "cgp-error 0.4.0",
- "cgp-field 0.4.0",
+ "cgp-async",
+ "cgp-component",
+ "cgp-error",
+ "cgp-field",
  "cgp-macro",
  "cgp-type",
 ]
 
 [[package]]
 name = "cgp-error"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a40e53c31277f55360d2ba76a616f2335e006a58ff19c05e6070a0f45931e1cb"
-dependencies = [
- "cgp-async 0.1.0",
- "cgp-component 0.1.0",
-]
-
-[[package]]
-name = "cgp-error"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-async 0.4.0",
- "cgp-component 0.4.0",
+ "cgp-async",
+ "cgp-component",
  "cgp-macro",
  "cgp-type",
 ]
@@ -810,7 +724,7 @@ name = "cgp-error-extra"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-core 0.4.0",
+ "cgp-core",
 ]
 
 [[package]]
@@ -818,17 +732,8 @@ name = "cgp-error-eyre"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-core 0.4.0",
+ "cgp-core",
  "eyre",
-]
-
-[[package]]
-name = "cgp-extra"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "704f0d30d3235cb181cc83146f3c9d42999435ff9236743be71aaf182e758ba9"
-dependencies = [
- "cgp-run 0.1.0",
 ]
 
 [[package]]
@@ -837,69 +742,27 @@ version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
  "cgp-error-extra",
- "cgp-inner 0.4.0",
- "cgp-run 0.4.0",
+ "cgp-inner",
+ "cgp-run",
  "cgp-runtime",
 ]
 
 [[package]]
 name = "cgp-field"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea5c75d9db95765005f357690a589c357debb95b6a3233737e095560c5e273cb"
-dependencies = [
- "cgp-field-macro",
-]
-
-[[package]]
-name = "cgp-field"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-component 0.4.0",
+ "cgp-component",
  "cgp-macro",
  "cgp-type",
 ]
 
 [[package]]
-name = "cgp-field-macro"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1c315a7a8847191333ab189234e5eae77df650b9bdf57abfdfc5fe83f188b883"
-dependencies = [
- "cgp-field-macro-lib",
- "proc-macro2",
-]
-
-[[package]]
-name = "cgp-field-macro-lib"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba35e703bac9e476efb61793bdd79b2bfd6abc551f4c7bf9f42899766536d87c"
-dependencies = [
- "itertools 0.11.0",
- "prettyplease",
- "proc-macro2",
- "quote",
- "syn 2.0.100",
-]
-
-[[package]]
-name = "cgp-inner"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9992e1a6cf0bb8a13bb72e8a91125a5594c1616555776905043e5924a8e12dd7"
-dependencies = [
- "cgp-async 0.1.0",
- "cgp-component 0.1.0",
-]
-
-[[package]]
 name = "cgp-inner"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-component 0.4.0",
+ "cgp-component",
  "cgp-macro",
 ]
 
@@ -917,7 +780,7 @@ name = "cgp-macro-lib"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "itertools 0.14.0",
+ "itertools",
  "prettyplease",
  "proc-macro2",
  "quote",
@@ -926,23 +789,12 @@ dependencies = [
 
 [[package]]
 name = "cgp-run"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44a08c8d94641ad0376d23aab67b703d0aac7f178d3a2483cf679074fc2b277d"
-dependencies = [
- "cgp-async 0.1.0",
- "cgp-component 0.1.0",
- "cgp-error 0.1.0",
-]
-
-[[package]]
-name = "cgp-run"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-async 0.4.0",
- "cgp-component 0.4.0",
- "cgp-error 0.4.0",
+ "cgp-async",
+ "cgp-component",
+ "cgp-error",
  "cgp-macro",
 ]
 
@@ -951,7 +803,7 @@ name = "cgp-runtime"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-core 0.4.0",
+ "cgp-core",
 ]
 
 [[package]]
@@ -959,7 +811,7 @@ name = "cgp-sync"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-async-macro 0.4.0",
+ "cgp-async-macro",
 ]
 
 [[package]]
@@ -967,7 +819,7 @@ name = "cgp-type"
 version = "0.4.0"
 source = "git+https://github.com/contextgeneric/cgp.git#b69a8a11927403f4abb455163b8983225d04acb2"
 dependencies = [
- "cgp-component 0.4.0",
+ "cgp-component",
  "cgp-macro",
 ]
 
@@ -1962,9 +1814,9 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 [[package]]
 name = "hermes-any-counterparty"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-cosmos-chain-components",
  "hermes-cosmos-chain-preset",
  "hermes-encoding-components",
@@ -1980,10 +1832,10 @@ dependencies = [
 [[package]]
 name = "hermes-async-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
  "async-trait",
- "cgp 0.4.0",
+ "cgp",
  "futures-channel",
  "futures-core",
  "futures-util",
@@ -1994,7 +1846,7 @@ dependencies = [
 name = "hermes-cairo-encoding-components"
 version = "0.1.0"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-encoding-components",
  "hermes-relayer-components",
  "starknet 0.14.0",
@@ -2003,9 +1855,9 @@ dependencies = [
 [[package]]
 name = "hermes-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-chain-type-components",
  "hermes-encoding-components",
  "hermes-runtime-components",
@@ -2014,17 +1866,17 @@ dependencies = [
 [[package]]
 name = "hermes-chain-type-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
 ]
 
 [[package]]
 name = "hermes-cli"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "clap",
  "dirs-next",
  "eyre",
@@ -2040,12 +1892,12 @@ dependencies = [
  "hermes-cosmos-test-components",
  "hermes-encoding-components",
  "hermes-error",
- "hermes-logger",
  "hermes-logging-components",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
  "hermes-runtime",
  "hermes-runtime-components",
+ "hermes-tracing-logging-components",
  "http 1.3.1",
  "humantime",
  "ibc",
@@ -2060,9 +1912,9 @@ dependencies = [
 [[package]]
 name = "hermes-cli-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "clap",
  "hermes-encoding-components",
  "hermes-error",
@@ -2080,14 +1932,13 @@ dependencies = [
 [[package]]
 name = "hermes-cli-framework"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "clap",
  "eyre",
  "hermes-cosmos-relayer",
  "hermes-error",
- "hermes-logger",
  "hermes-runtime",
  "serde",
  "serde_json",
@@ -2100,18 +1951,18 @@ dependencies = [
 [[package]]
 name = "hermes-comet-light-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-chain-type-components",
 ]
 
 [[package]]
 name = "hermes-comet-light-client-context"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "eyre",
  "hermes-chain-components",
  "hermes-chain-type-components",
@@ -2125,11 +1976,11 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
  "bech32 0.9.1",
  "bitcoin",
- "cgp 0.4.0",
+ "cgp",
  "digest 0.10.7",
  "dirs-next",
  "eyre",
@@ -2151,7 +2002,7 @@ dependencies = [
  "ibc-client-tendermint",
  "ibc-proto",
  "ics23",
- "itertools 0.14.0",
+ "itertools",
  "num-bigint",
  "num-rational",
  "prost",
@@ -2179,9 +2030,9 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-chain-preset"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-chain-type-components",
  "hermes-cosmos-chain-components",
  "hermes-cosmos-test-components",
@@ -2194,9 +2045,9 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-encoding-components",
  "hermes-protobuf-encoding-components",
  "ibc",
@@ -2208,9 +2059,9 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-integration-tests"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "eyre",
  "hermes-async-runtime-components",
  "hermes-cosmos-chain-components",
@@ -2218,13 +2069,13 @@ dependencies = [
  "hermes-cosmos-test-components",
  "hermes-error",
  "hermes-ibc-test-suite",
- "hermes-logger",
  "hermes-logging-components",
  "hermes-relayer-components",
  "hermes-relayer-components-extra",
  "hermes-runtime",
  "hermes-runtime-components",
  "hermes-test-components",
+ "hermes-tracing-logging-components",
  "hermes-wasm-test-components",
  "ibc",
  "ibc-proto",
@@ -2241,9 +2092,9 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "dirs-next",
  "eyre",
  "futures",
@@ -2255,7 +2106,6 @@ dependencies = [
  "hermes-cosmos-test-components",
  "hermes-encoding-components",
  "hermes-error",
- "hermes-logger",
  "hermes-logging-components",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
@@ -2269,7 +2119,7 @@ dependencies = [
  "http 1.3.1",
  "ibc",
  "ibc-proto",
- "itertools 0.14.0",
+ "itertools",
  "moka",
  "opentelemetry",
  "prost",
@@ -2291,9 +2141,9 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hdpath",
  "hermes-chain-type-components",
  "hermes-cosmos-chain-components",
@@ -2304,7 +2154,7 @@ dependencies = [
  "http 1.3.1",
  "ibc",
  "ibc-proto",
- "itertools 0.14.0",
+ "itertools",
  "prost",
  "secp256k1",
  "serde",
@@ -2319,9 +2169,9 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-wasm-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "eyre",
  "futures",
  "hermes-any-counterparty",
@@ -2333,7 +2183,6 @@ dependencies = [
  "hermes-cosmos-test-components",
  "hermes-encoding-components",
  "hermes-error",
- "hermes-logger",
  "hermes-logging-components",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
@@ -2348,7 +2197,7 @@ dependencies = [
  "http 1.3.1",
  "ibc",
  "ibc-proto",
- "itertools 0.14.0",
+ "itertools",
  "moka",
  "opentelemetry",
  "prost",
@@ -2369,17 +2218,17 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
 ]
 
 [[package]]
 name = "hermes-error"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "eyre",
  "hermes-relayer-components",
 ]
@@ -2387,9 +2236,9 @@ dependencies = [
 [[package]]
 name = "hermes-ibc-test-suite"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-chain-components",
  "hermes-chain-type-components",
  "hermes-logging-components",
@@ -2398,32 +2247,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "hermes-logger"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b4a7eaf2c85295add84cbe86016085c831e2c2b2d2be9c3d8decdc09bf54488"
-dependencies = [
- "cgp 0.1.0",
- "hermes-logging-components",
- "hermes-relayer-components",
- "hermes-relayer-components-extra",
- "hermes-tracing-logging-components",
-]
-
-[[package]]
 name = "hermes-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
 ]
 
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-encoding-components",
  "prost",
  "prost-types",
@@ -2432,9 +2268,9 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "futures",
  "hermes-chain-components",
  "hermes-chain-type-components",
@@ -2446,9 +2282,9 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components-extra"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-chain-type-components",
  "hermes-logging-components",
  "hermes-relayer-components",
@@ -2458,9 +2294,9 @@ dependencies = [
 [[package]]
 name = "hermes-runtime"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-async-runtime-components",
  "hermes-runtime-components",
  "hermes-tokio-runtime-components",
@@ -2470,9 +2306,9 @@ dependencies = [
 [[package]]
 name = "hermes-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
 ]
 
 [[package]]
@@ -2480,7 +2316,7 @@ name = "hermes-starknet-chain-components"
 version = "0.1.0"
 dependencies = [
  "cairo-lang-starknet-classes",
- "cgp 0.4.0",
+ "cgp",
  "crypto-bigint",
  "derive_more 2.0.1",
  "futures",
@@ -2522,7 +2358,7 @@ name = "hermes-starknet-chain-context"
 version = "0.1.0"
 dependencies = [
  "cairo-lang-starknet-classes",
- "cgp 0.4.0",
+ "cgp",
  "eyre",
  "futures",
  "hermes-async-runtime-components",
@@ -2558,7 +2394,7 @@ dependencies = [
 name = "hermes-starknet-cli"
 version = "0.1.0"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "cgp-error-eyre",
  "clap",
  "eyre",
@@ -2598,7 +2434,7 @@ dependencies = [
 name = "hermes-starknet-integration-tests"
 version = "0.1.0"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "eyre",
  "flate2",
  "futures",
@@ -2644,7 +2480,7 @@ name = "hermes-starknet-madara-tests"
 version = "0.1.0"
 dependencies = [
  "cairo-lang-starknet-classes",
- "cgp 0.4.0",
+ "cgp",
  "eyre",
  "flate2",
  "futures",
@@ -2698,7 +2534,7 @@ dependencies = [
 name = "hermes-starknet-relayer"
 version = "0.1.0"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "eyre",
  "futures",
  "hermes-cosmos-chain-components",
@@ -2724,7 +2560,7 @@ dependencies = [
 name = "hermes-starknet-test-components"
 version = "0.1.0"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-cairo-encoding-components",
  "hermes-cosmos-test-components",
  "hermes-encoding-components",
@@ -2741,7 +2577,7 @@ dependencies = [
 name = "hermes-starknet-tools-cli"
 version = "0.1.0"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "cgp-error-eyre",
  "clap",
  "eyre",
@@ -2771,9 +2607,9 @@ dependencies = [
 [[package]]
 name = "hermes-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-chain-type-components",
  "hermes-logging-components",
  "hermes-relayer-components",
@@ -2784,9 +2620,9 @@ dependencies = [
 [[package]]
 name = "hermes-tokio-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "futures",
  "hermes-async-runtime-components",
  "hermes-runtime-components",
@@ -2798,21 +2634,22 @@ dependencies = [
 [[package]]
 name = "hermes-tracing-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-logging-components",
  "hermes-relayer-components",
  "hermes-relayer-components-extra",
  "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
 name = "hermes-wasm-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-cosmos-chain-components",
  "hermes-cosmos-chain-preset",
  "hermes-cosmos-encoding-components",
@@ -2830,9 +2667,9 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-cosmos-encoding-components",
  "hermes-encoding-components",
  "hermes-protobuf-encoding-components",
@@ -2844,9 +2681,9 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#c6c3fc24e39ee6022274d80a367d61c4e099f930"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "hermes-chain-type-components",
  "hermes-cosmos-chain-components",
  "hermes-cosmos-test-components",
@@ -3219,7 +3056,7 @@ dependencies = [
 name = "ibc-client-starknet-types"
 version = "0.1.0"
 dependencies = [
- "cgp 0.4.0",
+ "cgp",
  "derive_more 0.99.19",
  "hermes-cosmos-encoding-components",
  "hermes-encoding-components",
@@ -3911,15 +3748,6 @@ checksum = "7943c866cc5cd64cbc25b2e01621d07fa8eb2a1a23160ee81ce38704e97b8ecf"
 
 [[package]]
 name = "itertools"
-version = "0.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1c173a5686ce8bfa551b3563d0c2170bf24ca44da99c7ca4bfdab5418c3fe57"
-dependencies = [
- "either",
-]
-
-[[package]]
-name = "itertools"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
@@ -3973,7 +3801,7 @@ dependencies = [
  "ascii-canvas",
  "bit-set",
  "ena",
- "itertools 0.14.0",
+ "itertools",
  "lalrpop-util",
  "petgraph",
  "pico-args",
@@ -4682,7 +4510,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a56d757972c98b346a9b766e3f02746cde6dd1cd1d1d563472929fdd74bec4d"
 dependencies = [
  "anyhow",
- "itertools 0.14.0",
+ "itertools",
  "proc-macro2",
  "quote",
  "syn 2.0.100",
