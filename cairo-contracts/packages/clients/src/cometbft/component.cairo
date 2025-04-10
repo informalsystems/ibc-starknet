@@ -459,6 +459,9 @@ pub mod CometClientComponent {
             substitute_client_state: Array<felt252>,
             substitute_consensus_state: Array<felt252>,
         ) {
+            // TODO: prune old consensus states.
+            // They are untrusted now even if they are within trusted period.
+
             let substitute_client_state = CometClientStateImpl::deserialize(
                 substitute_client_state,
             );
