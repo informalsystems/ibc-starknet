@@ -11,7 +11,7 @@ use hermes_runtime_components::traits::runtime::HasRuntime;
 use crate::types::node_config::StarknetNodeConfig;
 
 #[cgp_new_provider(ChainFullNodeStarterComponent)]
-impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartAnvil
+impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartPathfinder
 where
     Bootstrap: HasRuntime<Runtime = Runtime>
         + HasChainNodeConfigType<ChainNodeConfig = StarknetNodeConfig>
@@ -25,34 +25,56 @@ where
         chain_node_config: &StarknetNodeConfig,
         chain_genesis_config: &Bootstrap::ChainGenesisConfig,
     ) -> Result<Vec<Runtime::ChildProcess>, Bootstrap::Error> {
-        let chain_command = Runtime::file_path_from_string("anvil");
+        let chain_command = Runtime::file_path_from_string("pathfinder");
 
-        let anvil_home =
-            Runtime::join_file_path(chain_home_dir, &Runtime::file_path_from_string("anvil"));
+        let pathfinder_home = Runtime::join_file_path(
+            chain_home_dir,
+            &Runtime::file_path_from_string("pathfinder"),
+        );
 
         bootstrap
             .runtime()
-            .create_dir(&anvil_home)
+            .create_dir(&pathfinder_home)
             .await
             .map_err(Bootstrap::raise_error)?;
 
-        // Use RPC Port + 2 for Anvil port for now
-        let rpc_port = chain_node_config.rpc_port + 2;
+        let madara_port = chain_node_config.rpc_port;
+
+        // Use RPC Port + 1 for Anvil port for now
+        let anvil_port = chain_node_config.rpc_port + 1;
+
+        // Use RPC Port + 1 for Pathfinder port for now
+        let pathfinder_port = chain_node_config.rpc_port + 2;
 
         let args = [
-            "--block-time",
+            "--data-directory",
+            &Runtime::file_path_to_string(&pathfinder_home),
             "1",
+            "--network",
+            "custom",
+            "--storage.state-tries",
+            "archive",
+            "--ethereum.url",
+            &format!("http://localhost:{anvil_port}"),
+            "--gateway-url",
+            "http://localhost:{madara_port}/gateway",
+            "--feeder-gateway-url",
+            "http://localhost:{madara_port}/feeder_gateway",
             "--chain-id",
-            "11155111",
-            "--port",
-            &rpc_port.to_string(),
+            "starknet-devnet",
+            "--http-rpc",
+            &format!("127.0.0.1:{pathfinder_port}"),
         ];
 
-        let stdout_path =
-            Runtime::join_file_path(&anvil_home, &Runtime::file_path_from_string("stdout.log"));
+        let stdout_path = Runtime::join_file_path(
+            &pathfinder_home,
+            &Runtime::file_path_from_string("stdout.log"),
+        );
 
-        let stderr_path =
-            Runtime::join_file_path(&anvil_home, &Runtime::file_path_from_string("stderr.log"));
+        let stderr_path = Runtime::join_file_path(
+            &pathfinder_home,
+            &Runtime::file_path_from_string("stderr.log"),
+        );
 
         let child_process = bootstrap
             .runtime()
