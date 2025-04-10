@@ -4,7 +4,7 @@ use std::net::{IpAddr, Ipv4Addr};
 use cgp::core::error::CanRaiseAsyncError;
 use cgp::prelude::*;
 use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::CanBuildChainDriver;
-use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::CanStartChainFullNode;
+use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::CanStartChainFullNodes;
 use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::HasChainStoreDir;
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
@@ -33,7 +33,7 @@ where
         + HasChainNodeConfigType<ChainNodeConfig = StarknetNodeConfig>
         + HasChainGenesisConfigType<ChainGenesisConfig = StarknetGenesisConfig>
         + CanBuildChainDriver
-        + CanStartChainFullNode
+        + CanStartChainFullNodes
         + HasChainStoreDir
         + CanRaiseAsyncError<Runtime::Error>,
     Runtime: HasChildProcessType
@@ -86,7 +86,7 @@ where
         let node_config = StarknetNodeConfig { rpc_addr, rpc_port };
 
         let chain_process = bootstrap
-            .start_chain_full_node(&chain_home_dir, &node_config, &genesis_config)
+            .start_chain_full_nodes(&chain_home_dir, &node_config, &genesis_config)
             .await?;
 
         // For now, we hard code the wallets generated from devnet-rs

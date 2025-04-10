@@ -22,12 +22,12 @@ where
         + CanRaiseAsyncError<Runtime::Error>,
     Runtime: CanStartChildProcess + HasFilePathType,
 {
-    async fn start_chain_full_node(
+    async fn start_chain_full_nodes(
         bootstrap: &Bootstrap,
         chain_home_dir: &Runtime::FilePath,
         chain_node_config: &StarknetNodeConfig,
         chain_genesis_config: &StarknetGenesisConfig,
-    ) -> Result<Runtime::ChildProcess, Bootstrap::Error> {
+    ) -> Result<Vec<Runtime::ChildProcess>, Bootstrap::Error> {
         let chain_command = bootstrap.chain_command_path();
 
         let chain_state_path = Runtime::join_file_path(
@@ -73,6 +73,6 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
-        Ok(child_process)
+        Ok(vec![child_process])
     }
 }
