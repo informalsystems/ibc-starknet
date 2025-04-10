@@ -1024,7 +1024,7 @@ checksum = "bf151400ff0baff5465007dd2f3e717f3fe502074ca563069ce3a6629d07b289"
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#68e9831c55a2816b1f5176cc691959654325a324"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -1038,7 +1038,7 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#68e9831c55a2816b1f5176cc691959654325a324"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
  "cgp",
 ]
@@ -1046,7 +1046,7 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#68e9831c55a2816b1f5176cc691959654325a324"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/has-fields-macro#36d9db94814fe896b4270e75ba232824e98241bd"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -1813,7 +1813,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a56d757972c98b346a9b766e3f02746cde6dd1cd1d1d563472929fdd74bec4d"
 dependencies = [
  "anyhow",
- "itertools 0.14.0",
+ "itertools 0.10.5",
  "proc-macro2",
  "quote",
  "syn 2.0.98",

@@ -179,7 +179,6 @@ hermes-encoding-components           = { git = "https://github.com/informalsyste
 hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/has-fields-macro" }
 hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/has-fields-macro" }
 hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/has-fields-macro" }
-hermes-logger                        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/has-fields-macro" }
 hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/has-fields-macro" }
 hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/has-fields-macro" }
 hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/has-fields-macro" }
