@@ -2,7 +2,6 @@ use cgp::prelude::*;
 use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::{
     ChainFullNodeStarter, ChainFullNodeStarterComponent,
 };
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::HasChainCommandPath;
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
 use hermes_runtime_components::traits::fs::file_path::HasFilePathType;
@@ -12,12 +11,11 @@ use hermes_runtime_components::traits::runtime::HasRuntime;
 use crate::types::node_config::StarknetNodeConfig;
 
 #[cgp_new_provider(ChainFullNodeStarterComponent)]
-impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartMadaraSequencer
+impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartAnvil
 where
     Bootstrap: HasRuntime<Runtime = Runtime>
         + HasChainNodeConfigType<ChainNodeConfig = StarknetNodeConfig>
         + HasChainGenesisConfigType
-        + HasChainCommandPath
         + CanRaiseAsyncError<Runtime::Error>,
     Runtime: CanStartChildProcess + HasFilePathType,
 {
@@ -27,16 +25,18 @@ where
         chain_node_config: &StarknetNodeConfig,
         chain_genesis_config: &Bootstrap::ChainGenesisConfig,
     ) -> Result<Vec<Runtime::ChildProcess>, Bootstrap::Error> {
-        let chain_command = bootstrap.chain_command_path();
+        let chain_command = Runtime::file_path_from_string("anvil");
+
+        // Use RPC Port + 1 for Anvil port for now
+        let rpc_port = chain_node_config.rpc_port + 1;
 
         let args = [
-            "--devnet",
-            "--rpc-port",
-            &chain_node_config.rpc_port.to_string(),
-            "--base-path",
-            &Runtime::file_path_to_string(chain_home_dir),
-            "--chain-config-override",
-            "block_time=1s,pending_block_update_time=1s",
+            "--block-time",
+            "1",
+            "--chain-id",
+            "11155111",
+            "--port",
+            &rpc_port.to_string(),
         ];
 
         let stdout_path = Runtime::join_file_path(
@@ -52,7 +52,7 @@ where
         let child_process = bootstrap
             .runtime()
             .start_child_process(
-                chain_command,
+                &chain_command,
                 &args,
                 &[],
                 Some(&stdout_path),
