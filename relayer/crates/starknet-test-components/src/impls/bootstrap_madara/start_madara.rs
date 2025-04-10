@@ -38,14 +38,30 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
+        let rpc_port = chain_node_config.rpc_port;
+
+        let gateway_port = rpc_port + 1;
+
         let args = [
-            "--devnet",
-            "--rpc-port",
-            &chain_node_config.rpc_port.to_string(),
             "--base-path",
             &Runtime::file_path_to_string(&madara_home),
+            "--rpc-port",
+            &rpc_port.to_string(),
+            "--gateway-port",
+            &gateway_port.to_string(),
             "--chain-config-override",
             "block_time=1s,pending_block_update_time=1s",
+            "--sequencer",
+            "--gateway-enable",
+            "--feeder-gateway-enable",
+            "--preset",
+            "sepolia",
+            "--l1-sync-disabled",
+            "--l2-sync-disabled",
+            "--gas-price",
+            "0",
+            "--blob-gas-price",
+            "0",
         ];
 
         let stdout_path =

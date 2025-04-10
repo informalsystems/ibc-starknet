@@ -36,8 +36,8 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
-        // Use RPC Port + 1 for Anvil port for now
-        let rpc_port = chain_node_config.rpc_port + 1;
+        // Use RPC Port + 2 for Anvil port for now
+        let rpc_port = chain_node_config.rpc_port + 2;
 
         let args = [
             "--block-time",

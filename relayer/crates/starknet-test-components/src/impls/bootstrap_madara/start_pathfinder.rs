@@ -38,13 +38,13 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
-        let madara_port = chain_node_config.rpc_port;
+        let gateway_port = chain_node_config.rpc_port + 1;
 
-        // Use RPC Port + 1 for Anvil port for now
-        let anvil_port = chain_node_config.rpc_port + 1;
+        // Use RPC Port + 2 for Anvil port for now
+        let anvil_port = chain_node_config.rpc_port + 2;
 
-        // Use RPC Port + 1 for Pathfinder port for now
-        let pathfinder_port = chain_node_config.rpc_port + 2;
+        // Use RPC Port + 3 for Pathfinder port for now
+        let pathfinder_port = chain_node_config.rpc_port + 3;
 
         let args = [
             "--data-directory",
@@ -56,9 +56,9 @@ where
             "--ethereum.url",
             &format!("http://localhost:{anvil_port}"),
             "--gateway-url",
-            &format!("http://localhost:{madara_port}/gateway"),
+            &format!("http://localhost:{gateway_port}/gateway"),
             "--feeder-gateway-url",
-            &format!("http://localhost:{madara_port}/feeder_gateway"),
+            &format!("http://localhost:{gateway_port}/feeder_gateway"),
             "--chain-id",
             "starknet-devnet",
             "--http-rpc",

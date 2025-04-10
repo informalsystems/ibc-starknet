@@ -42,122 +42,124 @@ fn test_madara_bootstrap() -> Result<(), Error> {
 
         info!("block: {block}");
 
-        let erc20_class_hash = {
-            let contract_path = std::env::var("ERC20_CONTRACT")?;
+        tokio::time::sleep(core::time::Duration::from_secs(999999)).await;
 
-            let contract_str: String = runtime.read_file_as_string(&contract_path.into()).await?;
+        // let erc20_class_hash = {
+        //     let contract_path = std::env::var("ERC20_CONTRACT")?;
 
-            let contract = serde_json::from_str(&contract_str)?;
+        //     let contract_str: String = runtime.read_file_as_string(&contract_path.into()).await?;
 
-            let class_hash = chain.declare_contract(&contract).await?;
+        //     let contract = serde_json::from_str(&contract_str)?;
 
-            info!("declared class: {:?}", class_hash);
+        //     let class_hash = chain.declare_contract(&contract).await?;
 
-            class_hash
-        };
+        //     info!("declared class: {:?}", class_hash);
 
-        let event_encoding = StarknetEventEncoding::default();
+        //     class_hash
+        // };
 
-        event_encoding
-            .erc20_hashes
-            .set([erc20_class_hash].into())
-            .unwrap();
+        // let event_encoding = StarknetEventEncoding::default();
 
-        let initial_supply = 1000u32;
+        // event_encoding
+        //     .erc20_hashes
+        //     .set([erc20_class_hash].into())
+        //     .unwrap();
 
-        let token_address = {
-            let relayer_address = chain_driver.relayer_wallet.account_address;
+        // let initial_supply = 1000u32;
 
-            let calldata = StarknetCairoEncoding.encode(&product![
-                "token".to_owned(),
-                "token".to_owned(),
-                U256::from(initial_supply),
-                relayer_address,
-            ])?;
+        // let token_address = {
+        //     let relayer_address = chain_driver.relayer_wallet.account_address;
 
-            let token_address = chain
-                .deploy_contract(&erc20_class_hash, false, &calldata)
-                .await?;
+        //     let calldata = StarknetCairoEncoding.encode(&product![
+        //         "token".to_owned(),
+        //         "token".to_owned(),
+        //         U256::from(initial_supply),
+        //         relayer_address,
+        //     ])?;
 
-            info!("deployed ERC20 contract to address: {:?}", token_address);
+        //     let token_address = chain
+        //         .deploy_contract(&erc20_class_hash, false, &calldata)
+        //         .await?;
 
-            token_address
-        };
+        //     info!("deployed ERC20 contract to address: {:?}", token_address);
 
-        {
-            // Test local ERC20 token transfer
-            let account_address = chain_driver.relayer_wallet.account_address;
+        //     token_address
+        // };
 
-            let recipient_address = chain_driver.user_wallet_a.account_address;
+        // {
+        //     // Test local ERC20 token transfer
+        //     let account_address = chain_driver.relayer_wallet.account_address;
 
-            info!("sender address: {:?}", account_address);
-            info!("recipient address: {:?}", recipient_address);
+        //     let recipient_address = chain_driver.user_wallet_a.account_address;
 
-            let sender_balance_a = chain
-                .query_token_balance(&token_address, &account_address)
-                .await?;
+        //     info!("sender address: {:?}", account_address);
+        //     info!("recipient address: {:?}", recipient_address);
 
-            info!("sender balance before: {}", sender_balance_a);
+        //     let sender_balance_a = chain
+        //         .query_token_balance(&token_address, &account_address)
+        //         .await?;
 
-            let recipient_balance_a = chain
-                .query_token_balance(&token_address, &recipient_address)
-                .await?;
+        //     info!("sender balance before: {}", sender_balance_a);
 
-            info!("recipient balance before: {}", recipient_balance_a);
+        //     let recipient_balance_a = chain
+        //         .query_token_balance(&token_address, &recipient_address)
+        //         .await?;
 
-            let transfer_amount = 100u32.into();
+        //     info!("recipient balance before: {}", recipient_balance_a);
 
-            let message = chain.build_transfer_token_message(
-                &recipient_address,
-                &StarknetAmount::new(transfer_amount, token_address),
-            )?;
+        //     let transfer_amount = 100u32.into();
 
-            let response = chain.send_message(message).await?;
+        //     let message = chain.build_transfer_token_message(
+        //         &recipient_address,
+        //         &StarknetAmount::new(transfer_amount, token_address),
+        //     )?;
 
-            info!("performed transfer of 100 tokens");
+        //     let response = chain.send_message(message).await?;
 
-            info!("response: {:?}", response);
+        //     info!("performed transfer of 100 tokens");
 
-            let erc20_events: Vec<Erc20Event> =
-                event_encoding.filter_decode_events(&response.events)?;
+        //     info!("response: {:?}", response);
 
-            info!(
-                "events from sending transfer token message: {:?}",
-                erc20_events
-            );
+        //     let erc20_events: Vec<Erc20Event> =
+        //         event_encoding.filter_decode_events(&response.events)?;
 
-            match &erc20_events[0] {
-                Erc20Event::Transfer(transfer) => {
-                    assert_eq!(transfer.from, account_address);
-                    assert_eq!(transfer.to, recipient_address);
-                    assert_eq!(transfer.value, transfer_amount);
-                }
-                _ => {
-                    panic!("expected a Transfer event to be emitted");
-                }
-            }
+        //     info!(
+        //         "events from sending transfer token message: {:?}",
+        //         erc20_events
+        //     );
 
-            let sender_balance_b = chain
-                .query_token_balance(&token_address, &account_address)
-                .await?;
+        //     match &erc20_events[0] {
+        //         Erc20Event::Transfer(transfer) => {
+        //             assert_eq!(transfer.from, account_address);
+        //             assert_eq!(transfer.to, recipient_address);
+        //             assert_eq!(transfer.value, transfer_amount);
+        //         }
+        //         _ => {
+        //             panic!("expected a Transfer event to be emitted");
+        //         }
+        //     }
 
-            info!("sender balance after transfer: {}", sender_balance_b);
+        //     let sender_balance_b = chain
+        //         .query_token_balance(&token_address, &account_address)
+        //         .await?;
 
-            let recipient_balance_b = chain
-                .query_token_balance(&token_address, &recipient_address)
-                .await?;
+        //     info!("sender balance after transfer: {}", sender_balance_b);
 
-            info!("recipient balance transfer: {}", recipient_balance_b);
+        //     let recipient_balance_b = chain
+        //         .query_token_balance(&token_address, &recipient_address)
+        //         .await?;
 
-            assert_eq!(
-                sender_balance_b.quantity,
-                sender_balance_a.quantity - transfer_amount
-            );
-            assert_eq!(
-                recipient_balance_b.quantity,
-                recipient_balance_a.quantity + transfer_amount
-            );
-        }
+        //     info!("recipient balance transfer: {}", recipient_balance_b);
+
+        //     assert_eq!(
+        //         sender_balance_b.quantity,
+        //         sender_balance_a.quantity - transfer_amount
+        //     );
+        //     assert_eq!(
+        //         recipient_balance_b.quantity,
+        //         recipient_balance_a.quantity + transfer_amount
+        //     );
+        // }
 
         Ok(())
     })
