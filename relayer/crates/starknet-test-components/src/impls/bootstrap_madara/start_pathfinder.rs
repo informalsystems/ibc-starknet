@@ -2,69 +2,83 @@ use cgp::prelude::*;
 use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::{
     ChainFullNodeStarter, ChainFullNodeStarterComponent,
 };
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::HasChainCommandPath;
 use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
 use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
-use hermes_runtime_components::traits::fs::file_path::HasFilePathType;
+use hermes_runtime_components::traits::fs::create_dir::CanCreateDir;
 use hermes_runtime_components::traits::os::child_process::CanStartChildProcess;
 use hermes_runtime_components::traits::runtime::HasRuntime;
 
-use crate::types::genesis_config::StarknetGenesisConfig;
 use crate::types::node_config::StarknetNodeConfig;
 
 #[cgp_new_provider(ChainFullNodeStarterComponent)]
-impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartStarknetDevnet
+impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartPathfinder
 where
     Bootstrap: HasRuntime<Runtime = Runtime>
         + HasChainNodeConfigType<ChainNodeConfig = StarknetNodeConfig>
-        + HasChainGenesisConfigType<ChainGenesisConfig = StarknetGenesisConfig>
-        + HasChainCommandPath
+        + HasChainGenesisConfigType
         + CanRaiseAsyncError<Runtime::Error>,
-    Runtime: CanStartChildProcess + HasFilePathType,
+    Runtime: CanStartChildProcess + CanCreateDir,
 {
     async fn start_chain_full_nodes(
         bootstrap: &Bootstrap,
         chain_home_dir: &Runtime::FilePath,
         chain_node_config: &StarknetNodeConfig,
-        chain_genesis_config: &StarknetGenesisConfig,
+        chain_genesis_config: &Bootstrap::ChainGenesisConfig,
     ) -> Result<Vec<Runtime::ChildProcess>, Bootstrap::Error> {
-        let chain_command = bootstrap.chain_command_path();
+        let chain_command = Runtime::file_path_from_string("pathfinder");
 
-        let chain_state_path = Runtime::join_file_path(
+        let pathfinder_home = Runtime::join_file_path(
             chain_home_dir,
-            &Runtime::file_path_from_string("chain-state.json"),
+            &Runtime::file_path_from_string("pathfinder"),
         );
 
+        bootstrap
+            .runtime()
+            .create_dir(&pathfinder_home)
+            .await
+            .map_err(Bootstrap::raise_error)?;
+
+        let gateway_port = chain_node_config.rpc_port + 1;
+
+        // Use RPC Port + 2 for Anvil port for now
+        let anvil_port = chain_node_config.rpc_port + 2;
+
+        // Use RPC Port + 3 for Pathfinder port for now
+        let pathfinder_port = chain_node_config.rpc_port + 3;
+
         let args = [
-            "--seed",
-            &chain_genesis_config.seed.to_string(),
-            "--port",
-            &chain_node_config.rpc_port.to_string(),
-            "--block-generation-on",
-            "1",
-            "--state-archive-capacity",
-            "full",
-            "--dump-on",
-            "block",
-            "--request-body-size-limit=3000000", // 3M; ibc-core contract class is too large
-            "--dump-path",
-            &Runtime::file_path_to_string(&chain_state_path),
+            "--data-directory",
+            &Runtime::file_path_to_string(&pathfinder_home),
+            "--network",
+            "custom",
+            "--storage.state-tries",
+            "archive",
+            "--ethereum.url",
+            &format!("http://localhost:{anvil_port}"),
+            "--gateway-url",
+            &format!("http://localhost:{gateway_port}/gateway"),
+            "--feeder-gateway-url",
+            &format!("http://localhost:{gateway_port}/feeder_gateway"),
+            "--chain-id",
+            "starknet-devnet",
+            "--http-rpc",
+            &format!("127.0.0.1:{pathfinder_port}"),
         ];
 
         let stdout_path = Runtime::join_file_path(
-            chain_home_dir,
+            &pathfinder_home,
             &Runtime::file_path_from_string("stdout.log"),
         );
 
         let stderr_path = Runtime::join_file_path(
-            chain_home_dir,
+            &pathfinder_home,
             &Runtime::file_path_from_string("stderr.log"),
         );
 
         let child_process = bootstrap
             .runtime()
             .start_child_process(
-                chain_command,
+                &chain_command,
                 &args,
                 &[],
                 Some(&stdout_path),

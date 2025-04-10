@@ -56,7 +56,7 @@ where
         genesis_config: StarknetGenesisConfig,
         node_config: StarknetNodeConfig,
         wallets: BTreeMap<String, StarknetWallet>,
-        chain_process: Child,
+        chain_processes: Vec<Child>,
     ) -> Result<StarknetChainDriver, Bootstrap::Error> {
         let runtime = bootstrap.runtime().clone();
 
@@ -162,7 +162,7 @@ where
             genesis_config,
             node_config,
             wallets,
-            chain_process: Some(chain_process),
+            chain_processes,
             relayer_wallet,
             user_wallet_a,
             user_wallet_b,
