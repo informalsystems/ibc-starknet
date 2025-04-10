@@ -6,13 +6,17 @@
 use core::marker::PhantomData;
 use core::time::Duration;
 
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_chain_components::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
+};
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_cosmos_test_components::chain::types::amount::Amount;
 use hermes_error::types::Error;
 use hermes_relayer_components::birelay::traits::CanAutoBiRelay;
+use hermes_relayer_components::relay::traits::auto_relayer::CanAutoRelayWithHeights;
 use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
+use hermes_relayer_components::relay::traits::target::SourceTarget;
 use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
@@ -173,6 +177,10 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
 
         info!("send IBC transfer from Cosmos to Starknet");
 
+        let height_a1 = starknet_chain.query_chain_height().await?;
+
+        let height_b1 = cosmos_chain.query_chain_height().await?;
+
         // build packets with fast timeout
         let timeout = (Timestamp::now() + Duration::from_secs(5))?;
 
@@ -241,8 +249,16 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
 
         info!("will relay timeout packets");
 
-        birelay
-            .auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0)))
+        let height_a2 = starknet_chain.query_chain_height().await?;
+
+        let height_b2 = cosmos_chain.query_chain_height().await?;
+
+        starknet_to_cosmos_relay
+            .auto_relay_with_heights(SourceTarget, &height_a1, Some(&height_a2))
+            .await?;
+
+        cosmos_to_starknet_relay
+            .auto_relay_with_heights(SourceTarget, &height_b1, Some(&height_b2))
             .await?;
 
         cosmos_chain
