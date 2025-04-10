@@ -25,10 +25,7 @@ use hermes_encoding_components::traits::has_encoding::{
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::UseHermesError;
-use hermes_logger::UseHermesLogger;
-use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
-};
+use hermes_logging_components::traits::logger::LoggerComponent;
 use hermes_relayer_components::transaction::impls::global_nonce_mutex::GetGlobalNonceMutex;
 use hermes_relayer_components::transaction::traits::default_signer::DefaultSignerGetterComponent;
 use hermes_relayer_components::transaction::traits::nonce::nonce_mutex::NonceAllocationMutexGetterComponent;
@@ -57,12 +54,16 @@ use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
+use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use ibc::core::host::types::identifiers::ChainId;
+use reqwest::Client;
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
+use url::Url;
 
 use crate::impls::{BuildStarknetAccount, HandleMadaraChainError};
 use crate::presets::MadaraChainPreset;
+use crate::traits::{JsonRpcUrlGetterComponent, RpcClientGetterComponent};
 use crate::types::StarknetAccount;
 
 #[cgp_context(MadaraChainComponents: MadaraChainPreset)]
@@ -76,6 +77,8 @@ pub struct MadaraChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
     pub starknet_client: Arc<JsonRpcClient<HttpTransport>>,
+    pub rpc_client: Client,
+    pub json_rpc_url: Url,
     pub ibc_client_contract_address: OnceLock<StarknetAddress>,
     pub ibc_core_contract_address: OnceLock<StarknetAddress>,
     pub ibc_ics20_contract_address: OnceLock<StarknetAddress>,
@@ -122,11 +125,12 @@ delegate_components! {
         PollIntervalGetterComponent:
             UseField<symbol!("poll_interval")>,
         [
-            LoggerTypeProviderComponent,
-            LoggerGetterComponent,
-            GlobalLoggerGetterComponent,
+            RpcClientGetterComponent,
+            JsonRpcUrlGetterComponent,
         ]:
-            UseHermesLogger,
+            UseFields,
+        LoggerComponent:
+            TracingLogger,
         [
             StarknetClientTypeProviderComponent,
             StarknetClientGetterComponent,

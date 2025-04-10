@@ -2,7 +2,6 @@ use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
-use cgp::core::field::WithField;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
 use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField;
@@ -24,10 +23,7 @@ use hermes_cli_components::traits::output::{
     CanProduceOutput, OutputProducer, OutputProducerComponent, OutputTypeComponent,
 };
 use hermes_cli_components::traits::types::config::{ConfigTypeComponent, HasConfigType};
-use hermes_logger::UseHermesLogger;
-use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
-};
+use hermes_logging_components::traits::logger::LoggerComponent;
 use hermes_relayer_components::error::traits::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
@@ -41,6 +37,7 @@ use hermes_starknet_cli::impls::build::LoadStarknetBuilder;
 use hermes_starknet_cli::impls::error::ProvideCliError;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
+use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 
 use crate::commands::starknet::subcommand::{RunStarknetSubCommand, StarknetSubCommand};
 use crate::commands::starknet::transfer_args::{RunTransferArgs, TransferArgs};
@@ -64,18 +61,16 @@ delegate_components! {
             RetryableErrorComponent,
         ]:
             ProvideCliError,
-        RuntimeTypeProviderComponent: WithType<HermesRuntime>,
-        RuntimeGetterComponent: WithField<symbol!("runtime")>,
-        [
-            LoggerTypeProviderComponent,
-            LoggerGetterComponent,
-            GlobalLoggerGetterComponent,
-        ]:
-            UseHermesLogger,
+        RuntimeTypeProviderComponent:
+            UseType<HermesRuntime>,
+        RuntimeGetterComponent:
+            UseField<symbol!("runtime")>,
+        LoggerComponent:
+            TracingLogger,
         ConfigTypeComponent:
             WithType<StarknetRelayerConfig>,
         BootstrapTypeProviderComponent:
-            WithType<StarknetBootstrap>,
+            UseType<StarknetBootstrap>,
         OutputTypeComponent:
             WithType<()>,
         BootstrapLoaderComponent:
@@ -111,7 +106,6 @@ impl<Value> OutputProducer<ToolApp, Value> for ToolAppComponents {
 
 pub trait CanUseToolApp:
     HasRuntime
-    + HasLogger
     + HasConfigPath
     + HasConfigType<Config = StarknetRelayerConfig>
     + CanLoadConfig

@@ -5,10 +5,7 @@ use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_error::handlers::debug::DebugError;
 use hermes_error::impls::UseHermesError;
-use hermes_logger::UseHermesLogger;
-use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, LoggerGetterComponent, LoggerTypeProviderComponent,
-};
+use hermes_logging_components::traits::logger::LoggerComponent;
 use hermes_relayer_components::multi::traits::birelay_at::{
     BiRelayTypeProviderAtComponent, HasBiRelayTypeAt,
 };
@@ -37,6 +34,7 @@ use hermes_test_components::setup::traits::drivers::binary_channel::{
     BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent,
 };
 use hermes_test_components::setup::traits::port_id_at::PortIdGetterAtComponent;
+use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use ibc::core::host::types::identifiers::PortId;
 
 use crate::contexts::chain_driver::StarknetChainDriver;
@@ -62,12 +60,8 @@ delegate_components! {
     StarknetTestDriverComponents {
         ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: DebugError,
-        [
-            LoggerTypeProviderComponent,
-            LoggerGetterComponent,
-            GlobalLoggerGetterComponent,
-        ]:
-            UseHermesLogger,
+        LoggerComponent:
+            TracingLogger,
         ChainTypeProviderAtComponent<Index<0>>:
             UseType<StarknetChain>,
         ChainTypeProviderAtComponent<Index<1>>:
