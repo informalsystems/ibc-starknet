@@ -76,7 +76,6 @@ hermes-error                        = { version = "0.1.0" }
 hermes-encoding-components          = { version = "0.1.0" }
 hermes-logging-components           = { version = "0.1.0" }
 hermes-tracing-logging-components   = { version = "0.1.0" }
-hermes-logger                       = { version = "0.1.0" }
 hermes-relayer-components           = { version = "0.1.0" }
 hermes-cosmos-chain-components      = { version = "0.1.0" }
 hermes-cosmos-chain-preset          = { version = "0.1.0" }
@@ -182,7 +181,6 @@ hermes-encoding-components           = { git = "https://github.com/informalsyste
 hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-logger                        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
