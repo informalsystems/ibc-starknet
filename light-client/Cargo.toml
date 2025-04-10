@@ -95,6 +95,6 @@ cgp-runtime     = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git" }
 
-hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/has-fields-macro" }
-hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/has-fields-macro" }
-hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/has-fields-macro" }
+hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git" }
