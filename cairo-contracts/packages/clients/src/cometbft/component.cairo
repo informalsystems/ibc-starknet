@@ -281,7 +281,7 @@ pub mod CometClientComponent {
 
             assert(
                 subject_status.is_expired() | subject_status.is_frozen(),
-                CometErrors::INACTIVE_CLIENT,
+                CometErrors::ACTIVE_CLIENT,
             );
             assert(substitute_status.is_active(), CometErrors::INACTIVE_CLIENT);
 

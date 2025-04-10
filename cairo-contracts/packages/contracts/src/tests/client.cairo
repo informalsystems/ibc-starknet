@@ -167,3 +167,43 @@ fn test_client_expired() {
 
     assert!(comet.status(0).is_expired());
 }
+
+#[test]
+#[should_panic(expected: 'ICS07: active client')]
+fn test_client_recover_active_client() {
+    // -----------------------------------------------------------
+    // Setup Essentials
+    // -----------------------------------------------------------
+
+    let mut cfg = CometClientConfigTrait::default();
+
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+
+    // -----------------------------------------------------------
+    // Create Client
+    // -----------------------------------------------------------
+
+    let subject_client = cfg.create_client(@core);
+
+    // -----------------------------------------------------------
+    // Don't wait enough time for timeout
+    // -----------------------------------------------------------
+
+    let new_timestamp = cfg.latest_timestamp.clone().as_secs() + 50;
+    start_cheat_block_timestamp_global(new_timestamp);
+    start_cheat_block_number_global(5);
+
+    // -----------------------------------------------------------
+    // Recover client
+    // -----------------------------------------------------------
+
+    cfg.latest_timestamp = (new_timestamp * 1_000_000_000).into();
+    cfg.latest_height.revision_height = cfg.latest_height.revision_height + 5;
+    let substitute_client = cfg.create_client(@core);
+
+    // Create a `MsgRecoverClient` message.
+    let msg = cfg.dummy_msg_recover_client(subject_client.client_id, substitute_client.client_id);
+
+    // Submit a `MsgRecoverClient` to the IBC core contract.
+    let _recover_resp = core.recover_client(msg.clone());
+}
