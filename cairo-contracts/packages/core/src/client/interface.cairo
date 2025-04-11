@@ -87,6 +87,7 @@ pub trait IClientStateExecution<TContractState> {
     fn update_on_recover(
         ref self: TContractState,
         subject_client_sequence: u64,
+        substitute_client_sequence: u64,
         substitute_client_state: Array<felt252>,
         substitute_consensus_state: Array<felt252>,
     );
