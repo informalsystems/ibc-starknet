@@ -2,8 +2,6 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_encoding_components::traits::decode_mut::{
     CanDecodeMut, MutDecoder, MutDecoderComponent,
-use ibc::clients::tendermint::types::{
-    ConsensusState as TendermintConsensusState, Header as TendermintHeader,
 };
 use hermes_encoding_components::traits::encode_mut::{
     CanEncodeMut, MutEncoder, MutEncoderComponent,
@@ -612,20 +610,7 @@ where
                 ],
                 buffer,
             )?,
-#[derive(Debug, Clone, HasField, HasFields)]
-pub struct CometUpdateHeader {
-    pub trusted_height: Height,
-    pub target_height: Height,
-    pub time: Timestamp,
-    pub root: [u32; 8],
-}
-
-impl From<TendermintHeader> for CometUpdateHeader {
-    fn from(header: TendermintHeader) -> Self {
-        let trusted_height = Height {
-            revision_number: header.trusted_height.revision_number(),
-            revision_height: header.trusted_height.revision_height(),
-        };
+        }
 
         Ok(())
     }
@@ -729,6 +714,7 @@ where
         Ok(())
     }
 }
+
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, vote::Power> for EncodeVotePower
 where

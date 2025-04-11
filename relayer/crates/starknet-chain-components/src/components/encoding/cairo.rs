@@ -52,10 +52,9 @@ mod preset {
         EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionState, EncodeDuration,
     };
     use crate::types::cosmos::client_state::{
-        ClientStatus, CometClientState, EncodeChainId, EncodeClientStatus, EncodeCometClientState,
-        EncodeTrustThreshold,
+        ClientStatus, CometClientState, EncodeTrustThreshold,
     };
-    use crate::types::cosmos::consensus_state::{CometConsensusState, EncodeCometConsensusState};
+    use crate::types::cosmos::consensus_state::CometConsensusState;
     use crate::types::cosmos::height::{EncodeHeight, Height};
     use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
     use crate::types::cosmos::update::{
@@ -65,20 +64,6 @@ mod preset {
         EncodeTendermintLcHeader, EncodeTmHash, EncodeTmHeader, EncodeValidator,
         EncodeValidatorSet, EncodeVotePower,
     };
-    use crate::types::message_responses::create_client::{
-        CreateClientResponse, DecodeCreateClientResponse,
-    };
-    use crate::types::messages::erc20::deploy::{
-        DeployErc20TokenMessage, EncodeDeployErc20TokenMessage,
-    };
-    use crate::types::messages::erc20::transfer::{
-        EncodeTransferErc20TokenMessage, TransferErc20TokenMessage,
-    };
-    use crate::types::cosmos::client_state::{ClientStatus, CometClientState};
-    use crate::types::cosmos::consensus_state::CometConsensusState;
-    use crate::types::cosmos::height::{EncodeHeight, Height};
-    use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
-    use crate::types::cosmos::update::CometUpdateHeader;
     use crate::types::message_responses::create_client::CreateClientResponse;
     use crate::types::messages::erc20::deploy::DeployErc20TokenMessage;
     use crate::types::messages::erc20::transfer::TransferErc20TokenMessage;
@@ -142,17 +127,11 @@ mod preset {
             (ViaCairo, Packet): EncodePacket,
             (ViaCairo, Sequence): EncodeSequence,
             (ViaCairo, ClientId): EncodeClientId,
-            (ViaCairo, ChainId): EncodeChainId,
             (ViaCairo, TrustThreshold): EncodeTrustThreshold,
-            (ViaCairo, ConnectionId): EncodeConnectionId,
             (ViaCairo, Duration): EncodeDuration,
             (ViaCairo, ConnectionCounterparty): EncodeConnectionCounterparty,
             (ViaCairo, ConnectionState): EncodeConnectionState,
             (ViaCairo, ConnectionEnd): EncodeConnectionEnd,
-            (ViaCairo, ChannelId): EncodeChannelId,
-            (ViaCairo, ChannelState): EncodeChannelState,
-            (ViaCairo, ChannelCounterparty): EncodeChannelCounterparty,
-            (ViaCairo, ChannelEnd): EncodeChannelEnd,
             (ViaCairo, TendermintLcHeader): EncodeTendermintLcHeader,
             (ViaCairo, SignedHeader): EncodeSignedHeader,
             (ViaCairo, HeaderVersion): EncodeHeaderVersion,
@@ -174,9 +153,6 @@ mod preset {
             (ViaCairo, account::Id): EncodeAccountId,
             (ViaCairo, ProposerPriority): EncodeProposerPriority,
             (ViaCairo, PublicKey): EncodePublicKey,
-            (ViaCairo, CreateClientResponse): DecodeCreateClientResponse,
-            (ViaCairo, MsgRegisterClient): EncodeRegisterClient,
-            (ViaCairo, MsgRegisterApp): EncodeRegisterApp,
             (ViaCairo, BasePrefix): EncodeBasePrefix,
             (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
             (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
@@ -213,7 +189,6 @@ mod preset {
                 (ViaCairo, Acknowledgement),
                 (ViaCairo, MsgTransfer),
                 (ViaCairo, TransferPacketData),
-                (ViaCairo, CometUpdateHeader),
                 (ViaCairo, DeployErc20TokenMessage),
                 (ViaCairo, TransferErc20TokenMessage),
                 (ViaCairo, CreateClientResponse),
