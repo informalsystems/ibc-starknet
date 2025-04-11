@@ -401,6 +401,8 @@ pub mod CometClientComponent {
                     comet_consensus_state,
                 );
 
+            self.write_next_client_sequence(client_sequence + 1);
+
             let client_id = ClientIdImpl::new(self.client_type(), client_sequence);
 
             CreateResponseImpl::new(client_id, comet_client_state.latest_height)
@@ -579,19 +581,6 @@ pub mod CometClientComponent {
                 .write_consensus_state(
                     client_sequence, update_height.clone(), consensus_state.clone(),
                 );
-
-            let host_height = get_block_number();
-
-            self.write_client_processed_height(client_sequence, update_height.clone(), host_height);
-
-            let host_timestamp = get_block_timestamp();
-
-            self
-                .write_client_processed_time(
-                    client_sequence, update_height.clone(), host_timestamp,
-                );
-
-            self.write_next_client_sequence(client_sequence + 1);
         }
     }
 
@@ -711,7 +700,11 @@ pub mod CometClientComponent {
             height: Height,
             consensus_state: CometConsensusState,
         ) {
-            self.consensus_states.write((client_sequence, height), consensus_state);
+            self.consensus_states.write((client_sequence, height.clone()), consensus_state);
+            let host_height = get_block_number();
+            self.write_client_processed_height(client_sequence, height.clone(), host_height);
+            let host_timestamp = get_block_timestamp();
+            self.write_client_processed_time(client_sequence, height, host_timestamp);
         }
 
         fn remove_consensus_state(
@@ -719,6 +712,8 @@ pub mod CometClientComponent {
         ) {
             let consensus_zero = CometConsensusStateZero::zero();
             self.consensus_states.write((client_sequence, height), consensus_zero);
+            self.client_processed_times.write((client_sequence, height), TimestampZero::zero());
+            self.client_processed_heights.write((client_sequence, height), HeightZero::zero());
         }
 
         fn write_client_processed_time(
