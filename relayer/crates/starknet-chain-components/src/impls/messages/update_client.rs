@@ -15,7 +15,6 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientP
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use ibc::clients::tendermint::types::Header as TendermintHeader;
 use ibc_proto::ibc::lightclients::tendermint::v1::Header as RawHeader;
 use ibc_proto::Protobuf;
 use starknet::core::types::Felt;
