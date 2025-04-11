@@ -39,4 +39,17 @@ pub impl CometClientStateImpl of CometClientStateTrait {
     fn freeze(ref self: CometClientState, freezing_height: Height) {
         self.status = Status::Frozen(freezing_height);
     }
+
+    fn substitute_client_matches(
+        ref self: CometClientState, other_client_state: CometClientState,
+    ) -> bool {
+        let mut substitute_client_state = other_client_state.clone();
+
+        substitute_client_state.latest_height = self.latest_height.clone();
+        substitute_client_state.trusting_period = self.trusting_period.clone();
+        substitute_client_state.status = self.status.clone();
+        substitute_client_state.chain_id = self.chain_id.clone();
+
+        substitute_client_state == self
+    }
 }

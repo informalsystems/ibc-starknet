@@ -249,7 +249,7 @@ pub mod CometClientComponent {
             let subject_client_sequence = msg.subject_client_id.sequence;
             let substitute_client_sequence = msg.substitute_client_id.sequence;
 
-            let subject_client_state: CometClientState = self
+            let mut subject_client_state: CometClientState = self
                 .read_client_state(subject_client_sequence);
             let substitute_client_state: CometClientState = self
                 .read_client_state(substitute_client_sequence);
@@ -286,11 +286,7 @@ pub mod CometClientComponent {
             assert(substitute_status.is_active(), CometErrors::INACTIVE_CLIENT);
 
             assert(
-                subject_client_state.unbonding_period == substitute_client_state.unbonding_period,
-                CometErrors::INVALID_CLIENT_SUBSTITUTE,
-            );
-            assert(
-                subject_client_state.max_clock_drift == substitute_client_state.max_clock_drift,
+                subject_client_state.substitute_client_matches(substitute_client_state),
                 CometErrors::INVALID_CLIENT_SUBSTITUTE,
             );
         }

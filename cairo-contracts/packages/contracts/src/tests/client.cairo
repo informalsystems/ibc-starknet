@@ -177,7 +177,7 @@ fn test_client_recover_active_client() {
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+    let (mut core, _) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
 
     // -----------------------------------------------------------
     // Create Client
