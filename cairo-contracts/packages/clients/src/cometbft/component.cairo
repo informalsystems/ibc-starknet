@@ -429,7 +429,7 @@ pub mod CometClientComponent {
 
             let mut heights_kept = array![];
             let mut check_in_progress = true;
-            // Since th Heights are sorted when stored, as soon as we find the first
+            // Since the Heights are sorted when stored, as soon as we find the first
             // Height which isn't expired we can stop checking the rest and build
             // the new Heights array which are kept.
             while let Option::Some(height) = update_heights_span.pop_front() {
