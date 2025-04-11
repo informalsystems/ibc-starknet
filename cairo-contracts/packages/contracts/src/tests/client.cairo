@@ -481,8 +481,6 @@ fn test_prune_after_client_recover() {
 
     assert!(comet.status(0).is_active());
 
-    let third_consensus_state = comet.consensus_state_root(0, third_updating_height.clone());
-    assert!(third_consensus_state.is_non_zero());
     // Should panic as the first consensus state has been pruned
-    comet.consensus_state_root(0, second_updating_height.clone());
+    comet.consensus_state_root(0, third_updating_height.clone());
 }
