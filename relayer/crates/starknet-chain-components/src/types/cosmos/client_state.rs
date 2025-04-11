@@ -1,25 +1,13 @@
 use core::time::Duration;
 
-use cgp::core::component::UseContext;
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_chain_components::traits::types::chain_id::HasChainIdType;
 use hermes_chain_components::traits::types::client_state::{
     ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent,
     HasClientStateType,
 };
 use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
-use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
-};
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
-use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use ibc::clients::tendermint::types::{
     AllowUpdate, ClientState as IbcCometClientState, TrustThreshold,
 };
@@ -30,7 +18,7 @@ use ibc::primitives::proto::Any;
 
 use crate::types::cosmos::height::Height;
 
-#[derive(Debug, HasField)]
+#[derive(Debug, HasField, HasFields)]
 pub struct CometClientState {
     pub latest_height: Height,
     pub trusting_period: Duration,
@@ -41,7 +29,7 @@ pub struct CometClientState {
     pub chain_id: ChainId,
 }
 
-#[derive(Debug)]
+#[derive(Debug, HasFields)]
 pub enum ClientStatus {
     Active,
     Expired,
@@ -49,10 +37,6 @@ pub enum ClientStatus {
 }
 
 pub struct UseCometClientState;
-
-pub struct EncodeCometClientState;
-
-pub struct EncodeClientStatus;
 
 delegate_components! {
     UseCometClientState {

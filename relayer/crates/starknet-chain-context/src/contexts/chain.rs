@@ -39,10 +39,7 @@ use hermes_encoding_components::traits::has_encoding::{
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::UseHermesError;
-use hermes_logger::UseHermesLogger;
-use hermes_logging_components::traits::has_logger::{
-    GlobalLoggerGetterComponent, HasLogger, LoggerGetterComponent, LoggerTypeProviderComponent,
-};
+use hermes_logging_components::traits::logger::LoggerComponent;
 use hermes_relayer_components::chain::traits::commitment_prefix::{
     HasCommitmentPrefixType, HasIbcCommitmentPrefix,
 };
@@ -204,6 +201,7 @@ use hermes_test_components::chain::traits::transfer::timeout::{
 };
 use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
+use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::host::types::identifiers::{ChainId, PortId as IbcPortId, Sequence};
 use ibc::primitives::Timestamp;
@@ -275,12 +273,8 @@ delegate_components! {
             UseField<symbol!("runtime")>,
         PollIntervalGetterComponent:
             UseField<symbol!("poll_interval")>,
-        [
-            LoggerTypeProviderComponent,
-            LoggerGetterComponent,
-            GlobalLoggerGetterComponent,
-        ]:
-            UseHermesLogger,
+        LoggerComponent:
+            TracingLogger,
         [
             StarknetClientTypeProviderComponent,
             StarknetClientGetterComponent,
@@ -325,7 +319,6 @@ impl DefaultEncodingGetter<StarknetChain, AsBytes> for StarknetChainContextCompo
 
 pub trait CanUseStarknetChain:
     HasRuntime
-    + HasLogger
     + HasHeightType<Height = u64>
     + HasTimeType<Time = Time>
     + HasTimeoutType<Timeout = Timestamp>

@@ -5,7 +5,6 @@ use core::ops::Deref;
 use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_logging_components::traits::has_logger::HasLogger;
 use hermes_relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeProviderAtComponent,
 };
@@ -142,7 +141,6 @@ pub trait CanUseCosmosToStarknetRelay:
     + CanBootstrapChannel
     + CanRelayPacket
     + HasPacketLock
-    + HasLogger
     + CanRelayEvent<SourceTarget>
     + CanRelayEvent<DestinationTarget>
     + CanAutoRelayTarget<SourceTarget>

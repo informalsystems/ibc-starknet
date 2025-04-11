@@ -37,7 +37,6 @@ mod preset {
             (ViaCairo, ()): EncodeNothing,
             (ViaCairo, Nil): EncodeNothing,
             (ViaCairo, Vec<String>): EncodeList,
-            // TODO(rano): use <const N: usize>
             (ViaCairo, [String; 2]): EncodeArray,
             // For Tendermint Validator AccountId
             (ViaCairo, [u8; 20]): EncodeArray,
