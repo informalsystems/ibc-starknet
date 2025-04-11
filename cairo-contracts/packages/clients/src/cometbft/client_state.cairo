@@ -1,3 +1,4 @@
+use cometbft::utils::Fraction;
 use core::num::traits::Zero;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Duration, Height, HeightPartialOrd, Status, StatusTrait};
@@ -8,6 +9,7 @@ pub struct CometClientState {
     pub trusting_period: Duration,
     pub unbonding_period: Duration,
     pub max_clock_drift: Duration,
+    pub trust_level: Fraction,
     pub status: Status,
     pub chain_id: ByteArray,
 }

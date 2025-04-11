@@ -64,6 +64,7 @@ reqwest                     = { version = "0.12.5" }
 ibc                       = { version = "0.56.0" }
 ibc-proto                 = { version = "0.51.1" }
 ibc-client-starknet-types = { version = "0.1.0" }
+tendermint                = { version = "0.40" }
 tendermint-rpc            = { version = "0.40" }
 
 hermes-runtime-components           = { version = "0.1.0" }
@@ -103,7 +104,7 @@ hermes-starknet-integration-tests   = { version = "0.1.0" }
 poseidon                            = { version = "0.1.0" }
 
 [workspace.lints.rust]
-unsafe_code          = "forbid"
+# unsafe_code          = "forbid"
 dead_code            = "deny"
 rust_2018_idioms     = { level = "deny", priority = -1 }
 trivial_casts        = "deny"

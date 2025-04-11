@@ -35,6 +35,21 @@ fn header_fixture() -> (LcHeader, LcHeader) {
 }
 
 #[test]
+fn test_header_serde() {
+    let (header_a, _) = header_fixture();
+
+    let mut header_a_serialized = array![];
+
+    Serde::serialize(@header_a, ref header_a_serialized);
+
+    let mut header_a_serialized = header_a_serialized.span();
+
+    let header_a_deserialized = Serde::<LcHeader>::deserialize(ref header_a_serialized).unwrap();
+
+    assert_eq!(@header_a, @header_a_deserialized);
+}
+
+#[test]
 fn test_verify_update_header() {
     let (header_a, header_b) = header_fixture();
 

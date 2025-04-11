@@ -31,8 +31,9 @@ hermes-cosmos-encoding-components   = { workspace = true }
 hermes-wasm-encoding-components     = { workspace = true }
 poseidon                            = { workspace = true }
 
-ibc       = { workspace = true }
-ibc-proto = { workspace = true }
+ibc        = { workspace = true }
+ibc-proto  = { workspace = true }
+tendermint = { workspace = true }
 
 cairo-lang-starknet-classes = { workspace = true }
 http                        = { workspace = true }

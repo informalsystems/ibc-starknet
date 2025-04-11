@@ -30,7 +30,6 @@ use hermes_starknet_chain_components::types::cosmos::client_state::{
 };
 use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
-use hermes_starknet_chain_components::types::cosmos::update::CometUpdateHeader;
 use hermes_starknet_chain_components::types::message_responses::create_client::CreateClientResponse;
 use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
 use hermes_starknet_chain_components::types::messages::erc20::transfer::TransferErc20TokenMessage;
@@ -48,6 +47,7 @@ use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
 };
 use hermes_starknet_chain_components::types::messages::ibc::packet::{Packet, Sequence};
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
+use ibc::clients::tendermint::types::Header as TendermintLcHeader;
 use starknet::core::types::{Felt, U256};
 
 use crate::impls::error::HandleStarknetChainError;
@@ -133,7 +133,7 @@ pub trait CanUseCairoEncoding:
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenAck>
     + CanEncodeAndDecode<ViaCairo, MsgChanOpenConfirm>
     + CanEncodeAndDecode<ViaCairo, Duration>
-    + CanEncode<ViaCairo, CometUpdateHeader>
+    + CanEncode<ViaCairo, TendermintLcHeader>
     + CanDecode<ViaCairo, CreateClientResponse>
 {
 }

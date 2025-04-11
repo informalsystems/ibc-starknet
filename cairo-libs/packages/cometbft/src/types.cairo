@@ -47,7 +47,7 @@ impl ConsensusAsProtoName of ProtoName<Consensus> {
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct PartSetHeader {
     pub total: u32,
-    pub hash: ByteArray,
+    pub hash: Array<u8>,
 }
 
 impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
@@ -222,7 +222,7 @@ pub struct CommitSig {
     pub block_id_flag: BlockIdFlag,
     pub validator_address: AccountId,
     pub timestamp: Timestamp,
-    pub signature: ByteArray,
+    pub signature: Array<u8>,
 }
 
 impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
@@ -408,7 +408,7 @@ pub struct Validator {
     pub address: AccountId,
     pub pub_key: PublicKey,
     pub voting_power: u64,
-    pub proposer_priority: u64,
+    pub proposer_priority: i64,
 }
 
 #[generate_trait]
@@ -557,8 +557,8 @@ impl AccountIdDebug of core::fmt::Debug<AccountId> {
 
 impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
     fn eq(lhs: @AccountId, rhs: @AccountId) -> bool {
-        let lhs_span = lhs.id.span();
-        let rhs_span = rhs.id.span();
+        let mut lhs_span = lhs.id.span();
+        let mut rhs_span = rhs.id.span();
 
         if lhs_span.len() != rhs_span.len() {
             return false;
@@ -570,15 +570,17 @@ impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
             return true;
         }
 
-        let mut i = 0;
+        let mut rt = true;
 
-        while i < len {
-            if lhs_span.at(i) != rhs_span.at(i) {
-                return false;
+        // lengths are guaranteed to be the same
+        while let (Some(lhs_val), Some(rhs_val)) = (lhs_span.pop_front(), rhs_span.pop_front()) {
+            if lhs_val != rhs_val {
+                rt = false;
+                break;
             }
-            i += 1;
         }
-        return true;
+
+        return rt;
     }
 }
 
@@ -604,11 +606,14 @@ impl AccountIdAsProtoMessage of ProtoMessage<AccountId> {
     }
 }
 
-// TODO: impelement Serde
 impl AccountIdSerde of Serde<AccountId> {
-    fn serialize(self: @AccountId, ref output: Array<felt252>) {}
+    fn serialize(self: @AccountId, ref output: Array<felt252>) {
+        let mut id = self.id.span().into();
+        Serde::<Array<u8>>::serialize(@id, ref output);
+    }
+
     fn deserialize(ref serialized: Span<felt252>) -> Option<AccountId> {
-        Option::None
+        Serde::<Array<u8>>::deserialize(ref serialized)?.try_into()
     }
 }
 
@@ -639,7 +644,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
                         chain_id: signed_header.header.chain_id.clone(),
                     },
                     validator_address: signature.validator_address.clone(),
-                    signature: byte_array_to_array_u8(signature.signature),
+                    signature: signature.signature.clone(),
                 };
 
                 let verified = false;
