@@ -249,7 +249,7 @@ pub mod CometClientComponent {
             let subject_client_sequence = msg.subject_client_id.sequence;
             let substitute_client_sequence = msg.substitute_client_id.sequence;
 
-            let mut subject_client_state: CometClientState = self
+            let subject_client_state: CometClientState = self
                 .read_client_state(subject_client_sequence);
             let substitute_client_state: CometClientState = self
                 .read_client_state(substitute_client_sequence);
