@@ -18,7 +18,7 @@ pub mod CometClientComponent {
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
         IClientHandler, IClientQuery, IClientStateExecution, IClientStateValidation,
         MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient, Status, StatusTrait,
-        StoreHeightArray, Timestamp, UpdateResponse,
+        StoreHeightArray, Timestamp, TimestampImpl, TimestampTrait, UpdateResponse,
     };
     use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
     use starknet_ibc_core::host::ClientIdImpl;
@@ -346,11 +346,42 @@ pub mod CometClientComponent {
 
             let header_height = header.clone().signed_header.height;
 
-            // TODO: Implement consensus state pruning mechanism.
+            let update_heights = self.read_update_heights(client_sequence);
+            let mut update_heights_span = update_heights.span();
+
+            let mut client_state = self.read_client_state(client_sequence);
+
+            let mut heights_kept = array![];
+            let mut check_in_progress = true;
+            // Since th Heights are sorted when stored, as soon as we find the first
+            // Height which isn't expired we can stop checking the rest and build
+            // the new Heights array which are kept.
+            while let Option::Some(height) = update_heights_span.pop_front() {
+                if check_in_progress {
+                    let consensus_state = self
+                        .read_consensus_state(client_sequence, height.clone());
+
+                    let expiry_timestamp = consensus_state.timestamp.as_secs()
+                        + client_state.trusting_period.seconds;
+
+                    let host_timestamp = get_block_timestamp();
+
+                    if expiry_timestamp <= host_timestamp {
+                        let consensus_zero = CometConsensusStateImpl::zero();
+                        self.write_consensus_state(client_sequence, height.clone(), consensus_zero);
+                    } else {
+                        check_in_progress = false;
+                        heights_kept.append(height.clone());
+                    }
+                } else {
+                    heights_kept.append(height.clone());
+                }
+            }
+            // Write directly since heights_kept is already sorted and is equal or
+            // smaller to the previous one
+            self.update_heights.write(client_sequence, heights_kept);
 
             if !self.consensus_state_exists(client_sequence, header_height.clone()) {
-                let mut client_state = self.read_client_state(client_sequence);
-
                 client_state.update(header_height.clone());
 
                 let new_consensus_state: CometConsensusState = header.into();

@@ -1,9 +1,9 @@
 use core::num::traits::Zero;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{
-    Duration, DurationTrait, Status, Timestamp, TimestampImpl, TimestampIntoU128,
+    Duration, DurationTrait, Status, Timestamp, TimestampImpl, TimestampIntoU128, TimestampZero,
 };
-use starknet_ibc_core::commitment::StateRoot;
+use starknet_ibc_core::commitment::{StateRoot, StateRootZero};
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct CometConsensusState {
@@ -13,6 +13,10 @@ pub struct CometConsensusState {
 
 #[generate_trait]
 pub impl CometConsensusStateImpl of CometConsensusStateTrait {
+    fn zero() -> CometConsensusState {
+        CometConsensusState { timestamp: TimestampZero::zero(), root: StateRootZero::zero() }
+    }
+
     fn is_non_zero(self: @CometConsensusState) -> bool {
         !(self.root.is_zero() && self.timestamp.is_zero())
     }
