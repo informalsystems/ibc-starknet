@@ -18,7 +18,7 @@ pub mod CometClientComponent {
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
         IClientHandler, IClientQuery, IClientStateExecution, IClientStateValidation,
         MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient, Status, StatusTrait,
-        StoreHeightArray, Timestamp, TimestampImpl, TimestampTrait, UpdateResponse,
+        StoreHeightArray, Timestamp, TimestampImpl, UpdateResponse,
     };
     use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
     use starknet_ibc_core::host::ClientIdImpl;
@@ -430,12 +430,9 @@ pub mod CometClientComponent {
                     let consensus_state = self
                         .read_consensus_state(client_sequence, height.clone());
 
-                    let expiry_timestamp = consensus_state.timestamp.as_secs()
-                        + client_state.trusting_period.seconds;
-
-                    let host_timestamp = get_block_timestamp();
-
-                    if expiry_timestamp <= host_timestamp {
+                    if consensus_state
+                        .status(client_state.trusting_period, client_state.max_clock_drift)
+                        .is_expired() {
                         let consensus_zero = CometConsensusStateImpl::zero();
                         self.write_consensus_state(client_sequence, height.clone(), consensus_zero);
                     } else {
