@@ -12,7 +12,7 @@ pub mod CometClientComponent {
     use starknet::{ContractAddress, get_block_number, get_block_timestamp, get_caller_address};
     use starknet_ibc_clients::cometbft::{
         CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
-        CometErrors, CometHeader, CometHeaderImpl,
+        CometConsensusStateZero, CometErrors, CometHeader, CometHeaderImpl,
     };
     use starknet_ibc_core::client::{
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
@@ -433,7 +433,7 @@ pub mod CometClientComponent {
                     if consensus_state
                         .status(client_state.trusting_period, client_state.max_clock_drift)
                         .is_expired() {
-                        let consensus_zero = CometConsensusStateImpl::zero();
+                        let consensus_zero = CometConsensusStateZero::zero();
                         self.write_consensus_state(client_sequence, height.clone(), consensus_zero);
                     } else {
                         check_in_progress = false;
@@ -490,7 +490,7 @@ pub mod CometClientComponent {
             let last_height = update_heights_span.pop_back().unwrap();
 
             while let Option::Some(height) = update_heights_span.pop_front() {
-                let consensus_zero = CometConsensusStateImpl::zero();
+                let consensus_zero = CometConsensusStateZero::zero();
                 self.write_consensus_state(subject_client_sequence, height.clone(), consensus_zero);
             }
 

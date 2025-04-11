@@ -11,16 +11,22 @@ pub struct CometConsensusState {
     pub root: StateRoot,
 }
 
-#[generate_trait]
-pub impl CometConsensusStateImpl of CometConsensusStateTrait {
+pub impl CometConsensusStateZero of Zero<CometConsensusState> {
     fn zero() -> CometConsensusState {
         CometConsensusState { timestamp: TimestampZero::zero(), root: StateRootZero::zero() }
     }
 
-    fn is_non_zero(self: @CometConsensusState) -> bool {
-        !(self.root.is_zero() && self.timestamp.is_zero())
+    fn is_zero(self: @CometConsensusState) -> bool {
+        self.timestamp.is_zero() && self.root.is_zero()
     }
 
+    fn is_non_zero(self: @CometConsensusState) -> bool {
+        !self.is_zero()
+    }
+}
+
+#[generate_trait]
+pub impl CometConsensusStateImpl of CometConsensusStateTrait {
     fn timestamp(self: @CometConsensusState) -> Timestamp {
         *self.timestamp
     }
