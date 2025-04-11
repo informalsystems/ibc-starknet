@@ -629,7 +629,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
         let commit = signed_header.commit;
 
-        let mut signatures = commit.clone().signatures.span();
+        let mut signatures = commit.signatures.span();
 
         while let Some(signature) = signatures.pop_front() {
             let block_id_flag = signature.block_id_flag;
@@ -825,16 +825,16 @@ pub impl VotingPowerTallyImpl of VotingPowerTallyTrait {
         self.tallied += power;
     }
 
-    fn has_enough_power(self: VotingPowerTally) -> bool {
+    fn has_enough_power(self: @VotingPowerTally) -> bool {
         // 0 < numerator < denominator
-        assert!(0 < self.trust_threshold.numerator);
+        assert!(@0 < self.trust_threshold.numerator);
         assert!(self.trust_threshold.numerator < self.trust_threshold.denominator);
 
         // cast to u128 to avoid overflow
-        let tally: u128 = self.tallied.into();
-        let total: u128 = self.total.into();
-        let numerator: u128 = self.trust_threshold.numerator.into();
-        let denominator: u128 = self.trust_threshold.denominator.into();
+        let tally: u128 = (*self.tallied).into();
+        let total: u128 = (*self.total).into();
+        let numerator: u128 = (*self.trust_threshold.numerator).into();
+        let denominator: u128 = (*self.trust_threshold.denominator).into();
 
         // tally / total >= numerator / denominator
         tally * denominator >= total * numerator

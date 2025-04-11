@@ -53,21 +53,11 @@ fn test_header_serde() {
 fn test_verify_update_header() {
     let (header_a, header_b) = header_fixture();
 
-    let trusted_block_state = TrustedBlockState {
-        chain_id: header_a.signed_header.header.chain_id.clone(),
-        header_time: header_a.signed_header.header.time.clone(),
-        height: header_a.signed_header.header.height,
-        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
-        next_validators_hash: header_a.signed_header.header.next_validators_hash.clone(),
-    };
-
-    let untrusted_block_state = UntrustedBlockState {
-        signed_header: header_b.signed_header.clone(), validators: header_b.validator_set,
-    };
-
     let trusting_period = Duration { seconds: 1209600, nanos: 0 };
 
     let clock_drift = Duration { seconds: 3, nanos: 0 };
+
+    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
 
     let now = Timestamp {
         // header is submitted 30 seconds later
@@ -75,7 +65,17 @@ fn test_verify_update_header() {
         nanos: header_b.signed_header.header.time.nanos,
     };
 
-    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
+    let trusted_block_state = TrustedBlockState {
+        chain_id: header_a.signed_header.header.chain_id,
+        header_time: header_a.signed_header.header.time,
+        height: header_a.signed_header.header.height,
+        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
+        next_validators_hash: header_a.signed_header.header.next_validators_hash,
+    };
+
+    let untrusted_block_state = UntrustedBlockState {
+        signed_header: header_b.signed_header, validators: header_b.validator_set,
+    };
 
     verify_update_header(untrusted_block_state, trusted_block_state, options, now);
 }
@@ -85,21 +85,11 @@ fn test_verify_update_header() {
 fn test_verify_update_header_forged_header() {
     let (header_a, header_b) = header_fixture();
 
-    let trusted_block_state = TrustedBlockState {
-        chain_id: header_a.signed_header.header.chain_id.clone(),
-        header_time: header_a.signed_header.header.time.clone(),
-        height: header_a.signed_header.header.height,
-        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
-        next_validators_hash: header_a.signed_header.header.next_validators_hash.clone(),
-    };
-
-    let mut untrusted_block_state = UntrustedBlockState {
-        signed_header: header_b.signed_header.clone(), validators: header_b.validator_set,
-    };
-
     let trusting_period = Duration { seconds: 1209600, nanos: 0 };
 
     let clock_drift = Duration { seconds: 3, nanos: 0 };
+
+    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
 
     let now = Timestamp {
         // header is submitted 30 seconds later
@@ -107,7 +97,17 @@ fn test_verify_update_header_forged_header() {
         nanos: header_b.signed_header.header.time.nanos,
     };
 
-    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
+    let trusted_block_state = TrustedBlockState {
+        chain_id: header_a.signed_header.header.chain_id,
+        header_time: header_a.signed_header.header.time,
+        height: header_a.signed_header.header.height,
+        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
+        next_validators_hash: header_a.signed_header.header.next_validators_hash,
+    };
+
+    let mut untrusted_block_state = UntrustedBlockState {
+        signed_header: header_b.signed_header, validators: header_b.validator_set,
+    };
 
     // forged header
     untrusted_block_state.signed_header.header.next_validators_hash = array![0x1, 0x2];
@@ -120,21 +120,11 @@ fn test_verify_update_header_forged_header() {
 fn test_verify_update_header_empty_signatures() {
     let (header_a, header_b) = header_fixture();
 
-    let trusted_block_state = TrustedBlockState {
-        chain_id: header_a.signed_header.header.chain_id.clone(),
-        header_time: header_a.signed_header.header.time.clone(),
-        height: header_a.signed_header.header.height,
-        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
-        next_validators_hash: header_a.signed_header.header.next_validators_hash.clone(),
-    };
-
-    let mut untrusted_block_state = UntrustedBlockState {
-        signed_header: header_b.signed_header.clone(), validators: header_b.validator_set,
-    };
-
     let trusting_period = Duration { seconds: 1209600, nanos: 0 };
 
     let clock_drift = Duration { seconds: 3, nanos: 0 };
+
+    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
 
     let now = Timestamp {
         // header is submitted 30 seconds later
@@ -142,7 +132,17 @@ fn test_verify_update_header_empty_signatures() {
         nanos: header_b.signed_header.header.time.nanos,
     };
 
-    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
+    let trusted_block_state = TrustedBlockState {
+        chain_id: header_a.signed_header.header.chain_id,
+        header_time: header_a.signed_header.header.time,
+        height: header_a.signed_header.header.height,
+        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
+        next_validators_hash: header_a.signed_header.header.next_validators_hash,
+    };
+
+    let mut untrusted_block_state = UntrustedBlockState {
+        signed_header: header_b.signed_header, validators: header_b.validator_set,
+    };
 
     // empty signatures
     untrusted_block_state.signed_header.commit.signatures = array![];
