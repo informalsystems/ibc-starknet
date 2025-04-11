@@ -59,8 +59,8 @@ mod preset {
         EncodeAccountId, EncodeAppHash, EncodeBlockId, EncodeCommit, EncodeCommitBlockIdFlag,
         EncodeCommitSig, EncodeHeaderVersion, EncodePartSetHeader, EncodeProposerPriority,
         EncodeProtoTimestamp, EncodePublicKey, EncodeSignature, EncodeSignedHeader,
-        EncodeTendermintByteArray, EncodeTendermintLcHeader, EncodeTmHash, EncodeTmHeader,
-        EncodeValidator, EncodeValidatorSet, EncodeVotePower, TendermintByteArray,
+        EncodeTendermintLcHeader, EncodeTmHash, EncodeTmHeader, EncodeValidator,
+        EncodeValidatorSet, EncodeVotePower,
     };
     use crate::types::message_responses::create_client::{
         CreateClientResponse, DecodeCreateClientResponse,
@@ -172,7 +172,6 @@ mod preset {
             (ViaCairo, ChannelState): EncodeChannelState,
             (ViaCairo, ChannelCounterparty): EncodeChannelCounterparty,
             (ViaCairo, ChannelEnd): EncodeChannelEnd,
-            (ViaCairo, TendermintByteArray): EncodeTendermintByteArray,
             (ViaCairo, TendermintLcHeader): EncodeTendermintLcHeader,
             (ViaCairo, SignedHeader): EncodeSignedHeader,
             (ViaCairo, HeaderVersion): EncodeHeaderVersion,

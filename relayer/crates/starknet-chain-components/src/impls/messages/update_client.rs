@@ -16,6 +16,8 @@ use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use ibc::clients::tendermint::types::Header as TendermintHeader;
+use ibc_proto::ibc::lightclients::tendermint::v1::Header as RawHeader;
+use ibc_proto::Protobuf;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
@@ -40,7 +42,7 @@ where
     Counterparty:
         HasUpdateClientPayloadType<Chain, UpdateClientPayload = CosmosUpdateClientPayload>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanEncode<ViaCairo, TendermintHeader>
+        + CanEncode<ViaCairo, String>
         + CanEncode<ViaCairo, Product![ClientId, Vec<Felt>]>,
 {
     async fn build_update_client_message(
@@ -55,10 +57,16 @@ where
 
             let contract_address = chain.query_contract_address(PhantomData).await?;
 
-            let cairo_felts = encoding.encode(&header).map_err(Chain::raise_error)?;
+            let protobuf_bytes = Protobuf::<RawHeader>::encode_vec(header.clone());
+
+            let protobuf_string = unsafe { String::from_utf8_unchecked(protobuf_bytes) };
+
+            let raw_header = encoding
+                .encode(&protobuf_string)
+                .map_err(Chain::raise_error)?;
 
             let calldata = encoding
-                .encode(&product![client_id.clone(), cairo_felts])
+                .encode(&product![client_id.clone(), raw_header])
                 .map_err(Chain::raise_error)?;
 
             let message =

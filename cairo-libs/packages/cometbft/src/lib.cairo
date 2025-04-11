@@ -1,4 +1,3 @@
-pub mod array;
 pub mod errors;
 pub mod ibc;
 pub mod light_client;
