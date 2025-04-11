@@ -17,39 +17,6 @@ pub use ibc::core::host::types::identifiers::ConnectionId;
 use crate::types::client_id::ClientId;
 use crate::types::messages::ibc::connection::{BasePrefix, ConnectionVersion};
 
-pub struct EncodeConnectionId;
-
-#[cgp_provider(MutEncoderComponent)]
-impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ConnectionId> for EncodeConnectionId
-where
-    Encoding: CanEncodeMut<Strategy, Product![String]>,
-{
-    fn encode_mut(
-        encoding: &Encoding,
-        value: &ConnectionId,
-        buffer: &mut Encoding::EncodeBuffer,
-    ) -> Result<(), Encoding::Error> {
-        encoding.encode_mut(&product![value.to_string()], buffer)?;
-        Ok(())
-    }
-}
-
-#[cgp_provider(MutDecoderComponent)]
-impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ConnectionId> for EncodeConnectionId
-where
-    Encoding: CanDecodeMut<Strategy, Product![String]> + CanRaiseAsyncError<&'static str>,
-{
-    fn decode_mut<'a>(
-        encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer<'a>,
-    ) -> Result<ConnectionId, Encoding::Error> {
-        let product![value_str] = encoding.decode_mut(buffer)?;
-        value_str
-            .parse()
-            .map_err(|_| Encoding::raise_error("invalid connection id"))
-    }
-}
-
 pub struct EncodeDuration;
 
 #[cgp_provider(MutEncoderComponent)]

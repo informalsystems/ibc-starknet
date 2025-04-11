@@ -8,19 +8,17 @@ use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferTyp
 use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 
 use crate::impls::encode_mut::variant::SumEncoders;
-use crate::traits::size::HasSize;
-use crate::types::nat::{S, Z};
+use crate::types::nat::Z;
 
 pub struct EncodeVariantFrom<Transform>(pub PhantomData<Transform>);
 
 #[cgp_provider(MutEncoderComponent)]
-impl<Encoding, Strategy, N, Transform> MutEncoder<Encoding, Strategy, Transform::From>
+impl<Encoding, Strategy, Transform> MutEncoder<Encoding, Strategy, Transform::From>
     for EncodeVariantFrom<Transform>
 where
     Encoding: HasEncodeBufferType + HasAsyncErrorType,
-    SumEncoders<Z, N>: for<'a> MutEncoder<Encoding, Strategy, Transform::To<'a>>,
+    SumEncoders<Z>: for<'a> MutEncoder<Encoding, Strategy, Transform::To<'a>>,
     Transform: TransformerRef,
-    for<'a> Transform::To<'a>: HasSize<Size = S<N>>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -33,13 +31,12 @@ where
 }
 
 #[cgp_provider(MutDecoderComponent)]
-impl<Encoding, Strategy, N, Transform, Source, Target> MutDecoder<Encoding, Strategy, Target>
+impl<Encoding, Strategy, Transform, Source, Target> MutDecoder<Encoding, Strategy, Target>
     for EncodeVariantFrom<Transform>
 where
     Encoding: HasDecodeBufferType + HasAsyncErrorType,
-    SumEncoders<Z, N>: MutDecoder<Encoding, Strategy, Source>,
+    SumEncoders<Z>: MutDecoder<Encoding, Strategy, Source>,
     Transform: Transformer<From = Source, To = Target>,
-    Source: HasSize<Size = S<N>>,
 {
     fn decode_mut(
         encoding: &Encoding,

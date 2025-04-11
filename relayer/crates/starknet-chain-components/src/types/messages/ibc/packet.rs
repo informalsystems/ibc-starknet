@@ -1,6 +1,5 @@
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
-use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
 use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::impls::encode_mut::from::DecodeFrom;
@@ -10,7 +9,7 @@ use hermes_encoding_components::traits::decode_mut::{
 use hermes_encoding_components::traits::encode_mut::{
     CanEncodeMut, MutEncoder, MutEncoderComponent,
 };
-use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
+use hermes_encoding_components::traits::transform::Transformer;
 pub use ibc::core::host::types::identifiers::Sequence;
 use starknet::core::types::Felt;
 
@@ -78,139 +77,33 @@ impl Transformer for EncodePacket {
     }
 }
 
-#[derive(HasField)]
+#[derive(HasField, HasFields)]
 pub struct StateProof {
     // TODO(rano): Array<u8> in Cairo
     // Currently, Vec<u8> is serialized for ByteArray
     pub proof: Vec<u8>,
 }
 
-pub struct EncodeStateProof;
-
-delegate_components! {
-    EncodeStateProof {
-        MutEncoderComponent: CombineEncoders<
-            Product![
-                EncodeField<symbol!("proof"), UseContext>,
-            ],
-        >,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
-
-impl Transformer for EncodeStateProof {
-    type From = Product![Vec<u8>];
-    type To = StateProof;
-
-    fn transform(product![proof]: Self::From) -> StateProof {
-        StateProof { proof }
-    }
-}
-
-#[derive(HasField)]
+#[derive(HasField, HasFields)]
 pub struct MsgRecvPacket {
     pub packet: Packet,
     pub proof_commitment_on_a: StateProof,
     pub proof_height_on_a: Height,
 }
 
-pub struct EncodeMsgRecvPacket;
-
-delegate_components! {
-    EncodeMsgRecvPacket {
-        MutEncoderComponent: CombineEncoders<
-            Product![
-                EncodeField<symbol!("packet"), UseContext>,
-                EncodeField<symbol!("proof_commitment_on_a"), UseContext>,
-                EncodeField<symbol!("proof_height_on_a"), UseContext>,
-            ],
-        >,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
-
-impl Transformer for EncodeMsgRecvPacket {
-    type From = Product![Packet, StateProof, Height];
-    type To = MsgRecvPacket;
-
-    fn transform(
-        product![packet, proof_commitment_on_a, proof_height_on_a]: Self::From,
-    ) -> MsgRecvPacket {
-        MsgRecvPacket {
-            packet,
-            proof_commitment_on_a,
-            proof_height_on_a,
-        }
-    }
-}
-
-#[derive(HasField, Debug, Clone)]
+#[derive(HasField, HasFields, Debug, Clone)]
 pub struct Acknowledgement {
     // TODO(rano): Array<u8> in Cairo
     // Currently, Vec<u8> is serialized for ByteArray
     pub ack: Vec<u8>,
 }
 
-pub struct EncodeAcknowledgement;
-
-delegate_components! {
-    EncodeAcknowledgement {
-        MutEncoderComponent: CombineEncoders<
-            Product![
-                EncodeField<symbol!("ack"), UseContext>,
-            ],
-        >,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
-
-impl Transformer for EncodeAcknowledgement {
-    type From = Product![Vec<u8>];
-    type To = Acknowledgement;
-
-    fn transform(product![ack]: Self::From) -> Acknowledgement {
-        Acknowledgement { ack }
-    }
-}
-
-#[derive(HasField)]
+#[derive(HasField, HasFields)]
 pub struct MsgAckPacket {
     pub packet: Packet,
     pub acknowledgement: Acknowledgement,
     pub proof_ack_on_b: StateProof,
     pub proof_height_on_b: Height,
-}
-
-pub struct EncodeMsgAckPacket;
-
-delegate_components! {
-    EncodeMsgAckPacket {
-        MutEncoderComponent: CombineEncoders<
-            Product![
-                EncodeField<symbol!("packet"), UseContext>,
-                EncodeField<symbol!("acknowledgement"), UseContext>,
-                EncodeField<symbol!("proof_ack_on_b"), UseContext>,
-                EncodeField<symbol!("proof_height_on_b"), UseContext>,
-            ],
-        >,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
-
-impl Transformer for EncodeMsgAckPacket {
-    type From = Product![Packet, Acknowledgement, StateProof, Height];
-    type To = MsgAckPacket;
-
-    fn transform(
-        product![packet, acknowledgement, proof_ack_on_b, proof_height_on_b]: Self::From,
-    ) -> MsgAckPacket {
-        MsgAckPacket {
-            packet,
-            acknowledgement,
-            proof_ack_on_b,
-            proof_height_on_b,
-        }
-    }
 }
 
 pub struct EncodeSequence;
@@ -244,7 +137,7 @@ where
     }
 }
 
-#[derive(HasField)]
+#[derive(HasField, HasFields)]
 pub struct MsgTimeoutPacket {
     pub packet: Packet,
     pub next_seq_recv_on_b: Sequence,
@@ -252,81 +145,8 @@ pub struct MsgTimeoutPacket {
     pub proof_height_on_b: Height,
 }
 
-pub struct EncodeMsgTimeoutPacket;
-
-delegate_components! {
-    EncodeMsgTimeoutPacket {
-        MutEncoderComponent: CombineEncoders<
-            Product![
-                EncodeField<symbol!("packet"), UseContext>,
-                EncodeField<symbol!("next_seq_recv_on_b"), UseContext>,
-                EncodeField<symbol!("proof_unreceived_on_b"), UseContext>,
-                EncodeField<symbol!("proof_height_on_b"), UseContext>,
-            ],
-        >,
-        MutDecoderComponent: DecodeFrom<Self, UseContext>,
-    }
-}
-
-impl Transformer for EncodeMsgTimeoutPacket {
-    type From = Product![Packet, Sequence, StateProof, Height];
-    type To = MsgTimeoutPacket;
-
-    fn transform(
-        product![
-            packet,
-            next_seq_recv_on_b,
-            proof_unreceived_on_b,
-            proof_height_on_b
-        ]: Self::From,
-    ) -> MsgTimeoutPacket {
-        MsgTimeoutPacket {
-            packet,
-            next_seq_recv_on_b,
-            proof_unreceived_on_b,
-            proof_height_on_b,
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, HasFields)]
 pub enum AckStatus {
     Success(Acknowledgement),
     Error(Acknowledgement),
-}
-
-pub struct EncodeAckStatus;
-
-delegate_components! {
-    EncodeAckStatus {
-        [
-            MutEncoderComponent,
-            MutDecoderComponent,
-        ]: EncodeVariantFrom<EncodeAckStatus>,
-    }
-}
-
-impl TransformerRef for EncodeAckStatus {
-    type From = AckStatus;
-    type To<'a> = Sum![Acknowledgement, Acknowledgement];
-
-    fn transform<'a>(value: &'a Self::From) -> Self::To<'a> {
-        match value {
-            AckStatus::Success(ack) => Either::Left(ack.clone()),
-            AckStatus::Error(ack) => Either::Right(Either::Left(ack.clone())),
-        }
-    }
-}
-
-impl Transformer for EncodeAckStatus {
-    type From = Sum![Acknowledgement, Acknowledgement];
-    type To = AckStatus;
-
-    fn transform(value: Self::From) -> Self::To {
-        match value {
-            Either::Left(ack) => AckStatus::Success(ack),
-            Either::Right(Either::Left(ack)) => AckStatus::Error(ack),
-            Either::Right(Either::Right(value)) => match value {},
-        }
-    }
 }
