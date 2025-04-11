@@ -486,13 +486,12 @@ pub mod CometClientComponent {
             assert(update_heights.len() > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
 
             let mut update_heights_span = update_heights.span();
-            let last_height = update_heights_span.pop_back().unwrap();
 
             while let Option::Some(height) = update_heights_span.pop_front() {
                 self.remove_consensus_state(subject_client_sequence, height.clone());
             }
 
-            self.update_heights.write(subject_client_sequence, array![last_height.clone()]);
+            self.update_heights.write(subject_client_sequence, array![]);
 
             let substitute_client_state = CometClientStateImpl::deserialize(
                 substitute_client_state,
