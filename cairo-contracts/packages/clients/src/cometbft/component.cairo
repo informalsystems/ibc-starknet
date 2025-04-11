@@ -486,8 +486,18 @@ pub mod CometClientComponent {
             substitute_client_state: Array<felt252>,
             substitute_consensus_state: Array<felt252>,
         ) {
-            // TODO: prune old consensus states.
-            // They are untrusted now even if they are within trusted period.
+            let update_heights = self.read_update_heights(subject_client_sequence);
+            assert(update_heights.len() > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
+
+            let mut update_heights_span = update_heights.span();
+            let last_height = update_heights_span.pop_back().unwrap();
+
+            while let Option::Some(height) = update_heights_span.pop_front() {
+                let consensus_zero = CometConsensusStateImpl::zero();
+                self.write_consensus_state(subject_client_sequence, height.clone(), consensus_zero);
+            }
+
+            self.update_heights.write(subject_client_sequence, array![last_height.clone()]);
 
             let substitute_client_state = CometClientStateImpl::deserialize(
                 substitute_client_state,
