@@ -1,8 +1,4 @@
-use cgp::core::component::UseContext;
 use cgp::prelude::*;
-use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
-use hermes_encoding_components::impls::encode_mut::field::EncodeField;
-use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
 use ibc::clients::tendermint::types::{
     ConsensusState as TendermintConsensusState, Header as TendermintHeader,
 };
@@ -11,27 +7,12 @@ use ibc::core::primitives::Timestamp;
 use crate::impls::utils::array::from_vec_u8_to_be_u32_slice;
 use crate::types::cosmos::height::Height;
 
-#[derive(Debug, Clone, HasField)]
+#[derive(Debug, Clone, HasField, HasFields)]
 pub struct CometUpdateHeader {
     pub trusted_height: Height,
     pub target_height: Height,
     pub time: Timestamp,
     pub root: [u32; 8],
-}
-
-pub struct EncodeCometUpdateHeader;
-
-delegate_components! {
-    EncodeCometUpdateHeader {
-        MutEncoderComponent: CombineEncoders<
-            Product![
-                EncodeField<symbol!("trusted_height"), UseContext>,
-                EncodeField<symbol!("target_height"), UseContext>,
-                EncodeField<symbol!("time"), UseContext>,
-                EncodeField<symbol!("root"), UseContext>,
-            ],
-        >,
-    }
 }
 
 impl From<TendermintHeader> for CometUpdateHeader {

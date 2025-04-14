@@ -1,10 +1,7 @@
-use cgp::core::component::UseContext;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_chain_type_components::traits::types::amount::HasAmountType;
-use hermes_encoding_components::impls::encode_mut::combine::CombineEncoders;
-use hermes_encoding_components::impls::encode_mut::field::EncodeField;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_relayer_components::chain::traits::types::message::HasMessageType;
@@ -23,22 +20,13 @@ use crate::types::amount::StarknetAmount;
 
 pub const TRANSFER_SELECTOR: Felt = selector!("transfer");
 
-pub struct BuildTransferErc20TokenMessage;
-
-#[derive(Debug, HasField)]
+#[derive(Debug, HasField, HasFields)]
 pub struct TransferErc20TokenMessage {
     pub recipient: StarknetAddress,
     pub amount: U256,
 }
 
-pub type EncodeTransferErc20TokenMessage = CombineEncoders<
-    Product![
-        EncodeField<symbol!("recipient"), UseContext>,
-        EncodeField<symbol!("amount"), UseContext>
-    ],
->;
-
-#[cgp_provider(TransferTokenMessageBuilderComponent)]
+#[cgp_new_provider(TransferTokenMessageBuilderComponent)]
 impl<Chain, Encoding> TransferTokenMessageBuilder<Chain> for BuildTransferErc20TokenMessage
 where
     Chain: HasAddressType<Address = StarknetAddress>
