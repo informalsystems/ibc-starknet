@@ -570,12 +570,14 @@ impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
             return true;
         }
 
+        let mut result = true;
+
         while let Option::Some(lhs) = lhs_span.pop_front() {
             if lhs != rhs_span.pop_front().unwrap() {
-                return false;
+                result = false;
             }
         }
-        return true;
+        return result;
     }
 }
 
