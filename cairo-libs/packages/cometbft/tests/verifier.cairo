@@ -1,5 +1,7 @@
 use cometbft::light_client::Header as LcHeader;
-use cometbft::types::{Header as TmHeader, Options, TrustedBlockState, UntrustedBlockState};
+use cometbft::types::{
+    Header as TmHeader, NonAbsentCommitVotesTrait, Options, TrustedBlockState, UntrustedBlockState,
+};
 use cometbft::utils::TWO_THIRDS;
 use cometbft::verifier::{header_matches_commit, verify_update_header};
 use protobuf::types::message::ProtoCodecImpl;
@@ -174,4 +176,21 @@ fn test_verify_commit_hash() {
 
     let header = ProtoCodecImpl::decode::<TmHeader>(@header_bytes).unwrap();
     header_matches_commit(@header, @expected_hash_array);
+}
+
+
+#[test]
+fn test_failing_signature() {
+    let header_data =
+        "CtQECpgDCgIICxISY2hhaW4tMS0xNDkyMTM5Mzg2GC8iDAiWkPS/BhDwlY/WAypICiAR45w03EJQ6L9PnggVeIypSY++V483m0cD3fj34sbd8hIkCAESIMxUCi7UpKkmKxETcEF8+ztp9lqf4tmB9fJ6I2Fd8QUyMiC0uOyN5G2u8DfSuM52hq2nRGtOVargNQ462ufD3E6Pdjog47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFVCILEZF5ZTPHD/pgo4PvAx8DhyiF7QV31vYZtyBPAguVEFSiCxGReWUzxw/6YKOD7wMfA4cohe0Fd9b2GbcgTwILlRBVIgBICRvH3cKD93v7+R1zxE2ljD34qcvIZ0Bdi389qtoi9aIN9Rd4Lxx9sX1PbqfdQyf12t3s8i7QvTyOBxum70AbsJYiDjsMRCmPwcFJr79MiZb7kkJ65B5GSbk0yklZkbeFK4VWog47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFVyFHsGh8IucfhmG/Cwd/njh3qcdltqErYBCC8aSAogBMQRCRv0GnVw5CrPlmyAD647CA0hVTWd5iZpV/4DKnsSJAgBEiBgHnqCqh8RXo7yrd3tQN8FSmKr873rZTyrv7gn3XnqgSJoCAISFHsGh8IucfhmG/Cwd/njh3qcdltqGgwIl5D0vwYQqNH62AMiQNy8Vktx+eH9mCSDn4FVBeUgSr0rQUFwZ3jlfUCoxxWEI1VtBOgmzO+gyQ2+fScGW+vU47nMJpa1DqSx3Z+P3w0SjQEKQQoUewaHwi5x+GYb8LB3+eOHepx2W2oSIgogRumNuSPGaRrhvZCT6TaipGL/tb6kaeg1gAnrpczx7WcYgKCUpY0dEkEKFHsGh8IucfhmG/Cwd/njh3qcdltqEiIKIEbpjbkjxmka4b2Qk+k2oqRi/7W+pGnoNYAJ66XM8e1nGICglKWNHRiAoJSljR0aCAj6+sDHBRAkIo0BCkEKFHsGh8IucfhmG/Cwd/njh3qcdltqEiIKIEbpjbkjxmka4b2Qk+k2oqRi/7W+pGnoNYAJ66XM8e1nGICglKWNHRJBChR7BofCLnH4ZhvwsHf544d6nHZbahIiCiBG6Y25I8ZpGuG9kJPpNqKkYv+1vqRp6DWACeulzPHtZxiAoJSljR0YgKCUpY0d";
+
+    let header_bytes = base64::decode(@header_data);
+
+    let header = ProtoCodecImpl::decode::<LcHeader>(@header_bytes).unwrap();
+
+    let mut votes = NonAbsentCommitVotesTrait::new(header.signed_header);
+
+    for validator in header.validator_set.validators {
+        assert!(votes.has_voted(@validator))
+    }
 }
