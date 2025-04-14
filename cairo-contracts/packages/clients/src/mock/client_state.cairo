@@ -36,7 +36,7 @@ pub impl StoreProofSpecArray of Store<Array<ProofSpec>> {
             .expect('Storage Span too large');
         offset += 1;
 
-        let exit = len + offset;
+        let exit = Store::<ProofSpec>::size() * len + offset;
         while offset < exit {
             let value = Store::<ProofSpec>::read_at_offset(address_domain, base, offset).unwrap();
             arr.append(value);

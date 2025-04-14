@@ -358,7 +358,7 @@ pub impl StoreU8Array of Store<Array<u8>> {
             .expect('Storage Span too large');
         offset += 1;
 
-        let exit = len + offset;
+        let exit = Store::<u8>::size() * len + offset;
         loop {
             if offset >= exit {
                 break;
@@ -413,7 +413,7 @@ pub impl StoreU32Array of Store<Array<u32>> {
             .expect('Storage Span too large');
         offset += 1;
 
-        let exit = len + offset;
+        let exit = Store::<u32>::size() * len + offset;
         loop {
             if offset >= exit {
                 break;
