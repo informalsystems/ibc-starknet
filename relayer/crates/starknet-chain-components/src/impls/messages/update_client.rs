@@ -58,11 +58,6 @@ where
 
             let protobuf_bytes = Protobuf::<RawHeader>::encode_vec(header.clone());
 
-            dbg!(base64::Engine::encode(
-                &base64::engine::general_purpose::STANDARD,
-                &protobuf_bytes
-            ));
-
             let protobuf_string = unsafe { String::from_utf8_unchecked(protobuf_bytes) };
 
             let raw_header = encoding
