@@ -85,12 +85,10 @@ pub fn decode_varint_from_u8_array(ref bytes: Array<u8>) -> (u64, u32) {
 
 #[inline]
 pub fn decode_varint_from_byte_array(bytes: @ByteArray, ref index: usize) -> Result<u64, felt252> {
-    let bytes_len = bytes.len();
     let mut value: u64 = 0;
     let mut shift: u64 = 1;
     let mut done = false;
-    while index != bytes_len {
-        let byte = bytes[index];
+    while let Option::Some(byte) = bytes.at(index) {
         index += 1;
         // 0x7F == 0x0111_1111
         value = value | ((byte & 0x7F).into() * shift);
@@ -111,12 +109,10 @@ pub fn decode_varint_from_byte_array(bytes: @ByteArray, ref index: usize) -> Res
 pub fn decode_varintu128_from_byte_array(
     bytes: @ByteArray, ref index: usize,
 ) -> Result<u128, felt252> {
-    let bytes_len = bytes.len();
     let mut value: u128 = 0;
     let mut shift: u128 = 1;
     let mut done = false;
-    while index != bytes_len {
-        let byte = bytes[index];
+    while let Option::Some(byte) = bytes.at(index) {
         index += 1;
         // 0x7F == 0x0111_1111
         value = value | ((byte & 0x7F).into() * shift);

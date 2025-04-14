@@ -118,8 +118,8 @@ pub fn array_u32_into_array_u8(input: Array<u32>, last_word: u32, last_word_len:
 pub fn byte_array_to_array_u8(input: @ByteArray) -> Array<u8> {
     let mut output: Array<u8> = array![];
     let mut i = 0;
-    while i != input.len() {
-        output.append(input[i]);
+    while let Option::Some(value) = input.at(i) {
+        output.append(value);
         i += 1;
     }
     output
