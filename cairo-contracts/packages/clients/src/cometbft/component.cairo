@@ -6,6 +6,7 @@ pub mod CometClientComponent {
     use ics23::{
         MerkleProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
         verify_membership as ics23_verify_membership,
+        verify_non_membership as ics23_verify_non_membership,
     };
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
@@ -299,7 +300,22 @@ pub mod CometClientComponent {
             paths: Array<ByteArray>,
             proof: StateProof,
             root: StateRoot,
-        ) {}
+        ) {
+            let byte_array_proof = array_u8_to_byte_array(@proof.proof);
+            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(@byte_array_proof).unwrap();
+            let specs = self.read_client_state(client_sequence).proof_spec;
+            let mut proofs: Array<Proof> = ArrayTrait::new();
+            for proof in decoded_proof.proofs {
+                proofs.append(proof.proof);
+            }
+            let root = root.root;
+            let mut keys = array![];
+            for path in paths {
+                let path_ba = byte_array_to_array_u8(@path);
+                keys.append(path_ba);
+            }
+            ics23_verify_non_membership(specs, @proofs, root, keys);
+        }
 
         fn verify_client_message(
             self: @ComponentState<TContractState>,
