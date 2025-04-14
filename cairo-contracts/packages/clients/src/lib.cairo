@@ -10,7 +10,8 @@ pub mod cometbft {
     pub use component::CometClientComponent;
     pub use consensus_state::{
         CometConsensusState, CometConsensusStateImpl, CometConsensusStateStore,
-        CometConsensusStateToStore, CometConsensusStateTrait, StoreToCometConsensusState,
+        CometConsensusStateToStore, CometConsensusStateTrait, CometConsensusStateZero,
+        StoreToCometConsensusState,
     };
     pub use errors::CometErrors;
     pub use header::{CometHeaderImpl, CometHeaderIntoConsensusState, CometHeaderTrait};

@@ -111,7 +111,7 @@ pub mod client {
     pub use types::{
         CreateResponse, CreateResponseImpl, Duration, DurationImpl, DurationToProto, DurationTrait,
         Height, HeightImpl, HeightPartialOrd, HeightTrait, HeightZero, HeightsIntoUpdateResponse,
-        Status, StatusImpl, StatusTrait, StoreHeightArray, Timestamp, TimestampImpl,
+        Status, StatusImpl, StatusTrait, StoreHeightArray, Timestamp, TimestampAdd, TimestampImpl,
         TimestampIntoU128, TimestampPartialOrd, TimestampToProto, TimestampTrait, TimestampZero,
         U64IntoTimestamp, UpdateResponse,
     };

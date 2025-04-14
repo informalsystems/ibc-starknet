@@ -2,9 +2,9 @@ use alexandria_data_structures::byte_array_ext::{ByteArrayIntoArrayU8, SpanU8Int
 use core::num::traits::Zero;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{
-    Duration, DurationTrait, Status, Timestamp, TimestampImpl, TimestampIntoU128,
+    Duration, DurationTrait, Status, Timestamp, TimestampImpl, TimestampIntoU128, TimestampZero,
 };
-use starknet_ibc_core::commitment::StateRoot;
+use starknet_ibc_core::commitment::{StateRoot, StateRootZero};
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct CometConsensusState {
@@ -40,12 +40,26 @@ pub impl CometConsensusStateToStore of Into<CometConsensusState, CometConsensusS
     }
 }
 
-#[generate_trait]
-pub impl CometConsensusStateImpl of CometConsensusStateTrait {
-    fn is_non_zero(self: @CometConsensusState) -> bool {
-        !(self.root.is_zero() && self.timestamp.is_zero() && self.next_validators_hash.is_empty())
+pub impl CometConsensusStateZero of Zero<CometConsensusState> {
+    fn zero() -> CometConsensusState {
+        CometConsensusState {
+            timestamp: TimestampZero::zero(),
+            root: StateRootZero::zero(),
+            next_validators_hash: ArrayTrait::new(),
+        }
     }
 
+    fn is_zero(self: @CometConsensusState) -> bool {
+        self.timestamp.is_zero() && self.root.is_zero() && self.next_validators_hash.is_empty()
+    }
+
+    fn is_non_zero(self: @CometConsensusState) -> bool {
+        !self.is_zero()
+    }
+}
+
+#[generate_trait]
+pub impl CometConsensusStateImpl of CometConsensusStateTrait {
     fn timestamp(self: @CometConsensusState) -> Timestamp {
         *self.timestamp
     }

@@ -16,8 +16,8 @@ pub mod CometClientComponent {
     use starknet::{ContractAddress, get_block_number, get_block_timestamp, get_caller_address};
     use starknet_ibc_clients::cometbft::{
         CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
-        CometConsensusStateStore, CometConsensusStateToStore, CometErrors, CometHeader,
-        CometHeaderImpl, CometHeaderIntoConsensusState, StoreToCometConsensusState,
+        CometConsensusStateStore, CometConsensusStateToStore, CometConsensusStateZero, CometErrors,
+        CometHeader, CometHeaderImpl, CometHeaderIntoConsensusState, StoreToCometConsensusState,
     };
     use starknet_ibc_core::client::{
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
@@ -319,7 +319,10 @@ pub mod CometClientComponent {
 
             self
                 .update_on_recover(
-                    subject_client_sequence, serialised_client_state, serialised_consensus_state,
+                    subject_client_sequence,
+                    substitute_client_sequence,
+                    serialised_client_state,
+                    serialised_consensus_state,
                 );
         }
     }
@@ -440,7 +443,11 @@ pub mod CometClientComponent {
                     comet_client_state.latest_height,
                     comet_client_state.clone(),
                     comet_consensus_state,
+                    get_block_number(),
+                    get_block_timestamp(),
                 );
+
+            self.write_next_client_sequence(client_sequence + 1);
 
             let client_id = ClientIdImpl::new(self.client_type(), client_sequence);
 
@@ -460,18 +467,50 @@ pub mod CometClientComponent {
 
             let header_height = HeightImpl::new(latest_height.revision_number, tm_header_height);
 
-            // TODO: Implement consensus state pruning mechanism.
+            let update_heights = self.read_update_heights(client_sequence);
+            let mut update_heights_span = update_heights.span();
+
+            let mut client_state = self.read_client_state(client_sequence);
+
+            let mut heights_kept = array![];
+            let mut check_in_progress = true;
+            // Since the Heights are sorted when stored, as soon as we find the first
+            // Height which isn't expired we can stop checking the rest and build
+            // the new Heights array which are kept.
+            while let Option::Some(height) = update_heights_span.pop_front() {
+                if check_in_progress {
+                    let consensus_state = self
+                        .read_consensus_state(client_sequence, height.clone());
+
+                    if consensus_state
+                        .status(client_state.trusting_period, client_state.max_clock_drift)
+                        .is_expired() {
+                        self.remove_consensus_state(client_sequence, height.clone());
+                    } else {
+                        check_in_progress = false;
+                        heights_kept.append(height.clone());
+                    }
+                } else {
+                    heights_kept.append(height.clone());
+                }
+            }
+            // Write directly since heights_kept is already sorted and is equal or
+            // smaller to the previous one
+            self.update_heights.write(client_sequence, heights_kept);
 
             if !self.consensus_state_exists(client_sequence, header_height.clone()) {
-                let mut client_state = self.read_client_state(client_sequence);
-
                 client_state.update(header_height.clone());
 
                 let new_consensus_state: CometConsensusState = header.into();
 
                 self
                     ._update_state(
-                        client_sequence, header_height, client_state, new_consensus_state,
+                        client_sequence,
+                        header_height,
+                        client_state,
+                        new_consensus_state,
+                        get_block_number(),
+                        get_block_timestamp(),
                     );
             }
 
@@ -502,11 +541,20 @@ pub mod CometClientComponent {
         fn update_on_recover(
             ref self: ComponentState<TContractState>,
             subject_client_sequence: u64,
+            substitute_client_sequence: u64,
             substitute_client_state: Array<felt252>,
             substitute_consensus_state: Array<felt252>,
         ) {
-            // TODO: prune old consensus states.
-            // They are untrusted now even if they are within trusted period.
+            let update_heights = self.read_update_heights(subject_client_sequence);
+            assert(update_heights.len() > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
+
+            let mut update_heights_span = update_heights.span();
+
+            while let Option::Some(height) = update_heights_span.pop_front() {
+                self.remove_consensus_state(subject_client_sequence, height.clone());
+            }
+
+            self.update_heights.write(subject_client_sequence, array![]);
 
             let substitute_client_state = CometClientStateImpl::deserialize(
                 substitute_client_state,
@@ -514,12 +562,22 @@ pub mod CometClientComponent {
             let substitute_consensus_state = CometConsensusStateImpl::deserialize(
                 substitute_consensus_state,
             );
+
+            let latest_height = substitute_client_state.latest_height.clone();
+
+            let processed_height = self
+                .read_client_processed_height(substitute_client_sequence, latest_height.clone());
+            let processed_time = self
+                .read_client_processed_time(substitute_client_sequence, latest_height.clone());
+
             self
                 ._update_state(
                     subject_client_sequence,
                     substitute_client_state.latest_height,
                     substitute_client_state,
                     substitute_consensus_state,
+                    processed_height,
+                    processed_time,
                 );
         }
 
@@ -585,6 +643,8 @@ pub mod CometClientComponent {
             update_height: Height,
             client_state: CometClientState,
             consensus_state: CometConsensusState,
+            processed_height: u64,
+            processed_time: u64,
         ) {
             self.write_client_state(client_sequence, client_state.clone());
 
@@ -592,21 +652,12 @@ pub mod CometClientComponent {
 
             self
                 .write_consensus_state(
-                    client_sequence, update_height.clone(), consensus_state.clone(),
+                    client_sequence,
+                    update_height.clone(),
+                    consensus_state.clone(),
+                    processed_height,
+                    processed_time,
                 );
-
-            let host_height = get_block_number();
-
-            self.write_client_processed_height(client_sequence, update_height.clone(), host_height);
-
-            let host_timestamp = get_block_timestamp();
-
-            self
-                .write_client_processed_time(
-                    client_sequence, update_height.clone(), host_timestamp,
-                );
-
-            self.write_next_client_sequence(client_sequence + 1);
         }
     }
 
@@ -658,12 +709,12 @@ pub mod CometClientComponent {
 
         fn read_client_processed_time(
             self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
-        ) -> Timestamp {
+        ) -> u64 {
             let processed_time = self.client_processed_times.read((client_sequence, height));
 
             assert(processed_time.is_non_zero(), CometErrors::MISSING_CLIENT_PROCESSED_TIME);
 
-            processed_time.into()
+            processed_time
         }
 
         fn read_client_processed_height(
@@ -733,26 +784,23 @@ pub mod CometClientComponent {
             client_sequence: u64,
             height: Height,
             consensus_state: CometConsensusState,
+            processed_height: u64,
+            processed_time: u64,
         ) {
-            self.consensus_states.write((client_sequence, height), consensus_state.into());
+            self.consensus_states.write((client_sequence, height.clone()), consensus_state.into());
+            self
+                .client_processed_heights
+                .write((client_sequence, height.clone()), processed_height);
+            self.client_processed_times.write((client_sequence, height), processed_time);
         }
 
-        fn write_client_processed_time(
-            ref self: ComponentState<TContractState>,
-            client_sequence: u64,
-            height: Height,
-            timestamp: u64,
+        fn remove_consensus_state(
+            ref self: ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) {
-            self.client_processed_times.write((client_sequence, height), timestamp);
-        }
-
-        fn write_client_processed_height(
-            ref self: ComponentState<TContractState>,
-            client_sequence: u64,
-            height: Height,
-            host_height: u64,
-        ) {
-            self.client_processed_heights.write((client_sequence, height), host_height);
+            let consensus_zero = CometConsensusStateZero::zero();
+            self.consensus_states.write((client_sequence, height), consensus_zero.into());
+            self.client_processed_times.write((client_sequence, height), 0);
+            self.client_processed_heights.write((client_sequence, height), 0);
         }
     }
 }
