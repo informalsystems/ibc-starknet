@@ -14,8 +14,6 @@ fn test_negative_integer(x: u64) {
 
         assert_eq!(felts.len(), 1, "felts length mismatch");
 
-        // MAX felt252
-
         let result = FELT_MAX - ((-num).try_into().unwrap() - 1);
 
         assert_eq!(felts[0], @result, "wrong serialized value");
