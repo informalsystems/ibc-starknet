@@ -16,7 +16,6 @@ use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::Has
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_logging_components::traits::has_logger::HasLogger;
 use hermes_logging_components::traits::logger::CanLog;
 use hermes_logging_components::types::level::LevelInfo;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
@@ -36,7 +35,7 @@ use hermes_test_components::chain::traits::types::address::HasAddressType;
 use hermes_test_components::chain::traits::types::wallet::HasWalletType;
 use hermes_test_components::chain_driver::traits::types::chain::{HasChain, HasChainType};
 use hermes_test_components::driver::traits::types::chain_driver::HasChainDriverType;
-use starknet::core::types::{Call, Felt};
+use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
 use crate::traits::{CanDeployIbcContracts, IbcContractsDeployer, IbcContractsDeployerComponent};
@@ -79,9 +78,9 @@ where
 impl<Bootstrap, Chain, CairoEncoding, EventEncoding> IbcContractsDeployer<Bootstrap>
     for DeployIbcContract
 where
-    Bootstrap: HasLogger
-        + HasChainType<Chain = Chain>
+    Bootstrap: HasChainType<Chain = Chain>
         + HasIbcContracts
+        + CanLog<LevelInfo>
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Chain::Error>
         + CanRaiseAsyncError<CairoEncoding::Error>,
@@ -96,7 +95,6 @@ where
         + HasChainContractFields
         + HasAsyncErrorType,
     Chain::ContractClassHash: Eq + Debug + Hash,
-    Bootstrap::Logger: CanLog<LevelInfo>,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanEncode<ViaCairo, Chain::Address>
         + CanEncode<ViaCairo, Chain::ContractClassHash>
@@ -108,7 +106,6 @@ where
         bootstrap: &Bootstrap,
         chain: &Chain,
     ) -> Result<(), Bootstrap::Error> {
-        let logger = bootstrap.logger();
         let cairo_encoding = <Chain as HasEncoding<AsFelt>>::encoding(chain);
         let event_encoding = <Chain as HasEncoding<AsStarknetEvent>>::encoding(chain);
 
@@ -117,7 +114,7 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
-        logger
+        bootstrap
             .log(
                 &format!("declared ERC20 class: {erc20_class_hash:?}"),
                 &LevelInfo,
@@ -129,7 +126,7 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
-        logger
+        bootstrap
             .log(
                 &format!("declared ICS20 class: {ics20_class_hash:?}"),
                 &LevelInfo,
@@ -141,7 +138,7 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
-        logger
+        bootstrap
             .log(
                 &format!("declared IBC core class: {ibc_core_class_hash:?}"),
                 &LevelInfo,
@@ -153,7 +150,7 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
-        logger
+        bootstrap
             .log(
                 &format!("declared Comet IBC client class: {comet_client_class_hash:?}"),
                 &LevelInfo,
@@ -165,7 +162,7 @@ where
             .await
             .map_err(Bootstrap::raise_error)?;
 
-        logger
+        bootstrap
             .log(
                 &format!("deployed IBC core contract to address: {ibc_core_address:?}"),
                 &LevelInfo,
@@ -183,7 +180,7 @@ where
                 .map_err(Bootstrap::raise_error)?
         };
 
-        logger
+        bootstrap
             .log(
                 &format!("deployed Comet IBC client contract to address: {comet_client_address:?}"),
                 &LevelInfo,
@@ -209,7 +206,7 @@ where
                 .map_err(Bootstrap::raise_error)?
         };
 
-        logger
+        bootstrap
             .log(
                 &format!("deployed ICS20 contract to address: {ics20_contract_address:?}"),
                 &LevelInfo,
@@ -226,20 +223,15 @@ where
                 .encode(&register_client)
                 .map_err(Bootstrap::raise_error)?;
 
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("register_client"),
-                calldata,
-            };
-
-            let message = StarknetMessage::new(call);
+            let message =
+                StarknetMessage::new(*ibc_core_address, selector!("register_client"), calldata);
 
             let response = chain
                 .send_message(message)
                 .await
                 .map_err(Bootstrap::raise_error)?;
 
-            logger
+            bootstrap
                 .log("registered comet client contract with ibc core", &LevelInfo)
                 .await;
         }
@@ -256,20 +248,18 @@ where
                 .encode(&register_app)
                 .map_err(Bootstrap::raise_error)?;
 
-            let call = Call {
-                to: *ibc_core_address,
-                selector: selector!("bind_port_id"),
-                calldata: register_call_data,
-            };
-
-            let message = StarknetMessage::new(call);
+            let message = StarknetMessage::new(
+                *ibc_core_address,
+                selector!("bind_port_id"),
+                register_call_data,
+            );
 
             let response = chain
                 .send_message(message)
                 .await
                 .map_err(Bootstrap::raise_error)?;
 
-            logger
+            bootstrap
                 .log("registered ICS20 contract with ibc core", &LevelInfo)
                 .await;
         }
@@ -328,7 +318,8 @@ impl<Bootstrap, InBuilder, Chain> ChainDriverBuilder<Bootstrap>
     for BuildChainAndDeployIbcContracts<InBuilder>
 where
     Bootstrap: HasRuntimeType<Runtime: HasChildProcessType>
-        + HasChainDriverType<Chain = Chain>
+        + HasChainDriverType
+        + HasChainType<Chain = Chain>
         + HasChainGenesisConfigType
         + HasChainNodeConfigType
         + CanDeployIbcContracts
@@ -342,7 +333,7 @@ where
         genesis_config: Bootstrap::ChainGenesisConfig,
         chain_node_config: Bootstrap::ChainNodeConfig,
         wallets: BTreeMap<String, Chain::Wallet>,
-        chain_process: ChildProcessOf<Bootstrap::Runtime>,
+        chain_process: Vec<ChildProcessOf<Bootstrap::Runtime>>,
     ) -> Result<Bootstrap::ChainDriver, Bootstrap::Error> {
         let chain_driver = InBuilder::build_chain_driver(
             bootstrap,

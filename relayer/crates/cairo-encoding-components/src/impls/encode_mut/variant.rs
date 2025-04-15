@@ -12,24 +12,22 @@ use starknet::core::types::Felt;
 
 use crate::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use crate::impls::encode_mut::u128::felt_to_u128;
-use crate::types::nat::{Nat, S, Z};
-
-pub type EncodeVariants<N> = SumEncoders<Z, N>;
+use crate::types::nat::{Nat, S};
 
 #[derive(Debug)]
 pub struct VariantIndexOutOfBound {
     pub index: usize,
 }
 
-pub struct SumEncoders<Index, Remain>(pub PhantomData<(Index, Remain)>);
+pub struct SumEncoders<I>(pub PhantomData<I>);
 
 #[cgp_provider(MutEncoderComponent)]
-impl<Encoding, Strategy, ValueA, ValueB, I, N>
-    MutEncoder<Encoding, Strategy, Either<ValueA, ValueB>> for SumEncoders<I, S<N>>
+impl<Encoding, Strategy, ValueA, ValueB, I> MutEncoder<Encoding, Strategy, Either<ValueA, ValueB>>
+    for SumEncoders<I>
 where
     Encoding: CanEncodeMut<Strategy, ValueA> + CanEncodeMut<Strategy, usize>,
     I: Nat,
-    SumEncoders<S<I>, N>: MutEncoder<Encoding, Strategy, ValueB>,
+    SumEncoders<S<I>>: MutEncoder<Encoding, Strategy, ValueB>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -48,37 +46,30 @@ where
 }
 
 #[cgp_provider(MutEncoderComponent)]
-impl<Encoding, Strategy, Value, I> MutEncoder<Encoding, Strategy, Either<Value, Void>>
-    for SumEncoders<I, Z>
+impl<Encoding, Strategy, I> MutEncoder<Encoding, Strategy, Void> for SumEncoders<I>
 where
-    Encoding: CanEncodeMut<Strategy, Value> + CanEncodeMut<Strategy, usize>,
+    Encoding: HasEncodeBufferType + HasAsyncErrorType,
     I: Nat,
 {
     fn encode_mut(
         encoding: &Encoding,
-        value: &Either<Value, Void>,
+        value: &Void,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
-        match value {
-            Either::Left(value) => {
-                encoding.encode_mut(&I::N, buffer)?;
-                encoding.encode_mut(value, buffer)
-            }
-            Either::Right(value) => match *value {},
-        }
+        match *value {}
     }
 }
 
 #[cgp_provider(MutDecoderComponent)]
-impl<Encoding, Strategy, ValueA, ValueB, I, N>
-    MutDecoder<Encoding, Strategy, Either<ValueA, ValueB>> for SumEncoders<I, S<N>>
+impl<Encoding, Strategy, ValueA, ValueB, I> MutDecoder<Encoding, Strategy, Either<ValueA, ValueB>>
+    for SumEncoders<I>
 where
     Encoding: CanDecodeMut<Strategy, ValueA>
         + CanDecodeMut<Strategy, usize>
         + CanPeekDecodeBuffer<Felt>
         + CanRaiseAsyncError<UnexpectedEndOfBuffer>,
     I: Nat,
-    SumEncoders<S<I>, N>: MutDecoder<Encoding, Strategy, ValueB>,
+    SumEncoders<S<I>>: MutDecoder<Encoding, Strategy, ValueB>,
 {
     fn decode_mut(
         encoding: &Encoding,
@@ -101,27 +92,17 @@ where
 }
 
 #[cgp_provider(MutDecoderComponent)]
-impl<Encoding, Strategy, Value, I> MutDecoder<Encoding, Strategy, Either<Value, Void>>
-    for SumEncoders<I, Z>
+impl<Encoding, Strategy, I> MutDecoder<Encoding, Strategy, Void> for SumEncoders<I>
 where
-    Encoding: CanDecodeMut<Strategy, Value>
-        + CanDecodeMut<Strategy, usize>
-        + CanPeekDecodeBuffer<Felt>
-        + CanRaiseAsyncError<VariantIndexOutOfBound>,
+    Encoding: CanDecodeMut<Strategy, usize> + CanRaiseAsyncError<VariantIndexOutOfBound>,
     I: Nat,
 {
     fn decode_mut(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'_>,
-    ) -> Result<Either<Value, Void>, Encoding::Error> {
+    ) -> Result<Void, Encoding::Error> {
         let index: usize = encoding.decode_mut(buffer)?;
 
-        if index != I::N {
-            Err(Encoding::raise_error(VariantIndexOutOfBound { index }))
-        } else {
-            let decoded = encoding.decode_mut(buffer)?;
-
-            Ok(Either::Left(decoded))
-        }
+        Err(Encoding::raise_error(VariantIndexOutOfBound { index }))
     }
 }

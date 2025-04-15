@@ -1,6 +1,7 @@
 use core::time::Duration;
 
 use cgp::prelude::*;
+use hermes_chain_type_components::traits::types::amount::HasAmountType;
 use hermes_cosmos_chain_components::types::status::Time;
 use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
 use hermes_relayer_components::chain::traits::types::height::HasHeightType;
@@ -9,7 +10,6 @@ use hermes_test_components::chain::traits::transfer::timeout::{
     IbcTransferTimeoutCalculator, IbcTransferTimeoutCalculatorComponent,
 };
 use hermes_test_components::chain::traits::types::address::HasAddressType;
-use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use ibc::primitives::Timestamp;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
