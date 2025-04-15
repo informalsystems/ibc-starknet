@@ -1,10 +1,11 @@
 #[cgp::re_export_imports]
 mod preset {
     use cgp::prelude::*;
-    use starknet::core::types::{Felt, U256};
+    use starknet::core::types::{ByteArray, Felt, U256};
 
     use crate::impls::encode_mut::array::EncodeArray;
     use crate::impls::encode_mut::bool::EncodeBool;
+    use crate::impls::encode_mut::byte_array::EncodeStarknetByteArray;
     use crate::impls::encode_mut::felt::EncodeFelt;
     use crate::impls::encode_mut::from_i128::EncodeFromI128;
     use crate::impls::encode_mut::from_u128::EncodeFromU128;
@@ -41,6 +42,7 @@ mod preset {
             // For Tendermint Validator AccountId
             (ViaCairo, [u8; 20]): EncodeArray,
             (ViaCairo, [u32; 8]): EncodeArray,
+            (ViaCairo, ByteArray): EncodeStarknetByteArray,
         }
     }
 }

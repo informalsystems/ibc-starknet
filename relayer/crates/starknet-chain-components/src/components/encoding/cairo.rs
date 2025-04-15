@@ -32,7 +32,7 @@ mod preset {
     use ibc::clients::tendermint::types::{Header as TendermintLcHeader, TrustThreshold};
     use ibc::core::host::types::identifiers::ChainId;
     use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
-    use starknet::core::types::{Felt, U256};
+    use starknet::core::types::{ByteArray, Felt, U256};
     use tendermint::block::header::Version as HeaderVersion;
     use tendermint::block::parts::Header as PartSetHeader;
     use tendermint::block::signed_header::SignedHeader;
