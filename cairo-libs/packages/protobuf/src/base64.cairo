@@ -85,12 +85,8 @@ pub fn decode(input: @ByteArray) -> ByteArray {
 
     // Since input_len % 4 == 0, we know i += 4 will eventually be
     // equal to input_len
-    while i != input_len {
-        let c0 = input[i];
-        let c1 = input[i + 1];
-        let c2 = input[i + 2];
-        let c3 = input[i + 3];
-
+    while let (Some(c0), Some(c1), Some(c2), Some(c3)) =
+        (input.at(i), input.at(i + 1), input.at(i + 2), input.at(i + 3)) {
         let sextet0: u32 = base64_char_to_u6(c0).into();
         let sextet1: u32 = base64_char_to_u6(c1).into();
         let sextet2: u32 = if c2 != '=' {

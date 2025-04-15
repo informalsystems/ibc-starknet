@@ -25,8 +25,7 @@ pub fn encode(input: @ByteArray) -> ByteArray {
     let input_len = input.len();
     let mut output = "";
     let mut i = 0;
-    while i != input_len {
-        let value = input[i];
+    while let Some(value) = input.at(i) {
         output.append_byte(u4_to_digit(value / 0x10));
         output.append_byte(u4_to_digit(value & 0x0F));
         i += 1;
@@ -41,8 +40,8 @@ pub fn decode(input: @ByteArray) -> ByteArray {
     let mut i = 0;
     // Since input_len % 2 == 0, we know i += 2 will eventually be
     // equal to input_len
-    while i != input_len {
-        let value = (digit_to_u4(input[i]) * 0x10) | digit_to_u4(input[i + 1]);
+    while let (Some(c0), Some(c1)) = (input.at(i), input.at(i + 1)) {
+        let value = (digit_to_u4(c0) * 0x10) | digit_to_u4(c1);
         output.append_byte(value);
         i += 2;
     }
