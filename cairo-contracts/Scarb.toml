@@ -29,9 +29,11 @@ starknet      = "2.11.2"
 snforge_std   = "0.38.3" # can't bump because of oz testing
 
 # external dependencies
-alexandria_data_structures = "0.5.0"
-alexandria_numeric         = "0.5.0"
-alexandria_sorting         = "0.5.0"
+# FIXME: using main branch for ed25519 signature fix
+# use release version from scarbs.xyz
+alexandria_data_structures = { git = "https://github.com/keep-starknet-strange/alexandria" }
+alexandria_numeric         = { git = "https://github.com/keep-starknet-strange/alexandria" }
+alexandria_sorting         = { git = "https://github.com/keep-starknet-strange/alexandria" }
 openzeppelin_access        = "1.0.0"
 openzeppelin_token         = "1.0.0"
 openzeppelin_testing       = "2.0.0"
