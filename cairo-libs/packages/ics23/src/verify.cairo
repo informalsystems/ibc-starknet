@@ -42,7 +42,7 @@ pub fn verify_non_membership(
 ) {
     let proofs_len = proofs.len();
     assert(proofs_len > 0, ICS23Errors::MISSING_MERKLE_PROOF);
-    assert(root == [0; 8], ICS23Errors::ZERO_MERKLE_ROOT);
+    assert(root != [0; 8], ICS23Errors::ZERO_MERKLE_ROOT);
     assert(proofs_len == specs.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
     assert(proofs_len == keys.len(), ICS23Errors::MISMATCHED_NUM_OF_PROOFS);
     let mut subroot = [0; 8];
@@ -52,7 +52,7 @@ pub fn verify_non_membership(
     let spec = specs[0];
     let key = keys[proofs_len - 1];
     if let Proof::NonExist(p) = proof {
-        subroot = p.calculate_root();
+        subroot = p.calculate_root_for_spec(Option::Some(spec));
         verify_non_existence(spec, p, key.clone());
         verify_membership(specs.clone(), proofs, root, keys.clone(), subroot.into(), 1)
     } else {
