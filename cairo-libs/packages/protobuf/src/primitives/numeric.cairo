@@ -1,6 +1,7 @@
 use protobuf::primitives::utils::{
-    decode_2_complement_32, decode_2_complement_64, encode_2_complement_32, encode_2_complement_64,
-    little_endian_to_u64, u64_to_little_endian,
+    decode_2_complement_128, decode_2_complement_32, decode_2_complement_64,
+    encode_2_complement_128, encode_2_complement_32, encode_2_complement_64, little_endian_to_u64,
+    u64_to_little_endian,
 };
 use protobuf::types::message::{
     DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
@@ -90,6 +91,22 @@ pub impl I64AsProtoMessage of ProtoMessage<i64> {
     fn decode_raw(ref context: DecodeContext) -> Option<i64> {
         let num = decode_raw(ref context)?;
         Option::Some(decode_2_complement_64(@num))
+    }
+
+    fn wire_type() -> WireType {
+        WireType::Varint
+    }
+}
+
+pub impl I128AsProtoMessage of ProtoMessage<i128> {
+    fn encode_raw(self: @i128, ref context: EncodeContext) {
+        let num: u128 = encode_2_complement_128(@(*self).into());
+        num.encode_raw(ref context);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<i128> {
+        let num = decode_raw(ref context)?;
+        Option::Some(decode_2_complement_128(@num))
     }
 
     fn wire_type() -> WireType {

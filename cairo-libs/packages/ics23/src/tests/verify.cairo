@@ -7,9 +7,8 @@ use ics23::tests::data::{
 };
 use ics23::{
     ByteArrayIntoArrayU8, CommitmentProof, ExistenceProof, ExistenceProofImpl, HashOp, InnerOp,
-    InnerSpec, LeafOp, LengthOp, Proof, ProofSpec, SliceU32IntoArrayU8, byte_array_to_slice_u32,
-    decode_hex, encode_hex, iavl_spec, smt_spec, tendermint_spec, verify_existence,
-    verify_membership, verify_non_existence,
+    InnerSpec, LeafOp, LengthOp, Proof, ProofSpec, SliceU32IntoArrayU8, decode_hex, encode_hex,
+    iavl_spec, smt_spec, tendermint_spec, verify_existence, verify_membership, verify_non_existence,
 };
 use protobuf::hex::decode as decode_hex_byte_array;
 use protobuf::types::message::ProtoCodecImpl;
@@ -2192,7 +2191,7 @@ fn test_channel_ack_verification_calculate_root_for_spec_2() {
 
 #[test]
 fn test_channel_ack_verification_while_loop() {
-    let (specs, proofs, root, keys, value, index) = get_verification_params();
+    let (specs, proofs, _, keys, value, index) = get_verification_params();
 
     let proofs_len = proofs.len();
     let mut subroot = [0; 8];
