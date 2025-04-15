@@ -250,13 +250,10 @@ pub fn lexicographical_cmp(lhs: Array<u8>, rhs: Array<u8>) -> Ordering {
     let rhs_len = rhs.len();
     let mut lhs_span = lhs.span();
     let mut rhs_span = rhs.span();
-    let min_len = core::cmp::min(lhs_len, rhs_len);
 
     let mut ordering = Ordering::Equal;
 
-    for _ in 0..min_len {
-        let l = lhs_span.pop_front().unwrap();
-        let r = rhs_span.pop_front().unwrap();
+    while let (Some(l), Some(r)) = (lhs_span.pop_front(), rhs_span.pop_front()) {
         if l < r {
             ordering = Ordering::Less;
             break;

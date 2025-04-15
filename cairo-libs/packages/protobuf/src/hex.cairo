@@ -22,7 +22,6 @@ pub fn u4_to_digit(value: u8) -> u8 {
 }
 
 pub fn encode(input: @ByteArray) -> ByteArray {
-    let input_len = input.len();
     let mut output = "";
     let mut i = 0;
     while let Some(value) = input.at(i) {
