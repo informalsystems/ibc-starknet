@@ -28,15 +28,17 @@ pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
 pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of ProtoMessage<Array<T>> {
     fn encode_raw(self: @Array<T>, ref context: EncodeContext) {
         let mut self_span = self.span();
-        while let Option::Some(item) = self_span.pop_front() {
-            if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
+        if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
+            while let Option::Some(item) = self_span.pop_front() {
                 let mut context2 = EncodeContextImpl::new();
                 item.encode_raw(ref context2);
                 context2.buffer.len().encode_raw(ref context);
                 context.buffer.append(@context2.buffer);
-            } else {
+            };
+        } else {
+            while let Option::Some(item) = self_span.pop_front() {
                 item.encode_raw(ref context);
-            }
+            };
         }
     }
 
