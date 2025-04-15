@@ -2,6 +2,7 @@ use alexandria_math::ed25519::verify_signature;
 pub use canonical_vote_impl::CanonicalVoteAsProtoMessage;
 use cometbft::errors::CometErrors;
 use cometbft::utils::{Fraction, SpanU8TryIntoU256};
+use core::sha256::compute_sha256_byte_array;
 use ics23::byte_array_to_array_u8;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{
@@ -347,6 +348,44 @@ pub impl PublicKeyImpl of PublicKeyTrait {
             _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
         }
     }
+
+    fn address(self: @PublicKey) -> AccountId {
+        match self.sum {
+            Sum::Ed25519(pk) => {
+                let pub_key_byte_array = {
+                    let mut val = "";
+                    let mut span = pk.span();
+
+                    while let Some(b) = span.pop_front() {
+                        val.append_byte(*b);
+                    }
+
+                    val
+                };
+
+                let hash = compute_sha256_byte_array(@pub_key_byte_array);
+                let span = hash.span();
+
+                let mut id: Array<u8> = array![];
+                let limit: usize = 5;
+
+                for i in 0..limit {
+                    let value = *span[i];
+                    let byte1 = (value & 0xFF000000) / 0x1000000;
+                    let byte2 = (value & 0x00FF0000) / 0x0010000;
+                    let byte3 = (value & 0x0000FF00) / 0x0000100;
+                    let byte4 = value & 0x000000FF;
+                    id.append(byte1.try_into().unwrap());
+                    id.append(byte2.try_into().unwrap());
+                    id.append(byte3.try_into().unwrap());
+                    id.append(byte4.try_into().unwrap());
+                }
+
+                id.try_into().unwrap() // Never fails as length is 20.
+            },
+            _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
+        }
+    }
 }
 
 impl PublicKeyAsProtoMessage of ProtoMessage<PublicKey> {
@@ -413,6 +452,10 @@ pub struct Validator {
 
 #[generate_trait]
 pub impl ValidatorImpl of ValidatorTrait {
+    fn validate_id(self: @Validator) {
+        assert!(self.address == @self.pub_key.address());
+    }
+
     fn verify_signature(self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>) {
         self.pub_key.verify(sign_bytes, signature);
     }
@@ -668,6 +711,8 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
                 let signed_bytes = ProtoCodecImpl::encode_with_length(canonical_vote);
 
                 let signed_array_u8 = byte_array_to_array_u8(@signed_bytes);
+
+                validator.validate_id();
 
                 validator.verify_signature(signed_array_u8.span(), signature.span());
 

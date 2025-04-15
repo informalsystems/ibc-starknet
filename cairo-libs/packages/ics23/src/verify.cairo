@@ -52,7 +52,7 @@ pub fn verify_non_membership(
     let spec = specs[0];
     let key = keys[proofs_len - 1];
     if let Proof::NonExist(p) = proof {
-        subroot = p.calculate_root_for_spec(Option::Some(spec));
+        subroot = p.calculate_root();
         verify_non_existence(spec, p, key.clone());
         verify_membership(specs.clone(), proofs, root, keys.clone(), subroot.into(), 1)
     } else {

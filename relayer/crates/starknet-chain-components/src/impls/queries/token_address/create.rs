@@ -10,7 +10,7 @@ use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use starknet::core::types::{Call, Felt};
+use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
@@ -48,14 +48,11 @@ where
             .encode(prefixed_denom)
             .map_err(Chain::raise_error)?;
 
-        let message = StarknetMessage {
-            call: Call {
-                to: ics20_contract_address.0,
-                selector: selector!("create_ibc_token"),
-                calldata,
-            },
-            counterparty_height: None,
-        };
+        let message = StarknetMessage::new(
+            ics20_contract_address.0,
+            selector!("create_ibc_token"),
+            calldata,
+        );
 
         let message_response = chain.send_message(message).await?;
 

@@ -8,7 +8,8 @@ use starknet_ibc_core::channel::{
 use starknet_ibc_core::client::{
     CreateResponse, IClientHandlerDispatcher, IClientHandlerDispatcherTrait,
     IRegisterClientDispatcher, IRegisterClientDispatcherTrait, IRegisterRelayerDispatcher,
-    IRegisterRelayerDispatcherTrait, MsgCreateClient, MsgUpdateClient, UpdateResponse,
+    IRegisterRelayerDispatcherTrait, MsgCreateClient, MsgRecoverClient, MsgUpdateClient,
+    UpdateResponse,
 };
 use starknet_ibc_core::commitment::Commitment;
 use starknet_ibc_core::connection::{
@@ -72,6 +73,10 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn update_client(self: @CoreContract, msg: MsgUpdateClient) -> UpdateResponse {
         self.client_handler_dispatcher().update_client(msg)
+    }
+
+    fn recover_client(self: @CoreContract, msg: MsgRecoverClient) {
+        self.client_handler_dispatcher().recover_client(msg)
     }
 
     fn register_relayer(self: @CoreContract, relayer_address: ContractAddress) {

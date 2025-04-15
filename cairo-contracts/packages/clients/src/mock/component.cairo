@@ -384,6 +384,7 @@ pub mod MockClientComponent {
         fn update_on_recover(
             ref self: ComponentState<TContractState>,
             subject_client_sequence: u64,
+            substitute_client_sequence: u64,
             substitute_client_state: Array<felt252>,
             substitute_consensus_state: Array<felt252>,
         ) {}

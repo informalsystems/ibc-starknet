@@ -4,14 +4,14 @@ use cgp::prelude::*;
 use hermes_relayer_components::transaction::traits::query_tx_response::{
     TxResponseQuerier, TxResponseQuerierComponent,
 };
-use hermes_relayer_components::transaction::traits::types::tx_hash::HasTransactionHashType;
+use hermes_relayer_components::transaction::traits::types::tx_hash::HasTxHashType;
 use hermes_relayer_components::transaction::traits::types::tx_response::HasTxResponseType;
 use hermes_runtime_components::traits::runtime::HasRuntime;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use starknet::core::types::{Felt, StarknetError};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::traits::provider::HasStarknetProvider;
+use crate::traits::client::HasStarknetClient;
 use crate::types::tx_response::TxResponse;
 
 pub struct QueryTransactionReceipt;
@@ -19,9 +19,9 @@ pub struct QueryTransactionReceipt;
 #[cgp_provider(TxResponseQuerierComponent)]
 impl<Chain> TxResponseQuerier<Chain> for QueryTransactionReceipt
 where
-    Chain: HasTransactionHashType<TxHash = Felt>
+    Chain: HasTxHashType<TxHash = Felt>
         + HasTxResponseType<TxResponse = TxResponse>
-        + HasStarknetProvider
+        + HasStarknetClient<Client: Provider>
         + HasRuntime<Runtime: CanSleep>
         + CanRaiseAsyncError<ProviderError>,
 {

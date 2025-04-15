@@ -3,7 +3,8 @@ use starknet_ibc_clients::cometbft::{
     CometClientState, CometConsensusState, CometHeader, SignedHeader,
 };
 use starknet_ibc_core::client::{
-    CreateResponse, Duration, Height, MsgCreateClient, MsgUpdateClient, Status, Timestamp,
+    CreateResponse, Duration, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient, Status,
+    Timestamp,
 };
 use starknet_ibc_core::host::ClientId;
 use starknet_ibc_testkit::dummies::{CLIENT_TYPE, DURATION, HEIGHT, STATE_ROOT, TIMESTAMP};
@@ -80,6 +81,12 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         Serde::serialize(@header, ref serialized_header);
 
         MsgUpdateClient { client_id, client_message: serialized_header }
+    }
+
+    fn dummy_msg_recover_client(
+        self: @CometClientConfig, subject_client_id: ClientId, substitute_client_id: ClientId,
+    ) -> MsgRecoverClient {
+        MsgRecoverClient { subject_client_id, substitute_client_id }
     }
 
     fn create_client(self: @CometClientConfig, core: @CoreContract) -> CreateResponse {

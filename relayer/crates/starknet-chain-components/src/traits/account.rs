@@ -1,3 +1,4 @@
+use cgp::core::macros::blanket_trait;
 use cgp::prelude::*;
 use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
 use starknet::accounts::{Account, AccountError, ConnectedAccount};
@@ -7,15 +8,7 @@ use starknet::accounts::{Account, AccountError, ConnectedAccount};
     context: Chain,
 }]
 pub trait HasStarknetAccountType: Async {
-    type Account: Async + ConnectedAccount;
-}
-
-#[cgp_getter {
-    provider: StarknetAccountGetter,
-    context: Chain,
-}]
-pub trait HasStarknetAccount: HasStarknetAccountType {
-    fn account(&self) -> &Self::Account;
+    type Account: Async;
 }
 
 #[cgp_component {
@@ -26,16 +19,10 @@ pub trait CanBuildAccountFromSigner: HasStarknetAccountType + HasSignerType {
     fn build_account_from_signer(&self, signer: &Self::Signer) -> Self::Account;
 }
 
-pub trait CanRaiseAccountErrors:
-    HasStarknetAccountType
+#[blanket_trait]
+pub trait CanUseStarknetAccount:
+    HasStarknetAccountType<Account: ConnectedAccount>
     + CanRaiseAsyncError<<Self::Account as Account>::SignError>
     + CanRaiseAsyncError<AccountError<<Self::Account as Account>::SignError>>
-{
-}
-
-impl<Chain> CanRaiseAccountErrors for Chain where
-    Chain: HasStarknetAccountType
-        + CanRaiseAsyncError<<Chain::Account as Account>::SignError>
-        + CanRaiseAsyncError<AccountError<<Self::Account as Account>::SignError>>
 {
 }
