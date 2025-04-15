@@ -4,20 +4,17 @@ version = 1
 [[package]]
 name = "alexandria_data_structures"
 version = "0.5.0"
-source = "registry+https://scarbs.xyz/"
-checksum = "sha256:ead928134d8ba7207a3523ab20d865a4d121a8a6a496e1628c438fb8b264d9dc"
+source = "git+https://github.com/keep-starknet-strange/alexandria#f2c5fbe0bd4945275e664386e6b372e51e713596"
 
 [[package]]
 name = "alexandria_math"
 version = "0.5.0"
-source = "registry+https://scarbs.xyz/"
-checksum = "sha256:cfa321a7258aa4ff659d962755833e69ad11330799ad426252c76d1e2b25c95c"
+source = "git+https://github.com/keep-starknet-strange/alexandria#f2c5fbe0bd4945275e664386e6b372e51e713596"
 
 [[package]]
 name = "alexandria_numeric"
 version = "0.5.0"
-source = "registry+https://scarbs.xyz/"
-checksum = "sha256:96d8e55878a7a88caa01a9b2b1b5e4ff87fd8af446fa28bd4461d076071e9d81"
+source = "git+https://github.com/keep-starknet-strange/alexandria#f2c5fbe0bd4945275e664386e6b372e51e713596"
 dependencies = [
  "alexandria_math",
  "alexandria_searching",
@@ -26,8 +23,7 @@ dependencies = [
 [[package]]
 name = "alexandria_searching"
 version = "0.5.0"
-source = "registry+https://scarbs.xyz/"
-checksum = "sha256:63a5aa4df3fb7474bd9c64541789a6413c698a982e19048ce6b865d91c70822c"
+source = "git+https://github.com/keep-starknet-strange/alexandria#f2c5fbe0bd4945275e664386e6b372e51e713596"
 dependencies = [
  "alexandria_data_structures",
 ]
@@ -35,8 +31,7 @@ dependencies = [
 [[package]]
 name = "alexandria_sorting"
 version = "0.5.0"
-source = "registry+https://scarbs.xyz/"
-checksum = "sha256:be772b56d264a8c90aef918ade1724830cc1300ff2925eb566c073381a93f78c"
+source = "git+https://github.com/keep-starknet-strange/alexandria#f2c5fbe0bd4945275e664386e6b372e51e713596"
 dependencies = [
  "alexandria_data_structures",
 ]
