@@ -17,7 +17,7 @@ use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use ibc_proto::ibc::lightclients::tendermint::v1::Header as RawHeader;
 use ibc_proto::Protobuf;
-use starknet::core::types::Felt;
+use starknet::core::types::{ByteArray, Felt};
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
@@ -41,7 +41,7 @@ where
     Counterparty:
         HasUpdateClientPayloadType<Chain, UpdateClientPayload = CosmosUpdateClientPayload>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanEncode<ViaCairo, String>
+        + CanEncode<ViaCairo, ByteArray>
         + CanEncode<ViaCairo, Product![ClientId, Vec<Felt>]>,
 {
     async fn build_update_client_message(
@@ -58,10 +58,10 @@ where
 
             let protobuf_bytes = Protobuf::<RawHeader>::encode_vec(header.clone());
 
-            let protobuf_string = unsafe { String::from_utf8_unchecked(protobuf_bytes) };
+            let protobuf_byte_array: ByteArray = protobuf_bytes.into();
 
             let raw_header = encoding
-                .encode(&protobuf_string)
+                .encode(&protobuf_byte_array)
                 .map_err(Chain::raise_error)?;
 
             let calldata = encoding
