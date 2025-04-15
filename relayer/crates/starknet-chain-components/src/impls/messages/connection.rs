@@ -38,7 +38,7 @@ use ibc::core::connection::types::ConnectionEnd;
 use ibc::core::host::types::identifiers::{
     ClientId as CosmosClientId, ConnectionId as CosmosConnectionId,
 };
-use starknet::core::types::{Call, Felt};
+use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
@@ -101,13 +101,8 @@ where
             .encode(&conn_open_init_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("conn_open_init"),
-            calldata,
-        };
-
-        let message = StarknetMessage::new(call);
+        let message =
+            StarknetMessage::new(*ibc_core_address, selector!("conn_open_init"), calldata);
 
         Ok(message)
     }
@@ -177,14 +172,9 @@ where
             .encode(&conn_open_init_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("conn_open_init"),
-            calldata,
-        };
-
         let message =
-            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+            StarknetMessage::new(*ibc_core_address, selector!("conn_open_init"), calldata)
+                .with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }
@@ -245,14 +235,8 @@ where
             .encode(&conn_open_ack_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("conn_open_ack"),
-            calldata,
-        };
-
-        let message =
-            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+        let message = StarknetMessage::new(*ibc_core_address, selector!("conn_open_ack"), calldata)
+            .with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }
@@ -303,14 +287,9 @@ where
             .encode(&conn_open_confirm_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("conn_open_confirm"),
-            calldata,
-        };
-
         let message =
-            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+            StarknetMessage::new(*ibc_core_address, selector!("conn_open_confirm"), calldata)
+                .with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }

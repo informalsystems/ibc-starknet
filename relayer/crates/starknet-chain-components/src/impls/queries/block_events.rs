@@ -11,20 +11,18 @@ use starknet::core::types::{BlockId, EventFilter};
 use starknet::providers::{Provider, ProviderError};
 
 use crate::impls::types::address::StarknetAddress;
-use crate::traits::provider::HasStarknetProvider;
+use crate::traits::client::HasStarknetClient;
 use crate::traits::queries::contract_address::CanQueryContractAddress;
 use crate::types::event::StarknetEvent;
 
-pub struct GetStarknetBlockEvents;
-
-#[cgp_provider(BlockEventsQuerierComponent)]
+#[cgp_new_provider(BlockEventsQuerierComponent)]
 impl<Chain> BlockEventsQuerier<Chain> for GetStarknetBlockEvents
 where
     Chain: HasHeightType<Height = u64>
         + HasEventType<Event = StarknetEvent>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasAddressType<Address = StarknetAddress>
-        + HasStarknetProvider
+        + HasStarknetClient<Client: Provider>
         + CanRaiseAsyncError<ProviderError>,
 {
     async fn query_block_events(

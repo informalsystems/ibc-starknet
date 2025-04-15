@@ -11,8 +11,8 @@ members = [
 [workspace.package]
 version       = "0.1.0"
 edition       = "2024_07"
-cairo-version = "2.11.2"
-scarb-version = "2.11.3"
+cairo-version = "2.11.4"
+scarb-version = "2.11.4"
 license       = "Apache-2.0"
 authors       = [ "Informal Systems <hello@informal.systems>" ]
 repository    = "https://github.com/informalsystems/ibc-starknet"
@@ -24,9 +24,9 @@ description   = "Cairo components and contracts for integrating Starknet with IB
 test = "snforge test"
 
 [workspace.dependencies]
-assert_macros = "2.11.2"
-starknet      = "2.11.2"
-snforge_std   = "0.38.3" # can't bump because of oz testing
+assert_macros = "2.11.4"
+starknet      = "2.11.4"
+snforge_std   = "0.41.0"
 
 # external dependencies
 alexandria_data_structures = "0.5.0"
@@ -34,7 +34,7 @@ alexandria_numeric         = "0.5.0"
 alexandria_sorting         = "0.5.0"
 openzeppelin_access        = "1.0.0"
 openzeppelin_token         = "1.0.0"
-openzeppelin_testing       = "2.0.0"
+openzeppelin_testing       = "3.0.0"
 openzeppelin_utils         = "1.0.0"
 
 # internal dependencies

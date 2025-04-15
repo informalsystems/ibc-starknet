@@ -31,7 +31,7 @@ use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use ibc::core::channel::types::channel::{ChannelEnd, Order as IbcOrder};
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChannelId, ConnectionId, PortId as IbcPortId};
-use starknet::core::types::{Call, Felt};
+use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
@@ -97,13 +97,8 @@ where
             .encode(&chan_open_init_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("chan_open_init"),
-            calldata,
-        };
-
-        let message = StarknetMessage::new(call);
+        let message =
+            StarknetMessage::new(ibc_core_address.0, selector!("chan_open_init"), calldata);
 
         Ok(message)
     }
@@ -182,13 +177,9 @@ where
             .encode(&chan_open_try_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("chan_open_try"),
-            calldata,
-        };
-
-        let message = StarknetMessage::new(call).with_counterparty_height(payload.update_height);
+        let message =
+            StarknetMessage::new(ibc_core_address.0, selector!("chan_open_try"), calldata)
+                .with_counterparty_height(payload.update_height);
 
         Ok(message)
     }
@@ -247,14 +238,9 @@ where
             .encode(&chan_open_ack_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("chan_open_ack"),
-            calldata,
-        };
-
         let message =
-            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+            StarknetMessage::new(ibc_core_address.0, selector!("chan_open_ack"), calldata)
+                .with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }
@@ -308,14 +294,9 @@ where
             .encode(&chan_open_confirm_msg)
             .map_err(Chain::raise_error)?;
 
-        let call = Call {
-            to: *ibc_core_address,
-            selector: selector!("chan_open_confirm"),
-            calldata,
-        };
-
         let message =
-            StarknetMessage::new(call).with_counterparty_height(counterparty_payload.update_height);
+            StarknetMessage::new(*ibc_core_address, selector!("chan_open_confirm"), calldata)
+                .with_counterparty_height(counterparty_payload.update_height);
 
         Ok(message)
     }

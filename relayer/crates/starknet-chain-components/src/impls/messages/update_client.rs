@@ -15,7 +15,7 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientP
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use starknet::core::types::{Call, Felt};
+use starknet::core::types::Felt;
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
@@ -65,13 +65,8 @@ where
                 .encode(&(client_id.clone(), raw_header))
                 .map_err(Chain::raise_error)?;
 
-            let call = Call {
-                to: *contract_address,
-                selector: selector!("update_client"),
-                calldata,
-            };
-
-            let message = StarknetMessage::new(call);
+            let message =
+                StarknetMessage::new(*contract_address, selector!("update_client"), calldata);
 
             messages.push(message);
         }

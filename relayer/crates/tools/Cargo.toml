@@ -36,7 +36,6 @@ hermes-cli                        = { workspace = true }
 hermes-cli-components             = { workspace = true }
 hermes-encoding-components        = { workspace = true }
 hermes-error                      = { workspace = true }
-hermes-logger                     = { workspace = true }
 hermes-logging-components         = { workspace = true }
 hermes-relayer-components         = { workspace = true }
 hermes-runtime                    = { workspace = true }
@@ -46,3 +45,4 @@ hermes-starknet-chain-context     = { workspace = true }
 hermes-starknet-cli               = { workspace = true }
 hermes-starknet-integration-tests = { workspace = true }
 hermes-starknet-relayer           = { workspace = true }
+hermes-tracing-logging-components = { workspace = true }

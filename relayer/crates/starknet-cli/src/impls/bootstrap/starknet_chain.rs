@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use cgp::prelude::*;
 use hermes_cli_components::traits::bootstrap::{
     BootstrapLoader, BootstrapLoaderComponent, HasBootstrapType,
@@ -6,7 +8,9 @@ use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_runtime_components::traits::runtime::HasRuntime;
-use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
+use hermes_starknet_integration_tests::contexts::starknet_bootstrap::{
+    StarknetBootstrap, StarknetBootstrapFields,
+};
 
 #[derive(Debug, clap::Parser, HasField)]
 pub struct BootstrapStarknetChainArgs {
@@ -85,13 +89,15 @@ where
         };
 
         let bootstrap = StarknetBootstrap {
-            runtime: runtime.clone(),
-            chain_command_path: args.chain_command_path.clone().into(),
-            chain_store_dir: args.chain_store_dir.clone().into(),
-            erc20_contract,
-            ics20_contract,
-            ibc_core_contract,
-            comet_client_contract,
+            fields: Arc::new(StarknetBootstrapFields {
+                runtime: runtime.clone(),
+                chain_command_path: args.chain_command_path.clone().into(),
+                chain_store_dir: args.chain_store_dir.clone().into(),
+                erc20_contract,
+                ics20_contract,
+                ibc_core_contract,
+                comet_client_contract,
+            }),
         };
 
         Ok(bootstrap)

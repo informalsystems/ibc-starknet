@@ -9,6 +9,7 @@ use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdTyp
 use hermes_chain_components::traits::types::message::HasMessageType;
 use hermes_chain_components::traits::types::timestamp::HasTimeoutType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_chain_type_components::traits::types::amount::HasAmountType;
 use hermes_encoding_components::traits::decode::CanDecode;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
@@ -16,11 +17,10 @@ use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_test_components::chain::traits::messages::ibc_transfer::{
     IbcTokenTransferMessageBuilder, IbcTokenTransferMessageBuilderComponent,
 };
-use hermes_test_components::chain::traits::types::amount::HasAmountType;
 use hermes_test_components::chain::traits::types::memo::HasMemoType;
 use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
-use starknet::core::types::{Call, Felt, U256};
+use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
@@ -77,17 +77,11 @@ where
         let ics20_contract_address = chain.query_contract_address(PhantomData).await?;
 
         let approve_message = {
-            let call_data = encoding
+            let calldata = encoding
                 .encode(&product![ics20_contract_address, amount.quantity,])
                 .map_err(Chain::raise_error)?;
 
-            let call = Call {
-                to: amount.token_address.0,
-                selector: selector!("approve"),
-                calldata: call_data,
-            };
-
-            StarknetMessage::new(call)
+            StarknetMessage::new(amount.token_address.0, selector!("approve"), calldata)
         };
 
         let transfer_message = {
@@ -155,18 +149,16 @@ where
                 timeout_timestamp_on_b,
             };
 
-            let call_data = chain
+            let calldata = chain
                 .encoding()
                 .encode(&ics20_transfer_message)
                 .map_err(Chain::raise_error)?;
 
-            let call = Call {
-                to: ics20_contract_address.0,
-                selector: selector!("send_transfer"),
-                calldata: call_data,
-            };
-
-            StarknetMessage::new(call)
+            StarknetMessage::new(
+                ics20_contract_address.0,
+                selector!("send_transfer"),
+                calldata,
+            )
         };
 
         let messages = vec![approve_message, transfer_message];
