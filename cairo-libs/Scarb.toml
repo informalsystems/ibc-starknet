@@ -27,7 +27,9 @@ assert_macros = "2.11.2"
 snforge_std   = "0.40.0"
 
 # external dependencies
-alexandria_math = "0.5.0"
+# FIXME: using main branch for ed25519 signature fix
+# use release version from scarbs.xyz
+alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria" }
 
 # internal dependencies
 protobuf = { path = "packages/protobuf" }
