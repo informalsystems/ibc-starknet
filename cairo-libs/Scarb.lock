@@ -4,8 +4,7 @@ version = 1
 [[package]]
 name = "alexandria_math"
 version = "0.5.0"
-source = "registry+https://scarbs.xyz/"
-checksum = "sha256:cfa321a7258aa4ff659d962755833e69ad11330799ad426252c76d1e2b25c95c"
+source = "git+https://github.com/keep-starknet-strange/alexandria#f2c5fbe0bd4945275e664386e6b372e51e713596"
 
 [[package]]
 name = "cometbft"
