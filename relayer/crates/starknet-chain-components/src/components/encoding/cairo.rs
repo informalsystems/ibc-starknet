@@ -53,10 +53,9 @@ mod preset {
         ConnectionCounterparty, ConnectionEnd, ConnectionId, ConnectionState,
         EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionState, EncodeDuration,
     };
-    use crate::types::cosmos::client_state::EncodeTrustThreshold;
     use crate::types::cosmos::client_state::{
         ClientStatus, CometClientState, EncodeInnerSpec, EncodeLeafOp, EncodeProofSpec,
-        EncodeProofSpecs,
+        EncodeProofSpecs, EncodeTrustThreshold,
     };
     use crate::types::cosmos::consensus_state::CometConsensusState;
     use crate::types::cosmos::height::{EncodeHeight, Height};
