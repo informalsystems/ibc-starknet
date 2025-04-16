@@ -157,7 +157,9 @@ version = "0.1.0"
 dependencies = [
  "alexandria_data_structures",
  "alexandria_sorting",
+ "ics23",
  "openzeppelin_access",
+ "protobuf",
  "snforge_std",
  "starknet_ibc_core",
  "starknet_ibc_testkit",
@@ -187,6 +189,7 @@ dependencies = [
  "alexandria_numeric",
  "ics23",
  "openzeppelin_testing",
+ "protobuf",
  "serde_json",
  "snforge_std",
  "starknet_ibc_testkit",
@@ -197,10 +200,12 @@ dependencies = [
 name = "starknet_ibc_testkit"
 version = "0.1.0"
 dependencies = [
+ "ics23",
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",
  "openzeppelin_utils",
+ "protobuf",
  "serde_json",
  "snforge_std",
  "starknet_ibc_apps",

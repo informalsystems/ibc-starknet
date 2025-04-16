@@ -15,6 +15,7 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientP
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use ibc::core::commitment_types::specs::ProofSpecs;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
@@ -74,6 +75,7 @@ where
             max_clock_drift: payload.client_state.max_clock_drift,
             status: ClientStatus::Active,
             chain_id: payload.client_state.chain_id,
+            proof_specs: ProofSpecs::cosmos(),
         };
 
         let consensus_state = CometConsensusState {

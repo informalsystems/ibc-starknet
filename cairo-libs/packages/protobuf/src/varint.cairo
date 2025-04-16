@@ -19,10 +19,10 @@ pub fn encode_varint_to_u8_array(value: u32) -> Array<u8> {
 }
 
 #[inline]
-pub fn encode_varint_to_byte_array(value: u64) -> ByteArray {
+pub fn encode_varint_to_byte_array(value: u128) -> ByteArray {
     let mut result: ByteArray = "";
     let mut value = value;
-    for _ in 0..10_u32 {
+    for _ in 0..19_u32 {
         if value < 0x80 {
             result.append_byte(value.try_into().unwrap());
             break;
@@ -45,7 +45,7 @@ pub fn decode_varint_from_u8_array(ref bytes: Array<u8>) -> (u64, u32) {
     let mut num_of_read = 0;
     let mut value = 0;
     let mut shift = 1;
-    while num_of_read < 10 {
+    while num_of_read != 10 {
         let byte = bytes.pop_front().unwrap();
         assert(!(num_of_read == 9 && byte > 0x01), ProtobufErrors::OVERFLOWED_VARINT);
 
@@ -67,12 +67,11 @@ pub fn decode_varint_from_u8_array(ref bytes: Array<u8>) -> (u64, u32) {
 }
 
 #[inline]
-pub fn decode_varint_from_byte_array(bytes: @ByteArray, ref index: usize) -> Result<u64, felt252> {
-    let mut value: u64 = 0;
-    let mut shift: u64 = 1;
+pub fn decode_varint_from_byte_array(bytes: @ByteArray, ref index: usize) -> Result<u128, felt252> {
+    let mut value: u128 = 0;
+    let mut shift: u128 = 1;
     let mut done = false;
-    while index < bytes.len() {
-        let byte = bytes[index];
+    while let Option::Some(byte) = bytes.at(index) {
         index += 1;
         // 0x7F == 0x0111_1111
         value = value | ((byte & 0x7F).into() * shift);
@@ -88,4 +87,3 @@ pub fn decode_varint_from_byte_array(bytes: @ByteArray, ref index: usize) -> Res
     }
     Result::Ok(value)
 }
-

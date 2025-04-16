@@ -7,8 +7,8 @@ use ics23::tests::data::{
 };
 use ics23::{
     ByteArrayIntoArrayU8, CommitmentProof, ExistenceProof, ExistenceProofImpl, HashOp, InnerOp,
-    LeafOp, LengthOp, Proof, ProofSpec, SliceU32IntoArrayU8, byte_array_to_slice_u32, decode_hex,
-    encode_hex, iavl_spec, smt_spec, tendermint_spec, verify_existence, verify_non_existence,
+    InnerSpec, LeafOp, LengthOp, Proof, ProofSpec, SliceU32IntoArrayU8, decode_hex, encode_hex,
+    iavl_spec, smt_spec, tendermint_spec, verify_existence, verify_membership, verify_non_existence,
 };
 use protobuf::hex::decode as decode_hex_byte_array;
 use protobuf::types::message::ProtoCodecImpl;
@@ -21,17 +21,604 @@ fn encoding_roundtrip_fixture(proof: @ByteArray) {
 }
 
 fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
-    let root = byte_array_to_slice_u32(decode_hex_byte_array(data.root));
     let key = decode_hex_byte_array(data.key).into();
     let value = decode_hex_byte_array(data.value).into();
     let p = ProtoCodecImpl::decode::<CommitmentProof>(@decode_hex_byte_array(data.proof)).unwrap();
     match p.proof {
-        Proof::Exist(p) => { verify_existence(spec, @p, @root, @key, @value); },
+        Proof::Exist(p) => { verify_existence(spec, @p, @key, @value); },
         Proof::NonExist(p) => {
             assert(value.len() == 0, 'value must not exist');
-            verify_non_existence(spec, @p, @root, key);
+            verify_non_existence(spec, @p, key);
         },
     };
+}
+#[cairofmt::skip]
+fn get_verification_params() -> (
+    Array<ProofSpec>, Array<Proof>, [u32; 8], Array<Array<u8>>, Array<u8>, u32,
+) {
+    let specs = array![
+        ProofSpec {
+            leaf_spec: LeafOp {
+                hash: HashOp::Sha256(()),
+                prehash_key: HashOp::NoOp(()),
+                prehash_value: HashOp::Sha256(()),
+                length: LengthOp::VarProto(()),
+                prefix: array![0],
+            },
+            inner_spec: InnerSpec {
+                child_order: array![0, 1],
+                child_size: 33,
+                min_prefix_length: 4,
+                max_prefix_length: 12,
+                empty_child: array![],
+                hash: HashOp::Sha256(()),
+            },
+            max_depth: 0,
+            min_depth: 0,
+            prehash_key_before_comparison: false,
+        },
+        ProofSpec {
+            leaf_spec: LeafOp {
+                hash: HashOp::Sha256(()),
+                prehash_key: HashOp::NoOp(()),
+                prehash_value: HashOp::Sha256(()),
+                length: LengthOp::VarProto(()),
+                prefix: array![0],
+            },
+            inner_spec: InnerSpec {
+                child_order: array![0, 1],
+                child_size: 32,
+                min_prefix_length: 1,
+                max_prefix_length: 1,
+                empty_child: array![],
+                hash: HashOp::Sha256(()),
+            },
+            max_depth: 0,
+            min_depth: 0,
+            prehash_key_before_comparison: false,
+        },
+    ];
+    let proofs = array![
+        Proof::Exist(
+            ExistenceProof {
+                key: array![
+                    99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 115, 47, 99, 111, 110, 110, 101,
+                    99, 116, 105, 111, 110, 45, 48,
+                ],
+                value: array![
+                    10, 9, 48, 56, 45, 119, 97, 115, 109, 45, 48, 18, 35, 10, 1, 49, 18, 13, 79, 82,
+                    68, 69, 82, 95, 79, 82, 68, 69, 82, 69, 68, 18, 15, 79, 82, 68, 69, 82, 95, 85,
+                    78, 79, 82, 68, 69, 82, 69, 68, 24, 2, 34, 38, 10, 15, 48, 55, 45, 116, 101,
+                    110, 100, 101, 114, 109, 105, 110, 116, 45, 48, 18, 12, 99, 111, 110, 110, 101,
+                    99, 116, 105, 111, 110, 45, 48, 26, 5, 10, 3, 105, 98, 99,
+                ],
+                leaf: LeafOp {
+                    hash: HashOp::Sha256(()),
+                    prehash_key: HashOp::NoOp(()),
+                    prehash_value: HashOp::Sha256(()),
+                    length: LengthOp::VarProto(()),
+                    prefix: array![0, 2, 46],
+                },
+                path: array![
+                    InnerOp {
+                        hash: HashOp::Sha256(()),
+                        prefix: array![
+                            2, 4, 46, 32, 103, 183, 108, 123, 130, 214, 14, 190, 231, 244, 29, 209,
+                            26, 2, 83, 76, 26, 22, 239, 167, 12, 33, 115, 16, 53, 98, 48, 223, 213,
+                            173, 12, 32, 32,
+                        ],
+                        suffix: array![],
+                    },
+                    InnerOp {
+                        hash: HashOp::Sha256(()),
+                        prefix: array![
+                            4, 6, 46, 32, 155, 127, 121, 48, 181, 210, 25, 89, 222, 215, 112, 146,
+                            120, 123, 181, 30, 146, 159, 147, 70, 86, 149, 69, 29, 33, 171, 67, 123,
+                            70, 137, 11, 173, 32,
+                        ],
+                        suffix: array![],
+                    },
+                    InnerOp {
+                        hash: HashOp::Sha256(()),
+                        prefix: array![6, 14, 46, 32],
+                        suffix: array![
+                            32, 124, 169, 233, 205, 245, 0, 82, 237, 24, 14, 214, 193, 249, 20, 143,
+                            122, 107, 210, 130, 74, 150, 247, 170, 183, 63, 155, 117, 246, 214, 193,
+                            148, 151,
+                        ],
+                    },
+                    InnerOp {
+                        hash: HashOp::Sha256(()),
+                        prefix: array![
+                            10, 38, 46, 32, 23, 238, 211, 143, 159, 173, 21, 243, 33, 61, 211, 217,
+                            135, 232, 86, 99, 134, 121, 220, 133, 131, 238, 81, 170, 53, 159, 111,
+                            231, 2, 91, 173, 47, 32,
+                        ],
+                        suffix: array![],
+                    },
+                ],
+            },
+        ),
+        Proof::Exist(
+            ExistenceProof {
+                key: array![105, 98, 99],
+                value: array![
+                    169, 198, 253, 254, 219, 184, 1, 9, 160, 106, 211, 180, 41, 135, 1, 25, 160,
+                    130, 234, 77, 75, 205, 210, 181, 177, 76, 244, 57, 149, 186, 236, 217,
+                ],
+                leaf: LeafOp {
+                    hash: HashOp::Sha256(()),
+                    prehash_key: HashOp::NoOp(()),
+                    prehash_value: HashOp::Sha256(()),
+                    length: LengthOp::VarProto(()),
+                    prefix: array![0],
+                },
+                path: array![
+                    InnerOp {
+                        hash: HashOp::Sha256(()),
+                        prefix: array![
+                            1, 78, 29, 92, 86, 59, 13, 176, 255, 220, 186, 111, 201, 125, 192, 199,
+                            177, 59, 91, 92, 156, 52, 19, 87, 240, 136, 39, 86, 80, 71, 214, 198,
+                            185,
+                        ],
+                        suffix: array![],
+                    },
+                    InnerOp {
+                        hash: HashOp::Sha256(()),
+                        prefix: array![1],
+                        suffix: array![
+                            16, 43, 226, 80, 158, 2, 200, 133, 199, 73, 61, 110, 15, 162, 121, 43,
+                            8, 222, 107, 204, 113, 87, 112, 127, 57, 243, 145, 99, 246, 230, 142,
+                            253,
+                        ],
+                    },
+                    InnerOp {
+                        hash: HashOp::Sha256(()),
+                        prefix: array![1],
+                        suffix: array![
+                            130, 76, 240, 0, 5, 140, 189, 39, 186, 172, 69, 106, 251, 34, 190, 12,
+                            16, 24, 114, 62, 217, 153, 0, 119, 84, 197, 71, 45, 252, 187, 4, 23,
+                        ],
+                    },
+                    InnerOp {
+                        hash: HashOp::Sha256(()),
+                        prefix: array![1],
+                        suffix: array![
+                            147, 244, 66, 247, 144, 61, 183, 57, 85, 166, 4, 88, 91, 228, 197, 2,
+                            231, 156, 184, 227, 124, 191, 42, 127, 158, 80, 133, 223, 14, 211, 139,
+                            72,
+                        ],
+                    },
+                    InnerOp {
+                        hash: HashOp::Sha256(()),
+                        prefix: array![
+                            1, 146, 81, 36, 89, 158, 30, 171, 81, 161, 148, 14, 251, 50, 118, 234,
+                            138, 243, 17, 239, 59, 249, 53, 115, 195, 183, 222, 46, 54, 28, 20, 246,
+                            26,
+                        ],
+                        suffix: array![],
+                    },
+                    InnerOp {
+                        hash: HashOp::Sha256(()),
+                        prefix: array![1],
+                        suffix: array![
+                            180, 165, 124, 40, 174, 123, 121, 90, 64, 198, 11, 147, 199, 151, 209,
+                            216, 178, 47, 109, 111, 10, 240, 101, 212, 194, 186, 183, 100, 23, 62,
+                            42, 201,
+                        ],
+                    },
+                ],
+            },
+        ),
+    ];
+    let root: [u32; 8] = [
+        1873810883, 3319552262, 2244397051, 3941308800, 3095490340, 3765148856, 684595155,
+        1885881727,
+    ];
+    let keys = array![
+        array![105, 98, 99],
+        array![
+            99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 115, 47, 99, 111, 110, 110, 101, 99,
+            116, 105, 111, 110, 45, 48,
+        ],
+    ];
+    let value: Array<u8> = array![
+        10, 9, 48, 56, 45, 119, 97, 115, 109, 45, 48, 18, 35, 10, 1, 49, 18, 13, 79, 82, 68, 69, 82,
+        95, 79, 82, 68, 69, 82, 69, 68, 18, 15, 79, 82, 68, 69, 82, 95, 85, 78, 79, 82, 68, 69, 82,
+        69, 68, 24, 2, 34, 38, 10, 15, 48, 55, 45, 116, 101, 110, 100, 101, 114, 109, 105, 110, 116,
+        45, 48, 18, 12, 99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 45, 48, 26, 5, 10, 3, 105,
+        98, 99,
+    ];
+    let index = 0;
+    (specs, proofs, root, keys, value, index)
+}
+#[cairofmt::skip]
+#[test]
+fn test_channel_ack_verification_verify_existence_1() {
+    let spec = ProofSpec {
+        leaf_spec: LeafOp {
+            hash: HashOp::Sha256(()),
+            prehash_key: HashOp::NoOp(()),
+            prehash_value: HashOp::Sha256(()),
+            length: LengthOp::VarProto(()),
+            prefix: array![0],
+        },
+        inner_spec: InnerSpec {
+            child_order: array![0, 1],
+            child_size: 33,
+            min_prefix_length: 4,
+            max_prefix_length: 12,
+            empty_child: array![],
+            hash: HashOp::Sha256(()),
+        },
+        max_depth: 0,
+        min_depth: 0,
+        prehash_key_before_comparison: false,
+    };
+    let proof = ExistenceProof {
+        key: array![
+            99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 115, 47, 99, 111, 110, 110, 101, 99,
+            116, 105, 111, 110, 45, 48,
+        ],
+        value: array![
+            10, 9, 48, 56, 45, 119, 97, 115, 109, 45, 48, 18, 35, 10, 1, 49, 18, 13, 79, 82, 68, 69,
+            82, 95, 79, 82, 68, 69, 82, 69, 68, 18, 15, 79, 82, 68, 69, 82, 95, 85, 78, 79, 82, 68,
+            69, 82, 69, 68, 24, 2, 34, 38, 10, 15, 48, 55, 45, 116, 101, 110, 100, 101, 114, 109,
+            105, 110, 116, 45, 48, 18, 12, 99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 45, 48,
+            26, 5, 10, 3, 105, 98, 99,
+        ],
+        leaf: LeafOp {
+            hash: HashOp::Sha256(()),
+            prehash_key: HashOp::NoOp(()),
+            prehash_value: HashOp::Sha256(()),
+            length: LengthOp::VarProto(()),
+            prefix: array![0, 2, 46],
+        },
+        path: array![
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![
+                    2, 4, 46, 32, 103, 183, 108, 123, 130, 214, 14, 190, 231, 244, 29, 209, 26, 2,
+                    83, 76, 26, 22, 239, 167, 12, 33, 115, 16, 53, 98, 48, 223, 213, 173, 12, 32,
+                    32,
+                ],
+                suffix: array![],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![
+                    4, 6, 46, 32, 155, 127, 121, 48, 181, 210, 25, 89, 222, 215, 112, 146, 120, 123,
+                    181, 30, 146, 159, 147, 70, 86, 149, 69, 29, 33, 171, 67, 123, 70, 137, 11, 173,
+                    32,
+                ],
+                suffix: array![],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![6, 14, 46, 32],
+                suffix: array![
+                    32, 124, 169, 233, 205, 245, 0, 82, 237, 24, 14, 214, 193, 249, 20, 143, 122,
+                    107, 210, 130, 74, 150, 247, 170, 183, 63, 155, 117, 246, 214, 193, 148, 151,
+                ],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![
+                    10, 38, 46, 32, 23, 238, 211, 143, 159, 173, 21, 243, 33, 61, 211, 217, 135,
+                    232, 86, 99, 134, 121, 220, 133, 131, 238, 81, 170, 53, 159, 111, 231, 2, 91,
+                    173, 47, 32,
+                ],
+                suffix: array![],
+            },
+        ],
+    };
+    let key = array![
+        99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 115, 47, 99, 111, 110, 110, 101, 99, 116,
+        105, 111, 110, 45, 48,
+    ];
+    let subvalue = array![
+        10, 9, 48, 56, 45, 119, 97, 115, 109, 45, 48, 18, 35, 10, 1, 49, 18, 13, 79, 82, 68, 69, 82,
+        95, 79, 82, 68, 69, 82, 69, 68, 18, 15, 79, 82, 68, 69, 82, 95, 85, 78, 79, 82, 68, 69, 82,
+        69, 68, 24, 2, 34, 38, 10, 15, 48, 55, 45, 116, 101, 110, 100, 101, 114, 109, 105, 110, 116,
+        45, 48, 18, 12, 99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 45, 48, 26, 5, 10, 3, 105,
+        98, 99,
+    ];
+
+    verify_existence(@spec, @proof, @key, @subvalue);
+}
+#[cairofmt::skip]
+#[test]
+fn test_channel_ack_verification_verify_existence_2() {
+    let spec = ProofSpec {
+        leaf_spec: LeafOp {
+            hash: HashOp::Sha256(()),
+            prehash_key: HashOp::NoOp(()),
+            prehash_value: HashOp::Sha256(()),
+            length: LengthOp::VarProto(()),
+            prefix: array![0],
+        },
+        inner_spec: InnerSpec {
+            child_order: array![0, 1],
+            child_size: 32,
+            min_prefix_length: 1,
+            max_prefix_length: 1,
+            empty_child: array![],
+            hash: HashOp::Sha256(()),
+        },
+        max_depth: 0,
+        min_depth: 0,
+        prehash_key_before_comparison: false,
+    };
+    let proof = ExistenceProof {
+        key: array![105, 98, 99],
+        value: array![
+            169, 198, 253, 254, 219, 184, 1, 9, 160, 106, 211, 180, 41, 135, 1, 25, 160, 130, 234,
+            77, 75, 205, 210, 181, 177, 76, 244, 57, 149, 186, 236, 217,
+        ],
+        leaf: LeafOp {
+            hash: HashOp::Sha256(()),
+            prehash_key: HashOp::NoOp(()),
+            prehash_value: HashOp::Sha256(()),
+            length: LengthOp::VarProto(()),
+            prefix: array![0],
+        },
+        path: array![
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![
+                    1, 78, 29, 92, 86, 59, 13, 176, 255, 220, 186, 111, 201, 125, 192, 199, 177, 59,
+                    91, 92, 156, 52, 19, 87, 240, 136, 39, 86, 80, 71, 214, 198, 185,
+                ],
+                suffix: array![],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![1],
+                suffix: array![
+                    16, 43, 226, 80, 158, 2, 200, 133, 199, 73, 61, 110, 15, 162, 121, 43, 8, 222,
+                    107, 204, 113, 87, 112, 127, 57, 243, 145, 99, 246, 230, 142, 253,
+                ],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![1],
+                suffix: array![
+                    130, 76, 240, 0, 5, 140, 189, 39, 186, 172, 69, 106, 251, 34, 190, 12, 16, 24,
+                    114, 62, 217, 153, 0, 119, 84, 197, 71, 45, 252, 187, 4, 23,
+                ],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![1],
+                suffix: array![
+                    147, 244, 66, 247, 144, 61, 183, 57, 85, 166, 4, 88, 91, 228, 197, 2, 231, 156,
+                    184, 227, 124, 191, 42, 127, 158, 80, 133, 223, 14, 211, 139, 72,
+                ],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![
+                    1, 146, 81, 36, 89, 158, 30, 171, 81, 161, 148, 14, 251, 50, 118, 234, 138, 243,
+                    17, 239, 59, 249, 53, 115, 195, 183, 222, 46, 54, 28, 20, 246, 26,
+                ],
+                suffix: array![],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![1],
+                suffix: array![
+                    180, 165, 124, 40, 174, 123, 121, 90, 64, 198, 11, 147, 199, 151, 209, 216, 178,
+                    47, 109, 111, 10, 240, 101, 212, 194, 186, 183, 100, 23, 62, 42, 201,
+                ],
+            },
+        ],
+    };
+    let key = array![105, 98, 99];
+    let subvalue = array![
+        169, 198, 253, 254, 219, 184, 1, 9, 160, 106, 211, 180, 41, 135, 1, 25, 160, 130, 234, 77,
+        75, 205, 210, 181, 177, 76, 244, 57, 149, 186, 236, 217,
+    ];
+
+    verify_existence(@spec, @proof, @key, @subvalue);
+}
+#[cairofmt::skip]
+#[test]
+fn test_channel_ack_verification_calculate_root_for_spec_1() {
+    let spec = ProofSpec {
+        leaf_spec: LeafOp {
+            hash: HashOp::Sha256(()),
+            prehash_key: HashOp::NoOp(()),
+            prehash_value: HashOp::Sha256(()),
+            length: LengthOp::VarProto(()),
+            prefix: array![0],
+        },
+        inner_spec: InnerSpec {
+            child_order: array![0, 1],
+            child_size: 33,
+            min_prefix_length: 4,
+            max_prefix_length: 12,
+            empty_child: array![],
+            hash: HashOp::Sha256(()),
+        },
+        max_depth: 0,
+        min_depth: 0,
+        prehash_key_before_comparison: false,
+    };
+    let proof = ExistenceProof {
+        key: array![
+            99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 115, 47, 99, 111, 110, 110, 101, 99,
+            116, 105, 111, 110, 45, 48,
+        ],
+        value: array![
+            10, 9, 48, 56, 45, 119, 97, 115, 109, 45, 48, 18, 35, 10, 1, 49, 18, 13, 79, 82, 68, 69,
+            82, 95, 79, 82, 68, 69, 82, 69, 68, 18, 15, 79, 82, 68, 69, 82, 95, 85, 78, 79, 82, 68,
+            69, 82, 69, 68, 24, 2, 34, 38, 10, 15, 48, 55, 45, 116, 101, 110, 100, 101, 114, 109,
+            105, 110, 116, 45, 48, 18, 12, 99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 45, 48,
+            26, 5, 10, 3, 105, 98, 99,
+        ],
+        leaf: LeafOp {
+            hash: HashOp::Sha256(()),
+            prehash_key: HashOp::NoOp(()),
+            prehash_value: HashOp::Sha256(()),
+            length: LengthOp::VarProto(()),
+            prefix: array![0, 2, 46],
+        },
+        path: array![
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![
+                    2, 4, 46, 32, 103, 183, 108, 123, 130, 214, 14, 190, 231, 244, 29, 209, 26, 2,
+                    83, 76, 26, 22, 239, 167, 12, 33, 115, 16, 53, 98, 48, 223, 213, 173, 12, 32,
+                    32,
+                ],
+                suffix: array![],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![
+                    4, 6, 46, 32, 155, 127, 121, 48, 181, 210, 25, 89, 222, 215, 112, 146, 120, 123,
+                    181, 30, 146, 159, 147, 70, 86, 149, 69, 29, 33, 171, 67, 123, 70, 137, 11, 173,
+                    32,
+                ],
+                suffix: array![],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![6, 14, 46, 32],
+                suffix: array![
+                    32, 124, 169, 233, 205, 245, 0, 82, 237, 24, 14, 214, 193, 249, 20, 143, 122,
+                    107, 210, 130, 74, 150, 247, 170, 183, 63, 155, 117, 246, 214, 193, 148, 151,
+                ],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![
+                    10, 38, 46, 32, 23, 238, 211, 143, 159, 173, 21, 243, 33, 61, 211, 217, 135,
+                    232, 86, 99, 134, 121, 220, 133, 131, 238, 81, 170, 53, 159, 111, 231, 2, 91,
+                    173, 47, 32,
+                ],
+                suffix: array![],
+            },
+        ],
+    };
+
+    proof.calculate_root_for_spec(Option::Some(@spec));
+}
+#[cairofmt::skip]
+#[test]
+fn test_channel_ack_verification_calculate_root_for_spec_2() {
+    let spec = ProofSpec {
+        leaf_spec: LeafOp {
+            hash: HashOp::Sha256(()),
+            prehash_key: HashOp::NoOp(()),
+            prehash_value: HashOp::Sha256(()),
+            length: LengthOp::VarProto(()),
+            prefix: array![0],
+        },
+        inner_spec: InnerSpec {
+            child_order: array![0, 1],
+            child_size: 32,
+            min_prefix_length: 1,
+            max_prefix_length: 1,
+            empty_child: array![],
+            hash: HashOp::Sha256(()),
+        },
+        max_depth: 0,
+        min_depth: 0,
+        prehash_key_before_comparison: false,
+    };
+    let proof = ExistenceProof {
+        key: array![105, 98, 99],
+        value: array![
+            169, 198, 253, 254, 219, 184, 1, 9, 160, 106, 211, 180, 41, 135, 1, 25, 160, 130, 234,
+            77, 75, 205, 210, 181, 177, 76, 244, 57, 149, 186, 236, 217,
+        ],
+        leaf: LeafOp {
+            hash: HashOp::Sha256(()),
+            prehash_key: HashOp::NoOp(()),
+            prehash_value: HashOp::Sha256(()),
+            length: LengthOp::VarProto(()),
+            prefix: array![0],
+        },
+        path: array![
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![
+                    1, 78, 29, 92, 86, 59, 13, 176, 255, 220, 186, 111, 201, 125, 192, 199, 177, 59,
+                    91, 92, 156, 52, 19, 87, 240, 136, 39, 86, 80, 71, 214, 198, 185,
+                ],
+                suffix: array![],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![1],
+                suffix: array![
+                    16, 43, 226, 80, 158, 2, 200, 133, 199, 73, 61, 110, 15, 162, 121, 43, 8, 222,
+                    107, 204, 113, 87, 112, 127, 57, 243, 145, 99, 246, 230, 142, 253,
+                ],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![1],
+                suffix: array![
+                    130, 76, 240, 0, 5, 140, 189, 39, 186, 172, 69, 106, 251, 34, 190, 12, 16, 24,
+                    114, 62, 217, 153, 0, 119, 84, 197, 71, 45, 252, 187, 4, 23,
+                ],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![1],
+                suffix: array![
+                    147, 244, 66, 247, 144, 61, 183, 57, 85, 166, 4, 88, 91, 228, 197, 2, 231, 156,
+                    184, 227, 124, 191, 42, 127, 158, 80, 133, 223, 14, 211, 139, 72,
+                ],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![
+                    1, 146, 81, 36, 89, 158, 30, 171, 81, 161, 148, 14, 251, 50, 118, 234, 138, 243,
+                    17, 239, 59, 249, 53, 115, 195, 183, 222, 46, 54, 28, 20, 246, 26,
+                ],
+                suffix: array![],
+            },
+            InnerOp {
+                hash: HashOp::Sha256(()),
+                prefix: array![1],
+                suffix: array![
+                    180, 165, 124, 40, 174, 123, 121, 90, 64, 198, 11, 147, 199, 151, 209, 216, 178,
+                    47, 109, 111, 10, 240, 101, 212, 194, 186, 183, 100, 23, 62, 42, 201,
+                ],
+            },
+        ],
+    };
+
+    proof.calculate_root_for_spec(Option::Some(@spec));
+}
+
+#[test]
+fn test_channel_ack_verification_while_loop() {
+    let (specs, proofs, _, keys, value, index) = get_verification_params();
+
+    let proofs_len = proofs.len();
+    let mut subroot = [0; 8];
+    let mut subvalue = value;
+    let mut i = index;
+    while i != proofs_len {
+        if let Proof::Exist(p) = proofs[i] {
+            let spec = specs[i];
+            subroot = p.calculate_root_for_spec(Option::Some(spec));
+            verify_existence(spec, p, keys[proofs_len - 1 - i], @subvalue);
+        }
+        subvalue = subroot.into();
+        i += 1;
+    }
+}
+
+#[test]
+fn test_channel_ack_verificaion() {
+    let (specs, proofs, root, keys, value, index) = get_verification_params();
+
+    verify_membership(specs, @proofs, root, keys, value, index);
 }
 
 #[test]

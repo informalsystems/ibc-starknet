@@ -29,7 +29,9 @@ mod preset {
         EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
     };
     use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent;
+    use ibc::core::commitment_types::specs::ProofSpecs;
     use ibc::core::host::types::identifiers::ChainId;
+    use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
     use starknet::core::types::{Felt, U256};
 
     use crate::impls::types::address::StarknetAddress;
@@ -42,7 +44,10 @@ mod preset {
         ConnectionCounterparty, ConnectionEnd, ConnectionId, ConnectionState,
         EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionState, EncodeDuration,
     };
-    use crate::types::cosmos::client_state::{ClientStatus, CometClientState};
+    use crate::types::cosmos::client_state::{
+        ClientStatus, CometClientState, EncodeInnerSpec, EncodeLeafOp, EncodeProofSpec,
+        EncodeProofSpecs,
+    };
     use crate::types::cosmos::consensus_state::CometConsensusState;
     use crate::types::cosmos::height::{EncodeHeight, Height};
     use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
@@ -118,9 +123,14 @@ mod preset {
             (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
             (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
             (ViaCairo, ChannelEnd): EncodeChannelEnd,
+            (ViaCairo, InnerSpec): EncodeInnerSpec,
+            (ViaCairo, LeafOp): EncodeLeafOp,
+            (ViaCairo, ProofSpec): EncodeProofSpec,
+            (ViaCairo, ProofSpecs): EncodeProofSpecs,
             [
                 (ViaCairo, Vec<Sequence>),
                 (ViaCairo, Vec<TracePrefix>),
+                (ViaCairo, Vec<ProofSpec>),
             ]: EncodeList,
             [
                 (ViaCairo, ChainId),
