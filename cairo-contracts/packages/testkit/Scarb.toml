@@ -22,25 +22,23 @@ scarb = { workspace = true }
 
 [dependencies]
 # external dependencies
+snforge_std          = { workspace = true }
 openzeppelin_access  = { workspace = true }
 openzeppelin_testing = { workspace = true }
 openzeppelin_utils   = { workspace = true }
 openzeppelin_token   = { workspace = true }
 starknet             = { workspace = true }
 
-# internal dependencies
-ics23    = { workspace = true }
-protobuf = { workspace = true }
-
 # ibc dependencies
 starknet_ibc_core    = { workspace = true }
 starknet_ibc_clients = { workspace = true }
 starknet_ibc_apps    = { workspace = true }
 
-cometbft = { workspace = true }
-
-serde_json  = { workspace = true }
-snforge_std = { workspace = true }
+# internal dependencies
+cometbft   = { workspace = true }
+ics23      = { workspace = true }
+protobuf   = { workspace = true }
+serde_json = { workspace = true }
 
 [[target.starknet-contract]]
 allowed-libfuncs-list.name = "experimental"
