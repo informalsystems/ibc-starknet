@@ -147,11 +147,11 @@ fn test_verify_commit_hash() {
 
     let expected_hash_array = {
         let mut ar = array![];
-        let mut i = 0;
 
-        while i < expected_hash.len() {
-            ar.append(expected_hash[i]);
-            i += 1;
+        let mut expected_hash_iter = expected_hash.into_iter();
+
+        while let Option::Some(hash) = expected_hash_iter.next() {
+            ar.append(hash);
         }
 
         ar

@@ -1,13 +1,8 @@
 #[starknet::component]
-pub mod CometClientComponent {
+pub mod MockClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
     use alexandria_sorting::MergeSort;
     use core::num::traits::Zero;
-    use ics23::{
-        MerkleProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
-        verify_membership as ics23_verify_membership,
-        verify_non_membership as ics23_verify_non_membership,
-    };
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
     use protobuf::types::message::ProtoCodecImpl;
@@ -16,15 +11,15 @@ pub mod CometClientComponent {
         StoragePointerWriteAccess,
     };
     use starknet::{ContractAddress, get_block_number, get_block_timestamp, get_caller_address};
-    use starknet_ibc_clients::cometbft::{
-        CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
-        CometConsensusStateZero, CometErrors, CometHeader, CometHeaderImpl,
+    use starknet_ibc_clients::mock::{
+        MockClientState, MockClientStateImpl, MockConsensusState, MockConsensusStateImpl,
+        MockErrors, MockHeader, MockHeaderImpl,
     };
     use starknet_ibc_core::client::{
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
         IClientHandler, IClientQuery, IClientStateExecution, IClientStateValidation,
         MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient, Status, StatusTrait,
-        StoreHeightArray, Timestamp, TimestampImpl, UpdateResponse,
+        StoreHeightArray, Timestamp, UpdateResponse,
     };
     use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
     use starknet_ibc_core::host::ClientIdImpl;
@@ -34,8 +29,8 @@ pub mod CometClientComponent {
     pub struct Storage {
         next_client_sequence: u64,
         update_heights: Map<u64, Array<Height>>,
-        client_states: Map<u64, CometClientState>,
-        consensus_states: Map<(u64, Height), CometConsensusState>,
+        client_states: Map<u64, MockClientState>,
+        consensus_states: Map<(u64, Height), MockConsensusState>,
         client_processed_times: Map<(u64, Height), u64>,
         client_processed_heights: Map<(u64, Height), u64>,
     }
@@ -48,7 +43,7 @@ pub mod CometClientComponent {
     // IClientHandler
     // -----------------------------------------------------------
 
-    #[embeddable_as(CometClientHandler)]
+    #[embeddable_as(MockClientHandler)]
     impl ClientHandlerImpl<
         TContractState,
         +HasComponent<TContractState>,
@@ -74,8 +69,6 @@ pub mod CometClientComponent {
 
         fn recover_client(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
             self.assert_owner();
-            self.recover_validate(msg.clone());
-            self.recover_execute(msg)
         }
 
         fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
@@ -87,7 +80,7 @@ pub mod CometClientComponent {
     // IClientQuery
     // -----------------------------------------------------------
 
-    #[embeddable_as(CometClientQuery)]
+    #[embeddable_as(MockClientQuery)]
     impl ClientQueryImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of IClientQuery<ComponentState<TContractState>> {
@@ -96,9 +89,9 @@ pub mod CometClientComponent {
         }
 
         fn latest_height(self: @ComponentState<TContractState>, client_sequence: u64) -> Height {
-            let comet_client_state: CometClientState = self.read_client_state(client_sequence);
+            let mock_client_state: MockClientState = self.read_client_state(client_sequence);
 
-            comet_client_state.latest_height
+            mock_client_state.latest_height
         }
 
         fn update_height_before(
@@ -108,7 +101,7 @@ pub mod CometClientComponent {
 
             let mut len = update_heights.len();
 
-            assert(len > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
+            assert(len > 0, MockErrors::ZERO_UPDATE_HEIGHTS);
 
             let mut height = target_height;
 
@@ -135,12 +128,12 @@ pub mod CometClientComponent {
         }
 
         fn status(self: @ComponentState<TContractState>, client_sequence: u64) -> Status {
-            let comet_client_state: CometClientState = self.read_client_state(client_sequence);
+            let mock_client_state: MockClientState = self.read_client_state(client_sequence);
 
             let latest_consensus_state = self
-                .read_consensus_state(client_sequence, comet_client_state.latest_height.clone());
+                .read_consensus_state(client_sequence, mock_client_state.latest_height.clone());
 
-            self._status(comet_client_state, latest_consensus_state, client_sequence)
+            self._status(mock_client_state, latest_consensus_state, client_sequence)
         }
 
         fn client_state(
@@ -183,17 +176,17 @@ pub mod CometClientComponent {
         ) {
             msg.validate_basic();
 
-            assert(msg.client_type == @self.client_type(), CometErrors::INVALID_CLIENT_TYPE);
+            assert(msg.client_type == @self.client_type(), MockErrors::INVALID_CLIENT_TYPE);
 
-            let comet_client_state = CometClientStateImpl::deserialize(msg.client_state.clone());
+            let mock_client_state = MockClientStateImpl::deserialize(msg.client_state.clone());
 
-            let comet_consensus_state = CometConsensusStateImpl::deserialize(
+            let mock_consensus_state = MockConsensusStateImpl::deserialize(
                 msg.consensus_state.clone(),
             );
 
-            let status = self._status(comet_client_state, comet_consensus_state, client_sequence);
+            let status = self._status(mock_client_state, mock_consensus_state, client_sequence);
 
-            assert(status.is_active(), CometErrors::INACTIVE_CLIENT);
+            assert(status.is_active(), MockErrors::INACTIVE_CLIENT);
         }
 
         fn create_execute(
@@ -211,19 +204,19 @@ pub mod CometClientComponent {
             msg.validate_basic();
 
             assert(
-                msg.client_id.client_type == @self.client_type(), CometErrors::INVALID_CLIENT_TYPE,
+                msg.client_id.client_type == @self.client_type(), MockErrors::INVALID_CLIENT_TYPE,
             );
 
             let client_sequence = *msg.client_id.sequence;
 
-            let comet_client_state: CometClientState = self.read_client_state(client_sequence);
+            let mock_client_state: MockClientState = self.read_client_state(client_sequence);
 
             let latest_consensus_state = self
-                .read_consensus_state(client_sequence, comet_client_state.latest_height.clone());
+                .read_consensus_state(client_sequence, mock_client_state.latest_height.clone());
 
-            let status = self._status(comet_client_state, latest_consensus_state, client_sequence);
+            let status = self._status(mock_client_state, latest_consensus_state, client_sequence);
 
-            assert(status.is_active(), CometErrors::INACTIVE_CLIENT);
+            assert(status.is_active(), MockErrors::INACTIVE_CLIENT);
 
             self.verify_client_message(client_sequence, msg.client_message.clone());
         }
@@ -247,79 +240,9 @@ pub mod CometClientComponent {
     > of RecoverClientTrait<TContractState> {
         fn recover_validate(self: @ComponentState<TContractState>, msg: MsgRecoverClient) {
             msg.validate_basic();
-
-            // TODO: validate signer once assert_owner() has been removed
-
-            let subject_client_sequence = msg.subject_client_id.sequence;
-            let substitute_client_sequence = msg.substitute_client_id.sequence;
-
-            let subject_client_state: CometClientState = self
-                .read_client_state(subject_client_sequence);
-            let substitute_client_state: CometClientState = self
-                .read_client_state(substitute_client_sequence);
-
-            let subject_consensus_state = self
-                .read_consensus_state(
-                    subject_client_sequence, subject_client_state.latest_height.clone(),
-                );
-            let substitute_consensus_state = self
-                .read_consensus_state(
-                    substitute_client_sequence, substitute_client_state.latest_height.clone(),
-                );
-
-            let subject_status = self
-                ._status(
-                    subject_client_state.clone(), subject_consensus_state, subject_client_sequence,
-                );
-            let substitute_status = self
-                ._status(
-                    substitute_client_state.clone(),
-                    substitute_consensus_state,
-                    substitute_client_sequence,
-                );
-
-            assert(
-                subject_client_state.latest_height < substitute_client_state.latest_height,
-                CometErrors::INVALID_CLIENT_SUBSTITUTE,
-            );
-
-            assert(
-                subject_status.is_expired() | subject_status.is_frozen(),
-                CometErrors::ACTIVE_CLIENT,
-            );
-            assert(substitute_status.is_active(), CometErrors::INACTIVE_CLIENT);
-
-            assert(
-                subject_client_state.substitute_client_matches(substitute_client_state),
-                CometErrors::INVALID_CLIENT_SUBSTITUTE,
-            );
         }
 
-        fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
-            let subject_client_sequence = msg.subject_client_id.sequence;
-            let substitute_client_sequence = msg.substitute_client_id.sequence;
-
-            let substitute_client_state: CometClientState = self
-                .read_client_state(substitute_client_sequence);
-
-            let substitute_consensus_state = self
-                .read_consensus_state(
-                    substitute_client_sequence, substitute_client_state.latest_height.clone(),
-                );
-
-            let mut serialised_client_state = array![];
-            let mut serialised_consensus_state = array![];
-            substitute_client_state.serialize(ref serialised_client_state);
-            substitute_consensus_state.serialize(ref serialised_consensus_state);
-
-            self
-                .update_on_recover(
-                    subject_client_sequence,
-                    substitute_client_sequence,
-                    serialised_client_state,
-                    serialised_consensus_state,
-                );
-        }
+        fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {}
     }
 
     #[generate_trait]
@@ -337,7 +260,7 @@ pub mod CometClientComponent {
     // Client Validation/Execution
     // -----------------------------------------------------------
 
-    #[embeddable_as(CometClientValidation)]
+    #[embeddable_as(MockClientValidation)]
     impl ClientValidationImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of IClientStateValidation<ComponentState<TContractState>> {
@@ -348,23 +271,7 @@ pub mod CometClientComponent {
             value: StateValue,
             proof: StateProof,
             root: StateRoot,
-        ) {
-            let byte_array_proof = array_u8_to_byte_array(@proof.proof);
-            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(@byte_array_proof).unwrap();
-            let specs = self.read_client_state(client_sequence).proof_spec;
-            let mut proofs: Array<Proof> = ArrayTrait::new();
-            for proof in decoded_proof.proofs {
-                proofs.append(proof.proof);
-            }
-            let root = root.root;
-            let mut keys = array![];
-            for path in paths {
-                let path_ba = byte_array_to_array_u8(@path);
-                keys.append(path_ba);
-            }
-            let value = value.value;
-            ics23_verify_membership(specs, @proofs, root, keys, value, 0);
-        }
+        ) {}
 
         fn verify_non_membership(
             self: @ComponentState<TContractState>,
@@ -372,22 +279,7 @@ pub mod CometClientComponent {
             paths: Array<ByteArray>,
             proof: StateProof,
             root: StateRoot,
-        ) {
-            let byte_array_proof = array_u8_to_byte_array(@proof.proof);
-            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(@byte_array_proof).unwrap();
-            let specs = self.read_client_state(client_sequence).proof_spec;
-            let mut proofs: Array<Proof> = ArrayTrait::new();
-            for proof in decoded_proof.proofs {
-                proofs.append(proof.proof);
-            }
-            let root = root.root;
-            let mut keys = array![];
-            for path in paths {
-                let path_ba = byte_array_to_array_u8(@path);
-                keys.append(path_ba);
-            }
-            ics23_verify_non_membership(specs, @proofs, root, keys);
-        }
+        ) {}
 
         fn verify_client_message(
             self: @ComponentState<TContractState>,
@@ -417,7 +309,7 @@ pub mod CometClientComponent {
         ) {}
     }
 
-    #[embeddable_as(CometClientExecution)]
+    #[embeddable_as(MockClientExecution)]
     impl ClientExecutionImpl<
         TContractState, +HasComponent<TContractState>, +Drop<TContractState>,
     > of IClientStateExecution<ComponentState<TContractState>> {
@@ -427,27 +319,23 @@ pub mod CometClientComponent {
             client_state: Array<felt252>,
             consensus_state: Array<felt252>,
         ) -> CreateResponse {
-            let comet_client_state = CometClientStateImpl::deserialize(client_state);
+            let mock_client_state = MockClientStateImpl::deserialize(client_state);
 
-            let comet_consensus_state = CometConsensusStateImpl::deserialize(consensus_state);
+            let mock_consensus_state = MockConsensusStateImpl::deserialize(consensus_state);
 
-            let comet_client_state_latest_height = comet_client_state.latest_height.clone();
+            let mock_client_state_latest_height = mock_client_state.latest_height.clone();
 
             self
                 ._update_state(
                     client_sequence,
-                    comet_client_state.latest_height,
-                    comet_client_state,
-                    comet_consensus_state,
-                    get_block_number(),
-                    get_block_timestamp(),
+                    mock_client_state.latest_height,
+                    mock_client_state,
+                    mock_consensus_state,
                 );
-
-            self.write_next_client_sequence(client_sequence + 1);
 
             let client_id = ClientIdImpl::new(self.client_type(), client_sequence);
 
-            CreateResponseImpl::new(client_id, comet_client_state_latest_height)
+            CreateResponseImpl::new(client_id, mock_client_state_latest_height)
         }
 
         fn update_state(
@@ -455,54 +343,22 @@ pub mod CometClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> UpdateResponse {
-            let header: CometHeader = CometHeaderImpl::deserialize(client_message);
+            let header: MockHeader = MockHeaderImpl::deserialize(client_message);
 
             let header_height = header.signed_header.height.clone();
 
-            let update_heights = self.read_update_heights(client_sequence);
-            let mut update_heights_span = update_heights.span();
-
-            let mut client_state = self.read_client_state(client_sequence);
-
-            let mut heights_kept = array![];
-            let mut check_in_progress = true;
-            // Since the Heights are sorted when stored, as soon as we find the first
-            // Height which isn't expired we can stop checking the rest and build
-            // the new Heights array which are kept.
-            while let Option::Some(height) = update_heights_span.pop_front() {
-                if check_in_progress {
-                    let consensus_state = self
-                        .read_consensus_state(client_sequence, height.clone());
-
-                    if consensus_state
-                        .status(client_state.trusting_period, client_state.max_clock_drift)
-                        .is_expired() {
-                        self.remove_consensus_state(client_sequence, height.clone());
-                    } else {
-                        check_in_progress = false;
-                        heights_kept.append(height.clone());
-                    }
-                } else {
-                    heights_kept.append(height.clone());
-                }
-            }
-            // Write directly since heights_kept is already sorted and is equal or
-            // smaller to the previous one
-            self.update_heights.write(client_sequence, heights_kept);
+            // TODO: Implement consensus state pruning mechanism.
 
             if !self.consensus_state_exists(client_sequence, header_height.clone()) {
+                let mut client_state = self.read_client_state(client_sequence);
+
                 client_state.update(header_height.clone());
 
-                let new_consensus_state: CometConsensusState = header.into();
+                let new_consensus_state: MockConsensusState = header.into();
 
                 self
                     ._update_state(
-                        client_sequence,
-                        header_height,
-                        client_state,
-                        new_consensus_state,
-                        get_block_number(),
-                        get_block_timestamp(),
+                        client_sequence, header_height, client_state, new_consensus_state,
                     );
             }
 
@@ -514,7 +370,7 @@ pub mod CometClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> UpdateResponse {
-            let header = CometHeaderImpl::deserialize(client_message);
+            let header = MockHeaderImpl::deserialize(client_message);
 
             let mut client_state = self.read_client_state(client_sequence);
 
@@ -531,42 +387,7 @@ pub mod CometClientComponent {
             substitute_client_sequence: u64,
             substitute_client_state: Array<felt252>,
             substitute_consensus_state: Array<felt252>,
-        ) {
-            let update_heights = self.read_update_heights(subject_client_sequence);
-            assert(update_heights.len() > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
-
-            let mut update_heights_span = update_heights.span();
-
-            while let Option::Some(height) = update_heights_span.pop_front() {
-                self.remove_consensus_state(subject_client_sequence, height.clone());
-            }
-
-            self.update_heights.write(subject_client_sequence, array![]);
-
-            let substitute_client_state = CometClientStateImpl::deserialize(
-                substitute_client_state,
-            );
-            let substitute_consensus_state = CometConsensusStateImpl::deserialize(
-                substitute_consensus_state,
-            );
-
-            let latest_height = substitute_client_state.latest_height.clone();
-
-            let processed_height = self
-                .read_client_processed_height(substitute_client_sequence, latest_height.clone());
-            let processed_time = self
-                .read_client_processed_time(substitute_client_sequence, latest_height.clone());
-
-            self
-                ._update_state(
-                    subject_client_sequence,
-                    substitute_client_state.latest_height,
-                    substitute_client_state,
-                    substitute_consensus_state,
-                    processed_height,
-                    processed_time,
-                );
-        }
+        ) {}
 
         fn update_on_upgrade(
             ref self: ComponentState<TContractState>,
@@ -592,7 +413,7 @@ pub mod CometClientComponent {
         }
 
         fn assert_owner(self: @ComponentState<TContractState>) {
-            assert(self.owner() == get_caller_address(), CometErrors::INVALID_OWNER);
+            assert(self.owner() == get_caller_address(), MockErrors::INVALID_OWNER);
         }
     }
 
@@ -606,8 +427,8 @@ pub mod CometClientComponent {
     > of ClientInternalTrait<TContractState> {
         fn _status(
             self: @ComponentState<TContractState>,
-            client_state: CometClientState,
-            consensus_state: CometConsensusState,
+            client_state: MockClientState,
+            consensus_state: MockConsensusState,
             client_sequence: u64,
         ) -> Status {
             if !client_state.status.is_active() {
@@ -628,23 +449,24 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
             update_height: Height,
-            client_state: CometClientState,
-            consensus_state: CometConsensusState,
-            processed_height: u64,
-            processed_time: u64,
+            client_state: MockClientState,
+            consensus_state: MockConsensusState,
         ) {
             self.write_client_state(client_sequence, client_state);
 
             self.write_update_height(client_sequence, update_height.clone());
 
-            self
-                .write_consensus_state(
-                    client_sequence,
-                    update_height.clone(),
-                    consensus_state,
-                    processed_height,
-                    processed_time,
-                );
+            self.write_consensus_state(client_sequence, update_height.clone(), consensus_state);
+
+            let host_height = get_block_number();
+
+            self.write_client_processed_height(client_sequence, update_height.clone(), host_height);
+
+            let host_timestamp = get_block_timestamp();
+
+            self.write_client_processed_time(client_sequence, update_height, host_timestamp);
+
+            self.write_next_client_sequence(client_sequence + 1);
         }
     }
 
@@ -662,20 +484,20 @@ pub mod CometClientComponent {
 
         fn read_client_state(
             self: @ComponentState<TContractState>, client_sequence: u64,
-        ) -> CometClientState {
+        ) -> MockClientState {
             let client_state = self.client_states.read(client_sequence);
 
-            assert(client_state.is_non_zero(), CometErrors::MISSING_CLIENT_STATE);
+            assert(client_state.is_non_zero(), MockErrors::MISSING_CLIENT_STATE);
 
             client_state
         }
 
         fn read_consensus_state(
             self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
-        ) -> CometConsensusState {
+        ) -> MockConsensusState {
             let consensus_state = self.consensus_states.read((client_sequence, height));
 
-            assert(consensus_state.is_non_zero(), CometErrors::MISSING_CONSENSUS_STATE);
+            assert(consensus_state.is_non_zero(), MockErrors::MISSING_CONSENSUS_STATE);
 
             consensus_state
         }
@@ -688,12 +510,12 @@ pub mod CometClientComponent {
 
         fn read_client_processed_time(
             self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
-        ) -> u64 {
+        ) -> Timestamp {
             let processed_time = self.client_processed_times.read((client_sequence, height));
 
-            assert(processed_time.is_non_zero(), CometErrors::MISSING_CLIENT_PROCESSED_TIME);
+            assert(processed_time.is_non_zero(), MockErrors::MISSING_CLIENT_PROCESSED_TIME);
 
-            processed_time
+            processed_time.into()
         }
 
         fn read_client_processed_height(
@@ -701,7 +523,7 @@ pub mod CometClientComponent {
         ) -> u64 {
             let processed_height = self.client_processed_heights.read((client_sequence, height));
 
-            assert(processed_height.is_non_zero(), CometErrors::MISSING_CLIENT_PROCESSED_HEIGHT);
+            assert(processed_height.is_non_zero(), MockErrors::MISSING_CLIENT_PROCESSED_HEIGHT);
 
             processed_height
         }
@@ -753,7 +575,7 @@ pub mod CometClientComponent {
         fn write_client_state(
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
-            client_state: CometClientState,
+            client_state: MockClientState,
         ) {
             self.client_states.write(client_sequence, client_state);
         }
@@ -762,24 +584,27 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>,
             client_sequence: u64,
             height: Height,
-            consensus_state: CometConsensusState,
-            processed_height: u64,
-            processed_time: u64,
+            consensus_state: MockConsensusState,
         ) {
-            self.consensus_states.write((client_sequence, height.clone()), consensus_state);
-            self
-                .client_processed_heights
-                .write((client_sequence, height.clone()), processed_height);
-            self.client_processed_times.write((client_sequence, height), processed_time);
+            self.consensus_states.write((client_sequence, height), consensus_state);
         }
 
-        fn remove_consensus_state(
-            ref self: ComponentState<TContractState>, client_sequence: u64, height: Height,
+        fn write_client_processed_time(
+            ref self: ComponentState<TContractState>,
+            client_sequence: u64,
+            height: Height,
+            timestamp: u64,
         ) {
-            let consensus_zero = CometConsensusStateZero::zero();
-            self.consensus_states.write((client_sequence, height), consensus_zero);
-            self.client_processed_times.write((client_sequence, height), 0);
-            self.client_processed_heights.write((client_sequence, height), 0);
+            self.client_processed_times.write((client_sequence, height), timestamp);
+        }
+
+        fn write_client_processed_height(
+            ref self: ComponentState<TContractState>,
+            client_sequence: u64,
+            height: Height,
+            host_height: u64,
+        ) {
+            self.client_processed_heights.write((client_sequence, height), host_height);
         }
     }
 }

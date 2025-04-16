@@ -1,3 +1,5 @@
+use ics23::ByteArrayIntoArrayU8;
+use protobuf::types::message::ProtoCodecImpl;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{
     AppVersion, ChannelEnd, ChannelOrdering, ChannelState, Counterparty as ChanCounterparty,
@@ -8,8 +10,6 @@ use starknet_ibc_core::connection::{
     ConnectionEnd, ConnectionState, Counterparty as ConnCounterparty, VersionImpl,
 };
 use starknet_ibc_core::host::{BasePrefix, ChannelId, ClientId, ConnectionId, PortId, Sequence};
-use protobuf::types::message::ProtoCodecImpl;
-use ics23::{ByteArrayIntoArrayU8, CommitmentProof, ExistenceProof, HashOp, LeafOp, LengthOp, byte_array_to_array_u8, Proof};
 
 pub fn HEIGHT(revision_height: u64) -> Height {
     Height { revision_number: 0, revision_height }
@@ -58,7 +58,7 @@ pub fn CONNECTION_END(counterparty_connection_sequence: u64) -> ConnectionEnd {
         counterparty: ConnCounterparty {
             client_id: CLIENT_ID(),
             connection_id: CONNECTION_ID(counterparty_connection_sequence),
-            prefix: BasePrefix { prefix: "" },
+            prefix: BasePrefix { prefix: "ibc" },
         },
         version: VersionImpl::supported(),
         delay_period: DURATION(0),
@@ -94,20 +94,7 @@ pub fn VERSION_PROPOSAL() -> AppVersion {
 }
 
 pub fn STATE_PROOF() -> StateProof {
-    let key: ByteArray = "food";
-    let value: ByteArray = "some longer text";
-    let leaf = LeafOp {
-        hash: HashOp::Sha256,
-        prehash_key: HashOp::NoOp,
-        prehash_value: HashOp::NoOp,
-        length: LengthOp::VarProto,
-        prefix: array![],
-    };
-    let proof = ExistenceProof { key: key.into(), value: value.into(), leaf, path: array![] };
-    let commitment_proof = CommitmentProof { proof: Proof::Exist(proof) };
-    let commitment_proof_serialised = ProtoCodecImpl::encode(@commitment_proof);
-    let commitment_proof_bytes = byte_array_to_array_u8(@commitment_proof_serialised);
-    StateProof { proof: commitment_proof_bytes }
+    StateProof { proof: array![1] }
 }
 
 pub fn STATE_ROOT() -> StateRoot {
@@ -115,5 +102,5 @@ pub fn STATE_ROOT() -> StateRoot {
 }
 
 pub fn IBC_PREFIX() -> BasePrefix {
-    BasePrefix { prefix: "Ibc" }
+    BasePrefix { prefix: "ibc" }
 }

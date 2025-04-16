@@ -1,6 +1,7 @@
 use protobuf::primitives::utils::{
-    decode_2_complement_32, decode_2_complement_64, encode_2_complement_32, encode_2_complement_64,
-    little_endian_to_u64, u64_to_little_endian,
+    decode_2_complement_128, decode_2_complement_32, decode_2_complement_64,
+    encode_2_complement_128, encode_2_complement_32, encode_2_complement_64, little_endian_to_u64,
+    u64_to_little_endian,
 };
 use protobuf::types::message::{
     DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
@@ -8,6 +9,23 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::WireType;
 use protobuf::varint::{decode_varint_from_byte_array, encode_varint_to_byte_array};
+
+pub impl U128AsProtoMessage of ProtoMessage<u128> {
+    fn encode_raw(self: @u128, ref context: EncodeContext) {
+        let num = (*self).into();
+
+        let bytes = encode_varint_to_byte_array(num);
+        context.buffer.append(@bytes);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<u128> {
+        decode_varint_from_byte_array(context.buffer, ref context.index).ok()
+    }
+
+    fn wire_type() -> WireType {
+        WireType::Varint
+    }
+}
 
 pub impl U64AsProtoMessage of ProtoMessage<u64> {
     fn encode_raw(self: @u64, ref context: EncodeContext) {
@@ -18,7 +36,9 @@ pub impl U64AsProtoMessage of ProtoMessage<u64> {
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<u64> {
-        decode_varint_from_byte_array(context.buffer, ref context.index).ok()
+        decode_varint_from_byte_array(context.buffer, ref context.index)
+            .ok()
+            .map(|num| num.try_into().unwrap())
     }
 
     fn wire_type() -> WireType {
@@ -70,6 +90,22 @@ pub impl I64AsProtoMessage of ProtoMessage<i64> {
     fn decode_raw(ref context: DecodeContext) -> Option<i64> {
         let num = decode_raw(ref context)?;
         Option::Some(decode_2_complement_64(@num))
+    }
+
+    fn wire_type() -> WireType {
+        WireType::Varint
+    }
+}
+
+pub impl I128AsProtoMessage of ProtoMessage<i128> {
+    fn encode_raw(self: @i128, ref context: EncodeContext) {
+        let num: u128 = encode_2_complement_128(@(*self).into());
+        num.encode_raw(ref context);
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<i128> {
+        let num = decode_raw(ref context)?;
+        Option::Some(decode_2_complement_128(@num))
     }
 
     fn wire_type() -> WireType {

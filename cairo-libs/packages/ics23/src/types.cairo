@@ -12,6 +12,26 @@ use starknet::SyscallResult;
 use starknet::storage_access::{StorageBaseAddress, Store};
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
+pub struct MerkleProof {
+    pub proofs: Array<CommitmentProof>,
+}
+
+impl MerkleProofAsProtoMessage of ProtoMessage<MerkleProof> {
+    fn encode_raw(self: @MerkleProof, ref context: EncodeContext) {
+        context.encode_repeated_field(1, self.proofs)
+    }
+
+    fn decode_raw(ref context: DecodeContext) -> Option<MerkleProof> {
+        let proofs = context.decode_repeated_field(1)?;
+        Option::Some(MerkleProof { proofs })
+    }
+
+    fn wire_type() -> WireType {
+        WireType::LengthDelimited
+    }
+}
+
+#[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct CommitmentProof {
     pub proof: Proof,
 }
@@ -91,8 +111,11 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
         assert(self.key.len() > 0, ICS23Errors::MISSING_KEY);
         assert(self.value.len() > 0, ICS23Errors::MISSING_VALUE);
         let mut hash = apply_leaf(self.leaf, self.key.clone(), self.value.clone());
-        for i in 0..self.path.len() {
-            hash = apply_inner(self.path[i], hash.into());
+
+        let mut path_span = self.path.span();
+
+        while let Option::Some(path) = path_span.pop_front() {
+            hash = apply_inner(path, hash.into());
             if let Option::Some(s) = spec {
                 // NOTE: Multiplied by 4 since the hash is a u32 array, but the
                 // child size is in u8 bytes.
@@ -335,7 +358,7 @@ pub impl StoreU8Array of Store<Array<u8>> {
             .expect('Storage Span too large');
         offset += 1;
 
-        let exit = len + offset;
+        let exit = Store::<u8>::size() * len + offset;
         loop {
             if offset >= exit {
                 break;
@@ -390,7 +413,7 @@ pub impl StoreU32Array of Store<Array<u32>> {
             .expect('Storage Span too large');
         offset += 1;
 
-        let exit = len + offset;
+        let exit = Store::<u32>::size() * len + offset;
         loop {
             if offset >= exit {
                 break;
