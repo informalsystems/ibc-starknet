@@ -366,8 +366,8 @@ pub mod CometClientComponent {
             let root = root.root;
             let mut keys = array![];
             for path in paths {
-                let path_ba = byte_array_to_array_u8(@path);
-                keys.append(path_ba);
+                let path_bytes = byte_array_to_array_u8(@path);
+                keys.append(path_bytes);
             }
             let value = value.value;
             ics23_verify_membership(specs, @proofs, root, keys, value, 0);
@@ -390,8 +390,8 @@ pub mod CometClientComponent {
             let root = root.root;
             let mut keys = array![];
             for path in paths {
-                let path_ba = byte_array_to_array_u8(@path);
-                keys.append(path_ba);
+                let path_bytes = byte_array_to_array_u8(@path);
+                keys.append(path_bytes);
             }
             ics23_verify_non_membership(specs, @proofs, root, keys);
         }
