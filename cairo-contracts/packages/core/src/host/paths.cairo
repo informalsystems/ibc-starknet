@@ -5,69 +5,101 @@ use starknet_ibc_core::host::{
 };
 use starknet_ibc_utils::{RemotePathBuilder, RemotePathBuilderImpl};
 
-pub fn connection_path(base: BasePrefix, connection_id: ConnectionId) -> ByteArray {
-    let mut builder = RemotePathBuilderImpl::init(base);
-    append_prefix(ref builder, CONNECTIONS_PREFIX());
+pub fn connection_path(base: BasePrefix, connection_id: ConnectionId) -> Array<ByteArray> {
+    let mut paths = array![];
+    let mut builder_prefix = RemotePathBuilderImpl::init(base);
+    let prefix = builder_prefix.path();
+    let mut builder = RemotePathBuilderImpl::init(CONNECTIONS_PREFIX());
     builder.append(connection_id);
-    builder.path()
+    let path = builder.path();
+    paths.append(prefix);
+    paths.append(path);
+    paths
 }
 
-pub fn channel_end_path(base: BasePrefix, port_id: PortId, channel_id: ChannelId) -> ByteArray {
-    let mut builder = RemotePathBuilderImpl::init(base);
-    append_prefix(ref builder, CHANNEL_ENDS_PREFIX());
+pub fn channel_end_path(
+    base: BasePrefix, port_id: PortId, channel_id: ChannelId,
+) -> Array<ByteArray> {
+    let mut paths = array![];
+    let mut builder_prefix = RemotePathBuilderImpl::init(base);
+    let prefix = builder_prefix.path();
+    let mut builder = RemotePathBuilderImpl::init(CHANNEL_ENDS_PREFIX());
     append_port(ref builder, port_id);
     append_channel(ref builder, channel_id);
-    builder.path()
+    let path = builder.path();
+    paths.append(prefix);
+    paths.append(path);
+    paths
 }
 
 /// Constructs the commitment path of the counterparty chain for the given port
 /// ID, channel ID, and sequence.
 pub fn commitment_path(
     base: BasePrefix, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
-) -> ByteArray {
-    let mut builder = RemotePathBuilderImpl::init(base);
-    append_prefix(ref builder, COMMITMENTS_PREFIX());
+) -> Array<ByteArray> {
+    let mut paths = array![];
+    let mut builder_prefix = RemotePathBuilderImpl::init(base);
+    let prefix = builder_prefix.path();
+    let mut builder = RemotePathBuilderImpl::init(COMMITMENTS_PREFIX());
     append_port(ref builder, port_id);
     append_channel(ref builder, channel_id);
     append_sequence(ref builder, sequence);
-    builder.path()
+    let path = builder.path();
+    paths.append(prefix);
+    paths.append(path);
+    paths
 }
 
 /// Constructs the receipt path of the counterparty chain for the given port ID,
 /// channel ID, and sequence.
 pub fn receipt_path(
     base: BasePrefix, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
-) -> ByteArray {
-    let mut builder = RemotePathBuilderImpl::init(base);
-    append_prefix(ref builder, RECEIPTS_PREFIX());
+) -> Array<ByteArray> {
+    let mut paths = array![];
+    let mut builder_prefix = RemotePathBuilderImpl::init(base);
+    let prefix = builder_prefix.path();
+    let mut builder = RemotePathBuilderImpl::init(RECEIPTS_PREFIX());
     append_port(ref builder, port_id);
     append_channel(ref builder, channel_id);
     append_sequence(ref builder, sequence);
-    builder.path()
+    let path = builder.path();
+    paths.append(prefix);
+    paths.append(path);
+    paths
 }
 
 /// Constructs the ack path of the counterparty chain for the given port ID,
 /// channel ID, and sequence.
 pub fn ack_path(
     base: BasePrefix, port_id: PortId, channel_id: ChannelId, sequence: Sequence,
-) -> ByteArray {
-    let mut builder = RemotePathBuilderImpl::init(base);
-    append_prefix(ref builder, ACKS_PREFIX());
+) -> Array<ByteArray> {
+    let mut paths = array![];
+    let mut builder_prefix = RemotePathBuilderImpl::init(base);
+    let prefix = builder_prefix.path();
+    let mut builder = RemotePathBuilderImpl::init(ACKS_PREFIX());
     append_port(ref builder, port_id);
     append_channel(ref builder, channel_id);
     append_sequence(ref builder, sequence);
-    builder.path()
+    let path = builder.path();
+    paths.append(prefix);
+    paths.append(path);
+    paths
 }
 
 /// Constructs the next sequence send path for the given port ID and channel ID.
 pub fn next_sequence_recv_path(
     base: BasePrefix, port_id: PortId, channel_id: ChannelId,
-) -> ByteArray {
-    let mut builder = RemotePathBuilderImpl::init(base);
-    append_prefix(ref builder, NEXT_SEQ_RECV_PREFIX());
+) -> Array<ByteArray> {
+    let mut paths = array![];
+    let mut builder_prefix = RemotePathBuilderImpl::init(base);
+    let prefix = builder_prefix.path();
+    let mut builder = RemotePathBuilderImpl::init(NEXT_SEQ_RECV_PREFIX());
     append_port(ref builder, port_id);
     append_channel(ref builder, channel_id);
-    builder.path()
+    let path = builder.path();
+    paths.append(prefix);
+    paths.append(path);
+    paths
 }
 
 pub fn append_prefix(ref path_builder: RemotePathBuilder, prefix: ByteArray) {
@@ -92,9 +124,38 @@ pub fn append_sequence(ref path_builder: RemotePathBuilder, sequence: Sequence) 
 #[cfg(test)]
 mod tests {
     use starknet_ibc_core::host::{BasePrefixZero, ChannelId, PortId, Sequence};
-    use starknet_ibc_testkit::dummies::IBC_PREFIX;
+    use starknet_ibc_testkit::dummies::{
+        CHANNEL_END, CHANNEL_ID, CONNECTION_END, IBC_PREFIX, PORT_ID, SEQUENCE,
+    };
     use starknet_ibc_utils::RemotePathBuilderImpl;
-    use super::commitment_path;
+    use super::{
+        ack_path, channel_end_path, commitment_path, connection_path, next_sequence_recv_path,
+        receipt_path,
+    };
+
+    #[test]
+    fn test_connection_path() {
+        let connection_end = CONNECTION_END(0);
+
+        let paths = connection_path(
+            connection_end.counterparty.prefix.clone(),
+            connection_end.counterparty.connection_id.clone(),
+        );
+        assert_eq!(paths, array!["ibc", "connections/connection-0"]);
+    }
+
+    #[test]
+    fn test_channel_path() {
+        let connection_end = CONNECTION_END(0);
+        let channel_end = CHANNEL_END(0);
+
+        let paths = channel_end_path(
+            connection_end.counterparty.prefix.clone(),
+            channel_end.remote.port_id.clone(),
+            channel_end.remote.channel_id.clone(),
+        );
+        assert_eq!(paths, array!["ibc", "channelEnds/ports/transfer/channels/channel-0"]);
+    }
 
     #[test]
     fn test_commitment_path() {
@@ -102,12 +163,45 @@ mod tests {
         let channel_id = ChannelId { channel_id: "channel-0" };
         let sequence = Sequence { sequence: 0 };
 
-        let path = commitment_path(
+        let paths = commitment_path(
             BasePrefixZero::zero(), port_id.clone(), channel_id.clone(), sequence.clone(),
         );
-        assert_eq!(path, "commitments/ports/transfer/channels/channel-0/sequences/0");
+        // TODO: what is the expected behaviour if the prefix is empty?
+        assert_eq!(paths, array!["", "commitments/ports/transfer/channels/channel-0/sequences/0"]);
 
-        let path = commitment_path(IBC_PREFIX(), port_id, channel_id, sequence);
-        assert_eq!(path, "Ibc/commitments/ports/transfer/channels/channel-0/sequences/0");
+        let paths = commitment_path(IBC_PREFIX(), port_id, channel_id, sequence);
+        assert_eq!(
+            paths, array!["ibc", "commitments/ports/transfer/channels/channel-0/sequences/0"],
+        );
+    }
+
+    #[test]
+    fn test_receipt_path() {
+        let connection_end = CONNECTION_END(0);
+
+        let paths = receipt_path(
+            connection_end.counterparty.prefix.clone(), PORT_ID(), CHANNEL_ID(1), SEQUENCE(3),
+        );
+        assert_eq!(paths, array!["ibc", "receipts/ports/transfer/channels/channel-1/sequences/3"]);
+    }
+
+    #[test]
+    fn test_ack_path() {
+        let connection_end = CONNECTION_END(0);
+
+        let paths = ack_path(
+            connection_end.counterparty.prefix.clone(), PORT_ID(), CHANNEL_ID(2), SEQUENCE(4),
+        );
+        assert_eq!(paths, array!["ibc", "acks/ports/transfer/channels/channel-2/sequences/4"]);
+    }
+
+    #[test]
+    fn test_next_sequence_recv_path() {
+        let connection_end = CONNECTION_END(0);
+
+        let paths = next_sequence_recv_path(
+            connection_end.counterparty.prefix.clone(), PORT_ID(), CHANNEL_ID(3),
+        );
+        assert_eq!(paths, array!["ibc", "nextSequenceRecv/ports/transfer/channels/channel-3"]);
     }
 }

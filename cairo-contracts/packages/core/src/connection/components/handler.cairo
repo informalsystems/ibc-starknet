@@ -45,7 +45,7 @@ pub mod ConnectionHandlerComponent {
             ref self: ComponentState<TContractState>, msg: MsgConnOpenInit,
         ) -> ConnectionId {
             let connection_sequence = self.read_next_connection_sequence();
-            self.conn_open_init_validate(connection_sequence, msg.clone());
+            self.conn_open_init_validate(connection_sequence, @msg);
             self.conn_open_init_execute(connection_sequence, msg)
         }
 
@@ -53,19 +53,19 @@ pub mod ConnectionHandlerComponent {
             ref self: ComponentState<TContractState>, msg: MsgConnOpenTry,
         ) -> ConnectionId {
             let connection_sequence = self.read_next_connection_sequence();
-            self.conn_open_try_validate(connection_sequence, msg.clone());
+            self.conn_open_try_validate(connection_sequence, @msg);
             self.conn_open_try_execute(connection_sequence, msg)
         }
 
         fn conn_open_ack(ref self: ComponentState<TContractState>, msg: MsgConnOpenAck) {
             let conn_end_on_a = self.read_connection_end(@msg.conn_id_on_a);
-            self.conn_open_ack_validate(conn_end_on_a.clone(), msg.clone());
+            self.conn_open_ack_validate(conn_end_on_a.clone(), @msg);
             self.conn_open_ack_execute(conn_end_on_a, msg);
         }
 
         fn conn_open_confirm(ref self: ComponentState<TContractState>, msg: MsgConnOpenConfirm) {
             let conn_end_on_b = self.read_connection_end(@msg.conn_id_on_b);
-            self.conn_open_confirm_validate(conn_end_on_b.clone(), msg.clone());
+            self.conn_open_confirm_validate(conn_end_on_b.clone(), @msg);
             self.conn_open_confirm_execute(conn_end_on_b, msg);
         }
     }
@@ -98,13 +98,13 @@ pub mod ConnectionHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
     > of ConnOpenInitTrait<TContractState> {
         fn conn_open_init_validate(
-            self: @ComponentState<TContractState>, connection_sequence: u64, msg: MsgConnOpenInit,
+            self: @ComponentState<TContractState>, connection_sequence: u64, msg: @MsgConnOpenInit,
         ) {
             msg.validate_basic();
 
             let client = self.get_client(*msg.client_type_on_a());
 
-            let client_sequence = msg.client_id_on_a.sequence;
+            let client_sequence = *msg.client_id_on_a.sequence;
 
             client.verify_is_active(client_sequence);
         }
@@ -117,7 +117,7 @@ pub mod ConnectionHandlerComponent {
             let conn_end_on_a = ConnectionEndTrait::init(
                 msg.client_id_on_a.clone(),
                 msg.client_id_on_b.clone(),
-                msg.prefix_on_b.clone(),
+                msg.prefix_on_b,
                 msg.delay_period,
             );
 
@@ -131,7 +131,7 @@ pub mod ConnectionHandlerComponent {
 
             self
                 .emit_conn_open_init_event(
-                    msg.client_id_on_a.clone(), conn_id_on_a.clone(), msg.client_id_on_b,
+                    msg.client_id_on_a, conn_id_on_a.clone(), msg.client_id_on_b,
                 );
 
             conn_id_on_a
@@ -147,19 +147,19 @@ pub mod ConnectionHandlerComponent {
         impl ClientHandler: ClientHandlerComponent::HasComponent<TContractState>,
     > of ConnOpenTryTrait<TContractState> {
         fn conn_open_try_validate(
-            self: @ComponentState<TContractState>, connection_sequence: u64, msg: MsgConnOpenTry,
+            self: @ComponentState<TContractState>, connection_sequence: u64, msg: @MsgConnOpenTry,
         ) {
             msg.validate_basic();
 
             let client = self.get_client(*msg.client_type_on_b());
 
-            let client_sequence = msg.client_id_on_b.sequence;
+            let client_sequence = *msg.client_id_on_b.sequence;
 
             client.verify_is_active(client_sequence);
 
-            client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
+            client.verify_proof_height(msg.proof_height_on_a, client_sequence);
 
-            let path = connection_path(msg.prefix_on_a.clone(), msg.conn_id_on_a.clone());
+            let paths = connection_path(msg.prefix_on_a.clone(), msg.conn_id_on_a.clone());
 
             let expected_conn_end_on_a = ConnectionEndTrait::init(
                 msg.client_id_on_a.clone(),
@@ -174,9 +174,9 @@ pub mod ConnectionHandlerComponent {
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    paths,
                     expected_conn_end_on_a.into(),
-                    msg.proof_conn_end_on_a,
+                    msg.proof_conn_end_on_a.clone(),
                     root_on_b,
                 );
         }
@@ -223,7 +223,7 @@ pub mod ConnectionHandlerComponent {
         fn conn_open_ack_validate(
             self: @ComponentState<TContractState>,
             conn_end_on_a: ConnectionEnd,
-            msg: MsgConnOpenAck,
+            msg: @MsgConnOpenAck,
         ) {
             msg.validate_basic();
 
@@ -235,17 +235,20 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_is_active(client_sequence);
 
-            client.verify_proof_height(@msg.proof_height_on_b, client_sequence);
+            client.verify_proof_height(msg.proof_height_on_b, client_sequence);
 
-            let path = connection_path(
-                conn_end_on_a.counterparty.prefix.clone(),
-                conn_end_on_a.counterparty.connection_id.clone(),
+            // Counterparty ConnectionID is taken from the MsgConnOpenAck since the channel has
+            // only gone through the Init step, so the counterparty is not correctly set
+            let paths = connection_path(
+                conn_end_on_a.counterparty.prefix.clone(), msg.conn_id_on_b.clone(),
             );
 
+            // Counterparty ConnectionID is taken from the MsgConnOpenAck since the channel has
+            // only gone through the Init step, so the counterparty is not correctly set
             let expected_conn_end_on_b = ConnectionEndTrait::try_open(
-                conn_end_on_a.client_id.clone(),
                 conn_end_on_a.counterparty.client_id.clone(),
-                conn_end_on_a.counterparty.connection_id.clone(),
+                conn_end_on_a.client_id.clone(),
+                msg.conn_id_on_b.clone(),
                 conn_end_on_a.counterparty.prefix.clone(),
                 conn_end_on_a.delay_period,
             );
@@ -256,9 +259,9 @@ pub mod ConnectionHandlerComponent {
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    paths,
                     expected_conn_end_on_b.into(),
-                    msg.proof_conn_end_on_b,
+                    msg.proof_conn_end_on_b.clone(),
                     root_on_a,
                 );
         }
@@ -297,7 +300,7 @@ pub mod ConnectionHandlerComponent {
         fn conn_open_confirm_validate(
             self: @ComponentState<TContractState>,
             conn_end_on_b: ConnectionEnd,
-            msg: MsgConnOpenConfirm,
+            msg: @MsgConnOpenConfirm,
         ) {
             msg.validate_basic();
 
@@ -309,9 +312,9 @@ pub mod ConnectionHandlerComponent {
 
             client.verify_is_active(client_sequence);
 
-            client.verify_proof_height(@msg.proof_height_on_a, client_sequence);
+            client.verify_proof_height(msg.proof_height_on_a, client_sequence);
 
-            let path = connection_path(
+            let paths = connection_path(
                 conn_end_on_b.counterparty.prefix, conn_end_on_b.counterparty.connection_id.clone(),
             );
 
@@ -330,9 +333,9 @@ pub mod ConnectionHandlerComponent {
             client
                 .verify_membership(
                     client_sequence,
-                    path,
+                    paths,
                     expected_conn_end_on_a.into(),
-                    msg.proof_conn_end_on_a,
+                    msg.proof_conn_end_on_a.clone(),
                     root_on_b,
                 );
         }
@@ -406,7 +409,8 @@ pub mod ConnectionHandlerComponent {
 
             let mut i = 0;
 
-            while i < entry.len() {
+            // Can't use span() as entry is a Vec
+            while i != entry.len() {
                 conn_ids.append(entry.at(i).read());
                 i += 1;
             }

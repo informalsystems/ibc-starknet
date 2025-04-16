@@ -27,45 +27,38 @@ pub impl ByteArrayAsProtoMessage of ProtoMessage<ByteArray> {
 // for packed repeated fields (default for scalars)
 pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of ProtoMessage<Array<T>> {
     fn encode_raw(self: @Array<T>, ref context: EncodeContext) {
-        let mut i = 0;
+        let mut self_span = self.span();
         if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
-            while i < self.len() {
+            while let Option::Some(item) = self_span.pop_front() {
                 let mut context2 = EncodeContextImpl::new();
-                self[i].encode_raw(ref context2);
+                item.encode_raw(ref context2);
                 context2.buffer.len().encode_raw(ref context);
                 context.buffer.append(@context2.buffer);
-                i += 1;
             };
         } else {
-            while i < self.len() {
-                self[i].encode_raw(ref context);
-                i += 1;
+            while let Option::Some(item) = self_span.pop_front() {
+                item.encode_raw(ref context);
             };
         }
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<Array<T>> {
-        let mut failed = false;
         let mut value = ArrayTrait::new();
         if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
             while context.can_read_branch() {
                 let length = decode_raw(ref context);
                 if length.is_none() {
-                    failed = true;
-                    break;
+                    return Option::None;
                 }
                 if context.init_branch(length.unwrap()).is_none() {
-                    failed = true;
-                    break;
+                    return Option::None;
                 }
                 let item = decode_raw(ref context);
                 if item.is_none() {
-                    failed = true;
-                    break;
+                    return Option::None;
                 }
                 if context.end_branch().is_none() {
-                    failed = true;
-                    break;
+                    return Option::None;
                 }
                 value.append(item.unwrap());
             }
@@ -73,14 +66,10 @@ pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of Prot
             while context.can_read_branch() {
                 let item = decode_raw(ref context);
                 if item.is_none() {
-                    failed = true;
-                    break;
+                    return Option::None;
                 }
                 value.append(item.unwrap());
             }
-        }
-        if failed {
-            return Option::None;
         }
         Option::Some(value)
     }
@@ -92,13 +81,12 @@ pub impl ArrayAsProtoMessage<T, +ProtoMessage<T>, +Drop<T>, +Default<T>> of Prot
 
 pub impl BytesAsProtoMessage of ProtoMessage<Array<u8>> {
     fn encode_raw(self: @Array<u8>, ref context: EncodeContext) {
-        let mut i = 0;
         if self.len() == 0 {
             context.buffer.append_byte(0);
         }
-        while i < self.len() {
-            context.buffer.append_byte(self[i].clone());
-            i += 1;
+        let mut self_span = self.span();
+        while let Option::Some(item) = self_span.pop_front() {
+            context.buffer.append_byte(*item);
         };
     }
 

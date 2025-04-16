@@ -1,27 +1,28 @@
 pub fn array_u8_into_array_u32(input: Array<u8>) -> (Array<u32>, u32, u32) {
+    let input_len = input.len();
     let mut result: Array<u32> = ArrayTrait::new();
     let mut last_word: u32 = 0;
-    let mut last_word_len: u32 = 0;
 
-    let mut i: usize = 0;
-    while i < input.len() {
-        let mut value: u32 = 0;
-        let mut j: usize = 0;
-        while j < 4 {
-            if i + j >= input.len() {
-                break;
-            }
-            value *= 0x100;
-            value = value + (*input.at(i + j)).into();
-            j += 1;
+    let last_word_len = input_len % 4;
+    let trucated_len = input_len / 4;
+
+    let mut input_span = input.span();
+
+    for _ in 0..trucated_len {
+        let value1: u32 = (*input_span.pop_front().unwrap()).into() * 0x1000000;
+        let value2: u32 = (*input_span.pop_front().unwrap()).into() * 0x10000;
+        let value3: u32 = (*input_span.pop_front().unwrap()).into() * 0x100;
+        let value4: u32 = (*input_span.pop_front().unwrap()).into();
+        let value: u32 = value1 + value2 + value3 + value4;
+
+        result.append(value);
+    }
+
+    if last_word_len > 0 {
+        while let Option::Some(value) = input_span.pop_front() {
+            last_word *= 0x100;
+            last_word = last_word + (*value).into();
         }
-        if j % 4 == 0 {
-            result.append(value);
-        } else {
-            last_word = value;
-            last_word_len = j.try_into().unwrap();
-        }
-        i += 4;
     }
 
     (result, last_word, last_word_len)
@@ -117,8 +118,8 @@ pub fn array_u32_into_array_u8(input: Array<u32>, last_word: u32, last_word_len:
 pub fn byte_array_to_array_u8(input: @ByteArray) -> Array<u8> {
     let mut output: Array<u8> = array![];
     let mut i = 0;
-    while i < input.len() {
-        output.append(input[i]);
+    while let Option::Some(value) = input.at(i) {
+        output.append(value);
         i += 1;
     }
     output
@@ -145,10 +146,9 @@ pub impl ByteArrayIntoArrayU8 of Into<ByteArray, Array<u8>> {
 
 pub fn array_u8_to_byte_array(input: @Array<u8>) -> ByteArray {
     let mut output = "";
-    let mut i = 0;
-    while i < input.len() {
-        output.append_byte(*input[i]);
-        i += 1;
+    let mut input_span = input.span();
+    while let Option::Some(input) = input_span.pop_front() {
+        output.append_byte(*input);
     }
     output
 }
@@ -157,8 +157,10 @@ pub fn decode_hex(hex: @ByteArray) -> Array<u8> {
     let mut output: Array<u8> = array![];
     let len = hex.len();
     assert(len % 2 == 0, 'Invalid hex length');
+    // Since len % 2 == 0, we know i += 2 will eventually be
+    // equal to len
     let mut i = 0;
-    while i < len {
+    while i != len {
         let high = hex[i];
         let low = hex[i + 1];
         assert(is_valid_hex_char(high), 'Invalid hex character');
@@ -246,13 +248,12 @@ pub enum Ordering {
 pub fn lexicographical_cmp(lhs: Array<u8>, rhs: Array<u8>) -> Ordering {
     let lhs_len = lhs.len();
     let rhs_len = rhs.len();
-    let min_len = core::cmp::min(lhs_len, rhs_len);
+    let mut lhs_span = lhs.span();
+    let mut rhs_span = rhs.span();
 
     let mut ordering = Ordering::Equal;
 
-    for i in 0..min_len {
-        let l = lhs.at(i);
-        let r = rhs.at(i);
+    while let (Some(l), Some(r)) = (lhs_span.pop_front(), rhs_span.pop_front()) {
         if l < r {
             ordering = Ordering::Less;
             break;
@@ -275,4 +276,32 @@ pub fn lexicographical_cmp(lhs: Array<u8>, rhs: Array<u8>) -> Ordering {
     }
 
     ordering
+}
+
+pub fn felt252_to_u8_array(value: felt252) -> ByteArray {
+    let mut value_bytes: Array<u8> = array![];
+    let mut i = 0;
+    let mut current_value: u256 = value.into();
+    loop {
+        if current_value == 0 || i == 31 {
+            break;
+        }
+        let low = current_value % 256;
+        let lsb_u8: u8 = low.try_into().unwrap();
+        value_bytes.append(lsb_u8);
+        i += 1;
+        current_value = current_value / 256;
+    }
+    let reversed_value_bytes = reverse_array(value_bytes);
+    array_u8_to_byte_array(@reversed_value_bytes)
+}
+
+fn reverse_array(input: Array<u8>) -> Array<u8> {
+    let mut input_span = input.span();
+    let mut reverse: Array<u8> = array![];
+
+    while let Option::Some(value) = input_span.pop_back() {
+        reverse.append(value.clone());
+    }
+    reverse
 }
