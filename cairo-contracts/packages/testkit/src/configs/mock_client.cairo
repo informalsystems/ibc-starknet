@@ -9,7 +9,7 @@ use starknet_ibc_testkit::dummies::{CLIENT_TYPE, DURATION, HEIGHT, STATE_ROOT, T
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
 
 #[derive(Clone, Debug, Drop, Serde)]
-pub struct CometClientConfig {
+pub struct MockClientConfig {
     pub client_type: felt252,
     pub latest_height: Height,
     pub latest_timestamp: Timestamp,
@@ -19,9 +19,9 @@ pub struct CometClientConfig {
 }
 
 #[generate_trait]
-pub impl CometClientConfigImpl of CometClientConfigTrait {
-    fn default() -> CometClientConfig {
-        CometClientConfig {
+pub impl MockClientConfigImpl of MockClientConfigTrait {
+    fn default() -> MockClientConfig {
+        MockClientConfig {
             client_type: CLIENT_TYPE(),
             latest_height: HEIGHT(10),
             latest_timestamp: TIMESTAMP(10),
@@ -31,7 +31,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         }
     }
 
-    fn dummy_msg_create_client(self: @CometClientConfig) -> MsgCreateClient {
+    fn dummy_msg_create_client(self: @MockClientConfig) -> MsgCreateClient {
         let mut serialized_client_state: Array<felt252> = ArrayTrait::new();
 
         let client_state = MockClientState {
@@ -62,7 +62,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
     }
 
     fn dummy_msg_update_client(
-        self: @CometClientConfig,
+        self: @MockClientConfig,
         client_id: ClientId,
         trusted_height: Height,
         latest_height: Height,
@@ -82,12 +82,12 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
     }
 
     fn dummy_msg_recover_client(
-        self: @CometClientConfig, subject_client_id: ClientId, substitute_client_id: ClientId,
+        self: @MockClientConfig, subject_client_id: ClientId, substitute_client_id: ClientId,
     ) -> MsgRecoverClient {
         MsgRecoverClient { subject_client_id, substitute_client_id }
     }
 
-    fn create_client(self: @CometClientConfig, core: @CoreContract) -> CreateResponse {
+    fn create_client(self: @MockClientConfig, core: @CoreContract) -> CreateResponse {
         core.create_client(self.dummy_msg_create_client())
     }
 }

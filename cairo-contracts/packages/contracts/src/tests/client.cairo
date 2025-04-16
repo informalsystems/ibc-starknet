@@ -4,7 +4,7 @@ use starknet_ibc_core::client::{
     ClientContractTrait, StatusTrait, TimestampTrait, U64IntoTimestamp, UpdateResponse,
 };
 use starknet_ibc_core::commitment::StateRootZero;
-use starknet_ibc_testkit::configs::CometClientConfigTrait;
+use starknet_ibc_testkit::configs::MockClientConfigTrait;
 use starknet_ibc_testkit::dummies::{HEIGHT, TIMESTAMP};
 use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
 use starknet_ibc_testkit::handles::CoreHandle;
@@ -16,7 +16,7 @@ fn test_create_comet_client_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
 
     let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "MockClient");
 
@@ -46,7 +46,7 @@ fn test_update_comet_client_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
 
     let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "MockClient");
 
@@ -100,7 +100,7 @@ fn test_client_recover_ok() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
 
     let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
 
@@ -146,7 +146,7 @@ fn test_client_expired() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
 
     let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
 
@@ -176,7 +176,7 @@ fn test_client_recover_active_client() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
 
     let (mut core, _) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
 
@@ -216,7 +216,7 @@ fn test_prune_consensus_state() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
 
     let (mut core, comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
 
@@ -338,7 +338,7 @@ fn test_prune_after_client_recover() {
     // Setup Essentials
     // -----------------------------------------------------------
 
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
 
     let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
 

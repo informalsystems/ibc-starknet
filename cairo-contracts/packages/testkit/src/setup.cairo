@@ -8,7 +8,7 @@ use starknet_ibc_apps::transfer::{ERC20Contract, ERC20ContractTrait, TRANSFER_PO
 use starknet_ibc_core::client::ClientContract;
 use starknet_ibc_core::router::AppContract;
 use starknet_ibc_testkit::configs::{
-    CometClientConfig, CometClientConfigTrait, CoreConfig, CoreConfigTrait, TransferAppConfig,
+    CoreConfig, CoreConfigTrait, MockClientConfig, MockClientConfigTrait, TransferAppConfig,
     TransferAppConfigTrait,
 };
 use starknet_ibc_testkit::dummies::{CLIENT_TYPE, OWNER, RELAYER, SN_USER, SUPPLY};
@@ -155,13 +155,13 @@ pub fn setup(
     AppContract,
     ERC20Contract,
     CoreConfig,
-    CometClientConfig,
+    MockClientConfig,
     TransferAppConfig,
     EventSpyQueue,
 ) {
     let mut core_cfg = CoreConfigTrait::default();
 
-    let comet_cfg = CometClientConfigTrait::default();
+    let comet_cfg = MockClientConfigTrait::default();
 
     let mut transfer_cfg = TransferAppConfigTrait::default();
 

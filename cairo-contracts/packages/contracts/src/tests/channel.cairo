@@ -3,9 +3,7 @@ use starknet_ibc_apps::transfer::{ERC20Contract, SUCCESS_ACK, VERSION};
 use starknet_ibc_core::channel::{AckStatus, ChannelEndTrait, ChannelOrdering, ChannelState};
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::host::{Sequence, SequenceImpl};
-use starknet_ibc_testkit::configs::{
-    CometClientConfigTrait, CoreConfigTrait, TransferAppConfigTrait,
-};
+use starknet_ibc_testkit::configs::{CoreConfigTrait, MockClientConfigTrait, TransferAppConfigTrait};
 use starknet_ibc_testkit::dummies::{
     CHANNEL_ID, CLIENT_ID, CONNECTION_ID, COSMOS, CS_USER, HEIGHT, PACKET_COMMITMENT_ON_SN, PORT_ID,
     SN_USER, STARKNET, SUPPLY, TIMESTAMP,

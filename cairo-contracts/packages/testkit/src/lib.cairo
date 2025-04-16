@@ -20,7 +20,7 @@ pub mod configs {
     mod mock_client;
     mod transfer;
     pub use core::{CoreConfig, CoreConfigImpl, CoreConfigTrait};
-    pub use mock_client::{CometClientConfig, CometClientConfigImpl, CometClientConfigTrait};
+    pub use mock_client::{MockClientConfig, MockClientConfigImpl, MockClientConfigTrait};
     pub use transfer::{TransferAppConfig, TransferAppConfigImpl, TransferAppConfigTrait};
 }
 pub mod dummies {
