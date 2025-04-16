@@ -16,11 +16,11 @@ pub mod mocks {
     pub use transfer::MockTransferApp;
 }
 pub mod configs {
-    mod cometbft;
     mod core;
+    mod mock_client;
     mod transfer;
-    pub use cometbft::{CometClientConfig, CometClientConfigImpl, CometClientConfigTrait};
     pub use core::{CoreConfig, CoreConfigImpl, CoreConfigTrait};
+    pub use mock_client::{CometClientConfig, CometClientConfigImpl, CometClientConfigTrait};
     pub use transfer::{TransferAppConfig, TransferAppConfigImpl, TransferAppConfigTrait};
 }
 pub mod dummies {
@@ -29,8 +29,8 @@ pub mod dummies {
 
     pub use core::{
         CHANNEL_END, CHANNEL_ID, CLIENT, CLIENT_ID, CLIENT_TYPE, CONNECTION_END, CONNECTION_ID,
-        DURATION, HEIGHT, IBC_PREFIX, NEXT_VALIDATOR_HASH, PORT_ID, RELAYER, SEQUENCE, STATE_PROOF,
-        STATE_ROOT, TIMEOUT_HEIGHT, TIMEOUT_TIMESTAMP, TIMESTAMP, VERSION_PROPOSAL,
+        DURATION, HEIGHT, IBC_PREFIX, PORT_ID, RELAYER, SEQUENCE, STATE_PROOF, STATE_ROOT,
+        TIMEOUT_HEIGHT, TIMEOUT_TIMESTAMP, TIMESTAMP, VERSION_PROPOSAL,
     };
     pub use transfer::{
         AMOUNT, CLASS_HASH, COSMOS, CS_USER, DECIMALS_18, DECIMAL_ZERO, EMPTY_MEMO, ERC20,

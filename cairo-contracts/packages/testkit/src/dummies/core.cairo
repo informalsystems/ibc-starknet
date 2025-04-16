@@ -101,10 +101,6 @@ pub fn STATE_ROOT() -> StateRoot {
     StateRoot { root: [1; 8] }
 }
 
-pub fn NEXT_VALIDATOR_HASH() -> Array<u8> {
-    array![0, 0, 0, 0, 0, 0, 0, 0]
-}
-
 pub fn IBC_PREFIX() -> BasePrefix {
     BasePrefix { prefix: "ibc" }
 }
