@@ -66,7 +66,6 @@ pub mod CometClientComponent {
         fn update_client(
             ref self: ComponentState<TContractState>, msg: MsgUpdateClient,
         ) -> UpdateResponse {
-            self.assert_owner();
             self.update_validate(msg.clone());
             self.update_execute(msg)
         }
