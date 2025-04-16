@@ -102,7 +102,7 @@ fn test_client_recover_ok() {
 
     let mut cfg = MockClientConfigTrait::default();
 
-    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "MockClient");
 
     // -----------------------------------------------------------
     // Create Client
@@ -148,7 +148,7 @@ fn test_client_expired() {
 
     let mut cfg = MockClientConfigTrait::default();
 
-    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "MockClient");
 
     // -----------------------------------------------------------
     // Create Client
@@ -178,7 +178,7 @@ fn test_client_recover_active_client() {
 
     let mut cfg = MockClientConfigTrait::default();
 
-    let (mut core, _) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+    let (mut core, _) = SetupImpl::setup_core_with_client("IBCCore", "MockClient");
 
     // -----------------------------------------------------------
     // Create Client
@@ -218,7 +218,7 @@ fn test_prune_consensus_state() {
 
     let mut cfg = MockClientConfigTrait::default();
 
-    let (mut core, comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+    let (mut core, comet) = SetupImpl::setup_core_with_client("IBCCore", "MockClient");
 
     // -----------------------------------------------------------
     // Create Client
@@ -340,7 +340,7 @@ fn test_prune_after_client_recover() {
 
     let mut cfg = MockClientConfigTrait::default();
 
-    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "MockClient");
 
     // -----------------------------------------------------------
     // Create Client
