@@ -2,12 +2,12 @@ use core::byte_array::ByteArrayTrait;
 use core::num::traits::{CheckedAdd, CheckedSub, Zero};
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
-use ics23::{ArrayU32IntoArrayU8, u64_into_array_u32};
+use ics23::{ArrayU32IntoArrayU8, felt252_to_u8_array, u64_into_array_u32};
 use starknet_ibc_core::commitment::StateValue;
 use starknet_ibc_core::host::errors::HostErrors;
 use starknet_ibc_utils::{ComputeKey, ValidateBasic, poseidon_hash};
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ClientId {
     pub client_type: felt252,
     pub sequence: u64,
@@ -20,6 +20,11 @@ pub impl ClientIdImpl of ClientIdTrait {
     }
 
     fn validate(self: @ClientId, client_id_hash: felt252) {}
+
+    fn to_byte_array(self: @ClientId) -> ByteArray {
+        let client_type = felt252_to_u8_array(self.client_type.clone());
+        format!("{}-{}", client_type, self.sequence)
+    }
 }
 
 pub impl ClientIdZero of Zero<ClientId> {
@@ -36,7 +41,7 @@ pub impl ClientIdZero of Zero<ClientId> {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ConnectionId {
     pub connection_id: ByteArray,
 }
@@ -55,10 +60,7 @@ pub impl ConnectionIdImpl of ConnectionIdTrait {
         let mut sequence: u256 = 0;
         let mut multiplier: u256 = 1;
 
-        loop {
-            if i == 11 {
-                break;
-            }
+        while i != 11 {
             let char_byte = self.connection_id.at(i - 1).unwrap();
 
             assert_numeric(char_byte);
@@ -110,7 +112,7 @@ pub impl ConnectionIdIntoByteArray of Into<ConnectionId, ByteArray> {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct ChannelId {
     pub channel_id: ByteArray,
 }
@@ -129,10 +131,7 @@ pub impl ChannelIdImpl of ChannelIdTrait {
         let mut sequence: u256 = 0;
         let mut multiplier: u256 = 1;
 
-        loop {
-            if i == 8 {
-                break;
-            }
+        while i != 8 {
             let char_byte = self.channel_id.at(i - 1).unwrap();
 
             assert_numeric(char_byte);
@@ -184,7 +183,7 @@ pub impl ChannelIdIntoByteArray of Into<ChannelId, ByteArray> {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct PortId {
     pub port_id: ByteArray,
 }

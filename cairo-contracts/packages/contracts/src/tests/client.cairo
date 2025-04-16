@@ -18,7 +18,7 @@ fn test_create_comet_client_ok() {
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "MockClient");
 
     let mut spy = spy_events();
 
@@ -48,7 +48,7 @@ fn test_update_comet_client_ok() {
 
     let mut cfg = CometClientConfigTrait::default();
 
-    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "CometClient");
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "MockClient");
 
     let mut spy = spy_events();
 

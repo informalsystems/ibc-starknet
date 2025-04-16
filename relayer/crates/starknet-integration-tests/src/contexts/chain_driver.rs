@@ -43,7 +43,7 @@ pub struct StarknetChainDriver {
     pub genesis_config: StarknetGenesisConfig,
     pub node_config: StarknetNodeConfig,
     pub wallets: BTreeMap<String, StarknetWallet>,
-    pub chain_process: Option<Child>,
+    pub chain_processes: Vec<Child>,
     pub relayer_wallet: StarknetWallet,
     pub user_wallet_a: StarknetWallet,
     pub user_wallet_b: StarknetWallet,
@@ -92,8 +92,8 @@ impl DenomGetter<StarknetChainDriver, StakingDenom> for StarknetChainDriverCompo
 
 #[cgp_provider(ChainProcessTakerComponent)]
 impl ChainProcessTaker<StarknetChainDriver> for StarknetChainDriverComponents {
-    fn take_chain_process(chain_driver: &mut StarknetChainDriver) -> Option<Child> {
-        chain_driver.chain_process.take()
+    fn take_chain_process(chain_driver: &mut StarknetChainDriver) -> Vec<Child> {
+        core::mem::take(&mut chain_driver.chain_processes)
     }
 }
 

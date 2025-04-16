@@ -30,8 +30,10 @@ mod preset {
     };
     use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent;
     use ibc::clients::tendermint::types::{Header as TendermintLcHeader, TrustThreshold};
+    use ibc::core::commitment_types::specs::ProofSpecs;
     use ibc::core::host::types::identifiers::ChainId;
     use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
+    use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
     use starknet::core::types::{ByteArray, Felt, U256};
     use tendermint::block::header::Version as HeaderVersion;
     use tendermint::block::parts::Header as PartSetHeader;
@@ -51,8 +53,10 @@ mod preset {
         ConnectionCounterparty, ConnectionEnd, ConnectionId, ConnectionState,
         EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionState, EncodeDuration,
     };
+    use crate::types::cosmos::client_state::EncodeTrustThreshold;
     use crate::types::cosmos::client_state::{
-        ClientStatus, CometClientState, EncodeTrustThreshold,
+        ClientStatus, CometClientState, EncodeInnerSpec, EncodeLeafOp, EncodeProofSpec,
+        EncodeProofSpecs,
     };
     use crate::types::cosmos::consensus_state::CometConsensusState;
     use crate::types::cosmos::height::{EncodeHeight, Height};
@@ -155,11 +159,16 @@ mod preset {
             (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
             (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
             (ViaCairo, ChannelEnd): EncodeChannelEnd,
+            (ViaCairo, InnerSpec): EncodeInnerSpec,
+            (ViaCairo, LeafOp): EncodeLeafOp,
+            (ViaCairo, ProofSpec): EncodeProofSpec,
+            (ViaCairo, ProofSpecs): EncodeProofSpecs,
             [
                 (ViaCairo, Vec<Sequence>),
                 (ViaCairo, Vec<TracePrefix>),
                 (ViaCairo, Vec<validator::Info>),
                 (ViaCairo, Vec<block::CommitSig>),
+                (ViaCairo, Vec<ProofSpec>),
             ]: EncodeList,
             [
                 (ViaCairo, ChainId),

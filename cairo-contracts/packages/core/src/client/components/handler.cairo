@@ -2,8 +2,8 @@
 pub mod ClientHandlerComponent {
     use core::num::traits::Zero;
     use starknet::storage::{
-        Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
-        Vec, VecTrait,
+        IntoIterRange, Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess,
+        StoragePointerReadAccess, Vec,
     };
     use starknet::{ContractAddress, get_caller_address, get_tx_info};
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
@@ -77,12 +77,15 @@ pub mod ClientHandlerComponent {
 
             let mut client = self.get_client(msg.client_id.client_type);
 
-            let update_result = client.update(msg.clone());
+            let client_id = msg.client_id.clone();
+            let client_message = msg.client_message.clone();
+
+            let update_result = client.update(msg);
 
             match update_result.clone() {
                 UpdateResponse::Success(heights) => self
-                    .emit_update_client_event(msg.client_id, heights, msg.client_message),
-                UpdateResponse::Misbehaviour => self.emit_misbehaviour_event(msg.client_id),
+                    .emit_update_client_event(client_id, heights, client_message),
+                UpdateResponse::Misbehaviour => self.emit_misbehaviour_event(client_id),
             }
 
             update_result
@@ -185,14 +188,15 @@ pub mod ClientHandlerComponent {
             self: @ComponentState<TContractState>, caller: ContractAddress,
         ) -> bool {
             let mut allowed = false;
-            let mut i = 0;
-            while i < self.allowed_relayers.len() {
-                if self.allowed_relayers.at(i).read() == caller {
+            let mut iterator = self.allowed_relayers.into_iter_full_range();
+
+            while let Some(relayer) = iterator.next() {
+                if relayer.read() == caller {
                     allowed = true;
                     break;
                 }
-                i += 1;
             }
+
             allowed
         }
 

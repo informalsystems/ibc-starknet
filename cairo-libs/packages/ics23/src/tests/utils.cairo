@@ -1,4 +1,7 @@
-use ics23::{ArrayU8PartialOrd, array_u8_into_array_u32, decode_hex, encode_hex, u64_into_array_u32};
+use ics23::{
+    ArrayU8PartialOrd, array_u8_into_array_u32, decode_hex, encode_hex, felt252_to_u8_array,
+    u64_into_array_u32,
+};
 
 #[test]
 fn test_array_u8_into_array_u32() {
@@ -106,4 +109,20 @@ fn test_lexicographical_cmp() {
     // 11. Arrays with different leading zeros
     assert!(array![0_u8, 1_u8, 2_u8] < array![1_u8, 2_u8, 3_u8]);
     assert!(array![1_u8, 2_u8, 3_u8] > array![0_u8, 1_u8, 2_u8]);
+}
+
+#[test]
+fn test_wasm_id_felt252_to_u8_array() {
+    let raw_value: felt252 = 3820028427552332600290323295860;
+    let converted = felt252_to_u8_array(raw_value);
+    let expected: ByteArray = "07-tendermint";
+    assert(converted == expected, 'failed felt252 to ByteArray');
+}
+
+#[test]
+fn test_tendermint_id_felt252_to_u8_array() {
+    let raw_value: felt252 = 13572566809670509;
+    let converted = felt252_to_u8_array(raw_value);
+    let expected: ByteArray = "08-wasm";
+    assert(converted == expected, 'failed felt252 to ByteArray');
 }

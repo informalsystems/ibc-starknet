@@ -202,7 +202,7 @@ cargo run --release --bin hermes-starknet -- -c ../relayer.toml \
 
 ### Prerequisites
 
-- `scarb 2.11.3`
+- `scarb 2.11.3+`
 - `starkli 0.4.0`
 - `cargo`
 

@@ -161,12 +161,8 @@ pub impl StoreHeightArray of Store<Array<Height>> {
             .expect('Storage Span too large');
         offset += 1;
 
-        let exit = 2 * len + offset;
-        loop {
-            if offset >= exit {
-                break;
-            }
-
+        let exit = Store::<Height>::size() * len + offset;
+        while offset < exit {
             let value = Store::<Height>::read_at_offset(address_domain, base, offset).unwrap();
             arr.append(value);
             offset += Store::<Height>::size();

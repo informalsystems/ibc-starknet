@@ -14,17 +14,17 @@
     };
 
     cairo-src = {
-      url = "github:starkware-libs/cairo/v2.11.2";
+      url = "github:starkware-libs/cairo/v2.11.4";
       flake = false;
     };
 
     universal-sierra-compiler-src = {
-      url = "github:software-mansion/universal-sierra-compiler/v2.4.0";
+      url = "github:software-mansion/universal-sierra-compiler/v2.5.0";
       flake = false;
     };
 
     starknet-foundry-src = {
-      url = "github:foundry-rs/starknet-foundry/v0.38.3";
+      url = "github:foundry-rs/starknet-foundry/v0.41.0";
       flake = false;
     };
   };

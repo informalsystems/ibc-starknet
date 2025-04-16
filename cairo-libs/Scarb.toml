@@ -9,8 +9,8 @@ members = [
 [workspace.package]
 version       = "0.1.0"
 edition       = "2024_07"
-cairo-version = "2.11.2"
-scarb-version = "2.11.3"
+cairo-version = "2.11.4"
+scarb-version = "2.11.4"
 license       = "Apache-2.0"
 authors       = [ "Informal Systems <hello@informal.systems>" ]
 repository    = "https://github.com/informalsystems/ibc-starknet"
@@ -22,9 +22,9 @@ description   = "Cairo libraries for integrating Starknet with IBC"
 test = "snforge test"
 
 [workspace.dependencies]
-starknet      = "2.11.2"
-assert_macros = "2.11.2"
-snforge_std   = "0.40.0"
+starknet      = "2.11.4"
+assert_macros = "2.11.4"
+snforge_std   = "0.41.0"
 
 # external dependencies
 # FIXME: using main branch for ed25519 signature fix

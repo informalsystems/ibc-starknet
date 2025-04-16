@@ -1,5 +1,8 @@
 use cometbft::utils::ONE_THIRD;
-use starknet_ibc_clients::cometbft::{CometClientState, CometConsensusState, CometHeader};
+use ics23::tendermint_spec;
+use starknet_ibc_clients::cometbft::{
+    CometClientState, CometConsensusState, CometHeader, SignedHeader,
+};
 use starknet_ibc_core::client::{
     CreateResponse, Duration, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient, Status,
     Timestamp,
@@ -44,6 +47,7 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
             trust_level: ONE_THIRD,
             status: Status::Active,
             chain_id: "dummy_chain",
+            proof_spec: array![tendermint_spec()],
         };
 
         Serde::serialize(@client_state, ref serialized_client_state);
