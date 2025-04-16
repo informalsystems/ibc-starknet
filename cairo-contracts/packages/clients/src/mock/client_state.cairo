@@ -94,4 +94,17 @@ pub impl MockClientStateImpl of MockClientStateTrait {
     fn freeze(ref self: MockClientState, freezing_height: Height) {
         self.status = Status::Frozen(freezing_height);
     }
+
+    fn substitute_client_matches(
+        self: @MockClientState, other_client_state: MockClientState,
+    ) -> bool {
+        let mut substitute_client_state = other_client_state;
+
+        substitute_client_state.latest_height = self.latest_height.clone();
+        substitute_client_state.trusting_period = self.trusting_period.clone();
+        substitute_client_state.status = self.status.clone();
+        substitute_client_state.chain_id = self.chain_id.clone();
+
+        @substitute_client_state == self
+    }
 }

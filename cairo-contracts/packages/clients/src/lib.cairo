@@ -26,7 +26,9 @@ pub mod mock {
 
     pub use client_state::{MockClientState, MockClientStateImpl, MockClientStateTrait};
     pub use component::MockClientComponent;
-    pub use consensus_state::{MockConsensusState, MockConsensusStateImpl, MockConsensusStateTrait};
+    pub use consensus_state::{
+        MockConsensusState, MockConsensusStateImpl, MockConsensusStateTrait, MockConsensusStateZero,
+    };
     pub use errors::MockErrors;
     pub use header::{
         MockHeader, MockHeaderImpl, MockHeaderIntoConsensusState, MockHeaderTrait, SignedHeader,
