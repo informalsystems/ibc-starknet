@@ -1,4 +1,3 @@
-use ics23::tendermint_spec;
 use starknet_ibc_clients::mock::{MockClientState, MockConsensusState, MockHeader, SignedHeader};
 use starknet_ibc_core::client::{
     CreateResponse, Duration, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient, Status,
@@ -41,7 +40,6 @@ pub impl MockClientConfigImpl of MockClientConfigTrait {
             max_clock_drift: *self.max_clock_drift,
             status: Status::Active,
             chain_id: "dummy_chain",
-            proof_spec: array![tendermint_spec()],
         };
 
         Serde::serialize(@client_state, ref serialized_client_state);
