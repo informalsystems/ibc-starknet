@@ -1,18 +1,18 @@
-use CometClientComponent::ClientWriterTrait;
+use MockClientComponent::ClientWriterTrait;
 use snforge_std::start_cheat_block_timestamp_global;
-use starknet_ibc_clients::cometbft::CometClientComponent;
-use starknet_ibc_clients::cometbft::CometClientComponent::{
-    ClientReaderImpl, CometClientHandler, CometClientQuery,
+use starknet_ibc_clients::mock::MockClientComponent;
+use starknet_ibc_clients::mock::MockClientComponent::{
+    ClientReaderImpl, MockClientHandler, MockClientQuery,
 };
 use starknet_ibc_core::client::{StatusTrait, TimestampTrait};
 use starknet_ibc_testkit::configs::MockClientConfigTrait;
 use starknet_ibc_testkit::dummies::{HEIGHT, TIMESTAMP};
 use starknet_ibc_testkit::mocks::MockCometClient;
 
-type ComponentState = CometClientComponent::ComponentState<MockCometClient::ContractState>;
+type ComponentState = MockClientComponent::ComponentState<MockCometClient::ContractState>;
 
 fn COMPONENT_STATE() -> ComponentState {
-    CometClientComponent::component_state_for_testing()
+    MockClientComponent::component_state_for_testing()
 }
 
 fn setup() -> ComponentState {
