@@ -1,16 +1,11 @@
-use cometbft::utils::ONE_THIRD;
 use ics23::tendermint_spec;
-use starknet_ibc_clients::cometbft::{
-    CometClientState, CometConsensusState, CometHeader, SignedHeader,
-};
+use starknet_ibc_clients::mock::{MockClientState, MockConsensusState, MockHeader, SignedHeader};
 use starknet_ibc_core::client::{
     CreateResponse, Duration, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient, Status,
     Timestamp,
 };
 use starknet_ibc_core::host::ClientId;
-use starknet_ibc_testkit::dummies::{
-    CLIENT_TYPE, DURATION, HEIGHT, NEXT_VALIDATOR_HASH, STATE_ROOT, TIMESTAMP,
-};
+use starknet_ibc_testkit::dummies::{CLIENT_TYPE, DURATION, HEIGHT, STATE_ROOT, TIMESTAMP};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -39,12 +34,11 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
     fn dummy_msg_create_client(self: @CometClientConfig) -> MsgCreateClient {
         let mut serialized_client_state: Array<felt252> = ArrayTrait::new();
 
-        let client_state = CometClientState {
+        let client_state = MockClientState {
             latest_height: self.latest_height.clone(),
             trusting_period: *self.trusting_period,
             unbonding_period: *self.unbonding_period,
             max_clock_drift: *self.max_clock_drift,
-            trust_level: ONE_THIRD,
             status: Status::Active,
             chain_id: "dummy_chain",
             proof_spec: array![tendermint_spec()],
@@ -54,10 +48,8 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
 
         let mut serialized_consensus_state: Array<felt252> = ArrayTrait::new();
 
-        let consensus_state = CometConsensusState {
-            timestamp: self.latest_timestamp.clone().into(),
-            root: STATE_ROOT(),
-            next_validators_hash: NEXT_VALIDATOR_HASH(),
+        let consensus_state = MockConsensusState {
+            timestamp: self.latest_timestamp.clone().into(), root: STATE_ROOT(),
         };
 
         Serde::serialize(@consensus_state, ref serialized_consensus_state);
@@ -79,14 +71,10 @@ pub impl CometClientConfigImpl of CometClientConfigTrait {
         let mut serialized_header: Array<felt252> = ArrayTrait::new();
 
         let signed_header = SignedHeader {
-            height: latest_height,
-            timestamp: latest_timestamp,
-            root: STATE_ROOT(),
-            next_validators_hash: NEXT_VALIDATOR_HASH(),
-            protobuf_bytes: ArrayTrait::new(),
+            height: latest_height, timestamp: latest_timestamp, root: STATE_ROOT(),
         };
 
-        let header = CometHeader { trusted_height, signed_header };
+        let header = MockHeader { trusted_height, signed_header };
 
         Serde::serialize(@header, ref serialized_header);
 
