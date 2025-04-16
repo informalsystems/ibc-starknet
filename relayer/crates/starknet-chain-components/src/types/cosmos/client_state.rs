@@ -115,11 +115,12 @@ pub struct EncodeLeafOp;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, LeafOp> for EncodeLeafOp
 where
-    Encoding: CanEncodeMut<Strategy, Product![u32, u32, u32, u32, Vec<u8>]>,
+    Encoding: CanEncodeMut<Strategy, Product![u32, u32, u32, u32, Vec<u8>]>
+        + CanRaiseAsyncError<&'static str>,
 {
     fn encode_mut(
         encoding: &Encoding,
-        proof_specs: &LeafOp,
+        leaf_op: &LeafOp,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
         let LeafOp {
@@ -128,10 +129,9 @@ where
             prehash_value,
             length,
             prefix,
-        } = serde_json::to_value(proof_specs)
+        } = serde_json::to_value(leaf_op)
             .and_then(serde_json::from_value)
-            .unwrap();
-        //.map_err(|_| Encoding::raise_error("invalid connection end"))?;
+            .map_err(|_| Encoding::raise_error("invalid leaf op"))?;
         let hash = hash as u32;
         let prehash_key = prehash_key as u32;
         let prehash_value = prehash_value as u32;
@@ -172,11 +172,12 @@ pub struct EncodeInnerSpec;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, InnerSpec> for EncodeInnerSpec
 where
-    Encoding: CanEncodeMut<Strategy, Product![Vec<u32>, u32, u32, u32, Vec<u8>, u32]>,
+    Encoding: CanEncodeMut<Strategy, Product![Vec<u32>, u32, u32, u32, Vec<u8>, u32]>
+        + CanRaiseAsyncError<&'static str>,
 {
     fn encode_mut(
         encoding: &Encoding,
-        proof_specs: &InnerSpec,
+        inner_spec: &InnerSpec,
         buffer: &mut Encoding::EncodeBuffer,
     ) -> Result<(), Encoding::Error> {
         let InnerSpec {
@@ -186,10 +187,9 @@ where
             max_prefix_length,
             empty_child,
             hash,
-        } = serde_json::to_value(proof_specs)
+        } = serde_json::to_value(inner_spec)
             .and_then(serde_json::from_value)
-            .unwrap();
-        //.map_err(|_| Encoding::raise_error("invalid connection end"))?;
+            .map_err(|_| Encoding::raise_error("invalid inner spec"))?;
         let child_order = child_order.iter().map(|x| *x as u32).collect();
         let child_size = child_size as u32;
         let min_prefix_length = min_prefix_length as u32;
@@ -246,7 +246,8 @@ pub struct EncodeProofSpec;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ProofSpec> for EncodeProofSpec
 where
-    Encoding: CanEncodeMut<Strategy, Product![LeafOp, InnerSpec, u32, u32, bool]>,
+    Encoding: CanEncodeMut<Strategy, Product![LeafOp, InnerSpec, u32, u32, bool]>
+        + CanRaiseAsyncError<&'static str>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -261,8 +262,7 @@ where
             prehash_key_before_comparison,
         } = serde_json::to_value(proof_specs)
             .and_then(serde_json::from_value)
-            .unwrap();
-        //.map_err(|_| Encoding::raise_error("invalid connection end"))?;
+            .map_err(|_| Encoding::raise_error("invalid proof spec"))?;
 
         let leaf_spec = leaf_spec.unwrap();
         let inner_spec = inner_spec.unwrap();
@@ -314,7 +314,7 @@ pub struct EncodeProofSpecs;
 #[cgp_provider(MutEncoderComponent)]
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ProofSpecs> for EncodeProofSpecs
 where
-    Encoding: CanEncodeMut<Strategy, Vec<ProofSpec>>,
+    Encoding: CanEncodeMut<Strategy, Vec<ProofSpec>> + CanRaiseAsyncError<&'static str>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -328,8 +328,7 @@ where
 
         let DummyProofSpecs(specs) = serde_json::to_value(proof_specs)
             .and_then(serde_json::from_value)
-            .unwrap();
-        //.map_err(|_| Encoding::raise_error("invalid connection end"))?;
+            .map_err(|_| Encoding::raise_error("invalid proof specs"))?;
 
         encoding.encode_mut(&specs, buffer)?;
         Ok(())
