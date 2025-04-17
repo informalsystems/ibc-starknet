@@ -199,24 +199,24 @@ pub struct EncodeTmHeader;
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, TmHeader> for EncodeTmHeader
 where
     Encoding: CanEncodeMut<
-        Strategy,
-        Product![
-            HeaderVersion,
-            String,
-            u64,
-            ProtoTimestamp,
-            block::Id,
-            TmHash,
-            TmHash,
-            TmHash,
-            TmHash,
-            TmHash,
-            AppHash,
-            TmHash,
-            TmHash,
-            account::Id
-        ],
-    >,
+            Strategy,
+            Product![
+                HeaderVersion,
+                String,
+                u64,
+                ProtoTimestamp,
+                block::Id,
+                TmHash,
+                TmHash,
+                TmHash,
+                TmHash,
+                TmHash,
+                AppHash,
+                TmHash,
+                TmHash,
+                account::Id
+            ],
+        > + CanRaiseAsyncError<&'static str>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -229,15 +229,25 @@ where
                 value.chain_id.clone().into(),
                 value.height.value(),
                 value.time.into(),
-                value.last_block_id.unwrap(),
-                value.last_commit_hash.unwrap(),
-                value.data_hash.unwrap(),
+                value.last_block_id.ok_or_else(|| {
+                    Encoding::raise_error("last block id not found in header")
+                })?,
+                value.last_commit_hash.ok_or_else(|| {
+                    Encoding::raise_error("last commit hash not found in header")
+                })?,
+                value
+                    .data_hash
+                    .ok_or_else(|| { Encoding::raise_error("data hash not found in header") })?,
                 value.validators_hash,
                 value.next_validators_hash,
                 value.consensus_hash,
                 value.app_hash.clone(),
-                value.last_results_hash.unwrap(),
-                value.evidence_hash.unwrap(),
+                value.last_results_hash.ok_or_else(|| {
+                    Encoding::raise_error("last results hash not found in header")
+                })?,
+                value.evidence_hash.ok_or_else(|| {
+                    Encoding::raise_error("evidence hash not found in header")
+                })?,
                 value.proposer_address
             ],
             buffer,
@@ -560,7 +570,8 @@ pub struct EncodeCommitSig;
 impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, CommitSig> for EncodeCommitSig
 where
     Encoding: CanEncodeMut<Strategy, Product![BlockIdFlag, account::Id, ProtoTimestamp, Signature]>
-        + CanEncodeMut<Strategy, Product![BlockIdFlag, Vec<u8>, ProtoTimestamp, Vec<u8>]>,
+        + CanEncodeMut<Strategy, Product![BlockIdFlag, Vec<u8>, ProtoTimestamp, Vec<u8>]>
+        + CanRaiseAsyncError<&'static str>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -581,7 +592,9 @@ where
                     BlockIdFlag::Commit,
                     *validator_address,
                     (*timestamp).into(),
-                    signature.clone().unwrap()
+                    signature.clone().ok_or_else(|| {
+                        Encoding::raise_error("signature not found in commit signature")
+                    })?
                 ],
                 buffer,
             )?,
@@ -594,7 +607,9 @@ where
                     BlockIdFlag::Nil,
                     *validator_address,
                     (*timestamp).into(),
-                    signature.clone().unwrap()
+                    signature.clone().ok_or_else(|| {
+                        Encoding::raise_error("signature not found in nil signature")
+                    })?
                 ],
                 buffer,
             )?,
