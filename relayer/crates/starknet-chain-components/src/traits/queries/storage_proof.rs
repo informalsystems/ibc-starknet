@@ -4,6 +4,9 @@ use hermes_chain_type_components::traits::types::address::HasAddressType;
 
 use crate::traits::types::storage_proof::{HasStorageKeyType, HasStorageProofType};
 
+#[cgp_component {
+    provider: StorageProofQuerier,
+}]
 #[async_trait]
 pub trait CanQueryStorageProof:
     HasHeightType + HasAddressType + HasStorageKeyType + HasStorageProofType + HasAsyncErrorType
