@@ -22,9 +22,10 @@ where
             &proof.classes_proof,
             &vec![proof.global_roots.classes_tree_root],
         )?;
+
         Chain::verify_merkle_node_map(
             &proof.contracts_proof.nodes,
-            &vec![proof.global_roots.classes_tree_root],
+            &vec![proof.global_roots.contracts_tree_root],
         )?;
 
         let contract_roots = proof
@@ -113,7 +114,62 @@ where
             Chain::verify_merkle_node(hash, node)?;
         }
 
+        for (hash, node) in node_map.iter() {
+            Chain::verify_merkle_node_parent(hash, node_map, roots)?;
+        }
+
         Ok(())
+    }
+}
+
+/**
+   Validates that each node entry is either the child of another entry,
+   or is one of the root nodes.
+*/
+pub trait CanVerifyMerkleNodeParent: HasErrorType {
+    fn verify_merkle_node_parent(
+        node_hash: &Felt,
+        node_map: &IndexMap<Felt, MerkleNode>,
+        roots: &Vec<Felt>,
+    ) -> Result<(), Self::Error>;
+}
+
+impl<Chain> CanVerifyMerkleNodeParent for Chain
+where
+    Chain: CanRaiseError<String>,
+{
+    fn verify_merkle_node_parent(
+        hash: &Felt,
+        node_map: &IndexMap<Felt, MerkleNode>,
+        roots: &Vec<Felt>,
+    ) -> Result<(), Self::Error> {
+        if roots.contains(hash) {
+            return Ok(());
+        }
+
+        for (parent_hash, parent_node) in node_map.iter() {
+            if parent_hash != hash {
+                match parent_node {
+                    MerkleNode::BinaryNode(parent_node) => {
+                        if &parent_node.left == hash || &parent_node.right == hash {
+                            return Ok(());
+                        }
+                    }
+                    MerkleNode::EdgeNode(parent_node) => {
+                        // FIXME: How to verify that a child value is a node or a storage value?
+                        // If the child is a storage value, we should *not* treat it as a valid parent.
+                        if &parent_node.child == hash {
+                            return Ok(());
+                        }
+                    }
+                }
+            }
+        }
+
+        Err(Chain::raise_error(format!(
+            "failed to find parent node for child node with hash {}",
+            hash.to_hex_string()
+        )))
     }
 }
 
