@@ -1,6 +1,8 @@
 use cgp::prelude::*;
 use hermes_chain_components::traits::queries::block::CanQueryBlock;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_chain_components::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
+};
 use hermes_chain_components::traits::send_message::CanSendSingleMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -10,13 +12,15 @@ use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEv
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
+use hermes_starknet_chain_components::traits::queries::storage_proof::CanQueryStorageProof;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
-use starknet_v14::core::types::U256;
+use starknet::core::types::U256;
+use starknet::macros::selector;
 use tracing::info;
 
 use crate::contexts::MadaraChainDriver;
@@ -83,6 +87,27 @@ fn test_madara_bootstrap() -> Result<(), Error> {
 
             token_address
         };
+
+        {
+            let total_supply_key = selector!("ERC20_total_supply");
+
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &token_address,
+                    &[total_supply_key],
+                )
+                .await?;
+
+            let storage_proof_str = serde_json::to_string(&storage_proof)?;
+
+            info!(
+                total_supply = %initial_supply,
+                selector = %total_supply_key.to_hex_string(),
+                storage_proof = %storage_proof_str,
+                "gotten storage proof for total supply"
+            );
+        }
 
         {
             // Test local ERC20 token transfer

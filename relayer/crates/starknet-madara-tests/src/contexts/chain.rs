@@ -67,9 +67,9 @@ use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobu
 use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use ibc::core::host::types::identifiers::ChainId;
 use reqwest::Client;
+use starknet::core::types::Felt;
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
-use starknet_v14::core::types::Felt;
 use url::Url;
 
 use crate::impls::{BuildStarknetAccount, HandleMadaraChainError};

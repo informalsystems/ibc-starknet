@@ -28,7 +28,7 @@ where
     ) -> Result<Chain::StorageProof, Chain::Error> {
         let request = QueryStorageProofRequest {
             block_id: "latest",
-            contract_storage_keys: vec![ContractStorageKey {
+            contracts_storage_keys: vec![ContractStorageKey {
                 contract_address: contract_address.0,
                 storage_keys: Vec::from(storage_keys),
             }],
@@ -45,7 +45,7 @@ where
 #[derive(Serialize)]
 pub struct QueryStorageProofRequest {
     pub block_id: &'static str,
-    pub contract_storage_keys: Vec<ContractStorageKey>,
+    pub contracts_storage_keys: Vec<ContractStorageKey>,
 }
 
 #[derive(Serialize)]
