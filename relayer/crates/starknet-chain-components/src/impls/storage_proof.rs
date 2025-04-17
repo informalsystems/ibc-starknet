@@ -5,6 +5,10 @@ use starknet::core::types::{Felt, MerkleNode, StorageProof};
 
 use crate::traits::types::storage_proof::HasStorageProofType;
 
+/**
+    Try to verify the structure of storage proof according to:
+    <https://docs.starknet.io/architecture-and-concepts/network-architecture/starknet-state/>
+*/
 pub trait CanVerifyStorageProof: HasStorageProofType + HasErrorType {
     fn verify_storage_proof(proof: &Self::StorageProof) -> Result<(), Self::Error>;
 }
@@ -19,6 +23,44 @@ where
 
         for storage_entry in proof.contracts_storage_proofs.iter() {
             Chain::verify_merkle_node_map(storage_entry)?;
+        }
+
+        for contract_leaf in proof.contracts_proof.contract_leaves_data.iter() {
+            let storage_root = contract_leaf.storage_root.ok_or_else(|| {
+                Chain::raise_error(format!("storage root not found at {contract_leaf:?}"))
+            })?;
+
+            let contract_hash = pedersen_hash(
+                &pedersen_hash(
+                    &pedersen_hash(&contract_leaf.class_hash, &storage_root),
+                    &contract_leaf.nonce,
+                ),
+                &Felt::ZERO,
+            );
+
+            let _node = proof
+                .contracts_proof
+                .nodes
+                .iter()
+                .find_map(|(_, node)| match node {
+                    MerkleNode::EdgeNode(node) => {
+                        if node.child == contract_hash {
+                            Some(node)
+                        } else {
+                            None
+                        }
+                    }
+                    _ => None,
+                })
+                .ok_or_else(|| {
+                    Chain::raise_error(format!(
+                        "contract hash {} for {:?} not found in contract proof nodes",
+                        contract_hash.to_hex_string(),
+                        contract_leaf
+                    ))
+                })?;
+
+            // TODO: Verify that the edge node is a membership proof
         }
 
         Ok(())
