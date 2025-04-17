@@ -2331,6 +2331,7 @@ dependencies = [
  "hermes-cosmos-encoding-components",
  "hermes-cosmos-test-components",
  "hermes-encoding-components",
+ "hermes-logging-components",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
  "hermes-runtime-components",
@@ -2345,6 +2346,7 @@ dependencies = [
  "ibc-proto",
  "poseidon",
  "prost-types",
+ "reqwest 0.12.15",
  "secp256k1",
  "serde",
  "serde_json",
@@ -2353,6 +2355,7 @@ dependencies = [
  "starknet 0.14.0",
  "time",
  "tonic",
+ "url",
 ]
 
 [[package]]

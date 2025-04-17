@@ -50,6 +50,9 @@ use hermes_starknet_chain_components::traits::contract::message::InvokeContractM
 use hermes_starknet_chain_components::traits::proof_signer::{
     StarknetProofSignerGetterComponent, StarknetProofSignerTypeProviderComponent,
 };
+use hermes_starknet_chain_components::traits::{
+    JsonRpcUrlGetterComponent, ReqwestClientGetterComponent,
+};
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
@@ -63,7 +66,6 @@ use url::Url;
 
 use crate::impls::{BuildStarknetAccount, HandleMadaraChainError};
 use crate::presets::MadaraChainPreset;
-use crate::traits::{JsonRpcUrlGetterComponent, ReqwestClientGetterComponent};
 use crate::types::StarknetAccount;
 
 #[cgp_context(MadaraChainComponents: MadaraChainPreset)]
