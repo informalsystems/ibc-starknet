@@ -22,6 +22,9 @@ use crate::types::cosmos::height::Height;
 
 pub struct EncodeTendermintLcHeader;
 
+/// The zero value for a Time is defined to be
+/// January 1, year 1, 00:00:00.000000000 UTC
+/// ref: https://github.com/cometbft/tendermint-rs/blob/v0.40.0/tendermint/src/block/commit_sig.rs#L22
 const ZERO_TIMESTAMP: ProtoTimestamp = ProtoTimestamp {
     seconds: -62135596800,
     nanos: 0,
