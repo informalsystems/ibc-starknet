@@ -32,7 +32,7 @@ where
             .contracts_proof
             .contract_leaves_data
             .iter()
-            .flat_map(|leaf| leaf.storage_root.clone().into_iter())
+            .flat_map(|leaf| leaf.storage_root.into_iter())
             .collect::<Vec<_>>();
 
         for storage_entry in proof.contracts_storage_proofs.iter() {
