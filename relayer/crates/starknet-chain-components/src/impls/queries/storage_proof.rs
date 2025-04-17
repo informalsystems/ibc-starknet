@@ -5,6 +5,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use starknet::core::types::Felt;
 
+use crate::impls::types::address::StarknetAddress;
 use crate::traits::json_rpc::CanSendJsonRpcRequest;
 use crate::traits::queries::storage_proof::{StorageProofQuerier, StorageProofQuerierComponent};
 use crate::traits::types::storage_proof::{HasStorageKeyType, HasStorageProofType};
@@ -13,7 +14,7 @@ use crate::traits::types::storage_proof::{HasStorageKeyType, HasStorageProofType
 impl<Chain> StorageProofQuerier<Chain> for QueryStarknetStorageProof
 where
     Chain: HasHeightType<Height = u64>
-        + HasAddressType<Address = Felt>
+        + HasAddressType<Address = StarknetAddress>
         + HasStorageKeyType<StorageKey = Felt>
         + HasStorageProofType
         + CanSendJsonRpcRequest<QueryStorageProofRequest, Chain::StorageProof>,
@@ -22,13 +23,13 @@ where
     async fn query_storage_proof(
         chain: &Chain,
         height: &u64,
-        contract_address: &Felt,
+        contract_address: &StarknetAddress,
         storage_keys: &[Felt],
     ) -> Result<Chain::StorageProof, Chain::Error> {
         let request = QueryStorageProofRequest {
             block_id: "latest",
             contract_storage_keys: vec![ContractStorageKey {
-                contract_address: *contract_address,
+                contract_address: contract_address.0,
                 storage_keys: Vec::from(storage_keys),
             }],
         };

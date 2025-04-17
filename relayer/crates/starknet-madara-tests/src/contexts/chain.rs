@@ -36,6 +36,7 @@ use hermes_runtime_components::traits::runtime::{
 };
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::json_rpc::SendJsonRpcRequestWithReqwest;
+use hermes_starknet_chain_components::impls::queries::storage_proof::QueryStarknetStorageProof;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::account::{
     AccountFromSignerBuilderComponent, StarknetAccountTypeProviderComponent,
@@ -52,8 +53,12 @@ use hermes_starknet_chain_components::traits::json_rpc::JsonRpcRequestSenderComp
 use hermes_starknet_chain_components::traits::proof_signer::{
     StarknetProofSignerGetterComponent, StarknetProofSignerTypeProviderComponent,
 };
+use hermes_starknet_chain_components::traits::queries::storage_proof::StorageProofQuerierComponent;
 use hermes_starknet_chain_components::traits::rpc_client::{
     JsonRpcUrlGetterComponent, ReqwestClientGetterComponent,
+};
+use hermes_starknet_chain_components::traits::types::storage_proof::{
+    StorageKeyTypeProviderComponent, StorageProofTypeProviderComponent,
 };
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
@@ -64,6 +69,7 @@ use ibc::core::host::types::identifiers::ChainId;
 use reqwest::Client;
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
+use starknet_v14::core::types::Felt;
 use url::Url;
 
 use crate::impls::{BuildStarknetAccount, HandleMadaraChainError};
@@ -155,6 +161,12 @@ delegate_components! {
             BuildStarknetAccount,
         JsonRpcRequestSenderComponent:
             SendJsonRpcRequestWithReqwest,
+        StorageKeyTypeProviderComponent:
+            UseType<Felt>,
+        StorageProofTypeProviderComponent:
+            UseType<serde_json::Value>,
+        StorageProofQuerierComponent:
+            QueryStarknetStorageProof,
     }
 }
 
@@ -188,6 +200,7 @@ check_components! {
         MessageSenderComponent,
         NonceQuerierComponent,
         ChainStatusQuerierComponent,
+        StorageProofQuerierComponent,
         [
             ClientStateQuerierComponent,
             ConsensusStateQuerierComponent,
