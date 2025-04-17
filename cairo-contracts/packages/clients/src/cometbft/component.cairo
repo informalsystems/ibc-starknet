@@ -4,7 +4,7 @@ pub mod CometClientComponent {
     use alexandria_data_structures::byte_array_ext::SpanU8IntoBytearray;
     use alexandria_sorting::MergeSort;
     use cometbft::types::{Options, TrustedBlockState, UntrustedBlockState};
-    use cometbft::verifier::verify_update_header;
+    use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use core::num::traits::Zero;
     use ics23::{
         MerkleProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
@@ -20,9 +20,10 @@ pub mod CometClientComponent {
     };
     use starknet::{ContractAddress, get_block_number, get_block_timestamp, get_caller_address};
     use starknet_ibc_clients::cometbft::{
-        CometClientState, CometClientStateImpl, CometConsensusState, CometConsensusStateImpl,
-        CometConsensusStateStore, CometConsensusStateToStore, CometConsensusStateZero, CometErrors,
-        CometHeader, CometHeaderImpl, CometHeaderIntoConsensusState, StoreToCometConsensusState,
+        ClientMessage, CometClientState, CometClientStateImpl, CometConsensusState,
+        CometConsensusStateImpl, CometConsensusStateStore, CometConsensusStateToStore,
+        CometConsensusStateZero, CometErrors, CometHeader, CometHeaderImpl,
+        CometHeaderIntoConsensusState, Misbehaviour, MisbehaviourImpl, StoreToCometConsensusState,
     };
     use starknet_ibc_core::client::{
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
@@ -241,10 +242,10 @@ pub mod CometClientComponent {
             let client_sequence = msg.client_id.sequence;
 
             if self.verify_misbehaviour(client_sequence, msg.client_message.clone()) {
-                return self.update_on_misbehaviour(client_sequence, msg.client_message.clone());
+                self.update_on_misbehaviour(client_sequence, msg.client_message.clone())
+            } else {
+                self.update_state(client_sequence, msg.client_message)
             }
-
-            self.update_state(client_sequence, msg.client_message)
         }
     }
 
@@ -401,37 +402,19 @@ pub mod CometClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) {
-            let header: CometHeader = CometHeaderImpl::deserialize(client_message);
-            let trusted_height = header.trusted_height;
-
-            let ibc_trusted_height = HeightImpl::new(
-                trusted_height.revision_number, trusted_height.revision_height,
-            );
-
-            let client_state = self.read_client_state(client_sequence);
-
-            let trusted_consensus_state = self
-                .read_consensus_state(client_sequence, ibc_trusted_height);
-
-            let trusted_block_state = TrustedBlockState {
-                chain_id: client_state.chain_id,
-                header_time: trusted_consensus_state.timestamp.try_into().unwrap(),
-                height: trusted_height.revision_height,
-                next_validators: header.trusted_validator_set,
-                next_validators_hash: trusted_consensus_state.next_validators_hash,
-            };
-
-            let untrusted_block_state = UntrustedBlockState {
-                signed_header: header.signed_header, validators: header.validator_set,
-            };
-
-            let trust_threshold = client_state.trust_level;
-            let trusting_period = client_state.trusting_period.try_into().unwrap();
-            let clock_drift = client_state.max_clock_drift.try_into().unwrap();
-            let now = TimestampImpl::host().try_into().unwrap();
-
-            let options = Options { trust_threshold, trusting_period, clock_drift };
-            verify_update_header(untrusted_block_state, trusted_block_state, options, now)
+            let mut span = client_message.span();
+            match Serde::<ClientMessage>::deserialize(ref span).unwrap() {
+                ClientMessage::Update(message) => {
+                    let header: CometHeader = CometHeaderImpl::deserialize(message);
+                    self._verify_update(client_sequence, header);
+                },
+                ClientMessage::Misbehaviour(message) => {
+                    let misbehaviour: Misbehaviour = MisbehaviourImpl::deserialize(message);
+                    misbehaviour.validate_basic();
+                    self._verify_misbehaviour_header(client_sequence, misbehaviour.header_1);
+                    self._verify_misbehaviour_header(client_sequence, misbehaviour.header_2);
+                },
+            }
         }
 
         fn verify_misbehaviour(
@@ -439,7 +422,18 @@ pub mod CometClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> bool {
-            false
+            let mut span = client_message.span();
+            match Serde::<ClientMessage>::deserialize(ref span).unwrap() {
+                ClientMessage::Update(message) => {
+                    let _header: CometHeader = CometHeaderImpl::deserialize(message);
+                    // TODO(rano): misbehaviour on client update
+                    false
+                },
+                ClientMessage::Misbehaviour(message) => {
+                    let misbehaviour: Misbehaviour = MisbehaviourImpl::deserialize(message);
+                    misbehaviour.verify()
+                },
+            }
         }
 
         fn verify_substitute(
@@ -693,6 +687,81 @@ pub mod CometClientComponent {
                     processed_height,
                     processed_time,
                 );
+        }
+
+        fn _verify_update(
+            self: @ComponentState<TContractState>, client_sequence: u64, header: CometHeader,
+        ) {
+            let trusted_height = header.trusted_height;
+
+            let ibc_trusted_height = HeightImpl::new(
+                trusted_height.revision_number, trusted_height.revision_height,
+            );
+
+            let client_state = self.read_client_state(client_sequence);
+
+            let trusted_consensus_state = self
+                .read_consensus_state(client_sequence, ibc_trusted_height);
+
+            let trusted_block_state = TrustedBlockState {
+                chain_id: client_state.chain_id,
+                header_time: trusted_consensus_state.timestamp.try_into().unwrap(),
+                height: trusted_height.revision_height,
+                next_validators: header.trusted_validator_set.clone(),
+                next_validators_hash: trusted_consensus_state.next_validators_hash,
+            };
+
+            let untrusted_block_state = UntrustedBlockState {
+                signed_header: header.signed_header,
+                validators: header.validator_set,
+                next_validators: header.trusted_validator_set,
+            };
+
+            let trust_threshold = client_state.trust_level;
+            let trusting_period = client_state.trusting_period.try_into().unwrap();
+            let clock_drift = client_state.max_clock_drift.try_into().unwrap();
+            let now = TimestampImpl::host().try_into().unwrap();
+
+            let options = Options { trust_threshold, trusting_period, clock_drift };
+            verify_update_header(untrusted_block_state, trusted_block_state, options, now)
+        }
+
+
+        fn _verify_misbehaviour_header(
+            self: @ComponentState<TContractState>, client_sequence: u64, header: CometHeader,
+        ) {
+            let trusted_height = header.trusted_height;
+
+            let ibc_trusted_height = HeightImpl::new(
+                trusted_height.revision_number, trusted_height.revision_height,
+            );
+
+            let client_state = self.read_client_state(client_sequence);
+
+            let trusted_consensus_state = self
+                .read_consensus_state(client_sequence, ibc_trusted_height);
+
+            let trusted_block_state = TrustedBlockState {
+                chain_id: client_state.chain_id,
+                header_time: trusted_consensus_state.timestamp.try_into().unwrap(),
+                height: trusted_height.revision_height,
+                next_validators: header.trusted_validator_set.clone(),
+                next_validators_hash: trusted_consensus_state.next_validators_hash,
+            };
+
+            let untrusted_block_state = UntrustedBlockState {
+                signed_header: header.signed_header,
+                validators: header.validator_set,
+                next_validators: header.trusted_validator_set,
+            };
+
+            let trust_threshold = client_state.trust_level;
+            let trusting_period = client_state.trusting_period.try_into().unwrap();
+            let clock_drift = client_state.max_clock_drift.try_into().unwrap();
+            let now = TimestampImpl::host().try_into().unwrap();
+
+            let options = Options { trust_threshold, trusting_period, clock_drift };
+            verify_misbehaviour_header(untrusted_block_state, trusted_block_state, options, now)
         }
     }
 
