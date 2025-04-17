@@ -35,6 +35,7 @@ use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
+use hermes_starknet_chain_components::impls::json_rpc::SendJsonRpcRequestWithReqwest;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::account::{
     AccountFromSignerBuilderComponent, StarknetAccountTypeProviderComponent,
@@ -47,10 +48,11 @@ use hermes_starknet_chain_components::traits::contract::declare::ContractDeclare
 use hermes_starknet_chain_components::traits::contract::deploy::ContractDeployerComponent;
 use hermes_starknet_chain_components::traits::contract::invoke::ContractInvokerComponent;
 use hermes_starknet_chain_components::traits::contract::message::InvokeContractMessageBuilderComponent;
+use hermes_starknet_chain_components::traits::json_rpc::JsonRpcRequestSenderComponent;
 use hermes_starknet_chain_components::traits::proof_signer::{
     StarknetProofSignerGetterComponent, StarknetProofSignerTypeProviderComponent,
 };
-use hermes_starknet_chain_components::traits::{
+use hermes_starknet_chain_components::traits::rpc_client::{
     JsonRpcUrlGetterComponent, ReqwestClientGetterComponent,
 };
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
@@ -151,6 +153,8 @@ delegate_components! {
             UseType<StarknetAccount>,
         AccountFromSignerBuilderComponent:
             BuildStarknetAccount,
+        JsonRpcRequestSenderComponent:
+            SendJsonRpcRequestWithReqwest,
     }
 }
 

@@ -6,6 +6,7 @@ pub mod encoding;
 pub mod error;
 pub mod events;
 pub mod ibc_amount;
+pub mod json_rpc;
 pub mod messages;
 pub mod packet_fields;
 pub mod packet_filter;

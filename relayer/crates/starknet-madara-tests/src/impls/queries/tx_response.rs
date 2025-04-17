@@ -9,7 +9,7 @@ use hermes_relayer_components::transaction::traits::types::tx_response::HasTxRes
 use hermes_runtime_components::traits::runtime::HasRuntime;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::traits::client::HasStarknetClient;
-use hermes_starknet_chain_components::traits::CanSendJsonRpcRequest;
+use hermes_starknet_chain_components::traits::json_rpc::CanSendJsonRpcRequest;
 use serde::{Deserialize, Serialize};
 use starknet_v13::core::types::requests::TraceTransactionRequest;
 use starknet_v13::core::types::{Felt, StarknetError, TransactionTrace};
