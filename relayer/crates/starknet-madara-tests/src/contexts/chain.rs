@@ -67,7 +67,7 @@ use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobu
 use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use ibc::core::host::types::identifiers::ChainId;
 use reqwest::Client;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, StorageProof};
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
 use url::Url;
@@ -164,7 +164,7 @@ delegate_components! {
         StorageKeyTypeProviderComponent:
             UseType<Felt>,
         StorageProofTypeProviderComponent:
-            UseType<serde_json::Value>,
+            UseType<StorageProof>,
         StorageProofQuerierComponent:
             QueryStarknetStorageProof,
     }
