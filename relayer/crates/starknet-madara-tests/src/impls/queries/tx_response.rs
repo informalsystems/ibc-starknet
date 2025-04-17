@@ -10,12 +10,11 @@ use hermes_runtime_components::traits::runtime::HasRuntime;
 use hermes_runtime_components::traits::sleep::CanSleep;
 use hermes_starknet_chain_components::traits::client::HasStarknetClient;
 use serde::{Deserialize, Serialize};
-use starknet_v13::core::types::requests::TraceTransactionRequestRef;
+use starknet_v13::core::types::requests::TraceTransactionRequest;
 use starknet_v13::core::types::{Felt, StarknetError, TransactionTrace};
-use starknet_v13::providers::jsonrpc::JsonRpcMethod;
 use starknet_v13::providers::{Provider, ProviderError};
 
-use crate::traits::{HasJsonRpcUrl, HasRpcClient};
+use crate::traits::CanSendJsonRpcRequest;
 use crate::types::TxResponse;
 
 #[cgp_new_provider(TxResponseQuerierComponent)]
@@ -25,8 +24,6 @@ where
         + HasTxResponseType<TxResponse = TxResponse>
         + HasStarknetClient<Client: Provider>
         + CanTraceTransaction
-        + HasRpcClient
-        + HasJsonRpcUrl
         + HasRuntime<Runtime: CanSleep>
         + CanRaiseAsyncError<ProviderError>,
 {
@@ -65,56 +62,22 @@ pub trait CanTraceTransaction: HasAsyncErrorType {
 
 impl<Chain> CanTraceTransaction for Chain
 where
-    Chain: HasRpcClient
-        + HasJsonRpcUrl
-        + CanRaiseAsyncError<serde_json::Error>
-        + CanRaiseAsyncError<reqwest::Error>,
+    Chain: for<'a> CanSendJsonRpcRequest<TraceTransactionRequest, TraceTransactionResponse>,
 {
-    async fn trace_transaction(&self, tx_hash: Felt) -> Result<TransactionTrace, Self::Error> {
-        let params = TraceTransactionRequestRef {
-            transaction_hash: tx_hash.as_ref(),
-        };
+    async fn trace_transaction(
+        &self,
+        transaction_hash: Felt,
+    ) -> Result<TransactionTrace, Self::Error> {
+        let params = TraceTransactionRequest { transaction_hash };
 
-        let request_body = JsonRpcRequest {
-            id: 1,
-            jsonrpc: "2.0",
-            method: JsonRpcMethod::TraceTransaction,
-            params,
-        };
+        let rpc_response = self
+            .send_json_rpc_request("starknet_traceTransaction", &params)
+            .await?;
 
-        let request_body = serde_json::to_string(&request_body).map_err(Chain::raise_error)?;
-
-        let request = self
-            .rpc_client()
-            .post(self.json_rpc_url().clone())
-            .body(request_body)
-            .header("Content-Type", "application/json");
-
-        let response = request.send().await.map_err(Chain::raise_error)?;
-
-        let response_body = response.text().await.map_err(Chain::raise_error)?;
-
-        let rpc_response: JsonRpcResponse<TraceTransactionResponse> =
-            serde_json::from_str(&response_body).map_err(Chain::raise_error)?;
-
-        let trace = rpc_response.result.trace_root;
+        let trace = rpc_response.trace_root;
 
         Ok(trace)
     }
-}
-
-#[derive(Debug, Serialize)]
-pub struct JsonRpcRequest<T> {
-    id: u64,
-    jsonrpc: &'static str,
-    method: JsonRpcMethod,
-    params: T,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct JsonRpcResponse<T> {
-    pub jsonrpc: String,
-    pub result: T,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
