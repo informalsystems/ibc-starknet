@@ -49,6 +49,7 @@ tonic                       = { workspace = true }
 futures                     = { workspace = true }
 reqwest                     = { workspace = true }
 url                         = { workspace = true }
+indexmap                    = { workspace = true }
 time                        = { version = "0.3.36" }
 crypto-bigint               = { version = "0.5.5" }
 derive_more                 = { version = "2.0", features = [ "constructor", "deref", "display", "from", "from_str" ], default-features = false }
