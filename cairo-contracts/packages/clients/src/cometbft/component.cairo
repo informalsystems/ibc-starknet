@@ -411,7 +411,7 @@ pub mod CometClientComponent {
             let client_state = self.read_client_state(client_sequence);
 
             let trusted_consensus_state = self
-                .read_consensus_state(client_sequence, ibc_trusted_height.clone());
+                .read_consensus_state(client_sequence, ibc_trusted_height);
 
             let trusted_block_state = TrustedBlockState {
                 chain_id: client_state.chain_id,
