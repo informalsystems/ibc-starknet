@@ -63,7 +63,7 @@ use url::Url;
 
 use crate::impls::{BuildStarknetAccount, HandleMadaraChainError};
 use crate::presets::MadaraChainPreset;
-use crate::traits::{JsonRpcUrlGetterComponent, RpcClientGetterComponent};
+use crate::traits::{JsonRpcUrlGetterComponent, ReqwestClientGetterComponent};
 use crate::types::StarknetAccount;
 
 #[cgp_context(MadaraChainComponents: MadaraChainPreset)]
@@ -124,11 +124,10 @@ delegate_components! {
             UseField<symbol!("runtime")>,
         PollIntervalGetterComponent:
             UseField<symbol!("poll_interval")>,
-        [
-            RpcClientGetterComponent,
-            JsonRpcUrlGetterComponent,
-        ]:
-            UseFields,
+        ReqwestClientGetterComponent:
+            UseField<symbol!("rpc_client")>,
+        JsonRpcUrlGetterComponent:
+            UseField<symbol!("json_rpc_url")>,
         LoggerComponent:
             TracingLogger,
         [

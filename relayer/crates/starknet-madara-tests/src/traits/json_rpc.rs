@@ -1,7 +1,9 @@
 use cgp::prelude::*;
+use hermes_logging_components::traits::logger::CanLog;
+use hermes_logging_components::types::level::LevelTrace;
 use serde::{Deserialize, Serialize};
 
-use crate::traits::{HasJsonRpcUrl, HasRpcClient};
+use crate::traits::{HasJsonRpcUrl, HasReqwestClient};
 
 #[async_trait]
 pub trait CanSendJsonRpcRequest<Request, Response>: HasAsyncErrorType {
@@ -14,8 +16,9 @@ pub trait CanSendJsonRpcRequest<Request, Response>: HasAsyncErrorType {
 
 impl<Context, Request, Response> CanSendJsonRpcRequest<Request, Response> for Context
 where
-    Context: HasRpcClient
+    Context: HasReqwestClient
         + HasJsonRpcUrl
+        + CanLog<LevelTrace>
         + CanRaiseAsyncError<reqwest::Error>
         + CanRaiseAsyncError<serde_json::Error>,
     Request: Async + Serialize,
@@ -35,8 +38,14 @@ where
 
         let request_string = serde_json::to_string(&request_body).map_err(Self::raise_error)?;
 
+        self.log(
+            &format!("sending json rpc request: {request_string}"),
+            &LevelTrace,
+        )
+        .await;
+
         let request = self
-            .rpc_client()
+            .reqwest_client()
             .post(self.json_rpc_url().clone())
             .body(request_string)
             .header("Content-Type", "application/json");
@@ -44,6 +53,12 @@ where
         let response = request.send().await.map_err(Self::raise_error)?;
 
         let response_string = response.text().await.map_err(Self::raise_error)?;
+
+        self.log(
+            &format!("received json rpc response: {response_string}"),
+            &LevelTrace,
+        )
+        .await;
 
         let rpc_response: JsonRpcResponse<Response> =
             serde_json::from_str(&response_string).map_err(Self::raise_error)?;
