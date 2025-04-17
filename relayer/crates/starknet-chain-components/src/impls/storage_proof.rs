@@ -1,7 +1,7 @@
 use cgp::prelude::{CanRaiseError, HasErrorType};
 use indexmap::IndexMap;
 use starknet::core::crypto::pedersen_hash;
-use starknet::core::types::{Felt, MerkleNode, StorageProof};
+use starknet::core::types::{ContractsProof, Felt, MerkleNode, StorageProof};
 
 use crate::traits::types::storage_proof::HasStorageProofType;
 
@@ -25,7 +25,22 @@ where
             Chain::verify_merkle_node_map(storage_entry)?;
         }
 
-        for contract_leaf in proof.contracts_proof.contract_leaves_data.iter() {
+        Chain::verify_contracts_proof(&proof.contracts_proof)?;
+
+        Ok(())
+    }
+}
+
+pub trait CanVerifyContractsProof: HasErrorType {
+    fn verify_contracts_proof(contracts_proof: &ContractsProof) -> Result<(), Self::Error>;
+}
+
+impl<Chain> CanVerifyContractsProof for Chain
+where
+    Chain: CanRaiseError<String>,
+{
+    fn verify_contracts_proof(contracts_proof: &ContractsProof) -> Result<(), Self::Error> {
+        for contract_leaf in contracts_proof.contract_leaves_data.iter() {
             let storage_root = contract_leaf.storage_root.ok_or_else(|| {
                 Chain::raise_error(format!("storage root not found at {contract_leaf:?}"))
             })?;
@@ -38,8 +53,7 @@ where
                 &Felt::ZERO,
             );
 
-            let _node = proof
-                .contracts_proof
+            let _node = contracts_proof
                 .nodes
                 .iter()
                 .find_map(|(_, node)| match node {
