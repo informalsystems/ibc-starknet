@@ -1,6 +1,7 @@
 use core::num::traits::{CheckedAdd, OverflowingMul, Zero};
 use core::traits::PartialOrd;
 use ics23::IntoArrayU32;
+use protobuf::types::wkt::{Duration as ProtoDuration, Timestamp as ProtoTimestamp};
 use starknet::SyscallResult;
 use starknet::storage_access::{StorageBaseAddress, Store};
 use starknet_ibc_core::client::ClientErrors;
@@ -208,9 +209,21 @@ pub impl TimestampImpl of TimestampTrait {
         Timestamp { timestamp: unix_nanos }
     }
 
+    fn from_seconds_and_nanos(seconds: u64, nanos: u32) -> Timestamp {
+        let (unix_nanos, overflowed) = seconds.overflowing_mul(NANOS_PER_SEC.into());
+        assert(!overflowed, ClientErrors::OVERFLOWED_TIMESTAMP);
+        let timestamp = unix_nanos.checked_add(nanos.into()).unwrap();
+        Timestamp { timestamp }
+    }
+
     /// Returns the timestamp in seconds, truncating the nanoseconds.
     fn as_secs(self: Timestamp) -> u64 {
         self.timestamp / NANOS_PER_SEC.into()
+    }
+
+    /// Returns the timestamp in nanoseconds.
+    fn as_nanos(self: Timestamp) -> u64 {
+        self.timestamp % NANOS_PER_SEC.into()
     }
 
     /// Returns the timestamp of the latest block in Starknet, which serves as the host timestamp in
@@ -277,6 +290,14 @@ pub impl TimestampIntoArrayU32 of IntoArrayU32<Timestamp> {
     }
 }
 
+pub impl TimestampToProto of TryInto<Timestamp, ProtoTimestamp> {
+    fn try_into(self: Timestamp) -> Option<ProtoTimestamp> {
+        let seconds = self.as_secs().try_into()?;
+        let nanos = self.as_nanos().try_into()?;
+        Some(ProtoTimestamp { seconds, nanos })
+    }
+}
+
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde, starknet::Store)]
 pub struct Duration {
     pub seconds: u64,
@@ -322,6 +343,13 @@ impl DurationZero of Zero<Duration> {
     }
 }
 
+pub impl DurationToProto of TryInto<Duration, ProtoDuration> {
+    fn try_into(self: Duration) -> Option<ProtoDuration> {
+        let seconds = self.seconds.try_into()?;
+        let nanos = self.nanos.try_into()?;
+        Some(ProtoDuration { seconds, nanos })
+    }
+}
 
 #[cfg(test)]
 mod tests {

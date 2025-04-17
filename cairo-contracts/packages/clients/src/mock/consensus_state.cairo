@@ -1,9 +1,9 @@
 use core::num::traits::Zero;
 use starknet_ibc_clients::mock::MockErrors;
 use starknet_ibc_core::client::{
-    Duration, DurationTrait, Status, Timestamp, TimestampImpl, TimestampIntoU128,
+    Duration, DurationTrait, Status, Timestamp, TimestampImpl, TimestampIntoU128, TimestampZero,
 };
-use starknet_ibc_core::commitment::StateRoot;
+use starknet_ibc_core::commitment::{StateRoot, StateRootZero};
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct MockConsensusState {
@@ -11,12 +11,22 @@ pub struct MockConsensusState {
     pub root: StateRoot,
 }
 
-#[generate_trait]
-pub impl MockConsensusStateImpl of MockConsensusStateTrait {
-    fn is_non_zero(self: @MockConsensusState) -> bool {
-        !(self.root.is_zero() && self.timestamp.is_zero())
+pub impl MockConsensusStateZero of Zero<MockConsensusState> {
+    fn zero() -> MockConsensusState {
+        MockConsensusState { timestamp: TimestampZero::zero(), root: StateRootZero::zero() }
     }
 
+    fn is_zero(self: @MockConsensusState) -> bool {
+        self.timestamp.is_zero() && self.root.is_zero()
+    }
+
+    fn is_non_zero(self: @MockConsensusState) -> bool {
+        !self.is_zero()
+    }
+}
+
+#[generate_trait]
+pub impl MockConsensusStateImpl of MockConsensusStateTrait {
     fn timestamp(self: @MockConsensusState) -> Timestamp {
         *self.timestamp
     }

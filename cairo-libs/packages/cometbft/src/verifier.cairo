@@ -299,7 +299,7 @@ fn voting_power_in_impl(
     for validator in validator_set.validators {
         if votes.has_voted(@validator) {
             power.tally(validator.voting_power);
-            if power.clone().has_enough_power() {
+            if power.has_enough_power() {
                 break;
             }
         }
