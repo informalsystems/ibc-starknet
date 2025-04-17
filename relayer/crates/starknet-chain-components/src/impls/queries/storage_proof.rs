@@ -1,10 +1,13 @@
 use cgp::prelude::*;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_logging_components::traits::logger::CanLog;
+use hermes_logging_components::types::level::LevelDebug;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, StorageProof};
 
+use crate::impls::storage_proof::CanVerifyStorageProof;
 use crate::impls::types::address::StarknetAddress;
 use crate::traits::json_rpc::CanSendJsonRpcRequest;
 use crate::traits::queries::storage_proof::{StorageProofQuerier, StorageProofQuerierComponent};
@@ -17,7 +20,10 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasStorageKeyType<StorageKey = Felt>
         + HasStorageProofType
-        + CanSendJsonRpcRequest<QueryStorageProofRequest, Chain::StorageProof>,
+        + CanVerifyStorageProof<StorageProof = StorageProof>
+        + CanLog<LevelDebug>
+        + CanSendJsonRpcRequest<QueryStorageProofRequest, Chain::StorageProof>
+        + CanRaiseError<serde_json::Error>,
     Chain::StorageProof: DeserializeOwned,
 {
     async fn query_storage_proof(
@@ -38,6 +44,18 @@ where
         let storage_proof = chain
             .send_json_rpc_request("starknet_getStorageProof", &request)
             .await?;
+
+        let storage_proof_str =
+            serde_json::to_string_pretty(&storage_proof).map_err(Chain::raise_error)?;
+
+        chain
+            .log(
+                &format!("fetched storage proof: {}", storage_proof_str),
+                &LevelDebug,
+            )
+            .await;
+
+        Chain::verify_storage_proof(&storage_proof)?;
 
         Ok(storage_proof)
     }

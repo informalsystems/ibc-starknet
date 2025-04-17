@@ -21,11 +21,13 @@ where
         Chain::verify_merkle_node_map(
             &proof.classes_proof,
             &vec![proof.global_roots.classes_tree_root],
+            true,
         )?;
 
         Chain::verify_merkle_node_map(
             &proof.contracts_proof.nodes,
             &vec![proof.global_roots.contracts_tree_root],
+            true,
         )?;
 
         let contract_roots = proof
@@ -36,7 +38,7 @@ where
             .collect::<Vec<_>>();
 
         for storage_entry in proof.contracts_storage_proofs.iter() {
-            Chain::verify_merkle_node_map(storage_entry, &contract_roots)?;
+            Chain::verify_merkle_node_map(storage_entry, &contract_roots, false)?;
         }
 
         Chain::verify_contracts_proof(&proof.contracts_proof)?;
@@ -99,6 +101,7 @@ pub trait CanVerifyMerkleNodeMap: HasErrorType {
     fn verify_merkle_node_map(
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
+        trust_child: bool,
     ) -> Result<(), Self::Error>;
 }
 
@@ -109,13 +112,14 @@ where
     fn verify_merkle_node_map(
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
+        trust_child: bool,
     ) -> Result<(), Self::Error> {
         for (hash, node) in node_map.iter() {
             Chain::verify_merkle_node(hash, node)?;
         }
 
         for (hash, node) in node_map.iter() {
-            Chain::verify_merkle_node_parent(hash, node_map, roots)?;
+            Chain::verify_merkle_node_parent(hash, node_map, roots, trust_child)?;
         }
 
         Ok(())
@@ -131,6 +135,7 @@ pub trait CanVerifyMerkleNodeParent: HasErrorType {
         node_hash: &Felt,
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
+        trust_child: bool,
     ) -> Result<(), Self::Error>;
 }
 
@@ -142,6 +147,7 @@ where
         hash: &Felt,
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
+        trust_child: bool,
     ) -> Result<(), Self::Error> {
         if roots.contains(hash) {
             return Ok(());
@@ -156,9 +162,7 @@ where
                         }
                     }
                     MerkleNode::EdgeNode(parent_node) => {
-                        // FIXME: How to verify that a child value is a node or a storage value?
-                        // If the child is a storage value, we should *not* treat it as a valid parent.
-                        if &parent_node.child == hash {
+                        if trust_child && &parent_node.child == hash {
                             return Ok(());
                         }
                     }
