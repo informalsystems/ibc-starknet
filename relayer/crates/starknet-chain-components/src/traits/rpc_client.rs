@@ -3,10 +3,11 @@ use reqwest::Client;
 use url::Url;
 
 #[cgp_getter {
-    provider: RpcClientGetter,
+    name: ReqwestClientGetterComponent,
+    provider: ReqwestClientGetter,
 }]
-pub trait HasRpcClient {
-    fn rpc_client(&self) -> &Client;
+pub trait HasReqwestClient {
+    fn reqwest_client(&self) -> &Client;
 }
 
 #[cgp_getter {

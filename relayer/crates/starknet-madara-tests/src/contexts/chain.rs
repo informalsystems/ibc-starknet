@@ -35,6 +35,8 @@ use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
+use hermes_starknet_chain_components::impls::json_rpc::SendJsonRpcRequestWithReqwest;
+use hermes_starknet_chain_components::impls::queries::storage_proof::QueryStarknetStorageProof;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::account::{
     AccountFromSignerBuilderComponent, StarknetAccountTypeProviderComponent,
@@ -47,8 +49,16 @@ use hermes_starknet_chain_components::traits::contract::declare::ContractDeclare
 use hermes_starknet_chain_components::traits::contract::deploy::ContractDeployerComponent;
 use hermes_starknet_chain_components::traits::contract::invoke::ContractInvokerComponent;
 use hermes_starknet_chain_components::traits::contract::message::InvokeContractMessageBuilderComponent;
+use hermes_starknet_chain_components::traits::json_rpc::JsonRpcRequestSenderComponent;
 use hermes_starknet_chain_components::traits::proof_signer::{
     StarknetProofSignerGetterComponent, StarknetProofSignerTypeProviderComponent,
+};
+use hermes_starknet_chain_components::traits::queries::storage_proof::StorageProofQuerierComponent;
+use hermes_starknet_chain_components::traits::rpc_client::{
+    JsonRpcUrlGetterComponent, ReqwestClientGetterComponent,
+};
+use hermes_starknet_chain_components::traits::types::storage_proof::{
+    StorageKeyTypeProviderComponent, StorageProofTypeProviderComponent,
 };
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
@@ -57,13 +67,13 @@ use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobu
 use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use ibc::core::host::types::identifiers::ChainId;
 use reqwest::Client;
+use starknet::core::types::{Felt, StorageProof};
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
 use url::Url;
 
 use crate::impls::{BuildStarknetAccount, HandleMadaraChainError};
 use crate::presets::MadaraChainPreset;
-use crate::traits::{JsonRpcUrlGetterComponent, RpcClientGetterComponent};
 use crate::types::StarknetAccount;
 
 #[cgp_context(MadaraChainComponents: MadaraChainPreset)]
@@ -124,11 +134,10 @@ delegate_components! {
             UseField<symbol!("runtime")>,
         PollIntervalGetterComponent:
             UseField<symbol!("poll_interval")>,
-        [
-            RpcClientGetterComponent,
-            JsonRpcUrlGetterComponent,
-        ]:
-            UseFields,
+        ReqwestClientGetterComponent:
+            UseField<symbol!("rpc_client")>,
+        JsonRpcUrlGetterComponent:
+            UseField<symbol!("json_rpc_url")>,
         LoggerComponent:
             TracingLogger,
         [
@@ -150,6 +159,14 @@ delegate_components! {
             UseType<StarknetAccount>,
         AccountFromSignerBuilderComponent:
             BuildStarknetAccount,
+        JsonRpcRequestSenderComponent:
+            SendJsonRpcRequestWithReqwest,
+        StorageKeyTypeProviderComponent:
+            UseType<Felt>,
+        StorageProofTypeProviderComponent:
+            UseType<StorageProof>,
+        StorageProofQuerierComponent:
+            QueryStarknetStorageProof,
     }
 }
 
@@ -183,6 +200,7 @@ check_components! {
         MessageSenderComponent,
         NonceQuerierComponent,
         ChainStatusQuerierComponent,
+        StorageProofQuerierComponent,
         [
             ClientStateQuerierComponent,
             ConsensusStateQuerierComponent,

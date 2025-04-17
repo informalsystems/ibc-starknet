@@ -1,6 +1,8 @@
 use cgp::prelude::*;
 use hermes_chain_components::traits::queries::block::CanQueryBlock;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainStatus;
+use hermes_chain_components::traits::queries::chain_status::{
+    CanQueryChainHeight, CanQueryChainStatus,
+};
 use hermes_chain_components::traits::send_message::CanSendSingleMessage;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
@@ -10,13 +12,16 @@ use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEv
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
+use hermes_starknet_chain_components::traits::queries::storage_proof::CanQueryStorageProof;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
 use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
-use starknet_v14::core::types::U256;
+use starknet::core::crypto::pedersen_hash;
+use starknet::core::types::U256;
+use starknet::macros::selector;
 use tracing::info;
 
 use crate::contexts::MadaraChainDriver;
@@ -63,16 +68,17 @@ fn test_madara_bootstrap() -> Result<(), Error> {
             .set([erc20_class_hash].into())
             .unwrap();
 
-        let initial_supply = 1000u32;
+        let initial_supply = 0x1234u32;
+
+        let sender_address = chain_driver.relayer_wallet.account_address;
+        let recipient_address = chain_driver.user_wallet_a.account_address;
 
         let token_address = {
-            let relayer_address = chain_driver.relayer_wallet.account_address;
-
             let calldata = StarknetCairoEncoding.encode(&product![
                 "token".to_owned(),
                 "token".to_owned(),
                 U256::from(initial_supply),
-                relayer_address,
+                sender_address,
             ])?;
 
             let token_address = chain
@@ -85,16 +91,81 @@ fn test_madara_bootstrap() -> Result<(), Error> {
         };
 
         {
+            let total_supply_key = selector!("ERC20_total_supply");
+
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &token_address,
+                    &[total_supply_key],
+                )
+                .await?;
+
+            let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
+
+            info!(
+                total_supply = %initial_supply,
+                selector = %total_supply_key.to_hex_string(),
+                storage_proof = %storage_proof_str,
+                "gotten storage proof for total supply"
+            );
+        }
+
+        {
+            let base_balance_key = selector!("ERC20_balances");
+            let balance_key = pedersen_hash(&base_balance_key, &sender_address.0);
+
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &token_address,
+                    &[balance_key],
+                )
+                .await?;
+
+            let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
+
+            info!(
+                balance = %initial_supply,
+                selector = %balance_key.to_hex_string(),
+                storage_proof = %storage_proof_str,
+                "gotten storage proof for sender's balance"
+            );
+        }
+
+        {
+            let base_balance_key = selector!("ERC20_balances");
+            let balance_key = pedersen_hash(&base_balance_key, &recipient_address.0);
+
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &token_address,
+                    &[balance_key],
+                )
+                .await?;
+
+            let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
+
+            info!(
+                balance = %initial_supply,
+                selector = %balance_key.to_hex_string(),
+                storage_proof = %storage_proof_str,
+                "gotten storage proof for recipient's balance"
+            );
+        }
+
+        {
             // Test local ERC20 token transfer
-            let account_address = chain_driver.relayer_wallet.account_address;
+            let sender_address = chain_driver.relayer_wallet.account_address;
 
             let recipient_address = chain_driver.user_wallet_a.account_address;
 
-            info!("sender address: {:?}", account_address);
+            info!("sender address: {:?}", sender_address);
             info!("recipient address: {:?}", recipient_address);
 
             let sender_balance_a = chain
-                .query_token_balance(&token_address, &account_address)
+                .query_token_balance(&token_address, &sender_address)
                 .await?;
 
             info!("sender balance before: {}", sender_balance_a);
@@ -128,7 +199,7 @@ fn test_madara_bootstrap() -> Result<(), Error> {
 
             match &erc20_events[0] {
                 Erc20Event::Transfer(transfer) => {
-                    assert_eq!(transfer.from, account_address);
+                    assert_eq!(transfer.from, sender_address);
                     assert_eq!(transfer.to, recipient_address);
                     assert_eq!(transfer.value, transfer_amount);
                 }
@@ -138,7 +209,7 @@ fn test_madara_bootstrap() -> Result<(), Error> {
             }
 
             let sender_balance_b = chain
-                .query_token_balance(&token_address, &account_address)
+                .query_token_balance(&token_address, &sender_address)
                 .await?;
 
             info!("sender balance after transfer: {}", sender_balance_b);
@@ -156,6 +227,71 @@ fn test_madara_bootstrap() -> Result<(), Error> {
             assert_eq!(
                 recipient_balance_b.quantity,
                 recipient_balance_a.quantity + transfer_amount
+            );
+        }
+
+        {
+            let total_supply_key = selector!("ERC20_total_supply");
+
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &token_address,
+                    &[total_supply_key],
+                )
+                .await?;
+
+            let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
+
+            info!(
+                total_supply = %initial_supply,
+                selector = %total_supply_key.to_hex_string(),
+                storage_proof = %storage_proof_str,
+                "gotten storage proof for total supply"
+            );
+        }
+
+        {
+            let base_balance_key = selector!("ERC20_balances");
+            let balance_key = pedersen_hash(&base_balance_key, &sender_address.0);
+
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &token_address,
+                    &[balance_key],
+                )
+                .await?;
+
+            let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
+
+            info!(
+                balance = %initial_supply,
+                selector = %balance_key.to_hex_string(),
+                storage_proof = %storage_proof_str,
+                "gotten storage proof for sender's balance"
+            );
+        }
+
+        {
+            let base_balance_key = selector!("ERC20_balances");
+            let balance_key = pedersen_hash(&base_balance_key, &recipient_address.0);
+
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &token_address,
+                    &[balance_key],
+                )
+                .await?;
+
+            let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
+
+            info!(
+                balance = %initial_supply,
+                selector = %balance_key.to_hex_string(),
+                storage_proof = %storage_proof_str,
+                "gotten storage proof for recipient's balance"
             );
         }
 
