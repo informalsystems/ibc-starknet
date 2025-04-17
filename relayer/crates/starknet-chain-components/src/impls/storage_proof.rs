@@ -18,11 +18,24 @@ where
     Chain: HasStorageProofType<StorageProof = StorageProof> + CanRaiseError<String>,
 {
     fn verify_storage_proof(proof: &StorageProof) -> Result<(), Self::Error> {
-        Chain::verify_merkle_node_map(&proof.classes_proof)?;
-        Chain::verify_merkle_node_map(&proof.contracts_proof.nodes)?;
+        Chain::verify_merkle_node_map(
+            &proof.classes_proof,
+            &vec![proof.global_roots.classes_tree_root],
+        )?;
+        Chain::verify_merkle_node_map(
+            &proof.contracts_proof.nodes,
+            &vec![proof.global_roots.classes_tree_root],
+        )?;
+
+        let contract_roots = proof
+            .contracts_proof
+            .contract_leaves_data
+            .iter()
+            .flat_map(|leaf| leaf.storage_root.clone().into_iter())
+            .collect::<Vec<_>>();
 
         for storage_entry in proof.contracts_storage_proofs.iter() {
-            Chain::verify_merkle_node_map(storage_entry)?;
+            Chain::verify_merkle_node_map(storage_entry, &contract_roots)?;
         }
 
         Chain::verify_contracts_proof(&proof.contracts_proof)?;
@@ -82,14 +95,20 @@ where
 }
 
 pub trait CanVerifyMerkleNodeMap: HasErrorType {
-    fn verify_merkle_node_map(node_map: &IndexMap<Felt, MerkleNode>) -> Result<(), Self::Error>;
+    fn verify_merkle_node_map(
+        node_map: &IndexMap<Felt, MerkleNode>,
+        roots: &Vec<Felt>,
+    ) -> Result<(), Self::Error>;
 }
 
 impl<Chain> CanVerifyMerkleNodeMap for Chain
 where
     Chain: CanRaiseError<String>,
 {
-    fn verify_merkle_node_map(node_map: &IndexMap<Felt, MerkleNode>) -> Result<(), Self::Error> {
+    fn verify_merkle_node_map(
+        node_map: &IndexMap<Felt, MerkleNode>,
+        roots: &Vec<Felt>,
+    ) -> Result<(), Self::Error> {
         for (hash, node) in node_map.iter() {
             Chain::verify_merkle_node(hash, node)?;
         }
