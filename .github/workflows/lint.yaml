@@ -2,13 +2,13 @@ name: Linting
 on:
   pull_request:
     paths:
-      - .github/workflows/lint.yaml
       - cairo-contracts/**
       - light-client/**
       - "**/Cargo.toml"
       - "**/Cargo.lock"
       - justfile
       - README.md
+      - .github/workflows/lint.yaml
 
   push:
     tags:
