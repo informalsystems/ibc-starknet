@@ -9,6 +9,7 @@ use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
+use hermes_starknet_chain_components::impls::storage_proof::CanVerifyStorageProof;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
@@ -24,7 +25,7 @@ use starknet::core::types::U256;
 use starknet::macros::selector;
 use tracing::info;
 
-use crate::contexts::MadaraChainDriver;
+use crate::contexts::{MadaraChain, MadaraChainDriver};
 use crate::impls::init_madara_bootstrap;
 
 #[test]
@@ -249,6 +250,8 @@ fn test_madara_bootstrap() -> Result<(), Error> {
                 storage_proof = %storage_proof_str,
                 "gotten storage proof for total supply"
             );
+
+            MadaraChain::verify_storage_proof(&storage_proof)?;
         }
 
         {

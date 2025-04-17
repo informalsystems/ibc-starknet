@@ -14,6 +14,7 @@ pub mod payload_builders;
 pub mod queries;
 pub mod send_message;
 pub mod starknet_to_cosmos;
+pub mod storage_proof;
 pub mod transfer;
 pub mod tx_response;
 pub mod types;
