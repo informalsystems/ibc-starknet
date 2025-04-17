@@ -17,6 +17,7 @@ use hermes_encoding_components::traits::encode_mut::{
 use ibc::clients::tendermint::types::{
     AllowUpdate, ClientState as IbcCometClientState, TrustThreshold,
 };
+use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::commitment_types::specs::ProofSpecs;
 use ibc::core::host::types::identifiers::ChainId;
@@ -131,15 +132,14 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, TrustThreshold> for EncodeTrustThreshold
 where
-    Encoding: CanDecodeMut<Strategy, Product![u64, u64]> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Product![u64, u64]> + CanRaiseAsyncError<ClientError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<TrustThreshold, Encoding::Error> {
         let product![numerator, denominator] = encoding.decode_mut(buffer)?;
-        TrustThreshold::new(numerator, denominator)
-            .map_err(|_| Encoding::raise_error("invalid trust level"))
+        TrustThreshold::new(numerator, denominator).map_err(Encoding::raise_error)
     }
 }
 
