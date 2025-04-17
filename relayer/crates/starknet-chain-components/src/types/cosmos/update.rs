@@ -8,6 +8,7 @@ use hermes_encoding_components::traits::encode_mut::{
 };
 use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
 use ibc::clients::tendermint::types::Header as TendermintLcHeader;
+use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as IbcHeight;
 use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
 use tendermint::block::header::Version as HeaderVersion;
@@ -16,7 +17,9 @@ use tendermint::block::signed_header::SignedHeader;
 use tendermint::block::{BlockIdFlag, Commit, CommitSig, Header as TmHeader};
 use tendermint::hash::Hash as TmHash;
 use tendermint::validator::ProposerPriority;
-use tendermint::{account, block, validator, vote, AppHash, PublicKey, Signature};
+use tendermint::{
+    account, block, validator, vote, AppHash, Error as TendermintError, PublicKey, Signature,
+};
 
 use crate::types::cosmos::height::Height;
 
@@ -65,7 +68,7 @@ impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, TendermintLcHeader>
     for EncodeTendermintLcHeader
 where
     Encoding: CanDecodeMut<Strategy, Product![SignedHeader, validator::Set, Height, validator::Set]>
-        + CanRaiseAsyncError<&'static str>,
+        + CanRaiseAsyncError<ClientError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
@@ -82,7 +85,7 @@ where
             trusted_height.revision_number,
             trusted_height.revision_height,
         )
-        .map_err(|_| Encoding::raise_error("invalid trusted height"))?;
+        .map_err(Encoding::raise_error)?;
 
         Ok(TendermintLcHeader {
             signed_header,
@@ -116,15 +119,15 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, SignedHeader> for EncodeSignedHeader
 where
-    Encoding: CanDecodeMut<Strategy, Product![TmHeader, Commit]> + CanRaiseAsyncError<&'static str>,
+    Encoding:
+        CanDecodeMut<Strategy, Product![TmHeader, Commit]> + CanRaiseAsyncError<TendermintError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<SignedHeader, Encoding::Error> {
         let product![header, commit] = encoding.decode_mut(buffer)?;
-        SignedHeader::new(header, commit)
-            .map_err(|_| Encoding::raise_error("invalid signed header"))
+        SignedHeader::new(header, commit).map_err(Encoding::raise_error)
     }
 }
 
@@ -148,7 +151,7 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, HeaderVersion> for EncodeHeaderVersion
 where
-    Encoding: CanDecodeMut<Strategy, Product![u64, u64]> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Product![u64, u64]>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
@@ -179,16 +182,14 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, AppHash> for EncodeAppHash
 where
-    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<TendermintError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<AppHash, Encoding::Error> {
         let value = encoding.decode_mut(buffer)?;
-        value
-            .try_into()
-            .map_err(|_| Encoding::raise_error("invalid app hash"))
+        value.try_into().map_err(Encoding::raise_error)
     }
 }
 
@@ -266,7 +267,7 @@ where
                 TmHash,
                 account::Id,
             ],
-        > + CanRaiseAsyncError<&'static str>,
+        > + CanRaiseAsyncError<TendermintError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
@@ -291,15 +292,9 @@ where
 
         let header = TmHeader {
             version,
-            chain_id: chain_id
-                .try_into()
-                .map_err(|_| Encoding::raise_error("invalid chain id"))?,
-            height: height
-                .try_into()
-                .map_err(|_| Encoding::raise_error("invalid height"))?,
-            time: proto_timestamp
-                .try_into()
-                .map_err(|_| Encoding::raise_error("invalid timestamp"))?,
+            chain_id: chain_id.try_into().map_err(Encoding::raise_error)?,
+            height: height.try_into().map_err(Encoding::raise_error)?,
+            time: proto_timestamp.try_into().map_err(Encoding::raise_error)?,
             last_block_id: Some(last_block_id),
             last_commit_hash: Some(last_commit_hash),
             data_hash: Some(data_hash),
@@ -345,7 +340,7 @@ where
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Commit> for EncodeCommit
 where
     Encoding: CanDecodeMut<Strategy, Product![i64, i32, block::Id, Vec<CommitSig>]>
-        + CanRaiseAsyncError<&'static str>,
+        + CanRaiseAsyncError<TendermintError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
@@ -353,12 +348,8 @@ where
     ) -> Result<Commit, Encoding::Error> {
         let product![height, round, block_id, signatures] = encoding.decode_mut(buffer)?;
         Ok(Commit {
-            height: height
-                .try_into()
-                .map_err(|_| Encoding::raise_error("invalid height"))?,
-            round: round
-                .try_into()
-                .map_err(|_| Encoding::raise_error("invalid round"))?,
+            height: height.try_into().map_err(Encoding::raise_error)?,
+            round: round.try_into().map_err(Encoding::raise_error)?,
             block_id,
             signatures,
         })
@@ -385,16 +376,14 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, TmHash> for EncodeTmHash
 where
-    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<TendermintError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<TmHash, Encoding::Error> {
         let value = encoding.decode_mut(buffer)?;
-        value
-            .try_into()
-            .map_err(|_| Encoding::raise_error("invalid hash"))
+        value.try_into().map_err(Encoding::raise_error)
     }
 }
 
@@ -418,8 +407,7 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, block::Id> for EncodeBlockId
 where
-    Encoding:
-        CanDecodeMut<Strategy, Product![TmHash, PartSetHeader]> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Product![TmHash, PartSetHeader]>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
@@ -453,15 +441,14 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, PartSetHeader> for EncodePartSetHeader
 where
-    Encoding: CanDecodeMut<Strategy, Product![u32, TmHash]> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Product![u32, TmHash]> + CanRaiseAsyncError<TendermintError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<PartSetHeader, Encoding::Error> {
         let product![total, hash] = encoding.decode_mut(buffer)?;
-        PartSetHeader::new(total, hash)
-            .map_err(|_| Encoding::raise_error("invalid part set header"))
+        PartSetHeader::new(total, hash).map_err(Encoding::raise_error)
     }
 }
 
@@ -485,16 +472,14 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, Signature> for EncodeSignature
 where
-    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<TendermintError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<Signature, Encoding::Error> {
         let value = encoding.decode_mut(buffer)?;
-        value
-            .try_into()
-            .map_err(|_| Encoding::raise_error("invalid signature"))
+        value.try_into().map_err(Encoding::raise_error)
     }
 }
 
@@ -519,7 +504,7 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ProtoTimestamp> for EncodeProtoTimestamp
 where
-    Encoding: CanDecodeMut<Strategy, Product![i64, i32]> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Product![i64, i32]>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
@@ -623,7 +608,7 @@ where
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, CommitSig> for EncodeCommitSig
 where
     Encoding: CanDecodeMut<Strategy, Product![BlockIdFlag, account::Id, ProtoTimestamp, Signature]>
-        + CanRaiseAsyncError<&'static str>,
+        + CanRaiseAsyncError<TendermintError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
@@ -632,9 +617,7 @@ where
         let product![block_id_flag, validator_address, proto_timestamp, signature] =
             encoding.decode_mut(buffer)?;
 
-        let timestamp = proto_timestamp
-            .try_into()
-            .map_err(|_| Encoding::raise_error("invalid timestamp"))?;
+        let timestamp = proto_timestamp.try_into().map_err(Encoding::raise_error)?;
 
         let value = match block_id_flag {
             BlockIdFlag::Absent => CommitSig::BlockIdFlagAbsent,
@@ -695,7 +678,9 @@ where
 
         let validator_set = validator::Set::new(validators, Some(proposer));
 
-        assert!(validator_set.total_voting_power() == total_voting_power);
+        if validator_set.total_voting_power() != total_voting_power {
+            return Err(Encoding::raise_error("total voting power mismatch"));
+        }
 
         Ok(validator_set)
     }
@@ -721,16 +706,14 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, vote::Power> for EncodeVotePower
 where
-    Encoding: CanDecodeMut<Strategy, u64> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, u64> + CanRaiseAsyncError<TendermintError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<vote::Power, Encoding::Error> {
         let value = encoding.decode_mut(buffer)?;
-        value
-            .try_into()
-            .map_err(|_| Encoding::raise_error("invalid power"))
+        value.try_into().map_err(Encoding::raise_error)
     }
 }
 
@@ -763,8 +746,8 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, validator::Info> for EncodeValidator
 where
-    Encoding: CanDecodeMut<Strategy, Product![account::Id, PublicKey, vote::Power, ProposerPriority]>
-        + CanRaiseAsyncError<&'static str>,
+    Encoding:
+        CanDecodeMut<Strategy, Product![account::Id, PublicKey, vote::Power, ProposerPriority]>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
@@ -801,16 +784,14 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, account::Id> for EncodeAccountId
 where
-    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, Vec<u8>> + CanRaiseAsyncError<TendermintError>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'a>,
     ) -> Result<account::Id, Encoding::Error> {
         let value = encoding.decode_mut(buffer)?;
-        Ok(account::Id::new(value.try_into().map_err(|_| {
-            Encoding::raise_error("invalid account id")
-        })?))
+        value.try_into().map_err(Encoding::raise_error)
     }
 }
 
@@ -834,7 +815,7 @@ where
 #[cgp_provider(MutDecoderComponent)]
 impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ProposerPriority> for EncodeProposerPriority
 where
-    Encoding: CanDecodeMut<Strategy, i64> + CanRaiseAsyncError<&'static str>,
+    Encoding: CanDecodeMut<Strategy, i64>,
 {
     fn decode_mut<'a>(
         encoding: &Encoding,
