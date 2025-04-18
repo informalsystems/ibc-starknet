@@ -736,18 +736,24 @@ pub mod MockClientComponent {
             // we only need to insert the new height in the right place
 
             let mut new_update_heights = array![];
+            let mut inserted = false;
 
             while let Some(height) = update_heights.pop_front() {
-                if height < update_height {
-                    new_update_heights.append(height);
-                } else {
+                if height > update_height {
                     new_update_heights.append(update_height);
-                    new_update_heights.append(height);
+                    inserted = true;
+                }
+                new_update_heights.append(height);
+                if inserted {
                     break;
                 }
             }
 
-            new_update_heights.append_span(update_heights.span());
+            if inserted {
+                new_update_heights.append_span(update_heights.span());
+            } else {
+                new_update_heights.append(update_height);
+            }
 
             self.update_heights.write(client_sequence, new_update_heights);
         }
