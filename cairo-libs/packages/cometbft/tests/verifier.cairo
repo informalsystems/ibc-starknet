@@ -1,7 +1,5 @@
 use cometbft::light_client::Header as LcHeader;
-use cometbft::types::{
-    Header as TmHeader, NonAbsentCommitVotesTrait, Options, TrustedBlockState, UntrustedBlockState,
-};
+use cometbft::types::{Header as TmHeader, Options, TrustedBlockState, UntrustedBlockState};
 use cometbft::utils::TWO_THIRDS;
 use cometbft::verifier::{header_matches_commit, verify_update_header};
 use protobuf::types::message::ProtoCodecImpl;
@@ -76,14 +74,16 @@ fn test_verify_update_header() {
     };
 
     let untrusted_block_state = UntrustedBlockState {
-        signed_header: header_b.signed_header, validators: header_b.validator_set,
+        signed_header: header_b.signed_header,
+        validators: header_b.validator_set,
+        next_validators: header_b.trusted_validator_set,
     };
 
     verify_update_header(untrusted_block_state, trusted_block_state, options, now);
 }
 
 #[test]
-#[should_panic(expected: 'ICS07: invalid commit hash')]
+#[should_panic(expected: 'ICS07: invalid val set hash')]
 fn test_verify_update_header_forged_header() {
     let (header_a, header_b) = header_fixture();
 
@@ -108,7 +108,9 @@ fn test_verify_update_header_forged_header() {
     };
 
     let mut untrusted_block_state = UntrustedBlockState {
-        signed_header: header_b.signed_header, validators: header_b.validator_set,
+        signed_header: header_b.signed_header,
+        validators: header_b.validator_set,
+        next_validators: header_b.trusted_validator_set,
     };
 
     // forged header
@@ -143,7 +145,9 @@ fn test_verify_update_header_empty_signatures() {
     };
 
     let mut untrusted_block_state = UntrustedBlockState {
-        signed_header: header_b.signed_header, validators: header_b.validator_set,
+        signed_header: header_b.signed_header,
+        validators: header_b.validator_set,
+        next_validators: header_b.trusted_validator_set,
     };
 
     // empty signatures
@@ -229,7 +233,9 @@ fn test_verify_update_header_2() {
     };
 
     let untrusted_block_state = UntrustedBlockState {
-        signed_header: header_b.signed_header, validators: header_b.validator_set,
+        signed_header: header_b.signed_header,
+        validators: header_b.validator_set,
+        next_validators: header_b.trusted_validator_set,
     };
 
     verify_update_header(untrusted_block_state, trusted_block_state, options, now);

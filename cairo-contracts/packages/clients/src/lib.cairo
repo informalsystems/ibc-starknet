@@ -4,6 +4,8 @@ pub mod cometbft {
     mod consensus_state;
     mod errors;
     mod header;
+    mod message;
+    mod misbehaviour;
 
     pub use client_state::{CometClientState, CometClientStateImpl, CometClientStateTrait};
     pub use cometbft::light_client::Header as CometHeader;
@@ -15,6 +17,8 @@ pub mod cometbft {
     };
     pub use errors::CometErrors;
     pub use header::{CometHeaderImpl, CometHeaderIntoConsensusState, CometHeaderTrait};
+    pub use message::ClientMessage;
+    pub use misbehaviour::{Misbehaviour, MisbehaviourImpl, MisbehaviourTrait};
 }
 
 pub mod mock {

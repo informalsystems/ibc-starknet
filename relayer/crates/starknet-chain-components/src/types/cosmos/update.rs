@@ -11,6 +11,7 @@ use ibc::clients::tendermint::types::Header as TendermintLcHeader;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as IbcHeight;
 use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
+use starknet::core::types::Felt;
 use tendermint::block::header::Version as HeaderVersion;
 use tendermint::block::parts::Header as PartSetHeader;
 use tendermint::block::signed_header::SignedHeader;
@@ -30,6 +31,12 @@ const ZERO_TIMESTAMP: ProtoTimestamp = ProtoTimestamp {
     seconds: -62135596800,
     nanos: 0,
 };
+
+#[derive(Clone, Debug, PartialEq, Eq, HasFields)]
+pub enum ClientMessage {
+    Update(Vec<Felt>),
+    Misbehaviour(Vec<Felt>),
+}
 
 pub struct EncodeTendermintLcHeader;
 

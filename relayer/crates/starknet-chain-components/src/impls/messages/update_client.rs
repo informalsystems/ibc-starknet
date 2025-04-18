@@ -24,6 +24,7 @@ use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::contract_address::CanQueryContractAddress;
 use crate::types::client_id::ClientId;
+use crate::types::cosmos::update::ClientMessage;
 
 pub struct BuildUpdateCometClientMessage;
 
@@ -41,6 +42,7 @@ where
     Counterparty:
         HasUpdateClientPayloadType<Chain, UpdateClientPayload = CosmosUpdateClientPayload>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanEncode<ViaCairo, ClientMessage>
         + CanEncode<ViaCairo, ByteArray>
         + CanEncode<ViaCairo, Product![ClientId, Vec<Felt>]>,
 {
@@ -71,8 +73,12 @@ where
                 .encode(&protobuf_byte_array)
                 .map_err(Chain::raise_error)?;
 
+            let client_message_felts = encoding
+                .encode(&ClientMessage::Update(raw_header))
+                .map_err(Chain::raise_error)?;
+
             let calldata = encoding
-                .encode(&product![client_id.clone(), raw_header])
+                .encode(&product![client_id.clone(), client_message_felts])
                 .map_err(Chain::raise_error)?;
 
             let message =
