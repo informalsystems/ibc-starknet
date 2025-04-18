@@ -611,15 +611,16 @@ pub mod CometClientComponent {
             substitute_consensus_state: Array<felt252>,
         ) {
             let update_heights = self.read_update_heights(subject_client_sequence);
-            assert(update_heights.len() > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
 
-            let mut update_heights_span = update_heights.span();
+            if update_heights.len() > 0 {
+                let mut update_heights_span = update_heights.span();
 
-            while let Option::Some(height) = update_heights_span.pop_front() {
-                self.remove_consensus_state(subject_client_sequence, height.clone());
+                while let Option::Some(height) = update_heights_span.pop_front() {
+                    self.remove_consensus_state(subject_client_sequence, height.clone());
+                }
+
+                self.update_heights.write(subject_client_sequence, array![]);
             }
-
-            self.update_heights.write(subject_client_sequence, array![]);
 
             let substitute_client_state = CometClientStateImpl::deserialize(
                 substitute_client_state,
@@ -946,16 +947,13 @@ pub mod CometClientComponent {
 
             let mut len = update_heights.len();
 
-            assert(len > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
-
             if len == 100 {
                 update_heights.pop_front().unwrap();
                 len = update_heights.len();
             }
 
-            // if the new height is bigger than the last one, we can just append it
-
-            if update_heights.at(len - 1) < @update_height {
+            // if the new height is bigger than the last one or the first, we can just append it
+            if len == 0 || update_heights.at(len - 1) < @update_height {
                 update_heights.append(update_height);
                 self.update_heights.write(client_sequence, update_heights);
                 return;
