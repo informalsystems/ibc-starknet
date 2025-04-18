@@ -510,11 +510,12 @@ pub mod MockClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> UpdateResponse {
-            let header = MockHeaderImpl::deserialize(client_message);
-
             let mut client_state = self.read_client_state(client_sequence);
 
-            client_state.freeze(header.trusted_height);
+            // convention from ibc-go
+            let frozen_height = HeightImpl::new(0, 1);
+
+            client_state.freeze(frozen_height);
 
             self.write_client_state(client_sequence, client_state);
 

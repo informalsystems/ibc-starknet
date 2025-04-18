@@ -592,14 +592,10 @@ pub mod CometClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> UpdateResponse {
-            let header = CometHeaderImpl::deserialize(client_message);
-
             let mut client_state = self.read_client_state(client_sequence);
 
-            let frozen_height = Height {
-                revision_number: header.trusted_height.revision_number,
-                revision_height: header.trusted_height.revision_height,
-            };
+            // convention from ibc-go
+            let frozen_height = HeightImpl::new(0, 1);
 
             client_state.freeze(frozen_height);
 
