@@ -29,7 +29,8 @@ pub mod CometClientComponent {
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
         IClientHandler, IClientQuery, IClientStateExecution, IClientStateValidation,
         MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient, Status, StatusTrait,
-        StoreHeightArray, Timestamp, TimestampImpl, TimestampToProto, UpdateResponse,
+        StoreHeightArray, Timestamp, TimestampImpl, TimestampPartialOrd, TimestampToProto,
+        UpdateResponse,
     };
     use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
     use starknet_ibc_core::host::ClientIdImpl;
@@ -452,9 +453,8 @@ pub mod CometClientComponent {
             let mut span = client_message.span();
             match Serde::<ClientMessage>::deserialize(ref span).unwrap() {
                 ClientMessage::Update(message) => {
-                    let _header: CometHeader = CometHeaderImpl::deserialize(message);
-                    // TODO(rano): misbehaviour on client update
-                    false
+                    let header: CometHeader = CometHeaderImpl::deserialize(message);
+                    self._verify_misbehaviour_on_update(client_sequence, header)
                 },
                 ClientMessage::Misbehaviour(message) => {
                     let misbehaviour: Misbehaviour = MisbehaviourImpl::deserialize(message);
@@ -789,6 +789,49 @@ pub mod CometClientComponent {
 
             let options = Options { trust_threshold, trusting_period, clock_drift };
             verify_misbehaviour_header(untrusted_block_state, trusted_block_state, options, now)
+        }
+
+        fn _verify_misbehaviour_on_update(
+            self: @ComponentState<TContractState>, client_sequence: u64, header: CometHeader,
+        ) -> bool {
+            let client_state = self.read_client_state(client_sequence);
+
+            let target_height = HeightImpl::new(
+                client_state.latest_height.revision_number, header.signed_header.header.height,
+            );
+
+            let target_consensus_state: CometConsensusState = header.into();
+
+            let previous_height = self.update_height_before(client_sequence, target_height.clone());
+
+            if previous_height == target_height {
+                let stored_consensus_state = self
+                    .read_consensus_state(client_sequence, target_height.clone());
+
+                if stored_consensus_state != target_consensus_state {
+                    return true;
+                }
+            } else {
+                let next_height = self.update_height_after(client_sequence, target_height.clone());
+
+                let previous_consensus_state = self
+                    .read_consensus_state(client_sequence, previous_height.clone());
+
+                let next_consensus_state = self
+                    .read_consensus_state(client_sequence, next_height.clone());
+
+                // time should be monotonically increasing
+
+                if @previous_consensus_state.timestamp >= @target_consensus_state.timestamp {
+                    return true;
+                }
+
+                if @target_consensus_state.timestamp >= @next_consensus_state.timestamp {
+                    return true;
+                }
+            }
+
+            false
         }
     }
 
