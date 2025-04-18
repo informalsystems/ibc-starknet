@@ -191,7 +191,7 @@ fn test_update_height_before() {
     let mut state = setup();
     state.write_update_height(0, HEIGHT(5));
     let height = state.update_height_before(0, HEIGHT(3));
-    assert_eq!(height, Some(HEIGHT(3)));
+    assert_eq!(height, None);
 
     state.write_update_height(0, HEIGHT(2));
     let height = state.update_height_before(0, HEIGHT(3));
@@ -212,9 +212,9 @@ fn test_update_height_before() {
 #[test]
 fn test_update_height_after() {
     let mut state = setup();
-    state.write_update_height(0, HEIGHT(5));
+    state.write_update_height(0, HEIGHT(2));
     let height = state.update_height_after(0, HEIGHT(3));
-    assert_eq!(height, Some(HEIGHT(5)));
+    assert_eq!(height, None);
 
     state.write_update_height(0, HEIGHT(4));
     let height = state.update_height_after(0, HEIGHT(3));
