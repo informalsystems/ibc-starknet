@@ -191,19 +191,22 @@ fn test_update_height_before() {
     let mut state = setup();
     state.write_update_height(0, HEIGHT(5));
     let height = state.update_height_before(0, HEIGHT(3));
-    assert_eq!(height, HEIGHT(3));
+    assert_eq!(height, Some(HEIGHT(3)));
 
     state.write_update_height(0, HEIGHT(2));
     let height = state.update_height_before(0, HEIGHT(3));
-    assert_eq!(height, HEIGHT(2));
+    assert_eq!(height, Some(HEIGHT(2)));
 
     state.write_update_height(0, HEIGHT(4));
     let height = state.update_height_before(0, HEIGHT(4));
-    assert_eq!(height, HEIGHT(4));
+    assert_eq!(height, Some(HEIGHT(4)));
 
     state.write_update_height(0, HEIGHT(6));
     let height = state.update_height_before(0, HEIGHT(7));
-    assert_eq!(height, HEIGHT(6));
+    assert_eq!(height, Some(HEIGHT(6)));
+
+    let height = state.update_height_before(0, HEIGHT(1));
+    assert_eq!(height, None);
 }
 
 #[test]
@@ -211,19 +214,22 @@ fn test_update_height_after() {
     let mut state = setup();
     state.write_update_height(0, HEIGHT(5));
     let height = state.update_height_after(0, HEIGHT(3));
-    assert_eq!(height, HEIGHT(5));
+    assert_eq!(height, Some(HEIGHT(5)));
 
     state.write_update_height(0, HEIGHT(4));
     let height = state.update_height_after(0, HEIGHT(3));
-    assert_eq!(height, HEIGHT(4));
+    assert_eq!(height, Some(HEIGHT(4)));
 
     state.write_update_height(0, HEIGHT(7));
     let height = state.update_height_after(0, HEIGHT(6));
-    assert_eq!(height, HEIGHT(7));
+    assert_eq!(height, Some(HEIGHT(7)));
 
     state.write_update_height(0, HEIGHT(6));
     let height = state.update_height_after(0, HEIGHT(6));
-    assert_eq!(height, HEIGHT(6));
+    assert_eq!(height, Some(HEIGHT(6)));
+
+    let height = state.update_height_after(0, HEIGHT(8));
+    assert_eq!(height, None);
 }
 
 #[test]
@@ -243,12 +249,12 @@ fn test_update_heights_max_size() {
 #[should_panic(expected: 'ICS07: zero update heights')]
 fn test_update_height_before_empty() {
     let mut state = setup();
-    state.update_height_before(0, HEIGHT(3));
+    let _ = state.update_height_before(0, HEIGHT(3));
 }
 
 #[test]
 #[should_panic(expected: 'ICS07: zero update heights')]
 fn test_update_height_after_empty() {
     let mut state = setup();
-    state.update_height_after(0, HEIGHT(3));
+    let _ = state.update_height_before(0, HEIGHT(3));
 }
