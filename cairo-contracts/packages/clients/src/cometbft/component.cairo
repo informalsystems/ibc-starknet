@@ -119,13 +119,16 @@ pub mod CometClientComponent {
 
             let mut update_heights_span = update_heights.span();
 
-            while let Option::Some(update_height) = update_heights_span.pop_back() {
+            let mut result = None;
+
+            while let Some(update_height) = update_heights_span.pop_back() {
                 if @target_height >= update_height {
-                    return Some(*update_height);
+                    result = Some(*update_height);
+                    break;
                 }
             }
 
-            None
+            result
         }
 
         fn update_height_after(
@@ -141,13 +144,16 @@ pub mod CometClientComponent {
 
             let mut update_heights_span = update_heights.span();
 
-            while let Option::Some(update_height) = update_heights_span.pop_front() {
+            let mut result = None;
+
+            while let Some(update_height) = update_heights_span.pop_front() {
                 if @target_height <= update_height {
-                    return Some(*update_height);
+                    result = Some(*update_height);
+                    break;
                 }
             }
 
-            None
+            result
         }
 
         fn latest_timestamp(
