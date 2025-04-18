@@ -812,8 +812,9 @@ pub mod CometClientComponent {
                 let stored_consensus_state = self
                     .read_consensus_state(client_sequence, target_height.clone());
 
-                // stored consensus state should be different from target consensus state
-                if stored_consensus_state != target_consensus_state {
+                // stored consensus state should be the same from target consensus state
+                // negation of the correct condition is a misbehaviour case
+                if !(stored_consensus_state == target_consensus_state) {
                     return true;
                 }
             } else {
@@ -822,7 +823,8 @@ pub mod CometClientComponent {
                         .read_consensus_state(client_sequence, previous_height.clone());
 
                     // time should be monotonically increasing
-                    if @previous_consensus_state.timestamp >= @target_consensus_state.timestamp {
+                    // negation of the correct condition is a misbehaviour case
+                    if !(@previous_consensus_state.timestamp < @target_consensus_state.timestamp) {
                         return true;
                     }
                 }
@@ -834,7 +836,8 @@ pub mod CometClientComponent {
                         .read_consensus_state(client_sequence, next_height.clone());
 
                     // time should be monotonically increasing
-                    if @next_consensus_state.timestamp <= @target_consensus_state.timestamp {
+                    // negation of the correct condition is a misbehaviour case
+                    if !(@next_consensus_state.timestamp > @target_consensus_state.timestamp) {
                         return true;
                     }
                 }
