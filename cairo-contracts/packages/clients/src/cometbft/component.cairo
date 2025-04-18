@@ -116,10 +116,37 @@ pub mod CometClientComponent {
 
             let mut height = target_height;
 
+            // FIXME: do binary search
+
             let mut update_heights_span = update_heights.span();
 
             while let Option::Some(update_height) = update_heights_span.pop_back() {
                 if @target_height >= update_height {
+                    height = *update_height;
+                    break;
+                }
+            }
+
+            height
+        }
+
+        fn update_height_after(
+            self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height,
+        ) -> Height {
+            let update_heights = self.read_update_heights(client_sequence);
+
+            let mut len = update_heights.len();
+
+            assert(len > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
+
+            let mut height = target_height;
+
+            // FIXME: do binary search
+
+            let mut update_heights_span = update_heights.span();
+
+            while let Option::Some(update_height) = update_heights_span.pop_front() {
+                if @target_height <= update_height {
                     height = *update_height;
                     break;
                 }
