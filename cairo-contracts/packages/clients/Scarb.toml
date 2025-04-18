@@ -23,7 +23,6 @@ scarb = { workspace = true }
 [dependencies]
 # external dependencies
 alexandria_data_structures = { workspace = true }
-alexandria_sorting         = { workspace = true }
 openzeppelin_access        = { workspace = true }
 starknet                   = { workspace = true }
 
