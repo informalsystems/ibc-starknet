@@ -517,7 +517,21 @@ pub mod CometClientComponent {
         ) -> UpdateResponse {
             let latest_height = self.latest_height(client_sequence);
 
-            let header: CometHeader = CometHeaderImpl::deserialize(client_message);
+            let header = {
+                let mut span = client_message.span();
+
+                let client_message = Serde::<ClientMessage>::deserialize(ref span).unwrap();
+
+                match client_message {
+                    ClientMessage::Update(message) => {
+                        let header: CometHeader = CometHeaderImpl::deserialize(message);
+                        header
+                    },
+                    ClientMessage::Misbehaviour(_message) => {
+                        core::panic_with_const_felt252::<CometErrors::INVALID_MISBEHAVIOUR>()
+                    },
+                }
+            };
 
             let tm_header_height = header.clone().signed_header.header.height;
 
