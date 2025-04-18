@@ -1,7 +1,6 @@
 #[starknet::component]
 pub mod MockClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
-    use alexandria_sorting::MergeSort;
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
@@ -733,14 +732,22 @@ pub mod MockClientComponent {
                 update_heights.pop_front().unwrap();
             }
 
-            update_heights.append(update_height);
+            // update_heights is already sorted.
+            // we only need to insert the new height in the right place
 
-            let new_update_heights = if len.is_non_zero()
-                && update_heights.at(len - 1) > @update_height {
-                MergeSort::sort(update_heights.span())
-            } else {
-                update_heights
-            };
+            let mut new_update_heights = array![];
+
+            while let Some(height) = update_heights.pop_front() {
+                if height < update_height {
+                    new_update_heights.append(height);
+                } else {
+                    new_update_heights.append(update_height);
+                    new_update_heights.append(height);
+                    break;
+                }
+            }
+
+            new_update_heights.append_span(update_heights.span());
 
             self.update_heights.write(client_sequence, new_update_heights);
         }

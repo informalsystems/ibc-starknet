@@ -2,7 +2,6 @@
 pub mod CometClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
     use alexandria_data_structures::byte_array_ext::SpanU8IntoBytearray;
-    use alexandria_sorting::MergeSort;
     use cometbft::types::{Options, TrustedBlockState, UntrustedBlockState};
     use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use core::num::traits::Zero;
@@ -951,14 +950,22 @@ pub mod CometClientComponent {
                 update_heights.pop_front().unwrap();
             }
 
-            update_heights.append(update_height);
+            // update_heights is already sorted.
+            // we only need to insert the new height in the right place
 
-            let new_update_heights = if len.is_non_zero()
-                && update_heights.at(len - 1) > @update_height {
-                MergeSort::sort(update_heights.span())
-            } else {
-                update_heights
-            };
+            let mut new_update_heights = array![];
+
+            while let Some(height) = update_heights.pop_front() {
+                if height < update_height {
+                    new_update_heights.append(height);
+                } else {
+                    new_update_heights.append(update_height);
+                    new_update_heights.append(height);
+                    break;
+                }
+            }
+
+            new_update_heights.append_span(update_heights.span());
 
             self.update_heights.write(client_sequence, new_update_heights);
         }
