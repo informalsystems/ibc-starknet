@@ -73,12 +73,12 @@ where
                 .encode(&protobuf_byte_array)
                 .map_err(Chain::raise_error)?;
 
-            let client_update_felts = encoding
-                .encode(&product![client_id.clone(), raw_header])
+            let client_message_felts = encoding
+                .encode(&ClientMessage::Update(raw_header))
                 .map_err(Chain::raise_error)?;
 
             let calldata = encoding
-                .encode(&ClientMessage::Update(client_update_felts))
+                .encode(&product![client_id.clone(), client_message_felts])
                 .map_err(Chain::raise_error)?;
 
             let message =
