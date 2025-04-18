@@ -726,10 +726,20 @@ pub mod MockClientComponent {
                 return;
             }
 
-            let len = update_heights.len();
+            let mut len = update_heights.len();
+
+            assert(len > 0, MockErrors::ZERO_UPDATE_HEIGHTS);
 
             if len == 100 {
                 update_heights.pop_front().unwrap();
+                len = update_heights.len();
+            }
+
+            // if the new height is bigger than the last one, we can just append it
+            if update_heights.at(len - 1) < @update_height {
+                update_heights.append(update_height);
+                self.update_heights.write(client_sequence, update_heights);
+                return;
             }
 
             // update_heights is already sorted.
