@@ -110,11 +110,11 @@ pub trait IClientQuery<TContractState> {
     /// target height.
     fn update_height_before(
         self: @TContractState, client_sequence: u64, target_height: Height,
-    ) -> Height;
+    ) -> Option<Height>;
 
     fn update_height_after(
         self: @TContractState, client_sequence: u64, target_height: Height,
-    ) -> Height;
+    ) -> Option<Height>;
 
     fn latest_timestamp(self: @TContractState, client_sequence: u64) -> Timestamp;
 

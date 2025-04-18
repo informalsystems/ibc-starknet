@@ -97,52 +97,46 @@ pub mod MockClientComponent {
 
         fn update_height_before(
             self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height,
-        ) -> Height {
+        ) -> Option<Height> {
             let update_heights = self.read_update_heights(client_sequence);
 
             let mut len = update_heights.len();
 
             assert(len > 0, MockErrors::ZERO_UPDATE_HEIGHTS);
 
-            let mut height = target_height;
-
             // FIXME: do binary search
 
             let mut update_heights_span = update_heights.span();
 
-            while let Option::Some(update_height) = update_heights_span.pop_back() {
+            while let Some(update_height) = update_heights_span.pop_back() {
                 if @target_height >= update_height {
-                    height = *update_height;
-                    break;
+                    return Some(*update_height);
                 }
             }
 
-            height
+            None
         }
 
         fn update_height_after(
             self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height,
-        ) -> Height {
+        ) -> Option<Height> {
             let update_heights = self.read_update_heights(client_sequence);
 
             let mut len = update_heights.len();
 
             assert(len > 0, MockErrors::ZERO_UPDATE_HEIGHTS);
 
-            let mut height = target_height;
-
             // FIXME: do binary search
 
             let mut update_heights_span = update_heights.span();
 
-            while let Option::Some(update_height) = update_heights_span.pop_front() {
+            while let Some(update_height) = update_heights_span.pop_front() {
                 if @target_height <= update_height {
-                    height = *update_height;
-                    break;
+                    return Some(*update_height);
                 }
             }
 
-            height
+            None
         }
 
         fn latest_timestamp(

@@ -108,14 +108,12 @@ pub mod CometClientComponent {
 
         fn update_height_before(
             self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height,
-        ) -> Height {
+        ) -> Option<Height> {
             let update_heights = self.read_update_heights(client_sequence);
 
             let mut len = update_heights.len();
 
             assert(len > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
-
-            let mut height = target_height;
 
             // FIXME: do binary search
 
@@ -123,24 +121,21 @@ pub mod CometClientComponent {
 
             while let Option::Some(update_height) = update_heights_span.pop_back() {
                 if @target_height >= update_height {
-                    height = *update_height;
-                    break;
+                    return Some(*update_height);
                 }
             }
 
-            height
+            None
         }
 
         fn update_height_after(
             self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height,
-        ) -> Height {
+        ) -> Option<Height> {
             let update_heights = self.read_update_heights(client_sequence);
 
             let mut len = update_heights.len();
 
             assert(len > 0, CometErrors::ZERO_UPDATE_HEIGHTS);
-
-            let mut height = target_height;
 
             // FIXME: do binary search
 
@@ -148,12 +143,11 @@ pub mod CometClientComponent {
 
             while let Option::Some(update_height) = update_heights_span.pop_front() {
                 if @target_height <= update_height {
-                    height = *update_height;
-                    break;
+                    return Some(*update_height);
                 }
             }
 
-            height
+            None
         }
 
         fn latest_timestamp(
@@ -814,30 +808,35 @@ pub mod CometClientComponent {
 
             let previous_height = self.update_height_before(client_sequence, target_height.clone());
 
-            if previous_height == target_height {
+            if previous_height == Some(target_height) {
                 let stored_consensus_state = self
                     .read_consensus_state(client_sequence, target_height.clone());
 
+                // stored consensus state should be different from target consensus state
                 if stored_consensus_state != target_consensus_state {
                     return true;
                 }
             } else {
-                let next_height = self.update_height_after(client_sequence, target_height.clone());
+                if let Some(previous_height) = previous_height {
+                    let previous_consensus_state = self
+                        .read_consensus_state(client_sequence, previous_height.clone());
 
-                let previous_consensus_state = self
-                    .read_consensus_state(client_sequence, previous_height.clone());
-
-                let next_consensus_state = self
-                    .read_consensus_state(client_sequence, next_height.clone());
-
-                // time should be monotonically increasing
-
-                if @previous_consensus_state.timestamp >= @target_consensus_state.timestamp {
-                    return true;
+                    // time should be monotonically increasing
+                    if @previous_consensus_state.timestamp >= @target_consensus_state.timestamp {
+                        return true;
+                    }
                 }
 
-                if @target_consensus_state.timestamp >= @next_consensus_state.timestamp {
-                    return true;
+                let next_height = self.update_height_after(client_sequence, target_height.clone());
+
+                if let Some(next_height) = next_height {
+                    let next_consensus_state = self
+                        .read_consensus_state(client_sequence, next_height.clone());
+
+                    // time should be monotonically increasing
+                    if @next_consensus_state.timestamp <= @target_consensus_state.timestamp {
+                        return true;
+                    }
                 }
             }
 
