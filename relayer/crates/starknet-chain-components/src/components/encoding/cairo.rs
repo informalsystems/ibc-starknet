@@ -61,11 +61,11 @@ mod preset {
     use crate::types::cosmos::height::{EncodeHeight, Height};
     use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
     use crate::types::cosmos::update::{
-        EncodeAccountId, EncodeAppHash, EncodeBlockId, EncodeCommit, EncodeCommitBlockIdFlag,
-        EncodeCommitSig, EncodeHeaderVersion, EncodePartSetHeader, EncodeProposerPriority,
-        EncodeProtoTimestamp, EncodePublicKey, EncodeSignature, EncodeSignedHeader,
-        EncodeTendermintLcHeader, EncodeTmHash, EncodeTmHeader, EncodeValidator,
-        EncodeValidatorSet, EncodeVotePower,
+        ClientMessage, EncodeAccountId, EncodeAppHash, EncodeBlockId, EncodeCommit,
+        EncodeCommitBlockIdFlag, EncodeCommitSig, EncodeHeaderVersion, EncodePartSetHeader,
+        EncodeProposerPriority, EncodeProtoTimestamp, EncodePublicKey, EncodeSignature,
+        EncodeSignedHeader, EncodeTendermintLcHeader, EncodeTmHash, EncodeTmHeader,
+        EncodeValidator, EncodeValidatorSet, EncodeVotePower,
     };
     use crate::types::message_responses::create_client::CreateClientResponse;
     use crate::types::messages::erc20::deploy::DeployErc20TokenMessage;
@@ -211,6 +211,7 @@ mod preset {
                 (ViaCairo, Participant),
                 (ViaCairo, ClientStatus),
                 (ViaCairo, RawChannelState),
+                (ViaCairo, ClientMessage),
             ]:
                 EncodeEnumFields,
         }
