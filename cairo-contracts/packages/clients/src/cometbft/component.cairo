@@ -434,7 +434,7 @@ pub mod CometClientComponent {
             match Serde::<ClientMessage>::deserialize(ref span).unwrap() {
                 ClientMessage::Update(message) => {
                     let header: CometHeader = CometHeaderImpl::deserialize(message);
-                    self._verify_update(client_sequence, header);
+                    self._verify_update_header(client_sequence, header);
                 },
                 ClientMessage::Misbehaviour(message) => {
                     let misbehaviour: Misbehaviour = MisbehaviourImpl::deserialize(message);
@@ -716,7 +716,7 @@ pub mod CometClientComponent {
                 );
         }
 
-        fn _verify_update(
+        fn _verify_update_header(
             self: @ComponentState<TContractState>, client_sequence: u64, header: CometHeader,
         ) {
             let trusted_height = header.trusted_height;
