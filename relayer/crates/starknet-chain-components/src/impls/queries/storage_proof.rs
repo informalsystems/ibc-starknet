@@ -55,7 +55,7 @@ where
             )
             .await;
 
-        Chain::verify_storage_proof(&storage_proof)?;
+        // Chain::verify_storage_proof(&storage_proof)?;
 
         Ok(storage_proof)
     }

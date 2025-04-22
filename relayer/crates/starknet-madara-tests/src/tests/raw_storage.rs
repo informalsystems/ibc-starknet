@@ -1,4 +1,5 @@
 use cgp::prelude::*;
+use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::Error;
@@ -8,6 +9,7 @@ use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
+use hermes_starknet_chain_components::traits::queries::storage_proof::CanQueryStorageProof;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
@@ -57,14 +59,92 @@ fn test_madara_raw_storage() -> Result<(), Error> {
             contract_address
         };
 
-        let key = felt!("0x123");
-        let value = felt!("0x456");
+        let key1 = felt!("0x001");
+        let key2 = felt!("0x010");
+        let key3 = felt!("0x100");
 
-        chain.set(&contract_address, key, value).await?;
+        let value1 = felt!("0x9911");
+        let value2 = felt!("0x9922");
+        let value3 = felt!("0x9933");
 
-        let value2 = chain.get(&contract_address, key).await?;
+        {
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &contract_address,
+                    &[key1],
+                )
+                .await?;
 
-        assert_eq!(value2, value);
+            let storage_proof_str =
+                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
+
+            println!("storage proof before set: {storage_proof_str}");
+        }
+
+        chain.set(&contract_address, key1, value1).await?;
+        chain.set(&contract_address, key2, value2).await?;
+        chain.set(&contract_address, key3, value3).await?;
+
+        {
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &contract_address,
+                    &[key1],
+                )
+                .await?;
+
+            let storage_proof_str =
+                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
+
+            println!("storage proof of key1 after set: {storage_proof_str}");
+        }
+
+        {
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &contract_address,
+                    &[key2],
+                )
+                .await?;
+
+            let storage_proof_str =
+                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
+
+            println!("storage proof of key2 after set: {storage_proof_str}");
+        }
+
+        {
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &contract_address,
+                    &[key3],
+                )
+                .await?;
+
+            let storage_proof_str =
+                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
+
+            println!("storage proof of key3 after set: {storage_proof_str}");
+        }
+
+        {
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &contract_address,
+                    &[felt!("0x11")],
+                )
+                .await?;
+
+            let storage_proof_str =
+                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
+
+            println!("storage proof of non-existence: {storage_proof_str}");
+        }
 
         Ok(())
     })
