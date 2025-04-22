@@ -29,7 +29,7 @@ use crate::impls::init_madara_bootstrap;
 
 #[test]
 #[ignore]
-fn test_madara_bootstrap() -> Result<(), Error> {
+fn test_madara_erc20() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
