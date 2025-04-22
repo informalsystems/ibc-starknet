@@ -94,6 +94,62 @@ fn test_update_comet_client_ok() {
     }
 }
 
+
+#[test]
+fn test_misbehaviour_comet_client_ok() {
+    // -----------------------------------------------------------
+    // Setup Essentials
+    // -----------------------------------------------------------
+
+    let mut cfg = MockClientConfigTrait::default();
+
+    let (mut core, mut comet) = SetupImpl::setup_core_with_client("IBCCore", "MockClient");
+
+    let mut spy = spy_events();
+
+    // -----------------------------------------------------------
+    // Create Client
+    // -----------------------------------------------------------
+
+    let create_resp = cfg.create_client(@core);
+
+    // -----------------------------------------------------------
+    // Update Client
+    // -----------------------------------------------------------
+
+    // Update the client to a new height and time.
+    let updating_height = cfg.latest_height.clone() + HEIGHT(1);
+    let updating_time = cfg.latest_timestamp.clone() + TIMESTAMP(1);
+
+    // Create `MsgUpdateClient` messages with different state root.
+    let (msg1, msg2) = cfg
+        .dummy_msg_misbehaviour_client(
+            create_resp.client_id.clone(),
+            create_resp.height,
+            updating_height.clone(),
+            updating_time.clone(),
+        );
+
+    // Submit `MsgUpdateClient`s to the IBC core contract.
+    let _update_resp = core.update_client(msg1.clone());
+    let update_resp = core.update_client(msg2.clone());
+
+    // -----------------------------------------------------------
+    // Check Results
+    // -----------------------------------------------------------
+
+    assert_eq!(comet.client_type(), cfg.client_type);
+    assert_eq!(comet.latest_height(0), updating_height);
+    assert!(!comet.status(0).is_active());
+
+    if UpdateResponse::Misbehaviour == update_resp {
+        // Assert the `UpdateClientEvent` emitted.
+        spy.assert_misbehaviour_client_event(core.address, create_resp.client_id);
+    } else {
+        panic!("misbehaviour client failed");
+    }
+}
+
 #[test]
 fn test_client_recover_ok() {
     // -----------------------------------------------------------

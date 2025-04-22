@@ -1,7 +1,7 @@
 use openzeppelin_testing::{EventSpyExt, EventSpyQueue};
 use starknet::ContractAddress;
 use starknet_ibc_core::client::ClientEventEmitterComponent::{
-    CreateClientEvent, Event, UpdateClientEvent,
+    CreateClientEvent, Event, MisbehaviourEvent, UpdateClientEvent,
 };
 use starknet_ibc_core::client::Height;
 use starknet_ibc_core::host::ClientId;
@@ -28,6 +28,13 @@ pub impl ClientEventSpyExtImpl of ClientEventSpyExt {
         let expected = Event::UpdateClientEvent(
             UpdateClientEvent { client_id, consensus_heights, header },
         );
+        self.assert_emitted_single(contract_address, expected);
+    }
+
+    fn assert_misbehaviour_client_event(
+        ref self: EventSpyQueue, contract_address: ContractAddress, client_id: ClientId,
+    ) {
+        let expected = Event::MisbehaviourEvent(MisbehaviourEvent { client_id });
         self.assert_emitted_single(contract_address, expected);
     }
 }
