@@ -2,7 +2,7 @@ use cgp::prelude::*;
 use hermes_chain_components::traits::types::height::HasHeightType;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_logging_components::traits::logger::CanLog;
-use hermes_logging_components::types::level::LevelDebug;
+use hermes_logging_components::types::level::LevelTrace;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use starknet::core::types::{Felt, StorageProof};
@@ -21,7 +21,7 @@ where
         + HasStorageKeyType<StorageKey = Felt>
         + HasStorageProofType
         + CanVerifyStorageProof<StorageProof = StorageProof>
-        + CanLog<LevelDebug>
+        + CanLog<LevelTrace>
         + CanSendJsonRpcRequest<QueryStorageProofRequest, Chain::StorageProof>
         + CanRaiseError<serde_json::Error>,
     Chain::StorageProof: DeserializeOwned,
@@ -51,7 +51,7 @@ where
         chain
             .log(
                 &format!("fetched storage proof: {}", storage_proof_str),
-                &LevelDebug,
+                &LevelTrace,
             )
             .await;
 

@@ -111,22 +111,24 @@ fn test_madara_bootstrap() -> Result<(), Error> {
             );
         }
 
+        let base_balance_key = selector!("ERC20_balances");
+
         {
-            let base_balance_key = selector!("ERC20_balances");
-            let balance_key = pedersen_hash(&base_balance_key, &sender_address.0);
+            let address = sender_address.0;
+            let balance_key = pedersen_hash(&base_balance_key, &address);
 
             let storage_proof = chain
                 .query_storage_proof(
                     &chain.query_chain_height().await?,
                     &token_address,
-                    &[balance_key],
+                    &[base_balance_key],
                 )
                 .await?;
 
             let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
 
             info!(
-                balance = %initial_supply,
+                address = %address.to_hex_string(),
                 selector = %balance_key.to_hex_string(),
                 storage_proof = %storage_proof_str,
                 "gotten storage proof for sender's balance"
@@ -134,8 +136,8 @@ fn test_madara_bootstrap() -> Result<(), Error> {
         }
 
         {
-            let base_balance_key = selector!("ERC20_balances");
-            let balance_key = pedersen_hash(&base_balance_key, &recipient_address.0);
+            let address = recipient_address.0;
+            let balance_key = pedersen_hash(&base_balance_key, &address);
 
             let storage_proof = chain
                 .query_storage_proof(
@@ -148,12 +150,37 @@ fn test_madara_bootstrap() -> Result<(), Error> {
             let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
 
             info!(
-                balance = %initial_supply,
+                address = %address.to_hex_string(),
                 selector = %balance_key.to_hex_string(),
                 storage_proof = %storage_proof_str,
                 "gotten storage proof for recipient's balance"
             );
         }
+
+        // {
+        //     let address = recipient_address.0;
+
+        //     for i in 1..10 {
+        //         let balance_key = pedersen_hash(&base_balance_key, &(address + i));
+
+        //         let storage_proof = chain
+        //             .query_storage_proof(
+        //                 &chain.query_chain_height().await?,
+        //                 &token_address,
+        //                 &[balance_key],
+        //             )
+        //             .await?;
+
+        //         let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
+
+        //         info!(
+        //             address = %address.to_hex_string(),
+        //             selector = %balance_key.to_hex_string(),
+        //             storage_proof = %storage_proof_str,
+        //             "gotten storage proof for balance at recipient address + {i}"
+        //         );
+        //     }
+        // }
 
         {
             // Test local ERC20 token transfer
@@ -176,7 +203,7 @@ fn test_madara_bootstrap() -> Result<(), Error> {
 
             info!("recipient balance before: {}", recipient_balance_a);
 
-            let transfer_amount = 100u32.into();
+            let transfer_amount = 0x123u32.into();
 
             let message = chain.build_transfer_token_message(
                 &recipient_address,
@@ -185,7 +212,7 @@ fn test_madara_bootstrap() -> Result<(), Error> {
 
             let response = chain.send_message(message).await?;
 
-            info!("performed transfer of 100 tokens");
+            info!("performed transfer of {transfer_amount} tokens");
 
             info!("response: {:?}", response);
 
@@ -252,8 +279,8 @@ fn test_madara_bootstrap() -> Result<(), Error> {
         }
 
         {
-            let base_balance_key = selector!("ERC20_balances");
-            let balance_key = pedersen_hash(&base_balance_key, &sender_address.0);
+            let address = sender_address.0;
+            let balance_key = pedersen_hash(&base_balance_key, &address);
 
             let storage_proof = chain
                 .query_storage_proof(
@@ -266,7 +293,7 @@ fn test_madara_bootstrap() -> Result<(), Error> {
             let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
 
             info!(
-                balance = %initial_supply,
+                address = %address.to_hex_string(),
                 selector = %balance_key.to_hex_string(),
                 storage_proof = %storage_proof_str,
                 "gotten storage proof for sender's balance"
@@ -274,8 +301,8 @@ fn test_madara_bootstrap() -> Result<(), Error> {
         }
 
         {
-            let base_balance_key = selector!("ERC20_balances");
-            let balance_key = pedersen_hash(&base_balance_key, &recipient_address.0);
+            let address = recipient_address.0;
+            let balance_key = pedersen_hash(&base_balance_key, &address);
 
             let storage_proof = chain
                 .query_storage_proof(
@@ -288,7 +315,7 @@ fn test_madara_bootstrap() -> Result<(), Error> {
             let storage_proof_str = serde_json::to_string_pretty(&storage_proof)?;
 
             info!(
-                balance = %initial_supply,
+                address = %address.to_hex_string(),
                 selector = %balance_key.to_hex_string(),
                 storage_proof = %storage_proof_str,
                 "gotten storage proof for recipient's balance"
