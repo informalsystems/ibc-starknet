@@ -388,7 +388,8 @@ pub mod MockClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> bool {
-            false
+            let header: MockHeader = MockHeaderImpl::deserialize(client_message);
+            self._verify_misbehaviour_on_update(client_sequence, header)
         }
 
         fn verify_substitute(
@@ -640,6 +641,53 @@ pub mod MockClientComponent {
                     processed_height,
                     processed_time,
                 );
+        }
+
+        fn _verify_misbehaviour_on_update(
+            self: @ComponentState<TContractState>, client_sequence: u64, header: MockHeader,
+        ) -> bool {
+            let target_height = header.signed_header.height;
+
+            let target_consensus_state: MockConsensusState = header.into();
+
+            let previous_height = self.update_height_before(client_sequence, target_height.clone());
+
+            if previous_height == Some(target_height) {
+                let stored_consensus_state = self
+                    .read_consensus_state(client_sequence, target_height.clone());
+
+                // stored consensus state should be the same from target consensus state
+                // negation of the correct condition is a misbehaviour case
+                if !(stored_consensus_state == target_consensus_state) {
+                    return true;
+                }
+            } else {
+                if let Some(previous_height) = previous_height {
+                    let previous_consensus_state = self
+                        .read_consensus_state(client_sequence, previous_height.clone());
+
+                    // time should be monotonically increasing
+                    // negation of the correct condition is a misbehaviour case
+                    if !(@previous_consensus_state.timestamp < @target_consensus_state.timestamp) {
+                        return true;
+                    }
+                }
+
+                let next_height = self.update_height_after(client_sequence, target_height.clone());
+
+                if let Some(next_height) = next_height {
+                    let next_consensus_state = self
+                        .read_consensus_state(client_sequence, next_height.clone());
+
+                    // time should be monotonically increasing
+                    // negation of the correct condition is a misbehaviour case
+                    if !(@next_consensus_state.timestamp > @target_consensus_state.timestamp) {
+                        return true;
+                    }
+                }
+            }
+
+            false
         }
     }
 

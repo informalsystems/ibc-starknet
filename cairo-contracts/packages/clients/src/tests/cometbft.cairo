@@ -132,6 +132,30 @@ fn test_update_client_with_older_header() {
 }
 
 #[test]
+fn test_client_misbehaviour() {
+    let mut state = setup();
+    let mut cfg = MockClientConfigTrait::default();
+    start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
+    let msg = cfg.dummy_msg_create_client();
+    let create_resp = state.create_client(msg);
+    let updating_height = cfg.latest_height.clone() + HEIGHT(1);
+    let updating_timestamp = cfg.latest_timestamp.clone() + TIMESTAMP(1);
+    let (msg1, msg2) = cfg
+        .dummy_msg_misbehaviour_client(
+            create_resp.client_id,
+            create_resp.height,
+            updating_height.clone(),
+            updating_timestamp.clone(),
+        );
+    state.update_client(msg1);
+    println!("status1: {:?}", state.status(0));
+    assert!(state.status(0).is_active());
+    state.update_client(msg2);
+    assert!(!state.status(0).is_active());
+    println!("status2: {:?}", state.status(0));
+}
+
+#[test]
 #[should_panic(expected: 'ICS07: missing client state')]
 fn test_missing_client_state() {
     let mut state = setup();
