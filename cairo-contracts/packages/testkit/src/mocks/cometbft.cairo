@@ -3,36 +3,35 @@ pub mod MockCometClient {
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::ContractAddress;
-    use starknet_ibc_clients::cometbft::{CometClientComponent, CometErrors};
+    use starknet_ibc_clients::mock::{MockClientComponent, MockErrors};
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
-    component!(path: CometClientComponent, storage: client, event: CometClientEvent);
+    component!(path: MockClientComponent, storage: client, event: MockClientEvent);
 
     #[abi(embed_v0)]
     impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
     impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
 
     #[abi(embed_v0)]
-    impl CometClientHandlerImpl =
-        CometClientComponent::CometClientHandler<ContractState>;
+    impl MockClientHandlerImpl =
+        MockClientComponent::MockClientHandler<ContractState>;
     #[abi(embed_v0)]
-    impl CometClientQueryImpl =
-        CometClientComponent::CometClientQuery<ContractState>;
+    impl MockClientQueryImpl = MockClientComponent::MockClientQuery<ContractState>;
 
     #[abi(embed_v0)]
-    impl CometClientValidationImpl =
-        CometClientComponent::CometClientValidation<ContractState>;
+    impl MockClientValidationImpl =
+        MockClientComponent::MockClientValidation<ContractState>;
 
     #[abi(embed_v0)]
-    impl CometClientExecutionImpl =
-        CometClientComponent::CometClientExecution<ContractState>;
+    impl MockClientExecutionImpl =
+        MockClientComponent::MockClientExecution<ContractState>;
 
     #[storage]
     struct Storage {
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
-        client: CometClientComponent::Storage,
+        client: MockClientComponent::Storage,
     }
 
     #[event]
@@ -41,12 +40,12 @@ pub mod MockCometClient {
         #[flat]
         OwnableEvent: OwnableComponent::Event,
         #[flat]
-        CometClientEvent: CometClientComponent::Event,
+        MockClientEvent: MockClientComponent::Event,
     }
 
     #[constructor]
     fn constructor(ref self: ContractState, owner: ContractAddress) {
-        assert(owner.is_non_zero(), CometErrors::ZERO_OWNER);
+        assert(owner.is_non_zero(), MockErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
     }
 }

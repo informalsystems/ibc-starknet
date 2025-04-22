@@ -15,14 +15,15 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientP
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use starknet::core::types::Felt;
+use ibc_proto::ibc::lightclients::tendermint::v1::Header as RawHeader;
+use ibc_proto::Protobuf;
+use starknet::core::types::{ByteArray, Felt};
 use starknet::macros::selector;
 
 use crate::impls::types::address::StarknetAddress;
 use crate::impls::types::message::StarknetMessage;
 use crate::traits::queries::contract_address::CanQueryContractAddress;
 use crate::types::client_id::ClientId;
-use crate::types::cosmos::update::CometUpdateHeader;
 
 pub struct BuildUpdateCometClientMessage;
 
@@ -40,8 +41,8 @@ where
     Counterparty:
         HasUpdateClientPayloadType<Chain, UpdateClientPayload = CosmosUpdateClientPayload>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanEncode<ViaCairo, CometUpdateHeader>
-        + CanEncode<ViaCairo, (ClientId, Vec<Felt>)>,
+        + CanEncode<ViaCairo, ByteArray>
+        + CanEncode<ViaCairo, Product![ClientId, Vec<Felt>]>,
 {
     async fn build_update_client_message(
         chain: &Chain,
@@ -51,18 +52,27 @@ where
         let mut messages = Vec::with_capacity(counterparty_payload.headers.len());
 
         for header in counterparty_payload.headers {
-            let update_header = CometUpdateHeader::from(header);
-
             let encoding = chain.encoding();
 
             let contract_address = chain.query_contract_address(PhantomData).await?;
 
+            // We are not passing the Cairo serialization of the Client Header here.
+            // As it has a lot of hash fields as `Vec<u8>`. In the Cairo serialization,
+            // they are be encoded as `Array<felt252>` wasting a lot of encoding data space.
+            //
+            // So, we encode the Header as Protobuf bytes and then encode those bytes as
+            // Cairo `ByteArray` which has more succinct `Vec<u8>` representation.
+
+            let protobuf_bytes = Protobuf::<RawHeader>::encode_vec(header.clone());
+
+            let protobuf_byte_array: ByteArray = protobuf_bytes.into();
+
             let raw_header = encoding
-                .encode(&update_header)
+                .encode(&protobuf_byte_array)
                 .map_err(Chain::raise_error)?;
 
             let calldata = encoding
-                .encode(&(client_id.clone(), raw_header))
+                .encode(&product![client_id.clone(), raw_header])
                 .map_err(Chain::raise_error)?;
 
             let message =

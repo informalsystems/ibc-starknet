@@ -2,7 +2,7 @@ use starknet_ibc_clients::mock::{MockConsensusState, MockErrors};
 use starknet_ibc_core::client::{Height, Timestamp, U64IntoTimestamp};
 use starknet_ibc_core::commitment::StateRoot;
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct MockHeader {
     pub trusted_height: Height,
     pub signed_header: SignedHeader,
@@ -21,7 +21,7 @@ pub impl MockHeaderImpl of MockHeaderTrait {
     }
 }
 
-#[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct SignedHeader {
     pub height: Height,
     pub timestamp: Timestamp,

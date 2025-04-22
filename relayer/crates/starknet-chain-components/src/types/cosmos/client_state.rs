@@ -17,6 +17,7 @@ use hermes_encoding_components::traits::encode_mut::{
 use ibc::clients::tendermint::types::{
     AllowUpdate, ClientState as IbcCometClientState, TrustThreshold,
 };
+use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::commitment_types::specs::ProofSpecs;
 use ibc::core::host::types::identifiers::ChainId;
@@ -31,6 +32,7 @@ pub struct CometClientState {
     pub trusting_period: Duration,
     pub unbonding_period: Duration,
     pub max_clock_drift: Duration,
+    pub trust_level: TrustThreshold,
     pub status: ClientStatus,
     pub chain_id: ChainId,
     pub proof_specs: ProofSpecs,
@@ -107,6 +109,37 @@ impl From<CometClientState> for IbcCometClientState {
 impl From<CometClientState> for Any {
     fn from(client_state: CometClientState) -> Self {
         IbcCometClientState::from(client_state).into()
+    }
+}
+
+pub struct EncodeTrustThreshold;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, TrustThreshold> for EncodeTrustThreshold
+where
+    Encoding: CanEncodeMut<Strategy, Product![u64, u64]>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &TrustThreshold,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        encoding.encode_mut(&product![value.numerator(), value.denominator()], buffer)?;
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, TrustThreshold> for EncodeTrustThreshold
+where
+    Encoding: CanDecodeMut<Strategy, Product![u64, u64]> + CanRaiseAsyncError<ClientError>,
+{
+    fn decode_mut<'a>(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'a>,
+    ) -> Result<TrustThreshold, Encoding::Error> {
+        let product![numerator, denominator] = encoding.decode_mut(buffer)?;
+        TrustThreshold::new(numerator, denominator).map_err(Encoding::raise_error)
     }
 }
 

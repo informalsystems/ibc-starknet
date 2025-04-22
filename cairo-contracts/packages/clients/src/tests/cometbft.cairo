@@ -1,18 +1,18 @@
-use CometClientComponent::ClientWriterTrait;
+use MockClientComponent::ClientWriterTrait;
 use snforge_std::start_cheat_block_timestamp_global;
-use starknet_ibc_clients::cometbft::CometClientComponent;
-use starknet_ibc_clients::cometbft::CometClientComponent::{
-    ClientReaderImpl, CometClientHandler, CometClientQuery,
+use starknet_ibc_clients::mock::MockClientComponent;
+use starknet_ibc_clients::mock::MockClientComponent::{
+    ClientReaderImpl, MockClientHandler, MockClientQuery,
 };
 use starknet_ibc_core::client::{StatusTrait, TimestampTrait};
-use starknet_ibc_testkit::configs::CometClientConfigTrait;
+use starknet_ibc_testkit::configs::MockClientConfigTrait;
 use starknet_ibc_testkit::dummies::{HEIGHT, TIMESTAMP};
 use starknet_ibc_testkit::mocks::MockCometClient;
 
-type ComponentState = CometClientComponent::ComponentState<MockCometClient::ContractState>;
+type ComponentState = MockClientComponent::ComponentState<MockCometClient::ContractState>;
 
 fn COMPONENT_STATE() -> ComponentState {
-    CometClientComponent::component_state_for_testing()
+    MockClientComponent::component_state_for_testing()
 }
 
 fn setup() -> ComponentState {
@@ -23,7 +23,7 @@ fn setup() -> ComponentState {
 /// Performs an update client by taking an elapsed timestamp from the client's latest timestamp.
 fn simulate_update_client(elapsed_timestamp: u64) {
     let mut state = setup();
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
     start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
     let msg = cfg.dummy_msg_create_client();
     let create_resp = state.create_client(msg);
@@ -49,7 +49,7 @@ fn simulate_update_client(elapsed_timestamp: u64) {
 #[test]
 fn test_create_client_ok() {
     let mut state = setup();
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
     start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
     let msg = cfg.dummy_msg_create_client();
     state.create_client(msg);
@@ -62,7 +62,7 @@ fn test_create_client_ok() {
 #[test]
 fn test_client_sequence_ok() {
     let mut state = setup();
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
     start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
     let msg = cfg.dummy_msg_create_client();
     state.create_client(msg.clone());
@@ -91,7 +91,7 @@ fn test_update_client_with_invalid_future_header() {
 #[test]
 fn test_update_client_with_older_header() {
     let mut state = setup();
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
     start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 2);
     let msg = cfg.dummy_msg_create_client();
     let create_resp = state.create_client(msg);

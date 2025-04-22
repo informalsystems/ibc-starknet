@@ -44,11 +44,10 @@ where
             "1",
             "--state-archive-capacity",
             "full",
-            "--initial-balance",
-            "1000000000000000000000000000",
             "--dump-on",
             "block",
-            "--request-body-size-limit=3000000", // 3M; ibc-core contract class is too large
+            "--request-body-size-limit=4000000", // 4M; ibc contract classes are too large
+            "--initial-balance=1000000000000000000000000000000", // need large balance
             "--dump-path",
             &Runtime::file_path_to_string(&chain_state_path),
         ];

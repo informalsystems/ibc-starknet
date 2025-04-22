@@ -1,3 +1,4 @@
+use cometbft::utils::Fraction;
 use core::num::traits::Zero;
 use ics23::ProofSpec;
 use starknet::SyscallResult;
@@ -11,6 +12,7 @@ pub struct CometClientState {
     pub trusting_period: Duration,
     pub unbonding_period: Duration,
     pub max_clock_drift: Duration,
+    pub trust_level: Fraction,
     pub status: Status,
     pub chain_id: ByteArray,
     pub proof_spec: Array<ProofSpec>,
