@@ -27,12 +27,12 @@ where
     fn validate_storage_proof(proof: &StorageProof) -> Result<(), Self::Error> {
         Chain::validate_merkle_node_map(
             &proof.classes_proof,
-            &vec![proof.global_roots.classes_tree_root],
+            &[proof.global_roots.classes_tree_root],
         )?;
 
         Chain::validate_merkle_node_map(
             &proof.contracts_proof.nodes,
-            &vec![proof.global_roots.contracts_tree_root],
+            &[proof.global_roots.contracts_tree_root],
         )?;
 
         let contract_roots = proof
@@ -103,7 +103,7 @@ where
 pub trait CanValidateMerkleNodeMap: HasErrorType {
     fn validate_merkle_node_map(
         node_map: &IndexMap<Felt, MerkleNode>,
-        roots: &Vec<Felt>,
+        roots: &[Felt],
     ) -> Result<(), Self::Error>;
 }
 
@@ -113,7 +113,7 @@ where
 {
     fn validate_merkle_node_map(
         node_map: &IndexMap<Felt, MerkleNode>,
-        roots: &Vec<Felt>,
+        roots: &[Felt],
     ) -> Result<(), Self::Error> {
         for (hash, node) in node_map.iter() {
             Chain::validate_merkle_node(hash, node)?;
