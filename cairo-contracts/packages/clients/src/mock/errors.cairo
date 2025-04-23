@@ -14,4 +14,5 @@ pub mod MockErrors {
     pub const MISSING_CLIENT_PROCESSED_HEIGHT: felt252 = 'ICS07: missing processed height';
     pub const ZERO_UPDATE_HEIGHTS: felt252 = 'ICS07: zero update heights';
     pub const ZERO_OWNER: felt252 = 'ICS07: zero owner';
+    pub const INVALID_UPGRADE_HEIGHT: felt252 = 'ICS07: invalid upgrade height';
 }
