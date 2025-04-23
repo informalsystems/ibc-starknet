@@ -1,7 +1,8 @@
 use starknet_ibc_core::host::{
     ACKS_PREFIX, BasePrefix, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, COMMITMENTS_PREFIX,
     CONNECTIONS_PREFIX, ChannelId, ConnectionId, NEXT_SEQ_RECV_PREFIX, PORTS_PREFIX, PortId,
-    RECEIPTS_PREFIX, SEQUENCES_PREFIX, Sequence,
+    RECEIPTS_PREFIX, SEQUENCES_PREFIX, Sequence, UPGRADED_CLIENT_STATE_SUFFIX,
+    UPGRADED_CONSENSUS_STATE_SUFFIX, UPGRADED_IBC_STATE_PREFIX,
 };
 use starknet_ibc_utils::{RemotePathBuilder, RemotePathBuilderImpl};
 
@@ -97,6 +98,34 @@ pub fn next_sequence_recv_path(
     append_port(ref builder, port_id);
     append_channel(ref builder, channel_id);
     let path = builder.path();
+    paths.append(prefix);
+    paths.append(path);
+    paths
+}
+
+/// Constructs the client upgrade path for the given height
+pub fn client_upgrade_path(base: BasePrefix, height: u64) -> Array<ByteArray> {
+    let mut builder_prefix = RemotePathBuilderImpl::init(base);
+    let prefix = builder_prefix.path();
+    let mut builder = RemotePathBuilderImpl::init(UPGRADED_IBC_STATE_PREFIX());
+    builder.append(format!("{}", height));
+    builder.append(UPGRADED_CLIENT_STATE_SUFFIX());
+    let path = builder.path();
+    let mut paths = array![];
+    paths.append(prefix);
+    paths.append(path);
+    paths
+}
+
+/// Constructs the consensus upgrade path for the given height
+pub fn consensus_upgrade_path(base: BasePrefix, height: u64) -> Array<ByteArray> {
+    let mut builder_prefix = RemotePathBuilderImpl::init(base);
+    let prefix = builder_prefix.path();
+    let mut builder = RemotePathBuilderImpl::init(UPGRADED_IBC_STATE_PREFIX());
+    builder.append(format!("{}", height));
+    builder.append(UPGRADED_CONSENSUS_STATE_SUFFIX());
+    let path = builder.path();
+    let mut paths = array![];
     paths.append(prefix);
     paths.append(path);
     paths
