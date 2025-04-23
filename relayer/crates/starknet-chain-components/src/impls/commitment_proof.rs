@@ -1,23 +1,24 @@
 use core::num::TryFromIntError;
 
 use cgp::prelude::*;
-use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use starknet::core::types::{Felt, MerkleNode};
 
-use crate::traits::commitment_proof::{CommitmentProofVerifier, CommitmentProofVerifierComponent};
-use crate::traits::types::commitment::{HasCommitmentPathType, HasCommitmentValueType};
+use crate::traits::commitment_proof::{MerkleProofVerifier, MerkleProofVerifierComponent};
+use crate::traits::types::commitment::{
+    HasCommitmentPathType, HasCommitmentValueType, HasMerkleProofType,
+};
 use crate::types::merkle_proof::StarknetMerkleProof;
 
-#[cgp_new_provider(CommitmentProofVerifierComponent)]
-impl<Chain> CommitmentProofVerifier<Chain> for VerifyStarknetCommitmentProof
+#[cgp_new_provider(MerkleProofVerifierComponent)]
+impl<Chain> MerkleProofVerifier<Chain> for VerifyStarknetMerkleProof
 where
-    Chain: HasCommitmentProofType<CommitmentProof = StarknetMerkleProof>
+    Chain: HasMerkleProofType<MerkleProof = StarknetMerkleProof>
         + HasCommitmentPathType<CommitmentPath = Felt>
         + HasCommitmentValueType<CommitmentValue = Felt>
         + CanRaiseError<String>
         + CanRaiseError<TryFromIntError>,
 {
-    fn verify_commitment(
+    fn verify_merkle_proof(
         proof: &StarknetMerkleProof,
         path: &Felt,
         value: Option<&Felt>,

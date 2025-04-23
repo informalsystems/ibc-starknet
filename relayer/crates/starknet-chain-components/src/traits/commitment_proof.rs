@@ -1,16 +1,17 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 
-use crate::traits::types::commitment::{HasCommitmentPathType, HasCommitmentValueType};
+use crate::traits::types::commitment::{
+    HasCommitmentPathType, HasCommitmentValueType, HasMerkleProofType,
+};
 
 #[cgp_component {
-    provider: CommitmentProofVerifier,
+    provider: MerkleProofVerifier,
 }]
-pub trait CanVerifyCommitment:
-    HasCommitmentProofType + HasCommitmentPathType + HasCommitmentValueType + HasErrorType
+pub trait CanVerifyMerkleProof:
+    HasMerkleProofType + HasCommitmentPathType + HasCommitmentValueType + HasErrorType
 {
-    fn verify_commitment(
-        proof: &Self::CommitmentProof,
+    fn verify_merkle_proof(
+        proof: &Self::MerkleProof,
         path: &Self::CommitmentPath,
         value: Option<&Self::CommitmentValue>,
     ) -> Result<(), Self::Error>;
