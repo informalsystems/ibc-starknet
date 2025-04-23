@@ -139,8 +139,8 @@ pub mod host {
         next_sequence_ack_key, next_sequence_recv_key, next_sequence_send_key, receipt_key,
     };
     pub use paths::{
-        ack_path, channel_end_path, commitment_path, connection_path, next_sequence_recv_path,
-        receipt_path,
+        ack_path, channel_end_path, client_upgrade_path, commitment_path, connection_path,
+        consensus_upgrade_path, next_sequence_recv_path, receipt_path,
     };
     pub use prefixes::{
         ACKS_PREFIX, BasePrefix, BasePrefixTrait, BasePrefixZero, CHANNELS_PREFIX,

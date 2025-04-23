@@ -2,7 +2,7 @@ use starknet_ibc_core::host::{
     ACKS_PREFIX, BasePrefix, CHANNELS_PREFIX, CHANNEL_ENDS_PREFIX, COMMITMENTS_PREFIX,
     CONNECTIONS_PREFIX, ChannelId, ConnectionId, NEXT_SEQ_RECV_PREFIX, PORTS_PREFIX, PortId,
     RECEIPTS_PREFIX, SEQUENCES_PREFIX, Sequence, UPGRADED_CLIENT_STATE_SUFFIX,
-    UPGRADED_CONSENSUS_STATE_SUFFIX, UPGRADED_IBC_STATE_PREFIX,
+    UPGRADED_CONSENSUS_STATE_SUFFIX,
 };
 use starknet_ibc_utils::{RemotePathBuilder, RemotePathBuilderImpl};
 
@@ -104,10 +104,12 @@ pub fn next_sequence_recv_path(
 }
 
 /// Constructs the client upgrade path for the given height
-pub fn client_upgrade_path(base: BasePrefix, height: u64) -> Array<ByteArray> {
+pub fn client_upgrade_path(
+    base: BasePrefix, height: u64, upgrade_path: ByteArray,
+) -> Array<ByteArray> {
     let mut builder_prefix = RemotePathBuilderImpl::init(base);
     let prefix = builder_prefix.path();
-    let mut builder = RemotePathBuilderImpl::init(UPGRADED_IBC_STATE_PREFIX());
+    let mut builder = RemotePathBuilderImpl::init(upgrade_path);
     builder.append(format!("{}", height));
     builder.append(UPGRADED_CLIENT_STATE_SUFFIX());
     let path = builder.path();
@@ -118,10 +120,12 @@ pub fn client_upgrade_path(base: BasePrefix, height: u64) -> Array<ByteArray> {
 }
 
 /// Constructs the consensus upgrade path for the given height
-pub fn consensus_upgrade_path(base: BasePrefix, height: u64) -> Array<ByteArray> {
+pub fn consensus_upgrade_path(
+    base: BasePrefix, height: u64, upgrade_path: ByteArray,
+) -> Array<ByteArray> {
     let mut builder_prefix = RemotePathBuilderImpl::init(base);
     let prefix = builder_prefix.path();
-    let mut builder = RemotePathBuilderImpl::init(UPGRADED_IBC_STATE_PREFIX());
+    let mut builder = RemotePathBuilderImpl::init(upgrade_path);
     builder.append(format!("{}", height));
     builder.append(UPGRADED_CONSENSUS_STATE_SUFFIX());
     let path = builder.path();
@@ -152,7 +156,9 @@ pub fn append_sequence(ref path_builder: RemotePathBuilder, sequence: Sequence) 
 
 #[cfg(test)]
 mod tests {
-    use starknet_ibc_core::host::{BasePrefixZero, ChannelId, PortId, Sequence};
+    use starknet_ibc_core::host::{
+        BasePrefixZero, ChannelId, PortId, Sequence, UPGRADED_IBC_STATE_PREFIX,
+    };
     use starknet_ibc_testkit::dummies::{
         CHANNEL_END, CHANNEL_ID, CONNECTION_END, IBC_PREFIX, PORT_ID, SEQUENCE,
     };
@@ -236,13 +242,13 @@ mod tests {
 
     #[test]
     fn test_client_upgrade_path() {
-        let paths = super::client_upgrade_path(IBC_PREFIX(), 1);
+        let paths = super::client_upgrade_path(IBC_PREFIX(), 1, UPGRADED_IBC_STATE_PREFIX());
         assert_eq!(paths, array!["ibc", "upgradedIBCState/1/upgradedClient"]);
     }
 
     #[test]
     fn test_consensus_upgrade_path() {
-        let paths = super::consensus_upgrade_path(IBC_PREFIX(), 1);
+        let paths = super::consensus_upgrade_path(IBC_PREFIX(), 1, UPGRADED_IBC_STATE_PREFIX());
         assert_eq!(paths, array!["ibc", "upgradedIBCState/1/upgradedConsState"]);
     }
 }
