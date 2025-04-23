@@ -7,8 +7,10 @@ mod RawStore {
     struct Storage {}
 
     #[external(v0)]
-    fn set(ref self: ContractState, address: StorageAddress, value: felt252) {
-        storage_write_syscall(0, address, value).unwrap();
+    fn set(ref self: ContractState, entries: Array<(StorageAddress, felt252)>) {
+        for (key, value) in entries {
+            storage_write_syscall(0, key, value).unwrap();
+        }
     }
 
     #[external(v0)]

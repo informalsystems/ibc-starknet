@@ -94,7 +94,7 @@ pub trait CanTestProofEntries: HasContractClassHashType + HasAsyncErrorType {
 
 impl<Chain> CanTestProofEntries for Chain
 where
-    Chain: CanDeployContract<Blob = Vec<Felt>> + CanBulkSetRawStorage + CanVerifyMerkleProofs,
+    Chain: CanDeployContract<Blob = Vec<Felt>> + CanUseRawStorage + CanVerifyMerkleProofs,
     Chain::Address: Display,
 {
     async fn test_proof_entries(
@@ -111,7 +111,7 @@ where
             contract_address
         );
 
-        self.bulk_set(&contract_address, entries).await?;
+        self.set(&contract_address, entries).await?;
 
         self.verify_merkle_proofs(&contract_address, entries)
             .await?;
@@ -164,38 +164,11 @@ where
 }
 
 #[async_trait]
-pub trait CanBulkSetRawStorage: HasAddressType + HasAsyncErrorType {
-    async fn bulk_set(
-        &self,
-        contract: &Self::Address,
-        entries: &[(Felt, Felt)],
-    ) -> Result<(), Self::Error>;
-}
-
-impl<Chain> CanBulkSetRawStorage for Chain
-where
-    Chain: CanUseRawStorage,
-{
-    async fn bulk_set(
-        &self,
-        contract: &Self::Address,
-        entries: &[(Felt, Felt)],
-    ) -> Result<(), Self::Error> {
-        for (key, value) in entries {
-            self.set(contract, *key, *value).await?;
-        }
-
-        Ok(())
-    }
-}
-
-#[async_trait]
 pub trait CanUseRawStorage: HasAddressType + HasAsyncErrorType {
     async fn set(
         &self,
         contract: &Self::Address,
-        path: Felt,
-        value: Felt,
+        entries: &[(Felt, Felt)],
     ) -> Result<(), Self::Error>;
 
     async fn get(&self, contract: &Self::Address, path: Felt) -> Result<Felt, Self::Error>;
@@ -223,10 +196,17 @@ where
     async fn set(
         &self,
         contract: &StarknetAddress,
-        path: Felt,
-        value: Felt,
+        entries: &[(Felt, Felt)],
     ) -> Result<(), Self::Error> {
-        self.invoke_contract(contract, &selector!("set"), &vec![path, value])
+        let length = Felt::try_from(entries.len()).unwrap();
+        let mut calldata = vec![length];
+
+        for (key, value) in entries {
+            calldata.push(*key);
+            calldata.push(*value);
+        }
+
+        self.invoke_contract(contract, &selector!("set"), &calldata)
             .await?;
 
         Ok(())
