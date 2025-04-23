@@ -1,5 +1,6 @@
 pub mod assert;
 pub mod commitment_prefix;
+pub mod commitment_proof;
 pub mod contract;
 pub mod counterparty_message_height;
 pub mod encoding;

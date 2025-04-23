@@ -59,13 +59,19 @@ fn test_madara_raw_storage() -> Result<(), Error> {
             contract_address
         };
 
-        let key1 = felt!("0x001");
-        let key2 = felt!("0x010");
-        let key3 = felt!("0x100");
+        let key1 = felt!("0x0001");
+        let key2 = Felt::ELEMENT_UPPER_BOUND - 1;
+        // let key3 = felt!("0x100");
+
+        let key1_bits = key1.to_bits_le();
+        let key2_bits = key2.to_bits_le();
+
+        println!("key1_bits: {key1_bits:?}");
+        println!("key2_bits: {key2_bits:?}");
 
         let value1 = felt!("0x9911");
         let value2 = felt!("0x9922");
-        let value3 = felt!("0x9933");
+        // let value3 = felt!("0x9933");
 
         {
             let storage_proof = chain
@@ -84,7 +90,7 @@ fn test_madara_raw_storage() -> Result<(), Error> {
 
         chain.set(&contract_address, key1, value1).await?;
         chain.set(&contract_address, key2, value2).await?;
-        chain.set(&contract_address, key3, value3).await?;
+        // chain.set(&contract_address, key3, value3).await?;
 
         {
             let storage_proof = chain
@@ -116,35 +122,35 @@ fn test_madara_raw_storage() -> Result<(), Error> {
             println!("storage proof of key2 after set: {storage_proof_str}");
         }
 
-        {
-            let storage_proof = chain
-                .query_storage_proof(
-                    &chain.query_chain_height().await?,
-                    &contract_address,
-                    &[key3],
-                )
-                .await?;
+        // {
+        //     let storage_proof = chain
+        //         .query_storage_proof(
+        //             &chain.query_chain_height().await?,
+        //             &contract_address,
+        //             &[key3],
+        //         )
+        //         .await?;
 
-            let storage_proof_str =
-                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
+        //     let storage_proof_str =
+        //         serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
 
-            println!("storage proof of key3 after set: {storage_proof_str}");
-        }
+        //     println!("storage proof of key3 after set: {storage_proof_str}");
+        // }
 
-        {
-            let storage_proof = chain
-                .query_storage_proof(
-                    &chain.query_chain_height().await?,
-                    &contract_address,
-                    &[felt!("0x11")],
-                )
-                .await?;
+        // {
+        //     let storage_proof = chain
+        //         .query_storage_proof(
+        //             &chain.query_chain_height().await?,
+        //             &contract_address,
+        //             &[felt!("0x11")],
+        //         )
+        //         .await?;
 
-            let storage_proof_str =
-                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
+        //     let storage_proof_str =
+        //         serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
 
-            println!("storage proof of non-existence: {storage_proof_str}");
-        }
+        //     println!("storage proof of non-existence: {storage_proof_str}");
+        // }
 
         Ok(())
     })

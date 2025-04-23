@@ -1,5 +1,6 @@
 pub mod account;
 pub mod client;
+pub mod commitment_proof;
 pub mod contract;
 pub mod json_rpc;
 pub mod messages;
