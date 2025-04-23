@@ -1,7 +1,6 @@
 #[starknet::component]
 pub mod MockClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
-    use alexandria_sorting::MergeSort;
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
@@ -97,25 +96,52 @@ pub mod MockClientComponent {
 
         fn update_height_before(
             self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height,
-        ) -> Height {
+        ) -> Option<Height> {
             let update_heights = self.read_update_heights(client_sequence);
 
             let mut len = update_heights.len();
 
             assert(len > 0, MockErrors::ZERO_UPDATE_HEIGHTS);
 
-            let mut height = target_height;
+            // FIXME: do binary search
 
             let mut update_heights_span = update_heights.span();
 
-            while let Option::Some(update_height) = update_heights_span.pop_back() {
+            let mut result = None;
+
+            while let Some(update_height) = update_heights_span.pop_back() {
                 if @target_height >= update_height {
-                    height = *update_height;
+                    result = Some(*update_height);
                     break;
                 }
             }
 
-            height
+            result
+        }
+
+        fn update_height_after(
+            self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height,
+        ) -> Option<Height> {
+            let update_heights = self.read_update_heights(client_sequence);
+
+            let mut len = update_heights.len();
+
+            assert(len > 0, MockErrors::ZERO_UPDATE_HEIGHTS);
+
+            // FIXME: do binary search
+
+            let mut update_heights_span = update_heights.span();
+
+            let mut result = None;
+
+            while let Some(update_height) = update_heights_span.pop_front() {
+                if @target_height <= update_height {
+                    result = Some(*update_height);
+                    break;
+                }
+            }
+
+            result
         }
 
         fn latest_timestamp(
@@ -362,7 +388,8 @@ pub mod MockClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> bool {
-            false
+            let header: MockHeader = MockHeaderImpl::deserialize(client_message);
+            self._verify_misbehaviour_on_update(client_sequence, header)
         }
 
         fn verify_substitute(
@@ -483,11 +510,12 @@ pub mod MockClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> UpdateResponse {
-            let header = MockHeaderImpl::deserialize(client_message);
-
             let mut client_state = self.read_client_state(client_sequence);
 
-            client_state.freeze(header.trusted_height);
+            // convention from ibc-go
+            let frozen_height = HeightImpl::new(0, 1);
+
+            client_state.freeze(frozen_height);
 
             self.write_client_state(client_sequence, client_state);
 
@@ -502,15 +530,16 @@ pub mod MockClientComponent {
             substitute_consensus_state: Array<felt252>,
         ) {
             let update_heights = self.read_update_heights(subject_client_sequence);
-            assert(update_heights.len() > 0, MockErrors::ZERO_UPDATE_HEIGHTS);
 
-            let mut update_heights_span = update_heights.span();
+            if update_heights.len() > 0 {
+                let mut update_heights_span = update_heights.span();
 
-            while let Option::Some(height) = update_heights_span.pop_front() {
-                self.remove_consensus_state(subject_client_sequence, height.clone());
+                while let Option::Some(height) = update_heights_span.pop_front() {
+                    self.remove_consensus_state(subject_client_sequence, height.clone());
+                }
+
+                self.update_heights.write(subject_client_sequence, array![]);
             }
-
-            self.update_heights.write(subject_client_sequence, array![]);
 
             let substitute_client_state = MockClientStateImpl::deserialize(substitute_client_state);
             let substitute_consensus_state = MockConsensusStateImpl::deserialize(
@@ -613,6 +642,53 @@ pub mod MockClientComponent {
                     processed_time,
                 );
         }
+
+        fn _verify_misbehaviour_on_update(
+            self: @ComponentState<TContractState>, client_sequence: u64, header: MockHeader,
+        ) -> bool {
+            let target_height = header.signed_header.height;
+
+            let target_consensus_state: MockConsensusState = header.into();
+
+            let previous_height = self.update_height_before(client_sequence, target_height.clone());
+
+            if previous_height == Some(target_height) {
+                let stored_consensus_state = self
+                    .read_consensus_state(client_sequence, target_height.clone());
+
+                // stored consensus state should be the same from target consensus state
+                // negation of the correct condition is a misbehaviour case
+                if !(stored_consensus_state == target_consensus_state) {
+                    return true;
+                }
+            } else {
+                if let Some(previous_height) = previous_height {
+                    let previous_consensus_state = self
+                        .read_consensus_state(client_sequence, previous_height.clone());
+
+                    // time should be monotonically increasing
+                    // negation of the correct condition is a misbehaviour case
+                    if !(@previous_consensus_state.timestamp < @target_consensus_state.timestamp) {
+                        return true;
+                    }
+                }
+
+                let next_height = self.update_height_after(client_sequence, target_height.clone());
+
+                if let Some(next_height) = next_height {
+                    let next_consensus_state = self
+                        .read_consensus_state(client_sequence, next_height.clone());
+
+                    // time should be monotonically increasing
+                    // negation of the correct condition is a misbehaviour case
+                    if !(@next_consensus_state.timestamp > @target_consensus_state.timestamp) {
+                        return true;
+                    }
+                }
+            }
+
+            false
+        }
     }
 
     // -----------------------------------------------------------
@@ -699,20 +775,42 @@ pub mod MockClientComponent {
                 return;
             }
 
-            let len = update_heights.len();
+            let mut len = update_heights.len();
 
             if len == 100 {
                 update_heights.pop_front().unwrap();
+                len = update_heights.len();
             }
 
-            update_heights.append(update_height);
+            // if the new height is bigger than the last one or the first, we can just append it
+            if len == 0 || update_heights.at(len - 1) < @update_height {
+                update_heights.append(update_height);
+                self.update_heights.write(client_sequence, update_heights);
+                return;
+            }
 
-            let new_update_heights = if len.is_non_zero()
-                && update_heights.at(len - 1) > @update_height {
-                MergeSort::sort(update_heights.span())
+            // update_heights is already sorted.
+            // we only need to insert the new height in the right place
+
+            let mut new_update_heights = array![];
+            let mut inserted = false;
+
+            while let Some(height) = update_heights.pop_front() {
+                if height > update_height {
+                    new_update_heights.append(update_height);
+                    inserted = true;
+                }
+                new_update_heights.append(height);
+                if inserted {
+                    break;
+                }
+            }
+
+            if inserted {
+                new_update_heights.append_span(update_heights.span());
             } else {
-                update_heights
-            };
+                new_update_heights.append(update_height);
+            }
 
             self.update_heights.write(client_sequence, new_update_heights);
         }

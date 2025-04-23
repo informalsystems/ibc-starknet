@@ -3,6 +3,7 @@ use starknet_ibc_core::client::{
     CreateResponse, Duration, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient, Status,
     Timestamp,
 };
+use starknet_ibc_core::commitment::{StateProof, StateRoot};
 use starknet_ibc_core::host::ClientId;
 use starknet_ibc_testkit::dummies::{CLIENT_TYPE, DURATION, HEIGHT, STATE_ROOT, TIMESTAMP};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
@@ -77,6 +78,48 @@ pub impl MockClientConfigImpl of MockClientConfigTrait {
         Serde::serialize(@header, ref serialized_header);
 
         MsgUpdateClient { client_id, client_message: serialized_header }
+    }
+
+    fn dummy_msg_misbehaviour_client(
+        self: @MockClientConfig,
+        client_id: ClientId,
+        trusted_height: Height,
+        latest_height: Height,
+        latest_timestamp: Timestamp,
+    ) -> (MsgUpdateClient, MsgUpdateClient) {
+        let msg1 = {
+            let mut serialized_header: Array<felt252> = ArrayTrait::new();
+
+            let mut root = StateRoot { root: [2; 8] };
+
+            let signed_header = SignedHeader {
+                height: latest_height, timestamp: latest_timestamp, root,
+            };
+
+            let header = MockHeader { trusted_height, signed_header };
+
+            Serde::serialize(@header, ref serialized_header);
+
+            MsgUpdateClient { client_id: client_id.clone(), client_message: serialized_header }
+        };
+
+        let msg2 = {
+            let mut serialized_header: Array<felt252> = ArrayTrait::new();
+
+            let mut root = StateRoot { root: [3; 8] };
+
+            let signed_header = SignedHeader {
+                height: latest_height, timestamp: latest_timestamp, root,
+            };
+
+            let header = MockHeader { trusted_height, signed_header };
+
+            Serde::serialize(@header, ref serialized_header);
+
+            MsgUpdateClient { client_id: client_id.clone(), client_message: serialized_header }
+        };
+
+        (msg1, msg2)
     }
 
     fn dummy_msg_recover_client(

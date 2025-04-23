@@ -810,7 +810,7 @@ pub impl U32TryIntoVoteType of TryInto<u32, VoteType> {
 pub struct UntrustedBlockState {
     pub signed_header: SignedHeader,
     pub validators: ValidatorSet,
-    // pub next_validators: Option<ValidatorSet>,
+    pub next_validators: ValidatorSet,
 }
 
 #[generate_trait]
@@ -822,7 +822,11 @@ pub impl UntrustedBlockStateImpl of UntrustedBlockStateTrait {
 
 impl HeaderToUntrustedBlockState of Into<LcHeader, UntrustedBlockState> {
     fn into(self: LcHeader) -> UntrustedBlockState {
-        UntrustedBlockState { signed_header: self.signed_header, validators: self.validator_set }
+        UntrustedBlockState {
+            signed_header: self.signed_header,
+            validators: self.validator_set,
+            next_validators: self.trusted_validator_set,
+        }
     }
 }
 
