@@ -50,7 +50,7 @@ where
 
         chain
             .log(
-                &format!("fetched storage proof: {}", storage_proof_str),
+                &format!("fetched storage proof: {storage_proof_str}"),
                 &LevelTrace,
             )
             .await;

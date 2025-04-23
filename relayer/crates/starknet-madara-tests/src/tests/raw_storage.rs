@@ -102,9 +102,7 @@ where
         class_hash: &Self::ContractClassHash,
         entries: &[(Felt, Felt)],
     ) -> Result<(), Self::Error> {
-        let contract_address = self
-            .deploy_contract(&class_hash, false, &Vec::new())
-            .await?;
+        let contract_address = self.deploy_contract(class_hash, false, &Vec::new()).await?;
 
         info!(
             "deployed raw storage contract to address: {}",
@@ -198,7 +196,7 @@ where
         contract: &StarknetAddress,
         entries: &[(Felt, Felt)],
     ) -> Result<(), Self::Error> {
-        let length = Felt::try_from(entries.len()).unwrap();
+        let length = Felt::from(entries.len());
         let mut calldata = vec![length];
 
         for (key, value) in entries {

@@ -12,7 +12,7 @@ pub fn init_test_runtime() -> HermesRuntime {
 
     let tokio_runtime = Arc::new(Builder::new_multi_thread().enable_all().build().unwrap());
 
-    let runtime = HermesRuntime::new(tokio_runtime.clone());
+    let runtime = HermesRuntime::new(tokio_runtime);
 
     info!("initialized Hermes test runtime");
 

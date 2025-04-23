@@ -135,7 +135,7 @@ pub trait CanValidateMerkleNodeParent: HasErrorType {
     fn validate_merkle_node_parent(
         node_hash: &Felt,
         node_map: &IndexMap<Felt, MerkleNode>,
-        roots: &Vec<Felt>,
+        roots: &[Felt],
     ) -> Result<(), Self::Error>;
 }
 
@@ -146,7 +146,7 @@ where
     fn validate_merkle_node_parent(
         hash: &Felt,
         node_map: &IndexMap<Felt, MerkleNode>,
-        roots: &Vec<Felt>,
+        roots: &[Felt],
     ) -> Result<(), Self::Error> {
         if roots.contains(hash) {
             return Ok(());

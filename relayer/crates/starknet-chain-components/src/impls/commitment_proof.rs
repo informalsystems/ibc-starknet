@@ -66,7 +66,7 @@ where
                     let node_length = u8::try_from(node.length).map_err(Chain::raise_error)?;
                     let node_path_bits = node.path.to_bits_be();
 
-                    if node_length > remaining_length.into() {
+                    if node_length > remaining_length {
                         return Err(Chain::raise_error(format!("invalid edge node with node length {node_length} exceeding remaining length {remaining_length}")));
                     }
 
@@ -106,20 +106,18 @@ where
                             remaining_length -= node_length;
                             path_bits = &path_bits[node_length.into()..];
                         }
+                    } else if value == Felt::ZERO {
+                        return Ok(());
                     } else {
-                        if value == Felt::ZERO {
-                            return Ok(());
-                        } else {
-                            return Err(Chain::raise_error(format!("expect value to be present, but non-membership proof is found at {node:?}")));
-                        }
+                        return Err(Chain::raise_error(format!("expect value to be present, but non-membership proof is found at {node:?}")));
                     }
                 }
             }
         }
 
-        return Err(Chain::raise_error(format!(
-            "malform proof that exceed maximum depth of 251"
-        )));
+        Err(Chain::raise_error(
+            "malform proof that exceed maximum depth of 251".to_string(),
+        ))
     }
 }
 
@@ -140,22 +138,22 @@ where
         path: Felt,
         value: Felt,
     ) -> Result<(), Chain::Error> {
-        Chain::validate_storage_proof(&storage_proof)?;
+        Chain::validate_storage_proof(storage_proof)?;
 
         let contract_leaf = storage_proof
             .contracts_proof
             .contract_leaves_data
             .first()
-            .ok_or_else(|| Chain::raise_error(format!("contract leaf node not found")))?;
+            .ok_or_else(|| Chain::raise_error("contract leaf node not found".to_string()))?;
 
         let contract_root = contract_leaf
             .storage_root
-            .ok_or_else(|| Chain::raise_error(format!("contract storage root not found")))?;
+            .ok_or_else(|| Chain::raise_error("contract storage root not found".to_string()))?;
 
         let contract_storage_proof = storage_proof
             .contracts_storage_proofs
             .first()
-            .ok_or_else(|| Chain::raise_error(format!("contract storage proof not found")))?;
+            .ok_or_else(|| Chain::raise_error("contract storage proof not found".to_string()))?;
 
         let contract_hash = pedersen_hash(
             &pedersen_hash(
