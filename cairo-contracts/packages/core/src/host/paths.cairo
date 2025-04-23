@@ -233,4 +233,16 @@ mod tests {
         );
         assert_eq!(paths, array!["ibc", "nextSequenceRecv/ports/transfer/channels/channel-3"]);
     }
+
+    #[test]
+    fn test_client_upgrade_path() {
+        let paths = super::client_upgrade_path(IBC_PREFIX(), 1);
+        assert_eq!(paths, array!["ibc", "upgradedIBCState/1/upgradedClient"]);
+    }
+
+    #[test]
+    fn test_consensus_upgrade_path() {
+        let paths = super::consensus_upgrade_path(IBC_PREFIX(), 1);
+        assert_eq!(paths, array!["ibc", "upgradedIBCState/1/upgradedConsState"]);
+    }
 }
