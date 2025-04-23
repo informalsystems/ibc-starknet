@@ -3,7 +3,9 @@ use core::num::TryFromIntError;
 use cgp::prelude::*;
 use starknet::core::types::{Felt, MerkleNode};
 
-use crate::traits::commitment_proof::{StarknetMerkleProofVerifier, StarknetMerkleProofVerifierComponent};
+use crate::traits::commitment_proof::{
+    StarknetMerkleProofVerifier, StarknetMerkleProofVerifierComponent,
+};
 use crate::traits::types::commitment::HasMerkleProofType;
 use crate::types::merkle_proof::StarknetMerkleProof;
 

@@ -1,3 +1,5 @@
+use core::fmt::Display;
+
 use cgp::prelude::*;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
@@ -14,6 +16,7 @@ use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::commitment::{
     HasCommitmentPathType, HasCommitmentValueType, HasMerkleProofType,
 };
+use hermes_starknet_chain_components::traits::types::contract_class::HasContractClassHashType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::traits::types::storage_proof::{
     HasStorageKeyType, HasStorageProofType,
@@ -53,38 +56,30 @@ fn test_madara_raw_storage() -> Result<(), Error> {
             class_hash
         };
 
-        let contract_address = {
-            let contract_address = chain
-                .deploy_contract(&class_hash, false, &Vec::new())
-                .await?;
-
-            info!(
-                "deployed raw storage contract to address: {:?}",
-                contract_address
-            );
-
-            contract_address
-        };
-
-        let key1 = felt!("0x0001");
-        let key2 = Felt::ELEMENT_UPPER_BOUND - 1;
-        let key3 = felt!("0x100");
-
-        let key1_bits = key1.to_bits_le();
-        let key2_bits = key2.to_bits_le();
-
-        let value1 = felt!("0x9911");
-        let value2 = felt!("0x9922");
-        // let value3 = felt!("0x9933");
-
         chain
-            .bulk_set(&contract_address, &[(key1, value1), (key2, value2)])
+            .test_proof_entries(
+                &class_hash,
+                &[
+                    (felt!("0x0001"), felt!("0x9911")),
+                    (Felt::ELEMENT_UPPER_BOUND - 1, felt!("0x9922")),
+                    (felt!("0x100"), Felt::ZERO),
+                ],
+            )
             .await?;
 
         chain
-            .verify_merkle_proofs(
-                &contract_address,
-                &[(key1, value1), (key2, value2), (key3, Felt::ZERO)],
+            .test_proof_entries(
+                &class_hash,
+                &[
+                    (felt!("0x0001"), felt!("0x9991")),
+                    (felt!("0x0002"), felt!("0x9992")),
+                    (felt!("0x0003"), Felt::ZERO),
+                    (felt!("0x0004"), Felt::ZERO),
+                    (felt!("0x0005"), Felt::ZERO),
+                    (felt!("0x0006"), Felt::ZERO),
+                    (felt!("0x0007"), felt!("0x9997")),
+                    (felt!("0x0008"), felt!("0x9998")),
+                ],
             )
             .await?;
 
@@ -92,10 +87,42 @@ fn test_madara_raw_storage() -> Result<(), Error> {
     })
 }
 
-// #[async_trait]
-// pub trait CanTestProofEntries: HasAsyncErrorType {
-//     async fn test_proof_entries(entries: )
-// }
+#[async_trait]
+pub trait CanTestProofEntries: HasContractClassHashType + HasAsyncErrorType {
+    async fn test_proof_entries(
+        &self,
+        class_hash: &Self::ContractClassHash,
+        entries: &[(Felt, Felt)],
+    ) -> Result<(), Self::Error>;
+}
+
+impl<Chain> CanTestProofEntries for Chain
+where
+    Chain: CanDeployContract<Blob = Vec<Felt>> + CanBulkSetRawStorage + CanVerifyMerkleProofs,
+    Chain::Address: Display,
+{
+    async fn test_proof_entries(
+        &self,
+        class_hash: &Self::ContractClassHash,
+        entries: &[(Felt, Felt)],
+    ) -> Result<(), Self::Error> {
+        let contract_address = self
+            .deploy_contract(&class_hash, false, &Vec::new())
+            .await?;
+
+        info!(
+            "deployed raw storage contract to address: {}",
+            contract_address
+        );
+
+        self.bulk_set(&contract_address, entries).await?;
+
+        self.verify_merkle_proofs(&contract_address, entries)
+            .await?;
+
+        Ok(())
+    }
+}
 
 #[async_trait]
 pub trait CanVerifyMerkleProofs: HasAddressType + HasAsyncErrorType {
