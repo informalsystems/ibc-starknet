@@ -11,14 +11,20 @@ use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContrac
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
 use hermes_starknet_chain_components::traits::queries::storage_proof::CanQueryStorageProof;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
+use hermes_starknet_chain_components::traits::types::commitment::{
+    HasCommitmentPathType, HasCommitmentValueType, HasMerkleProofType,
+};
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
+use hermes_starknet_chain_components::traits::types::storage_proof::{
+    HasStorageKeyType, HasStorageProofType,
+};
 use hermes_starknet_chain_components::types::merkle_proof::StarknetMerkleProof;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, StorageProof};
 use starknet::macros::{felt, selector};
 use tracing::info;
 
-use crate::contexts::{MadaraChain, MadaraChainDriver};
+use crate::contexts::MadaraChainDriver;
 use crate::impls::{init_madara_bootstrap, init_test_runtime};
 
 #[test]
@@ -71,135 +77,99 @@ fn test_madara_raw_storage() -> Result<(), Error> {
         let value2 = felt!("0x9922");
         // let value3 = felt!("0x9933");
 
-        {
-            let storage_proof = chain
-                .query_storage_proof(
-                    &chain.query_chain_height().await?,
-                    &contract_address,
-                    &[key1],
-                )
-                .await?;
+        chain
+            .bulk_set(&contract_address, &[(key1, value1), (key2, value2)])
+            .await?;
 
-            let storage_proof_str =
-                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
-
-            println!("storage proof before set: {storage_proof_str}");
-        }
-
-        chain.set(&contract_address, key1, value1).await?;
-        chain.set(&contract_address, key2, value2).await?;
-        // chain.set(&contract_address, key3, value3).await?;
-
-        {
-            let storage_proof = chain
-                .query_storage_proof(
-                    &chain.query_chain_height().await?,
-                    &contract_address,
-                    &[key1],
-                )
-                .await?;
-
-            let storage_proof_str =
-                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
-
-            println!("storage proof of key1 after set: {storage_proof_str}");
-
-            MadaraChain::verify_merkle_proof(
-                &StarknetMerkleProof {
-                    root: storage_proof.contracts_proof.contract_leaves_data[0]
-                        .storage_root
-                        .unwrap(),
-                    proof_nodes: storage_proof.contracts_storage_proofs[0].clone(),
-                },
-                &key1,
-                Some(&value1),
-            )?;
-        }
-
-        {
-            let storage_proof = chain
-                .query_storage_proof(
-                    &chain.query_chain_height().await?,
-                    &contract_address,
-                    &[key2],
-                )
-                .await?;
-
-            let storage_proof_str =
-                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
-
-            println!("storage proof of key2 after set: {storage_proof_str}");
-
-            MadaraChain::verify_merkle_proof(
-                &StarknetMerkleProof {
-                    root: storage_proof.contracts_proof.contract_leaves_data[0]
-                        .storage_root
-                        .unwrap(),
-                    proof_nodes: storage_proof.contracts_storage_proofs[0].clone(),
-                },
-                &key2,
-                Some(&value2),
-            )?;
-        }
-
-        {
-            let storage_proof = chain
-                .query_storage_proof(
-                    &chain.query_chain_height().await?,
-                    &contract_address,
-                    &[key3],
-                )
-                .await?;
-
-            let storage_proof_str =
-                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
-
-            println!("storage proof of key3: {storage_proof_str}");
-
-            MadaraChain::verify_merkle_proof(
-                &StarknetMerkleProof {
-                    root: storage_proof.contracts_proof.contract_leaves_data[0]
-                        .storage_root
-                        .unwrap(),
-                    proof_nodes: storage_proof.contracts_storage_proofs[0].clone(),
-                },
-                &key3,
-                None,
-            )?;
-        }
-
-        // {
-        //     let storage_proof = chain
-        //         .query_storage_proof(
-        //             &chain.query_chain_height().await?,
-        //             &contract_address,
-        //             &[key3],
-        //         )
-        //         .await?;
-
-        //     let storage_proof_str =
-        //         serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
-
-        //     println!("storage proof of key3 after set: {storage_proof_str}");
-        // }
-
-        // {
-        //     let storage_proof = chain
-        //         .query_storage_proof(
-        //             &chain.query_chain_height().await?,
-        //             &contract_address,
-        //             &[felt!("0x11")],
-        //         )
-        //         .await?;
-
-        //     let storage_proof_str =
-        //         serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
-
-        //     println!("storage proof of non-existence: {storage_proof_str}");
-        // }
+        chain
+            .verify_merkle_proofs(
+                &contract_address,
+                &[(key1, Some(value1)), (key2, Some(value2)), (key3, None)],
+            )
+            .await?;
 
         Ok(())
     })
+}
+
+#[async_trait]
+pub trait CanVerifyMerkleProofs: HasAddressType + HasAsyncErrorType {
+    async fn verify_merkle_proofs(
+        &self,
+        contract: &Self::Address,
+        entries: &[(Felt, Option<Felt>)],
+    ) -> Result<(), Self::Error>;
+}
+
+impl<Chain> CanVerifyMerkleProofs for Chain
+where
+    Chain: HasAddressType
+        + HasStorageKeyType<StorageKey = Felt>
+        + HasStorageProofType<StorageProof = StorageProof>
+        + HasMerkleProofType<MerkleProof = StarknetMerkleProof>
+        + HasCommitmentPathType<CommitmentPath = Felt>
+        + HasCommitmentValueType<CommitmentValue = Felt>
+        + CanQueryStorageProof
+        + CanQueryChainHeight
+        + CanVerifyMerkleProof
+        + CanRaiseAsyncError<serde_json::Error>,
+{
+    async fn verify_merkle_proofs(
+        &self,
+        contract: &Self::Address,
+        entries: &[(Felt, Option<Felt>)],
+    ) -> Result<(), Self::Error> {
+        let height = self.query_chain_height().await?;
+
+        for (key, value) in entries {
+            let storage_proof = self.query_storage_proof(&height, contract, &[*key]).await?;
+
+            let storage_proof_str =
+                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)
+                    .map_err(Chain::raise_error)?;
+
+            println!("storage proof for {key}: {storage_proof_str}");
+
+            Chain::verify_merkle_proof(
+                &StarknetMerkleProof {
+                    root: storage_proof.contracts_proof.contract_leaves_data[0]
+                        .storage_root
+                        .unwrap(),
+                    proof_nodes: storage_proof.contracts_storage_proofs[0].clone(),
+                },
+                key,
+                value.as_ref(),
+            )?;
+        }
+
+        Ok(())
+    }
+}
+
+#[async_trait]
+pub trait CanBulkSetRawStorage: HasAddressType + HasAsyncErrorType {
+    async fn bulk_set(
+        &self,
+        contract: &Self::Address,
+        entries: &[(Felt, Felt)],
+    ) -> Result<(), Self::Error>;
+}
+
+impl<Chain> CanBulkSetRawStorage for Chain
+where
+    Chain: CanUseRawStorage,
+{
+    async fn bulk_set(
+        &self,
+        contract: &Self::Address,
+        entries: &[(Felt, Felt)],
+    ) -> Result<(), Self::Error> {
+        for (key, value) in entries {
+            self.set(contract, *key, *value).await?;
+        }
+
+        Ok(())
+    }
 }
 
 #[async_trait]

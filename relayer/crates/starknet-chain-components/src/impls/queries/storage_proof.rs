@@ -19,8 +19,8 @@ where
     Chain: HasHeightType<Height = u64>
         + HasAddressType<Address = StarknetAddress>
         + HasStorageKeyType<StorageKey = Felt>
-        + HasStorageProofType
-        + CanVerifyStorageProof<StorageProof = StorageProof>
+        + HasStorageProofType<StorageProof = StorageProof>
+        + CanVerifyStorageProof
         + CanLog<LevelTrace>
         + CanSendJsonRpcRequest<QueryStorageProofRequest, Chain::StorageProof>
         + CanRaiseError<serde_json::Error>,
