@@ -1,5 +1,6 @@
 use core::num::traits::zero::Zero;
 use starknet_ibc_core::client::ClientErrors;
+use starknet_ibc_core::commitment::StateProof;
 use starknet_ibc_core::host::ClientId;
 use starknet_ibc_utils::ValidateBasic;
 
@@ -50,6 +51,10 @@ impl MsgRecoverClientValidateBasic of ValidateBasic<MsgRecoverClient> {
 #[derive(Clone, Debug, Drop, PartialEq, Serde)]
 pub struct MsgUpgradeClient {
     pub client_id: ClientId,
+    pub upgraded_client_state: Array<felt252>,
+    pub upgraded_consensus_state: Array<felt252>,
+    pub proof_upgrade_client: StateProof,
+    pub proof_upgrade_consensus_state: StateProof,
 }
 
 impl MsgUpgradeClientValidateBasic of ValidateBasic<MsgUpgradeClient> {
