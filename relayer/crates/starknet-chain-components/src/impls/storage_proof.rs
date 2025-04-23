@@ -11,10 +11,10 @@ use crate::traits::types::storage_proof::HasStorageProofType;
 
     Here, we mainly validate that the hash values and parent relationships are valid.
     The actual membership proofs are verified later, depending on the paths and values
-    that we want to verify.
+    that we want to validate.
 
     The main advantage of separating the two is that we can validate a storage proof once,
-    and then use it to verify multiple Merkle membership proofs.
+    and then use it to validate multiple Merkle membership proofs.
 */
 pub trait CanValidateStorageProof: HasStorageProofType + HasErrorType {
     fn validate_storage_proof(proof: &Self::StorageProof) -> Result<(), Self::Error>;
@@ -25,12 +25,12 @@ where
     Chain: HasStorageProofType<StorageProof = StorageProof> + CanRaiseError<String>,
 {
     fn validate_storage_proof(proof: &StorageProof) -> Result<(), Self::Error> {
-        Chain::verify_merkle_node_map(
+        Chain::validate_merkle_node_map(
             &proof.classes_proof,
             &vec![proof.global_roots.classes_tree_root],
         )?;
 
-        Chain::verify_merkle_node_map(
+        Chain::validate_merkle_node_map(
             &proof.contracts_proof.nodes,
             &vec![proof.global_roots.contracts_tree_root],
         )?;
@@ -43,24 +43,24 @@ where
             .collect::<Vec<_>>();
 
         for storage_entry in proof.contracts_storage_proofs.iter() {
-            Chain::verify_merkle_node_map(storage_entry, &contract_roots)?;
+            Chain::validate_merkle_node_map(storage_entry, &contract_roots)?;
         }
 
-        Chain::verify_contracts_proof(&proof.contracts_proof)?;
+        Chain::validate_contracts_proof(&proof.contracts_proof)?;
 
         Ok(())
     }
 }
 
-pub trait CanVerifyContractsProof: HasErrorType {
-    fn verify_contracts_proof(contracts_proof: &ContractsProof) -> Result<(), Self::Error>;
+pub trait CanValidateContractsProof: HasErrorType {
+    fn validate_contracts_proof(contracts_proof: &ContractsProof) -> Result<(), Self::Error>;
 }
 
-impl<Chain> CanVerifyContractsProof for Chain
+impl<Chain> CanValidateContractsProof for Chain
 where
     Chain: CanRaiseError<String>,
 {
-    fn verify_contracts_proof(contracts_proof: &ContractsProof) -> Result<(), Self::Error> {
+    fn validate_contracts_proof(contracts_proof: &ContractsProof) -> Result<(), Self::Error> {
         for contract_leaf in contracts_proof.contract_leaves_data.iter() {
             let storage_root = contract_leaf.storage_root.ok_or_else(|| {
                 Chain::raise_error(format!("storage root not found at {contract_leaf:?}"))
@@ -74,7 +74,7 @@ where
                 &Felt::ZERO,
             );
 
-            let _node = contracts_proof
+            contracts_proof
                 .nodes
                 .iter()
                 .find_map(|(_, node)| match node {
@@ -94,35 +94,33 @@ where
                         contract_leaf
                     ))
                 })?;
-
-            // TODO: Verify that the edge node is a membership proof
         }
 
         Ok(())
     }
 }
 
-pub trait CanVerifyMerkleNodeMap: HasErrorType {
-    fn verify_merkle_node_map(
+pub trait CanValidateMerkleNodeMap: HasErrorType {
+    fn validate_merkle_node_map(
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
     ) -> Result<(), Self::Error>;
 }
 
-impl<Chain> CanVerifyMerkleNodeMap for Chain
+impl<Chain> CanValidateMerkleNodeMap for Chain
 where
     Chain: CanRaiseError<String>,
 {
-    fn verify_merkle_node_map(
+    fn validate_merkle_node_map(
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
     ) -> Result<(), Self::Error> {
         for (hash, node) in node_map.iter() {
-            Chain::verify_merkle_node(hash, node)?;
+            Chain::validate_merkle_node(hash, node)?;
         }
 
         for (hash, node) in node_map.iter() {
-            Chain::verify_merkle_node_parent(hash, node_map, roots)?;
+            Chain::validate_merkle_node_parent(hash, node_map, roots)?;
         }
 
         Ok(())
@@ -133,19 +131,19 @@ where
    Validates that each node entry is either the child of another entry,
    or is one of the root nodes.
 */
-pub trait CanVerifyMerkleNodeParent: HasErrorType {
-    fn verify_merkle_node_parent(
+pub trait CanValidateMerkleNodeParent: HasErrorType {
+    fn validate_merkle_node_parent(
         node_hash: &Felt,
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
     ) -> Result<(), Self::Error>;
 }
 
-impl<Chain> CanVerifyMerkleNodeParent for Chain
+impl<Chain> CanValidateMerkleNodeParent for Chain
 where
     Chain: CanRaiseError<String>,
 {
-    fn verify_merkle_node_parent(
+    fn validate_merkle_node_parent(
         hash: &Felt,
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
@@ -190,15 +188,15 @@ where
     }
 }
 
-pub trait CanVerifyMerkleNode: HasErrorType {
-    fn verify_merkle_node(node_hash: &Felt, node: &MerkleNode) -> Result<(), Self::Error>;
+pub trait CanValidateMerkleNode: HasErrorType {
+    fn validate_merkle_node(node_hash: &Felt, node: &MerkleNode) -> Result<(), Self::Error>;
 }
 
-impl<Chain> CanVerifyMerkleNode for Chain
+impl<Chain> CanValidateMerkleNode for Chain
 where
     Chain: CanRaiseError<String>,
 {
-    fn verify_merkle_node(node_hash: &Felt, node: &MerkleNode) -> Result<(), Self::Error> {
+    fn validate_merkle_node(node_hash: &Felt, node: &MerkleNode) -> Result<(), Self::Error> {
         match node {
             MerkleNode::BinaryNode(node) => {
                 let expected = pedersen_hash(&node.left, &node.right);

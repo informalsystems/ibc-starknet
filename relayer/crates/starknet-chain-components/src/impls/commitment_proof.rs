@@ -2,6 +2,7 @@ use core::num::TryFromIntError;
 
 use cgp::prelude::*;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
+use indexmap::IndexMap;
 use starknet::core::crypto::pedersen_hash;
 use starknet::core::types::{Felt, MerkleNode, StorageProof};
 
@@ -14,17 +15,17 @@ use crate::traits::commitment_proof::{
 };
 use crate::traits::types::commitment::HasMerkleProofType;
 use crate::traits::types::storage_proof::HasStorageProofType;
-use crate::types::merkle_proof::StarknetMerkleProof;
 
 #[cgp_new_provider(StarknetMerkleProofVerifierComponent)]
 impl<Chain> StarknetMerkleProofVerifier<Chain> for VerifyStarknetMerkleProof
 where
-    Chain: HasMerkleProofType<MerkleProof = StarknetMerkleProof>
+    Chain: HasMerkleProofType<MerkleProof = IndexMap<Felt, MerkleNode>>
         + CanRaiseError<String>
         + CanRaiseError<TryFromIntError>,
 {
     fn verify_starknet_merkle_proof(
-        proof: &StarknetMerkleProof,
+        nodes: &IndexMap<Felt, MerkleNode>,
+        root: Felt,
         path: Felt,
         value: Felt,
     ) -> Result<(), Chain::Error> {
@@ -37,11 +38,10 @@ where
         let mut remaining_length: u8 = 251;
         let mut path_bits = &path.to_bits_be()[5..];
 
-        let nodes = &proof.proof_nodes;
-        let mut current_node = nodes.get(&proof.root).ok_or_else(|| {
+        let mut current_node = nodes.get(&root).ok_or_else(|| {
             Chain::raise_error(format!(
                 "failed to find root proof node: {}",
-                proof.root.to_hex_string()
+                root.to_hex_string()
             ))
         })?;
 
@@ -128,7 +128,7 @@ impl<Chain> StarknetStorageProofVerifier<Chain> for VerifyStarknetStorageProof
 where
     Chain: HasAddressType<Address = StarknetAddress>
         + HasStorageProofType<StorageProof = StorageProof>
-        + HasMerkleProofType<MerkleProof = StarknetMerkleProof>
+        + HasMerkleProofType<MerkleProof = IndexMap<Felt, MerkleNode>>
         + CanValidateStorageProof
         + CanVerifyStarknetMerkleProof
         + CanRaiseError<String>
@@ -155,8 +155,7 @@ where
         let contract_storage_proof = storage_proof
             .contracts_storage_proofs
             .first()
-            .ok_or_else(|| Chain::raise_error(format!("contract storage proof not found")))?
-            .clone();
+            .ok_or_else(|| Chain::raise_error(format!("contract storage proof not found")))?;
 
         let contract_hash = pedersen_hash(
             &pedersen_hash(
@@ -167,22 +166,13 @@ where
         );
 
         Chain::verify_starknet_merkle_proof(
-            &StarknetMerkleProof {
-                root: storage_proof.global_roots.contracts_tree_root,
-                proof_nodes: storage_proof.contracts_proof.nodes.clone(),
-            },
+            &storage_proof.contracts_proof.nodes,
+            storage_proof.global_roots.contracts_tree_root,
             contract_address.0,
             contract_hash,
         )?;
 
-        Chain::verify_starknet_merkle_proof(
-            &StarknetMerkleProof {
-                root: contract_root,
-                proof_nodes: contract_storage_proof,
-            },
-            path,
-            value,
-        )?;
+        Chain::verify_starknet_merkle_proof(contract_storage_proof, contract_root, path, value)?;
 
         Ok(())
     }

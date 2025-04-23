@@ -57,6 +57,7 @@ tracing                     = { workspace = true }
 flate2                      = { workspace = true }
 tiny-bip39                  = { workspace = true }
 reqwest                     = { workspace = true }
+indexmap                    = { workspace = true }
 
 tracing-subscriber = { version = "0.3.18", features = [ "env-filter" ] }
 stable-eyre        = { version = "0.2.2" }

@@ -5,26 +5,19 @@ use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_error::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
-use hermes_starknet_chain_components::impls::storage_proof::CanValidateStorageProof;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::commitment_proof::{
-    CanVerifyStarknetMerkleProof, CanVerifyStarknetStorageProof,
-};
+use hermes_starknet_chain_components::traits::commitment_proof::CanVerifyStarknetStorageProof;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
 use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
 use hermes_starknet_chain_components::traits::queries::storage_proof::CanQueryStorageProof;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
-use hermes_starknet_chain_components::traits::types::commitment::{
-    HasCommitmentPathType, HasCommitmentValueType, HasMerkleProofType,
-};
 use hermes_starknet_chain_components::traits::types::contract_class::HasContractClassHashType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::traits::types::storage_proof::{
     HasStorageKeyType, HasStorageProofType,
 };
-use hermes_starknet_chain_components::types::merkle_proof::StarknetMerkleProof;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::core::types::{Felt, StorageProof};
 use starknet::macros::{felt, selector};
@@ -141,15 +134,9 @@ where
     Chain: HasAddressType<Address = StarknetAddress>
         + HasStorageKeyType<StorageKey = Felt>
         + HasStorageProofType<StorageProof = StorageProof>
-        + HasMerkleProofType<MerkleProof = StarknetMerkleProof>
-        + HasCommitmentPathType<CommitmentPath = Felt>
-        + HasCommitmentValueType<CommitmentValue = Felt>
         + CanQueryStorageProof
         + CanQueryChainHeight
-        + CanValidateStorageProof
-        + CanVerifyStarknetMerkleProof
         + CanVerifyStarknetStorageProof
-        + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<serde_json::Error>,
 {
     async fn verify_merkle_proofs(

@@ -65,15 +65,15 @@ use hermes_starknet_chain_components::traits::types::commitment::{
 use hermes_starknet_chain_components::traits::types::storage_proof::{
     StorageKeyTypeProviderComponent, StorageProofTypeProviderComponent,
 };
-use hermes_starknet_chain_components::types::merkle_proof::StarknetMerkleProof;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use ibc::core::host::types::identifiers::ChainId;
+use indexmap::IndexMap;
 use reqwest::Client;
-use starknet::core::types::{Felt, StorageProof};
+use starknet::core::types::{Felt, MerkleNode, StorageProof};
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
 use url::Url;
@@ -174,7 +174,7 @@ delegate_components! {
         StorageProofQuerierComponent:
             QueryStarknetStorageProof,
         MerkleProofTypeProviderComponent:
-            UseType<StarknetMerkleProof>,
+            UseType<IndexMap<Felt, MerkleNode>>,
         [
             CommitmentPathTypeProviderComponent,
             CommitmentValueTypeProviderComponent,

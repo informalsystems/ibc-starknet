@@ -12,6 +12,7 @@ use crate::traits::types::storage_proof::HasStorageProofType;
 pub trait CanVerifyStarknetMerkleProof: HasMerkleProofType + HasErrorType {
     fn verify_starknet_merkle_proof(
         proof: &Self::MerkleProof,
+        root: Felt,
         path: Felt,
         value: Felt,
     ) -> Result<(), Self::Error>;
