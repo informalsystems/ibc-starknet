@@ -21,13 +21,11 @@ where
         Chain::verify_merkle_node_map(
             &proof.classes_proof,
             &vec![proof.global_roots.classes_tree_root],
-            true,
         )?;
 
         Chain::verify_merkle_node_map(
             &proof.contracts_proof.nodes,
             &vec![proof.global_roots.contracts_tree_root],
-            true,
         )?;
 
         let contract_roots = proof
@@ -38,7 +36,7 @@ where
             .collect::<Vec<_>>();
 
         for storage_entry in proof.contracts_storage_proofs.iter() {
-            Chain::verify_merkle_node_map(storage_entry, &contract_roots, false)?;
+            Chain::verify_merkle_node_map(storage_entry, &contract_roots)?;
         }
 
         Chain::verify_contracts_proof(&proof.contracts_proof)?;
@@ -101,7 +99,6 @@ pub trait CanVerifyMerkleNodeMap: HasErrorType {
     fn verify_merkle_node_map(
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
-        trust_child: bool,
     ) -> Result<(), Self::Error>;
 }
 
@@ -112,14 +109,13 @@ where
     fn verify_merkle_node_map(
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
-        trust_child: bool,
     ) -> Result<(), Self::Error> {
         for (hash, node) in node_map.iter() {
             Chain::verify_merkle_node(hash, node)?;
         }
 
         for (hash, node) in node_map.iter() {
-            Chain::verify_merkle_node_parent(hash, node_map, roots, trust_child)?;
+            Chain::verify_merkle_node_parent(hash, node_map, roots)?;
         }
 
         Ok(())
@@ -135,7 +131,6 @@ pub trait CanVerifyMerkleNodeParent: HasErrorType {
         node_hash: &Felt,
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
-        trust_child: bool,
     ) -> Result<(), Self::Error>;
 }
 
@@ -147,7 +142,6 @@ where
         hash: &Felt,
         node_map: &IndexMap<Felt, MerkleNode>,
         roots: &Vec<Felt>,
-        trust_child: bool,
     ) -> Result<(), Self::Error> {
         if roots.contains(hash) {
             return Ok(());
@@ -162,7 +156,19 @@ where
                         }
                     }
                     MerkleNode::EdgeNode(parent_node) => {
-                        if trust_child && &parent_node.child == hash {
+                        // Note: we cannot really know whether a child subtree is trustworthy
+                        // with just a naive iteration here. It is possible for one to "embed"
+                        // an entire subtree inside a leaf node, and this validation will still
+                        // succeed. This may or may not be the intended behavior, but for formatting
+                        // purpose, we consider this as a valid tree.
+                        //
+                        // The actual validation of whether to walk "into" the subtree will depend
+                        // on the merkle proof verification with specific Merkle path. There, we will
+                        // keep track of the length (depth) and path so that we don't accidentally
+                        // go beyond a subtree. We don't do that here, as it would require significant
+                        // performance overhead to really keep track of the depth of the tree.
+
+                        if &parent_node.child == hash {
                             return Ok(());
                         }
                     }
