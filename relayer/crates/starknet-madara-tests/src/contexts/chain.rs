@@ -11,14 +11,10 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::queries::block_time::BlockTimeQuerierComponent;
 use hermes_chain_components::traits::queries::chain_status::ChainStatusQuerierComponent;
-use hermes_chain_components::traits::queries::client_state::ClientStateQuerierComponent;
-use hermes_chain_components::traits::queries::consensus_state::ConsensusStateQuerierComponent;
 use hermes_chain_components::traits::send_message::MessageSenderComponent;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
 use hermes_chain_type_components::traits::fields::chain_id::ChainIdGetterComponent;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
-use hermes_cosmos_chain_preset::delegate::DelegateCosmosChainComponents;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
     EncodingTypeProviderComponent,
@@ -34,7 +30,6 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::commitment_proof::VerifyStarknetMerkleProof;
 use hermes_starknet_chain_components::impls::json_rpc::SendJsonRpcRequestWithReqwest;
 use hermes_starknet_chain_components::impls::queries::storage_proof::QueryStarknetStorageProof;
@@ -186,12 +181,6 @@ delegate_components! {
     }
 }
 
-delegate_components! {
-    DelegateCosmosChainComponents {
-        MadaraChain: StarknetToCosmosComponents::Provider,
-    }
-}
-
 #[cgp_provider(EncodingGetterComponent<AsStarknetEvent>)]
 impl EncodingGetter<MadaraChain, AsStarknetEvent> for MadaraChainComponents {
     fn encoding(chain: &MadaraChain) -> &StarknetEventEncoding {
@@ -218,20 +207,5 @@ check_components! {
         ChainStatusQuerierComponent,
         StorageProofQuerierComponent,
         MerkleProofVerifierComponent,
-        [
-            ClientStateQuerierComponent,
-            ConsensusStateQuerierComponent,
-        ]:
-            CosmosChain,
-    }
-}
-
-check_components! {
-    CanUseCosmosChainWithMadara for CosmosChain {
-        [
-            ClientStateQuerierComponent,
-            ConsensusStateQuerierComponent,
-        ]:
-            MadaraChain,
     }
 }

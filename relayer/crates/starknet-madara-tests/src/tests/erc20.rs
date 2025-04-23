@@ -4,7 +4,6 @@ use hermes_chain_components::traits::queries::chain_status::{
     CanQueryChainHeight, CanQueryChainStatus,
 };
 use hermes_chain_components::traits::send_message::CanSendSingleMessage;
-use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_error::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
@@ -25,7 +24,7 @@ use starknet::macros::selector;
 use tracing::info;
 
 use crate::contexts::MadaraChainDriver;
-use crate::impls::init_madara_bootstrap;
+use crate::impls::{init_madara_bootstrap, init_test_runtime};
 
 #[test]
 #[ignore]

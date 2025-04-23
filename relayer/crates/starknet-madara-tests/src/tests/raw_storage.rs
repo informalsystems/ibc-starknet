@@ -1,10 +1,10 @@
 use cgp::prelude::*;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_integration_tests::init::init_test_runtime;
 use hermes_error::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
+use hermes_starknet_chain_components::traits::commitment_proof::CanVerifyMerkleProof;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
@@ -12,13 +12,14 @@ use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContrac
 use hermes_starknet_chain_components::traits::queries::storage_proof::CanQueryStorageProof;
 use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
 use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
+use hermes_starknet_chain_components::types::merkle_proof::StarknetMerkleProof;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
 use starknet::core::types::Felt;
 use starknet::macros::{felt, selector};
 use tracing::info;
 
-use crate::contexts::MadaraChainDriver;
-use crate::impls::init_madara_bootstrap;
+use crate::contexts::{MadaraChain, MadaraChainDriver};
+use crate::impls::{init_madara_bootstrap, init_test_runtime};
 
 #[test]
 #[ignore]
@@ -105,6 +106,17 @@ fn test_madara_raw_storage() -> Result<(), Error> {
                 serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
 
             println!("storage proof of key1 after set: {storage_proof_str}");
+
+            MadaraChain::verify_merkle_proof(
+                &StarknetMerkleProof {
+                    root: storage_proof.contracts_proof.contract_leaves_data[0]
+                        .storage_root
+                        .unwrap(),
+                    proof_nodes: storage_proof.contracts_storage_proofs[0].clone(),
+                },
+                &key1,
+                Some(&value1),
+            )?;
         }
 
         {
