@@ -83,7 +83,6 @@ pub mod CometClientComponent {
         }
 
         fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
-            self.assert_owner();
             self.upgrade_validate(msg.clone());
             self.upgrade_execute(msg);
         }
