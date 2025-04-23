@@ -72,7 +72,8 @@ pub mod MockClientComponent {
         }
 
         fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
-            self.assert_owner();
+            self.upgrade_validate(msg.clone());
+            self.upgrade_execute(msg);
         }
     }
 
@@ -349,7 +350,12 @@ pub mod MockClientComponent {
             msg.validate_basic();
         }
 
-        fn upgrade_execute(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {}
+        fn upgrade_execute(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
+            self
+                .update_on_upgrade(
+                    msg.client_id.sequence, msg.upgraded_client_state, msg.upgraded_consensus_state,
+                );
+        }
     }
 
     // -----------------------------------------------------------
@@ -569,7 +575,32 @@ pub mod MockClientComponent {
             client_sequence: u64,
             new_client_state: Array<felt252>,
             new_consensus_state: Array<felt252>,
-        ) {}
+        ) {
+            let update_heights = self.read_update_heights(client_sequence);
+
+            if update_heights.len() > 0 {
+                let mut update_heights_span = update_heights.span();
+
+                while let Option::Some(height) = update_heights_span.pop_front() {
+                    self.remove_consensus_state(client_sequence, height.clone());
+                }
+
+                self.update_heights.write(client_sequence, array![]);
+            }
+
+            let new_client_state = MockClientStateImpl::deserialize(new_client_state);
+            let new_consensus_state = MockConsensusStateImpl::deserialize(new_consensus_state);
+
+            self
+                ._update_state(
+                    client_sequence,
+                    new_client_state.latest_height,
+                    new_client_state,
+                    new_consensus_state,
+                    get_block_number(),
+                    get_block_timestamp(),
+                );
+        }
     }
 
     // -----------------------------------------------------------
