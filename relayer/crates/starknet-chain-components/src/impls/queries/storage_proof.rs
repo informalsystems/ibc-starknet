@@ -7,7 +7,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use starknet::core::types::{Felt, StorageProof};
 
-use crate::impls::storage_proof::CanVerifyStorageProof;
+use crate::impls::storage_proof::CanValidateStorageProof;
 use crate::impls::types::address::StarknetAddress;
 use crate::traits::json_rpc::CanSendJsonRpcRequest;
 use crate::traits::queries::storage_proof::{StorageProofQuerier, StorageProofQuerierComponent};
@@ -20,7 +20,7 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasStorageKeyType<StorageKey = Felt>
         + HasStorageProofType<StorageProof = StorageProof>
-        + CanVerifyStorageProof
+        + CanValidateStorageProof
         + CanLog<LevelTrace>
         + CanSendJsonRpcRequest<QueryStorageProofRequest, Chain::StorageProof>
         + CanRaiseError<serde_json::Error>,

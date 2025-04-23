@@ -6,18 +6,25 @@ use starknet::core::types::{ContractsProof, Felt, MerkleNode, StorageProof};
 use crate::traits::types::storage_proof::HasStorageProofType;
 
 /**
-    Try to verify the structure of storage proof according to:
-    <https://docs.starknet.io/architecture-and-concepts/network-architecture/starknet-state/>
+    Try to validate the structure of storage proof according to:
+    <https://docs.starknet.io/architecture-and-concepts/network-architecture/starknet-state/>.
+
+    Here, we mainly validate that the hash values and parent relationships are valid.
+    The actual membership proofs are verified later, depending on the paths and values
+    that we want to verify.
+
+    The main advantage of separating the two is that we can validate a storage proof once,
+    and then use it to verify multiple Merkle membership proofs.
 */
-pub trait CanVerifyStorageProof: HasStorageProofType + HasErrorType {
-    fn verify_storage_proof(proof: &Self::StorageProof) -> Result<(), Self::Error>;
+pub trait CanValidateStorageProof: HasStorageProofType + HasErrorType {
+    fn validate_storage_proof(proof: &Self::StorageProof) -> Result<(), Self::Error>;
 }
 
-impl<Chain> CanVerifyStorageProof for Chain
+impl<Chain> CanValidateStorageProof for Chain
 where
     Chain: HasStorageProofType<StorageProof = StorageProof> + CanRaiseError<String>,
 {
-    fn verify_storage_proof(proof: &StorageProof) -> Result<(), Self::Error> {
+    fn validate_storage_proof(proof: &StorageProof) -> Result<(), Self::Error> {
         Chain::verify_merkle_node_map(
             &proof.classes_proof,
             &vec![proof.global_roots.classes_tree_root],

@@ -5,7 +5,7 @@ use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
 use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_error::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
-use hermes_starknet_chain_components::impls::storage_proof::CanVerifyStorageProof;
+use hermes_starknet_chain_components::impls::storage_proof::CanValidateStorageProof;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::commitment_proof::CanVerifyStarknetMerkleProof;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
@@ -144,7 +144,7 @@ where
         + HasCommitmentValueType<CommitmentValue = Felt>
         + CanQueryStorageProof
         + CanQueryChainHeight
-        + CanVerifyStorageProof
+        + CanValidateStorageProof
         + CanVerifyStarknetMerkleProof
         + CanRaiseAsyncError<serde_json::Error>,
 {
@@ -164,7 +164,7 @@ where
 
             println!("storage proof for {key}: {storage_proof_str}");
 
-            Chain::verify_storage_proof(&storage_proof)?;
+            Chain::validate_storage_proof(&storage_proof)?;
 
             Chain::verify_starknet_merkle_proof(
                 &StarknetMerkleProof {
