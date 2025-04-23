@@ -4,7 +4,7 @@ use hermes_chain_type_components::traits::types::address::HasAddressType;
 use hermes_error::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::commitment_proof::CanVerifyMerkleProof;
+use hermes_starknet_chain_components::traits::commitment_proof::CanVerifyStarknetMerkleProof;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
@@ -84,7 +84,7 @@ fn test_madara_raw_storage() -> Result<(), Error> {
         chain
             .verify_merkle_proofs(
                 &contract_address,
-                &[(key1, Some(value1)), (key2, Some(value2)), (key3, None)],
+                &[(key1, value1), (key2, value2), (key3, Felt::ZERO)],
             )
             .await?;
 
@@ -92,12 +92,17 @@ fn test_madara_raw_storage() -> Result<(), Error> {
     })
 }
 
+// #[async_trait]
+// pub trait CanTestProofEntries: HasAsyncErrorType {
+//     async fn test_proof_entries(entries: )
+// }
+
 #[async_trait]
 pub trait CanVerifyMerkleProofs: HasAddressType + HasAsyncErrorType {
     async fn verify_merkle_proofs(
         &self,
         contract: &Self::Address,
-        entries: &[(Felt, Option<Felt>)],
+        entries: &[(Felt, Felt)],
     ) -> Result<(), Self::Error>;
 }
 
@@ -111,13 +116,13 @@ where
         + HasCommitmentValueType<CommitmentValue = Felt>
         + CanQueryStorageProof
         + CanQueryChainHeight
-        + CanVerifyMerkleProof
+        + CanVerifyStarknetMerkleProof
         + CanRaiseAsyncError<serde_json::Error>,
 {
     async fn verify_merkle_proofs(
         &self,
         contract: &Self::Address,
-        entries: &[(Felt, Option<Felt>)],
+        entries: &[(Felt, Felt)],
     ) -> Result<(), Self::Error> {
         let height = self.query_chain_height().await?;
 
@@ -130,15 +135,15 @@ where
 
             println!("storage proof for {key}: {storage_proof_str}");
 
-            Chain::verify_merkle_proof(
+            Chain::verify_starknet_merkle_proof(
                 &StarknetMerkleProof {
                     root: storage_proof.contracts_proof.contract_leaves_data[0]
                         .storage_root
                         .unwrap(),
                     proof_nodes: storage_proof.contracts_storage_proofs[0].clone(),
                 },
-                key,
-                value.as_ref(),
+                *key,
+                *value,
             )?;
         }
 

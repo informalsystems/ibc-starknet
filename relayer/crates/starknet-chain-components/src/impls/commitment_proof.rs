@@ -3,27 +3,23 @@ use core::num::TryFromIntError;
 use cgp::prelude::*;
 use starknet::core::types::{Felt, MerkleNode};
 
-use crate::traits::commitment_proof::{MerkleProofVerifier, MerkleProofVerifierComponent};
-use crate::traits::types::commitment::{
-    HasCommitmentPathType, HasCommitmentValueType, HasMerkleProofType,
-};
+use crate::traits::commitment_proof::{StarknetMerkleProofVerifier, StarknetMerkleProofVerifierComponent};
+use crate::traits::types::commitment::HasMerkleProofType;
 use crate::types::merkle_proof::StarknetMerkleProof;
 
-#[cgp_new_provider(MerkleProofVerifierComponent)]
-impl<Chain> MerkleProofVerifier<Chain> for VerifyStarknetMerkleProof
+#[cgp_new_provider(StarknetMerkleProofVerifierComponent)]
+impl<Chain> StarknetMerkleProofVerifier<Chain> for VerifyStarknetMerkleProof
 where
     Chain: HasMerkleProofType<MerkleProof = StarknetMerkleProof>
-        + HasCommitmentPathType<CommitmentPath = Felt>
-        + HasCommitmentValueType<CommitmentValue = Felt>
         + CanRaiseError<String>
         + CanRaiseError<TryFromIntError>,
 {
-    fn verify_merkle_proof(
+    fn verify_starknet_merkle_proof(
         proof: &StarknetMerkleProof,
-        path: &Felt,
-        value: Option<&Felt>,
+        path: Felt,
+        value: Felt,
     ) -> Result<(), Chain::Error> {
-        if path >= &Felt::ELEMENT_UPPER_BOUND {
+        if path >= Felt::ELEMENT_UPPER_BOUND {
             return Err(Chain::raise_error(format!(
                 "commitment path exceeds felt upper bound: {path}"
             )));
@@ -80,7 +76,7 @@ where
 
                     if node_path_slice == path_bits_slice {
                         if node_length == remaining_length {
-                            if value == Some(&node.child) {
+                            if value != Felt::ZERO && value == node.child {
                                 return Ok(());
                             } else {
                                 return Err(Chain::raise_error(format!(
@@ -102,7 +98,7 @@ where
                             path_bits = &path_bits[node_length.into()..];
                         }
                     } else {
-                        if value.is_none() {
+                        if value == Felt::ZERO {
                             return Ok(());
                         } else {
                             return Err(Chain::raise_error(format!("expect value to be present, but non-membership proof is found at {node:?}")));

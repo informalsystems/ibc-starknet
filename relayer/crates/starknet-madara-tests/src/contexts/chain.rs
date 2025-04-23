@@ -40,7 +40,7 @@ use hermes_starknet_chain_components::traits::account::{
 use hermes_starknet_chain_components::traits::client::{
     StarknetClientGetterComponent, StarknetClientTypeProviderComponent,
 };
-use hermes_starknet_chain_components::traits::commitment_proof::MerkleProofVerifierComponent;
+use hermes_starknet_chain_components::traits::commitment_proof::StarknetMerkleProofVerifierComponent;
 use hermes_starknet_chain_components::traits::contract::call::ContractCallerComponent;
 use hermes_starknet_chain_components::traits::contract::declare::ContractDeclarerComponent;
 use hermes_starknet_chain_components::traits::contract::deploy::ContractDeployerComponent;
@@ -176,7 +176,7 @@ delegate_components! {
             CommitmentValueTypeProviderComponent,
         ]:
             UseType<Felt>,
-        MerkleProofVerifierComponent:
+        StarknetMerkleProofVerifierComponent:
             VerifyStarknetMerkleProof,
     }
 }
@@ -206,6 +206,6 @@ check_components! {
         NonceQuerierComponent,
         ChainStatusQuerierComponent,
         StorageProofQuerierComponent,
-        MerkleProofVerifierComponent,
+        StarknetMerkleProofVerifierComponent,
     }
 }

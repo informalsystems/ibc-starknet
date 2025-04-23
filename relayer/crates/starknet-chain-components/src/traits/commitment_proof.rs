@@ -1,18 +1,16 @@
 use cgp::prelude::*;
+use starknet::core::types::Felt;
 
-use crate::traits::types::commitment::{
-    HasCommitmentPathType, HasCommitmentValueType, HasMerkleProofType,
-};
+use crate::traits::types::commitment::HasMerkleProofType;
 
 #[cgp_component {
-    provider: MerkleProofVerifier,
+    name: StarknetMerkleProofVerifierComponent,
+    provider: StarknetMerkleProofVerifier,
 }]
-pub trait CanVerifyMerkleProof:
-    HasMerkleProofType + HasCommitmentPathType + HasCommitmentValueType + HasErrorType
-{
-    fn verify_merkle_proof(
+pub trait CanVerifyStarknetMerkleProof: HasMerkleProofType + HasErrorType {
+    fn verify_starknet_merkle_proof(
         proof: &Self::MerkleProof,
-        path: &Self::CommitmentPath,
-        value: Option<&Self::CommitmentValue>,
+        path: Felt,
+        value: Felt,
     ) -> Result<(), Self::Error>;
 }
