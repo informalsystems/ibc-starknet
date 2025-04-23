@@ -62,13 +62,10 @@ fn test_madara_raw_storage() -> Result<(), Error> {
 
         let key1 = felt!("0x0001");
         let key2 = Felt::ELEMENT_UPPER_BOUND - 1;
-        // let key3 = felt!("0x100");
+        let key3 = felt!("0x100");
 
         let key1_bits = key1.to_bits_le();
         let key2_bits = key2.to_bits_le();
-
-        println!("key1_bits: {key1_bits:?}");
-        println!("key2_bits: {key2_bits:?}");
 
         let value1 = felt!("0x9911");
         let value2 = felt!("0x9922");
@@ -132,6 +129,43 @@ fn test_madara_raw_storage() -> Result<(), Error> {
                 serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
 
             println!("storage proof of key2 after set: {storage_proof_str}");
+
+            MadaraChain::verify_merkle_proof(
+                &StarknetMerkleProof {
+                    root: storage_proof.contracts_proof.contract_leaves_data[0]
+                        .storage_root
+                        .unwrap(),
+                    proof_nodes: storage_proof.contracts_storage_proofs[0].clone(),
+                },
+                &key2,
+                Some(&value2),
+            )?;
+        }
+
+        {
+            let storage_proof = chain
+                .query_storage_proof(
+                    &chain.query_chain_height().await?,
+                    &contract_address,
+                    &[key3],
+                )
+                .await?;
+
+            let storage_proof_str =
+                serde_json::to_string_pretty(&storage_proof.contracts_storage_proofs)?;
+
+            println!("storage proof of key3: {storage_proof_str}");
+
+            MadaraChain::verify_merkle_proof(
+                &StarknetMerkleProof {
+                    root: storage_proof.contracts_proof.contract_leaves_data[0]
+                        .storage_root
+                        .unwrap(),
+                    proof_nodes: storage_proof.contracts_storage_proofs[0].clone(),
+                },
+                &key3,
+                None,
+            )?;
         }
 
         // {

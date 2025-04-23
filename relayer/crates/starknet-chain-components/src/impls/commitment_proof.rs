@@ -34,7 +34,10 @@ where
 
         let nodes = &proof.proof_nodes;
         let mut current_node = nodes.get(&proof.root).ok_or_else(|| {
-            Chain::raise_error(format!("failed to find root proof node: {}", proof.root))
+            Chain::raise_error(format!(
+                "failed to find root proof node: {}",
+                proof.root.to_hex_string()
+            ))
         })?;
 
         while !path_bits.is_empty() {
@@ -42,10 +45,13 @@ where
                 MerkleNode::BinaryNode(node) => {
                     let next_bit = path_bits[0];
 
-                    let next_root = if next_bit { node.left } else { node.right };
+                    let next_root = if next_bit { node.right } else { node.left };
 
                     current_node = nodes.get(&next_root).ok_or_else(|| {
-                        Chain::raise_error(format!("failed to find proof node at: {}", next_root))
+                        Chain::raise_error(format!(
+                            "failed to find proof node at: {}",
+                            next_root.to_hex_string()
+                        ))
                     })?;
 
                     remaining_length -= 1;
@@ -69,7 +75,7 @@ where
                         }
                     }
 
-                    let node_path_slice = &node_path_bits[0..skip_length.into()];
+                    let node_path_slice = &node_path_bits[(skip_length + 5).into()..];
                     let path_bits_slice = &path_bits[0..node_length.into()];
 
                     if node_path_slice == path_bits_slice {
@@ -79,14 +85,16 @@ where
                             } else {
                                 return Err(Chain::raise_error(format!(
                                     "child node at path {} contains value {}, but expected {:?}",
-                                    node.path, node.child, value
+                                    node.path.to_hex_string(),
+                                    node.child.to_hex_string(),
+                                    value
                                 )));
                             }
                         } else {
                             current_node = nodes.get(&node.child).ok_or_else(|| {
                                 Chain::raise_error(format!(
                                     "failed to find proof node at: {}",
-                                    &node.child
+                                    &node.child.to_hex_string()
                                 ))
                             })?;
 
