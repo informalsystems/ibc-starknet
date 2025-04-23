@@ -148,11 +148,9 @@ fn test_client_misbehaviour() {
             updating_timestamp.clone(),
         );
     state.update_client(msg1);
-    println!("status1: {:?}", state.status(0));
     assert!(state.status(0).is_active());
     state.update_client(msg2);
-    assert!(!state.status(0).is_active());
-    println!("status2: {:?}", state.status(0));
+    assert!(state.status(0).is_frozen());
 }
 
 #[test]

@@ -140,7 +140,7 @@ fn test_misbehaviour_comet_client_ok() {
 
     assert_eq!(comet.client_type(), cfg.client_type);
     assert_eq!(comet.latest_height(0), updating_height);
-    assert!(!comet.status(0).is_active());
+    assert!(comet.status(0).is_frozen());
 
     if UpdateResponse::Misbehaviour == update_resp {
         // Assert the `UpdateClientEvent` emitted.
