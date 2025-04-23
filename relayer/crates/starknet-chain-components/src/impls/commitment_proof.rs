@@ -1,12 +1,19 @@
 use core::num::TryFromIntError;
 
 use cgp::prelude::*;
-use starknet::core::types::{Felt, MerkleNode};
+use hermes_chain_type_components::traits::types::address::HasAddressType;
+use starknet::core::crypto::pedersen_hash;
+use starknet::core::types::{Felt, MerkleNode, StorageProof};
 
+use crate::impls::storage_proof::CanValidateStorageProof;
+use crate::impls::types::address::StarknetAddress;
 use crate::traits::commitment_proof::{
-    StarknetMerkleProofVerifier, StarknetMerkleProofVerifierComponent,
+    CanVerifyStarknetMerkleProof, StarknetMerkleProofVerifier,
+    StarknetMerkleProofVerifierComponent, StarknetStorageProofVerifier,
+    StarknetStorageProofVerifierComponent,
 };
 use crate::traits::types::commitment::HasMerkleProofType;
+use crate::traits::types::storage_proof::HasStorageProofType;
 use crate::types::merkle_proof::StarknetMerkleProof;
 
 #[cgp_new_provider(StarknetMerkleProofVerifierComponent)]
@@ -113,5 +120,70 @@ where
         return Err(Chain::raise_error(format!(
             "malform proof that exceed maximum depth of 251"
         )));
+    }
+}
+
+#[cgp_new_provider(StarknetStorageProofVerifierComponent)]
+impl<Chain> StarknetStorageProofVerifier<Chain> for VerifyStarknetStorageProof
+where
+    Chain: HasAddressType<Address = StarknetAddress>
+        + HasStorageProofType<StorageProof = StorageProof>
+        + HasMerkleProofType<MerkleProof = StarknetMerkleProof>
+        + CanValidateStorageProof
+        + CanVerifyStarknetMerkleProof
+        + CanRaiseError<String>
+        + CanRaiseError<TryFromIntError>,
+{
+    fn verify_starknet_storage_proof(
+        storage_proof: &StorageProof,
+        contract_address: &StarknetAddress,
+        path: Felt,
+        value: Felt,
+    ) -> Result<(), Chain::Error> {
+        Chain::validate_storage_proof(&storage_proof)?;
+
+        let contract_leaf = storage_proof
+            .contracts_proof
+            .contract_leaves_data
+            .first()
+            .ok_or_else(|| Chain::raise_error(format!("contract leaf node not found")))?;
+
+        let contract_root = contract_leaf
+            .storage_root
+            .ok_or_else(|| Chain::raise_error(format!("contract storage root not found")))?;
+
+        let contract_storage_proof = storage_proof
+            .contracts_storage_proofs
+            .first()
+            .ok_or_else(|| Chain::raise_error(format!("contract storage proof not found")))?
+            .clone();
+
+        let contract_hash = pedersen_hash(
+            &pedersen_hash(
+                &pedersen_hash(&contract_leaf.class_hash, &contract_root),
+                &contract_leaf.nonce,
+            ),
+            &Felt::ZERO,
+        );
+
+        Chain::verify_starknet_merkle_proof(
+            &StarknetMerkleProof {
+                root: storage_proof.global_roots.contracts_tree_root,
+                proof_nodes: storage_proof.contracts_proof.nodes.clone(),
+            },
+            contract_address.0,
+            contract_hash,
+        )?;
+
+        Chain::verify_starknet_merkle_proof(
+            &StarknetMerkleProof {
+                root: contract_root,
+                proof_nodes: contract_storage_proof,
+            },
+            path,
+            value,
+        )?;
+
+        Ok(())
     }
 }

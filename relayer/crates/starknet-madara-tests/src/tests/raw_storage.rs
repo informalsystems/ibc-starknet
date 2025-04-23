@@ -1,5 +1,4 @@
 use core::fmt::Display;
-use std::sync::Arc;
 
 use cgp::prelude::*;
 use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
@@ -8,7 +7,9 @@ use hermes_error::Error;
 use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::storage_proof::CanValidateStorageProof;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::commitment_proof::CanVerifyStarknetMerkleProof;
+use hermes_starknet_chain_components::traits::commitment_proof::{
+    CanVerifyStarknetMerkleProof, CanVerifyStarknetStorageProof,
+};
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
@@ -25,7 +26,6 @@ use hermes_starknet_chain_components::traits::types::storage_proof::{
 };
 use hermes_starknet_chain_components::types::merkle_proof::StarknetMerkleProof;
 use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
-use starknet::core::crypto::pedersen_hash;
 use starknet::core::types::{Felt, StorageProof};
 use starknet::macros::{felt, selector};
 use tracing::info;
@@ -148,6 +148,7 @@ where
         + CanQueryChainHeight
         + CanValidateStorageProof
         + CanVerifyStarknetMerkleProof
+        + CanVerifyStarknetStorageProof
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<serde_json::Error>,
 {
@@ -168,48 +169,7 @@ where
 
             println!("storage proof for {key}: {storage_proof_str}");
 
-            Chain::validate_storage_proof(&storage_proof)?;
-
-            let contract_leaf = storage_proof
-                .contracts_proof
-                .contract_leaves_data
-                .first()
-                .ok_or_else(|| Chain::raise_error(format!("contract leaf node not found")))?;
-
-            let contract_root = contract_leaf
-                .storage_root
-                .ok_or_else(|| Chain::raise_error(format!("contract storage root not found")))?;
-
-            let contract_storage_proof = Arc::new(storage_proof.contracts_storage_proofs)
-                .first()
-                .ok_or_else(|| Chain::raise_error(format!("contract storage proof not found")))?
-                .clone();
-
-            let contract_hash = pedersen_hash(
-                &pedersen_hash(
-                    &pedersen_hash(&contract_leaf.class_hash, &contract_root),
-                    &contract_leaf.nonce,
-                ),
-                &Felt::ZERO,
-            );
-
-            Chain::verify_starknet_merkle_proof(
-                &StarknetMerkleProof {
-                    root: storage_proof.global_roots.contracts_tree_root,
-                    proof_nodes: storage_proof.contracts_proof.nodes,
-                },
-                contract_address.0,
-                contract_hash,
-            )?;
-
-            Chain::verify_starknet_merkle_proof(
-                &StarknetMerkleProof {
-                    root: contract_root,
-                    proof_nodes: contract_storage_proof,
-                },
-                *key,
-                *value,
-            )?;
+            Chain::verify_starknet_storage_proof(&storage_proof, contract_address, *key, *value)?;
         }
 
         Ok(())

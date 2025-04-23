@@ -30,7 +30,9 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_starknet_chain_components::impls::commitment_proof::VerifyStarknetMerkleProof;
+use hermes_starknet_chain_components::impls::commitment_proof::{
+    VerifyStarknetMerkleProof, VerifyStarknetStorageProof,
+};
 use hermes_starknet_chain_components::impls::json_rpc::SendJsonRpcRequestWithReqwest;
 use hermes_starknet_chain_components::impls::queries::storage_proof::QueryStarknetStorageProof;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
@@ -40,7 +42,9 @@ use hermes_starknet_chain_components::traits::account::{
 use hermes_starknet_chain_components::traits::client::{
     StarknetClientGetterComponent, StarknetClientTypeProviderComponent,
 };
-use hermes_starknet_chain_components::traits::commitment_proof::StarknetMerkleProofVerifierComponent;
+use hermes_starknet_chain_components::traits::commitment_proof::{
+    StarknetMerkleProofVerifierComponent, StarknetStorageProofVerifierComponent,
+};
 use hermes_starknet_chain_components::traits::contract::call::ContractCallerComponent;
 use hermes_starknet_chain_components::traits::contract::declare::ContractDeclarerComponent;
 use hermes_starknet_chain_components::traits::contract::deploy::ContractDeployerComponent;
@@ -178,6 +182,8 @@ delegate_components! {
             UseType<Felt>,
         StarknetMerkleProofVerifierComponent:
             VerifyStarknetMerkleProof,
+        StarknetStorageProofVerifierComponent:
+            VerifyStarknetStorageProof,
     }
 }
 
@@ -207,5 +213,6 @@ check_components! {
         ChainStatusQuerierComponent,
         StorageProofQuerierComponent,
         StarknetMerkleProofVerifierComponent,
+        StarknetStorageProofVerifierComponent,
     }
 }
