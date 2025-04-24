@@ -11,14 +11,10 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_chain_components::traits::queries::block_time::BlockTimeQuerierComponent;
 use hermes_chain_components::traits::queries::chain_status::ChainStatusQuerierComponent;
-use hermes_chain_components::traits::queries::client_state::ClientStateQuerierComponent;
-use hermes_chain_components::traits::queries::consensus_state::ConsensusStateQuerierComponent;
 use hermes_chain_components::traits::send_message::MessageSenderComponent;
 use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
 use hermes_chain_type_components::traits::fields::chain_id::ChainIdGetterComponent;
 use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
-use hermes_cosmos_chain_preset::delegate::DelegateCosmosChainComponents;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
 use hermes_encoding_components::traits::has_encoding::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
     EncodingTypeProviderComponent,
@@ -34,7 +30,11 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
+use hermes_starknet_chain_components::impls::commitment_proof::{
+    VerifyStarknetMerkleProof, VerifyStarknetStorageProof,
+};
+use hermes_starknet_chain_components::impls::json_rpc::SendJsonRpcRequestWithReqwest;
+use hermes_starknet_chain_components::impls::queries::storage_proof::QueryStarknetStorageProof;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::account::{
     AccountFromSignerBuilderComponent, StarknetAccountTypeProviderComponent,
@@ -42,13 +42,25 @@ use hermes_starknet_chain_components::traits::account::{
 use hermes_starknet_chain_components::traits::client::{
     StarknetClientGetterComponent, StarknetClientTypeProviderComponent,
 };
+use hermes_starknet_chain_components::traits::commitment_proof::{
+    StarknetMerkleProofVerifierComponent, StarknetStorageProofVerifierComponent,
+};
 use hermes_starknet_chain_components::traits::contract::call::ContractCallerComponent;
 use hermes_starknet_chain_components::traits::contract::declare::ContractDeclarerComponent;
 use hermes_starknet_chain_components::traits::contract::deploy::ContractDeployerComponent;
 use hermes_starknet_chain_components::traits::contract::invoke::ContractInvokerComponent;
 use hermes_starknet_chain_components::traits::contract::message::InvokeContractMessageBuilderComponent;
+use hermes_starknet_chain_components::traits::json_rpc::JsonRpcRequestSenderComponent;
 use hermes_starknet_chain_components::traits::proof_signer::{
     StarknetProofSignerGetterComponent, StarknetProofSignerTypeProviderComponent,
+};
+use hermes_starknet_chain_components::traits::queries::storage_proof::StorageProofQuerierComponent;
+use hermes_starknet_chain_components::traits::rpc_client::{
+    JsonRpcUrlGetterComponent, ReqwestClientGetterComponent,
+};
+use hermes_starknet_chain_components::traits::types::commitment::MerkleProofTypeProviderComponent;
+use hermes_starknet_chain_components::traits::types::storage_proof::{
+    StorageKeyTypeProviderComponent, StorageProofTypeProviderComponent,
 };
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
@@ -56,14 +68,15 @@ use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncod
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use ibc::core::host::types::identifiers::ChainId;
+use indexmap::IndexMap;
 use reqwest::Client;
+use starknet::core::types::{Felt, MerkleNode, StorageProof};
 use starknet_v13::providers::jsonrpc::HttpTransport;
 use starknet_v13::providers::JsonRpcClient;
 use url::Url;
 
 use crate::impls::{BuildStarknetAccount, HandleMadaraChainError};
 use crate::presets::MadaraChainPreset;
-use crate::traits::{JsonRpcUrlGetterComponent, RpcClientGetterComponent};
 use crate::types::StarknetAccount;
 
 #[cgp_context(MadaraChainComponents: MadaraChainPreset)]
@@ -124,11 +137,10 @@ delegate_components! {
             UseField<symbol!("runtime")>,
         PollIntervalGetterComponent:
             UseField<symbol!("poll_interval")>,
-        [
-            RpcClientGetterComponent,
-            JsonRpcUrlGetterComponent,
-        ]:
-            UseFields,
+        ReqwestClientGetterComponent:
+            UseField<symbol!("rpc_client")>,
+        JsonRpcUrlGetterComponent:
+            UseField<symbol!("json_rpc_url")>,
         LoggerComponent:
             TracingLogger,
         [
@@ -150,12 +162,20 @@ delegate_components! {
             UseType<StarknetAccount>,
         AccountFromSignerBuilderComponent:
             BuildStarknetAccount,
-    }
-}
-
-delegate_components! {
-    DelegateCosmosChainComponents {
-        MadaraChain: StarknetToCosmosComponents::Provider,
+        JsonRpcRequestSenderComponent:
+            SendJsonRpcRequestWithReqwest,
+        StorageKeyTypeProviderComponent:
+            UseType<Felt>,
+        StorageProofTypeProviderComponent:
+            UseType<StorageProof>,
+        StorageProofQuerierComponent:
+            QueryStarknetStorageProof,
+        MerkleProofTypeProviderComponent:
+            UseType<IndexMap<Felt, MerkleNode>>,
+        StarknetMerkleProofVerifierComponent:
+            VerifyStarknetMerkleProof,
+        StarknetStorageProofVerifierComponent:
+            VerifyStarknetStorageProof,
     }
 }
 
@@ -183,20 +203,8 @@ check_components! {
         MessageSenderComponent,
         NonceQuerierComponent,
         ChainStatusQuerierComponent,
-        [
-            ClientStateQuerierComponent,
-            ConsensusStateQuerierComponent,
-        ]:
-            CosmosChain,
-    }
-}
-
-check_components! {
-    CanUseCosmosChainWithMadara for CosmosChain {
-        [
-            ClientStateQuerierComponent,
-            ConsensusStateQuerierComponent,
-        ]:
-            MadaraChain,
+        StorageProofQuerierComponent,
+        StarknetMerkleProofVerifierComponent,
+        StarknetStorageProofVerifierComponent,
     }
 }

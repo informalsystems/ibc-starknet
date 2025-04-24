@@ -1,1 +1,2 @@
-pub mod bootstrap;
+pub mod erc20;
+pub mod raw_storage;

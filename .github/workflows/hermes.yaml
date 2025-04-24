@@ -84,8 +84,78 @@ jobs:
             ..#cargo-nextest \
             -c \
             cargo nextest run --release \
-            --retries 2 \
-            --test-threads=$TEST_THREADS
+              --workspace \
+              --exclude hermes-starknet-madara-tests \
+              --retries 2 \
+              --test-threads=$TEST_THREADS
+
+  madara-integration-tests:
+    name: Run Madara Integration Tests
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-22.04 ]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - uses: cachix/cachix-action@v15
+        with:
+          name: ibc-starknet
+          extraPullNames: hermes-sdk,cosmos-nix
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          workspaces: |
+            relayer
+            light-client
+
+      - name: Install Madara
+        run: |
+          mkdir -p ~/.bin
+          wget --quiet -O ~/.bin/madara "https://github.com/informalsystems/madara/releases/download/snapshot-2c88da11/madara"
+          chmod +x ~/.bin/madara
+
+      - name: Install Scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          tool-versions: madara-contracts/.tool-versions
+          scarb-lock: madara-contracts/Scarb.lock
+
+      - name: Build Madara contracts
+        working-directory: ./madara-contracts
+        run: |
+          scarb --profile release build
+
+      - name: Run Integration Tests
+        env:
+          RUST_BACKTRACE: 1
+          RUST_LOG: debug
+          TEST_THREADS: 4
+        working-directory: ./relayer
+        run: |
+          export PATH="$HOME/.bin:$PATH"
+          export STARKNET_BIN="$HOME/.bin/madara"
+          export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_RawStore.contract_class.json"
+          export ERC20_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_MyERC20Token.contract_class.json"
+
+          madara --help
+
+          nix shell \
+            ..#rust \
+            ..#cargo-nextest \
+            -c \
+            cargo nextest run \
+              -p hermes-starknet-madara-tests \
+              --test-threads=$TEST_THREADS
 
   lint-relayer:
     name: Lint Relayer Code
