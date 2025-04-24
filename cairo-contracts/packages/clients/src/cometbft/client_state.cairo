@@ -15,9 +15,9 @@ pub struct CometClientState {
     pub trust_level: Fraction,
     pub status: Status,
     pub chain_id: ByteArray,
-    pub proof_spec: Array<ProofSpec>,
     // the first element may be empty
     pub upgrade_path: [ByteArray; 2],
+    pub proof_spec: Array<ProofSpec>,
 }
 
 pub impl StoreProofSpecArray of Store<Array<ProofSpec>> {
