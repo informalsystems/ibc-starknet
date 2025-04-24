@@ -35,8 +35,8 @@ pub fn encode(input: @ByteArray) -> ByteArray {
     let input_len = input.len();
     let mut i = 0;
 
-    while i < input_len {
-        let b0: u32 = input[i].into();
+    while let Some(b0) = input.at(i) {
+        let b0: u32 = b0.into();
         let b1: u32 = if i + 1 < input_len {
             input[i + 1].into()
         } else {
