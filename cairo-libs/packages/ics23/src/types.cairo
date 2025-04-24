@@ -276,7 +276,7 @@ pub impl LengthOpIntoU32 of Into<@LengthOp, u32> {
     }
 }
 
-pub impl U32TryIntoLegthOp of TryInto<u32, LengthOp> {
+pub impl U32TryIntoLengthOp of TryInto<u32, LengthOp> {
     fn try_into(self: u32) -> Option<LengthOp> {
         match self {
             0 => Option::Some(LengthOp::NoPrefix),
