@@ -27,7 +27,6 @@ use crate::contexts::MadaraChainDriver;
 use crate::impls::{init_madara_bootstrap, init_test_runtime};
 
 #[test]
-#[ignore]
 fn test_madara_raw_storage() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
