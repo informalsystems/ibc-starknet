@@ -90,9 +90,9 @@ where
 
                     // The node length must not be zero, or else we can get stuck in an infinite loop and cannot proceed.
                     if node_length == 0 {
-                        return Err(Chain::raise_error(format!(
-                            "invalid edge node with 0 node length"
-                        )));
+                        return Err(Chain::raise_error(
+                            "invalid edge node with 0 node length".to_string(),
+                        ));
                     }
 
                     // The raw path bits that contains leading zeros
@@ -121,9 +121,9 @@ where
 
                     // If the two slices have different size, then we messed up somewhere in our code.
                     if node_path_slice.len() != path_bits_slice.len() {
-                        return Err(Chain::raise_error(format!(
-                            "internal error: sliced paths should have the same size"
-                        )));
+                        return Err(Chain::raise_error(
+                            "internal error: sliced paths should have the same size".to_string(),
+                        ));
                     }
 
                     if node_path_slice == path_bits_slice {
