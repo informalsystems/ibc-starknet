@@ -110,12 +110,6 @@ jobs:
           extraPullNames: hermes-sdk,cosmos-nix
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
-      - name: Install Scarb
-        uses: software-mansion/setup-scarb@v1
-        with:
-          tool-versions: cairo-contracts/.tool-versions
-          scarb-lock: cairo-contracts/Scarb.lock
-
       - uses: Swatinem/rust-cache@v2
         with:
           cache-on-failure: true
@@ -123,7 +117,24 @@ jobs:
             relayer
             light-client
 
+      - name: Install Scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          tool-versions: cairo-contracts/.tool-versions
+          scarb-lock: cairo-contracts/Scarb.lock
+
       - name: Build Cairo contracts
+        working-directory: ./cairo-contracts
+        run: |
+          scarb --profile release build -p starknet_ibc_contracts
+
+      - name: Install Scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          tool-versions: madara-contracts/.tool-versions
+          scarb-lock: madara-contracts/Scarb.lock
+
+      - name: Build Madara contracts
         working-directory: ./madara-contracts
         run: |
           scarb --profile release build
