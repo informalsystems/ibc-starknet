@@ -543,3 +543,22 @@ impl ProofSpecAsProtoName of ProtoName<ProofSpec> {
 pub type RootBytes = [u32; 8];
 pub type KeyBytes = Array<u8>;
 pub type ValueBytes = Array<u8>;
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_store_array_u8_size() {
+        assert_lt!(Store::<u8>::size().into() * 10, 0xFF_u64);
+        let size = StoreU8Array::size();
+        assert_eq!(size, 10 * Store::<u8>::size());
+    }
+
+    #[test]
+    fn test_store_array_u32_size() {
+        assert_lt!(Store::<u32>::size().into() * 10, 0xFF_u64);
+        let size = StoreU32Array::size();
+        assert_eq!(size, 10 * Store::<u32>::size());
+    }
+}

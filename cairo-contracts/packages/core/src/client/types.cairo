@@ -383,3 +383,15 @@ mod tests {
         assert_eq!(duration.as_nanos(), 1_000_000_001);
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_store_array_height_size() {
+        assert_lt!(Store::<Height>::size().into() * 100, 0xFF_u64);
+        let size = StoreHeightArray::size();
+        assert_eq!(size, 100 * Store::<Height>::size());
+    }
+}

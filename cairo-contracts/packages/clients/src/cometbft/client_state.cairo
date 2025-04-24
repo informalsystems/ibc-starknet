@@ -67,7 +67,7 @@ pub impl StoreProofSpecArray of Store<Array<ProofSpec>> {
 
     // FIXME: Use correct size
     fn size() -> u8 {
-        10 * Store::<ProofSpec>::size()
+        6 * Store::<ProofSpec>::size()
     }
 }
 
@@ -110,5 +110,17 @@ pub impl CometClientStateImpl of CometClientStateTrait {
         substitute_client_state.chain_id = self.chain_id.clone();
 
         @substitute_client_state == self
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_store_array_proof_spec_size() {
+        assert_lt!(Store::<ProofSpec>::size().into() * 6, 0xFF_u64);
+        let size = StoreProofSpecArray::size();
+        assert_eq!(size, 6 * Store::<ProofSpec>::size());
     }
 }
