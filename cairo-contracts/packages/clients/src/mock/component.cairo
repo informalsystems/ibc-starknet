@@ -435,17 +435,6 @@ pub mod MockClientComponent {
 
             assert(status.is_active(), MockErrors::INACTIVE_CLIENT);
 
-            // FIXME: store this in client state
-            let upgrade_path = array!["ibc", "upgrade"];
-
-            assert(upgrade_path.len() == 1 || upgrade_path.len() == 2, 'hmm');
-
-            let (prefix, upgrade_path) = if upgrade_path.len() == 0 {
-                ("", upgrade_path[0].clone())
-            } else {
-                (upgrade_path[0].clone(), upgrade_path[1].clone())
-            };
-
             let base_prefix = BasePrefix { prefix };
 
             let upgraded_client_path = client_upgrade_path(
