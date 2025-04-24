@@ -131,7 +131,7 @@ jobs:
       - name: Install Madara
         run: |
           mkdir -p ~/.bin
-          wget -O ~/.bin/madara "https://github.com/madara-alliance/madara/releases/download/v0.7.0/madara-v0.7.0-x86_64"
+          wget --quiet -O ~/.bin/madara "https://github.com/informalsystems/madara/releases/download/snapshot-2c88da11/madara"
           chmod +x ~/.bin/madara
 
       - name: Run Integration Tests
@@ -144,6 +144,8 @@ jobs:
           export PATH="~/.bin:$PATH"
           export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_RawStore.contract_class.json"
           export ERC20_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_MyERC20Token.contract_class.json"
+
+          madara --help
 
           nix shell \
             ..#rust \
