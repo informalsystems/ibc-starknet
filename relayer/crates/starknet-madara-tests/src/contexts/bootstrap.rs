@@ -19,7 +19,9 @@ use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_test_components::impls::bootstrap::deploy_contracts::DeployIbcContract;
-use hermes_starknet_test_components::impls::bootstrap_madara::{BootstrapMadara, StartMadaraStack};
+use hermes_starknet_test_components::impls::bootstrap_madara::{
+    BootstrapMadara, StartMadaraSequencer,
+};
 use hermes_starknet_test_components::impls::types::genesis_config::ProvideStarknetGenesisConfigType;
 use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetNodeConfigType;
 use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
@@ -75,7 +77,8 @@ delegate_components! {
         ChainBootstrapperComponent:
             BootstrapMadara,
         ChainFullNodeStarterComponent:
-            StartMadaraStack,
+            StartMadaraSequencer, // Start only Madara as sequencer
+            // StartMadaraStack, // Switch to this to start Madara, Pathfinder, and Anvil
         IbcContractsDeployerComponent:
             DeployIbcContract,
         ChainDriverBuilderComponent:
