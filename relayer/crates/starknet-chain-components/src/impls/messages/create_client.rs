@@ -15,7 +15,6 @@ use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientP
 use hermes_encoding_components::traits::encode::CanEncode;
 use hermes_encoding_components::traits::has_encoding::HasEncoding;
 use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use ibc::core::commitment_types::specs::ProofSpecs;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
@@ -76,7 +75,12 @@ where
             trust_level: payload.client_state.trust_level,
             status: ClientStatus::Active,
             chain_id: payload.client_state.chain_id,
-            proof_specs: ProofSpecs::cosmos(),
+            proof_specs: payload.client_state.proof_specs,
+            upgrade_path: payload
+                .client_state
+                .upgrade_path
+                .try_into()
+                .map_err(|e| Chain::raise_error(format!("UpgradePath is not size 2: {e:?}")))?,
         };
 
         let consensus_state = CometConsensusState {

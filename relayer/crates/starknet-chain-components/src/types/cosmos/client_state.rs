@@ -26,6 +26,7 @@ use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
 
 use crate::types::cosmos::height::Height;
 
+// FIXME: use ibc-rs type
 #[derive(Debug, HasField, HasFields)]
 pub struct CometClientState {
     pub latest_height: Height,
@@ -36,6 +37,8 @@ pub struct CometClientState {
     pub status: ClientStatus,
     pub chain_id: ChainId,
     pub proof_specs: ProofSpecs,
+    // as done in cairo
+    pub upgrade_path: [String; 2],
 }
 
 #[derive(Debug, HasFields)]
@@ -86,7 +89,7 @@ impl From<CometClientState> for IbcCometClientState {
     fn from(client_state: CometClientState) -> Self {
         Self::new(
             client_state.chain_id,
-            TrustThreshold::ONE_THIRD,
+            client_state.trust_level,
             client_state.trusting_period,
             client_state.unbonding_period,
             client_state.max_clock_drift,
@@ -95,8 +98,8 @@ impl From<CometClientState> for IbcCometClientState {
                 client_state.latest_height.revision_height,
             )
             .expect("no error"),
-            ProofSpecs::cosmos(),
-            Vec::new(),
+            client_state.proof_specs,
+            client_state.upgrade_path.to_vec(),
             AllowUpdate {
                 after_expiry: false,
                 after_misbehaviour: false,
