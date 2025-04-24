@@ -940,7 +940,7 @@ pub mod MockClientComponent {
             ref self: ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) {
             let consensus_zero = MockConsensusStateZero::zero();
-            self.consensus_states.write((client_sequence, height), consensus_zero.into());
+            self.consensus_states.write((client_sequence, height), consensus_zero);
             self.client_processed_times.write((client_sequence, height), 0);
             self.client_processed_heights.write((client_sequence, height), 0);
         }

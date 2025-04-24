@@ -988,8 +988,7 @@ pub mod CometClientComponent {
         ) -> bool {
             let consensus_state: CometConsensusState = self
                 .consensus_states
-                .read((client_sequence, height))
-                .into();
+                .read((client_sequence, height));
 
             consensus_state.is_non_zero()
         }
@@ -1095,7 +1094,7 @@ pub mod CometClientComponent {
             processed_height: u64,
             processed_time: u64,
         ) {
-            self.consensus_states.write((client_sequence, height.clone()), consensus_state.into());
+            self.consensus_states.write((client_sequence, height.clone()), consensus_state);
             self
                 .client_processed_heights
                 .write((client_sequence, height.clone()), processed_height);
@@ -1106,7 +1105,7 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) {
             let consensus_zero = CometConsensusStateZero::zero();
-            self.consensus_states.write((client_sequence, height), consensus_zero.into());
+            self.consensus_states.write((client_sequence, height), consensus_zero);
             self.client_processed_times.write((client_sequence, height), 0);
             self.client_processed_heights.write((client_sequence, height), 0);
         }
