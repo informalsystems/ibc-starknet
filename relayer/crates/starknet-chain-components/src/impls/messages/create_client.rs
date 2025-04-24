@@ -75,12 +75,12 @@ where
             trust_level: payload.client_state.trust_level,
             status: ClientStatus::Active,
             chain_id: payload.client_state.chain_id,
-            proof_specs: payload.client_state.proof_specs,
             upgrade_path: payload
                 .client_state
                 .upgrade_path
                 .try_into()
                 .map_err(|e| Chain::raise_error(format!("UpgradePath is not size 2: {e:?}")))?,
+            proof_specs: payload.client_state.proof_specs,
         };
 
         let consensus_state = CometConsensusState {
