@@ -117,6 +117,12 @@ jobs:
             relayer
             light-client
 
+      - name: Install Madara
+        run: |
+          mkdir -p ~/.bin
+          wget --quiet -O ~/.bin/madara "https://github.com/informalsystems/madara/releases/download/snapshot-2c88da11/madara"
+          chmod +x ~/.bin/madara
+
       - name: Install Scarb
         uses: software-mansion/setup-scarb@v1
         with:
@@ -128,12 +134,6 @@ jobs:
         run: |
           scarb --profile release build
 
-      - name: Install Madara
-        run: |
-          mkdir -p ~/.bin
-          wget --quiet -O ~/.bin/madara "https://github.com/informalsystems/madara/releases/download/snapshot-2c88da11/madara"
-          chmod +x ~/.bin/madara
-
       - name: Run Integration Tests
         env:
           RUST_BACKTRACE: 1
@@ -141,7 +141,8 @@ jobs:
           TEST_THREADS: 4
         working-directory: ./relayer
         run: |
-          export PATH="~/.bin:$PATH"
+          export PATH="$HOME/.bin:$PATH"
+          export STARKNET_BIN="$HOME/.bin/madara"
           export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_RawStore.contract_class.json"
           export ERC20_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_MyERC20Token.contract_class.json"
 
