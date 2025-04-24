@@ -41,6 +41,7 @@ pub impl MockClientConfigImpl of MockClientConfigTrait {
             max_clock_drift: *self.max_clock_drift,
             status: Status::Active,
             chain_id: "dummy_chain",
+            upgrade_path: ["upgrade", "upgradedIBCState"],
         };
 
         Serde::serialize(@client_state, ref serialized_client_state);
