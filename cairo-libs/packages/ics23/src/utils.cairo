@@ -305,3 +305,19 @@ fn reverse_array(input: Array<u8>) -> Array<u8> {
     }
     reverse
 }
+
+pub fn u32_from_u8(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
+    let b0 = b0.into() * 0x1_00_00_00;
+    let b1 = b1.into() * 0x1_00_00;
+    let b2 = b2.into() * 0x1_00;
+    let b3 = b3.into();
+    b0 | b1 | b2 | b3
+}
+
+pub fn u32_to_u8(value: u32) -> (u8, u8, u8, u8) {
+    let b0 = (value / 0x1_00_00_00).try_into().unwrap();
+    let b1 = (value / 0x1_00_00).try_into().unwrap();
+    let b2 = (value / 0x1_00).try_into().unwrap();
+    let b3 = value.try_into().unwrap();
+    (b0, b1, b2, b3)
+}
