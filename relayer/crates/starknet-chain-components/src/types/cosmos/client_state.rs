@@ -36,9 +36,9 @@ pub struct CometClientState {
     pub trust_level: TrustThreshold,
     pub status: ClientStatus,
     pub chain_id: ChainId,
+    pub proof_specs: ProofSpecs,
     // as done in cairo
     pub upgrade_path: [String; 2],
-    pub proof_specs: ProofSpecs,
 }
 
 #[derive(Debug, HasFields)]
