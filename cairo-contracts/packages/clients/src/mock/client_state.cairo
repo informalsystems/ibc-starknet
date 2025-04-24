@@ -10,6 +10,8 @@ pub struct MockClientState {
     pub max_clock_drift: Duration,
     pub status: Status,
     pub chain_id: ByteArray,
+    // the first element may be empty
+    pub upgrade_path: [ByteArray; 2],
 }
 
 #[generate_trait]

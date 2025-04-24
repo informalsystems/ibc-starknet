@@ -429,6 +429,8 @@ pub mod MockClientComponent {
 
             let root = latest_consensus_state.root.clone();
 
+            let [prefix, upgrade_path] = comet_client_state.upgrade_path.clone();
+
             let status = self._status(comet_client_state, latest_consensus_state, client_sequence);
 
             assert(status.is_active(), MockErrors::INACTIVE_CLIENT);
