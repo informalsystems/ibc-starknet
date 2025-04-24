@@ -10,6 +10,8 @@ use crate::traits::types::storage_proof::HasStorageProofType;
     provider: StarknetMerkleProofVerifier,
 }]
 pub trait CanVerifyStarknetMerkleProof: HasMerkleProofType + HasErrorType {
+    // Verify with a merkle proof that the given path contains the given value.
+    // The root given is assumed to be trusted.
     fn verify_starknet_merkle_proof(
         proof: &Self::MerkleProof,
         root: Felt,
@@ -25,6 +27,12 @@ pub trait CanVerifyStarknetMerkleProof: HasMerkleProofType + HasErrorType {
 pub trait CanVerifyStarknetStorageProof:
     HasStorageProofType + HasAddressType + HasErrorType
 {
+    /**
+       Verify from a storage proof that a contract contains a given value at the specified path.
+
+       This also verifies that a contract has a given state root, and that state root is provable
+       from the global stateroot of the blockchain.
+    */
     fn verify_starknet_storage_proof(
         proof: &Self::StorageProof,
         contract_address: &Self::Address,
