@@ -54,7 +54,7 @@ pub struct MsgUpgradeClient {
     pub upgraded_client_state: Array<felt252>,
     pub upgraded_consensus_state: Array<felt252>,
     pub proof_upgrade_client: StateProof,
-    pub proof_upgrade_consensus_state: StateProof,
+    pub proof_upgrade_consensus: StateProof,
 }
 
 impl MsgUpgradeClientValidateBasic of ValidateBasic<MsgUpgradeClient> {

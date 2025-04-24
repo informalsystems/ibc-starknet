@@ -351,72 +351,13 @@ pub mod MockClientComponent {
         fn upgrade_validate(self: @ComponentState<TContractState>, msg: MsgUpgradeClient) {
             msg.validate_basic();
 
-            let client_sequence = msg.client_id.sequence;
-            let comet_client_state: MockClientState = self.read_client_state(client_sequence);
-            let latest_height = comet_client_state.latest_height.clone();
-
-            let latest_consensus_state = self
-                .read_consensus_state(client_sequence, comet_client_state.latest_height.clone());
-
-            let root = latest_consensus_state.root.clone();
-
-            let status = self._status(comet_client_state, latest_consensus_state, client_sequence);
-
-            assert(status.is_active(), MockErrors::INACTIVE_CLIENT);
-
-            // FIXME: store this in client state
-            let upgrade_path = array!["ibc", "upgrade"];
-
-            assert(upgrade_path.len() == 1 || upgrade_path.len() == 2, 'hmm');
-
-            let (prefix, upgrade_path) = if upgrade_path.len() == 0 {
-                ("", upgrade_path[0].clone())
-            } else {
-                (upgrade_path[0].clone(), upgrade_path[1].clone())
-            };
-
-            let base_prefix = BasePrefix { prefix };
-
-            let upgraded_client_path = client_upgrade_path(
-                base_prefix.clone(), latest_height.revision_height, upgrade_path.clone(),
-            );
-
-            let upgraded_consensus_path = consensus_upgrade_path(
-                base_prefix, latest_height.revision_height, upgrade_path,
-            );
-
-            let upgraded_client_state = MockClientStateImpl::deserialize(
-                msg.upgraded_client_state.clone(),
-            );
-
-            let _upgraded_consensus_state = MockConsensusStateImpl::deserialize(
-                msg.upgraded_consensus_state.clone(),
-            );
-
-            let upgraded_height = upgraded_client_state.latest_height.clone();
-
-            assert(upgraded_height > latest_height, MockErrors::INVALID_UPGRADE_HEIGHT);
-
-            // FIXME: serialized the client and consensus state to protobuf bytes
-            let upgraded_client_protobuf = StateValue { value: array![] };
-            let upgraded_consensus_protobuf = StateValue { value: array![] };
-
             self
-                .verify_membership(
-                    client_sequence,
-                    upgraded_client_path,
-                    upgraded_client_protobuf,
+                .verify_upgrade(
+                    msg.client_id.sequence,
+                    msg.upgraded_client_state,
+                    msg.upgraded_consensus_state,
                     msg.proof_upgrade_client,
-                    root.clone(),
-                );
-
-            self
-                .verify_membership(
-                    client_sequence,
-                    upgraded_consensus_path,
-                    upgraded_consensus_protobuf,
-                    msg.proof_upgrade_consensus_state,
-                    root,
+                    msg.proof_upgrade_consensus,
                 );
         }
 
@@ -474,12 +415,77 @@ pub mod MockClientComponent {
 
         fn verify_upgrade(
             self: @ComponentState<TContractState>,
+            client_sequence: u64,
             upgrade_client_state: Array<felt252>,
             upgrade_consensus_state: Array<felt252>,
-            proof_upgrade_client: Array<felt252>,
-            proof_upgrade_consensus: Array<felt252>,
-            root: ByteArray,
-        ) {}
+            proof_upgrade_client: StateProof,
+            proof_upgrade_consensus: StateProof,
+        ) {
+            let comet_client_state: MockClientState = self.read_client_state(client_sequence);
+            let latest_height = comet_client_state.latest_height.clone();
+
+            let latest_consensus_state = self
+                .read_consensus_state(client_sequence, comet_client_state.latest_height.clone());
+
+            let root = latest_consensus_state.root.clone();
+
+            let status = self._status(comet_client_state, latest_consensus_state, client_sequence);
+
+            assert(status.is_active(), MockErrors::INACTIVE_CLIENT);
+
+            // FIXME: store this in client state
+            let upgrade_path = array!["ibc", "upgrade"];
+
+            assert(upgrade_path.len() == 1 || upgrade_path.len() == 2, 'hmm');
+
+            let (prefix, upgrade_path) = if upgrade_path.len() == 0 {
+                ("", upgrade_path[0].clone())
+            } else {
+                (upgrade_path[0].clone(), upgrade_path[1].clone())
+            };
+
+            let base_prefix = BasePrefix { prefix };
+
+            let upgraded_client_path = client_upgrade_path(
+                base_prefix.clone(), latest_height.revision_height, upgrade_path.clone(),
+            );
+
+            let upgraded_consensus_path = consensus_upgrade_path(
+                base_prefix, latest_height.revision_height, upgrade_path,
+            );
+
+            let upgraded_client_state = MockClientStateImpl::deserialize(upgrade_client_state);
+
+            let _upgraded_consensus_state = MockConsensusStateImpl::deserialize(
+                upgrade_consensus_state,
+            );
+
+            let upgraded_height = upgraded_client_state.latest_height.clone();
+
+            assert(upgraded_height > latest_height, MockErrors::INVALID_UPGRADE_HEIGHT);
+
+            // FIXME: serialized the client and consensus state to protobuf bytes
+            let upgraded_client_protobuf = StateValue { value: array![] };
+            let upgraded_consensus_protobuf = StateValue { value: array![] };
+
+            self
+                .verify_membership(
+                    client_sequence,
+                    upgraded_client_path,
+                    upgraded_client_protobuf,
+                    proof_upgrade_client,
+                    root.clone(),
+                );
+
+            self
+                .verify_membership(
+                    client_sequence,
+                    upgraded_consensus_path,
+                    upgraded_consensus_protobuf,
+                    proof_upgrade_consensus,
+                    root,
+                );
+        }
     }
 
     #[embeddable_as(MockClientExecution)]

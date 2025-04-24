@@ -59,11 +59,11 @@ pub trait IClientStateValidation<TContractState> {
 
     fn verify_upgrade(
         self: @TContractState,
+        client_sequence: u64,
         upgrade_client_state: Array<felt252>,
         upgrade_consensus_state: Array<felt252>,
-        proof_upgrade_client: Array<felt252>,
-        proof_upgrade_consensus: Array<felt252>,
-        root: ByteArray,
+        proof_upgrade_client: StateProof,
+        proof_upgrade_consensus: StateProof,
     );
 }
 
