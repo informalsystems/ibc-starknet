@@ -120,17 +120,6 @@ jobs:
       - name: Install Scarb
         uses: software-mansion/setup-scarb@v1
         with:
-          tool-versions: cairo-contracts/.tool-versions
-          scarb-lock: cairo-contracts/Scarb.lock
-
-      - name: Build Cairo contracts
-        working-directory: ./cairo-contracts
-        run: |
-          scarb --profile release build -p starknet_ibc_contracts
-
-      - name: Install Scarb
-        uses: software-mansion/setup-scarb@v1
-        with:
           tool-versions: madara-contracts/.tool-versions
           scarb-lock: madara-contracts/Scarb.lock
 
@@ -142,7 +131,7 @@ jobs:
       - name: Install Madara
         run: |
           mkdir -p ~/.bin
-          wget -o ~/.bin/madara "https://github.com/madara-alliance/madara/releases/download/v0.7.0/madara-v0.7.0-x86_64"
+          wget -O ~/.bin/madara "https://github.com/madara-alliance/madara/releases/download/v0.7.0/madara-v0.7.0-x86_64"
           chmod +x ~/.bin/madara
 
       - name: Run Integration Tests
@@ -155,10 +144,6 @@ jobs:
           export PATH="~/.bin:$PATH"
           export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_RawStore.contract_class.json"
           export ERC20_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_MyERC20Token.contract_class.json"
-
-          export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_TransferApp.contract_class.json"
-          export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_CometClient.contract_class.json"
-          export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_IBCCore.contract_class.json"
 
           nix shell \
             ..#rust \

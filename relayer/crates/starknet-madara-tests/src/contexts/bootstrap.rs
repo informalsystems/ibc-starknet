@@ -18,18 +18,15 @@ use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_runtime_components::traits::runtime::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_starknet_test_components::impls::bootstrap::deploy_contracts::DeployIbcContract;
 use hermes_starknet_test_components::impls::bootstrap_madara::{
     BootstrapMadara, StartMadaraSequencer,
 };
 use hermes_starknet_test_components::impls::types::genesis_config::ProvideStarknetGenesisConfigType;
 use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetNodeConfigType;
-use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
 use hermes_test_components::chain_driver::traits::types::chain::ChainTypeProviderComponent;
 use hermes_test_components::driver::traits::types::chain_driver::ChainDriverTypeProviderComponent;
 use hermes_tracing_logging_components::contexts::logger::TracingLogger;
-use starknet_v13::core::types::contract::SierraClass;
 
 use crate::contexts::{MadaraChain, MadaraChainDriver};
 use crate::impls::{BuildMadaraChainDriver, HandleMadaraChainError};
@@ -52,10 +49,6 @@ pub struct MadaraBootstrapFields {
     pub runtime: HermesRuntime,
     pub chain_command_path: PathBuf,
     pub chain_store_dir: PathBuf,
-    pub erc20_contract: SierraClass,
-    pub ics20_contract: SierraClass,
-    pub ibc_core_contract: SierraClass,
-    pub comet_client_contract: SierraClass,
 }
 
 delegate_components! {
@@ -79,8 +72,6 @@ delegate_components! {
         ChainFullNodeStarterComponent:
             StartMadaraSequencer, // Start only Madara as sequencer
             // StartMadaraStack, // Switch to this to start Madara, Pathfinder, and Anvil
-        IbcContractsDeployerComponent:
-            DeployIbcContract,
         ChainDriverBuilderComponent:
             BuildAndWaitChainDriver<BuildMadaraChainDriver>,
             // FIXME: Deploying Cairo contracts with Madara fails with 500 Internal server error
@@ -102,6 +93,5 @@ check_components! {
         ChainFullNodeStarterComponent,
         ChainBootstrapperComponent,
         ChainDriverBuilderComponent,
-        IbcContractsDeployerComponent,
     }
 }
