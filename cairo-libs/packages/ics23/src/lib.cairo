@@ -17,9 +17,10 @@ pub(crate) use ops::{apply_inner, apply_leaf, do_hash, do_length};
 
 pub use specs::{iavl_spec, smt_spec, tendermint_spec};
 pub use types::{
-    CommitmentProof, ExistenceProof, ExistenceProofImpl, ExistenceProofTrait, HashOp, InnerOp,
-    InnerSpec, KeyBytes, LeafOp, LengthOp, MerkleProof, NonExistenceProof, NonExistenceProofImpl,
-    Proof, ProofSpec, ProofSpecImpl, ProofSpecTrait, RootBytes, ValueBytes,
+    ArrayU32Pack, ArrayU8Pack, CommitmentProof, ExistenceProof, ExistenceProofImpl,
+    ExistenceProofTrait, HashOp, InnerOp, InnerSpec, KeyBytes, LeafOp, LengthOp, MerkleProof,
+    NonExistenceProof, NonExistenceProofImpl, Proof, ProofSpec, ProofSpecImpl, ProofSpecTrait,
+    RootBytes, ValueBytes,
 };
 pub use utils::{
     ArrayU32IntoArrayU8, ArrayU8PartialOrd, ByteArrayIntoArrayU32, ByteArrayIntoArrayU8,

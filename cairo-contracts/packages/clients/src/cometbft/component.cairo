@@ -20,9 +20,8 @@ pub mod CometClientComponent {
     use starknet::{ContractAddress, get_block_number, get_block_timestamp, get_caller_address};
     use starknet_ibc_clients::cometbft::{
         ClientMessage, CometClientState, CometClientStateImpl, CometConsensusState,
-        CometConsensusStateImpl, CometConsensusStateStore, CometConsensusStateToStore,
-        CometConsensusStateZero, CometErrors, CometHeader, CometHeaderImpl,
-        CometHeaderIntoConsensusState, Misbehaviour, MisbehaviourImpl, StoreToCometConsensusState,
+        CometConsensusStateImpl, CometConsensusStateZero, CometErrors, CometHeader, CometHeaderImpl,
+        CometHeaderIntoConsensusState, Misbehaviour, MisbehaviourImpl,
     };
     use starknet_ibc_core::client::{
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
@@ -42,7 +41,7 @@ pub mod CometClientComponent {
         next_client_sequence: u64,
         update_heights: Map<u64, Array<Height>>,
         client_states: Map<u64, CometClientState>,
-        consensus_states: Map<(u64, Height), CometConsensusStateStore>,
+        consensus_states: Map<(u64, Height), CometConsensusState>,
         client_processed_times: Map<(u64, Height), u64>,
         client_processed_heights: Map<(u64, Height), u64>,
     }
@@ -193,8 +192,7 @@ pub mod CometClientComponent {
             let mut serialized: Array<felt252> = ArrayTrait::new();
 
             let consensus_state: CometConsensusState = self
-                .read_consensus_state(client_sequence, height)
-                .into();
+                .read_consensus_state(client_sequence, height);
 
             consensus_state.serialize(ref serialized);
 
@@ -978,8 +976,7 @@ pub mod CometClientComponent {
         ) -> CometConsensusState {
             let consensus_state: CometConsensusState = self
                 .consensus_states
-                .read((client_sequence, height))
-                .into();
+                .read((client_sequence, height));
 
             assert(consensus_state.is_non_zero(), CometErrors::MISSING_CONSENSUS_STATE);
 
