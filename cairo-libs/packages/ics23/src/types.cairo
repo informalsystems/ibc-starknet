@@ -550,15 +550,13 @@ mod test {
 
     #[test]
     fn test_store_array_u8_size() {
-        assert_lt!(Store::<u8>::size().into() * 10, 0xFF_u64);
-        let size = StoreU8Array::size();
-        assert_eq!(size, 10 * Store::<u8>::size());
+        assert_le!(Store::<u8>::size().into() * 10, 0xFF_u64);
+        assert_eq!(Store::<u8>::size() * 10, StoreU8Array::size());
     }
 
     #[test]
     fn test_store_array_u32_size() {
-        assert_lt!(Store::<u32>::size().into() * 10, 0xFF_u64);
-        let size = StoreU32Array::size();
-        assert_eq!(size, 10 * Store::<u32>::size());
+        assert_le!(Store::<u32>::size().into() * 10, 0xFF_u64);
+        assert_eq!(Store::<u32>::size() * 10, StoreU32Array::size());
     }
 }

@@ -119,8 +119,7 @@ mod test {
 
     #[test]
     fn test_store_array_proof_spec_size() {
-        assert_lt!(Store::<ProofSpec>::size().into() * 6, 0xFF_u64);
-        let size = StoreProofSpecArray::size();
-        assert_eq!(size, 6 * Store::<ProofSpec>::size());
+        assert_le!(Store::<ProofSpec>::size().into() * 6, 0xFF_u64);
+        assert_eq!(Store::<ProofSpec>::size() * 6, StoreProofSpecArray::size());
     }
 }

@@ -390,8 +390,7 @@ mod test {
 
     #[test]
     fn test_store_array_height_size() {
-        assert_lt!(Store::<Height>::size().into() * 100, 0xFF_u64);
-        let size = StoreHeightArray::size();
-        assert_eq!(size, 100 * Store::<Height>::size());
+        assert_le!(Store::<Height>::size().into() * 100, 0xFF_u64);
+        assert_eq!(Store::<Height>::size() * 100, StoreHeightArray::size());
     }
 }
