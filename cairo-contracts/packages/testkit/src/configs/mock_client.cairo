@@ -3,7 +3,7 @@ use starknet_ibc_core::client::{
     CreateResponse, Duration, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient, Status,
     Timestamp,
 };
-use starknet_ibc_core::commitment::{StateProof, StateRoot};
+use starknet_ibc_core::commitment::StateRoot;
 use starknet_ibc_core::host::ClientId;
 use starknet_ibc_testkit::dummies::{CLIENT_TYPE, DURATION, HEIGHT, STATE_ROOT, TIMESTAMP};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
