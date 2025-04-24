@@ -13,7 +13,7 @@ pub trait CanVerifyStarknetMerkleProof: HasMerkleProofType + HasErrorType {
     fn verify_starknet_merkle_proof(
         proof: &Self::MerkleProof,
         root: Felt,
-        path: Felt,
+        path: Felt, // todo: allow multiple key/values to be verified at once
         value: Felt,
     ) -> Result<(), Self::Error>;
 }
@@ -28,7 +28,7 @@ pub trait CanVerifyStarknetStorageProof:
     fn verify_starknet_storage_proof(
         proof: &Self::StorageProof,
         contract_address: &Self::Address,
-        path: Felt,
+        path: Felt, // todo: allow multiple key/values to be verified at once
         value: Felt,
     ) -> Result<(), Self::Error>;
 }

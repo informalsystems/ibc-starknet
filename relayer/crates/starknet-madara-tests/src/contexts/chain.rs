@@ -58,10 +58,7 @@ use hermes_starknet_chain_components::traits::queries::storage_proof::StoragePro
 use hermes_starknet_chain_components::traits::rpc_client::{
     JsonRpcUrlGetterComponent, ReqwestClientGetterComponent,
 };
-use hermes_starknet_chain_components::traits::types::commitment::{
-    CommitmentPathTypeProviderComponent, CommitmentValueTypeProviderComponent,
-    MerkleProofTypeProviderComponent,
-};
+use hermes_starknet_chain_components::traits::types::commitment::MerkleProofTypeProviderComponent;
 use hermes_starknet_chain_components::traits::types::storage_proof::{
     StorageKeyTypeProviderComponent, StorageProofTypeProviderComponent,
 };
@@ -175,11 +172,6 @@ delegate_components! {
             QueryStarknetStorageProof,
         MerkleProofTypeProviderComponent:
             UseType<IndexMap<Felt, MerkleNode>>,
-        [
-            CommitmentPathTypeProviderComponent,
-            CommitmentValueTypeProviderComponent,
-        ]:
-            UseType<Felt>,
         StarknetMerkleProofVerifierComponent:
             VerifyStarknetMerkleProof,
         StarknetStorageProofVerifierComponent:

@@ -4,13 +4,3 @@ use cgp::prelude::*;
 pub trait HasMerkleProofType {
     type MerkleProof;
 }
-
-#[cgp_type]
-pub trait HasCommitmentPathType {
-    type CommitmentPath;
-}
-
-#[cgp_type]
-pub trait HasCommitmentValueType {
-    type CommitmentValue;
-}
