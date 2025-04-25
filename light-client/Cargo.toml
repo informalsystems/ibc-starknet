@@ -4,6 +4,7 @@ members = [
   "./ibc-client-starknet",
   "./ibc-client-starknet-cw",
   "./ibc-client-starknet-types",
+  "./starknet-storage-verifier",
 ]
 
 [workspace.package]
@@ -19,12 +20,16 @@ repository   = "https://github.com/informalsystems/ibc-starknet"
 ibc-client-starknet       = { version = "0.1.0" }
 ibc-client-starknet-cw    = { version = "0.1.0" }
 ibc-client-starknet-types = { version = "0.1.0" }
+starknet-storage-verifier = { version = "0.1.0" }
 
 # external dependencies
 derive_more = { version = "0.99.11", features = [ "from", "try_into" ] }
-serde       = { version = "1.0.210", features = [ "derive" ] }
+indexmap    = { version = "2.9.0" }
 prost       = { version = "0.13.1" }
 prost-types = { version = "0.13.1" }
+serde       = { version = "1.0.210", features = [ "derive" ] }
+starknet    = { version = "0.14.0" }
+thiserror   = { version = "2.0.12" }
 
 # ibc depedenencies
 ibc-core      = { version = "0.56.0", default-features = false, features = [ "borsh", "schema" ] }
