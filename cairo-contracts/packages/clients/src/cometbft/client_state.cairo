@@ -1,10 +1,10 @@
 use cometbft::utils::Fraction;
 use core::num::traits::Zero;
-use ics23::ProofSpec;
-use starknet::SyscallResult;
-use starknet::storage_access::{StorageBaseAddress, Store};
+use ics23::{ArrayFelt252Store, ProofSpec};
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Duration, Height, HeightPartialOrd, Status, StatusTrait};
+
+pub impl ArrayProofSpecStore = ics23::StorePackingViaSerde<Array<ProofSpec>>;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct CometClientState {
@@ -18,57 +18,6 @@ pub struct CometClientState {
     pub proof_spec: Array<ProofSpec>,
     // the first element may be empty
     pub upgrade_path: [ByteArray; 2],
-}
-
-pub impl StoreProofSpecArray of Store<Array<ProofSpec>> {
-    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Array<ProofSpec>> {
-        Self::read_at_offset(address_domain, base, 0)
-    }
-
-    fn write(
-        address_domain: u32, base: StorageBaseAddress, value: Array<ProofSpec>,
-    ) -> SyscallResult<()> {
-        Self::write_at_offset(address_domain, base, 0, value)
-    }
-
-    fn read_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8,
-    ) -> SyscallResult<Array<ProofSpec>> {
-        let mut arr: Array<ProofSpec> = array![];
-
-        let len: u8 = Store::<u8>::read_at_offset(address_domain, base, offset)
-            .expect('Storage Span too large');
-        offset += 1;
-
-        let exit = Store::<ProofSpec>::size() * len + offset;
-        while offset < exit {
-            let value = Store::<ProofSpec>::read_at_offset(address_domain, base, offset).unwrap();
-            arr.append(value);
-            offset += Store::<ProofSpec>::size();
-        }
-
-        Result::Ok(arr)
-    }
-
-    fn write_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<ProofSpec>,
-    ) -> SyscallResult<()> {
-        let len: u8 = value.len().try_into().expect('Storage - Span too large');
-        Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();
-        offset += 1;
-
-        while let Option::Some(element) = value.pop_front() {
-            Store::<ProofSpec>::write_at_offset(address_domain, base, offset, element).unwrap();
-            offset += Store::<ProofSpec>::size();
-        }
-
-        Result::Ok(())
-    }
-
-    // FIXME: Use correct size
-    fn size() -> u8 {
-        6 * Store::<ProofSpec>::size()
-    }
 }
 
 #[generate_trait]
@@ -110,16 +59,5 @@ pub impl CometClientStateImpl of CometClientStateTrait {
         substitute_client_state.chain_id = self.chain_id.clone();
 
         @substitute_client_state == self
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_store_array_proof_spec_size() {
-        assert_le!(Store::<ProofSpec>::size().into() * 6, 0xFF_u64);
-        assert_eq!(Store::<ProofSpec>::size() * 6, StoreProofSpecArray::size());
     }
 }

@@ -2,6 +2,7 @@
 pub mod MockClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
     use core::num::traits::Zero;
+    use ics23::ArrayFelt252Store;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
     use protobuf::types::message::ProtoCodecImpl;

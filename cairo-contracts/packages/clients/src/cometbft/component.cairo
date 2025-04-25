@@ -6,7 +6,7 @@ pub mod CometClientComponent {
     use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use core::num::traits::Zero;
     use ics23::{
-        MerkleProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
+        ArrayFelt252Store, MerkleProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
         verify_membership as ics23_verify_membership,
         verify_non_membership as ics23_verify_non_membership,
     };

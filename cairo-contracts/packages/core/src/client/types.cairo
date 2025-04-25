@@ -2,8 +2,6 @@ use core::num::traits::{CheckedAdd, OverflowingMul, Zero};
 use core::traits::PartialOrd;
 use ics23::IntoArrayU32;
 use protobuf::types::wkt::{Duration as ProtoDuration, Timestamp as ProtoTimestamp};
-use starknet::SyscallResult;
-use starknet::storage_access::{StorageBaseAddress, Store};
 use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::commitment::U32CollectorImpl;
 use starknet_ibc_core::host::ClientId;
@@ -141,55 +139,7 @@ pub impl HeightIntoArrayU32 of IntoArrayU32<Height> {
     }
 }
 
-pub impl StoreHeightArray of Store<Array<Height>> {
-    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Array<Height>> {
-        Self::read_at_offset(address_domain, base, 0)
-    }
-
-    fn write(
-        address_domain: u32, base: StorageBaseAddress, value: Array<Height>,
-    ) -> SyscallResult<()> {
-        Self::write_at_offset(address_domain, base, 0, value)
-    }
-
-    fn read_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8,
-    ) -> SyscallResult<Array<Height>> {
-        let mut arr: Array<Height> = array![];
-
-        let len: u8 = Store::<u8>::read_at_offset(address_domain, base, offset)
-            .expect('Storage Span too large');
-        offset += 1;
-
-        let exit = Store::<Height>::size() * len + offset;
-        while offset < exit {
-            let value = Store::<Height>::read_at_offset(address_domain, base, offset).unwrap();
-            arr.append(value);
-            offset += Store::<Height>::size();
-        }
-
-        Result::Ok(arr)
-    }
-
-    fn write_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<Height>,
-    ) -> SyscallResult<()> {
-        let len: u8 = value.len().try_into().expect('Storage - Span too large');
-        Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();
-        offset += 1;
-
-        while let Option::Some(element) = value.pop_front() {
-            Store::<Height>::write_at_offset(address_domain, base, offset, element).unwrap();
-            offset += Store::<Height>::size();
-        }
-
-        Result::Ok(())
-    }
-
-    fn size() -> u8 {
-        100 * Store::<Height>::size()
-    }
-}
+pub impl StoreHeightArray = ics23::StorePackingViaSerde<Array<Height>>;
 
 /// Represents Unix timestamp in nanoseconds.
 #[derive(Copy, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
@@ -381,16 +331,5 @@ mod tests {
     fn test_duration_as_nanos() {
         let duration = Duration { seconds: 1, nanos: 1 };
         assert_eq!(duration.as_nanos(), 1_000_000_001);
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_store_array_height_size() {
-        assert_le!(Store::<Height>::size().into() * 100, 0xFF_u64);
-        assert_eq!(Store::<Height>::size() * 100, StoreHeightArray::size());
     }
 }
