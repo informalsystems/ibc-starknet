@@ -76,14 +76,15 @@ fn inner_read_byte_array(
     let mut chunk_base = inner_byte_array_pointer(address, chunk);
     let mut index_in_chunk = 0_u8;
     let mut result: Array<felt252> = Default::default();
-    while len != 0 {
-        let value =
-            match starknet::syscalls::storage_read_syscall(
-                address_domain, storage_address_from_base_and_offset(chunk_base, index_in_chunk),
-            ) {
-            Ok(value) => value,
-            Err(err) => { return Err(err); },
-        };
+
+    loop {
+        if len == 0 {
+            break Ok(());
+        }
+
+        let value = starknet::syscalls::storage_read_syscall(
+            address_domain, storage_address_from_base_and_offset(chunk_base, index_in_chunk),
+        )?;
 
         result.append(value);
         len -= 1;
@@ -97,7 +98,7 @@ fn inner_read_byte_array(
         }
 
         index_in_chunk = next_index_in_chunk;
-    }
+    }?;
     Ok(result)
 }
 
@@ -112,7 +113,13 @@ fn inner_write_byte_array(
     let mut chunk = 0;
     let mut chunk_base = inner_byte_array_pointer(address, chunk);
     let mut index_in_chunk = 0_u8;
-    while let Some(curr_value) = full_words.pop_front() {
+
+    loop {
+        let curr_value = match full_words.pop_front() {
+            Some(value) => value,
+            None => { break Ok(()); },
+        };
+
         starknet::syscalls::storage_write_syscall(
             address_domain,
             storage_address_from_base_and_offset(chunk_base, index_in_chunk),
@@ -128,6 +135,6 @@ fn inner_write_byte_array(
         }
 
         index_in_chunk = next_index_in_chunk;
-    }
+    }?;
     Ok(())
 }
