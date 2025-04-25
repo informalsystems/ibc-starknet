@@ -78,7 +78,7 @@ pub impl MockConsensusStateImpl of MockConsensusStateTrait {
     }
 
     fn protobuf_bytes(self: @MockConsensusState) -> ByteArray {
-        // FIXME: convert to cometbft type to encode to protobuf bytes
+        // MockConsensusState does not implement protobuf serialization.
         ""
     }
 }

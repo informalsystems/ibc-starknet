@@ -58,7 +58,7 @@ pub impl MockClientStateImpl of MockClientStateTrait {
     }
 
     fn protobuf_bytes(self: @MockClientState) -> ByteArray {
-        // FIXME: convert to cometbft type to encode to protobuf bytes
+        // MockClientState does not implement protobuf serialization.
         ""
     }
 }
