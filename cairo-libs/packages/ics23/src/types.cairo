@@ -418,7 +418,7 @@ impl LeafOpAsProtoName of ProtoName<LeafOp> {
     }
 }
 
-#[derive(Default, Debug, Clone, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ProofSpec {
     pub leaf_spec: LeafOp,
     pub inner_spec: InnerSpec,
