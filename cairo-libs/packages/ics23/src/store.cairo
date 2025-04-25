@@ -5,7 +5,9 @@ use starknet::storage_access::{
     storage_address_from_base_and_offset, storage_base_address_from_felt252,
 };
 
-pub impl StorePackingViaSerde<T, +Serde<T>, +Drop<T>> of StorePacking<T, Array<felt252>> {
+pub impl StorePackingViaSerde<
+    T, +Serde<T>, +Drop<T>, +Default<T>,
+> of StorePacking<T, Array<felt252>> {
     fn pack(value: T) -> Array<felt252> {
         let mut serialized: Array<felt252> = Default::default();
         Serde::<T>::serialize(@value, ref serialized);
@@ -14,7 +16,13 @@ pub impl StorePackingViaSerde<T, +Serde<T>, +Drop<T>> of StorePacking<T, Array<f
 
     fn unpack(value: Array<felt252>) -> T {
         let mut serialized_span = value.span();
-        Serde::<T>::deserialize(ref serialized_span).unwrap()
+        if serialized_span.is_empty() {
+            Default::default()
+        } else {
+            let result = Serde::<T>::deserialize(ref serialized_span);
+            assert(result.is_some(), 'Invalid Array<felt> unpack');
+            result.unwrap()
+        }
     }
 }
 
