@@ -15,4 +15,5 @@ pub mod MockErrors {
     pub const ZERO_UPDATE_HEIGHTS: felt252 = 'ICS07: zero update heights';
     pub const ZERO_OWNER: felt252 = 'ICS07: zero owner';
     pub const INVALID_UPGRADE_HEIGHT: felt252 = 'ICS07: invalid upgrade height';
+    pub const INVALID_UPGRADE_PATH_LENGTH: felt252 = 'ICS07: invalid upgrade path len';
 }

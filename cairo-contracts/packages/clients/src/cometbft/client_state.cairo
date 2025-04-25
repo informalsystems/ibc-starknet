@@ -5,6 +5,7 @@ use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Duration, Height, HeightPartialOrd, Status, StatusTrait};
 
 pub impl ArrayProofSpecStore = ics23::StorePackingViaSerde<Array<ProofSpec>>;
+pub impl ArrayByteArrayStore = ics23::StorePackingViaSerde<Array<ByteArray>>;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct CometClientState {
@@ -16,8 +17,7 @@ pub struct CometClientState {
     pub status: Status,
     pub chain_id: ByteArray,
     pub proof_spec: Array<ProofSpec>,
-    // the first element may be empty
-    pub upgrade_path: [ByteArray; 2],
+    pub upgrade_path: Array<ByteArray>,
 }
 
 #[generate_trait]

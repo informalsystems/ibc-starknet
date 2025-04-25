@@ -1,6 +1,9 @@
 use core::num::traits::Zero;
+use ics23::ArrayFelt252Store;
 use starknet_ibc_clients::mock::MockErrors;
 use starknet_ibc_core::client::{Duration, Height, HeightPartialOrd, Status, StatusTrait};
+
+pub impl ArrayByteArrayStore = ics23::StorePackingViaSerde<Array<ByteArray>>;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct MockClientState {
@@ -10,8 +13,7 @@ pub struct MockClientState {
     pub max_clock_drift: Duration,
     pub status: Status,
     pub chain_id: ByteArray,
-    // the first element may be empty
-    pub upgrade_path: [ByteArray; 2],
+    pub upgrade_path: Array<ByteArray>,
 }
 
 #[generate_trait]
