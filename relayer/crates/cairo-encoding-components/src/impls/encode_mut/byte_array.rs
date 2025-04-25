@@ -5,7 +5,7 @@ use hermes_encoding_components::traits::decode_mut::{
 use hermes_encoding_components::traits::encode_mut::{
     CanEncodeMut, MutEncoder, MutEncoderComponent,
 };
-use starknet::core::types::Felt;
+use starknet::core::types::{ByteArray, Felt};
 
 pub struct EncodeByteArray;
 
@@ -75,5 +75,42 @@ where
         }
 
         Ok(out)
+    }
+}
+
+pub struct EncodeStarknetByteArray;
+
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, ByteArray> for EncodeStarknetByteArray
+where
+    EncodeByteArray: MutEncoder<Encoding, Strategy, Vec<u8>>,
+    Encoding: CanEncodeMut<Strategy, Felt> + CanEncodeMut<Strategy, usize>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &ByteArray,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        let bytes: Vec<u8> = value.clone().into();
+
+        EncodeByteArray::encode_mut(encoding, &bytes, buffer)?;
+
+        Ok(())
+    }
+}
+
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, ByteArray> for EncodeStarknetByteArray
+where
+    EncodeByteArray: MutDecoder<Encoding, Strategy, Vec<u8>>,
+    Encoding: CanDecodeMut<Strategy, Felt> + CanDecodeMut<Strategy, usize>,
+{
+    fn decode_mut(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
+    ) -> Result<ByteArray, Encoding::Error> {
+        let bytes = EncodeByteArray::decode_mut(encoding, buffer)?;
+
+        Ok(bytes.into())
     }
 }

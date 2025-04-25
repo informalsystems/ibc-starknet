@@ -73,6 +73,7 @@ where
             trusting_period: payload.client_state.trusting_period,
             unbonding_period: payload.client_state.unbonding_period,
             max_clock_drift: payload.client_state.max_clock_drift,
+            trust_level: payload.client_state.trust_level,
             status: ClientStatus::Active,
             chain_id: payload.client_state.chain_id,
             proof_specs: ProofSpecs::cosmos(),
@@ -82,6 +83,7 @@ where
             timestamp: u64::try_from(payload.consensus_state.timestamp.unix_timestamp_nanos())
                 .map_err(Chain::raise_error)?,
             root: root_slice,
+            next_validators_hash: payload.consensus_state.next_validators_hash.into(),
         };
 
         let raw_client_state = encoding.encode(&client_state).map_err(Chain::raise_error)?;

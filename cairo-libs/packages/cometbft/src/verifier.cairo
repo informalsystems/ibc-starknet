@@ -39,9 +39,9 @@ pub fn verify_misbehaviour_header(
 
 pub fn verify_validator_sets(untrusted: @UntrustedBlockState) {
     validator_sets_match(untrusted.validators, untrusted.signed_header.header.validators_hash);
-    // validator_sets_match(
-    //     untrusted.next_validators, untrusted.signed_header.header.next_validators_hash,
-    // );
+    validator_sets_match(
+        untrusted.next_validators, untrusted.signed_header.header.next_validators_hash,
+    );
     header_matches_commit(
         untrusted.signed_header.header, untrusted.signed_header.commit.block_id.hash,
     );
@@ -299,7 +299,7 @@ fn voting_power_in_impl(
     for validator in validator_set.validators {
         if votes.has_voted(@validator) {
             power.tally(validator.voting_power);
-            if power.clone().has_enough_power() {
+            if power.has_enough_power() {
                 break;
             }
         }

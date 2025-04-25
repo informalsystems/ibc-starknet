@@ -632,7 +632,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c387a696a29cea52ddedb3097706dd8168958ef5388157d6e5b388a2c0de061"
 dependencies = [
  "hashbrown 0.15.2",
- "indexmap 2.8.0",
+ "indexmap 2.9.0",
  "itertools",
  "num-bigint",
  "num-traits",
@@ -1740,7 +1740,7 @@ dependencies = [
  "futures-sink",
  "futures-util",
  "http 0.2.12",
- "indexmap 2.8.0",
+ "indexmap 2.9.0",
  "slab",
  "tokio",
  "tokio-util",
@@ -1759,7 +1759,7 @@ dependencies = [
  "futures-core",
  "futures-sink",
  "http 1.3.1",
- "indexmap 2.8.0",
+ "indexmap 2.9.0",
  "slab",
  "tokio",
  "tokio-util",
@@ -2331,6 +2331,7 @@ dependencies = [
  "hermes-cosmos-encoding-components",
  "hermes-cosmos-test-components",
  "hermes-encoding-components",
+ "hermes-logging-components",
  "hermes-protobuf-encoding-components",
  "hermes-relayer-components",
  "hermes-runtime-components",
@@ -2343,16 +2344,20 @@ dependencies = [
  "ibc",
  "ibc-client-starknet-types",
  "ibc-proto",
+ "indexmap 2.9.0",
  "poseidon",
  "prost-types",
+ "reqwest 0.12.15",
  "secp256k1",
  "serde",
  "serde_json",
  "sha2 0.10.8",
  "sha256",
  "starknet 0.14.0",
+ "tendermint",
  "time",
  "tonic",
+ "url",
 ]
 
 [[package]]
@@ -2490,11 +2495,7 @@ dependencies = [
  "hermes-chain-components",
  "hermes-chain-type-components",
  "hermes-cosmos-chain-components",
- "hermes-cosmos-chain-preset",
- "hermes-cosmos-integration-tests",
- "hermes-cosmos-relayer",
  "hermes-cosmos-test-components",
- "hermes-cosmos-wasm-relayer",
  "hermes-encoding-components",
  "hermes-error",
  "hermes-ibc-test-suite",
@@ -2505,8 +2506,6 @@ dependencies = [
  "hermes-runtime-components",
  "hermes-starknet-chain-components",
  "hermes-starknet-chain-context",
- "hermes-starknet-integration-tests",
- "hermes-starknet-relayer",
  "hermes-starknet-test-components",
  "hermes-test-components",
  "hermes-tracing-logging-components",
@@ -2514,6 +2513,7 @@ dependencies = [
  "ibc",
  "ibc-client-starknet-types",
  "ibc-proto",
+ "indexmap 2.9.0",
  "poseidon",
  "prost",
  "prost-types",
@@ -2522,6 +2522,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2 0.10.8",
+ "stable-eyre",
  "starknet 0.13.0",
  "starknet 0.14.0",
  "tendermint-rpc",
@@ -2529,6 +2530,7 @@ dependencies = [
  "tokio",
  "toml",
  "tracing",
+ "tracing-subscriber",
  "url",
 ]
 
@@ -3704,9 +3706,9 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "2.8.0"
+version = "2.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3954d50fe15b02142bf25d3b8bdadb634ec3948f103d04ffe3031bc8fe9d7058"
+checksum = "cea70ddb795996207ad57735b50c5982d8844f38ba9ee5f1aedcfb708a2aa11e"
 dependencies = [
  "equivalent",
  "hashbrown 0.15.2",
@@ -4334,7 +4336,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3672b37090dbd86368a4145bc067582552b29c27377cad4e0a306c97f9bd7772"
 dependencies = [
  "fixedbitset",
- "indexmap 2.8.0",
+ "indexmap 2.9.0",
 ]
 
 [[package]]
@@ -4785,7 +4787,7 @@ version = "0.17.0-pre.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "719825638c59fd26a55412a24561c7c5bcf54364c88b9a7a04ba08a6eafaba8d"
 dependencies = [
- "indexmap 2.8.0",
+ "indexmap 2.9.0",
  "lock_api",
  "oorandom",
  "parking_lot",
@@ -5245,7 +5247,7 @@ version = "1.0.140"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "20068b6e96dc6c9bd23e01df8827e6c7e1f2fddd43c21810382803c136b99373"
 dependencies = [
- "indexmap 2.8.0",
+ "indexmap 2.9.0",
  "itoa",
  "memchr",
  "ryu",
@@ -5305,7 +5307,7 @@ dependencies = [
  "chrono",
  "hex",
  "indexmap 1.9.3",
- "indexmap 2.8.0",
+ "indexmap 2.9.0",
  "serde",
  "serde_derive",
  "serde_json",
@@ -5599,7 +5601,7 @@ dependencies = [
  "flate2",
  "foldhash",
  "hex",
- "indexmap 2.8.0",
+ "indexmap 2.9.0",
  "num-traits",
  "serde",
  "serde_json",
@@ -5622,7 +5624,7 @@ dependencies = [
  "flate2",
  "foldhash",
  "hex",
- "indexmap 2.8.0",
+ "indexmap 2.9.0",
  "num-traits",
  "serde",
  "serde_json",
@@ -6334,7 +6336,7 @@ version = "0.22.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "17b4795ff5edd201c7cd6dca065ae59972ce77d1b80fa0a84d94950ece7d1474"
 dependencies = [
- "indexmap 2.8.0",
+ "indexmap 2.9.0",
  "serde",
  "serde_spanned",
  "toml_datetime",

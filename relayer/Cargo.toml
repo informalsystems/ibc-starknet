@@ -60,10 +60,12 @@ tiny-bip39                  = { version = "1.0.0" }
 hex                         = { version = "0.4.3" }
 sha256                      = { version = "1.6.0" }
 reqwest                     = { version = "0.12.5" }
+indexmap                    = { version = "2.9.0" }
 
 ibc                       = { version = "0.56.0" }
 ibc-proto                 = { version = "0.51.1" }
 ibc-client-starknet-types = { version = "0.1.0" }
+tendermint                = { version = "0.40" }
 tendermint-rpc            = { version = "0.40" }
 
 hermes-runtime-components           = { version = "0.1.0" }

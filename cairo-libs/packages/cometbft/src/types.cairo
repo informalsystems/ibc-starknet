@@ -48,7 +48,7 @@ impl ConsensusAsProtoName of ProtoName<Consensus> {
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct PartSetHeader {
     pub total: u32,
-    pub hash: ByteArray,
+    pub hash: Array<u8>,
 }
 
 impl PartSetHeaderAsProtoMessage of ProtoMessage<PartSetHeader> {
@@ -223,7 +223,7 @@ pub struct CommitSig {
     pub block_id_flag: BlockIdFlag,
     pub validator_address: AccountId,
     pub timestamp: Timestamp,
-    pub signature: ByteArray,
+    pub signature: Array<u8>,
 }
 
 impl CommitSigAsProtoMessage of ProtoMessage<CommitSig> {
@@ -447,7 +447,7 @@ pub struct Validator {
     pub address: AccountId,
     pub pub_key: PublicKey,
     pub voting_power: u64,
-    pub proposer_priority: u64,
+    pub proposer_priority: i64,
 }
 
 #[generate_trait]
@@ -615,11 +615,13 @@ impl AccountIdPartialEq of core::traits::PartialEq<AccountId> {
 
         let mut result = true;
 
-        while let Option::Some(lhs) = lhs_span.pop_front() {
-            if lhs != rhs_span.pop_front().unwrap() {
+        while let (Some(lhs), Some(rhs)) = (lhs_span.pop_front(), rhs_span.pop_front()) {
+            if lhs != rhs {
                 result = false;
+                break;
             }
         }
+
         return result;
     }
 }
@@ -646,11 +648,14 @@ impl AccountIdAsProtoMessage of ProtoMessage<AccountId> {
     }
 }
 
-// TODO: impelement Serde
 impl AccountIdSerde of Serde<AccountId> {
-    fn serialize(self: @AccountId, ref output: Array<felt252>) {}
+    fn serialize(self: @AccountId, ref output: Array<felt252>) {
+        let mut id = self.id.span().into();
+        Serde::<Array<u8>>::serialize(@id, ref output);
+    }
+
     fn deserialize(ref serialized: Span<felt252>) -> Option<AccountId> {
-        Option::None
+        Serde::<Array<u8>>::deserialize(ref serialized)?.try_into()
     }
 }
 
@@ -666,7 +671,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
         let commit = signed_header.commit;
 
-        let mut signatures = commit.clone().signatures.span();
+        let mut signatures = commit.signatures.span();
 
         while let Some(signature) = signatures.pop_front() {
             let block_id_flag = signature.block_id_flag;
@@ -681,7 +686,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
                         chain_id: signed_header.header.chain_id.clone(),
                     },
                     validator_address: signature.validator_address.clone(),
-                    signature: byte_array_to_array_u8(signature.signature),
+                    signature: signature.signature.clone(),
                 };
 
                 let verified = false;
@@ -805,7 +810,7 @@ pub impl U32TryIntoVoteType of TryInto<u32, VoteType> {
 pub struct UntrustedBlockState {
     pub signed_header: SignedHeader,
     pub validators: ValidatorSet,
-    // pub next_validators: Option<ValidatorSet>,
+    pub next_validators: ValidatorSet,
 }
 
 #[generate_trait]
@@ -817,7 +822,11 @@ pub impl UntrustedBlockStateImpl of UntrustedBlockStateTrait {
 
 impl HeaderToUntrustedBlockState of Into<LcHeader, UntrustedBlockState> {
     fn into(self: LcHeader) -> UntrustedBlockState {
-        UntrustedBlockState { signed_header: self.signed_header, validators: self.validator_set }
+        UntrustedBlockState {
+            signed_header: self.signed_header,
+            validators: self.validator_set,
+            next_validators: self.trusted_validator_set,
+        }
     }
 }
 
@@ -857,16 +866,16 @@ pub impl VotingPowerTallyImpl of VotingPowerTallyTrait {
         self.tallied += power;
     }
 
-    fn has_enough_power(self: VotingPowerTally) -> bool {
+    fn has_enough_power(self: @VotingPowerTally) -> bool {
         // 0 < numerator < denominator
-        assert!(0 < self.trust_threshold.numerator);
+        assert!(@0 < self.trust_threshold.numerator);
         assert!(self.trust_threshold.numerator < self.trust_threshold.denominator);
 
         // cast to u128 to avoid overflow
-        let tally: u128 = self.tallied.into();
-        let total: u128 = self.total.into();
-        let numerator: u128 = self.trust_threshold.numerator.into();
-        let denominator: u128 = self.trust_threshold.denominator.into();
+        let tally: u128 = (*self.tallied).into();
+        let total: u128 = (*self.total).into();
+        let numerator: u128 = (*self.trust_threshold.numerator).into();
+        let denominator: u128 = (*self.trust_threshold.denominator).into();
 
         // tally / total >= numerator / denominator
         tally * denominator >= total * numerator

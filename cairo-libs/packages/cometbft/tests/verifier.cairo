@@ -35,24 +35,29 @@ fn header_fixture() -> (LcHeader, LcHeader) {
 }
 
 #[test]
+fn test_header_serde() {
+    let (header_a, _) = header_fixture();
+
+    let mut header_a_serialized = array![];
+
+    Serde::serialize(@header_a, ref header_a_serialized);
+
+    let mut header_a_serialized = header_a_serialized.span();
+
+    let header_a_deserialized = Serde::<LcHeader>::deserialize(ref header_a_serialized).unwrap();
+
+    assert_eq!(@header_a, @header_a_deserialized);
+}
+
+#[test]
 fn test_verify_update_header() {
     let (header_a, header_b) = header_fixture();
-
-    let trusted_block_state = TrustedBlockState {
-        chain_id: header_a.signed_header.header.chain_id.clone(),
-        header_time: header_a.signed_header.header.time.clone(),
-        height: header_a.signed_header.header.height,
-        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
-        next_validators_hash: header_a.signed_header.header.next_validators_hash.clone(),
-    };
-
-    let untrusted_block_state = UntrustedBlockState {
-        signed_header: header_b.signed_header.clone(), validators: header_b.validator_set,
-    };
 
     let trusting_period = Duration { seconds: 1209600, nanos: 0 };
 
     let clock_drift = Duration { seconds: 3, nanos: 0 };
+
+    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
 
     let now = Timestamp {
         // header is submitted 30 seconds later
@@ -60,31 +65,33 @@ fn test_verify_update_header() {
         nanos: header_b.signed_header.header.time.nanos,
     };
 
-    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
+    let trusted_block_state = TrustedBlockState {
+        chain_id: header_a.signed_header.header.chain_id,
+        header_time: header_a.signed_header.header.time,
+        height: header_a.signed_header.header.height,
+        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
+        next_validators_hash: header_a.signed_header.header.next_validators_hash,
+    };
+
+    let untrusted_block_state = UntrustedBlockState {
+        signed_header: header_b.signed_header,
+        validators: header_b.validator_set,
+        next_validators: header_b.trusted_validator_set,
+    };
 
     verify_update_header(untrusted_block_state, trusted_block_state, options, now);
 }
 
 #[test]
-#[should_panic(expected: 'ICS07: invalid commit hash')]
+#[should_panic(expected: 'ICS07: invalid val set hash')]
 fn test_verify_update_header_forged_header() {
     let (header_a, header_b) = header_fixture();
-
-    let trusted_block_state = TrustedBlockState {
-        chain_id: header_a.signed_header.header.chain_id.clone(),
-        header_time: header_a.signed_header.header.time.clone(),
-        height: header_a.signed_header.header.height,
-        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
-        next_validators_hash: header_a.signed_header.header.next_validators_hash.clone(),
-    };
-
-    let mut untrusted_block_state = UntrustedBlockState {
-        signed_header: header_b.signed_header.clone(), validators: header_b.validator_set,
-    };
 
     let trusting_period = Duration { seconds: 1209600, nanos: 0 };
 
     let clock_drift = Duration { seconds: 3, nanos: 0 };
+
+    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
 
     let now = Timestamp {
         // header is submitted 30 seconds later
@@ -92,7 +99,19 @@ fn test_verify_update_header_forged_header() {
         nanos: header_b.signed_header.header.time.nanos,
     };
 
-    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
+    let trusted_block_state = TrustedBlockState {
+        chain_id: header_a.signed_header.header.chain_id,
+        header_time: header_a.signed_header.header.time,
+        height: header_a.signed_header.header.height,
+        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
+        next_validators_hash: header_a.signed_header.header.next_validators_hash,
+    };
+
+    let mut untrusted_block_state = UntrustedBlockState {
+        signed_header: header_b.signed_header,
+        validators: header_b.validator_set,
+        next_validators: header_b.trusted_validator_set,
+    };
 
     // forged header
     untrusted_block_state.signed_header.header.next_validators_hash = array![0x1, 0x2];
@@ -105,21 +124,11 @@ fn test_verify_update_header_forged_header() {
 fn test_verify_update_header_empty_signatures() {
     let (header_a, header_b) = header_fixture();
 
-    let trusted_block_state = TrustedBlockState {
-        chain_id: header_a.signed_header.header.chain_id.clone(),
-        header_time: header_a.signed_header.header.time.clone(),
-        height: header_a.signed_header.header.height,
-        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
-        next_validators_hash: header_a.signed_header.header.next_validators_hash.clone(),
-    };
-
-    let mut untrusted_block_state = UntrustedBlockState {
-        signed_header: header_b.signed_header.clone(), validators: header_b.validator_set,
-    };
-
     let trusting_period = Duration { seconds: 1209600, nanos: 0 };
 
     let clock_drift = Duration { seconds: 3, nanos: 0 };
+
+    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
 
     let now = Timestamp {
         // header is submitted 30 seconds later
@@ -127,7 +136,19 @@ fn test_verify_update_header_empty_signatures() {
         nanos: header_b.signed_header.header.time.nanos,
     };
 
-    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
+    let trusted_block_state = TrustedBlockState {
+        chain_id: header_a.signed_header.header.chain_id,
+        header_time: header_a.signed_header.header.time,
+        height: header_a.signed_header.header.height,
+        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
+        next_validators_hash: header_a.signed_header.header.next_validators_hash,
+    };
+
+    let mut untrusted_block_state = UntrustedBlockState {
+        signed_header: header_b.signed_header,
+        validators: header_b.validator_set,
+        next_validators: header_b.trusted_validator_set,
+    };
 
     // empty signatures
     untrusted_block_state.signed_header.commit.signatures = array![];
@@ -150,7 +171,7 @@ fn test_verify_commit_hash() {
 
         let mut expected_hash_iter = expected_hash.into_iter();
 
-        while let Option::Some(hash) = expected_hash_iter.next() {
+        while let Some(hash) = expected_hash_iter.next() {
             ar.append(hash);
         }
 
@@ -159,4 +180,63 @@ fn test_verify_commit_hash() {
 
     let header = ProtoCodecImpl::decode::<TmHeader>(@header_bytes).unwrap();
     header_matches_commit(@header, @expected_hash_array);
+}
+
+#[test]
+fn test_verify_update_header_2() {
+    let (header_a, header_b) = {
+        let header_31_data =
+            "CtQECpgDCgIICxISY2hhaW4tMS0zOTY1MTkyNTI0GEUiDAjBj/S/BhDRjtP5AipICiBV2gWqX6CI8jJVAHN1rTgL8wEsBguLKZYqpmQ+ePw6zxIkCAESIGndiTR+3rTntsuzRvQQR8/R2AGMVDaZXStS0BvZdu99MiD++0w9b/uWxtMfeDgUMdpAEAW1m6qSq/ZAOPffP/PVYTog+IAv/1bVmWQydSI5FkTXZ21n9kboygWuJ+GxjUIPHftCINcW8oxHV55BXwPjDwGa1MD56V3MRivoxwHwmFs+txiFSiDXFvKMR1eeQV8D4w8BmtTA+eldzEYr6McB8JhbPrcYhVIgBICRvH3cKD93v7+R1zxE2ljD34qcvIZ0Bdi389qtoi9aIKdlsaLtsHbZCc6JFZxRu9ivZMfUIb3G2y6TjcDuV3spYiDjsMRCmPwcFJr79MiZb7kkJ65B5GSbk0yklZkbeFK4VWog47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFVyFDSGI1jd7XjyZhOZj/vLrGKRTVR8ErYBCEUaSAog6/hVz9iZlDCSHdyOh8AkrfphKXM0mQjSh2Xu6YBDzacSJAgBEiBkWzJJVKt5MlUREPXcsxhLGWgelN0hNfqiherzFTwWSSJoCAISFDSGI1jd7XjyZhOZj/vLrGKRTVR8GgwIwo/0vwYQ3KjL/wIiQHbxSVVT+bnFgaVIeIa1mKzSVuoXYFsDEmOzZlzazzacKiOOrY1zkZnZNf82Az1w5VbcDN9orx7cCD+zoIYKbgMSjQEKQQoUNIYjWN3tePJmE5mP+8usYpFNVHwSIgogUjVI2wTi4xiY69iGv7kvlpG7+PanBNdyzNnxofDnkosYgKCUpY0dEkEKFDSGI1jd7XjyZhOZj/vLrGKRTVR8EiIKIFI1SNsE4uMYmOvYhr+5L5aRu/j2pwTXcszZ8aHw55KLGICglKWNHRiAoJSljR0aCAjMkuDiDhAwIo0BCkEKFDSGI1jd7XjyZhOZj/vLrGKRTVR8EiIKIFI1SNsE4uMYmOvYhr+5L5aRu/j2pwTXcszZ8aHw55KLGICglKWNHRJBChQ0hiNY3e148mYTmY/7y6xikU1UfBIiCiBSNUjbBOLjGJjr2Ia/uS+Wkbv49qcE13LM2fGh8OeSixiAoJSljR0YgKCUpY0d";
+        let header_43_data =
+            "CtQECpgDCgIICxISY2hhaW4tMS0zOTY1MTkyNTI0GEYiDAjCj/S/BhDcqMv/AipICiDr+FXP2JmUMJId3I6HwCSt+mEpczSZCNKHZe7pgEPNpxIkCAESIGRbMklUq3kyVREQ9dyzGEsZaB6U3SE1+qKF6vMVPBZJMiD08ju+8/EvUt35ojhJJ734jMbD6TOXAMHQ/QJmTBU1Tzog47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFVCINcW8oxHV55BXwPjDwGa1MD56V3MRivoxwHwmFs+txiFSiDXFvKMR1eeQV8D4w8BmtTA+eldzEYr6McB8JhbPrcYhVIgBICRvH3cKD93v7+R1zxE2ljD34qcvIZ0Bdi389qtoi9aIBMBRFTxiVtTxMkUUCa1ipwhwQ9bRuCkCY3PTCP8I0g9YiCypUT2NlQSsXCF65gTxHYNKw8Y+EW6uwgBljV9Ppu37Wog47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFVyFDSGI1jd7XjyZhOZj/vLrGKRTVR8ErYBCEYaSAogS7vnIE846QA5P3nSpjjS0G02m6y8bU0f2HwHfC8S2kMSJAgBEiBb3+vMlGIq7a/CeeqfsZ7H6Tzc5OrlmyGBNOqFr2/kjCJoCAISFDSGI1jd7XjyZhOZj/vLrGKRTVR8GgwIw4/0vwYQyarMhQMiQMRsYYTc3AFAJSL3AQ1BcEJlAwo9YYtZNfHr/dISMf8h6b0rZit+SzyIloxFp4t1NY4hnmwvNB/omqZeo3YQlQcSjQEKQQoUNIYjWN3tePJmE5mP+8usYpFNVHwSIgogUjVI2wTi4xiY69iGv7kvlpG7+PanBNdyzNnxofDnkosYgKCUpY0dEkEKFDSGI1jd7XjyZhOZj/vLrGKRTVR8EiIKIFI1SNsE4uMYmOvYhr+5L5aRu/j2pwTXcszZ8aHw55KLGICglKWNHRiAoJSljR0aCAjMkuDiDhAwIo0BCkEKFDSGI1jd7XjyZhOZj/vLrGKRTVR8EiIKIFI1SNsE4uMYmOvYhr+5L5aRu/j2pwTXcszZ8aHw55KLGICglKWNHRJBChQ0hiNY3e148mYTmY/7y6xikU1UfBIiCiBSNUjbBOLjGJjr2Ia/uS+Wkbv49qcE13LM2fGh8OeSixiAoJSljR0YgKCUpY0d";
+
+        let header_31_bytes = base64::decode(@header_31_data);
+        let header_43_bytes = base64::decode(@header_43_data);
+
+        let header_31 = ProtoCodecImpl::decode::<LcHeader>(@header_31_bytes).unwrap();
+        let header_43 = ProtoCodecImpl::decode::<LcHeader>(@header_43_bytes).unwrap();
+
+        assert_eq!(@header_31.signed_header.header.height, @69);
+        assert_eq!(@header_43.signed_header.header.height, @70);
+
+        assert_eq!(
+            @header_31.signed_header.header.chain_id, @header_43.signed_header.header.chain_id,
+        );
+        assert_lt!(@header_31.signed_header.header.time, @header_43.signed_header.header.time);
+
+        assert_eq!(
+            @header_31.signed_header.header.next_validators_hash,
+            @header_43.signed_header.header.validators_hash,
+        );
+
+        (header_31, header_43)
+    };
+
+    let trusting_period = Duration { seconds: 1209600, nanos: 0 };
+
+    let clock_drift = Duration { seconds: 3, nanos: 0 };
+
+    let options = Options { trust_threshold: TWO_THIRDS, trusting_period, clock_drift };
+
+    let now = Timestamp {
+        // header is submitted 30 seconds later
+        seconds: header_b.signed_header.header.time.seconds + 30,
+        nanos: header_b.signed_header.header.time.nanos,
+    };
+
+    let trusted_block_state = TrustedBlockState {
+        chain_id: header_a.signed_header.header.chain_id,
+        header_time: header_a.signed_header.header.time,
+        height: header_a.signed_header.header.height,
+        next_validators: header_b.validator_set.clone(), // full validator_set is in future header
+        next_validators_hash: header_a.signed_header.header.next_validators_hash,
+    };
+
+    let untrusted_block_state = UntrustedBlockState {
+        signed_header: header_b.signed_header,
+        validators: header_b.validator_set,
+        next_validators: header_b.trusted_validator_set,
+    };
+
+    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
 }

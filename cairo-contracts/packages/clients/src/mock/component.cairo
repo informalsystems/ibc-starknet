@@ -1,7 +1,6 @@
 #[starknet::component]
 pub mod MockClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
-    use alexandria_sorting::MergeSort;
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
@@ -13,7 +12,7 @@ pub mod MockClientComponent {
     use starknet::{ContractAddress, get_block_number, get_block_timestamp, get_caller_address};
     use starknet_ibc_clients::mock::{
         MockClientState, MockClientStateImpl, MockConsensusState, MockConsensusStateImpl,
-        MockErrors, MockHeader, MockHeaderImpl,
+        MockConsensusStateZero, MockErrors, MockHeader, MockHeaderImpl,
     };
     use starknet_ibc_core::client::{
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
@@ -62,13 +61,14 @@ pub mod MockClientComponent {
         fn update_client(
             ref self: ComponentState<TContractState>, msg: MsgUpdateClient,
         ) -> UpdateResponse {
-            self.assert_owner();
             self.update_validate(@msg);
             self.update_execute(msg)
         }
 
         fn recover_client(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
             self.assert_owner();
+            self.recover_validate(msg.clone());
+            self.recover_execute(msg)
         }
 
         fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
@@ -96,25 +96,52 @@ pub mod MockClientComponent {
 
         fn update_height_before(
             self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height,
-        ) -> Height {
+        ) -> Option<Height> {
             let update_heights = self.read_update_heights(client_sequence);
 
             let mut len = update_heights.len();
 
             assert(len > 0, MockErrors::ZERO_UPDATE_HEIGHTS);
 
-            let mut height = target_height;
+            // FIXME: do binary search
 
             let mut update_heights_span = update_heights.span();
 
-            while let Option::Some(update_height) = update_heights_span.pop_back() {
+            let mut result = None;
+
+            while let Some(update_height) = update_heights_span.pop_back() {
                 if @target_height >= update_height {
-                    height = *update_height;
+                    result = Some(*update_height);
                     break;
                 }
             }
 
-            height
+            result
+        }
+
+        fn update_height_after(
+            self: @ComponentState<TContractState>, client_sequence: u64, target_height: Height,
+        ) -> Option<Height> {
+            let update_heights = self.read_update_heights(client_sequence);
+
+            let mut len = update_heights.len();
+
+            assert(len > 0, MockErrors::ZERO_UPDATE_HEIGHTS);
+
+            // FIXME: do binary search
+
+            let mut update_heights_span = update_heights.span();
+
+            let mut result = None;
+
+            while let Some(update_height) = update_heights_span.pop_front() {
+                if @target_height <= update_height {
+                    result = Some(*update_height);
+                    break;
+                }
+            }
+
+            result
         }
 
         fn latest_timestamp(
@@ -240,9 +267,78 @@ pub mod MockClientComponent {
     > of RecoverClientTrait<TContractState> {
         fn recover_validate(self: @ComponentState<TContractState>, msg: MsgRecoverClient) {
             msg.validate_basic();
+
+            // TODO: validate signer once assert_owner() has been removed
+
+            let subject_client_sequence = msg.subject_client_id.sequence;
+            let substitute_client_sequence = msg.substitute_client_id.sequence;
+
+            let subject_client_state: MockClientState = self
+                .read_client_state(subject_client_sequence);
+            let substitute_client_state: MockClientState = self
+                .read_client_state(substitute_client_sequence);
+
+            let subject_consensus_state = self
+                .read_consensus_state(
+                    subject_client_sequence, subject_client_state.latest_height.clone(),
+                );
+            let substitute_consensus_state = self
+                .read_consensus_state(
+                    substitute_client_sequence, substitute_client_state.latest_height.clone(),
+                );
+
+            let subject_status = self
+                ._status(
+                    subject_client_state.clone(), subject_consensus_state, subject_client_sequence,
+                );
+            let substitute_status = self
+                ._status(
+                    substitute_client_state.clone(),
+                    substitute_consensus_state,
+                    substitute_client_sequence,
+                );
+
+            assert(
+                subject_client_state.latest_height < substitute_client_state.latest_height,
+                MockErrors::INVALID_CLIENT_SUBSTITUTE,
+            );
+
+            assert(
+                subject_status.is_expired() | subject_status.is_frozen(), MockErrors::ACTIVE_CLIENT,
+            );
+            assert(substitute_status.is_active(), MockErrors::INACTIVE_CLIENT);
+
+            assert(
+                subject_client_state.substitute_client_matches(substitute_client_state),
+                MockErrors::INVALID_CLIENT_SUBSTITUTE,
+            );
         }
 
-        fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {}
+        fn recover_execute(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
+            let subject_client_sequence = msg.subject_client_id.sequence;
+            let substitute_client_sequence = msg.substitute_client_id.sequence;
+
+            let substitute_client_state: MockClientState = self
+                .read_client_state(substitute_client_sequence);
+
+            let substitute_consensus_state = self
+                .read_consensus_state(
+                    substitute_client_sequence, substitute_client_state.latest_height.clone(),
+                );
+
+            let mut serialised_client_state = array![];
+            let mut serialised_consensus_state = array![];
+            substitute_client_state.serialize(ref serialised_client_state);
+            substitute_consensus_state.serialize(ref serialised_consensus_state);
+
+            self
+                .update_on_recover(
+                    subject_client_sequence,
+                    substitute_client_sequence,
+                    serialised_client_state,
+                    serialised_consensus_state,
+                );
+        }
     }
 
     #[generate_trait]
@@ -292,7 +388,8 @@ pub mod MockClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> bool {
-            false
+            let header: MockHeader = MockHeaderImpl::deserialize(client_message);
+            self._verify_misbehaviour_on_update(client_sequence, header)
         }
 
         fn verify_substitute(
@@ -331,7 +428,11 @@ pub mod MockClientComponent {
                     mock_client_state.latest_height,
                     mock_client_state,
                     mock_consensus_state,
+                    get_block_number(),
+                    get_block_timestamp(),
                 );
+
+            self.write_next_client_sequence(client_sequence + 1);
 
             let client_id = ClientIdImpl::new(self.client_type(), client_sequence);
 
@@ -343,22 +444,61 @@ pub mod MockClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> UpdateResponse {
+            let latest_height = self.latest_height(client_sequence);
+
             let header: MockHeader = MockHeaderImpl::deserialize(client_message);
 
-            let header_height = header.signed_header.height.clone();
+            assert(
+                header.trusted_height.revision_number == latest_height.revision_number,
+                MockErrors::INVALID_HEADER,
+            );
 
-            // TODO: Implement consensus state pruning mechanism.
+            let header_height = header.clone().signed_header.height;
+
+            let update_heights = self.read_update_heights(client_sequence);
+            let mut update_heights_span = update_heights.span();
+
+            let mut client_state = self.read_client_state(client_sequence);
+
+            let mut heights_kept = array![];
+            let mut check_in_progress = true;
+            // Since the Heights are sorted when stored, as soon as we find the first
+            // Height which isn't expired we can stop checking the rest and build
+            // the new Heights array which are kept.
+            while let Option::Some(height) = update_heights_span.pop_front() {
+                if check_in_progress {
+                    let consensus_state = self
+                        .read_consensus_state(client_sequence, height.clone());
+
+                    if consensus_state
+                        .status(client_state.trusting_period, client_state.max_clock_drift)
+                        .is_expired() {
+                        self.remove_consensus_state(client_sequence, height.clone());
+                    } else {
+                        check_in_progress = false;
+                        heights_kept.append(height.clone());
+                    }
+                } else {
+                    heights_kept.append(height.clone());
+                }
+            }
+            // Write directly since heights_kept is already sorted and is equal or
+            // smaller to the previous one
+            self.update_heights.write(client_sequence, heights_kept);
 
             if !self.consensus_state_exists(client_sequence, header_height.clone()) {
-                let mut client_state = self.read_client_state(client_sequence);
-
                 client_state.update(header_height.clone());
 
                 let new_consensus_state: MockConsensusState = header.into();
 
                 self
                     ._update_state(
-                        client_sequence, header_height, client_state, new_consensus_state,
+                        client_sequence,
+                        header_height,
+                        client_state,
+                        new_consensus_state,
+                        get_block_number(),
+                        get_block_timestamp(),
                     );
             }
 
@@ -370,11 +510,12 @@ pub mod MockClientComponent {
             client_sequence: u64,
             client_message: Array<felt252>,
         ) -> UpdateResponse {
-            let header = MockHeaderImpl::deserialize(client_message);
-
             let mut client_state = self.read_client_state(client_sequence);
 
-            client_state.freeze(header.trusted_height);
+            // convention from ibc-go
+            let frozen_height = HeightImpl::new(0, 1);
+
+            client_state.freeze(frozen_height);
 
             self.write_client_state(client_sequence, client_state);
 
@@ -387,7 +528,41 @@ pub mod MockClientComponent {
             substitute_client_sequence: u64,
             substitute_client_state: Array<felt252>,
             substitute_consensus_state: Array<felt252>,
-        ) {}
+        ) {
+            let update_heights = self.read_update_heights(subject_client_sequence);
+
+            if update_heights.len() > 0 {
+                let mut update_heights_span = update_heights.span();
+
+                while let Option::Some(height) = update_heights_span.pop_front() {
+                    self.remove_consensus_state(subject_client_sequence, height.clone());
+                }
+
+                self.update_heights.write(subject_client_sequence, array![]);
+            }
+
+            let substitute_client_state = MockClientStateImpl::deserialize(substitute_client_state);
+            let substitute_consensus_state = MockConsensusStateImpl::deserialize(
+                substitute_consensus_state,
+            );
+
+            let latest_height = substitute_client_state.latest_height.clone();
+
+            let processed_height = self
+                .read_client_processed_height(substitute_client_sequence, latest_height.clone());
+            let processed_time = self
+                .read_client_processed_time(substitute_client_sequence, latest_height.clone());
+
+            self
+                ._update_state(
+                    subject_client_sequence,
+                    substitute_client_state.latest_height,
+                    substitute_client_state,
+                    substitute_consensus_state,
+                    processed_height,
+                    processed_time,
+                );
+        }
 
         fn update_on_upgrade(
             ref self: ComponentState<TContractState>,
@@ -451,22 +626,68 @@ pub mod MockClientComponent {
             update_height: Height,
             client_state: MockClientState,
             consensus_state: MockConsensusState,
+            processed_height: u64,
+            processed_time: u64,
         ) {
             self.write_client_state(client_sequence, client_state);
 
             self.write_update_height(client_sequence, update_height.clone());
 
-            self.write_consensus_state(client_sequence, update_height.clone(), consensus_state);
+            self
+                .write_consensus_state(
+                    client_sequence,
+                    update_height.clone(),
+                    consensus_state,
+                    processed_height,
+                    processed_time,
+                );
+        }
 
-            let host_height = get_block_number();
+        fn _verify_misbehaviour_on_update(
+            self: @ComponentState<TContractState>, client_sequence: u64, header: MockHeader,
+        ) -> bool {
+            let target_height = header.signed_header.height;
 
-            self.write_client_processed_height(client_sequence, update_height.clone(), host_height);
+            let target_consensus_state: MockConsensusState = header.into();
 
-            let host_timestamp = get_block_timestamp();
+            let previous_height = self.update_height_before(client_sequence, target_height.clone());
 
-            self.write_client_processed_time(client_sequence, update_height, host_timestamp);
+            if previous_height == Some(target_height) {
+                let stored_consensus_state = self
+                    .read_consensus_state(client_sequence, target_height.clone());
 
-            self.write_next_client_sequence(client_sequence + 1);
+                // stored consensus state should be the same from target consensus state
+                // negation of the correct condition is a misbehaviour case
+                if !(stored_consensus_state == target_consensus_state) {
+                    return true;
+                }
+            } else {
+                if let Some(previous_height) = previous_height {
+                    let previous_consensus_state = self
+                        .read_consensus_state(client_sequence, previous_height.clone());
+
+                    // time should be monotonically increasing
+                    // negation of the correct condition is a misbehaviour case
+                    if !(@previous_consensus_state.timestamp < @target_consensus_state.timestamp) {
+                        return true;
+                    }
+                }
+
+                let next_height = self.update_height_after(client_sequence, target_height.clone());
+
+                if let Some(next_height) = next_height {
+                    let next_consensus_state = self
+                        .read_consensus_state(client_sequence, next_height.clone());
+
+                    // time should be monotonically increasing
+                    // negation of the correct condition is a misbehaviour case
+                    if !(@next_consensus_state.timestamp > @target_consensus_state.timestamp) {
+                        return true;
+                    }
+                }
+            }
+
+            false
         }
     }
 
@@ -510,12 +731,12 @@ pub mod MockClientComponent {
 
         fn read_client_processed_time(
             self: @ComponentState<TContractState>, client_sequence: u64, height: Height,
-        ) -> Timestamp {
+        ) -> u64 {
             let processed_time = self.client_processed_times.read((client_sequence, height));
 
             assert(processed_time.is_non_zero(), MockErrors::MISSING_CLIENT_PROCESSED_TIME);
 
-            processed_time.into()
+            processed_time
         }
 
         fn read_client_processed_height(
@@ -554,20 +775,42 @@ pub mod MockClientComponent {
                 return;
             }
 
-            let len = update_heights.len();
+            let mut len = update_heights.len();
 
             if len == 100 {
                 update_heights.pop_front().unwrap();
+                len = update_heights.len();
             }
 
-            update_heights.append(update_height);
+            // if the new height is bigger than the last one or the first, we can just append it
+            if len == 0 || update_heights.at(len - 1) < @update_height {
+                update_heights.append(update_height);
+                self.update_heights.write(client_sequence, update_heights);
+                return;
+            }
 
-            let new_update_heights = if len.is_non_zero()
-                && update_heights.at(len - 1) > @update_height {
-                MergeSort::sort(update_heights.span())
+            // update_heights is already sorted.
+            // we only need to insert the new height in the right place
+
+            let mut new_update_heights = array![];
+            let mut inserted = false;
+
+            while let Some(height) = update_heights.pop_front() {
+                if height > update_height {
+                    new_update_heights.append(update_height);
+                    inserted = true;
+                }
+                new_update_heights.append(height);
+                if inserted {
+                    break;
+                }
+            }
+
+            if inserted {
+                new_update_heights.append_span(update_heights.span());
             } else {
-                update_heights
-            };
+                new_update_heights.append(update_height);
+            }
 
             self.update_heights.write(client_sequence, new_update_heights);
         }
@@ -585,26 +828,23 @@ pub mod MockClientComponent {
             client_sequence: u64,
             height: Height,
             consensus_state: MockConsensusState,
+            processed_height: u64,
+            processed_time: u64,
         ) {
-            self.consensus_states.write((client_sequence, height), consensus_state);
+            self.consensus_states.write((client_sequence, height.clone()), consensus_state);
+            self
+                .client_processed_heights
+                .write((client_sequence, height.clone()), processed_height);
+            self.client_processed_times.write((client_sequence, height), processed_time);
         }
 
-        fn write_client_processed_time(
-            ref self: ComponentState<TContractState>,
-            client_sequence: u64,
-            height: Height,
-            timestamp: u64,
+        fn remove_consensus_state(
+            ref self: ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) {
-            self.client_processed_times.write((client_sequence, height), timestamp);
-        }
-
-        fn write_client_processed_height(
-            ref self: ComponentState<TContractState>,
-            client_sequence: u64,
-            height: Height,
-            host_height: u64,
-        ) {
-            self.client_processed_heights.write((client_sequence, height), host_height);
+            let consensus_zero = MockConsensusStateZero::zero();
+            self.consensus_states.write((client_sequence, height), consensus_zero.into());
+            self.client_processed_times.write((client_sequence, height), 0);
+            self.client_processed_heights.write((client_sequence, height), 0);
         }
     }
 }

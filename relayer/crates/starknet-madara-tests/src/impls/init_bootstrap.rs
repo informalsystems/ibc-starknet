@@ -17,23 +17,11 @@ pub async fn init_madara_bootstrap(runtime: &HermesRuntime) -> Result<MadaraBoot
         .duration_since(SystemTime::UNIX_EPOCH)?
         .as_secs();
 
-    let erc20_contract = load_contract_from_env(runtime, "ERC20_CONTRACT").await?;
-
-    let ics20_contract = load_contract_from_env(runtime, "ICS20_CONTRACT").await?;
-
-    let ibc_core_contract = load_contract_from_env(runtime, "IBC_CORE_CONTRACT").await?;
-
-    let comet_client_contract = load_contract_from_env(runtime, "COMET_CLIENT_CONTRACT").await?;
-
     let starknet_bootstrap = MadaraBootstrap {
         fields: Arc::new(MadaraBootstrapFields {
             runtime: runtime.clone(),
             chain_command_path,
             chain_store_dir: format!("./test-data/{timestamp}").into(),
-            erc20_contract,
-            ics20_contract,
-            ibc_core_contract,
-            comet_client_contract,
         }),
     };
 

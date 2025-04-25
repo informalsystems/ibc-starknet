@@ -1,18 +1,18 @@
-use CometClientComponent::ClientWriterTrait;
+use MockClientComponent::ClientWriterTrait;
 use snforge_std::start_cheat_block_timestamp_global;
-use starknet_ibc_clients::cometbft::CometClientComponent;
-use starknet_ibc_clients::cometbft::CometClientComponent::{
-    ClientReaderImpl, CometClientHandler, CometClientQuery,
+use starknet_ibc_clients::mock::MockClientComponent;
+use starknet_ibc_clients::mock::MockClientComponent::{
+    ClientReaderImpl, MockClientHandler, MockClientQuery,
 };
 use starknet_ibc_core::client::{StatusTrait, TimestampTrait};
-use starknet_ibc_testkit::configs::CometClientConfigTrait;
+use starknet_ibc_testkit::configs::MockClientConfigTrait;
 use starknet_ibc_testkit::dummies::{HEIGHT, TIMESTAMP};
 use starknet_ibc_testkit::mocks::MockCometClient;
 
-type ComponentState = CometClientComponent::ComponentState<MockCometClient::ContractState>;
+type ComponentState = MockClientComponent::ComponentState<MockCometClient::ContractState>;
 
 fn COMPONENT_STATE() -> ComponentState {
-    CometClientComponent::component_state_for_testing()
+    MockClientComponent::component_state_for_testing()
 }
 
 fn setup() -> ComponentState {
@@ -23,7 +23,7 @@ fn setup() -> ComponentState {
 /// Performs an update client by taking an elapsed timestamp from the client's latest timestamp.
 fn simulate_update_client(elapsed_timestamp: u64) {
     let mut state = setup();
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
     start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
     let msg = cfg.dummy_msg_create_client();
     let create_resp = state.create_client(msg);
@@ -49,7 +49,7 @@ fn simulate_update_client(elapsed_timestamp: u64) {
 #[test]
 fn test_create_client_ok() {
     let mut state = setup();
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
     start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
     let msg = cfg.dummy_msg_create_client();
     state.create_client(msg);
@@ -62,7 +62,7 @@ fn test_create_client_ok() {
 #[test]
 fn test_client_sequence_ok() {
     let mut state = setup();
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
     start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
     let msg = cfg.dummy_msg_create_client();
     state.create_client(msg.clone());
@@ -91,7 +91,7 @@ fn test_update_client_with_invalid_future_header() {
 #[test]
 fn test_update_client_with_older_header() {
     let mut state = setup();
-    let mut cfg = CometClientConfigTrait::default();
+    let mut cfg = MockClientConfigTrait::default();
     start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 2);
     let msg = cfg.dummy_msg_create_client();
     let create_resp = state.create_client(msg);
@@ -129,6 +129,28 @@ fn test_update_client_with_older_header() {
     assert_eq!(consensus_state.timestamp, updating_timestamp_2);
     state.read_client_processed_time(0, updating_height_2); // It panics if not exist. 
     state.read_client_processed_height(0, updating_height_2); // It panics if not exist. 
+}
+
+#[test]
+fn test_client_misbehaviour() {
+    let mut state = setup();
+    let mut cfg = MockClientConfigTrait::default();
+    start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 1);
+    let msg = cfg.dummy_msg_create_client();
+    let create_resp = state.create_client(msg);
+    let updating_height = cfg.latest_height.clone() + HEIGHT(1);
+    let updating_timestamp = cfg.latest_timestamp.clone() + TIMESTAMP(1);
+    let (msg1, msg2) = cfg
+        .dummy_msg_misbehaviour_client(
+            create_resp.client_id,
+            create_resp.height,
+            updating_height.clone(),
+            updating_timestamp.clone(),
+        );
+    state.update_client(msg1);
+    assert!(state.status(0).is_active());
+    state.update_client(msg2);
+    assert!(state.status(0).is_frozen());
 }
 
 #[test]
@@ -191,19 +213,45 @@ fn test_update_height_before() {
     let mut state = setup();
     state.write_update_height(0, HEIGHT(5));
     let height = state.update_height_before(0, HEIGHT(3));
-    assert_eq!(height, HEIGHT(3));
+    assert_eq!(height, None);
 
     state.write_update_height(0, HEIGHT(2));
     let height = state.update_height_before(0, HEIGHT(3));
-    assert_eq!(height, HEIGHT(2));
+    assert_eq!(height, Some(HEIGHT(2)));
 
     state.write_update_height(0, HEIGHT(4));
     let height = state.update_height_before(0, HEIGHT(4));
-    assert_eq!(height, HEIGHT(4));
+    assert_eq!(height, Some(HEIGHT(4)));
 
     state.write_update_height(0, HEIGHT(6));
     let height = state.update_height_before(0, HEIGHT(7));
-    assert_eq!(height, HEIGHT(6));
+    assert_eq!(height, Some(HEIGHT(6)));
+
+    let height = state.update_height_before(0, HEIGHT(1));
+    assert_eq!(height, None);
+}
+
+#[test]
+fn test_update_height_after() {
+    let mut state = setup();
+    state.write_update_height(0, HEIGHT(2));
+    let height = state.update_height_after(0, HEIGHT(3));
+    assert_eq!(height, None);
+
+    state.write_update_height(0, HEIGHT(4));
+    let height = state.update_height_after(0, HEIGHT(3));
+    assert_eq!(height, Some(HEIGHT(4)));
+
+    state.write_update_height(0, HEIGHT(7));
+    let height = state.update_height_after(0, HEIGHT(6));
+    assert_eq!(height, Some(HEIGHT(7)));
+
+    state.write_update_height(0, HEIGHT(6));
+    let height = state.update_height_after(0, HEIGHT(6));
+    assert_eq!(height, Some(HEIGHT(6)));
+
+    let height = state.update_height_after(0, HEIGHT(8));
+    assert_eq!(height, None);
 }
 
 #[test]
@@ -223,5 +271,12 @@ fn test_update_heights_max_size() {
 #[should_panic(expected: 'ICS07: zero update heights')]
 fn test_update_height_before_empty() {
     let mut state = setup();
-    state.update_height_before(0, HEIGHT(3));
+    let _ = state.update_height_before(0, HEIGHT(3));
+}
+
+#[test]
+#[should_panic(expected: 'ICS07: zero update heights')]
+fn test_update_height_after_empty() {
+    let mut state = setup();
+    let _ = state.update_height_before(0, HEIGHT(3));
 }

@@ -29,10 +29,19 @@ mod preset {
         EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
     };
     use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent;
+    use ibc::clients::tendermint::types::{Header as TendermintLcHeader, TrustThreshold};
     use ibc::core::commitment_types::specs::ProofSpecs;
     use ibc::core::host::types::identifiers::ChainId;
+    use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
     use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
-    use starknet::core::types::{Felt, U256};
+    use starknet::core::types::{ByteArray, Felt, U256};
+    use tendermint::block::header::Version as HeaderVersion;
+    use tendermint::block::parts::Header as PartSetHeader;
+    use tendermint::block::signed_header::SignedHeader;
+    use tendermint::block::Header as TmHeader;
+    use tendermint::hash::Hash as TmHash;
+    use tendermint::validator::ProposerPriority;
+    use tendermint::{account, block, validator, vote, AppHash, PublicKey, Signature};
 
     use crate::impls::types::address::StarknetAddress;
     use crate::types::channel_id::{
@@ -46,12 +55,18 @@ mod preset {
     };
     use crate::types::cosmos::client_state::{
         ClientStatus, CometClientState, EncodeInnerSpec, EncodeLeafOp, EncodeProofSpec,
-        EncodeProofSpecs,
+        EncodeProofSpecs, EncodeTrustThreshold,
     };
     use crate::types::cosmos::consensus_state::CometConsensusState;
     use crate::types::cosmos::height::{EncodeHeight, Height};
     use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
-    use crate::types::cosmos::update::CometUpdateHeader;
+    use crate::types::cosmos::update::{
+        ClientMessage, EncodeAccountId, EncodeAppHash, EncodeBlockId, EncodeCommit,
+        EncodeCommitBlockIdFlag, EncodeCommitSig, EncodeHeaderVersion, EncodePartSetHeader,
+        EncodeProposerPriority, EncodeProtoTimestamp, EncodePublicKey, EncodeSignature,
+        EncodeSignedHeader, EncodeTendermintLcHeader, EncodeTmHash, EncodeTmHeader,
+        EncodeValidator, EncodeValidatorSet, EncodeVotePower,
+    };
     use crate::types::message_responses::create_client::CreateClientResponse;
     use crate::types::messages::erc20::deploy::DeployErc20TokenMessage;
     use crate::types::messages::erc20::transfer::TransferErc20TokenMessage;
@@ -119,6 +134,26 @@ mod preset {
             (ViaCairo, ConnectionCounterparty): EncodeConnectionCounterparty,
             (ViaCairo, ConnectionState): EncodeConnectionState,
             (ViaCairo, ConnectionEnd): EncodeConnectionEnd,
+            (ViaCairo, TendermintLcHeader): EncodeTendermintLcHeader,
+            (ViaCairo, TrustThreshold): EncodeTrustThreshold,
+            (ViaCairo, SignedHeader): EncodeSignedHeader,
+            (ViaCairo, HeaderVersion): EncodeHeaderVersion,
+            (ViaCairo, AppHash): EncodeAppHash,
+            (ViaCairo, TmHeader): EncodeTmHeader,
+            (ViaCairo, block::Commit): EncodeCommit,
+            (ViaCairo, TmHash): EncodeTmHash,
+            (ViaCairo, block::Id): EncodeBlockId,
+            (ViaCairo, PartSetHeader): EncodePartSetHeader,
+            (ViaCairo, Signature): EncodeSignature,
+            (ViaCairo, ProtoTimestamp): EncodeProtoTimestamp,
+            (ViaCairo, block::BlockIdFlag): EncodeCommitBlockIdFlag,
+            (ViaCairo, block::CommitSig): EncodeCommitSig,
+            (ViaCairo, validator::Set): EncodeValidatorSet,
+            (ViaCairo, vote::Power): EncodeVotePower,
+            (ViaCairo, validator::Info): EncodeValidator,
+            (ViaCairo, account::Id): EncodeAccountId,
+            (ViaCairo, ProposerPriority): EncodeProposerPriority,
+            (ViaCairo, PublicKey): EncodePublicKey,
             (ViaCairo, BasePrefix): EncodeBasePrefix,
             (ViaCairo, ConnectionVersion): EncodeConnectionVersion,
             (ViaCairo, ChannelOrdering): EncodeChannelOrdering,
@@ -130,6 +165,8 @@ mod preset {
             [
                 (ViaCairo, Vec<Sequence>),
                 (ViaCairo, Vec<TracePrefix>),
+                (ViaCairo, Vec<validator::Info>),
+                (ViaCairo, Vec<block::CommitSig>),
                 (ViaCairo, Vec<ProofSpec>),
             ]: EncodeList,
             [
@@ -160,7 +197,6 @@ mod preset {
                 (ViaCairo, Acknowledgement),
                 (ViaCairo, MsgTransfer),
                 (ViaCairo, TransferPacketData),
-                (ViaCairo, CometUpdateHeader),
                 (ViaCairo, DeployErc20TokenMessage),
                 (ViaCairo, TransferErc20TokenMessage),
                 (ViaCairo, CreateClientResponse),
@@ -175,6 +211,7 @@ mod preset {
                 (ViaCairo, Participant),
                 (ViaCairo, ClientStatus),
                 (ViaCairo, RawChannelState),
+                (ViaCairo, ClientMessage),
             ]:
                 EncodeEnumFields,
         }
