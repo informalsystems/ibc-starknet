@@ -1,6 +1,8 @@
+use cometbft::light_client::ClientState as ProtoCometClientState;
 use cometbft::utils::Fraction;
 use core::num::traits::Zero;
 use ics23::{ArrayFelt252Store, ProofSpec};
+use protobuf::types::message::ProtoCodecImpl;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Duration, Height, HeightPartialOrd, Status, StatusTrait};
 
@@ -61,8 +63,30 @@ pub impl CometClientStateImpl of CometClientStateTrait {
         @substitute_client_state == self
     }
 
-    fn protobuf_bytes(self: @CometClientState) -> ByteArray {
-        // FIXME: convert to cometbft type to encode to protobuf bytes
-        ""
+    fn protobuf_bytes(self: CometClientState) -> ByteArray {
+        let proto_client_state: ProtoCometClientState = self.try_into().unwrap();
+        ProtoCodecImpl::encode(@proto_client_state)
+    }
+}
+
+pub impl CometClientStateToProto of TryInto<CometClientState, ProtoCometClientState> {
+    fn try_into(self: CometClientState) -> Option<ProtoCometClientState> {
+        let frozen_height: Height = self.status.into();
+
+        Some(
+            ProtoCometClientState {
+                chain_id: self.chain_id,
+                trust_level: self.trust_level,
+                trusting_period: self.trusting_period.try_into()?,
+                unbonding_period: self.unbonding_period.try_into()?,
+                max_clock_drift: self.max_clock_drift.try_into()?,
+                frozen_height: frozen_height.into(),
+                latest_height: self.latest_height.into(),
+                proof_specs: self.proof_spec,
+                upgrade_path: self.upgrade_path,
+                allow_update_after_expiry: false,
+                allow_update_after_misbehaviour: false,
+            },
+        )
     }
 }

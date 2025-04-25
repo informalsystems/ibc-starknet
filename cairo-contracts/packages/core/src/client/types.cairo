@@ -1,3 +1,4 @@
+use cometbft::ibc::Height as ProtoHeight;
 use core::num::traits::{CheckedAdd, OverflowingMul, Zero};
 use core::traits::PartialOrd;
 use ics23::IntoArrayU32;
@@ -66,6 +67,16 @@ pub impl StatusImpl of StatusTrait {
     }
 }
 
+pub impl StatusToFrozenHeight of Into<Status, Height> {
+    fn into(self: Status) -> Height {
+        match self {
+            Status::Active => Height { revision_number: 0, revision_height: 0 },
+            Status::Expired => Height { revision_number: 0, revision_height: 1 },
+            Status::Frozen(height) => height,
+        }
+    }
+}
+
 #[derive(Copy, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]
 pub struct Height {
     pub revision_number: u64,
@@ -127,6 +138,12 @@ pub impl HeightPartialOrd of PartialOrd<Height> {
         lhs.revision_number > rhs.revision_number
             || (lhs.revision_number == rhs.revision_number
                 && lhs.revision_height > rhs.revision_height)
+    }
+}
+
+pub impl HeightToProto of Into<Height, ProtoHeight> {
+    fn into(self: Height) -> ProtoHeight {
+        ProtoHeight { revision_number: self.revision_number, revision_height: self.revision_height }
     }
 }
 

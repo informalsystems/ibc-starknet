@@ -35,6 +35,11 @@ pub fn byte_array_to_slice_u32(input: ByteArray) -> [u32; 8] {
     [*b[0], *b[1], *b[2], *b[3], *b[4], *b[5], *b[6], *b[7]]
 }
 
+pub fn slice_u32_to_byte_array(input: [u32; 8]) -> ByteArray {
+    let ar: Array<u8> = input.into();
+    array_u8_to_byte_array(@ar)
+}
+
 /// Converts the give type `T` into an array of `u32` values. If the last word
 /// is not a full word, the method returns the last word and its length.
 pub trait IntoArrayU32<T> {

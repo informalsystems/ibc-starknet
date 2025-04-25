@@ -1,6 +1,8 @@
 use alexandria_data_structures::byte_array_ext::{ByteArrayIntoArrayU8, SpanU8IntoBytearray};
+use cometbft::ibc::MerkleRoot;
+use cometbft::light_client::ConsensusState as ProtoCometConsensusState;
 use core::num::traits::Zero;
-use ics23::ArrayU8Pack;
+use ics23::{ArrayU8Pack, array_u8_to_byte_array, slice_u32_to_byte_array};
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{
     Duration, DurationTrait, Status, Timestamp, TimestampImpl, TimestampIntoU128, TimestampZero,
@@ -87,5 +89,17 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
     fn protobuf_bytes(self: @CometConsensusState) -> ByteArray {
         // FIXME: convert to cometbft type to encode to protobuf bytes
         ""
+    }
+}
+
+pub impl CometConsensusStateToProto of TryInto<CometConsensusState, ProtoCometConsensusState> {
+    fn try_into(self: CometConsensusState) -> Option<ProtoCometConsensusState> {
+        Some(
+            ProtoCometConsensusState {
+                timestamp: self.timestamp.try_into()?,
+                root: MerkleRoot { hash: slice_u32_to_byte_array(self.root.root) },
+                next_validators_hash: array_u8_to_byte_array(@self.next_validators_hash),
+            },
+        )
     }
 }
