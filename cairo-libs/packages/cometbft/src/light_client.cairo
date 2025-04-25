@@ -13,17 +13,17 @@ use protobuf::types::wkt::{Duration, Timestamp};
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ClientState {
-    chain_id: ByteArray,
-    trust_level: Fraction,
-    trusting_period: Duration,
-    unbonding_period: Duration,
-    max_clock_drift: Duration,
-    frozen_height: Height,
-    latest_height: Height,
-    proof_specs: Array<ProofSpec>,
-    upgrade_path: Array<ByteArray>,
-    allow_update_after_expiry: bool,
-    allow_update_after_misbehaviour: bool,
+    pub chain_id: ByteArray,
+    pub trust_level: Fraction,
+    pub trusting_period: Duration,
+    pub unbonding_period: Duration,
+    pub max_clock_drift: Duration,
+    pub frozen_height: Height,
+    pub latest_height: Height,
+    pub proof_specs: Array<ProofSpec>,
+    pub upgrade_path: Array<ByteArray>,
+    pub allow_update_after_expiry: bool,
+    pub allow_update_after_misbehaviour: bool,
 }
 
 impl ClientStateAsProtoMessage of ProtoMessage<ClientState> {
@@ -85,9 +85,9 @@ impl ClientStateAsProtoName of ProtoName<ClientState> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ConsensusState {
-    timestamp: Timestamp,
-    root: MerkleRoot,
-    next_validators_hash: ByteArray,
+    pub timestamp: Timestamp,
+    pub root: MerkleRoot,
+    pub next_validators_hash: ByteArray,
 }
 
 impl ConsensusStateAsProtoMessage of ProtoMessage<ConsensusState> {

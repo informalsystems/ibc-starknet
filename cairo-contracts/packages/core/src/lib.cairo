@@ -139,13 +139,14 @@ pub mod host {
         next_sequence_ack_key, next_sequence_recv_key, next_sequence_send_key, receipt_key,
     };
     pub use paths::{
-        ack_path, channel_end_path, commitment_path, connection_path, next_sequence_recv_path,
-        receipt_path,
+        ack_path, channel_end_path, client_upgrade_path, commitment_path, connection_path,
+        consensus_upgrade_path, next_sequence_recv_path, receipt_path,
     };
     pub use prefixes::{
         ACKS_PREFIX, BasePrefix, BasePrefixTrait, BasePrefixZero, CHANNELS_PREFIX,
         CHANNEL_ENDS_PREFIX, CLIENTS_PREFIX, COMMITMENTS_PREFIX, CONNECTIONS_PREFIX,
         NEXT_SEQ_ACK_PREFIX, NEXT_SEQ_RECV_PREFIX, NEXT_SEQ_SEND_PREFIX, PORTS_PREFIX,
-        RECEIPTS_PREFIX, SEQUENCES_PREFIX,
+        RECEIPTS_PREFIX, SEQUENCES_PREFIX, UPGRADED_CLIENT_STATE_SUFFIX,
+        UPGRADED_CONSENSUS_STATE_SUFFIX, UPGRADED_IBC_STATE_PREFIX,
     };
 }

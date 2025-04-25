@@ -8,8 +8,8 @@ use protobuf::types::message::{
     EncodeContextTrait, ProtoCodecImpl, ProtoMessage, ProtoName, ProtoOneof,
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
-use starknet::SyscallResult;
-use starknet::storage_access::{StorageBaseAddress, Store};
+use starknet::storage_access::StorePacking;
+use crate::utils::{u32_from_u8, u32_to_u8};
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct MerkleProof {
@@ -276,7 +276,7 @@ pub impl LengthOpIntoU32 of Into<@LengthOp, u32> {
     }
 }
 
-pub impl U32TryIntoLegthOp of TryInto<u32, LengthOp> {
+pub impl U32TryIntoLengthOp of TryInto<u32, LengthOp> {
     fn try_into(self: u32) -> Option<LengthOp> {
         match self {
             0 => Option::Some(LengthOp::NoPrefix),
@@ -337,114 +337,55 @@ pub struct LeafOp {
     pub prehash_key: HashOp,
     pub prehash_value: HashOp,
     pub length: LengthOp,
-    pub prefix: Array<u8> // TODO: Can be ByteArray?
+    pub prefix: Array<u8>,
 }
 
-pub impl StoreU8Array of Store<Array<u8>> {
-    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Array<u8>> {
-        Self::read_at_offset(address_domain, base, 0)
-    }
-
-    fn write(address_domain: u32, base: StorageBaseAddress, value: Array<u8>) -> SyscallResult<()> {
-        Self::write_at_offset(address_domain, base, 0, value)
-    }
-
-    fn read_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8,
-    ) -> SyscallResult<Array<u8>> {
-        let mut arr: Array<u8> = array![];
-
-        let len: u8 = Store::<u8>::read_at_offset(address_domain, base, offset)
-            .expect('Storage Span too large');
-        offset += 1;
-
-        let exit = Store::<u8>::size() * len + offset;
-        loop {
-            if offset >= exit {
-                break;
-            }
-
-            let value = Store::<u8>::read_at_offset(address_domain, base, offset).unwrap();
-            arr.append(value);
-            offset += Store::<u8>::size();
+pub impl ArrayU8Pack of StorePacking<Array<u8>, ByteArray> {
+    fn pack(value: Array<u8>) -> ByteArray {
+        let mut byte_array = "";
+        let mut span = value.span();
+        while let Some(byte) = span.pop_front() {
+            byte_array.append_byte(*byte);
         }
-
-        Result::Ok(arr)
+        byte_array
     }
 
-    fn write_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<u8>,
-    ) -> SyscallResult<()> {
-        let len: u8 = value.len().try_into().expect('Storage - Span too large');
-        Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();
-        offset += 1;
-
-        while let Option::Some(element) = value.pop_front() {
-            Store::<u8>::write_at_offset(address_domain, base, offset, element).unwrap();
-            offset += Store::<u8>::size();
+    fn unpack(value: ByteArray) -> Array<u8> {
+        let mut arr = array![];
+        let mut i = 0;
+        while let Some(byte) = value.at(i) {
+            arr.append(byte);
+            i += 1;
         }
-
-        Result::Ok(())
-    }
-
-    // FIXME: Use correct size
-    fn size() -> u8 {
-        10 * Store::<u8>::size()
+        arr
     }
 }
 
-pub impl StoreU32Array of Store<Array<u32>> {
-    fn read(address_domain: u32, base: StorageBaseAddress) -> SyscallResult<Array<u32>> {
-        Self::read_at_offset(address_domain, base, 0)
-    }
-
-    fn write(
-        address_domain: u32, base: StorageBaseAddress, value: Array<u32>,
-    ) -> SyscallResult<()> {
-        Self::write_at_offset(address_domain, base, 0, value)
-    }
-
-    fn read_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8,
-    ) -> SyscallResult<Array<u32>> {
-        let mut arr: Array<u32> = array![];
-
-        let len: u8 = Store::<u8>::read_at_offset(address_domain, base, offset)
-            .expect('Storage Span too large');
-        offset += 1;
-
-        let exit = Store::<u32>::size() * len + offset;
-        loop {
-            if offset >= exit {
-                break;
-            }
-
-            let value = Store::<u32>::read_at_offset(address_domain, base, offset).unwrap();
-            arr.append(value);
-            offset += Store::<u32>::size();
+pub impl ArrayU32Pack of StorePacking<Array<u32>, ByteArray> {
+    fn pack(value: Array<u32>) -> ByteArray {
+        let mut byte_array = "";
+        let mut span = value.span();
+        while let Some(limb) = span.pop_front() {
+            let (b0, b1, b2, b3) = u32_to_u8(*limb);
+            byte_array.append_byte(b0);
+            byte_array.append_byte(b1);
+            byte_array.append_byte(b2);
+            byte_array.append_byte(b3);
         }
-
-        Result::Ok(arr)
+        byte_array
     }
 
-    fn write_at_offset(
-        address_domain: u32, base: StorageBaseAddress, mut offset: u8, mut value: Array<u32>,
-    ) -> SyscallResult<()> {
-        let len: u8 = value.len().try_into().expect('Storage - Span too large');
-        Store::<u8>::write_at_offset(address_domain, base, offset, len).unwrap();
-        offset += 1;
-
-        while let Option::Some(element) = value.pop_front() {
-            Store::<u32>::write_at_offset(address_domain, base, offset, element).unwrap();
-            offset += Store::<u32>::size();
+    fn unpack(value: ByteArray) -> Array<u32> {
+        assert(value.len() % 4 == 0, 'Invalid length');
+        let mut arr = array![];
+        let mut i = 0;
+        while let (Some(b0), Some(b1), Some(b2), Some(b3)) =
+            (value.at(i), value.at(i + 1), value.at(i + 2), value.at(i + 3)) {
+            let limb = u32_from_u8(b0, b1, b2, b3);
+            arr.append(limb);
+            i += 4;
         }
-
-        Result::Ok(())
-    }
-
-    // FIXME: Use correct size
-    fn size() -> u8 {
-        10 * Store::<u32>::size()
+        arr
     }
 }
 
@@ -477,7 +418,7 @@ impl LeafOpAsProtoName of ProtoName<LeafOp> {
     }
 }
 
-#[derive(Default, Debug, Clone, Drop, PartialEq, Serde, starknet::Store)]
+#[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct ProofSpec {
     pub leaf_spec: LeafOp,
     pub inner_spec: InnerSpec,
@@ -543,3 +484,4 @@ impl ProofSpecAsProtoName of ProtoName<ProofSpec> {
 pub type RootBytes = [u32; 8];
 pub type KeyBytes = Array<u8>;
 pub type ValueBytes = Array<u8>;
+

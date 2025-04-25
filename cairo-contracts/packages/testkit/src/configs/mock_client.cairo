@@ -3,7 +3,7 @@ use starknet_ibc_core::client::{
     CreateResponse, Duration, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient, Status,
     Timestamp,
 };
-use starknet_ibc_core::commitment::{StateProof, StateRoot};
+use starknet_ibc_core::commitment::StateRoot;
 use starknet_ibc_core::host::ClientId;
 use starknet_ibc_testkit::dummies::{CLIENT_TYPE, DURATION, HEIGHT, STATE_ROOT, TIMESTAMP};
 use starknet_ibc_testkit::handles::{CoreContract, CoreHandle};
@@ -41,6 +41,7 @@ pub impl MockClientConfigImpl of MockClientConfigTrait {
             max_clock_drift: *self.max_clock_drift,
             status: Status::Active,
             chain_id: "dummy_chain",
+            upgrade_path: array!["upgrade", "upgradedIBCState"],
         };
 
         Serde::serialize(@client_state, ref serialized_client_state);

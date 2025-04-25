@@ -4,11 +4,11 @@ pub fn array_u8_into_array_u32(input: Array<u8>) -> (Array<u32>, u32, u32) {
     let mut last_word: u32 = 0;
 
     let last_word_len = input_len % 4;
-    let trucated_len = input_len / 4;
+    let truncated_len = input_len / 4;
 
     let mut input_span = input.span();
 
-    for _ in 0..trucated_len {
+    for _ in 0..truncated_len {
         let value1: u32 = (*input_span.pop_front().unwrap()).into() * 0x1000000;
         let value2: u32 = (*input_span.pop_front().unwrap()).into() * 0x10000;
         let value3: u32 = (*input_span.pop_front().unwrap()).into() * 0x100;
@@ -33,6 +33,11 @@ pub fn byte_array_to_slice_u32(input: ByteArray) -> [u32; 8] {
     assert(word == 0 && word_len == 0, 'invalid byte array');
     assert(b.len() == 8, 'invalid byte array');
     [*b[0], *b[1], *b[2], *b[3], *b[4], *b[5], *b[6], *b[7]]
+}
+
+pub fn slice_u32_to_byte_array(input: [u32; 8]) -> ByteArray {
+    let ar: Array<u8> = input.into();
+    array_u8_to_byte_array(@ar)
 }
 
 /// Converts the give type `T` into an array of `u32` values. If the last word
@@ -282,15 +287,12 @@ pub fn felt252_to_u8_array(value: felt252) -> ByteArray {
     let mut value_bytes: Array<u8> = array![];
     let mut i = 0;
     let mut current_value: u256 = value.into();
-    loop {
-        if current_value == 0 || i == 31 {
-            break;
-        }
-        let low = current_value % 256;
+    while current_value != 0 && i != 31 {
+        let low = current_value % 0x100;
         let lsb_u8: u8 = low.try_into().unwrap();
         value_bytes.append(lsb_u8);
         i += 1;
-        current_value = current_value / 256;
+        current_value = current_value / 0x100;
     }
     let reversed_value_bytes = reverse_array(value_bytes);
     array_u8_to_byte_array(@reversed_value_bytes)
@@ -304,4 +306,20 @@ fn reverse_array(input: Array<u8>) -> Array<u8> {
         reverse.append(value.clone());
     }
     reverse
+}
+
+pub fn u32_from_u8(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
+    let b0 = b0.into() * 0x1_00_00_00;
+    let b1 = b1.into() * 0x1_00_00;
+    let b2 = b2.into() * 0x1_00;
+    let b3 = b3.into();
+    b0 | b1 | b2 | b3
+}
+
+pub fn u32_to_u8(value: u32) -> (u8, u8, u8, u8) {
+    let b0 = (value / 0x1_00_00_00).try_into().unwrap();
+    let b1 = (value / 0x1_00_00).try_into().unwrap();
+    let b2 = (value / 0x1_00).try_into().unwrap();
+    let b3 = value.try_into().unwrap();
+    (b0, b1, b2, b3)
 }

@@ -6,7 +6,7 @@ pub mod CometClientComponent {
     use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use core::num::traits::Zero;
     use ics23::{
-        MerkleProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
+        ArrayFelt252Store, MerkleProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
         verify_membership as ics23_verify_membership,
         verify_non_membership as ics23_verify_non_membership,
     };
@@ -20,9 +20,8 @@ pub mod CometClientComponent {
     use starknet::{ContractAddress, get_block_number, get_block_timestamp, get_caller_address};
     use starknet_ibc_clients::cometbft::{
         ClientMessage, CometClientState, CometClientStateImpl, CometConsensusState,
-        CometConsensusStateImpl, CometConsensusStateStore, CometConsensusStateToStore,
-        CometConsensusStateZero, CometErrors, CometHeader, CometHeaderImpl,
-        CometHeaderIntoConsensusState, Misbehaviour, MisbehaviourImpl, StoreToCometConsensusState,
+        CometConsensusStateImpl, CometConsensusStateZero, CometErrors, CometHeader, CometHeaderImpl,
+        CometHeaderIntoConsensusState, Misbehaviour, MisbehaviourImpl,
     };
     use starknet_ibc_core::client::{
         CreateResponse, CreateResponseImpl, Height, HeightImpl, HeightPartialOrd, HeightZero,
@@ -32,7 +31,9 @@ pub mod CometClientComponent {
         UpdateResponse,
     };
     use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
-    use starknet_ibc_core::host::ClientIdImpl;
+    use starknet_ibc_core::host::{
+        BasePrefix, ClientIdImpl, client_upgrade_path, consensus_upgrade_path,
+    };
     use starknet_ibc_utils::ValidateBasic;
 
     #[storage]
@@ -40,7 +41,7 @@ pub mod CometClientComponent {
         next_client_sequence: u64,
         update_heights: Map<u64, Array<Height>>,
         client_states: Map<u64, CometClientState>,
-        consensus_states: Map<(u64, Height), CometConsensusStateStore>,
+        consensus_states: Map<(u64, Height), CometConsensusState>,
         client_processed_times: Map<(u64, Height), u64>,
         client_processed_heights: Map<(u64, Height), u64>,
     }
@@ -83,7 +84,8 @@ pub mod CometClientComponent {
         }
 
         fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
-            self.assert_owner();
+            self.upgrade_validate(msg.clone());
+            self.upgrade_execute(msg);
         }
     }
 
@@ -190,8 +192,7 @@ pub mod CometClientComponent {
             let mut serialized: Array<felt252> = ArrayTrait::new();
 
             let consensus_state: CometConsensusState = self
-                .read_consensus_state(client_sequence, height)
-                .into();
+                .read_consensus_state(client_sequence, height);
 
             consensus_state.serialize(ref serialized);
 
@@ -363,9 +364,23 @@ pub mod CometClientComponent {
     > of UpgradeClientTrait<TContractState> {
         fn upgrade_validate(self: @ComponentState<TContractState>, msg: MsgUpgradeClient) {
             msg.validate_basic();
+
+            self
+                .verify_upgrade(
+                    msg.client_id.sequence,
+                    msg.upgraded_client_state,
+                    msg.upgraded_consensus_state,
+                    msg.proof_upgrade_client,
+                    msg.proof_upgrade_consensus,
+                );
         }
 
-        fn upgrade_execute(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {}
+        fn upgrade_execute(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
+            self
+                .update_on_upgrade(
+                    msg.client_id.sequence, msg.upgraded_client_state, msg.upgraded_consensus_state,
+                );
+        }
     }
 
     // -----------------------------------------------------------
@@ -468,12 +483,82 @@ pub mod CometClientComponent {
 
         fn verify_upgrade(
             self: @ComponentState<TContractState>,
+            client_sequence: u64,
             upgrade_client_state: Array<felt252>,
             upgrade_consensus_state: Array<felt252>,
-            proof_upgrade_client: Array<felt252>,
-            proof_upgrade_consensus: Array<felt252>,
-            root: ByteArray,
-        ) {}
+            proof_upgrade_client: StateProof,
+            proof_upgrade_consensus: StateProof,
+        ) {
+            let comet_client_state: CometClientState = self.read_client_state(client_sequence);
+            let latest_height = comet_client_state.latest_height.clone();
+
+            let latest_consensus_state = self
+                .read_consensus_state(client_sequence, comet_client_state.latest_height.clone());
+
+            let root = latest_consensus_state.root.clone();
+
+            let upgrade_path = comet_client_state.upgrade_path.clone();
+
+            let status = self._status(comet_client_state, latest_consensus_state, client_sequence);
+
+            assert(status.is_active(), CometErrors::INACTIVE_CLIENT);
+
+            assert(
+                upgrade_path.len() == 1 || upgrade_path.len() == 2,
+                CometErrors::INVALID_UPGRADE_PATH_LENGTH,
+            );
+
+            let (prefix, upgrade_path) = if upgrade_path.len() == 1 {
+                ("", upgrade_path[0].clone())
+            } else {
+                (upgrade_path[0].clone(), upgrade_path[1].clone())
+            };
+
+            let base_prefix = BasePrefix { prefix };
+
+            let upgraded_client_path = client_upgrade_path(
+                base_prefix.clone(), latest_height.revision_height, upgrade_path.clone(),
+            );
+
+            let upgraded_consensus_path = consensus_upgrade_path(
+                base_prefix, latest_height.revision_height, upgrade_path,
+            );
+
+            let upgraded_client_state = CometClientStateImpl::deserialize(upgrade_client_state);
+
+            let upgraded_consensus_state = CometConsensusStateImpl::deserialize(
+                upgrade_consensus_state,
+            );
+
+            let upgraded_height = upgraded_client_state.latest_height.clone();
+
+            assert(upgraded_height > latest_height, CometErrors::INVALID_UPGRADE_HEIGHT);
+
+            let upgraded_client_protobuf = StateValue {
+                value: ics23::byte_array_to_array_u8(@upgraded_client_state.protobuf_bytes()),
+            };
+            let upgraded_consensus_protobuf = StateValue {
+                value: ics23::byte_array_to_array_u8(@upgraded_consensus_state.protobuf_bytes()),
+            };
+
+            self
+                .verify_membership(
+                    client_sequence,
+                    upgraded_client_path,
+                    upgraded_client_protobuf,
+                    proof_upgrade_client,
+                    root.clone(),
+                );
+
+            self
+                .verify_membership(
+                    client_sequence,
+                    upgraded_consensus_path,
+                    upgraded_consensus_protobuf,
+                    proof_upgrade_consensus,
+                    root,
+                );
+        }
     }
 
     #[embeddable_as(CometClientExecution)]
@@ -652,7 +737,32 @@ pub mod CometClientComponent {
             client_sequence: u64,
             new_client_state: Array<felt252>,
             new_consensus_state: Array<felt252>,
-        ) {}
+        ) {
+            let update_heights = self.read_update_heights(client_sequence);
+
+            if update_heights.len() > 0 {
+                let mut update_heights_span = update_heights.span();
+
+                while let Option::Some(height) = update_heights_span.pop_front() {
+                    self.remove_consensus_state(client_sequence, height.clone());
+                }
+
+                self.update_heights.write(client_sequence, array![]);
+            }
+
+            let new_client_state = CometClientStateImpl::deserialize(new_client_state);
+            let new_consensus_state = CometConsensusStateImpl::deserialize(new_consensus_state);
+
+            self
+                ._update_state(
+                    client_sequence,
+                    new_client_state.latest_height,
+                    new_client_state,
+                    new_consensus_state,
+                    get_block_number(),
+                    get_block_timestamp(),
+                );
+        }
     }
 
     // -----------------------------------------------------------
@@ -880,8 +990,7 @@ pub mod CometClientComponent {
         ) -> CometConsensusState {
             let consensus_state: CometConsensusState = self
                 .consensus_states
-                .read((client_sequence, height))
-                .into();
+                .read((client_sequence, height));
 
             assert(consensus_state.is_non_zero(), CometErrors::MISSING_CONSENSUS_STATE);
 
@@ -893,8 +1002,7 @@ pub mod CometClientComponent {
         ) -> bool {
             let consensus_state: CometConsensusState = self
                 .consensus_states
-                .read((client_sequence, height))
-                .into();
+                .read((client_sequence, height));
 
             consensus_state.is_non_zero()
         }
@@ -1000,7 +1108,7 @@ pub mod CometClientComponent {
             processed_height: u64,
             processed_time: u64,
         ) {
-            self.consensus_states.write((client_sequence, height.clone()), consensus_state.into());
+            self.consensus_states.write((client_sequence, height.clone()), consensus_state);
             self
                 .client_processed_heights
                 .write((client_sequence, height.clone()), processed_height);
@@ -1011,7 +1119,7 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) {
             let consensus_zero = CometConsensusStateZero::zero();
-            self.consensus_states.write((client_sequence, height), consensus_zero.into());
+            self.consensus_states.write((client_sequence, height), consensus_zero);
             self.client_processed_times.write((client_sequence, height), 0);
             self.client_processed_heights.write((client_sequence, height), 0);
         }
