@@ -17,6 +17,7 @@ pub use errors::ICS23Errors;
 pub(crate) use ops::{apply_inner, apply_leaf, do_hash, do_length};
 
 pub use specs::{iavl_spec, smt_spec, tendermint_spec};
+pub use store::{ArrayFelt252Store, StorePackingViaSerde};
 pub use types::{
     ArrayU32Pack, ArrayU8Pack, CommitmentProof, ExistenceProof, ExistenceProofImpl,
     ExistenceProofTrait, HashOp, InnerOp, InnerSpec, KeyBytes, LeafOp, LengthOp, MerkleProof,
