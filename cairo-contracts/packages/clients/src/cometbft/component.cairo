@@ -501,11 +501,11 @@ pub mod CometClientComponent {
 
             let status = self._status(comet_client_state, latest_consensus_state, client_sequence);
 
-            assert(status.is_active(), MockErrors::INACTIVE_CLIENT);
+            assert(status.is_active(), CometErrors::INACTIVE_CLIENT);
 
             assert(
                 upgrade_path.len() == 1 || upgrade_path.len() == 2,
-                MockErrors::INVALID_UPGRADE_PATH_LENGTH,
+                CometErrors::INVALID_UPGRADE_PATH_LENGTH,
             );
 
             let (prefix, upgrade_path) = if upgrade_path.len() == 1 {
