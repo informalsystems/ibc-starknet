@@ -1,6 +1,7 @@
 mod errors;
 mod ops;
 mod specs;
+mod store;
 mod types;
 mod utils;
 mod verify;
