@@ -30,7 +30,6 @@ pub fn verify_starknet_merkle_proof(
         .ok_or_else(|| StorageError::MissingRootProofNode(root.to_hex_string()))?;
 
     // Keep interating until all path bits are consumed.
-    // TODO: ensure that the loop terminates
     while !path_bits.is_empty() {
         match current_node {
             MerkleNode::BinaryNode(node) => {
@@ -162,8 +161,12 @@ pub fn verify_starknet_storage_proof(
     // If there is more than one, it may fail if the contract of interest
     // is not at the first position.
 
-    // TODO: reject if the storage proof contains multiple contract proofs,
-    // or use a more strict domain type.
+    if storage_proof.contracts_proof.contract_leaves_data.len() != 1 {
+        return Err(StorageError::Generic(format!(
+            "storage proof should contain exactly 1 contract proof, but it contains {}",
+            storage_proof.contracts_proof.contract_leaves_data.len()
+        )));
+    }
 
     // Get the state details about the contract, which contains the
     // state root, class hash, and nonce.
