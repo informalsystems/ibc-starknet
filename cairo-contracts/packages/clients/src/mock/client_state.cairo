@@ -56,4 +56,9 @@ pub impl MockClientStateImpl of MockClientStateTrait {
 
         @substitute_client_state == self
     }
+
+    fn protobuf_bytes(self: @MockClientState) -> ByteArray {
+        // FIXME: convert to cometbft type to encode to protobuf bytes
+        ""
+    }
 }

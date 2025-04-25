@@ -60,4 +60,9 @@ pub impl CometClientStateImpl of CometClientStateTrait {
 
         @substitute_client_state == self
     }
+
+    fn protobuf_bytes(self: @CometClientState) -> ByteArray {
+        // FIXME: convert to cometbft type to encode to protobuf bytes
+        ""
+    }
 }

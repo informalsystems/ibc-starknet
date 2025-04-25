@@ -526,7 +526,7 @@ pub mod CometClientComponent {
 
             let upgraded_client_state = CometClientStateImpl::deserialize(upgrade_client_state);
 
-            let _upgraded_consensus_state = CometConsensusStateImpl::deserialize(
+            let upgraded_consensus_state = CometConsensusStateImpl::deserialize(
                 upgrade_consensus_state,
             );
 
@@ -534,9 +534,12 @@ pub mod CometClientComponent {
 
             assert(upgraded_height > latest_height, CometErrors::INVALID_UPGRADE_HEIGHT);
 
-            // FIXME: serialized the client and consensus state to protobuf bytes
-            let upgraded_client_protobuf = StateValue { value: array![] };
-            let upgraded_consensus_protobuf = StateValue { value: array![] };
+            let upgraded_client_protobuf = StateValue {
+                value: ics23::byte_array_to_array_u8(@upgraded_client_state.protobuf_bytes()),
+            };
+            let upgraded_consensus_protobuf = StateValue {
+                value: ics23::byte_array_to_array_u8(@upgraded_consensus_state.protobuf_bytes()),
+            };
 
             self
                 .verify_membership(

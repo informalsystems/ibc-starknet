@@ -83,4 +83,9 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
             Status::Expired
         }
     }
+
+    fn protobuf_bytes(self: @CometConsensusState) -> ByteArray {
+        // FIXME: convert to cometbft type to encode to protobuf bytes
+        ""
+    }
 }

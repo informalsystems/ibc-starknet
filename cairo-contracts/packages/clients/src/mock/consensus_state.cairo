@@ -76,4 +76,9 @@ pub impl MockConsensusStateImpl of MockConsensusStateTrait {
             Status::Expired
         }
     }
+
+    fn protobuf_bytes(self: @MockConsensusState) -> ByteArray {
+        // FIXME: convert to cometbft type to encode to protobuf bytes
+        ""
+    }
 }
