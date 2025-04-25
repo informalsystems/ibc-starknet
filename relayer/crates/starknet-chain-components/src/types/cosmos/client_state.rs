@@ -37,8 +37,7 @@ pub struct CometClientState {
     pub status: ClientStatus,
     pub chain_id: ChainId,
     pub proof_specs: ProofSpecs,
-    // as done in cairo
-    pub upgrade_path: [String; 2],
+    pub upgrade_path: Vec<String>,
 }
 
 #[derive(Debug, HasFields)]
@@ -99,7 +98,7 @@ impl From<CometClientState> for IbcCometClientState {
             )
             .expect("no error"),
             client_state.proof_specs,
-            client_state.upgrade_path.to_vec(),
+            client_state.upgrade_path,
             AllowUpdate {
                 after_expiry: false,
                 after_misbehaviour: false,
