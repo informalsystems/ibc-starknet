@@ -1,8 +1,8 @@
 use cgp::extra::runtime::HasRuntime;
 use cgp::prelude::*;
 use hermes_cli_components::traits::{BootstrapLoader, BootstrapLoaderComponent, HasBootstrapType};
-use hermes_cosmos_chain_components::types::{DynamicGasConfig, EipQueryType};
-use hermes_cosmos_relayer::contexts::CosmosBuilder;
+use hermes_cosmos_core::chain_components::types::{DynamicGasConfig, EipQueryType};
+use hermes_cosmos_core::relayer::contexts::CosmosBuilder;
 use hermes_error::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;

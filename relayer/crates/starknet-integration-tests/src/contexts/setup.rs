@@ -17,12 +17,12 @@ use hermes_core::test_components::setup::traits::{
     InitConnectionOptionsGetterAtComponent, PortIdGetterAtComponent, RelaySetupComponent,
     TestDriverTypeProviderComponent,
 };
-use hermes_cosmos_chain_components::types::{
+use hermes_cosmos_core::chain_components::types::{
     CosmosCreateClientOptions, CosmosInitChannelOptions, CosmosInitConnectionOptions,
 };
-use hermes_cosmos_integration_tests::contexts::CosmosChainDriver;
-use hermes_cosmos_integration_tests::impls::UseCosmosInitChannelOptions;
-use hermes_cosmos_relayer::contexts::CosmosChain;
+use hermes_cosmos_core::integration_tests::contexts::CosmosChainDriver;
+use hermes_cosmos_core::integration_tests::impls::UseCosmosInitChannelOptions;
+use hermes_cosmos_core::relayer::contexts::CosmosChain;
 use hermes_error::handlers::DebugError;
 use hermes_error::impls::UseHermesError;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;

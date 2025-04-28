@@ -33,8 +33,8 @@ use hermes_core::relayer_components::multi::traits::relay_at::RelayTypeProviderA
 use hermes_core::runtime_components::traits::{
     CanReadFileAsString, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
-use hermes_cosmos_relayer::contexts::{CosmosBuilder, CosmosChain};
+use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_core::relayer::contexts::{CosmosBuilder, CosmosChain};
 use hermes_error::impls::UseHermesError;
 use hermes_error::types::Error;
 use hermes_error::HermesError;

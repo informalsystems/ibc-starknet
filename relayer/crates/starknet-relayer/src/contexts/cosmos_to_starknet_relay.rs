@@ -21,7 +21,7 @@ use hermes_core::relayer_components::relay::traits::{
     HasRelayClientIds, HasSourceTargetChainTypes, HasTargetClientIds, IbcMessageSenderComponent,
     MainSink, SourceTarget,
 };
-use hermes_cosmos_relayer::contexts::CosmosChain;
+use hermes_cosmos_core::relayer::contexts::CosmosChain;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;

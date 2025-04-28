@@ -10,8 +10,8 @@ use hermes_core::relayer_components::multi::traits::relay_at::RelayTypeProviderA
 use hermes_core::test_components::relay_driver::run::{
     RelayerBackgroundRunner, RelayerBackgroundRunnerComponent,
 };
-use hermes_cosmos_integration_tests::contexts::AbortOnDrop;
-use hermes_cosmos_relayer::contexts::CosmosChain;
+use hermes_cosmos_core::integration_tests::contexts::AbortOnDrop;
+use hermes_cosmos_core::relayer::contexts::CosmosChain;
 use hermes_error::handlers::DebugError;
 use hermes_error::impls::UseHermesError;
 use hermes_error::Error;

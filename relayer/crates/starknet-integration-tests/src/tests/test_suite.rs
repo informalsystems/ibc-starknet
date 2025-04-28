@@ -1,6 +1,6 @@
 use cgp::core::field::Index;
 use hermes_core::test_components::test_case::traits::test_case::TestCase;
-use hermes_cosmos_integration_tests::init::init_test_runtime;
+use hermes_cosmos_core::integration_tests::init::init_test_runtime;
 use hermes_error::types::Error;
 use hermes_ibc_test_suite::tests::clearing::TestPacketClearing;
 use hermes_ibc_test_suite::tests::transfer::TestIbcTransfer;

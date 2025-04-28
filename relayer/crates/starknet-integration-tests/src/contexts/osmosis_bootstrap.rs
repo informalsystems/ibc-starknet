@@ -9,22 +9,22 @@ use hermes_core::runtime_components::traits::{
 use hermes_core::test_components::bootstrap::traits::ChainBootstrapperComponent;
 use hermes_core::test_components::chain_driver::traits::ChainTypeProviderComponent;
 use hermes_core::test_components::driver::traits::ChainDriverTypeProviderComponent;
-use hermes_cosmos_chain_components::types::DynamicGasConfig;
-use hermes_cosmos_integration_tests::contexts::CosmosChainDriver;
-use hermes_cosmos_integration_tests::impls::{
+use hermes_cosmos_core::chain_components::types::DynamicGasConfig;
+use hermes_cosmos_core::integration_tests::contexts::CosmosChainDriver;
+use hermes_cosmos_core::integration_tests::impls::{
     BuildCosmosChainDriver, BuildCosmosChainWithNodeConfig, BuildRelayerChainConfig,
 };
-use hermes_cosmos_integration_tests::traits::{
+use hermes_cosmos_core::integration_tests::traits::{
     ChainBuilderWithNodeConfigComponent, CompatModeGetterComponent, CosmosBuilderGetterComponent,
     RelayerChainConfigBuilderComponent, UseCompatMode37,
 };
-use hermes_cosmos_relayer::contexts::{CosmosBuilder, CosmosChain};
-use hermes_cosmos_test_components::bootstrap::components::LegacyCosmosSdkBootstrapComponents;
-use hermes_cosmos_test_components::bootstrap::impls::{
+use hermes_cosmos_core::relayer::contexts::{CosmosBuilder, CosmosChain};
+use hermes_cosmos_core::test_components::bootstrap::components::LegacyCosmosSdkBootstrapComponents;
+use hermes_cosmos_core::test_components::bootstrap::impls::{
     BuildAndWaitChainDriver, GenerateStandardWalletConfig, NoModifyCometConfig,
     NoModifyCosmosSdkConfig, NoModifyGenesisConfig,
 };
-use hermes_cosmos_test_components::bootstrap::traits::{
+use hermes_cosmos_core::test_components::bootstrap::traits::{
     AccountPrefixGetterComponent, ChainCommandPathGetterComponent, ChainDriverBuilderComponent,
     ChainStoreDirGetterComponent, CometConfigModifierComponent,
     CosmosGenesisConfigModifierComponent, CosmosSdkConfigModifierComponent, DenomForStaking,

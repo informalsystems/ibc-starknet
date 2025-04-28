@@ -2,7 +2,7 @@ use cgp::prelude::*;
 use hermes_core::chain_components::traits::{
     ChainStatusQuerier, ChainStatusQuerierComponent, HasChainStatusType,
 };
-use hermes_cosmos_chain_components::types::Time;
+use hermes_cosmos_core::chain_components::types::Time;
 use hermes_starknet_chain_components::traits::client::HasStarknetClient;
 use hermes_starknet_chain_components::types::status::StarknetChainStatus;
 use starknet_v13::core::types::{BlockId, BlockTag, MaybePendingBlockWithTxHashes};

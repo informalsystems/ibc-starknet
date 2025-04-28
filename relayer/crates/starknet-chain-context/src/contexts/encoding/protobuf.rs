@@ -14,7 +14,7 @@ use hermes_starknet_chain_components::types::client_state::{
 use hermes_starknet_chain_components::types::consensus_state::{
     StarknetConsensusState, WasmStarknetConsensusState,
 };
-use hermes_wasm_encoding_components::types::{WasmClientState, WasmConsensusState};
+use hermes_cosmos_core::wasm_encoding_components::types::{WasmClientState, WasmConsensusState};
 use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::commitment_types::commitment::CommitmentRoot;
 use ibc::primitives::Timestamp;

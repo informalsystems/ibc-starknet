@@ -13,7 +13,7 @@ use hermes_core::relayer_components::multi::traits::relay_at::{
 use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_cosmos_relayer::contexts::CosmosChain;
+use hermes_cosmos_core::relayer::contexts::CosmosChain;
 use hermes_error::impls::UseHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;

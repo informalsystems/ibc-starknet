@@ -16,9 +16,9 @@ use hermes_core::runtime_components::traits::CanSleep;
 use hermes_core::test_components::chain::traits::{
     CanAssertEventualAmount, CanBuildIbcTokenTransferMessages, CanIbcTransferToken, CanQueryBalance,
 };
-use hermes_cosmos_integration_tests::init::init_test_runtime;
-use hermes_cosmos_relayer::contexts::CosmosChain;
-use hermes_cosmos_test_components::chain::types::Amount;
+use hermes_cosmos_core::integration_tests::init::init_test_runtime;
+use hermes_cosmos_core::relayer::contexts::CosmosChain;
+use hermes_cosmos_core::test_components::chain::types::Amount;
 use hermes_error::types::Error;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::queries::token_address::CanQueryCosmosTokenAddressOnStarknet;
