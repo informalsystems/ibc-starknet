@@ -7,18 +7,12 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::decode_mut::CanPeekDecodeBuffer;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
-use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetterComponent,
-    EncodingTypeProviderComponent, HasEncodingType,
+use hermes_encoding_components::impls::GetDefaultEncoding;
+use hermes_encoding_components::traits::{
+    CanDecode, CanEncode, CanEncodeAndDecode, CanPeekDecodeBuffer, DefaultEncodingGetter,
+    DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeProviderComponent,
+    HasDecodeBufferType, HasEncodeBufferType, HasEncodedType, HasEncodingType,
 };
-use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
-use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use hermes_error::impls::UseHermesError;
 use hermes_error::types::HermesError;
 use hermes_starknet_chain_components::components::encoding::cairo::*;

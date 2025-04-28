@@ -2,9 +2,9 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::Index;
 use cgp::extra::run::CanRun;
 use cgp::prelude::*;
-use hermes_cosmos_integration_tests::contexts::relay_driver::AbortOnDrop;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::handlers::debug::DebugError;
+use hermes_cosmos_integration_tests::contexts::AbortOnDrop;
+use hermes_cosmos_relayer::contexts::CosmosChain;
+use hermes_error::handlers::DebugError;
 use hermes_error::impls::UseHermesError;
 use hermes_error::Error;
 use hermes_relayer_components::multi::traits::birelay_at::{

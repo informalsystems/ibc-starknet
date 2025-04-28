@@ -1,7 +1,5 @@
 use cgp::prelude::*;
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
+use hermes_encoding_components::traits::{CanEncodeMut, MutEncoder, MutEncoderComponent};
 use starknet::core::types::Felt;
 
 pub struct EncodeFromFelt;

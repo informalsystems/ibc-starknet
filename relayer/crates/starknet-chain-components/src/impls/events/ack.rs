@@ -5,19 +5,12 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_chain_components::traits::extract_data::{EventExtractor, EventExtractorComponent};
-use hermes_chain_components::traits::packet::from_write_ack::{
-    PacketFromWriteAckEventBuilder, PacketFromWriteAckEventBuilderComponent,
+use hermes_chain_components::traits::{
+    EventExtractor, EventExtractorComponent, HasAcknowledgementType, HasEventType,
+    HasOutgoingPacketType, HasWriteAckEvent, PacketFromWriteAckEventBuilder,
+    PacketFromWriteAckEventBuilderComponent, ProvideWriteAckEvent, WriteAckEventComponent,
 };
-use hermes_chain_components::traits::types::event::HasEventType;
-use hermes_chain_components::traits::types::ibc_events::write_ack::{
-    HasWriteAckEvent, ProvideWriteAckEvent, WriteAckEventComponent,
-};
-use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
-use hermes_chain_components::traits::types::packets::ack::HasAcknowledgementType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_encoding_components::traits::{CanDecode, HasEncodedType, HasEncoding};
 use ibc::apps::transfer::types::{Amount, BaseDenom, Memo, PrefixedDenom, TracePath};
 use ibc::core::channel::types::packet::Packet as IbcPacket;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};

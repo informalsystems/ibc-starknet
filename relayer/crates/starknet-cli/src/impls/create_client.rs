@@ -2,12 +2,10 @@ use core::time::Duration;
 
 use cgp::core::field::Index;
 use cgp::prelude::*;
-use hermes_cli::commands::client::create::CreateCosmosClientArgs;
-use hermes_cli_components::impls::commands::client::create::{
-    CreateClientOptionsParser, CreateClientOptionsParserComponent,
-};
-use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
+use hermes_cli::commands::CreateCosmosClientArgs;
+use hermes_cli_components::impls::{CreateClientOptionsParser, CreateClientOptionsParserComponent};
+use hermes_cosmos_chain_components::types::CosmosCreateClientOptions;
+use hermes_cosmos_relayer::contexts::CosmosChain;
 use hermes_error::HermesError;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;

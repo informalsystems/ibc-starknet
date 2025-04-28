@@ -1,8 +1,7 @@
 use cgp::core::field::Index;
 use cgp::prelude::*;
-use hermes_cli_components::impls::commands::start::{RunStartRelayerCommand, StartRelayerArgs};
-use hermes_cli_components::traits::command::{CommandRunner, CommandRunnerComponent};
-use hermes_cli_components::traits::output::HasOutputType;
+use hermes_cli_components::impls::{RunStartRelayerCommand, StartRelayerArgs};
+use hermes_cli_components::traits::{CommandRunner, CommandRunnerComponent, HasOutputType};
 
 #[derive(Debug, clap::Subcommand)]
 pub enum StartSubCommand {

@@ -15,6 +15,8 @@ workspace = true
 [dependencies]
 cgp                               = { workspace = true }
 ibc                               = { workspace = true }
+hermes-prelude                    = { workspace = true }
+hermes-core                       = { workspace = true }
 hermes-error                      = { workspace = true }
 hermes-runtime                    = { workspace = true }
 hermes-runtime-components         = { workspace = true }

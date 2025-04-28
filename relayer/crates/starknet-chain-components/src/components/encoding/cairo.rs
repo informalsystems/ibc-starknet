@@ -14,21 +14,12 @@ mod preset {
     use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
     use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
     use hermes_cairo_encoding_components::strategy::ViaCairo;
-    use hermes_encoding_components::impls::fields::EncodeFields;
-    use hermes_encoding_components::impls::tagged::EncodeTaggedField;
-    use hermes_encoding_components::traits::decode::DecoderComponent;
-    use hermes_encoding_components::traits::decode_mut::{
-        DecodeBufferPeekerComponent, MutDecoderComponent,
+    use hermes_encoding_components::impls::{EncodeFields, EncodeTaggedField};
+    use hermes_encoding_components::traits::{
+        DecodeBufferBuilderComponent, DecodeBufferPeekerComponent, DecodeBufferTypeComponent,
+        DecoderComponent, EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
+        EncodedTypeComponent, EncoderComponent, MutDecoderComponent, MutEncoderComponent,
     };
-    use hermes_encoding_components::traits::encode::EncoderComponent;
-    use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
-    use hermes_encoding_components::traits::types::decode_buffer::{
-        DecodeBufferBuilderComponent, DecodeBufferTypeComponent,
-    };
-    use hermes_encoding_components::traits::types::encode_buffer::{
-        EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
-    };
-    use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent;
     use ibc::clients::tendermint::types::{Header as TendermintLcHeader, TrustThreshold};
     use ibc::core::commitment_types::specs::ProofSpecs;
     use ibc::core::host::types::identifiers::ChainId;

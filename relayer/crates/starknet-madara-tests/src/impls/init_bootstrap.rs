@@ -3,7 +3,7 @@ use std::time::SystemTime;
 
 use hermes_error::Error;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
+use hermes_runtime_components::traits::CanReadFileAsString;
 use starknet_v13::core::types::contract::SierraClass;
 
 use crate::contexts::{MadaraBootstrap, MadaraBootstrapFields};

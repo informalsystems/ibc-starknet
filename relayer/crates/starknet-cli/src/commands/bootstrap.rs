@@ -1,7 +1,5 @@
 use cgp::prelude::*;
-use hermes_cli_components::traits::command::{
-    CanRunCommand, CommandRunner, CommandRunnerComponent,
-};
+use hermes_cli_components::traits::{CanRunCommand, CommandRunner, CommandRunnerComponent};
 
 use crate::impls::bootstrap::osmosis_chain::BootstrapOsmosisChainArgs;
 use crate::impls::bootstrap::starknet_chain::BootstrapStarknetChainArgs;

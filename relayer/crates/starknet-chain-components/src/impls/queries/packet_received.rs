@@ -3,19 +3,11 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::queries::packet_is_received::{
-    PacketIsReceivedQuerier, PacketIsReceivedQuerierComponent,
+use hermes_chain_components::traits::{
+    HasChannelIdType, HasCommitmentProofType, HasHeightType, HasPacketCommitmentType,
+    HasPortIdType, HasSequenceType, PacketIsReceivedQuerier, PacketIsReceivedQuerierComponent,
 };
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::ibc::{
-    HasChannelIdType, HasPortIdType, HasSequenceType,
-};
-use hermes_chain_components::traits::types::packets::receive::HasPacketCommitmentType;
-use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence as IbcSequence};
 use starknet::core::types::Felt;
 use starknet::macros::selector;

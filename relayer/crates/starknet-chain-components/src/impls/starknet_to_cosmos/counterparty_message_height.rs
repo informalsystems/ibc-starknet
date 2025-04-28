@@ -1,9 +1,9 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::types::ibc::CounterpartyMessageHeightGetterComponent;
-use hermes_cosmos_chain_components::traits::message::CosmosMessage;
-use hermes_relayer_components::chain::traits::types::height::HasHeightType;
-use hermes_relayer_components::chain::traits::types::ibc::CounterpartyMessageHeightGetter;
-use hermes_relayer_components::chain::traits::types::message::HasMessageType;
+use hermes_chain_components::traits::CounterpartyMessageHeightGetterComponent;
+use hermes_core::chain_components::traits::{
+    CounterpartyMessageHeightGetter, HasHeightType, HasMessageType,
+};
+use hermes_cosmos_chain_components::traits::CosmosMessage;
 
 pub struct GetCosmosCounterpartyMessageStarknetHeight;
 

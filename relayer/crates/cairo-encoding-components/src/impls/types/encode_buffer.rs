@@ -1,9 +1,8 @@
 use cgp::prelude::*;
-use hermes_encoding_components::traits::types::encode_buffer::{
+use hermes_encoding_components::traits::{
     EncodeBufferFinalizer, EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
-    HasEncodeBufferType, ProvideEncodeBufferType,
+    HasEncodeBufferType, HasEncodedType, ProvideEncodeBufferType,
 };
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
 use starknet::core::types::Felt;
 
 pub struct ProvideVecEncodeBuffer;

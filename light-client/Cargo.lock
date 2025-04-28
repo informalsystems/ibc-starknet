@@ -1024,10 +1024,11 @@ checksum = "bf151400ff0baff5465007dd2f3e717f3fe502074ca563069ce3a6629d07b289"
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#cc0d85a5285e81c2a4516342454ce9c1c3f3a4c4"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
+ "hermes-prelude",
  "hermes-protobuf-encoding-components",
  "ibc",
  "ibc-proto",
@@ -1038,18 +1039,29 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#cc0d85a5285e81c2a4516342454ce9c1c3f3a4c4"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
 dependencies = [
  "cgp",
+ "hermes-prelude",
+]
+
+[[package]]
+name = "hermes-prelude"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
+dependencies = [
+ "cgp",
+ "cgp-async",
 ]
 
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#cc0d85a5285e81c2a4516342454ce9c1c3f3a4c4"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
+ "hermes-prelude",
  "prost",
  "prost-types",
 ]
@@ -2382,3 +2394,43 @@ dependencies = [
  "quote",
  "syn 2.0.98",
 ]
+
+[[patch.unused]]
+name = "hermes-chain-components"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
+
+[[patch.unused]]
+name = "hermes-chain-type-components"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
+
+[[patch.unused]]
+name = "hermes-core"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
+
+[[patch.unused]]
+name = "hermes-logging-components"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
+
+[[patch.unused]]
+name = "hermes-relayer-components"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
+
+[[patch.unused]]
+name = "hermes-relayer-components-extra"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
+
+[[patch.unused]]
+name = "hermes-runtime-components"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"
+
+[[patch.unused]]
+name = "hermes-test-components"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#459ce5ff0b4976c61a7dcdcfbdfeb4458dd04968"

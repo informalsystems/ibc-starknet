@@ -4,29 +4,18 @@ use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField;
-use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
-use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
-use hermes_cli_components::traits::bootstrap::{
-    BootstrapLoaderComponent, BootstrapTypeProviderComponent, CanLoadBootstrap,
+use hermes_cli_components::impls::{GetDefaultConfigField, LoadTomlConfig, WriteTomlConfig};
+use hermes_cli_components::traits::{
+    BootstrapLoaderComponent, BootstrapTypeProviderComponent, BuilderLoaderComponent,
+    BuilderTypeComponent, CanLoadBootstrap, CanLoadBuilder, CanLoadConfig, CanProduceOutput,
+    CanWriteConfig, CommandRunnerComponent, ConfigLoaderComponent, ConfigPathGetterComponent,
+    ConfigTypeComponent, ConfigWriterComponent, HasConfigPath, HasConfigType, OutputProducer,
+    OutputProducerComponent, OutputTypeComponent,
 };
-use hermes_cli_components::traits::build::{
-    BuilderLoaderComponent, BuilderTypeComponent, CanLoadBuilder,
-};
-use hermes_cli_components::traits::command::CommandRunnerComponent;
-use hermes_cli_components::traits::config::config_path::{
-    ConfigPathGetterComponent, HasConfigPath,
-};
-use hermes_cli_components::traits::config::load_config::{CanLoadConfig, ConfigLoaderComponent};
-use hermes_cli_components::traits::config::write_config::{CanWriteConfig, ConfigWriterComponent};
-use hermes_cli_components::traits::output::{
-    CanProduceOutput, OutputProducer, OutputProducerComponent, OutputTypeComponent,
-};
-use hermes_cli_components::traits::types::config::{ConfigTypeComponent, HasConfigType};
-use hermes_logging_components::traits::logger::LoggerComponent;
+use hermes_logging_components::traits::LoggerComponent;
 use hermes_relayer_components::error::traits::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::{
+use hermes_runtime_components::traits::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_starknet_chain_components::impls::types::config::StarknetRelayerConfig;
@@ -37,7 +26,7 @@ use hermes_starknet_cli::impls::build::LoadStarknetBuilder;
 use hermes_starknet_cli::impls::error::ProvideCliError;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
-use hermes_tracing_logging_components::contexts::logger::TracingLogger;
+use hermes_tracing_logging_components::contexts::TracingLogger;
 
 use crate::commands::starknet::subcommand::{RunStarknetSubCommand, StarknetSubCommand};
 use crate::commands::starknet::transfer_args::{RunTransferArgs, TransferArgs};

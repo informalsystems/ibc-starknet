@@ -1,7 +1,7 @@
 use cgp::prelude::*;
-use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
-use hermes_test_components::chain::traits::types::address::HasAddressType;
-use hermes_test_components::chain::traits::types::wallet::{
+use hermes_chain_type_components::traits::HasAddressType;
+use hermes_relayer_components::transaction::traits::HasSignerType;
+use hermes_test_components::chain::traits::{
     HasWalletType, ProvideWalletType, WalletSignerComponent, WalletSignerProvider,
     WalletTypeComponent,
 };

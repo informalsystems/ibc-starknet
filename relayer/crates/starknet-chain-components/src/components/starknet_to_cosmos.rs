@@ -2,48 +2,33 @@
 mod preset {
     use cgp::core::types::WithType;
     use cgp::prelude::*;
-    use hermes_chain_components::traits::message_builders::ack_packet::AckPacketMessageBuilderComponent;
-    use hermes_chain_components::traits::message_builders::channel_handshake::{
-        ChannelOpenAckMessageBuilderComponent, ChannelOpenConfirmMessageBuilderComponent,
-        ChannelOpenInitMessageBuilderComponent, ChannelOpenTryMessageBuilderComponent,
+    use hermes_chain_components::traits::{
+        AckPacketMessageBuilderComponent, ChannelOpenAckMessageBuilderComponent,
+        ChannelOpenConfirmMessageBuilderComponent, ChannelOpenInitMessageBuilderComponent,
+        ChannelOpenTryMessageBuilderComponent, ClientStateFieldsComponent,
+        ClientStateTypeComponent, ConnectionOpenAckMessageBuilderComponent,
+        ConnectionOpenConfirmMessageBuilderComponent, ConnectionOpenInitMessageBuilderComponent,
+        ConnectionOpenTryMessageBuilderComponent, ConsensusStateHeightsQuerierComponent,
+        ConsensusStateTypeComponent, CounterpartyMessageHeightGetterComponent,
+        CreateClientMessageBuilderComponent, CreateClientMessageOptionsTypeComponent,
+        CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent,
+        CreateClientPayloadTypeComponent, PacketDstChannelIdGetterComponent,
+        PacketDstPortIdGetterComponent, PacketSequenceGetterComponent,
+        PacketSrcChannelIdGetterComponent, PacketSrcPortIdGetterComponent,
+        PacketTimeoutHeightGetterComponent, PacketTimeoutTimestampGetterComponent,
+        ReceivePacketMessageBuilderComponent, TimeoutUnorderedPacketMessageBuilderComponent,
+        UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
+        UpdateClientPayloadTypeComponent,
     };
-    use hermes_chain_components::traits::message_builders::connection_handshake::{
-        ConnectionOpenAckMessageBuilderComponent, ConnectionOpenConfirmMessageBuilderComponent,
-        ConnectionOpenInitMessageBuilderComponent, ConnectionOpenTryMessageBuilderComponent,
-    };
-    use hermes_chain_components::traits::message_builders::create_client::CreateClientMessageBuilderComponent;
-    use hermes_chain_components::traits::message_builders::receive_packet::ReceivePacketMessageBuilderComponent;
-    use hermes_chain_components::traits::message_builders::timeout_unordered_packet::TimeoutUnorderedPacketMessageBuilderComponent;
-    use hermes_chain_components::traits::message_builders::update_client::UpdateClientMessageBuilderComponent;
-    use hermes_chain_components::traits::packet::fields::{
-        PacketDstChannelIdGetterComponent, PacketDstPortIdGetterComponent,
-        PacketSequenceGetterComponent, PacketSrcChannelIdGetterComponent,
-        PacketSrcPortIdGetterComponent, PacketTimeoutHeightGetterComponent,
-        PacketTimeoutTimestampGetterComponent,
-    };
-    use hermes_chain_components::traits::payload_builders::create_client::CreateClientPayloadBuilderComponent;
-    use hermes_chain_components::traits::payload_builders::update_client::UpdateClientPayloadBuilderComponent;
-    use hermes_chain_components::traits::queries::consensus_state_height::ConsensusStateHeightsQuerierComponent;
-    use hermes_chain_components::traits::types::client_state::{
-        ClientStateFieldsComponent, ClientStateTypeComponent,
-    };
-    use hermes_chain_components::traits::types::consensus_state::ConsensusStateTypeComponent;
-    use hermes_chain_components::traits::types::create_client::{
-        CreateClientMessageOptionsTypeComponent, CreateClientPayloadOptionsTypeComponent,
-        CreateClientPayloadTypeComponent,
-    };
-    use hermes_chain_components::traits::types::ibc::CounterpartyMessageHeightGetterComponent;
-    use hermes_chain_components::traits::types::update_client::UpdateClientPayloadTypeComponent;
-    use hermes_cosmos_chain_components::impls::packet::packet_fields::CosmosPacketFieldReader;
-    use hermes_cosmos_chain_components::impls::packet::packet_message::BuildCosmosPacketMessages;
-    use hermes_cosmos_chain_preset::presets::CosmosToCosmosComponents;
-    use hermes_relayer_components::chain::traits::queries::client_state::{
+    use hermes_core::chain_components::traits::{
         ClientStateQuerierComponent, ClientStateWithProofsQuerierComponent,
-    };
-    use hermes_relayer_components::chain::traits::queries::consensus_state::{
         ConsensusStateQuerierComponent, ConsensusStateWithProofsQuerierComponent,
     };
-    use hermes_test_components::chain::traits::transfer::amount::IbcTransferredAmountConverterComponent;
+    use hermes_cosmos_chain_components::impls::{
+        BuildCosmosPacketMessages, CosmosPacketFieldReader,
+    };
+    use hermes_cosmos_chain_preset::presets::CosmosToCosmosComponents;
+    use hermes_test_components::chain::traits::IbcTransferredAmountConverterComponent;
 
     use crate::impls::starknet_to_cosmos::connection_message::BuildStarknetToCosmosConnectionHandshake;
     use crate::impls::starknet_to_cosmos::counterparty_message_height::GetCosmosCounterpartyMessageStarknetHeight;

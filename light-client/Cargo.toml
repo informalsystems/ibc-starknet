@@ -95,6 +95,15 @@ cgp-runtime     = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git" }
 
-hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
-hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-core                         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-prelude                      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-chain-components             = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-relayer-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-relayer-components-extra     = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-chain-type-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-logging-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-runtime-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-test-components              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }

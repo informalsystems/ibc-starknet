@@ -1,8 +1,8 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::queries::block::{BlockQuerier, BlockQuerierComponent};
-use hermes_chain_components::traits::types::block::HasBlockType;
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_cosmos_chain_components::types::status::Time;
+use hermes_chain_components::traits::{
+    BlockQuerier, BlockQuerierComponent, HasBlockType, HasHeightType,
+};
+use hermes_cosmos_chain_components::types::Time;
 use starknet::core::types::{BlockId, MaybePendingBlockWithTxHashes};
 use starknet::providers::{Provider, ProviderError};
 

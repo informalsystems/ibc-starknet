@@ -1,7 +1,5 @@
 use cgp::prelude::*;
-use hermes_chain_type_components::traits::types::denom::DenomTypeComponent;
-use hermes_test_components::chain::traits::types::address::HasAddressType;
-use hermes_test_components::chain::traits::types::denom::ProvideDenomType;
+use hermes_chain_type_components::traits::{DenomTypeComponent, HasAddressType, ProvideDenomType};
 
 pub struct ProvideTokenAddressDenom;
 

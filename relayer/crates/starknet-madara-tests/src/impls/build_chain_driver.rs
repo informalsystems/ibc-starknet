@@ -5,24 +5,20 @@ use std::sync::OnceLock;
 use cgp::extra::runtime::HasRuntime;
 use cgp::prelude::*;
 use futures::lock::Mutex;
-use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
-use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
-    ChainDriverBuilder, ChainDriverBuilderComponent,
+use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_test_components::bootstrap::traits::{
+    ChainDriverBuilder, ChainDriverBuilderComponent, HasChainGenesisConfigType,
+    HasChainNodeConfigType, HasChainStoreDir,
 };
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::HasChainStoreDir;
-use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
-use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
 use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::fs::create_dir::CanCreateDir;
-use hermes_runtime_components::traits::fs::write_file::CanWriteStringToFile;
-use hermes_runtime_components::traits::sleep::CanSleep;
+use hermes_runtime_components::traits::{CanCreateDir, CanSleep, CanWriteStringToFile};
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
-use hermes_test_components::chain::traits::types::wallet::HasWalletType;
-use hermes_test_components::chain_driver::traits::types::chain::HasChainType;
-use hermes_test_components::driver::traits::types::chain_driver::HasChainDriverType;
+use hermes_test_components::chain::traits::HasWalletType;
+use hermes_test_components::chain_driver::traits::HasChainType;
+use hermes_test_components::driver::traits::HasChainDriverType;
 use ibc::core::host::types::error::IdentifierError;
 use reqwest::Client;
 use starknet_v13::providers::jsonrpc::HttpTransport;

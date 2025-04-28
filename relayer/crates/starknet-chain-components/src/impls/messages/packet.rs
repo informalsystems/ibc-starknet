@@ -3,32 +3,19 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::message_builders::ack_packet::{
-    AckPacketMessageBuilder, AckPacketMessageBuilderComponent,
-};
-use hermes_chain_components::traits::message_builders::receive_packet::{
+use hermes_chain_components::traits::{
+    AckPacketMessageBuilder, AckPacketMessageBuilderComponent, HasAckPacketPayloadType,
+    HasAcknowledgementType, HasCommitmentProofType, HasHeightType, HasMessageType,
+    HasOutgoingPacketType, HasReceivePacketPayloadType, HasTimeoutUnorderedPacketPayloadType,
     ReceivePacketMessageBuilder, ReceivePacketMessageBuilderComponent,
-};
-use hermes_chain_components::traits::message_builders::timeout_unordered_packet::{
     TimeoutUnorderedPacketMessageBuilder, TimeoutUnorderedPacketMessageBuilderComponent,
 };
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::message::HasMessageType;
-use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
-use hermes_chain_components::traits::types::packets::ack::{
-    HasAckPacketPayloadType, HasAcknowledgementType,
-};
-use hermes_chain_components::traits::types::packets::receive::HasReceivePacketPayloadType;
-use hermes_chain_components::traits::types::packets::timeout::HasTimeoutUnorderedPacketPayloadType;
-use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
 use hermes_chain_components::types::payloads::packet::{
     AckPacketPayload, ReceivePacketPayload, TimeoutUnorderedPacketPayload,
 };
-use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::types::commitment_proof::CosmosCommitmentProof;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_chain_type_components::traits::HasAddressType;
+use hermes_cosmos_chain_components::types::CosmosCommitmentProof;
+use hermes_encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
 use ibc::apps::transfer::types::packet::PacketData as IbcIcs20PacketData;
 use ibc::core::channel::types::packet::Packet as IbcPacket;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};

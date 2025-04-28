@@ -1,9 +1,9 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::queries::consensus_state_height::ConsensusStateHeightsQuerierComponent;
-use hermes_cosmos_chain_components::traits::grpc_address::HasGrpcAddress;
-use hermes_relayer_components::chain::traits::queries::consensus_state_height::ConsensusStateHeightsQuerier;
-use hermes_relayer_components::chain::traits::types::height::HasHeightType;
-use hermes_relayer_components::chain::traits::types::ibc::HasIbcChainTypes;
+use hermes_chain_components::traits::ConsensusStateHeightsQuerierComponent;
+use hermes_core::chain_components::traits::{
+    ConsensusStateHeightsQuerier, HasHeightType, HasIbcChainTypes,
+};
+use hermes_cosmos_chain_components::traits::HasGrpcAddress;
 use http::uri::InvalidUri;
 use http::Uri;
 use ibc::core::host::types::identifiers::ClientId;

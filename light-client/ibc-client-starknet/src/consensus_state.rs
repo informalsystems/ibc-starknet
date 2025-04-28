@@ -1,4 +1,4 @@
-use hermes_encoding_components::traits::convert::CanConvert;
+use hermes_encoding_components::traits::CanConvert;
 use ibc_client_starknet_types::StarknetConsensusState as ConsensusStateType;
 use ibc_core::client::context::consensus_state::ConsensusState as ConsensusStateTrait;
 use ibc_core::client::types::error::ClientError;

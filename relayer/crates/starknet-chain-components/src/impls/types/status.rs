@@ -1,9 +1,8 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::types::status::ChainStatusTypeComponent;
-use hermes_chain_type_components::traits::types::time::HasTimeType;
-use hermes_cosmos_chain_components::types::status::Time;
-use hermes_relayer_components::chain::traits::types::height::HasHeightType;
-use hermes_relayer_components::chain::traits::types::status::ProvideChainStatusType;
+use hermes_chain_components::traits::ChainStatusTypeComponent;
+use hermes_chain_type_components::traits::HasTimeType;
+use hermes_core::chain_components::traits::{HasHeightType, ProvideChainStatusType};
+use hermes_cosmos_chain_components::types::Time;
 
 use crate::types::status::StarknetChainStatus;
 

@@ -1,13 +1,10 @@
 use core::marker::PhantomData;
 
 use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, CanPeekDecodeBuffer, MutDecoder, MutDecoderComponent,
+use hermes_encoding_components::traits::{
+    CanDecodeMut, CanEncodeMut, CanPeekDecodeBuffer, HasEncodeBufferType, MutDecoder,
+    MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
-use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
 use starknet::core::types::Felt;
 
 use crate::impls::encode_mut::felt::UnexpectedEndOfBuffer;

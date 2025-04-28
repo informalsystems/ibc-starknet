@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_chain_type_components::traits::types::denom::HasDenomType;
+use hermes_chain_type_components::traits::HasDenomType;
 
 use crate::types::messages::ibc::denom::PrefixedDenom;
 

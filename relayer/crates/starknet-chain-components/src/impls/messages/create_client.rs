@@ -3,18 +3,13 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::message_builders::create_client::{
+use hermes_chain_components::traits::{
     CreateClientMessageBuilder, CreateClientMessageBuilderComponent,
+    HasCreateClientMessageOptionsType, HasCreateClientPayloadType, HasMessageType,
 };
-use hermes_chain_components::traits::types::create_client::{
-    HasCreateClientMessageOptionsType, HasCreateClientPayloadType,
-};
-use hermes_chain_components::traits::types::message::HasMessageType;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientPayload;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_chain_type_components::traits::HasAddressType;
+use hermes_cosmos_chain_components::types::CosmosCreateClientPayload;
+use hermes_encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 

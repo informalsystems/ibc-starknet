@@ -1,10 +1,10 @@
 use core::fmt::Display;
 
 use cgp::prelude::*;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_chain_components::traits::CanQueryChainHeight;
+use hermes_chain_type_components::traits::HasAddressType;
 use hermes_error::Error;
-use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
+use hermes_runtime_components::traits::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::commitment_proof::CanVerifyStarknetStorageProof;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
@@ -18,7 +18,7 @@ use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use hermes_starknet_chain_components::traits::types::storage_proof::{
     HasStorageKeyType, HasStorageProofType,
 };
-use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
+use hermes_test_components::bootstrap::traits::CanBootstrapChain;
 use starknet::core::types::{Felt, StorageProof};
 use starknet::macros::{felt, selector};
 use tracing::info;

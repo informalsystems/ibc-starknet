@@ -1,9 +1,7 @@
 use core::ops::Deref;
 
 use cgp::prelude::*;
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
+use hermes_encoding_components::traits::{CanEncodeMut, MutEncoder, MutEncoderComponent};
 
 pub struct EncodeDeref;
 

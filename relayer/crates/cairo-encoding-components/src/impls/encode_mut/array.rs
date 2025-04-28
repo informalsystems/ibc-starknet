@@ -1,11 +1,8 @@
 use core::fmt::Debug;
 
 use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
-};
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
+use hermes_encoding_components::traits::{
+    CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
 
 pub struct EncodeArray;

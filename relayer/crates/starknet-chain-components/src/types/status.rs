@@ -1,6 +1,6 @@
 use core::fmt::{Display, Formatter, Result};
 
-use hermes_cosmos_chain_components::types::status::Time;
+use hermes_cosmos_chain_components::types::Time;
 use serde::Serialize;
 use starknet::core::types::Felt;
 

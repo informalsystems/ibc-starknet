@@ -6,8 +6,7 @@ use cairo_lang_starknet_classes::casm_contract_class::{
 use cairo_lang_starknet_classes::contract_class::ContractClass;
 use cgp::core::error::CanRaiseAsyncError;
 use cgp::prelude::*;
-use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
-use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
+use hermes_relayer_components::transaction::traits::{CanPollTxResponse, HasDefaultSigner};
 use starknet::accounts::Account;
 use starknet::core::types::contract::{
     CompiledClass, ComputeClassHashError, JsonError, SierraClass,

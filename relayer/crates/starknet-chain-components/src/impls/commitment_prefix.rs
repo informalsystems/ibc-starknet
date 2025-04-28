@@ -1,7 +1,7 @@
 use std::sync::LazyLock;
 
 use cgp::prelude::*;
-use hermes_chain_components::traits::commitment_prefix::{
+use hermes_chain_components::traits::{
     HasCommitmentPrefixType, IbcCommitmentPrefixGetter, IbcCommitmentPrefixGetterComponent,
 };
 

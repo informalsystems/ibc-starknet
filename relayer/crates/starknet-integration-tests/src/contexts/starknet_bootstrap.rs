@@ -5,19 +5,15 @@ use std::sync::Arc;
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
-use hermes_cosmos_test_components::bootstrap::impls::chain::build_wait::BuildAndWaitChainDriver;
-use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::ChainDriverBuilderComponent;
-use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::ChainFullNodeStarterComponent;
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::ChainCommandPathGetterComponent;
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::ChainStoreDirGetterComponent;
-use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::ChainNodeConfigTypeComponent;
-use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::ChainGenesisConfigTypeComponent;
-use hermes_error::impls::UseHermesError;
-use hermes_logging_components::traits::logger::LoggerComponent;
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::{
-    RuntimeGetterComponent, RuntimeTypeProviderComponent,
+use hermes_cosmos_test_components::bootstrap::impls::BuildAndWaitChainDriver;
+use hermes_cosmos_test_components::bootstrap::traits::{
+    ChainCommandPathGetterComponent, ChainDriverBuilderComponent, ChainFullNodeStarterComponent,
+    ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent, ChainStoreDirGetterComponent,
 };
+use hermes_error::impls::UseHermesError;
+use hermes_logging_components::traits::LoggerComponent;
+use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_runtime_components::traits::{RuntimeGetterComponent, RuntimeTypeProviderComponent};
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 use hermes_starknet_test_components::impls::bootstrap::bootstrap_chain::BootstrapStarknetDevnet;
@@ -28,10 +24,10 @@ use hermes_starknet_test_components::impls::bootstrap::start_chain::StartStarkne
 use hermes_starknet_test_components::impls::types::genesis_config::ProvideStarknetGenesisConfigType;
 use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetNodeConfigType;
 use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
-use hermes_test_components::bootstrap::traits::chain::ChainBootstrapperComponent;
-use hermes_test_components::chain_driver::traits::types::chain::ChainTypeProviderComponent;
-use hermes_test_components::driver::traits::types::chain_driver::ChainDriverTypeProviderComponent;
-use hermes_tracing_logging_components::contexts::logger::TracingLogger;
+use hermes_test_components::bootstrap::traits::ChainBootstrapperComponent;
+use hermes_test_components::chain_driver::traits::ChainTypeProviderComponent;
+use hermes_test_components::driver::traits::ChainDriverTypeProviderComponent;
+use hermes_tracing_logging_components::contexts::TracingLogger;
 use starknet::core::types::contract::SierraClass;
 
 use crate::contexts::chain_driver::StarknetChainDriver;

@@ -1,10 +1,8 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::types::event::HasEventType;
-use hermes_chain_type_components::traits::fields::message_response_events::{
-    MessageResponseEventsGetter, MessageResponseEventsGetterComponent,
-};
-use hermes_chain_type_components::traits::types::message_response::{
-    HasMessageResponseType, MessageResponseTypeComponent, ProvideMessageResponseType,
+use hermes_chain_components::traits::HasEventType;
+use hermes_chain_type_components::traits::{
+    HasMessageResponseType, MessageResponseEventsGetter, MessageResponseEventsGetterComponent,
+    MessageResponseTypeComponent, ProvideMessageResponseType,
 };
 use starknet::core::types::Felt;
 

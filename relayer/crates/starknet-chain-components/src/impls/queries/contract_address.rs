@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 use std::sync::OnceLock;
 
 use cgp::prelude::*;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_chain_type_components::traits::HasAddressType;
 
 use crate::traits::queries::contract_address::{
     ContractAddressQuerier, ContractAddressQuerierComponent,

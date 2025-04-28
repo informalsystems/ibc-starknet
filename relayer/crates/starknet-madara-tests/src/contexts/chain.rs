@@ -9,27 +9,25 @@ use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_chain_components::traits::queries::block_time::BlockTimeQuerierComponent;
-use hermes_chain_components::traits::queries::chain_status::ChainStatusQuerierComponent;
-use hermes_chain_components::traits::send_message::MessageSenderComponent;
-use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
-use hermes_chain_type_components::traits::fields::chain_id::ChainIdGetterComponent;
-use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
-use hermes_encoding_components::traits::has_encoding::{
+use hermes_chain_components::traits::{
+    BlockTimeQuerierComponent, ChainStatusQuerierComponent, MessageSenderComponent,
+    PollIntervalGetterComponent,
+};
+use hermes_chain_type_components::traits::ChainIdGetterComponent;
+use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
+use hermes_encoding_components::traits::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
     EncodingTypeProviderComponent,
 };
 use hermes_encoding_components::types::AsBytes;
 use hermes_error::impls::UseHermesError;
-use hermes_logging_components::traits::logger::LoggerComponent;
-use hermes_relayer_components::transaction::impls::global_nonce_mutex::GetGlobalNonceMutex;
-use hermes_relayer_components::transaction::traits::default_signer::DefaultSignerGetterComponent;
-use hermes_relayer_components::transaction::traits::nonce::nonce_mutex::NonceAllocationMutexGetterComponent;
-use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::{
-    RuntimeGetterComponent, RuntimeTypeProviderComponent,
+use hermes_logging_components::traits::LoggerComponent;
+use hermes_relayer_components::transaction::impls::GetGlobalNonceMutex;
+use hermes_relayer_components::transaction::traits::{
+    DefaultSignerGetterComponent, NonceAllocationMutexGetterComponent, NonceQuerierComponent,
 };
+use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_runtime_components::traits::{RuntimeGetterComponent, RuntimeTypeProviderComponent};
 use hermes_starknet_chain_components::impls::commitment_proof::{
     VerifyStarknetMerkleProof, VerifyStarknetStorageProof,
 };
@@ -66,7 +64,7 @@ use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
-use hermes_tracing_logging_components::contexts::logger::TracingLogger;
+use hermes_tracing_logging_components::contexts::TracingLogger;
 use ibc::core::host::types::identifiers::ChainId;
 use indexmap::IndexMap;
 use reqwest::Client;

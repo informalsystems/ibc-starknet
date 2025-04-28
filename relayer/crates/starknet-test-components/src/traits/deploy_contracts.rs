@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_test_components::chain_driver::traits::types::chain::HasChainType;
+use hermes_test_components::chain_driver::traits::HasChainType;
 
 #[cgp_component {
     provider: IbcContractsDeployer,

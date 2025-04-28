@@ -1,6 +1,6 @@
 use cgp::core::macros::blanket_trait;
 use cgp::prelude::*;
-use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
+use hermes_relayer_components::transaction::traits::HasSignerType;
 use starknet::accounts::{Account, AccountError, ConnectedAccount};
 
 #[cgp_type {

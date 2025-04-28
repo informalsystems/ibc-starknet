@@ -1,11 +1,11 @@
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::Index;
 use cgp::prelude::*;
-use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::handlers::debug::DebugError;
+use hermes_cosmos_integration_tests::contexts::CosmosChainDriver;
+use hermes_cosmos_relayer::contexts::CosmosChain;
+use hermes_error::handlers::DebugError;
 use hermes_error::impls::UseHermesError;
-use hermes_logging_components::traits::logger::LoggerComponent;
+use hermes_logging_components::traits::LoggerComponent;
 use hermes_relayer_components::multi::traits::birelay_at::{
     BiRelayTypeProviderAtComponent, HasBiRelayTypeAt,
 };
@@ -22,19 +22,15 @@ use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBi
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
-use hermes_test_components::driver::traits::channel_at::ChannelIdGetterAtComponent;
-use hermes_test_components::driver::traits::types::chain_driver_at::{
-    ChainDriverGetterAtComponent, ChainDriverTypeProviderAtComponent, HasChainDriverTypeAt,
+use hermes_test_components::driver::traits::{
+    ChainDriverGetterAtComponent, ChainDriverTypeProviderAtComponent, ChannelIdGetterAtComponent,
+    HasChainDriverTypeAt, RelayDriverGetterAtComponent, RelayDriverTypeProviderAtComponent,
 };
-use hermes_test_components::driver::traits::types::relay_driver_at::{
-    RelayDriverGetterAtComponent, RelayDriverTypeProviderAtComponent,
+use hermes_test_components::setup::traits::{
+    BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent, HasTestDriverType,
+    PortIdGetterAtComponent,
 };
-use hermes_test_components::setup::traits::driver::HasTestDriverType;
-use hermes_test_components::setup::traits::drivers::binary_channel::{
-    BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent,
-};
-use hermes_test_components::setup::traits::port_id_at::PortIdGetterAtComponent;
-use hermes_tracing_logging_components::contexts::logger::TracingLogger;
+use hermes_tracing_logging_components::contexts::TracingLogger;
 use ibc::core::host::types::identifiers::PortId;
 
 use crate::contexts::chain_driver::StarknetChainDriver;

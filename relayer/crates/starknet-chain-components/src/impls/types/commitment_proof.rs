@@ -1,9 +1,8 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::proof::{
+use hermes_chain_components::traits::{
     CommitmentProofBytesGetter, CommitmentProofBytesGetterComponent, CommitmentProofHeightGetter,
     CommitmentProofHeightGetterComponent, CommitmentProofTypeProviderComponent,
-    HasCommitmentProofType,
+    HasCommitmentProofType, HasHeightType,
 };
 
 use crate::types::commitment_proof::StarknetCommitmentProof;

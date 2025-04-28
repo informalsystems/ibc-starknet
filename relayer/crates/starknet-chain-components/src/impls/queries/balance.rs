@@ -1,14 +1,9 @@
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_chain_type_components::traits::types::amount::HasAmountType;
-use hermes_chain_type_components::traits::types::denom::HasDenomType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_test_components::chain::traits::queries::balance::{
-    BalanceQuerier, BalanceQuerierComponent,
-};
+use hermes_chain_type_components::traits::{HasAddressType, HasAmountType, HasDenomType};
+use hermes_encoding_components::traits::{CanDecode, HasEncoding};
+use hermes_test_components::chain::traits::{BalanceQuerier, BalanceQuerierComponent};
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
