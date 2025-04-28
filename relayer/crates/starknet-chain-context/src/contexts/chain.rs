@@ -74,10 +74,10 @@ use hermes_cosmos::chain_components::types::{
     Secp256k1KeyPair, Time,
 };
 use hermes_cosmos::chain_preset::delegate::DelegateCosmosChainComponents;
+use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
-use hermes_error::impls::UseHermesError;
-use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::components::chain::StarknetChainComponents;
 use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;

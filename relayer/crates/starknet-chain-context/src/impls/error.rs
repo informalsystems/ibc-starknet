@@ -22,14 +22,14 @@ use hermes_core::relayer_components::transaction::traits::HasTxHashType;
 use hermes_core::test_components::chain::impls::{
     EventualAmountTimeoutError, MissingSendPacketEventError,
 };
+use hermes_cosmos::error::handlers::{
+    DebugError, DisplayError, HandleInfallible, ReportError, ReturnError,
+};
+use hermes_cosmos::error::types::Error;
 use hermes_cosmos::protobuf_encoding_components::impls::{
     InvalidWireType, RequiredFieldTagNotFound, TypeUrlMismatchError, UnsupportedWireType,
 };
-use hermes_error::handlers::{
-    DebugError, DisplayError, HandleInfallible, ReportError, ReturnError,
-};
-use hermes_error::types::Error;
-use hermes_runtime::types::error::TokioRuntimeError;
+use hermes_cosmos::runtime::types::error::TokioRuntimeError;
 use hermes_starknet_chain_components::impls::error::account::RaiseAccountError;
 use hermes_starknet_chain_components::impls::error::provider::RaiseProviderError;
 use hermes_starknet_chain_components::impls::error::starknet::RaiseStarknetError;

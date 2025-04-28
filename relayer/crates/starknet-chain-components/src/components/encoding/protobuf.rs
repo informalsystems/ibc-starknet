@@ -15,9 +15,11 @@ mod preset {
     };
     use hermes_cosmos_core::protobuf_encoding_components::traits::EncodedLengthGetterComponent;
     use hermes_cosmos_core::protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
-    use hermes_wasm_encoding_components::components::WasmEncodingComponents;
-    use hermes_wasm_encoding_components::impls::{DecodeViaClientMessage, EncodeViaClientMessage};
-    use hermes_wasm_encoding_components::types::{
+    use hermes_cosmos_core::wasm_encoding_components::components::WasmEncodingComponents;
+    use hermes_cosmos_core::wasm_encoding_components::impls::{
+        DecodeViaClientMessage, EncodeViaClientMessage,
+    };
+    use hermes_cosmos_core::wasm_encoding_components::types::{
         WasmClientMessage, WasmClientState, WasmConsensusState,
     };
     use ibc::clients::wasm_types::client_message::ClientMessage;

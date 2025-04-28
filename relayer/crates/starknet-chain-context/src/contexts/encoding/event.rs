@@ -10,7 +10,7 @@ use hermes_core::encoding_components::traits::{
     CanDecode, DefaultEncodingGetterComponent, EncodingGetterComponent,
     EncodingTypeProviderComponent, HasEncodedType, HasEncoding,
 };
-use hermes_error::impls::UseHermesError;
+use hermes_cosmos::error::impls::UseHermesError;
 use hermes_starknet_chain_components::components::encoding::event::*;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::types::event::StarknetEvent;

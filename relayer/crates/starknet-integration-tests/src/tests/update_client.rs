@@ -11,9 +11,9 @@ use hermes_core::relayer_components::relay::traits::{
 };
 use hermes_core::runtime_components::traits::CanSleep;
 use hermes_core::test_components::setup::traits::{CanSetupChain, CanSetupClients};
+use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_cosmos::relayer::contexts::CosmosChain;
-use hermes_error::types::Error;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;

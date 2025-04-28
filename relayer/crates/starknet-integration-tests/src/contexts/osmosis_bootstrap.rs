@@ -10,6 +10,8 @@ use hermes_core::test_components::bootstrap::traits::ChainBootstrapperComponent;
 use hermes_core::test_components::chain_driver::traits::ChainTypeProviderComponent;
 use hermes_core::test_components::driver::traits::ChainDriverTypeProviderComponent;
 use hermes_cosmos::chain_components::types::DynamicGasConfig;
+use hermes_cosmos::error::handlers::DebugError;
+use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos::integration_tests::impls::{
     BuildCosmosChainDriver, BuildCosmosChainWithNodeConfig, BuildRelayerChainConfig,
@@ -19,6 +21,7 @@ use hermes_cosmos::integration_tests::traits::{
     RelayerChainConfigBuilderComponent, UseCompatMode37,
 };
 use hermes_cosmos::relayer::contexts::{CosmosBuilder, CosmosChain};
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos::test_components::bootstrap::components::LegacyCosmosSdkBootstrapComponents;
 use hermes_cosmos::test_components::bootstrap::impls::{
     BuildAndWaitChainDriver, GenerateStandardWalletConfig, NoModifyCometConfig,
@@ -32,13 +35,10 @@ use hermes_cosmos::test_components::bootstrap::traits::{
     RandomIdFlagGetterComponent, WalletConfigGeneratorComponent,
 };
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
-use hermes_error::handlers::DebugError;
-use hermes_error::impls::UseHermesError;
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_wasm_test_components::impls::bootstrap::{
+use hermes_cosmos_core::wasm_test_components::impls::bootstrap::{
     BuildChainDriverAndInitWasmClient, ModifyWasmGenesisConfig, ModifyWasmNodeConfig,
 };
-use hermes_wasm_test_components::traits::bootstrap::{
+use hermes_cosmos_core::wasm_test_components::traits::bootstrap::{
     GovernanceProposalAuthorityGetterComponent, WasmClientByteCodeGetterComponent,
 };
 

@@ -13,8 +13,8 @@ use hermes_core::encoding_components::traits::{
     DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeProviderComponent,
     HasDecodeBufferType, HasEncodeBufferType, HasEncodedType, HasEncodingType,
 };
-use hermes_error::impls::UseHermesError;
-use hermes_error::types::HermesError;
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::error::types::HermesError;
 use hermes_starknet_chain_components::components::encoding::cairo::*;
 use hermes_starknet_chain_components::types::channel_id::{ChannelEnd, ChannelId};
 use hermes_starknet_chain_components::types::client_id::ClientId;

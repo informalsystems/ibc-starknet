@@ -8,10 +8,10 @@ use cgp::core::error::{
 use cgp::prelude::*;
 use eyre::Report;
 use hermes_core::relayer_components::error::traits::RetryableErrorComponent;
-use hermes_error::handlers::{DisplayError, HandleInfallible, ReportError, ReturnError};
-use hermes_error::impls::UseHermesError;
-use hermes_error::types::Error;
-use hermes_runtime::types::error::TokioRuntimeError;
+use hermes_cosmos::error::handlers::{DisplayError, HandleInfallible, ReportError, ReturnError};
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::error::types::Error;
+use hermes_cosmos::runtime::types::error::TokioRuntimeError;
 use ibc::core::channel::types::error::ChannelError;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};
 use starknet_types_core::felt::FromStrError;

@@ -16,10 +16,10 @@ use hermes_core::runtime_components::traits::CanSleep;
 use hermes_core::test_components::chain::traits::{
     CanAssertEventualAmount, CanBuildIbcTokenTransferMessages, CanIbcTransferToken, CanQueryBalance,
 };
+use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::test_components::chain::types::Amount;
-use hermes_error::types::Error;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::queries::token_address::CanQueryCosmosTokenAddressOnStarknet;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;

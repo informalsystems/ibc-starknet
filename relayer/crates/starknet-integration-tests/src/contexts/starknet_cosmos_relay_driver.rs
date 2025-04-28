@@ -10,11 +10,11 @@ use hermes_core::relayer_components::multi::traits::relay_at::RelayTypeProviderA
 use hermes_core::test_components::relay_driver::run::{
     RelayerBackgroundRunner, RelayerBackgroundRunnerComponent,
 };
+use hermes_cosmos::error::handlers::DebugError;
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::error::Error;
 use hermes_cosmos::integration_tests::contexts::AbortOnDrop;
 use hermes_cosmos::relayer::contexts::CosmosChain;
-use hermes_error::handlers::DebugError;
-use hermes_error::impls::UseHermesError;
-use hermes_error::Error;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;

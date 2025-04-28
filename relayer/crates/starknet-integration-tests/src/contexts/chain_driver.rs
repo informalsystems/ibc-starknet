@@ -15,8 +15,8 @@ use hermes_core::test_components::chain_driver::traits::{
     HasChain, RandomAmountGeneratorComponent, RelayerWallet, StakingDenom, TransferDenom,
     UserWallet, WalletGetterComponent,
 };
-use hermes_error::impls::UseHermesError;
-use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::amount::UseU256Amount;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;

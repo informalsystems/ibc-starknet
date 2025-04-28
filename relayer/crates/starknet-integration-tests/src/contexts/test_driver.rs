@@ -19,11 +19,11 @@ use hermes_core::test_components::setup::traits::{
     BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent, HasTestDriverType,
     PortIdGetterAtComponent,
 };
+use hermes_cosmos::error::handlers::DebugError;
+use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
-use hermes_error::handlers::DebugError;
-use hermes_error::impls::UseHermesError;
 use hermes_starknet_chain_components::types::channel_id::ChannelId;
 use hermes_starknet_chain_components::types::connection_id::ConnectionId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;

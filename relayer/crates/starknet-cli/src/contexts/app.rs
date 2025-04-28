@@ -28,11 +28,11 @@ use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_core::test_components::chain_driver::traits::{ConfigUpdater, ConfigUpdaterComponent};
+use hermes_cosmos::error::types::HermesError;
 use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
-use hermes_error::types::HermesError;
-use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::config::{
     StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses, StarknetRelayerConfig,

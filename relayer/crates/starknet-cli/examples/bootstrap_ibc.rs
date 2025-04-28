@@ -17,9 +17,9 @@ use hermes_core::relayer_components::relay::traits::{
 use hermes_cosmos::chain_components::types::{
     CosmosCreateClientOptions, CosmosInitChannelOptions, CosmosInitConnectionOptions,
 };
+use hermes_cosmos::error::Error;
 use hermes_cosmos::relayer::contexts::CosmosChain;
-use hermes_error::Error;
-use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_cli::contexts::app::StarknetApp;
