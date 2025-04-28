@@ -33,12 +33,12 @@ use hermes_core::relayer_components::multi::traits::relay_at::RelayTypeProviderA
 use hermes_core::runtime_components::traits::{
     CanReadFileAsString, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
-use hermes_cosmos_core::relayer::contexts::{CosmosBuilder, CosmosChain};
-use hermes_error::impls::UseHermesError;
-use hermes_error::types::Error;
-use hermes_error::HermesError;
-use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_cosmos::chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::error::types::Error;
+use hermes_cosmos::error::HermesError;
+use hermes_cosmos::relayer::contexts::{CosmosBuilder, CosmosChain};
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};

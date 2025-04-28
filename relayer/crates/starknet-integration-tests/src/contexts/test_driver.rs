@@ -19,8 +19,8 @@ use hermes_core::test_components::setup::traits::{
     BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent, HasTestDriverType,
     PortIdGetterAtComponent,
 };
-use hermes_cosmos_core::integration_tests::contexts::CosmosChainDriver;
-use hermes_cosmos_core::relayer::contexts::CosmosChain;
+use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
+use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_error::handlers::DebugError;
 use hermes_error::impls::UseHermesError;
 use hermes_starknet_chain_components::types::channel_id::ChannelId;

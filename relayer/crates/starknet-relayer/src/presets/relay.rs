@@ -15,11 +15,11 @@ mod preset {
     use hermes_core::runtime_components::traits::{
         RuntimeGetterComponent, RuntimeTypeProviderComponent,
     };
-    use hermes_cosmos_core::relayer::contexts::CosmosChain;
-    use hermes_error::impls::UseHermesError;
-    use hermes_runtime::types::runtime::HermesRuntime;
+    use hermes_cosmos::error::impls::UseHermesError;
+    use hermes_cosmos::relayer::contexts::CosmosChain;
+    use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+    use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
     use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-    use hermes_tracing_logging_components::contexts::TracingLogger;
     use DefaultRelayPreset::re_exports::*;
 
     use crate::impls::error::HandleStarknetRelayError;

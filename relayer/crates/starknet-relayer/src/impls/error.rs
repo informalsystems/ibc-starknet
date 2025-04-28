@@ -10,11 +10,11 @@ use hermes_core::relayer_components::relay::impls::{
     MissingConnectionTryEventError, MissingCreateClientEventError,
 };
 use hermes_core::relayer_components::relay::traits::HasRelayChains;
-use hermes_error::handlers::{
+use hermes_cosmos::error::handlers::{
     DebugError, DisplayError, HandleInfallible, ReportError, ReturnError,
 };
-use hermes_error::types::Error;
-use hermes_runtime::types::error::TokioRuntimeError;
+use hermes_cosmos::error::types::Error;
+use hermes_cosmos::runtime::types::error::TokioRuntimeError;
 
 pub struct HandleStarknetRelayError;
 

@@ -70,6 +70,7 @@ tendermint-rpc            = { version = "0.40" }
 
 hermes-prelude                      = { version = "0.1.0" }
 hermes-core                         = { version = "0.1.0" }
+hermes-cosmos                       = { version = "0.1.0" }
 hermes-cosmos-core                  = { version = "0.1.0" }
 hermes-runtime-components           = { version = "0.1.0" }
 hermes-async-runtime-components     = { version = "0.1.0" }

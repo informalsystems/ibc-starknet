@@ -14,10 +14,10 @@ use hermes_core::relayer_components::relay::impls::{CanBootstrapChannel, CanBoot
 use hermes_core::relayer_components::relay::traits::{
     CanCreateClient, DestinationTarget, SourceTarget,
 };
-use hermes_cosmos_core::chain_components::types::{
+use hermes_cosmos::chain_components::types::{
     CosmosCreateClientOptions, CosmosInitChannelOptions, CosmosInitConnectionOptions,
 };
-use hermes_cosmos_core::relayer::contexts::CosmosChain;
+use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_error::Error;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;

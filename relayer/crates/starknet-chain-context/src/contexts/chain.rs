@@ -69,12 +69,12 @@ use hermes_core::test_components::chain::traits::{
     CanConvertIbcTransferredAmount, CanIbcTransferToken, CanQueryBalance, HasMemoType,
     IbcTransferTimeoutCalculatorComponent, IbcTransferredAmountConverterComponent,
 };
-use hermes_cosmos_core::chain_components::types::{
+use hermes_cosmos::chain_components::types::{
     CosmosInitChannelOptions, CosmosInitConnectionOptions, CosmosUpdateClientPayload,
     Secp256k1KeyPair, Time,
 };
-use hermes_cosmos_core::chain_preset::delegate::DelegateCosmosChainComponents;
-use hermes_cosmos_core::relayer::contexts::CosmosChain;
+use hermes_cosmos::chain_preset::delegate::DelegateCosmosChainComponents;
+use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_error::impls::UseHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::components::chain::StarknetChainComponents;

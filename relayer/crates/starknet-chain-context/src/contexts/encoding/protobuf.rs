@@ -4,7 +4,7 @@ use cgp::prelude::*;
 use hermes_core::encoding_components::traits::{
     CanConvertBothWays, CanEncodeAndDecode, CanEncodeAndDecodeMut,
 };
-use hermes_cosmos_core::wasm_encoding_components::types::{WasmClientState, WasmConsensusState};
+use hermes_cosmos::wasm_encoding_components::types::{WasmClientState, WasmConsensusState};
 use hermes_error::impls::UseHermesError;
 use hermes_protobuf_encoding_components::types::any::Any;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};

@@ -28,8 +28,8 @@ use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_core::test_components::chain_driver::traits::{ConfigUpdater, ConfigUpdaterComponent};
-use hermes_cosmos_core::integration_tests::contexts::CosmosChainDriver;
-use hermes_cosmos_core::relayer::contexts::CosmosChain;
+use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
+use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_error::types::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
