@@ -5,18 +5,20 @@ use core::time::Duration;
 use std::sync::Arc;
 
 use cgp::extra::run::CanRun;
-use hermes_chain_components::traits::{
+use hermes_cli_components::traits::CanLoadBuilder;
+use hermes_core::chain_components::traits::{
     CanQueryChainHeight, CanQueryChainStatus, CanQueryChannelEnd,
     CanQueryClientStateWithLatestHeight, CanQueryConnectionEnd, HasChainId,
 };
-use hermes_cli_components::traits::CanLoadBuilder;
+use hermes_core::relayer_components::relay::impls::{CanBootstrapChannel, CanBootstrapConnection};
+use hermes_core::relayer_components::relay::traits::{
+    CanCreateClient, DestinationTarget, SourceTarget,
+};
 use hermes_cosmos_chain_components::types::{
     CosmosCreateClientOptions, CosmosInitChannelOptions, CosmosInitConnectionOptions,
 };
 use hermes_cosmos_relayer::contexts::CosmosChain;
 use hermes_error::Error;
-use hermes_relayer_components::relay::impls::{CanBootstrapChannel, CanBootstrapConnection};
-use hermes_relayer_components::relay::traits::{CanCreateClient, DestinationTarget, SourceTarget};
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;

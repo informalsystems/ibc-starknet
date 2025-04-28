@@ -1,11 +1,8 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::{
-    CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
-    UpdateClientPayloadTypeComponent,
-};
 use hermes_core::chain_components::traits::{
+    CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
     ProvideCreateClientPayloadOptionsType, ProvideCreateClientPayloadType,
-    ProvideUpdateClientPayloadType,
+    ProvideUpdateClientPayloadType, UpdateClientPayloadTypeComponent,
 };
 
 use crate::types::payloads::client::{

@@ -1,6 +1,6 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::HasEventType;
-use hermes_chain_type_components::traits::{
+use hermes_core::chain_components::traits::HasEventType;
+use hermes_core::chain_type_components::traits::{
     HasMessageResponseType, MessageResponseEventsGetter, MessageResponseEventsGetterComponent,
     MessageResponseTypeComponent, ProvideMessageResponseType,
 };

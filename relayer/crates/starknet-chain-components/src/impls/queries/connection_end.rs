@@ -3,14 +3,14 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::{
+use hermes_core::chain_components::traits::{
     CanQueryBlock, ConnectionEndQuerier, ConnectionEndQuerierComponent,
     ConnectionEndWithProofsQuerier, ConnectionEndWithProofsQuerierComponent,
     HasCommitmentProofType, HasConnectionEndType, HasConnectionIdType, HasHeightType,
     HasIbcCommitmentPrefix,
 };
+use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
-use hermes_encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use ibc::core::host::types::path::{ConnectionPath, Path};
 use ibc_proto::Protobuf;
 use starknet::core::types::Felt;

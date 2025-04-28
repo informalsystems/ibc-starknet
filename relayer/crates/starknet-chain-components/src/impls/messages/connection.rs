@@ -6,7 +6,7 @@ use core::time::Duration;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::{
+use hermes_core::chain_components::traits::{
     ConnectionOpenAckMessageBuilder, ConnectionOpenAckMessageBuilderComponent,
     ConnectionOpenConfirmMessageBuilder, ConnectionOpenConfirmMessageBuilderComponent,
     ConnectionOpenInitMessageBuilder, ConnectionOpenInitMessageBuilderComponent,
@@ -16,13 +16,13 @@ use hermes_chain_components::traits::{
     HasConnectionOpenInitPayloadType, HasConnectionOpenTryPayloadType, HasHeightType,
     HasInitConnectionOptionsType, HasMessageType,
 };
-use hermes_chain_components::types::payloads::connection::{
+use hermes_core::chain_components::types::payloads::connection::{
     ConnectionOpenAckPayload, ConnectionOpenConfirmPayload, ConnectionOpenInitPayload,
     ConnectionOpenTryPayload,
 };
-use hermes_chain_type_components::traits::HasAddressType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
 use hermes_cosmos_chain_components::types::{CosmosCommitmentProof, CosmosInitConnectionOptions};
-use hermes_encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
 use ibc::core::client::types::Height;
 use ibc::core::connection::types::ConnectionEnd;
 use ibc::core::host::types::identifiers::{

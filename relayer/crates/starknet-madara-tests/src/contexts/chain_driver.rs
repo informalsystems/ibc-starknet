@@ -5,21 +5,23 @@ use std::path::PathBuf;
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
-use hermes_error::impls::UseHermesError;
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::{RuntimeGetterComponent, RuntimeTypeProviderComponent};
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::amount::UseU256Amount;
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
-use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
-use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
-use hermes_test_components::chain_driver::impls::WaitChainReachHeight;
-use hermes_test_components::chain_driver::traits::{
+use hermes_core::runtime_components::traits::{
+    RuntimeGetterComponent, RuntimeTypeProviderComponent,
+};
+use hermes_core::test_components::chain_driver::impls::WaitChainReachHeight;
+use hermes_core::test_components::chain_driver::traits::{
     ChainGetterComponent, ChainProcessTaker, ChainProcessTakerComponent,
     ChainStartupWaiterComponent, ChainTypeProviderComponent, DenomGetter, DenomGetterComponent,
     RandomAmountGeneratorComponent, RelayerWallet, StakingDenom, TransferDenom, UserWallet,
     WalletGetterComponent,
 };
+use hermes_error::impls::UseHermesError;
+use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
+use hermes_starknet_chain_components::impls::types::amount::UseU256Amount;
+use hermes_starknet_chain_components::types::wallet::StarknetWallet;
+use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
+use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
 use tokio::process::Child;
 
 use crate::contexts::MadaraChain;

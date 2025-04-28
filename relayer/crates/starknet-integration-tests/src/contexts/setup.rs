@@ -1,29 +1,14 @@
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::Index;
 use cgp::prelude::*;
-use hermes_cosmos_chain_components::types::{
-    CosmosCreateClientOptions, CosmosInitChannelOptions, CosmosInitConnectionOptions,
-};
-use hermes_cosmos_integration_tests::contexts::CosmosChainDriver;
-use hermes_cosmos_integration_tests::impls::UseCosmosInitChannelOptions;
-use hermes_cosmos_relayer::contexts::CosmosChain;
-use hermes_error::handlers::DebugError;
-use hermes_error::impls::UseHermesError;
-use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
-use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
-use hermes_relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
-use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
-use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
-use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
-use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
-use hermes_test_components::driver::traits::{
+use hermes_core::relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
+use hermes_core::relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
+use hermes_core::relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
+use hermes_core::test_components::driver::traits::{
     BuilderAtTypeProviderComponent, ChainDriverTypeProviderAtComponent,
 };
-use hermes_test_components::setup::binary_channel::BinaryChannelTestComponents;
-use hermes_test_components::setup::traits::{
+use hermes_core::test_components::setup::binary_channel::BinaryChannelTestComponents;
+use hermes_core::test_components::setup::traits::{
     BiRelaySetupComponent, BinaryChannelDriverBuilderComponent, BootstrapGetterAtComponent,
     BootstrapTypeProviderAtComponent, BuilderAtGetterComponent, ChainSetupComponent,
     ChannelSetupComponent, ClientSetupComponent, ConnectionSetupComponent,
@@ -32,6 +17,21 @@ use hermes_test_components::setup::traits::{
     InitConnectionOptionsGetterAtComponent, PortIdGetterAtComponent, RelaySetupComponent,
     TestDriverTypeProviderComponent,
 };
+use hermes_cosmos_chain_components::types::{
+    CosmosCreateClientOptions, CosmosInitChannelOptions, CosmosInitConnectionOptions,
+};
+use hermes_cosmos_integration_tests::contexts::CosmosChainDriver;
+use hermes_cosmos_integration_tests::impls::UseCosmosInitChannelOptions;
+use hermes_cosmos_relayer::contexts::CosmosChain;
+use hermes_error::handlers::DebugError;
+use hermes_error::impls::UseHermesError;
+use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
+use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
+use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
+use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
+use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use ibc::core::host::types::identifiers::PortId;
 
 use crate::contexts::chain_driver::StarknetChainDriver;

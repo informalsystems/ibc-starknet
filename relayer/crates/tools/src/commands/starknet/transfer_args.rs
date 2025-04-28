@@ -1,8 +1,8 @@
 use cgp::prelude::*;
 use hermes_cli_components::traits::{CommandRunner, CommandRunnerComponent, HasOutputType};
-use hermes_encoding_components::traits::CanEncode;
-use hermes_logging_components::traits::CanLog;
-use hermes_logging_components::types::LevelInfo;
+use hermes_core::encoding_components::traits::CanEncode;
+use hermes_core::logging_components::traits::CanLog;
+use hermes_core::logging_components::types::LevelInfo;
 use hermes_starknet_chain_components::types::cosmos::height::Height;
 use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
 use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;

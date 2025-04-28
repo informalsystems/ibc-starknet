@@ -1,10 +1,11 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::{
+use hermes_core::chain_components::traits::{
     CanQueryBlock, CanQueryChainHeight, CanQueryChainStatus, CanSendSingleMessage,
 };
-use hermes_encoding_components::traits::CanEncode;
+use hermes_core::encoding_components::traits::CanEncode;
+use hermes_core::runtime_components::traits::CanReadFileAsString;
+use hermes_core::test_components::bootstrap::traits::CanBootstrapChain;
 use hermes_error::Error;
-use hermes_runtime_components::traits::CanReadFileAsString;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
@@ -15,7 +16,6 @@ use hermes_starknet_chain_components::types::amount::StarknetAmount;
 use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
-use hermes_test_components::bootstrap::traits::CanBootstrapChain;
 use starknet::core::crypto::pedersen_hash;
 use starknet::core::types::U256;
 use starknet::macros::selector;

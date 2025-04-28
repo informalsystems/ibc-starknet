@@ -2,8 +2,8 @@
 mod preset {
     use cgp::core::component::{UseContext, UseDelegate};
     use cgp::prelude::*;
-    use hermes_encoding_components::impls::{ProvideEncodedBytes, ProvideStringSchema};
-    use hermes_encoding_components::traits::{
+    use hermes_core::encoding_components::impls::{ProvideEncodedBytes, ProvideStringSchema};
+    use hermes_core::encoding_components::traits::{
         ConverterComponent, DecodeBufferTypeComponent, DecoderComponent, EncodeBufferTypeComponent,
         EncodedTypeComponent, EncoderComponent, MutDecoderComponent, MutEncoderComponent,
         SchemaGetterComponent, SchemaTypeComponent,

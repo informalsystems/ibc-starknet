@@ -1,6 +1,6 @@
 use cgp::prelude::*;
-use hermes_chain_type_components::traits::HasAddressType;
-use hermes_relayer_components::transaction::traits::{CanPollTxResponse, HasDefaultSigner};
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::relayer_components::transaction::traits::{CanPollTxResponse, HasDefaultSigner};
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::account::CanBuildAccountFromSigner;
 use hermes_starknet_chain_components::traits::contract::deploy::{

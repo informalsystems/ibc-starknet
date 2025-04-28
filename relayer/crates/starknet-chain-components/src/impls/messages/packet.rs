@@ -3,19 +3,19 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::{
+use hermes_core::chain_components::traits::{
     AckPacketMessageBuilder, AckPacketMessageBuilderComponent, HasAckPacketPayloadType,
     HasAcknowledgementType, HasCommitmentProofType, HasHeightType, HasMessageType,
     HasOutgoingPacketType, HasReceivePacketPayloadType, HasTimeoutUnorderedPacketPayloadType,
     ReceivePacketMessageBuilder, ReceivePacketMessageBuilderComponent,
     TimeoutUnorderedPacketMessageBuilder, TimeoutUnorderedPacketMessageBuilderComponent,
 };
-use hermes_chain_components::types::payloads::packet::{
+use hermes_core::chain_components::types::payloads::packet::{
     AckPacketPayload, ReceivePacketPayload, TimeoutUnorderedPacketPayload,
 };
-use hermes_chain_type_components::traits::HasAddressType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
 use hermes_cosmos_chain_components::types::CosmosCommitmentProof;
-use hermes_encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
 use ibc::apps::transfer::types::packet::PacketData as IbcIcs20PacketData;
 use ibc::core::channel::types::packet::Packet as IbcPacket;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};

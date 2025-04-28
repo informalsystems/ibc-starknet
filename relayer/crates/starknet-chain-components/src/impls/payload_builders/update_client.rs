@@ -1,11 +1,11 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::{CanQueryBlock, UpdateClientPayloadBuilderComponent};
 use hermes_core::chain_components::traits::{
-    HasClientStateType, HasHeightType, HasUpdateClientPayloadType, UpdateClientPayloadBuilder,
+    CanQueryBlock, HasClientStateType, HasHeightType, HasUpdateClientPayloadType,
+    UpdateClientPayloadBuilder, UpdateClientPayloadBuilderComponent,
 };
+use hermes_core::encoding_components::traits::{CanEncode, HasDefaultEncoding};
+use hermes_core::encoding_components::types::AsBytes;
 use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
-use hermes_encoding_components::traits::{CanEncode, HasDefaultEncoding};
-use hermes_encoding_components::types::AsBytes;
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc::core::client::types::Height;
 use ibc::primitives::Timestamp;

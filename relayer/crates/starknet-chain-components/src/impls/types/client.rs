@@ -1,13 +1,10 @@
 use core::time::Duration;
 
 use cgp::prelude::*;
-use hermes_chain_components::traits::{
-    ClientStateFieldsComponent, ClientStateTypeComponent, ConsensusStateTypeComponent,
-    HasChainIdType,
-};
 use hermes_core::chain_components::traits::{
-    ClientStateFieldsGetter, HasClientStateType, HasHeightType, ProvideClientStateType,
-    ProvideConsensusStateType,
+    ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent,
+    ConsensusStateTypeComponent, HasChainIdType, HasClientStateType, HasHeightType,
+    ProvideClientStateType, ProvideConsensusStateType,
 };
 use ibc::core::host::types::identifiers::ChainId;
 

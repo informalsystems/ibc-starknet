@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use std::sync::OnceLock;
 
 use cgp::prelude::*;
-use hermes_encoding_components::traits::{CanDecode, Decoder, DecoderComponent};
+use hermes_core::encoding_components::traits::{CanDecode, Decoder, DecoderComponent};
 
 use crate::impls::types::address::StarknetAddress;
 use crate::types::event::StarknetEvent;

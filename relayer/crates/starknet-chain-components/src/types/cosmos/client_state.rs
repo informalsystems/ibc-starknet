@@ -2,11 +2,11 @@ use core::time::Duration;
 
 use cgp::core::types::WithType;
 use cgp::prelude::*;
-use hermes_chain_components::traits::{
+use hermes_core::chain_components::traits::{
     ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent, HasChainIdType,
     HasClientStateType, HasHeightType,
 };
-use hermes_encoding_components::traits::{
+use hermes_core::encoding_components::traits::{
     CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
 use ibc::clients::tendermint::types::{

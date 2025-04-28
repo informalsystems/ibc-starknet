@@ -1,6 +1,6 @@
 use cgp::prelude::*;
-use hermes_logging_components::traits::CanLog;
-use hermes_logging_components::types::LevelTrace;
+use hermes_core::logging_components::traits::CanLog;
+use hermes_core::logging_components::types::LevelTrace;
 use serde::{Deserialize, Serialize};
 
 use crate::traits::json_rpc::{JsonRpcRequestSender, JsonRpcRequestSenderComponent};

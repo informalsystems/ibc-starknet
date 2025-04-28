@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::{
+use hermes_core::chain_components::traits::{
     BlockQuerier, BlockQuerierComponent, HasBlockType, HasHeightType,
 };
 use hermes_cosmos_chain_components::types::Time;

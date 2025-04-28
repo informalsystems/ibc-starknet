@@ -1,7 +1,7 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::ConsensusStateHeightsQuerierComponent;
 use hermes_core::chain_components::traits::{
-    ConsensusStateHeightsQuerier, HasHeightType, HasIbcChainTypes,
+    ConsensusStateHeightsQuerier, ConsensusStateHeightsQuerierComponent, HasHeightType,
+    HasIbcChainTypes,
 };
 use hermes_cosmos_chain_components::traits::HasGrpcAddress;
 use http::uri::InvalidUri;

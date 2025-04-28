@@ -5,12 +5,12 @@ use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_chain_components::traits::{
+use hermes_core::chain_components::traits::{
     EventExtractor, EventExtractorComponent, HasEventType, HasOutgoingPacketType,
     HasSendPacketEvent, PacketFromSendPacketEventBuilder,
     PacketFromSendPacketEventBuilderComponent, ProvideSendPacketEvent, SendPacketEventComponent,
 };
-use hermes_encoding_components::traits::{CanDecode, HasEncodedType, HasEncoding};
+use hermes_core::encoding_components::traits::{CanDecode, HasEncodedType, HasEncoding};
 use ibc::apps::transfer::types::{Amount, BaseDenom, Memo, PrefixedDenom, TracePath};
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};

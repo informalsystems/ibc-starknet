@@ -2,14 +2,16 @@
 mod preset {
     use cgp::core::types::WithType;
     use cgp::prelude::*;
-    use hermes_chain_components::traits::{
+    use hermes_core::chain_components::traits::{
         AckPacketMessageBuilderComponent, ChannelOpenAckMessageBuilderComponent,
         ChannelOpenConfirmMessageBuilderComponent, ChannelOpenInitMessageBuilderComponent,
         ChannelOpenTryMessageBuilderComponent, ClientStateFieldsComponent,
-        ClientStateTypeComponent, ConnectionOpenAckMessageBuilderComponent,
+        ClientStateQuerierComponent, ClientStateTypeComponent,
+        ClientStateWithProofsQuerierComponent, ConnectionOpenAckMessageBuilderComponent,
         ConnectionOpenConfirmMessageBuilderComponent, ConnectionOpenInitMessageBuilderComponent,
         ConnectionOpenTryMessageBuilderComponent, ConsensusStateHeightsQuerierComponent,
-        ConsensusStateTypeComponent, CounterpartyMessageHeightGetterComponent,
+        ConsensusStateQuerierComponent, ConsensusStateTypeComponent,
+        ConsensusStateWithProofsQuerierComponent, CounterpartyMessageHeightGetterComponent,
         CreateClientMessageBuilderComponent, CreateClientMessageOptionsTypeComponent,
         CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent,
         CreateClientPayloadTypeComponent, PacketDstChannelIdGetterComponent,
@@ -20,15 +22,11 @@ mod preset {
         UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
         UpdateClientPayloadTypeComponent,
     };
-    use hermes_core::chain_components::traits::{
-        ClientStateQuerierComponent, ClientStateWithProofsQuerierComponent,
-        ConsensusStateQuerierComponent, ConsensusStateWithProofsQuerierComponent,
-    };
+    use hermes_core::test_components::chain::traits::IbcTransferredAmountConverterComponent;
     use hermes_cosmos_chain_components::impls::{
         BuildCosmosPacketMessages, CosmosPacketFieldReader,
     };
     use hermes_cosmos_chain_preset::presets::CosmosToCosmosComponents;
-    use hermes_test_components::chain::traits::IbcTransferredAmountConverterComponent;
 
     use crate::impls::starknet_to_cosmos::connection_message::BuildStarknetToCosmosConnectionHandshake;
     use crate::impls::starknet_to_cosmos::counterparty_message_height::GetCosmosCounterpartyMessageStarknetHeight;

@@ -1,9 +1,8 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::{
-    CanQueryBlock, CanQueryChainHeight, CreateClientPayloadBuilderComponent, HasChainId,
-};
 use hermes_core::chain_components::traits::{
-    CreateClientPayloadBuilder, HasCreateClientPayloadOptionsType, HasCreateClientPayloadType,
+    CanQueryBlock, CanQueryChainHeight, CreateClientPayloadBuilder,
+    CreateClientPayloadBuilderComponent, HasChainId, HasCreateClientPayloadOptionsType,
+    HasCreateClientPayloadType,
 };
 use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
 use ibc::core::client::types::error::ClientError;

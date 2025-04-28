@@ -2,9 +2,9 @@ use core::fmt::Debug;
 use std::sync::Arc;
 
 use cgp::prelude::*;
-use hermes_chain_type_components::traits::HasMessageResponseType;
 use hermes_core::chain_components::traits::HasMessageType;
-use hermes_relayer_components::transaction::traits::{
+use hermes_core::chain_type_components::traits::HasMessageResponseType;
+use hermes_core::relayer_components::transaction::traits::{
     CanPollTxResponse, HasNonceType, HasSignerType, HasTxHashType, HasTxResponseType,
     MessagesWithSignerAndNonceSender, MessagesWithSignerAndNonceSenderComponent,
     TxMessageResponseParser, TxMessageResponseParserComponent,

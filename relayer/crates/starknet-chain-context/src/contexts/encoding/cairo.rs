@@ -7,8 +7,8 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_encoding_components::impls::GetDefaultEncoding;
-use hermes_encoding_components::traits::{
+use hermes_core::encoding_components::impls::GetDefaultEncoding;
+use hermes_core::encoding_components::traits::{
     CanDecode, CanEncode, CanEncodeAndDecode, CanPeekDecodeBuffer, DefaultEncodingGetter,
     DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeProviderComponent,
     HasDecodeBufferType, HasEncodeBufferType, HasEncodedType, HasEncodingType,

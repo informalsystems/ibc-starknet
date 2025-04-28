@@ -1,20 +1,28 @@
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::Index;
 use cgp::prelude::*;
+use hermes_core::logging_components::traits::LoggerComponent;
+use hermes_core::relayer_components::multi::traits::birelay_at::{
+    BiRelayTypeProviderAtComponent, HasBiRelayTypeAt,
+};
+use hermes_core::relayer_components::multi::traits::chain_at::{
+    ChainTypeProviderAtComponent, HasChainTypeAt,
+};
+use hermes_core::relayer_components::multi::traits::relay_at::{
+    HasRelayTypeAt, RelayTypeProviderAtComponent,
+};
+use hermes_core::test_components::driver::traits::{
+    ChainDriverGetterAtComponent, ChainDriverTypeProviderAtComponent, ChannelIdGetterAtComponent,
+    HasChainDriverTypeAt, RelayDriverGetterAtComponent, RelayDriverTypeProviderAtComponent,
+};
+use hermes_core::test_components::setup::traits::{
+    BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent, HasTestDriverType,
+    PortIdGetterAtComponent,
+};
 use hermes_cosmos_integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos_relayer::contexts::CosmosChain;
 use hermes_error::handlers::DebugError;
 use hermes_error::impls::UseHermesError;
-use hermes_logging_components::traits::LoggerComponent;
-use hermes_relayer_components::multi::traits::birelay_at::{
-    BiRelayTypeProviderAtComponent, HasBiRelayTypeAt,
-};
-use hermes_relayer_components::multi::traits::chain_at::{
-    ChainTypeProviderAtComponent, HasChainTypeAt,
-};
-use hermes_relayer_components::multi::traits::relay_at::{
-    HasRelayTypeAt, RelayTypeProviderAtComponent,
-};
 use hermes_starknet_chain_components::types::channel_id::ChannelId;
 use hermes_starknet_chain_components::types::connection_id::ConnectionId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
@@ -22,14 +30,6 @@ use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBi
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
-use hermes_test_components::driver::traits::{
-    ChainDriverGetterAtComponent, ChainDriverTypeProviderAtComponent, ChannelIdGetterAtComponent,
-    HasChainDriverTypeAt, RelayDriverGetterAtComponent, RelayDriverTypeProviderAtComponent,
-};
-use hermes_test_components::setup::traits::{
-    BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent, HasTestDriverType,
-    PortIdGetterAtComponent,
-};
 use hermes_tracing_logging_components::contexts::TracingLogger;
 use ibc::core::host::types::identifiers::PortId;
 

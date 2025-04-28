@@ -1,7 +1,7 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::CounterpartyMessageHeightGetterComponent;
 use hermes_core::chain_components::traits::{
-    CounterpartyMessageHeightGetter, HasHeightType, HasMessageType,
+    CounterpartyMessageHeightGetter, CounterpartyMessageHeightGetterComponent, HasHeightType,
+    HasMessageType,
 };
 use hermes_cosmos_chain_components::traits::CosmosMessage;
 

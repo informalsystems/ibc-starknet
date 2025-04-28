@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_encoding_components::traits::{
+use hermes_core::encoding_components::traits::{
     CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
 pub use ibc::core::host::types::identifiers::ClientId;

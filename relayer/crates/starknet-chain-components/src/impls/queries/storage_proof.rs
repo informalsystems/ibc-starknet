@@ -1,8 +1,8 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::HasHeightType;
-use hermes_chain_type_components::traits::HasAddressType;
-use hermes_logging_components::traits::CanLog;
-use hermes_logging_components::types::LevelTrace;
+use hermes_core::chain_components::traits::HasHeightType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::logging_components::traits::CanLog;
+use hermes_core::logging_components::types::LevelTrace;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 use starknet::core::types::{Felt, StorageProof};

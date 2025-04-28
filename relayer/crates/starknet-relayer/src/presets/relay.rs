@@ -5,17 +5,19 @@ mod preset {
         ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent,
     };
     use cgp::core::field::{Index, UseField};
-    use hermes_cosmos_relayer::contexts::CosmosChain;
-    use hermes_error::impls::UseHermesError;
-    use hermes_logging_components::traits::LoggerComponent;
-    use hermes_relayer_components::components::default::DefaultRelayPreset;
-    use hermes_relayer_components::multi::traits::chain_at::{
+    use hermes_core::logging_components::traits::LoggerComponent;
+    use hermes_core::relayer_components::components::default::DefaultRelayPreset;
+    use hermes_core::relayer_components::multi::traits::chain_at::{
         ChainGetterAtComponent, ChainTypeProviderAtComponent,
     };
-    use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
-    use hermes_relayer_components::relay::impls::PacketMutexGetterComponent;
+    use hermes_core::relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
+    use hermes_core::relayer_components::relay::impls::PacketMutexGetterComponent;
+    use hermes_core::runtime_components::traits::{
+        RuntimeGetterComponent, RuntimeTypeProviderComponent,
+    };
+    use hermes_cosmos_relayer::contexts::CosmosChain;
+    use hermes_error::impls::UseHermesError;
     use hermes_runtime::types::runtime::HermesRuntime;
-    use hermes_runtime_components::traits::{RuntimeGetterComponent, RuntimeTypeProviderComponent};
     use hermes_starknet_chain_context::contexts::chain::StarknetChain;
     use hermes_tracing_logging_components::contexts::TracingLogger;
     use DefaultRelayPreset::re_exports::*;

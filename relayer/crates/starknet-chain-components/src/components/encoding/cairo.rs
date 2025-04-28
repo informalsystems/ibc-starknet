@@ -14,8 +14,8 @@ mod preset {
     use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
     use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
     use hermes_cairo_encoding_components::strategy::ViaCairo;
-    use hermes_encoding_components::impls::{EncodeFields, EncodeTaggedField};
-    use hermes_encoding_components::traits::{
+    use hermes_core::encoding_components::impls::{EncodeFields, EncodeTaggedField};
+    use hermes_core::encoding_components::traits::{
         DecodeBufferBuilderComponent, DecodeBufferPeekerComponent, DecodeBufferTypeComponent,
         DecoderComponent, EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
         EncodedTypeComponent, EncoderComponent, MutDecoderComponent, MutEncoderComponent,

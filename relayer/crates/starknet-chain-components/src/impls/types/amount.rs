@@ -1,12 +1,12 @@
 use cgp::extra::runtime::HasRuntime;
 use cgp::prelude::*;
-use hermes_chain_type_components::traits::{
+use hermes_core::chain_type_components::traits::{
     AmountDenomGetter, AmountDenomGetterComponent, AmountTypeProviderComponent, HasAmountType,
     HasDenomType,
 };
-use hermes_runtime_components::traits::CanGenerateRandom;
-use hermes_test_components::chain::traits::{AmountMethodsComponent, ProvideAmountMethods};
-use hermes_test_components::chain_driver::traits::{
+use hermes_core::runtime_components::traits::CanGenerateRandom;
+use hermes_core::test_components::chain::traits::{AmountMethodsComponent, ProvideAmountMethods};
+use hermes_core::test_components::chain_driver::traits::{
     HasChainType, RandomAmountGenerator, RandomAmountGeneratorComponent,
 };
 

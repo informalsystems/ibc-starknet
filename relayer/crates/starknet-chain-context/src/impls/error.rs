@@ -11,10 +11,17 @@ use hermes_cairo_encoding_components::impls::encode_mut::bool::DecodeBoolError;
 use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::felt::UnexpectedEndOfBuffer;
 use hermes_cairo_encoding_components::impls::encode_mut::variant::VariantIndexOutOfBound;
-use hermes_chain_components::impls::InvalidTimeoutReceipt;
-use hermes_chain_components::traits::HasOutgoingPacketType;
-use hermes_chain_type_components::traits::{HasAddressType, HasAmountType, HasHeightType};
-use hermes_core::chain_components::traits::{EmptyMessageResponse, HasClientIdType};
+use hermes_core::chain_components::impls::InvalidTimeoutReceipt;
+use hermes_core::chain_components::traits::{
+    EmptyMessageResponse, HasClientIdType, HasOutgoingPacketType,
+};
+use hermes_core::chain_type_components::traits::{HasAddressType, HasAmountType, HasHeightType};
+use hermes_core::relayer_components::chain::impls::NoConsensusStateAtLessThanHeight;
+use hermes_core::relayer_components::transaction::impls::TxNoResponseError;
+use hermes_core::relayer_components::transaction::traits::HasTxHashType;
+use hermes_core::test_components::chain::impls::{
+    EventualAmountTimeoutError, MissingSendPacketEventError,
+};
 use hermes_error::handlers::{
     DebugError, DisplayError, HandleInfallible, ReportError, ReturnError,
 };
@@ -22,9 +29,6 @@ use hermes_error::types::Error;
 use hermes_protobuf_encoding_components::impls::{
     InvalidWireType, RequiredFieldTagNotFound, TypeUrlMismatchError, UnsupportedWireType,
 };
-use hermes_relayer_components::chain::impls::NoConsensusStateAtLessThanHeight;
-use hermes_relayer_components::transaction::impls::TxNoResponseError;
-use hermes_relayer_components::transaction::traits::HasTxHashType;
 use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_starknet_chain_components::impls::error::account::RaiseAccountError;
 use hermes_starknet_chain_components::impls::error::provider::RaiseProviderError;
@@ -33,9 +37,6 @@ use hermes_starknet_chain_components::impls::queries::consensus_state::Consensus
 use hermes_starknet_chain_components::impls::queries::contract_address::ContractAddressNotFound;
 use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
 use hermes_starknet_chain_components::types::event::UnknownEvent;
-use hermes_test_components::chain::impls::{
-    EventualAmountTimeoutError, MissingSendPacketEventError,
-};
 use ibc::core::channel::types::error::ChannelError;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};

@@ -22,13 +22,16 @@ use hermes_cli_components::traits::{
     CommandRunnerComponent, ConfigLoaderComponent, ConfigPathGetterComponent, ConfigTypeComponent,
     ConfigWriterComponent, OutputProducer, OutputProducerComponent, OutputTypeComponent,
 };
+use hermes_core::logging_components::traits::LoggerComponent;
+use hermes_core::relayer_components::error::traits::RetryableErrorComponent;
+use hermes_core::runtime_components::traits::{
+    RuntimeGetterComponent, RuntimeTypeProviderComponent,
+};
+use hermes_core::test_components::chain_driver::traits::{ConfigUpdater, ConfigUpdaterComponent};
 use hermes_cosmos_integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos_relayer::contexts::CosmosChain;
 use hermes_error::types::HermesError;
-use hermes_logging_components::traits::LoggerComponent;
-use hermes_relayer_components::error::traits::RetryableErrorComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::{RuntimeGetterComponent, RuntimeTypeProviderComponent};
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::config::{
     StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses, StarknetRelayerConfig,
@@ -39,7 +42,6 @@ use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriv
 use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
-use hermes_test_components::chain_driver::traits::{ConfigUpdater, ConfigUpdaterComponent};
 use hermes_tracing_logging_components::contexts::TracingLogger;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId, PortId};

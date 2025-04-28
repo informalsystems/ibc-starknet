@@ -5,15 +5,15 @@ use std::string::FromUtf8Error;
 use cgp::prelude::*;
 use eyre::Report;
 use hermes_core::chain_components::traits::{EmptyMessageResponse, HasChainIdType};
+use hermes_core::relayer_components::relay::impls::{
+    MissingChannelInitEventError, MissingChannelTryEventError, MissingConnectionInitEventError,
+    MissingConnectionTryEventError, MissingCreateClientEventError,
+};
+use hermes_core::relayer_components::relay::traits::HasRelayChains;
 use hermes_error::handlers::{
     DebugError, DisplayError, HandleInfallible, ReportError, ReturnError,
 };
 use hermes_error::types::Error;
-use hermes_relayer_components::relay::impls::{
-    MissingChannelInitEventError, MissingChannelTryEventError, MissingConnectionInitEventError,
-    MissingConnectionTryEventError, MissingCreateClientEventError,
-};
-use hermes_relayer_components::relay::traits::HasRelayChains;
 use hermes_runtime::types::error::TokioRuntimeError;
 
 pub struct HandleStarknetRelayError;

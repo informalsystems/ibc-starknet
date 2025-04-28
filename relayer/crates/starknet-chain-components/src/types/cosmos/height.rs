@@ -1,7 +1,9 @@
 use cgp::core::component::UseContext;
 use cgp::prelude::*;
-use hermes_encoding_components::impls::{CombineEncoders, DecodeFrom, EncodeField};
-use hermes_encoding_components::traits::{MutDecoderComponent, MutEncoderComponent, Transformer};
+use hermes_core::encoding_components::impls::{CombineEncoders, DecodeFrom, EncodeField};
+use hermes_core::encoding_components::traits::{
+    MutDecoderComponent, MutEncoderComponent, Transformer,
+};
 
 #[derive(Debug, Clone, HasField)]
 pub struct Height {

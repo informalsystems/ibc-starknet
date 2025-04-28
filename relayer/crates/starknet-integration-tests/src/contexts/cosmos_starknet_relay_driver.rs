@@ -2,23 +2,23 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::Index;
 use cgp::extra::run::CanRun;
 use cgp::prelude::*;
+use hermes_core::relayer_components::multi::traits::birelay_at::{
+    BiRelayGetterAtComponent, BiRelayTypeProviderAtComponent,
+};
+use hermes_core::relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
+use hermes_core::relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
+use hermes_core::test_components::relay_driver::run::{
+    RelayerBackgroundRunner, RelayerBackgroundRunnerComponent,
+};
 use hermes_cosmos_integration_tests::contexts::AbortOnDrop;
 use hermes_cosmos_relayer::contexts::CosmosChain;
 use hermes_error::handlers::DebugError;
 use hermes_error::impls::UseHermesError;
 use hermes_error::Error;
-use hermes_relayer_components::multi::traits::birelay_at::{
-    BiRelayGetterAtComponent, BiRelayTypeProviderAtComponent,
-};
-use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
-use hermes_relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
-use hermes_test_components::relay_driver::run::{
-    RelayerBackgroundRunner, RelayerBackgroundRunnerComponent,
-};
 
 #[cgp_context(StarknetRelayDriverComponents)]
 #[derive(HasField)]

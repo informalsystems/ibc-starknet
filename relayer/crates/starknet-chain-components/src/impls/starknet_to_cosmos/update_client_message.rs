@@ -1,12 +1,12 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::UpdateClientMessageBuilderComponent;
 use hermes_core::chain_components::traits::{
     HasIbcChainTypes, HasMessageType, HasUpdateClientPayloadType, UpdateClientMessageBuilder,
+    UpdateClientMessageBuilderComponent,
 };
+use hermes_core::encoding_components::traits::{CanConvert, CanEncode, HasDefaultEncoding};
+use hermes_core::encoding_components::types::AsBytes;
 use hermes_cosmos_chain_components::traits::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_chain_components::types::CosmosUpdateClientMessage;
-use hermes_encoding_components::traits::{CanConvert, CanEncode, HasDefaultEncoding};
-use hermes_encoding_components::types::AsBytes;
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc::core::host::types::identifiers::ClientId;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};

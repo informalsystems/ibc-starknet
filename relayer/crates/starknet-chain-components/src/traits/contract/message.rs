@@ -1,6 +1,6 @@
 use cgp::prelude::*;
-use hermes_chain_type_components::traits::HasAddressType;
 use hermes_core::chain_components::traits::HasMessageType;
+use hermes_core::chain_type_components::traits::HasAddressType;
 
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;

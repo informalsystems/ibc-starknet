@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_chain_type_components::traits::{HasAddressType, HasHeightType};
+use hermes_core::chain_type_components::traits::{HasAddressType, HasHeightType};
 
 use crate::traits::types::blob::HasBlobType;
 use crate::traits::types::method::HasSelectorType;

@@ -1,6 +1,7 @@
 use cgp::prelude::*;
-use hermes_chain_components::traits::ChainStatusQuerierComponent;
-use hermes_core::chain_components::traits::{ChainStatusQuerier, HasChainStatusType};
+use hermes_core::chain_components::traits::{
+    ChainStatusQuerier, ChainStatusQuerierComponent, HasChainStatusType,
+};
 use hermes_cosmos_chain_components::types::Time;
 use hermes_starknet_chain_components::traits::client::HasStarknetClient;
 use hermes_starknet_chain_components::types::status::StarknetChainStatus;

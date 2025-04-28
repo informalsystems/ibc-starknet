@@ -12,33 +12,33 @@ use cgp::core::types::WithType;
 use cgp::prelude::*;
 use eyre::eyre;
 use futures::lock::Mutex;
+use hermes_core::relayer_components::build::traits::builders::birelay_builder::{
+    BiRelayBuilder, BiRelayBuilderComponent,
+};
+use hermes_core::relayer_components::build::traits::builders::birelay_from_relay_builder::{
+    BiRelayFromRelayBuilder, BiRelayFromRelayBuilderComponent,
+};
+use hermes_core::relayer_components::build::traits::builders::chain_builder::{
+    CanBuildChain, ChainBuilder, ChainBuilderComponent,
+};
+use hermes_core::relayer_components::build::traits::builders::relay_builder::{
+    RelayBuilder, RelayBuilderComponent,
+};
+use hermes_core::relayer_components::build::traits::builders::relay_from_chains_builder::{
+    RelayFromChainsBuilder, RelayFromChainsBuilderComponent,
+};
+use hermes_core::relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
+use hermes_core::relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
+use hermes_core::relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
+use hermes_core::runtime_components::traits::{
+    CanReadFileAsString, RuntimeGetterComponent, RuntimeTypeProviderComponent,
+};
 use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
 use hermes_cosmos_relayer::contexts::{CosmosBuilder, CosmosChain};
 use hermes_error::impls::UseHermesError;
 use hermes_error::types::Error;
 use hermes_error::HermesError;
-use hermes_relayer_components::build::traits::builders::birelay_builder::{
-    BiRelayBuilder, BiRelayBuilderComponent,
-};
-use hermes_relayer_components::build::traits::builders::birelay_from_relay_builder::{
-    BiRelayFromRelayBuilder, BiRelayFromRelayBuilderComponent,
-};
-use hermes_relayer_components::build::traits::builders::chain_builder::{
-    CanBuildChain, ChainBuilder, ChainBuilderComponent,
-};
-use hermes_relayer_components::build::traits::builders::relay_builder::{
-    RelayBuilder, RelayBuilderComponent,
-};
-use hermes_relayer_components::build::traits::builders::relay_from_chains_builder::{
-    RelayFromChainsBuilder, RelayFromChainsBuilderComponent,
-};
-use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
-use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
-use hermes_relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::{
-    CanReadFileAsString, RuntimeGetterComponent, RuntimeTypeProviderComponent,
-};
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};

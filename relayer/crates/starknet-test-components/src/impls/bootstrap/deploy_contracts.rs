@@ -10,14 +10,17 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_core::chain_components::traits::{CanSendSingleMessage, HasMessageType};
 use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
+use hermes_core::logging_components::traits::CanLog;
+use hermes_core::logging_components::types::LevelInfo;
+use hermes_core::runtime_components::traits::{ChildProcessOf, HasChildProcessType};
+use hermes_core::test_components::chain::traits::HasWalletType;
+use hermes_core::test_components::chain_driver::traits::{HasChain, HasChainType};
+use hermes_core::test_components::driver::traits::HasChainDriverType;
 use hermes_cosmos_test_components::bootstrap::traits::{
     ChainDriverBuilder, ChainDriverBuilderComponent, HasChainGenesisConfigType,
     HasChainNodeConfigType,
 };
-use hermes_encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
-use hermes_logging_components::traits::CanLog;
-use hermes_logging_components::types::LevelInfo;
-use hermes_runtime_components::traits::{ChildProcessOf, HasChildProcessType};
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
@@ -28,9 +31,6 @@ use hermes_starknet_chain_components::traits::types::contract_class::{
 };
 use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
 use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
-use hermes_test_components::chain::traits::HasWalletType;
-use hermes_test_components::chain_driver::traits::{HasChain, HasChainType};
-use hermes_test_components::driver::traits::HasChainDriverType;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 

@@ -1,7 +1,7 @@
 use core::time::Duration;
 
 use cgp::prelude::*;
-use hermes_chain_components::traits::{
+use hermes_core::chain_components::traits::{
     CanQueryChainHeight, ConnectionOpenAckMessageBuilder, ConnectionOpenAckMessageBuilderComponent,
     ConnectionOpenConfirmMessageBuilder, ConnectionOpenConfirmMessageBuilderComponent,
     ConnectionOpenInitMessageBuilder, ConnectionOpenInitMessageBuilderComponent,
@@ -11,7 +11,7 @@ use hermes_chain_components::traits::{
     HasConnectionOpenInitPayloadType, HasConnectionOpenTryPayloadType, HasConsensusStateType,
     HasHeightType, HasInitConnectionOptionsType, HasMessageType,
 };
-use hermes_chain_components::types::payloads::connection::{
+use hermes_core::chain_components::types::payloads::connection::{
     ConnectionOpenAckPayload, ConnectionOpenConfirmPayload, ConnectionOpenInitPayload,
     ConnectionOpenTryPayload,
 };

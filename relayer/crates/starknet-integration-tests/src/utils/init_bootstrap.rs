@@ -1,11 +1,11 @@
 use std::sync::Arc;
 use std::time::SystemTime;
 
+use hermes_core::runtime_components::traits::CanReadFileAsString;
 use hermes_cosmos_chain_components::types::{DynamicGasConfig, EipQueryType};
 use hermes_cosmos_relayer::contexts::CosmosBuilder;
 use hermes_error::Error;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::CanReadFileAsString;
 use starknet::core::types::contract::SierraClass;
 
 use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;

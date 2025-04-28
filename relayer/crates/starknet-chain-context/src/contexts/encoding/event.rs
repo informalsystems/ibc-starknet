@@ -6,7 +6,7 @@ use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_encoding_components::traits::{
+use hermes_core::encoding_components::traits::{
     CanDecode, DefaultEncodingGetterComponent, EncodingGetterComponent,
     EncodingTypeProviderComponent, HasEncodedType, HasEncoding,
 };

@@ -1,7 +1,7 @@
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::prelude::*;
-use hermes_encoding_components::traits::{
+use hermes_core::encoding_components::traits::{
     CanConvertBothWays, CanEncodeAndDecode, CanEncodeAndDecodeMut,
 };
 use hermes_error::impls::UseHermesError;

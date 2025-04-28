@@ -3,9 +3,9 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::CanSendSingleMessage;
-use hermes_chain_type_components::traits::{HasAddressType, HasDenomType};
-use hermes_encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_core::chain_components::traits::CanSendSingleMessage;
+use hermes_core::chain_type_components::traits::{HasAddressType, HasDenomType};
+use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 

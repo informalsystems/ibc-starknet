@@ -2,7 +2,7 @@
 mod preset {
     use cgp::core::types::UseDelegatedType;
     use cgp::prelude::*;
-    use hermes_chain_components::impls::{
+    use hermes_core::chain_components::impls::{
         BuildChannelHandshakePayload, BuildConnectionHandshakePayload, BuildPacketPayloads,
         ProvideBytesPacketCommitment, ProvideBytesPacketReceipt, ProvideChannelPayloadTypes,
         ProvideCommitmentPrefixBytes, ProvideConnectionPayloadTypes, ProvidePacketPayloadTypes,
@@ -10,11 +10,12 @@ mod preset {
         QueryLatestConsensusStateHeightAsHeights, RetryQueryBlockEvents,
         WaitBlockHeightAndQueryEvents,
     };
-    use hermes_chain_components::traits::{
+    use hermes_core::chain_components::traits::{
         AckCommitmentHashTypeProviderComponent, AckPacketMessageBuilderComponent,
         AckPacketPayloadBuilderComponent, AckPacketPayloadTypeProviderComponent,
         AcknowledgementTypeProviderComponent, BlockEventsQuerierComponent, BlockQuerierComponent,
-        BlockTypeComponent, ChannelEndQuerierComponent, ChannelEndTypeComponent,
+        BlockTypeComponent, ChainIdTypeProviderComponent, ChainStatusQuerierComponent,
+        ChainStatusTypeComponent, ChannelEndQuerierComponent, ChannelEndTypeComponent,
         ChannelEndWithProofsQuerierComponent, ChannelIdTypeComponent,
         ChannelOpenAckMessageBuilderComponent, ChannelOpenAckPayloadBuilderComponent,
         ChannelOpenAckPayloadTypeComponent, ChannelOpenConfirmMessageBuilderComponent,
@@ -23,34 +24,37 @@ mod preset {
         ChannelOpenTryEventComponent, ChannelOpenTryMessageBuilderComponent,
         ChannelOpenTryPayloadBuilderComponent, ChannelOpenTryPayloadTypeComponent,
         ClientIdTypeComponent, ClientStateFieldsComponent, ClientStateQuerierComponent,
-        ClientStateWithProofsQuerierComponent, CommitmentPrefixTypeComponent,
-        CommitmentProofBytesGetterComponent, CommitmentProofHeightGetterComponent,
-        CommitmentProofTypeProviderComponent, ConnectionEndQuerierComponent,
-        ConnectionEndTypeComponent, ConnectionEndWithProofsQuerierComponent,
-        ConnectionIdTypeComponent, ConnectionOpenAckMessageBuilderComponent,
-        ConnectionOpenAckPayloadBuilderComponent, ConnectionOpenAckPayloadTypeComponent,
-        ConnectionOpenConfirmMessageBuilderComponent, ConnectionOpenConfirmPayloadBuilderComponent,
-        ConnectionOpenConfirmPayloadTypeComponent, ConnectionOpenInitEventComponent,
-        ConnectionOpenInitMessageBuilderComponent, ConnectionOpenInitPayloadBuilderComponent,
-        ConnectionOpenInitPayloadTypeComponent, ConnectionOpenTryEventComponent,
-        ConnectionOpenTryMessageBuilderComponent, ConnectionOpenTryPayloadBuilderComponent,
-        ConnectionOpenTryPayloadTypeComponent, ConsensusStateHeightQuerierComponent,
-        ConsensusStateHeightsQuerierComponent, ConsensusStateQuerierComponent,
+        ClientStateTypeComponent, ClientStateWithProofsQuerierComponent,
+        CommitmentPrefixTypeComponent, CommitmentProofBytesGetterComponent,
+        CommitmentProofHeightGetterComponent, CommitmentProofTypeProviderComponent,
+        ConnectionEndQuerierComponent, ConnectionEndTypeComponent,
+        ConnectionEndWithProofsQuerierComponent, ConnectionIdTypeComponent,
+        ConnectionOpenAckMessageBuilderComponent, ConnectionOpenAckPayloadBuilderComponent,
+        ConnectionOpenAckPayloadTypeComponent, ConnectionOpenConfirmMessageBuilderComponent,
+        ConnectionOpenConfirmPayloadBuilderComponent, ConnectionOpenConfirmPayloadTypeComponent,
+        ConnectionOpenInitEventComponent, ConnectionOpenInitMessageBuilderComponent,
+        ConnectionOpenInitPayloadBuilderComponent, ConnectionOpenInitPayloadTypeComponent,
+        ConnectionOpenTryEventComponent, ConnectionOpenTryMessageBuilderComponent,
+        ConnectionOpenTryPayloadBuilderComponent, ConnectionOpenTryPayloadTypeComponent,
+        ConsensusStateHeightQuerierComponent, ConsensusStateHeightsQuerierComponent,
+        ConsensusStateQuerierComponent, ConsensusStateTypeComponent,
         ConsensusStateWithProofsQuerierComponent, CounterpartyChainIdQuerierComponent,
         CounterpartyConnectionIdQuerierComponent, CounterpartyMessageHeightGetterComponent,
         CreateClientEventComponent, CreateClientMessageBuilderComponent,
         CreateClientMessageOptionsTypeComponent, CreateClientPayloadBuilderComponent,
         CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
-        EventExtractorComponent, HeightAdjusterComponent, HeightIncrementerComponent,
+        EventExtractorComponent, EventTypeProviderComponent, HeightAdjusterComponent,
+        HeightFieldComponent, HeightIncrementerComponent, HeightTypeProviderComponent,
         IbcCommitmentPrefixGetterComponent, IncomingPacketFilterComponent,
         InitChannelOptionsTypeComponent, InitConnectionOptionsTypeComponent,
-        MessageResponseExtractorComponent, OutgoingPacketFilterComponent,
-        OutgoingPacketTypeComponent, PacketAckCommitmentQuerierComponent,
-        PacketCommitmentQuerierComponent, PacketCommitmentTypeComponent,
-        PacketDstChannelIdGetterComponent, PacketDstPortIdGetterComponent,
-        PacketFromSendPacketEventBuilderComponent, PacketFromWriteAckEventBuilderComponent,
-        PacketIsClearedQuerierComponent, PacketIsReceivedQuerierComponent,
-        PacketReceiptQuerierComponent, PacketReceiptTypeComponent, PacketSequenceGetterComponent,
+        MessageResponseExtractorComponent, MessageSenderComponent, MessageTypeProviderComponent,
+        OutgoingPacketFilterComponent, OutgoingPacketTypeComponent,
+        PacketAckCommitmentQuerierComponent, PacketCommitmentQuerierComponent,
+        PacketCommitmentTypeComponent, PacketDstChannelIdGetterComponent,
+        PacketDstPortIdGetterComponent, PacketFromSendPacketEventBuilderComponent,
+        PacketFromWriteAckEventBuilderComponent, PacketIsClearedQuerierComponent,
+        PacketIsReceivedQuerierComponent, PacketReceiptQuerierComponent,
+        PacketReceiptTypeComponent, PacketSequenceGetterComponent,
         PacketSrcChannelIdGetterComponent, PacketSrcPortIdGetterComponent,
         PacketTimeoutHeightGetterComponent, PacketTimeoutTimestampGetterComponent,
         PortIdTypeComponent, ReceivePacketMessageBuilderComponent,
@@ -61,41 +65,35 @@ mod preset {
         UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
         UpdateClientPayloadTypeComponent, WriteAckEventComponent,
     };
-    use hermes_chain_type_components::traits::{
+    use hermes_core::chain_type_components::traits::{
         AddressTypeProviderComponent, AmountDenomGetterComponent, AmountTypeProviderComponent,
         DenomTypeComponent, MessageResponseEventsGetterComponent, MessageResponseTypeComponent,
         TimeTypeComponent,
     };
-    use hermes_core::chain_components::traits::{
-        ChainIdTypeProviderComponent, ChainStatusQuerierComponent, ChainStatusTypeComponent,
-        ClientStateTypeComponent, ConsensusStateTypeComponent, EventTypeProviderComponent,
-        HeightFieldComponent, HeightTypeProviderComponent, MessageSenderComponent,
-        MessageTypeProviderComponent,
-    };
-    use hermes_cosmos_chain_components::impls::{
-        CosmosPacketFieldReader, FixedPollTimeoutSecs, ProvideCosmosChainTypes,
-        ProvideCosmosInitChannelOptionsType, ProvideCosmosInitConnectionOptionsType,
-        ProvideNoCreateClientMessageOptionsType, QueryCounterpartyConnectionId,
-    };
-    use hermes_relayer_components::components::default::DefaultTxComponents;
-    use hermes_relayer_components::error::impls::retry::ReturnRetryable;
-    use hermes_relayer_components::error::traits::RetryableErrorComponent;
-    use hermes_relayer_components::transaction::impls::PollTimeoutGetterComponent;
-    use hermes_relayer_components::transaction::traits::{
+    use hermes_core::relayer_components::components::default::DefaultTxComponents;
+    use hermes_core::relayer_components::error::impls::retry::ReturnRetryable;
+    use hermes_core::relayer_components::error::traits::RetryableErrorComponent;
+    use hermes_core::relayer_components::transaction::impls::PollTimeoutGetterComponent;
+    use hermes_core::relayer_components::transaction::traits::{
         MessagesWithSignerAndNonceSenderComponent, MessagesWithSignerSenderComponent,
         NonceAllocatorComponent, NonceQuerierComponent, NonceTypeProviderComponent,
         SignerTypeProviderComponent, TxHashTypeProviderComponent, TxMessageResponseParserComponent,
         TxResponsePollerComponent, TxResponseQuerierComponent, TxResponseTypeProviderComponent,
     };
-    use hermes_test_components::chain::impls::{
+    use hermes_core::test_components::chain::impls::{
         PollAssertEventualAmount, ProvideDefaultMemo, SendIbcTransferMessage,
     };
-    use hermes_test_components::chain::traits::{
+    use hermes_core::test_components::chain::traits::{
         AmountMethodsComponent, BalanceQuerierComponent, DefaultMemoGetterComponent,
         EventualAmountAsserterComponent, IbcTokenTransferMessageBuilderComponent,
         IbcTransferTimeoutCalculatorComponent, IbcTransferredAmountConverterComponent,
         MemoTypeProviderComponent, PollAssertDurationGetterComponent, TokenIbcTransferrerComponent,
         WalletSignerComponent, WalletTypeComponent,
+    };
+    use hermes_cosmos_chain_components::impls::{
+        CosmosPacketFieldReader, FixedPollTimeoutSecs, ProvideCosmosChainTypes,
+        ProvideCosmosInitChannelOptionsType, ProvideCosmosInitConnectionOptionsType,
+        ProvideNoCreateClientMessageOptionsType, QueryCounterpartyConnectionId,
     };
     use ibc::core::host::types::identifiers::ChainId;
     use starknet::core::types::Felt;

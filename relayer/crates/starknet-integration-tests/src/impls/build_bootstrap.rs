@@ -5,6 +5,10 @@ use std::sync::OnceLock;
 use cgp::extra::runtime::HasRuntime;
 use cgp::prelude::*;
 use futures::lock::Mutex;
+use hermes_core::runtime_components::traits::{CanCreateDir, CanSleep, CanWriteStringToFile};
+use hermes_core::test_components::chain::traits::HasWalletType;
+use hermes_core::test_components::chain_driver::traits::HasChainType;
+use hermes_core::test_components::driver::traits::HasChainDriverType;
 use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
 use hermes_cosmos_test_components::bootstrap::traits::{
     ChainDriverBuilder, ChainDriverBuilderComponent, HasChainGenesisConfigType,
@@ -12,14 +16,10 @@ use hermes_cosmos_test_components::bootstrap::traits::{
 };
 use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::{CanCreateDir, CanSleep, CanWriteStringToFile};
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
 use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
 use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
-use hermes_test_components::chain::traits::HasWalletType;
-use hermes_test_components::chain_driver::traits::HasChainType;
-use hermes_test_components::driver::traits::HasChainDriverType;
 use ibc::core::host::types::error::IdentifierError;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::providers::jsonrpc::HttpTransport;

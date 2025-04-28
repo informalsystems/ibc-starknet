@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_chain_type_components::traits::{ProvideTimeType, TimeTypeComponent};
+use hermes_core::chain_type_components::traits::{ProvideTimeType, TimeTypeComponent};
 
 pub struct ProvideStarknetTimeType;
 

@@ -1,7 +1,7 @@
 use core::num::TryFromIntError;
 
 use cgp::prelude::*;
-use hermes_chain_type_components::traits::HasAddressType;
+use hermes_core::chain_type_components::traits::HasAddressType;
 use indexmap::IndexMap;
 use starknet::core::crypto::pedersen_hash;
 use starknet::core::types::{Felt, MerkleNode, StorageProof};

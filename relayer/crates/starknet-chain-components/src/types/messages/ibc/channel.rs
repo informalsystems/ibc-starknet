@@ -1,6 +1,6 @@
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
-use hermes_encoding_components::traits::{
+use hermes_core::encoding_components::traits::{
     MutDecoderComponent, MutEncoderComponent, Transformer, TransformerRef,
 };
 pub use ibc::core::channel::types::channel::Order as ChannelOrdering;

@@ -1,7 +1,7 @@
 use core::time::Duration;
 
 use cgp::prelude::*;
-use hermes_test_components::chain::traits::{
+use hermes_core::test_components::chain::traits::{
     PollAssertDurationGetter, PollAssertDurationGetterComponent,
 };
 

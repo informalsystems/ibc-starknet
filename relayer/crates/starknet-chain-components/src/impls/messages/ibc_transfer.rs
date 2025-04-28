@@ -4,12 +4,12 @@ use std::str::FromStr;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::{
+use hermes_core::chain_components::traits::{
     HasChannelIdType, HasHeightFields, HasMessageType, HasPortIdType, HasTimeoutType,
 };
-use hermes_chain_type_components::traits::{HasAddressType, HasAmountType};
-use hermes_encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
-use hermes_test_components::chain::traits::{
+use hermes_core::chain_type_components::traits::{HasAddressType, HasAmountType};
+use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_core::test_components::chain::traits::{
     HasMemoType, IbcTokenTransferMessageBuilder, IbcTokenTransferMessageBuilderComponent,
 };
 use ibc::core::host::types::identifiers::PortId;

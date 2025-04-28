@@ -3,12 +3,12 @@ use core::marker::PhantomData;
 use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::{
+use hermes_core::chain_components::traits::{
     CreateClientEventComponent, HasClientIdType, MessageResponseExtractor,
     MessageResponseExtractorComponent, ProvideCreateClientEvent,
 };
-use hermes_chain_type_components::traits::HasMessageResponseType;
-use hermes_encoding_components::traits::{CanDecode, HasDefaultEncoding, HasEncodedType};
+use hermes_core::chain_type_components::traits::HasMessageResponseType;
+use hermes_core::encoding_components::traits::{CanDecode, HasDefaultEncoding, HasEncodedType};
 use starknet::core::types::Felt;
 
 use crate::impls::events::UseStarknetEvents;

@@ -12,12 +12,12 @@ use hermes_cli_components::traits::{
     ConfigTypeComponent, ConfigWriterComponent, HasConfigPath, HasConfigType, OutputProducer,
     OutputProducerComponent, OutputTypeComponent,
 };
-use hermes_logging_components::traits::LoggerComponent;
-use hermes_relayer_components::error::traits::RetryableErrorComponent;
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::{
+use hermes_core::logging_components::traits::LoggerComponent;
+use hermes_core::relayer_components::error::traits::RetryableErrorComponent;
+use hermes_core::runtime_components::traits::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
+use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::types::config::StarknetRelayerConfig;
 use hermes_starknet_cli::impls::bootstrap::starknet_chain::{
     BootstrapStarknetChainArgs, LoadStarknetBootstrap,
