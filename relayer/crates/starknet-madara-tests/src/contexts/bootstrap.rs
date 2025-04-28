@@ -12,8 +12,8 @@ use hermes_core::runtime_components::traits::{
 use hermes_core::test_components::bootstrap::traits::ChainBootstrapperComponent;
 use hermes_core::test_components::chain_driver::traits::ChainTypeProviderComponent;
 use hermes_core::test_components::driver::traits::ChainDriverTypeProviderComponent;
-use hermes_cosmos_core::test_components::bootstrap::impls::BuildAndWaitChainDriver;
-use hermes_cosmos_core::test_components::bootstrap::traits::{
+use hermes_cosmos_test_components::bootstrap::impls::BuildAndWaitChainDriver;
+use hermes_cosmos_test_components::bootstrap::traits::{
     ChainCommandPathGetterComponent, ChainDriverBuilderComponent, ChainFullNodeStarterComponent,
     ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent, ChainStoreDirGetterComponent,
 };

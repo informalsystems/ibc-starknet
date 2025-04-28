@@ -9,8 +9,8 @@ use hermes_core::runtime_components::traits::{CanCreateDir, CanSleep, CanWriteSt
 use hermes_core::test_components::chain::traits::HasWalletType;
 use hermes_core::test_components::chain_driver::traits::HasChainType;
 use hermes_core::test_components::driver::traits::HasChainDriverType;
-use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
-use hermes_cosmos_core::test_components::bootstrap::traits::{
+use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_test_components::bootstrap::traits::{
     ChainDriverBuilder, ChainDriverBuilderComponent, HasChainGenesisConfigType,
     HasChainNodeConfigType, HasChainStoreDir,
 };
