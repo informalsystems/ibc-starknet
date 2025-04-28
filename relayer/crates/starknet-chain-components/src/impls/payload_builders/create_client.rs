@@ -4,7 +4,7 @@ use hermes_core::chain_components::traits::{
     CreateClientPayloadBuilderComponent, HasChainId, HasCreateClientPayloadOptionsType,
     HasCreateClientPayloadType,
 };
-use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;

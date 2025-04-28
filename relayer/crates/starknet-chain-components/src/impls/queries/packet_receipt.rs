@@ -9,7 +9,7 @@ use hermes_core::chain_components::traits::{
     PacketReceiptQuerierComponent,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
-use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence as IbcSequence};
 use ibc::core::host::types::path::{Path, ReceiptPath};
 use starknet::core::types::Felt;

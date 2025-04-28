@@ -190,6 +190,7 @@ hermes-tracing-logging-components    = { git = "https://github.com/informalsyste
 hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
 hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
 hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
+hermes-cosmos                        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
 hermes-cosmos-core                   = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
 hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }
 hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "soares/simplify-exports-2" }

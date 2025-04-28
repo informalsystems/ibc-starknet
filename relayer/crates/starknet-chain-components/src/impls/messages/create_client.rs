@@ -9,7 +9,7 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
-use hermes_cosmos_chain_components::types::CosmosCreateClientPayload;
+use hermes_cosmos_core::chain_components::types::CosmosCreateClientPayload;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 

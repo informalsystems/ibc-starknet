@@ -23,10 +23,10 @@ mod preset {
         UpdateClientPayloadTypeComponent,
     };
     use hermes_core::test_components::chain::traits::IbcTransferredAmountConverterComponent;
-    use hermes_cosmos_chain_components::impls::{
+    use hermes_cosmos_chain_preset::presets::CosmosToCosmosComponents;
+    use hermes_cosmos_core::chain_components::impls::{
         BuildCosmosPacketMessages, CosmosPacketFieldReader,
     };
-    use hermes_cosmos_chain_preset::presets::CosmosToCosmosComponents;
 
     use crate::impls::starknet_to_cosmos::connection_message::BuildStarknetToCosmosConnectionHandshake;
     use crate::impls::starknet_to_cosmos::counterparty_message_height::GetCosmosCounterpartyMessageStarknetHeight;

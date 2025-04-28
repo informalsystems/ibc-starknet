@@ -15,8 +15,8 @@ use hermes_core::chain_components::types::payloads::connection::{
     ConnectionOpenAckPayload, ConnectionOpenConfirmPayload, ConnectionOpenInitPayload,
     ConnectionOpenTryPayload,
 };
-use hermes_cosmos_chain_components::traits::{CosmosMessage, ToCosmosMessage};
-use hermes_cosmos_chain_components::types::{
+use hermes_cosmos_core::chain_components::traits::{CosmosMessage, ToCosmosMessage};
+use hermes_cosmos_core::chain_components::types::{
     CosmosConnectionOpenAckMessage, CosmosConnectionOpenConfirmMessage,
     CosmosConnectionOpenInitMessage, CosmosConnectionOpenTryMessage, CosmosInitConnectionOptions,
 };

@@ -17,7 +17,9 @@ use hermes_core::chain_components::types::payloads::channel::{
 };
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
-use hermes_cosmos_chain_components::types::{CosmosCommitmentProof, CosmosInitChannelOptions};
+use hermes_cosmos_core::chain_components::types::{
+    CosmosCommitmentProof, CosmosInitChannelOptions,
+};
 use ibc::core::channel::types::channel::{ChannelEnd, Order as IbcOrder};
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChannelId, ConnectionId, PortId as IbcPortId};

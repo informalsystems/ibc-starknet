@@ -3,7 +3,7 @@ use hermes_core::chain_components::traits::{
     ConsensusStateHeightsQuerier, ConsensusStateHeightsQuerierComponent, HasHeightType,
     HasIbcChainTypes,
 };
-use hermes_cosmos_chain_components::traits::HasGrpcAddress;
+use hermes_cosmos_core::chain_components::traits::HasGrpcAddress;
 use http::uri::InvalidUri;
 use http::Uri;
 use ibc::core::host::types::identifiers::ClientId;

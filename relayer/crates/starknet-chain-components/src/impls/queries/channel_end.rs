@@ -9,7 +9,7 @@ use hermes_core::chain_components::traits::{
     HasChannelIdType, HasCommitmentProofType, HasHeightType, HasIbcCommitmentPrefix, HasPortIdType,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
-use hermes_cosmos_chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use ibc::core::host::types::path::{ChannelEndPath, Path};
 use ibc_proto::Protobuf;
 use starknet::core::types::Felt;

@@ -16,6 +16,7 @@ workspace = true
 cgp                                 = { workspace = true }
 hermes-prelude                      = { workspace = true }
 hermes-core                         = { workspace = true }
+hermes-cosmos-core                  = { workspace = true }
 hermes-relayer-components           = { workspace = true }
 hermes-test-components              = { workspace = true }
 hermes-runtime-components           = { workspace = true }

@@ -22,7 +22,9 @@ use hermes_core::chain_components::types::payloads::connection::{
 };
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
-use hermes_cosmos_chain_components::types::{CosmosCommitmentProof, CosmosInitConnectionOptions};
+use hermes_cosmos_core::chain_components::types::{
+    CosmosCommitmentProof, CosmosInitConnectionOptions,
+};
 use ibc::core::client::types::Height;
 use ibc::core::connection::types::ConnectionEnd;
 use ibc::core::host::types::identifiers::{

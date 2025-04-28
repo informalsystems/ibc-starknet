@@ -90,7 +90,7 @@ mod preset {
         MemoTypeProviderComponent, PollAssertDurationGetterComponent, TokenIbcTransferrerComponent,
         WalletSignerComponent, WalletTypeComponent,
     };
-    use hermes_cosmos_chain_components::impls::{
+    use hermes_cosmos_core::chain_components::impls::{
         CosmosPacketFieldReader, FixedPollTimeoutSecs, ProvideCosmosChainTypes,
         ProvideCosmosInitChannelOptionsType, ProvideCosmosInitConnectionOptionsType,
         ProvideNoCreateClientMessageOptionsType, QueryCounterpartyConnectionId,

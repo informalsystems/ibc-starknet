@@ -9,7 +9,7 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
-use hermes_cosmos_chain_components::types::CosmosUpdateClientPayload;
+use hermes_cosmos_core::chain_components::types::CosmosUpdateClientPayload;
 use ibc_proto::ibc::lightclients::tendermint::v1::Header as RawHeader;
 use ibc_proto::Protobuf;
 use starknet::core::types::{ByteArray, Felt};

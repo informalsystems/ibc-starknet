@@ -3,7 +3,7 @@ use hermes_core::chain_components::traits::{
     CounterpartyMessageHeightGetter, CounterpartyMessageHeightGetterComponent, HasHeightType,
     HasMessageType,
 };
-use hermes_cosmos_chain_components::traits::CosmosMessage;
+use hermes_cosmos_core::chain_components::traits::CosmosMessage;
 
 pub struct GetCosmosCounterpartyMessageStarknetHeight;
 
