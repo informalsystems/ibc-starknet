@@ -17,7 +17,7 @@ use hermes_core::runtime_components::traits::{ChildProcessOf, HasChildProcessTyp
 use hermes_core::test_components::chain::traits::HasWalletType;
 use hermes_core::test_components::chain_driver::traits::{HasChain, HasChainType};
 use hermes_core::test_components::driver::traits::HasChainDriverType;
-use hermes_cosmos_test_components::bootstrap::traits::{
+use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainDriverBuilder, ChainDriverBuilderComponent, HasChainGenesisConfigType,
     HasChainNodeConfigType,
 };

@@ -1,6 +1,6 @@
 use cgp::prelude::*;
 use hermes_core::runtime_components::traits::{HasChildProcessType, HasFilePathType, HasRuntime};
-use hermes_cosmos_test_components::bootstrap::traits::{
+use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainFullNodeStarter, ChainFullNodeStarterComponent, HasChainGenesisConfigType,
     HasChainNodeConfigType,
 };

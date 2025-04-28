@@ -17,6 +17,7 @@ use hermes_cosmos::test_components::bootstrap::traits::{
     ChainCommandPathGetterComponent, ChainDriverBuilderComponent, ChainFullNodeStarterComponent,
     ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent, ChainStoreDirGetterComponent,
 };
+use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::impls::UseHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
@@ -29,7 +30,6 @@ use hermes_starknet_test_components::impls::bootstrap::start_chain::StartStarkne
 use hermes_starknet_test_components::impls::types::genesis_config::ProvideStarknetGenesisConfigType;
 use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetNodeConfigType;
 use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
-use hermes_tracing_logging_components::contexts::TracingLogger;
 use starknet::core::types::contract::SierraClass;
 
 use crate::contexts::chain_driver::StarknetChainDriver;

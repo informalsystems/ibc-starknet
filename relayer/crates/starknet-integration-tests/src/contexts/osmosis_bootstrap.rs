@@ -31,10 +31,10 @@ use hermes_cosmos::test_components::bootstrap::traits::{
     DenomForTransfer, DenomPrefixGetterComponent, DynamicGasGetterComponent,
     RandomIdFlagGetterComponent, WalletConfigGeneratorComponent,
 };
+use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::handlers::DebugError;
 use hermes_error::impls::UseHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_tracing_logging_components::contexts::TracingLogger;
 use hermes_wasm_test_components::impls::bootstrap::{
     BuildChainDriverAndInitWasmClient, ModifyWasmGenesisConfig, ModifyWasmNodeConfig,
 };

@@ -8,13 +8,13 @@ mod preset {
         EncodedTypeComponent, EncoderComponent, MutDecoderComponent, MutEncoderComponent,
         SchemaGetterComponent, SchemaTypeComponent,
     };
-    use hermes_protobuf_encoding_components::impl_type_url;
-    use hermes_protobuf_encoding_components::impls::{
+    use hermes_cosmos_core::protobuf_encoding_components::impl_type_url;
+    use hermes_cosmos_core::protobuf_encoding_components::impls::{
         DecodeAsAnyProtobuf, EncodeAsAnyProtobuf, ProvideBytesEncodeBuffer,
         ProvideProtoChunksDecodeBuffer,
     };
-    use hermes_protobuf_encoding_components::traits::EncodedLengthGetterComponent;
-    use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
+    use hermes_cosmos_core::protobuf_encoding_components::traits::EncodedLengthGetterComponent;
+    use hermes_cosmos_core::protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
     use hermes_wasm_encoding_components::components::WasmEncodingComponents;
     use hermes_wasm_encoding_components::impls::{DecodeViaClientMessage, EncodeViaClientMessage};
     use hermes_wasm_encoding_components::types::{

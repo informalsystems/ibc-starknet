@@ -6,7 +6,7 @@ use hermes_core::chain_type_components::traits::{HasAddressType, HasAmountType, 
 use hermes_core::test_components::chain::traits::{
     IbcTransferredAmountConverter, IbcTransferredAmountConverterComponent,
 };
-use hermes_cosmos_test_components::chain::types::Amount;
+use hermes_cosmos_core::test_components::chain::types::Amount;
 use ibc::core::host::types::identifiers::{ChannelId, PortId};
 
 use crate::impls::types::address::StarknetAddress;

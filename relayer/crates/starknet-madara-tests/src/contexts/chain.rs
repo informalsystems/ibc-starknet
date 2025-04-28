@@ -28,6 +28,7 @@ use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::impls::UseHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::commitment_proof::{
@@ -66,7 +67,6 @@ use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
 use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
 use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
-use hermes_tracing_logging_components::contexts::TracingLogger;
 use ibc::core::host::types::identifiers::ChainId;
 use indexmap::IndexMap;
 use reqwest::Client;

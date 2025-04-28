@@ -1,5 +1,5 @@
 use cgp::prelude::*;
-use hermes_cosmos_test_components::bootstrap::traits::{
+use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainNodeConfigTypeComponent, ProvideChainNodeConfigType,
 };
 

@@ -34,6 +34,7 @@ ibc = { workspace = true }
 
 hermes-prelude                    = { workspace = true }
 hermes-core                       = { workspace = true }
+hermes-cosmos-core                = { workspace = true }
 hermes-cli                        = { workspace = true }
 hermes-cli-components             = { workspace = true }
 hermes-encoding-components        = { workspace = true }

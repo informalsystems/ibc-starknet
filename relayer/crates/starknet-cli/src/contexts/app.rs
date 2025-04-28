@@ -30,6 +30,7 @@ use hermes_core::runtime_components::traits::{
 use hermes_core::test_components::chain_driver::traits::{ConfigUpdater, ConfigUpdaterComponent};
 use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::types::HermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
@@ -42,7 +43,6 @@ use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriv
 use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
-use hermes_tracing_logging_components::contexts::TracingLogger;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId, PortId};
 use toml::to_string_pretty;

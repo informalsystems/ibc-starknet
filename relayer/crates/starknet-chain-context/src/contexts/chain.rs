@@ -75,6 +75,7 @@ use hermes_cosmos::chain_components::types::{
 };
 use hermes_cosmos::chain_preset::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::impls::UseHermesError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::components::chain::StarknetChainComponents;
@@ -117,7 +118,6 @@ use hermes_starknet_chain_components::types::payloads::client::{
 };
 use hermes_starknet_chain_components::types::status::StarknetChainStatus;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
-use hermes_tracing_logging_components::contexts::TracingLogger;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::host::types::identifiers::{ChainId, PortId as IbcPortId, Sequence};
 use ibc::primitives::Timestamp;

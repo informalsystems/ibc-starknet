@@ -21,6 +21,7 @@ use hermes_core::test_components::setup::traits::{
 };
 use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::handlers::DebugError;
 use hermes_error::impls::UseHermesError;
 use hermes_starknet_chain_components::types::channel_id::ChannelId;
@@ -30,7 +31,6 @@ use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBi
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
-use hermes_tracing_logging_components::contexts::TracingLogger;
 use ibc::core::host::types::identifiers::PortId;
 
 use crate::contexts::chain_driver::StarknetChainDriver;

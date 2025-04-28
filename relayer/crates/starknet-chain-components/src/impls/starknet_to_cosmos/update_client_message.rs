@@ -7,7 +7,7 @@ use hermes_core::encoding_components::traits::{CanConvert, CanEncode, HasDefault
 use hermes_core::encoding_components::types::AsBytes;
 use hermes_cosmos_core::chain_components::traits::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_core::chain_components::types::CosmosUpdateClientMessage;
-use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
+use hermes_cosmos_core::protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc::core::host::types::identifiers::ClientId;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use prost_types::Any;

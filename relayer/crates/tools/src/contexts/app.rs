@@ -17,6 +17,7 @@ use hermes_core::relayer_components::error::traits::RetryableErrorComponent;
 use hermes_core::runtime_components::traits::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
+use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::types::config::StarknetRelayerConfig;
 use hermes_starknet_cli::impls::bootstrap::starknet_chain::{
@@ -26,7 +27,6 @@ use hermes_starknet_cli::impls::build::LoadStarknetBuilder;
 use hermes_starknet_cli::impls::error::ProvideCliError;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
-use hermes_tracing_logging_components::contexts::TracingLogger;
 
 use crate::commands::starknet::subcommand::{RunStarknetSubCommand, StarknetSubCommand};
 use crate::commands::starknet::transfer_args::{RunTransferArgs, TransferArgs};

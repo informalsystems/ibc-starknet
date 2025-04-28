@@ -22,13 +22,13 @@ use hermes_core::relayer_components::transaction::traits::HasTxHashType;
 use hermes_core::test_components::chain::impls::{
     EventualAmountTimeoutError, MissingSendPacketEventError,
 };
+use hermes_cosmos::protobuf_encoding_components::impls::{
+    InvalidWireType, RequiredFieldTagNotFound, TypeUrlMismatchError, UnsupportedWireType,
+};
 use hermes_error::handlers::{
     DebugError, DisplayError, HandleInfallible, ReportError, ReturnError,
 };
 use hermes_error::types::Error;
-use hermes_protobuf_encoding_components::impls::{
-    InvalidWireType, RequiredFieldTagNotFound, TypeUrlMismatchError, UnsupportedWireType,
-};
 use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_starknet_chain_components::impls::error::account::RaiseAccountError;
 use hermes_starknet_chain_components::impls::error::provider::RaiseProviderError;
