@@ -1,5 +1,14 @@
-pub mod blob;
-pub mod commitment;
-pub mod contract_class;
-pub mod method;
-pub mod storage_proof;
+mod blob;
+pub use blob::*;
+
+mod commitment;
+pub use commitment::*;
+
+mod contract_class;
+pub use contract_class::*;
+
+mod method;
+pub use method::*;
+
+mod storage_proof;
+pub use storage_proof::*;

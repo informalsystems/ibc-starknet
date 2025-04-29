@@ -3,13 +3,9 @@ use hermes_core::encoding_components::traits::CanEncode;
 use hermes_core::logging_components::traits::CanLog;
 use hermes_core::logging_components::types::LevelInfo;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::types::cosmos::height::Height;
-use hermes_starknet_chain_components::types::cosmos::timestamp::Timestamp;
-use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
-use hermes_starknet_chain_components::types::messages::ibc::denom::{
-    Denom, PrefixedDenom, TracePrefix,
+use hermes_starknet_chain_components::types::{
+    Denom, Height, MsgTransfer, PortId, PrefixedDenom, Timestamp, TracePrefix,
 };
-use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::MsgTransfer;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
 use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use starknet::core::types::Felt;

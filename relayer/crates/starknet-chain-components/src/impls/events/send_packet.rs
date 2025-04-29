@@ -20,9 +20,8 @@ use ibc::primitives::Signer;
 use serde::{Deserialize, Serialize};
 use starknet::core::types::Felt;
 
-use crate::impls::events::UseStarknetEvents;
-use crate::types::events::packet::{PacketRelayEvents, SendPacketEvent};
-use crate::types::messages::ibc::ibc_transfer::TransferPacketData;
+use crate::impls::UseStarknetEvents;
+use crate::types::{PacketRelayEvents, SendPacketEvent, TransferPacketData};
 
 #[cgp_provider(SendPacketEventComponent)]
 impl<Chain, Counterparty> ProvideSendPacketEvent<Chain, Counterparty> for UseStarknetEvents

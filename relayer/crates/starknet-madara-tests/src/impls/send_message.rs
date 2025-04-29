@@ -9,13 +9,11 @@ use hermes_core::relayer_components::transaction::traits::{
     TxMessageResponseParser, TxMessageResponseParserComponent,
 };
 use hermes_prelude::*;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
-use hermes_starknet_chain_components::traits::account::{
-    CanBuildAccountFromSigner, HasStarknetAccountType,
+use hermes_starknet_chain_components::impls::{StarknetAddress, StarknetMessage};
+use hermes_starknet_chain_components::traits::{CanBuildAccountFromSigner, HasStarknetAccountType};
+use hermes_starknet_chain_components::types::{
+    StarknetEvent, StarknetEventFields, StarknetMessageResponse,
 };
-use hermes_starknet_chain_components::types::event::{StarknetEvent, StarknetEventFields};
-use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
 use starknet_v13::accounts::Account;
 use starknet_v13::core::types::{
     Call, ExecuteInvocation, Felt, FunctionInvocation, OrderedEvent, RevertedInvocation,

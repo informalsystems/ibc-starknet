@@ -5,7 +5,7 @@ use hermes_core::chain_components::traits::{
 use hermes_prelude::*;
 use ibc::core::client::types::Height;
 
-use crate::impls::types::message::StarknetMessage;
+use crate::impls::StarknetMessage;
 
 pub struct GetCounterpartyCosmosHeightFromStarknetMessage;
 

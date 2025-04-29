@@ -10,12 +10,11 @@ use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
 
-use crate::traits::proof_signer::HasStarknetProofSigner;
-use crate::types::consensus_state::{StarknetConsensusState, WasmStarknetConsensusState};
-use crate::types::payloads::client::{
-    StarknetCreateClientPayload, StarknetCreateClientPayloadOptions,
+use crate::traits::HasStarknetProofSigner;
+use crate::types::{
+    StarknetChainStatus, StarknetConsensusState, StarknetCreateClientPayload,
+    StarknetCreateClientPayloadOptions, WasmStarknetConsensusState,
 };
-use crate::types::status::StarknetChainStatus;
 
 pub struct BuildStarknetCreateClientPayload;
 

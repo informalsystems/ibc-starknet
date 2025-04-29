@@ -23,7 +23,7 @@ use hermes_core::relayer_components::relay::traits::{
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
+use hermes_starknet_chain_components::types::ClientId as StarknetClientId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
 

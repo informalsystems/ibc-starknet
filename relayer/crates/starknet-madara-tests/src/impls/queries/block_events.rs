@@ -6,10 +6,9 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::client::HasStarknetClient;
-use hermes_starknet_chain_components::traits::queries::contract_address::CanQueryContractAddress;
-use hermes_starknet_chain_components::types::event::{StarknetEvent, StarknetEventFields};
+use hermes_starknet_chain_components::impls::StarknetAddress;
+use hermes_starknet_chain_components::traits::{CanQueryContractAddress, HasStarknetClient};
+use hermes_starknet_chain_components::types::{StarknetEvent, StarknetEventFields};
 use starknet_v13::core::types::{BlockId, EmittedEvent, EventFilter};
 use starknet_v13::providers::{Provider, ProviderError};
 

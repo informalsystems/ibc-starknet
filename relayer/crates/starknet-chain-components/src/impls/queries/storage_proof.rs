@@ -7,11 +7,11 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 use starknet::core::types::{Felt, StorageProof};
 
-use crate::impls::storage_proof::CanValidateStorageProof;
-use crate::impls::types::address::StarknetAddress;
-use crate::traits::json_rpc::CanSendJsonRpcRequest;
-use crate::traits::queries::storage_proof::{StorageProofQuerier, StorageProofQuerierComponent};
-use crate::traits::types::storage_proof::{HasStorageKeyType, HasStorageProofType};
+use crate::impls::{CanValidateStorageProof, StarknetAddress};
+use crate::traits::{
+    CanSendJsonRpcRequest, HasStorageKeyType, HasStorageProofType, StorageProofQuerier,
+    StorageProofQuerierComponent,
+};
 
 #[cgp_new_provider(StorageProofQuerierComponent)]
 impl<Chain> StorageProofQuerier<Chain> for QueryStarknetStorageProof

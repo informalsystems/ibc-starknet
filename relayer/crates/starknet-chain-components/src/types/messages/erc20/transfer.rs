@@ -7,14 +7,11 @@ use hermes_prelude::*;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::messages::transfer::{
-    TransferTokenMessageBuilder, TransferTokenMessageBuilderComponent,
+use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::traits::{
+    HasBlobType, HasSelectorType, TransferTokenMessageBuilder, TransferTokenMessageBuilderComponent,
 };
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
-use crate::types::amount::StarknetAmount;
+use crate::types::StarknetAmount;
 
 pub const TRANSFER_SELECTOR: Felt = selector!("transfer");
 

@@ -16,7 +16,7 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
     HasChainStoreDir,
 };
 use hermes_prelude::*;
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
+use hermes_starknet_chain_components::types::StarknetWallet;
 use starknet::macros::felt;
 
 use crate::types::genesis_config::StarknetGenesisConfig;

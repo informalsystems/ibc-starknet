@@ -20,10 +20,11 @@ use ibc_proto::ibc::core::client::v1::Height as RawHeight;
 use serde::{Deserialize, Serialize};
 use starknet::core::types::Felt;
 
-use crate::impls::events::UseStarknetEvents;
-use crate::types::events::packet::{PacketRelayEvents, WriteAcknowledgementEvent};
-use crate::types::messages::ibc::ibc_transfer::TransferPacketData as CairoTransferPacketData;
-use crate::types::messages::ibc::packet::Packet;
+use crate::impls::UseStarknetEvents;
+use crate::types::{
+    Packet, PacketRelayEvents, TransferPacketData as CairoTransferPacketData,
+    WriteAcknowledgementEvent,
+};
 
 #[cgp_provider(WriteAckEventComponent)]
 impl<Chain, Counterparty> ProvideWriteAckEvent<Chain, Counterparty> for UseStarknetEvents

@@ -6,13 +6,11 @@ use hermes_core::encoding_components::traits::{
     Transformer, TransformerRef,
 };
 use hermes_prelude::*;
-pub use ibc::core::connection::types::{
-    ConnectionEnd, Counterparty as ConnectionCounterparty, State as ConnectionState,
+use ibc::core::connection::types::{
+    Counterparty as ConnectionCounterparty, State as ConnectionState,
 };
-pub use ibc::core::host::types::identifiers::ConnectionId;
 
-use crate::types::client_id::ClientId;
-use crate::types::messages::ibc::connection::{BasePrefix, ConnectionVersion};
+use crate::types::{BasePrefix, ClientId, ConnectionEnd, ConnectionVersion};
 
 pub struct EncodeDuration;
 

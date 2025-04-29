@@ -1,20 +1,59 @@
-pub mod amount;
-pub mod channel_id;
-pub mod client_id;
-pub mod client_state;
-pub mod commitment_proof;
-pub mod connection_id;
-pub mod consensus_state;
-pub mod cosmos;
-pub mod event;
-pub mod events;
-pub mod membership_proof_signer;
-pub mod message_response;
-pub mod message_responses;
-pub mod messages;
-pub mod payloads;
-pub mod register;
-pub mod status;
-pub mod tx_response;
-pub mod utils;
-pub mod wallet;
+mod amount;
+pub use amount::*;
+
+mod channel_id;
+pub use channel_id::*;
+
+mod client_id;
+pub use client_id::*;
+
+mod client_state;
+pub use client_state::*;
+
+mod commitment_proof;
+pub use commitment_proof::*;
+
+mod connection_id;
+pub use connection_id::*;
+
+mod consensus_state;
+pub use consensus_state::*;
+
+mod cosmos;
+pub use cosmos::*;
+
+mod event;
+pub use event::*;
+
+mod events;
+pub use events::*;
+
+mod membership_proof_signer;
+pub use membership_proof_signer::*;
+
+mod message_response;
+pub use message_response::*;
+
+mod message_responses;
+pub use message_responses::*;
+
+mod messages;
+pub use messages::*;
+
+mod payloads;
+pub use payloads::*;
+
+mod register;
+pub use register::*;
+
+mod status;
+pub use status::*;
+
+mod tx_response;
+pub use tx_response::*;
+
+mod utils;
+pub use utils::*;
+
+mod wallet;
+pub use wallet::*;

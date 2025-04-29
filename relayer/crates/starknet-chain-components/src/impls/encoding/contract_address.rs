@@ -5,8 +5,8 @@ use std::sync::OnceLock;
 use hermes_core::encoding_components::traits::{CanDecode, Decoder, DecoderComponent};
 use hermes_prelude::*;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::types::event::StarknetEvent;
+use crate::impls::StarknetAddress;
+use crate::types::StarknetEvent;
 
 pub struct DecodeOptionalByContractAddress<Tag>(pub PhantomData<Tag>);
 

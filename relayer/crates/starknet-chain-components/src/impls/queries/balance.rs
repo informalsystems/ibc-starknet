@@ -5,19 +5,12 @@ use hermes_core::encoding_components::traits::{CanDecode, HasEncoding};
 use hermes_core::test_components::chain::traits::{BalanceQuerier, BalanceQuerierComponent};
 use hermes_prelude::*;
 use starknet::core::types::{Felt, U256};
-use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::traits::contract::call::CanCallContract;
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
-use crate::types::amount::StarknetAmount;
+use crate::impls::{StarknetAddress, BALANCE_SELECTOR};
+use crate::traits::{CanCallContract, HasBlobType, HasSelectorType};
+use crate::types::StarknetAmount;
 
-pub const BALANCE_SELECTOR: Felt = selector!("balance_of");
-
-pub struct QueryStarknetWalletBalance;
-
-#[cgp_provider(BalanceQuerierComponent)]
+#[cgp_new_provider(BalanceQuerierComponent)]
 impl<Chain, Encoding> BalanceQuerier<Chain> for QueryStarknetWalletBalance
 where
     Chain: HasAddressType<Address = StarknetAddress>

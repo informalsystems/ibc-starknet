@@ -30,9 +30,8 @@ use hermes_error::handlers::{
 use hermes_error::types::Error;
 use hermes_prelude::*;
 use hermes_runtime::types::error::TokioRuntimeError;
-use hermes_starknet_chain_components::impls::queries::consensus_state::ConsensusStateNotFound;
-use hermes_starknet_chain_components::impls::queries::contract_address::ContractAddressNotFound;
-use hermes_starknet_chain_components::types::event::UnknownEvent;
+use hermes_starknet_chain_components::impls::{ConsensusStateNotFound, ContractAddressNotFound};
+use hermes_starknet_chain_components::types::UnknownEvent;
 use ibc::core::channel::types::error::ChannelError;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};

@@ -12,14 +12,8 @@ use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence as IbcSe
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::traits::contract::call::CanCallContract;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
-use crate::types::channel_id::ChannelId;
-use crate::types::commitment_proof::StarknetCommitmentProof;
-use crate::types::messages::ibc::channel::PortId as CairoPortId;
-use crate::types::messages::ibc::packet::Sequence;
+use crate::traits::{CanCallContract, CanQueryContractAddress, HasBlobType, HasSelectorType};
+use crate::types::{ChannelId, PortId as CairoPortId, Sequence, StarknetCommitmentProof};
 
 pub struct QueryPacketIsReceivedOnStarknet;
 

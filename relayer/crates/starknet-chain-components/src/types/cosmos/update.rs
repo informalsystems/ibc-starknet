@@ -19,7 +19,7 @@ use tendermint::{
     account, block, validator, vote, AppHash, Error as TendermintError, PublicKey, Signature,
 };
 
-use crate::types::cosmos::height::Height;
+use crate::types::Height;
 
 /// The zero value for a Time is defined to be
 /// January 1, year 1, 00:00:00.000000000 UTC

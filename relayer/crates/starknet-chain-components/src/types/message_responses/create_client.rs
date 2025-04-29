@@ -1,7 +1,6 @@
 use hermes_prelude::*;
 
-use crate::types::client_id::ClientId;
-use crate::types::cosmos::height::Height;
+use crate::types::{ClientId, Height};
 
 #[derive(Debug, HasField, HasFields)]
 pub struct CreateClientResponse {

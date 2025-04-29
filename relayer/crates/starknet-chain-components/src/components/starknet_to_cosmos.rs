@@ -28,15 +28,13 @@ mod preset {
     use hermes_cosmos_core::chain_preset::presets::CosmosToCosmosComponents;
     use hermes_prelude::*;
 
-    use crate::impls::starknet_to_cosmos::connection_message::BuildStarknetToCosmosConnectionHandshake;
-    use crate::impls::starknet_to_cosmos::counterparty_message_height::GetCosmosCounterpartyMessageStarknetHeight;
-    use crate::impls::starknet_to_cosmos::create_client_message::BuildStarknetCreateClientMessage;
-    use crate::impls::starknet_to_cosmos::ibc_amount::ConvertCosmosIbcAmountFromStarknet;
-    use crate::impls::starknet_to_cosmos::packet_fields::ReadPacketDstStarknetFields;
-    use crate::impls::starknet_to_cosmos::query_consensus_state_height::QueryStarknetConsensusStateHeightsFromGrpc;
-    use crate::impls::starknet_to_cosmos::update_client_message::BuildStarknetUpdateClientMessage;
-    use crate::types::cosmos::client_state::UseCometClientState;
-    use crate::types::cosmos::consensus_state::CometConsensusState;
+    use crate::impls::{
+        BuildStarknetCreateClientMessage, BuildStarknetToCosmosConnectionHandshake,
+        BuildStarknetUpdateClientMessage, ConvertCosmosIbcAmountFromStarknet,
+        GetCosmosCounterpartyMessageStarknetHeight, QueryStarknetConsensusStateHeightsFromGrpc,
+        ReadPacketDstStarknetFields,
+    };
+    use crate::types::{CometConsensusState, UseCometClientState};
 
     cgp_preset! {
         StarknetToCosmosComponents {

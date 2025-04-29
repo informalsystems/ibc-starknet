@@ -2,7 +2,7 @@ use hermes_core::chain_components::traits::HasHeightType;
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_prelude::*;
 
-use crate::traits::types::storage_proof::{HasStorageKeyType, HasStorageProofType};
+use crate::traits::{HasStorageKeyType, HasStorageProofType};
 
 #[cgp_component {
     provider: StorageProofQuerier,

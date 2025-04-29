@@ -11,11 +11,8 @@ use hermes_core::encoding_components::traits::{CanDecode, HasDefaultEncoding, Ha
 use hermes_prelude::*;
 use starknet::core::types::Felt;
 
-use crate::impls::events::UseStarknetEvents;
-use crate::impls::types::events::StarknetCreateClientEvent;
-use crate::types::client_id::ClientId;
-use crate::types::message_response::StarknetMessageResponse;
-use crate::types::message_responses::create_client::CreateClientResponse;
+use crate::impls::{StarknetCreateClientEvent, UseStarknetEvents};
+use crate::types::{ClientId, CreateClientResponse, StarknetMessageResponse};
 
 #[cgp_provider(CreateClientEventComponent)]
 impl<Chain, Counterparty> ProvideCreateClientEvent<Chain, Counterparty> for UseStarknetEvents

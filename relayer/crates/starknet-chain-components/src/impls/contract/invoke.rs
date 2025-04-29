@@ -1,8 +1,7 @@
 use hermes_core::chain_components::traits::CanSendSingleMessage;
 use hermes_prelude::*;
 
-use crate::traits::contract::invoke::{ContractInvoker, ContractInvokerComponent};
-use crate::traits::contract::message::CanBuildInvokeContractMessage;
+use crate::traits::{CanBuildInvokeContractMessage, ContractInvoker, ContractInvokerComponent};
 
 pub struct InvokeStarknetContract;
 

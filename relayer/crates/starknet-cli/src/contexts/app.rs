@@ -33,11 +33,11 @@ use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::config::{
-    StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses, StarknetRelayerConfig,
+use hermes_starknet_chain_components::impls::{
+    StarknetAddress, StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses,
+    StarknetRelayerConfig,
 };
-use hermes_starknet_chain_components::types::client_id::ClientId;
+use hermes_starknet_chain_components::types::ClientId;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;

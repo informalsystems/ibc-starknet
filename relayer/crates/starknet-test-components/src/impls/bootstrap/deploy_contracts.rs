@@ -21,16 +21,12 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
     HasChainNodeConfigType,
 };
 use hermes_prelude::*;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
-use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
-use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
-use hermes_starknet_chain_components::traits::types::contract_class::{
-    ContractClassOf, HasContractClassHashType, HasContractClassType,
+use hermes_starknet_chain_components::impls::{StarknetAddress, StarknetMessage};
+use hermes_starknet_chain_components::traits::{
+    CanDeclareContract, CanDeployContract, ContractClassOf, HasBlobType, HasContractClassHashType,
+    HasContractClassType,
 };
-use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
-use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
+use hermes_starknet_chain_components::types::{MsgRegisterApp, MsgRegisterClient, PortId};
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 

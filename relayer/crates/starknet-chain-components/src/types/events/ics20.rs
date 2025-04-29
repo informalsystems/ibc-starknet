@@ -7,10 +7,8 @@ use hermes_prelude::*;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::types::event::{StarknetEvent, UnknownEvent};
-use crate::types::messages::ibc::denom::PrefixedDenom;
-use crate::types::messages::ibc::packet::{AckStatus, Acknowledgement};
+use crate::impls::StarknetAddress;
+use crate::types::{AckStatus, Acknowledgement, PrefixedDenom, StarknetEvent, UnknownEvent};
 
 #[derive(Debug)]
 pub enum IbcTransferEvent {

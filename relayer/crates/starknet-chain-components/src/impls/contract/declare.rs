@@ -14,11 +14,11 @@ use starknet::core::types::contract::{
 use starknet::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
 use starknet::providers::Provider;
 
-use crate::traits::account::{CanBuildAccountFromSigner, CanUseStarknetAccount};
-use crate::traits::client::HasStarknetClient;
-use crate::traits::contract::declare::{ContractDeclarer, ContractDeclarerComponent};
-use crate::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
-use crate::types::tx_response::TxResponse;
+use crate::traits::{
+    CanBuildAccountFromSigner, CanUseStarknetAccount, ContractDeclarer, ContractDeclarerComponent,
+    HasContractClassHashType, HasContractClassType, HasStarknetClient,
+};
+use crate::types::TxResponse;
 
 #[cgp_new_provider(ContractDeclarerComponent)]
 impl<Chain> ContractDeclarer<Chain> for DeclareSierraContract

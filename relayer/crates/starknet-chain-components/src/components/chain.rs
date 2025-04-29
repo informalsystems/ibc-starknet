@@ -99,79 +99,40 @@ mod preset {
     use starknet::core::types::Felt;
 
     use crate::components::types::StarknetChainTypes;
-    use crate::impls::assert::assert_duration::ProvidePollAssertDuration;
-    use crate::impls::commitment_prefix::GetStarknetCommitmentPrefix;
-    use crate::impls::contract::call::CallStarknetContract;
-    use crate::impls::contract::declare::DeclareSierraContract;
-    use crate::impls::contract::deploy::DeployStarknetContract;
-    use crate::impls::contract::invoke::InvokeStarknetContract;
-    use crate::impls::contract::message::BuildInvokeContractCall;
-    use crate::impls::counterparty_message_height::GetCounterpartyCosmosHeightFromStarknetMessage;
-    use crate::impls::events::UseStarknetEvents;
-    use crate::impls::ibc_amount::ConvertStarknetTokenAddressFromCosmos;
-    use crate::impls::messages::channel::BuildStarknetChannelHandshakeMessages;
-    use crate::impls::messages::connection::BuildStarknetConnectionHandshakeMessages;
-    use crate::impls::messages::create_client::BuildCreateCometClientMessage;
-    use crate::impls::messages::ibc_transfer::BuildStarknetIbcTransferMessage;
-    use crate::impls::messages::packet::BuildStarknetPacketMessages;
-    use crate::impls::messages::update_client::BuildUpdateCometClientMessage;
-    use crate::impls::packet_fields::ReadPacketSrcStarknetFields;
-    use crate::impls::packet_filter::FilterStarknetPackets;
-    use crate::impls::payload_builders::create_client::BuildStarknetCreateClientPayload;
-    use crate::impls::payload_builders::update_client::BuildStarknetUpdateClientPayload;
-    use crate::impls::queries::ack_commitment::QueryStarknetAckCommitment;
-    use crate::impls::queries::balance::QueryStarknetWalletBalance;
-    use crate::impls::queries::block::QueryStarknetBlock;
-    use crate::impls::queries::block_events::GetStarknetBlockEvents;
-    use crate::impls::queries::channel_end::QueryChannelEndFromStarknet;
-    use crate::impls::queries::client_state::QueryCometClientState;
-    use crate::impls::queries::connection_end::QueryConnectionEndFromStarknet;
-    use crate::impls::queries::consensus_state::QueryCometConsensusState;
-    use crate::impls::queries::contract_address::GetContractAddressFromField;
-    use crate::impls::queries::counterparty_chain_id::QueryCosmosChainIdFromStarknetChannelId;
-    use crate::impls::queries::nonce::QueryStarknetNonce;
-    use crate::impls::queries::packet_commitment::QueryStarknetPacketCommitment;
-    use crate::impls::queries::packet_receipt::QueryStarknetPacketReceipt;
-    use crate::impls::queries::packet_received::QueryPacketIsReceivedOnStarknet;
-    use crate::impls::queries::status::QueryStarknetChainStatus;
-    use crate::impls::queries::token_address::GetOrCreateCosmosTokenAddressOnStarknet;
-    use crate::impls::queries::token_balance::QueryErc20TokenBalance;
-    use crate::impls::send_message::SendStarknetMessages;
-    use crate::impls::transfer::{IbcTransferTimeoutAfterSeconds, TransferErc20Token};
-    use crate::impls::tx_response::QueryTransactionReceipt;
-    use crate::impls::types::address::StarknetAddress;
-    use crate::impls::types::amount::UseU256Amount;
-    use crate::impls::types::block::ProvideStarknetBlockType;
-    use crate::impls::types::client::ProvideStarknetIbcClientTypes;
-    use crate::impls::types::commitment_proof::UseStarknetCommitmentProof;
-    use crate::impls::types::contract::UseStarknetContractTypes;
-    use crate::impls::types::denom::ProvideTokenAddressDenom;
-    use crate::impls::types::height::ProvideStarknetHeight;
-    use crate::impls::types::message::StarknetMessage;
-    use crate::impls::types::method::ProvideFeltSelector;
-    use crate::impls::types::payloads::ProvideStarknetPayloadTypes;
-    use crate::impls::types::status::ProvideStarknetChainStatusType;
-    use crate::impls::types::wallet::ProvideStarknetWallet;
-    use crate::traits::contract::call::ContractCallerComponent;
-    use crate::traits::contract::declare::ContractDeclarerComponent;
-    use crate::traits::contract::deploy::ContractDeployerComponent;
-    use crate::traits::contract::invoke::ContractInvokerComponent;
-    use crate::traits::contract::message::InvokeContractMessageBuilderComponent;
-    use crate::traits::messages::transfer::TransferTokenMessageBuilderComponent;
-    use crate::traits::queries::contract_address::ContractAddressQuerierComponent;
-    use crate::traits::queries::token_address::CosmosTokenAddressOnStarknetQuerierComponent;
-    use crate::traits::queries::token_balance::TokenBalanceQuerierComponent;
-    use crate::traits::transfer::TokenTransferComponent;
-    use crate::traits::types::blob::BlobTypeProviderComponent;
-    use crate::traits::types::contract_class::{
-        ContractClassHashTypeProviderComponent, ContractClassTypeProviderComponent,
+    use crate::impls::{
+        BuildCreateCometClientMessage, BuildInvokeContractCall,
+        BuildStarknetChannelHandshakeMessages, BuildStarknetConnectionHandshakeMessages,
+        BuildStarknetCreateClientPayload, BuildStarknetIbcTransferMessage,
+        BuildStarknetPacketMessages, BuildStarknetUpdateClientPayload,
+        BuildUpdateCometClientMessage, CallStarknetContract, ConvertStarknetTokenAddressFromCosmos,
+        DeclareSierraContract, DeployStarknetContract, FilterStarknetPackets,
+        GetContractAddressFromField, GetCounterpartyCosmosHeightFromStarknetMessage,
+        GetOrCreateCosmosTokenAddressOnStarknet, GetStarknetBlockEvents,
+        GetStarknetCommitmentPrefix, IbcTransferTimeoutAfterSeconds, InvokeStarknetContract,
+        ProvideFeltSelector, ProvidePollAssertDuration, ProvideStarknetBlockType,
+        ProvideStarknetChainStatusType, ProvideStarknetHeight, ProvideStarknetIbcClientTypes,
+        ProvideStarknetPayloadTypes, ProvideStarknetWallet, ProvideTokenAddressDenom,
+        QueryChannelEndFromStarknet, QueryCometClientState, QueryCometConsensusState,
+        QueryConnectionEndFromStarknet, QueryCosmosChainIdFromStarknetChannelId,
+        QueryErc20TokenBalance, QueryPacketIsReceivedOnStarknet, QueryStarknetAckCommitment,
+        QueryStarknetBlock, QueryStarknetChainStatus, QueryStarknetNonce,
+        QueryStarknetPacketCommitment, QueryStarknetPacketReceipt, QueryStarknetWalletBalance,
+        QueryTransactionReceipt, ReadPacketSrcStarknetFields, SendStarknetMessages,
+        StarknetAddress, StarknetMessage, TransferErc20Token, UseStarknetCommitmentProof,
+        UseStarknetContractTypes, UseStarknetEvents, UseU256Amount,
     };
-    use crate::traits::types::method::SelectorTypeComponent;
-    use crate::types::event::StarknetEvent;
-    use crate::types::message_response::UseStarknetMessageResponse;
-    use crate::types::messages::erc20::transfer::BuildTransferErc20TokenMessage;
-    use crate::types::tx_response::TxResponse;
-    use crate::types::wallet::StarknetWallet;
+    use crate::traits::{
+        BlobTypeProviderComponent, ContractAddressQuerierComponent, ContractCallerComponent,
+        ContractClassHashTypeProviderComponent, ContractClassTypeProviderComponent,
+        ContractDeclarerComponent, ContractDeployerComponent, ContractInvokerComponent,
+        CosmosTokenAddressOnStarknetQuerierComponent, InvokeContractMessageBuilderComponent,
+        SelectorTypeComponent, TokenBalanceQuerierComponent, TokenTransferComponent,
+        TransferTokenMessageBuilderComponent,
+    };
+    use crate::types::{
+        BuildTransferErc20TokenMessage, StarknetEvent, StarknetWallet, TxResponse,
+        UseStarknetMessageResponse,
+    };
 
     cgp_preset! {
         StarknetChainComponents {

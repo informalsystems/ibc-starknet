@@ -2,9 +2,7 @@ use hermes_prelude::*;
 use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
 
-use crate::traits::types::contract_class::{
-    ContractClassHashTypeProviderComponent, ContractClassTypeProviderComponent,
-};
+use crate::traits::{ContractClassHashTypeProviderComponent, ContractClassTypeProviderComponent};
 
 pub struct UseStarknetContractTypes;
 

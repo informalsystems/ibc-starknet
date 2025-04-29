@@ -3,16 +3,15 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::encoding_components::traits::{
     CanDecode, Decoder, DecoderComponent, HasEncodedType, HasEncoding,
 };
-use hermes_prelude::{CanRaiseAsyncError, *};
+use hermes_prelude::*;
+use ibc::core::channel::types::channel::Order as ChannelOrdering;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::types::channel_id::ChannelId;
-use crate::types::cosmos::height::Height;
-use crate::types::cosmos::timestamp::Timestamp;
-use crate::types::event::{StarknetEvent, UnknownEvent};
-use crate::types::messages::ibc::channel::{ChannelOrdering, PortId};
-use crate::types::messages::ibc::packet::{Acknowledgement, Packet, Sequence};
+use crate::types::{
+    Acknowledgement, ChannelId, Height, Packet, PortId, Sequence, StarknetEvent, Timestamp,
+    UnknownEvent,
+};
 
 #[derive(Debug)]
 pub enum PacketRelayEvents {

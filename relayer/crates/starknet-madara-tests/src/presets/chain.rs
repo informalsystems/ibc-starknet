@@ -1,7 +1,7 @@
 #[cgp::re_export_imports]
 mod preset {
     use hermes_prelude::*;
-    use hermes_starknet_chain_components::components::chain::StarknetChainComponents;
+    use hermes_starknet_chain_components::components::StarknetChainComponents;
     use starknet_v13::core::types::contract::SierraClass;
     use StarknetChainComponents::re_exports::*;
 

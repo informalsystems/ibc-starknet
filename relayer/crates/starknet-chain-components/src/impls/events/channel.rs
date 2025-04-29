@@ -10,12 +10,11 @@ use hermes_core::chain_components::traits::{
 use hermes_core::chain_type_components::traits::HasMessageResponseType;
 use hermes_core::encoding_components::traits::{CanDecode, HasDefaultEncoding, HasEncodedType};
 use hermes_prelude::*;
+use ibc::core::host::types::identifiers::ChannelId;
 use starknet::core::types::Felt;
 
-use crate::impls::events::UseStarknetEvents;
-use crate::impls::types::events::{StarknetChannelOpenInitEvent, StarknetChannelOpenTryEvent};
-use crate::types::channel_id::ChannelId;
-use crate::types::message_response::StarknetMessageResponse;
+use crate::impls::{StarknetChannelOpenInitEvent, StarknetChannelOpenTryEvent, UseStarknetEvents};
+use crate::types::StarknetMessageResponse;
 
 #[cgp_provider(ChannelOpenInitEventComponent)]
 impl<Chain, Counterparty> ProvideChannelOpenInitEvent<Chain, Counterparty> for UseStarknetEvents

@@ -30,11 +30,9 @@ mod preset {
     use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
     use prost_types::Any;
 
-    use crate::types::client_state::{
-        ConvertWasmStarknetClientState, StarknetClientState, WasmStarknetClientState,
-    };
-    use crate::types::consensus_state::{
-        ConvertWasmStarknetConsensusState, StarknetConsensusState, WasmStarknetConsensusState,
+    use crate::types::{
+        ConvertWasmStarknetClientState, ConvertWasmStarknetConsensusState, StarknetClientState,
+        StarknetConsensusState, WasmStarknetClientState, WasmStarknetConsensusState,
     };
 
     cgp_preset! {

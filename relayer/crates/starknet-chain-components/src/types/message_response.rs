@@ -6,7 +6,7 @@ use hermes_core::chain_type_components::traits::{
 use hermes_prelude::*;
 use starknet::core::types::Felt;
 
-use crate::types::event::StarknetEvent;
+use crate::types::StarknetEvent;
 
 #[derive(Debug)]
 pub struct StarknetMessageResponse {

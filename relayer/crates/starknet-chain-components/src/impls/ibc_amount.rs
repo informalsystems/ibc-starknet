@@ -9,10 +9,9 @@ use hermes_cosmos_core::test_components::chain::types::Amount;
 use hermes_prelude::*;
 use ibc::core::host::types::identifiers::{ChannelId, PortId};
 
-use crate::impls::types::address::StarknetAddress;
-use crate::traits::queries::token_address::CanQueryCosmosTokenAddressOnStarknet;
-use crate::types::amount::StarknetAmount;
-use crate::types::messages::ibc::denom::{Denom, PrefixedDenom, TracePrefix};
+use crate::impls::StarknetAddress;
+use crate::traits::CanQueryCosmosTokenAddressOnStarknet;
+use crate::types::{Denom, PrefixedDenom, StarknetAmount, TracePrefix};
 
 #[cgp_new_provider(IbcTransferredAmountConverterComponent)]
 impl<Chain, Counterparty> IbcTransferredAmountConverter<Chain, Counterparty>

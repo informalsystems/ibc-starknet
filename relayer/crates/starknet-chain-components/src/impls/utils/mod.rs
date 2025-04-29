@@ -1,1 +1,2 @@
-pub mod array;
+mod array;
+pub use array::*;

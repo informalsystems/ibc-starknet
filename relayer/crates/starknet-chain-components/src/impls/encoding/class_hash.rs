@@ -6,7 +6,7 @@ use hermes_core::encoding_components::traits::{CanDecode, Decoder, DecoderCompon
 use hermes_prelude::*;
 use starknet::core::types::Felt;
 
-use crate::types::event::StarknetEvent;
+use crate::types::StarknetEvent;
 
 pub struct DecodeOptionalByClassHash<Tag>(pub PhantomData<Tag>);
 

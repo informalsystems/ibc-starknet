@@ -30,13 +30,11 @@ use hermes_cosmos::protobuf_encoding_components::impls::{
 };
 use hermes_cosmos::runtime::types::error::TokioRuntimeError;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::impls::error::account::RaiseAccountError;
-use hermes_starknet_chain_components::impls::error::provider::RaiseProviderError;
-use hermes_starknet_chain_components::impls::error::starknet::RaiseStarknetError;
-use hermes_starknet_chain_components::impls::queries::consensus_state::ConsensusStateNotFound;
-use hermes_starknet_chain_components::impls::queries::contract_address::ContractAddressNotFound;
-use hermes_starknet_chain_components::impls::send_message::UnexpectedTransactionTraceType;
-use hermes_starknet_chain_components::types::event::UnknownEvent;
+use hermes_starknet_chain_components::impls::{
+    ConsensusStateNotFound, ContractAddressNotFound, RaiseAccountError, RaiseProviderError,
+    RaiseStarknetError, UnexpectedTransactionTraceType,
+};
+use hermes_starknet_chain_components::types::UnknownEvent;
 use ibc::core::channel::types::error::ChannelError;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};

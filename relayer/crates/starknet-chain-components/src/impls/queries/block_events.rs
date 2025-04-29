@@ -8,10 +8,9 @@ use hermes_prelude::*;
 use starknet::core::types::{BlockId, EventFilter};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::impls::types::address::StarknetAddress;
-use crate::traits::client::HasStarknetClient;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::types::event::StarknetEvent;
+use crate::impls::StarknetAddress;
+use crate::traits::{CanQueryContractAddress, HasStarknetClient};
+use crate::types::StarknetEvent;
 
 #[cgp_new_provider(BlockEventsQuerierComponent)]
 impl<Chain> BlockEventsQuerier<Chain> for GetStarknetBlockEvents

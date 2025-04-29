@@ -9,14 +9,12 @@ use hermes_prelude::*;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::traits::queries::token_address::{
-    CosmosTokenAddressOnStarknetQuerier, CosmosTokenAddressOnStarknetQuerierComponent,
+use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::traits::{
+    CanQueryContractAddress, CosmosTokenAddressOnStarknetQuerier,
+    CosmosTokenAddressOnStarknetQuerierComponent,
 };
-use crate::types::message_response::StarknetMessageResponse;
-use crate::types::messages::ibc::denom::PrefixedDenom;
+use crate::types::{PrefixedDenom, StarknetMessageResponse};
 
 #[cgp_new_provider(CosmosTokenAddressOnStarknetQuerierComponent)]
 impl<Chain, Encoding> CosmosTokenAddressOnStarknetQuerier<Chain>

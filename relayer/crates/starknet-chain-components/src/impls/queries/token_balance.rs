@@ -6,18 +6,16 @@ use hermes_prelude::*;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::traits::contract::call::CanCallContract;
-use crate::traits::queries::token_balance::{TokenBalanceQuerier, TokenBalanceQuerierComponent};
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
-use crate::types::amount::StarknetAmount;
-
-pub struct QueryErc20TokenBalance;
+use crate::impls::StarknetAddress;
+use crate::traits::{
+    CanCallContract, HasBlobType, HasSelectorType, TokenBalanceQuerier,
+    TokenBalanceQuerierComponent,
+};
+use crate::types::StarknetAmount;
 
 pub const BALANCE_SELECTOR: Felt = selector!("balance_of");
 
-#[cgp_provider(TokenBalanceQuerierComponent)]
+#[cgp_new_provider(TokenBalanceQuerierComponent)]
 impl<Chain, Encoding> TokenBalanceQuerier<Chain> for QueryErc20TokenBalance
 where
     Chain: HasAddressType<Address = StarknetAddress>
