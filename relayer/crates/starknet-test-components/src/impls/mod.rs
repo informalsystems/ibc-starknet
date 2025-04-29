@@ -1,3 +1,8 @@
-pub mod bootstrap;
-pub mod bootstrap_madara;
-pub mod types;
+mod bootstrap;
+pub use bootstrap::*;
+
+mod bootstrap_madara;
+pub use bootstrap_madara::*;
+
+mod types;
+pub use types::*;

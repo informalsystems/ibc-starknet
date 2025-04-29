@@ -5,7 +5,7 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
 };
 use hermes_prelude::*;
 
-use crate::types::node_config::StarknetNodeConfig;
+use crate::types::StarknetNodeConfig;
 
 #[cgp_new_provider(ChainFullNodeStarterComponent)]
 impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartAnvil

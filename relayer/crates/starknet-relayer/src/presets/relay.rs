@@ -22,7 +22,7 @@ mod preset {
     use hermes_starknet_chain_context::contexts::StarknetChain;
     use DefaultRelayPreset::re_exports::*;
 
-    use crate::impls::error::HandleStarknetRelayError;
+    use crate::impls::HandleStarknetRelayError;
 
     DefaultRelayPreset::with_components! {
         | Components | {

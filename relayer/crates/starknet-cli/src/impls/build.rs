@@ -6,7 +6,7 @@ use hermes_cosmos::relayer::contexts::CosmosBuilder;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::StarknetRelayerConfig;
-use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
+use hermes_starknet_relayer::contexts::StarknetBuilder;
 
 pub struct LoadStarknetBuilder;
 

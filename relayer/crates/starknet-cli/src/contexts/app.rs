@@ -42,7 +42,7 @@ use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_integration_tests::contexts::{
     OsmosisBootstrap, StarknetBootstrap, StarknetChainDriver,
 };
-use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
+use hermes_starknet_relayer::contexts::StarknetBuilder;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId, PortId};
 use toml::to_string_pretty;

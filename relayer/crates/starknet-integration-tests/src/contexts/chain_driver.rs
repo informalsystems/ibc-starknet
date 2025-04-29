@@ -21,8 +21,7 @@ use hermes_starknet_chain_components::impls::{StarknetAddress, UseU256Amount};
 use hermes_starknet_chain_components::types::StarknetWallet;
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_chain_context::impls::HandleStarknetChainError;
-use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
-use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
+use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
 use tokio::process::Child;
 
 #[cgp_context(StarknetChainDriverComponents)]

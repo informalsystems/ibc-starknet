@@ -27,7 +27,7 @@ use hermes_starknet_chain_components::types::ClientId as StarknetClientId;
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
 
-use crate::presets::relay::StarknetCommonRelayContextPreset;
+use crate::presets::StarknetCommonRelayContextPreset;
 
 #[cgp_context(CosmosToStarknetRelayComponents: StarknetCommonRelayContextPreset)]
 #[derive(Clone)]

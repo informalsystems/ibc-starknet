@@ -16,9 +16,9 @@ use hermes_cosmos::integration_tests::contexts::AbortOnDrop;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_prelude::*;
 use hermes_starknet_chain_context::contexts::StarknetChain;
-use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
-use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
+use hermes_starknet_relayer::contexts::{
+    CosmosToStarknetRelay, StarknetCosmosBiRelay, StarknetToCosmosRelay,
+};
 
 #[cgp_context(StarknetCosmosRelayDriverComponents)]
 #[derive(HasField)]

@@ -51,9 +51,7 @@ use starknet::providers::{JsonRpcClient, Provider};
 use url::Url;
 
 use super::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use crate::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
-use crate::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
-use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
+use crate::contexts::{CosmosStarknetBiRelay, StarknetCosmosBiRelay, StarknetToCosmosRelay};
 
 #[cgp_context(StarknetBuildComponents)]
 #[derive(Clone)]

@@ -5,8 +5,7 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
 };
 use hermes_prelude::*;
 
-use crate::types::genesis_config::StarknetGenesisConfig;
-use crate::types::node_config::StarknetNodeConfig;
+use crate::types::{StarknetGenesisConfig, StarknetNodeConfig};
 
 #[cgp_new_provider(ChainFullNodeStarterComponent)]
 impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartStarknetDevnet

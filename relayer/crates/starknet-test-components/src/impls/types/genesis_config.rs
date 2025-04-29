@@ -3,7 +3,7 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
 };
 use hermes_prelude::*;
 
-use crate::types::genesis_config::StarknetGenesisConfig;
+use crate::types::StarknetGenesisConfig;
 
 pub struct ProvideStarknetGenesisConfigType;
 

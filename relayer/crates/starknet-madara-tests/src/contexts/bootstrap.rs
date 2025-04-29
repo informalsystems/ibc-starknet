@@ -20,11 +20,10 @@ use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::impls::UseHermesError;
 use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_starknet_test_components::impls::bootstrap_madara::{
-    BootstrapMadara, StartMadaraSequencer,
+use hermes_starknet_test_components::impls::{
+    BootstrapMadara, ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType,
+    StartMadaraSequencer,
 };
-use hermes_starknet_test_components::impls::types::genesis_config::ProvideStarknetGenesisConfigType;
-use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetNodeConfigType;
 
 use crate::contexts::{MadaraChain, MadaraChainDriver};
 use crate::impls::{BuildMadaraChainDriver, HandleMadaraChainError};

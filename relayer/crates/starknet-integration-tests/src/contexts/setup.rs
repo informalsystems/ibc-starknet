@@ -27,11 +27,10 @@ use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_prelude::*;
 use hermes_starknet_chain_components::types::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::StarknetChain;
-use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
-use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
-use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
-use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
+use hermes_starknet_relayer::contexts::{
+    CosmosStarknetBiRelay, CosmosToStarknetRelay, StarknetBuilder, StarknetCosmosBiRelay,
+    StarknetToCosmosRelay,
+};
 use ibc::core::host::types::identifiers::PortId;
 
 use crate::contexts::{

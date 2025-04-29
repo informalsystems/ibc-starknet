@@ -1,1 +1,2 @@
-pub mod relay;
+mod relay;
+pub use relay::*;

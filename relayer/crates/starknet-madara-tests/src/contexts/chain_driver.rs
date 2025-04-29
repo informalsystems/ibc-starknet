@@ -19,8 +19,7 @@ use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::{StarknetAddress, UseU256Amount};
 use hermes_starknet_chain_components::types::StarknetWallet;
-use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
-use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
+use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
 use tokio::process::Child;
 
 use crate::contexts::MadaraChain;

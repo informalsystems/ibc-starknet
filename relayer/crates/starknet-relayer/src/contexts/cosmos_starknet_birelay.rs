@@ -20,10 +20,9 @@ use hermes_prelude::*;
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_chain_context::impls::HandleStarknetChainError;
 
-use crate::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
+use crate::contexts::{CosmosToStarknetRelay, StarknetToCosmosRelay};
 
-#[cgp_context(StarknetCosmosBiRelayComponents: DefaultBiRelayComponents)]
+#[cgp_context(CosmosStarknetBiRelayComponents: DefaultBiRelayComponents)]
 #[derive(Clone, HasField)]
 pub struct CosmosStarknetBiRelay {
     pub runtime: HermesRuntime,
@@ -32,7 +31,7 @@ pub struct CosmosStarknetBiRelay {
 }
 
 delegate_components! {
-    StarknetCosmosBiRelayComponents {
+    CosmosStarknetBiRelayComponents {
         [
             ErrorTypeProviderComponent,
             ErrorWrapperComponent,
