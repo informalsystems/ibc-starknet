@@ -20,14 +20,14 @@ use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarkne
 use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 
-#[cgp_context(StarknetRelayDriverComponents)]
+#[cgp_context(StarknetCosmosRelayDriverComponents)]
 #[derive(HasField)]
 pub struct StarknetCosmosRelayDriver {
     pub birelay: StarknetCosmosBiRelay,
 }
 
 delegate_components! {
-    StarknetRelayDriverComponents {
+    StarknetCosmosRelayDriverComponents {
         ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: DebugError,
         ChainTypeProviderAtComponent<Index<0>>:
@@ -46,7 +46,7 @@ delegate_components! {
 }
 
 #[cgp_provider(RelayerBackgroundRunnerComponent)]
-impl RelayerBackgroundRunner<StarknetCosmosRelayDriver> for StarknetRelayDriverComponents {
+impl RelayerBackgroundRunner<StarknetCosmosRelayDriver> for StarknetCosmosRelayDriverComponents {
     type RunHandle<'a> = AbortOnDrop;
 
     async fn run_relayer_in_background(

@@ -25,7 +25,7 @@ use hermes_starknet_cli::impls::bootstrap::starknet_chain::{
 };
 use hermes_starknet_cli::impls::build::LoadStarknetBuilder;
 use hermes_starknet_cli::impls::error::ProvideCliError;
-use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
+use hermes_starknet_integration_tests::contexts::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 
 use crate::commands::starknet::subcommand::{RunStarknetSubCommand, StarknetSubCommand};

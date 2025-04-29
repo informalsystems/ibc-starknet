@@ -39,9 +39,9 @@ use hermes_starknet_chain_components::impls::{
 };
 use hermes_starknet_chain_components::types::ClientId;
 use hermes_starknet_chain_context::contexts::StarknetChain;
-use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
-use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
-use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
+use hermes_starknet_integration_tests::contexts::{
+    OsmosisBootstrap, StarknetBootstrap, StarknetChainDriver,
+};
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId, PortId};

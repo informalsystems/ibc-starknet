@@ -4,8 +4,7 @@ use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_prelude::CanRaiseError;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 
-use crate::contexts::setup::StarknetTestSetup;
-use crate::contexts::test_driver::StarknetTestDriver;
+use crate::contexts::{StarknetTestDriver, StarknetTestSetup};
 use crate::utils::{init_osmosis_bootstrap, init_starknet_bootstrap, load_wasm_client};
 
 pub async fn init_starknet_setup(runtime: &HermesRuntime) -> Result<StarknetTestSetup, Error> {

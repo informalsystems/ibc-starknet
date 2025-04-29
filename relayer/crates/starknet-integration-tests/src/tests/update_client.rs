@@ -19,7 +19,7 @@ use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmo
 use ibc::core::client::types::Height as CosmosHeight;
 use tracing::info;
 
-use crate::contexts::setup::StarknetTestSetup;
+use crate::contexts::StarknetTestSetup;
 use crate::utils::init_starknet_setup;
 
 #[test]

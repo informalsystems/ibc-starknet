@@ -28,7 +28,7 @@ use starknet::signers::{LocalWallet, SigningKey};
 use tokio::process::Child;
 use url::{ParseError, Url};
 
-use crate::contexts::chain_driver::StarknetChainDriver;
+use crate::contexts::StarknetChainDriver;
 
 #[cgp_new_provider(ChainDriverBuilderComponent)]
 impl<Bootstrap> ChainDriverBuilder<Bootstrap> for BuildStarknetChainDriver

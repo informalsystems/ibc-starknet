@@ -32,7 +32,7 @@ use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetN
 use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use starknet::core::types::contract::SierraClass;
 
-use crate::contexts::chain_driver::StarknetChainDriver;
+use crate::contexts::StarknetChainDriver;
 use crate::impls::BuildStarknetChainDriver;
 
 #[cgp_context(StarknetBootstrapComponents)]

@@ -34,10 +34,10 @@ use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBi
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use ibc::core::host::types::identifiers::PortId;
 
-use crate::contexts::chain_driver::StarknetChainDriver;
-use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
-use crate::contexts::starknet_bootstrap::StarknetBootstrap;
-use crate::contexts::test_driver::{BuildStarknetTestDriver, StarknetTestDriver};
+use crate::contexts::{
+    BuildStarknetTestDriver, OsmosisBootstrap, StarknetBootstrap, StarknetChainDriver,
+    StarknetTestDriver,
+};
 
 #[cgp_context(StarknetBinaryChannelSetupComponents: BinaryChannelTestComponents)]
 #[derive(HasField)]

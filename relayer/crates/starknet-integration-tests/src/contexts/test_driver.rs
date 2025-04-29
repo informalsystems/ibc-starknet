@@ -32,9 +32,7 @@ use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBi
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 use ibc::core::host::types::identifiers::PortId;
 
-use crate::contexts::chain_driver::StarknetChainDriver;
-use crate::contexts::cosmos_starknet_relay_driver::CosmosStarknetRelayDriver;
-use crate::contexts::starknet_cosmos_relay_driver::StarknetCosmosRelayDriver;
+use crate::contexts::{CosmosStarknetRelayDriver, StarknetChainDriver, StarknetCosmosRelayDriver};
 
 #[cgp_context(StarknetTestDriverComponents)]
 #[derive(HasField)]
