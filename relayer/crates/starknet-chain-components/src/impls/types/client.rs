@@ -1,11 +1,11 @@
 use core::time::Duration;
 
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::{
     ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent,
     ConsensusStateTypeComponent, HasChainIdType, HasClientStateType, HasHeightType,
     ProvideClientStateType, ProvideConsensusStateType,
 };
+use hermes_prelude::*;
 use ibc::core::host::types::identifiers::ChainId;
 
 use crate::types::client_state::WasmStarknetClientState;

@@ -1,8 +1,8 @@
-use cgp::prelude::*;
 use hermes_cli_components::impls::{
     QueryBalanceArgs, QueryChainStatusArgs, QueryClientStateArgs, QueryConsensusStateArgs,
 };
 use hermes_cli_components::traits::{CanRunCommand, CommandRunner, CommandRunnerComponent};
+use hermes_prelude::*;
 
 #[derive(Debug, clap::Subcommand)]
 pub enum QuerySubCommand {

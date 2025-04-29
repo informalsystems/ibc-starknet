@@ -33,6 +33,7 @@ ibc-proto     = { version = "0.51.1", default-features = false }
 tendermint    = { version = "0.40.0", default-features = false }
 
 cgp                                 = { version = "0.4.0" }
+hermes-prelude                      = { version = "0.1.0" }
 hermes-encoding-components          = { version = "0.1.0" }
 hermes-protobuf-encoding-components = { version = "0.1.0" }
 hermes-cosmos-encoding-components   = { version = "0.1.0" }

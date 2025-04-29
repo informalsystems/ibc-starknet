@@ -1,9 +1,9 @@
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::{
     HasChannelIdType, HasHeightType, HasOutgoingPacketType, PacketDstChannelIdGetter,
     PacketDstChannelIdGetterComponent, PacketTimeoutHeightGetter,
     PacketTimeoutHeightGetterComponent,
 };
+use hermes_prelude::*;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::channel::types::timeout::TimeoutHeight;
 

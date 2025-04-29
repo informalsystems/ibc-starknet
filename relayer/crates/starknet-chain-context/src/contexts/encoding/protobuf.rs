@@ -1,6 +1,5 @@
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
-use cgp::prelude::*;
 use hermes_core::encoding_components::traits::{
     CanConvertBothWays, CanEncodeAndDecode, CanEncodeAndDecodeMut,
 };
@@ -8,6 +7,7 @@ use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::protobuf_encoding_components::types::any::Any;
 use hermes_cosmos::protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use hermes_cosmos::wasm_encoding_components::types::{WasmClientState, WasmConsensusState};
+use hermes_prelude::*;
 use hermes_starknet_chain_components::components::encoding::protobuf::*;
 use hermes_starknet_chain_components::types::client_state::{
     StarknetClientState, WasmStarknetClientState,

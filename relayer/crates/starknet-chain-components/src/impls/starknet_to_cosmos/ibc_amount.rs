@@ -1,7 +1,6 @@
 use core::marker::PhantomData;
 use std::string::FromUtf8Error;
 
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::{HasChannelIdType, HasPortIdType};
 use hermes_core::chain_type_components::traits::{HasAmountType, HasDenomType};
 use hermes_core::test_components::chain::traits::{
@@ -9,6 +8,7 @@ use hermes_core::test_components::chain::traits::{
 };
 use hermes_cosmos_core::test_components::chain::impls::derive_ibc_denom;
 use hermes_cosmos_core::test_components::chain::types::{Amount, Denom};
+use hermes_prelude::*;
 use ibc::core::host::types::identifiers::{ChannelId, PortId};
 
 use crate::types::amount::StarknetAmount;

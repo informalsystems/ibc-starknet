@@ -1,7 +1,6 @@
 #[cgp::re_export_imports]
 mod preset {
     use cgp::core::types::WithType;
-    use cgp::prelude::*;
     use hermes_core::chain_components::traits::{
         AckPacketMessageBuilderComponent, ChannelOpenAckMessageBuilderComponent,
         ChannelOpenConfirmMessageBuilderComponent, ChannelOpenInitMessageBuilderComponent,
@@ -27,6 +26,7 @@ mod preset {
         BuildCosmosPacketMessages, CosmosPacketFieldReader,
     };
     use hermes_cosmos_core::chain_preset::presets::CosmosToCosmosComponents;
+    use hermes_prelude::*;
 
     use crate::impls::starknet_to_cosmos::connection_message::BuildStarknetToCosmosConnectionHandshake;
     use crate::impls::starknet_to_cosmos::counterparty_message_height::GetCosmosCounterpartyMessageStarknetHeight;

@@ -1,9 +1,9 @@
-use cgp::prelude::*;
 use hermes_core::runtime_components::traits::{HasChildProcessType, HasFilePathType, HasRuntime};
 use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainFullNodeStarter, ChainFullNodeStarterComponent, HasChainGenesisConfigType,
     HasChainNodeConfigType,
 };
+use hermes_prelude::*;
 
 use crate::impls::bootstrap_madara::{StartAnvil, StartMadaraSequencer, StartPathfinder};
 

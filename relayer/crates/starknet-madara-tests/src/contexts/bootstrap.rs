@@ -4,7 +4,6 @@ use std::sync::Arc;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
-use cgp::prelude::*;
 use hermes_core::logging_components::traits::LoggerComponent;
 use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -19,6 +18,7 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
 };
 use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::impls::UseHermesError;
+use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_test_components::impls::bootstrap_madara::{
     BootstrapMadara, StartMadaraSequencer,

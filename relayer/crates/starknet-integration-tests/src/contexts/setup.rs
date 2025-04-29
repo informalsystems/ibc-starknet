@@ -1,6 +1,5 @@
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::Index;
-use cgp::prelude::*;
 use hermes_core::relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
 use hermes_core::relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
 use hermes_core::relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
@@ -25,6 +24,7 @@ use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos::integration_tests::impls::UseCosmosInitChannelOptions;
 use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;

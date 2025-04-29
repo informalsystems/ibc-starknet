@@ -1,9 +1,9 @@
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_core::encoding_components::traits::{
     CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
     Transformer, TransformerRef,
 };
+use hermes_prelude::*;
 use ibc::clients::tendermint::types::Header as TendermintLcHeader;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as IbcHeight;

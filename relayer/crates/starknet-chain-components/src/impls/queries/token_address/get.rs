@@ -1,10 +1,10 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_type_components::traits::HasDenomType;
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_prelude::*;
 use poseidon::Poseidon3Hasher;
 use starknet::core::types::Felt;
 use starknet::macros::selector;

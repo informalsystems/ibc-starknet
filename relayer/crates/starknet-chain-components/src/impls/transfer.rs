@@ -1,6 +1,5 @@
 use core::time::Duration;
 
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::{
     CanSendSingleMessage, HasHeightType, HasTimeType, HasTimeoutType,
 };
@@ -9,6 +8,7 @@ use hermes_core::test_components::chain::traits::{
     IbcTransferTimeoutCalculator, IbcTransferTimeoutCalculatorComponent,
 };
 use hermes_cosmos_core::chain_components::types::Time;
+use hermes_prelude::*;
 use ibc::primitives::Timestamp;
 use starknet::core::types::Felt;
 use starknet::macros::selector;

@@ -1,12 +1,12 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::{
     CanQueryChainHeight, CanQueryChannelEnd, CanQueryClientState, CanQueryConnectionEnd,
     CounterpartyChainIdQuerier, CounterpartyChainIdQuerierComponent, HasChannelEndType,
     HasChannelIdType, HasClientIdType, HasClientStateFields, HasConnectionEndType,
     HasConnectionIdType, HasPortIdType,
 };
+use hermes_prelude::*;
 
 use crate::types::channel_id::ChannelEnd;
 use crate::types::client_id::ClientId;

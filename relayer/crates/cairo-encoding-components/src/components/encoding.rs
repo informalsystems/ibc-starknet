@@ -1,11 +1,11 @@
 #[cgp::re_export_imports]
 mod preset {
-    use cgp::prelude::*;
     use hermes_encoding_components::traits::{
         DecodeBufferBuilderComponent, DecodeBufferPeekerComponent, DecodeBufferTypeComponent,
         DecoderComponent, EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
         EncodedTypeComponent, EncoderComponent,
     };
+    use hermes_prelude::*;
 
     use crate::impls::encode::buffer::EncodeWithMutBuffer;
     use crate::impls::types::decode_buffer::ProvideVecIterDecodeBuffer;

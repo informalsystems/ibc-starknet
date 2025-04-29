@@ -1,6 +1,5 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
@@ -8,6 +7,7 @@ use hermes_core::chain_components::traits::{
     HasPortIdType, HasSequenceType, PacketIsReceivedQuerier, PacketIsReceivedQuerierComponent,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_prelude::*;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence as IbcSequence};
 use starknet::core::types::Felt;
 use starknet::macros::selector;

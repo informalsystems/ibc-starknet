@@ -9,7 +9,6 @@ use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::{Index, WithField};
 use cgp::core::types::WithType;
-use cgp::prelude::*;
 use eyre::eyre;
 use futures::lock::Mutex;
 use hermes_core::relayer_components::build::traits::builders::birelay_builder::{
@@ -39,6 +38,7 @@ use hermes_cosmos::error::types::Error;
 use hermes_cosmos::error::HermesError;
 use hermes_cosmos::relayer::contexts::{CosmosBuilder, CosmosChain};
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::types::config::StarknetChainConfig;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};

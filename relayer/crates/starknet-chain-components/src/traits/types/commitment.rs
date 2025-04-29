@@ -1,4 +1,4 @@
-use cgp::prelude::*;
+use hermes_prelude::*;
 
 /**
    A Starknet Merkle proof is a part of the larger storage proof,

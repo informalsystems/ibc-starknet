@@ -1,10 +1,10 @@
 use core::iter;
 
-use cgp::prelude::*;
 use hermes_encoding_components::traits::{
     HasDecodeBufferType, HasEncodeBufferType, MutDecoder, MutDecoderComponent, MutEncoder,
     MutEncoderComponent,
 };
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 
 pub struct EncodeFelt;

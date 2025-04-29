@@ -1,9 +1,9 @@
-use cgp::prelude::*;
 use hermes_core::encoding_components::traits::{
     CanConvert, CanDecode, CanEncode, Converter, ConverterComponent, HasEncodedType,
 };
 use hermes_cosmos_core::protobuf_encoding_components::types::strategy::ViaAny;
 use hermes_cosmos_core::wasm_encoding_components::types::WasmClientState;
+use hermes_prelude::*;
 pub use ibc_client_starknet_types::StarknetClientState;
 use prost_types::Any;
 

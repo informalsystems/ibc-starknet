@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
-use cgp::prelude::*;
 use hermes_cli_components::traits::{BootstrapLoader, BootstrapLoaderComponent, HasBootstrapType};
 use hermes_core::runtime_components::traits::{CanReadFileAsString, HasRuntime};
 use hermes_cosmos::runtime::types::error::TokioRuntimeError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_prelude::*;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::{
     StarknetBootstrap, StarknetBootstrapFields,
 };

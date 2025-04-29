@@ -1,10 +1,10 @@
 use core::time::Duration;
 
-use cgp::prelude::*;
 use hermes_core::relayer_components::transaction::traits::{
     HasTxHashType, HasTxResponseType, TxResponseQuerier, TxResponseQuerierComponent,
 };
 use hermes_core::runtime_components::traits::{CanSleep, HasRuntime};
+use hermes_prelude::*;
 use starknet::core::types::{Felt, StarknetError};
 use starknet::providers::{Provider, ProviderError};
 

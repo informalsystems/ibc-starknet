@@ -6,10 +6,10 @@ use core::str::Utf8Error;
 use cgp::core::error::{
     ErrorRaiser, ErrorRaiserComponent, ErrorTypeProvider, ErrorTypeProviderComponent,
 };
-use cgp::prelude::*;
 use hermes_encoding_components::traits::{
     CanConvert, CanConvertBothWays, CanEncodeAndDecode, CanEncodeAndDecodeMut,
 };
+use hermes_prelude::*;
 use hermes_protobuf_encoding_components::impls::{
     InvalidWireType, RequiredFieldTagNotFound, TypeUrlMismatchError, UnsupportedWireType,
 };

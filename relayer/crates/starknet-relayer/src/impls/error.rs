@@ -2,7 +2,6 @@ use core::convert::Infallible;
 use core::num::TryFromIntError;
 use std::string::FromUtf8Error;
 
-use cgp::prelude::*;
 use eyre::Report;
 use hermes_core::chain_components::traits::{EmptyMessageResponse, HasChainIdType};
 use hermes_core::relayer_components::relay::impls::{
@@ -15,6 +14,7 @@ use hermes_cosmos::error::handlers::{
 };
 use hermes_cosmos::error::types::Error;
 use hermes_cosmos::runtime::types::error::TokioRuntimeError;
+use hermes_prelude::*;
 
 pub struct HandleStarknetRelayError;
 

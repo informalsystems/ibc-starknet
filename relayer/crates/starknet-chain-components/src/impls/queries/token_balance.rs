@@ -1,8 +1,8 @@
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_type_components::traits::{HasAddressType, HasAmountType};
 use hermes_core::encoding_components::traits::{CanDecode, HasEncoding};
+use hermes_prelude::*;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 

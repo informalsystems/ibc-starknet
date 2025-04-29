@@ -1,5 +1,5 @@
-use cgp::prelude::*;
 use hermes_encoding_components::traits::{CanEncodeMut, MutEncoder, MutEncoderComponent};
+use hermes_prelude::*;
 
 pub struct EncodeArray;
 

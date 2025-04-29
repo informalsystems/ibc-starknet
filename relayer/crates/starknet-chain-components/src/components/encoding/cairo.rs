@@ -3,7 +3,6 @@ mod preset {
     use core::time::Duration;
 
     use cgp::core::component::{UseContext, UseDelegate};
-    use cgp::prelude::*;
     use hermes_cairo_encoding_components::components::encode_mut::CairoEncodeMutComponents;
     use hermes_cairo_encoding_components::components::encoding::*;
     use hermes_cairo_encoding_components::impls::encode_mut::cons::EncoderCons;
@@ -20,6 +19,7 @@ mod preset {
         DecoderComponent, EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
         EncodedTypeComponent, EncoderComponent, MutDecoderComponent, MutEncoderComponent,
     };
+    use hermes_prelude::*;
     use ibc::clients::tendermint::types::{Header as TendermintLcHeader, TrustThreshold};
     use ibc::core::commitment_types::specs::ProofSpecs;
     use ibc::core::host::types::identifiers::ChainId;

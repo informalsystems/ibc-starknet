@@ -1,7 +1,6 @@
 use core::fmt::Debug;
 use std::sync::Arc;
 
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::HasMessageType;
 use hermes_core::chain_type_components::traits::HasMessageResponseType;
 use hermes_core::relayer_components::transaction::traits::{
@@ -9,6 +8,7 @@ use hermes_core::relayer_components::transaction::traits::{
     MessagesWithSignerAndNonceSender, MessagesWithSignerAndNonceSenderComponent,
     TxMessageResponseParser, TxMessageResponseParserComponent,
 };
+use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::account::{

@@ -5,7 +5,6 @@ use core::str::Utf8Error;
 use std::string::FromUtf8Error;
 
 use cairo_lang_starknet_classes::casm_contract_class::StarknetSierraCompilationError;
-use cgp::prelude::*;
 use eyre::Report;
 use hermes_cairo_encoding_components::impls::encode_mut::bool::DecodeBoolError;
 use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;
@@ -29,6 +28,7 @@ use hermes_error::handlers::{
     DebugError, DisplayError, HandleInfallible, ReportError, ReturnError,
 };
 use hermes_error::types::Error;
+use hermes_prelude::*;
 use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_starknet_chain_components::impls::queries::consensus_state::ConsensusStateNotFound;
 use hermes_starknet_chain_components::impls::queries::contract_address::ContractAddressNotFound;

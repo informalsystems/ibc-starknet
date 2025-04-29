@@ -4,7 +4,6 @@ use core::time::Duration;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::encoding_components::impls::GetDefaultEncoding;
@@ -15,6 +14,7 @@ use hermes_core::encoding_components::traits::{
 };
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::error::types::HermesError;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::components::encoding::cairo::*;
 use hermes_starknet_chain_components::types::channel_id::{ChannelEnd, ChannelId};
 use hermes_starknet_chain_components::types::client_id::ClientId;

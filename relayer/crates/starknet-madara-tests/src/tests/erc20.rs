@@ -1,4 +1,3 @@
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::{
     CanQueryBlock, CanQueryChainHeight, CanQueryChainStatus, CanSendSingleMessage,
 };
@@ -6,6 +5,7 @@ use hermes_core::encoding_components::traits::CanEncode;
 use hermes_core::runtime_components::traits::CanReadFileAsString;
 use hermes_core::test_components::bootstrap::traits::CanBootstrapChain;
 use hermes_error::Error;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
 use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;

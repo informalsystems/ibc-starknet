@@ -2,7 +2,6 @@ use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::Index;
 use cgp::extra::run::RunnerComponent;
-use cgp::prelude::*;
 use hermes_core::logging_components::traits::LoggerComponent;
 use hermes_core::relayer_components::birelay::traits::AutoBiRelayerComponent;
 use hermes_core::relayer_components::components::default::DefaultBiRelayComponents;
@@ -17,6 +16,7 @@ use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
+use hermes_prelude::*;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
 

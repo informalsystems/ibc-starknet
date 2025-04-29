@@ -1,11 +1,11 @@
 use core::marker::PhantomData;
 
 use cgp::core::error::HasAsyncErrorType;
-use cgp::prelude::*;
 use hermes_encoding_components::traits::{
     HasDecodeBufferType, HasEncodeBufferType, MutDecoder, MutDecoderComponent, MutEncoder,
     MutEncoderComponent,
 };
+use hermes_prelude::*;
 
 pub struct EncoderCons<EncoderA, EncoderB>(pub PhantomData<(EncoderA, EncoderB)>);
 

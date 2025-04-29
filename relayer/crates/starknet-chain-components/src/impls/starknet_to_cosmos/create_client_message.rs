@@ -1,4 +1,3 @@
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::{
     CreateClientMessageBuilder, CreateClientMessageBuilderComponent, HasClientStateType,
     HasConsensusStateType, HasCreateClientMessageOptionsType, HasCreateClientPayloadType,
@@ -8,6 +7,7 @@ use hermes_core::encoding_components::traits::{CanConvert, HasDefaultEncoding};
 use hermes_core::encoding_components::types::AsBytes;
 use hermes_cosmos_core::chain_components::traits::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_core::chain_components::types::CosmosCreateClientMessage;
+use hermes_prelude::*;
 use ibc_client_starknet_types::StarknetClientState;
 use prost_types::Any;
 

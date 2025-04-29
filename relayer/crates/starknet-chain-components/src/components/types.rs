@@ -1,8 +1,8 @@
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::{
     ChannelEndTypeComponent, ChannelIdTypeComponent, ClientIdTypeComponent,
     ConnectionEndTypeComponent, ConnectionIdTypeComponent,
 };
+use hermes_prelude::*;
 
 use crate::types::channel_id::{ChannelEnd, ChannelId};
 use crate::types::client_id::ClientId;

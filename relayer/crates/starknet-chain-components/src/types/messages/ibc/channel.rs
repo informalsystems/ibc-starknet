@@ -1,8 +1,8 @@
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
 use hermes_core::encoding_components::traits::{
     MutDecoderComponent, MutEncoderComponent, Transformer, TransformerRef,
 };
+use hermes_prelude::*;
 pub use ibc::core::channel::types::channel::Order as ChannelOrdering;
 pub use ibc::core::channel::types::Version as AppVersion;
 pub use ibc::core::host::types::identifiers::PortId;

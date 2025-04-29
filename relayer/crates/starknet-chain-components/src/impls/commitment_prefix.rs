@@ -1,9 +1,9 @@
 use std::sync::LazyLock;
 
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::{
     HasCommitmentPrefixType, IbcCommitmentPrefixGetter, IbcCommitmentPrefixGetterComponent,
 };
+use hermes_prelude::*;
 
 pub struct GetStarknetCommitmentPrefix;
 

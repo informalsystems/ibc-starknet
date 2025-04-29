@@ -1,9 +1,9 @@
 use core::str::FromStr;
 use std::sync::Arc;
 
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::HasChainId;
 use hermes_core::relayer_components::transaction::traits::HasSignerType;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::traits::account::{
     AccountFromSignerBuilder, AccountFromSignerBuilderComponent, HasStarknetAccountType,
 };

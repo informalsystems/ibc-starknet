@@ -3,7 +3,6 @@ use std::path::PathBuf;
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::types::WithType;
-use cgp::prelude::*;
 use hermes_cli_components::impls::{GetDefaultConfigField, LoadTomlConfig, WriteTomlConfig};
 use hermes_cli_components::traits::{
     BootstrapLoaderComponent, BootstrapTypeProviderComponent, BuilderLoaderComponent,
@@ -18,6 +17,7 @@ use hermes_core::runtime_components::traits::{
     HasRuntime, RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
+use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::types::config::StarknetRelayerConfig;
 use hermes_starknet_cli::impls::bootstrap::starknet_chain::{

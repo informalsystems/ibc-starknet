@@ -1,7 +1,7 @@
-use cgp::prelude::*;
 use hermes_encoding_components::traits::{
     CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
+use hermes_prelude::*;
 use starknet::core::types::{ByteArray, Felt};
 
 pub struct EncodeByteArray;

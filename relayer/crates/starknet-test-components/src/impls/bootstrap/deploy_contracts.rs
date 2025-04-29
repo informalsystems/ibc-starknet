@@ -4,7 +4,6 @@ use std::collections::{BTreeMap, HashSet};
 use std::sync::OnceLock;
 
 use cgp::extra::runtime::HasRuntimeType;
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
@@ -21,6 +20,7 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainDriverBuilder, ChainDriverBuilderComponent, HasChainGenesisConfigType,
     HasChainNodeConfigType,
 };
+use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
 use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;

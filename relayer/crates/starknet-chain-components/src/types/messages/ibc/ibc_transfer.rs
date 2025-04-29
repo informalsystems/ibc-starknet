@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use cgp::prelude::*;
+use hermes_prelude::*;
 use starknet::core::types::U256;
 
 use super::channel::PortId;

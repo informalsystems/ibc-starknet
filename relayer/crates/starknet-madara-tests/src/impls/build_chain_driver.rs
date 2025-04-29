@@ -3,7 +3,6 @@ use alloc::sync::Arc;
 use std::sync::OnceLock;
 
 use cgp::extra::runtime::HasRuntime;
-use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_core::runtime_components::traits::{CanCreateDir, CanSleep, CanWriteStringToFile};
 use hermes_core::test_components::chain::traits::HasWalletType;
@@ -14,6 +13,7 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainDriverBuilder, ChainDriverBuilderComponent, HasChainGenesisConfigType,
     HasChainNodeConfigType, HasChainStoreDir,
 };
+use hermes_prelude::*;
 use hermes_runtime::types::error::TokioRuntimeError;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;

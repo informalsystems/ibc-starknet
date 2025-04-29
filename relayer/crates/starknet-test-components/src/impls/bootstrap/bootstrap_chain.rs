@@ -2,7 +2,6 @@ use std::collections::BTreeMap;
 use std::net::{IpAddr, Ipv4Addr};
 
 use cgp::core::error::CanRaiseAsyncError;
-use cgp::prelude::*;
 use hermes_core::runtime_components::traits::{
     CanCreateDir, CanGenerateRandom, CanReserveTcpPort, HasChildProcessType, HasFilePathType,
     HasRuntime,
@@ -16,6 +15,7 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
     CanBuildChainDriver, CanStartChainFullNodes, HasChainGenesisConfigType, HasChainNodeConfigType,
     HasChainStoreDir,
 };
+use hermes_prelude::*;
 use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use starknet::macros::felt;
 

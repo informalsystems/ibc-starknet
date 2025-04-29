@@ -1,7 +1,6 @@
 use core::marker::PhantomData;
 use std::str::FromStr;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
@@ -11,6 +10,7 @@ use hermes_core::chain_components::traits::{
     PacketFromWriteAckEventBuilderComponent, ProvideWriteAckEvent, WriteAckEventComponent,
 };
 use hermes_core::encoding_components::traits::{CanDecode, HasEncodedType, HasEncoding};
+use hermes_prelude::*;
 use ibc::apps::transfer::types::{Amount, BaseDenom, Memo, PrefixedDenom, TracePath};
 use ibc::core::channel::types::packet::Packet as IbcPacket;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};

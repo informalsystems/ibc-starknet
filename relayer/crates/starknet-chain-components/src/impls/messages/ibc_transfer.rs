@@ -1,7 +1,6 @@
 use std::marker::PhantomData;
 use std::str::FromStr;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
@@ -12,6 +11,7 @@ use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedT
 use hermes_core::test_components::chain::traits::{
     HasMemoType, IbcTokenTransferMessageBuilder, IbcTokenTransferMessageBuilderComponent,
 };
+use hermes_prelude::*;
 use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
 use starknet::core::types::{Felt, U256};

@@ -1,9 +1,9 @@
-use cgp::prelude::*;
 use hermes_core::runtime_components::traits::{CanCreateDir, CanStartChildProcess, HasRuntime};
 use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainFullNodeStarter, ChainFullNodeStarterComponent, HasChainGenesisConfigType,
     HasChainNodeConfigType,
 };
+use hermes_prelude::*;
 
 use crate::types::node_config::StarknetNodeConfig;
 

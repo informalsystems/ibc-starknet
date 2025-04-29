@@ -4,7 +4,6 @@ use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::Index;
 use cgp::core::types::WithType;
-use cgp::prelude::*;
 use hermes_cli::commands::{CreateChannelArgs, CreateCosmosClientArgs};
 use hermes_cli::impls::ParseInitCosmosChannelOptions;
 use hermes_cli_components::impls::{
@@ -33,6 +32,7 @@ use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::impls::types::config::{
     StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses, StarknetRelayerConfig,

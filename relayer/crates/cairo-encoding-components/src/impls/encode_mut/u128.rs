@@ -1,7 +1,7 @@
-use cgp::prelude::*;
 use hermes_encoding_components::traits::{
     CanDecodeMut, MutDecoder, MutDecoderComponent, MutEncoderComponent,
 };
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 
 use crate::impls::encode_mut::from_felt::EncodeFromFelt;

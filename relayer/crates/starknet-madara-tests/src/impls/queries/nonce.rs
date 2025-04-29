@@ -1,7 +1,7 @@
-use cgp::prelude::*;
 use hermes_core::relayer_components::transaction::traits::{
     HasNonceType, HasSignerType, NonceQuerier, NonceQuerierComponent,
 };
+use hermes_prelude::*;
 use hermes_starknet_chain_components::traits::account::{
     CanBuildAccountFromSigner, HasStarknetAccountType,
 };

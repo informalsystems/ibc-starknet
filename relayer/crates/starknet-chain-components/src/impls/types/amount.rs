@@ -1,5 +1,4 @@
 use cgp::extra::runtime::HasRuntime;
-use cgp::prelude::*;
 use hermes_core::chain_type_components::traits::{
     AmountDenomGetter, AmountDenomGetterComponent, AmountTypeProviderComponent, HasAmountType,
     HasDenomType,
@@ -9,6 +8,7 @@ use hermes_core::test_components::chain::traits::{AmountMethodsComponent, Provid
 use hermes_core::test_components::chain_driver::traits::{
     HasChainType, RandomAmountGenerator, RandomAmountGeneratorComponent,
 };
+use hermes_prelude::*;
 
 use super::address::StarknetAddress;
 use crate::types::amount::StarknetAmount;

@@ -5,7 +5,6 @@ use std::sync::{Arc, OnceLock};
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::WithField;
-use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
@@ -30,6 +29,7 @@ use hermes_core::runtime_components::traits::{
 use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::impls::UseHermesError;
+use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::commitment_proof::{
     VerifyStarknetMerkleProof, VerifyStarknetStorageProof,

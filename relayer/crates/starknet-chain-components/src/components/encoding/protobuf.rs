@@ -1,7 +1,6 @@
 #[cgp::re_export_imports]
 mod preset {
     use cgp::core::component::{UseContext, UseDelegate};
-    use cgp::prelude::*;
     use hermes_core::encoding_components::impls::{ProvideEncodedBytes, ProvideStringSchema};
     use hermes_core::encoding_components::traits::{
         ConverterComponent, DecodeBufferTypeComponent, DecoderComponent, EncodeBufferTypeComponent,
@@ -22,6 +21,7 @@ mod preset {
     use hermes_cosmos_core::wasm_encoding_components::types::{
         WasmClientMessage, WasmClientState, WasmConsensusState,
     };
+    use hermes_prelude::*;
     use ibc::clients::wasm_types::client_message::ClientMessage;
     use ibc::core::client::types::Height;
     use ibc::core::commitment_types::commitment::CommitmentRoot;

@@ -1,10 +1,10 @@
 use cgp::core::component::UseContext;
-use cgp::prelude::*;
 use hermes_core::encoding_components::impls::{CombineEncoders, DecodeFrom, EncodeField};
 use hermes_core::encoding_components::traits::{
     CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
     Transformer,
 };
+use hermes_prelude::*;
 pub use ibc::core::host::types::identifiers::Sequence;
 use starknet::core::types::Felt;
 

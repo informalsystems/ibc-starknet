@@ -1,6 +1,5 @@
 use core::fmt::Debug;
 
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::HasMessageType;
 use hermes_core::chain_type_components::traits::HasMessageResponseType;
 use hermes_core::relayer_components::transaction::traits::{
@@ -8,6 +7,7 @@ use hermes_core::relayer_components::transaction::traits::{
     MessagesWithSignerAndNonceSender, MessagesWithSignerAndNonceSenderComponent,
     TxMessageResponseParser, TxMessageResponseParserComponent,
 };
+use hermes_prelude::*;
 use starknet::accounts::Account;
 use starknet::core::types::{
     Call, ExecuteInvocation, Felt, FunctionInvocation, RevertedInvocation, TransactionTrace,

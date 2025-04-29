@@ -1,4 +1,4 @@
-use cgp::prelude::*;
+use hermes_prelude::*;
 use hermes_core::relayer_components::transaction::traits::HasSignerType;
 
 #[cgp_getter {

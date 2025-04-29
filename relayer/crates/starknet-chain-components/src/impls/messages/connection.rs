@@ -3,7 +3,6 @@ use core::num::ParseIntError;
 use core::str::Utf8Error;
 use core::time::Duration;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
@@ -25,6 +24,7 @@ use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEnc
 use hermes_cosmos_core::chain_components::types::{
     CosmosCommitmentProof, CosmosInitConnectionOptions,
 };
+use hermes_prelude::*;
 use ibc::core::client::types::Height;
 use ibc::core::connection::types::ConnectionEnd;
 use ibc::core::host::types::identifiers::{

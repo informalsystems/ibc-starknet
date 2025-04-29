@@ -1,7 +1,6 @@
 #[cgp::re_export_imports]
 mod preset {
     use cgp::core::types::UseDelegatedType;
-    use cgp::prelude::*;
     use hermes_core::chain_components::impls::{
         BuildChannelHandshakePayload, BuildConnectionHandshakePayload, BuildPacketPayloads,
         ProvideBytesPacketCommitment, ProvideBytesPacketReceipt, ProvideChannelPayloadTypes,
@@ -95,6 +94,7 @@ mod preset {
         ProvideCosmosInitChannelOptionsType, ProvideCosmosInitConnectionOptionsType,
         ProvideNoCreateClientMessageOptionsType, QueryCounterpartyConnectionId,
     };
+    use hermes_prelude::*;
     use ibc::core::host::types::identifiers::ChainId;
     use starknet::core::types::Felt;
 

@@ -1,8 +1,8 @@
-use cgp::prelude::*;
 use hermes_encoding_components::traits::{
     CanBuildDecodeBuffer, CanDecodeMut, CanEncodeMut, CanFinalizedEncodeBuffer, Decoder,
     DecoderComponent, Encoder, EncoderComponent, MutDecoder,
 };
+use hermes_prelude::*;
 
 use crate::impls::encode_mut::end::DecodeEnd;
 

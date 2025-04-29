@@ -1,11 +1,11 @@
 use core::fmt::Display;
 
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::CanQueryChainHeight;
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_core::runtime_components::traits::CanReadFileAsString;
 use hermes_core::test_components::bootstrap::traits::CanBootstrapChain;
 use hermes_error::Error;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::commitment_proof::CanVerifyStarknetStorageProof;
 use hermes_starknet_chain_components::traits::contract::call::CanCallContract;

@@ -1,8 +1,8 @@
 use cgp::core::component::UseContext;
-use cgp::prelude::*;
 use hermes_cosmos_encoding_components::impls::EncodeChainIdField;
 use hermes_encoding_components::impls::{CombineEncoders, DecodeFrom, EncodeField};
 use hermes_encoding_components::traits::{MutDecoderComponent, MutEncoderComponent, Transformer};
+use hermes_prelude::*;
 use hermes_protobuf_encoding_components::impls::{
     DecodeRequiredProtoField, EncodeByteField, EncodeLengthDelimitedProtoField,
 };

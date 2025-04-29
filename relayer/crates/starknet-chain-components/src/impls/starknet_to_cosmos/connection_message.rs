@@ -1,6 +1,5 @@
 use core::time::Duration;
 
-use cgp::prelude::*;
 use hermes_core::chain_components::traits::{
     CanQueryChainHeight, ConnectionOpenAckMessageBuilder, ConnectionOpenAckMessageBuilderComponent,
     ConnectionOpenConfirmMessageBuilder, ConnectionOpenConfirmMessageBuilderComponent,
@@ -20,6 +19,7 @@ use hermes_cosmos_core::chain_components::types::{
     CosmosConnectionOpenAckMessage, CosmosConnectionOpenConfirmMessage,
     CosmosConnectionOpenInitMessage, CosmosConnectionOpenTryMessage, CosmosInitConnectionOptions,
 };
+use hermes_prelude::*;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::connection::types::version::Version as CosmosConnectionVersion;

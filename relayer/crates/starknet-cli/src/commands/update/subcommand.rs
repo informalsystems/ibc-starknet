@@ -1,6 +1,6 @@
-use cgp::prelude::*;
 use hermes_cli_components::impls::UpdateClientArgs;
 use hermes_cli_components::traits::{CanRunCommand, CommandRunner, CommandRunnerComponent};
+use hermes_prelude::*;
 
 #[derive(Debug, clap::Subcommand)]
 pub enum UpdateSubCommand {

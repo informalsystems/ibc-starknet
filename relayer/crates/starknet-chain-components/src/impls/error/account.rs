@@ -1,7 +1,7 @@
 use core::fmt::Debug;
 
 use cgp::core::error::{ErrorRaiser, ErrorRaiserComponent};
-use cgp::prelude::*;
+use hermes_prelude::*;
 use starknet::accounts::AccountError;
 use starknet::providers::ProviderError;
 

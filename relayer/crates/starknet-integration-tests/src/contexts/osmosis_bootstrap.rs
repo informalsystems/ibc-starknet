@@ -1,7 +1,6 @@
 use std::path::PathBuf;
 
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
-use cgp::prelude::*;
 use hermes_core::logging_components::traits::LoggerComponent;
 use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -41,6 +40,7 @@ use hermes_cosmos_core::wasm_test_components::impls::bootstrap::{
 use hermes_cosmos_core::wasm_test_components::traits::bootstrap::{
     GovernanceProposalAuthorityGetterComponent, WasmClientByteCodeGetterComponent,
 };
+use hermes_prelude::*;
 
 /**
    A bootstrap context for bootstrapping a new Cosmos chain, and builds
