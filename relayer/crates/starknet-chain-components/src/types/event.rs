@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use starknet::core::types::{EmittedEvent, Felt, OrderedEvent};
 
-use crate::impls::types::address::StarknetAddress;
+use crate::impls::StarknetAddress;
 
 #[derive(Debug, Clone)]
 pub struct StarknetEvent {

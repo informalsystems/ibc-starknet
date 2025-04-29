@@ -6,8 +6,8 @@ use hermes_prelude::*;
 use starknet::core::types::{BlockId, BlockTag, MaybePendingBlockWithTxHashes};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::traits::client::HasStarknetClient;
-use crate::types::status::StarknetChainStatus;
+use crate::traits::HasStarknetClient;
+use crate::types::StarknetChainStatus;
 
 pub struct QueryStarknetChainStatus;
 

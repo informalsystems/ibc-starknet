@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use starknet::core::types::Felt;
 use starknet::signers::SigningKey;
 
-use crate::impls::types::address::StarknetAddress;
+use crate::impls::StarknetAddress;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StarknetWallet {

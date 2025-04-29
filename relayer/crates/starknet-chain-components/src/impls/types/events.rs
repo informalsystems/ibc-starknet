@@ -1,6 +1,4 @@
-use crate::types::channel_id::ChannelId;
-use crate::types::client_id::ClientId;
-use crate::types::connection_id::ConnectionId;
+use crate::types::{ChannelId, ClientId, ConnectionId};
 
 pub struct StarknetCreateClientEvent {
     pub client_id: ClientId,

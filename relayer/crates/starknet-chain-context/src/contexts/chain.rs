@@ -78,46 +78,24 @@ use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::components::chain::StarknetChainComponents;
-use hermes_starknet_chain_components::components::starknet_to_cosmos::StarknetToCosmosComponents;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::events::StarknetCreateClientEvent;
-use hermes_starknet_chain_components::traits::account::{
-    AccountFromSignerBuilderComponent, StarknetAccountTypeProviderComponent,
+use hermes_starknet_chain_components::components::{
+    StarknetChainComponents, StarknetToCosmosComponents,
 };
-use hermes_starknet_chain_components::traits::client::{
-    HasStarknetClient, StarknetClientGetterComponent, StarknetClientTypeProviderComponent,
-};
-use hermes_starknet_chain_components::traits::contract::call::CanCallContract;
-use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
-use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::traits::contract::invoke::CanInvokeContract;
-use hermes_starknet_chain_components::traits::proof_signer::{
-    HasStarknetProofSigner, StarknetProofSignerGetterComponent,
+use hermes_starknet_chain_components::impls::{StarknetAddress, StarknetCreateClientEvent};
+use hermes_starknet_chain_components::traits::{
+    AccountFromSignerBuilderComponent, CanCallContract, CanDeclareContract, CanDeployContract,
+    CanInvokeContract, CanQueryContractAddress, CanQueryTokenBalance, CanTransferToken,
+    CosmosTokenAddressOnStarknetQuerierComponent, HasBlobType, HasSelectorType, HasStarknetClient,
+    HasStarknetProofSigner, StarknetAccountTypeProviderComponent, StarknetClientGetterComponent,
+    StarknetClientTypeProviderComponent, StarknetProofSignerGetterComponent,
     StarknetProofSignerTypeProviderComponent,
 };
-use hermes_starknet_chain_components::traits::queries::contract_address::CanQueryContractAddress;
-use hermes_starknet_chain_components::traits::queries::token_address::CosmosTokenAddressOnStarknetQuerierComponent;
-use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
-use hermes_starknet_chain_components::traits::transfer::CanTransferToken;
-use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
-use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
-use hermes_starknet_chain_components::types::channel_id::{ChannelEnd, ChannelId};
-use hermes_starknet_chain_components::types::client_id::ClientId;
-use hermes_starknet_chain_components::types::client_state::WasmStarknetClientState;
-use hermes_starknet_chain_components::types::commitment_proof::StarknetCommitmentProof;
-use hermes_starknet_chain_components::types::connection_id::{ConnectionEnd, ConnectionId};
-use hermes_starknet_chain_components::types::consensus_state::WasmStarknetConsensusState;
-use hermes_starknet_chain_components::types::cosmos::client_state::CometClientState;
-use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
-use hermes_starknet_chain_components::types::event::StarknetEvent;
-use hermes_starknet_chain_components::types::events::packet::WriteAcknowledgementEvent;
-use hermes_starknet_chain_components::types::message_response::StarknetMessageResponse;
-use hermes_starknet_chain_components::types::payloads::client::{
-    StarknetCreateClientPayloadOptions, StarknetUpdateClientPayload,
+use hermes_starknet_chain_components::types::{
+    ChannelEnd, ChannelId, ClientId, CometClientState, CometConsensusState, ConnectionEnd,
+    ConnectionId, StarknetChainStatus, StarknetCommitmentProof, StarknetCreateClientPayloadOptions,
+    StarknetEvent, StarknetMessageResponse, StarknetUpdateClientPayload, StarknetWallet,
+    WasmStarknetClientState, WasmStarknetConsensusState, WriteAcknowledgementEvent,
 };
-use hermes_starknet_chain_components::types::status::StarknetChainStatus;
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::host::types::identifiers::{ChainId, PortId as IbcPortId, Sequence};
 use ibc::primitives::Timestamp;
@@ -125,11 +103,11 @@ use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 
-use crate::contexts::encoding::cairo::{StarknetCairoEncoding, UseStarknetCairoEncoding};
-use crate::contexts::encoding::event::StarknetEventEncoding;
-use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
-use crate::impls::build_account::BuildStarknetAccount;
-use crate::impls::error::HandleStarknetChainError;
+use crate::contexts::{
+    StarknetCairoEncoding, StarknetEventEncoding, StarknetProtobufEncoding,
+    UseStarknetCairoEncoding,
+};
+use crate::impls::{BuildStarknetAccount, HandleStarknetChainError};
 use crate::types::StarknetAccount;
 
 #[cgp_context(StarknetChainContextComponents: StarknetChainComponents)]

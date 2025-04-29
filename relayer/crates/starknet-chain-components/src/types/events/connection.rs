@@ -7,9 +7,7 @@ use hermes_prelude::*;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::types::client_id::ClientId;
-use crate::types::connection_id::ConnectionId;
-use crate::types::event::{StarknetEvent, UnknownEvent};
+use crate::types::{ClientId, ConnectionId, StarknetEvent, UnknownEvent};
 
 #[derive(Debug)]
 pub enum ConnectionHandshakeEvents {

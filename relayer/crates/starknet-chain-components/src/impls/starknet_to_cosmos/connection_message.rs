@@ -30,11 +30,10 @@ use ibc::core::host::types::identifiers::{
 use ibc::primitives::proto::Any as IbcProtoAny;
 use prost_types::Any;
 
-use crate::types::client_id::ClientId as StarknetClientId;
-use crate::types::commitment_proof::StarknetCommitmentProof;
-use crate::types::connection_id::ConnectionId as StarknetConnectionId;
-use crate::types::consensus_state::WasmStarknetConsensusState;
-use crate::types::cosmos::client_state::CometClientState;
+use crate::types::{
+    ClientId as StarknetClientId, CometClientState, ConnectionId as StarknetConnectionId,
+    StarknetCommitmentProof, WasmStarknetConsensusState,
+};
 pub struct BuildStarknetToCosmosConnectionHandshake;
 
 #[cgp_provider(ConnectionOpenInitMessageBuilderComponent)]

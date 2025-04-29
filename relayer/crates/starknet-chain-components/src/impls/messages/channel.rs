@@ -26,15 +26,12 @@ use ibc::core::host::types::identifiers::{ChannelId, ConnectionId, PortId as Ibc
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::types::channel_id::ChannelId as StarknetChannelId;
-use crate::types::cosmos::height::Height as CairoHeight;
-use crate::types::messages::ibc::channel::{
-    ChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry,
+use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::traits::CanQueryContractAddress;
+use crate::types::{
+    ChannelId as StarknetChannelId, ChannelOrdering, Height as CairoHeight, MsgChanOpenAck,
+    MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry, StateProof,
 };
-use crate::types::messages::ibc::packet::StateProof;
 pub struct BuildStarknetChannelHandshakeMessages;
 
 #[cgp_provider(ChannelOpenInitMessageBuilderComponent)]

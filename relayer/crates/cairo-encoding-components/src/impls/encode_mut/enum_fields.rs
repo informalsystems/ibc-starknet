@@ -4,7 +4,7 @@ use hermes_encoding_components::traits::{
 };
 use hermes_prelude::*;
 
-use crate::impls::encode_mut::variant::SumEncoders;
+use crate::impls::SumEncoders;
 use crate::types::nat::Z;
 
 pub struct EncodeEnumFields;

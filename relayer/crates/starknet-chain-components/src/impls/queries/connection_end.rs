@@ -16,15 +16,13 @@ use ibc_proto::Protobuf;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::traits::contract::call::CanCallContract;
-use crate::traits::proof_signer::HasStarknetProofSigner;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
-use crate::types::commitment_proof::StarknetCommitmentProof;
-use crate::types::connection_id::{ConnectionEnd, ConnectionId};
-use crate::types::membership_proof_signer::MembershipVerifierContainer;
-use crate::types::status::StarknetChainStatus;
+use crate::traits::{
+    CanCallContract, CanQueryContractAddress, HasBlobType, HasSelectorType, HasStarknetProofSigner,
+};
+use crate::types::{
+    ConnectionEnd, ConnectionId, MembershipVerifierContainer, StarknetChainStatus,
+    StarknetCommitmentProof,
+};
 
 pub struct QueryConnectionEndFromStarknet;
 

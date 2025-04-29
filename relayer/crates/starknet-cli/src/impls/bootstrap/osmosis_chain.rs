@@ -5,7 +5,7 @@ use hermes_cosmos::error::HermesError;
 use hermes_cosmos::relayer::contexts::CosmosBuilder;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_prelude::*;
-use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
+use hermes_starknet_integration_tests::contexts::OsmosisBootstrap;
 use hermes_starknet_integration_tests::utils::load_wasm_client;
 use tracing::info;
 

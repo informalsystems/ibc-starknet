@@ -6,7 +6,7 @@ use starknet::accounts::ConnectedAccount;
 use starknet::core::types::Felt;
 use starknet::providers::ProviderError;
 
-use crate::traits::account::{CanBuildAccountFromSigner, HasStarknetAccountType};
+use crate::traits::{CanBuildAccountFromSigner, HasStarknetAccountType};
 
 #[cgp_new_provider(NonceQuerierComponent)]
 impl<Chain> NonceQuerier<Chain> for QueryStarknetNonce

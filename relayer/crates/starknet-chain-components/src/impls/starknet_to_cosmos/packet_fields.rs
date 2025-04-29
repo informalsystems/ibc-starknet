@@ -7,7 +7,7 @@ use hermes_prelude::*;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::channel::types::timeout::TimeoutHeight;
 
-use crate::types::channel_id::ChannelId;
+use crate::types::ChannelId;
 
 pub struct ReadPacketDstStarknetFields;
 

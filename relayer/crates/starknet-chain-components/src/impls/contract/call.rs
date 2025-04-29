@@ -4,11 +4,10 @@ use hermes_prelude::*;
 use starknet::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::impls::types::address::StarknetAddress;
-use crate::traits::client::HasStarknetClient;
-use crate::traits::contract::call::{ContractCaller, ContractCallerComponent};
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
+use crate::impls::StarknetAddress;
+use crate::traits::{
+    ContractCaller, ContractCallerComponent, HasBlobType, HasSelectorType, HasStarknetClient,
+};
 
 pub struct CallStarknetContract;
 

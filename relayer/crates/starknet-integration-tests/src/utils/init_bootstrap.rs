@@ -8,8 +8,7 @@ use hermes_cosmos::relayer::contexts::CosmosBuilder;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use starknet::core::types::contract::SierraClass;
 
-use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
-use crate::contexts::starknet_bootstrap::{StarknetBootstrap, StarknetBootstrapFields};
+use crate::contexts::{OsmosisBootstrap, StarknetBootstrap, StarknetBootstrapFields};
 
 pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<StarknetBootstrap, Error> {
     let chain_command_path = std::env::var("STARKNET_BIN")

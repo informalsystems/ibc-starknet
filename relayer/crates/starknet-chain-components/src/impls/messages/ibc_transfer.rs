@@ -17,17 +17,9 @@ use ibc::primitives::Timestamp;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::contract::call::CanCallContract;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
-use crate::types::amount::StarknetAmount;
-use crate::types::channel_id::ChannelId;
-use crate::types::cosmos::height::Height;
-use crate::types::messages::ibc::denom::{Denom, PrefixedDenom};
-use crate::types::messages::ibc::ibc_transfer::MsgTransfer;
+use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::traits::{CanCallContract, CanQueryContractAddress, HasBlobType, HasSelectorType};
+use crate::types::{ChannelId, Denom, Height, MsgTransfer, PrefixedDenom, StarknetAmount};
 
 pub struct BuildStarknetIbcTransferMessage;
 

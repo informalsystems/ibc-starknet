@@ -12,7 +12,7 @@ use ibc::core::host::types::identifiers::ClientId;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use prost_types::Any;
 
-use crate::types::payloads::client::StarknetUpdateClientPayload;
+use crate::types::StarknetUpdateClientPayload;
 
 pub struct BuildStarknetUpdateClientMessage;
 

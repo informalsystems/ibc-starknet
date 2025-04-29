@@ -12,11 +12,8 @@ use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::StarknetHeader;
 use starknet::providers::ProviderError;
 
-use crate::traits::client::HasStarknetClient;
-use crate::traits::proof_signer::HasStarknetProofSigner;
-use crate::types::consensus_state::StarknetConsensusState;
-use crate::types::payloads::client::StarknetUpdateClientPayload;
-use crate::types::status::StarknetChainStatus;
+use crate::traits::{HasStarknetClient, HasStarknetProofSigner};
+use crate::types::{StarknetChainStatus, StarknetConsensusState, StarknetUpdateClientPayload};
 
 pub struct BuildStarknetUpdateClientPayload;
 

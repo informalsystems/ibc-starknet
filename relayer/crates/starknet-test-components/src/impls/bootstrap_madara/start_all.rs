@@ -5,7 +5,7 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
 };
 use hermes_prelude::*;
 
-use crate::impls::bootstrap_madara::{StartAnvil, StartMadaraSequencer, StartPathfinder};
+use crate::impls::{StartAnvil, StartMadaraSequencer, StartPathfinder};
 
 #[cgp_new_provider(ChainFullNodeStarterComponent)]
 impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartMadaraStack

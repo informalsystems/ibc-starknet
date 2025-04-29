@@ -5,7 +5,7 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_prelude::*;
 
-use crate::types::payloads::client::{
+use crate::types::{
     StarknetCreateClientPayload, StarknetCreateClientPayloadOptions, StarknetUpdateClientPayload,
 };
 

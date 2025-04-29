@@ -5,7 +5,7 @@ use hermes_core::chain_type_components::traits::HasTimeType;
 use hermes_cosmos_core::chain_components::types::Time;
 use hermes_prelude::*;
 
-use crate::types::status::StarknetChainStatus;
+use crate::types::StarknetChainStatus;
 
 pub struct ProvideStarknetChainStatusType;
 

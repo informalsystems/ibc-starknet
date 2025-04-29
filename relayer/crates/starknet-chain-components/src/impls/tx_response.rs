@@ -8,8 +8,8 @@ use hermes_prelude::*;
 use starknet::core::types::{Felt, StarknetError};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::traits::client::HasStarknetClient;
-use crate::types::tx_response::TxResponse;
+use crate::traits::HasStarknetClient;
+use crate::types::TxResponse;
 
 pub struct QueryTransactionReceipt;
 

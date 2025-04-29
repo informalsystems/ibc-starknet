@@ -1,1 +1,2 @@
-pub mod subcommand;
+mod subcommand;
+pub use subcommand::*;

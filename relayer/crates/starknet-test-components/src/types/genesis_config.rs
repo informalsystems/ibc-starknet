@@ -1,4 +1,4 @@
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
+use hermes_starknet_chain_components::impls::StarknetAddress;
 
 pub struct StarknetGenesisConfig {
     pub seed: u64,

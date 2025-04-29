@@ -14,10 +14,10 @@ use starknet::core::types::Felt;
 use starknet::macros::selector;
 use time::OffsetDateTime;
 
-use crate::traits::messages::transfer::CanBuildTransferTokenMessage;
-use crate::traits::transfer::{TokenTransferComponent, TokenTransferer};
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
+use crate::traits::{
+    CanBuildTransferTokenMessage, HasBlobType, HasSelectorType, TokenTransferComponent,
+    TokenTransferer,
+};
 
 pub const TRANSFER_SELECTOR: Felt = selector!("transfer");
 

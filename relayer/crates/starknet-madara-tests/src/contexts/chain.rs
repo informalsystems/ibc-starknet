@@ -31,42 +31,25 @@ use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::impls::UseHermesError;
 use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_starknet_chain_components::impls::commitment_proof::{
+use hermes_starknet_chain_components::impls::{
+    QueryStarknetStorageProof, SendJsonRpcRequestWithReqwest, StarknetAddress,
     VerifyStarknetMerkleProof, VerifyStarknetStorageProof,
 };
-use hermes_starknet_chain_components::impls::json_rpc::SendJsonRpcRequestWithReqwest;
-use hermes_starknet_chain_components::impls::queries::storage_proof::QueryStarknetStorageProof;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::account::{
-    AccountFromSignerBuilderComponent, StarknetAccountTypeProviderComponent,
-};
-use hermes_starknet_chain_components::traits::client::{
+use hermes_starknet_chain_components::traits::{
+    AccountFromSignerBuilderComponent, ContractCallerComponent, ContractDeclarerComponent,
+    ContractDeployerComponent, ContractInvokerComponent, InvokeContractMessageBuilderComponent,
+    JsonRpcRequestSenderComponent, JsonRpcUrlGetterComponent, MerkleProofTypeProviderComponent,
+    ReqwestClientGetterComponent, StarknetAccountTypeProviderComponent,
     StarknetClientGetterComponent, StarknetClientTypeProviderComponent,
+    StarknetMerkleProofVerifierComponent, StarknetProofSignerGetterComponent,
+    StarknetProofSignerTypeProviderComponent, StarknetStorageProofVerifierComponent,
+    StorageKeyTypeProviderComponent, StorageProofQuerierComponent,
+    StorageProofTypeProviderComponent,
 };
-use hermes_starknet_chain_components::traits::commitment_proof::{
-    StarknetMerkleProofVerifierComponent, StarknetStorageProofVerifierComponent,
+use hermes_starknet_chain_components::types::StarknetWallet;
+use hermes_starknet_chain_context::contexts::{
+    StarknetEventEncoding, StarknetProtobufEncoding, UseStarknetCairoEncoding,
 };
-use hermes_starknet_chain_components::traits::contract::call::ContractCallerComponent;
-use hermes_starknet_chain_components::traits::contract::declare::ContractDeclarerComponent;
-use hermes_starknet_chain_components::traits::contract::deploy::ContractDeployerComponent;
-use hermes_starknet_chain_components::traits::contract::invoke::ContractInvokerComponent;
-use hermes_starknet_chain_components::traits::contract::message::InvokeContractMessageBuilderComponent;
-use hermes_starknet_chain_components::traits::json_rpc::JsonRpcRequestSenderComponent;
-use hermes_starknet_chain_components::traits::proof_signer::{
-    StarknetProofSignerGetterComponent, StarknetProofSignerTypeProviderComponent,
-};
-use hermes_starknet_chain_components::traits::queries::storage_proof::StorageProofQuerierComponent;
-use hermes_starknet_chain_components::traits::rpc_client::{
-    JsonRpcUrlGetterComponent, ReqwestClientGetterComponent,
-};
-use hermes_starknet_chain_components::traits::types::commitment::MerkleProofTypeProviderComponent;
-use hermes_starknet_chain_components::traits::types::storage_proof::{
-    StorageKeyTypeProviderComponent, StorageProofTypeProviderComponent,
-};
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
-use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
-use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
-use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
 use ibc::core::host::types::identifiers::ChainId;
 use indexmap::IndexMap;
 use reqwest::Client;

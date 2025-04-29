@@ -8,19 +8,17 @@ use hermes_cosmos::protobuf_encoding_components::types::any::Any;
 use hermes_cosmos::protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use hermes_cosmos::wasm_encoding_components::types::{WasmClientState, WasmConsensusState};
 use hermes_prelude::*;
-use hermes_starknet_chain_components::components::encoding::protobuf::*;
-use hermes_starknet_chain_components::types::client_state::{
-    StarknetClientState, WasmStarknetClientState,
-};
-use hermes_starknet_chain_components::types::consensus_state::{
-    StarknetConsensusState, WasmStarknetConsensusState,
+use hermes_starknet_chain_components::components::*;
+use hermes_starknet_chain_components::types::{
+    StarknetClientState, StarknetConsensusState, WasmStarknetClientState,
+    WasmStarknetConsensusState,
 };
 use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::commitment_types::commitment::CommitmentRoot;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 
-use crate::impls::error::HandleStarknetChainError;
+use crate::impls::HandleStarknetChainError;
 
 #[cgp_context(StarknetProtobufEncodingContextComponents: StarknetProtobufEncodingComponents)]
 pub struct StarknetProtobufEncoding;

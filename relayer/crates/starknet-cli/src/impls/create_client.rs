@@ -7,12 +7,12 @@ use hermes_cosmos::chain_components::types::CosmosCreateClientOptions;
 use hermes_cosmos::error::HermesError;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_starknet_chain_components::types::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_context::contexts::StarknetChain;
 use hex::FromHex;
 use ibc::clients::tendermint::types::TrustThreshold;
 
-use crate::contexts::app::{StarknetApp, StarknetAppComponents};
+use crate::contexts::{StarknetApp, StarknetAppComponents};
 
 #[derive(Debug, clap::Parser, HasField)]
 pub struct CreateStarknetClientArgs {

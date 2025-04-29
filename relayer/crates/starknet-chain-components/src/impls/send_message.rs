@@ -13,13 +13,9 @@ use starknet::core::types::{
     Call, ExecuteInvocation, Felt, FunctionInvocation, RevertedInvocation, TransactionTrace,
 };
 
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::account::{
-    CanBuildAccountFromSigner, CanUseStarknetAccount, HasStarknetAccountType,
-};
-use crate::types::event::StarknetEvent;
-use crate::types::message_response::StarknetMessageResponse;
-use crate::types::tx_response::TxResponse;
+use crate::impls::StarknetMessage;
+use crate::traits::{CanBuildAccountFromSigner, CanUseStarknetAccount, HasStarknetAccountType};
+use crate::types::{StarknetEvent, StarknetMessageResponse, TxResponse};
 
 pub struct UnexpectedTransactionTraceType {
     pub trace: TransactionTrace,

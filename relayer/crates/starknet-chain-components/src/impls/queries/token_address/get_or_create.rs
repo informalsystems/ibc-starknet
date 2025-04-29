@@ -1,13 +1,11 @@
 use hermes_core::chain_type_components::traits::HasDenomType;
 use hermes_prelude::*;
 
-use crate::impls::queries::token_address::{
-    CreateCosmosTokenAddressOnStarknet, GetCosmosTokenAddressOnStarknet,
-};
-use crate::traits::queries::token_address::{
+use crate::impls::{CreateCosmosTokenAddressOnStarknet, GetCosmosTokenAddressOnStarknet};
+use crate::traits::{
     CosmosTokenAddressOnStarknetQuerier, CosmosTokenAddressOnStarknetQuerierComponent,
 };
-use crate::types::messages::ibc::denom::PrefixedDenom;
+use crate::types::PrefixedDenom;
 
 #[cgp_new_provider(CosmosTokenAddressOnStarknetQuerierComponent)]
 impl<Chain> CosmosTokenAddressOnStarknetQuerier<Chain> for GetOrCreateCosmosTokenAddressOnStarknet

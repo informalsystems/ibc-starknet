@@ -17,11 +17,9 @@ use hermes_core::test_components::chain_driver::traits::{
 use hermes_error::impls::UseHermesError;
 use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::amount::UseU256Amount;
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
-use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
-use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
+use hermes_starknet_chain_components::impls::{StarknetAddress, UseU256Amount};
+use hermes_starknet_chain_components::types::StarknetWallet;
+use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
 use tokio::process::Child;
 
 use crate::contexts::MadaraChain;

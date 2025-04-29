@@ -4,7 +4,7 @@ use std::str::FromStr;
 use hermes_prelude::*;
 use ibc::apps::transfer::types::PrefixedDenom as IbcPrefixedDenom;
 
-use crate::impls::types::address::StarknetAddress;
+use crate::impls::StarknetAddress;
 
 #[derive(Clone, Debug, PartialEq, HasFields)]
 pub enum Denom {

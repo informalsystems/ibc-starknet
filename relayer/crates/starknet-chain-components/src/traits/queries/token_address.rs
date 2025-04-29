@@ -1,7 +1,7 @@
 use hermes_core::chain_type_components::traits::HasDenomType;
 use hermes_prelude::*;
 
-use crate::types::messages::ibc::denom::PrefixedDenom;
+use crate::types::PrefixedDenom;
 
 #[cgp_component {
     provider: CosmosTokenAddressOnStarknetQuerier,

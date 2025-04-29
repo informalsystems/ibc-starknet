@@ -1,11 +1,9 @@
 use hermes_cli_components::traits::{CanRunCommand, CommandRunner, CommandRunnerComponent};
 use hermes_prelude::*;
 
-use crate::commands::bootstrap::BootstrapSubCommand;
-use crate::commands::create::subcommand::CreateSubCommand;
-use crate::commands::query::subcommand::QuerySubCommand;
-use crate::commands::start::StartSubCommand;
-use crate::commands::update::subcommand::UpdateSubCommand;
+use crate::commands::{
+    BootstrapSubCommand, CreateSubCommand, QuerySubCommand, StartSubCommand, UpdateSubCommand,
+};
 
 #[derive(Debug, clap::Subcommand)]
 pub enum AllSubCommands {

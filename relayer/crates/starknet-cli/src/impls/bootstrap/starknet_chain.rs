@@ -5,9 +5,7 @@ use hermes_core::runtime_components::traits::{CanReadFileAsString, HasRuntime};
 use hermes_cosmos::runtime::types::error::TokioRuntimeError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_prelude::*;
-use hermes_starknet_integration_tests::contexts::starknet_bootstrap::{
-    StarknetBootstrap, StarknetBootstrapFields,
-};
+use hermes_starknet_integration_tests::contexts::{StarknetBootstrap, StarknetBootstrapFields};
 
 #[derive(Debug, clap::Parser, HasField)]
 pub struct BootstrapStarknetChainArgs {

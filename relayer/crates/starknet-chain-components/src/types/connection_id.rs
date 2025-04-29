@@ -1,18 +1,16 @@
 use core::time::Duration;
 
-use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
+use hermes_cairo_encoding_components::impls::EncodeVariantFrom;
 use hermes_core::encoding_components::traits::{
     CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
     Transformer, TransformerRef,
 };
 use hermes_prelude::*;
-pub use ibc::core::connection::types::{
-    ConnectionEnd, Counterparty as ConnectionCounterparty, State as ConnectionState,
+use ibc::core::connection::types::{
+    Counterparty as ConnectionCounterparty, State as ConnectionState,
 };
-pub use ibc::core::host::types::identifiers::ConnectionId;
 
-use crate::types::client_id::ClientId;
-use crate::types::messages::ibc::connection::{BasePrefix, ConnectionVersion};
+use crate::types::{BasePrefix, ClientId, ConnectionEnd, ConnectionVersion};
 
 pub struct EncodeDuration;
 

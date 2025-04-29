@@ -20,15 +20,12 @@ use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::test_components::chain::types::Amount;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::queries::token_address::CanQueryCosmosTokenAddressOnStarknet;
-use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
-use hermes_starknet_chain_components::types::amount::StarknetAmount;
-use hermes_starknet_chain_components::types::messages::ibc::denom::{
-    Denom, PrefixedDenom, TracePrefix,
+use hermes_starknet_chain_components::impls::StarknetAddress;
+use hermes_starknet_chain_components::traits::{
+    CanQueryCosmosTokenAddressOnStarknet, CanQueryTokenBalance,
 };
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
+use hermes_starknet_chain_components::types::{Denom, PrefixedDenom, StarknetAmount, TracePrefix};
+use hermes_starknet_chain_context::contexts::{StarknetCairoEncoding, StarknetChain};
 use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
 use tracing::info;

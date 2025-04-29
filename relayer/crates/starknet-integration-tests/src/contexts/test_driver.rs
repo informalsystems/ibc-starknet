@@ -24,18 +24,14 @@ use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::types::channel_id::ChannelId;
-use hermes_starknet_chain_components::types::connection_id::ConnectionId;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
-use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
-use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
+use hermes_starknet_chain_components::types::{ChannelId, ConnectionId};
+use hermes_starknet_chain_context::contexts::StarknetChain;
+use hermes_starknet_relayer::contexts::{
+    CosmosStarknetBiRelay, CosmosToStarknetRelay, StarknetCosmosBiRelay, StarknetToCosmosRelay,
+};
 use ibc::core::host::types::identifiers::PortId;
 
-use crate::contexts::chain_driver::StarknetChainDriver;
-use crate::contexts::cosmos_starknet_relay_driver::CosmosStarknetRelayDriver;
-use crate::contexts::starknet_cosmos_relay_driver::StarknetCosmosRelayDriver;
+use crate::contexts::{CosmosStarknetRelayDriver, StarknetChainDriver, StarknetCosmosRelayDriver};
 
 #[cgp_context(StarknetTestDriverComponents)]
 #[derive(HasField)]

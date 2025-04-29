@@ -13,13 +13,9 @@ use hermes_prelude::*;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::impls::utils::array::from_vec_u8_to_be_u32_slice;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::types::cosmos::client_state::{ClientStatus, CometClientState};
-use crate::types::cosmos::consensus_state::CometConsensusState;
-use crate::types::cosmos::height::Height;
+use crate::impls::{from_vec_u8_to_be_u32_slice, StarknetAddress, StarknetMessage};
+use crate::traits::CanQueryContractAddress;
+use crate::types::{ClientStatus, CometClientState, CometConsensusState, Height};
 
 pub struct BuildCreateCometClientMessage;
 

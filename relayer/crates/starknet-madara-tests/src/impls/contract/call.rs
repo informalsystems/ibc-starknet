@@ -1,13 +1,10 @@
 use hermes_core::chain_components::traits::HasHeightType;
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::client::HasStarknetClient;
-use hermes_starknet_chain_components::traits::contract::call::{
-    ContractCaller, ContractCallerComponent,
+use hermes_starknet_chain_components::impls::StarknetAddress;
+use hermes_starknet_chain_components::traits::{
+    ContractCaller, ContractCallerComponent, HasBlobType, HasSelectorType, HasStarknetClient,
 };
-use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
-use hermes_starknet_chain_components::traits::types::method::HasSelectorType;
 use starknet_v13::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet_v13::providers::{Provider, ProviderError};
 

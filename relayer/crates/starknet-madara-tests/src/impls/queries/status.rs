@@ -3,8 +3,8 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_cosmos_core::chain_components::types::Time;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::traits::client::HasStarknetClient;
-use hermes_starknet_chain_components::types::status::StarknetChainStatus;
+use hermes_starknet_chain_components::traits::HasStarknetClient;
+use hermes_starknet_chain_components::types::StarknetChainStatus;
 use starknet_v13::core::types::{BlockId, BlockTag, MaybePendingBlockWithTxHashes};
 use starknet_v13::providers::{Provider, ProviderError};
 

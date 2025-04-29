@@ -5,7 +5,7 @@ use hermes_core::chain_components::traits::{
 use hermes_prelude::*;
 use ibc::core::channel::types::packet::Packet;
 
-use crate::types::channel_id::ChannelId;
+use crate::types::ChannelId;
 
 pub struct ReadPacketSrcStarknetFields;
 

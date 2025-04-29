@@ -17,11 +17,10 @@ use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
+use hermes_starknet_chain_context::contexts::StarknetChain;
+use hermes_starknet_chain_context::impls::HandleStarknetChainError;
 
-use crate::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
+use crate::contexts::{CosmosToStarknetRelay, StarknetToCosmosRelay};
 
 #[cgp_context(StarknetCosmosBiRelayComponents: DefaultBiRelayComponents)]
 #[derive(Clone, HasField)]
@@ -60,9 +59,9 @@ delegate_components! {
     }
 }
 
-pub trait CanUseCosmosStarnetBiRelay:
+pub trait CanUseStarknetCosmosBiRelay:
     CanUseComponent<RunnerComponent> + CanUseComponent<AutoBiRelayerComponent>
 {
 }
 
-impl CanUseCosmosStarnetBiRelay for StarknetCosmosBiRelay {}
+impl CanUseStarknetCosmosBiRelay for StarknetCosmosBiRelay {}

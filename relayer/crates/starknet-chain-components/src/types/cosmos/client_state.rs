@@ -19,7 +19,7 @@ use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::proto::Any;
 use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
 
-use crate::types::cosmos::height::Height;
+use crate::types::Height;
 
 // FIXME: use ibc-rs type
 #[derive(Debug, HasField, HasFields)]

@@ -4,11 +4,11 @@ use std::sync::Arc;
 use hermes_core::chain_components::traits::HasChainId;
 use hermes_core::relayer_components::transaction::traits::HasSignerType;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::traits::account::{
+use hermes_starknet_chain_components::traits::{
     AccountFromSignerBuilder, AccountFromSignerBuilderComponent, HasStarknetAccountType,
+    HasStarknetClient,
 };
-use hermes_starknet_chain_components::traits::client::HasStarknetClient;
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
+use hermes_starknet_chain_components::types::StarknetWallet;
 use ibc::core::host::types::identifiers::ChainId;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::core::types::Felt;

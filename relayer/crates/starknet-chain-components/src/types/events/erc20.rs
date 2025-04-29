@@ -7,8 +7,8 @@ use hermes_prelude::*;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::types::event::{StarknetEvent, UnknownEvent};
+use crate::impls::StarknetAddress;
+use crate::types::{StarknetEvent, UnknownEvent};
 
 #[derive(Debug)]
 pub enum Erc20Event {

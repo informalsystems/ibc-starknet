@@ -1,7 +1,7 @@
 use hermes_core::chain_components::traits::{BlockTypeComponent, ProvideBlockType};
 use hermes_prelude::*;
 
-use crate::types::status::StarknetChainStatus;
+use crate::types::StarknetChainStatus;
 
 pub struct ProvideStarknetBlockType;
 

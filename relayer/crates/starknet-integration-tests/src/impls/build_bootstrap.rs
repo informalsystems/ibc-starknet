@@ -16,10 +16,9 @@ use hermes_cosmos::test_components::bootstrap::traits::{
     HasChainNodeConfigType, HasChainStoreDir,
 };
 use hermes_prelude::*;
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
-use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
-use hermes_starknet_test_components::types::genesis_config::StarknetGenesisConfig;
-use hermes_starknet_test_components::types::node_config::StarknetNodeConfig;
+use hermes_starknet_chain_components::types::StarknetWallet;
+use hermes_starknet_chain_context::contexts::{StarknetChain, StarknetChainFields};
+use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
 use ibc::core::host::types::error::IdentifierError;
 use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::providers::jsonrpc::HttpTransport;
@@ -28,7 +27,7 @@ use starknet::signers::{LocalWallet, SigningKey};
 use tokio::process::Child;
 use url::{ParseError, Url};
 
-use crate::contexts::chain_driver::StarknetChainDriver;
+use crate::contexts::StarknetChainDriver;
 
 #[cgp_new_provider(ChainDriverBuilderComponent)]
 impl<Bootstrap> ChainDriverBuilder<Bootstrap> for BuildStarknetChainDriver

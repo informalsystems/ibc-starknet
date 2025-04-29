@@ -14,16 +14,13 @@ use ibc::core::host::types::path::{ClientStatePath, Path};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::traits::contract::call::CanCallContract;
-use crate::traits::proof_signer::HasStarknetProofSigner;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
-use crate::types::client_id::ClientId;
-use crate::types::commitment_proof::StarknetCommitmentProof;
-use crate::types::cosmos::client_state::CometClientState;
-use crate::types::membership_proof_signer::MembershipVerifierContainer;
-use crate::types::status::StarknetChainStatus;
+use crate::traits::{
+    CanCallContract, CanQueryContractAddress, HasBlobType, HasSelectorType, HasStarknetProofSigner,
+};
+use crate::types::{
+    ClientId, CometClientState, MembershipVerifierContainer, StarknetChainStatus,
+    StarknetCommitmentProof,
+};
 
 pub struct QueryCometClientState;
 

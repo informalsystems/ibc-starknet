@@ -3,8 +3,9 @@ use hermes_core::logging_components::types::LevelTrace;
 use hermes_prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::traits::json_rpc::{JsonRpcRequestSender, JsonRpcRequestSenderComponent};
-use crate::traits::rpc_client::{HasJsonRpcUrl, HasReqwestClient};
+use crate::traits::{
+    HasJsonRpcUrl, HasReqwestClient, JsonRpcRequestSender, JsonRpcRequestSenderComponent,
+};
 
 #[cgp_new_provider(JsonRpcRequestSenderComponent)]
 impl<Context, Request, Response> JsonRpcRequestSender<Context, Request, Response>

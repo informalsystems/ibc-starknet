@@ -7,10 +7,10 @@ mod preset {
     };
     use hermes_prelude::*;
 
-    use crate::impls::encode::buffer::EncodeWithMutBuffer;
-    use crate::impls::types::decode_buffer::ProvideVecIterDecodeBuffer;
-    use crate::impls::types::encode_buffer::ProvideVecEncodeBuffer;
-    use crate::impls::types::encoded::ProvideVecFeltEncodedType;
+    use crate::impls::{
+        EncodeWithMutBuffer, ProvideVecEncodeBuffer, ProvideVecFeltEncodedType,
+        ProvideVecIterDecodeBuffer,
+    };
 
     cgp_preset! {
         CairoEncodingComponents {

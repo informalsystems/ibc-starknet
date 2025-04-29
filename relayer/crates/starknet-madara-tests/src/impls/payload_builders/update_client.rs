@@ -7,11 +7,10 @@ use hermes_core::encoding_components::types::AsBytes;
 use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use hermes_cosmos_core::protobuf_encoding_components::types::strategy::ViaProtobuf;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::traits::client::HasStarknetClient;
-use hermes_starknet_chain_components::traits::proof_signer::HasStarknetProofSigner;
-use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;
-use hermes_starknet_chain_components::types::payloads::client::StarknetUpdateClientPayload;
-use hermes_starknet_chain_components::types::status::StarknetChainStatus;
+use hermes_starknet_chain_components::traits::{HasStarknetClient, HasStarknetProofSigner};
+use hermes_starknet_chain_components::types::{
+    StarknetChainStatus, StarknetConsensusState, StarknetUpdateClientPayload,
+};
 use ibc::core::client::types::Height;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::StarknetHeader;

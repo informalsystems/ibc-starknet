@@ -6,12 +6,12 @@ use starknet::core::types::{Felt, RevertedInvocation};
 use starknet::macros::felt;
 use starknet::signers::SigningKey;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::traits::account::{CanBuildAccountFromSigner, CanUseStarknetAccount};
-use crate::traits::contract::deploy::{ContractDeployer, ContractDeployerComponent};
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::contract_class::HasContractClassHashType;
-use crate::types::tx_response::TxResponse;
+use crate::impls::StarknetAddress;
+use crate::traits::{
+    CanBuildAccountFromSigner, CanUseStarknetAccount, ContractDeployer, ContractDeployerComponent,
+    HasBlobType, HasContractClassHashType,
+};
+use crate::types::TxResponse;
 
 pub struct DeployStarknetContract;
 

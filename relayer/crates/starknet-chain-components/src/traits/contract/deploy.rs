@@ -1,8 +1,7 @@
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_prelude::*;
 
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::contract_class::HasContractClassHashType;
+use crate::traits::{HasBlobType, HasContractClassHashType};
 
 #[cgp_component {
   name: ContractDeployerComponent,

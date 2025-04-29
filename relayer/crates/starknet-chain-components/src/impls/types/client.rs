@@ -8,8 +8,7 @@ use hermes_core::chain_components::traits::{
 use hermes_prelude::*;
 use ibc::core::host::types::identifiers::ChainId;
 
-use crate::types::client_state::WasmStarknetClientState;
-use crate::types::consensus_state::WasmStarknetConsensusState;
+use crate::types::{WasmStarknetClientState, WasmStarknetConsensusState};
 
 pub struct ProvideStarknetIbcClientTypes;
 

@@ -15,36 +15,19 @@ use hermes_core::encoding_components::traits::{
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::error::types::HermesError;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::components::encoding::cairo::*;
-use hermes_starknet_chain_components::types::channel_id::{ChannelEnd, ChannelId};
-use hermes_starknet_chain_components::types::client_id::ClientId;
-use hermes_starknet_chain_components::types::connection_id::{ConnectionEnd, ConnectionId};
-use hermes_starknet_chain_components::types::cosmos::client_state::{
-    ClientStatus, CometClientState,
+use hermes_starknet_chain_components::components::*;
+use hermes_starknet_chain_components::types::{
+    ChannelEnd, ChannelId, ClientId, ClientStatus, CometClientState, CometConsensusState,
+    ConnectionEnd, ConnectionId, CreateClientResponse, Denom, DeployErc20TokenMessage, Height,
+    MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry, MsgConnOpenAck,
+    MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry, MsgRegisterApp, MsgRegisterClient, Packet,
+    Participant, PrefixedDenom, Sequence, TracePrefix, TransferErc20TokenMessage,
+    TransferPacketData,
 };
-use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
-use hermes_starknet_chain_components::types::cosmos::height::Height;
-use hermes_starknet_chain_components::types::message_responses::create_client::CreateClientResponse;
-use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
-use hermes_starknet_chain_components::types::messages::erc20::transfer::TransferErc20TokenMessage;
-use hermes_starknet_chain_components::types::messages::ibc::channel::{
-    MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry,
-};
-use hermes_starknet_chain_components::types::messages::ibc::connection::{
-    MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
-};
-use hermes_starknet_chain_components::types::messages::ibc::denom::{
-    Denom, PrefixedDenom, TracePrefix,
-};
-use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
-    Participant, TransferPacketData,
-};
-use hermes_starknet_chain_components::types::messages::ibc::packet::{Packet, Sequence};
-use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use ibc::clients::tendermint::types::Header as TendermintLcHeader;
 use starknet::core::types::{Felt, U256};
 
-use crate::impls::error::HandleStarknetChainError;
+use crate::impls::HandleStarknetChainError;
 
 #[cgp_context(StarknetCairoEncodingContextComponents: StarknetCairoEncodingComponents)]
 pub struct StarknetCairoEncoding;

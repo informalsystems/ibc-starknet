@@ -12,12 +12,10 @@ use hermes_core::encoding_components::traits::{CanDecode, HasDefaultEncoding, Ha
 use hermes_prelude::*;
 use starknet::core::types::Felt;
 
-use crate::impls::events::UseStarknetEvents;
-use crate::impls::types::events::{
-    StarknetConnectionOpenInitEvent, StarknetConnectionOpenTryEvent,
+use crate::impls::{
+    StarknetConnectionOpenInitEvent, StarknetConnectionOpenTryEvent, UseStarknetEvents,
 };
-use crate::types::connection_id::ConnectionId;
-use crate::types::message_response::StarknetMessageResponse;
+use crate::types::{ConnectionId, StarknetMessageResponse};
 
 #[cgp_provider(ConnectionOpenInitEventComponent)]
 impl<Chain, Counterparty> ProvideConnectionOpenInitEvent<Chain, Counterparty> for UseStarknetEvents

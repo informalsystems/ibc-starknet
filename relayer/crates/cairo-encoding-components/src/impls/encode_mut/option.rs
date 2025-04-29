@@ -5,7 +5,7 @@ use hermes_encoding_components::traits::{
 };
 use hermes_prelude::*;
 
-use crate::impls::encode_mut::variant_from::EncodeVariantFrom;
+use crate::impls::EncodeVariantFrom;
 
 pub struct EncodeOption<T>(pub PhantomData<T>);
 

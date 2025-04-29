@@ -3,18 +3,11 @@ mod preset {
     use hermes_prelude::*;
     use starknet::core::types::{ByteArray, Felt, U256};
 
-    use crate::impls::encode_mut::array::EncodeArray;
-    use crate::impls::encode_mut::bool::EncodeBool;
-    use crate::impls::encode_mut::byte_array::EncodeStarknetByteArray;
-    use crate::impls::encode_mut::felt::EncodeFelt;
-    use crate::impls::encode_mut::from_i128::EncodeFromI128;
-    use crate::impls::encode_mut::from_u128::EncodeFromU128;
-    use crate::impls::encode_mut::i128::EncodeI128;
-    use crate::impls::encode_mut::string::EncodeUtf8String;
-    use crate::impls::encode_mut::u128::EncodeU128;
-    use crate::impls::encode_mut::u256::EncodeU256;
-    use crate::impls::encode_mut::unit::EncodeNothing;
-    use crate::impls::encode_mut::vec::EncodeList;
+    use crate::impls::{
+        EncodeArray, EncodeBool, EncodeFelt, EncodeFromI128, EncodeFromU128, EncodeI128,
+        EncodeList, EncodeNothing, EncodeStarknetByteArray, EncodeU128, EncodeU256,
+        EncodeUtf8String,
+    };
     use crate::strategy::ViaCairo;
 
     cgp_preset! {

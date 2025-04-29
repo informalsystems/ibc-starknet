@@ -11,7 +11,7 @@ use hermes_core::test_components::chain_driver::traits::{
 use hermes_prelude::*;
 
 use super::address::StarknetAddress;
-use crate::types::amount::StarknetAmount;
+use crate::types::StarknetAmount;
 
 pub struct UseU256Amount;
 

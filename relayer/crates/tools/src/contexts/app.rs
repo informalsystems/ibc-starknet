@@ -19,14 +19,12 @@ use hermes_core::runtime_components::traits::{
 use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_starknet_chain_components::impls::types::config::StarknetRelayerConfig;
-use hermes_starknet_cli::impls::bootstrap::starknet_chain::{
-    BootstrapStarknetChainArgs, LoadStarknetBootstrap,
+use hermes_starknet_chain_components::impls::StarknetRelayerConfig;
+use hermes_starknet_cli::impls::{
+    BootstrapStarknetChainArgs, LoadStarknetBootstrap, LoadStarknetBuilder, ProvideCliError,
 };
-use hermes_starknet_cli::impls::build::LoadStarknetBuilder;
-use hermes_starknet_cli::impls::error::ProvideCliError;
-use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
-use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
+use hermes_starknet_integration_tests::contexts::StarknetBootstrap;
+use hermes_starknet_relayer::contexts::StarknetBuilder;
 
 use crate::commands::starknet::subcommand::{RunStarknetSubCommand, StarknetSubCommand};
 use crate::commands::starknet::transfer_args::{RunTransferArgs, TransferArgs};

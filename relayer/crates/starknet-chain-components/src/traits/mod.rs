@@ -1,11 +1,32 @@
-pub mod account;
-pub mod client;
-pub mod commitment_proof;
-pub mod contract;
-pub mod json_rpc;
-pub mod messages;
-pub mod proof_signer;
-pub mod queries;
-pub mod rpc_client;
-pub mod transfer;
-pub mod types;
+mod account;
+pub use account::*;
+
+mod client;
+pub use client::*;
+
+mod commitment_proof;
+pub use commitment_proof::*;
+
+mod contract;
+pub use contract::*;
+
+mod json_rpc;
+pub use json_rpc::*;
+
+mod messages;
+pub use messages::*;
+
+mod proof_signer;
+pub use proof_signer::*;
+
+mod queries;
+pub use queries::*;
+
+mod rpc_client;
+pub use rpc_client::*;
+
+mod transfer;
+pub use transfer::*;
+
+mod types;
+pub use types::*;

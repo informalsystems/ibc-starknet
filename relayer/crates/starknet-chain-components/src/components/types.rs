@@ -4,9 +4,7 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_prelude::*;
 
-use crate::types::channel_id::{ChannelEnd, ChannelId};
-use crate::types::client_id::ClientId;
-use crate::types::connection_id::{ConnectionEnd, ConnectionId};
+use crate::types::{ChannelEnd, ChannelId, ClientId, ConnectionEnd, ConnectionId};
 
 pub struct StarknetChainTypes;
 

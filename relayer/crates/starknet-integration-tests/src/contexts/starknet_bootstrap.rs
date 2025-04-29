@@ -20,19 +20,16 @@ use hermes_cosmos::test_components::bootstrap::traits::{
 };
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
-use hermes_starknet_test_components::impls::bootstrap::bootstrap_chain::BootstrapStarknetDevnet;
-use hermes_starknet_test_components::impls::bootstrap::deploy_contracts::{
-    BuildChainAndDeployIbcContracts, DeployIbcContract,
+use hermes_starknet_chain_context::contexts::StarknetChain;
+use hermes_starknet_chain_context::impls::HandleStarknetChainError;
+use hermes_starknet_test_components::impls::{
+    BootstrapStarknetDevnet, BuildChainAndDeployIbcContracts, DeployIbcContract,
+    ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType, StartStarknetDevnet,
 };
-use hermes_starknet_test_components::impls::bootstrap::start_chain::StartStarknetDevnet;
-use hermes_starknet_test_components::impls::types::genesis_config::ProvideStarknetGenesisConfigType;
-use hermes_starknet_test_components::impls::types::node_config::ProvideStarknetNodeConfigType;
 use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use starknet::core::types::contract::SierraClass;
 
-use crate::contexts::chain_driver::StarknetChainDriver;
+use crate::contexts::StarknetChainDriver;
 use crate::impls::BuildStarknetChainDriver;
 
 #[cgp_context(StarknetBootstrapComponents)]

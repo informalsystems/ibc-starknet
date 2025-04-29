@@ -11,7 +11,7 @@ use hermes_cosmos_core::test_components::chain::types::{Amount, Denom};
 use hermes_prelude::*;
 use ibc::core::host::types::identifiers::{ChannelId, PortId};
 
-use crate::types::amount::StarknetAmount;
+use crate::types::StarknetAmount;
 
 #[cgp_new_provider(IbcTransferredAmountConverterComponent)]
 impl<Chain, Counterparty> IbcTransferredAmountConverter<Chain, Counterparty>

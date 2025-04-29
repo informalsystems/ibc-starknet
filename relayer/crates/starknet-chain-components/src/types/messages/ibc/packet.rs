@@ -8,7 +8,7 @@ use hermes_prelude::*;
 pub use ibc::core::host::types::identifiers::Sequence;
 use starknet::core::types::Felt;
 
-use crate::types::cosmos::height::Height;
+use crate::types::Height;
 
 #[derive(HasField, Clone, Debug)]
 pub struct Packet {

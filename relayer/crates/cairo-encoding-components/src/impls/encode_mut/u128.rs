@@ -4,7 +4,7 @@ use hermes_encoding_components::traits::{
 use hermes_prelude::*;
 use starknet::core::types::Felt;
 
-use crate::impls::encode_mut::from_felt::EncodeFromFelt;
+use crate::impls::EncodeFromFelt;
 
 pub struct EncodeU128;
 

@@ -5,7 +5,7 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_prelude::*;
 
-use crate::types::commitment_proof::StarknetCommitmentProof;
+use crate::types::StarknetCommitmentProof;
 
 pub struct UseStarknetCommitmentProof;
 

@@ -16,11 +16,10 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
     HasChainStoreDir,
 };
 use hermes_prelude::*;
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
+use hermes_starknet_chain_components::types::StarknetWallet;
 use starknet::macros::felt;
 
-use crate::types::genesis_config::StarknetGenesisConfig;
-use crate::types::node_config::StarknetNodeConfig;
+use crate::types::{StarknetGenesisConfig, StarknetNodeConfig};
 
 #[cgp_new_provider(ChainBootstrapperComponent)]
 impl<Bootstrap, Runtime> ChainBootstrapper<Bootstrap> for BootstrapMadara

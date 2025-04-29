@@ -3,7 +3,7 @@ use indexmap::IndexMap;
 use starknet::core::crypto::pedersen_hash;
 use starknet::core::types::{ContractsProof, Felt, MerkleNode, StorageProof};
 
-use crate::traits::types::storage_proof::HasStorageProofType;
+use crate::traits::HasStorageProofType;
 
 /**
     Try to validate the structure of storage proof according to:

@@ -6,8 +6,8 @@ use hermes_core::test_components::chain::traits::{
 };
 use hermes_prelude::*;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::types::wallet::StarknetWallet;
+use crate::impls::StarknetAddress;
+use crate::types::StarknetWallet;
 
 pub struct ProvideStarknetWallet;
 

@@ -23,17 +23,12 @@ use ibc::core::client::types::Height;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::types::cosmos::height::Height as CairoHeight;
-use crate::types::messages::ibc::denom::{Denom, PrefixedDenom, TracePrefix};
-use crate::types::messages::ibc::ibc_transfer::{
-    Participant, TransferPacketData as CairoTransferPacketData,
-};
-use crate::types::messages::ibc::packet::{
-    Acknowledgement as CairoAck, MsgAckPacket, MsgRecvPacket, MsgTimeoutPacket,
-    Packet as CairoPacket, StateProof,
+use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::traits::CanQueryContractAddress;
+use crate::types::{
+    Acknowledgement as CairoAck, Denom, Height as CairoHeight, MsgAckPacket, MsgRecvPacket,
+    MsgTimeoutPacket, Packet as CairoPacket, Participant, PrefixedDenom, StateProof, TracePrefix,
+    TransferPacketData as CairoTransferPacketData,
 };
 
 pub struct BuildStarknetPacketMessages;

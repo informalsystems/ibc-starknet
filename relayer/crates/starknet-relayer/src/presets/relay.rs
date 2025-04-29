@@ -19,10 +19,10 @@ mod preset {
     use hermes_cosmos::relayer::contexts::CosmosChain;
     use hermes_cosmos::runtime::types::runtime::HermesRuntime;
     use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
-    use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+    use hermes_starknet_chain_context::contexts::StarknetChain;
     use DefaultRelayPreset::re_exports::*;
 
-    use crate::impls::error::HandleStarknetRelayError;
+    use crate::impls::HandleStarknetRelayError;
 
     DefaultRelayPreset::with_components! {
         | Components | {

@@ -1,8 +1,8 @@
 use hermes_prelude::*;
 use starknet::core::types::Felt;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::types::messages::ibc::channel::PortId;
+use crate::impls::StarknetAddress;
+use crate::types::PortId;
 
 #[derive(HasField, HasFields)]
 pub struct MsgRegisterClient {

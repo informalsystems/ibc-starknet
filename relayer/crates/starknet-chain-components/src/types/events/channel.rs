@@ -4,13 +4,11 @@ use hermes_core::encoding_components::traits::{
     CanDecode, Decoder, DecoderComponent, HasEncodedType, HasEncoding,
 };
 use hermes_prelude::*;
+use ibc::core::channel::types::Version as AppVersion;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::types::channel_id::ChannelId;
-use crate::types::connection_id::ConnectionId;
-use crate::types::event::{StarknetEvent, UnknownEvent};
-use crate::types::messages::ibc::channel::{AppVersion, PortId};
+use crate::types::{ChannelId, ConnectionId, PortId, StarknetEvent, UnknownEvent};
 
 #[derive(Debug)]
 pub enum ChannelHandshakeEvents {

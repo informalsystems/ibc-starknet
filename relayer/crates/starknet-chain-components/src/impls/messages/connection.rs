@@ -33,16 +33,13 @@ use ibc::core::host::types::identifiers::{
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::types::client_id::ClientId as StarknetClientId;
-use crate::types::connection_id::ConnectionId as StarknetConnectionId;
-use crate::types::cosmos::height::Height as CairoHeight;
-use crate::types::messages::ibc::connection::{
-    ConnectionVersion, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
+use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::traits::CanQueryContractAddress;
+use crate::types::{
+    ClientId as StarknetClientId, ConnectionId as StarknetConnectionId, ConnectionVersion,
+    Height as CairoHeight, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
+    StateProof,
 };
-use crate::types::messages::ibc::packet::StateProof;
 
 pub struct BuildStarknetConnectionHandshakeMessages;
 
