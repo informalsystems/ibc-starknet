@@ -2394,8 +2394,3 @@ dependencies = [
  "quote",
  "syn 2.0.98",
 ]
-
-[[patch.unused]]
-name = "hermes-core"
-version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=soares/simplify-exports-2#ef8b260ace842359c7ef379cdc0eb547a4911e5f"
