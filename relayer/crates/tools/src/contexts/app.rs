@@ -20,11 +20,9 @@ use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_chain_components::impls::StarknetRelayerConfig;
-use hermes_starknet_cli::impls::bootstrap::starknet_chain::{
-    BootstrapStarknetChainArgs, LoadStarknetBootstrap,
+use hermes_starknet_cli::impls::{
+    BootstrapStarknetChainArgs, LoadStarknetBootstrap, LoadStarknetBuilder, ProvideCliError,
 };
-use hermes_starknet_cli::impls::build::LoadStarknetBuilder;
-use hermes_starknet_cli::impls::error::ProvideCliError;
 use hermes_starknet_integration_tests::contexts::StarknetBootstrap;
 use hermes_starknet_relayer::contexts::StarknetBuilder;
 
