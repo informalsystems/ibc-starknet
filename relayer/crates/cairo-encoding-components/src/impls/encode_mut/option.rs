@@ -1,9 +1,9 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
-use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
-use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
+use hermes_encoding_components::traits::{
+    MutDecoderComponent, MutEncoderComponent, Transformer, TransformerRef,
+};
+use hermes_prelude::*;
 
 use crate::impls::encode_mut::variant_from::EncodeVariantFrom;
 

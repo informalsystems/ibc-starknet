@@ -2,7 +2,7 @@ use std::io::Write;
 
 use flate2::write::GzEncoder;
 use flate2::Compression;
-use hermes_error::Error;
+use hermes_cosmos::error::Error;
 use sha2::{Digest, Sha256};
 
 pub async fn load_wasm_client(wasm_client_code_path: &str) -> Result<([u8; 32], Vec<u8>), Error> {

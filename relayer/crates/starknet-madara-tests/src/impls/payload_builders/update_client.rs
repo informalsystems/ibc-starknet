@@ -1,15 +1,12 @@
-use cgp::prelude::*;
-use hermes_chain_components::traits::payload_builders::update_client::UpdateClientPayloadBuilderComponent;
-use hermes_chain_components::traits::queries::block::CanQueryBlock;
-use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
-use hermes_encoding_components::types::AsBytes;
-use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
-use hermes_relayer_components::chain::traits::payload_builders::update_client::UpdateClientPayloadBuilder;
-use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
-use hermes_relayer_components::chain::traits::types::height::HasHeightType;
-use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
+use hermes_core::chain_components::traits::{
+    CanQueryBlock, HasClientStateType, HasHeightType, HasUpdateClientPayloadType,
+    UpdateClientPayloadBuilder, UpdateClientPayloadBuilderComponent,
+};
+use hermes_core::encoding_components::traits::{CanEncode, HasDefaultEncoding};
+use hermes_core::encoding_components::types::AsBytes;
+use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_core::protobuf_encoding_components::types::strategy::ViaProtobuf;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::traits::client::HasStarknetClient;
 use hermes_starknet_chain_components::traits::proof_signer::HasStarknetProofSigner;
 use hermes_starknet_chain_components::types::consensus_state::StarknetConsensusState;

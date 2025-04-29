@@ -1,13 +1,10 @@
 use core::fmt::Display;
 use core::str::FromStr;
 
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
+use hermes_encoding_components::traits::{
+    CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
+use hermes_prelude::*;
 
 pub struct EncodeDisplay;
 

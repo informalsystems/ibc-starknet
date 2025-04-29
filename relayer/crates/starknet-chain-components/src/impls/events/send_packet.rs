@@ -1,22 +1,16 @@
 use core::marker::PhantomData;
 use std::str::FromStr;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_chain_components::traits::extract_data::{EventExtractor, EventExtractorComponent};
-use hermes_chain_components::traits::packet::from_send_packet::{
-    PacketFromSendPacketEventBuilder, PacketFromSendPacketEventBuilderComponent,
+use hermes_core::chain_components::traits::{
+    EventExtractor, EventExtractorComponent, HasEventType, HasOutgoingPacketType,
+    HasSendPacketEvent, PacketFromSendPacketEventBuilder,
+    PacketFromSendPacketEventBuilderComponent, ProvideSendPacketEvent, SendPacketEventComponent,
 };
-use hermes_chain_components::traits::types::event::HasEventType;
-use hermes_chain_components::traits::types::ibc_events::send_packet::{
-    HasSendPacketEvent, ProvideSendPacketEvent, SendPacketEventComponent,
-};
-use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::encoding_components::traits::{CanDecode, HasEncodedType, HasEncoding};
+use hermes_prelude::*;
 use ibc::apps::transfer::types::{Amount, BaseDenom, Memo, PrefixedDenom, TracePath};
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::channel::types::timeout::{TimeoutHeight, TimeoutTimestamp};

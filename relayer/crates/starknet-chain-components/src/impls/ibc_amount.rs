@@ -1,14 +1,12 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
-use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_chain_type_components::traits::types::amount::HasAmountType;
-use hermes_chain_type_components::traits::types::denom::HasDenomType;
-use hermes_cosmos_test_components::chain::types::amount::Amount;
-use hermes_test_components::chain::traits::transfer::amount::{
+use hermes_core::chain_components::traits::{HasChannelIdType, HasPortIdType};
+use hermes_core::chain_type_components::traits::{HasAddressType, HasAmountType, HasDenomType};
+use hermes_core::test_components::chain::traits::{
     IbcTransferredAmountConverter, IbcTransferredAmountConverterComponent,
 };
+use hermes_cosmos_core::test_components::chain::types::Amount;
+use hermes_prelude::*;
 use ibc::core::host::types::identifiers::{ChannelId, PortId};
 
 use crate::impls::types::address::StarknetAddress;

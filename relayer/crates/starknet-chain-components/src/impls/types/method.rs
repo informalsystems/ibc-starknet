@@ -1,4 +1,4 @@
-use cgp::prelude::*;
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 
 use crate::traits::types::method::{ProvideSelectorType, SelectorTypeComponent};

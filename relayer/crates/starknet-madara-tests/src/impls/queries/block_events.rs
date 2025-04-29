@@ -1,13 +1,11 @@
 use core::marker::PhantomData;
 use std::sync::Arc;
 
-use cgp::prelude::*;
-use hermes_chain_components::traits::queries::block_events::{
-    BlockEventsQuerier, BlockEventsQuerierComponent,
+use hermes_core::chain_components::traits::{
+    BlockEventsQuerier, BlockEventsQuerierComponent, HasEventType, HasHeightType,
 };
-use hermes_chain_components::traits::types::event::HasEventType;
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::client::HasStarknetClient;
 use hermes_starknet_chain_components::traits::queries::contract_address::CanQueryContractAddress;

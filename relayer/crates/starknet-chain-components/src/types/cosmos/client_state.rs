@@ -1,19 +1,14 @@
 use core::time::Duration;
 
 use cgp::core::types::WithType;
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::chain_id::HasChainIdType;
-use hermes_chain_components::traits::types::client_state::{
-    ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent,
-    HasClientStateType,
+use hermes_core::chain_components::traits::{
+    ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent, HasChainIdType,
+    HasClientStateType, HasHeightType,
 };
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
+use hermes_core::encoding_components::traits::{
+    CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
+use hermes_prelude::*;
 use ibc::clients::tendermint::types::{
     AllowUpdate, ClientState as IbcCometClientState, TrustThreshold,
 };

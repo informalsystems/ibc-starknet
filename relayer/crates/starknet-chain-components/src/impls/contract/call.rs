@@ -1,6 +1,6 @@
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_test_components::chain::traits::types::address::HasAddressType;
+use hermes_core::chain_components::traits::HasHeightType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_prelude::*;
 use starknet::core::types::{BlockId, BlockTag, Felt, FunctionCall};
 use starknet::providers::{Provider, ProviderError};
 

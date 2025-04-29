@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
+use hermes_cosmos_core::tracing_logging_components::subscriber::init_tracing_subscriber;
 use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_tracing_logging_components::subscriber::init_tracing_subscriber;
 use tokio::runtime::Builder;
 use tracing::info;
 

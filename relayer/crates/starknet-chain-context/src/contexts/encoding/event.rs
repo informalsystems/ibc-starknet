@@ -3,16 +3,14 @@ use std::sync::OnceLock;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeProviderComponent,
-    HasEncoding,
+use hermes_core::encoding_components::traits::{
+    CanDecode, DefaultEncodingGetterComponent, EncodingGetterComponent,
+    EncodingTypeProviderComponent, HasEncodedType, HasEncoding,
 };
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_error::impls::UseHermesError;
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::components::encoding::event::*;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::types::event::StarknetEvent;

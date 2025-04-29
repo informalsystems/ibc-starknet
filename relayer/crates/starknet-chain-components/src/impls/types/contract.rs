@@ -1,4 +1,4 @@
-use cgp::prelude::*;
+use hermes_prelude::*;
 use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
 

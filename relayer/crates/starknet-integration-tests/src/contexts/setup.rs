@@ -1,17 +1,30 @@
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::Index;
-use cgp::prelude::*;
-use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
-use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
-use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
-use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
-use hermes_cosmos_integration_tests::impls::init_channel_options::UseCosmosInitChannelOptions;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::handlers::debug::DebugError;
-use hermes_error::impls::UseHermesError;
-use hermes_relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
-use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
-use hermes_relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
+use hermes_core::relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
+use hermes_core::relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
+use hermes_core::relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
+use hermes_core::test_components::driver::traits::{
+    BuilderAtTypeProviderComponent, ChainDriverTypeProviderAtComponent,
+};
+use hermes_core::test_components::setup::binary_channel::BinaryChannelTestComponents;
+use hermes_core::test_components::setup::traits::{
+    BiRelaySetupComponent, BinaryChannelDriverBuilderComponent, BootstrapGetterAtComponent,
+    BootstrapTypeProviderAtComponent, BuilderAtGetterComponent, ChainSetupComponent,
+    ChannelSetupComponent, ClientSetupComponent, ConnectionSetupComponent,
+    CreateClientMessageOptionsGetterAtComponent, CreateClientPayloadOptionsGetterAtComponent,
+    DriverBuilderComponent, InitChannelOptionsGetterAtComponent,
+    InitConnectionOptionsGetterAtComponent, PortIdGetterAtComponent, RelaySetupComponent,
+    TestDriverTypeProviderComponent,
+};
+use hermes_cosmos::chain_components::types::{
+    CosmosCreateClientOptions, CosmosInitChannelOptions, CosmosInitConnectionOptions,
+};
+use hermes_cosmos::error::handlers::DebugError;
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
+use hermes_cosmos::integration_tests::impls::UseCosmosInitChannelOptions;
+use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
@@ -19,29 +32,6 @@ use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBi
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
 use hermes_starknet_relayer::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
 use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
-use hermes_test_components::driver::traits::types::builder_at::BuilderAtTypeProviderComponent;
-use hermes_test_components::driver::traits::types::chain_driver_at::ChainDriverTypeProviderAtComponent;
-use hermes_test_components::setup::binary_channel::components::BinaryChannelTestComponents;
-use hermes_test_components::setup::traits::birelay::BiRelaySetupComponent;
-use hermes_test_components::setup::traits::bootstrap_at::{
-    BootstrapGetterAtComponent, BootstrapTypeProviderAtComponent,
-};
-use hermes_test_components::setup::traits::builder_at::BuilderAtGetterComponent;
-use hermes_test_components::setup::traits::chain::ChainSetupComponent;
-use hermes_test_components::setup::traits::channel::ChannelSetupComponent;
-use hermes_test_components::setup::traits::clients::ClientSetupComponent;
-use hermes_test_components::setup::traits::connection::ConnectionSetupComponent;
-use hermes_test_components::setup::traits::create_client_options_at::{
-    CreateClientMessageOptionsGetterAtComponent, CreateClientPayloadOptionsGetterAtComponent,
-};
-use hermes_test_components::setup::traits::driver::{
-    DriverBuilderComponent, TestDriverTypeProviderComponent,
-};
-use hermes_test_components::setup::traits::drivers::binary_channel::BinaryChannelDriverBuilderComponent;
-use hermes_test_components::setup::traits::init_channel_options_at::InitChannelOptionsGetterAtComponent;
-use hermes_test_components::setup::traits::init_connection_options_at::InitConnectionOptionsGetterAtComponent;
-use hermes_test_components::setup::traits::port_id_at::PortIdGetterAtComponent;
-use hermes_test_components::setup::traits::relay::RelaySetupComponent;
 use ibc::core::host::types::identifiers::PortId;
 
 use crate::contexts::chain_driver::StarknetChainDriver;

@@ -1,34 +1,27 @@
 #[cgp::re_export_imports]
 mod preset {
     use cgp::core::component::{UseContext, UseDelegate};
-    use cgp::prelude::*;
-    use hermes_encoding_components::impls::types::encoded::ProvideEncodedBytes;
-    use hermes_encoding_components::impls::types::schema::ProvideStringSchema;
-    use hermes_encoding_components::traits::convert::ConverterComponent;
-    use hermes_encoding_components::traits::decode::DecoderComponent;
-    use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
-    use hermes_encoding_components::traits::encode::EncoderComponent;
-    use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
-    use hermes_encoding_components::traits::schema::SchemaGetterComponent;
-    use hermes_encoding_components::traits::types::decode_buffer::DecodeBufferTypeComponent;
-    use hermes_encoding_components::traits::types::encode_buffer::EncodeBufferTypeComponent;
-    use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent;
-    use hermes_encoding_components::traits::types::schema::SchemaTypeComponent;
-    use hermes_protobuf_encoding_components::impl_type_url;
-    use hermes_protobuf_encoding_components::impls::any::{
-        DecodeAsAnyProtobuf, EncodeAsAnyProtobuf,
+    use hermes_core::encoding_components::impls::{ProvideEncodedBytes, ProvideStringSchema};
+    use hermes_core::encoding_components::traits::{
+        ConverterComponent, DecodeBufferTypeComponent, DecoderComponent, EncodeBufferTypeComponent,
+        EncodedTypeComponent, EncoderComponent, MutDecoderComponent, MutEncoderComponent,
+        SchemaGetterComponent, SchemaTypeComponent,
     };
-    use hermes_protobuf_encoding_components::impls::types::decode_buffer::ProvideProtoChunksDecodeBuffer;
-    use hermes_protobuf_encoding_components::impls::types::encode_buffer::ProvideBytesEncodeBuffer;
-    use hermes_protobuf_encoding_components::traits::length::EncodedLengthGetterComponent;
-    use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
-    use hermes_wasm_encoding_components::components::WasmEncodingComponents;
-    use hermes_wasm_encoding_components::impls::convert::client_message::{
+    use hermes_cosmos_core::protobuf_encoding_components::impl_type_url;
+    use hermes_cosmos_core::protobuf_encoding_components::impls::{
+        DecodeAsAnyProtobuf, EncodeAsAnyProtobuf, ProvideBytesEncodeBuffer,
+        ProvideProtoChunksDecodeBuffer,
+    };
+    use hermes_cosmos_core::protobuf_encoding_components::traits::EncodedLengthGetterComponent;
+    use hermes_cosmos_core::protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
+    use hermes_cosmos_core::wasm_encoding_components::components::WasmEncodingComponents;
+    use hermes_cosmos_core::wasm_encoding_components::impls::{
         DecodeViaClientMessage, EncodeViaClientMessage,
     };
-    use hermes_wasm_encoding_components::types::client_message::WasmClientMessage;
-    use hermes_wasm_encoding_components::types::client_state::WasmClientState;
-    use hermes_wasm_encoding_components::types::consensus_state::WasmConsensusState;
+    use hermes_cosmos_core::wasm_encoding_components::types::{
+        WasmClientMessage, WasmClientState, WasmConsensusState,
+    };
+    use hermes_prelude::*;
     use ibc::clients::wasm_types::client_message::ClientMessage;
     use ibc::core::client::types::Height;
     use ibc::core::commitment_types::commitment::CommitmentRoot;

@@ -1,7 +1,7 @@
 use std::fmt::Display;
 use std::str::FromStr;
 
-use cgp::prelude::*;
+use hermes_prelude::*;
 use ibc::apps::transfer::types::PrefixedDenom as IbcPrefixedDenom;
 
 use crate::impls::types::address::StarknetAddress;

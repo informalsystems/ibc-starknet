@@ -1,19 +1,14 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::extract_data::{
-    MessageResponseExtractor, MessageResponseExtractorComponent,
+use hermes_core::chain_components::traits::{
+    CreateClientEventComponent, HasClientIdType, MessageResponseExtractor,
+    MessageResponseExtractorComponent, ProvideCreateClientEvent,
 };
-use hermes_chain_components::traits::types::create_client::{
-    CreateClientEventComponent, ProvideCreateClientEvent,
-};
-use hermes_chain_components::traits::types::ibc::HasClientIdType;
-use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::chain_type_components::traits::HasMessageResponseType;
+use hermes_core::encoding_components::traits::{CanDecode, HasDefaultEncoding, HasEncodedType};
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 
 use crate::impls::events::UseStarknetEvents;

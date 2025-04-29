@@ -1,16 +1,14 @@
 use core::marker::PhantomData;
 use std::string::FromUtf8Error;
 
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
-use hermes_chain_type_components::traits::types::amount::HasAmountType;
-use hermes_chain_type_components::traits::types::denom::HasDenomType;
-use hermes_cosmos_test_components::chain::impls::transfer::amount::derive_ibc_denom;
-use hermes_cosmos_test_components::chain::types::amount::Amount;
-use hermes_cosmos_test_components::chain::types::denom::Denom;
-use hermes_test_components::chain::traits::transfer::amount::{
+use hermes_core::chain_components::traits::{HasChannelIdType, HasPortIdType};
+use hermes_core::chain_type_components::traits::{HasAmountType, HasDenomType};
+use hermes_core::test_components::chain::traits::{
     IbcTransferredAmountConverter, IbcTransferredAmountConverterComponent,
 };
+use hermes_cosmos_core::test_components::chain::impls::derive_ibc_denom;
+use hermes_cosmos_core::test_components::chain::types::{Amount, Denom};
+use hermes_prelude::*;
 use ibc::core::host::types::identifiers::{ChannelId, PortId};
 
 use crate::types::amount::StarknetAmount;

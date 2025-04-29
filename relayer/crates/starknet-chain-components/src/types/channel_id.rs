@@ -1,10 +1,7 @@
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
+use hermes_core::encoding_components::traits::{
+    CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
+use hermes_prelude::*;
 pub use ibc::core::channel::types::channel::{
     ChannelEnd, Counterparty as ChannelCounterparty, State as ChannelState,
 };

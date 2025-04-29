@@ -1,9 +1,9 @@
 use core::time::Duration;
 
-use cgp::prelude::*;
-use hermes_test_components::chain::traits::assert::poll_assert::{
+use hermes_core::test_components::chain::traits::{
     PollAssertDurationGetter, PollAssertDurationGetterComponent,
 };
+use hermes_prelude::*;
 
 pub struct ProvidePollAssertDuration<const INTERVAL: u64, const ATTEMPTS: u32>;
 

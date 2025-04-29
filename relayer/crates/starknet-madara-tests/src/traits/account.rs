@@ -1,5 +1,5 @@
 use cgp::core::macros::blanket_trait;
-use cgp::prelude::CanRaiseAsyncError;
+use hermes_prelude::CanRaiseAsyncError;
 use hermes_starknet_chain_components::traits::account::HasStarknetAccountType;
 use starknet_v13::accounts::{Account, AccountError, ConnectedAccount};
 

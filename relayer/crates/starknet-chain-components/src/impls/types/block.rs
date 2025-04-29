@@ -1,5 +1,5 @@
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::block::{BlockTypeComponent, ProvideBlockType};
+use hermes_core::chain_components::traits::{BlockTypeComponent, ProvideBlockType};
+use hermes_prelude::*;
 
 use crate::types::status::StarknetChainStatus;
 

@@ -1,9 +1,9 @@
-use cgp::prelude::{CanRaiseAsyncError, *};
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_encoding_components::traits::decode::{CanDecode, Decoder, DecoderComponent};
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::encoding_components::traits::{
+    CanDecode, Decoder, DecoderComponent, HasEncodedType, HasEncoding,
+};
+use hermes_prelude::{CanRaiseAsyncError, *};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 

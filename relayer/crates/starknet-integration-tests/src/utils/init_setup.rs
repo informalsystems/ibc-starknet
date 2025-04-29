@@ -1,8 +1,8 @@
-use cgp::prelude::CanRaiseError;
-use hermes_error::Error;
-use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_core::test_components::setup::traits::CanBuildTestDriver;
+use hermes_cosmos::error::Error;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_prelude::CanRaiseError;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
-use hermes_test_components::setup::traits::driver::CanBuildTestDriver;
 
 use crate::contexts::setup::StarknetTestSetup;
 use crate::contexts::test_driver::StarknetTestDriver;

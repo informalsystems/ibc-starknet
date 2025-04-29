@@ -1,35 +1,25 @@
 use core::time::Duration;
 
-use cgp::prelude::*;
-use hermes_chain_components::traits::commitment_prefix::HasCommitmentPrefixType;
-use hermes_chain_components::traits::message_builders::connection_handshake::{
-    ConnectionOpenAckMessageBuilder, ConnectionOpenAckMessageBuilderComponent,
+use hermes_core::chain_components::traits::{
+    CanQueryChainHeight, ConnectionOpenAckMessageBuilder, ConnectionOpenAckMessageBuilderComponent,
     ConnectionOpenConfirmMessageBuilder, ConnectionOpenConfirmMessageBuilderComponent,
     ConnectionOpenInitMessageBuilder, ConnectionOpenInitMessageBuilderComponent,
-    ConnectionOpenTryMessageBuilder, ConnectionOpenTryMessageBuilderComponent,
+    ConnectionOpenTryMessageBuilder, ConnectionOpenTryMessageBuilderComponent, HasClientIdType,
+    HasClientStateType, HasCommitmentPrefixType, HasCommitmentProofType, HasConnectionEndType,
+    HasConnectionIdType, HasConnectionOpenAckPayloadType, HasConnectionOpenConfirmPayloadType,
+    HasConnectionOpenInitPayloadType, HasConnectionOpenTryPayloadType, HasConsensusStateType,
+    HasHeightType, HasInitConnectionOptionsType, HasMessageType,
 };
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
-use hermes_chain_components::traits::types::client_state::HasClientStateType;
-use hermes_chain_components::traits::types::connection::{
-    HasConnectionEndType, HasConnectionOpenAckPayloadType, HasConnectionOpenConfirmPayloadType,
-    HasConnectionOpenInitPayloadType, HasConnectionOpenTryPayloadType,
-    HasInitConnectionOptionsType,
-};
-use hermes_chain_components::traits::types::consensus_state::HasConsensusStateType;
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::ibc::{HasClientIdType, HasConnectionIdType};
-use hermes_chain_components::traits::types::message::HasMessageType;
-use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_chain_components::types::payloads::connection::{
+use hermes_core::chain_components::types::payloads::connection::{
     ConnectionOpenAckPayload, ConnectionOpenConfirmPayload, ConnectionOpenInitPayload,
     ConnectionOpenTryPayload,
 };
-use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
-use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
-use hermes_cosmos_chain_components::types::messages::connection::open_ack::CosmosConnectionOpenAckMessage;
-use hermes_cosmos_chain_components::types::messages::connection::open_confirm::CosmosConnectionOpenConfirmMessage;
-use hermes_cosmos_chain_components::types::messages::connection::open_init::CosmosConnectionOpenInitMessage;
-use hermes_cosmos_chain_components::types::messages::connection::open_try::CosmosConnectionOpenTryMessage;
+use hermes_cosmos_core::chain_components::traits::{CosmosMessage, ToCosmosMessage};
+use hermes_cosmos_core::chain_components::types::{
+    CosmosConnectionOpenAckMessage, CosmosConnectionOpenConfirmMessage,
+    CosmosConnectionOpenInitMessage, CosmosConnectionOpenTryMessage, CosmosInitConnectionOptions,
+};
+use hermes_prelude::*;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as CosmosHeight;
 use ibc::core::connection::types::version::Version as CosmosConnectionVersion;

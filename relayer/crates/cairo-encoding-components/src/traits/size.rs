@@ -1,4 +1,4 @@
-use cgp::prelude::{Either, Void};
+use hermes_prelude::{Either, Void};
 
 use crate::types::nat::{S, Z};
 

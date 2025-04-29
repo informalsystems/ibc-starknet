@@ -1,4 +1,4 @@
-use cgp::prelude::{CanRaiseError, HasErrorType};
+use hermes_prelude::{CanRaiseError, HasErrorType};
 use indexmap::IndexMap;
 use starknet::core::crypto::pedersen_hash;
 use starknet::core::types::{ContractsProof, Felt, MerkleNode, StorageProof};

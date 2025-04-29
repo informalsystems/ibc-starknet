@@ -1,10 +1,10 @@
-use cgp::prelude::*;
-use hermes_cli_components::traits::build::{BuilderLoader, BuilderLoaderComponent, HasBuilderType};
-use hermes_cli_components::traits::config::load_config::CanLoadConfig;
-use hermes_cli_components::traits::types::config::HasConfigType;
-use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::HasRuntime;
+use hermes_cli_components::traits::{
+    BuilderLoader, BuilderLoaderComponent, CanLoadConfig, HasBuilderType, HasConfigType,
+};
+use hermes_core::runtime_components::traits::HasRuntime;
+use hermes_cosmos::relayer::contexts::CosmosBuilder;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::types::config::StarknetRelayerConfig;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 

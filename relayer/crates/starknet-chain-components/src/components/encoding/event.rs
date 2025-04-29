@@ -1,12 +1,10 @@
 #[cgp::re_export_imports]
 mod preset {
     use cgp::core::component::UseDelegate;
-    use cgp::prelude::*;
     use hermes_cairo_encoding_components::strategy::ViaCairo;
-    pub use hermes_encoding_components::traits::decode::DecoderComponent;
-    use hermes_encoding_components::traits::types::encoded::{
-        EncodedTypeComponent, ProvideEncodedType,
-    };
+    pub use hermes_core::encoding_components::traits::DecoderComponent;
+    use hermes_core::encoding_components::traits::{EncodedTypeComponent, ProvideEncodedType};
+    use hermes_prelude::*;
 
     use crate::impls::encoding::class_hash::DecodeOptionalByClassHash;
     use crate::impls::encoding::contract_address::DecodeOptionalByContractAddress;

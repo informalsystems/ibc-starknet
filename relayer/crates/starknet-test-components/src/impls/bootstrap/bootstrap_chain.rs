@@ -2,24 +2,21 @@ use std::collections::BTreeMap;
 use std::net::{IpAddr, Ipv4Addr};
 
 use cgp::core::error::CanRaiseAsyncError;
-use cgp::prelude::*;
-use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::CanBuildChainDriver;
-use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::CanStartChainFullNodes;
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_store_dir::HasChainStoreDir;
-use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
-use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
-use hermes_runtime_components::traits::fs::create_dir::CanCreateDir;
-use hermes_runtime_components::traits::fs::file_path::HasFilePathType;
-use hermes_runtime_components::traits::os::child_process::HasChildProcessType;
-use hermes_runtime_components::traits::os::reserve_port::CanReserveTcpPort;
-use hermes_runtime_components::traits::random::CanGenerateRandom;
-use hermes_runtime_components::traits::runtime::HasRuntime;
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
-use hermes_test_components::bootstrap::traits::chain::{
+use hermes_core::runtime_components::traits::{
+    CanCreateDir, CanGenerateRandom, CanReserveTcpPort, HasChildProcessType, HasFilePathType,
+    HasRuntime,
+};
+use hermes_core::test_components::bootstrap::traits::{
     ChainBootstrapper, ChainBootstrapperComponent,
 };
-use hermes_test_components::chain::traits::types::wallet::HasWalletType;
-use hermes_test_components::chain_driver::traits::types::chain::HasChainType;
+use hermes_core::test_components::chain::traits::HasWalletType;
+use hermes_core::test_components::chain_driver::traits::HasChainType;
+use hermes_cosmos_core::test_components::bootstrap::traits::{
+    CanBuildChainDriver, CanStartChainFullNodes, HasChainGenesisConfigType, HasChainNodeConfigType,
+    HasChainStoreDir,
+};
+use hermes_prelude::*;
+use hermes_starknet_chain_components::types::wallet::StarknetWallet;
 use starknet::macros::felt;
 
 use crate::types::genesis_config::StarknetGenesisConfig;

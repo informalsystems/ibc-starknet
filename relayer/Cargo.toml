@@ -68,6 +68,10 @@ ibc-client-starknet-types = { version = "0.1.0" }
 tendermint                = { version = "0.40" }
 tendermint-rpc            = { version = "0.40" }
 
+hermes-prelude                      = { version = "0.1.0" }
+hermes-core                         = { version = "0.1.0" }
+hermes-cosmos                       = { version = "0.1.0" }
+hermes-cosmos-core                  = { version = "0.1.0" }
 hermes-runtime-components           = { version = "0.1.0" }
 hermes-async-runtime-components     = { version = "0.1.0" }
 hermes-tokio-runtime-components     = { version = "0.1.0" }
@@ -168,6 +172,8 @@ cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-error-eyre  = { git = "https://github.com/contextgeneric/cgp.git" }
 
+hermes-core                          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-prelude                       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
@@ -184,6 +190,8 @@ hermes-tracing-logging-components    = { git = "https://github.com/informalsyste
 hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos                        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-core                   = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git" }

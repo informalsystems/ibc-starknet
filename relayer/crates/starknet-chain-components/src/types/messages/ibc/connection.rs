@@ -1,12 +1,9 @@
 use core::time::Duration;
 
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
+use hermes_core::encoding_components::traits::{
+    CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
+use hermes_prelude::*;
 pub use ibc::core::commitment_types::commitment::CommitmentPrefix as BasePrefix;
 pub use ibc::core::connection::types::version::Version as ConnectionVersion;
 

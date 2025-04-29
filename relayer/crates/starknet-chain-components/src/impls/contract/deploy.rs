@@ -1,7 +1,6 @@
-use cgp::prelude::*;
-use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
-use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
-use hermes_test_components::chain::traits::types::address::HasAddressType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::relayer_components::transaction::traits::{CanPollTxResponse, HasDefaultSigner};
+use hermes_prelude::*;
 use starknet::contract::ContractFactory;
 use starknet::core::types::{Felt, RevertedInvocation};
 use starknet::macros::felt;

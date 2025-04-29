@@ -1,7 +1,5 @@
-use cgp::prelude::*;
-use hermes_encoding_components::traits::types::encoded::{
-    EncodedTypeComponent, ProvideEncodedType,
-};
+use hermes_encoding_components::traits::{EncodedTypeComponent, ProvideEncodedType};
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 
 pub struct ProvideVecFeltEncodedType;

@@ -13,19 +13,13 @@ readme       = "README.md"
 workspace = true
 
 [dependencies]
-cgp                               = { workspace = true }
-ibc                               = { workspace = true }
-hermes-error                      = { workspace = true }
-hermes-runtime                    = { workspace = true }
-hermes-runtime-components         = { workspace = true }
-hermes-logging-components         = { workspace = true }
-hermes-tracing-logging-components = { workspace = true }
-hermes-encoding-components        = { workspace = true }
-hermes-relayer-components         = { workspace = true }
-hermes-cosmos-relayer             = { workspace = true }
-hermes-cosmos-chain-components    = { workspace = true }
-hermes-starknet-chain-context     = { workspace = true }
-hermes-starknet-chain-components  = { workspace = true }
+cgp                              = { workspace = true }
+ibc                              = { workspace = true }
+hermes-prelude                   = { workspace = true }
+hermes-core                      = { workspace = true }
+hermes-cosmos                    = { workspace = true }
+hermes-starknet-chain-context    = { workspace = true }
+hermes-starknet-chain-components = { workspace = true }
 
 starknet = { workspace = true }
 

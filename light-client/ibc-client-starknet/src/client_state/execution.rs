@@ -1,8 +1,7 @@
 use cgp::core::component::UseContext;
-use hermes_cosmos_encoding_components::impls::any::ConvertIbcAny;
-use hermes_encoding_components::impls::convert::ConvertVia;
-use hermes_encoding_components::traits::convert::Converter;
-use hermes_encoding_components::traits::decode::CanDecode;
+use hermes_cosmos_encoding_components::impls::ConvertIbcAny;
+use hermes_encoding_components::impls::ConvertVia;
+use hermes_encoding_components::traits::{CanDecode, Converter};
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc_client_cw::context::client_ctx::CwClientExecution;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};

@@ -6,19 +6,20 @@
 use core::marker::PhantomData;
 use core::time::Duration;
 
-use hermes_chain_components::traits::queries::chain_status::{
-    CanQueryChainHeight, CanQueryChainStatus,
+use hermes_core::chain_components::traits::{CanQueryChainHeight, CanQueryChainStatus};
+use hermes_core::relayer_components::birelay::traits::CanAutoBiRelay;
+use hermes_core::relayer_components::relay::traits::{
+    CanAutoRelayWithHeights, CanRelayPacket, SourceTarget,
 };
-use hermes_cosmos_integration_tests::init::init_test_runtime;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_cosmos_test_components::chain::types::amount::Amount;
-use hermes_error::types::Error;
-use hermes_relayer_components::birelay::traits::CanAutoBiRelay;
-use hermes_relayer_components::relay::traits::auto_relayer::CanAutoRelayWithHeights;
-use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
-use hermes_relayer_components::relay::traits::target::SourceTarget;
-use hermes_relayer_components::transaction::traits::send_messages_with_signer::CanSendMessagesWithSigner;
-use hermes_runtime_components::traits::sleep::CanSleep;
+use hermes_core::relayer_components::transaction::traits::CanSendMessagesWithSigner;
+use hermes_core::runtime_components::traits::CanSleep;
+use hermes_core::test_components::chain::traits::{
+    CanAssertEventualAmount, CanBuildIbcTokenTransferMessages, CanIbcTransferToken, CanQueryBalance,
+};
+use hermes_cosmos::error::types::Error;
+use hermes_cosmos::integration_tests::init::init_test_runtime;
+use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_cosmos::test_components::chain::types::Amount;
 use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
 use hermes_starknet_chain_components::traits::queries::token_address::CanQueryCosmosTokenAddressOnStarknet;
 use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
@@ -28,10 +29,6 @@ use hermes_starknet_chain_components::types::messages::ibc::denom::{
 };
 use hermes_starknet_chain_context::contexts::chain::StarknetChain;
 use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
-use hermes_test_components::chain::traits::assert::eventual_amount::CanAssertEventualAmount;
-use hermes_test_components::chain::traits::messages::ibc_transfer::CanBuildIbcTokenTransferMessages;
-use hermes_test_components::chain::traits::queries::balance::CanQueryBalance;
-use hermes_test_components::chain::traits::transfer::ibc_transfer::CanIbcTransferToken;
 use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
 use tracing::info;

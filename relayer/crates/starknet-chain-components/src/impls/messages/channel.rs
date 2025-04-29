@@ -1,33 +1,25 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::message_builders::channel_handshake::{
+use hermes_core::chain_components::traits::{
     ChannelOpenAckMessageBuilder, ChannelOpenAckMessageBuilderComponent,
     ChannelOpenConfirmMessageBuilder, ChannelOpenConfirmMessageBuilderComponent,
     ChannelOpenInitMessageBuilder, ChannelOpenInitMessageBuilderComponent,
-    ChannelOpenTryMessageBuilder, ChannelOpenTryMessageBuilderComponent,
+    ChannelOpenTryMessageBuilder, ChannelOpenTryMessageBuilderComponent, HasChannelEndType,
+    HasChannelIdType, HasChannelOpenAckPayloadType, HasChannelOpenConfirmPayloadType,
+    HasChannelOpenTryPayloadType, HasCommitmentProofType, HasConnectionIdType, HasHeightType,
+    HasInitChannelOptionsType, HasMessageType, HasPortIdType,
 };
-use hermes_chain_components::traits::types::channel::{
-    HasChannelEndType, HasChannelOpenAckPayloadType, HasChannelOpenConfirmPayloadType,
-    HasChannelOpenTryPayloadType, HasInitChannelOptionsType,
-};
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::ibc::{
-    HasChannelIdType, HasConnectionIdType, HasPortIdType,
-};
-use hermes_chain_components::traits::types::message::HasMessageType;
-use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_chain_components::types::payloads::channel::{
+use hermes_core::chain_components::types::payloads::channel::{
     ChannelOpenAckPayload, ChannelOpenConfirmPayload, ChannelOpenTryPayload,
 };
-use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
-use hermes_cosmos_chain_components::types::commitment_proof::CosmosCommitmentProof;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
+use hermes_cosmos_core::chain_components::types::{
+    CosmosCommitmentProof, CosmosInitChannelOptions,
+};
+use hermes_prelude::*;
 use ibc::core::channel::types::channel::{ChannelEnd, Order as IbcOrder};
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChannelId, ConnectionId, PortId as IbcPortId};
