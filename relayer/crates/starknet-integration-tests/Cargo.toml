@@ -13,17 +13,17 @@ readme       = "README.md"
 workspace = true
 
 [dependencies]
-cgp                               = { workspace = true }
-hermes-prelude                    = { workspace = true }
-hermes-core                       = { workspace = true }
-hermes-cosmos                     = { workspace = true }
-hermes-cosmos-core                = { workspace = true }
-hermes-ibc-test-suite             = { workspace = true }
-hermes-starknet-chain-components  = { workspace = true }
-hermes-starknet-test-components   = { workspace = true }
-hermes-starknet-chain-context     = { workspace = true }
-hermes-starknet-relayer           = { workspace = true }
-poseidon                          = { workspace = true }
+cgp                              = { workspace = true }
+hermes-prelude                   = { workspace = true }
+hermes-core                      = { workspace = true }
+hermes-cosmos                    = { workspace = true }
+hermes-cosmos-core               = { workspace = true }
+hermes-ibc-test-suite            = { workspace = true }
+hermes-starknet-chain-components = { workspace = true }
+hermes-starknet-test-components  = { workspace = true }
+hermes-starknet-chain-context    = { workspace = true }
+hermes-starknet-relayer          = { workspace = true }
+poseidon                         = { workspace = true }
 
 ibc            = { workspace = true }
 ibc-proto      = { workspace = true }

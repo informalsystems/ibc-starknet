@@ -12,30 +12,18 @@ rust-version = { workspace = true }
 workspace = true
 
 [dependencies]
-cgp                                 = { workspace = true }
-hermes-prelude                      = { workspace = true }
-hermes-core                         = { workspace = true }
-hermes-cosmos-core                  = { workspace = true }
-hermes-error                        = { workspace = true }
-hermes-runtime                      = { workspace = true }
-hermes-relayer-components           = { workspace = true }
-hermes-test-components              = { workspace = true }
-hermes-ibc-test-suite               = { workspace = true }
-hermes-runtime-components           = { workspace = true }
-hermes-encoding-components          = { workspace = true }
-hermes-cairo-encoding-components    = { workspace = true }
-hermes-starknet-chain-components    = { workspace = true }
-hermes-starknet-test-components     = { workspace = true }
-hermes-starknet-chain-context       = { workspace = true }
-hermes-cosmos-test-components       = { workspace = true }
-hermes-wasm-test-components         = { workspace = true }
-hermes-chain-components             = { workspace = true }
-hermes-cosmos-chain-components      = { workspace = true }
-hermes-logging-components           = { workspace = true }
-poseidon                            = { workspace = true }
-hermes-protobuf-encoding-components = { workspace = true }
-hermes-chain-type-components        = { workspace = true }
-hermes-tracing-logging-components   = { workspace = true }
+cgp                              = { workspace = true }
+hermes-prelude                   = { workspace = true }
+hermes-core                      = { workspace = true }
+hermes-cosmos-core               = { workspace = true }
+hermes-error                     = { workspace = true }
+hermes-runtime                   = { workspace = true }
+hermes-ibc-test-suite            = { workspace = true }
+hermes-cairo-encoding-components = { workspace = true }
+hermes-starknet-chain-components = { workspace = true }
+hermes-starknet-test-components  = { workspace = true }
+hermes-starknet-chain-context    = { workspace = true }
+poseidon                         = { workspace = true }
 
 ibc                       = { workspace = true }
 ibc-proto                 = { workspace = true }

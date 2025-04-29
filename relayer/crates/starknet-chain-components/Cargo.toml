@@ -13,12 +13,12 @@ readme       = "README.md"
 workspace = true
 
 [dependencies]
-cgp                                 = { workspace = true }
-hermes-prelude                      = { workspace = true }
-hermes-core                         = { workspace = true }
-hermes-cosmos-core                  = { workspace = true }
-hermes-cairo-encoding-components    = { workspace = true }
-poseidon                            = { workspace = true }
+cgp                              = { workspace = true }
+hermes-prelude                   = { workspace = true }
+hermes-core                      = { workspace = true }
+hermes-cosmos-core               = { workspace = true }
+hermes-cairo-encoding-components = { workspace = true }
+poseidon                         = { workspace = true }
 
 ibc        = { workspace = true }
 ibc-proto  = { workspace = true }
