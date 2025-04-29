@@ -23,6 +23,7 @@ hermes-prelude                    = { workspace = true }
 hermes-core                       = { workspace = true }
 hermes-cosmos                     = { workspace = true }
 hermes-cosmos-core                = { workspace = true }
+hermes-cli                        = { workspace = true }
 hermes-cli-components             = { workspace = true }
 hermes-starknet-chain-components  = { workspace = true }
 hermes-starknet-chain-context     = { workspace = true }
