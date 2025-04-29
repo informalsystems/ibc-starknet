@@ -6,10 +6,9 @@ use std::string::FromUtf8Error;
 
 use cairo_lang_starknet_classes::casm_contract_class::StarknetSierraCompilationError;
 use eyre::Report;
-use hermes_cairo_encoding_components::impls::encode_mut::bool::DecodeBoolError;
-use hermes_cairo_encoding_components::impls::encode_mut::end::NonEmptyBuffer;
-use hermes_cairo_encoding_components::impls::encode_mut::felt::UnexpectedEndOfBuffer;
-use hermes_cairo_encoding_components::impls::encode_mut::variant::VariantIndexOutOfBound;
+use hermes_cairo_encoding_components::impls::{
+    DecodeBoolError, NonEmptyBuffer, UnexpectedEndOfBuffer, VariantIndexOutOfBound,
+};
 use hermes_core::chain_components::impls::InvalidTimeoutReceipt;
 use hermes_core::chain_components::traits::{
     EmptyMessageResponse, HasClientIdType, HasOutgoingPacketType,

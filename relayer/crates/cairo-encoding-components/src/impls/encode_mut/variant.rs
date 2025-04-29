@@ -7,8 +7,7 @@ use hermes_encoding_components::traits::{
 use hermes_prelude::*;
 use starknet::core::types::Felt;
 
-use crate::impls::encode_mut::felt::UnexpectedEndOfBuffer;
-use crate::impls::encode_mut::u128::felt_to_u128;
+use crate::impls::{felt_to_u128, UnexpectedEndOfBuffer};
 use crate::types::nat::{Nat, S};
 
 #[derive(Debug)]

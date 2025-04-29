@@ -1,1 +1,2 @@
-pub mod size;
+mod size;
+pub use size::*;

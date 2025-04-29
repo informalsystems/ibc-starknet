@@ -5,13 +5,10 @@ mod preset {
     use cgp::core::component::{UseContext, UseDelegate};
     use hermes_cairo_encoding_components::components::encode_mut::CairoEncodeMutComponents;
     use hermes_cairo_encoding_components::components::encoding::*;
-    use hermes_cairo_encoding_components::impls::encode_mut::cons::EncoderCons;
-    use hermes_cairo_encoding_components::impls::encode_mut::display::EncodeDisplay;
-    use hermes_cairo_encoding_components::impls::encode_mut::enum_fields::EncodeEnumFields;
-    use hermes_cairo_encoding_components::impls::encode_mut::option::EncodeOption;
-    use hermes_cairo_encoding_components::impls::encode_mut::pair::EncoderPair;
-    use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
-    use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
+    use hermes_cairo_encoding_components::impls::{
+        EncodeDeref, EncodeDisplay, EncodeEnumFields, EncodeList, EncodeOption, EncoderCons,
+        EncoderPair,
+    };
     use hermes_cairo_encoding_components::strategy::ViaCairo;
     use hermes_core::encoding_components::impls::{EncodeFields, EncodeTaggedField};
     use hermes_core::encoding_components::traits::{
