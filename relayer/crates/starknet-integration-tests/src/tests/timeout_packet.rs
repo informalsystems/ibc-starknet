@@ -25,8 +25,7 @@ use hermes_starknet_chain_components::traits::{
     CanQueryCosmosTokenAddressOnStarknet, CanQueryTokenBalance,
 };
 use hermes_starknet_chain_components::types::{Denom, PrefixedDenom, StarknetAmount, TracePrefix};
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
+use hermes_starknet_chain_context::contexts::{StarknetCairoEncoding, StarknetChain};
 use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
 use tracing::info;

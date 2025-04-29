@@ -38,7 +38,7 @@ use hermes_starknet_chain_components::impls::{
     StarknetRelayerConfig,
 };
 use hermes_starknet_chain_components::types::ClientId;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
 use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
 use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;

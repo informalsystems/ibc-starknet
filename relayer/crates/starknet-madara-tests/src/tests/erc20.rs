@@ -12,8 +12,7 @@ use hermes_starknet_chain_components::traits::{
     CanQueryTokenBalance,
 };
 use hermes_starknet_chain_components::types::{Erc20Event, StarknetAmount};
-use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
-use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
+use hermes_starknet_chain_context::contexts::{StarknetCairoEncoding, StarknetEventEncoding};
 use starknet::core::crypto::pedersen_hash;
 use starknet::core::types::U256;
 use starknet::macros::selector;

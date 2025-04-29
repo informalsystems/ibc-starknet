@@ -47,9 +47,9 @@ use hermes_starknet_chain_components::traits::{
     StorageProofTypeProviderComponent,
 };
 use hermes_starknet_chain_components::types::StarknetWallet;
-use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
-use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
-use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
+use hermes_starknet_chain_context::contexts::{
+    StarknetEventEncoding, StarknetProtobufEncoding, UseStarknetCairoEncoding,
+};
 use ibc::core::host::types::identifiers::ChainId;
 use indexmap::IndexMap;
 use reqwest::Client;

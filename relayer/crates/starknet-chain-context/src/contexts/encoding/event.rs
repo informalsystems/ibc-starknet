@@ -19,8 +19,8 @@ use hermes_starknet_chain_components::types::{
 };
 use starknet::core::types::Felt;
 
-use crate::contexts::encoding::cairo::{StarknetCairoEncoding, UseStarknetCairoEncoding};
-use crate::impls::error::HandleStarknetChainError;
+use crate::contexts::{StarknetCairoEncoding, UseStarknetCairoEncoding};
+use crate::impls::HandleStarknetChainError;
 
 #[cgp_context(StarknetEventEncodingContextComponents: StarknetEventEncodingComponents)]
 #[derive(HasField, Default, Clone)]

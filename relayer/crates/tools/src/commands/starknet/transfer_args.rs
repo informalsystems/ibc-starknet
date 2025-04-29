@@ -6,7 +6,7 @@ use hermes_prelude::*;
 use hermes_starknet_chain_components::types::{
     Denom, Height, MsgTransfer, PortId, PrefixedDenom, Timestamp, TracePrefix,
 };
-use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
+use hermes_starknet_chain_context::contexts::StarknetCairoEncoding;
 use ibc::core::host::types::identifiers::PortId as IbcPortId;
 use starknet::core::types::Felt;
 

@@ -27,7 +27,7 @@ use hermes_starknet_chain_components::types::{
 use ibc::clients::tendermint::types::Header as TendermintLcHeader;
 use starknet::core::types::{Felt, U256};
 
-use crate::impls::error::HandleStarknetChainError;
+use crate::impls::HandleStarknetChainError;
 
 #[cgp_context(StarknetCairoEncodingContextComponents: StarknetCairoEncodingComponents)]
 pub struct StarknetCairoEncoding;

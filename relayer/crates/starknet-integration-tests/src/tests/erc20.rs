@@ -13,8 +13,7 @@ use hermes_starknet_chain_components::traits::{
 use hermes_starknet_chain_components::types::{
     DeployErc20TokenMessage, Erc20Event, StarknetAmount,
 };
-use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
-use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
+use hermes_starknet_chain_context::contexts::{StarknetCairoEncoding, StarknetEventEncoding};
 use starknet::core::types::U256;
 use starknet::macros::selector;
 use tracing::info;

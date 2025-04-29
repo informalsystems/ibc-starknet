@@ -103,11 +103,11 @@ use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 
-use crate::contexts::encoding::cairo::{StarknetCairoEncoding, UseStarknetCairoEncoding};
-use crate::contexts::encoding::event::StarknetEventEncoding;
-use crate::contexts::encoding::protobuf::StarknetProtobufEncoding;
-use crate::impls::build_account::BuildStarknetAccount;
-use crate::impls::error::HandleStarknetChainError;
+use crate::contexts::{
+    StarknetCairoEncoding, StarknetEventEncoding, StarknetProtobufEncoding,
+    UseStarknetCairoEncoding,
+};
+use crate::impls::{BuildStarknetAccount, HandleStarknetChainError};
 use crate::types::StarknetAccount;
 
 #[cgp_context(StarknetChainContextComponents: StarknetChainComponents)]

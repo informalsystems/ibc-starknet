@@ -8,7 +8,7 @@ use hermes_cosmos::error::HermesError;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_prelude::*;
 use hermes_starknet_chain_components::types::StarknetCreateClientPayloadOptions;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_starknet_chain_context::contexts::StarknetChain;
 use hex::FromHex;
 use ibc::clients::tendermint::types::TrustThreshold;
 

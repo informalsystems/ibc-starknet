@@ -18,7 +18,7 @@ use ibc::core::commitment_types::commitment::CommitmentRoot;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 
-use crate::impls::error::HandleStarknetChainError;
+use crate::impls::HandleStarknetChainError;
 
 #[cgp_context(StarknetProtobufEncodingContextComponents: StarknetProtobufEncodingComponents)]
 pub struct StarknetProtobufEncoding;

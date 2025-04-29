@@ -26,7 +26,7 @@ use hermes_cosmos::integration_tests::impls::UseCosmosInitChannelOptions;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_prelude::*;
 use hermes_starknet_chain_components::types::StarknetCreateClientPayloadOptions;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
 use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
 use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;

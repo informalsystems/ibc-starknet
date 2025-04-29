@@ -41,9 +41,10 @@ use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::StarknetChainConfig;
 use hermes_starknet_chain_components::types::StarknetWallet;
-use hermes_starknet_chain_context::contexts::chain::{StarknetChain, StarknetChainFields};
-use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
-use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
+use hermes_starknet_chain_context::contexts::{
+    StarknetChain, StarknetChainFields, StarknetEventEncoding,
+};
+use hermes_starknet_chain_context::impls::HandleStarknetChainError;
 use ibc::core::host::types::identifiers::{ChainId, ClientId};
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
