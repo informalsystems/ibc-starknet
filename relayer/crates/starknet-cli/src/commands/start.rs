@@ -2,7 +2,7 @@ use hermes_prelude::*;
 
 #[derive(Debug, clap::Parser, HasField)]
 pub struct StartRelayerArgs {
-    /// Identifier of chain A
+    /// Identifier of Starknet chain
     #[clap(
         long = "starknet-chain-id",
         required = true,
@@ -11,7 +11,7 @@ pub struct StartRelayerArgs {
     )]
     chain_id_a: String,
 
-    /// Identifier of client A
+    /// Identifier of Starknet client
     #[clap(
         long = "starknet-client-id",
         required = true,
@@ -20,7 +20,7 @@ pub struct StartRelayerArgs {
     )]
     client_id_a: String,
 
-    /// Identifier of chain B
+    /// Identifier of Cosmos chain
     #[clap(
         long = "cosmos-chain-id",
         required = true,
@@ -29,7 +29,7 @@ pub struct StartRelayerArgs {
     )]
     chain_id_b: String,
 
-    /// Identifier of client B
+    /// Identifier of Cosmos client
     #[clap(
         long = "cosmos-client-id",
         required = true,
