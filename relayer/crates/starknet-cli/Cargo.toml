@@ -45,6 +45,7 @@ tokio              = { workspace = true }
 tracing            = { workspace = true }
 tracing-subscriber = { workspace = true }
 stable-eyre        = { workspace = true }
+humantime          = { workspace = true }
 
 [dev-dependencies]
 hex                     = { workspace = true }

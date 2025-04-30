@@ -1,32 +1,46 @@
-use cgp::core::field::Index;
-use hermes_cli_components::impls::{RunStartRelayerCommand, StartRelayerArgs};
-use hermes_cli_components::traits::{CommandRunner, CommandRunnerComponent, HasOutputType};
 use hermes_prelude::*;
 
-#[derive(Debug, clap::Subcommand)]
-pub enum StartSubCommand {
-    StarknetWithCosmos(StartRelayerArgs),
-    CosmosWithStarknet(StartRelayerArgs),
-}
+#[derive(Debug, clap::Parser, HasField)]
+pub struct StartRelayerArgs {
+    /// Identifier of Starknet chain
+    #[clap(
+        long = "starknet-chain-id",
+        required = true,
+        value_name = "STARKNET_CHAIN_ID",
+        help_heading = "REQUIRED"
+    )]
+    chain_id_a: String,
 
-#[cgp_new_provider(CommandRunnerComponent)]
-impl<App> CommandRunner<App, StartSubCommand> for RunStartSubCommand
-where
-    App: HasOutputType + HasAsyncErrorType,
-    RunStartRelayerCommand<Index<0>, Index<1>>: CommandRunner<App, StartRelayerArgs>,
-    RunStartRelayerCommand<Index<1>, Index<0>>: CommandRunner<App, StartRelayerArgs>,
-{
-    async fn run_command(
-        app: &App,
-        subcommand: &StartSubCommand,
-    ) -> Result<App::Output, App::Error> {
-        match subcommand {
-            StartSubCommand::StarknetWithCosmos(args) => {
-                <RunStartRelayerCommand<Index<0>, Index<1>>>::run_command(app, args).await
-            }
-            StartSubCommand::CosmosWithStarknet(args) => {
-                <RunStartRelayerCommand<Index<1>, Index<0>>>::run_command(app, args).await
-            }
-        }
-    }
+    /// Identifier of Starknet client
+    #[clap(
+        long = "starknet-client-id",
+        required = true,
+        value_name = "STARKNET_CLIENT_ID",
+        help_heading = "REQUIRED"
+    )]
+    client_id_a: String,
+
+    /// Identifier of Cosmos chain
+    #[clap(
+        long = "cosmos-chain-id",
+        required = true,
+        value_name = "COSMOS_CHAIN_ID",
+        help_heading = "REQUIRED"
+    )]
+    chain_id_b: String,
+
+    /// Identifier of Cosmos client
+    #[clap(
+        long = "cosmos-client-id",
+        required = true,
+        value_name = "COSMOS_CLIENT_ID",
+        help_heading = "REQUIRED"
+    )]
+    client_id_b: String,
+
+    #[clap(long = "clear-past-blocks", required = false)]
+    clear_past_blocks: Option<humantime::Duration>,
+
+    #[clap(long = "stop-after-blocks", required = false)]
+    stop_after_blocks: Option<humantime::Duration>,
 }
