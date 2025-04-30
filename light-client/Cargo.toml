@@ -59,7 +59,6 @@ uninlined_format_args         = "deny"
 trait_duplication_in_bounds   = "deny"
 use_self                      = "deny"
 redundant_clone               = "deny"
-type_repetition_in_bounds     = "deny"
 
 [patch.crates-io]
 ibc-client-starknet       = { path = "./ibc-client-starknet" }
