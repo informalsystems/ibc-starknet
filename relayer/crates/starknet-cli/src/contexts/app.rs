@@ -12,8 +12,7 @@ use hermes_cli_components::impls::{
     QueryConsensusStateArgs, RunBootstrapChainCommand, RunCreateChannelCommand,
     RunCreateClientCommand, RunCreateConnectionCommand, RunQueryBalanceCommand,
     RunQueryChainStatusCommand, RunQueryClientStateCommand, RunQueryConsensusStateCommand,
-    RunStartRelayerCommand, RunUpdateClientCommand, StartRelayerArgs, UpdateClientArgs,
-    WriteTomlConfig,
+    RunStartRelayerCommand, RunUpdateClientCommand, UpdateClientArgs, WriteTomlConfig,
 };
 use hermes_cli_components::traits::{
     AnyCounterpartyTypeProviderComponent, ArgParserComponent, BootstrapLoaderComponent,
@@ -49,8 +48,8 @@ use toml::to_string_pretty;
 
 use crate::commands::{
     AllSubCommands, BootstrapSubCommand, CreateSubCommand, QuerySubCommand, RunAllSubCommand,
-    RunBootstrapSubCommand, RunCreateSubCommand, RunQuerySubCommand, RunStartSubCommand,
-    RunUpdateSubCommand, StartSubCommand, UpdateSubCommand,
+    RunBootstrapSubCommand, RunCreateSubCommand, RunQuerySubCommand, RunUpdateSubCommand,
+    StartRelayerArgs, UpdateSubCommand,
 };
 use crate::impls::{
     BootstrapOsmosisChainArgs, BootstrapStarknetChainArgs, CreateStarknetClientArgs,
@@ -182,7 +181,6 @@ delegate_components! {
         BootstrapSubCommand: RunBootstrapSubCommand,
 
         StartRelayerArgs: RunStartRelayerCommand<Index<0>, Index<1>>,
-        StartSubCommand: RunStartSubCommand,
 
         QuerySubCommand: RunQuerySubCommand,
         QueryClientStateArgs: RunQueryClientStateCommand,
@@ -309,7 +307,6 @@ check_components! {
         ],
         CommandRunnerComponent: [
             AllSubCommands,
-            StartSubCommand,
             BootstrapSubCommand,
             BootstrapStarknetChainArgs,
             BootstrapOsmosisChainArgs,
