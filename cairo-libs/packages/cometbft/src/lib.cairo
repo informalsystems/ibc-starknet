@@ -1,3 +1,5 @@
+#[cfg(feature: "ed25519")]
+pub mod alexandria;
 pub mod errors;
 pub mod ibc;
 pub mod light_client;

@@ -322,6 +322,10 @@ pub struct PublicKey {
     pub sum: Sum,
 }
 
+pub trait Ed25519<T> {
+    fn verify(self: @T, pub_key: Span<u8>, msg: Span<u8>, signature: Span<u8>) -> bool;
+}
+
 #[generate_trait]
 pub impl PublicKeyImpl of PublicKeyTrait {
     fn verify(self: @PublicKey, msg: Span<u8>, signature: Span<u8>) {
