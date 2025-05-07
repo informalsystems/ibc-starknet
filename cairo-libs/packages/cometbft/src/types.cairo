@@ -448,8 +448,10 @@ pub impl ValidatorImpl of ValidatorTrait {
         assert!(self.address == @self.pub_key.address());
     }
 
-    fn verify_signature(self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>) {
-        self.pub_key.verify(sign_bytes, signature);
+    fn verify_signature<V, +Ed25519<V>>(
+        self: @Validator, verifier: @V, sign_bytes: Span<u8>, signature: Span<u8>,
+    ) {
+        self.pub_key.verify(verifier, sign_bytes, signature);
     }
 }
 
@@ -690,7 +692,9 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
         NonAbsentCommitVotes { votes }
     }
 
-    fn has_voted(self: @NonAbsentCommitVotes, validator: @Validator) -> bool {
+    fn has_voted<V, +Ed25519<V>>(
+        self: @NonAbsentCommitVotes, verifier: @V, validator: @Validator,
+    ) -> bool {
         let mut votes_span = self.votes.span();
         let mut result = false;
         while let Option::Some(ith_vote) = votes_span.pop_front() {
@@ -711,7 +715,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
                 validator.validate_id();
 
-                validator.verify_signature(signed_array_u8.span(), signature.span());
+                validator.verify_signature(verifier, signed_array_u8.span(), signature.span());
 
                 // TODO: set verified field to true
 
