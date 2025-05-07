@@ -1,5 +1,5 @@
+use cometbft::alexandria::AlexandriaEd25519;
 use cometbft::types::{PublicKey, PublicKeyTrait, Sum};
-use cometbft::utils::SpanU8TryIntoU256;
 
 #[derive(Drop, Debug)]
 pub struct TestData {
@@ -164,7 +164,7 @@ pub fn ed25519_case_1024() -> TestData {
 
 pub fn test_verify_ed25519_signature(data: TestData) {
     let pubkey = PublicKey { sum: Sum::Ed25519(data.pubkey) };
-    pubkey.verify(data.msg.span(), data.signature.span());
+    pubkey.verify(@AlexandriaEd25519 {}, data.msg.span(), data.signature.span());
 }
 
 #[test]

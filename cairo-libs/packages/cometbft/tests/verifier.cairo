@@ -1,3 +1,4 @@
+use cometbft::alexandria::AlexandriaEd25519;
 use cometbft::light_client::Header as LcHeader;
 use cometbft::types::{Header as TmHeader, Options, TrustedBlockState, UntrustedBlockState};
 use cometbft::utils::TWO_THIRDS;
@@ -79,7 +80,9 @@ fn test_verify_update_header() {
         next_validators: header_b.trusted_validator_set,
     };
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    verify_update_header(
+        @AlexandriaEd25519 {}, untrusted_block_state, trusted_block_state, options, now,
+    );
 }
 
 #[test]
@@ -116,7 +119,9 @@ fn test_verify_update_header_forged_header() {
     // forged header
     untrusted_block_state.signed_header.header.next_validators_hash = array![0x1, 0x2];
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    verify_update_header(
+        @AlexandriaEd25519 {}, untrusted_block_state, trusted_block_state, options, now,
+    );
 }
 
 #[test]
@@ -153,7 +158,9 @@ fn test_verify_update_header_empty_signatures() {
     // empty signatures
     untrusted_block_state.signed_header.commit.signatures = array![];
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    verify_update_header(
+        @AlexandriaEd25519 {}, untrusted_block_state, trusted_block_state, options, now,
+    );
 }
 
 #[test]
@@ -238,5 +245,7 @@ fn test_verify_update_header_2() {
         next_validators: header_b.trusted_validator_set,
     };
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    verify_update_header(
+        @AlexandriaEd25519 {}, untrusted_block_state, trusted_block_state, options, now,
+    );
 }
