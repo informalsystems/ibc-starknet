@@ -14,10 +14,15 @@ scarb = { workspace = true }
 
 [dependencies]
 starknet        = { workspace = true }
-alexandria_math = { workspace = true }
 protobuf        = { workspace = true }
 ics23           = { workspace = true }
+alexandria_math = { workspace = true, optional = true }
 
 [dev-dependencies]
 assert_macros = { workspace = true }
 snforge_std   = { workspace = true }
+
+[features]
+default         = [ "ed25519" ]
+alexandria_math = [  ]
+ed25519         = [ "alexandria_math" ]
