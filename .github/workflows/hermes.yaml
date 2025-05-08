@@ -61,7 +61,7 @@ jobs:
         with:
           tool: starknet-devnet
           git: https://github.com/informalsystems/starknet-devnet
-          rev: f4c591f # `rano/higher-sierra-gas` branch
+          rev: f938680 # `rano/ibc-starknet` branch
 
       - name: Run Integration Tests
         env:
