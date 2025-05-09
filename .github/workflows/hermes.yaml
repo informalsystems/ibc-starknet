@@ -8,7 +8,8 @@ on:
       - light-client/**
       - .github/workflows/hermes.yaml
   push:
-    branches: main
+    branches:
+      - main
 
 # Cancel previous runs of this workflow when a new commit is added to the PR, branch or tag
 concurrency:
@@ -94,7 +95,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-22.04 ]
+        os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
