@@ -88,6 +88,7 @@ jobs:
               --exclude hermes-starknet-madara-tests \
               --retries 2 \
               --test-threads=$TEST_THREADS
+              --success-output=final
 
   madara-integration-tests:
     name: Run Madara Integration Tests
@@ -156,6 +157,7 @@ jobs:
             cargo nextest run \
               -p hermes-starknet-madara-tests \
               --test-threads=$TEST_THREADS
+              --success-output=final
 
   lint-relayer:
     name: Lint Relayer Code
