@@ -1,19 +1,16 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
-use hermes_chain_components::traits::queries::block_events::{
-    BlockEventsQuerier, BlockEventsQuerierComponent,
+use hermes_core::chain_components::traits::{
+    BlockEventsQuerier, BlockEventsQuerierComponent, HasEventType, HasHeightType,
 };
-use hermes_chain_components::traits::types::event::HasEventType;
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_prelude::*;
 use starknet::core::types::{BlockId, EventFilter};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::impls::types::address::StarknetAddress;
-use crate::traits::client::HasStarknetClient;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::types::event::StarknetEvent;
+use crate::impls::StarknetAddress;
+use crate::traits::{CanQueryContractAddress, HasStarknetClient};
+use crate::types::StarknetEvent;
 
 #[cgp_new_provider(BlockEventsQuerierComponent)]
 impl<Chain> BlockEventsQuerier<Chain> for GetStarknetBlockEvents

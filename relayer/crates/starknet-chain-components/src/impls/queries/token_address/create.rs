@@ -1,26 +1,20 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::send_message::CanSendSingleMessage;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_chain_type_components::traits::types::denom::HasDenomType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::chain_components::traits::CanSendSingleMessage;
+use hermes_core::chain_type_components::traits::{HasAddressType, HasDenomType};
+use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::traits::queries::token_address::{
-    CosmosTokenAddressOnStarknetQuerier, CosmosTokenAddressOnStarknetQuerierComponent,
+use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::traits::{
+    CanQueryContractAddress, CosmosTokenAddressOnStarknetQuerier,
+    CosmosTokenAddressOnStarknetQuerierComponent,
 };
-use crate::types::message_response::StarknetMessageResponse;
-use crate::types::messages::ibc::denom::PrefixedDenom;
+use crate::types::{PrefixedDenom, StarknetMessageResponse};
 
 #[cgp_new_provider(CosmosTokenAddressOnStarknetQuerierComponent)]
 impl<Chain, Encoding> CosmosTokenAddressOnStarknetQuerier<Chain>

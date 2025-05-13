@@ -1,18 +1,13 @@
-use cgp::prelude::*;
-use hermes_cli_components::traits::command::{
-    CanRunCommand, CommandRunner, CommandRunnerComponent,
-};
+use hermes_cli_components::traits::{CanRunCommand, CommandRunner, CommandRunnerComponent};
+use hermes_prelude::*;
 
-use crate::commands::bootstrap::BootstrapSubCommand;
-use crate::commands::create::subcommand::CreateSubCommand;
-use crate::commands::query::subcommand::QuerySubCommand;
-use crate::commands::start::StartSubCommand;
-use crate::commands::update::subcommand::UpdateSubCommand;
+use crate::commands::{
+    BootstrapSubCommand, CreateSubCommand, QuerySubCommand, StartRelayerArgs, UpdateSubCommand,
+};
 
 #[derive(Debug, clap::Subcommand)]
 pub enum AllSubCommands {
-    #[clap(subcommand)]
-    Start(StartSubCommand),
+    Start(StartRelayerArgs),
 
     #[clap(subcommand)]
     Bootstrap(BootstrapSubCommand),
@@ -36,7 +31,7 @@ where
         + CanRunCommand<QuerySubCommand>
         + CanRunCommand<CreateSubCommand>
         + CanRunCommand<UpdateSubCommand>
-        + CanRunCommand<StartSubCommand>,
+        + CanRunCommand<StartRelayerArgs>,
 {
     async fn run_command(
         app: &App,

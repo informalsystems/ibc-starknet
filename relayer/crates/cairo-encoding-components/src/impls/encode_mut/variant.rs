@@ -1,17 +1,13 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, CanPeekDecodeBuffer, MutDecoder, MutDecoderComponent,
+use hermes_encoding_components::traits::{
+    CanDecodeMut, CanEncodeMut, CanPeekDecodeBuffer, HasEncodeBufferType, MutDecoder,
+    MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
-use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 
-use crate::impls::encode_mut::felt::UnexpectedEndOfBuffer;
-use crate::impls::encode_mut::u128::felt_to_u128;
+use crate::impls::{felt_to_u128, UnexpectedEndOfBuffer};
 use crate::types::nat::{Nat, S};
 
 #[derive(Debug)]

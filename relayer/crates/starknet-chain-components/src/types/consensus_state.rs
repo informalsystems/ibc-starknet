@@ -1,8 +1,8 @@
-use cgp::prelude::*;
-use hermes_encoding_components::traits::convert::{Converter, ConverterComponent};
-use hermes_wasm_encoding_components::impls::strategies::consensus_state::{
+use hermes_core::encoding_components::traits::{Converter, ConverterComponent};
+use hermes_cosmos_core::wasm_encoding_components::impls::{
     DecodeViaWasmConsensusState, EncodeViaWasmConsensusState,
 };
+use hermes_prelude::*;
 pub use ibc_client_starknet_types::StarknetConsensusState;
 use prost_types::Any;
 

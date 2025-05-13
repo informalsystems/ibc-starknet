@@ -1,27 +1,24 @@
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
-use cgp::prelude::*;
-use hermes_encoding_components::traits::convert::CanConvertBothWays;
-use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
-use hermes_encoding_components::traits::encode_and_decode_mut::CanEncodeAndDecodeMut;
-use hermes_error::impls::UseHermesError;
-use hermes_protobuf_encoding_components::types::any::Any;
-use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
-use hermes_starknet_chain_components::components::encoding::protobuf::*;
-use hermes_starknet_chain_components::types::client_state::{
-    StarknetClientState, WasmStarknetClientState,
+use hermes_core::encoding_components::traits::{
+    CanConvertBothWays, CanEncodeAndDecode, CanEncodeAndDecodeMut,
 };
-use hermes_starknet_chain_components::types::consensus_state::{
-    StarknetConsensusState, WasmStarknetConsensusState,
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::protobuf_encoding_components::types::any::Any;
+use hermes_cosmos::protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
+use hermes_cosmos::wasm_encoding_components::types::{WasmClientState, WasmConsensusState};
+use hermes_prelude::*;
+use hermes_starknet_chain_components::components::*;
+use hermes_starknet_chain_components::types::{
+    StarknetClientState, StarknetConsensusState, WasmStarknetClientState,
+    WasmStarknetConsensusState,
 };
-use hermes_wasm_encoding_components::types::client_state::WasmClientState;
-use hermes_wasm_encoding_components::types::consensus_state::WasmConsensusState;
 use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::commitment_types::commitment::CommitmentRoot;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 
-use crate::impls::error::HandleStarknetChainError;
+use crate::impls::HandleStarknetChainError;
 
 #[cgp_context(StarknetProtobufEncodingContextComponents: StarknetProtobufEncodingComponents)]
 pub struct StarknetProtobufEncoding;

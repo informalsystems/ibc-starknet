@@ -3,35 +3,25 @@ mod preset {
     use core::time::Duration;
 
     use cgp::core::component::{UseContext, UseDelegate};
-    use cgp::prelude::*;
     use hermes_cairo_encoding_components::components::encode_mut::CairoEncodeMutComponents;
     use hermes_cairo_encoding_components::components::encoding::*;
-    use hermes_cairo_encoding_components::impls::encode_mut::cons::EncoderCons;
-    use hermes_cairo_encoding_components::impls::encode_mut::display::EncodeDisplay;
-    use hermes_cairo_encoding_components::impls::encode_mut::enum_fields::EncodeEnumFields;
-    use hermes_cairo_encoding_components::impls::encode_mut::option::EncodeOption;
-    use hermes_cairo_encoding_components::impls::encode_mut::pair::EncoderPair;
-    use hermes_cairo_encoding_components::impls::encode_mut::reference::EncodeDeref;
-    use hermes_cairo_encoding_components::impls::encode_mut::vec::EncodeList;
+    use hermes_cairo_encoding_components::impls::{
+        EncodeDeref, EncodeDisplay, EncodeEnumFields, EncodeList, EncodeOption, EncoderCons,
+        EncoderPair,
+    };
     use hermes_cairo_encoding_components::strategy::ViaCairo;
-    use hermes_encoding_components::impls::fields::EncodeFields;
-    use hermes_encoding_components::impls::tagged::EncodeTaggedField;
-    use hermes_encoding_components::traits::decode::DecoderComponent;
-    use hermes_encoding_components::traits::decode_mut::{
-        DecodeBufferPeekerComponent, MutDecoderComponent,
+    use hermes_core::encoding_components::impls::{EncodeFields, EncodeTaggedField};
+    use hermes_core::encoding_components::traits::{
+        DecodeBufferBuilderComponent, DecodeBufferPeekerComponent, DecodeBufferTypeComponent,
+        DecoderComponent, EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
+        EncodedTypeComponent, EncoderComponent, MutDecoderComponent, MutEncoderComponent,
     };
-    use hermes_encoding_components::traits::encode::EncoderComponent;
-    use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
-    use hermes_encoding_components::traits::types::decode_buffer::{
-        DecodeBufferBuilderComponent, DecodeBufferTypeComponent,
-    };
-    use hermes_encoding_components::traits::types::encode_buffer::{
-        EncodeBufferFinalizerComponent, EncodeBufferTypeComponent,
-    };
-    use hermes_encoding_components::traits::types::encoded::EncodedTypeComponent;
+    use hermes_prelude::*;
     use ibc::clients::tendermint::types::{Header as TendermintLcHeader, TrustThreshold};
+    use ibc::core::channel::types::channel::Order as ChannelOrdering;
+    use ibc::core::channel::types::Version as AppVersion;
     use ibc::core::commitment_types::specs::ProofSpecs;
-    use ibc::core::host::types::identifiers::ChainId;
+    use ibc::core::host::types::identifiers::{ChainId, ChannelId, ConnectionId, PortId};
     use ibc_proto::google::protobuf::Timestamp as ProtoTimestamp;
     use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
     use starknet::core::types::{ByteArray, Felt, U256};
@@ -43,48 +33,26 @@ mod preset {
     use tendermint::validator::ProposerPriority;
     use tendermint::{account, block, validator, vote, AppHash, PublicKey, Signature};
 
-    use crate::impls::types::address::StarknetAddress;
-    use crate::types::channel_id::{
-        ChannelEnd, ChannelId, EncodeChannelEnd, RawChannelCounterparty, RawChannelEnd,
-        RawChannelState,
+    use crate::impls::StarknetAddress;
+    use crate::types::{
+        AckStatus, Acknowledgement, BasePrefix, ChannelEnd, ClientId, ClientMessage, ClientStatus,
+        CometClientState, CometConsensusState, ConnectionCounterparty, ConnectionEnd,
+        ConnectionState, ConnectionVersion, CreateClientResponse, Denom, DeployErc20TokenMessage,
+        EncodeAccountId, EncodeAppHash, EncodeBasePrefix, EncodeBlockId, EncodeChannelEnd,
+        EncodeChannelOrdering, EncodeClientId, EncodeCommit, EncodeCommitBlockIdFlag,
+        EncodeCommitSig, EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionState,
+        EncodeConnectionVersion, EncodeDuration, EncodeHeaderVersion, EncodeHeight,
+        EncodeInnerSpec, EncodeLeafOp, EncodePacket, EncodePartSetHeader, EncodeProofSpec,
+        EncodeProofSpecs, EncodeProposerPriority, EncodeProtoTimestamp, EncodePublicKey,
+        EncodeSequence, EncodeSignature, EncodeSignedHeader, EncodeTendermintLcHeader,
+        EncodeTimestamp, EncodeTmHash, EncodeTmHeader, EncodeTrustThreshold, EncodeValidator,
+        EncodeValidatorSet, EncodeVotePower, Height, MsgAckPacket, MsgChanOpenAck,
+        MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry, MsgConnOpenAck, MsgConnOpenConfirm,
+        MsgConnOpenInit, MsgConnOpenTry, MsgRecvPacket, MsgRegisterApp, MsgRegisterClient,
+        MsgTimeoutPacket, MsgTransfer, Packet, Participant, PrefixedDenom, RawChannelCounterparty,
+        RawChannelEnd, RawChannelState, Sequence, StateProof, Timestamp, TracePrefix,
+        TransferErc20TokenMessage, TransferPacketData,
     };
-    use crate::types::client_id::{ClientId, EncodeClientId};
-    use crate::types::connection_id::{
-        ConnectionCounterparty, ConnectionEnd, ConnectionId, ConnectionState,
-        EncodeConnectionCounterparty, EncodeConnectionEnd, EncodeConnectionState, EncodeDuration,
-    };
-    use crate::types::cosmos::client_state::{
-        ClientStatus, CometClientState, EncodeInnerSpec, EncodeLeafOp, EncodeProofSpec,
-        EncodeProofSpecs, EncodeTrustThreshold,
-    };
-    use crate::types::cosmos::consensus_state::CometConsensusState;
-    use crate::types::cosmos::height::{EncodeHeight, Height};
-    use crate::types::cosmos::timestamp::{EncodeTimestamp, Timestamp};
-    use crate::types::cosmos::update::{
-        ClientMessage, EncodeAccountId, EncodeAppHash, EncodeBlockId, EncodeCommit,
-        EncodeCommitBlockIdFlag, EncodeCommitSig, EncodeHeaderVersion, EncodePartSetHeader,
-        EncodeProposerPriority, EncodeProtoTimestamp, EncodePublicKey, EncodeSignature,
-        EncodeSignedHeader, EncodeTendermintLcHeader, EncodeTmHash, EncodeTmHeader,
-        EncodeValidator, EncodeValidatorSet, EncodeVotePower,
-    };
-    use crate::types::message_responses::create_client::CreateClientResponse;
-    use crate::types::messages::erc20::deploy::DeployErc20TokenMessage;
-    use crate::types::messages::erc20::transfer::TransferErc20TokenMessage;
-    use crate::types::messages::ibc::channel::{
-        AppVersion, ChannelOrdering, EncodeChannelOrdering, MsgChanOpenAck, MsgChanOpenConfirm,
-        MsgChanOpenInit, MsgChanOpenTry, PortId,
-    };
-    use crate::types::messages::ibc::connection::{
-        BasePrefix, ConnectionVersion, EncodeBasePrefix, EncodeConnectionVersion, MsgConnOpenAck,
-        MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
-    };
-    use crate::types::messages::ibc::denom::{Denom, PrefixedDenom, TracePrefix};
-    use crate::types::messages::ibc::ibc_transfer::{MsgTransfer, Participant, TransferPacketData};
-    use crate::types::messages::ibc::packet::{
-        AckStatus, Acknowledgement, EncodePacket, EncodeSequence, MsgAckPacket, MsgRecvPacket,
-        MsgTimeoutPacket, Packet, Sequence, StateProof,
-    };
-    use crate::types::register::{MsgRegisterApp, MsgRegisterClient};
 
     cgp_preset! {
         StarknetCairoEncodingComponents {

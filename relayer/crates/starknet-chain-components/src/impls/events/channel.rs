@@ -1,26 +1,20 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::extract_data::{
-    MessageResponseExtractor, MessageResponseExtractorComponent,
-};
-use hermes_chain_components::traits::types::ibc::HasChannelIdType;
-use hermes_chain_components::traits::types::ibc_events::channel::{
-    ChannelOpenInitEventComponent, ChannelOpenTryEventComponent, ProvideChannelOpenInitEvent,
+use hermes_core::chain_components::traits::{
+    ChannelOpenInitEventComponent, ChannelOpenTryEventComponent, HasChannelIdType,
+    MessageResponseExtractor, MessageResponseExtractorComponent, ProvideChannelOpenInitEvent,
     ProvideChannelOpenTryEvent,
 };
-use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::chain_type_components::traits::HasMessageResponseType;
+use hermes_core::encoding_components::traits::{CanDecode, HasDefaultEncoding, HasEncodedType};
+use hermes_prelude::*;
+use ibc::core::host::types::identifiers::ChannelId;
 use starknet::core::types::Felt;
 
-use crate::impls::events::UseStarknetEvents;
-use crate::impls::types::events::{StarknetChannelOpenInitEvent, StarknetChannelOpenTryEvent};
-use crate::types::channel_id::ChannelId;
-use crate::types::message_response::StarknetMessageResponse;
+use crate::impls::{StarknetChannelOpenInitEvent, StarknetChannelOpenTryEvent, UseStarknetEvents};
+use crate::types::StarknetMessageResponse;
 
 #[cgp_provider(ChannelOpenInitEventComponent)]
 impl<Chain, Counterparty> ProvideChannelOpenInitEvent<Chain, Counterparty> for UseStarknetEvents

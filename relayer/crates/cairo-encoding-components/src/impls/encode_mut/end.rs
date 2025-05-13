@@ -1,8 +1,7 @@
 use core::fmt::Debug;
 
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{MutDecoder, MutDecoderComponent};
-use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
+use hermes_encoding_components::traits::{HasDecodeBufferType, MutDecoder, MutDecoderComponent};
+use hermes_prelude::*;
 
 pub struct DecodeEnd;
 

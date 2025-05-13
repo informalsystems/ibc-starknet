@@ -6,15 +6,13 @@ use core::str::Utf8Error;
 use cgp::core::error::{
     ErrorRaiser, ErrorRaiserComponent, ErrorTypeProvider, ErrorTypeProviderComponent,
 };
-use cgp::prelude::*;
-use hermes_encoding_components::traits::convert::{CanConvert, CanConvertBothWays};
-use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
-use hermes_encoding_components::traits::encode_and_decode_mut::CanEncodeAndDecodeMut;
-use hermes_protobuf_encoding_components::impls::any::TypeUrlMismatchError;
-use hermes_protobuf_encoding_components::impls::encode_mut::chunk::{
-    InvalidWireType, UnsupportedWireType,
+use hermes_encoding_components::traits::{
+    CanConvert, CanConvertBothWays, CanEncodeAndDecode, CanEncodeAndDecodeMut,
 };
-use hermes_protobuf_encoding_components::impls::encode_mut::proto_field::decode_required::RequiredFieldTagNotFound;
+use hermes_prelude::*;
+use hermes_protobuf_encoding_components::impls::{
+    InvalidWireType, RequiredFieldTagNotFound, TypeUrlMismatchError, UnsupportedWireType,
+};
 use hermes_protobuf_encoding_components::types::any::Any;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use ibc_client_starknet_types::encoding::components::*;

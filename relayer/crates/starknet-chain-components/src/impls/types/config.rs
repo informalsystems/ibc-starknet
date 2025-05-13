@@ -1,10 +1,10 @@
 use core::time::Duration;
 
-use hermes_cosmos_chain_components::impls::types::config::CosmosChainConfig;
+use hermes_cosmos_core::chain_components::impls::CosmosChainConfig;
 use serde::{Deserialize, Serialize};
 use starknet::core::types::Felt;
 
-use crate::impls::types::address::StarknetAddress;
+use crate::impls::StarknetAddress;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StarknetRelayerConfig {

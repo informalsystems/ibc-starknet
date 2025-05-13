@@ -1,12 +1,10 @@
-use cgp::prelude::*;
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
+use hermes_encoding_components::traits::{CanEncodeMut, MutEncoder, MutEncoderComponent};
+use hermes_prelude::*;
 
-pub struct EncodeArray;
+pub struct EncodeIterator;
 
 #[cgp_provider(MutEncoderComponent)]
-impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Value> for EncodeArray
+impl<Encoding, Strategy, Value> MutEncoder<Encoding, Strategy, Value> for EncodeIterator
 where
     Encoding: for<'a> CanEncodeMut<Strategy, <&'a Value as IntoIterator>::Item>,
     for<'a> &'a Value: IntoIterator,

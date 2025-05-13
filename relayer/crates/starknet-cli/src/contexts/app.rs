@@ -4,86 +4,57 @@ use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::Index;
 use cgp::core::types::WithType;
-use cgp::prelude::*;
-use hermes_cli::commands::channel::CreateChannelArgs;
-use hermes_cli::commands::client::create::CreateCosmosClientArgs;
-use hermes_cli::impls::parse::ParseInitCosmosChannelOptions;
-use hermes_cli_components::impls::commands::bootstrap::chain::RunBootstrapChainCommand;
-use hermes_cli_components::impls::commands::channel::create::RunCreateChannelCommand;
-use hermes_cli_components::impls::commands::client::create::RunCreateClientCommand;
-use hermes_cli_components::impls::commands::client::update::{
-    RunUpdateClientCommand, UpdateClientArgs,
+use hermes_cli::commands::{CreateChannelArgs, CreateCosmosClientArgs};
+use hermes_cli::impls::ParseInitCosmosChannelOptions;
+use hermes_cli_components::impls::{
+    CreateConnectionArgs, GetDefaultConfigField, LoadTomlConfig, ParseFromOptionalString,
+    ParseFromString, QueryBalanceArgs, QueryChainStatusArgs, QueryClientStateArgs,
+    QueryConsensusStateArgs, RunBootstrapChainCommand, RunCreateChannelCommand,
+    RunCreateClientCommand, RunCreateConnectionCommand, RunQueryBalanceCommand,
+    RunQueryChainStatusCommand, RunQueryClientStateCommand, RunQueryConsensusStateCommand,
+    RunStartRelayerCommand, RunUpdateClientCommand, UpdateClientArgs, WriteTomlConfig,
 };
-use hermes_cli_components::impls::commands::connection::create::{
-    CreateConnectionArgs, RunCreateConnectionCommand,
+use hermes_cli_components::traits::{
+    AnyCounterpartyTypeProviderComponent, ArgParserComponent, BootstrapLoaderComponent,
+    BootstrapTypeProviderComponent, BuilderLoaderComponent, BuilderTypeComponent,
+    CommandRunnerComponent, ConfigLoaderComponent, ConfigPathGetterComponent, ConfigTypeComponent,
+    ConfigWriterComponent, OutputProducer, OutputProducerComponent, OutputTypeComponent,
 };
-use hermes_cli_components::impls::commands::queries::balance::{
-    QueryBalanceArgs, RunQueryBalanceCommand,
-};
-use hermes_cli_components::impls::commands::queries::chain_status::{
-    QueryChainStatusArgs, RunQueryChainStatusCommand,
-};
-use hermes_cli_components::impls::commands::queries::client_state::{
-    QueryClientStateArgs, RunQueryClientStateCommand,
-};
-use hermes_cli_components::impls::commands::queries::consensus_state::{
-    QueryConsensusStateArgs, RunQueryConsensusStateCommand,
-};
-use hermes_cli_components::impls::commands::start::{RunStartRelayerCommand, StartRelayerArgs};
-use hermes_cli_components::impls::config::get_config_path::GetDefaultConfigField;
-use hermes_cli_components::impls::config::load_toml_config::LoadTomlConfig;
-use hermes_cli_components::impls::config::save_toml_config::WriteTomlConfig;
-use hermes_cli_components::impls::parse::string::{ParseFromOptionalString, ParseFromString};
-use hermes_cli_components::traits::any_counterparty::AnyCounterpartyTypeProviderComponent;
-use hermes_cli_components::traits::bootstrap::{
-    BootstrapLoaderComponent, BootstrapTypeProviderComponent,
-};
-use hermes_cli_components::traits::build::{BuilderLoaderComponent, BuilderTypeComponent};
-use hermes_cli_components::traits::command::CommandRunnerComponent;
-use hermes_cli_components::traits::config::config_path::ConfigPathGetterComponent;
-use hermes_cli_components::traits::config::load_config::ConfigLoaderComponent;
-use hermes_cli_components::traits::config::write_config::ConfigWriterComponent;
-use hermes_cli_components::traits::output::{
-    OutputProducer, OutputProducerComponent, OutputTypeComponent,
-};
-use hermes_cli_components::traits::parse::ArgParserComponent;
-use hermes_cli_components::traits::types::config::ConfigTypeComponent;
-use hermes_cosmos_integration_tests::contexts::chain_driver::CosmosChainDriver;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::types::HermesError;
-use hermes_logging_components::traits::logger::LoggerComponent;
-use hermes_relayer_components::error::traits::RetryableErrorComponent;
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::{
+use hermes_core::logging_components::traits::LoggerComponent;
+use hermes_core::relayer_components::error::traits::RetryableErrorComponent;
+use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::config::{
-    StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses, StarknetRelayerConfig,
+use hermes_core::test_components::chain_driver::traits::{ConfigUpdater, ConfigUpdaterComponent};
+use hermes_cosmos::error::types::HermesError;
+use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
+use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
+use hermes_prelude::*;
+use hermes_starknet_chain_components::impls::{
+    StarknetAddress, StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses,
+    StarknetRelayerConfig,
 };
-use hermes_starknet_chain_components::types::client_id::ClientId;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_integration_tests::contexts::chain_driver::StarknetChainDriver;
-use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
-use hermes_starknet_integration_tests::contexts::starknet_bootstrap::StarknetBootstrap;
-use hermes_starknet_relayer::contexts::builder::StarknetBuilder;
-use hermes_test_components::chain_driver::traits::config::{ConfigUpdater, ConfigUpdaterComponent};
-use hermes_tracing_logging_components::contexts::logger::TracingLogger;
+use hermes_starknet_chain_components::types::ClientId;
+use hermes_starknet_chain_context::contexts::StarknetChain;
+use hermes_starknet_integration_tests::contexts::{
+    OsmosisBootstrap, StarknetBootstrap, StarknetChainDriver,
+};
+use hermes_starknet_relayer::contexts::StarknetBuilder;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::{ChainId, ClientId as CosmosClientId, PortId};
 use toml::to_string_pretty;
 
-use crate::commands::all::{AllSubCommands, RunAllSubCommand};
-use crate::commands::bootstrap::{BootstrapSubCommand, RunBootstrapSubCommand};
-use crate::commands::create::subcommand::{CreateSubCommand, RunCreateSubCommand};
-use crate::commands::query::subcommand::{QuerySubCommand, RunQuerySubCommand};
-use crate::commands::start::{RunStartSubCommand, StartSubCommand};
-use crate::commands::update::subcommand::{RunUpdateSubCommand, UpdateSubCommand};
-use crate::impls::bootstrap::osmosis_chain::{BootstrapOsmosisChainArgs, LoadOsmosisBootstrap};
-use crate::impls::bootstrap::starknet_chain::{BootstrapStarknetChainArgs, LoadStarknetBootstrap};
-use crate::impls::build::LoadStarknetBuilder;
-use crate::impls::create_client::CreateStarknetClientArgs;
-use crate::impls::error::ProvideCliError;
+use crate::commands::{
+    AllSubCommands, BootstrapSubCommand, CreateSubCommand, QuerySubCommand, RunAllSubCommand,
+    RunBootstrapSubCommand, RunCreateSubCommand, RunQuerySubCommand, RunUpdateSubCommand,
+    StartRelayerArgs, UpdateSubCommand,
+};
+use crate::impls::{
+    BootstrapOsmosisChainArgs, BootstrapStarknetChainArgs, CreateStarknetClientArgs,
+    LoadOsmosisBootstrap, LoadStarknetBootstrap, LoadStarknetBuilder, ProvideCliError,
+};
 
 #[cgp_context(StarknetAppComponents)]
 #[derive(HasField)]
@@ -210,7 +181,6 @@ delegate_components! {
         BootstrapSubCommand: RunBootstrapSubCommand,
 
         StartRelayerArgs: RunStartRelayerCommand<Index<0>, Index<1>>,
-        StartSubCommand: RunStartSubCommand,
 
         QuerySubCommand: RunQuerySubCommand,
         QueryClientStateArgs: RunQueryClientStateCommand,
@@ -337,7 +307,6 @@ check_components! {
         ],
         CommandRunnerComponent: [
             AllSubCommands,
-            StartSubCommand,
             BootstrapSubCommand,
             BootstrapStarknetChainArgs,
             BootstrapOsmosisChainArgs,

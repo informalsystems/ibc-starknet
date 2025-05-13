@@ -1,16 +1,47 @@
-pub mod address;
-pub mod amount;
-pub mod block;
-pub mod client;
-pub mod commitment_proof;
-pub mod config;
-pub mod contract;
-pub mod denom;
-pub mod events;
-pub mod height;
-pub mod message;
-pub mod method;
-pub mod payloads;
-pub mod status;
-pub mod timestamp;
-pub mod wallet;
+mod address;
+pub use address::*;
+
+mod amount;
+pub use amount::*;
+
+mod block;
+pub use block::*;
+
+mod client;
+pub use client::*;
+
+mod commitment_proof;
+pub use commitment_proof::*;
+
+mod config;
+pub use config::*;
+
+mod contract;
+pub use contract::*;
+
+mod denom;
+pub use denom::*;
+
+mod events;
+pub use events::*;
+
+mod height;
+pub use height::*;
+
+mod message;
+pub use message::*;
+
+mod method;
+pub use method::*;
+
+mod payloads;
+pub use payloads::*;
+
+mod status;
+pub use status::*;
+
+mod timestamp;
+pub use timestamp::*;
+
+mod wallet;
+pub use wallet::*;

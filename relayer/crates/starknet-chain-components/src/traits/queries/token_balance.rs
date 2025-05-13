@@ -1,6 +1,5 @@
-use cgp::prelude::*;
-use hermes_chain_type_components::traits::types::amount::HasAmountType;
-use hermes_test_components::chain::traits::types::address::HasAddressType;
+use hermes_core::chain_type_components::traits::{HasAddressType, HasAmountType};
+use hermes_prelude::*;
 
 #[cgp_component {
   name: TokenBalanceQuerierComponent,

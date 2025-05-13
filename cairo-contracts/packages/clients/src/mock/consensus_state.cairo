@@ -76,4 +76,9 @@ pub impl MockConsensusStateImpl of MockConsensusStateTrait {
             Status::Expired
         }
     }
+
+    fn protobuf_bytes(self: @MockConsensusState) -> ByteArray {
+        // MockConsensusState does not implement protobuf serialization.
+        ""
+    }
 }

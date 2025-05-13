@@ -1,19 +1,14 @@
 use core::time::Duration;
 
 use cgp::core::types::WithType;
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::chain_id::HasChainIdType;
-use hermes_chain_components::traits::types::client_state::{
-    ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent,
-    HasClientStateType,
+use hermes_core::chain_components::traits::{
+    ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent, HasChainIdType,
+    HasClientStateType, HasHeightType,
 };
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
+use hermes_core::encoding_components::traits::{
+    CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
+use hermes_prelude::*;
 use ibc::clients::tendermint::types::{
     AllowUpdate, ClientState as IbcCometClientState, TrustThreshold,
 };
@@ -24,8 +19,9 @@ use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::proto::Any;
 use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
 
-use crate::types::cosmos::height::Height;
+use crate::types::Height;
 
+// FIXME: use ibc-rs type
 #[derive(Debug, HasField, HasFields)]
 pub struct CometClientState {
     pub latest_height: Height,
@@ -36,6 +32,7 @@ pub struct CometClientState {
     pub status: ClientStatus,
     pub chain_id: ChainId,
     pub proof_specs: ProofSpecs,
+    pub upgrade_path: Vec<String>,
 }
 
 #[derive(Debug, HasFields)]
@@ -86,7 +83,7 @@ impl From<CometClientState> for IbcCometClientState {
     fn from(client_state: CometClientState) -> Self {
         Self::new(
             client_state.chain_id,
-            TrustThreshold::ONE_THIRD,
+            client_state.trust_level,
             client_state.trusting_period,
             client_state.unbonding_period,
             client_state.max_clock_drift,
@@ -95,8 +92,8 @@ impl From<CometClientState> for IbcCometClientState {
                 client_state.latest_height.revision_height,
             )
             .expect("no error"),
-            ProofSpecs::cosmos(),
-            Vec::new(),
+            client_state.proof_specs,
+            client_state.upgrade_path,
             AllowUpdate {
                 after_expiry: false,
                 after_misbehaviour: false,

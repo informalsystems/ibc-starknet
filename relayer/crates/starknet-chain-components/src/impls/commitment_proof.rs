@@ -1,20 +1,17 @@
 use core::num::TryFromIntError;
 
-use cgp::prelude::*;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_prelude::*;
 use indexmap::IndexMap;
 use starknet::core::crypto::pedersen_hash;
 use starknet::core::types::{Felt, MerkleNode, StorageProof};
 
-use crate::impls::storage_proof::CanValidateStorageProof;
-use crate::impls::types::address::StarknetAddress;
-use crate::traits::commitment_proof::{
-    CanVerifyStarknetMerkleProof, StarknetMerkleProofVerifier,
-    StarknetMerkleProofVerifierComponent, StarknetStorageProofVerifier,
-    StarknetStorageProofVerifierComponent,
+use crate::impls::{CanValidateStorageProof, StarknetAddress};
+use crate::traits::{
+    CanVerifyStarknetMerkleProof, HasMerkleProofType, HasStorageProofType,
+    StarknetMerkleProofVerifier, StarknetMerkleProofVerifierComponent,
+    StarknetStorageProofVerifier, StarknetStorageProofVerifierComponent,
 };
-use crate::traits::types::commitment::HasMerkleProofType;
-use crate::traits::types::storage_proof::HasStorageProofType;
 
 #[cgp_new_provider(StarknetMerkleProofVerifierComponent)]
 impl<Chain> StarknetMerkleProofVerifier<Chain> for VerifyStarknetMerkleProof

@@ -1,9 +1,7 @@
-use cgp::prelude::*;
-use hermes_chain_type_components::traits::types::height::HasHeightType;
-use hermes_test_components::chain::traits::types::address::HasAddressType;
+use hermes_core::chain_type_components::traits::{HasAddressType, HasHeightType};
+use hermes_prelude::*;
 
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
+use crate::traits::{HasBlobType, HasSelectorType};
 
 #[cgp_component {
   name: ContractCallerComponent,

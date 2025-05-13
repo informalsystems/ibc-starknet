@@ -1,5 +1,5 @@
-use cgp::prelude::*;
-use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
+use hermes_prelude::*;
+use hermes_core::relayer_components::transaction::traits::HasSignerType;
 
 #[cgp_getter {
     provider: StarknetSignerGetter,

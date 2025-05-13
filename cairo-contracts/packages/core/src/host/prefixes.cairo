@@ -107,3 +107,13 @@ pub fn NEXT_SEQ_RECV_PREFIX() -> ByteArray {
 pub fn NEXT_SEQ_ACK_PREFIX() -> ByteArray {
     "nextSequenceAck"
 }
+
+pub fn UPGRADED_IBC_STATE_PREFIX() -> ByteArray {
+    "upgradedIBCState"
+}
+pub fn UPGRADED_CLIENT_STATE_SUFFIX() -> ByteArray {
+    "upgradedClient"
+}
+pub fn UPGRADED_CONSENSUS_STATE_SUFFIX() -> ByteArray {
+    "upgradedConsState"
+}

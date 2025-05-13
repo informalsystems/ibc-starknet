@@ -1,23 +1,19 @@
-use cgp::prelude::*;
-use hermes_chain_components::traits::message_builders::create_client::CreateClientMessageBuilderComponent;
-use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
-use hermes_cosmos_chain_components::types::messages::client::create::CosmosCreateClientMessage;
-use hermes_encoding_components::traits::convert::CanConvert;
-use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
-use hermes_encoding_components::types::AsBytes;
-use hermes_relayer_components::chain::traits::message_builders::create_client::CreateClientMessageBuilder;
-use hermes_relayer_components::chain::traits::types::client_state::HasClientStateType;
-use hermes_relayer_components::chain::traits::types::consensus_state::HasConsensusStateType;
-use hermes_relayer_components::chain::traits::types::create_client::{
-    HasCreateClientMessageOptionsType, HasCreateClientPayloadType,
+use hermes_core::chain_components::traits::{
+    CreateClientMessageBuilder, CreateClientMessageBuilderComponent, HasClientStateType,
+    HasConsensusStateType, HasCreateClientMessageOptionsType, HasCreateClientPayloadType,
+    HasMessageType,
 };
-use hermes_relayer_components::chain::traits::types::message::HasMessageType;
+use hermes_core::encoding_components::traits::{CanConvert, HasDefaultEncoding};
+use hermes_core::encoding_components::types::AsBytes;
+use hermes_cosmos_core::chain_components::traits::{CosmosMessage, ToCosmosMessage};
+use hermes_cosmos_core::chain_components::types::CosmosCreateClientMessage;
+use hermes_prelude::*;
 use ibc_client_starknet_types::StarknetClientState;
 use prost_types::Any;
 
-use crate::types::client_state::WasmStarknetClientState;
-use crate::types::consensus_state::WasmStarknetConsensusState;
-use crate::types::payloads::client::StarknetCreateClientPayload;
+use crate::types::{
+    StarknetCreateClientPayload, WasmStarknetClientState, WasmStarknetConsensusState,
+};
 
 pub struct BuildStarknetCreateClientMessage;
 

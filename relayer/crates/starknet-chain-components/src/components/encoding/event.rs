@@ -1,35 +1,22 @@
 #[cgp::re_export_imports]
 mod preset {
     use cgp::core::component::UseDelegate;
-    use cgp::prelude::*;
     use hermes_cairo_encoding_components::strategy::ViaCairo;
-    pub use hermes_encoding_components::traits::decode::DecoderComponent;
-    use hermes_encoding_components::traits::types::encoded::{
-        EncodedTypeComponent, ProvideEncodedType,
-    };
+    pub use hermes_core::encoding_components::traits::DecoderComponent;
+    use hermes_core::encoding_components::traits::{EncodedTypeComponent, ProvideEncodedType};
+    use hermes_prelude::*;
 
-    use crate::impls::encoding::class_hash::DecodeOptionalByClassHash;
-    use crate::impls::encoding::contract_address::DecodeOptionalByContractAddress;
-    use crate::types::event::StarknetEvent;
-    use crate::types::events::channel::{
+    use crate::impls::{DecodeOptionalByClassHash, DecodeOptionalByContractAddress};
+    use crate::types::{
+        AckIbcTransferEvent, AckStatusIbcTransferEvent, AcknowledgePacketEvent, ApprovalEvent,
         ChanOpenAckEvent, ChanOpenConfirmEvent, ChanOpenInitEvent, ChanOpenTryEvent,
-        ChannelHandshakeEvents, DecodeChannelHandshakeEvents,
-    };
-    use crate::types::events::connection::{
-        ConnOpenAckEvent, ConnOpenConfirmEvent, ConnOpenInitEvent, ConnOpenTryEvent,
-        ConnectionHandshakeEvents, DecodeConnectionHandshakeEvents,
-    };
-    use crate::types::events::erc20::{
-        ApprovalEvent, DecodeErc20Events, Erc20Event, TransferEvent,
-    };
-    use crate::types::events::ics20::{
-        AckIbcTransferEvent, AckStatusIbcTransferEvent, CreateIbcTokenEvent,
-        DecodeIbcTransferEvents, IbcTransferEvent, ReceiveIbcTransferEvent, SendIbcTransferEvent,
-        TimeoutIbcTransferEvent,
-    };
-    use crate::types::events::packet::{
-        AcknowledgePacketEvent, DecodePacketRelayEvents, PacketRelayEvents, ReceivePacketEvent,
-        SendPacketEvent, TimeoutPacketEvent, WriteAcknowledgementEvent,
+        ChannelHandshakeEvents, ConnOpenAckEvent, ConnOpenConfirmEvent, ConnOpenInitEvent,
+        ConnOpenTryEvent, ConnectionHandshakeEvents, CreateIbcTokenEvent,
+        DecodeChannelHandshakeEvents, DecodeConnectionHandshakeEvents, DecodeErc20Events,
+        DecodeIbcTransferEvents, DecodePacketRelayEvents, Erc20Event, IbcTransferEvent,
+        PacketRelayEvents, ReceiveIbcTransferEvent, ReceivePacketEvent, SendIbcTransferEvent,
+        SendPacketEvent, StarknetEvent, TimeoutIbcTransferEvent, TimeoutPacketEvent, TransferEvent,
+        WriteAcknowledgementEvent,
     };
 
     cgp_preset! {

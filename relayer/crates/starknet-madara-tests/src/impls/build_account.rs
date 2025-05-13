@@ -1,14 +1,14 @@
 use core::str::FromStr;
 use std::sync::Arc;
 
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::chain_id::HasChainId;
-use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
-use hermes_starknet_chain_components::traits::account::{
+use hermes_core::chain_components::traits::HasChainId;
+use hermes_core::relayer_components::transaction::traits::HasSignerType;
+use hermes_prelude::*;
+use hermes_starknet_chain_components::traits::{
     AccountFromSignerBuilder, AccountFromSignerBuilderComponent, HasStarknetAccountType,
+    HasStarknetClient,
 };
-use hermes_starknet_chain_components::traits::client::HasStarknetClient;
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
+use hermes_starknet_chain_components::types::StarknetWallet;
 use ibc::core::host::types::identifiers::ChainId;
 use starknet_v13::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet_v13::core::types::Felt;

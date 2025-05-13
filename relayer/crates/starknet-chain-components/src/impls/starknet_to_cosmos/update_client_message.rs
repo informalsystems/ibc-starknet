@@ -1,21 +1,18 @@
-use cgp::prelude::*;
-use hermes_chain_components::traits::message_builders::update_client::UpdateClientMessageBuilderComponent;
-use hermes_cosmos_chain_components::traits::message::{CosmosMessage, ToCosmosMessage};
-use hermes_cosmos_chain_components::types::messages::client::update::CosmosUpdateClientMessage;
-use hermes_encoding_components::traits::convert::CanConvert;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
-use hermes_encoding_components::types::AsBytes;
-use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
-use hermes_relayer_components::chain::traits::message_builders::update_client::UpdateClientMessageBuilder;
-use hermes_relayer_components::chain::traits::types::ibc::HasIbcChainTypes;
-use hermes_relayer_components::chain::traits::types::message::HasMessageType;
-use hermes_relayer_components::chain::traits::types::update_client::HasUpdateClientPayloadType;
+use hermes_core::chain_components::traits::{
+    HasIbcChainTypes, HasMessageType, HasUpdateClientPayloadType, UpdateClientMessageBuilder,
+    UpdateClientMessageBuilderComponent,
+};
+use hermes_core::encoding_components::traits::{CanConvert, CanEncode, HasDefaultEncoding};
+use hermes_core::encoding_components::types::AsBytes;
+use hermes_cosmos_core::chain_components::traits::{CosmosMessage, ToCosmosMessage};
+use hermes_cosmos_core::chain_components::types::CosmosUpdateClientMessage;
+use hermes_cosmos_core::protobuf_encoding_components::types::strategy::ViaProtobuf;
+use hermes_prelude::*;
 use ibc::core::host::types::identifiers::ClientId;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use prost_types::Any;
 
-use crate::types::payloads::client::StarknetUpdateClientPayload;
+use crate::types::StarknetUpdateClientPayload;
 
 pub struct BuildStarknetUpdateClientMessage;
 

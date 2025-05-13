@@ -1,6 +1,6 @@
-use cgp::prelude::*;
+use hermes_prelude::*;
 
-use crate::impls::types::address::StarknetAddress;
+use crate::impls::StarknetAddress;
 #[derive(HasField, HasFields)]
 pub struct DeployErc20TokenMessage {
     pub name: String,

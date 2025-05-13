@@ -1,4 +1,4 @@
-use cgp::prelude::*;
+use hermes_prelude::*;
 
 /**
     A storage proof contains multiple Merkle proofs that are relative to the global state root.

@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use clap::Parser;
 use eyre::{eyre, Error};
-use hermes_cli_components::traits::command::CanRunCommand;
+use hermes_cli_components::traits::CanRunCommand;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_tools_cli::commands::subcommand::AllSubCommands;
 use hermes_starknet_tools_cli::contexts::app::ToolApp;

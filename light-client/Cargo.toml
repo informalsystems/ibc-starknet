@@ -38,6 +38,7 @@ ibc-proto     = { version = "0.51.1", default-features = false }
 tendermint    = { version = "0.40.0", default-features = false }
 
 cgp                                 = { version = "0.4.0" }
+hermes-prelude                      = { version = "0.1.0" }
 hermes-encoding-components          = { version = "0.1.0" }
 hermes-protobuf-encoding-components = { version = "0.1.0" }
 hermes-cosmos-encoding-components   = { version = "0.1.0" }
@@ -63,7 +64,6 @@ uninlined_format_args         = "deny"
 trait_duplication_in_bounds   = "deny"
 use_self                      = "deny"
 redundant_clone               = "deny"
-type_repetition_in_bounds     = "deny"
 
 [patch.crates-io]
 ibc-client-starknet       = { path = "./ibc-client-starknet" }
@@ -100,6 +100,7 @@ cgp-runtime     = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git" }
 
+hermes-prelude                      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git" }

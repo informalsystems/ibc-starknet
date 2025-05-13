@@ -1,3 +1,8 @@
-pub mod class_hash;
-pub mod contract_address;
-pub mod events;
+mod class_hash;
+pub use class_hash::*;
+
+mod contract_address;
+pub use contract_address::*;
+
+mod events;
+pub use events::*;

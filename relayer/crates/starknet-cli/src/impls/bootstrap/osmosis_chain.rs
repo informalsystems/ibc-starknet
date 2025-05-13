@@ -1,14 +1,11 @@
 use cgp::extra::runtime::HasRuntime;
-use cgp::prelude::*;
-use hermes_cli_components::traits::bootstrap::{
-    BootstrapLoader, BootstrapLoaderComponent, HasBootstrapType,
-};
-use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
-use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
-use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
-use hermes_error::HermesError;
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_starknet_integration_tests::contexts::osmosis_bootstrap::OsmosisBootstrap;
+use hermes_cli_components::traits::{BootstrapLoader, BootstrapLoaderComponent, HasBootstrapType};
+use hermes_cosmos::chain_components::types::{DynamicGasConfig, EipQueryType};
+use hermes_cosmos::error::HermesError;
+use hermes_cosmos::relayer::contexts::CosmosBuilder;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_prelude::*;
+use hermes_starknet_integration_tests::contexts::OsmosisBootstrap;
 use hermes_starknet_integration_tests::utils::load_wasm_client;
 use tracing::info;
 

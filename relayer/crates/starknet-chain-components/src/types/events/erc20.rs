@@ -1,14 +1,14 @@
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_encoding_components::traits::decode::{CanDecode, Decoder, DecoderComponent};
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::encoding_components::traits::{
+    CanDecode, Decoder, DecoderComponent, HasEncodedType, HasEncoding,
+};
+use hermes_prelude::*;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::types::event::{StarknetEvent, UnknownEvent};
+use crate::impls::StarknetAddress;
+use crate::types::{StarknetEvent, UnknownEvent};
 
 #[derive(Debug)]
 pub enum Erc20Event {

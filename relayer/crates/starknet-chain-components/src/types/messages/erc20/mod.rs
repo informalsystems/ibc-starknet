@@ -1,2 +1,5 @@
-pub mod deploy;
-pub mod transfer;
+mod deploy;
+pub use deploy::*;
+
+mod transfer;
+pub use transfer::*;

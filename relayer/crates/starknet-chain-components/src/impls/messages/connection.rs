@@ -3,36 +3,28 @@ use core::num::ParseIntError;
 use core::str::Utf8Error;
 use core::time::Duration;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::commitment_prefix::HasCommitmentPrefixType;
-use hermes_chain_components::traits::message_builders::connection_handshake::{
+use hermes_core::chain_components::traits::{
     ConnectionOpenAckMessageBuilder, ConnectionOpenAckMessageBuilderComponent,
     ConnectionOpenConfirmMessageBuilder, ConnectionOpenConfirmMessageBuilderComponent,
     ConnectionOpenInitMessageBuilder, ConnectionOpenInitMessageBuilderComponent,
-    ConnectionOpenTryMessageBuilder, ConnectionOpenTryMessageBuilderComponent,
+    ConnectionOpenTryMessageBuilder, ConnectionOpenTryMessageBuilderComponent, HasClientIdType,
+    HasClientStateType, HasCommitmentPrefixType, HasCommitmentProofType, HasConnectionEndType,
+    HasConnectionIdType, HasConnectionOpenAckPayloadType, HasConnectionOpenConfirmPayloadType,
+    HasConnectionOpenInitPayloadType, HasConnectionOpenTryPayloadType, HasHeightType,
+    HasInitConnectionOptionsType, HasMessageType,
 };
-use hermes_chain_components::traits::types::client_state::HasClientStateType;
-use hermes_chain_components::traits::types::connection::{
-    HasConnectionEndType, HasConnectionOpenAckPayloadType, HasConnectionOpenConfirmPayloadType,
-    HasConnectionOpenInitPayloadType, HasConnectionOpenTryPayloadType,
-    HasInitConnectionOptionsType,
-};
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::ibc::{HasClientIdType, HasConnectionIdType};
-use hermes_chain_components::traits::types::message::HasMessageType;
-use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_chain_components::types::payloads::connection::{
+use hermes_core::chain_components::types::payloads::connection::{
     ConnectionOpenAckPayload, ConnectionOpenConfirmPayload, ConnectionOpenInitPayload,
     ConnectionOpenTryPayload,
 };
-use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::types::commitment_proof::CosmosCommitmentProof;
-use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
+use hermes_cosmos_core::chain_components::types::{
+    CosmosCommitmentProof, CosmosInitConnectionOptions,
+};
+use hermes_prelude::*;
 use ibc::core::client::types::Height;
 use ibc::core::connection::types::ConnectionEnd;
 use ibc::core::host::types::identifiers::{
@@ -41,16 +33,13 @@ use ibc::core::host::types::identifiers::{
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::types::client_id::ClientId as StarknetClientId;
-use crate::types::connection_id::ConnectionId as StarknetConnectionId;
-use crate::types::cosmos::height::Height as CairoHeight;
-use crate::types::messages::ibc::connection::{
-    ConnectionVersion, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
+use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::traits::CanQueryContractAddress;
+use crate::types::{
+    ClientId as StarknetClientId, ConnectionId as StarknetConnectionId, ConnectionVersion,
+    Height as CairoHeight, MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
+    StateProof,
 };
-use crate::types::messages::ibc::packet::StateProof;
 
 pub struct BuildStarknetConnectionHandshakeMessages;
 

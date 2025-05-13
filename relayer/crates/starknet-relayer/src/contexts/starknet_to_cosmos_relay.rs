@@ -2,46 +2,32 @@ use alloc::collections::BTreeSet;
 use alloc::sync::Arc;
 use core::ops::Deref;
 
-use cgp::prelude::*;
 use futures::lock::Mutex;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_relayer_components::multi::traits::chain_at::{
+use hermes_core::relayer_components::multi::traits::chain_at::{
     ChainGetterAtComponent, ChainTypeProviderAtComponent,
 };
-use hermes_relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
-use hermes_relayer_components::multi::types::tags::{Dst, Src};
-use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
-use hermes_relayer_components::relay::impls::packet_lock::PacketMutexOf;
-use hermes_relayer_components::relay::impls::selector::SelectRelayBToA;
-use hermes_relayer_components::relay::traits::auto_relayer::{
-    AutoRelayerWithHeightsComponent, TargetAutoRelayerComponent,
+use hermes_core::relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
+use hermes_core::relayer_components::multi::types::tags::{Dst, Src};
+use hermes_core::relayer_components::relay::impls::{
+    CanBootstrapConnection, PacketMutexOf, SelectRelayBToA,
 };
-use hermes_relayer_components::relay::traits::chains::{
-    CanRaiseRelayChainErrors, HasRelayChains, HasRelayClientIds,
+use hermes_core::relayer_components::relay::traits::{
+    AutoRelayerWithHeightsComponent, CanBuildTargetUpdateClientMessage, CanCreateClient,
+    CanInitConnection, CanRaiseRelayChainErrors, CanRelayConnectionOpenAck,
+    CanRelayConnectionOpenConfirm, CanRelayConnectionOpenTry, CanRelayPacket, CanSendIbcMessages,
+    CanSendSingleIbcMessage, CanSendTargetUpdateClientMessage, DestinationTarget,
+    EventRelayerComponent, HasDestinationTargetChainTypes, HasRelayChains, HasRelayClientIds,
+    HasSourceTargetChainTypes, HasTargetClientIds, MainSink, SourceTarget,
+    TargetAutoRelayerComponent,
 };
-use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
-use hermes_relayer_components::relay::traits::connection::open_ack::CanRelayConnectionOpenAck;
-use hermes_relayer_components::relay::traits::connection::open_confirm::CanRelayConnectionOpenConfirm;
-use hermes_relayer_components::relay::traits::connection::open_init::CanInitConnection;
-use hermes_relayer_components::relay::traits::connection::open_try::CanRelayConnectionOpenTry;
-use hermes_relayer_components::relay::traits::event_relayer::EventRelayerComponent;
-use hermes_relayer_components::relay::traits::ibc_message_sender::{
-    CanSendIbcMessages, CanSendSingleIbcMessage, MainSink,
-};
-use hermes_relayer_components::relay::traits::packet_relayer::CanRelayPacket;
-use hermes_relayer_components::relay::traits::target::{
-    DestinationTarget, HasDestinationTargetChainTypes, HasSourceTargetChainTypes,
-    HasTargetClientIds, SourceTarget,
-};
-use hermes_relayer_components::relay::traits::update_client_message_builder::{
-    CanBuildTargetUpdateClientMessage, CanSendTargetUpdateClientMessage,
-};
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_starknet_chain_components::types::client_id::ClientId as StarknetClientId;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
+use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_prelude::*;
+use hermes_starknet_chain_components::types::ClientId as StarknetClientId;
+use hermes_starknet_chain_context::contexts::StarknetChain;
 use ibc::core::host::types::identifiers::ClientId as CosmosClientId;
 
-use crate::presets::relay::StarknetCommonRelayContextPreset;
+use crate::presets::StarknetCommonRelayContextPreset;
 
 #[cgp_context(StarknetToCosmosRelayComponents: StarknetCommonRelayContextPreset)]
 #[derive(Clone)]

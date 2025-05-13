@@ -1,33 +1,33 @@
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::Index;
 use cgp::extra::run::CanRun;
-use cgp::prelude::*;
-use hermes_cosmos_integration_tests::contexts::relay_driver::AbortOnDrop;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::handlers::debug::DebugError;
-use hermes_error::impls::UseHermesError;
-use hermes_error::Error;
-use hermes_relayer_components::multi::traits::birelay_at::{
+use hermes_core::relayer_components::multi::traits::birelay_at::{
     BiRelayGetterAtComponent, BiRelayTypeProviderAtComponent,
 };
-use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
-use hermes_relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_relayer::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
-use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
-use hermes_test_components::relay_driver::run::{
+use hermes_core::relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
+use hermes_core::relayer_components::multi::traits::relay_at::RelayTypeProviderAtComponent;
+use hermes_core::test_components::relay_driver::run::{
     RelayerBackgroundRunner, RelayerBackgroundRunnerComponent,
 };
+use hermes_cosmos::error::handlers::DebugError;
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::error::Error;
+use hermes_cosmos::integration_tests::contexts::AbortOnDrop;
+use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_prelude::*;
+use hermes_starknet_chain_context::contexts::StarknetChain;
+use hermes_starknet_relayer::contexts::{
+    CosmosStarknetBiRelay, CosmosToStarknetRelay, StarknetToCosmosRelay,
+};
 
-#[cgp_context(StarknetRelayDriverComponents)]
+#[cgp_context(CosmosStarknetRelayDriverComponents)]
 #[derive(HasField)]
 pub struct CosmosStarknetRelayDriver {
     pub birelay: CosmosStarknetBiRelay,
 }
 
 delegate_components! {
-    StarknetRelayDriverComponents {
+    CosmosStarknetRelayDriverComponents {
         ErrorTypeProviderComponent: UseHermesError,
         ErrorRaiserComponent: DebugError,
         ChainTypeProviderAtComponent<Index<0>>:
@@ -46,7 +46,7 @@ delegate_components! {
 }
 
 #[cgp_provider(RelayerBackgroundRunnerComponent)]
-impl RelayerBackgroundRunner<CosmosStarknetRelayDriver> for StarknetRelayDriverComponents {
+impl RelayerBackgroundRunner<CosmosStarknetRelayDriver> for CosmosStarknetRelayDriverComponents {
     type RunHandle<'a> = AbortOnDrop;
 
     async fn run_relayer_in_background(

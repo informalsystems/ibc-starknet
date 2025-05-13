@@ -1,5 +1,14 @@
-pub mod call;
-pub mod declare;
-pub mod deploy;
-pub mod invoke;
-pub mod message;
+mod call;
+pub use call::*;
+
+mod declare;
+pub use declare::*;
+
+mod deploy;
+pub use deploy::*;
+
+mod invoke;
+pub use invoke::*;
+
+mod message;
+pub use message::*;

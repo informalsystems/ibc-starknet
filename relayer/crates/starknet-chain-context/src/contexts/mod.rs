@@ -1,2 +1,5 @@
-pub mod chain;
-pub mod encoding;
+mod chain;
+pub use chain::*;
+
+mod encoding;
+pub use encoding::*;

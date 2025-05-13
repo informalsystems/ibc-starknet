@@ -1,28 +1,21 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::extract_data::{
-    MessageResponseExtractor, MessageResponseExtractorComponent,
+use hermes_core::chain_components::traits::{
+    ConnectionOpenInitEventComponent, ConnectionOpenTryEventComponent, HasConnectionIdType,
+    MessageResponseExtractor, MessageResponseExtractorComponent, ProvideConnectionOpenInitEvent,
+    ProvideConnectionOpenTryEvent,
 };
-use hermes_chain_components::traits::types::ibc::HasConnectionIdType;
-use hermes_chain_components::traits::types::ibc_events::connection::{
-    ConnectionOpenInitEventComponent, ConnectionOpenTryEventComponent,
-    ProvideConnectionOpenInitEvent, ProvideConnectionOpenTryEvent,
-};
-use hermes_chain_type_components::traits::types::message_response::HasMessageResponseType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::has_encoding::HasDefaultEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::chain_type_components::traits::HasMessageResponseType;
+use hermes_core::encoding_components::traits::{CanDecode, HasDefaultEncoding, HasEncodedType};
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 
-use crate::impls::events::UseStarknetEvents;
-use crate::impls::types::events::{
-    StarknetConnectionOpenInitEvent, StarknetConnectionOpenTryEvent,
+use crate::impls::{
+    StarknetConnectionOpenInitEvent, StarknetConnectionOpenTryEvent, UseStarknetEvents,
 };
-use crate::types::connection_id::ConnectionId;
-use crate::types::message_response::StarknetMessageResponse;
+use crate::types::{ConnectionId, StarknetMessageResponse};
 
 #[cgp_provider(ConnectionOpenInitEventComponent)]
 impl<Chain, Counterparty> ProvideConnectionOpenInitEvent<Chain, Counterparty> for UseStarknetEvents

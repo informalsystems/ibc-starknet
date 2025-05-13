@@ -1,20 +1,14 @@
 use core::time::Duration;
 
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::chain_id::HasChainIdType;
-use hermes_chain_components::traits::types::client_state::{
-    ClientStateFieldsComponent, ClientStateTypeComponent,
+use hermes_core::chain_components::traits::{
+    ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent,
+    ConsensusStateTypeComponent, HasChainIdType, HasClientStateType, HasHeightType,
+    ProvideClientStateType, ProvideConsensusStateType,
 };
-use hermes_chain_components::traits::types::consensus_state::ConsensusStateTypeComponent;
-use hermes_relayer_components::chain::traits::types::client_state::{
-    ClientStateFieldsGetter, HasClientStateType, ProvideClientStateType,
-};
-use hermes_relayer_components::chain::traits::types::consensus_state::ProvideConsensusStateType;
-use hermes_relayer_components::chain::traits::types::height::HasHeightType;
+use hermes_prelude::*;
 use ibc::core::host::types::identifiers::ChainId;
 
-use crate::types::client_state::WasmStarknetClientState;
-use crate::types::consensus_state::WasmStarknetConsensusState;
+use crate::types::{WasmStarknetClientState, WasmStarknetConsensusState};
 
 pub struct ProvideStarknetIbcClientTypes;
 

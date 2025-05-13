@@ -4,37 +4,29 @@ use std::collections::{BTreeMap, HashSet};
 use std::sync::OnceLock;
 
 use cgp::extra::runtime::HasRuntimeType;
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_cosmos_test_components::bootstrap::traits::chain::build_chain_driver::{
-    ChainDriverBuilder, ChainDriverBuilderComponent,
+use hermes_core::chain_components::traits::{CanSendSingleMessage, HasMessageType};
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
+use hermes_core::logging_components::traits::CanLog;
+use hermes_core::logging_components::types::LevelInfo;
+use hermes_core::runtime_components::traits::{ChildProcessOf, HasChildProcessType};
+use hermes_core::test_components::chain::traits::HasWalletType;
+use hermes_core::test_components::chain_driver::traits::{HasChain, HasChainType};
+use hermes_core::test_components::driver::traits::HasChainDriverType;
+use hermes_cosmos_core::test_components::bootstrap::traits::{
+    ChainDriverBuilder, ChainDriverBuilderComponent, HasChainGenesisConfigType,
+    HasChainNodeConfigType,
 };
-use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
-use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_logging_components::traits::logger::CanLog;
-use hermes_logging_components::types::level::LevelInfo;
-use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
-use hermes_relayer_components::chain::traits::types::message::HasMessageType;
-use hermes_runtime_components::traits::os::child_process::{ChildProcessOf, HasChildProcessType};
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
-use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
-use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
-use hermes_starknet_chain_components::traits::types::contract_class::{
-    ContractClassOf, HasContractClassHashType, HasContractClassType,
+use hermes_prelude::*;
+use hermes_starknet_chain_components::impls::{StarknetAddress, StarknetMessage};
+use hermes_starknet_chain_components::traits::{
+    CanDeclareContract, CanDeployContract, ContractClassOf, HasBlobType, HasContractClassHashType,
+    HasContractClassType,
 };
-use hermes_starknet_chain_components::types::messages::ibc::channel::PortId;
-use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
-use hermes_test_components::chain::traits::types::address::HasAddressType;
-use hermes_test_components::chain::traits::types::wallet::HasWalletType;
-use hermes_test_components::chain_driver::traits::types::chain::{HasChain, HasChainType};
-use hermes_test_components::driver::traits::types::chain_driver::HasChainDriverType;
+use hermes_starknet_chain_components::types::{MsgRegisterApp, MsgRegisterClient, PortId};
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 

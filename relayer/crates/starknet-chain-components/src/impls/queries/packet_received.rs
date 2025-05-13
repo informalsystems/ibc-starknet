@@ -1,33 +1,19 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::queries::packet_is_received::{
-    PacketIsReceivedQuerier, PacketIsReceivedQuerierComponent,
+use hermes_core::chain_components::traits::{
+    HasChannelIdType, HasCommitmentProofType, HasHeightType, HasPacketCommitmentType,
+    HasPortIdType, HasSequenceType, PacketIsReceivedQuerier, PacketIsReceivedQuerierComponent,
 };
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::ibc::{
-    HasChannelIdType, HasPortIdType, HasSequenceType,
-};
-use hermes_chain_components::traits::types::packets::receive::HasPacketCommitmentType;
-use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_prelude::*;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence as IbcSequence};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::traits::contract::call::CanCallContract;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
-use crate::types::channel_id::ChannelId;
-use crate::types::commitment_proof::StarknetCommitmentProof;
-use crate::types::messages::ibc::channel::PortId as CairoPortId;
-use crate::types::messages::ibc::packet::Sequence;
+use crate::traits::{CanCallContract, CanQueryContractAddress, HasBlobType, HasSelectorType};
+use crate::types::{ChannelId, PortId as CairoPortId, Sequence, StarknetCommitmentProof};
 
 pub struct QueryPacketIsReceivedOnStarknet;
 

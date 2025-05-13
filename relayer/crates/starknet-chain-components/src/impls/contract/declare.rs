@@ -5,9 +5,8 @@ use cairo_lang_starknet_classes::casm_contract_class::{
 };
 use cairo_lang_starknet_classes::contract_class::ContractClass;
 use cgp::core::error::CanRaiseAsyncError;
-use cgp::prelude::*;
-use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
-use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
+use hermes_core::relayer_components::transaction::traits::{CanPollTxResponse, HasDefaultSigner};
+use hermes_prelude::*;
 use starknet::accounts::Account;
 use starknet::core::types::contract::{
     CompiledClass, ComputeClassHashError, JsonError, SierraClass,
@@ -15,11 +14,11 @@ use starknet::core::types::contract::{
 use starknet::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
 use starknet::providers::Provider;
 
-use crate::traits::account::{CanBuildAccountFromSigner, CanUseStarknetAccount};
-use crate::traits::client::HasStarknetClient;
-use crate::traits::contract::declare::{ContractDeclarer, ContractDeclarerComponent};
-use crate::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
-use crate::types::tx_response::TxResponse;
+use crate::traits::{
+    CanBuildAccountFromSigner, CanUseStarknetAccount, ContractDeclarer, ContractDeclarerComponent,
+    HasContractClassHashType, HasContractClassType, HasStarknetClient,
+};
+use crate::types::TxResponse;
 
 #[cgp_new_provider(ContractDeclarerComponent)]
 impl<Chain> ContractDeclarer<Chain> for DeclareSierraContract

@@ -4,53 +4,30 @@ use core::time::Duration;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_encoding_components::impls::default_encoding::GetDefaultEncoding;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::decode_mut::CanPeekDecodeBuffer;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::encode_and_decode::CanEncodeAndDecode;
-use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetterComponent,
-    EncodingTypeProviderComponent, HasEncodingType,
+use hermes_core::encoding_components::impls::GetDefaultEncoding;
+use hermes_core::encoding_components::traits::{
+    CanDecode, CanEncode, CanEncodeAndDecode, CanPeekDecodeBuffer, DefaultEncodingGetter,
+    DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeProviderComponent,
+    HasDecodeBufferType, HasEncodeBufferType, HasEncodedType, HasEncodingType,
 };
-use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
-use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_error::impls::UseHermesError;
-use hermes_error::types::HermesError;
-use hermes_starknet_chain_components::components::encoding::cairo::*;
-use hermes_starknet_chain_components::types::channel_id::{ChannelEnd, ChannelId};
-use hermes_starknet_chain_components::types::client_id::ClientId;
-use hermes_starknet_chain_components::types::connection_id::{ConnectionEnd, ConnectionId};
-use hermes_starknet_chain_components::types::cosmos::client_state::{
-    ClientStatus, CometClientState,
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::error::types::HermesError;
+use hermes_prelude::*;
+use hermes_starknet_chain_components::components::*;
+use hermes_starknet_chain_components::types::{
+    ChannelEnd, ChannelId, ClientId, ClientStatus, CometClientState, CometConsensusState,
+    ConnectionEnd, ConnectionId, CreateClientResponse, Denom, DeployErc20TokenMessage, Height,
+    MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry, MsgConnOpenAck,
+    MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry, MsgRegisterApp, MsgRegisterClient, Packet,
+    Participant, PrefixedDenom, Sequence, TracePrefix, TransferErc20TokenMessage,
+    TransferPacketData,
 };
-use hermes_starknet_chain_components::types::cosmos::consensus_state::CometConsensusState;
-use hermes_starknet_chain_components::types::cosmos::height::Height;
-use hermes_starknet_chain_components::types::message_responses::create_client::CreateClientResponse;
-use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
-use hermes_starknet_chain_components::types::messages::erc20::transfer::TransferErc20TokenMessage;
-use hermes_starknet_chain_components::types::messages::ibc::channel::{
-    MsgChanOpenAck, MsgChanOpenConfirm, MsgChanOpenInit, MsgChanOpenTry,
-};
-use hermes_starknet_chain_components::types::messages::ibc::connection::{
-    MsgConnOpenAck, MsgConnOpenConfirm, MsgConnOpenInit, MsgConnOpenTry,
-};
-use hermes_starknet_chain_components::types::messages::ibc::denom::{
-    Denom, PrefixedDenom, TracePrefix,
-};
-use hermes_starknet_chain_components::types::messages::ibc::ibc_transfer::{
-    Participant, TransferPacketData,
-};
-use hermes_starknet_chain_components::types::messages::ibc::packet::{Packet, Sequence};
-use hermes_starknet_chain_components::types::register::{MsgRegisterApp, MsgRegisterClient};
 use ibc::clients::tendermint::types::Header as TendermintLcHeader;
 use starknet::core::types::{Felt, U256};
 
-use crate::impls::error::HandleStarknetChainError;
+use crate::impls::HandleStarknetChainError;
 
 #[cgp_context(StarknetCairoEncodingContextComponents: StarknetCairoEncodingComponents)]
 pub struct StarknetCairoEncoding;

@@ -1,16 +1,12 @@
-use cgp::prelude::*;
-use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
-use hermes_encoding_components::traits::decode_mut::MutDecoderComponent;
-use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
-use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
-pub use ibc::core::channel::types::channel::Order as ChannelOrdering;
-pub use ibc::core::channel::types::Version as AppVersion;
-pub use ibc::core::host::types::identifiers::PortId;
+use hermes_cairo_encoding_components::impls::EncodeVariantFrom;
+use hermes_core::encoding_components::traits::{
+    MutDecoderComponent, MutEncoderComponent, Transformer, TransformerRef,
+};
+use hermes_prelude::*;
+use ibc::core::channel::types::channel::Order as ChannelOrdering;
+use ibc::core::channel::types::Version as AppVersion;
 
-use super::packet::StateProof;
-use crate::types::channel_id::ChannelId;
-use crate::types::connection_id::ConnectionId;
-use crate::types::cosmos::height::Height;
+use crate::types::{ChannelId, ConnectionId, Height, PortId, StateProof};
 
 #[derive(HasFields)]
 pub enum SerializeOrdering {

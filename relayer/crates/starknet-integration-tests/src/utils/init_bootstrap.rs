@@ -1,16 +1,14 @@
 use std::sync::Arc;
 use std::time::SystemTime;
 
-use hermes_cosmos_chain_components::types::config::gas::dynamic_gas_config::DynamicGasConfig;
-use hermes_cosmos_chain_components::types::config::gas::eip_type::EipQueryType;
-use hermes_cosmos_relayer::contexts::build::CosmosBuilder;
-use hermes_error::Error;
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
+use hermes_core::runtime_components::traits::CanReadFileAsString;
+use hermes_cosmos::chain_components::types::{DynamicGasConfig, EipQueryType};
+use hermes_cosmos::error::Error;
+use hermes_cosmos::relayer::contexts::CosmosBuilder;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use starknet::core::types::contract::SierraClass;
 
-use crate::contexts::osmosis_bootstrap::OsmosisBootstrap;
-use crate::contexts::starknet_bootstrap::{StarknetBootstrap, StarknetBootstrapFields};
+use crate::contexts::{OsmosisBootstrap, StarknetBootstrap, StarknetBootstrapFields};
 
 pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<StarknetBootstrap, Error> {
     let chain_command_path = std::env::var("STARKNET_BIN")

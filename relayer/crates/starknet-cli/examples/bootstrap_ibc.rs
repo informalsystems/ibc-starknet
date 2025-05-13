@@ -5,29 +5,25 @@ use core::time::Duration;
 use std::sync::Arc;
 
 use cgp::extra::run::CanRun;
-use hermes_chain_components::traits::queries::chain_status::{
-    CanQueryChainHeight, CanQueryChainStatus,
+use hermes_cli_components::traits::CanLoadBuilder;
+use hermes_core::chain_components::traits::{
+    CanQueryChainHeight, CanQueryChainStatus, CanQueryChannelEnd,
+    CanQueryClientStateWithLatestHeight, CanQueryConnectionEnd, HasChainId,
 };
-use hermes_chain_components::traits::queries::channel_end::CanQueryChannelEnd;
-use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
-use hermes_chain_components::traits::queries::connection_end::CanQueryConnectionEnd;
-use hermes_chain_components::traits::types::chain_id::HasChainId;
-use hermes_cli_components::traits::build::CanLoadBuilder;
-use hermes_cosmos_chain_components::types::channel::CosmosInitChannelOptions;
-use hermes_cosmos_chain_components::types::connection::CosmosInitConnectionOptions;
-use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientOptions;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::Error;
-use hermes_relayer_components::relay::impls::channel::bootstrap::CanBootstrapChannel;
-use hermes_relayer_components::relay::impls::connection::bootstrap::CanBootstrapConnection;
-use hermes_relayer_components::relay::traits::client_creator::CanCreateClient;
-use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_starknet_chain_components::types::payloads::client::StarknetCreateClientPayloadOptions;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_cli::contexts::app::StarknetApp;
-use hermes_starknet_relayer::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
+use hermes_core::relayer_components::relay::impls::{CanBootstrapChannel, CanBootstrapConnection};
+use hermes_core::relayer_components::relay::traits::{
+    CanCreateClient, DestinationTarget, SourceTarget,
+};
+use hermes_cosmos::chain_components::types::{
+    CosmosCreateClientOptions, CosmosInitChannelOptions, CosmosInitConnectionOptions,
+};
+use hermes_cosmos::error::Error;
+use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_starknet_chain_components::types::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_context::contexts::StarknetChain;
+use hermes_starknet_cli::contexts::StarknetApp;
+use hermes_starknet_relayer::contexts::{CosmosToStarknetRelay, StarknetToCosmosRelay};
 use hex::FromHex;
 use ibc::core::connection::types::version::Version as IbcConnectionVersion;
 use ibc::core::host::types::identifiers::PortId;

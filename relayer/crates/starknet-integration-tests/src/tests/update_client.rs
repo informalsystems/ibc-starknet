@@ -2,24 +2,24 @@ use core::marker::PhantomData;
 use core::time::Duration;
 
 use cgp::core::field::Index;
-use hermes_chain_components::traits::queries::chain_status::CanQueryChainHeight;
-use hermes_chain_components::traits::queries::client_state::CanQueryClientStateWithLatestHeight;
-use hermes_chain_components::traits::queries::consensus_state::CanQueryConsensusStateWithLatestHeight;
-use hermes_cosmos_integration_tests::init::init_test_runtime;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::types::Error;
-use hermes_relayer_components::relay::traits::target::{DestinationTarget, SourceTarget};
-use hermes_relayer_components::relay::traits::update_client_message_builder::CanSendTargetUpdateClientMessage;
-use hermes_runtime_components::traits::sleep::CanSleep;
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
-use hermes_starknet_relayer::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
-use hermes_test_components::setup::traits::chain::CanSetupChain;
-use hermes_test_components::setup::traits::clients::CanSetupClients;
+use hermes_core::chain_components::traits::{
+    CanQueryChainHeight, CanQueryClientStateWithLatestHeight,
+    CanQueryConsensusStateWithLatestHeight,
+};
+use hermes_core::relayer_components::relay::traits::{
+    CanSendTargetUpdateClientMessage, DestinationTarget, SourceTarget,
+};
+use hermes_core::runtime_components::traits::CanSleep;
+use hermes_core::test_components::setup::traits::{CanSetupChain, CanSetupClients};
+use hermes_cosmos::error::types::Error;
+use hermes_cosmos::integration_tests::init::init_test_runtime;
+use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_starknet_chain_context::contexts::{StarknetCairoEncoding, StarknetChain};
+use hermes_starknet_relayer::contexts::StarknetToCosmosRelay;
 use ibc::core::client::types::Height as CosmosHeight;
 use tracing::info;
 
-use crate::contexts::setup::StarknetTestSetup;
+use crate::contexts::StarknetTestSetup;
 use crate::utils::init_starknet_setup;
 
 #[test]

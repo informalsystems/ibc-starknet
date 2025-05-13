@@ -1,39 +1,25 @@
 use std::marker::PhantomData;
 use std::str::FromStr;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::types::height::HasHeightFields;
-use hermes_chain_components::traits::types::ibc::{HasChannelIdType, HasPortIdType};
-use hermes_chain_components::traits::types::message::HasMessageType;
-use hermes_chain_components::traits::types::timestamp::HasTimeoutType;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_chain_type_components::traits::types::amount::HasAmountType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_test_components::chain::traits::messages::ibc_transfer::{
-    IbcTokenTransferMessageBuilder, IbcTokenTransferMessageBuilderComponent,
+use hermes_core::chain_components::traits::{
+    HasChannelIdType, HasHeightFields, HasMessageType, HasPortIdType, HasTimeoutType,
 };
-use hermes_test_components::chain::traits::types::memo::HasMemoType;
+use hermes_core::chain_type_components::traits::{HasAddressType, HasAmountType};
+use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_core::test_components::chain::traits::{
+    HasMemoType, IbcTokenTransferMessageBuilder, IbcTokenTransferMessageBuilderComponent,
+};
+use hermes_prelude::*;
 use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
 use starknet::core::types::{Felt, U256};
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::contract::call::CanCallContract;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
-use crate::types::amount::StarknetAmount;
-use crate::types::channel_id::ChannelId;
-use crate::types::cosmos::height::Height;
-use crate::types::messages::ibc::denom::{Denom, PrefixedDenom};
-use crate::types::messages::ibc::ibc_transfer::MsgTransfer;
+use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::traits::{CanCallContract, CanQueryContractAddress, HasBlobType, HasSelectorType};
+use crate::types::{ChannelId, Denom, Height, MsgTransfer, PrefixedDenom, StarknetAmount};
 
 pub struct BuildStarknetIbcTransferMessage;
 

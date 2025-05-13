@@ -2,6 +2,7 @@
 pub mod MockClientComponent {
     use alexandria_data_structures::array_ext::ArrayTraitExt;
     use core::num::traits::Zero;
+    use ics23::ArrayFelt252Store;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
     use protobuf::types::message::ProtoCodecImpl;
@@ -21,7 +22,9 @@ pub mod MockClientComponent {
         StoreHeightArray, Timestamp, UpdateResponse,
     };
     use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
-    use starknet_ibc_core::host::ClientIdImpl;
+    use starknet_ibc_core::host::{
+        BasePrefix, ClientIdImpl, client_upgrade_path, consensus_upgrade_path,
+    };
     use starknet_ibc_utils::ValidateBasic;
 
     #[storage]
@@ -72,7 +75,8 @@ pub mod MockClientComponent {
         }
 
         fn upgrade_client(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
-            self.assert_owner();
+            self.upgrade_validate(msg.clone());
+            self.upgrade_execute(msg);
         }
     }
 
@@ -347,9 +351,23 @@ pub mod MockClientComponent {
     > of UpgradeClientTrait<TContractState> {
         fn upgrade_validate(self: @ComponentState<TContractState>, msg: MsgUpgradeClient) {
             msg.validate_basic();
+
+            self
+                .verify_upgrade(
+                    msg.client_id.sequence,
+                    msg.upgraded_client_state,
+                    msg.upgraded_consensus_state,
+                    msg.proof_upgrade_client,
+                    msg.proof_upgrade_consensus,
+                );
         }
 
-        fn upgrade_execute(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {}
+        fn upgrade_execute(ref self: ComponentState<TContractState>, msg: MsgUpgradeClient) {
+            self
+                .update_on_upgrade(
+                    msg.client_id.sequence, msg.upgraded_client_state, msg.upgraded_consensus_state,
+                );
+        }
     }
 
     // -----------------------------------------------------------
@@ -398,12 +416,81 @@ pub mod MockClientComponent {
 
         fn verify_upgrade(
             self: @ComponentState<TContractState>,
+            client_sequence: u64,
             upgrade_client_state: Array<felt252>,
             upgrade_consensus_state: Array<felt252>,
-            proof_upgrade_client: Array<felt252>,
-            proof_upgrade_consensus: Array<felt252>,
-            root: ByteArray,
-        ) {}
+            proof_upgrade_client: StateProof,
+            proof_upgrade_consensus: StateProof,
+        ) {
+            let comet_client_state: MockClientState = self.read_client_state(client_sequence);
+            let latest_height = comet_client_state.latest_height.clone();
+
+            let latest_consensus_state = self
+                .read_consensus_state(client_sequence, comet_client_state.latest_height.clone());
+
+            let root = latest_consensus_state.root.clone();
+
+            let upgrade_path = comet_client_state.upgrade_path.clone();
+
+            let status = self._status(comet_client_state, latest_consensus_state, client_sequence);
+
+            assert(status.is_active(), MockErrors::INACTIVE_CLIENT);
+
+            assert(
+                upgrade_path.len() == 1 || upgrade_path.len() == 2,
+                MockErrors::INVALID_UPGRADE_PATH_LENGTH,
+            );
+
+            let (prefix, upgrade_path) = if upgrade_path.len() == 1 {
+                ("", upgrade_path[0].clone())
+            } else {
+                (upgrade_path[0].clone(), upgrade_path[1].clone())
+            };
+
+            let base_prefix = BasePrefix { prefix };
+
+            let upgraded_client_path = client_upgrade_path(
+                base_prefix.clone(), latest_height.revision_height, upgrade_path.clone(),
+            );
+
+            let upgraded_consensus_path = consensus_upgrade_path(
+                base_prefix, latest_height.revision_height, upgrade_path,
+            );
+
+            let upgraded_client_state = MockClientStateImpl::deserialize(upgrade_client_state);
+
+            let upgraded_consensus_state = MockConsensusStateImpl::deserialize(
+                upgrade_consensus_state,
+            );
+
+            let upgraded_height = upgraded_client_state.latest_height.clone();
+
+            assert(upgraded_height > latest_height, MockErrors::INVALID_UPGRADE_HEIGHT);
+
+            let upgraded_client_protobuf = StateValue {
+                value: ics23::byte_array_to_array_u8(@upgraded_client_state.protobuf_bytes()),
+            };
+            let upgraded_consensus_protobuf = StateValue {
+                value: ics23::byte_array_to_array_u8(@upgraded_consensus_state.protobuf_bytes()),
+            };
+            self
+                .verify_membership(
+                    client_sequence,
+                    upgraded_client_path,
+                    upgraded_client_protobuf,
+                    proof_upgrade_client,
+                    root.clone(),
+                );
+
+            self
+                .verify_membership(
+                    client_sequence,
+                    upgraded_consensus_path,
+                    upgraded_consensus_protobuf,
+                    proof_upgrade_consensus,
+                    root,
+                );
+        }
     }
 
     #[embeddable_as(MockClientExecution)]
@@ -569,7 +656,32 @@ pub mod MockClientComponent {
             client_sequence: u64,
             new_client_state: Array<felt252>,
             new_consensus_state: Array<felt252>,
-        ) {}
+        ) {
+            let update_heights = self.read_update_heights(client_sequence);
+
+            if update_heights.len() > 0 {
+                let mut update_heights_span = update_heights.span();
+
+                while let Option::Some(height) = update_heights_span.pop_front() {
+                    self.remove_consensus_state(client_sequence, height.clone());
+                }
+
+                self.update_heights.write(client_sequence, array![]);
+            }
+
+            let new_client_state = MockClientStateImpl::deserialize(new_client_state);
+            let new_consensus_state = MockConsensusStateImpl::deserialize(new_consensus_state);
+
+            self
+                ._update_state(
+                    client_sequence,
+                    new_client_state.latest_height,
+                    new_client_state,
+                    new_consensus_state,
+                    get_block_number(),
+                    get_block_timestamp(),
+                );
+        }
     }
 
     // -----------------------------------------------------------
@@ -842,7 +954,7 @@ pub mod MockClientComponent {
             ref self: ComponentState<TContractState>, client_sequence: u64, height: Height,
         ) {
             let consensus_zero = MockConsensusStateZero::zero();
-            self.consensus_states.write((client_sequence, height), consensus_zero.into());
+            self.consensus_states.write((client_sequence, height), consensus_zero);
             self.client_processed_times.write((client_sequence, height), 0);
             self.client_processed_heights.write((client_sequence, height), 0);
         }

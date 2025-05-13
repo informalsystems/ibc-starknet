@@ -1,14 +1,11 @@
-use cgp::prelude::*;
-use hermes_relayer_components::transaction::traits::default_signer::HasDefaultSigner;
-use hermes_relayer_components::transaction::traits::poll_tx_response::CanPollTxResponse;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::account::CanBuildAccountFromSigner;
-use hermes_starknet_chain_components::traits::contract::deploy::{
-    ContractDeployer, ContractDeployerComponent,
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::relayer_components::transaction::traits::{CanPollTxResponse, HasDefaultSigner};
+use hermes_prelude::*;
+use hermes_starknet_chain_components::impls::StarknetAddress;
+use hermes_starknet_chain_components::traits::{
+    CanBuildAccountFromSigner, ContractDeployer, ContractDeployerComponent, HasBlobType,
+    HasContractClassHashType,
 };
-use hermes_starknet_chain_components::traits::types::blob::HasBlobType;
-use hermes_starknet_chain_components::traits::types::contract_class::HasContractClassHashType;
-use hermes_test_components::chain::traits::types::address::HasAddressType;
 use starknet_v13::contract::ContractFactory;
 use starknet_v13::core::types::{Felt, RevertedInvocation};
 use starknet_v13::signers::SigningKey;

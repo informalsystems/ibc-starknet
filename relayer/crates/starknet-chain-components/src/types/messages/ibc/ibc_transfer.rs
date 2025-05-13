@@ -1,14 +1,10 @@
 use std::fmt::Display;
 
-use cgp::prelude::*;
+use hermes_prelude::*;
 use starknet::core::types::U256;
 
-use super::channel::PortId;
-use crate::impls::types::address::StarknetAddress;
-use crate::types::channel_id::ChannelId;
-use crate::types::cosmos::height::Height;
-use crate::types::cosmos::timestamp::Timestamp;
-use crate::types::messages::ibc::denom::PrefixedDenom;
+use crate::impls::StarknetAddress;
+use crate::types::{ChannelId, Height, PortId, PrefixedDenom, Timestamp};
 
 #[derive(HasField, HasFields)]
 pub struct TransferPacketData {

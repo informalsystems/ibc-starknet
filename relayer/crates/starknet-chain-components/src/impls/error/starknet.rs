@@ -1,5 +1,5 @@
 use cgp::core::error::{ErrorRaiser, ErrorRaiserComponent};
-use cgp::prelude::*;
+use hermes_prelude::*;
 use starknet::core::types::StarknetError;
 pub struct RaiseStarknetError;
 

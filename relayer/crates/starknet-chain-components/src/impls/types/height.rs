@@ -1,9 +1,8 @@
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::height::{
-    HeightAdjuster, HeightAdjusterComponent, HeightFieldComponent, HeightIncrementer,
-    HeightIncrementerComponent, HeightTypeProviderComponent,
+use hermes_core::chain_components::traits::{
+    HasHeightType, HeightAdjuster, HeightAdjusterComponent, HeightFieldComponent,
+    HeightFieldGetter, HeightIncrementer, HeightIncrementerComponent, HeightTypeProviderComponent,
 };
-use hermes_relayer_components::chain::traits::types::height::{HasHeightType, HeightFieldGetter};
+use hermes_prelude::*;
 
 pub struct ProvideStarknetHeight;
 

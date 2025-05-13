@@ -1,6 +1,6 @@
-use cgp::prelude::*;
+use hermes_prelude::*;
 
-use crate::traits::types::contract_class::{HasContractClassHashType, HasContractClassType};
+use crate::traits::{HasContractClassHashType, HasContractClassType};
 
 #[cgp_component {
   name: ContractDeclarerComponent,

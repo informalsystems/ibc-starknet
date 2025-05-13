@@ -1,19 +1,15 @@
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
+use hermes_core::encoding_components::traits::{
+    CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
-pub use ibc::core::channel::types::channel::{
+use hermes_prelude::*;
+use ibc::core::channel::types::channel::{
     ChannelEnd, Counterparty as ChannelCounterparty, State as ChannelState,
 };
 use ibc::core::channel::types::error::ChannelError;
 use ibc::core::host::types::error::IdentifierError;
-pub use ibc::core::host::types::identifiers::ChannelId;
+use ibc::core::host::types::identifiers::PortId;
 
-use super::connection_id::ConnectionId;
-use super::messages::ibc::channel::{AppVersion, ChannelOrdering, PortId};
+use crate::types::{AppVersion, ChannelOrdering, ConnectionId};
 
 #[derive(HasFields)]
 pub struct RawChannelEnd {

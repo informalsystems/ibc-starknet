@@ -1,11 +1,11 @@
 use std::string::FromUtf8Error;
 
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{MutDecoder, MutDecoderComponent};
-use hermes_encoding_components::traits::encode_mut::MutEncoderComponent;
-use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
+use hermes_encoding_components::traits::{
+    HasDecodeBufferType, MutDecoder, MutDecoderComponent, MutEncoderComponent,
+};
+use hermes_prelude::*;
 
-use crate::impls::encode_mut::byte_array::EncodeByteArray;
+use crate::impls::EncodeByteArray;
 
 pub struct EncodeUtf8String;
 

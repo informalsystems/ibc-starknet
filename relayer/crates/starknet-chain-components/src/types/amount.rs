@@ -2,7 +2,7 @@ use core::fmt::Display;
 
 use starknet::core::types::U256;
 
-use crate::impls::types::address::StarknetAddress;
+use crate::impls::StarknetAddress;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct StarknetAmount {

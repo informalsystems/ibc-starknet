@@ -1,12 +1,9 @@
-use cgp::prelude::*;
-use hermes_cairo_encoding_components::impls::encode_mut::variant_from::EncodeVariantFrom;
-use hermes_encoding_components::traits::decode_mut::{
-    CanDecodeMut, MutDecoder, MutDecoderComponent,
+use hermes_cairo_encoding_components::impls::EncodeVariantFrom;
+use hermes_core::encoding_components::traits::{
+    CanDecodeMut, CanEncodeMut, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
+    Transformer, TransformerRef,
 };
-use hermes_encoding_components::traits::encode_mut::{
-    CanEncodeMut, MutEncoder, MutEncoderComponent,
-};
-use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
+use hermes_prelude::*;
 use ibc::clients::tendermint::types::Header as TendermintLcHeader;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height as IbcHeight;
@@ -22,7 +19,7 @@ use tendermint::{
     account, block, validator, vote, AppHash, Error as TendermintError, PublicKey, Signature,
 };
 
-use crate::types::cosmos::height::Height;
+use crate::types::Height;
 
 /// The zero value for a Time is defined to be
 /// January 1, year 1, 00:00:00.000000000 UTC

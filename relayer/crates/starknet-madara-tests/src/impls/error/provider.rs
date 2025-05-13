@@ -1,5 +1,5 @@
 use cgp::core::error::{ErrorRaiser, ErrorRaiserComponent};
-use cgp::prelude::*;
+use hermes_prelude::*;
 use starknet_v13::core::types::StarknetError;
 use starknet_v13::providers::ProviderError;
 

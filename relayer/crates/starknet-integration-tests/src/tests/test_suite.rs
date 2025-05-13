@@ -1,9 +1,9 @@
 use cgp::core::field::Index;
-use hermes_cosmos_integration_tests::init::init_test_runtime;
-use hermes_error::types::Error;
+use hermes_core::test_components::test_case::traits::test_case::TestCase;
+use hermes_cosmos::error::types::Error;
+use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_ibc_test_suite::tests::clearing::TestPacketClearing;
 use hermes_ibc_test_suite::tests::transfer::TestIbcTransfer;
-use hermes_test_components::test_case::traits::test_case::TestCase;
 
 use crate::utils::init_starknet_test_driver;
 

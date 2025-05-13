@@ -3,7 +3,7 @@ pub mod cw;
 pub mod execution;
 pub mod validation;
 
-use hermes_encoding_components::traits::convert::CanConvert;
+use hermes_encoding_components::traits::CanConvert;
 use ibc_client_starknet_types::StarknetClientState as ClientStateType;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::primitives::proto::{Any, Protobuf};

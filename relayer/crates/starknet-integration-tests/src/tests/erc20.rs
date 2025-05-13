@@ -1,22 +1,19 @@
 use std::time::SystemTime;
 
-use hermes_cosmos_integration_tests::init::init_test_runtime;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_error::types::Error;
-use hermes_relayer_components::chain::traits::send_message::CanSendSingleMessage;
-use hermes_runtime_components::traits::fs::read_file::CanReadFileAsString;
-use hermes_starknet_chain_components::impls::encoding::events::CanFilterDecodeEvents;
-use hermes_starknet_chain_components::impls::types::message::StarknetMessage;
-use hermes_starknet_chain_components::traits::contract::declare::CanDeclareContract;
-use hermes_starknet_chain_components::traits::contract::deploy::CanDeployContract;
-use hermes_starknet_chain_components::traits::messages::transfer::CanBuildTransferTokenMessage;
-use hermes_starknet_chain_components::traits::queries::token_balance::CanQueryTokenBalance;
-use hermes_starknet_chain_components::types::amount::StarknetAmount;
-use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
-use hermes_starknet_chain_components::types::messages::erc20::deploy::DeployErc20TokenMessage;
-use hermes_starknet_chain_context::contexts::encoding::cairo::StarknetCairoEncoding;
-use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
-use hermes_test_components::bootstrap::traits::chain::CanBootstrapChain;
+use hermes_core::chain_components::traits::CanSendSingleMessage;
+use hermes_core::encoding_components::traits::CanEncode;
+use hermes_core::runtime_components::traits::CanReadFileAsString;
+use hermes_core::test_components::bootstrap::traits::CanBootstrapChain;
+use hermes_cosmos::error::types::Error;
+use hermes_cosmos::integration_tests::init::init_test_runtime;
+use hermes_starknet_chain_components::impls::{CanFilterDecodeEvents, StarknetMessage};
+use hermes_starknet_chain_components::traits::{
+    CanBuildTransferTokenMessage, CanDeclareContract, CanDeployContract, CanQueryTokenBalance,
+};
+use hermes_starknet_chain_components::types::{
+    DeployErc20TokenMessage, Erc20Event, StarknetAmount,
+};
+use hermes_starknet_chain_context::contexts::{StarknetCairoEncoding, StarknetEventEncoding};
 use starknet::core::types::U256;
 use starknet::macros::selector;
 use tracing::info;

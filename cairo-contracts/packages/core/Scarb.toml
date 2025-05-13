@@ -29,6 +29,7 @@ starknet                   = { workspace = true }
 # internal dependencies
 ics23    = { workspace = true }
 protobuf = { workspace = true }
+cometbft = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_utils = { workspace = true }

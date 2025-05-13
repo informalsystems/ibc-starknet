@@ -1,9 +1,9 @@
-use cgp::prelude::*;
-use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::{
+use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainNodeConfigTypeComponent, ProvideChainNodeConfigType,
 };
+use hermes_prelude::*;
 
-use crate::types::node_config::StarknetNodeConfig;
+use crate::types::StarknetNodeConfig;
 
 pub struct ProvideStarknetNodeConfigType;
 

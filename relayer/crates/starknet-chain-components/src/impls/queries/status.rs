@@ -1,13 +1,13 @@
-use cgp::prelude::*;
-use hermes_chain_components::traits::queries::chain_status::ChainStatusQuerierComponent;
-use hermes_cosmos_chain_components::types::status::Time;
-use hermes_relayer_components::chain::traits::queries::chain_status::ChainStatusQuerier;
-use hermes_relayer_components::chain::traits::types::status::HasChainStatusType;
+use hermes_core::chain_components::traits::{
+    ChainStatusQuerier, ChainStatusQuerierComponent, HasChainStatusType,
+};
+use hermes_cosmos_core::chain_components::types::Time;
+use hermes_prelude::*;
 use starknet::core::types::{BlockId, BlockTag, MaybePendingBlockWithTxHashes};
 use starknet::providers::{Provider, ProviderError};
 
-use crate::traits::client::HasStarknetClient;
-use crate::types::status::StarknetChainStatus;
+use crate::traits::HasStarknetClient;
+use crate::types::StarknetChainStatus;
 
 pub struct QueryStarknetChainStatus;
 

@@ -2,15 +2,12 @@ use core::iter::Peekable;
 use core::ops::Deref;
 use core::slice::Iter;
 
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{
-    DecodeBufferPeeker, DecodeBufferPeekerComponent,
+use hermes_encoding_components::traits::{
+    DecodeBufferBuilder, DecodeBufferBuilderComponent, DecodeBufferPeeker,
+    DecodeBufferPeekerComponent, DecodeBufferTypeComponent, HasDecodeBufferType, HasEncodedType,
+    ProvideDecodeBufferType,
 };
-use hermes_encoding_components::traits::types::decode_buffer::{
-    DecodeBufferBuilder, DecodeBufferBuilderComponent, DecodeBufferTypeComponent,
-    HasDecodeBufferType, ProvideDecodeBufferType,
-};
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 
 pub struct ProvideVecIterDecodeBuffer;

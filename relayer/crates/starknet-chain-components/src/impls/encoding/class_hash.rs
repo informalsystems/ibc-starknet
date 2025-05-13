@@ -2,11 +2,11 @@ use core::marker::PhantomData;
 use std::collections::HashSet;
 use std::sync::OnceLock;
 
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode::{CanDecode, Decoder, DecoderComponent};
+use hermes_core::encoding_components::traits::{CanDecode, Decoder, DecoderComponent};
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 
-use crate::types::event::StarknetEvent;
+use crate::types::StarknetEvent;
 
 pub struct DecodeOptionalByClassHash<Tag>(pub PhantomData<Tag>);
 

@@ -3,28 +3,24 @@ use std::sync::OnceLock;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::has_encoding::{
-    DefaultEncodingGetterComponent, EncodingGetterComponent, EncodingTypeProviderComponent,
-    HasEncoding,
+use hermes_core::encoding_components::traits::{
+    CanDecode, DefaultEncodingGetterComponent, EncodingGetterComponent,
+    EncodingTypeProviderComponent, HasEncodedType, HasEncoding,
 };
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use hermes_error::impls::UseHermesError;
-use hermes_starknet_chain_components::components::encoding::event::*;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::types::event::StarknetEvent;
-use hermes_starknet_chain_components::types::events::channel::ChannelHandshakeEvents;
-use hermes_starknet_chain_components::types::events::connection::ConnectionHandshakeEvents;
-use hermes_starknet_chain_components::types::events::erc20::Erc20Event;
-use hermes_starknet_chain_components::types::events::ics20::IbcTransferEvent;
-use hermes_starknet_chain_components::types::events::packet::PacketRelayEvents;
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_prelude::*;
+use hermes_starknet_chain_components::components::*;
+use hermes_starknet_chain_components::impls::StarknetAddress;
+use hermes_starknet_chain_components::types::{
+    ChannelHandshakeEvents, ConnectionHandshakeEvents, Erc20Event, IbcTransferEvent,
+    PacketRelayEvents, StarknetEvent,
+};
 use starknet::core::types::Felt;
 
-use crate::contexts::encoding::cairo::{StarknetCairoEncoding, UseStarknetCairoEncoding};
-use crate::impls::error::HandleStarknetChainError;
+use crate::contexts::{StarknetCairoEncoding, UseStarknetCairoEncoding};
+use crate::impls::HandleStarknetChainError;
 
 #[cgp_context(StarknetEventEncodingContextComponents: StarknetEventEncodingComponents)]
 #[derive(HasField, Default, Clone)]

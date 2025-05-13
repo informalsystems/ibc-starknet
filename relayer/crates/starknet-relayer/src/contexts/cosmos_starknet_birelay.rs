@@ -2,28 +2,27 @@ use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::Index;
 use cgp::extra::run::RunnerComponent;
-use cgp::prelude::*;
-use hermes_cosmos_relayer::contexts::chain::CosmosChain;
-use hermes_error::impls::UseHermesError;
-use hermes_logging_components::traits::logger::LoggerComponent;
-use hermes_relayer_components::birelay::traits::AutoBiRelayerComponent;
-use hermes_relayer_components::components::default::birelay::DefaultBiRelayComponents;
-use hermes_relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
-use hermes_relayer_components::multi::traits::relay_at::{
+use hermes_core::logging_components::traits::LoggerComponent;
+use hermes_core::relayer_components::birelay::traits::AutoBiRelayerComponent;
+use hermes_core::relayer_components::components::default::DefaultBiRelayComponents;
+use hermes_core::relayer_components::multi::traits::chain_at::ChainTypeProviderAtComponent;
+use hermes_core::relayer_components::multi::traits::relay_at::{
     RelayGetterAtComponent, RelayTypeProviderAtComponent,
 };
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::{
+use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_starknet_chain_context::contexts::chain::StarknetChain;
-use hermes_starknet_chain_context::impls::error::HandleStarknetChainError;
-use hermes_tracing_logging_components::contexts::logger::TracingLogger;
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::relayer::contexts::CosmosChain;
+use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
+use hermes_prelude::*;
+use hermes_starknet_chain_context::contexts::StarknetChain;
+use hermes_starknet_chain_context::impls::HandleStarknetChainError;
 
-use crate::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
+use crate::contexts::{CosmosToStarknetRelay, StarknetToCosmosRelay};
 
-#[cgp_context(StarknetCosmosBiRelayComponents: DefaultBiRelayComponents)]
+#[cgp_context(CosmosStarknetBiRelayComponents: DefaultBiRelayComponents)]
 #[derive(Clone, HasField)]
 pub struct CosmosStarknetBiRelay {
     pub runtime: HermesRuntime,
@@ -32,7 +31,7 @@ pub struct CosmosStarknetBiRelay {
 }
 
 delegate_components! {
-    StarknetCosmosBiRelayComponents {
+    CosmosStarknetBiRelayComponents {
         [
             ErrorTypeProviderComponent,
             ErrorWrapperComponent,

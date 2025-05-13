@@ -1,15 +1,13 @@
-use cgp::prelude::*;
-use hermes_chain_components::traits::packet::fields::{
-    PacketDstChannelIdGetter, PacketDstChannelIdGetterComponent, PacketTimeoutHeightGetter,
+use hermes_core::chain_components::traits::{
+    HasChannelIdType, HasHeightType, HasOutgoingPacketType, PacketDstChannelIdGetter,
+    PacketDstChannelIdGetterComponent, PacketTimeoutHeightGetter,
     PacketTimeoutHeightGetterComponent,
 };
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::ibc::HasChannelIdType;
-use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
+use hermes_prelude::*;
 use ibc::core::channel::types::packet::Packet;
 use ibc::core::channel::types::timeout::TimeoutHeight;
 
-use crate::types::channel_id::ChannelId;
+use crate::types::ChannelId;
 
 pub struct ReadPacketDstStarknetFields;
 

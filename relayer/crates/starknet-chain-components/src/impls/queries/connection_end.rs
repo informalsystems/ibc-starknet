@@ -1,37 +1,28 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::commitment_prefix::HasIbcCommitmentPrefix;
-use hermes_chain_components::traits::queries::block::CanQueryBlock;
-use hermes_chain_components::traits::queries::connection_end::{
-    ConnectionEndQuerier, ConnectionEndQuerierComponent, ConnectionEndWithProofsQuerier,
-    ConnectionEndWithProofsQuerierComponent,
+use hermes_core::chain_components::traits::{
+    CanQueryBlock, ConnectionEndQuerier, ConnectionEndQuerierComponent,
+    ConnectionEndWithProofsQuerier, ConnectionEndWithProofsQuerierComponent,
+    HasCommitmentProofType, HasConnectionEndType, HasConnectionIdType, HasHeightType,
+    HasIbcCommitmentPrefix,
 };
-use hermes_chain_components::traits::types::connection::HasConnectionEndType;
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::ibc::HasConnectionIdType;
-use hermes_chain_components::traits::types::proof::HasCommitmentProofType;
-use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
+use hermes_prelude::*;
 use ibc::core::host::types::path::{ConnectionPath, Path};
 use ibc_proto::Protobuf;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::traits::contract::call::CanCallContract;
-use crate::traits::proof_signer::HasStarknetProofSigner;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::traits::types::blob::HasBlobType;
-use crate::traits::types::method::HasSelectorType;
-use crate::types::commitment_proof::StarknetCommitmentProof;
-use crate::types::connection_id::{ConnectionEnd, ConnectionId};
-use crate::types::membership_proof_signer::MembershipVerifierContainer;
-use crate::types::status::StarknetChainStatus;
+use crate::traits::{
+    CanCallContract, CanQueryContractAddress, HasBlobType, HasSelectorType, HasStarknetProofSigner,
+};
+use crate::types::{
+    ConnectionEnd, ConnectionId, MembershipVerifierContainer, StarknetChainStatus,
+    StarknetCommitmentProof,
+};
 
 pub struct QueryConnectionEndFromStarknet;
 

@@ -1,12 +1,8 @@
-use cgp::prelude::*;
-use hermes_relayer_components::transaction::traits::nonce::query_nonce::{
-    NonceQuerier, NonceQuerierComponent,
+use hermes_core::relayer_components::transaction::traits::{
+    HasNonceType, HasSignerType, NonceQuerier, NonceQuerierComponent,
 };
-use hermes_relayer_components::transaction::traits::types::nonce::HasNonceType;
-use hermes_relayer_components::transaction::traits::types::signer::HasSignerType;
-use hermes_starknet_chain_components::traits::account::{
-    CanBuildAccountFromSigner, HasStarknetAccountType,
-};
+use hermes_prelude::*;
+use hermes_starknet_chain_components::traits::{CanBuildAccountFromSigner, HasStarknetAccountType};
 use starknet_v13::accounts::ConnectedAccount;
 use starknet_v13::core::types::Felt;
 use starknet_v13::providers::ProviderError;

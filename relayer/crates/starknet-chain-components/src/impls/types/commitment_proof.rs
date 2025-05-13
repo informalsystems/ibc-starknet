@@ -1,12 +1,11 @@
-use cgp::prelude::*;
-use hermes_chain_components::traits::types::height::HasHeightType;
-use hermes_chain_components::traits::types::proof::{
+use hermes_core::chain_components::traits::{
     CommitmentProofBytesGetter, CommitmentProofBytesGetterComponent, CommitmentProofHeightGetter,
     CommitmentProofHeightGetterComponent, CommitmentProofTypeProviderComponent,
-    HasCommitmentProofType,
+    HasCommitmentProofType, HasHeightType,
 };
+use hermes_prelude::*;
 
-use crate::types::commitment_proof::StarknetCommitmentProof;
+use crate::types::StarknetCommitmentProof;
 
 pub struct UseStarknetCommitmentProof;
 

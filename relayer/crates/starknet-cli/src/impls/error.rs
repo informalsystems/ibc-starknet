@@ -5,16 +5,13 @@ use cgp::core::component::UseDelegate;
 use cgp::core::error::{
     ErrorRaiser, ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent,
 };
-use cgp::prelude::*;
 use eyre::Report;
-use hermes_error::handlers::display::DisplayError;
-use hermes_error::handlers::identity::ReturnError;
-use hermes_error::handlers::infallible::HandleInfallible;
-use hermes_error::handlers::report::ReportError;
-use hermes_error::impls::UseHermesError;
-use hermes_error::types::Error;
-use hermes_relayer_components::error::traits::RetryableErrorComponent;
-use hermes_runtime::types::error::TokioRuntimeError;
+use hermes_core::relayer_components::error::traits::RetryableErrorComponent;
+use hermes_cosmos::error::handlers::{DisplayError, HandleInfallible, ReportError, ReturnError};
+use hermes_cosmos::error::impls::UseHermesError;
+use hermes_cosmos::error::types::Error;
+use hermes_cosmos::runtime::types::error::TokioRuntimeError;
+use hermes_prelude::*;
 use ibc::core::channel::types::error::ChannelError;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};
 use starknet_types_core::felt::FromStrError;

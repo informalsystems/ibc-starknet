@@ -1,31 +1,21 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::message_builders::create_client::{
+use hermes_core::chain_components::traits::{
     CreateClientMessageBuilder, CreateClientMessageBuilderComponent,
+    HasCreateClientMessageOptionsType, HasCreateClientPayloadType, HasMessageType,
 };
-use hermes_chain_components::traits::types::create_client::{
-    HasCreateClientMessageOptionsType, HasCreateClientPayloadType,
-};
-use hermes_chain_components::traits::types::message::HasMessageType;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::types::payloads::client::CosmosCreateClientPayload;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
-use ibc::core::commitment_types::specs::ProofSpecs;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
+use hermes_cosmos_core::chain_components::types::CosmosCreateClientPayload;
+use hermes_prelude::*;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::impls::utils::array::from_vec_u8_to_be_u32_slice;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::types::cosmos::client_state::{ClientStatus, CometClientState};
-use crate::types::cosmos::consensus_state::CometConsensusState;
-use crate::types::cosmos::height::Height;
+use crate::impls::{from_vec_u8_to_be_u32_slice, StarknetAddress, StarknetMessage};
+use crate::traits::CanQueryContractAddress;
+use crate::types::{ClientStatus, CometClientState, CometConsensusState, Height};
 
 pub struct BuildCreateCometClientMessage;
 
@@ -76,7 +66,8 @@ where
             trust_level: payload.client_state.trust_level,
             status: ClientStatus::Active,
             chain_id: payload.client_state.chain_id,
-            proof_specs: ProofSpecs::cosmos(),
+            proof_specs: payload.client_state.proof_specs,
+            upgrade_path: payload.client_state.upgrade_path,
         };
 
         let consensus_state = CometConsensusState {

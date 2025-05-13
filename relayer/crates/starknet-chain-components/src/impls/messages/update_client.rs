@@ -1,30 +1,23 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
-use hermes_chain_components::traits::message_builders::update_client::{
+use hermes_core::chain_components::traits::{
+    HasClientIdType, HasCreateClientMessageOptionsType, HasMessageType, HasUpdateClientPayloadType,
     UpdateClientMessageBuilder, UpdateClientMessageBuilderComponent,
 };
-use hermes_chain_components::traits::types::create_client::HasCreateClientMessageOptionsType;
-use hermes_chain_components::traits::types::ibc::HasClientIdType;
-use hermes_chain_components::traits::types::message::HasMessageType;
-use hermes_chain_components::traits::types::update_client::HasUpdateClientPayloadType;
-use hermes_chain_type_components::traits::types::address::HasAddressType;
-use hermes_cosmos_chain_components::types::payloads::client::CosmosUpdateClientPayload;
-use hermes_encoding_components::traits::encode::CanEncode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::chain_type_components::traits::HasAddressType;
+use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
+use hermes_cosmos_core::chain_components::types::CosmosUpdateClientPayload;
+use hermes_prelude::*;
 use ibc_proto::ibc::lightclients::tendermint::v1::Header as RawHeader;
 use ibc_proto::Protobuf;
 use starknet::core::types::{ByteArray, Felt};
 use starknet::macros::selector;
 
-use crate::impls::types::address::StarknetAddress;
-use crate::impls::types::message::StarknetMessage;
-use crate::traits::queries::contract_address::CanQueryContractAddress;
-use crate::types::client_id::ClientId;
-use crate::types::cosmos::update::ClientMessage;
+use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::traits::CanQueryContractAddress;
+use crate::types::{ClientId, ClientMessage};
 
 pub struct BuildUpdateCometClientMessage;
 

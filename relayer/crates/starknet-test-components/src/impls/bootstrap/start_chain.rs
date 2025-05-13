@@ -1,16 +1,11 @@
-use cgp::prelude::*;
-use hermes_cosmos_test_components::bootstrap::traits::chain::start_chain::{
-    ChainFullNodeStarter, ChainFullNodeStarterComponent,
+use hermes_core::runtime_components::traits::{CanStartChildProcess, HasFilePathType, HasRuntime};
+use hermes_cosmos_core::test_components::bootstrap::traits::{
+    ChainFullNodeStarter, ChainFullNodeStarterComponent, HasChainCommandPath,
+    HasChainGenesisConfigType, HasChainNodeConfigType,
 };
-use hermes_cosmos_test_components::bootstrap::traits::fields::chain_command_path::HasChainCommandPath;
-use hermes_cosmos_test_components::bootstrap::traits::types::chain_node_config::HasChainNodeConfigType;
-use hermes_cosmos_test_components::bootstrap::traits::types::genesis_config::HasChainGenesisConfigType;
-use hermes_runtime_components::traits::fs::file_path::HasFilePathType;
-use hermes_runtime_components::traits::os::child_process::CanStartChildProcess;
-use hermes_runtime_components::traits::runtime::HasRuntime;
+use hermes_prelude::*;
 
-use crate::types::genesis_config::StarknetGenesisConfig;
-use crate::types::node_config::StarknetNodeConfig;
+use crate::types::{StarknetGenesisConfig, StarknetNodeConfig};
 
 #[cgp_new_provider(ChainFullNodeStarterComponent)]
 impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartStarknetDevnet

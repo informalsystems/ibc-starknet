@@ -5,68 +5,51 @@ use std::sync::{Arc, OnceLock};
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent, ErrorWrapperComponent};
 use cgp::core::field::WithField;
-use cgp::prelude::*;
 use futures::lock::Mutex;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_chain_components::traits::queries::block_time::BlockTimeQuerierComponent;
-use hermes_chain_components::traits::queries::chain_status::ChainStatusQuerierComponent;
-use hermes_chain_components::traits::send_message::MessageSenderComponent;
-use hermes_chain_components::traits::types::poll_interval::PollIntervalGetterComponent;
-use hermes_chain_type_components::traits::fields::chain_id::ChainIdGetterComponent;
-use hermes_cosmos_chain_components::types::key_types::secp256k1::Secp256k1KeyPair;
-use hermes_encoding_components::traits::has_encoding::{
+use hermes_core::chain_components::traits::{
+    BlockTimeQuerierComponent, ChainStatusQuerierComponent, MessageSenderComponent,
+    PollIntervalGetterComponent,
+};
+use hermes_core::chain_type_components::traits::ChainIdGetterComponent;
+use hermes_core::encoding_components::traits::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
     EncodingTypeProviderComponent,
 };
-use hermes_encoding_components::types::AsBytes;
-use hermes_error::impls::UseHermesError;
-use hermes_logging_components::traits::logger::LoggerComponent;
-use hermes_relayer_components::transaction::impls::global_nonce_mutex::GetGlobalNonceMutex;
-use hermes_relayer_components::transaction::traits::default_signer::DefaultSignerGetterComponent;
-use hermes_relayer_components::transaction::traits::nonce::nonce_mutex::NonceAllocationMutexGetterComponent;
-use hermes_relayer_components::transaction::traits::nonce::query_nonce::NonceQuerierComponent;
-use hermes_runtime::types::runtime::HermesRuntime;
-use hermes_runtime_components::traits::runtime::{
+use hermes_core::encoding_components::types::AsBytes;
+use hermes_core::logging_components::traits::LoggerComponent;
+use hermes_core::relayer_components::transaction::impls::GetGlobalNonceMutex;
+use hermes_core::relayer_components::transaction::traits::{
+    DefaultSignerGetterComponent, NonceAllocationMutexGetterComponent, NonceQuerierComponent,
+};
+use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
-use hermes_starknet_chain_components::impls::commitment_proof::{
+use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
+use hermes_error::impls::UseHermesError;
+use hermes_prelude::*;
+use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_starknet_chain_components::impls::{
+    QueryStarknetStorageProof, SendJsonRpcRequestWithReqwest, StarknetAddress,
     VerifyStarknetMerkleProof, VerifyStarknetStorageProof,
 };
-use hermes_starknet_chain_components::impls::json_rpc::SendJsonRpcRequestWithReqwest;
-use hermes_starknet_chain_components::impls::queries::storage_proof::QueryStarknetStorageProof;
-use hermes_starknet_chain_components::impls::types::address::StarknetAddress;
-use hermes_starknet_chain_components::traits::account::{
-    AccountFromSignerBuilderComponent, StarknetAccountTypeProviderComponent,
-};
-use hermes_starknet_chain_components::traits::client::{
+use hermes_starknet_chain_components::traits::{
+    AccountFromSignerBuilderComponent, ContractCallerComponent, ContractDeclarerComponent,
+    ContractDeployerComponent, ContractInvokerComponent, InvokeContractMessageBuilderComponent,
+    JsonRpcRequestSenderComponent, JsonRpcUrlGetterComponent, MerkleProofTypeProviderComponent,
+    ReqwestClientGetterComponent, StarknetAccountTypeProviderComponent,
     StarknetClientGetterComponent, StarknetClientTypeProviderComponent,
+    StarknetMerkleProofVerifierComponent, StarknetProofSignerGetterComponent,
+    StarknetProofSignerTypeProviderComponent, StarknetStorageProofVerifierComponent,
+    StorageKeyTypeProviderComponent, StorageProofQuerierComponent,
+    StorageProofTypeProviderComponent,
 };
-use hermes_starknet_chain_components::traits::commitment_proof::{
-    StarknetMerkleProofVerifierComponent, StarknetStorageProofVerifierComponent,
+use hermes_starknet_chain_components::types::StarknetWallet;
+use hermes_starknet_chain_context::contexts::{
+    StarknetEventEncoding, StarknetProtobufEncoding, UseStarknetCairoEncoding,
 };
-use hermes_starknet_chain_components::traits::contract::call::ContractCallerComponent;
-use hermes_starknet_chain_components::traits::contract::declare::ContractDeclarerComponent;
-use hermes_starknet_chain_components::traits::contract::deploy::ContractDeployerComponent;
-use hermes_starknet_chain_components::traits::contract::invoke::ContractInvokerComponent;
-use hermes_starknet_chain_components::traits::contract::message::InvokeContractMessageBuilderComponent;
-use hermes_starknet_chain_components::traits::json_rpc::JsonRpcRequestSenderComponent;
-use hermes_starknet_chain_components::traits::proof_signer::{
-    StarknetProofSignerGetterComponent, StarknetProofSignerTypeProviderComponent,
-};
-use hermes_starknet_chain_components::traits::queries::storage_proof::StorageProofQuerierComponent;
-use hermes_starknet_chain_components::traits::rpc_client::{
-    JsonRpcUrlGetterComponent, ReqwestClientGetterComponent,
-};
-use hermes_starknet_chain_components::traits::types::commitment::MerkleProofTypeProviderComponent;
-use hermes_starknet_chain_components::traits::types::storage_proof::{
-    StorageKeyTypeProviderComponent, StorageProofTypeProviderComponent,
-};
-use hermes_starknet_chain_components::types::wallet::StarknetWallet;
-use hermes_starknet_chain_context::contexts::encoding::cairo::UseStarknetCairoEncoding;
-use hermes_starknet_chain_context::contexts::encoding::event::StarknetEventEncoding;
-use hermes_starknet_chain_context::contexts::encoding::protobuf::StarknetProtobufEncoding;
-use hermes_tracing_logging_components::contexts::logger::TracingLogger;
 use ibc::core::host::types::identifiers::ChainId;
 use indexmap::IndexMap;
 use reqwest::Client;

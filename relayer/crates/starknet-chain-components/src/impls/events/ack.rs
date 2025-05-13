@@ -1,23 +1,16 @@
 use core::marker::PhantomData;
 use std::str::FromStr;
 
-use cgp::prelude::*;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
-use hermes_chain_components::traits::extract_data::{EventExtractor, EventExtractorComponent};
-use hermes_chain_components::traits::packet::from_write_ack::{
-    PacketFromWriteAckEventBuilder, PacketFromWriteAckEventBuilderComponent,
+use hermes_core::chain_components::traits::{
+    EventExtractor, EventExtractorComponent, HasAcknowledgementType, HasEventType,
+    HasOutgoingPacketType, HasWriteAckEvent, PacketFromWriteAckEventBuilder,
+    PacketFromWriteAckEventBuilderComponent, ProvideWriteAckEvent, WriteAckEventComponent,
 };
-use hermes_chain_components::traits::types::event::HasEventType;
-use hermes_chain_components::traits::types::ibc_events::write_ack::{
-    HasWriteAckEvent, ProvideWriteAckEvent, WriteAckEventComponent,
-};
-use hermes_chain_components::traits::types::packet::HasOutgoingPacketType;
-use hermes_chain_components::traits::types::packets::ack::HasAcknowledgementType;
-use hermes_encoding_components::traits::decode::CanDecode;
-use hermes_encoding_components::traits::has_encoding::HasEncoding;
-use hermes_encoding_components::traits::types::encoded::HasEncodedType;
+use hermes_core::encoding_components::traits::{CanDecode, HasEncodedType, HasEncoding};
+use hermes_prelude::*;
 use ibc::apps::transfer::types::{Amount, BaseDenom, Memo, PrefixedDenom, TracePath};
 use ibc::core::channel::types::packet::Packet as IbcPacket;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};
@@ -27,10 +20,11 @@ use ibc_proto::ibc::core::client::v1::Height as RawHeight;
 use serde::{Deserialize, Serialize};
 use starknet::core::types::Felt;
 
-use crate::impls::events::UseStarknetEvents;
-use crate::types::events::packet::{PacketRelayEvents, WriteAcknowledgementEvent};
-use crate::types::messages::ibc::ibc_transfer::TransferPacketData as CairoTransferPacketData;
-use crate::types::messages::ibc::packet::Packet;
+use crate::impls::UseStarknetEvents;
+use crate::types::{
+    Packet, PacketRelayEvents, TransferPacketData as CairoTransferPacketData,
+    WriteAcknowledgementEvent,
+};
 
 #[cgp_provider(WriteAckEventComponent)]
 impl<Chain, Counterparty> ProvideWriteAckEvent<Chain, Counterparty> for UseStarknetEvents

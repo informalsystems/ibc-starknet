@@ -1,12 +1,10 @@
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode::{Decoder, DecoderComponent};
-use hermes_encoding_components::traits::decode_mut::{CanDecodeMut, MutDecoder};
-use hermes_encoding_components::traits::encode::{Encoder, EncoderComponent};
-use hermes_encoding_components::traits::encode_mut::CanEncodeMut;
-use hermes_encoding_components::traits::types::decode_buffer::CanBuildDecodeBuffer;
-use hermes_encoding_components::traits::types::encode_buffer::CanFinalizedEncodeBuffer;
+use hermes_encoding_components::traits::{
+    CanBuildDecodeBuffer, CanDecodeMut, CanEncodeMut, CanFinalizedEncodeBuffer, Decoder,
+    DecoderComponent, Encoder, EncoderComponent, MutDecoder,
+};
+use hermes_prelude::*;
 
-use crate::impls::encode_mut::end::DecodeEnd;
+use crate::impls::DecodeEnd;
 
 pub struct EncodeWithMutBuffer;
 

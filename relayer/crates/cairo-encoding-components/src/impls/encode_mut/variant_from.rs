@@ -1,13 +1,12 @@
 use core::marker::PhantomData;
 
-use cgp::prelude::*;
-use hermes_encoding_components::traits::decode_mut::{MutDecoder, MutDecoderComponent};
-use hermes_encoding_components::traits::encode_mut::{MutEncoder, MutEncoderComponent};
-use hermes_encoding_components::traits::transform::{Transformer, TransformerRef};
-use hermes_encoding_components::traits::types::decode_buffer::HasDecodeBufferType;
-use hermes_encoding_components::traits::types::encode_buffer::HasEncodeBufferType;
+use hermes_encoding_components::traits::{
+    HasDecodeBufferType, HasEncodeBufferType, MutDecoder, MutDecoderComponent, MutEncoder,
+    MutEncoderComponent, Transformer, TransformerRef,
+};
+use hermes_prelude::*;
 
-use crate::impls::encode_mut::variant::SumEncoders;
+use crate::impls::SumEncoders;
 use crate::types::nat::Z;
 
 pub struct EncodeVariantFrom<Transform>(pub PhantomData<Transform>);
