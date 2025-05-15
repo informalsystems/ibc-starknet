@@ -1,0 +1,27 @@
+[package]
+name         = "starknet-block-verifier"
+authors      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
+rust-version = { workspace = true }
+version      = { workspace = true }
+repository   = { workspace = true }
+readme       = "./../README.md"
+keywords     = [ "starknet", "ibc", "light-client" ]
+description  = "Starknet block header verifier"
+
+[dependencies]
+reqwest         = { version = "0.12.15", default-features = false, features = [ "json", "default-tls" ] }
+serde           = { workspace = true }
+starknet-crypto = { version = "0.7.4", default-features = false }
+
+[dev-dependencies]
+tokio    = { version = "1.34.0", features = [ "full" ] }
+starknet = { version = "0.15.1" }
+
+[lints]
+workspace = true
+
+[features]
+default = [  ]
+feeder  = [  ]
