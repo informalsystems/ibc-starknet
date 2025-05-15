@@ -11,7 +11,7 @@ let
 
   starknet-foundry = rust-platform.buildRustPackage {
     pname = "starknet-foundry";
-    version = "0.41.0";
+    version = "0.42.0";
 
     src = starknet-foundry-src;
 
