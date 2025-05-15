@@ -26,7 +26,7 @@ test = "snforge test"
 [workspace.dependencies]
 assert_macros = "2.11.4"
 starknet      = "2.11.4"
-snforge_std   = "0.41.0"
+snforge_std   = "0.42.0"
 
 # external dependencies
 # FIXME: pinned to specific rev for ed25519 signature fix
@@ -34,7 +34,7 @@ snforge_std   = "0.41.0"
 alexandria_data_structures = { git = "https://github.com/keep-starknet-strange/alexandria", rev = "f2c5fbe" }
 openzeppelin_access        = "1.0.0"
 openzeppelin_token         = "1.0.0"
-openzeppelin_testing       = "3.0.0"
+openzeppelin_testing       = "4.0.0"
 openzeppelin_utils         = "1.0.0"
 
 # internal dependencies
