@@ -32,8 +32,6 @@ snforge_std   = "0.41.0"
 # FIXME: pinned to specific rev for ed25519 signature fix
 # update to release version from scarbs.xyz once available
 alexandria_data_structures = { git = "https://github.com/keep-starknet-strange/alexandria", rev = "f2c5fbe" }
-alexandria_numeric         = { git = "https://github.com/keep-starknet-strange/alexandria", rev = "f2c5fbe" }
-alexandria_sorting         = { git = "https://github.com/keep-starknet-strange/alexandria", rev = "f2c5fbe" }
 openzeppelin_access        = "1.0.0"
 openzeppelin_token         = "1.0.0"
 openzeppelin_testing       = "3.0.0"

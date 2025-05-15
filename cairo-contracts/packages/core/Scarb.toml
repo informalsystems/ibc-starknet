@@ -23,7 +23,6 @@ scarb = { workspace = true }
 [dependencies]
 # external dependencies
 alexandria_data_structures = { workspace = true }
-alexandria_numeric         = { workspace = true }
 starknet                   = { workspace = true }
 
 # internal dependencies

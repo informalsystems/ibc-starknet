@@ -12,23 +12,6 @@ version = "0.5.0"
 source = "git+https://github.com/keep-starknet-strange/alexandria?rev=f2c5fbe#f2c5fbe0bd4945275e664386e6b372e51e713596"
 
 [[package]]
-name = "alexandria_numeric"
-version = "0.5.0"
-source = "git+https://github.com/keep-starknet-strange/alexandria?rev=f2c5fbe#f2c5fbe0bd4945275e664386e6b372e51e713596"
-dependencies = [
- "alexandria_math",
- "alexandria_searching",
-]
-
-[[package]]
-name = "alexandria_searching"
-version = "0.5.0"
-source = "git+https://github.com/keep-starknet-strange/alexandria?rev=f2c5fbe#f2c5fbe0bd4945275e664386e6b372e51e713596"
-dependencies = [
- "alexandria_data_structures",
-]
-
-[[package]]
 name = "cometbft"
 version = "0.1.0"
 dependencies = [
@@ -182,7 +165,6 @@ name = "starknet_ibc_core"
 version = "0.1.0"
 dependencies = [
  "alexandria_data_structures",
- "alexandria_numeric",
  "cometbft",
  "ics23",
  "openzeppelin_testing",
