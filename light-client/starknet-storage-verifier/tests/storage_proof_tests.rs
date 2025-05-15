@@ -23,7 +23,7 @@ fn test_verify_starknet_storage_proof() {
     nodes.insert(
         felt!("0x2ed240ee95949cd56bb6d1feb5974abd931b844fd090f6738c1166ab129f256"),
         MerkleNode::EdgeNode(EdgeNode {
-            path: felt!("0x0"),
+            path: Felt::ZERO,
             length: 1,
             child: felt!("0x69caa1781f8cd2bd601d17d668e4268a609430ada713cbfd97c4f1a7b79a37e"),
         }),
@@ -82,7 +82,7 @@ fn test_verify_starknet_storage_proof() {
     let contracts_proof = ContractsProof {
         contract_leaves_data: vec![ContractLeafData {
             class_hash: felt!("0x45ba727abaff9ae3a4311d7a30196e09d1f30aeeb3a8e157277793740d20f61"),
-            nonce: felt!("0x0"),
+            nonce: Felt::ZERO,
             storage_root: Some(felt!(
                 "0x4592da9795f9fd7a042eb0cb0d4dae7b6894bd90ccb3e6ff360185db24301f7"
             )),
@@ -134,7 +134,7 @@ fn test_verify_starknet_merkle_proof() {
     nodes.insert(
         felt!("0x2ed240ee95949cd56bb6d1feb5974abd931b844fd090f6738c1166ab129f256"),
         MerkleNode::EdgeNode(EdgeNode {
-            path: felt!("0x0"),
+            path: Felt::ZERO,
             length: 1,
             child: felt!("0x69caa1781f8cd2bd601d17d668e4268a609430ada713cbfd97c4f1a7b79a37e"),
         }),
@@ -198,7 +198,7 @@ fn test_verify_starknet_merkle_proof() {
                 &felt!("0x45ba727abaff9ae3a4311d7a30196e09d1f30aeeb3a8e157277793740d20f61"),
                 &felt!("0x4592da9795f9fd7a042eb0cb0d4dae7b6894bd90ccb3e6ff360185db24301f7"),
             ),
-            &felt!("0x0"),
+            &Felt::ZERO,
         ),
         &Felt::ZERO,
     );
@@ -225,7 +225,7 @@ fn test_verify_starknet_storage_proof_failure() {
     nodes.insert(
         felt!("0x2ed240ee95949cd56bb6d1feb5974abd931b844fd090f6738c1166ab129f256"),
         MerkleNode::EdgeNode(EdgeNode {
-            path: felt!("0x0"),
+            path: Felt::ZERO,
             length: 1,
             child: felt!("0x69caa1781f8cd2bd601d17d668e4268a609430ada713cbfd97c4f1a7b79a37e"),
         }),
@@ -285,7 +285,7 @@ fn test_verify_starknet_storage_proof_failure() {
     let contracts_proof = ContractsProof {
         contract_leaves_data: vec![ContractLeafData {
             class_hash: felt!("0x45ba727abaff9ae3a4311d7a30196e09d1f30aeeb3a8e157277793740d20f61"),
-            nonce: felt!("0x0"),
+            nonce: Felt::ZERO,
             storage_root: Some(felt!(
                 "0x4592da9795f9fd7a042eb0cb0d4dae7b6894bd90ccb3e6ff360185db24301f7"
             )),
@@ -337,7 +337,7 @@ fn test_verify_starknet_merkle_proof_failure() {
     nodes.insert(
         felt!("0x2ed240ee95949cd56bb6d1feb5974abd931b844fd090f6738c1166ab129f256"),
         MerkleNode::EdgeNode(EdgeNode {
-            path: felt!("0x0"),
+            path: Felt::ZERO,
             length: 1,
             child: felt!("0x69caa1781f8cd2bd601d17d668e4268a609430ada713cbfd97c4f1a7b79a37e"),
         }),
@@ -402,7 +402,7 @@ fn test_verify_starknet_merkle_proof_failure() {
                 &felt!("0x45ba727abaff9ae3a4311d7a30196e09d1f30aeeb3a8e157277793740d20f61"),
                 &felt!("0x4592da9795f9fd7a042eb0cb0d4dae7b6894bd90ccb3e6ff360185db24301f7"),
             ),
-            &felt!("0x0"),
+            &Felt::ZERO,
         ),
         &Felt::ZERO,
     );
@@ -465,7 +465,7 @@ fn test_verify_non_membership_proof() {
     let contracts_proof = ContractsProof {
         contract_leaves_data: vec![ContractLeafData {
             class_hash: felt!("0x120e105241f6157aac9149848bca548501d2b66080e71650e11353043a1a61d"),
-            nonce: felt!("0x0"),
+            nonce: Felt::ZERO,
             storage_root: Some(felt!(
                 "0x42db0df05b5d299e7fbc5255f0e20a982530dafd765f62421b66c2763dd0951"
             )),
