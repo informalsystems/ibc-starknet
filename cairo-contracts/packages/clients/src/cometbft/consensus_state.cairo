@@ -1,4 +1,3 @@
-use alexandria_data_structures::byte_array_ext::{ByteArrayIntoArrayU8, SpanU8IntoBytearray};
 use cometbft::ibc::MerkleRoot;
 use cometbft::light_client::ConsensusState as ProtoCometConsensusState;
 use core::num::traits::Zero;

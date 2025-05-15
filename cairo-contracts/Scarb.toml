@@ -31,11 +31,10 @@ snforge_std   = "0.42.0"
 # external dependencies
 # FIXME: pinned to specific rev for ed25519 signature fix
 # update to release version from scarbs.xyz once available
-alexandria_data_structures = { git = "https://github.com/keep-starknet-strange/alexandria", rev = "f2c5fbe" }
-openzeppelin_access        = "1.0.0"
-openzeppelin_token         = "1.0.0"
-openzeppelin_testing       = "4.0.0"
-openzeppelin_utils         = "1.0.0"
+openzeppelin_access  = "1.0.0"
+openzeppelin_token   = "1.0.0"
+openzeppelin_testing = "4.0.0"
+openzeppelin_utils   = "1.0.0"
 
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }

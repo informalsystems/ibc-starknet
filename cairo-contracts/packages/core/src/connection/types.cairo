@@ -1,4 +1,3 @@
-use alexandria_data_structures::span_ext::SpanTraitExt;
 use core::num::traits::Zero;
 use ics23::ByteArrayIntoArrayU8;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
@@ -321,12 +320,12 @@ pub impl VersionImpl of VersionTrait {
     fn is_supported(self: @Version) -> bool {
         let features_span = self.features.span();
         self.identifier == @"1"
-            && features_span.contains(@"ORDER_ORDERED")
-            && features_span.contains(@"ORDER_UNORDERED")
+            && ics23::span_contains(features_span, @"ORDER_ORDERED")
+            && ics23::span_contains(features_span, @"ORDER_UNORDERED")
     }
 
     fn is_feature_supported(self: @Version, feature: @ByteArray) -> bool {
-        self.features.span().contains(feature)
+        ics23::span_contains(self.features.span(), feature)
     }
 }
 
