@@ -4,6 +4,7 @@ members = [
   "./ibc-client-starknet",
   "./ibc-client-starknet-cw",
   "./ibc-client-starknet-types",
+  "./starknet-block-verifier",
 ]
 
 [workspace.package]
