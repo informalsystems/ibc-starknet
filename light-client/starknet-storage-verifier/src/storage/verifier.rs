@@ -29,7 +29,7 @@ pub fn verify_starknet_merkle_proof(
         .get(&root)
         .ok_or_else(|| StorageError::MissingRootProofNode(root.to_hex_string()))?;
 
-    // Keep interating until all path bits are consumed.
+    // Keep iterating until all path bits are consumed.
     while !path_bits.is_empty() {
         match current_node {
             MerkleNode::BinaryNode(node) => {
@@ -44,7 +44,7 @@ pub fn verify_starknet_merkle_proof(
                     .get(&next_root)
                     .ok_or_else(|| StorageError::MissingProofNode(next_root.to_hex_string()))?;
 
-                // Slice out the one bit and continue with hte next iteration.
+                // Slice out the one bit and continue with the next iteration.
 
                 remaining_length -= 1;
                 path_bits = &path_bits[1..];
@@ -125,7 +125,7 @@ pub fn verify_starknet_merkle_proof(
                             StorageError::MissingProofNode(node.child.to_hex_string())
                         })?;
 
-                        // Slice out the bits that we have traveresed and continue with the next iteration.
+                        // Slice out the bits that we have traversed and continue with the next iteration.
 
                         remaining_length -= node_length;
                         path_bits = &path_bits[node_length.into()..];
