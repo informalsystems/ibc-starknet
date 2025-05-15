@@ -28,7 +28,9 @@ indexmap    = { version = "2.9.0" }
 prost       = { version = "0.13.1" }
 prost-types = { version = "0.13.1" }
 serde       = { version = "1.0.210", features = [ "derive" ] }
-starknet    = { version = "0.14.0" }
+starknet-core    = { version = "0.13.0" }
+starknet-crypto    = { version = "0.7.4" }
+starknet-macros  = { version = "0.2.2" }
 thiserror   = { version = "2.0.12" }
 
 # ibc depedenencies

@@ -1,6 +1,6 @@
 use indexmap::IndexMap;
-use starknet::core::crypto::pedersen_hash;
-use starknet::core::types::{ContractsProof, Felt, MerkleNode, StorageProof};
+use starknet_core::types::{ContractsProof, MerkleNode, StorageProof};
+use starknet_crypto::{pedersen_hash, Felt};
 
 use crate::StorageError;
 

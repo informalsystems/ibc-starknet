@@ -1,6 +1,7 @@
 use std::num::TryFromIntError;
 
-use starknet::core::types::{BinaryNode, ContractLeafData, EdgeNode, Felt};
+use starknet_core::types::{BinaryNode, ContractLeafData, EdgeNode};
+use starknet_crypto::Felt;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
