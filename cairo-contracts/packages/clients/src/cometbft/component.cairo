@@ -1,7 +1,5 @@
 #[starknet::component]
 pub mod CometClientComponent {
-    use alexandria_data_structures::array_ext::ArrayTraitExt;
-    use alexandria_data_structures::byte_array_ext::SpanU8IntoBytearray;
     use cometbft::types::{Options, TrustedBlockState, UntrustedBlockState};
     use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use core::num::traits::Zero;
@@ -1049,7 +1047,7 @@ pub mod CometClientComponent {
         ) {
             let mut update_heights = self.update_heights.read(client_sequence);
 
-            if update_heights.contains(@update_height) {
+            if ics23::span_contains(update_heights.span(), @update_height) {
                 return;
             }
 

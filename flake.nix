@@ -24,7 +24,7 @@
     };
 
     starknet-foundry-src = {
-      url = "github:foundry-rs/starknet-foundry/v0.41.0";
+      url = "github:foundry-rs/starknet-foundry/v0.42.0";
       flake = false;
     };
   };

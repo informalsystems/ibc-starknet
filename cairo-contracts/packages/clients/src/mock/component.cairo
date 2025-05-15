@@ -1,6 +1,5 @@
 #[starknet::component]
 pub mod MockClientComponent {
-    use alexandria_data_structures::array_ext::ArrayTraitExt;
     use core::num::traits::Zero;
     use ics23::ArrayFelt252Store;
     use openzeppelin_access::ownable::OwnableComponent;
@@ -883,7 +882,7 @@ pub mod MockClientComponent {
         ) {
             let mut update_heights = self.update_heights.read(client_sequence);
 
-            if update_heights.contains(@update_height) {
+            if ics23::span_contains(update_heights.span(), @update_height) {
                 return;
             }
 

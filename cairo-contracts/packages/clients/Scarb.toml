@@ -22,9 +22,8 @@ scarb = { workspace = true }
 
 [dependencies]
 # external dependencies
-alexandria_data_structures = { workspace = true }
-openzeppelin_access        = { workspace = true }
-starknet                   = { workspace = true }
+openzeppelin_access = { workspace = true }
+starknet            = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_core  = { workspace = true }

@@ -323,3 +323,14 @@ pub fn u32_to_u8(value: u32) -> (u8, u8, u8, u8) {
     let b3 = value.try_into().unwrap();
     (b0, b1, b2, b3)
 }
+
+pub fn span_contains<T, +PartialEq<T>>(mut span: Span<T>, value: @T) -> bool {
+    let mut result = false;
+    while let Option::Some(v) = span.pop_front() {
+        if v == value {
+            result = true;
+            break;
+        }
+    }
+    result
+}
