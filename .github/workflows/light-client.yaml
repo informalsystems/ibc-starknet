@@ -72,7 +72,7 @@ jobs:
       - name: Run tests
         working-directory: ./light-client
         run: |
-          cargo test --package starknet-storage-verifier --test storage_proof_tests --  --show-output
+          cargo test -- --show-output
 
   lint-light-client:
     name: Lint CosmWasm Light Client Contract
