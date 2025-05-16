@@ -1,0 +1,24 @@
+[package]
+name         = "starknet-storage-verifier"
+authors      = { workspace = true }
+edition      = { workspace = true }
+license      = { workspace = true }
+rust-version = { workspace = true }
+version      = { workspace = true }
+repository   = { workspace = true }
+readme       = "./../README.md"
+keywords     = [ "starknet", "ibc", "light-client", "merkle-proof" ]
+description  = "Starknet storage verifier"
+
+[lints]
+workspace = true
+
+[dependencies]
+indexmap        = { workspace = true }
+starknet-core   = { workspace = true }
+starknet-crypto = { workspace = true }
+starknet-macros = { workspace = true }
+thiserror       = { workspace = true }
+
+[dev-dependencies]
+starknet = { version = "0.14.0" }
