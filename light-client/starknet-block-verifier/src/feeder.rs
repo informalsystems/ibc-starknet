@@ -77,32 +77,30 @@ mod tests {
 
     #[tokio::test]
     async fn test_sepolia_get_block() {
-        let block = Endpoint::sepolia().get_block(Some(732297)).await.unwrap();
-        assert_eq!(block.block_number, 732297);
+        let block = Endpoint::sepolia().get_block(Some(785794)).await.unwrap();
+        assert_eq!(block.block_number, 785794);
         assert_eq!(
             block.block_hash,
-            felt!("0x116702238e674269e8cf96de73d917e9bd79dec067cb528d57da863fe1d8468")
+            felt!("0x37b7814b6ca55e1a9f1f5d1069548110f783f8afc23c380ceadd21e7383b038")
         );
         assert!(block.validate());
     }
 
     #[tokio::test]
     async fn test_mainnet_get_block() {
-        let block = Endpoint::mainnet().get_block(Some(732297)).await.unwrap();
-        assert_eq!(block.block_number, 732297);
+        let block = Endpoint::mainnet().get_block(Some(1415244)).await.unwrap();
+        assert_eq!(block.block_number, 1415244);
         assert_eq!(
             block.block_hash,
-            felt!("0x65b1882d075244cc8319b4a8155a69c8a98d8cc81c32f69ee2bc0f241a8f7e")
+            felt!("0x1d690fa8011e5f0cf87052099772ad39188e40b9b42e2b4b274c2335387bc83")
         );
-        // mainnet is still on 0.13.2
-        // currently, we are computing hash for >= 0.13.3
-        // assert!(block.validate());
+        assert!(block.validate());
     }
 
     #[tokio::test]
     async fn test_sepolia_get_public_key() {
         let pub_key = Endpoint::sepolia()
-            .get_public_key(Some(732297))
+            .get_public_key(Some(785794))
             .await
             .unwrap();
         assert_eq!(pub_key, SEPOLIA_PUBLIC_KEY);
@@ -111,7 +109,7 @@ mod tests {
     #[tokio::test]
     async fn test_mainnet_get_public_key() {
         let pub_key = Endpoint::mainnet()
-            .get_public_key(Some(732297))
+            .get_public_key(Some(1415244))
             .await
             .unwrap();
         assert_eq!(pub_key, MAINNET_PUBLIC_KEY);
@@ -120,7 +118,7 @@ mod tests {
     #[tokio::test]
     async fn test_sepolia_get_signature() {
         let signature = Endpoint::sepolia()
-            .get_signature(Some(732297))
+            .get_signature(Some(785794))
             .await
             .unwrap();
 
@@ -128,11 +126,11 @@ mod tests {
             signature,
             Signature {
                 block_hash: felt!(
-                    "0x116702238e674269e8cf96de73d917e9bd79dec067cb528d57da863fe1d8468"
+                    "0x37b7814b6ca55e1a9f1f5d1069548110f783f8afc23c380ceadd21e7383b038"
                 ),
                 signature: [
-                    felt!("0x5b045b193b3d8a72d5ebc9145b6a7426816aca4969d471e6fc51383caf99c13"),
-                    felt!("0x703e65a44b1780e6ae0f23f4dc4cabe7bab1ece109d551497843f51487f6773"),
+                    felt!("0x7eeec392ab47f1bdf91b9084a471ff76a9a921eec59c36ff59e20a0c667ba6f"),
+                    felt!("0x39836a94595614c1dce61bf88fcf7f5bdfb38ed618301fd1c94759e16831e9e"),
                 ],
             }
         );
@@ -141,7 +139,7 @@ mod tests {
     #[tokio::test]
     async fn test_mainnet_get_signature() {
         let signature = Endpoint::mainnet()
-            .get_signature(Some(732297))
+            .get_signature(Some(1415244))
             .await
             .unwrap();
 
@@ -149,11 +147,11 @@ mod tests {
             signature,
             Signature {
                 block_hash: felt!(
-                    "0x65b1882d075244cc8319b4a8155a69c8a98d8cc81c32f69ee2bc0f241a8f7e"
+                    "0x1d690fa8011e5f0cf87052099772ad39188e40b9b42e2b4b274c2335387bc83"
                 ),
                 signature: [
-                    felt!("0x760b20a5120b1d1164abe192128ab83a18f59c63e4b4eeb9a6eb56e426359e7"),
-                    felt!("0x6d56d7f23af14c8dce749208a8240e4a766a2d51a0d08a6a73ecdd89fe70460"),
+                    felt!("0x1561afc7a7a36106bd7224a709ee54b1653152adce5f631c85e296ca6252109"),
+                    felt!("0x58239310a16cfcd8bb6b6b89ace3f1a0b77a9fa854f1253faf7d6073a624fbd"),
                 ],
             }
         );
