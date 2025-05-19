@@ -129,7 +129,7 @@ impl Block {
             self.event_commitment,
             self.receipt_commitment.unwrap_or(Felt::ZERO),
             self.gas_commitment(),
-            Felt::from_bytes_be_slice(dbg!(&self.starknet_version).as_bytes()),
+            Felt::from_bytes_be_slice(self.starknet_version.as_bytes()),
             Felt::ZERO,
             self.parent_block_hash,
         ])
