@@ -1,6 +1,4 @@
-use core::time::Duration;
 use hermes_core::chain_components::traits::{CanQueryBlock, CanQueryChainStatus};
-use hermes_core::runtime_components::traits::CanSleep;
 use hermes_core::test_components::bootstrap::traits::CanBootstrapChain;
 use hermes_error::Error;
 use starknet::core::crypto::{ecdsa_verify, Signature};
@@ -21,9 +19,6 @@ fn test_madara_feeder_gateway_signature() -> Result<(), Error> {
 
         let chain_driver: MadaraChainDriver = madara_bootstrap.bootstrap_chain("madara").await?;
 
-        // Wait for the chain to be ready
-        runtime.sleep(Duration::from_secs(10)).await;
-
         let chain = &chain_driver.chain;
 
         let chain_status = chain.query_chain_status().await?;
@@ -39,11 +34,11 @@ fn test_madara_feeder_gateway_signature() -> Result<(), Error> {
         // madara feeder gateway endpoint
         let endpoint = Endpoint::new(&format!("http://0.0.0.0:{gateway_port}"));
 
-        let public_key = endpoint.get_public_key(None).unwrap();
+        let public_key = endpoint.get_public_key(Some(block.height)).unwrap();
 
         info!("public key: {public_key:x}");
 
-        let signature = endpoint.get_signature(None).unwrap();
+        let signature = endpoint.get_signature(Some(block.height)).unwrap();
 
         info!("signature: {signature:x?}");
 
