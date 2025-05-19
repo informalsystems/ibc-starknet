@@ -124,7 +124,7 @@ jobs:
         run: |
           mkdir -p ~/.bin
           curl -sSLf "https://github.com/informalsystems/madara/releases/download/snapshot-2c88da11/madara" -o ~/.bin/madara
-          chmod +x ~/.bin/madara
+          chmod u+x ~/.bin/madara
 
       - name: Install Scarb
         uses: software-mansion/setup-scarb@v1

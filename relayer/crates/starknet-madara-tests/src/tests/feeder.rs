@@ -29,8 +29,10 @@ fn test_madara_feeder_gateway_signature() -> Result<(), Error> {
 
         info!("block: {block}");
 
+        let gateway_port = chain_driver.node_config.rpc_port + 1;
+
         // madara feeder gateway endpoint
-        let endpoint = Endpoint::new("http://0.0.0.0:8080");
+        let endpoint = Endpoint::new(&format!("http://0.0.0.0:{gateway_port}"));
 
         let public_key = endpoint.get_public_key(None).unwrap();
 
