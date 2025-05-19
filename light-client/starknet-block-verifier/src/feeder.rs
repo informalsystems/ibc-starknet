@@ -47,7 +47,7 @@ impl Endpoint {
         Ok(result)
     }
 
-    pub fn get_block(&self, block_number: Option<u64>) -> Result<Block, ureq::Error> {
+    pub fn get_block_header(&self, block_number: Option<u64>) -> Result<Block, ureq::Error> {
         self.get(GET_BLOCK_PATH, block_number)
     }
 
@@ -69,7 +69,7 @@ mod tests {
 
     #[test]
     fn test_sepolia_get_block() {
-        let block = Endpoint::sepolia().get_block(Some(785794)).unwrap();
+        let block = Endpoint::sepolia().get_block_header(Some(785794)).unwrap();
         assert_eq!(block.block_number, 785794);
         assert_eq!(
             block.block_hash,
@@ -80,7 +80,7 @@ mod tests {
 
     #[test]
     fn test_mainnet_get_block() {
-        let block = Endpoint::mainnet().get_block(Some(1415244)).unwrap();
+        let block = Endpoint::mainnet().get_block_header(Some(1415244)).unwrap();
         assert_eq!(block.block_number, 1415244);
         assert_eq!(
             block.block_hash,
