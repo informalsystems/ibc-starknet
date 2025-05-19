@@ -35,35 +35,27 @@ impl Endpoint {
         &self,
         path: &'static str,
         block_number: Option<u64>,
-    ) -> Result<T, reqwest::Error> {
-        let url_params = block_number.map(|num| ("blockNumber", num.to_string()));
+    ) -> Result<T, ureq::Error> {
+        let mut req = ureq::get(&format!("{}/feeder_gateway/{}", self.0, path));
 
-        let url = reqwest::Url::parse_with_params(
-            &format!("{}/feeder_gateway/{path}", self.0),
-            url_params,
-        )
-        .unwrap();
+        if let Some(block_number) = block_number {
+            req = req.query("blockNumber", block_number.to_string());
+        }
 
-        let client = reqwest::Client::new();
-        let response = client.get(url).send().await?;
-
-        let result = response.json().await?;
+        let result = req.call()?.body_mut().read_json()?;
 
         Ok(result)
     }
 
-    pub async fn get_block(&self, block_number: Option<u64>) -> Result<Block, reqwest::Error> {
+    pub async fn get_block(&self, block_number: Option<u64>) -> Result<Block, ureq::Error> {
         self.get(GET_BLOCK_PATH, block_number).await
     }
 
-    pub async fn get_public_key(&self, block_number: Option<u64>) -> Result<Felt, reqwest::Error> {
+    pub async fn get_public_key(&self, block_number: Option<u64>) -> Result<Felt, ureq::Error> {
         self.get(GET_PUBLIC_KEY, block_number).await
     }
 
-    pub async fn get_signature(
-        &self,
-        block_number: Option<u64>,
-    ) -> Result<Signature, reqwest::Error> {
+    pub async fn get_signature(&self, block_number: Option<u64>) -> Result<Signature, ureq::Error> {
         self.get(GET_SIGNATURE, block_number).await
     }
 }

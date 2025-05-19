@@ -11,13 +11,13 @@ keywords     = [ "starknet", "ibc", "light-client" ]
 description  = "Starknet block header verifier"
 
 [dependencies]
-reqwest         = { version = "0.12.15", default-features = false, features = [ "json", "default-tls" ] }
 serde           = { workspace = true }
-starknet-crypto = { version = "0.7.4", default-features = false }
+starknet-crypto = { workspace = true }
+ureq            = { version = "3.0.11", default-features = false, features = [ "json", "rustls" ] }
 
 [dev-dependencies]
 tokio    = { version = "1.34.0", features = [ "full" ] }
-starknet = { version = "0.15.1" }
+starknet = { workspace = true }
 
 [lints]
 workspace = true
