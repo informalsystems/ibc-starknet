@@ -16,7 +16,6 @@ starknet-crypto = { workspace = true }
 ureq            = { version = "3.0.11", default-features = false, features = [ "json", "rustls" ] }
 
 [dev-dependencies]
-tokio    = { version = "1.34.0", features = [ "full" ] }
 starknet = { workspace = true }
 
 [lints]

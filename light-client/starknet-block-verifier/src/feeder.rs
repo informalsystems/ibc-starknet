@@ -31,7 +31,7 @@ impl Endpoint {
         Self(MAINNET_FEEDER_URL.to_string())
     }
 
-    pub async fn get<T: DeserializeOwned>(
+    pub fn get<T: DeserializeOwned>(
         &self,
         path: &'static str,
         block_number: Option<u64>,
@@ -47,16 +47,16 @@ impl Endpoint {
         Ok(result)
     }
 
-    pub async fn get_block(&self, block_number: Option<u64>) -> Result<Block, ureq::Error> {
-        self.get(GET_BLOCK_PATH, block_number).await
+    pub fn get_block(&self, block_number: Option<u64>) -> Result<Block, ureq::Error> {
+        self.get(GET_BLOCK_PATH, block_number)
     }
 
-    pub async fn get_public_key(&self, block_number: Option<u64>) -> Result<Felt, ureq::Error> {
-        self.get(GET_PUBLIC_KEY, block_number).await
+    pub fn get_public_key(&self, block_number: Option<u64>) -> Result<Felt, ureq::Error> {
+        self.get(GET_PUBLIC_KEY, block_number)
     }
 
-    pub async fn get_signature(&self, block_number: Option<u64>) -> Result<Signature, ureq::Error> {
-        self.get(GET_SIGNATURE, block_number).await
+    pub fn get_signature(&self, block_number: Option<u64>) -> Result<Signature, ureq::Error> {
+        self.get(GET_SIGNATURE, block_number)
     }
 }
 
@@ -67,9 +67,9 @@ mod tests {
 
     use super::*;
 
-    #[tokio::test]
-    async fn test_sepolia_get_block() {
-        let block = Endpoint::sepolia().get_block(Some(785794)).await.unwrap();
+    #[test]
+    fn test_sepolia_get_block() {
+        let block = Endpoint::sepolia().get_block(Some(785794)).unwrap();
         assert_eq!(block.block_number, 785794);
         assert_eq!(
             block.block_hash,
@@ -78,9 +78,9 @@ mod tests {
         assert!(block.validate());
     }
 
-    #[tokio::test]
-    async fn test_mainnet_get_block() {
-        let block = Endpoint::mainnet().get_block(Some(1415244)).await.unwrap();
+    #[test]
+    fn test_mainnet_get_block() {
+        let block = Endpoint::mainnet().get_block(Some(1415244)).unwrap();
         assert_eq!(block.block_number, 1415244);
         assert_eq!(
             block.block_hash,
@@ -89,30 +89,21 @@ mod tests {
         assert!(block.validate());
     }
 
-    #[tokio::test]
-    async fn test_sepolia_get_public_key() {
-        let pub_key = Endpoint::sepolia()
-            .get_public_key(Some(785794))
-            .await
-            .unwrap();
+    #[test]
+    fn test_sepolia_get_public_key() {
+        let pub_key = Endpoint::sepolia().get_public_key(Some(785794)).unwrap();
         assert_eq!(pub_key, SEPOLIA_PUBLIC_KEY);
     }
 
-    #[tokio::test]
-    async fn test_mainnet_get_public_key() {
-        let pub_key = Endpoint::mainnet()
-            .get_public_key(Some(1415244))
-            .await
-            .unwrap();
+    #[test]
+    fn test_mainnet_get_public_key() {
+        let pub_key = Endpoint::mainnet().get_public_key(Some(1415244)).unwrap();
         assert_eq!(pub_key, MAINNET_PUBLIC_KEY);
     }
 
-    #[tokio::test]
-    async fn test_sepolia_get_signature() {
-        let signature = Endpoint::sepolia()
-            .get_signature(Some(785794))
-            .await
-            .unwrap();
+    #[test]
+    fn test_sepolia_get_signature() {
+        let signature = Endpoint::sepolia().get_signature(Some(785794)).unwrap();
 
         assert_eq!(
             signature,
@@ -128,12 +119,9 @@ mod tests {
         );
     }
 
-    #[tokio::test]
-    async fn test_mainnet_get_signature() {
-        let signature = Endpoint::mainnet()
-            .get_signature(Some(1415244))
-            .await
-            .unwrap();
+    #[test]
+    fn test_mainnet_get_signature() {
+        let signature = Endpoint::mainnet().get_signature(Some(1415244)).unwrap();
 
         assert_eq!(
             signature,
@@ -149,13 +137,13 @@ mod tests {
         );
     }
 
-    #[tokio::test]
-    async fn test_sepolia_signature() {
+    #[test]
+    fn test_sepolia_signature() {
         let endpoint = Endpoint::sepolia();
 
-        let public_key = endpoint.get_public_key(None).await.unwrap();
+        let public_key = endpoint.get_public_key(None).unwrap();
 
-        let signature = endpoint.get_signature(None).await.unwrap();
+        let signature = endpoint.get_signature(None).unwrap();
 
         assert!(verify(
             &public_key,
@@ -166,13 +154,13 @@ mod tests {
         .unwrap());
     }
 
-    #[tokio::test]
-    async fn test_mainnet_signature() {
+    #[test]
+    fn test_mainnet_signature() {
         let endpoint = Endpoint::mainnet();
 
-        let public_key = endpoint.get_public_key(None).await.unwrap();
+        let public_key = endpoint.get_public_key(None).unwrap();
 
-        let signature = endpoint.get_signature(None).await.unwrap();
+        let signature = endpoint.get_signature(None).unwrap();
 
         assert!(verify(
             &public_key,
