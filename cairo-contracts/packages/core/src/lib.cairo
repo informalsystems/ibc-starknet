@@ -4,6 +4,7 @@ mod tests {
     mod client;
     mod commitment;
     mod connection;
+    mod keys;
     mod router;
 }
 pub mod router {
