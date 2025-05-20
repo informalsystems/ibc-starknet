@@ -6,26 +6,26 @@ use poseidon::Poseidon3Hasher;
 use starknet_core::utils::starknet_keccak;
 use starknet_crypto::{pedersen_hash, Felt};
 
-pub fn convert_value(value: &[u8]) -> Felt {
-    starknet_keccak(value)
-}
-
-pub fn convert_storage_value(path: &str, storage_member: &Felt) -> Felt {
+pub fn convert_storage_value(path: &str) -> Felt {
     let path = Path::from_str(path).unwrap();
     match path {
         Path::SeqAck(seq_ack_path) => {
-            let next_sequence_ack_key = next_sequence_ack_key(seq_ack_path.0, seq_ack_path.1);
+            let sequence_hash = starknet_keccak(b"sequence");
 
-            let path_sn_keccak = starknet_keccak(&next_sequence_ack_key.to_bytes_be());
-            pedersen_hash(&path_sn_keccak, storage_member)
+            // Compute the Map's key
+            let key = next_sequence_key("nextSequenceAck", seq_ack_path.0, seq_ack_path.1);
+
+            let key_hash = pedersen_hash(&key, &sequence_hash);
+
+            pedersen_hash(&starknet_keccak(b"ack_sequences"), &key_hash)
         }
         _ => unimplemented!(),
     }
 }
 
-pub fn next_sequence_ack_key(port_id: PortId, channel_id: ChannelId) -> Felt {
+pub fn next_sequence_key(prefix: &str, port_id: PortId, channel_id: ChannelId) -> Felt {
     let mut raw_path: Vec<Felt> = vec![];
-    raw_path.extend(serialize_byte_array("nextSequenceAck".as_bytes()));
+    raw_path.extend(serialize_byte_array(prefix.as_bytes()));
     raw_path.extend(serialize_byte_array("ports".as_bytes()));
     raw_path.extend(serialize_byte_array(port_id.as_bytes()));
     raw_path.extend(serialize_byte_array("channels".as_bytes()));
