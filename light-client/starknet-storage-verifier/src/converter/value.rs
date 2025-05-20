@@ -10,14 +10,30 @@ pub fn convert_storage_value(path: &str) -> Felt {
     let path = Path::from_str(path).unwrap();
     match path {
         Path::SeqAck(seq_ack_path) => {
-            let sequence_hash = starknet_keccak(b"sequence");
-
             // Compute the Map's key
             let key = next_sequence_key("nextSequenceAck", seq_ack_path.0, seq_ack_path.1);
 
-            let key_hash = pedersen_hash(&key, &sequence_hash);
+            let variable_name = starknet_keccak(b"ack_sequences");
 
-            pedersen_hash(&starknet_keccak(b"ack_sequences"), &key_hash)
+            pedersen_hash(&variable_name, &key)
+        }
+
+        Path::SeqSend(seq_send_path) => {
+            // Compute the Map's key
+            let key = next_sequence_key("nextSequenceSend", seq_send_path.0, seq_send_path.1);
+
+            let variable_name = starknet_keccak(b"send_sequences");
+
+            pedersen_hash(&variable_name, &key)
+        }
+
+        Path::SeqRecv(seq_recv_path) => {
+            // Compute the Map's key
+            let key = next_sequence_key("nextSequenceRecv", seq_recv_path.0, seq_recv_path.1);
+
+            let variable_name = starknet_keccak(b"recv_sequences");
+
+            pedersen_hash(&variable_name, &key)
         }
         _ => unimplemented!(),
     }

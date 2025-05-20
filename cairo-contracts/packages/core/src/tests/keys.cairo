@@ -3,9 +3,9 @@ use starknet_ibc_testkit::dummies::{CHANNEL_ID, PORT_ID};
 
 #[test]
 fn test_next_sequence_ack_key() {
-    let channel_id = CHANNEL_ID(1);
+    let channel_id = CHANNEL_ID(0);
     let port_id = PORT_ID();
     let key = next_sequence_ack_key(@port_id, @channel_id);
-    let expected_key: felt252 = 0x6df926e78cbebe00e6ce07b5205dd71875e6b69b4cb8d1a07f4e00210b87d2c;
+    let expected_key: felt252 = 0x3bd37d2d2afff7ce21f13c1fb0d1190cec01aba29de094629ce1e411114762c;
     assert_eq!(expected_key, key);
 }
