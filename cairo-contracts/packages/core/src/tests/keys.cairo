@@ -1,6 +1,5 @@
 use starknet_ibc_core::host::next_sequence_ack_key;
-use starknet_ibc_testkit::dummies::PORT_ID;
-use starknet_ibc_testkit::dummies::CHANNEL_ID;
+use starknet_ibc_testkit::dummies::{CHANNEL_ID, PORT_ID};
 
 #[test]
 fn test_next_sequence_ack_key() {
