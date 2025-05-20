@@ -1,4 +1,3 @@
-use alexandria_math::ed25519::verify_signature;
 pub use canonical_vote_impl::CanonicalVoteAsProtoMessage;
 use cometbft::errors::CometErrors;
 use cometbft::utils::{Fraction, SpanU8TryIntoU256};
@@ -322,26 +321,19 @@ pub struct PublicKey {
     pub sum: Sum,
 }
 
+pub trait Ed25519<T> {
+    fn verify(self: @T, pub_key: Span<u8>, msg: Span<u8>, signature: Span<u8>) -> bool;
+}
+
 #[generate_trait]
 pub impl PublicKeyImpl of PublicKeyTrait {
-    fn verify(self: @PublicKey, msg: Span<u8>, signature: Span<u8>) {
+    fn verify<V, +Ed25519<V>>(self: @PublicKey, verifier: @V, msg: Span<u8>, signature: Span<u8>) {
         match self.sum {
             Sum::Ed25519(pk) => {
-                assert(signature.len() == 64, CometErrors::INVALID_SIGNATURE_LENGTH);
-                assert(pk.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
-
-                let r_sign = signature
-                    .slice(0, 32)
-                    .try_into()
-                    .unwrap(); // Never fails as length is 32.
-                let s_sign = signature
-                    .slice(32, 32)
-                    .try_into()
-                    .unwrap(); // Never fails as length is 32.
-                let pubkey = pk.span().try_into().unwrap(); // Never fails as length is 32.
+                let pk_span = pk.span();
 
                 assert(
-                    verify_signature(msg, array![r_sign, s_sign].span(), pubkey),
+                    verifier.verify(pk_span, msg, signature),
                     CometErrors::INVALID_ED25519_SIGNATURE,
                 );
             },
@@ -456,8 +448,10 @@ pub impl ValidatorImpl of ValidatorTrait {
         assert!(self.address == @self.pub_key.address());
     }
 
-    fn verify_signature(self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>) {
-        self.pub_key.verify(sign_bytes, signature);
+    fn verify_signature<V, +Ed25519<V>>(
+        self: @Validator, verifier: @V, sign_bytes: Span<u8>, signature: Span<u8>,
+    ) {
+        self.pub_key.verify(verifier, sign_bytes, signature);
     }
 }
 
@@ -698,7 +692,9 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
         NonAbsentCommitVotes { votes }
     }
 
-    fn has_voted(self: @NonAbsentCommitVotes, validator: @Validator) -> bool {
+    fn has_voted<V, +Ed25519<V>>(
+        self: @NonAbsentCommitVotes, verifier: @V, validator: @Validator,
+    ) -> bool {
         let mut votes_span = self.votes.span();
         let mut result = false;
         while let Option::Some(ith_vote) = votes_span.pop_front() {
@@ -719,7 +715,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
                 validator.validate_id();
 
-                validator.verify_signature(signed_array_u8.span(), signature.span());
+                validator.verify_signature(verifier, signed_array_u8.span(), signature.span());
 
                 // TODO: set verified field to true
 
