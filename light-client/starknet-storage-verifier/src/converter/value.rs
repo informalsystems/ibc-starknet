@@ -9,6 +9,14 @@ use starknet_crypto::{pedersen_hash, Felt};
 pub fn convert_storage_value(path: &str) -> Felt {
     let path = Path::from_str(path).unwrap();
     match path {
+        Path::ChannelEnd(channel_end_path) => {
+            let key = next_sequence_key("channelEnds", channel_end_path.0, channel_end_path.1);
+
+            let variable_name = starknet_keccak(b"channel_ends");
+
+            pedersen_hash(&variable_name, &key)
+        }
+
         Path::Commitment(commitment_path) => {
             let key = packet_key(
                 "commitments",

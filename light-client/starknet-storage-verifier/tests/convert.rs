@@ -1,31 +1,5 @@
-use ibc_core::host::types::identifiers::{ChannelId, PortId, Sequence};
 use starknet_macros::felt;
-use starknet_storage_verifier::value::{convert_storage_value, next_sequence_key, packet_key};
-
-// This test insures that the behavior is the same as the one in the Cairo contract
-// cairo-contracts/packages/core/src/tests/keys.cairo
-#[test]
-fn test_next_sequence_ack_key() {
-    let port_id = PortId::transfer();
-    let channel_id = ChannelId::new(0);
-    let converted_value = next_sequence_key("nextSequenceAck", port_id, channel_id);
-    let expected_converted_value =
-        felt!("0x3bd37d2d2afff7ce21f13c1fb0d1190cec01aba29de094629ce1e411114762c");
-    assert_eq!(expected_converted_value, converted_value,);
-}
-
-// This test insures that the behavior is the same as the one in the Cairo contract
-// cairo-contracts/packages/core/src/tests/keys.cairo
-#[test]
-fn test_commitment_key() {
-    let port_id = PortId::transfer();
-    let channel_id = ChannelId::new(0);
-    let sequence = Sequence::from(1);
-    let converted_value = packet_key("commitments", port_id, channel_id, sequence);
-    let expected_converted_value =
-        felt!("0x21d9da1890ea380cfe5af2c3e84da497be6d2c220159f4e81dd7949cf5512f1");
-    assert_eq!(expected_converted_value, converted_value,);
-}
+use starknet_storage_verifier::value::convert_storage_value;
 
 #[test]
 fn test_convert_storage_value_next_ack() {
@@ -78,5 +52,14 @@ fn test_convert_storage_value_receipt() {
     let converted_value = convert_storage_value(path);
     let expected_converted_value =
         felt!("0x73e8c053278111020f75cbc1e556b2d03ea598b19d7748535a6fb7054c51d17");
+    assert_eq!(expected_converted_value, converted_value,);
+}
+
+#[test]
+fn test_convert_storage_value_channel_end() {
+    let path = "channelEnds/ports/transfer/channels/channel-0";
+    let converted_value = convert_storage_value(path);
+    let expected_converted_value =
+        felt!("0x71e478d871b699d378f44c8a63e3f52673593fd7557b8485f3046042088fa35");
     assert_eq!(expected_converted_value, converted_value,);
 }
