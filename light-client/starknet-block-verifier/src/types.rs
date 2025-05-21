@@ -126,7 +126,6 @@ impl Block {
     ///
     /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L111-L116
     pub fn compute_hash(&self) -> Felt {
-        // works for starknet blocks >=0.13.3
         poseidon_hash_many(&[
             Felt::from_bytes_be_slice(STARKNET_BLOCK_HASH1),
             self.block_number.into(),
