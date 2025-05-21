@@ -1,9 +1,30 @@
+//! This test file insure that the behavior of the methods used to convert the
+//! key paths are the same as the ones in the Cairo contract.
+
 use ibc_core::host::types::identifiers::{ChannelId, PortId, Sequence};
 use starknet_macros::felt;
 use starknet_storage_verifier::value::{next_sequence_key, packet_key};
 
-// This test insures that the behavior is the same as the one in the Cairo contract
-// cairo-contracts/packages/core/src/tests/keys.cairo
+#[test]
+fn test_next_sequence_send_key() {
+    let port_id = PortId::transfer();
+    let channel_id = ChannelId::new(0);
+    let converted_value = next_sequence_key("nextSequenceSend", port_id, channel_id);
+    let expected_converted_value =
+        felt!("0xd3d1f8a9059807297ef2a9e4ff3c29f83fc879279fe9a90e27542a5a4a657b");
+    assert_eq!(expected_converted_value, converted_value,);
+}
+
+#[test]
+fn test_next_sequence_recv_key() {
+    let port_id = PortId::transfer();
+    let channel_id = ChannelId::new(0);
+    let converted_value = next_sequence_key("nextSequenceRecv", port_id, channel_id);
+    let expected_converted_value =
+        felt!("0x3425bf7734bd7178fc550139794c9601ca84413b7cc0b3f03e44ef98cd7402c");
+    assert_eq!(expected_converted_value, converted_value,);
+}
+
 #[test]
 fn test_next_sequence_ack_key() {
     let port_id = PortId::transfer();
@@ -14,8 +35,6 @@ fn test_next_sequence_ack_key() {
     assert_eq!(expected_converted_value, converted_value,);
 }
 
-// This test insures that the behavior is the same as the one in the Cairo contract
-// cairo-contracts/packages/core/src/tests/keys.cairo
 #[test]
 fn test_commitment_key() {
     let port_id = PortId::transfer();
@@ -27,8 +46,28 @@ fn test_commitment_key() {
     assert_eq!(expected_converted_value, converted_value,);
 }
 
-// This test insures that the behavior is the same as the one in the Cairo contract
-// cairo-contracts/packages/core/src/tests/keys.cairo
+#[test]
+fn test_ack_key() {
+    let port_id = PortId::transfer();
+    let channel_id = ChannelId::new(0);
+    let sequence = Sequence::from(1);
+    let converted_value = packet_key("acks", port_id, channel_id, sequence);
+    let expected_converted_value =
+        felt!("0x3b02df8da2f3e88823af46061f810747c5b8c87d7d4de448b815f782201f7c9");
+    assert_eq!(expected_converted_value, converted_value,);
+}
+
+#[test]
+fn test_receipt_key() {
+    let port_id = PortId::transfer();
+    let channel_id = ChannelId::new(0);
+    let sequence = Sequence::from(1);
+    let converted_value = packet_key("receipts", port_id, channel_id, sequence);
+    let expected_converted_value =
+        felt!("0x50c0dcd9f4776b5a563887592d4bc3279a818addeafaba5f43f1358bbfd3993");
+    assert_eq!(expected_converted_value, converted_value,);
+}
+
 #[test]
 fn test_channel_ends_key() {
     let port_id = PortId::transfer();
