@@ -16,7 +16,9 @@ starknet-crypto = { workspace = true }
 ureq            = { version = "3.0.11", default-features = false, features = [ "json", "rustls" ] }
 
 [dev-dependencies]
-starknet = { workspace = true }
+starknet   = { workspace = true }
+serde_json = { workspace = true }
+rstest     = { workspace = true }
 
 [lints]
 workspace = true
