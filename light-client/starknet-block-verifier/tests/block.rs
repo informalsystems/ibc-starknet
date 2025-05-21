@@ -40,13 +40,13 @@ fn mainnet_public_key() -> Felt {
 
 #[rstest::rstest]
 fn test_sepolia(sepolia_block: Block, sepolia_signature: Signature, sepolia_public_key: Felt) {
-    assert_eq!(sepolia_block.block_number, 1415244);
+    assert_eq!(sepolia_block.block_number, 785794);
 
     assert!(sepolia_block.validate());
 
     assert_eq!(sepolia_block.block_hash, sepolia_signature.block_hash);
 
-    assert_eq!(sepolia_public_key, MAINNET_PUBLIC_KEY);
+    assert_eq!(sepolia_public_key, SEPOLIA_PUBLIC_KEY);
 
     assert!(sepolia_block
         .verify_signature(&sepolia_signature, &sepolia_public_key)
