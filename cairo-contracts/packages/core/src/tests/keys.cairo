@@ -1,4 +1,4 @@
-use starknet_ibc_core::host::{next_sequence_ack_key, commitment_key};
+use starknet_ibc_core::host::{commitment_key, next_sequence_ack_key};
 use starknet_ibc_testkit::dummies::{CHANNEL_ID, PORT_ID, SEQUENCE};
 
 #[test]
