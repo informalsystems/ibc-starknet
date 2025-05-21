@@ -22,6 +22,7 @@ pub enum L1DataAvailabilityMode {
 
 impl From<L1DataAvailabilityMode> for u8 {
     fn from(mode: L1DataAvailabilityMode) -> Self {
+        // https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L214-L217
         match mode {
             L1DataAvailabilityMode::Calldata => 0b0000_0000,
             L1DataAvailabilityMode::Blob => 0b1000_0000,
@@ -76,6 +77,9 @@ pub struct Block {
 }
 
 impl Block {
+    /// Computes the concatenated counts of the block.
+    ///
+    /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L204-L208
     pub fn concatenated_counts(&self) -> Felt {
         let l1_data_availability_byte: u8 = self.l1_da_mode.into();
 
@@ -103,6 +107,9 @@ impl Block {
         Felt::from_bytes_be_slice(concat_bytes.as_slice())
     }
 
+    /// Computes the Starknet 0.13.5 gas commitment.
+    ///
+    /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L234-L242
     pub fn gas_commitment(&self) -> Felt {
         poseidon_hash_many(&[
             Felt::from_bytes_be_slice(STARKNET_GAS_PRICES0),
@@ -115,6 +122,9 @@ impl Block {
         ])
     }
 
+    /// Computes the Starknet 0.13.5 block hash.
+    ///
+    /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L111-L116
     pub fn compute_hash(&self) -> Felt {
         // works for starknet blocks >=0.13.3
         poseidon_hash_many(&[
