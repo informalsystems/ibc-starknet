@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use starknet_crypto::{poseidon_hash_many, Felt};
+use starknet_crypto::{poseidon_hash_many, verify, Felt};
 
 pub const STARKNET_GAS_PRICES0: &[u8] = b"STARKNET_GAS_PRICES0";
 pub const STARKNET_BLOCK_HASH1: &[u8] = b"STARKNET_BLOCK_HASH1";
@@ -137,5 +137,20 @@ impl Block {
 
     pub fn validate(&self) -> bool {
         self.block_hash == self.compute_hash()
+    }
+
+    pub fn verify_signature(
+        &self,
+        signature: &Signature,
+        public_key: &Felt,
+    ) -> Result<bool, starknet_crypto::VerifyError> {
+        Ok(self.validate()
+            && signature.block_hash == self.block_hash
+            && verify(
+                public_key,
+                &signature.block_hash,
+                &signature.signature[0],
+                &signature.signature[1],
+            )?)
     }
 }
