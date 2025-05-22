@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use ibc_core::host::types::identifiers::{ChannelId, PortId, Sequence};
+use ibc_core::host::types::identifiers::{ChannelId, ConnectionId, PortId, Sequence};
 use ibc_core::host::types::path::Path;
 use poseidon::Poseidon3Hasher;
 use starknet_core::utils::starknet_keccak;
@@ -9,6 +9,13 @@ use starknet_crypto::{pedersen_hash, Felt};
 pub fn convert_storage_value(path: &str) -> Felt {
     let path = Path::from_str(path).unwrap();
     match path {
+        Path::Connection(connection_path) => {
+            let key = connection_key(connection_path.0);
+
+            let variable_name = starknet_keccak(b"connection_ends");
+
+            pedersen_hash(&variable_name, &key)
+        }
         Path::ChannelEnd(channel_end_path) => {
             let key = next_sequence_key("channelEnds", channel_end_path.0, channel_end_path.1);
 
@@ -85,6 +92,14 @@ pub fn convert_storage_value(path: &str) -> Felt {
 
         _ => unimplemented!(),
     }
+}
+
+pub fn connection_key(connection_id: ConnectionId) -> Felt {
+    let mut raw_path: Vec<Felt> = vec![];
+    raw_path.extend(serialize_byte_array(b"connections"));
+    raw_path.extend(serialize_byte_array(connection_id.as_bytes()));
+
+    Poseidon3Hasher::digest(&raw_path)
 }
 
 pub fn next_sequence_key(prefix: &str, port_id: PortId, channel_id: ChannelId) -> Felt {

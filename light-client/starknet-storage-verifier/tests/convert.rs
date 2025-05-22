@@ -63,3 +63,12 @@ fn test_convert_storage_value_channel_end() {
         felt!("0x71e478d871b699d378f44c8a63e3f52673593fd7557b8485f3046042088fa35");
     assert_eq!(expected_converted_value, converted_value,);
 }
+
+#[test]
+fn test_convert_storage_value_connection_end() {
+    let path = "connections/connection-0";
+    let converted_value = convert_storage_value(path);
+    let expected_converted_value =
+        felt!("0x3ca369d5a8d92da1fb783a2764ff662fb0e2b5e43c29530ac4273b17e827f7f");
+    assert_eq!(expected_converted_value, converted_value,);
+}

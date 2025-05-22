@@ -1,9 +1,9 @@
 //! This test file insure that the behavior of the methods used to convert the
 //! key paths are the same as the ones in the Cairo contract.
 
-use ibc_core::host::types::identifiers::{ChannelId, PortId, Sequence};
+use ibc_core::host::types::identifiers::{ChannelId, ConnectionId, PortId, Sequence};
 use starknet_macros::felt;
-use starknet_storage_verifier::value::{next_sequence_key, packet_key};
+use starknet_storage_verifier::value::{connection_key, next_sequence_key, packet_key};
 
 #[test]
 fn test_next_sequence_send_key() {
@@ -75,5 +75,14 @@ fn test_channel_ends_key() {
     let converted_value = next_sequence_key("channelEnds", port_id, channel_id);
     let expected_converted_value =
         felt!("0x4763930c1c148bddb94c2603126c8d849bbc6921a0fc46734f21ebd2016579e");
+    assert_eq!(expected_converted_value, converted_value,);
+}
+
+#[test]
+fn test_connection_ends_key() {
+    let connection_id = ConnectionId::new(0);
+    let converted_value = connection_key(connection_id);
+    let expected_converted_value =
+        felt!("0x208b5c68df93de403a4d24a5dae739dd3301be96546dfee39836b2ffa9e0584");
     assert_eq!(expected_converted_value, converted_value,);
 }

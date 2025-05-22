@@ -1,8 +1,8 @@
 use starknet_ibc_core::host::{
-    ack_key, channel_end_key, commitment_key, next_sequence_ack_key, next_sequence_recv_key,
-    next_sequence_send_key, receipt_key,
+    ack_key, channel_end_key, commitment_key, connection_end_key, next_sequence_ack_key,
+    next_sequence_recv_key, next_sequence_send_key, receipt_key,
 };
-use starknet_ibc_testkit::dummies::{CHANNEL_ID, PORT_ID, SEQUENCE};
+use starknet_ibc_testkit::dummies::{CHANNEL_ID, CONNECTION_ID, PORT_ID, SEQUENCE};
 
 #[test]
 fn test_next_sequence_send_key() {
@@ -67,6 +67,14 @@ fn test_channel_end_key() {
     let port_id = PORT_ID();
     let key = channel_end_key(@port_id, @channel_id);
     let expected_key: felt252 = 0x4763930c1c148bddb94c2603126c8d849bbc6921a0fc46734f21ebd2016579e;
+    assert_eq!(expected_key, key);
+}
+
+#[test]
+fn test_connection_end_key() {
+    let connection_id = CONNECTION_ID(0);
+    let key = connection_end_key(@connection_id);
+    let expected_key: felt252 = 0x208b5c68df93de403a4d24a5dae739dd3301be96546dfee39836b2ffa9e0584;
     assert_eq!(expected_key, key);
 }
 
