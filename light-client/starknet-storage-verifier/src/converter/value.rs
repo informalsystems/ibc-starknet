@@ -12,14 +12,14 @@ pub fn convert_storage_value(path: &str) -> Felt {
         Path::Connection(connection_path) => {
             let key = connection_key(connection_path.0);
 
-            let variable_name = starknet_keccak(b"connection_ends");
+            let variable_name = starknet_keccak(b"connection_ends_commitments");
 
             pedersen_hash(&variable_name, &key)
         }
         Path::ChannelEnd(channel_end_path) => {
             let key = next_sequence_key("channelEnds", channel_end_path.0, channel_end_path.1);
 
-            let variable_name = starknet_keccak(b"channel_ends");
+            let variable_name = starknet_keccak(b"channel_ends_commitments");
 
             pedersen_hash(&variable_name, &key)
         }
@@ -32,7 +32,7 @@ pub fn convert_storage_value(path: &str) -> Felt {
                 commitment_path.sequence,
             );
 
-            let variable_name = starknet_keccak(b"packet_commitments");
+            let variable_name = starknet_keccak(b"packet_commitments_commitments");
 
             pedersen_hash(&variable_name, &key)
         }
@@ -45,7 +45,7 @@ pub fn convert_storage_value(path: &str) -> Felt {
                 ack_path.sequence,
             );
 
-            let variable_name = starknet_keccak(b"packet_acks");
+            let variable_name = starknet_keccak(b"packet_acks_commitments");
 
             pedersen_hash(&variable_name, &key)
         }
@@ -58,7 +58,7 @@ pub fn convert_storage_value(path: &str) -> Felt {
                 receipt_path.sequence,
             );
 
-            let variable_name = starknet_keccak(b"packet_receipts");
+            let variable_name = starknet_keccak(b"packet_receipts_commitments");
 
             pedersen_hash(&variable_name, &key)
         }
@@ -67,7 +67,7 @@ pub fn convert_storage_value(path: &str) -> Felt {
             // Compute the Map's key
             let key = next_sequence_key("nextSequenceSend", seq_send_path.0, seq_send_path.1);
 
-            let variable_name = starknet_keccak(b"send_sequences");
+            let variable_name = starknet_keccak(b"send_sequences_commitments");
 
             pedersen_hash(&variable_name, &key)
         }
@@ -76,7 +76,7 @@ pub fn convert_storage_value(path: &str) -> Felt {
             // Compute the Map's key
             let key = next_sequence_key("nextSequenceRecv", seq_recv_path.0, seq_recv_path.1);
 
-            let variable_name = starknet_keccak(b"recv_sequences");
+            let variable_name = starknet_keccak(b"recv_sequences_commitments");
 
             pedersen_hash(&variable_name, &key)
         }
@@ -85,7 +85,7 @@ pub fn convert_storage_value(path: &str) -> Felt {
             // Compute the Map's key
             let key = next_sequence_key("nextSequenceAck", seq_ack_path.0, seq_ack_path.1);
 
-            let variable_name = starknet_keccak(b"ack_sequences");
+            let variable_name = starknet_keccak(b"ack_sequences_commitments");
 
             pedersen_hash(&variable_name, &key)
         }
