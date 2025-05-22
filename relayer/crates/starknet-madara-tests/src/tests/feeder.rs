@@ -12,8 +12,6 @@ use crate::impls::{init_madara_bootstrap, init_test_runtime};
 fn test_madara_feeder_gateway_signature() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
-    let runtime = init_test_runtime();
-
     runtime.runtime.clone().block_on(async move {
         let madara_bootstrap = init_madara_bootstrap(&runtime).await?;
 
