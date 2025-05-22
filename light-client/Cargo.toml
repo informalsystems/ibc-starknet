@@ -5,13 +5,14 @@ members = [
   "./ibc-client-starknet-cw",
   "./ibc-client-starknet-types",
   "./starknet-storage-verifier",
+  "./poseidon",
 ]
 
 [workspace.package]
 version      = "0.1.0"
 license      = "MIT OR Apache-2.0"
 edition      = "2021"
-rust-version = "1.72.1"
+rust-version = "1.80.0"
 publish      = false
 authors      = [ "Informal Systems <hello@informal.systems>" ]
 repository   = "https://github.com/informalsystems/ibc-starknet"
@@ -21,17 +22,20 @@ ibc-client-starknet       = { version = "0.1.0" }
 ibc-client-starknet-cw    = { version = "0.1.0" }
 ibc-client-starknet-types = { version = "0.1.0" }
 starknet-storage-verifier = { version = "0.1.0" }
+poseidon                  = { version = "0.1.0" }
 
 # external dependencies
-derive_more     = { version = "0.99.11", features = [ "from", "try_into" ] }
-indexmap        = { version = "2.9.0" }
-prost           = { version = "0.13.1" }
-prost-types     = { version = "0.13.1" }
-serde           = { version = "1.0.210", features = [ "derive" ] }
-starknet-core   = { version = "0.13.0" }
-starknet-crypto = { version = "0.7.4" }
-starknet-macros = { version = "0.2.2" }
-thiserror       = { version = "2.0.12" }
+derive_more         = { version = "0.99.11", features = [ "from", "try_into" ] }
+indexmap            = { version = "2.9.0" }
+prost               = { version = "0.13.1" }
+prost-types         = { version = "0.13.1" }
+serde               = { version = "1.0.210", features = [ "derive" ] }
+sha2                = { version = "0.10.8" }
+starknet-core       = { version = "0.13.0" }
+starknet-crypto     = { version = "0.7.4" }
+starknet-macros     = { version = "0.2.2" }
+starknet-types-core = { version = "0.1.7" }
+thiserror           = { version = "2.0.12" }
 
 # ibc depedenencies
 ibc-core      = { version = "0.56.0", default-features = false, features = [ "borsh", "schema" ] }
@@ -71,6 +75,7 @@ redundant_clone               = "deny"
 ibc-client-starknet       = { path = "./ibc-client-starknet" }
 ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
 ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
+poseidon                  = { path = "./poseidon" }
 
 ibc-client-cw = { git = "https://github.com/informalsystems/cosmwasm-ibc.git", branch = "starknet/demo2" }
 

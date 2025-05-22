@@ -1865,16 +1865,16 @@
     "starknet-foundry-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1744282779,
-        "narHash": "sha256-xrhrlweOZhdd3bA4X9EyKw+Swjp3Cs4lmnxoyvjsbnQ=",
+        "lastModified": 1745836075,
+        "narHash": "sha256-BbzE7sAPSBgrxBiatiDmMIPeNFmsIfqtFGnUANdPGiI=",
         "owner": "foundry-rs",
         "repo": "starknet-foundry",
-        "rev": "d6589e67bd93fbc604560d49566a79ca951e195a",
+        "rev": "24abff8ac058424de827d25ec8b72e1bf67e136c",
         "type": "github"
       },
       "original": {
         "owner": "foundry-rs",
-        "ref": "v0.41.0",
+        "ref": "v0.42.0",
         "repo": "starknet-foundry",
         "type": "github"
       }

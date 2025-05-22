@@ -11,7 +11,6 @@ members = [
   "crates/starknet-integration-tests",
   "crates/starknet-madara-tests",
   "crates/starknet-cli",
-  "crates/poseidon",
   "crates/tools",
 ]
 
@@ -152,7 +151,7 @@ ibc-core-handler-types      = { git = "https://github.com/cosmos/ibc-rs", rev = 
 
 ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types" }
 
-poseidon = { path = "./crates/poseidon" }
+poseidon = { path = "../light-client/poseidon" }
 
 cgp             = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-core        = { git = "https://github.com/contextgeneric/cgp.git" }

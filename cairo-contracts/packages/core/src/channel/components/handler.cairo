@@ -36,18 +36,25 @@ pub mod ChannelHandlerComponent {
         next_sequence_send_key, receipt_key, receipt_path,
     };
     use starknet_ibc_core::router::{AppContract, AppContractTrait, RouterHandlerComponent};
-    use starknet_ibc_utils::ValidateBasic;
+    use starknet_ibc_utils::{ValidateBasic, poseidon_hash};
 
     #[storage]
     pub struct Storage {
         pub next_channel_sequence: u64,
         pub channel_ends: Map<felt252, ChannelEnd>,
+        pub channel_ends_commitments: Map<felt252, felt252>,
         pub packet_commitments: Map<felt252, Commitment>,
+        pub packet_commitments_commitments: Map<felt252, felt252>,
         pub packet_receipts: Map<felt252, Receipt>,
+        pub packet_receipts_commitments: Map<felt252, felt252>,
         pub packet_acks: Map<felt252, Commitment>,
+        pub packet_acks_commitments: Map<felt252, felt252>,
         pub send_sequences: Map<felt252, Sequence>,
+        pub send_sequences_commitments: Map<felt252, felt252>,
         pub recv_sequences: Map<felt252, Sequence>,
+        pub recv_sequences_commitments: Map<felt252, felt252>,
         pub ack_sequences: Map<felt252, Sequence>,
+        pub ack_sequences_commitments: Map<felt252, felt252>,
     }
 
     #[event]
@@ -1267,7 +1274,10 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             channel_end: ChannelEnd,
         ) {
-            self.channel_ends.write(channel_end_key(port_id, channel_id), channel_end);
+            let key = channel_end_key(port_id, channel_id);
+            let channel_end_commitment = poseidon_hash(@channel_end);
+            self.channel_ends.write(key, channel_end);
+            self.channel_ends_commitments.write(key, channel_end_commitment);
         }
 
         fn write_packet_commitment(
@@ -1277,9 +1287,10 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence,
             commitment: Commitment,
         ) {
-            self
-                .packet_commitments
-                .write(commitment_key(port_id, channel_id, sequence), commitment);
+            let key = commitment_key(port_id, channel_id, sequence);
+            let commitment_commitment = poseidon_hash(@commitment);
+            self.packet_commitments.write(key, commitment);
+            self.packet_commitments_commitments.write(key, commitment_commitment);
         }
 
         fn delete_packet_commitment(
@@ -1288,9 +1299,9 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: @Sequence,
         ) {
-            self
-                .packet_commitments
-                .write(commitment_key(port_id, channel_id, sequence), CommitmentZero::zero());
+            let key = commitment_key(port_id, channel_id, sequence);
+            self.packet_commitments.write(key, CommitmentZero::zero());
+            self.packet_commitments_commitments.write(key, 0x0);
         }
 
         fn write_packet_receipt(
@@ -1300,7 +1311,10 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence,
             receipt: Receipt,
         ) {
-            self.packet_receipts.write(receipt_key(port_id, channel_id, sequence), receipt);
+            let key = receipt_key(port_id, channel_id, sequence);
+            let receipt_commitment = poseidon_hash(@receipt);
+            self.packet_receipts.write(key, receipt);
+            self.packet_receipts_commitments.write(key, receipt_commitment);
         }
 
         fn write_packet_ack(
@@ -1310,7 +1324,10 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence,
             ack_commitment: Commitment,
         ) {
-            self.packet_acks.write(ack_key(port_id, channel_id, sequence), ack_commitment);
+            let key = ack_key(port_id, channel_id, sequence);
+            let ack_commitment_commitment = poseidon_hash(@ack_commitment);
+            self.packet_acks.write(key, ack_commitment);
+            self.packet_acks_commitments.write(key, ack_commitment_commitment);
         }
 
         fn write_next_sequence_send(
@@ -1319,7 +1336,10 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: Sequence,
         ) {
-            self.send_sequences.write(next_sequence_send_key(port_id, channel_id), sequence);
+            let key = next_sequence_send_key(port_id, channel_id);
+            let sequence_commitment = poseidon_hash(@sequence);
+            self.send_sequences.write(key, sequence);
+            self.send_sequences_commitments.write(key, sequence_commitment);
         }
 
         fn write_next_sequence_recv(
@@ -1328,7 +1348,10 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: Sequence,
         ) {
-            self.recv_sequences.write(next_sequence_recv_key(port_id, channel_id), sequence);
+            let key = next_sequence_recv_key(port_id, channel_id);
+            let sequence_commitment = poseidon_hash(@sequence);
+            self.recv_sequences.write(key, sequence);
+            self.recv_sequences_commitments.write(key, sequence_commitment);
         }
 
         fn write_next_sequence_ack(
@@ -1337,7 +1360,10 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: Sequence,
         ) {
-            self.ack_sequences.write(next_sequence_ack_key(port_id, channel_id), sequence);
+            let key = next_sequence_ack_key(port_id, channel_id);
+            let sequence_commitment = poseidon_hash(@sequence);
+            self.ack_sequences.write(key, sequence);
+            self.ack_sequences_commitments.write(key, sequence_commitment);
         }
     }
 
