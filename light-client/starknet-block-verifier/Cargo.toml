@@ -13,7 +13,7 @@ description  = "Starknet block header verifier"
 [dependencies]
 serde           = { workspace = true }
 starknet-crypto = { workspace = true }
-ureq            = { workspace = true, features = [ "json", "rustls" ] }
+ureq            = { workspace = true, optional = true, features = [ "json", "rustls" ] }
 
 [dev-dependencies]
 starknet   = { workspace = true }
@@ -25,4 +25,4 @@ workspace = true
 
 [features]
 default = [  ]
-feeder  = [  ]
+feeder  = [ "dep:ureq" ]
