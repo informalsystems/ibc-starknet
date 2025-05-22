@@ -69,10 +69,13 @@ jobs:
           workspaces: |
             light-client
 
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@cargo-nextest
+
       - name: Run tests
         working-directory: ./light-client
         run: |
-          cargo test -- --show-output
+          cargo nextest run --all-features --success-output=final
 
   lint-light-client:
     name: Lint CosmWasm Light Client Contract

@@ -4,6 +4,7 @@ members = [
   "./ibc-client-starknet",
   "./ibc-client-starknet-cw",
   "./ibc-client-starknet-types",
+  "./starknet-block-verifier",
   "./starknet-storage-verifier",
 ]
 
@@ -23,15 +24,17 @@ ibc-client-starknet-types = { version = "0.1.0" }
 starknet-storage-verifier = { version = "0.1.0" }
 
 # external dependencies
-derive_more     = { version = "0.99.11", features = [ "from", "try_into" ] }
-indexmap        = { version = "2.9.0" }
-prost           = { version = "0.13.1" }
-prost-types     = { version = "0.13.1" }
-serde           = { version = "1.0.210", features = [ "derive" ] }
+derive_more = { version = "0.99.11", features = [ "from", "try_into" ] }
+indexmap    = { version = "2.9.0" }
+prost       = { version = "0.13.1" }
+prost-types = { version = "0.13.1" }
+serde       = { version = "1.0.210", features = [ "derive" ] }
+thiserror   = { version = "2.0.12" }
+
+starknet        = { version = "0.14.0" }
 starknet-core   = { version = "0.13.0" }
 starknet-crypto = { version = "0.7.4" }
 starknet-macros = { version = "0.2.2" }
-thiserror       = { version = "2.0.12" }
 
 # ibc depedenencies
 ibc-core      = { version = "0.56.0", default-features = false, features = [ "borsh", "schema" ] }
@@ -45,6 +48,11 @@ hermes-encoding-components          = { version = "0.1.0" }
 hermes-protobuf-encoding-components = { version = "0.1.0" }
 hermes-cosmos-encoding-components   = { version = "0.1.0" }
 hermes-wasm-encoding-components     = { version = "0.1.0" }
+
+ureq = { version = "3.0.11", default-features = false }
+
+rstest     = { version = "0.25" }
+serde_json = { version = "1.0" }
 
 [workspace.lints.rust]
 unsafe_code          = "forbid"

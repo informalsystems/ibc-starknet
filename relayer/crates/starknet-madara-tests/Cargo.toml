@@ -25,6 +25,8 @@ hermes-starknet-test-components  = { workspace = true }
 hermes-starknet-chain-context    = { workspace = true }
 poseidon                         = { workspace = true }
 
+starknet-block-verifier = { workspace = true, features = [ "feeder" ] }
+
 ibc                       = { workspace = true }
 ibc-proto                 = { workspace = true }
 tendermint-rpc            = { workspace = true }
