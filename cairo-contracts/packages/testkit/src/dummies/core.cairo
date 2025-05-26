@@ -1,4 +1,4 @@
-use ics23::ByteArrayIntoArrayU8;
+use ibc_utils::bytes::ByteArrayIntoArrayU8;
 use protobuf::types::message::ProtoCodecImpl;
 use starknet::ContractAddress;
 use starknet_ibc_core::channel::{

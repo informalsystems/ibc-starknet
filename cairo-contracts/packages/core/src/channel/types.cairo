@@ -1,5 +1,5 @@
 use core::num::traits::Zero;
-use ics23::{ByteArrayIntoArrayU8, IntoArrayU32, array_u8_into_array_u32};
+use ibc_utils::bytes::{ByteArrayIntoArrayU8, IntoArrayU32, SpanU8IntoArrayU32};
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
 use protobuf::types::message::{
     DecodeContext, EncodeContext, EncodeContextTrait, ProtoCodecImpl, ProtoMessage, ProtoName,
@@ -402,7 +402,7 @@ pub impl ArrayU8IntoAcknowledgement of Into<Array<u8>, Acknowledgement> {
 
 pub impl AcknowledgementIntoArrayU32 of IntoArrayU32<Acknowledgement> {
     fn into_array_u32(self: Acknowledgement) -> (Array<u32>, u32, u32) {
-        array_u8_into_array_u32(self.ack)
+        self.ack.span().into_array_u32()
     }
 }
 

@@ -1,4 +1,5 @@
 use cometbft::light_client::Header as CometHeader;
+use ibc_utils::bytes::{ByteArrayIntoArrayU8, SpanU8IntoByteArray};
 use protobuf::types::message::ProtoCodecImpl;
 use starknet_ibc_clients::cometbft::{CometConsensusState, CometErrors};
 use starknet_ibc_core::client::{TimestampImpl, U64IntoTimestamp};
@@ -27,7 +28,9 @@ pub impl CometHeaderImpl of CometHeaderTrait {
 
         assert(maybe_byte_array.is_some(), CometErrors::INVALID_HEADER);
 
-        let maybe_header = ProtoCodecImpl::decode::<CometHeader>(@maybe_byte_array.unwrap());
+        let maybe_header = ProtoCodecImpl::decode::<
+            CometHeader,
+        >(ByteArrayIntoArrayU8::into(maybe_byte_array.unwrap()).span());
 
         assert(maybe_header.is_some(), CometErrors::INVALID_HEADER);
 
@@ -52,6 +55,10 @@ pub impl CometHeaderIntoConsensusState of Into<CometHeader, CometConsensusState>
             *root_u32[6], *root_u32[7],
         ];
 
-        CometConsensusState { timestamp, root: StateRoot { root }, next_validators_hash }
+        CometConsensusState {
+            timestamp,
+            root: StateRoot { root },
+            next_validators_hash: SpanU8IntoByteArray::into(next_validators_hash.span()),
+        }
     }
 }

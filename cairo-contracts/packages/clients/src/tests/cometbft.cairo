@@ -258,7 +258,7 @@ fn test_update_height_after() {
 fn test_update_heights_max_size() {
     let mut state = setup();
     let mut i = 0;
-    while i < 101 {
+    while i != 101 {
         state.write_update_height(0, HEIGHT(i));
         i += 1;
     }

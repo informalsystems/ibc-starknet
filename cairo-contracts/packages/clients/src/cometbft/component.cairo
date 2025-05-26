@@ -3,9 +3,11 @@ pub mod CometClientComponent {
     use cometbft::types::{Options, TrustedBlockState, UntrustedBlockState};
     use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use core::num::traits::Zero;
+    use ibc_utils::array::span_contains;
+    use ibc_utils::bytes::ByteArrayIntoArrayU8;
+    use ibc_utils::storage::ArrayFelt252Store;
     use ics23::{
-        ArrayFelt252Store, MerkleProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
-        verify_membership as ics23_verify_membership,
+        MerkleProof, Proof, verify_membership as ics23_verify_membership,
         verify_non_membership as ics23_verify_non_membership,
     };
     use openzeppelin_access::ownable::OwnableComponent;
@@ -397,8 +399,7 @@ pub mod CometClientComponent {
             proof: StateProof,
             root: StateRoot,
         ) {
-            let byte_array_proof = array_u8_to_byte_array(@proof.proof);
-            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(@byte_array_proof).unwrap();
+            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(proof.proof.span()).unwrap();
             let specs = self.read_client_state(client_sequence).proof_spec;
             let mut proofs: Array<Proof> = ArrayTrait::new();
             for proof in decoded_proof.proofs {
@@ -407,7 +408,7 @@ pub mod CometClientComponent {
             let root = root.root;
             let mut keys = array![];
             for path in paths {
-                let path_bytes = byte_array_to_array_u8(@path);
+                let path_bytes = ByteArrayIntoArrayU8::into(path);
                 keys.append(path_bytes);
             }
             let value = value.value;
@@ -421,8 +422,7 @@ pub mod CometClientComponent {
             proof: StateProof,
             root: StateRoot,
         ) {
-            let byte_array_proof = array_u8_to_byte_array(@proof.proof);
-            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(@byte_array_proof).unwrap();
+            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(proof.proof.span()).unwrap();
             let specs = self.read_client_state(client_sequence).proof_spec;
             let mut proofs: Array<Proof> = ArrayTrait::new();
             for proof in decoded_proof.proofs {
@@ -431,7 +431,7 @@ pub mod CometClientComponent {
             let root = root.root;
             let mut keys = array![];
             for path in paths {
-                let path_bytes = byte_array_to_array_u8(@path);
+                let path_bytes = ByteArrayIntoArrayU8::into(path);
                 keys.append(path_bytes);
             }
             ics23_verify_non_membership(specs, @proofs, root, keys);
@@ -533,10 +533,10 @@ pub mod CometClientComponent {
             assert(upgraded_height > latest_height, CometErrors::INVALID_UPGRADE_HEIGHT);
 
             let upgraded_client_protobuf = StateValue {
-                value: ics23::byte_array_to_array_u8(@upgraded_client_state.protobuf_bytes()),
+                value: upgraded_client_state.protobuf_bytes(),
             };
             let upgraded_consensus_protobuf = StateValue {
-                value: ics23::byte_array_to_array_u8(@upgraded_consensus_state.protobuf_bytes()),
+                value: upgraded_consensus_state.protobuf_bytes(),
             };
 
             self
@@ -853,7 +853,9 @@ pub mod CometClientComponent {
                 header_time: trusted_consensus_state.timestamp.try_into().unwrap(),
                 height: trusted_height.revision_height,
                 next_validators: header.trusted_validator_set.clone(),
-                next_validators_hash: trusted_consensus_state.next_validators_hash,
+                next_validators_hash: ByteArrayIntoArrayU8::into(
+                    trusted_consensus_state.next_validators_hash,
+                ),
             };
 
             let untrusted_block_state = UntrustedBlockState {
@@ -891,7 +893,9 @@ pub mod CometClientComponent {
                 header_time: trusted_consensus_state.timestamp.try_into().unwrap(),
                 height: trusted_height.revision_height,
                 next_validators: header.trusted_validator_set.clone(),
-                next_validators_hash: trusted_consensus_state.next_validators_hash,
+                next_validators_hash: ByteArrayIntoArrayU8::into(
+                    trusted_consensus_state.next_validators_hash,
+                ),
             };
 
             let untrusted_block_state = UntrustedBlockState {
@@ -1047,7 +1051,7 @@ pub mod CometClientComponent {
         ) {
             let mut update_heights = self.update_heights.read(client_sequence);
 
-            if ics23::span_contains(update_heights.span(), @update_height) {
+            if span_contains(update_heights.span(), @update_height) {
                 return;
             }
 

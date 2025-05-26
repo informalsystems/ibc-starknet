@@ -1,5 +1,6 @@
 use core::num::traits::Zero;
-use ics23::ByteArrayIntoArrayU8;
+use ibc_utils::array::span_contains;
+use ibc_utils::bytes::ByteArrayIntoArrayU8;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::U128AsProtoMessage;
 use protobuf::types::message::{
@@ -320,12 +321,12 @@ pub impl VersionImpl of VersionTrait {
     fn is_supported(self: @Version) -> bool {
         let features_span = self.features.span();
         self.identifier == @"1"
-            && ics23::span_contains(features_span, @"ORDER_ORDERED")
-            && ics23::span_contains(features_span, @"ORDER_UNORDERED")
+            && span_contains(features_span, @"ORDER_ORDERED")
+            && span_contains(features_span, @"ORDER_UNORDERED")
     }
 
     fn is_feature_supported(self: @Version, feature: @ByteArray) -> bool {
-        ics23::span_contains(self.features.span(), feature)
+        span_contains(self.features.span(), feature)
     }
 }
 

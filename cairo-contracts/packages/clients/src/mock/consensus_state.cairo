@@ -77,8 +77,8 @@ pub impl MockConsensusStateImpl of MockConsensusStateTrait {
         }
     }
 
-    fn protobuf_bytes(self: @MockConsensusState) -> ByteArray {
+    fn protobuf_bytes(self: @MockConsensusState) -> Array<u8> {
         // MockConsensusState does not implement protobuf serialization.
-        ""
+        array![]
     }
 }

@@ -1,6 +1,7 @@
 use core::num::traits::Zero;
-use core::sha256::{compute_sha256_byte_array, compute_sha256_u32_array};
-use ics23::{IntoArrayU32, array_u32_into_array_u8};
+use core::sha256::compute_sha256_u32_array;
+use ibc_utils::bytes::{SpanU32IntoArrayU8, U64IntoArrayU32};
+use ibc_utils::sha256::compute_sha256_span_u8;
 use starknet_ibc_core::channel::Acknowledgement;
 use starknet_ibc_core::client::{Height, Timestamp};
 use starknet_ibc_core::commitment::U32CollectorImpl;
@@ -44,26 +45,25 @@ pub impl CommitmentZero of Zero<Commitment> {
 
 pub impl CommitmentIntoStateValue of Into<Commitment, StateValue> {
     fn into(self: Commitment) -> StateValue {
-        let value = array_u32_into_array_u8(self.into(), 0, 0);
+        let value = SpanU32IntoArrayU8::into(self.value.span());
         StateValue { value }
     }
 }
 
 pub fn compute_packet_commitment(
-    json_packet_data: @ByteArray, timeout_height: Height, timeout_timestamp: Timestamp,
+    json_packet_data: Span<u8>, timeout_height: Height, timeout_timestamp: Timestamp,
 ) -> Commitment {
     let mut coll = U32CollectorImpl::init();
     // ibc-go uses nanosecs
     // https://github.com/cosmos/ibc-go/blob/98d7e7550a23ecf8d96ce042ab11ef857b184f2a/proto/ibc/core/channel/v1/channel.proto#L179-L180
     coll.extend(timeout_timestamp.timestamp);
     coll.extend(timeout_height);
-    coll.extend_from_chunk(compute_sha256_byte_array(json_packet_data));
+    coll.extend_from_chunk(compute_sha256_span_u8(json_packet_data));
     compute_sha256_u32_array(coll.value(), 0, 0).into()
 }
 
 pub fn compute_ack_commitment(ack: Acknowledgement) -> Commitment {
-    let (array, last_word, last_word_len) = ack.into_array_u32();
-    compute_sha256_u32_array(array, last_word, last_word_len).into()
+    compute_sha256_span_u8(ack.ack.span()).into()
 }
 
 // -----------------------------------------------------------

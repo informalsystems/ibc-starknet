@@ -24,6 +24,7 @@ version = "0.1.0"
 name = "ics23"
 version = "0.1.0"
 dependencies = [
+ "ibc_utils",
  "protobuf",
 ]
 
@@ -124,6 +125,7 @@ dependencies = [
 name = "starknet_ibc_apps"
 version = "0.1.0"
 dependencies = [
+ "ibc_utils",
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",
@@ -141,6 +143,7 @@ name = "starknet_ibc_clients"
 version = "0.1.0"
 dependencies = [
  "cometbft",
+ "ibc_utils",
  "ics23",
  "openzeppelin_access",
  "protobuf",
@@ -170,6 +173,7 @@ name = "starknet_ibc_core"
 version = "0.1.0"
 dependencies = [
  "cometbft",
+ "ibc_utils",
  "ics23",
  "openzeppelin_testing",
  "protobuf",
@@ -184,6 +188,7 @@ name = "starknet_ibc_testkit"
 version = "0.1.0"
 dependencies = [
  "cometbft",
+ "ibc_utils",
  "ics23",
  "openzeppelin_access",
  "openzeppelin_testing",

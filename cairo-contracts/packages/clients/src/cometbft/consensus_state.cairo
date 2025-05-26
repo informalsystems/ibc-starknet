@@ -1,7 +1,8 @@
 use cometbft::ibc::MerkleRoot;
 use cometbft::light_client::ConsensusState as ProtoCometConsensusState;
 use core::num::traits::Zero;
-use ics23::{ArrayU8Pack, array_u8_to_byte_array, slice_u32_to_byte_array};
+use ibc_utils::bytes::SpanU32IntoByteArray;
+use ibc_utils::storage::ArrayU8Pack;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{
     Duration, DurationTrait, Status, Timestamp, TimestampImpl, TimestampIntoU128, TimestampZero,
@@ -12,20 +13,18 @@ use starknet_ibc_core::commitment::{StateRoot, StateRootZero};
 pub struct CometConsensusState {
     pub timestamp: Timestamp,
     pub root: StateRoot,
-    pub next_validators_hash: Array<u8>,
+    pub next_validators_hash: ByteArray,
 }
 
 pub impl CometConsensusStateZero of Zero<CometConsensusState> {
     fn zero() -> CometConsensusState {
         CometConsensusState {
-            timestamp: TimestampZero::zero(),
-            root: StateRootZero::zero(),
-            next_validators_hash: ArrayTrait::new(),
+            timestamp: TimestampZero::zero(), root: StateRootZero::zero(), next_validators_hash: "",
         }
     }
 
     fn is_zero(self: @CometConsensusState) -> bool {
-        self.timestamp.is_zero() && self.root.is_zero() && self.next_validators_hash.is_empty()
+        self.timestamp.is_zero() && self.root.is_zero() && self.next_validators_hash.len() == 0
     }
 
     fn is_non_zero(self: @CometConsensusState) -> bool {
@@ -85,9 +84,9 @@ pub impl CometConsensusStateImpl of CometConsensusStateTrait {
         }
     }
 
-    fn protobuf_bytes(self: @CometConsensusState) -> ByteArray {
+    fn protobuf_bytes(self: @CometConsensusState) -> Array<u8> {
         // FIXME: convert to cometbft type to encode to protobuf bytes
-        ""
+        array![]
     }
 }
 
@@ -96,8 +95,8 @@ pub impl CometConsensusStateToProto of TryInto<CometConsensusState, ProtoCometCo
         Some(
             ProtoCometConsensusState {
                 timestamp: self.timestamp.try_into()?,
-                root: MerkleRoot { hash: slice_u32_to_byte_array(self.root.root) },
-                next_validators_hash: array_u8_to_byte_array(@self.next_validators_hash),
+                root: MerkleRoot { hash: SpanU32IntoByteArray::into(self.root.root.span()) },
+                next_validators_hash: self.next_validators_hash,
             },
         )
     }

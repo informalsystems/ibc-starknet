@@ -1,4 +1,5 @@
 use cometbft::light_client::Header as CometHeader;
+use ibc_utils::bytes::ByteArrayIntoArrayU8;
 use protobuf::types::message::ProtoCodecImpl;
 
 #[derive(Drop)]
@@ -17,8 +18,14 @@ pub impl MisbehaviourImpl of MisbehaviourTrait {
         >::deserialize(ref span)
             .unwrap();
 
-        let header_1 = ProtoCodecImpl::decode::<CometHeader>(@header_1_bytes).unwrap();
-        let header_2 = ProtoCodecImpl::decode::<CometHeader>(@header_2_bytes).unwrap();
+        let header_1 = ProtoCodecImpl::decode::<
+            CometHeader,
+        >(ByteArrayIntoArrayU8::into(header_1_bytes).span())
+            .unwrap();
+        let header_2 = ProtoCodecImpl::decode::<
+            CometHeader,
+        >(ByteArrayIntoArrayU8::into(header_2_bytes).span())
+            .unwrap();
 
         Misbehaviour { header_1, header_2 }
     }

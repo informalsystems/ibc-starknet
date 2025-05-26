@@ -41,6 +41,7 @@ ics23      = { path = "../cairo-libs/packages/ics23" }
 cometbft   = { path = "../cairo-libs/packages/cometbft" }
 protobuf   = { path = "../cairo-libs/packages/protobuf" }
 serde_json = { path = "../cairo-libs/packages/serde_json" }
+ibc_utils  = { path = "../cairo-libs/packages/ibc_utils" }
 
 # ibc dependencies
 starknet_ibc_apps      = { path = "packages/apps" }

@@ -634,7 +634,7 @@ pub mod ChannelHandlerComponent {
             let json_packet_data = app.json_packet_data(packet.data.clone());
 
             let packet_commitment_on_a = compute_packet_commitment(
-                @json_packet_data,
+                json_packet_data.span(),
                 packet.timeout_height_on_b.clone(),
                 packet.timeout_timestamp_on_b.clone(),
             );
@@ -687,7 +687,10 @@ pub mod ChannelHandlerComponent {
 
             let json_packet_data = app.json_packet_data(msg.packet.data.clone());
 
-            self.verify_packet_commitment(@client, conn_end_on_a, msg.clone(), json_packet_data);
+            self
+                .verify_packet_commitment(
+                    @client, conn_end_on_a, msg.clone(), json_packet_data.span(),
+                );
 
             match @chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
@@ -807,7 +810,7 @@ pub mod ChannelHandlerComponent {
 
             let json_packet_data = app.json_packet_data(packet.data.clone());
 
-            self.verify_packet_commitment_matches(packet, @json_packet_data);
+            self.verify_packet_commitment_matches(packet, json_packet_data.span());
 
             if chan_end_on_a.is_ordered() {
                 self.verify_ack_sequence_matches(packet);
@@ -872,7 +875,7 @@ pub mod ChannelHandlerComponent {
 
             let json_packet_data = app.json_packet_data(packet.data.clone());
 
-            self.verify_packet_commitment_matches(@packet, @json_packet_data);
+            self.verify_packet_commitment_matches(@packet, json_packet_data.span());
 
             assert(
                 packet
@@ -971,7 +974,7 @@ pub mod ChannelHandlerComponent {
         /// non-existence is a no-op to avoid the relayer paying transaction fees.
         /// Here, in any case, the relayer pays a fee regardless.
         fn verify_packet_commitment_matches(
-            self: @ComponentState<TContractState>, packet: @Packet, json_packet_data: @ByteArray,
+            self: @ComponentState<TContractState>, packet: @Packet, json_packet_data: Span<u8>,
         ) {
             let packet_commitment = self
                 .read_packet_commitment(packet.port_id_on_a, packet.chan_id_on_a, packet.seq_on_a);
@@ -1009,7 +1012,7 @@ pub mod ChannelHandlerComponent {
             client: @ClientContract,
             connection_end: ConnectionEnd,
             msg: MsgRecvPacket,
-            json_packet_data: ByteArray,
+            json_packet_data: Span<u8>,
         ) {
             let client_sequence = connection_end.client_id.sequence;
 
@@ -1023,9 +1026,7 @@ pub mod ChannelHandlerComponent {
             );
 
             let packet_commitment_on_a = compute_packet_commitment(
-                @json_packet_data,
-                msg.packet.timeout_height_on_b,
-                msg.packet.timeout_timestamp_on_b,
+                json_packet_data, msg.packet.timeout_height_on_b, msg.packet.timeout_timestamp_on_b,
             );
 
             let root_on_a = client.consensus_state_root(client_sequence, msg.proof_height_on_a);

@@ -1,9 +1,9 @@
 use core::num::traits::Zero;
-use ics23::ArrayFelt252Store;
+use ibc_utils::storage::ArrayFelt252Store;
 use starknet_ibc_clients::mock::MockErrors;
 use starknet_ibc_core::client::{Duration, Height, HeightPartialOrd, Status, StatusTrait};
 
-pub impl ArrayByteArrayStore = ics23::StorePackingViaSerde<Array<ByteArray>>;
+pub impl ArrayByteArrayStore = ibc_utils::storage::StorePackingViaSerde<Array<ByteArray>>;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct MockClientState {
@@ -57,8 +57,8 @@ pub impl MockClientStateImpl of MockClientStateTrait {
         @substitute_client_state == self
     }
 
-    fn protobuf_bytes(self: @MockClientState) -> ByteArray {
+    fn protobuf_bytes(self: @MockClientState) -> Array<u8> {
         // MockClientState does not implement protobuf serialization.
-        ""
+        array![]
     }
 }
