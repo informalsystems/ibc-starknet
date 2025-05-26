@@ -1,4 +1,4 @@
-use crate::numeric::{u32_to_u8, u64_into_array_u32};
+use crate::numeric::{u32_to_big_endian, u64_into_array_u32};
 
 pub impl ByteArrayIntoArrayU8 of Into<ByteArray, Array<u8>> {
     fn into(self: ByteArray) -> Array<u8> {
@@ -139,7 +139,7 @@ pub impl SpanU32IntoArrayU8 of Into<Span<u32>, Array<u8>> {
     fn into(mut self: Span<u32>) -> Array<u8> {
         let mut result: Array<u8> = array![];
         while let Some(i) = self.pop_front() {
-            let [b0, b1, b2, b3] = u32_to_u8(*i);
+            let [b0, b1, b2, b3] = u32_to_big_endian(*i);
             result.append(b0);
             result.append(b1);
             result.append(b2);
@@ -153,7 +153,7 @@ pub impl SpanU32IntoByteArray of Into<Span<u32>, ByteArray> {
     fn into(mut self: Span<u32>) -> ByteArray {
         let mut result: ByteArray = "";
         while let Some(i) = self.pop_front() {
-            let [b0, b1, b2, b3] = u32_to_u8(*i);
+            let [b0, b1, b2, b3] = u32_to_big_endian(*i);
             result.append_byte(b0);
             result.append_byte(b1);
             result.append_byte(b2);

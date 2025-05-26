@@ -1,24 +1,27 @@
 use crate::array::reverse_array;
 use crate::bytes::SpanU8IntoByteArray;
 
-pub fn u32_from_u8(val: [u8; 4]) -> u32 {
+pub fn u32_from_big_endian(val: [u8; 4]) -> u32 {
     let [b0, b1, b2, b3] = val;
+
     let p0 = b0.into() * 0x1_00_00_00;
     let p1 = b1.into() * 0x1_00_00;
     let p2 = b2.into() * 0x1_00;
     let p3 = b3.into();
+
     p0 | p1 | p2 | p3
 }
 
-pub fn u32_to_u8(value: u32) -> [u8; 4] {
+pub fn u32_to_big_endian(value: u32) -> [u8; 4] {
     let b0 = ((value / 0x1_00_00_00) & 0xFF).try_into().unwrap();
     let b1 = ((value / 0x1_00_00) & 0xFF).try_into().unwrap();
     let b2 = ((value / 0x1_00) & 0xFF).try_into().unwrap();
     let b3 = (value & 0xFF).try_into().unwrap();
+
     [b0, b1, b2, b3]
 }
 
-pub fn u64_from_u8(val: [u8; 8]) -> u64 {
+pub fn u64_from_big_endian(val: [u8; 8]) -> u64 {
     let [b0, b1, b2, b3, b4, b5, b6, b7] = val;
 
     let p0 = b0.into() * 0x1_00_00_00_00_00_00_00;
@@ -33,7 +36,7 @@ pub fn u64_from_u8(val: [u8; 8]) -> u64 {
     p0 | p1 | p2 | p3 | p4 | p5 | p6 | p7
 }
 
-pub fn u64_to_u8(value: u64) -> [u8; 8] {
+pub fn u64_to_big_endian(value: u64) -> [u8; 8] {
     let b0 = ((value / 0x1_00_00_00_00_00_00_00) & 0xFF).try_into().unwrap();
     let b1 = ((value / 0x1_00_00_00_00_00_00) & 0xFF).try_into().unwrap();
     let b2 = ((value / 0x1_00_00_00_00_00) & 0xFF).try_into().unwrap();
@@ -42,6 +45,55 @@ pub fn u64_to_u8(value: u64) -> [u8; 8] {
     let b5 = ((value / 0x1_00_00) & 0xFF).try_into().unwrap();
     let b6 = ((value / 0x1_00) & 0xFF).try_into().unwrap();
     let b7 = (value & 0xFF).try_into().unwrap();
+
+    [b0, b1, b2, b3, b4, b5, b6, b7]
+}
+
+pub fn u32_from_little_endian(val: [u8; 4]) -> u32 {
+    let [b0, b1, b2, b3] = val;
+
+    let p3 = b3.into() * 0x1_00_00_00;
+    let p2 = b2.into() * 0x1_00_00;
+    let p1 = b1.into() * 0x1_00;
+    let p0 = b0.into();
+
+    p3 | p2 | p1 | p0
+}
+
+pub fn u32_to_little_endian(value: u32) -> [u8; 4] {
+    let b3 = ((value / 0x1_00_00_00) & 0xFF).try_into().unwrap();
+    let b2 = ((value / 0x1_00_00) & 0xFF).try_into().unwrap();
+    let b1 = ((value / 0x1_00) & 0xFF).try_into().unwrap();
+    let b0 = (value & 0xFF).try_into().unwrap();
+
+    [b0, b1, b2, b3]
+}
+
+pub fn u64_from_little_endian(val: [u8; 8]) -> u64 {
+    let [b0, b1, b2, b3, b4, b5, b6, b7] = val;
+
+    let p7 = b7.into() * 0x1_00_00_00_00_00_00_00;
+    let p6 = b6.into() * 0x1_00_00_00_00_00_00;
+    let p5 = b5.into() * 0x1_00_00_00_00_00;
+    let p4 = b4.into() * 0x1_00_00_00_00;
+    let p3 = b3.into() * 0x1_00_00_00;
+    let p2 = b2.into() * 0x1_00_00;
+    let p1 = b1.into() * 0x1_00;
+    let p0 = b0.into();
+
+    p7 | p6 | p5 | p4 | p3 | p2 | p1 | p0
+}
+
+pub fn u64_to_little_endian(value: u64) -> [u8; 8] {
+    let b7 = ((value / 0x1_00_00_00_00_00_00_00) & 0xFF).try_into().unwrap();
+    let b6 = ((value / 0x1_00_00_00_00_00_00) & 0xFF).try_into().unwrap();
+    let b5 = ((value / 0x1_00_00_00_00_00) & 0xFF).try_into().unwrap();
+    let b4 = ((value / 0x1_00_00_00_00) & 0xFF).try_into().unwrap();
+    let b3 = ((value / 0x1_00_00_00) & 0xFF).try_into().unwrap();
+    let b2 = ((value / 0x1_00_00) & 0xFF).try_into().unwrap();
+    let b1 = ((value / 0x1_00) & 0xFF).try_into().unwrap();
+    let b0 = (value & 0xFF).try_into().unwrap();
+
     [b0, b1, b2, b3, b4, b5, b6, b7]
 }
 
@@ -143,72 +195,13 @@ pub fn decode_2_complement_32(value: @u32) -> i32 {
     }
 }
 
-pub fn u64_to_little_endian(value: @u64) -> [u8; 8] {
-    let mut value = *value;
-
-    let byte0 = (value % 0x100).try_into().unwrap();
-
-    value = value / 0x100;
-    let byte1 = (value % 0x100).try_into().unwrap();
-
-    value = value / 0x100;
-    let byte2 = (value % 0x100).try_into().unwrap();
-
-    value = value / 0x100;
-    let byte3 = (value % 0x100).try_into().unwrap();
-
-    value = value / 0x100;
-    let byte4 = (value % 0x100).try_into().unwrap();
-
-    value = value / 0x100;
-    let byte5 = (value % 0x100).try_into().unwrap();
-
-    value = value / 0x100;
-    let byte6 = (value % 0x100).try_into().unwrap();
-
-    value = value / 0x100;
-    let byte7 = (value % 0x100).try_into().unwrap();
-
-    [byte0, byte1, byte2, byte3, byte4, byte5, byte6, byte7]
-}
-
-pub fn little_endian_to_u64(value: @[u8; 8]) -> u64 {
-    let value = value.span();
-
-    let mut result: u64 = 0;
-
-    result = result | ((*value[7]).into());
-
-    result = result * 0x100;
-    result = result | ((*value[6]).into());
-
-    result = result * 0x100;
-    result = result | ((*value[5]).into());
-
-    result = result * 0x100;
-    result = result | ((*value[4]).into());
-
-    result = result * 0x100;
-    result = result | ((*value[3]).into());
-
-    result = result * 0x100;
-    result = result | ((*value[2]).into());
-
-    result = result * 0x100;
-    result = result | ((*value[1]).into());
-
-    result = result * 0x100;
-    result = result | ((*value[0]).into());
-
-    result
-}
-
 #[cfg(test)]
 mod tests {
     use super::{
         decode_2_complement_128, decode_2_complement_64, encode_2_complement_128,
-        encode_2_complement_64, little_endian_to_u64, next_power_of_two, u32_from_u8, u32_to_u8,
-        u64_from_u8, u64_to_little_endian, u64_to_u8,
+        encode_2_complement_64, next_power_of_two, u32_from_big_endian, u32_from_little_endian,
+        u32_to_big_endian, u32_to_little_endian, u64_from_big_endian, u64_from_little_endian,
+        u64_to_big_endian, u64_to_little_endian,
     };
 
     #[test]
@@ -266,39 +259,6 @@ mod tests {
     }
 
     #[test]
-    fn test_little_endian_encode() {
-        let value = 0x123456789ABCDEF0;
-        let encoded = u64_to_little_endian(@value);
-        assert_eq!(
-            encoded, [0xF0, 0xDE, 0xBC, 0x9A, 0x78, 0x56, 0x34, 0x12], "invalid encoded value",
-        );
-    }
-
-    #[test]
-    fn test_little_endian_decode() {
-        let bytes = [0xF0, 0xDE, 0xBC, 0x9A, 0x78, 0x56, 0x34, 0x12];
-        let decoded = little_endian_to_u64(@bytes);
-        assert_eq!(decoded, 0x123456789ABCDEF0, "invalid decoded value");
-    }
-
-    #[test]
-    #[fuzzer]
-    fn fuzz_little_endian_encode(x: u64) {
-        let encoded = u64_to_little_endian(@x);
-        let decoded = little_endian_to_u64(@encoded);
-        assert_eq!(decoded, x, "invalid decoded value");
-    }
-
-    #[test]
-    #[fuzzer]
-    fn fuzz_little_endian_decode(b1: u8, b2: u8, b3: u8, b4: u8, b5: u8, b6: u8, b7: u8, b8: u8) {
-        let bytes = [b1, b2, b3, b4, b5, b6, b7, b8];
-        let decoded = little_endian_to_u64(@bytes);
-        let encoded = u64_to_little_endian(@decoded);
-        assert_eq!(encoded, bytes, "invalid encoded value");
-    }
-
-    #[test]
     fn test_next_power_of_two() {
         assert_eq!(next_power_of_two(0), 1);
         assert_eq!(next_power_of_two(1), 1);
@@ -313,34 +273,136 @@ mod tests {
     }
 
     #[test]
-    fn test_u32_to_u8() {
+    fn test_u32_to_big_endian() {
         let val_u32 = 0x12345678;
         let [b0, b1, b2, b3] = [0x12, 0x34, 0x56, 0x78];
-        let actual = u32_to_u8(val_u32);
-        assert_eq!([b0, b1, b2, b3], actual, "u32 to u8 fail")
+        let actual = u32_to_big_endian(val_u32);
+        assert_eq!([b0, b1, b2, b3], actual, "u32 to big endian fail")
     }
 
     #[test]
-    fn test_u8_to_u32() {
+    fn test_u32_from_big_endian() {
         let [b0, b1, b2, b3] = [0x12, 0x34, 0x56, 0x78];
         let val_u32 = 0x12345678;
-        let actual = u32_from_u8([b0, b1, b2, b3]);
-        assert_eq!(val_u32, actual, "u32 from u8 fail")
+        let actual = u32_from_big_endian([b0, b1, b2, b3]);
+        assert_eq!(val_u32, actual, "u32 from big endian fail")
     }
 
     #[test]
-    fn test_u8_to_u64() {
+    fn test_u64_from_big_endian() {
         let [b0, b1, b2, b3, b4, b5, b6, b7] = [0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF];
         let val_u32 = 0x1234567890ABCDEF;
-        let actual = u64_from_u8([b0, b1, b2, b3, b4, b5, b6, b7]);
-        assert_eq!(val_u32, actual, "u64 from u8 fail")
+        let actual = u64_from_big_endian([b0, b1, b2, b3, b4, b5, b6, b7]);
+        assert_eq!(val_u32, actual, "u64 from big endian fail")
     }
 
     #[test]
-    fn test_u64_to_u8() {
+    fn test_u64_to_big_endian() {
         let val_u32 = 0x1234567890ABCDEF;
         let [b0, b1, b2, b3, b4, b5, b6, b7] = [0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF];
-        let actual = u64_to_u8(val_u32);
-        assert_eq!([b0, b1, b2, b3, b4, b5, b6, b7], actual, "u64 to u8 fail")
+        let actual = u64_to_big_endian(val_u32);
+        assert_eq!([b0, b1, b2, b3, b4, b5, b6, b7], actual, "u64 to big endian fail")
+    }
+
+    #[test]
+    fn test_u32_to_little_endian() {
+        let val_u32 = 0x12345678;
+        let [b0, b1, b2, b3] = [0x78, 0x56, 0x34, 0x12];
+        let actual = u32_to_little_endian(val_u32);
+        assert_eq!([b0, b1, b2, b3], actual, "u32 to big endian fail")
+    }
+
+    #[test]
+    fn test_u32_from_little_endian() {
+        let [b0, b1, b2, b3] = [0x78, 0x56, 0x34, 0x12];
+        let val_u32 = 0x12345678;
+        let actual = u32_from_little_endian([b0, b1, b2, b3]);
+        assert_eq!(val_u32, actual, "u32 from big endian fail")
+    }
+
+    #[test]
+    fn test_u64_from_little_endian() {
+        let [b0, b1, b2, b3, b4, b5, b6, b7] = [0xEF, 0xCD, 0xAB, 0x90, 0x78, 0x56, 0x34, 0x12];
+        let val_u32 = 0x1234567890ABCDEF;
+        let actual = u64_from_little_endian([b0, b1, b2, b3, b4, b5, b6, b7]);
+        assert_eq!(val_u32, actual, "u64 from big endian fail")
+    }
+
+    #[test]
+    fn test_u64_to_little_endian() {
+        let val_u32 = 0x1234567890ABCDEF;
+        let [b0, b1, b2, b3, b4, b5, b6, b7] = [0xEF, 0xCD, 0xAB, 0x90, 0x78, 0x56, 0x34, 0x12];
+        let actual = u64_to_little_endian(val_u32);
+        assert_eq!([b0, b1, b2, b3, b4, b5, b6, b7], actual, "u64 to big endian fail")
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_little_endian_encode_u64(x: u64) {
+        let encoded = u64_to_little_endian(x);
+        let decoded = u64_from_little_endian(encoded);
+        assert_eq!(decoded, x, "invalid decoded value");
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_little_endian_decode_u64(
+        b0: u8, b1: u8, b2: u8, b3: u8, b4: u8, b5: u8, b6: u8, b7: u8,
+    ) {
+        let bytes = [b0, b1, b2, b3, b4, b5, b6, b7];
+        let decoded = u64_from_little_endian(bytes);
+        let encoded = u64_to_little_endian(decoded);
+        assert_eq!(encoded, bytes, "invalid encoded value");
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_big_endian_encode_u64(x: u64) {
+        let encoded = u64_to_big_endian(x);
+        let decoded = u64_from_big_endian(encoded);
+        assert_eq!(decoded, x, "invalid decoded value");
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_big_endian_decode_u64(b0: u8, b1: u8, b2: u8, b3: u8, b4: u8, b5: u8, b6: u8, b7: u8) {
+        let bytes = [b0, b1, b2, b3, b4, b5, b6, b7];
+        let decoded = u64_from_big_endian(bytes);
+        let encoded = u64_to_big_endian(decoded);
+        assert_eq!(encoded, bytes, "invalid encoded value");
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_little_endian_encode_u32(x: u32) {
+        let encoded = u32_to_little_endian(x);
+        let decoded = u32_from_little_endian(encoded);
+        assert_eq!(decoded, x, "invalid decoded value");
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_little_endian_decode_u32(b0: u8, b1: u8, b2: u8, b3: u8) {
+        let bytes = [b0, b1, b2, b3];
+        let decoded = u32_from_little_endian(bytes);
+        let encoded = u32_to_little_endian(decoded);
+        assert_eq!(encoded, bytes, "invalid encoded value");
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_big_endian_encode_u32(x: u32) {
+        let encoded = u32_to_big_endian(x);
+        let decoded = u32_from_big_endian(encoded);
+        assert_eq!(decoded, x, "invalid decoded value");
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_big_endian_decode_u32(b0: u8, b1: u8, b2: u8, b3: u8) {
+        let bytes = [b0, b1, b2, b3];
+        let decoded = u32_from_big_endian(bytes);
+        let encoded = u32_to_big_endian(decoded);
+        assert_eq!(encoded, bytes, "invalid encoded value");
     }
 }

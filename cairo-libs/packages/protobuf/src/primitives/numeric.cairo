@@ -1,6 +1,6 @@
 use ibc_utils::numeric::{
     decode_2_complement_128, decode_2_complement_32, decode_2_complement_64,
-    encode_2_complement_128, encode_2_complement_32, encode_2_complement_64, little_endian_to_u64,
+    encode_2_complement_128, encode_2_complement_32, encode_2_complement_64, u64_from_little_endian,
     u64_to_little_endian,
 };
 use protobuf::types::message::{
@@ -120,7 +120,7 @@ pub impl SFixed64AsProtoMessage of ProtoMessage<i64> {
 
     fn encode_raw(self: @i64, ref context: EncodeContext) {
         let num: u64 = encode_2_complement_64(@(*self).into());
-        let mut bytes = u64_to_little_endian(@num).span();
+        let mut bytes = u64_to_little_endian(num).span();
         while let Some(byte) = bytes.pop_front() {
             context.buffer.append(*byte);
         }
@@ -134,7 +134,7 @@ pub impl SFixed64AsProtoMessage of ProtoMessage<i64> {
             *context.buffer[context.index + 6], *context.buffer[context.index + 7],
         ];
         context.index += 8;
-        let num = little_endian_to_u64(@bytes);
+        let num = u64_from_little_endian(bytes);
         Option::Some(decode_2_complement_64(@num))
     }
 

@@ -2,7 +2,7 @@ use core::byte_array::ByteArrayTrait;
 use core::num::traits::{CheckedAdd, CheckedSub, Zero};
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
-use ibc_utils::numeric::{felt252_to_byte_array, u64_to_u8};
+use ibc_utils::numeric::{felt252_to_byte_array, u64_to_big_endian};
 use starknet_ibc_core::commitment::StateValue;
 use starknet_ibc_core::host::errors::HostErrors;
 use starknet_ibc_utils::{ComputeKey, ValidateBasic, poseidon_hash};
@@ -249,7 +249,7 @@ pub impl SequenceImpl of SequenceTrait {
     }
 
     fn to_array_u8(self: Sequence) -> Array<u8> {
-        u64_to_u8(self.sequence).span().into()
+        u64_to_big_endian(self.sequence).span().into()
     }
 }
 

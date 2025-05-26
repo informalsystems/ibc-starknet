@@ -4,7 +4,7 @@ use starknet::storage_access::{
     StorageAddress, StorageBaseAddress, Store, StorePacking, storage_address_from_base,
     storage_address_from_base_and_offset, storage_base_address_from_felt252,
 };
-use crate::numeric::{u32_from_u8, u32_to_u8};
+use crate::numeric::{u32_from_big_endian, u32_to_big_endian};
 
 pub impl ArrayU8Pack of StorePacking<Array<u8>, ByteArray> {
     fn pack(value: Array<u8>) -> ByteArray {
@@ -32,7 +32,7 @@ pub impl ArrayU32Pack of StorePacking<Array<u32>, ByteArray> {
         let mut byte_array = "";
         let mut span = value.span();
         while let Some(limb) = span.pop_front() {
-            let [b0, b1, b2, b3] = u32_to_u8(*limb);
+            let [b0, b1, b2, b3] = u32_to_big_endian(*limb);
             byte_array.append_byte(b0);
             byte_array.append_byte(b1);
             byte_array.append_byte(b2);
@@ -47,7 +47,7 @@ pub impl ArrayU32Pack of StorePacking<Array<u32>, ByteArray> {
         let mut i = 0;
         while let (Some(b0), Some(b1), Some(b2), Some(b3)) =
             (value.at(i), value.at(i + 1), value.at(i + 2), value.at(i + 3)) {
-            let limb = u32_from_u8([b0, b1, b2, b3]);
+            let limb = u32_from_big_endian([b0, b1, b2, b3]);
             arr.append(limb);
             i += 4;
         }
