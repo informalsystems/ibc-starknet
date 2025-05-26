@@ -1,5 +1,4 @@
-use ibc_utils::bytes::ByteArrayIntoArrayU8;
-
+use ibc_utils::bytes::{ByteArrayIntoArrayU8, SpanU8IntoByteArray};
 
 pub fn base64_char_to_u6(value: u8) -> u8 {
     if 'A' <= value && value <= 'Z' {
@@ -183,15 +182,17 @@ mod tests {
         for (input, expected_encoded) in test_cases {
             let encoded = encode(ByteArrayIntoArrayU8::into(input.clone()).span());
             assert_eq!(
-                encoded,
-                ByteArrayIntoArrayU8::into(expected_encoded),
+                SpanU8IntoByteArray::into(encoded.span()),
+                expected_encoded,
                 "Encoding failed for input: '{}'",
                 input,
             );
 
             let decoded = decode(encoded.span());
             assert_eq!(
-                decoded, ByteArrayIntoArrayU8::into(input), "Decoding failed for encoded string",
+                SpanU8IntoByteArray::into(decoded.span()),
+                input,
+                "Decoding failed for encoded string",
             );
         }
     }
