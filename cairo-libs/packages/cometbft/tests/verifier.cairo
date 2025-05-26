@@ -15,8 +15,8 @@ fn header_fixture() -> (LcHeader, LcHeader) {
     let header_43_data =
         "CtMECpcDCgIICxIRY29zbW9zLTE4ODM0OTA4MjEYKyIMCNCvqr8GEI+fmoQBKkgKIM/ZJJBezJ1/N5oZ81wGNakLmvdXqJUTeo9BflXGB/CVEiQIARIgGavZsDudynigNSd0t9pB3gsLO4jBPiTAvg68tr9bSK8yILQDlUyLpWuELNkvXzc0wYO6HX7p8iBNs0LTSm9XUXUNOiDjsMRCmPwcFJr79MiZb7kkJ65B5GSbk0yklZkbeFK4VUIgKghhc7iMawF0w1OS0HrVbz7AgQZ5LBdTPUZMkJLL7MFKICoIYXO4jGsBdMNTktB61W8+wIEGeSwXUz1GTJCSy+zBUiAEgJG8fdwoP3e/v5HXPETaWMPfipy8hnQF2Lfz2q2iL1ogzm0HC2rcfn6E1osiy9/b1EghkZPbwy12IUhatZAb15JiIOOwxEKY/BwUmvv0yJlvuSQnrkHkZJuTTKSVmRt4UrhVaiDjsMRCmPwcFJr79MiZb7kkJ65B5GSbk0yklZkbeFK4VXIUnX5Uljlx7LVtbBKgIuc5AVYOYD8StgEIKxpICiC2aFSjURAzE+gYhms6RpW76keJyGqQVkoKVSv6IUzorBIkCAESINciCYx+c3vGBhxjY9LDgKvTBFjXlXfdKHreQ0c5J7HjImgIAhIUnX5Uljlx7LVtbBKgIuc5AVYOYD8aDAjRr6q/BhDDypWtASJAsBQH8E+My3FUmQTbx+j0g+0emNYXNV1wiirfrqJRJUnLhTYXwnLaQSBXuARAQYp9E+K8XT6jVtAjRQfZby8aCRKNAQpBChSdflSWOXHstW1sEqAi5zkBVg5gPxIiCiA57g6RpkaiCURNYrCSk8ORUAPEwW2GNEkGlL3jxdVtzhiAoJSljR0SQQoUnX5Uljlx7LVtbBKgIuc5AVYOYD8SIgogOe4OkaZGoglETWKwkpPDkVADxMFthjRJBpS948XVbc4YgKCUpY0dGICglKWNHRoICIWUj4IHEB8ijQEKQQoUnX5Uljlx7LVtbBKgIuc5AVYOYD8SIgogOe4OkaZGoglETWKwkpPDkVADxMFthjRJBpS948XVbc4YgKCUpY0dEkEKFJ1+VJY5cey1bWwSoCLnOQFWDmA/EiIKIDnuDpGmRqIJRE1isJKTw5FQA8TBbYY0SQaUvePF1W3OGICglKWNHRiAoJSljR0=";
 
-    let header_31_bytes = base64::decode(ByteArrayIntoArrayU8::into(header_31_data).span());
-    let header_43_bytes = base64::decode(ByteArrayIntoArrayU8::into(header_43_data).span());
+    let header_31_bytes = base64::decode_byte_array(header_31_data);
+    let header_43_bytes = base64::decode_byte_array(header_43_data);
 
     let header_31 = ProtoCodecImpl::decode::<LcHeader>(header_31_bytes.span()).unwrap();
     let header_43 = ProtoCodecImpl::decode::<LcHeader>(header_43_bytes.span()).unwrap();
@@ -164,8 +164,8 @@ fn test_verify_commit_hash() {
         "CgQICxABEgtkb2NrZXJjaGFpbhjIDCILCPK2/voFEOKbhmUqSAog07LMftr/h0M6Xbzc30B3pWqs3jYGA0JisM2xIPYutAsSJAgBEiA6tBHq/po7esATsCFJkOVlMRKjmQkonj6pIR8HuM1u7TIgRwcbhu/Ci+wXVDlnl181GRupvsnCrXfob2OxSVKNcaE6IOOwxEKY/BwUmvv0yJlvuSQnrkHkZJuTTKSVmRt4UrhVQiBeIFIOyAuEBEtkugxVscBtVDu9V5VcJ7ipmZ7FJr9wPEogXiBSDsgLhARLZLoMVbHAbVQ7vVeVXCe4qZmexSa/cDxSIASAkbx93Cg/d7+/kdc8RNpYw9+KnLyGdAXYt/ParaIvWggAAAAAAAAAAGIg47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFVqIOOwxEKY/BwUmvv0yJlvuSQnrkHkZJuTTKSVmRt4UrhVchTIZXow0gw7rUFGJKGpYzc91QDM0w==";
     let expected_hash_data = "F30A71F2409FB15AACAEDB6CC122DFA2525BEE9CAE521721B06BFDCA291B8D56";
 
-    let header_bytes = base64::decode(ByteArrayIntoArrayU8::into(header_data).span());
-    let expected_hash = hex::decode(ByteArrayIntoArrayU8::into(expected_hash_data).span());
+    let header_bytes = base64::decode_byte_array(header_data);
+    let expected_hash = hex::decode_byte_array(expected_hash_data);
 
     let header = ProtoCodecImpl::decode::<TmHeader>(header_bytes.span()).unwrap();
     header_matches_commit(@header, expected_hash.span());
@@ -179,8 +179,8 @@ fn test_verify_update_header_2() {
         let header_43_data =
             "CtQECpgDCgIICxISY2hhaW4tMS0zOTY1MTkyNTI0GEYiDAjCj/S/BhDcqMv/AipICiDr+FXP2JmUMJId3I6HwCSt+mEpczSZCNKHZe7pgEPNpxIkCAESIGRbMklUq3kyVREQ9dyzGEsZaB6U3SE1+qKF6vMVPBZJMiD08ju+8/EvUt35ojhJJ734jMbD6TOXAMHQ/QJmTBU1Tzog47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFVCINcW8oxHV55BXwPjDwGa1MD56V3MRivoxwHwmFs+txiFSiDXFvKMR1eeQV8D4w8BmtTA+eldzEYr6McB8JhbPrcYhVIgBICRvH3cKD93v7+R1zxE2ljD34qcvIZ0Bdi389qtoi9aIBMBRFTxiVtTxMkUUCa1ipwhwQ9bRuCkCY3PTCP8I0g9YiCypUT2NlQSsXCF65gTxHYNKw8Y+EW6uwgBljV9Ppu37Wog47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFVyFDSGI1jd7XjyZhOZj/vLrGKRTVR8ErYBCEYaSAogS7vnIE846QA5P3nSpjjS0G02m6y8bU0f2HwHfC8S2kMSJAgBEiBb3+vMlGIq7a/CeeqfsZ7H6Tzc5OrlmyGBNOqFr2/kjCJoCAISFDSGI1jd7XjyZhOZj/vLrGKRTVR8GgwIw4/0vwYQyarMhQMiQMRsYYTc3AFAJSL3AQ1BcEJlAwo9YYtZNfHr/dISMf8h6b0rZit+SzyIloxFp4t1NY4hnmwvNB/omqZeo3YQlQcSjQEKQQoUNIYjWN3tePJmE5mP+8usYpFNVHwSIgogUjVI2wTi4xiY69iGv7kvlpG7+PanBNdyzNnxofDnkosYgKCUpY0dEkEKFDSGI1jd7XjyZhOZj/vLrGKRTVR8EiIKIFI1SNsE4uMYmOvYhr+5L5aRu/j2pwTXcszZ8aHw55KLGICglKWNHRiAoJSljR0aCAjMkuDiDhAwIo0BCkEKFDSGI1jd7XjyZhOZj/vLrGKRTVR8EiIKIFI1SNsE4uMYmOvYhr+5L5aRu/j2pwTXcszZ8aHw55KLGICglKWNHRJBChQ0hiNY3e148mYTmY/7y6xikU1UfBIiCiBSNUjbBOLjGJjr2Ia/uS+Wkbv49qcE13LM2fGh8OeSixiAoJSljR0YgKCUpY0d";
 
-        let header_31_bytes = base64::decode(ByteArrayIntoArrayU8::into(header_31_data).span());
-        let header_43_bytes = base64::decode(ByteArrayIntoArrayU8::into(header_43_data).span());
+        let header_31_bytes = base64::decode_byte_array(header_31_data);
+        let header_43_bytes = base64::decode_byte_array(header_43_data);
 
         let header_31 = ProtoCodecImpl::decode::<LcHeader>(header_31_bytes.span()).unwrap();
         let header_43 = ProtoCodecImpl::decode::<LcHeader>(header_43_bytes.span()).unwrap();

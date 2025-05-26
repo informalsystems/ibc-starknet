@@ -1,6 +1,6 @@
 use alexandria_math::pow;
 use ibc_utils::bytes::{ByteArrayIntoArrayU8, SpanU8IntoByteArray};
-use ibc_utils::hex::decode as hex_decode;
+use ibc_utils::hex::decode_byte_array as hex_decode;
 use protobuf::varint::{decode_varint_from_byte_array, encode_varint_to_u8_array};
 
 fn assert_encode_varint(value: u128, expected: Array<u8>) {
@@ -38,7 +38,7 @@ fn test_encode_decode_varint_u64() {
     let value = 0x1234567890ABCDEF;
     let bytes = encode_varint_to_u8_array(value);
     let hex = "ef9baf8589cf959a12";
-    let bytes2 = hex_decode(ByteArrayIntoArrayU8::into(hex).span());
+    let bytes2 = hex_decode(hex);
     assert_eq!(bytes, bytes2, "invalid encoded bytes");
     let mut index = 0;
     let decoded = decode_varint_from_byte_array(@SpanU8IntoByteArray::into(bytes.span()), ref index)

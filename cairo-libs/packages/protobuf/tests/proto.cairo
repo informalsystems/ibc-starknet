@@ -1,6 +1,6 @@
-use ibc_utils::base64::decode as base64_decode;
+use ibc_utils::base64::decode_byte_array as base64_decode;
 use ibc_utils::bytes::ByteArrayIntoArrayU8;
-use ibc_utils::hex::decode as hex_decode;
+use ibc_utils::hex::decode_byte_array as hex_decode;
 use protobuf::primitives::array::{
     ArrayAsProtoMessage, ByteArrayAsProtoMessage, BytesAsProtoMessage,
 };
@@ -125,7 +125,7 @@ pub impl TmHeaderAsProtoName of ProtoName<TmHeader> {
 #[test]
 fn test_proto_u64() {
     let hex = "d295fcd8ceb1aaaaab01";
-    let bytes = hex_decode(ByteArrayIntoArrayU8::into(hex).span());
+    let bytes = hex_decode(hex);
     let num = ProtoCodecImpl::decode::<u64>(bytes.span()).unwrap();
     assert_eq!(num, 0xab54a98ceb1f0ad2, "number decode failed");
     let bytes2 = ProtoCodecImpl::encode(@num);
@@ -135,7 +135,7 @@ fn test_proto_u64() {
 #[test]
 fn test_proto_byte_array() {
     let hex = "48656C6C6F2C20576F726C6421";
-    let bytes = hex_decode(ByteArrayIntoArrayU8::into(hex).span());
+    let bytes = hex_decode(hex);
     let byte_array = ProtoCodecImpl::decode::<ByteArray>(bytes.span()).unwrap();
     assert_eq!(@byte_array, @"Hello, World!", "byte array decode failed");
     let bytes2 = ProtoCodecImpl::encode(@byte_array);
@@ -146,7 +146,7 @@ fn test_proto_byte_array() {
 fn test_proto_to_cairo_struct() {
     let base64 =
         "CPb//////////wEQARoLY29zbW9zaHViLTQggMy5/wUqBBI0VngyCvis0ZEB8L3z1Qk6JgoSY29zbW9zMWhhZnB0bTR6eHk2EhBjb3Ntb3N2YWxwdWIxMjM0QAE=";
-    let bytes = base64_decode(ByteArrayIntoArrayU8::into(base64).span());
+    let bytes = base64_decode(base64);
     let header = ProtoCodecImpl::decode::<TmHeader>(bytes.span()).unwrap();
     let header2 = TmHeader {
         height: -10,
@@ -167,7 +167,7 @@ fn test_proto_to_cairo_struct() {
 #[test]
 fn test_proto_to_cairo_struct_absent_field() {
     let hex = "08f6ffffffffffffffff012080ccb9ff05";
-    let bytes = hex_decode(ByteArrayIntoArrayU8::into(hex).span());
+    let bytes = hex_decode(hex);
     let header = ProtoCodecImpl::decode::<TmHeader>(bytes.span()).unwrap();
     let header2 = TmHeader {
         height: -10,
@@ -188,7 +188,7 @@ fn test_proto_to_cairo_struct_absent_field() {
 #[test]
 fn test_proto_to_cairo_struct_non_canonical_order() {
     let hex = "2080ccb9ff0508f6ffffffffffffffff01";
-    let bytes = hex_decode(ByteArrayIntoArrayU8::into(hex).span());
+    let bytes = hex_decode(hex);
     let header = ProtoCodecImpl::decode::<TmHeader>(bytes.span());
     assert(header.is_none(), 'Decoding must fail')
 }
@@ -197,7 +197,7 @@ fn test_proto_to_cairo_struct_non_canonical_order() {
 fn test_repeated_default_value() {
     let base64 =
         "IIDMuf8FKgcSADQAVgB4SiYKEmNvc21vczFoYWZwdG00enh5NhIQY29zbW9zdmFscHViMTIzNEoASiYKEmNvc21vczFoYWZwdG00enh5NhIQY29zbW9zdmFscHViMTIzNA==";
-    let bytes = base64_decode(ByteArrayIntoArrayU8::into(base64).span());
+    let bytes = base64_decode(base64);
     let header = ProtoCodecImpl::decode::<TmHeader>(bytes.span()).unwrap();
     let header2 = TmHeader {
         height: 0,
