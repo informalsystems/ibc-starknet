@@ -1,6 +1,7 @@
 use ibc_utils::bytes::SpanU32IntoArrayU8;
 use ibc_utils::storage::{ArrayU32Pack, ArrayU8Pack};
-use ics23::{ICS23Errors, apply_inner, apply_leaf, do_hash, iavl_spec};
+use ics23::ops::{apply_inner, apply_leaf, do_hash};
+use ics23::{ICS23Errors, iavl_spec};
 use protobuf::primitives::array::{
     ArrayAsProtoMessage, ByteArrayAsProtoMessage, BytesAsProtoMessage,
 };

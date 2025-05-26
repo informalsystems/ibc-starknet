@@ -2,7 +2,8 @@ use ibc_utils::bytes::{
     ByteArrayIntoArrayU8, SpanU32IntoArrayU8, SpanU8IntoArrayU32, SpanU8IntoByteArray,
 };
 use ibc_utils::hex::{decode_byte_array as decode_hex, encode_lower as encode_hex};
-use ics23::{HashOp, InnerOp, LeafOp, LengthOp, apply_inner, apply_leaf, do_hash, do_length};
+use ics23::ops::{apply_inner, apply_leaf, do_hash, do_length};
+use ics23::{HashOp, InnerOp, LeafOp, LengthOp};
 
 // https://github.com/cosmos/ics23/blob/c7c728879896fb260fe76b208ea6a17c2b0132a3/rust/src/ops.rs#L210
 #[test]

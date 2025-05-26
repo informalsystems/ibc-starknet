@@ -36,7 +36,7 @@ pub impl CometHeaderIntoConsensusState of Into<CometHeader, CometConsensusState>
             proto_ts.seconds.try_into().unwrap(), proto_ts.nanos.try_into().unwrap(),
         );
 
-        assert(root_u8.len() == 32, 'not sha256 hash');
+        assert(root_u8.len() == 32, 'Invalid CometBFT root hash');
 
         let mut root_span = root_u8.span();
 
