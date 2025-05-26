@@ -453,7 +453,7 @@ pub struct Validator {
 #[generate_trait]
 pub impl ValidatorImpl of ValidatorTrait {
     fn validate_id(self: @Validator) {
-        assert!(self.address == @self.pub_key.address());
+        assert(self.address == @self.pub_key.address(), 'invalid validator ID');
     }
 
     fn verify_signature(self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>) {
@@ -866,8 +866,11 @@ pub impl VotingPowerTallyImpl of VotingPowerTallyTrait {
 
     fn has_enough_power(self: @VotingPowerTally) -> bool {
         // 0 < numerator < denominator
-        assert!(@0 < self.trust_threshold.numerator);
-        assert!(self.trust_threshold.numerator < self.trust_threshold.denominator);
+        assert(@0 < self.trust_threshold.numerator, 'invalid trust threshold');
+        assert(
+            self.trust_threshold.numerator < self.trust_threshold.denominator,
+            'invalid trust threshold',
+        );
 
         // cast to u128 to avoid overflow
         let tally: u128 = (*self.tallied).into();

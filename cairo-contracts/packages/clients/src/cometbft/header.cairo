@@ -1,23 +1,11 @@
 use cometbft::light_client::Header as CometHeader;
 use ibc_utils::bytes::{ByteArrayIntoArrayU8, SpanU8IntoByteArray};
+use ibc_utils::numeric::u32_from_big_endian;
 use protobuf::types::message::ProtoCodecImpl;
 use starknet_ibc_clients::cometbft::{CometConsensusState, CometErrors};
 use starknet_ibc_core::client::{TimestampImpl, U64IntoTimestamp};
 use starknet_ibc_core::commitment::StateRoot;
 
-fn from_u8Array_to_u32Array(mut data: Span<u8>) -> Array<u32> {
-    assert!(data.len() % 4 == 0);
-    let mut result = array![];
-    while let Option::Some(vals) = data.multi_pop_front() {
-        let [val1, val2, val3, val4] = (*vals).unbox();
-        let mut value = val1.into() * 0x1000000;
-        value = value + val2.into() * 0x10000;
-        value = value + val3.into() * 0x100;
-        value = value + val4.into();
-        result.append(value);
-    }
-    result
-}
 
 #[generate_trait]
 pub impl CometHeaderImpl of CometHeaderTrait {
@@ -48,17 +36,21 @@ pub impl CometHeaderIntoConsensusState of Into<CometHeader, CometConsensusState>
             proto_ts.seconds.try_into().unwrap(), proto_ts.nanos.try_into().unwrap(),
         );
 
-        let root_u32 = from_u8Array_to_u32Array(root_u8.span());
+        assert(root_u8.len() == 32, 'not sha256 hash');
 
-        let root = [
-            *root_u32[0], *root_u32[1], *root_u32[2], *root_u32[3], *root_u32[4], *root_u32[5],
-            *root_u32[6], *root_u32[7],
-        ];
+        let mut root_span = root_u8.span();
 
-        CometConsensusState {
-            timestamp,
-            root: StateRoot { root },
-            next_validators_hash: SpanU8IntoByteArray::into(next_validators_hash.span()),
-        }
+        let r0 = u32_from_big_endian((*root_span.multi_pop_front().unwrap()).unbox());
+        let r1 = u32_from_big_endian((*root_span.multi_pop_front().unwrap()).unbox());
+        let r2 = u32_from_big_endian((*root_span.multi_pop_front().unwrap()).unbox());
+        let r3 = u32_from_big_endian((*root_span.multi_pop_front().unwrap()).unbox());
+        let r4 = u32_from_big_endian((*root_span.multi_pop_front().unwrap()).unbox());
+        let r5 = u32_from_big_endian((*root_span.multi_pop_front().unwrap()).unbox());
+        let r6 = u32_from_big_endian((*root_span.multi_pop_front().unwrap()).unbox());
+        let r7 = u32_from_big_endian((*root_span.multi_pop_front().unwrap()).unbox());
+
+        let root = [r0, r1, r2, r3, r4, r5, r6, r7];
+
+        CometConsensusState { timestamp, root: StateRoot { root }, next_validators_hash }
     }
 }

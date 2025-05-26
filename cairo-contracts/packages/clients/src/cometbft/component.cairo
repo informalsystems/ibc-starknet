@@ -853,9 +853,7 @@ pub mod CometClientComponent {
                 header_time: trusted_consensus_state.timestamp.try_into().unwrap(),
                 height: trusted_height.revision_height,
                 next_validators: header.trusted_validator_set.clone(),
-                next_validators_hash: ByteArrayIntoArrayU8::into(
-                    trusted_consensus_state.next_validators_hash,
-                ),
+                next_validators_hash: trusted_consensus_state.next_validators_hash,
             };
 
             let untrusted_block_state = UntrustedBlockState {
@@ -893,9 +891,7 @@ pub mod CometClientComponent {
                 header_time: trusted_consensus_state.timestamp.try_into().unwrap(),
                 height: trusted_height.revision_height,
                 next_validators: header.trusted_validator_set.clone(),
-                next_validators_hash: ByteArrayIntoArrayU8::into(
-                    trusted_consensus_state.next_validators_hash,
-                ),
+                next_validators_hash: trusted_consensus_state.next_validators_hash,
             };
 
             let untrusted_block_state = UntrustedBlockState {

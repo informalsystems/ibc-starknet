@@ -13,18 +13,20 @@ use starknet_ibc_core::commitment::{StateRoot, StateRootZero};
 pub struct CometConsensusState {
     pub timestamp: Timestamp,
     pub root: StateRoot,
-    pub next_validators_hash: ByteArray,
+    pub next_validators_hash: Array<u8>,
 }
 
 pub impl CometConsensusStateZero of Zero<CometConsensusState> {
     fn zero() -> CometConsensusState {
         CometConsensusState {
-            timestamp: TimestampZero::zero(), root: StateRootZero::zero(), next_validators_hash: "",
+            timestamp: TimestampZero::zero(),
+            root: StateRootZero::zero(),
+            next_validators_hash: array![],
         }
     }
 
     fn is_zero(self: @CometConsensusState) -> bool {
-        self.timestamp.is_zero() && self.root.is_zero() && self.next_validators_hash.len() == 0
+        self.timestamp.is_zero() && self.root.is_zero() && self.next_validators_hash.is_empty()
     }
 
     fn is_non_zero(self: @CometConsensusState) -> bool {
