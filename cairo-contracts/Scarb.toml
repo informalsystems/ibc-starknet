@@ -36,6 +36,8 @@ openzeppelin_token   = "1.0.0"
 openzeppelin_testing = "4.0.0"
 openzeppelin_utils   = "1.0.0"
 
+alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria", rev = "f2c5fbe" }
+
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }
 cometbft   = { path = "../cairo-libs/packages/cometbft" }

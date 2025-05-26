@@ -24,6 +24,10 @@ scarb = { workspace = true }
 # external dependencies
 openzeppelin_token = { workspace = true }
 starknet           = { workspace = true }
+cometbft           = { workspace = true }
+ics23              = { workspace = true }
+protobuf           = { workspace = true }
+alexandria_math    = { workspace = true }
 
 [dev-dependencies]
 assert_macros = { workspace = true }

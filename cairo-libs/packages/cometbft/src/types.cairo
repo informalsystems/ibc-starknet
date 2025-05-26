@@ -752,7 +752,7 @@ pub struct SignedVote {
     signature: Array<u8> // TODO: whether to define a Signature type?
 }
 
-#[derive(Drop, Debug, Clone, PartialEq, Default)]
+#[derive(Drop, Debug, Clone, PartialEq, Default, Serde)]
 pub struct CanonicalVote {
     /// Type of vote (prevote or precommit)
     pub vote_type: VoteType,
@@ -768,7 +768,7 @@ pub struct CanonicalVote {
 }
 
 /// Type of votes
-#[derive(Drop, Debug, Clone, PartialEq, Default)]
+#[derive(Drop, Debug, Clone, PartialEq, Default, Serde)]
 pub enum VoteType {
     #[default]
     Unknown,

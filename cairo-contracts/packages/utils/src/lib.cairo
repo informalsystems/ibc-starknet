@@ -12,3 +12,13 @@ pub mod governance {
     pub use component::IBCGovernanceComponent;
     pub use interface::{IGovernance, IGovernanceDispatcher, IGovernanceDispatcherTrait};
 }
+pub mod comet {
+    mod component;
+    pub use component::CometBftFactCheckerComponent;
+
+    pub use component::{
+        ICometBftFactCheckerQueryTrait, ICometBftFactCheckerQueryTraitDispatcher,
+        ICometBftFactCheckerQueryTraitDispatcherTrait, ICometBftFactCheckerQueryTraitSafeDispatcher,
+        ICometBftFactCheckerQueryTraitSafeDispatcherTrait,
+    };
+}

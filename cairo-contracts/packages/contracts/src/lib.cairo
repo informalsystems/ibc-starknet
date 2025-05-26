@@ -1,3 +1,4 @@
+pub mod cometbft_fact_checker;
 pub mod core;
 pub mod erc20;
 pub mod apps {

@@ -190,6 +190,10 @@ dependencies = [
 name = "starknet_ibc_utils"
 version = "0.1.0"
 dependencies = [
+ "alexandria_math",
+ "cometbft",
+ "ics23",
  "openzeppelin_token",
+ "protobuf",
  "snforge_std",
 ]
