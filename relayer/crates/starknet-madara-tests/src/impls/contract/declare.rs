@@ -11,12 +11,12 @@ use hermes_starknet_chain_components::traits::{
     CanBuildAccountFromSigner, ContractDeclarer, ContractDeclarerComponent,
     HasContractClassHashType, HasContractClassType, HasStarknetClient,
 };
-use starknet_v13::accounts::Account;
-use starknet_v13::core::types::contract::{
+use starknet::accounts::Account;
+use starknet::core::types::contract::{
     CompiledClass, ComputeClassHashError, JsonError, SierraClass,
 };
-use starknet_v13::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
-use starknet_v13::providers::Provider;
+use starknet::core::types::{BlockId, BlockTag, Felt, RevertedInvocation};
+use starknet::providers::Provider;
 
 use crate::traits::CanUseStarknetAccount;
 use crate::types::TxResponse;

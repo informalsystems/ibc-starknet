@@ -36,11 +36,11 @@ use ibc::core::client::types::error::ClientError;
 use ibc::core::host::types::error::{DecodingError, IdentifierError};
 use ibc::primitives::TimestampError;
 use prost::{DecodeError, EncodeError};
-use starknet_v13::accounts::{single_owner, AccountError};
-use starknet_v13::core::types::contract::{ComputeClassHashError, JsonError};
-use starknet_v13::core::types::{RevertedInvocation, StarknetError};
-use starknet_v13::providers::ProviderError;
-use starknet_v13::signers::local_wallet;
+use starknet::accounts::{single_owner, AccountError};
+use starknet::core::types::contract::{ComputeClassHashError, JsonError};
+use starknet::core::types::{RevertedInvocation, StarknetError};
+use starknet::providers::ProviderError;
+use starknet::signers::local_wallet;
 use url::ParseError;
 
 use crate::impls::{

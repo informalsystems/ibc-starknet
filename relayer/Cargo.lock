@@ -1835,7 +1835,6 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 [[package]]
 name = "hermes-any-counterparty"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -1855,7 +1854,6 @@ dependencies = [
 [[package]]
 name = "hermes-async-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "async-trait",
  "cgp",
@@ -1874,13 +1872,12 @@ dependencies = [
  "hermes-encoding-components",
  "hermes-prelude",
  "hermes-relayer-components",
- "starknet 0.14.0",
+ "starknet",
 ]
 
 [[package]]
 name = "hermes-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -1892,7 +1889,6 @@ dependencies = [
 [[package]]
 name = "hermes-chain-type-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -1901,7 +1897,6 @@ dependencies = [
 [[package]]
 name = "hermes-cli"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "clap",
@@ -1928,7 +1923,6 @@ dependencies = [
 [[package]]
 name = "hermes-cli-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "clap",
@@ -1944,7 +1938,6 @@ dependencies = [
 [[package]]
 name = "hermes-cli-framework"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "clap",
@@ -1964,7 +1957,6 @@ dependencies = [
 [[package]]
 name = "hermes-comet-light-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -1974,7 +1966,6 @@ dependencies = [
 [[package]]
 name = "hermes-comet-light-client-context"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "eyre",
@@ -1991,7 +1982,6 @@ dependencies = [
 [[package]]
 name = "hermes-core"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-chain-components",
@@ -2008,7 +1998,6 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "hermes-comet-light-client-context",
  "hermes-core",
@@ -2023,7 +2012,6 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "bech32 0.9.1",
  "bitcoin",
@@ -2072,7 +2060,6 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-chain-preset"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2084,7 +2071,6 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-core"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "hermes-comet-light-client-components",
  "hermes-core",
@@ -2107,7 +2093,6 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -2122,7 +2107,6 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-integration-tests"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "eyre",
@@ -2148,7 +2132,6 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "dirs-next",
@@ -2185,7 +2168,6 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hdpath",
@@ -2211,7 +2193,6 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-wasm-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "eyre",
@@ -2248,7 +2229,6 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -2257,7 +2237,6 @@ dependencies = [
 [[package]]
 name = "hermes-error"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "eyre",
@@ -2269,7 +2248,6 @@ dependencies = [
 [[package]]
 name = "hermes-ibc-test-suite"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-chain-components",
@@ -2284,7 +2262,6 @@ dependencies = [
 [[package]]
 name = "hermes-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -2293,7 +2270,6 @@ dependencies = [
 [[package]]
 name = "hermes-prelude"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "cgp-async",
@@ -2302,7 +2278,6 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -2314,7 +2289,6 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "futures",
@@ -2329,7 +2303,6 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components-extra"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "futures",
@@ -2343,7 +2316,6 @@ dependencies = [
 [[package]]
 name = "hermes-runtime"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-async-runtime-components",
@@ -2358,7 +2330,6 @@ dependencies = [
 [[package]]
 name = "hermes-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -2392,7 +2363,7 @@ dependencies = [
  "serde_json",
  "sha2 0.10.8",
  "sha256",
- "starknet 0.14.0",
+ "starknet",
  "tendermint",
  "time",
  "tonic",
@@ -2417,7 +2388,7 @@ dependencies = [
  "ibc-client-starknet-types",
  "prost",
  "serde_json",
- "starknet 0.14.0",
+ "starknet",
  "toml",
  "url",
 ]
@@ -2448,7 +2419,7 @@ dependencies = [
  "serde",
  "serde_json",
  "stable-eyre",
- "starknet 0.14.0",
+ "starknet",
  "starknet-types-core",
  "tokio",
  "toml",
@@ -2471,6 +2442,7 @@ dependencies = [
  "hermes-prelude",
  "hermes-starknet-chain-components",
  "hermes-starknet-chain-context",
+ "hermes-starknet-madara-tests",
  "hermes-starknet-relayer",
  "hermes-starknet-test-components",
  "ibc",
@@ -2481,7 +2453,7 @@ dependencies = [
  "rand",
  "serde_json",
  "sha2 0.10.8",
- "starknet 0.14.0",
+ "starknet",
  "tendermint-rpc",
  "tiny-bip39",
  "tokio",
@@ -2522,8 +2494,7 @@ dependencies = [
  "serde_json",
  "sha2 0.10.8",
  "stable-eyre",
- "starknet 0.13.0",
- "starknet 0.14.0",
+ "starknet",
  "starknet-block-verifier",
  "tendermint-rpc",
  "tiny-bip39",
@@ -2546,9 +2517,11 @@ dependencies = [
  "hermes-prelude",
  "hermes-starknet-chain-components",
  "hermes-starknet-chain-context",
+ "hermes-starknet-madara-tests",
  "ibc",
+ "reqwest 0.12.15",
  "serde",
- "starknet 0.14.0",
+ "starknet",
  "tiny-bip39",
  "toml",
  "url",
@@ -2565,7 +2538,7 @@ dependencies = [
  "hermes-prelude",
  "hermes-starknet-chain-components",
  "serde",
- "starknet 0.14.0",
+ "starknet",
 ]
 
 [[package]]
@@ -2591,7 +2564,7 @@ dependencies = [
  "hermes-starknet-relayer",
  "ibc",
  "stable-eyre",
- "starknet 0.14.0",
+ "starknet",
  "tokio",
  "toml",
  "tracing",
@@ -2601,7 +2574,6 @@ dependencies = [
 [[package]]
 name = "hermes-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -2615,7 +2587,6 @@ dependencies = [
 [[package]]
 name = "hermes-tokio-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "futures",
@@ -2632,7 +2603,6 @@ dependencies = [
 [[package]]
 name = "hermes-tracing-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2647,7 +2617,6 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2667,7 +2636,6 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2682,7 +2650,6 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git#462b25f67f64ac2796988a93cbec25d3472d0180"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -5490,49 +5457,18 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
 name = "starknet"
-version = "0.13.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc9b221c99a1ea1d65fb130e5b0dbaa6d362698430232902ebeb2a898a1ab531"
-dependencies = [
- "starknet-accounts 0.12.0",
- "starknet-contract 0.12.0",
- "starknet-core 0.12.2",
- "starknet-core-derive",
- "starknet-crypto",
- "starknet-macros",
- "starknet-providers 0.12.1",
- "starknet-signers 0.10.2",
-]
-
-[[package]]
-name = "starknet"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "61e2e53e7705c9a9aad7f118a4bac7386afeb8db272b3eb445a464ca4c3dfee5"
 dependencies = [
- "starknet-accounts 0.13.0",
- "starknet-contract 0.13.0",
- "starknet-core 0.13.0",
+ "starknet-accounts",
+ "starknet-contract",
+ "starknet-core",
  "starknet-core-derive",
  "starknet-crypto",
  "starknet-macros",
- "starknet-providers 0.13.0",
- "starknet-signers 0.11.0",
-]
-
-[[package]]
-name = "starknet-accounts"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3fc4364f5684e4a5dcb100847a9ea023deae3815f45526721a6fa94ab595651"
-dependencies = [
- "async-trait",
- "auto_impl",
- "starknet-core 0.12.2",
- "starknet-crypto",
- "starknet-providers 0.12.1",
- "starknet-signers 0.10.2",
- "thiserror 1.0.69",
+ "starknet-providers",
+ "starknet-signers",
 ]
 
 [[package]]
@@ -5543,10 +5479,10 @@ checksum = "eca52534db01eda3bf3250f398bd4597aed3856d0d17d84070efbc7919abad71"
 dependencies = [
  "async-trait",
  "auto_impl",
- "starknet-core 0.13.0",
+ "starknet-core",
  "starknet-crypto",
- "starknet-providers 0.13.0",
- "starknet-signers 0.11.0",
+ "starknet-providers",
+ "starknet-signers",
  "thiserror 1.0.69",
 ]
 
@@ -5561,21 +5497,6 @@ dependencies = [
 
 [[package]]
 name = "starknet-contract"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f2102b8f763477a1bdece683da51514bc73829d5dcc3bbe75ff1b6aca6d4e02"
-dependencies = [
- "serde",
- "serde_json",
- "serde_with",
- "starknet-accounts 0.12.0",
- "starknet-core 0.12.2",
- "starknet-providers 0.12.1",
- "thiserror 1.0.69",
-]
-
-[[package]]
-name = "starknet-contract"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "67d8d5a5306527eedcb4bd70afecfc6824add631a08eac8fd1cf9c2bdfd21e77"
@@ -5583,33 +5504,10 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
- "starknet-accounts 0.13.0",
- "starknet-core 0.13.0",
- "starknet-providers 0.13.0",
+ "starknet-accounts",
+ "starknet-core",
+ "starknet-providers",
  "thiserror 1.0.69",
-]
-
-[[package]]
-name = "starknet-core"
-version = "0.12.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab44b2157b7f4697d58375cc8b8dbac8dfb6be79f13fd80c9f59634d2ac972c7"
-dependencies = [
- "base64 0.21.7",
- "crypto-bigint",
- "flate2",
- "foldhash",
- "hex",
- "indexmap 2.9.0",
- "num-traits",
- "serde",
- "serde_json",
- "serde_json_pythonic",
- "serde_with",
- "sha3",
- "starknet-core-derive",
- "starknet-crypto",
- "starknet-types-core",
 ]
 
 [[package]]
@@ -5680,29 +5578,8 @@ version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb14b6714e7625aca063e91022e574ee0bca863df98071dd7191e24919a367b0"
 dependencies = [
- "starknet-core 0.13.0",
+ "starknet-core",
  "syn 2.0.100",
-]
-
-[[package]]
-name = "starknet-providers"
-version = "0.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9256247f718564b3e4c73cc941735012691c14903fbc25cea306745bcbfa384"
-dependencies = [
- "async-trait",
- "auto_impl",
- "ethereum-types",
- "flate2",
- "getrandom 0.2.15",
- "log",
- "reqwest 0.11.27",
- "serde",
- "serde_json",
- "serde_with",
- "starknet-core 0.12.2",
- "thiserror 1.0.69",
- "url",
 ]
 
 [[package]]
@@ -5721,26 +5598,9 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_with",
- "starknet-core 0.13.0",
+ "starknet-core",
  "thiserror 1.0.69",
  "url",
-]
-
-[[package]]
-name = "starknet-signers"
-version = "0.10.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "518c7de189cd4158d45d33067c580094ad5cd2f027a90ac76d49a81c89fa37bc"
-dependencies = [
- "async-trait",
- "auto_impl",
- "crypto-bigint",
- "eth-keystore",
- "getrandom 0.2.15",
- "rand",
- "starknet-core 0.12.2",
- "starknet-crypto",
- "thiserror 1.0.69",
 ]
 
 [[package]]
@@ -5755,7 +5615,7 @@ dependencies = [
  "eth-keystore",
  "getrandom 0.2.15",
  "rand",
- "starknet-core 0.13.0",
+ "starknet-core",
  "starknet-crypto",
  "thiserror 1.0.69",
 ]

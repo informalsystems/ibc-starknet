@@ -3,9 +3,9 @@ use hermes_core::relayer_components::transaction::traits::{
 };
 use hermes_prelude::*;
 use hermes_starknet_chain_components::traits::{CanBuildAccountFromSigner, HasStarknetAccountType};
-use starknet_v13::accounts::ConnectedAccount;
-use starknet_v13::core::types::Felt;
-use starknet_v13::providers::ProviderError;
+use starknet::accounts::ConnectedAccount;
+use starknet::core::types::Felt;
+use starknet::providers::ProviderError;
 
 #[cgp_new_provider(NonceQuerierComponent)]
 impl<Chain> NonceQuerier<Chain> for QueryStarknetNonce

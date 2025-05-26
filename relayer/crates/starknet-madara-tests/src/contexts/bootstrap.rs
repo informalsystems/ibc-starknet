@@ -21,9 +21,11 @@ use hermes_error::impls::UseHermesError;
 use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
 use hermes_starknet_test_components::impls::{
-    BootstrapMadara, ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType,
-    StartMadaraSequencer,
+    BootstrapMadara, BuildChainAndDeployIbcContracts, DeployIbcContract,
+    ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType, StartMadaraSequencer,
 };
+use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
+use starknet::core::types::contract::SierraClass;
 
 use crate::contexts::{MadaraChain, MadaraChainDriver};
 use crate::impls::{BuildMadaraChainDriver, HandleMadaraChainError};
@@ -46,6 +48,10 @@ pub struct MadaraBootstrapFields {
     pub runtime: HermesRuntime,
     pub chain_command_path: PathBuf,
     pub chain_store_dir: PathBuf,
+    pub erc20_contract: SierraClass,
+    pub ics20_contract: SierraClass,
+    pub ibc_core_contract: SierraClass,
+    pub comet_client_contract: SierraClass,
 }
 
 delegate_components! {
@@ -69,11 +75,10 @@ delegate_components! {
         ChainFullNodeStarterComponent:
             StartMadaraSequencer, // Start only Madara as sequencer
             // StartMadaraStack, // Switch to this to start Madara, Pathfinder, and Anvil
+        IbcContractsDeployerComponent:
+            DeployIbcContract,
         ChainDriverBuilderComponent:
-            BuildAndWaitChainDriver<BuildMadaraChainDriver>,
-            // FIXME: Deploying Cairo contracts with Madara fails with 500 Internal server error
-            // Note: This might be caused by the contracts built with newer versions of Cairo
-            // BuildChainAndDeployIbcContracts<BuildAndWaitChainDriver<BuildMadaraChainDriver>>,
+            BuildChainAndDeployIbcContracts<BuildAndWaitChainDriver<BuildMadaraChainDriver>>,
         ChainTypeProviderComponent:
             UseType<MadaraChain>,
         ChainDriverTypeProviderComponent:

@@ -6,8 +6,8 @@ use hermes_core::relayer_components::transaction::traits::{
 use hermes_core::runtime_components::traits::{CanSleep, HasRuntime};
 use hermes_prelude::*;
 use hermes_starknet_chain_components::traits::HasStarknetClient;
-use starknet_v13::core::types::{Felt, StarknetError};
-use starknet_v13::providers::{Provider, ProviderError};
+use starknet::core::types::{Felt, StarknetError};
+use starknet::providers::{Provider, ProviderError};
 
 use crate::types::TxResponse;
 

@@ -1,6 +1,6 @@
 use cgp::core::error::{ErrorRaiser, ErrorRaiserComponent};
 use hermes_prelude::*;
-use starknet_v13::core::types::StarknetError;
+use starknet::core::types::StarknetError;
 pub struct RaiseStarknetError;
 
 #[cgp_provider(ErrorRaiserComponent)]

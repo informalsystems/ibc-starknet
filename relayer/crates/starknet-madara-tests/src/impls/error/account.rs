@@ -2,8 +2,8 @@ use core::fmt::Debug;
 
 use cgp::core::error::{ErrorRaiser, ErrorRaiserComponent};
 use hermes_prelude::*;
-use starknet_v13::accounts::AccountError;
-use starknet_v13::providers::ProviderError;
+use starknet::accounts::AccountError;
+use starknet::providers::ProviderError;
 
 pub struct RaiseAccountError;
 

@@ -1,4 +1,4 @@
-use starknet_v13::core::types::{
+use starknet::core::types::{
     ExecutionResult, RevertedInvocation, TransactionReceipt, TransactionReceiptWithBlockInfo,
     TransactionTrace,
 };

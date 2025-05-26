@@ -5,8 +5,8 @@ use hermes_starknet_chain_components::impls::StarknetAddress;
 use hermes_starknet_chain_components::traits::{
     ContractCaller, ContractCallerComponent, HasBlobType, HasSelectorType, HasStarknetClient,
 };
-use starknet_v13::core::types::{BlockId, BlockTag, Felt, FunctionCall};
-use starknet_v13::providers::{Provider, ProviderError};
+use starknet::core::types::{BlockId, BlockTag, Felt, FunctionCall};
+use starknet::providers::{Provider, ProviderError};
 
 #[cgp_new_provider(ContractCallerComponent)]
 impl<Chain> ContractCaller<Chain> for CallStarknetContract

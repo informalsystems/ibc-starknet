@@ -32,8 +32,7 @@ ibc-proto                 = { workspace = true }
 tendermint-rpc            = { workspace = true }
 ibc-client-starknet-types = { workspace = true }
 
-starknet                    = { version = "0.14.0" }
-starknet-v13                = { version = "0.13.0", package = "starknet" }
+starknet                    = { workspace = true }
 cairo-lang-starknet-classes = { workspace = true }
 futures                     = { workspace = true }
 url                         = { workspace = true }

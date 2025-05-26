@@ -27,10 +27,12 @@ use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_core::chain_preset::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_error::impls::UseHermesError;
 use hermes_prelude::*;
 use hermes_runtime::types::runtime::HermesRuntime;
+use hermes_starknet_chain_components::components::MadaraToCosmosComponents;
 use hermes_starknet_chain_components::impls::{
     QueryStarknetStorageProof, SendJsonRpcRequestWithReqwest, StarknetAddress,
     VerifyStarknetMerkleProof, VerifyStarknetStorageProof,
@@ -54,8 +56,8 @@ use ibc::core::host::types::identifiers::ChainId;
 use indexmap::IndexMap;
 use reqwest::Client;
 use starknet::core::types::{Felt, MerkleNode, StorageProof};
-use starknet_v13::providers::jsonrpc::HttpTransport;
-use starknet_v13::providers::JsonRpcClient;
+use starknet::providers::jsonrpc::HttpTransport;
+use starknet::providers::JsonRpcClient;
 use url::Url;
 
 use crate::impls::{BuildStarknetAccount, HandleMadaraChainError};
@@ -159,6 +161,12 @@ delegate_components! {
             VerifyStarknetMerkleProof,
         StarknetStorageProofVerifierComponent:
             VerifyStarknetStorageProof,
+    }
+}
+
+delegate_components! {
+    DelegateCosmosChainComponents {
+        MadaraChain: MadaraToCosmosComponents::Provider,
     }
 }
 
