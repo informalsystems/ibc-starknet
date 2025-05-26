@@ -1,9 +1,9 @@
 use alexandria_math::ed25519::verify_signature;
 pub use canonical_vote_impl::CanonicalVoteAsProtoMessage;
 use cometbft::errors::CometErrors;
-use cometbft::utils::{Fraction, SpanU8TryIntoU256};
+use cometbft::utils::Fraction;
 use core::sha256::compute_sha256_byte_array;
-use ics23::byte_array_to_array_u8;
+use ibc_utils::bytes::SpanU8TryIntoU256;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{
     BoolAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, U64AsProtoMessage,
@@ -715,11 +715,9 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
                 let signed_bytes = ProtoCodecImpl::encode_with_length(canonical_vote);
 
-                let signed_array_u8 = byte_array_to_array_u8(@signed_bytes);
-
                 validator.validate_id();
 
-                validator.verify_signature(signed_array_u8.span(), signature.span());
+                validator.verify_signature(signed_bytes.span(), signature.span());
 
                 // TODO: set verified field to true
 

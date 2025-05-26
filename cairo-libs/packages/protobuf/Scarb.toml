@@ -13,6 +13,7 @@ fmt   = { workspace = true }
 scarb = { workspace = true }
 
 [dependencies]
+ibc_utils = { workspace = true }
 
 [dev-dependencies]
 alexandria_math = { workspace = true }

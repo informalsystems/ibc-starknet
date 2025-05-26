@@ -1,4 +1,6 @@
-use ics23::{ICS23Errors, SliceU32IntoArrayU8, apply_inner, apply_leaf, do_hash, iavl_spec};
+use ibc_utils::bytes::SpanU32IntoArrayU8;
+use ibc_utils::numeric::{u32_from_u8, u32_to_u8};
+use ics23::{ICS23Errors, apply_inner, apply_leaf, do_hash, iavl_spec};
 use protobuf::primitives::array::{
     ArrayAsProtoMessage, ByteArrayAsProtoMessage, BytesAsProtoMessage,
 };
@@ -9,7 +11,6 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
 use starknet::storage_access::StorePacking;
-use crate::utils::{u32_from_u8, u32_to_u8};
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct MerkleProof {
@@ -115,7 +116,7 @@ pub impl ExistenceProofImpl of ExistenceProofTrait {
         let mut path_span = self.path.span();
 
         while let Option::Some(path) = path_span.pop_front() {
-            hash = apply_inner(path, hash.into());
+            hash = apply_inner(path, hash.span().into());
             if let Option::Some(s) = spec {
                 // NOTE: Multiplied by 4 since the hash is a u32 array, but the
                 // child size is in u8 bytes.

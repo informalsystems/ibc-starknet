@@ -11,9 +11,14 @@ name = "cometbft"
 version = "0.1.0"
 dependencies = [
  "alexandria_math",
+ "ibc_utils",
  "ics23",
  "protobuf",
 ]
+
+[[package]]
+name = "ibc_utils"
+version = "0.1.0"
 
 [[package]]
 name = "ics23"
@@ -78,10 +83,16 @@ checksum = "sha256:fd348b31c4a4407add33adc3c2b8f26dca71dbd7431faaf726168f37a91db
 [[package]]
 name = "protobuf"
 version = "0.1.0"
+dependencies = [
+ "ibc_utils",
+]
 
 [[package]]
 name = "serde_json"
 version = "0.1.0"
+dependencies = [
+ "ibc_utils",
+]
 
 [[package]]
 name = "snforge_scarb_plugin"

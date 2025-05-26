@@ -1,8 +1,6 @@
 use core::sha256::compute_sha256_u32_array;
-use ics23::{
-    ArrayU32IntoArrayU8, HashOp, ICS23Errors, InnerOp, IntoArrayU32, KeyBytes, LeafOp, LengthOp,
-    SliceU32IntoArrayU8, ValueBytes,
-};
+use ibc_utils::bytes::{IntoArrayU32, SpanU32IntoArrayU8};
+use ics23::{HashOp, ICS23Errors, InnerOp, KeyBytes, LeafOp, LengthOp, ValueBytes};
 use protobuf::varint::encode_varint_to_u8_array;
 
 pub fn apply_inner(inner: @InnerOp, child: Array<u8>) -> [u32; 8] {
@@ -17,7 +15,7 @@ pub fn apply_inner(inner: @InnerOp, child: Array<u8>) -> [u32; 8] {
     data.append_span(inner.suffix.span());
 
     // Compute the hash
-    let (bytes, last_word, last_word_len) = data.into_array_u32();
+    let (bytes, last_word, last_word_len) = data.span().into_array_u32();
     compute_sha256_u32_array(bytes, last_word, last_word_len)
 }
 
@@ -34,7 +32,7 @@ pub fn apply_leaf(leaf_op: @LeafOp, key: KeyBytes, value: ValueBytes) -> [u32; 8
     data.append_span(preval.span());
 
     // Compute the hash
-    let (bytes, last_word, last_word_len) = data.into_array_u32();
+    let (bytes, last_word, last_word_len) = data.span().into_array_u32();
     compute_sha256_u32_array(bytes, last_word, last_word_len)
 }
 
@@ -47,8 +45,8 @@ pub fn do_hash(hash_op: @HashOp, data: Array<u8>) -> Array<u8> {
     match hash_op {
         HashOp::NoOp => { data },
         HashOp::Sha256 => {
-            let (bytes, last_word, last_word_len) = data.into_array_u32();
-            compute_sha256_u32_array(bytes, last_word, last_word_len).into()
+            let (bytes, last_word, last_word_len) = data.span().into_array_u32();
+            compute_sha256_u32_array(bytes, last_word, last_word_len).span().into()
         },
     }
 }
@@ -58,7 +56,7 @@ pub fn do_length(length_op: @LengthOp, data: Array<u8>) -> Array<u8> {
         LengthOp::NoPrefix => data,
         LengthOp::VarProto => {
             let mut data = data;
-            let mut len = encode_varint_to_u8_array(data.len());
+            let mut len = encode_varint_to_u8_array(data.len().into());
             len.append_span(data.span());
             len
         },

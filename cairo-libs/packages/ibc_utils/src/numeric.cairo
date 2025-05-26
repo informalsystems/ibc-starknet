@@ -1,3 +1,60 @@
+use crate::array::reverse_array;
+
+pub fn u32_from_u8(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
+    let b0 = b0.into() * 0x1_00_00_00;
+    let b1 = b1.into() * 0x1_00_00;
+    let b2 = b2.into() * 0x1_00;
+    let b3 = b3.into();
+    b0 | b1 | b2 | b3
+}
+
+pub fn u32_to_u8(value: u32) -> (u8, u8, u8, u8) {
+    let b0 = ((value / 0x1_00_00_00) & 0xFF).try_into().unwrap();
+    let b1 = ((value / 0x1_00_00) & 0xFF).try_into().unwrap();
+    let b2 = ((value / 0x1_00) & 0xFF).try_into().unwrap();
+    let b3 = (value & 0xFF).try_into().unwrap();
+    (b0, b1, b2, b3)
+}
+
+pub fn felt252_to_u8_array(value: felt252) -> Array<u8> {
+    let mut value_bytes: Array<u8> = array![];
+    let mut i = 0;
+    let mut current_value: u256 = value.into();
+    while current_value != 0 && i != 31 {
+        let low = current_value % 0x100;
+        let lsb_u8: u8 = low.try_into().unwrap();
+        value_bytes.append(lsb_u8);
+        i += 1;
+        current_value = current_value / 0x100;
+    }
+    reverse_array(value_bytes)
+}
+
+pub fn u64_into_array_u32(value: u64) -> Array<u32> {
+    let mut array: Array<u32> = ArrayTrait::new();
+    let upper = (value / 0x100000000).try_into().unwrap();
+    let lower = (value % 0x100000000).try_into().unwrap();
+    array.append(upper);
+    array.append(lower);
+    array
+}
+
+pub fn next_power_of_two(num: u32) -> u32 {
+    if num == 0 {
+        return 1;
+    }
+    let mut n = num - 1;
+    n = n | (n / 2); // n |= n >> 1;
+    n = n | (n / 4); // n |= n >> 2;
+    n = n | (n / 16); // n |= n >> 4;
+    n = n | (n / 256); // n |= n >> 8;
+    n = n | (n / 65536); // n |= n >> 16;
+
+    // we can stop, as `num` is u32.
+
+    n + 1
+}
+
 pub fn encode_2_complement_128(value: @i128) -> u128 {
     let value = *value;
     if value < 0 {
@@ -117,7 +174,8 @@ pub fn little_endian_to_u64(value: @[u8; 8]) -> u64 {
 mod tests {
     use super::{
         decode_2_complement_128, decode_2_complement_64, encode_2_complement_128,
-        encode_2_complement_64, little_endian_to_u64, u64_to_little_endian,
+        encode_2_complement_64, little_endian_to_u64, next_power_of_two, u32_from_u8, u32_to_u8,
+        u64_to_little_endian,
     };
 
     #[test]
@@ -205,5 +263,35 @@ mod tests {
         let decoded = little_endian_to_u64(@bytes);
         let encoded = u64_to_little_endian(@decoded);
         assert_eq!(encoded, bytes, "invalid encoded value");
+    }
+
+    #[test]
+    fn test_next_power_of_two() {
+        assert_eq!(next_power_of_two(0), 1);
+        assert_eq!(next_power_of_two(1), 1);
+        assert_eq!(next_power_of_two(2), 2);
+        assert_eq!(next_power_of_two(3), 4);
+        assert_eq!(next_power_of_two(4), 4);
+        assert_eq!(next_power_of_two(5), 8);
+        assert_eq!(next_power_of_two(6), 8);
+        assert_eq!(next_power_of_two(7), 8);
+        assert_eq!(next_power_of_two(8), 8);
+        assert_eq!(next_power_of_two(9), 16);
+    }
+
+    #[test]
+    fn test_u32_to_u8() {
+        let val_u32 = 0x12345678;
+        let (b0, b1, b2, b3) = (0x12, 0x34, 0x56, 0x78);
+        let actual = u32_to_u8(val_u32);
+        assert_eq!((b0, b1, b2, b3), actual, "u32 to u8 fail")
+    }
+
+    #[test]
+    fn test_u8_to_u32() {
+        let (b0, b1, b2, b3) = (0x12, 0x34, 0x56, 0x78);
+        let val_u32 = 0x12345678;
+        let actual = u32_from_u8(b0, b1, b2, b3);
+        assert_eq!(val_u32, actual, "u32 from u8 fail")
     }
 }

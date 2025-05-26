@@ -1,5 +1,5 @@
 use cometbft::types::{PublicKey, PublicKeyTrait, Sum};
-use cometbft::utils::SpanU8TryIntoU256;
+use ibc_utils::bytes::SpanU8TryIntoU256;
 
 #[derive(Drop, Debug)]
 pub struct TestData {

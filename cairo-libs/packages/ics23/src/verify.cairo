@@ -1,8 +1,10 @@
 use core::num::traits::{CheckedSub, Zero};
+use ibc_utils::array::ArrayU8PartialOrd;
+use ibc_utils::bytes::SpanU32IntoArrayU8;
 use ics23::{
-    ArrayU8PartialOrd, ExistenceProof, ExistenceProofImpl, HashOp, ICS23Errors, InnerOp, InnerSpec,
-    KeyBytes, LeafOp, NonExistenceProof, NonExistenceProofImpl, Proof, ProofSpec, ProofSpecTrait,
-    RootBytes, SliceU32IntoArrayU8, ValueBytes,
+    ExistenceProof, ExistenceProofImpl, HashOp, ICS23Errors, InnerOp, InnerSpec, KeyBytes, LeafOp,
+    NonExistenceProof, NonExistenceProofImpl, Proof, ProofSpec, ProofSpecTrait, RootBytes,
+    ValueBytes,
 };
 use protobuf::varint::decode_varint_from_u8_array;
 
@@ -31,7 +33,7 @@ pub fn verify_membership(
         } else {
             panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
         }
-        subvalue = subroot.into();
+        subvalue = subroot.span().into();
         i += 1;
     }
     assert(root == subroot, ICS23Errors::INVALID_MERKLE_PROOF);
@@ -54,7 +56,7 @@ pub fn verify_non_membership(
     if let Proof::NonExist(p) = proof {
         subroot = p.calculate_root();
         verify_non_existence(spec, p, key.clone());
-        verify_membership(specs.clone(), proofs, root, keys.clone(), subroot.into(), 1)
+        verify_membership(specs.clone(), proofs, root, keys.clone(), subroot.span().into(), 1)
     } else {
         panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
     }

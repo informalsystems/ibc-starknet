@@ -6,11 +6,12 @@ use cometbft::types::{
 };
 use cometbft::utils::{Fraction, TWO_THIRDS};
 use core::num::traits::CheckedAdd;
+use ibc_utils::bytes::SpanU32IntoArrayU8;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::U64AsProtoMessage;
 use protobuf::types::message::ProtoCodecImpl;
 use protobuf::types::wkt::{Duration, Timestamp};
-use crate::utils::{MerkleHashImpl, u32_8_to_array_u8};
+use crate::utils::MerkleHashImpl;
 
 /// Verifies an update header received as the `header` field of `MsgUpdateClient`.
 ///
@@ -38,12 +39,14 @@ pub fn verify_misbehaviour_header(
 }
 
 pub fn verify_validator_sets(untrusted: @UntrustedBlockState) {
-    validator_sets_match(untrusted.validators, untrusted.signed_header.header.validators_hash);
     validator_sets_match(
-        untrusted.next_validators, untrusted.signed_header.header.next_validators_hash,
+        untrusted.validators, untrusted.signed_header.header.validators_hash.span(),
+    );
+    validator_sets_match(
+        untrusted.next_validators, untrusted.signed_header.header.next_validators_hash.span(),
     );
     header_matches_commit(
-        untrusted.signed_header.header, untrusted.signed_header.commit.block_id.hash,
+        untrusted.signed_header.header, untrusted.signed_header.commit.block_id.hash.span(),
     );
     valid_commit(untrusted.signed_header, untrusted.validators);
 }
@@ -71,43 +74,43 @@ pub fn verify_header_is_from_past(
     is_header_from_past(untrusted.signed_header.header.time, options.clock_drift, now);
 }
 
-pub fn validator_sets_match(validator_set: @ValidatorSet, header_validator_hash: @Array<u8>) {
+pub fn validator_sets_match(validator_set: @ValidatorSet, header_validator_hash: Span<u8>) {
     let mut validator_bytes = array![];
 
     for validator in validator_set.validators {
         let simple_validator: SimpleValidator = validator.clone().into();
         let bytes = ProtoCodecImpl::encode(@simple_validator);
-        validator_bytes.append(bytes);
+        validator_bytes.append(bytes.span());
     }
 
     let hash = MerkleHashImpl::hash_byte_vectors(validator_bytes.span());
+    let hash_u8: Array<u8> = hash.span().into();
 
-    assert(
-        header_validator_hash == @u32_8_to_array_u8(hash), CometErrors::INVALID_VALIDATOR_SET_HASH,
-    );
+    assert(header_validator_hash == hash_u8.span(), CometErrors::INVALID_VALIDATOR_SET_HASH);
 }
 
-pub fn header_matches_commit(header: @Header, commit_hash: @Array<u8>) {
+pub fn header_matches_commit(header: @Header, commit_hash: Span<u8>) {
     let header_bytes = array![
-        ProtoCodecImpl::encode(header.version),
-        ProtoCodecImpl::encode_as_msg(header.chain_id),
-        ProtoCodecImpl::encode_as_msg(header.height),
-        ProtoCodecImpl::encode(header.time),
-        ProtoCodecImpl::encode(header.last_block_id),
-        ProtoCodecImpl::encode_as_msg(header.last_commit_hash),
-        ProtoCodecImpl::encode_as_msg(header.data_hash),
-        ProtoCodecImpl::encode_as_msg(header.validators_hash),
-        ProtoCodecImpl::encode_as_msg(header.next_validators_hash),
-        ProtoCodecImpl::encode_as_msg(header.consensus_hash),
-        ProtoCodecImpl::encode_as_msg(header.app_hash),
-        ProtoCodecImpl::encode_as_msg(header.last_results_hash),
-        ProtoCodecImpl::encode_as_msg(header.evidence_hash),
-        ProtoCodecImpl::encode_as_msg(header.proposer_address),
+        ProtoCodecImpl::encode(header.version).span(),
+        ProtoCodecImpl::encode_as_msg(header.chain_id).span(),
+        ProtoCodecImpl::encode_as_msg(header.height).span(),
+        ProtoCodecImpl::encode(header.time).span(),
+        ProtoCodecImpl::encode(header.last_block_id).span(),
+        ProtoCodecImpl::encode_as_msg(header.last_commit_hash).span(),
+        ProtoCodecImpl::encode_as_msg(header.data_hash).span(),
+        ProtoCodecImpl::encode_as_msg(header.validators_hash).span(),
+        ProtoCodecImpl::encode_as_msg(header.next_validators_hash).span(),
+        ProtoCodecImpl::encode_as_msg(header.consensus_hash).span(),
+        ProtoCodecImpl::encode_as_msg(header.app_hash).span(),
+        ProtoCodecImpl::encode_as_msg(header.last_results_hash).span(),
+        ProtoCodecImpl::encode_as_msg(header.evidence_hash).span(),
+        ProtoCodecImpl::encode_as_msg(header.proposer_address).span(),
     ];
 
-    let hash_bytes = MerkleHashImpl::hash_byte_vectors(header_bytes.span());
+    let hash = MerkleHashImpl::hash_byte_vectors(header_bytes.span());
+    let hash_u8: Array<u8> = hash.span().into();
 
-    assert(commit_hash == @u32_8_to_array_u8(hash_bytes), CometErrors::INVALID_COMMIT_HASH);
+    assert(commit_hash == hash_u8.span(), CometErrors::INVALID_COMMIT_HASH);
 }
 
 pub fn valid_commit(signed_header: @SignedHeader, validators: @ValidatorSet) {

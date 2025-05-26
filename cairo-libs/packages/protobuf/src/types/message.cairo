@@ -25,13 +25,13 @@ pub trait ProtoName<T> {
 
 #[derive(Drop)]
 pub struct EncodeContext {
-    pub buffer: ByteArray,
+    pub buffer: Array<u8>,
 }
 
 #[generate_trait]
 pub impl EncodeContextImpl of EncodeContextTrait {
     fn new() -> EncodeContext {
-        EncodeContext { buffer: "" }
+        EncodeContext { buffer: array![] }
     }
 
     fn encode_field<T, +ProtoMessage<T>, +Default<T>, +PartialEq<T>, +Drop<T>>(
@@ -42,11 +42,11 @@ pub impl EncodeContextImpl of EncodeContextTrait {
             let mut context2 = Self::new();
             value.encode_raw(ref context2);
             let wire_type = ProtoMessage::<T>::wire_type();
-            self.buffer.append_byte(ProtobufTag { field_number, wire_type }.encode());
+            self.buffer.append(ProtobufTag { field_number, wire_type }.encode());
             if wire_type == WireType::LengthDelimited {
                 context2.buffer.len().encode_raw(ref self);
             }
-            self.buffer.append(@context2.buffer);
+            self.buffer.append_span(context2.buffer.span());
         }
     }
 
@@ -60,11 +60,11 @@ pub impl EncodeContextImpl of EncodeContextTrait {
             v.encode_raw(ref context2);
             // do not ignore default values
             let wire_type = ProtoMessage::<T>::wire_type();
-            self.buffer.append_byte(ProtobufTag { field_number, wire_type }.encode());
+            self.buffer.append(ProtobufTag { field_number, wire_type }.encode());
             if wire_type == WireType::LengthDelimited {
                 context2.buffer.len().encode_raw(ref self);
             }
-            self.buffer.append(@context2.buffer);
+            self.buffer.append_span(context2.buffer.span());
         }
     }
 
@@ -88,11 +88,11 @@ pub impl EncodeContextImpl of EncodeContextTrait {
     fn encode_oneof<T, +ProtoOneof<T>, +Drop<T>>(ref self: EncodeContext, value: @T) {
         let mut context2 = Self::new();
         let tag = value.encode_raw(ref context2);
-        self.buffer.append_byte(tag.encode());
+        self.buffer.append(tag.encode());
         if tag.wire_type == WireType::LengthDelimited {
             context2.buffer.len().encode_raw(ref self);
         }
-        self.buffer.append(@context2.buffer);
+        self.buffer.append_span(context2.buffer.span());
     }
 
     fn encode_with_length<T, +ProtoMessage<T>, +Default<T>, +Drop<T>, +PartialEq<T>>(
@@ -101,20 +101,20 @@ pub impl EncodeContextImpl of EncodeContextTrait {
         let mut context2 = Self::new();
         value.encode_raw(ref context2);
         context2.buffer.len().encode_raw(ref self);
-        self.buffer.append(@context2.buffer);
+        self.buffer.append_span(context2.buffer.span());
     }
 }
 
 #[derive(Drop, Debug)]
 pub struct DecodeContext {
-    pub buffer: @ByteArray,
+    pub buffer: Span<u8>,
     pub index: usize,
     pub limits: Array<usize>,
 }
 
 #[generate_trait]
 pub impl DecodeContextImpl of DecodeContextTrait {
-    fn new(buffer: @ByteArray) -> DecodeContext {
+    fn new(buffer: Span<u8>) -> DecodeContext {
         DecodeContext { buffer, index: 0, limits: array![] }
     }
 
@@ -142,7 +142,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
     ) -> Option<T> {
         let mut field = Default::<T>::default();
         if self.can_read_branch() {
-            let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
+            let tag = ProtobufTagImpl::decode(*self.buffer[self.index]);
             if tag.field_number == field_number {
                 self.index += 1;
 
@@ -174,7 +174,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
         let mut field = ArrayTrait::new();
         let mut failed = false;
         while self.can_read_branch() {
-            let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
+            let tag = ProtobufTagImpl::decode(*self.buffer[self.index]);
             if tag.field_number != field_number {
                 break;
             }
@@ -211,7 +211,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
 
     /// Performs the Protobuf decoding for a `Oneof` field.
     fn decode_oneof<T, +ProtoOneof<T>, +Drop<T>>(ref self: DecodeContext) -> Option<T> {
-        let tag = ProtobufTagImpl::decode(self.buffer[self.index]);
+        let tag = ProtobufTagImpl::decode(*self.buffer[self.index]);
         let value = ProtoOneof::decode_raw(ref self, tag.field_number)?;
         Option::Some(value)
     }
@@ -230,7 +230,7 @@ pub impl DecodeContextImpl of DecodeContextTrait {
 
 #[generate_trait]
 pub impl ProtoCodecImpl of ProtoCodecTrait {
-    fn decode<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(serialized: @ByteArray) -> Option<T> {
+    fn decode<T, +ProtoMessage<T>, +Drop<T>, +Default<T>>(serialized: Span<u8>) -> Option<T> {
         let mut value = Default::<T>::default();
         let mut context = DecodeContextImpl::new(serialized);
         if ProtoMessage::<T>::wire_type() == WireType::LengthDelimited {
@@ -243,7 +243,7 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
         Option::Some(value)
     }
 
-    fn encode<T, +ProtoMessage<T>>(value: @T) -> ByteArray {
+    fn encode<T, +ProtoMessage<T>>(value: @T) -> Array<u8> {
         let mut context = EncodeContextImpl::new();
         value.encode_raw(ref context);
         context.buffer
@@ -251,7 +251,7 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
 
     fn encode_as_msg<T, +ProtoMessage<T>, +Default<T>, +Drop<T>, +PartialEq<T>>(
         value: @T,
-    ) -> ByteArray {
+    ) -> Array<u8> {
         // TODO(rano): can we avoid this?
         let mut context = EncodeContextImpl::new();
         context.encode_field(1, value);
@@ -260,7 +260,7 @@ pub impl ProtoCodecImpl of ProtoCodecTrait {
 
     fn encode_with_length<T, +ProtoMessage<T>, +Default<T>, +Drop<T>, +PartialEq<T>>(
         value: @T,
-    ) -> ByteArray {
+    ) -> Array<u8> {
         let mut context = EncodeContextImpl::new();
         context.encode_with_length(value);
         context.buffer

@@ -1,4 +1,4 @@
-use protobuf::primitives::array::ByteArrayAsProtoMessage;
+use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{I32AsProtoMessage, I64AsProtoMessage};
 use protobuf::types::message::{
     DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
@@ -82,7 +82,7 @@ impl TimestampAsProtoName of ProtoName<Timestamp> {
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Any {
     pub type_url: ByteArray,
-    pub value: ByteArray,
+    pub value: Array<u8>,
 }
 
 impl AnyAsProtoMessage of ProtoMessage<Any> {
@@ -120,7 +120,7 @@ pub impl AnyTryIntoProtoMessage<
 > of TryInto<Any, T> {
     fn try_into(self: Any) -> Option<T> {
         if self.type_url == ProtoName::<T>::type_url() {
-            ProtoCodecImpl::decode::<T>(@self.value)
+            ProtoCodecImpl::decode::<T>(self.value.span())
         } else {
             Option::None
         }
