@@ -1,4 +1,4 @@
-use ibc_utils::bytes::{ByteArrayIntoArrayU8, SpanU8IntoByteArray};
+use crate::bytes::ByteArrayIntoArrayU8;
 
 pub fn base64_char_to_u6(value: u8) -> u8 {
     if 'A' <= value && value <= 'Z' {
@@ -134,7 +134,7 @@ pub fn decode_byte_array(input: ByteArray) -> Array<u8> {
 
 #[cfg(test)]
 mod tests {
-    use crate::bytes::ByteArrayIntoArrayU8;
+    use crate::bytes::{ByteArrayIntoArrayU8, SpanU8IntoByteArray};
     use super::{base64_char_to_u6, decode, encode, u6_to_base64_char};
 
     #[test]
