@@ -1,4 +1,5 @@
 use crate::array::reverse_array;
+use crate::bytes::ArrayU8IntoByteArray;
 
 pub fn u32_from_u8(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
     let b0 = b0.into() * 0x1_00_00_00;
@@ -16,7 +17,7 @@ pub fn u32_to_u8(value: u32) -> (u8, u8, u8, u8) {
     (b0, b1, b2, b3)
 }
 
-pub fn felt252_to_u8_array(value: felt252) -> Array<u8> {
+pub fn felt252_to_array_u8(value: felt252) -> Array<u8> {
     let mut value_bytes: Array<u8> = array![];
     let mut i = 0;
     let mut current_value: u256 = value.into();
@@ -28,6 +29,10 @@ pub fn felt252_to_u8_array(value: felt252) -> Array<u8> {
         current_value = current_value / 0x100;
     }
     reverse_array(value_bytes)
+}
+
+pub fn felt252_to_byte_array(value: felt252) -> ByteArray {
+    ArrayU8IntoByteArray::into(reverse_array(felt252_to_array_u8(value)))
 }
 
 pub fn u64_into_array_u32(value: u64) -> Array<u32> {

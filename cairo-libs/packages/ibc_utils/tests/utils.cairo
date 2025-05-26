@@ -1,7 +1,7 @@
 use ibc_utils::array::ArrayU8PartialOrd;
 use ibc_utils::bytes::{ByteArrayIntoArrayU8, SpanU8IntoArrayU32, SpanU8IntoByteArray};
 use ibc_utils::hex::{decode as decode_hex, encode as encode_hex};
-use ibc_utils::numeric::{felt252_to_u8_array, u64_into_array_u32};
+use ibc_utils::numeric::{felt252_to_byte_array, u64_into_array_u32};
 
 #[test]
 fn test_array_u8_into_array_u32() {
@@ -134,15 +134,15 @@ fn test_lexicographical_cmp() {
 #[test]
 fn test_wasm_id_felt252_to_u8_array() {
     let raw_value: felt252 = 3820028427552332600290323295860;
-    let converted = felt252_to_u8_array(raw_value);
+    let converted = felt252_to_byte_array(raw_value);
     let expected: ByteArray = "07-tendermint";
-    assert(SpanU8IntoByteArray::into(converted.span()) == expected, 'failed felt252 to ByteArray');
+    assert(converted == expected, 'failed felt252 to ByteArray');
 }
 
 #[test]
 fn test_tendermint_id_felt252_to_u8_array() {
     let raw_value: felt252 = 13572566809670509;
-    let converted = felt252_to_u8_array(raw_value);
+    let converted = felt252_to_byte_array(raw_value);
     let expected: ByteArray = "08-wasm";
-    assert(SpanU8IntoByteArray::into(converted.span()) == expected, 'failed felt252 to ByteArray');
+    assert(converted == expected, 'failed felt252 to ByteArray');
 }
