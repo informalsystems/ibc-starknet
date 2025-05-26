@@ -1,20 +1,48 @@
 use crate::array::reverse_array;
-use crate::bytes::ArrayU8IntoByteArray;
+use crate::bytes::SpanU8IntoByteArray;
 
-pub fn u32_from_u8(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
-    let b0 = b0.into() * 0x1_00_00_00;
-    let b1 = b1.into() * 0x1_00_00;
-    let b2 = b2.into() * 0x1_00;
-    let b3 = b3.into();
-    b0 | b1 | b2 | b3
+pub fn u32_from_u8(val: [u8; 4]) -> u32 {
+    let [b0, b1, b2, b3] = val;
+    let p0 = b0.into() * 0x1_00_00_00;
+    let p1 = b1.into() * 0x1_00_00;
+    let p2 = b2.into() * 0x1_00;
+    let p3 = b3.into();
+    p0 | p1 | p2 | p3
 }
 
-pub fn u32_to_u8(value: u32) -> (u8, u8, u8, u8) {
+pub fn u32_to_u8(value: u32) -> [u8; 4] {
     let b0 = ((value / 0x1_00_00_00) & 0xFF).try_into().unwrap();
     let b1 = ((value / 0x1_00_00) & 0xFF).try_into().unwrap();
     let b2 = ((value / 0x1_00) & 0xFF).try_into().unwrap();
     let b3 = (value & 0xFF).try_into().unwrap();
-    (b0, b1, b2, b3)
+    [b0, b1, b2, b3]
+}
+
+pub fn u64_from_u8(val: [u8; 8]) -> u64 {
+    let [b0, b1, b2, b3, b4, b5, b6, b7] = val;
+
+    let p0 = b0.into() * 0x1_00_00_00_00_00_00_00;
+    let p1 = b1.into() * 0x1_00_00_00_00_00_00;
+    let p2 = b2.into() * 0x1_00_00_00_00_00;
+    let p3 = b3.into() * 0x1_00_00_00_00;
+    let p4 = b4.into() * 0x1_00_00_00;
+    let p5 = b5.into() * 0x1_00_00;
+    let p6 = b6.into() * 0x1_00;
+    let p7 = b7.into();
+
+    p0 | p1 | p2 | p3 | p4 | p5 | p6 | p7
+}
+
+pub fn u64_to_u8(value: u64) -> [u8; 8] {
+    let b0 = ((value / 0x1_00_00_00_00_00_00_00) & 0xFF).try_into().unwrap();
+    let b1 = ((value / 0x1_00_00_00_00_00_00) & 0xFF).try_into().unwrap();
+    let b2 = ((value / 0x1_00_00_00_00_00) & 0xFF).try_into().unwrap();
+    let b3 = ((value / 0x1_00_00_00_00) & 0xFF).try_into().unwrap();
+    let b4 = ((value / 0x1_00_00_00) & 0xFF).try_into().unwrap();
+    let b5 = ((value / 0x1_00_00) & 0xFF).try_into().unwrap();
+    let b6 = ((value / 0x1_00) & 0xFF).try_into().unwrap();
+    let b7 = (value & 0xFF).try_into().unwrap();
+    [b0, b1, b2, b3, b4, b5, b6, b7]
 }
 
 pub fn felt252_to_array_u8(value: felt252) -> Array<u8> {
@@ -32,7 +60,7 @@ pub fn felt252_to_array_u8(value: felt252) -> Array<u8> {
 }
 
 pub fn felt252_to_byte_array(value: felt252) -> ByteArray {
-    ArrayU8IntoByteArray::into(reverse_array(felt252_to_array_u8(value)))
+    SpanU8IntoByteArray::into(felt252_to_array_u8(value).span())
 }
 
 pub fn u64_into_array_u32(value: u64) -> Array<u32> {
@@ -180,7 +208,7 @@ mod tests {
     use super::{
         decode_2_complement_128, decode_2_complement_64, encode_2_complement_128,
         encode_2_complement_64, little_endian_to_u64, next_power_of_two, u32_from_u8, u32_to_u8,
-        u64_to_little_endian,
+        u64_from_u8, u64_to_little_endian, u64_to_u8,
     };
 
     #[test]
@@ -287,16 +315,32 @@ mod tests {
     #[test]
     fn test_u32_to_u8() {
         let val_u32 = 0x12345678;
-        let (b0, b1, b2, b3) = (0x12, 0x34, 0x56, 0x78);
+        let [b0, b1, b2, b3] = [0x12, 0x34, 0x56, 0x78];
         let actual = u32_to_u8(val_u32);
-        assert_eq!((b0, b1, b2, b3), actual, "u32 to u8 fail")
+        assert_eq!([b0, b1, b2, b3], actual, "u32 to u8 fail")
     }
 
     #[test]
     fn test_u8_to_u32() {
-        let (b0, b1, b2, b3) = (0x12, 0x34, 0x56, 0x78);
+        let [b0, b1, b2, b3] = [0x12, 0x34, 0x56, 0x78];
         let val_u32 = 0x12345678;
-        let actual = u32_from_u8(b0, b1, b2, b3);
+        let actual = u32_from_u8([b0, b1, b2, b3]);
         assert_eq!(val_u32, actual, "u32 from u8 fail")
+    }
+
+    #[test]
+    fn test_u8_to_u64() {
+        let [b0, b1, b2, b3, b4, b5, b6, b7] = [0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF];
+        let val_u32 = 0x1234567890ABCDEF;
+        let actual = u64_from_u8([b0, b1, b2, b3, b4, b5, b6, b7]);
+        assert_eq!(val_u32, actual, "u64 from u8 fail")
+    }
+
+    #[test]
+    fn test_u64_to_u8() {
+        let val_u32 = 0x1234567890ABCDEF;
+        let [b0, b1, b2, b3, b4, b5, b6, b7] = [0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF];
+        let actual = u64_to_u8(val_u32);
+        assert_eq!([b0, b1, b2, b3, b4, b5, b6, b7], actual, "u64 to u8 fail")
     }
 }

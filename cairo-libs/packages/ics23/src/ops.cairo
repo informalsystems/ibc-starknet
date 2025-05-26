@@ -1,5 +1,5 @@
 use core::sha256::compute_sha256_u32_array;
-use ibc_utils::bytes::{IntoArrayU32, SpanU32IntoArrayU8};
+use ibc_utils::bytes::{IntoArrayU32, SpanU32IntoArrayU8, SpanU8IntoArrayU32};
 use ics23::{HashOp, ICS23Errors, InnerOp, KeyBytes, LeafOp, LengthOp, ValueBytes};
 use protobuf::varint::encode_varint_to_u8_array;
 
