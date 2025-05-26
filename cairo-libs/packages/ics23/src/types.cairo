@@ -1,5 +1,5 @@
 use ibc_utils::bytes::SpanU32IntoArrayU8;
-use ibc_utils::numeric::{u32_from_u8, u32_to_u8};
+use ibc_utils::storage::{ArrayU32Pack, ArrayU8Pack};
 use ics23::{ICS23Errors, apply_inner, apply_leaf, do_hash, iavl_spec};
 use protobuf::primitives::array::{
     ArrayAsProtoMessage, ByteArrayAsProtoMessage, BytesAsProtoMessage,
@@ -10,7 +10,6 @@ use protobuf::types::message::{
     EncodeContextTrait, ProtoCodecImpl, ProtoMessage, ProtoName, ProtoOneof,
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
-use starknet::storage_access::StorePacking;
 
 #[derive(Default, Debug, Drop, PartialEq, Serde)]
 pub struct MerkleProof {
@@ -339,55 +338,6 @@ pub struct LeafOp {
     pub prehash_value: HashOp,
     pub length: LengthOp,
     pub prefix: Array<u8>,
-}
-
-pub impl ArrayU8Pack of StorePacking<Array<u8>, ByteArray> {
-    fn pack(value: Array<u8>) -> ByteArray {
-        let mut byte_array = "";
-        let mut span = value.span();
-        while let Some(byte) = span.pop_front() {
-            byte_array.append_byte(*byte);
-        }
-        byte_array
-    }
-
-    fn unpack(value: ByteArray) -> Array<u8> {
-        let mut arr = array![];
-        let mut i = 0;
-        while let Some(byte) = value.at(i) {
-            arr.append(byte);
-            i += 1;
-        }
-        arr
-    }
-}
-
-pub impl ArrayU32Pack of StorePacking<Array<u32>, ByteArray> {
-    fn pack(value: Array<u32>) -> ByteArray {
-        let mut byte_array = "";
-        let mut span = value.span();
-        while let Some(limb) = span.pop_front() {
-            let (b0, b1, b2, b3) = u32_to_u8(*limb);
-            byte_array.append_byte(b0);
-            byte_array.append_byte(b1);
-            byte_array.append_byte(b2);
-            byte_array.append_byte(b3);
-        }
-        byte_array
-    }
-
-    fn unpack(value: ByteArray) -> Array<u32> {
-        assert(value.len() % 4 == 0, 'Invalid length');
-        let mut arr = array![];
-        let mut i = 0;
-        while let (Some(b0), Some(b1), Some(b2), Some(b3)) =
-            (value.at(i), value.at(i + 1), value.at(i + 2), value.at(i + 3)) {
-            let limb = u32_from_u8(b0, b1, b2, b3);
-            arr.append(limb);
-            i += 4;
-        }
-        arr
-    }
 }
 
 impl LeafOpAsProtoMessage of ProtoMessage<LeafOp> {
