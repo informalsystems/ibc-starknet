@@ -42,18 +42,23 @@ pub mod ChannelHandlerComponent {
     pub struct Storage {
         pub next_channel_sequence: u64,
         pub channel_ends: Map<felt252, ChannelEnd>,
-        pub channel_ends_commitments: Map<felt252, felt252>,
         pub packet_commitments: Map<felt252, Commitment>,
-        pub packet_commitments_commitments: Map<felt252, felt252>,
         pub packet_receipts: Map<felt252, Receipt>,
-        pub packet_receipts_commitments: Map<felt252, felt252>,
         pub packet_acks: Map<felt252, Commitment>,
-        pub packet_acks_commitments: Map<felt252, felt252>,
         pub send_sequences: Map<felt252, Sequence>,
-        pub send_sequences_commitments: Map<felt252, felt252>,
         pub recv_sequences: Map<felt252, Sequence>,
-        pub recv_sequences_commitments: Map<felt252, felt252>,
         pub ack_sequences: Map<felt252, Sequence>,
+        //
+        // The following fields are used to generate storage proofs for IBC.
+        // Since Starknet storage stores data per field,
+        // we (poseidon) hash the intended data and store
+        // the hash as storage commitment.
+        pub channel_ends_commitments: Map<felt252, felt252>,
+        pub packet_commitments_commitments: Map<felt252, felt252>,
+        pub packet_receipts_commitments: Map<felt252, felt252>,
+        pub packet_acks_commitments: Map<felt252, felt252>,
+        pub send_sequences_commitments: Map<felt252, felt252>,
+        pub recv_sequences_commitments: Map<felt252, felt252>,
         pub ack_sequences_commitments: Map<felt252, felt252>,
     }
 

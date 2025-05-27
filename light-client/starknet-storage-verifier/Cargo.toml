@@ -19,11 +19,10 @@ poseidon = { workspace = true }
 
 # External dependencies
 indexmap  = { workspace = true }
-serde     = { workspace = true }
 thiserror = { workspace = true }
 
 # Ibc dependencies
-ibc-core = { workspace = true }
+ibc-core = { workspace = true, optional = true }
 
 # Starknet dependencies
 starknet-core   = { workspace = true }
@@ -31,4 +30,8 @@ starknet-crypto = { workspace = true }
 starknet-macros = { workspace = true }
 
 [dev-dependencies]
-starknet = { version = "0.14.0" }
+starknet                  = { version = "0.14.0" }
+starknet-storage-verifier = { path = ".", features = [ "ibc" ] }
+
+[features]
+ibc = [ "dep:ibc-core" ]

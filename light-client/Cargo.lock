@@ -3388,6 +3388,7 @@ dependencies = [
  "serde",
  "serde_json",
  "starknet",
+ "starknet-block-verifier",
  "starknet-crypto",
  "ureq",
 ]
@@ -3547,11 +3548,11 @@ dependencies = [
  "ibc-core",
  "indexmap 2.9.0",
  "poseidon",
- "serde",
  "starknet",
  "starknet-core 0.13.0",
  "starknet-crypto",
  "starknet-macros",
+ "starknet-storage-verifier",
  "thiserror 2.0.12",
 ]
 

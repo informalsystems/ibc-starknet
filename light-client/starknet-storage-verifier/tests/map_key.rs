@@ -3,7 +3,7 @@
 
 use ibc_core::host::types::identifiers::{ChannelId, ConnectionId, PortId, Sequence};
 use starknet_macros::felt;
-use starknet_storage_verifier::value::{connection_key, next_sequence_key, packet_key};
+use starknet_storage_verifier::ibc::{connection_key, next_sequence_key, packet_key};
 
 #[test]
 fn test_next_sequence_send_key() {

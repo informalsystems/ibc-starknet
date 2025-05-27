@@ -23,6 +23,9 @@ pub mod ConnectionHandlerComponent {
         pub next_connection_sequence: u64,
         pub client_to_connections: Map<felt252, Vec<ConnectionId>>,
         pub connection_ends: Map<felt252, ConnectionEnd>,
+        //
+        // This is generate storage commitment proofs for IBC.
+        // Check the comment in channel handler for more details.
         pub connection_ends_commitments: Map<felt252, felt252>,
     }
 
