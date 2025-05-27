@@ -35,6 +35,8 @@ use starknet_crypto::{pedersen_hash, Felt};
 /// doesn't support custom types:
 /// `bar.buzz`: the key is `starknet_storage_key([Field(b"bar")])`
 /// `bar.bull` : the key is `starknet_storage_key([Field(b"bar")]) + 1``
+///
+/// ref: https://book.cairo-lang.org/ch101-01-00-contract-storage.html
 pub enum KeyPart<'a> {
     Field(&'a [u8]),
     Map(Felt),
