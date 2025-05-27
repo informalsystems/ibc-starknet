@@ -43,7 +43,7 @@ pub enum KeyPart<'a> {
     Vec(u32),
 }
 
-impl<'a> KeyPart<'a> {
+impl KeyPart<'_> {
     pub fn hash(&self) -> Felt {
         match self {
             Self::Field(name) => starknet_keccak(name),
@@ -53,7 +53,7 @@ impl<'a> KeyPart<'a> {
     }
 }
 
-pub fn starknet_storage_key<'a, const N: usize>(parts: [KeyPart<'a>; N]) -> Felt {
+pub fn starknet_storage_key<const N: usize>(parts: [KeyPart<'_>; N]) -> Felt {
     // left-associative nesting of hashes
     parts
         .map(|part| part.hash())

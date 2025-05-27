@@ -14,6 +14,7 @@ pub fn ibc_path_to_storage_key(path: Path) -> Felt {
                 KeyPart::Map(key),
             ])
         }
+
         Path::ChannelEnd(channel_end_path) => {
             let key = next_sequence_key("channelEnds", channel_end_path.0, channel_end_path.1);
 
