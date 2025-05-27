@@ -4,6 +4,7 @@ members = [
   "./ibc-client-starknet",
   "./ibc-client-starknet-cw",
   "./ibc-client-starknet-types",
+  "./starknet-block-verifier",
   "./starknet-storage-verifier",
   "./poseidon",
 ]
@@ -25,17 +26,22 @@ starknet-storage-verifier = { version = "0.1.0" }
 poseidon                  = { version = "0.1.0" }
 
 # external dependencies
-derive_more         = { version = "0.99.11", features = [ "from", "try_into" ] }
-indexmap            = { version = "2.9.0" }
-prost               = { version = "0.13.1" }
-prost-types         = { version = "0.13.1" }
-serde               = { version = "1.0.210", features = [ "derive" ] }
-sha2                = { version = "0.10.8" }
+derive_more = { version = "0.99.11", features = [ "from", "try_into" ] }
+indexmap    = { version = "2.9.0" }
+prost       = { version = "0.13.1" }
+prost-types = { version = "0.13.1" }
+rstest      = { version = "0.25" }
+serde       = { version = "1.0.210", features = [ "derive" ] }
+serde_json  = { version = "1.0" }
+thiserror   = { version = "2.0.12" }
+sha2        = { version = "0.10.8" }
+ureq        = { version = "3.0.11", default-features = false }
+
+starknet            = { version = "0.14.0" }
 starknet-core       = { version = "0.13.0" }
 starknet-crypto     = { version = "0.7.4" }
 starknet-macros     = { version = "0.2.2" }
 starknet-types-core = { version = "0.1.7" }
-thiserror           = { version = "2.0.12" }
 
 # ibc depedenencies
 ibc-core      = { version = "0.56.0", default-features = false, features = [ "borsh", "schema" ] }

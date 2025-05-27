@@ -108,6 +108,8 @@ hermes-starknet-relayer             = { version = "0.1.0" }
 hermes-starknet-integration-tests   = { version = "0.1.0" }
 poseidon                            = { version = "0.1.0" }
 
+starknet-block-verifier = { version = "0.1.0" }
+
 [workspace.lints.rust]
 unsafe_code          = "forbid"
 dead_code            = "deny"
@@ -150,6 +152,8 @@ ibc-core-channel-types      = { git = "https://github.com/cosmos/ibc-rs", rev = 
 ibc-core-handler-types      = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
 
 ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types" }
+
+starknet-block-verifier = { path = "../light-client/starknet-block-verifier" }
 
 poseidon = { path = "../light-client/poseidon" }
 

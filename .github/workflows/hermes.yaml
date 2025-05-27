@@ -123,8 +123,8 @@ jobs:
       - name: Install Madara
         run: |
           mkdir -p ~/.bin
-          wget --quiet -O ~/.bin/madara "https://github.com/informalsystems/madara/releases/download/snapshot-2c88da11/madara"
-          chmod +x ~/.bin/madara
+          curl -sSLf "https://github.com/informalsystems/madara/releases/download/snapshot-2c88da11/madara" -o ~/.bin/madara
+          chmod u+x ~/.bin/madara
 
       - name: Install Scarb
         uses: software-mansion/setup-scarb@v1
