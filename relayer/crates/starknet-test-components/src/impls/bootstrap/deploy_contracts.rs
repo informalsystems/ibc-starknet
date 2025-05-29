@@ -138,7 +138,7 @@ where
 
         bootstrap
             .log(
-                &format!("declared CometBft library class: {comet_lib_class_hash:?}"),
+                &format!("declared Comet library class: {comet_lib_class_hash:?}"),
                 &LevelInfo,
             )
             .await;
@@ -167,18 +167,6 @@ where
             )
             .await;
 
-        let ibc_core_class_hash = chain
-            .declare_contract(bootstrap.ibc_core_contract())
-            .await
-            .map_err(Bootstrap::raise_error)?;
-
-        bootstrap
-            .log(
-                &format!("declared IBC core class: {ibc_core_class_hash:?}"),
-                &LevelInfo,
-            )
-            .await;
-
         let comet_client_class_hash = chain
             .declare_contract(bootstrap.comet_client_contract())
             .await
@@ -187,6 +175,18 @@ where
         bootstrap
             .log(
                 &format!("declared Comet IBC client class: {comet_client_class_hash:?}"),
+                &LevelInfo,
+            )
+            .await;
+
+        let ibc_core_class_hash = chain
+            .declare_contract(bootstrap.ibc_core_contract())
+            .await
+            .map_err(Bootstrap::raise_error)?;
+
+        bootstrap
+            .log(
+                &format!("declared IBC core class: {ibc_core_class_hash:?}"),
                 &LevelInfo,
             )
             .await;
