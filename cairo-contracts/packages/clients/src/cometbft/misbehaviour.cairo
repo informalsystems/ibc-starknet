@@ -1,6 +1,7 @@
 use cometbft::light_client::Header as CometHeader;
 use ibc_utils::bytes::ByteArrayIntoArrayU8;
 use protobuf::types::message::ProtoCodecImpl;
+use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 
 #[derive(Drop)]
 pub struct Misbehaviour {
@@ -18,14 +19,24 @@ pub impl MisbehaviourImpl of MisbehaviourTrait {
         >::deserialize(ref span)
             .unwrap();
 
-        let header_1 = ProtoCodecImpl::decode::<
-            CometHeader,
-        >(ByteArrayIntoArrayU8::into(header_1_bytes).span())
-            .unwrap();
-        let header_2 = ProtoCodecImpl::decode::<
-            CometHeader,
-        >(ByteArrayIntoArrayU8::into(header_2_bytes).span())
-            .unwrap();
+        // let header_1 = ProtoCodecImpl::decode::<
+        //     CometHeader,
+        // >(ByteArrayIntoArrayU8::into(header_1_bytes).span())
+        //     .unwrap();
+        // let header_2 = ProtoCodecImpl::decode::<
+        //     CometHeader,
+        // >(ByteArrayIntoArrayU8::into(header_2_bytes).span())
+        //     .unwrap();
+
+        let header_1 = IProtobufLibraryDispatcher {
+            class_hash: 'protobuf-class-hash'.try_into().unwrap(),
+        }
+            .comet_header_decode(ByteArrayIntoArrayU8::into(header_1_bytes));
+
+        let header_2 = IProtobufLibraryDispatcher {
+            class_hash: 'protobuf-class-hash'.try_into().unwrap(),
+        }
+            .comet_header_decode(ByteArrayIntoArrayU8::into(header_2_bytes));
 
         Misbehaviour { header_1, header_2 }
     }

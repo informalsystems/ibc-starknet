@@ -7,7 +7,7 @@ pub mod CometClientComponent {
     use ibc_utils::bytes::ByteArrayIntoArrayU8;
     use ibc_utils::storage::ArrayFelt252Store;
     use ics23::{
-        MerkleProof, Proof, verify_membership as ics23_verify_membership,
+        Proof, verify_membership as ics23_verify_membership,
         verify_non_membership as ics23_verify_non_membership,
     };
     use openzeppelin_access::ownable::OwnableComponent;
@@ -34,6 +34,7 @@ pub mod CometClientComponent {
     use starknet_ibc_core::host::{
         BasePrefix, ClientIdImpl, client_upgrade_path, consensus_upgrade_path,
     };
+    use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
     use starknet_ibc_utils::ValidateBasic;
 
     #[storage]
@@ -399,7 +400,13 @@ pub mod CometClientComponent {
             proof: StateProof,
             root: StateRoot,
         ) {
-            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(proof.proof.span()).unwrap();
+            // let decoded_proof =
+            // ProtoCodecImpl::decode::<MerkleProof>(proof.proof.span()).unwrap();
+            let decoded_proof = IProtobufLibraryDispatcher {
+                class_hash: 'protobuf-class-hash'.try_into().unwrap(),
+            }
+                .merkle_proof_decode(proof.proof);
+
             let specs = self.read_client_state(client_sequence).proof_spec;
             let mut proofs: Array<Proof> = ArrayTrait::new();
             for proof in decoded_proof.proofs {
@@ -422,7 +429,12 @@ pub mod CometClientComponent {
             proof: StateProof,
             root: StateRoot,
         ) {
-            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(proof.proof.span()).unwrap();
+            // let decoded_proof =
+            // ProtoCodecImpl::decode::<MerkleProof>(proof.proof.span()).unwrap();
+            let decoded_proof = IProtobufLibraryDispatcher {
+                class_hash: 'protobuf-class-hash'.try_into().unwrap(),
+            }
+                .merkle_proof_decode(proof.proof);
             let specs = self.read_client_state(client_sequence).proof_spec;
             let mut proofs: Array<Proof> = ArrayTrait::new();
             for proof in decoded_proof.proofs {

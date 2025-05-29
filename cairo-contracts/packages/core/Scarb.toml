@@ -32,6 +32,7 @@ ibc_utils = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_utils = { workspace = true }
+starknet_ibc_lib   = { workspace = true }
 
 [dev-dependencies]
 # external dependencies

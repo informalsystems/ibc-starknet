@@ -15,6 +15,7 @@ use starknet_ibc_core::host::{
     BasePrefix, BasePrefixZero, ClientId, ClientIdImpl, ClientIdTrait, ClientIdZero, ConnectionId,
     ConnectionIdZero,
 };
+use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
@@ -195,7 +196,13 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
 
 pub impl ConnectionEndIntoStateValue of Into<ConnectionEnd, StateValue> {
     fn into(self: ConnectionEnd) -> StateValue {
-        let encoded_connection_end = ProtoCodecImpl::encode(@self);
+        // let encoded_connection_end = ProtoCodecImpl::encode(@self);
+
+        let encoded_connection_end = IProtobufLibraryDispatcher {
+            class_hash: 'protobuf-class-hash'.try_into().unwrap(),
+        }
+            .connection_end_encode(self);
+
         StateValue { value: encoded_connection_end.into() }
     }
 }

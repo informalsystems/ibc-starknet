@@ -5,7 +5,7 @@ use protobuf::types::message::ProtoCodecImpl;
 use starknet_ibc_clients::cometbft::{CometConsensusState, CometErrors};
 use starknet_ibc_core::client::{TimestampImpl, U64IntoTimestamp};
 use starknet_ibc_core::commitment::StateRoot;
-
+use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 
 #[generate_trait]
 pub impl CometHeaderImpl of CometHeaderTrait {
@@ -16,13 +16,16 @@ pub impl CometHeaderImpl of CometHeaderTrait {
 
         assert(maybe_byte_array.is_some(), CometErrors::INVALID_HEADER);
 
-        let maybe_header = ProtoCodecImpl::decode::<
-            CometHeader,
-        >(ByteArrayIntoArrayU8::into(maybe_byte_array.unwrap()).span());
+        // let maybe_header = ProtoCodecImpl::decode::<
+        //     CometHeader,
+        // >(ByteArrayIntoArrayU8::into(maybe_byte_array.unwrap()).span());
 
-        assert(maybe_header.is_some(), CometErrors::INVALID_HEADER);
+        // assert(maybe_header.is_some(), CometErrors::INVALID_HEADER);
 
-        maybe_header.unwrap()
+        // maybe_header.unwrap()
+
+        IProtobufLibraryDispatcher { class_hash: 'protobuf-class-hash'.try_into().unwrap() }
+            .comet_header_decode(ByteArrayIntoArrayU8::into(maybe_byte_array.unwrap()))
     }
 }
 

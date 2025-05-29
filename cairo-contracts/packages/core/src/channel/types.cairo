@@ -11,6 +11,7 @@ use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::host::{
     ChannelId, ChannelIdZero, ConnectionId, PortId, PortIdTrait, Sequence,
 };
+use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -246,7 +247,13 @@ pub impl ChannelEndImpl of ChannelEndTrait {
 
 pub impl ChannelEndIntoStateValue of Into<ChannelEnd, StateValue> {
     fn into(self: ChannelEnd) -> StateValue {
-        let encoded_channel_end = ProtoCodecImpl::encode(@self);
+        // let encoded_channel_end = ProtoCodecImpl::encode(@self);
+
+        let encoded_channel_end = IProtobufLibraryDispatcher {
+            class_hash: 'protobuf-class-hash'.try_into().unwrap(),
+        }
+            .channel_end_encode(self);
+
         StateValue { value: encoded_channel_end.into() }
     }
 }
