@@ -56,7 +56,7 @@ jobs:
         working-directory: ./cairo-contracts
         run: |
           scarb --profile release build -p starknet_ibc_contracts
-          scarb --profile release build -p starknet_ibc_lib
+          scarb --profile release build -p starknet_ibc_libs
 
       - name: Install starknet-devnet
         uses: taiki-e/cache-cargo-install-action@v2
@@ -77,16 +77,16 @@ jobs:
           export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_CometClient.contract_class.json"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_IBCCore.contract_class.json"
 
-          export COMETBFT_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_lib_ICometBftLib.contract_class.json"
-          export ICS23_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_lib_IIcs23Lib.contract_class.json"
-          export PROTOBUF_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_lib_IProtobufLib.contract_class.json"
+          export COMET_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_libs_ICometLib.contract_class.json"
+          export ICS23_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_libs_IIcs23Lib.contract_class.json"
+          export PROTOBUF_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_libs_IProtobufLib.contract_class.json"
 
           cargo run --quiet --example contract_size "$ERC20_CONTRACT"
           cargo run --quiet --example contract_size "$ICS20_CONTRACT"
           cargo run --quiet --example contract_size "$COMET_CLIENT_CONTRACT"
           cargo run --quiet --example contract_size "$IBC_CORE_CONTRACT"
 
-          cargo run --quiet --example contract_size "$COMETBFT_LIB_CONTRACT"
+          cargo run --quiet --example contract_size "$COMET_LIB_CONTRACT"
           cargo run --quiet --example contract_size "$ICS23_LIB_CONTRACT"
           cargo run --quiet --example contract_size "$PROTOBUF_LIB_CONTRACT"
 

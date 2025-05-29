@@ -15,7 +15,7 @@ use starknet_ibc_core::host::{
     BasePrefix, BasePrefixZero, ClientId, ClientIdImpl, ClientIdTrait, ClientIdZero, ConnectionId,
     ConnectionIdZero,
 };
-use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
+use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]

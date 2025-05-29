@@ -5,7 +5,7 @@ use ibc_utils::storage::ArrayFelt252Store;
 use ics23::ProofSpec;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Duration, Height, HeightPartialOrd, Status, StatusTrait};
-use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
+use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 
 pub impl ArrayProofSpecStore = ibc_utils::storage::StorePackingViaSerde<Array<ProofSpec>>;
 pub impl ArrayByteArrayStore = ibc_utils::storage::StorePackingViaSerde<Array<ByteArray>>;

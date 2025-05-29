@@ -29,9 +29,9 @@ pub mod CometClientComponent {
     use starknet_ibc_core::host::{
         BasePrefix, ClientIdImpl, client_upgrade_path, consensus_upgrade_path,
     };
-    use starknet_ibc_lib::cometbft::{ICometBftDispatcherTrait, ICometBftLibraryDispatcher};
-    use starknet_ibc_lib::ics23::{IIcs23DispatcherTrait, IIcs23LibraryDispatcher};
-    use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
+    use starknet_ibc_libs::comet::{ICometDispatcherTrait, ICometLibraryDispatcher};
+    use starknet_ibc_libs::ics23::{IIcs23DispatcherTrait, IIcs23LibraryDispatcher};
+    use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
     use starknet_ibc_utils::ValidateBasic;
 
     #[storage]
@@ -885,7 +885,7 @@ pub mod CometClientComponent {
             let options = Options { trust_threshold, trusting_period, clock_drift };
             // verify_update_header(untrusted_block_state, trusted_block_state, options, now)
 
-            ICometBftLibraryDispatcher { class_hash: 'comet-bft-class-hash'.try_into().unwrap() }
+            ICometLibraryDispatcher { class_hash: 'comet-bft-class-hash'.try_into().unwrap() }
                 .verify_update_header(untrusted_block_state, trusted_block_state, options, now)
         }
 
@@ -926,7 +926,7 @@ pub mod CometClientComponent {
             let options = Options { trust_threshold, trusting_period, clock_drift };
             // verify_misbehaviour_header(untrusted_block_state, trusted_block_state, options, now)
 
-            ICometBftLibraryDispatcher { class_hash: 'comet-bft-class-hash'.try_into().unwrap() }
+            ICometLibraryDispatcher { class_hash: 'comet-bft-class-hash'.try_into().unwrap() }
                 .verify_misbehaviour_header(
                     untrusted_block_state, trusted_block_state, options, now,
                 )

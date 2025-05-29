@@ -1,5 +1,5 @@
 [package]
-name          = "starknet_ibc_lib"
+name          = "starknet_ibc_libs"
 version       = { workspace = true }
 edition       = { workspace = true }
 cairo-version = { workspace = true }

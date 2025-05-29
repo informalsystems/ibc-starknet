@@ -50,7 +50,7 @@ starknet_ibc_core      = { path = "packages/core" }
 starknet_ibc_testkit   = { path = "packages/testkit" }
 starknet_ibc_utils     = { path = "packages/utils" }
 
-starknet_ibc_lib = { path = "packages/libraries" }
+starknet_ibc_libs = { path = "packages/libraries" }
 
 [workspace.tool.fmt]
 sort-module-level-items = true

@@ -3,7 +3,7 @@ use protobuf::types::wkt::Timestamp;
 
 
 #[starknet::interface]
-pub trait ICometBft<TContractState> {
+pub trait IComet<TContractState> {
     fn verify_update_header(
         self: @TContractState,
         untrusted: UntrustedBlockState,
@@ -22,7 +22,7 @@ pub trait ICometBft<TContractState> {
 }
 
 #[starknet::contract]
-pub mod ICometBftLib {
+pub mod ICometLib {
     use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use super::*;
 
@@ -30,7 +30,7 @@ pub mod ICometBftLib {
     struct Storage {}
 
     #[abi(embed_v0)]
-    impl ICometBftImpl of super::ICometBft<ContractState> {
+    impl ICometImpl of super::IComet<ContractState> {
         fn verify_update_header(
             self: @ContractState,
             untrusted: UntrustedBlockState,

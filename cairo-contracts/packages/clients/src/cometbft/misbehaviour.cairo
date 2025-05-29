@@ -1,6 +1,6 @@
 use cometbft::light_client::Header as CometHeader;
 use ibc_utils::bytes::ByteArrayIntoArrayU8;
-use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
+use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 
 #[derive(Drop)]
 pub struct Misbehaviour {

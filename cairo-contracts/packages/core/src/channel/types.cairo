@@ -11,7 +11,7 @@ use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::host::{
     ChannelId, ChannelIdZero, ConnectionId, PortId, PortIdTrait, Sequence,
 };
-use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
+use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]

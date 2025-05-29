@@ -42,7 +42,7 @@ pub trait HasIbcContracts: HasChainType<Chain: HasContractClassType> {
 
     fn comet_client_contract(&self) -> &ContractClassOf<Self::Chain>;
 
-    fn cometbft_lib_contract(&self) -> &ContractClassOf<Self::Chain>;
+    fn comet_lib_contract(&self) -> &ContractClassOf<Self::Chain>;
 
     fn ics23_lib_contract(&self) -> &ContractClassOf<Self::Chain>;
 
@@ -131,14 +131,14 @@ where
             )
             .await;
 
-        let cometbft_lib_class_hash = chain
-            .declare_contract(bootstrap.cometbft_lib_contract())
+        let comet_lib_class_hash = chain
+            .declare_contract(bootstrap.comet_lib_contract())
             .await
             .map_err(Bootstrap::raise_error)?;
 
         bootstrap
             .log(
-                &format!("declared CometBft library class: {cometbft_lib_class_hash:?}"),
+                &format!("declared CometBft library class: {comet_lib_class_hash:?}"),
                 &LevelInfo,
             )
             .await;

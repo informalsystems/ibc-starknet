@@ -28,7 +28,7 @@ starknet            = { workspace = true }
 # ibc dependencies
 starknet_ibc_core  = { workspace = true }
 starknet_ibc_utils = { workspace = true }
-starknet_ibc_lib   = { workspace = true }
+starknet_ibc_libs  = { workspace = true }
 
 # internal dependencies
 cometbft  = { workspace = true }

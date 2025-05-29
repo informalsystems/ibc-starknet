@@ -30,8 +30,8 @@ pub struct BootstrapStarknetChainArgs {
     #[clap(long = "comet-client-contract-path")]
     pub comet_client_contract_path: String,
 
-    #[clap(long = "cometbft-lib-contract-path")]
-    pub cometbft_lib_contract_path: String,
+    #[clap(long = "comet-lib-contract-path")]
+    pub comet_lib_contract_path: String,
 
     #[clap(long = "ics23-lib-contract-path")]
     pub ics23_lib_contract_path: String,
@@ -92,9 +92,9 @@ where
             serde_json::from_str(&contract_str).map_err(App::raise_error)?
         };
 
-        let cometbft_lib_contract = {
+        let comet_lib_contract = {
             let contract_str = runtime
-                .read_file_as_string(&args.cometbft_lib_contract_path.clone().into())
+                .read_file_as_string(&args.comet_lib_contract_path.clone().into())
                 .await
                 .map_err(App::raise_error)?;
 
@@ -128,7 +128,7 @@ where
                 ics20_contract,
                 ibc_core_contract,
                 comet_client_contract,
-                cometbft_lib_contract,
+                comet_lib_contract,
                 ics23_lib_contract,
                 protobuf_lib_contract,
             }),

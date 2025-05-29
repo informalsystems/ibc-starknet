@@ -150,7 +150,7 @@ dependencies = [
  "protobuf",
  "snforge_std",
  "starknet_ibc_core",
- "starknet_ibc_lib",
+ "starknet_ibc_libs",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]
@@ -181,13 +181,13 @@ dependencies = [
  "protobuf",
  "serde_json",
  "snforge_std",
- "starknet_ibc_lib",
+ "starknet_ibc_libs",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]
 
 [[package]]
-name = "starknet_ibc_lib"
+name = "starknet_ibc_libs"
 version = "0.1.0"
 dependencies = [
  "cometbft",
