@@ -400,7 +400,9 @@ pub mod CometClientComponent {
             // let decoded_proof =
             // ProtoCodecImpl::decode::<MerkleProof>(proof.proof.span()).unwrap();
             let decoded_proof = IProtobufLibraryDispatcher {
-                class_hash: 'protobuf-class-hash'.try_into().unwrap(),
+                class_hash: 0x79ee6d6ba7d56ddfaddde35ec724dd632cdf3f605c4190ba93c8ec27db5a9e6
+                    .try_into()
+                    .unwrap(),
             }
                 .merkle_proof_decode(proof.proof);
 
@@ -418,7 +420,11 @@ pub mod CometClientComponent {
             let value = value.value;
             // ics23_verify_membership(specs, @proofs, root, keys, value, 0);
 
-            IIcs23LibraryDispatcher { class_hash: 'ics23-class-hash'.try_into().unwrap() }
+            IIcs23LibraryDispatcher {
+                class_hash: 0x3880dbc97687df3270d6f51ac26b7316275cbf60667d46ce19a6813fd191a73
+                    .try_into()
+                    .unwrap(),
+            }
                 .verify_membership(specs, proofs, root, keys, value, 0);
         }
 
@@ -432,7 +438,9 @@ pub mod CometClientComponent {
             // let decoded_proof =
             // ProtoCodecImpl::decode::<MerkleProof>(proof.proof.span()).unwrap();
             let decoded_proof = IProtobufLibraryDispatcher {
-                class_hash: 'protobuf-class-hash'.try_into().unwrap(),
+                class_hash: 0x79ee6d6ba7d56ddfaddde35ec724dd632cdf3f605c4190ba93c8ec27db5a9e6
+                    .try_into()
+                    .unwrap(),
             }
                 .merkle_proof_decode(proof.proof);
             let specs = self.read_client_state(client_sequence).proof_spec;
@@ -448,7 +456,11 @@ pub mod CometClientComponent {
             }
             // ics23_verify_non_membership(specs, @proofs, root, keys);
 
-            IIcs23LibraryDispatcher { class_hash: 'ics23-class-hash'.try_into().unwrap() }
+            IIcs23LibraryDispatcher {
+                class_hash: 0x3880dbc97687df3270d6f51ac26b7316275cbf60667d46ce19a6813fd191a73
+                    .try_into()
+                    .unwrap(),
+            }
                 .verify_non_membership(specs, proofs, root, keys);
         }
 
@@ -885,7 +897,11 @@ pub mod CometClientComponent {
             let options = Options { trust_threshold, trusting_period, clock_drift };
             // verify_update_header(untrusted_block_state, trusted_block_state, options, now)
 
-            ICometLibraryDispatcher { class_hash: 'comet-bft-class-hash'.try_into().unwrap() }
+            ICometLibraryDispatcher {
+                class_hash: 0x634812480c54f9942ec37535b717633bfe9fb34d691d262574d09d400d7aa10
+                    .try_into()
+                    .unwrap(),
+            }
                 .verify_update_header(untrusted_block_state, trusted_block_state, options, now)
         }
 
@@ -926,7 +942,11 @@ pub mod CometClientComponent {
             let options = Options { trust_threshold, trusting_period, clock_drift };
             // verify_misbehaviour_header(untrusted_block_state, trusted_block_state, options, now)
 
-            ICometLibraryDispatcher { class_hash: 'comet-bft-class-hash'.try_into().unwrap() }
+            ICometLibraryDispatcher {
+                class_hash: 0x634812480c54f9942ec37535b717633bfe9fb34d691d262574d09d400d7aa10
+                    .try_into()
+                    .unwrap(),
+            }
                 .verify_misbehaviour_header(
                     untrusted_block_state, trusted_block_state, options, now,
                 )

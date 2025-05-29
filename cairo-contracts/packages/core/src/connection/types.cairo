@@ -199,7 +199,9 @@ pub impl ConnectionEndIntoStateValue of Into<ConnectionEnd, StateValue> {
         // let encoded_connection_end = ProtoCodecImpl::encode(@self);
 
         let encoded_connection_end = IProtobufLibraryDispatcher {
-            class_hash: 'protobuf-class-hash'.try_into().unwrap(),
+            class_hash: 0x79ee6d6ba7d56ddfaddde35ec724dd632cdf3f605c4190ba93c8ec27db5a9e6
+                .try_into()
+                .unwrap(),
         }
             .connection_end_encode(self);
 

@@ -23,7 +23,11 @@ pub impl CometHeaderImpl of CometHeaderTrait {
 
         // maybe_header.unwrap()
 
-        IProtobufLibraryDispatcher { class_hash: 'protobuf-class-hash'.try_into().unwrap() }
+        IProtobufLibraryDispatcher {
+            class_hash: 0x79ee6d6ba7d56ddfaddde35ec724dd632cdf3f605c4190ba93c8ec27db5a9e6
+                .try_into()
+                .unwrap(),
+        }
             .comet_header_decode(ByteArrayIntoArrayU8::into(maybe_byte_array.unwrap()))
     }
 }
