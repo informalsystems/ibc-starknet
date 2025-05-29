@@ -76,6 +76,11 @@ jobs:
           export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_CometClient.contract_class.json"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_IBCCore.contract_class.json"
 
+          cargo run --quiet --example contract_size "$ERC20_CONTRACT"
+          cargo run --quiet --example contract_size "$ICS20_CONTRACT"
+          cargo run --quiet --example contract_size "$COMET_CLIENT_CONTRACT"
+          cargo run --quiet --example contract_size "$IBC_CORE_CONTRACT"
+
           export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
 
           nix shell \
