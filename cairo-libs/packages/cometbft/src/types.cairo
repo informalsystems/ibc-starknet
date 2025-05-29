@@ -804,7 +804,7 @@ pub impl U32TryIntoVoteType of TryInto<u32, VoteType> {
     }
 }
 
-#[derive(Drop, Debug, Clone)]
+#[derive(Drop, Debug, Clone, Serde)]
 pub struct UntrustedBlockState {
     pub signed_header: SignedHeader,
     pub validators: ValidatorSet,
@@ -828,7 +828,7 @@ impl HeaderToUntrustedBlockState of Into<LcHeader, UntrustedBlockState> {
     }
 }
 
-#[derive(Drop, Debug, Clone)]
+#[derive(Drop, Debug, Clone, Serde)]
 pub struct TrustedBlockState {
     pub chain_id: ByteArray,
     pub header_time: Timestamp,
@@ -837,7 +837,7 @@ pub struct TrustedBlockState {
     pub next_validators_hash: Array<u8>,
 }
 
-#[derive(Drop, Debug, Clone)]
+#[derive(Drop, Debug, Clone, Serde)]
 pub struct Options {
     pub trust_threshold: Fraction,
     pub trusting_period: Duration,

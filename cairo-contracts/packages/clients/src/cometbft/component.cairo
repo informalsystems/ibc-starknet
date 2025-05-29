@@ -1,7 +1,6 @@
 #[starknet::component]
 pub mod CometClientComponent {
     use cometbft::types::{Options, TrustedBlockState, UntrustedBlockState};
-    use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use core::num::traits::Zero;
     use ibc_utils::array::span_contains;
     use ibc_utils::bytes::ByteArrayIntoArrayU8;
@@ -31,6 +30,7 @@ pub mod CometClientComponent {
     use starknet_ibc_core::host::{
         BasePrefix, ClientIdImpl, client_upgrade_path, consensus_upgrade_path,
     };
+    use starknet_ibc_lib::cometbft::{ICometBftDispatcherTrait, ICometBftLibraryDispatcher};
     use starknet_ibc_lib::ics23::{IIcs23DispatcherTrait, IIcs23LibraryDispatcher};
     use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
     use starknet_ibc_utils::ValidateBasic;
@@ -884,7 +884,10 @@ pub mod CometClientComponent {
             let now = TimestampImpl::host().try_into().unwrap();
 
             let options = Options { trust_threshold, trusting_period, clock_drift };
-            verify_update_header(untrusted_block_state, trusted_block_state, options, now)
+            // verify_update_header(untrusted_block_state, trusted_block_state, options, now)
+
+            ICometBftLibraryDispatcher { class_hash: 'comet-bft-class-hash'.try_into().unwrap() }
+                .verify_update_header(untrusted_block_state, trusted_block_state, options, now)
         }
 
 
@@ -922,7 +925,12 @@ pub mod CometClientComponent {
             let now = TimestampImpl::host().try_into().unwrap();
 
             let options = Options { trust_threshold, trusting_period, clock_drift };
-            verify_misbehaviour_header(untrusted_block_state, trusted_block_state, options, now)
+            // verify_misbehaviour_header(untrusted_block_state, trusted_block_state, options, now)
+
+            ICometBftLibraryDispatcher { class_hash: 'comet-bft-class-hash'.try_into().unwrap() }
+                .verify_misbehaviour_header(
+                    untrusted_block_state, trusted_block_state, options, now,
+                )
         }
 
         fn _verify_misbehaviour_on_update(
