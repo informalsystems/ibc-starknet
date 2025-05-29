@@ -150,6 +150,7 @@ dependencies = [
  "protobuf",
  "snforge_std",
  "starknet_ibc_core",
+ "starknet_ibc_lib",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]
@@ -180,6 +181,26 @@ dependencies = [
  "protobuf",
  "serde_json",
  "snforge_std",
+ "starknet_ibc_lib",
+ "starknet_ibc_testkit",
+ "starknet_ibc_utils",
+]
+
+[[package]]
+name = "starknet_ibc_lib"
+version = "0.1.0"
+dependencies = [
+ "cometbft",
+ "ibc_utils",
+ "ics23",
+ "openzeppelin_access",
+ "openzeppelin_testing",
+ "openzeppelin_token",
+ "openzeppelin_utils",
+ "protobuf",
+ "snforge_std",
+ "starknet_ibc_contracts",
+ "starknet_ibc_core",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]

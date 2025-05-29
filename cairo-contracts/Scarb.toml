@@ -6,6 +6,7 @@ members = [
   "packages/core",
   "packages/testkit",
   "packages/utils",
+  "packages/libraries",
 ]
 
 [workspace.package]
@@ -48,6 +49,8 @@ starknet_ibc_contracts = { path = "packages/contracts" }
 starknet_ibc_core      = { path = "packages/core" }
 starknet_ibc_testkit   = { path = "packages/testkit" }
 starknet_ibc_utils     = { path = "packages/utils" }
+
+starknet_ibc_lib = { path = "packages/libraries" }
 
 [workspace.tool.fmt]
 sort-module-level-items = true
