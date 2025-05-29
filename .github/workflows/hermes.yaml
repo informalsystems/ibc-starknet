@@ -58,12 +58,17 @@ jobs:
           scarb --profile release build -p starknet_ibc_contracts
           scarb --profile release build -p starknet_ibc_libs
 
+      # - name: Install starknet-devnet from fork
+      #   uses: taiki-e/cache-cargo-install-action@v2
+      #   with:
+      #     tool: starknet-devnet
+      #     git: https://github.com/informalsystems/starknet-devnet
+      #     rev: f938680 # `rano/ibc-starknet` branch
+
       - name: Install starknet-devnet
-        uses: taiki-e/cache-cargo-install-action@v2
+        uses: taiki-e/install-action@v2
         with:
           tool: starknet-devnet
-          git: https://github.com/informalsystems/starknet-devnet
-          rev: f938680 # `rano/ibc-starknet` branch
 
       - name: Run Integration Tests
         env:
