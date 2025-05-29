@@ -41,6 +41,12 @@ pub trait HasIbcContracts: HasChainType<Chain: HasContractClassType> {
     fn ibc_core_contract(&self) -> &ContractClassOf<Self::Chain>;
 
     fn comet_client_contract(&self) -> &ContractClassOf<Self::Chain>;
+
+    fn cometbft_lib_contract(&self) -> &ContractClassOf<Self::Chain>;
+
+    fn ics23_lib_contract(&self) -> &ContractClassOf<Self::Chain>;
+
+    fn protobuf_lib_contract(&self) -> &ContractClassOf<Self::Chain>;
 }
 
 #[cgp_auto_getter]
@@ -121,6 +127,42 @@ where
         bootstrap
             .log(
                 &format!("declared ICS20 class: {ics20_class_hash:?}"),
+                &LevelInfo,
+            )
+            .await;
+
+        let cometbft_lib_class_hash = chain
+            .declare_contract(bootstrap.cometbft_lib_contract())
+            .await
+            .map_err(Bootstrap::raise_error)?;
+
+        bootstrap
+            .log(
+                &format!("declared CometBft library class: {cometbft_lib_class_hash:?}"),
+                &LevelInfo,
+            )
+            .await;
+
+        let ics23_lib_class_hash = chain
+            .declare_contract(bootstrap.ics23_lib_contract())
+            .await
+            .map_err(Bootstrap::raise_error)?;
+
+        bootstrap
+            .log(
+                &format!("declared ICS23 library class: {ics23_lib_class_hash:?}"),
+                &LevelInfo,
+            )
+            .await;
+
+        let protobuf_lib_class_hash = chain
+            .declare_contract(bootstrap.protobuf_lib_contract())
+            .await
+            .map_err(Bootstrap::raise_error)?;
+
+        bootstrap
+            .log(
+                &format!("declared Protobuf library class: {protobuf_lib_class_hash:?}"),
                 &LevelInfo,
             )
             .await;
