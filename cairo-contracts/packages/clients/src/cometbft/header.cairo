@@ -1,7 +1,6 @@
 use cometbft::light_client::Header as CometHeader;
 use ibc_utils::bytes::{ByteArrayIntoArrayU8, SpanU8IntoByteArray};
 use ibc_utils::numeric::u32_from_big_endian;
-use protobuf::types::message::ProtoCodecImpl;
 use starknet_ibc_clients::cometbft::{CometConsensusState, CometErrors};
 use starknet_ibc_core::client::{TimestampImpl, U64IntoTimestamp};
 use starknet_ibc_core::commitment::StateRoot;

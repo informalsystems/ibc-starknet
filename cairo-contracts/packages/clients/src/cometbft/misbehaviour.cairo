@@ -1,6 +1,5 @@
 use cometbft::light_client::Header as CometHeader;
 use ibc_utils::bytes::ByteArrayIntoArrayU8;
-use protobuf::types::message::ProtoCodecImpl;
 use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 
 #[derive(Drop)]

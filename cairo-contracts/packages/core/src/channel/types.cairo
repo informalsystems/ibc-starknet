@@ -2,7 +2,7 @@ use core::num::traits::Zero;
 use ibc_utils::bytes::{ByteArrayIntoArrayU8, IntoArrayU32, SpanU8IntoArrayU32};
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
 use protobuf::types::message::{
-    DecodeContext, EncodeContext, EncodeContextTrait, ProtoCodecImpl, ProtoMessage, ProtoName,
+    DecodeContext, EncodeContext, EncodeContextTrait, ProtoMessage, ProtoName,
 };
 use protobuf::types::tag::WireType;
 use starknet_ibc_core::channel::ChannelErrors;

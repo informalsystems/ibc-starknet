@@ -8,7 +8,6 @@ pub mod CometClientComponent {
     use ics23::Proof;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
-    use protobuf::types::message::ProtoCodecImpl;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,

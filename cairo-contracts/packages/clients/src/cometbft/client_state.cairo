@@ -3,7 +3,6 @@ use cometbft::utils::Fraction;
 use core::num::traits::Zero;
 use ibc_utils::storage::ArrayFelt252Store;
 use ics23::ProofSpec;
-use protobuf::types::message::ProtoCodecImpl;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Duration, Height, HeightPartialOrd, Status, StatusTrait};
 use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
