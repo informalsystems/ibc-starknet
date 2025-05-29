@@ -6,10 +6,7 @@ pub mod CometClientComponent {
     use ibc_utils::array::span_contains;
     use ibc_utils::bytes::ByteArrayIntoArrayU8;
     use ibc_utils::storage::ArrayFelt252Store;
-    use ics23::{
-        Proof, verify_membership as ics23_verify_membership,
-        verify_non_membership as ics23_verify_non_membership,
-    };
+    use ics23::Proof;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
     use protobuf::types::message::ProtoCodecImpl;
@@ -34,6 +31,7 @@ pub mod CometClientComponent {
     use starknet_ibc_core::host::{
         BasePrefix, ClientIdImpl, client_upgrade_path, consensus_upgrade_path,
     };
+    use starknet_ibc_lib::ics23::{IIcs23DispatcherTrait, IIcs23LibraryDispatcher};
     use starknet_ibc_lib::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
     use starknet_ibc_utils::ValidateBasic;
 
@@ -419,7 +417,10 @@ pub mod CometClientComponent {
                 keys.append(path_bytes);
             }
             let value = value.value;
-            ics23_verify_membership(specs, @proofs, root, keys, value, 0);
+            // ics23_verify_membership(specs, @proofs, root, keys, value, 0);
+
+            IIcs23LibraryDispatcher { class_hash: 'ics23-class-hash'.try_into().unwrap() }
+                .verify_membership(specs, proofs, root, keys, value, 0);
         }
 
         fn verify_non_membership(
@@ -446,7 +447,10 @@ pub mod CometClientComponent {
                 let path_bytes = ByteArrayIntoArrayU8::into(path);
                 keys.append(path_bytes);
             }
-            ics23_verify_non_membership(specs, @proofs, root, keys);
+            // ics23_verify_non_membership(specs, @proofs, root, keys);
+
+            IIcs23LibraryDispatcher { class_hash: 'ics23-class-hash'.try_into().unwrap() }
+                .verify_non_membership(specs, proofs, root, keys);
         }
 
         fn verify_client_message(
