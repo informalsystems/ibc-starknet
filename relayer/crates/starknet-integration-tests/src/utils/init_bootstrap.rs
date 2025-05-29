@@ -27,7 +27,7 @@ pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<Starknet
 
     let comet_client_contract = load_contract_from_env(runtime, "COMET_CLIENT_CONTRACT").await?;
 
-    let comet_lib_contract = load_contract_from_env(runtime, "COMEBFT_LIB_CONTRACT").await?;
+    let comet_lib_contract = load_contract_from_env(runtime, "COMET_LIB_CONTRACT").await?;
 
     let ics23_lib_contract = load_contract_from_env(runtime, "ICS23_LIB_CONTRACT").await?;
 
