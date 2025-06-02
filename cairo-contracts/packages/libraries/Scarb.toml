@@ -27,6 +27,8 @@ openzeppelin_token   = { workspace = true }
 openzeppelin_utils   = { workspace = true }
 openzeppelin_testing = { workspace = true }
 starknet             = { workspace = true }
+alexandria_math      = { workspace = true }
+garaga               = { workspace = true }
 
 # internal dependencies
 cometbft = { workspace = true }
@@ -45,6 +47,9 @@ ibc_utils     = { workspace = true }
 # ibc dependencies
 starknet_ibc_testkit   = { workspace = true }
 starknet_ibc_contracts = { workspace = true }
+
+[cairo]
+sierra-replace-ids = false
 
 [[target.starknet-contract]]
 allowed-libfuncs-list.name = "experimental"
