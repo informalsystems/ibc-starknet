@@ -96,7 +96,15 @@ where
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanEncode<ViaCairo, Chain::Address>
         + CanEncode<ViaCairo, Chain::ContractClassHash>
-        + CanEncode<ViaCairo, MsgRegisterClient>
+        + CanEncode<
+            ViaCairo,
+            Product![
+                Chain::Address,
+                Chain::ContractClassHash,
+                Chain::ContractClassHash,
+                Chain::ContractClassHash
+            ],
+        > + CanEncode<ViaCairo, MsgRegisterClient>
         + CanEncode<ViaCairo, MsgRegisterApp>,
     EventEncoding: Async + HasEventContractFields<Chain>,
 {
@@ -191,10 +199,16 @@ where
             )
             .await;
 
-        let ibc_core_address = chain
-            .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
-            .await
-            .map_err(Bootstrap::raise_error)?;
+        let ibc_core_address = {
+            let call_data = cairo_encoding
+                .encode(&protobuf_lib_class_hash)
+                .map_err(Bootstrap::raise_error)?;
+
+            chain
+                .deploy_contract(&ibc_core_class_hash, false, &call_data)
+                .await
+                .map_err(Bootstrap::raise_error)?
+        };
 
         bootstrap
             .log(
@@ -205,7 +219,12 @@ where
 
         let comet_client_address = {
             let call_data = cairo_encoding
-                .encode(&ibc_core_address)
+                .encode(&product![
+                    ibc_core_address,
+                    comet_lib_class_hash,
+                    ics23_lib_class_hash,
+                    protobuf_lib_class_hash,
+                ])
                 .map_err(Bootstrap::raise_error)?;
 
             chain
