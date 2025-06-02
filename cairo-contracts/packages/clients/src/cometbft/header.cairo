@@ -1,6 +1,7 @@
 use cometbft::light_client::Header as CometHeader;
 use ibc_utils::bytes::{ByteArrayIntoArrayU8, SpanU8IntoByteArray};
 use ibc_utils::numeric::u32_from_big_endian;
+use ibc_utils::storage::read_raw_key;
 use starknet_ibc_clients::cometbft::{CometConsensusState, CometErrors};
 use starknet_ibc_core::client::{TimestampImpl, U64IntoTimestamp};
 use starknet_ibc_core::commitment::StateRoot;
@@ -15,19 +16,7 @@ pub impl CometHeaderImpl of CometHeaderTrait {
 
         assert(maybe_byte_array.is_some(), CometErrors::INVALID_HEADER);
 
-        // let maybe_header = ProtoCodecImpl::decode::<
-        //     CometHeader,
-        // >(ByteArrayIntoArrayU8::into(maybe_byte_array.unwrap()).span());
-
-        // assert(maybe_header.is_some(), CometErrors::INVALID_HEADER);
-
-        // maybe_header.unwrap()
-
-        IProtobufLibraryDispatcher {
-            class_hash: 0x79ee6d6ba7d56ddfaddde35ec724dd632cdf3f605c4190ba93c8ec27db5a9e6
-                .try_into()
-                .unwrap(),
-        }
+        IProtobufLibraryDispatcher { class_hash: read_raw_key::<'protobuf-library'>() }
             .comet_header_decode(ByteArrayIntoArrayU8::into(maybe_byte_array.unwrap()))
     }
 }

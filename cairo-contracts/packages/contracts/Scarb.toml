@@ -31,6 +31,7 @@ starknet_ibc_apps    = { workspace = true }
 starknet_ibc_core    = { workspace = true }
 starknet_ibc_clients = { workspace = true }
 starknet_ibc_utils   = { workspace = true }
+ibc_utils            = { workspace = true }
 
 [dev-dependencies]
 openzeppelin_testing = { workspace = true }

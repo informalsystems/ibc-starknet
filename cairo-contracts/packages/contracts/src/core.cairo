@@ -1,5 +1,7 @@
 #[starknet::contract]
 pub mod IBCCore {
+    use ibc_utils::storage::write_raw_key;
+    use starknet::ClassHash;
     use starknet_ibc_core::channel::{ChannelEventEmitterComponent, ChannelHandlerComponent};
     use starknet_ibc_core::client::{ClientEventEmitterComponent, ClientHandlerComponent};
     use starknet_ibc_core::connection::{
@@ -132,9 +134,13 @@ pub mod IBCCore {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState) {
+    fn constructor(ref self: ContractState, protobuf_lib: ClassHash) {
         self.governance.initializer();
         self.client_handler.initializer();
         self.router_handler.initializer();
+
+        // store the library classes
+        // not using storage keys, as these keys are read without contract context.
+        write_raw_key::<'protobuf-library'>(protobuf_lib);
     }
 }

@@ -1,5 +1,6 @@
 use core::num::traits::Zero;
 use ibc_utils::bytes::{ByteArrayIntoArrayU8, IntoArrayU32, SpanU8IntoArrayU32};
+use ibc_utils::storage::read_raw_key;
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
 use protobuf::types::message::{
     DecodeContext, EncodeContext, EncodeContextTrait, ProtoMessage, ProtoName,
@@ -247,12 +248,8 @@ pub impl ChannelEndImpl of ChannelEndTrait {
 
 pub impl ChannelEndIntoStateValue of Into<ChannelEnd, StateValue> {
     fn into(self: ChannelEnd) -> StateValue {
-        // let encoded_channel_end = ProtoCodecImpl::encode(@self);
-
         let encoded_channel_end = IProtobufLibraryDispatcher {
-            class_hash: 0x79ee6d6ba7d56ddfaddde35ec724dd632cdf3f605c4190ba93c8ec27db5a9e6
-                .try_into()
-                .unwrap(),
+            class_hash: read_raw_key::<'protobuf-library'>(),
         }
             .channel_end_encode(self);
 

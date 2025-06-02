@@ -1,8 +1,9 @@
 #[starknet::contract]
 pub mod CometClient {
     use core::num::traits::Zero;
+    use ibc_utils::storage::write_raw_key;
     use openzeppelin_access::ownable::OwnableComponent;
-    use starknet::ContractAddress;
+    use starknet::{ClassHash, ContractAddress};
     use starknet_ibc_clients::cometbft::{CometClientComponent, CometErrors};
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
@@ -55,9 +56,21 @@ pub mod CometClient {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, owner: ContractAddress) {
+    fn constructor(
+        ref self: ContractState,
+        owner: ContractAddress,
+        comet_lib: ClassHash,
+        ics23_lib: ClassHash,
+        protobuf_lib: ClassHash,
+    ) {
         assert(owner.is_non_zero(), CometErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
         self.governance.initializer();
+
+        // store the library classes
+        // not using storage keys, as these keys are read without contract context.
+        write_raw_key::<'comet-library'>(comet_lib);
+        write_raw_key::<'ics23-library'>(ics23_lib);
+        write_raw_key::<'protobuf-library'>(protobuf_lib);
     }
 }

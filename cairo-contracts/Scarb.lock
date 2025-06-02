@@ -164,6 +164,7 @@ dependencies = [
 name = "starknet_ibc_contracts"
 version = "0.1.0"
 dependencies = [
+ "ibc_utils",
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",

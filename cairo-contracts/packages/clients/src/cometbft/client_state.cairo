@@ -1,7 +1,7 @@
 use cometbft::light_client::ClientState as ProtoCometClientState;
 use cometbft::utils::Fraction;
 use core::num::traits::Zero;
-use ibc_utils::storage::ArrayFelt252Store;
+use ibc_utils::storage::{ArrayFelt252Store, read_raw_key};
 use ics23::ProofSpec;
 use starknet_ibc_clients::cometbft::CometErrors;
 use starknet_ibc_core::client::{Duration, Height, HeightPartialOrd, Status, StatusTrait};
@@ -66,12 +66,7 @@ pub impl CometClientStateImpl of CometClientStateTrait {
 
     fn protobuf_bytes(self: CometClientState) -> Array<u8> {
         let proto_client_state: ProtoCometClientState = self.try_into().unwrap();
-        // ProtoCodecImpl::encode(@proto_client_state)
-        IProtobufLibraryDispatcher {
-            class_hash: 0x79ee6d6ba7d56ddfaddde35ec724dd632cdf3f605c4190ba93c8ec27db5a9e6
-                .try_into()
-                .unwrap(),
-        }
+        IProtobufLibraryDispatcher { class_hash: read_raw_key::<'protobuf-library'>() }
             .comet_client_state_encode(proto_client_state)
     }
 }
