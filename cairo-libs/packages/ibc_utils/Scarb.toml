@@ -9,7 +9,7 @@ repository    = { workspace = true }
 license       = { workspace = true }
 Readme        = { workspace = true }
 keywords      = { workspace = true }
-description   = "Util methods for IBC"
+description   = "Utility methods for IBC"
 
 [lib]
 
