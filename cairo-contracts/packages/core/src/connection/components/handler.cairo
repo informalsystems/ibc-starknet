@@ -16,13 +16,17 @@ pub mod ConnectionHandlerComponent {
         BasePrefixZero, ClientId, ConnectionId, ConnectionIdImpl, client_connection_key,
         connection_end_key, connection_path,
     };
-    use starknet_ibc_utils::ValidateBasic;
+    use starknet_ibc_utils::{ValidateBasic, poseidon_hash};
 
     #[storage]
     pub struct Storage {
         pub next_connection_sequence: u64,
         pub client_to_connections: Map<felt252, Vec<ConnectionId>>,
         pub connection_ends: Map<felt252, ConnectionEnd>,
+        //
+        // This is generate storage commitment proofs for IBC.
+        // Check the comment in channel handler for more details.
+        pub connection_ends_commitments: Map<felt252, felt252>,
     }
 
     #[event]
@@ -452,7 +456,10 @@ pub mod ConnectionHandlerComponent {
             connection_id: @ConnectionId,
             connection_end: ConnectionEnd,
         ) {
-            self.connection_ends.write(connection_end_key(connection_id), connection_end)
+            let key = connection_end_key(connection_id);
+            let connection_end_commitment = poseidon_hash(@connection_end);
+            self.connection_ends.write(key, connection_end);
+            self.connection_ends_commitments.write(key, connection_end_commitment);
         }
     }
 

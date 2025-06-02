@@ -11,7 +11,6 @@ members = [
   "crates/starknet-integration-tests",
   "crates/starknet-madara-tests",
   "crates/starknet-cli",
-  "crates/poseidon",
   "crates/tools",
 ]
 
@@ -156,7 +155,7 @@ ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types"
 
 starknet-block-verifier = { path = "../light-client/starknet-block-verifier" }
 
-poseidon = { path = "./crates/poseidon" }
+poseidon = { path = "../light-client/poseidon" }
 
 cgp             = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-core        = { git = "https://github.com/contextgeneric/cgp.git" }
