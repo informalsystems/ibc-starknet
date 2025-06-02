@@ -51,7 +51,7 @@ pub trait IAppCallback<TContractState> {
     fn on_timeout_packet(ref self: TContractState, packet: Packet);
     /// Calls for the JSON representation of the packet data, typically used for
     /// computing the packet commitment.
-    fn json_packet_data(self: @TContractState, raw_packet_data: Array<felt252>) -> ByteArray;
+    fn json_packet_data(self: @TContractState, raw_packet_data: Array<felt252>) -> Array<u8>;
 }
 
 #[starknet::interface]

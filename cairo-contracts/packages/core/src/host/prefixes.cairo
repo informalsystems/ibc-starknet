@@ -1,5 +1,5 @@
 use core::num::traits::Zero;
-use ics23::byte_array_to_array_u8;
+use ibc_utils::bytes::ByteArrayIntoArrayU8;
 use protobuf::primitives::array::BytesAsProtoMessage;
 use protobuf::types::message::{
     DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoMessage, ProtoName,
@@ -36,7 +36,7 @@ impl BasePrefixAsProtoName of ProtoName<BasePrefix> {
 #[generate_trait]
 pub impl BasePrefixImpl of BasePrefixTrait {
     fn to_array_u8(self: @BasePrefix) -> Array<u8> {
-        byte_array_to_array_u8(self.prefix)
+        ByteArrayIntoArrayU8::into(self.prefix.clone())
     }
 }
 

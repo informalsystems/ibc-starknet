@@ -253,10 +253,10 @@ pub mod TokenTransferComponent {
 
         fn json_packet_data(
             self: @ComponentState<TContractState>, raw_packet_data: Array<felt252>,
-        ) -> ByteArray {
+        ) -> Array<u8> {
             let packet_data: PacketData = raw_packet_data.into();
 
-            serde_json::to_byte_array(packet_data)
+            serde_json::to_array_u8(packet_data)
         }
     }
 

@@ -1,7 +1,5 @@
-use ics23::{
-    ByteArrayIntoArrayU8, CommitmentProof, ExistenceProof, HashOp, InnerOp, LeafOp, LengthOp,
-    MerkleProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
-};
+use ibc_utils::bytes::ByteArrayIntoArrayU8;
+use ics23::{CommitmentProof, ExistenceProof, HashOp, InnerOp, LeafOp, LengthOp, MerkleProof, Proof};
 use protobuf::types::message::ProtoCodecImpl;
 
 #[test]
@@ -38,16 +36,14 @@ fn test_commitment_decode() {
         180, 165, 124, 40, 174, 123, 121, 90, 64, 198, 11, 147, 199, 151, 209, 216, 178, 47, 109,
         111, 10, 240, 101, 212, 194, 186, 183, 100, 23, 62, 42, 201,
     ];
-    let byte_array_proof = array_u8_to_byte_array(@proof);
     let maybe_decoded_proof: Option<MerkleProof> = ProtoCodecImpl::decode::<
         MerkleProof,
-    >(@byte_array_proof);
+    >(proof.span());
     assert(maybe_decoded_proof.is_some(), 'expected proof to be non zero');
     let decoded_proof: MerkleProof = maybe_decoded_proof.unwrap();
     for commitment_proof in decoded_proof.proofs {
-        match commitment_proof.proof {
-            Proof::Exist(p) => { assert(p.value.len() > 0, 'decoded proof has empty value'); },
-            Proof::NonExist(_p) => {},
+        if let Proof::Exist(p) = @commitment_proof.proof {
+            assert(p.value.len() > 0, 'decoded proof has empty value');
         }
     }
 }
@@ -77,22 +73,17 @@ fn test_encode_and_decode_commitment_proof() {
     };
     let commitment = CommitmentProof { proof: Proof::Exist(proof) };
     // Encode CommitmentProof to ByteArray
-    let commitment_bytes_ba = ProtoCodecImpl::encode(@commitment);
-    // Convert CommitmentProof ByteArray to Array<u8>
-    let byte_array_proof = byte_array_to_array_u8(@commitment_bytes_ba);
+    let byte_array_proof = ProtoCodecImpl::encode(@commitment);
 
-    // Convert back CommitmentProof Array<u8> to ByteArray
-    let commitment_bytes = array_u8_to_byte_array(@byte_array_proof);
     // Decode CommitmentProof from ByteArray
     let maybe_decoded_proof: Option<CommitmentProof> = ProtoCodecImpl::decode::<
         CommitmentProof,
-    >(@commitment_bytes);
+    >(byte_array_proof.span());
 
     assert(maybe_decoded_proof.is_some(), 'expected proof to be non zero');
     let decoded_proof: CommitmentProof = maybe_decoded_proof.unwrap();
-    match @decoded_proof.proof {
-        Proof::Exist(p) => { assert(p.value.len() > 0, 'decoded proof has empty value'); },
-        Proof::NonExist(_p) => {},
+    if let Proof::Exist(p) = @decoded_proof.proof {
+        assert(p.value.len() > 0, 'decoded proof has empty value');
     }
     assert(decoded_proof == commitment, 'decoded not equal original');
 }

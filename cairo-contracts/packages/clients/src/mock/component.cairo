@@ -1,7 +1,8 @@
 #[starknet::component]
 pub mod MockClientComponent {
     use core::num::traits::Zero;
-    use ics23::ArrayFelt252Store;
+    use ibc_utils::array::span_contains;
+    use ibc_utils::storage::ArrayFelt252Store;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
     use protobuf::types::message::ProtoCodecImpl;
@@ -467,10 +468,10 @@ pub mod MockClientComponent {
             assert(upgraded_height > latest_height, MockErrors::INVALID_UPGRADE_HEIGHT);
 
             let upgraded_client_protobuf = StateValue {
-                value: ics23::byte_array_to_array_u8(@upgraded_client_state.protobuf_bytes()),
+                value: upgraded_client_state.protobuf_bytes(),
             };
             let upgraded_consensus_protobuf = StateValue {
-                value: ics23::byte_array_to_array_u8(@upgraded_consensus_state.protobuf_bytes()),
+                value: upgraded_consensus_state.protobuf_bytes(),
             };
             self
                 .verify_membership(
@@ -882,7 +883,7 @@ pub mod MockClientComponent {
         ) {
             let mut update_heights = self.update_heights.read(client_sequence);
 
-            if ics23::span_contains(update_heights.span(), @update_height) {
+            if span_contains(update_heights.span(), @update_height) {
                 return;
             }
 

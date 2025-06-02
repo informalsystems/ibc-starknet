@@ -1,7 +1,7 @@
 use cometbft::ibc::Height as ProtoHeight;
 use core::num::traits::{CheckedAdd, OverflowingMul, Zero};
 use core::traits::PartialOrd;
-use ics23::IntoArrayU32;
+use ibc_utils::bytes::{IntoArrayU32, U64IntoArrayU32};
 use protobuf::types::wkt::{Duration as ProtoDuration, Timestamp as ProtoTimestamp};
 use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::commitment::U32CollectorImpl;
@@ -156,7 +156,7 @@ pub impl HeightIntoArrayU32 of IntoArrayU32<Height> {
     }
 }
 
-pub impl StoreHeightArray = ics23::StorePackingViaSerde<Array<Height>>;
+pub impl StoreHeightArray = ibc_utils::storage::StorePackingViaSerde<Array<Height>>;
 
 /// Represents Unix timestamp in nanoseconds.
 #[derive(Copy, Debug, Drop, Hash, PartialEq, Serde, starknet::Store)]

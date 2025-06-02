@@ -12,14 +12,20 @@ name = "cometbft"
 version = "0.1.0"
 dependencies = [
  "alexandria_math",
+ "ibc_utils",
  "ics23",
  "protobuf",
 ]
 
 [[package]]
+name = "ibc_utils"
+version = "0.1.0"
+
+[[package]]
 name = "ics23"
 version = "0.1.0"
 dependencies = [
+ "ibc_utils",
  "protobuf",
 ]
 
@@ -79,10 +85,16 @@ checksum = "sha256:fd348b31c4a4407add33adc3c2b8f26dca71dbd7431faaf726168f37a91db
 [[package]]
 name = "protobuf"
 version = "0.1.0"
+dependencies = [
+ "ibc_utils",
+]
 
 [[package]]
 name = "serde_json"
 version = "0.1.0"
+dependencies = [
+ "ibc_utils",
+]
 
 [[package]]
 name = "snforge_scarb_plugin"
@@ -114,6 +126,7 @@ dependencies = [
 name = "starknet_ibc_apps"
 version = "0.1.0"
 dependencies = [
+ "ibc_utils",
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",
@@ -131,6 +144,7 @@ name = "starknet_ibc_clients"
 version = "0.1.0"
 dependencies = [
  "cometbft",
+ "ibc_utils",
  "ics23",
  "openzeppelin_access",
  "protobuf",
@@ -160,6 +174,7 @@ name = "starknet_ibc_core"
 version = "0.1.0"
 dependencies = [
  "cometbft",
+ "ibc_utils",
  "ics23",
  "openzeppelin_testing",
  "protobuf",
@@ -174,6 +189,7 @@ name = "starknet_ibc_testkit"
 version = "0.1.0"
 dependencies = [
  "cometbft",
+ "ibc_utils",
  "ics23",
  "openzeppelin_access",
  "openzeppelin_testing",

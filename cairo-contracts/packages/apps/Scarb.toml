@@ -38,6 +38,7 @@ starknet_ibc_utils = { workspace = true }
 [dev-dependencies]
 snforge_std   = { workspace = true }
 assert_macros = { workspace = true }
+ibc_utils     = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_testkit   = { workspace = true }

@@ -78,7 +78,7 @@ pub impl AppContractImpl of AppContractTrait {
         IAppCallbackDispatcher { contract_address: *self.address }.on_timeout_packet(packet)
     }
 
-    fn json_packet_data(self: @AppContract, raw_packet_data: Array<felt252>) -> ByteArray {
+    fn json_packet_data(self: @AppContract, raw_packet_data: Array<felt252>) -> Array<u8> {
         IAppCallbackDispatcher { contract_address: *self.address }.json_packet_data(raw_packet_data)
     }
 }

@@ -1,6 +1,6 @@
-use protobuf::primitives::utils::{
+use ibc_utils::numeric::{
     decode_2_complement_128, decode_2_complement_32, decode_2_complement_64,
-    encode_2_complement_128, encode_2_complement_32, encode_2_complement_64, little_endian_to_u64,
+    encode_2_complement_128, encode_2_complement_32, encode_2_complement_64, u64_from_little_endian,
     u64_to_little_endian,
 };
 use protobuf::types::message::{
@@ -8,18 +8,18 @@ use protobuf::types::message::{
     ProtoMessage, decode_raw,
 };
 use protobuf::types::tag::WireType;
-use protobuf::varint::{decode_varint_from_byte_array, encode_varint_to_byte_array};
+use protobuf::varint::{decode_varint_from_u8_array_with_index, encode_varint_to_u8_array};
 
 pub impl U128AsProtoMessage of ProtoMessage<u128> {
     fn encode_raw(self: @u128, ref context: EncodeContext) {
         let num = (*self).into();
 
-        let bytes = encode_varint_to_byte_array(num);
-        context.buffer.append(@bytes);
+        let bytes = encode_varint_to_u8_array(num);
+        context.buffer.append_span(bytes.span());
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<u128> {
-        decode_varint_from_byte_array(context.buffer, ref context.index).ok()
+        decode_varint_from_u8_array_with_index(context.buffer, ref context.index).ok()
     }
 
     fn wire_type() -> WireType {
@@ -31,12 +31,12 @@ pub impl U64AsProtoMessage of ProtoMessage<u64> {
     fn encode_raw(self: @u64, ref context: EncodeContext) {
         let num = (*self).into();
 
-        let bytes = encode_varint_to_byte_array(num);
-        context.buffer.append(@bytes);
+        let bytes = encode_varint_to_u8_array(num);
+        context.buffer.append_span(bytes.span());
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<u64> {
-        decode_varint_from_byte_array(context.buffer, ref context.index)
+        decode_varint_from_u8_array_with_index(context.buffer, ref context.index)
             .ok()
             .map(|num| num.try_into().unwrap())
     }
@@ -50,12 +50,13 @@ pub impl U32AsProtoMessage of ProtoMessage<u32> {
     fn encode_raw(self: @u32, ref context: EncodeContext) {
         let num = (*self).into();
 
-        let bytes = encode_varint_to_byte_array(num);
-        context.buffer.append(@bytes);
+        let bytes = encode_varint_to_u8_array(num);
+        context.buffer.append_span(bytes.span());
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<u32> {
-        let varint = decode_varint_from_byte_array(context.buffer, ref context.index).ok()?;
+        let varint = decode_varint_from_u8_array_with_index(context.buffer, ref context.index)
+            .ok()?;
         let num = varint.try_into()?;
         Option::Some(num)
     }
@@ -119,21 +120,21 @@ pub impl SFixed64AsProtoMessage of ProtoMessage<i64> {
 
     fn encode_raw(self: @i64, ref context: EncodeContext) {
         let num: u64 = encode_2_complement_64(@(*self).into());
-        let mut bytes = u64_to_little_endian(@num).span();
+        let mut bytes = u64_to_little_endian(num).span();
         while let Some(byte) = bytes.pop_front() {
-            context.buffer.append_byte(*byte);
+            context.buffer.append(*byte);
         }
     }
 
     fn decode_raw(ref context: DecodeContext) -> Option<i64> {
         let bytes = [
-            context.buffer[context.index], context.buffer[context.index + 1],
-            context.buffer[context.index + 2], context.buffer[context.index + 3],
-            context.buffer[context.index + 4], context.buffer[context.index + 5],
-            context.buffer[context.index + 6], context.buffer[context.index + 7],
+            *context.buffer[context.index], *context.buffer[context.index + 1],
+            *context.buffer[context.index + 2], *context.buffer[context.index + 3],
+            *context.buffer[context.index + 4], *context.buffer[context.index + 5],
+            *context.buffer[context.index + 6], *context.buffer[context.index + 7],
         ];
         context.index += 8;
-        let num = little_endian_to_u64(@bytes);
+        let num = u64_from_little_endian(bytes);
         Option::Some(decode_2_complement_64(@num))
     }
 

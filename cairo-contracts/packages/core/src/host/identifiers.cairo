@@ -2,7 +2,7 @@ use core::byte_array::ByteArrayTrait;
 use core::num::traits::{CheckedAdd, CheckedSub, Zero};
 use core::to_byte_array::FormatAsByteArray;
 use core::traits::TryInto;
-use ics23::{ArrayU32IntoArrayU8, felt252_to_u8_array, u64_into_array_u32};
+use ibc_utils::numeric::{felt252_to_byte_array, u64_to_big_endian};
 use starknet_ibc_core::commitment::StateValue;
 use starknet_ibc_core::host::errors::HostErrors;
 use starknet_ibc_utils::{ComputeKey, ValidateBasic, poseidon_hash};
@@ -22,7 +22,7 @@ pub impl ClientIdImpl of ClientIdTrait {
     fn validate(self: @ClientId, client_id_hash: felt252) {}
 
     fn to_byte_array(self: @ClientId) -> ByteArray {
-        let client_type = felt252_to_u8_array(self.client_type.clone());
+        let client_type = felt252_to_byte_array(self.client_type.clone());
         format!("{}-{}", client_type, self.sequence)
     }
 }
@@ -249,7 +249,7 @@ pub impl SequenceImpl of SequenceTrait {
     }
 
     fn to_array_u8(self: Sequence) -> Array<u8> {
-        u64_into_array_u32(self.sequence).into()
+        u64_to_big_endian(self.sequence).span().into()
     }
 }
 

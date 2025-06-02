@@ -1,5 +1,6 @@
-use cometbft::utils::{MerkleHashImpl, u32_8_to_byte_array};
-use protobuf::hex;
+use cometbft::utils::MerkleHashImpl;
+use ibc_utils::bytes::{ByteArrayIntoArrayU8, SpanU32IntoArrayU8};
+use ibc_utils::hex;
 use protobuf::types::message::ProtoCodecImpl;
 
 // copied from:
@@ -8,11 +9,11 @@ use protobuf::types::message::ProtoCodecImpl;
 #[test]
 fn test_rfc6962_empty_tree() {
     let empty_tree_root_hex = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-    let empty_tree_root = hex::decode(@empty_tree_root_hex);
-    let empty_tree: Array<ByteArray> = array![];
+    let empty_tree_root = hex::decode_byte_array(empty_tree_root_hex);
+    let empty_tree: Array<Span<u8>> = array![];
 
     let root = MerkleHashImpl::hash_byte_vectors(empty_tree.span());
-    assert_eq!(empty_tree_root, u32_8_to_byte_array(root));
+    assert_eq!(empty_tree_root, root.span().into());
 }
 
 #[test]
@@ -20,11 +21,11 @@ fn test_rfc6962_leaf() {
     let leaf_root_hex = "395aa064aa4c29f7010acfe3f25db9485bbd4b91897b6ad7ad547639252b4d56";
     let leaf_string = "L123456";
 
-    let leaf_root = hex::decode(@leaf_root_hex);
-    let leaf_tree: Array<ByteArray> = array![leaf_string];
+    let leaf_root = hex::decode_byte_array(leaf_root_hex);
+    let leaf_tree = array![ByteArrayIntoArrayU8::into(leaf_string).span()];
 
     let root = MerkleHashImpl::hash_byte_vectors(leaf_tree.span());
-    assert_eq!(leaf_root, u32_8_to_byte_array(root));
+    assert_eq!(leaf_root, root.span().into())
 }
 
 #[test]
@@ -33,9 +34,11 @@ fn test_rfc6962_tree_of_2() {
     let left = "N123";
     let right = "N456";
 
-    let node_hash = hex::decode(@node_hash_hex);
-    let tree = array![left, right];
+    let node_hash = hex::decode_byte_array(node_hash_hex);
+    let tree = array![
+        ByteArrayIntoArrayU8::into(left).span(), ByteArrayIntoArrayU8::into(right).span(),
+    ];
 
     let root = MerkleHashImpl::hash_byte_vectors(tree.span());
-    assert_eq!(node_hash, u32_8_to_byte_array(root));
+    assert_eq!(node_hash, root.span().into());
 }

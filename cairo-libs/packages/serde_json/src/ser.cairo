@@ -1,4 +1,4 @@
-use serde_json::{CompactFormatter, FormatterTrait, byte_array_to_array_u8};
+use serde_json::{CompactFormatter, FormatterTrait};
 
 pub trait Serialize<T> {
     fn serialize<S, +Drop<S>, +SerializerTrait<S>>(self: T, ref serializer: S);
@@ -42,7 +42,7 @@ pub type DefaultSerializer = Serializer<CompactFormatter>;
 
 #[derive(Drop, Clone)]
 pub struct Serializer<F, +FormatterTrait<F>> {
-    writer: ByteArray,
+    writer: Array<u8>,
     formatter: F,
 }
 
@@ -93,7 +93,7 @@ pub impl SerializerImpl of SerializerTrait<DefaultSerializer> {
 
     fn serialize_string(ref self: DefaultSerializer, v: ByteArray) {
         self.formatter.begin_string(ref self.writer);
-        self.formatter.write_string(ref self.writer, @v);
+        self.formatter.write_string(ref self.writer, v);
         self.formatter.end_string(ref self.writer);
     }
 
@@ -102,10 +102,10 @@ pub impl SerializerImpl of SerializerTrait<DefaultSerializer> {
     ) {
         if self.writer.len() == 0 {
             self.formatter.begin_object(ref self.writer);
-        } else if self.writer.at(self.writer.len() - 1) == Option::Some(58) {
+        } else if self.writer.at(self.writer.len() - 1) == @58 {
             self.formatter.begin_object(ref self.writer);
         }
-        if self.writer.at(self.writer.len() - 1) != Option::Some(123) {
+        if self.writer.at(self.writer.len() - 1) != @123 {
             self.formatter.end_object_value(ref self.writer);
         }
         self.serialize_string(field_name);
@@ -118,10 +118,10 @@ pub impl SerializerImpl of SerializerTrait<DefaultSerializer> {
     ) {
         if self.writer.len() == 0 {
             self.formatter.begin_object(ref self.writer);
-        } else if self.writer.at(self.writer.len() - 1) == Option::Some(58) {
+        } else if self.writer.at(self.writer.len() - 1) == @58 {
             self.formatter.begin_object(ref self.writer);
         }
-        if self.writer.at(self.writer.len() - 1) != Option::Some(123) {
+        if self.writer.at(self.writer.len() - 1) != @123 {
             self.formatter.end_object_value(ref self.writer);
         }
         self.serialize_field(variant_name, variant_value);
@@ -199,12 +199,8 @@ pub impl SerializeOption<V, +Drop<V>, +Serialize<V>> of Serialize<Option<V>> {
 // Serializer functions
 // ----------------------------------------------------------------
 
-pub fn to_byte_array<T, +Drop<T>, +Serialize<T>>(value: T) -> ByteArray {
-    let mut ser = Serializer { writer: "", formatter: CompactFormatter {} };
+pub fn to_array_u8<T, +Drop<T>, +Serialize<T>>(value: T) -> Array<u8> {
+    let mut ser = Serializer { writer: array![], formatter: CompactFormatter {} };
     value.serialize(ref ser);
     ser.writer
-}
-
-pub fn to_array_u8<T, +Drop<T>, +Serialize<T>>(value: T) -> Array<u8> {
-    byte_array_to_array_u8(@to_byte_array(value))
 }
