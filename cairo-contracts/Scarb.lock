@@ -18,6 +18,11 @@ dependencies = [
 ]
 
 [[package]]
+name = "garaga"
+version = "0.18.1"
+source = "git+https://github.com/keep-starknet-strange/garaga.git#9ed3552f7547129bca3ba740918ad9eb8fab4aff"
+
+[[package]]
 name = "ibc_utils"
 version = "0.1.0"
 
@@ -150,6 +155,7 @@ dependencies = [
  "protobuf",
  "snforge_std",
  "starknet_ibc_core",
+ "starknet_ibc_libs",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]
@@ -158,6 +164,7 @@ dependencies = [
 name = "starknet_ibc_contracts"
 version = "0.1.0"
 dependencies = [
+ "ibc_utils",
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",
@@ -165,6 +172,7 @@ dependencies = [
  "starknet_ibc_apps",
  "starknet_ibc_clients",
  "starknet_ibc_core",
+ "starknet_ibc_libs",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]
@@ -180,6 +188,28 @@ dependencies = [
  "protobuf",
  "serde_json",
  "snforge_std",
+ "starknet_ibc_libs",
+ "starknet_ibc_testkit",
+ "starknet_ibc_utils",
+]
+
+[[package]]
+name = "starknet_ibc_libs"
+version = "0.1.0"
+dependencies = [
+ "alexandria_math",
+ "cometbft",
+ "garaga",
+ "ibc_utils",
+ "ics23",
+ "openzeppelin_access",
+ "openzeppelin_testing",
+ "openzeppelin_token",
+ "openzeppelin_utils",
+ "protobuf",
+ "snforge_std",
+ "starknet_ibc_contracts",
+ "starknet_ibc_core",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]

@@ -2,7 +2,7 @@
 pub mod MockClient {
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
-    use starknet::ContractAddress;
+    use starknet::{ClassHash, ContractAddress};
     use starknet_ibc_clients::mock::{MockClientComponent, MockErrors};
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
@@ -54,7 +54,13 @@ pub mod MockClient {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, owner: ContractAddress) {
+    fn constructor(
+        ref self: ContractState,
+        owner: ContractAddress,
+        comet_lib: ClassHash,
+        ics23_lib: ClassHash,
+        protobuf_lib: ClassHash,
+    ) {
         assert(owner.is_non_zero(), MockErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
         self.governance.initializer();

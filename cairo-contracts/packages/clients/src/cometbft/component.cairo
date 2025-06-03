@@ -1,18 +1,13 @@
 #[starknet::component]
 pub mod CometClientComponent {
     use cometbft::types::{Options, TrustedBlockState, UntrustedBlockState};
-    use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use core::num::traits::Zero;
     use ibc_utils::array::span_contains;
     use ibc_utils::bytes::ByteArrayIntoArrayU8;
-    use ibc_utils::storage::ArrayFelt252Store;
-    use ics23::{
-        MerkleProof, Proof, verify_membership as ics23_verify_membership,
-        verify_non_membership as ics23_verify_non_membership,
-    };
+    use ibc_utils::storage::{ArrayFelt252Store, read_raw_key};
+    use ics23::Proof;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
-    use protobuf::types::message::ProtoCodecImpl;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,
@@ -34,6 +29,9 @@ pub mod CometClientComponent {
     use starknet_ibc_core::host::{
         BasePrefix, ClientIdImpl, client_upgrade_path, consensus_upgrade_path,
     };
+    use starknet_ibc_libs::comet::{ICometDispatcherTrait, ICometLibraryDispatcher};
+    use starknet_ibc_libs::ics23::{IIcs23DispatcherTrait, IIcs23LibraryDispatcher};
+    use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
     use starknet_ibc_utils::ValidateBasic;
 
     #[storage]
@@ -399,7 +397,11 @@ pub mod CometClientComponent {
             proof: StateProof,
             root: StateRoot,
         ) {
-            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(proof.proof.span()).unwrap();
+            let decoded_proof = IProtobufLibraryDispatcher {
+                class_hash: read_raw_key::<'protobuf-library'>(),
+            }
+                .merkle_proof_decode(proof.proof);
+
             let specs = self.read_client_state(client_sequence).proof_spec;
             let mut proofs: Array<Proof> = ArrayTrait::new();
             for proof in decoded_proof.proofs {
@@ -412,7 +414,9 @@ pub mod CometClientComponent {
                 keys.append(path_bytes);
             }
             let value = value.value;
-            ics23_verify_membership(specs, @proofs, root, keys, value, 0);
+
+            IIcs23LibraryDispatcher { class_hash: read_raw_key::<'ics23-library'>() }
+                .verify_membership(specs, proofs, root, keys, value, 0);
         }
 
         fn verify_non_membership(
@@ -422,7 +426,10 @@ pub mod CometClientComponent {
             proof: StateProof,
             root: StateRoot,
         ) {
-            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(proof.proof.span()).unwrap();
+            let decoded_proof = IProtobufLibraryDispatcher {
+                class_hash: read_raw_key::<'protobuf-library'>(),
+            }
+                .merkle_proof_decode(proof.proof);
             let specs = self.read_client_state(client_sequence).proof_spec;
             let mut proofs: Array<Proof> = ArrayTrait::new();
             for proof in decoded_proof.proofs {
@@ -434,7 +441,9 @@ pub mod CometClientComponent {
                 let path_bytes = ByteArrayIntoArrayU8::into(path);
                 keys.append(path_bytes);
             }
-            ics23_verify_non_membership(specs, @proofs, root, keys);
+
+            IIcs23LibraryDispatcher { class_hash: read_raw_key::<'ics23-library'>() }
+                .verify_non_membership(specs, proofs, root, keys);
         }
 
         fn verify_client_message(
@@ -868,7 +877,9 @@ pub mod CometClientComponent {
             let now = TimestampImpl::host().try_into().unwrap();
 
             let options = Options { trust_threshold, trusting_period, clock_drift };
-            verify_update_header(untrusted_block_state, trusted_block_state, options, now)
+
+            ICometLibraryDispatcher { class_hash: read_raw_key::<'comet-library'>() }
+                .verify_update_header(untrusted_block_state, trusted_block_state, options, now)
         }
 
 
@@ -906,7 +917,11 @@ pub mod CometClientComponent {
             let now = TimestampImpl::host().try_into().unwrap();
 
             let options = Options { trust_threshold, trusting_period, clock_drift };
-            verify_misbehaviour_header(untrusted_block_state, trusted_block_state, options, now)
+
+            ICometLibraryDispatcher { class_hash: read_raw_key::<'comet-library'>() }
+                .verify_misbehaviour_header(
+                    untrusted_block_state, trusted_block_state, options, now,
+                )
         }
 
         fn _verify_misbehaviour_on_update(

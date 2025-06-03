@@ -6,6 +6,7 @@ members = [
   "packages/core",
   "packages/testkit",
   "packages/utils",
+  "packages/libraries",
 ]
 
 [workspace.package]
@@ -33,6 +34,8 @@ openzeppelin_access  = "1.0.0"
 openzeppelin_token   = "1.0.0"
 openzeppelin_testing = "4.1.0"
 openzeppelin_utils   = "1.0.0"
+alexandria_math      = "0.5.1"
+garaga               = { git = "https://github.com/keep-starknet-strange/garaga.git" }
 
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }
@@ -48,6 +51,8 @@ starknet_ibc_contracts = { path = "packages/contracts" }
 starknet_ibc_core      = { path = "packages/core" }
 starknet_ibc_testkit   = { path = "packages/testkit" }
 starknet_ibc_utils     = { path = "packages/utils" }
+
+starknet_ibc_libs = { path = "packages/libraries" }
 
 [workspace.tool.fmt]
 sort-module-level-items = true

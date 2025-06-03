@@ -1,9 +1,11 @@
 use core::num::traits::OverflowingAdd;
+use core::poseidon::poseidon_hash_span;
 use starknet::SyscallResult;
 use starknet::storage_access::{
     StorageAddress, StorageBaseAddress, Store, StorePacking, storage_address_from_base,
     storage_address_from_base_and_offset, storage_base_address_from_felt252,
 };
+use starknet::syscalls::{storage_read_syscall, storage_write_syscall};
 use crate::numeric::{u32_from_big_endian, u32_to_big_endian};
 
 pub impl ArrayU8Pack of StorePacking<Array<u8>, ByteArray> {
@@ -195,4 +197,14 @@ fn inner_write_byte_array(
         index_in_chunk = next_index_in_chunk;
     }?;
     Ok(())
+}
+
+pub fn read_raw_key<const KEY: felt252, T, +TryInto<felt252, T>>() -> T {
+    let hash = poseidon_hash_span([KEY].span());
+    storage_read_syscall(0, hash.try_into().unwrap()).unwrap().try_into().unwrap()
+}
+
+pub fn write_raw_key<const KEY: felt252, T, +Into<T, felt252>, +Drop<T>>(value: T) {
+    let hash = poseidon_hash_span([KEY].span());
+    storage_write_syscall(0, hash.try_into().unwrap(), value.into()).unwrap();
 }

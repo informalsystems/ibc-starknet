@@ -47,6 +47,9 @@ pub struct StarknetBootstrapFields {
     pub ics20_contract: SierraClass,
     pub ibc_core_contract: SierraClass,
     pub comet_client_contract: SierraClass,
+    pub comet_lib_contract: SierraClass,
+    pub ics23_lib_contract: SierraClass,
+    pub protobuf_lib_contract: SierraClass,
 }
 
 impl Deref for StarknetBootstrap {

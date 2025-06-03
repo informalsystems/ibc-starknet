@@ -10,6 +10,14 @@ pub mod clients {
     pub use cometbft::CometClient;
     pub use mock::MockClient;
 }
+pub mod libraries {
+    mod comet;
+    mod ics23;
+    mod protobuf;
+    pub use comet::CometLib;
+    pub use ics23::Ics23Lib;
+    pub use protobuf::ProtobufLib;
+}
 #[cfg(test)]
 mod tests {
     pub(crate) mod channel;

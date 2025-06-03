@@ -54,11 +54,13 @@ declare() {
 
 deploy_core() {
     CORE_CLASS_HASH=$1
+    PROTOBUF_LIB_CLASS_HASH=$2
 
     output=$(
         starkli deploy --not-unique \
         $STARKLI_ARGS \
         "$CORE_CLASS_HASH" \
+        "$PROTOBUF_LIB_CLASS_HASH" \
         2>&1 | tee /dev/tty
     )
 
@@ -75,11 +77,18 @@ deploy_core() {
 deploy_comet() {
     COMET_CLASS_HASH=$1
     CORE_ADDRESS=$2
+    COMET_LIB_CLASS_HASH=$3
+    ICS23_LIB_CLASS_HASH=$4
+    PROTOBUF_LIB_CLASS_HASH=$5
 
     output=$(
         starkli deploy --not-unique \
         $STARKLI_ARGS \
-        "$COMET_CLASS_HASH" "$CORE_ADDRESS" \
+        "$COMET_CLASS_HASH" \
+        "$CORE_ADDRESS" \
+        "$COMET_LIB_CLASS_HASH" \
+        "$ICS23_LIB_CLASS_HASH" \
+        "$PROTOBUF_LIB_CLASS_HASH" \
         2>&1 | tee /dev/tty
     )
 
@@ -141,14 +150,35 @@ else
     ics20_class_hash=$ICS20_CLASS_HASH
 fi
 
+if [[ $COMET_LIB_CLASS_HASH == "" ]]; then
+    comet_lib_class_hash=$(declare "$COMET_LIB_CONTRACT_SRC")
+else
+    comet_lib_class_hash=$COMET_LIB_CLASS_HASH
+fi
+
+if [[ $ICS23_LIB_CLASS_HASH == "" ]]; then
+    ics23_lib_class_hash=$(declare "$ICS23_LIB_CONTRACT_SRC")
+else
+    ics23_lib_class_hash=$ICS23_LIB_CLASS_HASH
+fi
+
+if [[ $PROTOBUF_LIB_CLASS_HASH == "" ]]; then
+    protobuf_lib_class_hash=$(declare "$PROTOBUF_LIB_CONTRACT_SRC")
+else
+    protobuf_lib_class_hash=$PROTOBUF_LIB_CLASS_HASH
+fi
+
 echo "Class hashes:"
 echo "  CORE: $core_class_hash"
 echo "  COMET: $comet_class_hash"
 echo "  ICS20: $ics20_class_hash"
 echo "  ERC20: $erc20_class_hash"
+echo "  COMET LIB: $comet_lib_class_hash"
+echo "  ICS23 LIB: $ics23_lib_class_hash"
+echo "  PROTOBUF LIB: $protobuf_lib_class_hash"
 
-core_contract_address=$(deploy_core "$core_class_hash")
-comet_contract_address=$(deploy_comet "$comet_class_hash" "$core_contract_address")
+core_contract_address=$(deploy_core "$core_class_hash" "$protobuf_lib_class_hash")
+comet_contract_address=$(deploy_comet "$comet_class_hash" "$core_contract_address" "$comet_lib_class_hash" "$ics23_lib_class_hash" "$protobuf_lib_class_hash")
 ics20_contract_address=$(deploy_ics20 "$ics20_class_hash" "$core_contract_address" "$erc20_class_hash")
 
 echo "Contract addresses:"
