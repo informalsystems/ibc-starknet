@@ -2,7 +2,7 @@
 pub mod MockClient {
     use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
-    use starknet::{ContractAddress, ClassHash};
+    use starknet::{ClassHash, ContractAddress};
     use starknet_ibc_clients::mock::{MockClientComponent, MockErrors};
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
