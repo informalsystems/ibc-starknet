@@ -9,18 +9,20 @@ pub trait IEd25519<TContractState> {
     );
 }
 
-#[starknet::contract]
-pub mod IAlexandriaEd25519Lib {
+#[starknet::component]
+pub mod AlexandriaEd25519LibComponent {
     use alexandria_math::ed25519::verify_signature;
     use super::*;
 
     #[storage]
-    struct Storage {}
+    pub struct Storage {}
 
-    #[abi(embed_v0)]
-    impl IAlexandriaEd25519Impl of IEd25519<ContractState> {
+    #[embeddable_as(AlexandriaEd25519Lib)]
+    impl AlexandriaEd25519LibImpl<
+        TContractState, +HasComponent<TContractState>,
+    > of IEd25519<ComponentState<TContractState>> {
         fn verify_signature(
-            self: @ContractState,
+            self: @ComponentState<TContractState>,
             msg: Array<u8>,
             signature: [u256; 2],
             public_key: u256,
@@ -34,20 +36,22 @@ pub mod IAlexandriaEd25519Lib {
     }
 }
 
-#[starknet::contract]
-pub mod IGaragaEd25519Lib {
+#[starknet::component]
+pub mod GaragaEd25519LibComponent {
     use garaga::signatures::eddsa_25519::{
         EdDSASignature, EdDSASignatureWithHint, is_valid_eddsa_signature,
     };
     use super::*;
 
     #[storage]
-    struct Storage {}
+    pub struct Storage {}
 
-    #[abi(embed_v0)]
-    impl IGaragaEd25519Impl of IEd25519<ContractState> {
+    #[embeddable_as(GaragaEd25519Lib)]
+    impl GaragaEd25519LibImpl<
+        TContractState, +HasComponent<TContractState>,
+    > of IEd25519<ComponentState<TContractState>> {
         fn verify_signature(
-            self: @ContractState,
+            self: @ComponentState<TContractState>,
             msg: Array<u8>,
             signature: [u256; 2],
             public_key: u256,

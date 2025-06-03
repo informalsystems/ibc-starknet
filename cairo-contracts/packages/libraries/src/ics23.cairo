@@ -23,18 +23,20 @@ pub trait IIcs23<TContractState> {
     );
 }
 
-#[starknet::contract]
-pub mod IIcs23Lib {
+#[starknet::component]
+pub mod Ics23LibComponent {
     use ics23::{verify_membership, verify_non_membership};
     use super::*;
 
     #[storage]
-    struct Storage {}
+    pub struct Storage {}
 
-    #[abi(embed_v0)]
-    impl IIcs23Impl of super::IIcs23<ContractState> {
+    #[embeddable_as(Ics23Lib)]
+    impl Ics23LibImpl<
+        TContractState, +HasComponent<TContractState>,
+    > of super::IIcs23<ComponentState<TContractState>> {
         fn verify_membership(
-            self: @ContractState,
+            self: @ComponentState<TContractState>,
             specs: Array<ProofSpec>,
             proofs: Array<Proof>,
             root: RootBytes,
@@ -46,7 +48,7 @@ pub mod IIcs23Lib {
         }
 
         fn verify_non_membership(
-            self: @ContractState,
+            self: @ComponentState<TContractState>,
             specs: Array<ProofSpec>,
             proofs: Array<Proof>,
             root: RootBytes,

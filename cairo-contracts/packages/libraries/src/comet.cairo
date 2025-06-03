@@ -21,18 +21,20 @@ pub trait IComet<TContractState> {
     );
 }
 
-#[starknet::contract]
-pub mod ICometLib {
+#[starknet::component]
+pub mod CometLibComponent {
     use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use super::*;
 
     #[storage]
-    struct Storage {}
+    pub struct Storage {}
 
-    #[abi(embed_v0)]
-    impl ICometImpl of super::IComet<ContractState> {
+    #[embeddable_as(CometLib)]
+    pub impl CometLibImpl<
+        TContractState, +HasComponent<TContractState>,
+    > of super::IComet<ComponentState<TContractState>> {
         fn verify_update_header(
-            self: @ContractState,
+            self: @ComponentState<TContractState>,
             untrusted: UntrustedBlockState,
             trusted: TrustedBlockState,
             options: Options,
@@ -42,7 +44,7 @@ pub mod ICometLib {
         }
 
         fn verify_misbehaviour_header(
-            self: @ContractState,
+            self: @ComponentState<TContractState>,
             untrusted: UntrustedBlockState,
             trusted: TrustedBlockState,
             options: Options,

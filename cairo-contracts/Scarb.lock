@@ -172,6 +172,7 @@ dependencies = [
  "starknet_ibc_apps",
  "starknet_ibc_clients",
  "starknet_ibc_core",
+ "starknet_ibc_libs",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]

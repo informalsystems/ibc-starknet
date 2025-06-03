@@ -18,26 +18,41 @@ use starknet_ibc_testkit::handles::{AppHandle, ClientHandle, CoreContract, CoreH
 pub struct Setup {
     pub owner: ContractAddress,
     pub erc20_contract_class: ContractClass,
+    pub comet_lib_class: ContractClass,
+    pub ics23_lib_class: ContractClass,
+    pub protobuf_lib_class: ContractClass,
 }
 
 #[generate_trait]
 pub impl SetupImpl of SetupTrait {
     /// Initializes the test setup with default values.
     fn default() -> Setup {
-        Setup { owner: OWNER(), erc20_contract_class: declare_class("ERC20Mintable") }
+        Setup {
+            owner: OWNER(),
+            erc20_contract_class: declare_class("ERC20Mintable"),
+            comet_lib_class: declare_class("CometLib"),
+            ics23_lib_class: declare_class("Ics23Lib"),
+            protobuf_lib_class: declare_class("ProtobufLib"),
+        }
     }
 
     /// Deploys an instance of IBC core contract, and sets the owner to the core
     /// address.
     fn deploy_core(ref self: Setup, contract_name: ByteArray) -> CoreContract {
-        let core = CoreHandle::deploy(contract_name);
+        let core = CoreHandle::deploy(contract_name, self.protobuf_lib_class);
         self.owner = core.address;
         core
     }
 
     /// Deploys an instance of IBC light client contract.
     fn deploy_client(self: @Setup, contract_name: ByteArray) -> ClientContract {
-        ClientHandle::deploy_client(contract_name, *self.owner)
+        ClientHandle::deploy_client(
+            contract_name,
+            *self.owner,
+            *self.comet_lib_class,
+            *self.ics23_lib_class,
+            *self.protobuf_lib_class,
+        )
     }
 
     /// Deploys an instance of IBC-compatible ERC20 contract with `0` initial supply.
