@@ -81,7 +81,7 @@ jobs:
           export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_CometClient.contract_class.json"
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_IBCCore.contract_class.json"
 
-          export COMET_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts__CometLib.contract_class.json"
+          export COMET_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_CometLib.contract_class.json"
           export ICS23_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_Ics23Lib.contract_class.json"
           export PROTOBUF_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_ProtobufLib.contract_class.json"
 
