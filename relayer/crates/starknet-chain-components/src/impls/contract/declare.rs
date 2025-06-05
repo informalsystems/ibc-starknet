@@ -94,29 +94,27 @@ where
         let l1_gas = core::cmp::max(
             1,
             fee_estimation
-                .l1_gas_consumed
+                .gas_consumed
                 .try_into()
                 .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
         );
         let l1_data_gas = core::cmp::max(
             1,
             fee_estimation
-                .l1_data_gas_consumed
+                .data_gas_consumed
                 .try_into()
                 .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
         );
         let l2_gas = core::cmp::max(
             1,
             fee_estimation
-                .l2_gas_consumed
+                .gas_consumed
                 .try_into()
                 .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
         );
 
         let declare_result = declaration
-            .l1_gas(l1_gas)
-            .l1_data_gas(l1_data_gas)
-            .l2_gas(l2_gas)
+            .gas(l1_gas)
             .send()
             .await
             .map_err(Chain::raise_error)?;

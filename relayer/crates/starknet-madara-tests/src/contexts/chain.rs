@@ -55,7 +55,8 @@ use hermes_starknet_chain_context::contexts::{
 use ibc::core::host::types::identifiers::ChainId;
 use indexmap::IndexMap;
 use reqwest::Client;
-use starknet::core::types::{Felt, MerkleNode, StorageProof};
+use starknet::core::types::Felt;
+use starknet_v14::core::types::{MerkleNode, StorageProof};
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 use url::Url;

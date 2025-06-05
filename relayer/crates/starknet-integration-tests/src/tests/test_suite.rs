@@ -5,7 +5,7 @@ use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_ibc_test_suite::tests::clearing::TestPacketClearing;
 use hermes_ibc_test_suite::tests::transfer::TestIbcTransfer;
 
-use crate::utils::{init_madara_test_driver, init_starknet_test_driver};
+use crate::utils::init_madara_test_driver;
 
 #[test]
 fn test_ibc_transfer() -> Result<(), Error> {
@@ -33,7 +33,7 @@ fn test_packet_clearing() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let test_driver = init_starknet_test_driver(&runtime).await?;
+        let test_driver = init_madara_test_driver(&runtime).await?;
 
         <TestPacketClearing<Index<0>, Index<1>>>::default()
             .run_test(&test_driver)

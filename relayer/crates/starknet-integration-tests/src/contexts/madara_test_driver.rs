@@ -118,7 +118,6 @@ where
         port_id_a: PortId,
         port_id_b: PortId,
     ) -> Result<MadaraTestDriver, Setup::Error> {
-        tracing::warn!("called build_driver_with_binary_channel");
         let relay_driver_b_a = CosmosMadaraRelayDriver {
             birelay: CosmosMadaraBiRelay {
                 runtime: birelay.runtime.clone(),

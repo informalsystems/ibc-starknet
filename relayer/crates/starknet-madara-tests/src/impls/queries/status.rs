@@ -1,8 +1,6 @@
 use hermes_core::chain_components::traits::{
     ChainStatusQuerier, ChainStatusQuerierComponent, HasChainStatusType,
 };
-use hermes_core::logging_components::traits::CanLog;
-use hermes_core::logging_components::types::LevelTrace;
 use hermes_cosmos_core::chain_components::types::Time;
 use hermes_prelude::*;
 use hermes_starknet_chain_components::traits::{CanSendJsonRpcRequest, HasStarknetClient};
@@ -16,7 +14,6 @@ use crate::impls::queries::utils::{QueryBlockWithTxHashesRequest, QueryBlockWith
 impl<Chain> ChainStatusQuerier<Chain> for QueryStarknetChainStatus
 where
     Chain: HasChainStatusType<ChainStatus = StarknetChainStatus>
-        + CanLog<LevelTrace>
         + HasStarknetClient<Client: Provider + std::fmt::Debug>
         + CanSendJsonRpcRequest<QueryBlockWithTxHashesRequest, QueryBlockWithTxHashesResponse>
         + CanRaiseAsyncError<ProviderError>
