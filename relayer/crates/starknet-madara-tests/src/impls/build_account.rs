@@ -10,11 +10,11 @@ use hermes_starknet_chain_components::traits::{
 };
 use hermes_starknet_chain_components::types::StarknetWallet;
 use ibc::core::host::types::identifiers::ChainId;
-use starknet_v13::accounts::{ExecutionEncoding, SingleOwnerAccount};
-use starknet_v13::core::types::Felt;
-use starknet_v13::providers::jsonrpc::HttpTransport;
-use starknet_v13::providers::JsonRpcClient;
-use starknet_v13::signers::{LocalWallet, SigningKey};
+use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
+use starknet::core::types::Felt;
+use starknet::providers::jsonrpc::HttpTransport;
+use starknet::providers::JsonRpcClient;
+use starknet::signers::{LocalWallet, SigningKey};
 
 use crate::types::StarknetAccount;
 

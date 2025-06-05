@@ -6,9 +6,9 @@ use hermes_starknet_chain_components::traits::{
     CanBuildAccountFromSigner, ContractDeployer, ContractDeployerComponent, HasBlobType,
     HasContractClassHashType,
 };
-use starknet_v13::contract::ContractFactory;
-use starknet_v13::core::types::{Felt, RevertedInvocation};
-use starknet_v13::signers::SigningKey;
+use starknet::contract::ContractFactory;
+use starknet::core::types::{Felt, RevertedInvocation};
+use starknet::signers::SigningKey;
 
 use crate::traits::CanUseStarknetAccount;
 use crate::types::TxResponse;

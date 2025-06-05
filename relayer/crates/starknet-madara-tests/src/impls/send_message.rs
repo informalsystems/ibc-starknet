@@ -14,8 +14,8 @@ use hermes_starknet_chain_components::traits::{CanBuildAccountFromSigner, HasSta
 use hermes_starknet_chain_components::types::{
     StarknetEvent, StarknetEventFields, StarknetMessageResponse,
 };
-use starknet_v13::accounts::Account;
-use starknet_v13::core::types::{
+use starknet::accounts::Account;
+use starknet::core::types::{
     Call, ExecuteInvocation, Felt, FunctionInvocation, OrderedEvent, RevertedInvocation,
     TransactionTrace,
 };

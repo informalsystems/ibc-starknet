@@ -20,8 +20,8 @@ use hermes_starknet_chain_components::types::StarknetWallet;
 use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
 use ibc::core::host::types::error::IdentifierError;
 use reqwest::Client;
-use starknet_v13::providers::jsonrpc::HttpTransport;
-use starknet_v13::providers::{JsonRpcClient, Provider, ProviderError};
+use starknet::providers::jsonrpc::HttpTransport;
+use starknet::providers::{JsonRpcClient, Provider, ProviderError};
 use tokio::process::Child;
 use url::{ParseError, Url};
 

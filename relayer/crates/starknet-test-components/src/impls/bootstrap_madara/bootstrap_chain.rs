@@ -86,6 +86,7 @@ where
             .await?;
 
         // For now, we hard code the wallets generated from madara
+        // TODO: Can we retrieve the information from stdout.log?
         let wallets = BTreeMap::from([
             (
                 "relayer".into(),
@@ -98,7 +99,7 @@ where
                 "user-a".into(),
                 StarknetWallet::from_signing_key(
                     felt!("0x008a1719e7ca19f3d91e8ef50a48fc456575f645497a1d55f30e3781f786afe4"),
-                    felt!("0x00177100ae65c71074126963e695e17adf5b360146f960378b5cdfd9ed69870b"),
+                    felt!("0x0514977443078cf1e0c36bc88b89ada9a46061a5cf728f40274caea21d76f174"),
                 ),
             ),
             (

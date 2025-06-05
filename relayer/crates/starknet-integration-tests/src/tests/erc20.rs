@@ -14,11 +14,10 @@ use hermes_starknet_chain_components::types::{
     DeployErc20TokenMessage, Erc20Event, StarknetAmount,
 };
 use hermes_starknet_chain_context::contexts::{StarknetCairoEncoding, StarknetEventEncoding};
+use hermes_starknet_madara_tests::impls::init_madara_bootstrap;
 use starknet::core::types::U256;
 use starknet::macros::selector;
 use tracing::info;
-
-use crate::utils::init_starknet_bootstrap;
 
 #[test]
 fn test_erc20_transfer() -> Result<(), Error> {
@@ -29,7 +28,7 @@ fn test_erc20_transfer() -> Result<(), Error> {
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
 
-        let bootstrap = init_starknet_bootstrap(&runtime).await?;
+        let bootstrap = init_madara_bootstrap(&runtime).await?;
 
         let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
 

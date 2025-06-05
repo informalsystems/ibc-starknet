@@ -17,27 +17,27 @@ use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
-use hermes_starknet_chain_context::contexts::StarknetChain;
-use hermes_starknet_chain_context::impls::HandleStarknetChainError;
+use hermes_starknet_madara_tests::contexts::MadaraChain;
+use hermes_starknet_madara_tests::impls::HandleMadaraChainError;
 
-use crate::contexts::{CosmosToStarknetRelay, StarknetToCosmosRelay};
+use crate::contexts::{CosmosToMadaraRelay, MadaraToCosmosRelay};
 
-#[cgp_context(CosmosStarknetBiRelayComponents: DefaultBiRelayComponents)]
+#[cgp_context(MadaraCosmosBiRelayComponents: DefaultBiRelayComponents)]
 #[derive(Clone, HasField)]
-pub struct CosmosStarknetBiRelay {
+pub struct MadaraCosmosBiRelay {
     pub runtime: HermesRuntime,
-    pub relay_a_to_b: CosmosToStarknetRelay,
-    pub relay_b_to_a: StarknetToCosmosRelay,
+    pub relay_a_to_b: MadaraToCosmosRelay,
+    pub relay_b_to_a: CosmosToMadaraRelay,
 }
 
 delegate_components! {
-    CosmosStarknetBiRelayComponents {
+    MadaraCosmosBiRelayComponents {
         [
             ErrorTypeProviderComponent,
             ErrorWrapperComponent,
         ]: UseHermesError,
         ErrorRaiserComponent:
-            UseDelegate<HandleStarknetChainError>,
+            UseDelegate<HandleMadaraChainError>,
         RuntimeTypeProviderComponent:
             UseType<HermesRuntime>,
         RuntimeGetterComponent:
@@ -45,13 +45,13 @@ delegate_components! {
         LoggerComponent:
             TracingLogger,
         ChainTypeProviderAtComponent<Index<0>>:
-            UseType<CosmosChain>,
+            UseType<MadaraChain>,
         ChainTypeProviderAtComponent<Index<1>>:
-            UseType<StarknetChain>,
+            UseType<CosmosChain>,
         RelayTypeProviderAtComponent<Index<0>, Index<1>>:
-            UseType<CosmosToStarknetRelay>,
+            UseType<MadaraToCosmosRelay>,
         RelayTypeProviderAtComponent<Index<1>, Index<0>>:
-            UseType<StarknetToCosmosRelay>,
+            UseType<CosmosToMadaraRelay>,
         RelayGetterAtComponent<Index<0>, Index<1>>:
             UseField<symbol!("relay_a_to_b")>,
         RelayGetterAtComponent<Index<1>, Index<0>>:
@@ -59,9 +59,9 @@ delegate_components! {
     }
 }
 
-pub trait CanUseCosmosStarknetBiRelay:
+pub trait CanUseMadaraCosmosBiRelay:
     CanUseComponent<RunnerComponent> + CanUseComponent<AutoBiRelayerComponent>
 {
 }
 
-impl CanUseCosmosStarknetBiRelay for CosmosStarknetBiRelay {}
+impl CanUseMadaraCosmosBiRelay for MadaraCosmosBiRelay {}

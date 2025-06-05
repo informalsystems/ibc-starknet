@@ -1,3 +1,5 @@
+use core::fmt::Debug;
+
 use cgp::core::macros::blanket_trait;
 use hermes_core::relayer_components::transaction::traits::HasSignerType;
 use hermes_prelude::*;
@@ -8,7 +10,7 @@ use starknet::accounts::{Account, AccountError, ConnectedAccount};
     context: Chain,
 }]
 pub trait HasStarknetAccountType: Async {
-    type Account: Async;
+    type Account: Async + Debug;
 }
 
 #[cgp_component {

@@ -1,7 +1,7 @@
 use cgp::core::macros::blanket_trait;
 use hermes_prelude::CanRaiseAsyncError;
 use hermes_starknet_chain_components::traits::HasStarknetAccountType;
-use starknet_v13::accounts::{Account, AccountError, ConnectedAccount};
+use starknet::accounts::{Account, AccountError, ConnectedAccount};
 
 #[blanket_trait]
 pub trait CanUseStarknetAccount:
