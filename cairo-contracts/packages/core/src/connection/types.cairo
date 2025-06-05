@@ -1,5 +1,7 @@
 use core::num::traits::Zero;
-use ics23::ByteArrayIntoArrayU8;
+use ibc_utils::array::span_contains;
+use ibc_utils::bytes::ByteArrayIntoArrayU8;
+use ibc_utils::storage::read_raw_key;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::U128AsProtoMessage;
 use protobuf::types::message::{
@@ -14,6 +16,7 @@ use starknet_ibc_core::host::{
     BasePrefix, BasePrefixZero, ClientId, ClientIdImpl, ClientIdTrait, ClientIdZero, ConnectionId,
     ConnectionIdZero,
 };
+use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
@@ -194,7 +197,11 @@ pub impl ConnectionEndImpl of ConnectionEndTrait {
 
 pub impl ConnectionEndIntoStateValue of Into<ConnectionEnd, StateValue> {
     fn into(self: ConnectionEnd) -> StateValue {
-        let encoded_connection_end = ProtoCodecImpl::encode(@self);
+        let encoded_connection_end = IProtobufLibraryDispatcher {
+            class_hash: read_raw_key::<'protobuf-library'>(),
+        }
+            .connection_end_encode(self);
+
         StateValue { value: encoded_connection_end.into() }
     }
 }
@@ -320,12 +327,12 @@ pub impl VersionImpl of VersionTrait {
     fn is_supported(self: @Version) -> bool {
         let features_span = self.features.span();
         self.identifier == @"1"
-            && ics23::span_contains(features_span, @"ORDER_ORDERED")
-            && ics23::span_contains(features_span, @"ORDER_UNORDERED")
+            && span_contains(features_span, @"ORDER_ORDERED")
+            && span_contains(features_span, @"ORDER_UNORDERED")
     }
 
     fn is_feature_supported(self: @Version, feature: @ByteArray) -> bool {
-        ics23::span_contains(self.features.span(), feature)
+        span_contains(self.features.span(), feature)
     }
 }
 

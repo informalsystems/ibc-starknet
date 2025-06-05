@@ -28,11 +28,13 @@ starknet            = { workspace = true }
 # ibc dependencies
 starknet_ibc_core  = { workspace = true }
 starknet_ibc_utils = { workspace = true }
+starknet_ibc_libs  = { workspace = true }
 
 # internal dependencies
-cometbft = { workspace = true }
-ics23    = { workspace = true }
-protobuf = { workspace = true }
+cometbft  = { workspace = true }
+ics23     = { workspace = true }
+protobuf  = { workspace = true }
+ibc_utils = { workspace = true }
 
 [dev-dependencies]
 snforge_std          = { workspace = true }

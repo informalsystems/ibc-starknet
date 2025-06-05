@@ -17,6 +17,7 @@ description   = "JSON serialization"
 test = { workspace = true }
 
 [dependencies]
+ibc_utils = { workspace = true }
 
 [dev-dependencies]
 assert_macros = { workspace = true }

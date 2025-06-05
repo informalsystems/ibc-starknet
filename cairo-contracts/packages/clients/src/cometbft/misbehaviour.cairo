@@ -1,5 +1,7 @@
 use cometbft::light_client::Header as CometHeader;
-use protobuf::types::message::ProtoCodecImpl;
+use ibc_utils::bytes::ByteArrayIntoArrayU8;
+use ibc_utils::storage::read_raw_key;
+use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 
 #[derive(Drop)]
 pub struct Misbehaviour {
@@ -17,8 +19,15 @@ pub impl MisbehaviourImpl of MisbehaviourTrait {
         >::deserialize(ref span)
             .unwrap();
 
-        let header_1 = ProtoCodecImpl::decode::<CometHeader>(@header_1_bytes).unwrap();
-        let header_2 = ProtoCodecImpl::decode::<CometHeader>(@header_2_bytes).unwrap();
+        let protobuf_library_dispatcher = IProtobufLibraryDispatcher {
+            class_hash: read_raw_key::<'protobuf-library'>(),
+        };
+
+        let header_1 = protobuf_library_dispatcher
+            .comet_header_decode(ByteArrayIntoArrayU8::into(header_1_bytes));
+
+        let header_2 = protobuf_library_dispatcher
+            .comet_header_decode(ByteArrayIntoArrayU8::into(header_2_bytes));
 
         Misbehaviour { header_1, header_2 }
     }

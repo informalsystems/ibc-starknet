@@ -29,6 +29,15 @@ pub struct BootstrapStarknetChainArgs {
 
     #[clap(long = "comet-client-contract-path")]
     pub comet_client_contract_path: String,
+
+    #[clap(long = "comet-lib-contract-path")]
+    pub comet_lib_contract_path: String,
+
+    #[clap(long = "ics23-lib-contract-path")]
+    pub ics23_lib_contract_path: String,
+
+    #[clap(long = "protobuf-lib-contract-path")]
+    pub protobuf_lib_contract_path: String,
 }
 
 pub struct LoadStarknetBootstrap;
@@ -83,6 +92,33 @@ where
             serde_json::from_str(&contract_str).map_err(App::raise_error)?
         };
 
+        let comet_lib_contract = {
+            let contract_str = runtime
+                .read_file_as_string(&args.comet_lib_contract_path.clone().into())
+                .await
+                .map_err(App::raise_error)?;
+
+            serde_json::from_str(&contract_str).map_err(App::raise_error)?
+        };
+
+        let ics23_lib_contract = {
+            let contract_str = runtime
+                .read_file_as_string(&args.ics23_lib_contract_path.clone().into())
+                .await
+                .map_err(App::raise_error)?;
+
+            serde_json::from_str(&contract_str).map_err(App::raise_error)?
+        };
+
+        let protobuf_lib_contract = {
+            let contract_str = runtime
+                .read_file_as_string(&args.protobuf_lib_contract_path.clone().into())
+                .await
+                .map_err(App::raise_error)?;
+
+            serde_json::from_str(&contract_str).map_err(App::raise_error)?
+        };
+
         let bootstrap = StarknetBootstrap {
             fields: Arc::new(StarknetBootstrapFields {
                 runtime: runtime.clone(),
@@ -92,6 +128,9 @@ where
                 ics20_contract,
                 ibc_core_contract,
                 comet_client_contract,
+                comet_lib_contract,
+                ics23_lib_contract,
+                protobuf_lib_contract,
             }),
         };
 

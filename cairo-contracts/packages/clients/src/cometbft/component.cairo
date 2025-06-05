@@ -1,16 +1,13 @@
 #[starknet::component]
 pub mod CometClientComponent {
     use cometbft::types::{Options, TrustedBlockState, UntrustedBlockState};
-    use cometbft::verifier::{verify_misbehaviour_header, verify_update_header};
     use core::num::traits::Zero;
-    use ics23::{
-        ArrayFelt252Store, MerkleProof, Proof, array_u8_to_byte_array, byte_array_to_array_u8,
-        verify_membership as ics23_verify_membership,
-        verify_non_membership as ics23_verify_non_membership,
-    };
+    use ibc_utils::array::span_contains;
+    use ibc_utils::bytes::ByteArrayIntoArrayU8;
+    use ibc_utils::storage::{ArrayFelt252Store, read_raw_key};
+    use ics23::Proof;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_access::ownable::interface::IOwnable;
-    use protobuf::types::message::ProtoCodecImpl;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,
@@ -32,6 +29,9 @@ pub mod CometClientComponent {
     use starknet_ibc_core::host::{
         BasePrefix, ClientIdImpl, client_upgrade_path, consensus_upgrade_path,
     };
+    use starknet_ibc_libs::comet::{ICometDispatcherTrait, ICometLibraryDispatcher};
+    use starknet_ibc_libs::ics23::{IIcs23DispatcherTrait, IIcs23LibraryDispatcher};
+    use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
     use starknet_ibc_utils::ValidateBasic;
 
     #[storage]
@@ -397,8 +397,11 @@ pub mod CometClientComponent {
             proof: StateProof,
             root: StateRoot,
         ) {
-            let byte_array_proof = array_u8_to_byte_array(@proof.proof);
-            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(@byte_array_proof).unwrap();
+            let decoded_proof = IProtobufLibraryDispatcher {
+                class_hash: read_raw_key::<'protobuf-library'>(),
+            }
+                .merkle_proof_decode(proof.proof);
+
             let specs = self.read_client_state(client_sequence).proof_spec;
             let mut proofs: Array<Proof> = ArrayTrait::new();
             for proof in decoded_proof.proofs {
@@ -407,11 +410,13 @@ pub mod CometClientComponent {
             let root = root.root;
             let mut keys = array![];
             for path in paths {
-                let path_bytes = byte_array_to_array_u8(@path);
+                let path_bytes = ByteArrayIntoArrayU8::into(path);
                 keys.append(path_bytes);
             }
             let value = value.value;
-            ics23_verify_membership(specs, @proofs, root, keys, value, 0);
+
+            IIcs23LibraryDispatcher { class_hash: read_raw_key::<'ics23-library'>() }
+                .verify_membership(specs, proofs, root, keys, value, 0);
         }
 
         fn verify_non_membership(
@@ -421,8 +426,10 @@ pub mod CometClientComponent {
             proof: StateProof,
             root: StateRoot,
         ) {
-            let byte_array_proof = array_u8_to_byte_array(@proof.proof);
-            let decoded_proof = ProtoCodecImpl::decode::<MerkleProof>(@byte_array_proof).unwrap();
+            let decoded_proof = IProtobufLibraryDispatcher {
+                class_hash: read_raw_key::<'protobuf-library'>(),
+            }
+                .merkle_proof_decode(proof.proof);
             let specs = self.read_client_state(client_sequence).proof_spec;
             let mut proofs: Array<Proof> = ArrayTrait::new();
             for proof in decoded_proof.proofs {
@@ -431,10 +438,12 @@ pub mod CometClientComponent {
             let root = root.root;
             let mut keys = array![];
             for path in paths {
-                let path_bytes = byte_array_to_array_u8(@path);
+                let path_bytes = ByteArrayIntoArrayU8::into(path);
                 keys.append(path_bytes);
             }
-            ics23_verify_non_membership(specs, @proofs, root, keys);
+
+            IIcs23LibraryDispatcher { class_hash: read_raw_key::<'ics23-library'>() }
+                .verify_non_membership(specs, proofs, root, keys);
         }
 
         fn verify_client_message(
@@ -533,10 +542,10 @@ pub mod CometClientComponent {
             assert(upgraded_height > latest_height, CometErrors::INVALID_UPGRADE_HEIGHT);
 
             let upgraded_client_protobuf = StateValue {
-                value: ics23::byte_array_to_array_u8(@upgraded_client_state.protobuf_bytes()),
+                value: upgraded_client_state.protobuf_bytes(),
             };
             let upgraded_consensus_protobuf = StateValue {
-                value: ics23::byte_array_to_array_u8(@upgraded_consensus_state.protobuf_bytes()),
+                value: upgraded_consensus_state.protobuf_bytes(),
             };
 
             self
@@ -868,7 +877,9 @@ pub mod CometClientComponent {
             let now = TimestampImpl::host().try_into().unwrap();
 
             let options = Options { trust_threshold, trusting_period, clock_drift };
-            verify_update_header(untrusted_block_state, trusted_block_state, options, now)
+
+            ICometLibraryDispatcher { class_hash: read_raw_key::<'comet-library'>() }
+                .verify_update_header(untrusted_block_state, trusted_block_state, options, now)
         }
 
 
@@ -906,7 +917,11 @@ pub mod CometClientComponent {
             let now = TimestampImpl::host().try_into().unwrap();
 
             let options = Options { trust_threshold, trusting_period, clock_drift };
-            verify_misbehaviour_header(untrusted_block_state, trusted_block_state, options, now)
+
+            ICometLibraryDispatcher { class_hash: read_raw_key::<'comet-library'>() }
+                .verify_misbehaviour_header(
+                    untrusted_block_state, trusted_block_state, options, now,
+                )
         }
 
         fn _verify_misbehaviour_on_update(
@@ -1047,7 +1062,7 @@ pub mod CometClientComponent {
         ) {
             let mut update_heights = self.update_heights.read(client_sequence);
 
-            if ics23::span_contains(update_heights.span(), @update_height) {
+            if span_contains(update_heights.span(), @update_height) {
                 return;
             }
 

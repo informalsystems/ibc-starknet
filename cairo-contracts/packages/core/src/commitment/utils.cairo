@@ -1,4 +1,4 @@
-use ics23::IntoArrayU32;
+use ibc_utils::bytes::IntoArrayU32;
 
 #[derive(Drop, Clone)]
 pub struct U32Collector {

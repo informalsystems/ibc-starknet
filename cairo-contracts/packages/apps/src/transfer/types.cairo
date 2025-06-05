@@ -301,7 +301,8 @@ impl MemoValidateBasic of ValidateBasic<Memo> {
 
 #[cfg(test)]
 pub mod tests {
-    use serde_json::to_byte_array;
+    use ibc_utils::bytes::SpanU8IntoByteArray;
+    use serde_json::to_array_u8;
     use starknet_ibc_testkit::dummies::{CHANNEL_ID, ERC20, PACKET_DATA_FROM_SN, PORT_ID};
     use starknet_ibc_utils::{ComputeKey, LocalKeyBuilderImpl, LocalKeyBuilderTrait};
     use super::{Denom, PrefixedDenom, TracePrefix};
@@ -309,10 +310,10 @@ pub mod tests {
     // Snapshot test to ensure serialization stays consistent.
     #[test]
     fn test_json_serialized_packet_data() {
-        let json = to_byte_array(PACKET_DATA_FROM_SN(ERC20()));
+        let json = to_array_u8(PACKET_DATA_FROM_SN(ERC20()));
         let expected: ByteArray =
             "{\"amount\":\"100\",\"denom\":\"0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7\",\"receiver\":\"cosmos1wxeyh7zgn4tctjzs0vtqpc6p5cxq5t2muzl7ng\",\"sender\":\"0x55534552\"}";
-        assert_eq!(json, expected);
+        assert_eq!(SpanU8IntoByteArray::into(json.span()), expected);
     }
 
     #[test]

@@ -10,19 +10,19 @@ readme       = "./../README.md"
 keywords     = [ "starknet", "ibc", "light-client" ]
 description  = "Starknet block header verifier"
 
+[lints]
+workspace = true
+
 [dependencies]
 serde           = { workspace = true }
 starknet-crypto = { workspace = true }
 ureq            = { workspace = true, optional = true, features = [ "json", "rustls" ] }
 
 [dev-dependencies]
-starknet   = { workspace = true }
-serde_json = { workspace = true }
-rstest     = { workspace = true }
-
-[lints]
-workspace = true
+starknet                = { workspace = true }
+serde_json              = { workspace = true }
+rstest                  = { workspace = true }
+starknet-block-verifier = { path = ".", features = [ "feeder" ] }
 
 [features]
-default = [  ]
-feeder  = [ "dep:ureq" ]
+feeder = [ "dep:ureq" ]

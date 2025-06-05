@@ -38,6 +38,7 @@ starknet_ibc_utils = { workspace = true }
 [dev-dependencies]
 snforge_std   = { workspace = true }
 assert_macros = { workspace = true }
+ibc_utils     = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_testkit   = { workspace = true }
@@ -47,5 +48,8 @@ starknet_ibc_contracts = { workspace = true }
 name = "starknet_ibc_apps_unittest"
 build-external-contracts = [
   "starknet_ibc_contracts::erc20::ERC20Mintable",
+  "starknet_ibc_contracts::libraries::comet::CometLib",
+  "starknet_ibc_contracts::libraries::ics23::Ics23Lib",
+  "starknet_ibc_contracts::libraries::protobuf::ProtobufLib",
   "starknet_ibc_testkit::mocks::transfer::MockTransferApp",
 ]

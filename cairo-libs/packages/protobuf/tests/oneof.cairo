@@ -105,7 +105,7 @@ pub impl U32TryIntoEnum of TryInto<u32, Enum> {
 fn oneof_roundtrip_fixture(oneof: Oneof) {
     let message = MessageWithOneof { oneof };
     let encoded = ProtoCodecImpl::encode(@message);
-    let decoded = ProtoCodecImpl::decode(@encoded).unwrap();
+    let decoded = ProtoCodecImpl::decode(encoded.span()).unwrap();
     assert_eq!(message, decoded);
 }
 

@@ -1,3 +1,5 @@
+use crate::bytes::ByteArrayIntoArrayU8;
+
 pub fn base64_char_to_u6(value: u8) -> u8 {
     if 'A' <= value && value <= 'Z' {
         value - 'A'
@@ -30,22 +32,25 @@ pub fn u6_to_base64_char(value: u8) -> u8 {
     }
 }
 
-pub fn encode(input: @ByteArray) -> ByteArray {
-    let mut output = "";
+pub fn encode(input: Span<u8>) -> Array<u8> {
+    let mut output = array![];
     let input_len = input.len();
     let mut i = 0;
 
-    while let Some(b0) = input.at(i) {
-        let b0: u32 = b0.into();
-        let b1: u32 = if i + 1 < input_len {
-            input[i + 1].into()
+    while i != input_len {
+        let b0: u32 = (*input[i]).into();
+        let (b1, b2) = if i + 1 != input_len {
+            let b1 = (*input[i + 1]).into();
+
+            let b2: u32 = if i + 2 != input_len {
+                (*input[i + 2]).into()
+            } else {
+                0
+            };
+
+            (b1, b2)
         } else {
-            0
-        };
-        let b2: u32 = if i + 2 < input_len {
-            input[i + 2].into()
-        } else {
-            0
+            (0, 0)
         };
 
         // 0x10000 = 2^16; 0x100 = 2^8(= 2^16 / 2^8); 0x40 = 2^6
@@ -55,38 +60,42 @@ pub fn encode(input: @ByteArray) -> ByteArray {
         let c0 = u6_to_base64_char(((triple / 0x40000) & 0x3f).try_into().unwrap());
         // 0x1000 = 2^12
         let c1 = u6_to_base64_char(((triple / 0x1000) & 0x3f).try_into().unwrap());
-        let c2 = if i + 1 < input_len {
+        let (c2, c3) = if i + 1 != input_len {
             // 0x40 = 2^6
-            u6_to_base64_char(((triple / 0x40) & 0x3f).try_into().unwrap())
+            let c2 = u6_to_base64_char(((triple / 0x40) & 0x3f).try_into().unwrap());
+
+            let c3 = if i + 2 != input_len {
+                i += 3;
+                u6_to_base64_char((triple & 0x3f).try_into().unwrap())
+            } else {
+                i += 2;
+                '='
+            };
+
+            (c2, c3)
         } else {
-            '='
-        };
-        let c3 = if i + 2 < input_len {
-            u6_to_base64_char((triple & 0x3f).try_into().unwrap())
-        } else {
-            '='
+            i += 1;
+            ('=', '=')
         };
 
-        output.append_byte(c0);
-        output.append_byte(c1);
-        output.append_byte(c2);
-        output.append_byte(c3);
-
-        i += 3;
+        output.append(c0);
+        output.append(c1);
+        output.append(c2);
+        output.append(c3);
     }
     output
 }
 
-pub fn decode(input: @ByteArray) -> ByteArray {
+pub fn decode(mut input: Span<u8>) -> Array<u8> {
     let input_len = input.len();
     assert(input_len % 4 == 0, 'invalid Base64 string length');
-    let mut output = "";
+    let mut output = array![];
     let mut i = 0;
 
     // Since input_len % 4 == 0, we know i += 4 will eventually be
     // equal to input_len
-    while let (Some(c0), Some(c1), Some(c2), Some(c3)) =
-        (input.at(i), input.at(i + 1), input.at(i + 2), input.at(i + 3)) {
+    while let Some(tuple) = input.multi_pop_front() {
+        let [c0, c1, c2, c3] = (*tuple).unbox();
         let sextet0: u32 = base64_char_to_u6(c0).into();
         let sextet1: u32 = base64_char_to_u6(c1).into();
         let sextet2: u32 = if c2 != '=' {
@@ -106,12 +115,12 @@ pub fn decode(input: @ByteArray) -> ByteArray {
         let b1 = ((triple / 0x100) & 0xff).try_into().unwrap();
         let b2 = (triple & 0xff).try_into().unwrap();
 
-        output.append_byte(b0);
+        output.append(b0);
         if c2 != '=' {
-            output.append_byte(b1);
+            output.append(b1);
         }
         if c3 != '=' {
-            output.append_byte(b2);
+            output.append(b2);
         }
 
         i += 4;
@@ -119,8 +128,13 @@ pub fn decode(input: @ByteArray) -> ByteArray {
     output
 }
 
+pub fn decode_byte_array(input: ByteArray) -> Array<u8> {
+    decode(ByteArrayIntoArrayU8::into(input).span())
+}
+
 #[cfg(test)]
 mod tests {
+    use crate::bytes::{ByteArrayIntoArrayU8, SpanU8IntoByteArray};
     use super::{base64_char_to_u6, decode, encode, u6_to_base64_char};
 
     #[test]
@@ -166,11 +180,20 @@ mod tests {
         ];
 
         for (input, expected_encoded) in test_cases {
-            let encoded = encode(@input);
-            assert_eq!(@encoded, @expected_encoded, "Encoding failed for input: '{}'", input);
+            let encoded = encode(ByteArrayIntoArrayU8::into(input.clone()).span());
+            assert_eq!(
+                SpanU8IntoByteArray::into(encoded.span()),
+                expected_encoded,
+                "Encoding failed for input: '{}'",
+                input,
+            );
 
-            let decoded = decode(@encoded);
-            assert_eq!(@decoded, @input, "Decoding failed for encoded string: '{}'", encoded);
+            let decoded = decode(encoded.span());
+            assert_eq!(
+                SpanU8IntoByteArray::into(decoded.span()),
+                input,
+                "Decoding failed for encoded string",
+            );
         }
     }
 }

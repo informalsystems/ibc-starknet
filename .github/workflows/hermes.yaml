@@ -77,7 +77,20 @@ jobs:
           export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_IBCCore.contract_class.json"
           export STARKNET_BIN="$HOME/.cargo/bin/madara"
 
+          export COMET_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_CometLib.contract_class.json"
+          export ICS23_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_Ics23Lib.contract_class.json"
+          export PROTOBUF_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_ProtobufLib.contract_class.json"
+
           export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
+
+          cargo run --quiet --example contract_size "$ERC20_CONTRACT"
+          cargo run --quiet --example contract_size "$ICS20_CONTRACT"
+          cargo run --quiet --example contract_size "$COMET_CLIENT_CONTRACT"
+          cargo run --quiet --example contract_size "$IBC_CORE_CONTRACT"
+
+          cargo run --quiet --example contract_size "$COMET_LIB_CONTRACT"
+          cargo run --quiet --example contract_size "$ICS23_LIB_CONTRACT"
+          cargo run --quiet --example contract_size "$PROTOBUF_LIB_CONTRACT"
 
           nix shell \
             ..#osmosis \

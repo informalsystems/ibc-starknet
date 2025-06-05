@@ -1,8 +1,9 @@
 use core::num::traits::Zero;
-use ics23::{ByteArrayIntoArrayU8, IntoArrayU32, array_u8_into_array_u32};
+use ibc_utils::bytes::{ByteArrayIntoArrayU8, IntoArrayU32, SpanU8IntoArrayU32};
+use ibc_utils::storage::read_raw_key;
 use protobuf::primitives::array::ByteArrayAsProtoMessage;
 use protobuf::types::message::{
-    DecodeContext, EncodeContext, EncodeContextTrait, ProtoCodecImpl, ProtoMessage, ProtoName,
+    DecodeContext, EncodeContext, EncodeContextTrait, ProtoMessage, ProtoName,
 };
 use protobuf::types::tag::WireType;
 use starknet_ibc_core::channel::ChannelErrors;
@@ -11,6 +12,7 @@ use starknet_ibc_core::commitment::{StateValue, StateValueZero};
 use starknet_ibc_core::host::{
     ChannelId, ChannelIdZero, ConnectionId, PortId, PortIdTrait, Sequence,
 };
+use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 use starknet_ibc_utils::ValidateBasic;
 
 #[derive(Clone, Debug, Drop, Serde)]
@@ -246,7 +248,11 @@ pub impl ChannelEndImpl of ChannelEndTrait {
 
 pub impl ChannelEndIntoStateValue of Into<ChannelEnd, StateValue> {
     fn into(self: ChannelEnd) -> StateValue {
-        let encoded_channel_end = ProtoCodecImpl::encode(@self);
+        let encoded_channel_end = IProtobufLibraryDispatcher {
+            class_hash: read_raw_key::<'protobuf-library'>(),
+        }
+            .channel_end_encode(self);
+
         StateValue { value: encoded_channel_end.into() }
     }
 }
@@ -402,7 +408,7 @@ pub impl ArrayU8IntoAcknowledgement of Into<Array<u8>, Acknowledgement> {
 
 pub impl AcknowledgementIntoArrayU32 of IntoArrayU32<Acknowledgement> {
     fn into_array_u32(self: Acknowledgement) -> (Array<u32>, u32, u32) {
-        array_u8_into_array_u32(self.ack)
+        self.ack.span().into_array_u32()
     }
 }
 

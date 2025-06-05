@@ -41,6 +41,12 @@ pub trait HasIbcContracts: HasChainType<Chain: HasContractClassType> {
     fn ibc_core_contract(&self) -> &ContractClassOf<Self::Chain>;
 
     fn comet_client_contract(&self) -> &ContractClassOf<Self::Chain>;
+
+    fn comet_lib_contract(&self) -> &ContractClassOf<Self::Chain>;
+
+    fn ics23_lib_contract(&self) -> &ContractClassOf<Self::Chain>;
+
+    fn protobuf_lib_contract(&self) -> &ContractClassOf<Self::Chain>;
 }
 
 #[cgp_auto_getter]
@@ -90,7 +96,15 @@ where
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanEncode<ViaCairo, Chain::Address>
         + CanEncode<ViaCairo, Chain::ContractClassHash>
-        + CanEncode<ViaCairo, MsgRegisterClient>
+        + CanEncode<
+            ViaCairo,
+            Product![
+                Chain::Address,
+                Chain::ContractClassHash,
+                Chain::ContractClassHash,
+                Chain::ContractClassHash
+            ],
+        > + CanEncode<ViaCairo, MsgRegisterClient>
         + CanEncode<ViaCairo, MsgRegisterApp>,
     EventEncoding: Async + HasEventContractFields<Chain>,
 {
@@ -125,14 +139,38 @@ where
             )
             .await;
 
-        let ibc_core_class_hash = chain
-            .declare_contract(bootstrap.ibc_core_contract())
+        let comet_lib_class_hash = chain
+            .declare_contract(bootstrap.comet_lib_contract())
             .await
             .map_err(Bootstrap::raise_error)?;
 
         bootstrap
             .log(
-                &format!("declared IBC core class: {ibc_core_class_hash:?}"),
+                &format!("declared Comet library class: {comet_lib_class_hash:?}"),
+                &LevelInfo,
+            )
+            .await;
+
+        let ics23_lib_class_hash = chain
+            .declare_contract(bootstrap.ics23_lib_contract())
+            .await
+            .map_err(Bootstrap::raise_error)?;
+
+        bootstrap
+            .log(
+                &format!("declared ICS23 library class: {ics23_lib_class_hash:?}"),
+                &LevelInfo,
+            )
+            .await;
+
+        let protobuf_lib_class_hash = chain
+            .declare_contract(bootstrap.protobuf_lib_contract())
+            .await
+            .map_err(Bootstrap::raise_error)?;
+
+        bootstrap
+            .log(
+                &format!("declared Protobuf library class: {protobuf_lib_class_hash:?}"),
                 &LevelInfo,
             )
             .await;
@@ -149,10 +187,28 @@ where
             )
             .await;
 
-        let ibc_core_address = chain
-            .deploy_contract(&ibc_core_class_hash, false, &Vec::new())
+        let ibc_core_class_hash = chain
+            .declare_contract(bootstrap.ibc_core_contract())
             .await
             .map_err(Bootstrap::raise_error)?;
+
+        bootstrap
+            .log(
+                &format!("declared IBC core class: {ibc_core_class_hash:?}"),
+                &LevelInfo,
+            )
+            .await;
+
+        let ibc_core_address = {
+            let call_data = cairo_encoding
+                .encode(&protobuf_lib_class_hash)
+                .map_err(Bootstrap::raise_error)?;
+
+            chain
+                .deploy_contract(&ibc_core_class_hash, false, &call_data)
+                .await
+                .map_err(Bootstrap::raise_error)?
+        };
 
         bootstrap
             .log(
@@ -163,7 +219,12 @@ where
 
         let comet_client_address = {
             let call_data = cairo_encoding
-                .encode(&ibc_core_address)
+                .encode(&product![
+                    ibc_core_address,
+                    comet_lib_class_hash,
+                    ics23_lib_class_hash,
+                    protobuf_lib_class_hash,
+                ])
                 .map_err(Bootstrap::raise_error)?;
 
             chain

@@ -6,6 +6,7 @@ members = [
   "packages/core",
   "packages/testkit",
   "packages/utils",
+  "packages/libraries",
 ]
 
 [workspace.package]
@@ -26,21 +27,22 @@ test = "snforge test"
 [workspace.dependencies]
 assert_macros = "2.11.4"
 starknet      = "2.11.4"
-snforge_std   = "0.42.0"
+snforge_std   = "0.44.0"
 
 # external dependencies
-# FIXME: pinned to specific rev for ed25519 signature fix
-# update to release version from scarbs.xyz once available
 openzeppelin_access  = "1.0.0"
 openzeppelin_token   = "1.0.0"
-openzeppelin_testing = "4.0.0"
+openzeppelin_testing = "4.1.0"
 openzeppelin_utils   = "1.0.0"
+alexandria_math      = "0.5.1"
+garaga               = { git = "https://github.com/keep-starknet-strange/garaga.git" }
 
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }
 cometbft   = { path = "../cairo-libs/packages/cometbft" }
 protobuf   = { path = "../cairo-libs/packages/protobuf" }
 serde_json = { path = "../cairo-libs/packages/serde_json" }
+ibc_utils  = { path = "../cairo-libs/packages/ibc_utils" }
 
 # ibc dependencies
 starknet_ibc_apps      = { path = "packages/apps" }
@@ -49,6 +51,8 @@ starknet_ibc_contracts = { path = "packages/contracts" }
 starknet_ibc_core      = { path = "packages/core" }
 starknet_ibc_testkit   = { path = "packages/testkit" }
 starknet_ibc_utils     = { path = "packages/utils" }
+
+starknet_ibc_libs = { path = "packages/libraries" }
 
 [workspace.tool.fmt]
 sort-module-level-items = true

@@ -21,8 +21,9 @@ fmt   = { workspace = true }
 scarb = { workspace = true }
 
 [dependencies]
-protobuf = { workspace = true }
-starknet = { workspace = true }
+protobuf  = { workspace = true }
+starknet  = { workspace = true }
+ibc_utils = { workspace = true }
 
 [dev-dependencies]
 assert_macros = { workspace = true }

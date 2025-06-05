@@ -1,4 +1,5 @@
-use serde_json::{Serialize, SerializerTrait, to_byte_array};
+use ibc_utils::bytes::ByteArrayIntoArrayU8;
+use serde_json::{Serialize, SerializerTrait, to_array_u8};
 
 #[derive(Drop)]
 struct User {
@@ -80,36 +81,36 @@ pub fn DUMMY_USER() -> User {
 
 #[test]
 fn test_serialize_struct_ok() {
-    let value = to_byte_array(DUMMY_USER());
+    let value = to_array_u8(DUMMY_USER());
     let expected =
         "{\"name\":\"john doe\",\"age\":25,\"email\":\"john.doe@example.com\",\"permission\":{\"admin\":0},\"is_active\":true,\"metadata\":100}";
-    assert_eq!(value, expected);
+    assert_eq!(value, ByteArrayIntoArrayU8::into(expected));
 }
 
 #[test]
 fn test_serialize_struct_zero_values() {
-    let value = to_byte_array(UserImpl::new("", 0, Option::None, Permission::Guest, false, 0));
+    let value = to_array_u8(UserImpl::new("", 0, Option::None, Permission::Guest, false, 0));
     let expected =
         "{\"name\":\"\",\"age\":0,\"email\":null,\"permission\":\"guest\",\"is_active\":false,\"metadata\":0}";
-    assert_eq!(value, expected);
+    assert_eq!(value, ByteArrayIntoArrayU8::into(expected));
 }
 
 #[test]
 fn test_serialize_enum_ok() {
     let enum_active = AccountStatus::Active(DUMMY_USER());
 
-    let value = to_byte_array(enum_active);
+    let value = to_array_u8(enum_active);
 
     let expected =
         "{\"active\":{\"name\":\"john doe\",\"age\":25,\"email\":\"john.doe@example.com\",\"permission\":{\"admin\":0},\"is_active\":true,\"metadata\":100}}";
 
-    assert_eq!(value, expected);
+    assert_eq!(value, ByteArrayIntoArrayU8::into(expected));
 
     let enum_inactive = AccountStatus::InActive;
 
-    let value = to_byte_array(enum_inactive);
+    let value = to_array_u8(enum_inactive);
 
     let expected = "\"inactive\"";
 
-    assert_eq!(value, expected);
+    assert_eq!(value, ByteArrayIntoArrayU8::into(expected));
 }

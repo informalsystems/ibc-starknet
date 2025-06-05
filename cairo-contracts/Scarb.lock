@@ -3,22 +3,34 @@ version = 1
 
 [[package]]
 name = "alexandria_math"
-version = "0.5.0"
-source = "git+https://github.com/keep-starknet-strange/alexandria?rev=f2c5fbe#f2c5fbe0bd4945275e664386e6b372e51e713596"
+version = "0.5.1"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:a115109644f62742ed8a4e97bc55c0a82b450df64f8c137d78990c42b1178f25"
 
 [[package]]
 name = "cometbft"
 version = "0.1.0"
 dependencies = [
  "alexandria_math",
+ "ibc_utils",
  "ics23",
  "protobuf",
 ]
 
 [[package]]
+name = "garaga"
+version = "0.18.1"
+source = "git+https://github.com/keep-starknet-strange/garaga.git#9ed3552f7547129bca3ba740918ad9eb8fab4aff"
+
+[[package]]
+name = "ibc_utils"
+version = "0.1.0"
+
+[[package]]
 name = "ics23"
 version = "0.1.0"
 dependencies = [
+ "ibc_utils",
  "protobuf",
 ]
 
@@ -50,9 +62,9 @@ checksum = "sha256:34e088ecf19e0b3012481a29f1fbb20e600540cb9a5db1c3002a97ebb7f5a
 
 [[package]]
 name = "openzeppelin_testing"
-version = "4.0.0"
+version = "4.1.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:af54d20f8334c6f185e48ea66ab09ecd9d04070d5342551b9b8006d6c47cae6b"
+checksum = "sha256:0f0ad8c3aa25ec1ce4a934cc7d1e9f9fa7319e98416dc4c9c9a1289cbf90f647"
 dependencies = [
  "snforge_std",
 ]
@@ -78,22 +90,28 @@ checksum = "sha256:fd348b31c4a4407add33adc3c2b8f26dca71dbd7431faaf726168f37a91db
 [[package]]
 name = "protobuf"
 version = "0.1.0"
+dependencies = [
+ "ibc_utils",
+]
 
 [[package]]
 name = "serde_json"
 version = "0.1.0"
+dependencies = [
+ "ibc_utils",
+]
 
 [[package]]
 name = "snforge_scarb_plugin"
-version = "0.42.0"
+version = "0.44.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:10ab6af7c3d0ffcaa68f037cdee33e004379b53528904fbe60ee9c25227a0624"
+checksum = "sha256:ec8c7637b33392a53153c1e5b87a4617ddcb1981951b233ea043cad5136697e2"
 
 [[package]]
 name = "snforge_std"
-version = "0.42.0"
+version = "0.44.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:f4e9cd4b0ac5142290259be84c8e8ff8a7fbe62354b60977199745fc0d2a0bb9"
+checksum = "sha256:d4affedfb90715b1ac417b915c0a63377ae6dd69432040e5d933130d65114702"
 dependencies = [
  "snforge_scarb_plugin",
 ]
@@ -113,6 +131,7 @@ dependencies = [
 name = "starknet_ibc_apps"
 version = "0.1.0"
 dependencies = [
+ "ibc_utils",
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",
@@ -130,11 +149,13 @@ name = "starknet_ibc_clients"
 version = "0.1.0"
 dependencies = [
  "cometbft",
+ "ibc_utils",
  "ics23",
  "openzeppelin_access",
  "protobuf",
  "snforge_std",
  "starknet_ibc_core",
+ "starknet_ibc_libs",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]
@@ -143,6 +164,7 @@ dependencies = [
 name = "starknet_ibc_contracts"
 version = "0.1.0"
 dependencies = [
+ "ibc_utils",
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",
@@ -150,6 +172,7 @@ dependencies = [
  "starknet_ibc_apps",
  "starknet_ibc_clients",
  "starknet_ibc_core",
+ "starknet_ibc_libs",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]
@@ -159,11 +182,34 @@ name = "starknet_ibc_core"
 version = "0.1.0"
 dependencies = [
  "cometbft",
+ "ibc_utils",
  "ics23",
  "openzeppelin_testing",
  "protobuf",
  "serde_json",
  "snforge_std",
+ "starknet_ibc_libs",
+ "starknet_ibc_testkit",
+ "starknet_ibc_utils",
+]
+
+[[package]]
+name = "starknet_ibc_libs"
+version = "0.1.0"
+dependencies = [
+ "alexandria_math",
+ "cometbft",
+ "garaga",
+ "ibc_utils",
+ "ics23",
+ "openzeppelin_access",
+ "openzeppelin_testing",
+ "openzeppelin_token",
+ "openzeppelin_utils",
+ "protobuf",
+ "snforge_std",
+ "starknet_ibc_contracts",
+ "starknet_ibc_core",
  "starknet_ibc_testkit",
  "starknet_ibc_utils",
 ]
@@ -173,6 +219,7 @@ name = "starknet_ibc_testkit"
 version = "0.1.0"
 dependencies = [
  "cometbft",
+ "ibc_utils",
  "ics23",
  "openzeppelin_access",
  "openzeppelin_testing",

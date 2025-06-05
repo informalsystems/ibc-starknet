@@ -39,6 +39,7 @@ cometbft   = { workspace = true }
 ics23      = { workspace = true }
 protobuf   = { workspace = true }
 serde_json = { workspace = true }
+ibc_utils  = { workspace = true }
 
 [[target.starknet-contract]]
 allowed-libfuncs-list.name = "experimental"

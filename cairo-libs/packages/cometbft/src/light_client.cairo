@@ -2,7 +2,7 @@ use cometbft::ibc::{Height, MerkleRoot};
 use cometbft::types::{SignedHeader, ValidatorSet};
 use cometbft::utils::Fraction;
 use ics23::ProofSpec;
-use protobuf::primitives::array::ByteArrayAsProtoMessage;
+use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{BoolAsProtoMessage, I32AsProtoMessage};
 use protobuf::types::message::{
     DecodeContext, DecodeContextImpl, EncodeContext, EncodeContextImpl, ProtoCodecImpl,
@@ -87,7 +87,7 @@ impl ClientStateAsProtoName of ProtoName<ClientState> {
 pub struct ConsensusState {
     pub timestamp: Timestamp,
     pub root: MerkleRoot,
-    pub next_validators_hash: ByteArray,
+    pub next_validators_hash: Array<u8>,
 }
 
 impl ConsensusStateAsProtoMessage of ProtoMessage<ConsensusState> {

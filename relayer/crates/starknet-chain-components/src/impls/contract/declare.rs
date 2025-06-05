@@ -65,8 +65,10 @@ where
             let contract_class: ContractClass =
                 serde_json::from_str(&sierra_class_json).map_err(Chain::raise_error)?;
 
+            // https://docs.starknet.io/resources/chain-info
+            // max contract bytecode size: 81_920
             let casm_contract =
-                CasmContractClass::from_contract_class(contract_class, false, 180000)
+                CasmContractClass::from_contract_class(contract_class, false, 81_920)
                     .map_err(Chain::raise_error)?;
 
             let casm_class_json =

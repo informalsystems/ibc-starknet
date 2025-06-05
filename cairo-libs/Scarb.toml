@@ -4,6 +4,7 @@ members = [
   "packages/cometbft",
   "packages/serde_json",
   "packages/ics23",
+  "packages/ibc_utils",
 ]
 
 [workspace.package]
@@ -24,16 +25,15 @@ test = "snforge test"
 [workspace.dependencies]
 starknet      = "2.11.4"
 assert_macros = "2.11.4"
-snforge_std   = "0.42.0"
+snforge_std   = "0.44.0"
 
 # external dependencies
-# FIXME: pinned to specific rev for ed25519 signature fix
-# update to release version from scarbs.xyz once available
-alexandria_math = { git = "https://github.com/keep-starknet-strange/alexandria", rev = "f2c5fbe" }
+alexandria_math = { version = "0.5.1" }
 
 # internal dependencies
-protobuf = { path = "packages/protobuf" }
-ics23    = { path = "packages/ics23" }
+protobuf  = { path = "packages/protobuf" }
+ics23     = { path = "packages/ics23" }
+ibc_utils = { path = "packages/ibc_utils" }
 
 [workspace.tool.fmt]
 sort-module-level-items = true

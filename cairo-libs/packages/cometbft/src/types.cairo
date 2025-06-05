@@ -1,9 +1,9 @@
 use alexandria_math::ed25519::verify_signature;
 pub use canonical_vote_impl::CanonicalVoteAsProtoMessage;
 use cometbft::errors::CometErrors;
-use cometbft::utils::{Fraction, SpanU8TryIntoU256};
+use cometbft::utils::Fraction;
 use core::sha256::compute_sha256_byte_array;
-use ics23::byte_array_to_array_u8;
+use ibc_utils::bytes::SpanU8TryIntoU256;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{
     BoolAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, U64AsProtoMessage,
@@ -453,7 +453,7 @@ pub struct Validator {
 #[generate_trait]
 pub impl ValidatorImpl of ValidatorTrait {
     fn validate_id(self: @Validator) {
-        assert!(self.address == @self.pub_key.address());
+        assert(self.address == @self.pub_key.address(), 'invalid validator ID');
     }
 
     fn verify_signature(self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>) {
@@ -715,11 +715,9 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
                 let signed_bytes = ProtoCodecImpl::encode_with_length(canonical_vote);
 
-                let signed_array_u8 = byte_array_to_array_u8(@signed_bytes);
-
                 validator.validate_id();
 
-                validator.verify_signature(signed_array_u8.span(), signature.span());
+                validator.verify_signature(signed_bytes.span(), signature.span());
 
                 // TODO: set verified field to true
 
@@ -806,7 +804,7 @@ pub impl U32TryIntoVoteType of TryInto<u32, VoteType> {
     }
 }
 
-#[derive(Drop, Debug, Clone)]
+#[derive(Drop, Debug, Clone, Serde)]
 pub struct UntrustedBlockState {
     pub signed_header: SignedHeader,
     pub validators: ValidatorSet,
@@ -830,7 +828,7 @@ impl HeaderToUntrustedBlockState of Into<LcHeader, UntrustedBlockState> {
     }
 }
 
-#[derive(Drop, Debug, Clone)]
+#[derive(Drop, Debug, Clone, Serde)]
 pub struct TrustedBlockState {
     pub chain_id: ByteArray,
     pub header_time: Timestamp,
@@ -839,7 +837,7 @@ pub struct TrustedBlockState {
     pub next_validators_hash: Array<u8>,
 }
 
-#[derive(Drop, Debug, Clone)]
+#[derive(Drop, Debug, Clone, Serde)]
 pub struct Options {
     pub trust_threshold: Fraction,
     pub trusting_period: Duration,
@@ -868,8 +866,11 @@ pub impl VotingPowerTallyImpl of VotingPowerTallyTrait {
 
     fn has_enough_power(self: @VotingPowerTally) -> bool {
         // 0 < numerator < denominator
-        assert!(@0 < self.trust_threshold.numerator);
-        assert!(self.trust_threshold.numerator < self.trust_threshold.denominator);
+        assert(@0 < self.trust_threshold.numerator, 'invalid trust threshold');
+        assert(
+            self.trust_threshold.numerator < self.trust_threshold.denominator,
+            'invalid trust threshold',
+        );
 
         // cast to u128 to avoid overflow
         let tally: u128 = (*self.tallied).into();

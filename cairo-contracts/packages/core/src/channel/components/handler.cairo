@@ -36,7 +36,7 @@ pub mod ChannelHandlerComponent {
         next_sequence_send_key, receipt_key, receipt_path,
     };
     use starknet_ibc_core::router::{AppContract, AppContractTrait, RouterHandlerComponent};
-    use starknet_ibc_utils::ValidateBasic;
+    use starknet_ibc_utils::{ValidateBasic, poseidon_hash};
 
     #[storage]
     pub struct Storage {
@@ -48,6 +48,18 @@ pub mod ChannelHandlerComponent {
         pub send_sequences: Map<felt252, Sequence>,
         pub recv_sequences: Map<felt252, Sequence>,
         pub ack_sequences: Map<felt252, Sequence>,
+        //
+        // The following fields are used to generate storage proofs for IBC.
+        // Since Starknet storage stores data per field,
+        // we (poseidon) hash the intended data and store
+        // the hash as storage commitment.
+        pub channel_ends_commitments: Map<felt252, felt252>,
+        pub packet_commitments_commitments: Map<felt252, felt252>,
+        pub packet_receipts_commitments: Map<felt252, felt252>,
+        pub packet_acks_commitments: Map<felt252, felt252>,
+        pub send_sequences_commitments: Map<felt252, felt252>,
+        pub recv_sequences_commitments: Map<felt252, felt252>,
+        pub ack_sequences_commitments: Map<felt252, felt252>,
     }
 
     #[event]
@@ -634,7 +646,7 @@ pub mod ChannelHandlerComponent {
             let json_packet_data = app.json_packet_data(packet.data.clone());
 
             let packet_commitment_on_a = compute_packet_commitment(
-                @json_packet_data,
+                json_packet_data.span(),
                 packet.timeout_height_on_b.clone(),
                 packet.timeout_timestamp_on_b.clone(),
             );
@@ -687,7 +699,10 @@ pub mod ChannelHandlerComponent {
 
             let json_packet_data = app.json_packet_data(msg.packet.data.clone());
 
-            self.verify_packet_commitment(@client, conn_end_on_a, msg.clone(), json_packet_data);
+            self
+                .verify_packet_commitment(
+                    @client, conn_end_on_a, msg.clone(), json_packet_data.span(),
+                );
 
             match @chan_end_on_b.ordering {
                 ChannelOrdering::Unordered => {
@@ -807,7 +822,7 @@ pub mod ChannelHandlerComponent {
 
             let json_packet_data = app.json_packet_data(packet.data.clone());
 
-            self.verify_packet_commitment_matches(packet, @json_packet_data);
+            self.verify_packet_commitment_matches(packet, json_packet_data.span());
 
             if chan_end_on_a.is_ordered() {
                 self.verify_ack_sequence_matches(packet);
@@ -872,7 +887,7 @@ pub mod ChannelHandlerComponent {
 
             let json_packet_data = app.json_packet_data(packet.data.clone());
 
-            self.verify_packet_commitment_matches(@packet, @json_packet_data);
+            self.verify_packet_commitment_matches(@packet, json_packet_data.span());
 
             assert(
                 packet
@@ -971,7 +986,7 @@ pub mod ChannelHandlerComponent {
         /// non-existence is a no-op to avoid the relayer paying transaction fees.
         /// Here, in any case, the relayer pays a fee regardless.
         fn verify_packet_commitment_matches(
-            self: @ComponentState<TContractState>, packet: @Packet, json_packet_data: @ByteArray,
+            self: @ComponentState<TContractState>, packet: @Packet, json_packet_data: Span<u8>,
         ) {
             let packet_commitment = self
                 .read_packet_commitment(packet.port_id_on_a, packet.chan_id_on_a, packet.seq_on_a);
@@ -1009,7 +1024,7 @@ pub mod ChannelHandlerComponent {
             client: @ClientContract,
             connection_end: ConnectionEnd,
             msg: MsgRecvPacket,
-            json_packet_data: ByteArray,
+            json_packet_data: Span<u8>,
         ) {
             let client_sequence = connection_end.client_id.sequence;
 
@@ -1023,9 +1038,7 @@ pub mod ChannelHandlerComponent {
             );
 
             let packet_commitment_on_a = compute_packet_commitment(
-                @json_packet_data,
-                msg.packet.timeout_height_on_b,
-                msg.packet.timeout_timestamp_on_b,
+                json_packet_data, msg.packet.timeout_height_on_b, msg.packet.timeout_timestamp_on_b,
             );
 
             let root_on_a = client.consensus_state_root(client_sequence, msg.proof_height_on_a);
@@ -1267,7 +1280,10 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             channel_end: ChannelEnd,
         ) {
-            self.channel_ends.write(channel_end_key(port_id, channel_id), channel_end);
+            let key = channel_end_key(port_id, channel_id);
+            let channel_end_commitment = poseidon_hash(@channel_end);
+            self.channel_ends.write(key, channel_end);
+            self.channel_ends_commitments.write(key, channel_end_commitment);
         }
 
         fn write_packet_commitment(
@@ -1277,9 +1293,10 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence,
             commitment: Commitment,
         ) {
-            self
-                .packet_commitments
-                .write(commitment_key(port_id, channel_id, sequence), commitment);
+            let key = commitment_key(port_id, channel_id, sequence);
+            let commitment_commitment = poseidon_hash(@commitment);
+            self.packet_commitments.write(key, commitment);
+            self.packet_commitments_commitments.write(key, commitment_commitment);
         }
 
         fn delete_packet_commitment(
@@ -1288,9 +1305,9 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: @Sequence,
         ) {
-            self
-                .packet_commitments
-                .write(commitment_key(port_id, channel_id, sequence), CommitmentZero::zero());
+            let key = commitment_key(port_id, channel_id, sequence);
+            self.packet_commitments.write(key, CommitmentZero::zero());
+            self.packet_commitments_commitments.write(key, 0x0);
         }
 
         fn write_packet_receipt(
@@ -1300,7 +1317,10 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence,
             receipt: Receipt,
         ) {
-            self.packet_receipts.write(receipt_key(port_id, channel_id, sequence), receipt);
+            let key = receipt_key(port_id, channel_id, sequence);
+            let receipt_commitment = poseidon_hash(@receipt);
+            self.packet_receipts.write(key, receipt);
+            self.packet_receipts_commitments.write(key, receipt_commitment);
         }
 
         fn write_packet_ack(
@@ -1310,7 +1330,10 @@ pub mod ChannelHandlerComponent {
             sequence: @Sequence,
             ack_commitment: Commitment,
         ) {
-            self.packet_acks.write(ack_key(port_id, channel_id, sequence), ack_commitment);
+            let key = ack_key(port_id, channel_id, sequence);
+            let ack_commitment_commitment = poseidon_hash(@ack_commitment);
+            self.packet_acks.write(key, ack_commitment);
+            self.packet_acks_commitments.write(key, ack_commitment_commitment);
         }
 
         fn write_next_sequence_send(
@@ -1319,7 +1342,10 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: Sequence,
         ) {
-            self.send_sequences.write(next_sequence_send_key(port_id, channel_id), sequence);
+            let key = next_sequence_send_key(port_id, channel_id);
+            let sequence_commitment = poseidon_hash(@sequence);
+            self.send_sequences.write(key, sequence);
+            self.send_sequences_commitments.write(key, sequence_commitment);
         }
 
         fn write_next_sequence_recv(
@@ -1328,7 +1354,10 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: Sequence,
         ) {
-            self.recv_sequences.write(next_sequence_recv_key(port_id, channel_id), sequence);
+            let key = next_sequence_recv_key(port_id, channel_id);
+            let sequence_commitment = poseidon_hash(@sequence);
+            self.recv_sequences.write(key, sequence);
+            self.recv_sequences_commitments.write(key, sequence_commitment);
         }
 
         fn write_next_sequence_ack(
@@ -1337,7 +1366,10 @@ pub mod ChannelHandlerComponent {
             channel_id: @ChannelId,
             sequence: Sequence,
         ) {
-            self.ack_sequences.write(next_sequence_ack_key(port_id, channel_id), sequence);
+            let key = next_sequence_ack_key(port_id, channel_id);
+            let sequence_commitment = poseidon_hash(@sequence);
+            self.ack_sequences.write(key, sequence);
+            self.ack_sequences_commitments.write(key, sequence_commitment);
         }
     }
 

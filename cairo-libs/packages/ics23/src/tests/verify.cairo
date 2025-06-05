@@ -1,29 +1,31 @@
-use ics23::tests::data::{
+use ibc_utils::bytes::{ByteArrayIntoArrayU8, SpanU32IntoArrayU8, SpanU8IntoByteArray};
+use ibc_utils::hex::{decode_byte_array as decode_hex, encode_lower as encode_hex};
+use ics23::{
+    CommitmentProof, ExistenceProof, ExistenceProofImpl, HashOp, InnerOp, InnerSpec, LeafOp,
+    LengthOp, Proof, ProofSpec, iavl_spec, smt_spec, tendermint_spec, verify_existence,
+    verify_membership, verify_non_existence,
+};
+use protobuf::types::message::ProtoCodecImpl;
+use crate::tests::data::{
     TestData, iavl_exist_left, iavl_exist_middle, iavl_exist_right, iavl_nonexist_left,
     iavl_nonexist_middle, iavl_nonexist_right, smt_exist_left, smt_exist_middle, smt_exist_right,
     smt_nonexist_left, smt_nonexist_middle, smt_nonexist_right, tendermint_exist_left,
     tendermint_exist_middle, tendermint_exist_right, tendermint_nonexist_left,
     tendermint_nonexist_middle, tendermint_nonexist_right,
 };
-use ics23::{
-    ByteArrayIntoArrayU8, CommitmentProof, ExistenceProof, ExistenceProofImpl, HashOp, InnerOp,
-    InnerSpec, LeafOp, LengthOp, Proof, ProofSpec, SliceU32IntoArrayU8, decode_hex, encode_hex,
-    iavl_spec, smt_spec, tendermint_spec, verify_existence, verify_membership, verify_non_existence,
-};
-use protobuf::hex::decode as decode_hex_byte_array;
-use protobuf::types::message::ProtoCodecImpl;
 
 fn encoding_roundtrip_fixture(proof: @ByteArray) {
-    let proof_bytes = decode_hex_byte_array(proof);
-    let decoded = ProtoCodecImpl::decode::<CommitmentProof>(@proof_bytes).unwrap();
+    let proof_bytes = decode_hex(proof.clone());
+    let decoded = ProtoCodecImpl::decode::<CommitmentProof>(proof_bytes.span()).unwrap();
     let encoded = ProtoCodecImpl::encode(@decoded);
     assert_eq!(proof_bytes, encoded);
 }
 
 fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
-    let key = decode_hex_byte_array(data.key).into();
-    let value = decode_hex_byte_array(data.value).into();
-    let p = ProtoCodecImpl::decode::<CommitmentProof>(@decode_hex_byte_array(data.proof)).unwrap();
+    let key = decode_hex(data.key.clone());
+    let value = decode_hex(data.value.clone());
+    let proof = decode_hex(data.proof.clone());
+    let p = ProtoCodecImpl::decode::<CommitmentProof>(proof.span()).unwrap();
     match p.proof {
         Proof::Exist(p) => { verify_existence(spec, @p, @key, @value); },
         Proof::NonExist(p) => {
@@ -609,13 +611,13 @@ fn test_channel_ack_verification_while_loop() {
             subroot = p.calculate_root_for_spec(Option::Some(spec));
             verify_existence(spec, p, keys[proofs_len - 1 - i], @subvalue);
         }
-        subvalue = subroot.into();
+        subvalue = subroot.span().into();
         i += 1;
     }
 }
 
 #[test]
-fn test_channel_ack_verificaion() {
+fn test_channel_ack_verification() {
     let (specs, proofs, root, keys, value, index) = get_verification_params();
 
     verify_membership(specs, @proofs, root, keys, value, index);
@@ -766,9 +768,11 @@ fn test_calculate_root_from_leaf() {
     let proof = ExistenceProof { key: key.into(), value: value.into(), leaf, path: array![] };
 
     let root = proof.calculate_root();
+    let root_u8: Array<u8> = root.span().into();
 
     assert_eq!(
-        encode_hex(root.into()), "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265",
+        SpanU8IntoByteArray::into(encode_hex(root_u8.span()).span()),
+        "b68f5d298e915ae1753dd333da1f9cf605411a5f2e12516be6758f365e6db265",
     );
 }
 
@@ -785,13 +789,15 @@ fn test_calculate_root_from_leaf_and_inner() {
         prefix: array![],
     };
     let inner = InnerOp {
-        hash: HashOp::Sha256, prefix: decode_hex(@"deadbeef00cafe00"), suffix: array![],
+        hash: HashOp::Sha256, prefix: decode_hex("deadbeef00cafe00"), suffix: array![],
     };
     let proof = ExistenceProof { key: key.into(), value: value.into(), leaf, path: array![inner] };
 
     let root = proof.calculate_root();
+    let root_u8: Array<u8> = root.span().into();
 
     assert_eq!(
-        encode_hex(root.into()), "836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9",
+        SpanU8IntoByteArray::into(encode_hex(root_u8.span()).span()),
+        "836ea236a6902a665c2a004c920364f24cad52ded20b1e4f22c3179bfe25b2a9",
     );
 }

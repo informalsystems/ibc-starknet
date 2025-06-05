@@ -94,7 +94,7 @@ fn test_packet_commitment_sequences() {
     let cfg = TransferAppConfigImpl::default();
     let packet_data = cfg.dummy_packet_data(NATIVE_DENOM(), STARKNET(), COSMOS());
     let packet_commitment = compute_packet_commitment(
-        @serde_json::to_byte_array(packet_data), TIMEOUT_HEIGHT(0), TIMEOUT_TIMESTAMP(1000),
+        serde_json::to_array_u8(packet_data).span(), TIMEOUT_HEIGHT(0), TIMEOUT_TIMESTAMP(1000),
     );
     let port_id = PORT_ID();
     let channel_id = CHANNEL_ID(0);
