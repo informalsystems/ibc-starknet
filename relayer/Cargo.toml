@@ -106,9 +106,8 @@ hermes-starknet-test-components     = { version = "0.1.0" }
 hermes-starknet-chain-context       = { version = "0.1.0" }
 hermes-starknet-relayer             = { version = "0.1.0" }
 hermes-starknet-integration-tests   = { version = "0.1.0" }
-poseidon                            = { version = "0.1.0" }
-
 hermes-starknet-madara-tests        = { version = "0.1.0" }
+poseidon                            = { version = "0.1.0" }
 
 starknet-block-verifier = { version = "0.1.0" }
 
