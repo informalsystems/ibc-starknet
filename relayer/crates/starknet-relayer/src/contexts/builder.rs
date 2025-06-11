@@ -46,12 +46,15 @@ use hermes_starknet_chain_context::contexts::{
 };
 use hermes_starknet_chain_context::impls::HandleStarknetChainError;
 use ibc::core::host::types::identifiers::{ChainId, ClientId};
+use reqwest::Client;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
 use url::Url;
 
-use super::cosmos_to_starknet_relay::CosmosToStarknetRelay;
-use crate::contexts::{CosmosStarknetBiRelay, StarknetCosmosBiRelay, StarknetToCosmosRelay};
+use crate::contexts::cosmos_starknet_birelay::CosmosStarknetBiRelay;
+use crate::contexts::cosmos_to_starknet_relay::CosmosToStarknetRelay;
+use crate::contexts::starknet_cosmos_birelay::StarknetCosmosBiRelay;
+use crate::contexts::starknet_to_cosmos_relay::StarknetToCosmosRelay;
 
 #[cgp_context(StarknetBuildComponents)]
 #[derive(Clone)]
@@ -338,14 +341,15 @@ impl StarknetBuilder {
 
         let json_rpc_url = Url::parse(&chain_config.json_rpc_url)?;
 
-        let rpc_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
+        let starknet_rpc_client =
+            Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url.clone())));
 
-        let chain_id_felt = rpc_client.chain_id().await?;
+        let chain_id_felt = starknet_rpc_client.chain_id().await?;
 
         let chain_id = chain_id_felt.to_string().parse()?;
 
         if &chain_id != expected_chain_id {
-            return Err(eyre!("Starknet chain has a different ID as configured. Expected: {expected_chain_id}, got: {chain_id}").into());
+            return Err(eyre!("Starknet Starknet chain has a different ID as configured. Expected: {expected_chain_id}, got: {chain_id}").into());
         }
 
         let wallet_path = PathBuf::from(chain_config.relayer_wallet.clone());
@@ -408,11 +412,13 @@ impl StarknetBuilder {
             ibc_ics20_contract_address.set(address).unwrap();
         }
 
+        let rpc_client = Client::new();
+
         let context = StarknetChain {
             fields: Arc::new(StarknetChainFields {
                 runtime: self.runtime.clone(),
                 chain_id,
-                starknet_client: rpc_client,
+                starknet_client: starknet_rpc_client,
                 ibc_client_contract_address,
                 ibc_core_contract_address,
                 ibc_ics20_contract_address,
@@ -422,6 +428,8 @@ impl StarknetBuilder {
                 block_time: chain_config.block_time,
                 nonce_mutex: Arc::new(Mutex::new(())),
                 signer: relayer_wallet,
+                rpc_client,
+                json_rpc_url,
             }),
         };
 

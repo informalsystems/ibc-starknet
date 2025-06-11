@@ -13,18 +13,18 @@ use hermes_core::test_components::chain_driver::traits::ChainTypeProviderCompone
 use hermes_core::test_components::driver::traits::ChainDriverTypeProviderComponent;
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
-use hermes_cosmos::test_components::bootstrap::impls::BuildAndWaitChainDriver;
-use hermes_cosmos::test_components::bootstrap::traits::{
+use hermes_cosmos_core::test_components::bootstrap::impls::BuildAndWaitChainDriver;
+use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainCommandPathGetterComponent, ChainDriverBuilderComponent, ChainFullNodeStarterComponent,
     ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent, ChainStoreDirGetterComponent,
 };
-use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
+use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_chain_context::impls::HandleStarknetChainError;
 use hermes_starknet_test_components::impls::{
-    BootstrapStarknetDevnet, BuildChainAndDeployIbcContracts, DeployIbcContract,
-    ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType, StartStarknetDevnet,
+    BootstrapStarknet, BuildChainAndDeployIbcContracts, DeployIbcContract,
+    ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType, StartStarknetSequencer,
 };
 use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
 use starknet::core::types::contract::SierraClass;
@@ -33,9 +33,16 @@ use crate::contexts::StarknetChainDriver;
 use crate::impls::BuildStarknetChainDriver;
 
 #[cgp_context(StarknetBootstrapComponents)]
-#[derive(Clone)]
 pub struct StarknetBootstrap {
     pub fields: Arc<StarknetBootstrapFields>,
+}
+
+impl Deref for StarknetBootstrap {
+    type Target = StarknetBootstrapFields;
+
+    fn deref(&self) -> &Self::Target {
+        &self.fields
+    }
 }
 
 #[derive(HasField, Clone)]
@@ -50,14 +57,6 @@ pub struct StarknetBootstrapFields {
     pub comet_lib_contract: SierraClass,
     pub ics23_lib_contract: SierraClass,
     pub protobuf_lib_contract: SierraClass,
-}
-
-impl Deref for StarknetBootstrap {
-    type Target = StarknetBootstrapFields;
-
-    fn deref(&self) -> &Self::Target {
-        &self.fields
-    }
 }
 
 delegate_components! {
@@ -77,9 +76,10 @@ delegate_components! {
         ChainGenesisConfigTypeComponent:
             ProvideStarknetGenesisConfigType,
         ChainBootstrapperComponent:
-            BootstrapStarknetDevnet,
+            BootstrapStarknet,
         ChainFullNodeStarterComponent:
-            StartStarknetDevnet,
+            StartStarknetSequencer, // Start only Starknet as sequencer
+            // StartStarknetStack, // Switch to this to start Starknet, Pathfinder, and Anvil
         IbcContractsDeployerComponent:
             DeployIbcContract,
         ChainDriverBuilderComponent:

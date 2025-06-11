@@ -1,4 +1,5 @@
 use core::fmt::Debug;
+use std::sync::Arc;
 
 use hermes_core::chain_components::traits::HasMessageType;
 use hermes_core::chain_type_components::traits::HasMessageResponseType;
@@ -10,12 +11,13 @@ use hermes_core::relayer_components::transaction::traits::{
 use hermes_prelude::*;
 use starknet::accounts::Account;
 use starknet::core::types::{
-    Call, ExecuteInvocation, Felt, FunctionInvocation, RevertedInvocation, TransactionTrace,
+    Call, ExecuteInvocation, Felt, FunctionInvocation, OrderedEvent, RevertedInvocation,
+    TransactionTrace,
 };
 
-use crate::impls::StarknetMessage;
+use crate::impls::{StarknetAddress, StarknetMessage};
 use crate::traits::{CanBuildAccountFromSigner, CanUseStarknetAccount, HasStarknetAccountType};
-use crate::types::{StarknetEvent, StarknetMessageResponse, TxResponse};
+use crate::types::{StarknetEvent, StarknetEventFields, StarknetMessageResponse, TxResponse};
 
 pub struct UnexpectedTransactionTraceType {
     pub trace: TransactionTrace,
@@ -53,33 +55,7 @@ where
 
         let execution = account.execute_v3(calls).nonce(*nonce);
 
-        let fee_estimation = execution.estimate_fee().await.map_err(Chain::raise_error)?;
-
-        // starknet v3 transactions requires all fee bound present.
-        let l1_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-        let l1_data_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .data_gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-        let l2_gas = core::cmp::max(
-            1,
-            fee_estimation
-                .gas_consumed
-                .try_into()
-                .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
-
         let tx_hash = execution
-            .gas(l1_gas)
             .send()
             .await
             .map_err(Chain::raise_error)?
@@ -138,7 +114,7 @@ pub fn extract_events_from_function_invocation(
         .events
         .into_iter()
         .map(|event| {
-            StarknetEvent::from_ordered_event(
+            from_ordered_event(
                 invocation.contract_address.into(),
                 invocation.class_hash,
                 event,
@@ -161,5 +137,26 @@ impl Debug for UnexpectedTransactionTraceType {
             "Expected transaction trace to be of type Invoke, but instead got: {:?}",
             self.trace
         )
+    }
+}
+
+pub fn from_ordered_event(
+    contract_address: StarknetAddress,
+    class_hash: Felt,
+    event: OrderedEvent,
+) -> StarknetEvent {
+    let mut keys = event.keys.into_iter();
+    let data = event.data;
+
+    let selector = keys.next();
+
+    StarknetEvent {
+        fields: Arc::new(StarknetEventFields {
+            contract_address,
+            class_hash: Some(class_hash),
+            selector,
+            keys: keys.collect(),
+            data,
+        }),
     }
 }

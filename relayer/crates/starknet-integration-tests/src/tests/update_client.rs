@@ -15,41 +15,41 @@ use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_starknet_chain_context::contexts::{StarknetCairoEncoding, StarknetChain};
-use hermes_starknet_relayer::contexts::MadaraToCosmosRelay;
+use hermes_starknet_relayer::contexts::StarknetToCosmosRelay;
 use ibc::core::client::types::Height as CosmosHeight;
 use tracing::info;
 
-use crate::contexts::MadaraTestSetup;
-use crate::utils::init_madara_setup;
+use crate::contexts::StarknetTestSetup;
+use crate::utils::init_starknet_setup;
 
 #[test]
 fn test_relay_update_clients() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let setup = init_madara_setup(&runtime).await?;
+        let setup = init_starknet_setup(&runtime).await?;
 
-        let madara_chain_driver = setup.setup_chain(PhantomData::<Index<0>>).await?;
+        let starknet_chain_driver = setup.setup_chain(PhantomData::<Index<0>>).await?;
 
         let cosmos_chain_driver = setup.setup_chain(PhantomData::<Index<1>>).await?;
 
-        let madara_chain = &madara_chain_driver.chain;
+        let starknet_chain = &starknet_chain_driver.chain;
 
         let cosmos_chain = &cosmos_chain_driver.chain;
 
-        let (starknet_client_id, cosmos_client_id) = <MadaraTestSetup as CanSetupClients<
+        let (starknet_client_id, cosmos_client_id) = <StarknetTestSetup as CanSetupClients<
             Index<0>,
             Index<1>,
         >>::setup_clients(
-            &setup, madara_chain, cosmos_chain
+            &setup, starknet_chain, cosmos_chain
         )
         .await?;
 
         let cairo_encoding = StarknetCairoEncoding;
 
-        let starknet_to_cosmos_relay = MadaraToCosmosRelay::new(
+        let starknet_to_cosmos_relay = StarknetToCosmosRelay::new(
             runtime.clone(),
-            madara_chain.clone(),
+            starknet_chain.clone(),
             cosmos_chain.clone(),
             starknet_client_id.clone(),
             cosmos_client_id.clone(),
@@ -59,7 +59,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
             info!("test relaying UpdateClient from Cosmos to Starknet");
 
             {
-                let client_state = madara_chain
+                let client_state = starknet_chain
                     .query_client_state_with_latest_height(
                         PhantomData::<CosmosChain>,
                         &starknet_client_id,
@@ -68,7 +68,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
 
                 info!("Cosmos client state on Starknet: {client_state:?}");
 
-                let consensus_state = madara_chain
+                let consensus_state = starknet_chain
                     .query_consensus_state_with_latest_height(
                         PhantomData::<CosmosChain>,
                         &starknet_client_id,
@@ -98,7 +98,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
             info!("sent update client message from Cosmos to Starknet");
 
             {
-                let client_state = madara_chain
+                let client_state = starknet_chain
                     .query_client_state_with_latest_height(
                         PhantomData::<CosmosChain>,
                         &starknet_client_id,
@@ -107,7 +107,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
 
                 info!("Cosmos client state on Starknet after UpdateClient: {client_state:?}");
 
-                let consensus_state = madara_chain
+                let consensus_state = starknet_chain
                     .query_consensus_state_with_latest_height(
                         PhantomData::<CosmosChain>,
                         &starknet_client_id,
@@ -146,7 +146,7 @@ fn test_relay_update_clients() -> Result<(), Error> {
                 info!("Starknet consensus state on Cosmos: {consensus_state:?}");
             }
 
-            let target_height = madara_chain.query_chain_height().await?;
+            let target_height = starknet_chain.query_chain_height().await?;
 
             info!(
                 "updating Starknet client on Cosmos to height {}",

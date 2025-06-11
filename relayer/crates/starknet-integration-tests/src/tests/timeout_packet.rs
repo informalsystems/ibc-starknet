@@ -30,7 +30,7 @@ use ibc::core::host::types::identifiers::PortId;
 use ibc::primitives::Timestamp;
 use tracing::info;
 
-use crate::utils::init_madara_test_driver;
+use crate::utils::init_starknet_test_driver;
 
 #[test]
 fn test_relay_timeout_packet() -> Result<(), Error> {
@@ -38,9 +38,9 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let test_driver = init_madara_test_driver(&runtime).await?;
+        let test_driver = init_starknet_test_driver(&runtime).await?;
 
-        let starknet_chain_driver = &test_driver.madara_chain_driver;
+        let starknet_chain_driver = &test_driver.starknet_chain_driver;
         let cosmos_chain_driver = &test_driver.cosmos_chain_driver;
 
         let starknet_chain = &starknet_chain_driver.chain;

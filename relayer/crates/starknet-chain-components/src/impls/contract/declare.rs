@@ -92,6 +92,9 @@ where
             .await
             .map_err(Chain::raise_error)?;
 
+        // While using Madara this code is commented out due to the configured max gas being 0.
+        // This causes: Error: StarknetError: ValidationFailure("Max L1Gas price (0) is lower than the actual gas price: 1.")
+        /*
         // starknet v3 transactions requires all fee bound present.
         let l1_gas = core::cmp::max(
             1,
@@ -113,10 +116,10 @@ where
                 .gas_consumed
                 .try_into()
                 .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
+        );*/
 
         let declare_result = declaration
-            .gas(l1_gas)
+            //.gas(l1_gas)
             .send()
             .await
             .map_err(Chain::raise_error)?;

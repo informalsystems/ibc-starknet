@@ -3,7 +3,6 @@ use hermes_core::relayer_components::transaction::traits::{CanPollTxResponse, Ha
 use hermes_prelude::*;
 use starknet::contract::ContractFactory;
 use starknet::core::types::{Felt, RevertedInvocation};
-use starknet::macros::felt;
 use starknet::signers::SigningKey;
 
 use crate::impls::StarknetAddress;
@@ -15,8 +14,12 @@ use crate::types::TxResponse;
 
 pub struct DeployStarknetContract;
 
-const DEFAULT_UDC_ADDRESS: Felt =
-    felt!("0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf");
+const DEFAULT_UDC_ADDRESS: Felt = Felt::from_raw([
+    121672436446604875,
+    9333317513348225193,
+    15685625669053253235,
+    15144800532519055890,
+]);
 
 #[cgp_provider(ContractDeployerComponent)]
 impl<Chain> ContractDeployer<Chain> for DeployStarknetContract
@@ -53,6 +56,9 @@ where
             .await
             .map_err(Chain::raise_error)?;
 
+        // While using Madara this code is commented out due to the configured max gas being 0.
+        // This causes: Error: StarknetError: ValidationFailure("Max L1Gas price (0) is lower than the actual gas price: 1.")
+        /*
         // starknet v3 transactions requires all fee bound present.
         let l1_gas = core::cmp::max(
             1,
@@ -74,10 +80,10 @@ where
                 .gas_consumed
                 .try_into()
                 .map_err(|_| Chain::raise_error("failed to convert felt to u64"))?,
-        );
+        ); */
 
         let tx_hash = contract_deployment
-            .gas(l1_gas)
+            //.gas(l1_gas)
             .send()
             .await
             .map_err(Chain::raise_error)?

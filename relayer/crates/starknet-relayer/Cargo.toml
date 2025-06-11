@@ -20,7 +20,6 @@ hermes-core                      = { workspace = true }
 hermes-cosmos                    = { workspace = true }
 hermes-starknet-chain-context    = { workspace = true }
 hermes-starknet-chain-components = { workspace = true }
-hermes-starknet-madara-tests     = { workspace = true }
 
 starknet = { workspace = true }
 
