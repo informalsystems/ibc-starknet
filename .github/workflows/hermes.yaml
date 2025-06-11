@@ -57,6 +57,11 @@ jobs:
         run: |
           scarb --profile release build -p starknet_ibc_contracts
 
+      - name: Build Madara contracts
+        working-directory: ./madara-contracts
+        run: |
+          scarb --profile release build
+
       - name: Install madara
         run: |
           git clone https://github.com/madara-alliance/madara.git
@@ -81,6 +86,8 @@ jobs:
           export ICS23_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_Ics23Lib.contract_class.json"
           export PROTOBUF_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_ProtobufLib.contract_class.json"
 
+          export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_RawStore.contract_class.json"
+
           export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
 
           cargo run --quiet --example contract_size "$ERC20_CONTRACT"
@@ -102,75 +109,6 @@ jobs:
               --workspace \
               --exclude hermes-starknet-madara-tests \
               --retries 2 \
-              --test-threads=$TEST_THREADS \
-              --success-output=final
-
-  madara-integration-tests:
-    name: Run Madara Integration Tests
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-22.04]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: cachix/install-nix-action@v30
-        with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-
-      - uses: cachix/cachix-action@v15
-        with:
-          name: ibc-starknet
-          extraPullNames: hermes-sdk,cosmos-nix
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
-      - uses: Swatinem/rust-cache@v2
-        with:
-          cache-on-failure: true
-          workspaces: |
-            relayer
-            light-client
-
-      - name: Install Madara
-        run: |
-          mkdir -p ~/.bin
-          curl -sSLf "https://github.com/informalsystems/madara/releases/download/snapshot-2c88da11/madara" -o ~/.bin/madara
-          chmod u+x ~/.bin/madara
-
-      - name: Install Scarb
-        uses: software-mansion/setup-scarb@v1
-        with:
-          tool-versions: madara-contracts/.tool-versions
-          scarb-lock: madara-contracts/Scarb.lock
-
-      - name: Build Madara contracts
-        working-directory: ./madara-contracts
-        run: |
-          scarb --profile release build
-
-      - name: Run Integration Tests
-        env:
-          RUST_BACKTRACE: 1
-          RUST_LOG: debug
-          TEST_THREADS: 4
-        working-directory: ./relayer
-        run: |
-          export PATH="$HOME/.bin:$PATH"
-          export STARKNET_BIN="$HOME/.bin/madara"
-          export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_RawStore.contract_class.json"
-          export ERC20_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_MyERC20Token.contract_class.json"
-
-          madara --help
-
-          nix shell \
-            ..#rust \
-            ..#cargo-nextest \
-            -c \
-            cargo nextest run \
-              -p hermes-starknet-madara-tests \
               --test-threads=$TEST_THREADS \
               --success-output=final
 

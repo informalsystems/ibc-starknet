@@ -1,12 +1,13 @@
 use hermes_core::chain_components::traits::{CanQueryBlock, CanQueryChainStatus};
 use hermes_core::test_components::bootstrap::traits::CanBootstrapChain;
+use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
-use hermes_error::Error;
-use hermes_starknet_integration_tests::contexts::StarknetChainDriver;
-use hermes_starknet_integration_tests::utils::init_starknet_bootstrap;
 use starknet::core::crypto::{ecdsa_verify, Signature};
 use starknet_block_verifier::Endpoint;
 use tracing::info;
+
+use crate::contexts::StarknetChainDriver;
+use crate::utils::init_starknet_bootstrap;
 
 #[test]
 fn test_starknet_feeder_gateway_signature() -> Result<(), Error> {

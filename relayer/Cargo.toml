@@ -9,7 +9,6 @@ members = [
   "crates/starknet-relayer",
   "crates/starknet-test-components",
   "crates/starknet-integration-tests",
-  "crates/starknet-madara-tests",
   "crates/starknet-cli",
   "crates/tools",
 ]
@@ -107,7 +106,6 @@ hermes-starknet-test-components     = { version = "0.1.0" }
 hermes-starknet-chain-context       = { version = "0.1.0" }
 hermes-starknet-relayer             = { version = "0.1.0" }
 hermes-starknet-integration-tests   = { version = "0.1.0" }
-hermes-starknet-madara-tests        = { version = "0.1.0" }
 poseidon                            = { version = "0.1.0" }
 
 starknet-block-verifier = { version = "0.1.0" }
@@ -141,8 +139,6 @@ hermes-starknet-chain-context     = { path = "./crates/starknet-chain-context" }
 hermes-starknet-relayer           = { path = "./crates/starknet-relayer" }
 hermes-starknet-cli               = { path = "./crates/starknet-cli" }
 hermes-starknet-integration-tests = { path = "./crates/starknet-integration-tests" }
-
-hermes-starknet-madara-tests = { path = "./crates/starknet-madara-tests" }
 
 ibc                         = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
 ibc-core                    = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
