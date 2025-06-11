@@ -28,6 +28,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout Madara repo
+        uses: actions/checkout@v4
+        with:
+          repository: madara-alliance/madara
+          path: madara
+          ref: e6fca12103a97238b5b5a87b5a22342804caac4c # chore/bump-blockifier
+
       - uses: cachix/install-nix-action@v30
         with:
           extra_nix_config: |
@@ -51,6 +58,7 @@ jobs:
           workspaces: |
             relayer
             light-client
+            madara/madara
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
@@ -62,11 +70,9 @@ jobs:
         run: |
           scarb --profile release build
 
-      - name: Install madara
+      - name: Install Madara
         run: |
-          git clone https://github.com/madara-alliance/madara.git
           cd madara
-          git checkout e6fca12103a97238b5b5a87b5a22342804caac4c
           nix develop -c cargo install --path madara/crates/node
 
       - name: Run Integration Tests
