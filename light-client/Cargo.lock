@@ -1686,6 +1686,10 @@ dependencies = [
  "prost",
  "prost-types",
  "serde",
+ "serde_json",
+ "starknet-core 0.13.0",
+ "starknet-crypto",
+ "starknet-storage-verifier",
 ]
 
 [[package]]

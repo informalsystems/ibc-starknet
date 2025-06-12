@@ -14,9 +14,13 @@ description  = "Starknet IBC light-client"
 workspace = true
 
 [dependencies]
+# internal dependencies
+starknet-storage-verifier = { workspace = true }
+
 # external dependencies
 derive_more                         = { workspace = true }
 serde                               = { workspace = true, optional = true }
+serde_json                          = { workspace = true }
 prost                               = { workspace = true }
 prost-types                         = { workspace = true }
 cgp                                 = { workspace = true }
@@ -29,6 +33,10 @@ hermes-cosmos-encoding-components   = { workspace = true }
 ibc-core                  = { workspace = true }
 ibc-client-starknet-types = { workspace = true }
 ibc-client-cw             = { workspace = true }
+
+# starknet dependencies
+starknet-crypto = { workspace = true }
+starknet-core   = { workspace = true }
 
 [features]
 default = [ "std" ]
