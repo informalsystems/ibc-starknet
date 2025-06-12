@@ -34,7 +34,7 @@ serde                       = { workspace = true }
 serde_json                  = { workspace = true }
 sha2                        = { workspace = true }
 starknet                    = { workspace = true }
-starknet-v14                = { version = "0.14.0", package = "starknet" }
+starknet-v14                = { workspace = true }
 tonic                       = { workspace = true }
 futures                     = { workspace = true }
 reqwest                     = { workspace = true }
