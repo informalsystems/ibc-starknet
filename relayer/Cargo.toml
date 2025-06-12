@@ -175,38 +175,38 @@ cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-error-eyre  = { git = "https://github.com/contextgeneric/cgp.git" }
 
-hermes-core                          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-prelude                       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-relayer-components-extra      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-runtime-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-async-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-tokio-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-runtime                       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-error                         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-encoding-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cosmos                        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cosmos-core                   = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cosmos-encoding-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cosmos-integration-tests      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-comet-light-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-comet-light-client-context    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-wasm-test-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-wasm-client-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-wasm-encoding-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cli-components                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cli                           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
-hermes-cli-framework                 = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-retry-to-poll-event" }
+hermes-core                          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-prelude                       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-relayer-components-extra      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-runtime-components            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-async-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-tokio-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-runtime                       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-error                         = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-encoding-components           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos                        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-core                   = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-encoding-components    = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cosmos-integration-tests      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-comet-light-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-comet-light-client-context    = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-wasm-test-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-wasm-client-components        = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-wasm-encoding-components      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cli-components                = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cli                           = { git = "https://github.com/informalsystems/hermes-sdk.git" }
+hermes-cli-framework                 = { git = "https://github.com/informalsystems/hermes-sdk.git" }

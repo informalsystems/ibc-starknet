@@ -1835,7 +1835,7 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 [[package]]
 name = "hermes-any-counterparty"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -1855,7 +1855,7 @@ dependencies = [
 [[package]]
 name = "hermes-async-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "async-trait",
  "cgp",
@@ -1880,7 +1880,7 @@ dependencies = [
 [[package]]
 name = "hermes-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -1892,7 +1892,7 @@ dependencies = [
 [[package]]
 name = "hermes-chain-type-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -1901,7 +1901,7 @@ dependencies = [
 [[package]]
 name = "hermes-cli"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "clap",
@@ -1928,7 +1928,7 @@ dependencies = [
 [[package]]
 name = "hermes-cli-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "clap",
@@ -1944,7 +1944,7 @@ dependencies = [
 [[package]]
 name = "hermes-cli-framework"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "clap",
@@ -1964,7 +1964,7 @@ dependencies = [
 [[package]]
 name = "hermes-comet-light-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -1974,7 +1974,7 @@ dependencies = [
 [[package]]
 name = "hermes-comet-light-client-context"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "eyre",
@@ -1991,7 +1991,7 @@ dependencies = [
 [[package]]
 name = "hermes-core"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-chain-components",
@@ -2008,7 +2008,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "hermes-comet-light-client-context",
  "hermes-core",
@@ -2023,7 +2023,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "bech32 0.9.1",
  "bitcoin",
@@ -2072,7 +2072,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-chain-preset"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2084,7 +2084,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-core"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "hermes-comet-light-client-components",
  "hermes-core",
@@ -2107,7 +2107,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -2122,7 +2122,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-integration-tests"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "eyre",
@@ -2148,7 +2148,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "dirs-next",
@@ -2185,7 +2185,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hdpath",
@@ -2211,7 +2211,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-wasm-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "eyre",
@@ -2248,7 +2248,7 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -2257,7 +2257,7 @@ dependencies = [
 [[package]]
 name = "hermes-error"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "eyre",
@@ -2269,7 +2269,7 @@ dependencies = [
 [[package]]
 name = "hermes-ibc-test-suite"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-chain-components",
@@ -2284,7 +2284,7 @@ dependencies = [
 [[package]]
 name = "hermes-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -2293,7 +2293,7 @@ dependencies = [
 [[package]]
 name = "hermes-prelude"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "cgp-async",
@@ -2302,7 +2302,7 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -2314,7 +2314,7 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "futures",
@@ -2329,7 +2329,7 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components-extra"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "futures",
@@ -2343,7 +2343,7 @@ dependencies = [
 [[package]]
 name = "hermes-runtime"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-async-runtime-components",
@@ -2358,7 +2358,7 @@ dependencies = [
 [[package]]
 name = "hermes-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -2566,7 +2566,7 @@ dependencies = [
 [[package]]
 name = "hermes-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -2580,7 +2580,7 @@ dependencies = [
 [[package]]
 name = "hermes-tokio-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "futures",
@@ -2597,7 +2597,7 @@ dependencies = [
 [[package]]
 name = "hermes-tracing-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2612,7 +2612,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2632,7 +2632,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2647,7 +2647,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-retry-to-poll-event#b1add671498f76dea7fb61acbb13e8eedf1c14da"
+source = "git+https://github.com/informalsystems/hermes-sdk.git#02c5ae18d79d958c9d5dce345c0427bdd2c04077"
 dependencies = [
  "cgp",
  "hermes-core",
