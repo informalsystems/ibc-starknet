@@ -14,6 +14,8 @@ use crate::types::TxResponse;
 
 pub struct DeployStarknetContract;
 
+// Taken from starknet v0.13.0
+// See: https://github.com/xJonathanLEI/starknet-rs/blob/starknet/v0.13.0/starknet-contract/src/factory.rs#L8-L13
 const DEFAULT_UDC_ADDRESS: Felt = Felt::from_raw([
     121672436446604875,
     9333317513348225193,
