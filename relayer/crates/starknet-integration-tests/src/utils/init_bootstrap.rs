@@ -12,7 +12,7 @@ use crate::contexts::{OsmosisBootstrap, StarknetBootstrap, StarknetBootstrapFiel
 
 pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<StarknetBootstrap, Error> {
     let chain_command_path = std::env::var("STARKNET_BIN")
-        .unwrap_or("starknet-devnet".into())
+        .unwrap_or("madara".into())
         .into();
 
     let timestamp = SystemTime::now()

@@ -8,10 +8,10 @@ use hermes_core::runtime_components::traits::{CanCreateDir, CanSleep, CanWriteSt
 use hermes_core::test_components::chain::traits::HasWalletType;
 use hermes_core::test_components::chain_driver::traits::HasChainType;
 use hermes_core::test_components::driver::traits::HasChainDriverType;
-use hermes_cosmos::chain_components::types::Secp256k1KeyPair;
 use hermes_cosmos::runtime::types::error::TokioRuntimeError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
-use hermes_cosmos::test_components::bootstrap::traits::{
+use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
+use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainDriverBuilder, ChainDriverBuilderComponent, HasChainGenesisConfigType,
     HasChainNodeConfigType, HasChainStoreDir,
 };
@@ -20,10 +20,8 @@ use hermes_starknet_chain_components::types::StarknetWallet;
 use hermes_starknet_chain_context::contexts::{StarknetChain, StarknetChainFields};
 use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
 use ibc::core::host::types::error::IdentifierError;
-use starknet::accounts::{ExecutionEncoding, SingleOwnerAccount};
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider, ProviderError};
-use starknet::signers::{LocalWallet, SigningKey};
 use tokio::process::Child;
 use url::{ParseError, Url};
 
@@ -93,7 +91,10 @@ where
         ))
         .map_err(Bootstrap::raise_error)?;
 
-        let starknet_client = Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url)));
+        let starknet_client =
+            Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url.clone())));
+
+        let rpc_client = ureq::agent();
 
         // Wait for the chain to be ready.
         for _ in 0..10 {
@@ -107,16 +108,6 @@ where
             .chain_id()
             .await
             .map_err(Bootstrap::raise_error)?;
-
-        let account = SingleOwnerAccount::new(
-            starknet_client.clone(),
-            LocalWallet::from_signing_key(SigningKey::from_secret_scalar(
-                relayer_wallet.signing_key,
-            )),
-            *relayer_wallet.account_address,
-            chain_id,
-            ExecutionEncoding::New,
-        );
 
         let proof_signer = Secp256k1KeyPair::from_mnemonic(
             bip39::Mnemonic::from_entropy(
@@ -138,6 +129,8 @@ where
                     .parse()
                     .map_err(Bootstrap::raise_error)?,
                 starknet_client,
+                rpc_client,
+                json_rpc_url,
                 ibc_client_contract_address: OnceLock::new(),
                 ibc_core_contract_address: OnceLock::new(),
                 ibc_ics20_contract_address: OnceLock::new(),

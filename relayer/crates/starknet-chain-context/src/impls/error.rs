@@ -65,6 +65,7 @@ delegate_components! {
             TokioRuntimeError,
             serde_json::error::Error,
             toml::ser::Error,
+            ureq::Error,
             JsonError,
             EncodeError,
             DecodeError,

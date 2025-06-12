@@ -1,58 +1,73 @@
-use hermes_core::runtime_components::traits::{CanStartChildProcess, HasFilePathType, HasRuntime};
+use hermes_core::runtime_components::traits::{CanCreateDir, CanStartChildProcess, HasRuntime};
 use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainFullNodeStarter, ChainFullNodeStarterComponent, HasChainCommandPath,
     HasChainGenesisConfigType, HasChainNodeConfigType,
 };
 use hermes_prelude::*;
 
-use crate::types::{StarknetGenesisConfig, StarknetNodeConfig};
+use crate::types::StarknetNodeConfig;
 
 #[cgp_new_provider(ChainFullNodeStarterComponent)]
-impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartStarknetDevnet
+impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartStarknetSequencer
 where
     Bootstrap: HasRuntime<Runtime = Runtime>
         + HasChainNodeConfigType<ChainNodeConfig = StarknetNodeConfig>
-        + HasChainGenesisConfigType<ChainGenesisConfig = StarknetGenesisConfig>
+        + HasChainGenesisConfigType
         + HasChainCommandPath
         + CanRaiseAsyncError<Runtime::Error>,
-    Runtime: CanStartChildProcess + HasFilePathType,
+    Runtime: CanStartChildProcess + CanCreateDir,
 {
     async fn start_chain_full_nodes(
         bootstrap: &Bootstrap,
         chain_home_dir: &Runtime::FilePath,
         chain_node_config: &StarknetNodeConfig,
-        chain_genesis_config: &StarknetGenesisConfig,
+        chain_genesis_config: &Bootstrap::ChainGenesisConfig,
     ) -> Result<Vec<Runtime::ChildProcess>, Bootstrap::Error> {
         let chain_command = bootstrap.chain_command_path();
 
-        let chain_state_path = Runtime::join_file_path(
-            chain_home_dir,
-            &Runtime::file_path_from_string("chain-state.json"),
-        );
+        let starknet_home =
+            Runtime::join_file_path(chain_home_dir, &Runtime::file_path_from_string("starknet"));
+
+        bootstrap
+            .runtime()
+            .create_dir(&starknet_home)
+            .await
+            .map_err(Bootstrap::raise_error)?;
+
+        let rpc_port = chain_node_config.rpc_port;
+
+        let gateway_port = rpc_port + 1;
 
         let args = [
-            "--seed",
-            &chain_genesis_config.seed.to_string(),
-            "--port",
-            &chain_node_config.rpc_port.to_string(),
-            "--block-generation-on",
-            "1",
-            "--state-archive-capacity",
-            "full",
-            "--dump-on",
-            "block",
-            "--initial-balance=1000000000000000000000000000000", // need large balance
-            "--dump-path",
-            &Runtime::file_path_to_string(&chain_state_path),
+            "--base-path",
+            &Runtime::file_path_to_string(&starknet_home),
+            "--rpc-port",
+            &rpc_port.to_string(),
+            "--gateway-port",
+            &gateway_port.to_string(),
+            "--chain-config-override",
+            "block_time=1s,pending_block_update_time=1s,chain_id=SN_SEPOLIA",
+            "--devnet",
+            "--devnet-unsafe",
+            "--gateway-enable",
+            "--feeder-gateway-enable",
+            "--preset",
+            "sepolia",
+            "--l1-sync-disabled",
+            "--l2-sync-disabled",
+            "--gas-price",
+            "0",
+            "--blob-gas-price",
+            "0",
         ];
 
         let stdout_path = Runtime::join_file_path(
-            chain_home_dir,
+            &starknet_home,
             &Runtime::file_path_from_string("stdout.log"),
         );
 
         let stderr_path = Runtime::join_file_path(
-            chain_home_dir,
+            &starknet_home,
             &Runtime::file_path_from_string("stderr.log"),
         );
 

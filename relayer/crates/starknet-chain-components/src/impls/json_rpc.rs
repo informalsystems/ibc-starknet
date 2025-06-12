@@ -14,7 +14,7 @@ where
     Context: HasReqwestClient
         + HasJsonRpcUrl
         + CanLog<LevelTrace>
-        + CanRaiseAsyncError<reqwest::Error>
+        + CanRaiseAsyncError<ureq::Error>
         + CanRaiseAsyncError<serde_json::Error>,
     Request: Async + Serialize,
     Response: Async + for<'a> Deserialize<'a>,
@@ -42,13 +42,15 @@ where
 
         let request = context
             .reqwest_client()
-            .post(context.json_rpc_url().clone())
-            .body(request_string)
+            .post(context.json_rpc_url().as_str())
             .header("Content-Type", "application/json");
 
-        let response = request.send().await.map_err(Context::raise_error)?;
+        let mut response = request.send(request_string).map_err(Context::raise_error)?;
 
-        let response_string = response.text().await.map_err(Context::raise_error)?;
+        let response_string = response
+            .body_mut()
+            .read_to_string()
+            .map_err(Context::raise_error)?;
 
         context
             .log(

@@ -1,21 +1,23 @@
 use hermes_core::chain_components::traits::{CanQueryBlock, CanQueryChainStatus};
 use hermes_core::test_components::bootstrap::traits::CanBootstrapChain;
-use hermes_error::Error;
+use hermes_cosmos::error::types::Error;
+use hermes_cosmos::integration_tests::init::init_test_runtime;
 use starknet::core::crypto::{ecdsa_verify, Signature};
 use starknet_block_verifier::Endpoint;
 use tracing::info;
 
-use crate::contexts::MadaraChainDriver;
-use crate::impls::{init_madara_bootstrap, init_test_runtime};
+use crate::contexts::StarknetChainDriver;
+use crate::utils::init_starknet_bootstrap;
 
 #[test]
-fn test_madara_feeder_gateway_signature() -> Result<(), Error> {
+fn test_starknet_feeder_gateway_signature() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let madara_bootstrap = init_madara_bootstrap(&runtime).await?;
+        let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
 
-        let chain_driver: MadaraChainDriver = madara_bootstrap.bootstrap_chain("madara").await?;
+        let chain_driver: StarknetChainDriver =
+            starknet_bootstrap.bootstrap_chain("starknet").await?;
 
         let chain = &chain_driver.chain;
 
@@ -29,7 +31,7 @@ fn test_madara_feeder_gateway_signature() -> Result<(), Error> {
 
         let gateway_port = chain_driver.node_config.rpc_port + 1;
 
-        // madara feeder gateway endpoint
+        // starknet feeder gateway endpoint
         let endpoint = Endpoint::new(&format!("http://0.0.0.0:{gateway_port}"));
 
         let public_key = endpoint.get_public_key(Some(block.height)).unwrap();

@@ -11,8 +11,8 @@ use hermes_core::test_components::chain_driver::impls::WaitChainReachHeight;
 use hermes_core::test_components::chain_driver::traits::{
     ChainGetterComponent, ChainProcessTaker, ChainProcessTakerComponent,
     ChainStartupWaiterComponent, ChainTypeProviderComponent, DenomGetter, DenomGetterComponent,
-    HasChain, RandomAmountGeneratorComponent, RelayerWallet, StakingDenom, TransferDenom,
-    UserWallet, WalletGetterComponent,
+    RandomAmountGeneratorComponent, RelayerWallet, StakingDenom, TransferDenom, UserWallet,
+    WalletGetterComponent,
 };
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
@@ -86,7 +86,3 @@ impl ChainProcessTaker<StarknetChainDriver> for StarknetChainDriverComponents {
         core::mem::take(&mut chain_driver.chain_processes)
     }
 }
-
-pub trait CanUseStarknetChainDriver: HasChain<Chain = StarknetChain> {}
-
-impl CanUseStarknetChainDriver for StarknetChainDriver {}

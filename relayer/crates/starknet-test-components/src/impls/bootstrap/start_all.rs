@@ -5,17 +5,17 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
 };
 use hermes_prelude::*;
 
-use crate::impls::{StartAnvil, StartMadaraSequencer, StartPathfinder};
+use crate::impls::{StartAnvil, StartPathfinder, StartStarknetSequencer};
 
 #[cgp_new_provider(ChainFullNodeStarterComponent)]
-impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartMadaraStack
+impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartStarknetStack
 where
     Bootstrap: HasRuntime<Runtime = Runtime>
         + HasChainNodeConfigType
         + HasChainGenesisConfigType
         + HasAsyncErrorType,
     Runtime: HasChildProcessType + HasFilePathType,
-    StartMadaraSequencer: ChainFullNodeStarter<Bootstrap>,
+    StartStarknetSequencer: ChainFullNodeStarter<Bootstrap>,
     StartAnvil: ChainFullNodeStarter<Bootstrap>,
     StartPathfinder: ChainFullNodeStarter<Bootstrap>,
 {
@@ -25,7 +25,7 @@ where
         chain_node_config: &Bootstrap::ChainNodeConfig,
         chain_genesis_config: &Bootstrap::ChainGenesisConfig,
     ) -> Result<Vec<Runtime::ChildProcess>, Bootstrap::Error> {
-        let mut madara_processes = StartMadaraSequencer::start_chain_full_nodes(
+        let mut starknet_processes = StartStarknetSequencer::start_chain_full_nodes(
             bootstrap,
             chain_home_dir,
             chain_node_config,
@@ -40,7 +40,7 @@ where
             chain_genesis_config,
         )
         .await?;
-        madara_processes.extend(anvil_processes);
+        starknet_processes.extend(anvil_processes);
 
         let pathfinder_processes = StartPathfinder::start_chain_full_nodes(
             bootstrap,
@@ -49,8 +49,8 @@ where
             chain_genesis_config,
         )
         .await?;
-        madara_processes.extend(pathfinder_processes);
+        starknet_processes.extend(pathfinder_processes);
 
-        Ok(madara_processes)
+        Ok(starknet_processes)
     }
 }

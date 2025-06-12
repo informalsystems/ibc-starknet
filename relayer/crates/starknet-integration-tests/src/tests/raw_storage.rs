@@ -4,7 +4,8 @@ use hermes_core::chain_components::traits::CanQueryChainHeight;
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_core::runtime_components::traits::CanReadFileAsString;
 use hermes_core::test_components::bootstrap::traits::CanBootstrapChain;
-use hermes_error::Error;
+use hermes_cosmos::error::types::Error;
+use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::StarknetAddress;
 use hermes_starknet_chain_components::traits::{
@@ -12,21 +13,23 @@ use hermes_starknet_chain_components::traits::{
     CanQueryStorageProof, CanVerifyStarknetStorageProof, HasBlobType, HasContractClassHashType,
     HasSelectorType, HasStorageKeyType, HasStorageProofType,
 };
-use starknet::core::types::{Felt, StorageProof};
+use starknet::core::types::Felt;
 use starknet::macros::{felt, selector};
+use starknet_v14::core::types::StorageProof;
 use tracing::info;
 
-use crate::contexts::MadaraChainDriver;
-use crate::impls::{init_madara_bootstrap, init_test_runtime};
+use crate::contexts::StarknetChainDriver;
+use crate::utils::init_starknet_bootstrap;
 
 #[test]
-fn test_madara_raw_storage() -> Result<(), Error> {
+fn test_starknet_raw_storage() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let madara_bootstrap = init_madara_bootstrap(&runtime).await?;
+        let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
 
-        let chain_driver: MadaraChainDriver = madara_bootstrap.bootstrap_chain("madara").await?;
+        let chain_driver: StarknetChainDriver =
+            starknet_bootstrap.bootstrap_chain("starknet").await?;
 
         let chain = &chain_driver.chain;
 

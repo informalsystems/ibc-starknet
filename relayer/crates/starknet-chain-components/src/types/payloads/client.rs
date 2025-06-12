@@ -21,6 +21,7 @@ pub struct StarknetCreateClientPayloadOptions {
     pub wasm_code_hash: [u8; 32],
 }
 
+#[derive(Debug)]
 pub struct StarknetUpdateClientPayload {
     pub header: StarknetHeader,
 

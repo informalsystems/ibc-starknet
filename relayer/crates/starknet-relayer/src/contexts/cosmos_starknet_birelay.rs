@@ -59,9 +59,9 @@ delegate_components! {
     }
 }
 
-pub trait CanUseCosmosStarnetBiRelay:
+pub trait CanUseCosmosStarknetBiRelay:
     CanUseComponent<RunnerComponent> + CanUseComponent<AutoBiRelayerComponent>
 {
 }
 
-impl CanUseCosmosStarnetBiRelay for CosmosStarknetBiRelay {}
+impl CanUseCosmosStarknetBiRelay for CosmosStarknetBiRelay {}

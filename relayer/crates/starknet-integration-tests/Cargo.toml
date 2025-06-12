@@ -43,6 +43,9 @@ prost-types = { workspace = true }
 tracing     = { workspace = true }
 flate2      = { workspace = true }
 tiny-bip39  = { workspace = true }
+ureq        = { workspace = true }
 
 [dev-dependencies]
 cairo-lang-starknet-classes = { workspace = true }
+starknet-block-verifier     = { workspace = true, features = [ "feeder" ] }
+starknet-v14                = { workspace = true }

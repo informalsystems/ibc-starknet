@@ -33,9 +33,9 @@ use hermes_starknet_relayer::contexts::{
 };
 use ibc::core::host::types::identifiers::PortId;
 
+use super::OsmosisBootstrap;
 use crate::contexts::{
-    BuildStarknetTestDriver, OsmosisBootstrap, StarknetBootstrap, StarknetChainDriver,
-    StarknetTestDriver,
+    BuildStarknetTestDriver, StarknetBootstrap, StarknetChainDriver, StarknetTestDriver,
 };
 
 #[cgp_context(StarknetBinaryChannelSetupComponents: BinaryChannelTestComponents)]
