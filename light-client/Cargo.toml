@@ -81,6 +81,7 @@ redundant_clone               = "deny"
 ibc-client-starknet       = { path = "./ibc-client-starknet" }
 ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
 ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
+starknet-storage-verifier = { path = "./starknet-storage-verifier" }
 poseidon                  = { path = "./poseidon" }
 
 ibc-client-cw = { git = "https://github.com/informalsystems/cosmwasm-ibc.git", branch = "starknet/demo2" }
