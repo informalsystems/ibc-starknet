@@ -53,11 +53,11 @@ use hermes_starknet_chain_components::traits::{
 use hermes_starknet_chain_components::types::StarknetWallet;
 use ibc::core::host::types::identifiers::ChainId;
 use indexmap::IndexMap;
-use reqwest::Client;
 use starknet::core::types::Felt;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 use starknet_v14::core::types::{MerkleNode, StorageProof};
+use ureq::Agent;
 use url::Url;
 
 use crate::contexts::{StarknetEventEncoding, StarknetProtobufEncoding, UseStarknetCairoEncoding};
@@ -75,7 +75,7 @@ pub struct StarknetChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
     pub starknet_client: Arc<JsonRpcClient<HttpTransport>>,
-    pub rpc_client: Client,
+    pub rpc_client: Agent,
     pub json_rpc_url: Url,
     pub ibc_client_contract_address: OnceLock<StarknetAddress>,
     pub ibc_core_contract_address: OnceLock<StarknetAddress>,

@@ -1,5 +1,5 @@
 use hermes_prelude::*;
-use reqwest::Client;
+use ureq::Agent;
 use url::Url;
 
 #[cgp_getter {
@@ -7,7 +7,7 @@ use url::Url;
     provider: ReqwestClientGetter,
 }]
 pub trait HasReqwestClient {
-    fn reqwest_client(&self) -> &Client;
+    fn reqwest_client(&self) -> &Agent;
 }
 
 #[cgp_getter {

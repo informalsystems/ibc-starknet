@@ -20,7 +20,6 @@ use hermes_starknet_chain_components::types::StarknetWallet;
 use hermes_starknet_chain_context::contexts::{StarknetChain, StarknetChainFields};
 use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
 use ibc::core::host::types::error::IdentifierError;
-use reqwest::Client;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider, ProviderError};
 use tokio::process::Child;
@@ -95,7 +94,7 @@ where
         let starknet_client =
             Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url.clone())));
 
-        let rpc_client = Client::new();
+        let rpc_client = ureq::agent();
 
         // Wait for the chain to be ready.
         for _ in 0..10 {

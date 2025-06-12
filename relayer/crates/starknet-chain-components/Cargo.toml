@@ -37,7 +37,7 @@ starknet                    = { workspace = true }
 starknet-v14                = { workspace = true }
 tonic                       = { workspace = true }
 futures                     = { workspace = true }
-reqwest                     = { workspace = true }
+ureq                        = { workspace = true }
 url                         = { workspace = true }
 indexmap                    = { workspace = true }
 time                        = { version = "0.3.36" }

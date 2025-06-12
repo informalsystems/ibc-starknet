@@ -46,7 +46,6 @@ use hermes_starknet_chain_context::contexts::{
 };
 use hermes_starknet_chain_context::impls::HandleStarknetChainError;
 use ibc::core::host::types::identifiers::{ChainId, ClientId};
-use reqwest::Client;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::{JsonRpcClient, Provider};
 use url::Url;
@@ -412,7 +411,7 @@ impl StarknetBuilder {
             ibc_ics20_contract_address.set(address).unwrap();
         }
 
-        let rpc_client = Client::new();
+        let rpc_client = ureq::agent();
 
         let context = StarknetChain {
             fields: Arc::new(StarknetChainFields {
