@@ -64,7 +64,7 @@ impl ClientStateCommon for ClientState {
         value: Vec<u8>,
     ) -> Result<(), ClientError> {
         let path_bytes = path.into_vec();
-        let processed_path = str::from_utf8(path_bytes.as_slice())
+        let processed_path = std::str::from_utf8(path_bytes.as_ref())
             .map_err(|e| ClientError::Decoding(DecodingError::StrUtf8(e)))?;
         let felt_path = ibc_path_to_storage_key(Path::from_str(processed_path).map_err(|e| {
             ClientError::Decoding(DecodingError::InvalidRawData {
@@ -95,7 +95,7 @@ impl ClientStateCommon for ClientState {
         path: PathBytes,
     ) -> Result<(), ClientError> {
         let path_bytes = path.into_vec();
-        let processed_path = str::from_utf8(path_bytes.as_slice())
+        let processed_path = std::str::from_utf8(path_bytes.as_ref())
             .map_err(|e| ClientError::Decoding(DecodingError::StrUtf8(e)))?;
         let felt_path = ibc_path_to_storage_key(Path::from_str(processed_path).map_err(|e| {
             ClientError::Decoding(DecodingError::InvalidRawData {
