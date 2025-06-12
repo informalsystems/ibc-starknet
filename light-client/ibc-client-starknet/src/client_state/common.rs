@@ -89,11 +89,33 @@ impl ClientStateCommon for ClientState {
 
     fn verify_non_membership_raw(
         &self,
-        prefix: &CommitmentPrefix,
+        _prefix: &CommitmentPrefix,
         proof: &CommitmentProofBytes,
         root: &CommitmentRoot,
         path: PathBytes,
     ) -> Result<(), ClientError> {
-        Ok(())
+        let path_bytes = path.into_vec();
+        let processed_path = str::from_utf8(path_bytes.as_slice())
+            .map_err(|e| ClientError::Decoding(DecodingError::StrUtf8(e)))?;
+        let felt_path = ibc_path_to_storage_key(Path::from_str(processed_path).map_err(|e| {
+            ClientError::Decoding(DecodingError::InvalidRawData {
+                description: e.to_string(),
+            })
+        })?);
+
+        let storage_proof: StorageProof = serde_json::from_slice(proof.as_ref()).map_err(|e| {
+            ClientError::Decoding(DecodingError::InvalidJson {
+                description: e.to_string(),
+            })
+        })?;
+
+        let root = Felt::from_bytes_be_slice(root.as_bytes());
+
+        // For non-membership proof, the expected value is a zero value
+        let value = Felt::ZERO;
+
+        verify_starknet_merkle_proof(&storage_proof.classes_proof, root, felt_path, value).map_err(
+            |e| ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership),
+        )
     }
 }
