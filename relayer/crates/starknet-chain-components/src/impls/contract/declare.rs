@@ -94,6 +94,8 @@ where
 
         // While using Madara this code is commented out due to the configured max gas being 0.
         // This causes: Error: StarknetError: ValidationFailure("Max L1Gas price (0) is lower than the actual gas price: 1.")
+        // This is blocked by Madara's starknet version update
+        // See: https://www.starknet.io/developers/roadmap/
         /*
         // starknet v3 transactions requires all fee bound present.
         let l1_gas = core::cmp::max(

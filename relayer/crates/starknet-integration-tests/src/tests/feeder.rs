@@ -53,7 +53,7 @@ fn test_starknet_feeder_gateway_signature() -> Result<(), Error> {
         .unwrap());
 
         // can't call `get_block` yet as we are using `0.13.5` block header
-        // and, starknet uses `0.13.2` block header
+        // and, madara uses `0.13.2` block header
 
         // let block_header = endpoint.get_block_header(Some(block.height)).unwrap();
         // info!("block_header: {block_header:?}");

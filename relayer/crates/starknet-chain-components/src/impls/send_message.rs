@@ -1,5 +1,4 @@
 use core::fmt::Debug;
-use std::sync::Arc;
 
 use hermes_core::chain_components::traits::HasMessageType;
 use hermes_core::chain_type_components::traits::HasMessageResponseType;
@@ -11,13 +10,12 @@ use hermes_core::relayer_components::transaction::traits::{
 use hermes_prelude::*;
 use starknet::accounts::Account;
 use starknet::core::types::{
-    Call, ExecuteInvocation, Felt, FunctionInvocation, OrderedEvent, RevertedInvocation,
-    TransactionTrace,
+    Call, ExecuteInvocation, Felt, FunctionInvocation, RevertedInvocation, TransactionTrace,
 };
 
-use crate::impls::{StarknetAddress, StarknetMessage};
+use crate::impls::StarknetMessage;
 use crate::traits::{CanBuildAccountFromSigner, CanUseStarknetAccount, HasStarknetAccountType};
-use crate::types::{StarknetEvent, StarknetEventFields, StarknetMessageResponse, TxResponse};
+use crate::types::{StarknetEvent, StarknetMessageResponse, TxResponse};
 
 pub struct UnexpectedTransactionTraceType {
     pub trace: TransactionTrace,
@@ -114,7 +112,7 @@ pub fn extract_events_from_function_invocation(
         .events
         .into_iter()
         .map(|event| {
-            from_ordered_event(
+            StarknetEvent::from_ordered_event(
                 invocation.contract_address.into(),
                 invocation.class_hash,
                 event,
@@ -137,26 +135,5 @@ impl Debug for UnexpectedTransactionTraceType {
             "Expected transaction trace to be of type Invoke, but instead got: {:?}",
             self.trace
         )
-    }
-}
-
-pub fn from_ordered_event(
-    contract_address: StarknetAddress,
-    class_hash: Felt,
-    event: OrderedEvent,
-) -> StarknetEvent {
-    let mut keys = event.keys.into_iter();
-    let data = event.data;
-
-    let selector = keys.next();
-
-    StarknetEvent {
-        fields: Arc::new(StarknetEventFields {
-            contract_address,
-            class_hash: Some(class_hash),
-            selector,
-            keys: keys.collect(),
-            data,
-        }),
     }
 }
