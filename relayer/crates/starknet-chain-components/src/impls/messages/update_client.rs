@@ -7,12 +7,13 @@ use hermes_core::chain_components::traits::{
     UpdateClientMessageBuilder, UpdateClientMessageBuilderComponent,
 };
 use hermes_core::chain_type_components::traits::HasAddressType;
-use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
+use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use hermes_cosmos_core::chain_components::types::CosmosUpdateClientPayload;
 use hermes_prelude::*;
 use ibc_proto::ibc::lightclients::tendermint::v1::Header as RawHeader;
 use ibc_proto::Protobuf;
-use starknet::core::types::{ByteArray, Felt};
+use num_bigint::BigUint;
+use starknet::core::types::{ByteArray, Felt, U256};
 use starknet::macros::selector;
 use tendermint::block::CommitSig;
 use tendermint::vote::{SignedVote, ValidatorIndex, Vote};
@@ -37,6 +38,8 @@ where
     Counterparty:
         HasUpdateClientPayloadType<Chain, UpdateClientPayload = CosmosUpdateClientPayload>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
+        + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
         + CanEncode<ViaCairo, Vec<Vec<Felt>>>
         + CanEncode<ViaCairo, Product![ClientMessage, Vec<Felt>]>
         + CanEncode<ViaCairo, ByteArray>
@@ -112,24 +115,71 @@ where
                             SignedVote::from_vote(vote, signed_header.header.chain_id.clone())?;
 
                         let msg = signed_vote.sign_bytes();
-                        let signature = signed_vote.signature();
+                        let signature: [u8; 64] =
+                            signed_vote.signature().as_bytes().try_into().ok()?;
                         let validator_id = signed_vote.validator_id();
 
                         let validator_public_key = validators.get(&validator_id)?;
 
-                        let tendermint::PublicKey::Ed25519(ed25519_public_key_bytes) =
+                        let tendermint::PublicKey::Ed25519(ed25519_public_key) =
                             validator_public_key
                         else {
                             // If the public key is not Ed25519, we can return None or handle accordingly.
                             return None;
                         };
 
-                        Some((msg, signature.clone(), *ed25519_public_key_bytes))
+                        let ed25519_public_key: [u8; 32] =
+                            ed25519_public_key.as_bytes().try_into().ok()?;
+
+                        Some((msg, signature, ed25519_public_key))
                     })
                     .map(|value| {
                         if let Some((msg, signature, public_key)) = value {
-                            // TODO(rano): produce correct signature hints for garaga verifier.
-                            vec![]
+                            {
+                                // verify ed25519 signature using standard rust libraries
+                                // TODO(rano): remove this assert when PR is ready.
+                                use ed25519_dalek::{Signature, Verifier, VerifyingKey};
+                                let public_key = VerifyingKey::from_bytes(&public_key)
+                                    .expect("Invalid public key");
+                                let signature_to_verify = Signature::from_bytes(&signature);
+
+                                public_key.verify(&msg, &signature_to_verify).unwrap();
+                            }
+
+                            let ry_twisted = BigUint::from_bytes_le(&signature[0..32]);
+                            let s = BigUint::from_bytes_le(&signature[32..64]);
+                            let py_twisted = BigUint::from_bytes_le(&public_key);
+
+                            let hint = garaga::calldata::signatures::eddsa_calldata_builder(
+                                ry_twisted,
+                                s,
+                                py_twisted,
+                                msg.clone(),
+                            )
+                            .unwrap();
+
+                            let felt_hint = hint
+                                .into_iter()
+                                .map(|x| Felt::from_hex(&format!("{x:x}")).unwrap())
+                                .collect::<Vec<Felt>>();
+
+                            let product![
+                                product![p_ry_twisted, p_s, p_py_twisted, p_msg],
+                                p_msm_hint,
+                                p_sqrt_Rx_hint,
+                                p_sqrt_Px_hint
+                            ]: Product![
+                                Product![U256, U256, U256, Vec<u8>],
+                                Vec<Felt>,
+                                U256,
+                                U256
+                            ] = encoding.decode(&felt_hint).unwrap();
+
+                            assert_eq!(p_msg, msg);
+
+                            encoding
+                                .encode(&product![p_msm_hint, p_sqrt_Rx_hint, p_sqrt_Px_hint])
+                                .unwrap()
                         } else {
                             // only return hints for the valid signatures
                             vec![]
