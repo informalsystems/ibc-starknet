@@ -15,6 +15,7 @@ scarb = { workspace = true }
 [dependencies]
 starknet        = { workspace = true }
 alexandria_math = { workspace = true }
+garaga          = { workspace = true }
 protobuf        = { workspace = true }
 ics23           = { workspace = true }
 ibc_utils       = { workspace = true }

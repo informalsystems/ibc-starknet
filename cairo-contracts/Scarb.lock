@@ -12,6 +12,7 @@ name = "cometbft"
 version = "0.1.0"
 dependencies = [
  "alexandria_math",
+ "garaga",
  "ibc_utils",
  "ics23",
  "protobuf",
