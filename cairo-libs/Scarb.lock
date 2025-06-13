@@ -12,11 +12,17 @@ name = "cometbft"
 version = "0.1.0"
 dependencies = [
  "alexandria_math",
+ "garaga",
  "ibc_utils",
  "ics23",
  "protobuf",
  "snforge_std",
 ]
+
+[[package]]
+name = "garaga"
+version = "0.18.1"
+source = "git+https://github.com/keep-starknet-strange/garaga.git#11ed9fee3a04d9496481d5ce051b97380b06c405"
 
 [[package]]
 name = "ibc_utils"

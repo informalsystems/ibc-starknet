@@ -74,13 +74,21 @@ fn test_verify_update_header() {
         next_validators_hash: header_a.signed_header.header.next_validators_hash,
     };
 
+    let mut signature_span = header_b.signed_header.commit.signatures.span();
+
     let untrusted_block_state = UntrustedBlockState {
         signed_header: header_b.signed_header,
         validators: header_b.validator_set,
         next_validators: header_b.trusted_validator_set,
     };
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    let mut signature_hints = array![];
+
+    while let Some(_) = signature_span.pop_front() {
+        signature_hints.append(array![]);
+    }
+
+    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
 }
 
 #[test]
@@ -108,6 +116,8 @@ fn test_verify_update_header_forged_header() {
         next_validators_hash: header_a.signed_header.header.next_validators_hash,
     };
 
+    let mut signature_span = header_b.signed_header.commit.signatures.span();
+
     let mut untrusted_block_state = UntrustedBlockState {
         signed_header: header_b.signed_header,
         validators: header_b.validator_set,
@@ -117,7 +127,13 @@ fn test_verify_update_header_forged_header() {
     // forged header
     untrusted_block_state.signed_header.header.next_validators_hash = array![0x1, 0x2];
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    let mut signature_hints = array![];
+
+    while let Some(_) = signature_span.pop_front() {
+        signature_hints.append(array![]);
+    }
+
+    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
 }
 
 #[test]
@@ -145,6 +161,8 @@ fn test_verify_update_header_empty_signatures() {
         next_validators_hash: header_a.signed_header.header.next_validators_hash,
     };
 
+    let mut signature_span = header_b.signed_header.commit.signatures.span();
+
     let mut untrusted_block_state = UntrustedBlockState {
         signed_header: header_b.signed_header,
         validators: header_b.validator_set,
@@ -154,7 +172,13 @@ fn test_verify_update_header_empty_signatures() {
     // empty signatures
     untrusted_block_state.signed_header.commit.signatures = array![];
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    let mut signature_hints = array![];
+
+    while let Some(_) = signature_span.pop_front() {
+        signature_hints.append(array![]);
+    }
+
+    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
 }
 
 #[test]
@@ -221,11 +245,19 @@ fn test_verify_update_header_2() {
         next_validators_hash: header_a.signed_header.header.next_validators_hash,
     };
 
+    let mut signature_span = header_b.signed_header.commit.signatures.span();
+
     let untrusted_block_state = UntrustedBlockState {
         signed_header: header_b.signed_header,
         validators: header_b.validator_set,
         next_validators: header_b.trusted_validator_set,
     };
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    let mut signature_hints = array![];
+
+    while let Some(_) = signature_span.pop_front() {
+        signature_hints.append(array![]);
+    }
+
+    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
 }
