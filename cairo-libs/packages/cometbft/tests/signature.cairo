@@ -164,7 +164,7 @@ pub fn ed25519_case_1024() -> TestData {
 
 pub fn test_verify_ed25519_signature(data: TestData) {
     let pubkey = PublicKey { sum: Sum::Ed25519(data.pubkey) };
-    pubkey.verify(data.msg.span(), data.signature.span());
+    pubkey.verify(data.msg.span(), data.signature.span(), array![].span());
 }
 
 #[test]

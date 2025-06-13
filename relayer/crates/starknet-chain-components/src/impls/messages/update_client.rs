@@ -35,7 +35,8 @@ where
     Counterparty:
         HasUpdateClientPayloadType<Chain, UpdateClientPayload = CosmosUpdateClientPayload>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanEncode<ViaCairo, ClientMessage>
+        + CanEncode<ViaCairo, Vec<Vec<Felt>>>
+        + CanEncode<ViaCairo, Product![ClientMessage, Vec<Felt>]>
         + CanEncode<ViaCairo, ByteArray>
         + CanEncode<ViaCairo, Product![ClientId, Vec<Felt>]>,
 {
@@ -66,8 +67,26 @@ where
                 .encode(&protobuf_byte_array)
                 .map_err(Chain::raise_error)?;
 
+            let signature_hints: Vec<_> = header
+                .signed_header
+                .commit
+                .signatures
+                .iter()
+                // TODO(rano): produce correct signature hints for garaga verifier.
+                .map(|_| vec![])
+                .collect();
+
+            let serialized_signature_hints = encoding
+                .encode(&signature_hints)
+                .map_err(Chain::raise_error)?;
+
+            let client_message_with_hints = product![
+                ClientMessage::Update(raw_header),
+                serialized_signature_hints
+            ];
+
             let client_message_felts = encoding
-                .encode(&ClientMessage::Update(raw_header))
+                .encode(&client_message_with_hints)
                 .map_err(Chain::raise_error)?;
 
             let calldata = encoding

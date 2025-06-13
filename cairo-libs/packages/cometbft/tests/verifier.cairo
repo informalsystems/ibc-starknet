@@ -80,7 +80,15 @@ fn test_verify_update_header() {
         next_validators: header_b.trusted_validator_set,
     };
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    let mut signature_hints = array![];
+
+    let signature_span = header_b.signed_header.commit.signatures.span();
+
+    while let Some(_) = signature_span.pop_front() {
+        signature_hints.push(array![]);
+    }
+
+    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
 }
 
 #[test]
@@ -117,7 +125,15 @@ fn test_verify_update_header_forged_header() {
     // forged header
     untrusted_block_state.signed_header.header.next_validators_hash = array![0x1, 0x2];
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    let mut signature_hints = array![];
+
+    let signature_span = header_b.signed_header.commit.signatures.span();
+
+    while let Some(_) = signature_span.pop_front() {
+        signature_hints.push(array![]);
+    }
+
+    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
 }
 
 #[test]
@@ -154,7 +170,15 @@ fn test_verify_update_header_empty_signatures() {
     // empty signatures
     untrusted_block_state.signed_header.commit.signatures = array![];
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    let mut signature_hints = array![];
+
+    let signature_span = header_b.signed_header.commit.signatures.span();
+
+    while let Some(_) = signature_span.pop_front() {
+        signature_hints.push(array![]);
+    }
+
+    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
 }
 
 #[test]
@@ -227,5 +251,13 @@ fn test_verify_update_header_2() {
         next_validators: header_b.trusted_validator_set,
     };
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now);
+    let mut signature_hints = array![];
+
+    let signature_span = header_b.signed_header.commit.signatures.span();
+
+    while let Some(_) = signature_span.pop_front() {
+        signature_hints.push(array![]);
+    }
+
+    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
 }
