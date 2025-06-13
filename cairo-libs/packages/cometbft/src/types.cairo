@@ -13,7 +13,7 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
 use protobuf::types::wkt::{Duration, Timestamp};
-use crate::ed25519::AlexandriaEd25519Verifier;
+use crate::ed25519::GaragaEd25519Verifier as Ed25519Verifier;
 use crate::light_client::Header as LcHeader;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
@@ -340,7 +340,7 @@ pub impl PublicKeyImpl of PublicKeyTrait {
                     .unwrap(); // Never fails as length is 32.
                 let pubkey: u256 = pk.span().try_into().unwrap(); // Never fails as length is 32.
 
-                AlexandriaEd25519Verifier::assert_signature(msg, [r_sign, s_sign], pubkey, hint);
+                Ed25519Verifier::assert_signature(msg, [r_sign, s_sign], pubkey, hint);
             },
             _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
         }
