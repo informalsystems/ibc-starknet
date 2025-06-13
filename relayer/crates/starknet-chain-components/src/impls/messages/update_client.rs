@@ -14,6 +14,8 @@ use ibc_proto::ibc::lightclients::tendermint::v1::Header as RawHeader;
 use ibc_proto::Protobuf;
 use starknet::core::types::{ByteArray, Felt};
 use starknet::macros::selector;
+use tendermint::block::CommitSig;
+use tendermint::vote::{SignedVote, ValidatorIndex, Vote};
 
 use crate::impls::{StarknetAddress, StarknetMessage};
 use crate::traits::CanQueryContractAddress;
@@ -67,14 +69,74 @@ where
                 .encode(&protobuf_byte_array)
                 .map_err(Chain::raise_error)?;
 
-            let signature_hints: Vec<_> = header
-                .signed_header
-                .commit
-                .signatures
-                .iter()
-                // TODO(rano): produce correct signature hints for garaga verifier.
-                .map(|_| vec![])
-                .collect();
+            let signature_hints: Vec<_> = {
+                let signed_header = &header.signed_header;
+                let validators: std::collections::HashMap<_, _> = header
+                    .validator_set
+                    .validators()
+                    .iter()
+                    .map(|v| (v.address, v.pub_key))
+                    .collect();
+
+                signed_header
+                    .commit
+                    .signatures
+                    .iter()
+                    .enumerate()
+                    .map(|(idx, signature)| {
+                        let validator_index = ValidatorIndex::try_from(idx).unwrap();
+
+                        let CommitSig::BlockIdFlagCommit {
+                            validator_address,
+                            timestamp,
+                            signature,
+                        } = signature
+                        else {
+                            return None;
+                        };
+
+                        let vote = Vote {
+                            vote_type: tendermint::vote::Type::Precommit,
+                            height: signed_header.commit.height,
+                            round: signed_header.commit.round,
+                            block_id: Some(signed_header.commit.block_id),
+                            timestamp: Some(*timestamp),
+                            validator_address: *validator_address,
+                            validator_index,
+                            signature: signature.clone(),
+                            extension: Default::default(),
+                            extension_signature: None,
+                        };
+
+                        let signed_vote =
+                            SignedVote::from_vote(vote, signed_header.header.chain_id.clone())?;
+
+                        let msg = signed_vote.sign_bytes();
+                        let signature = signed_vote.signature();
+                        let validator_id = signed_vote.validator_id();
+
+                        let validator_public_key = validators.get(&validator_id)?;
+
+                        let tendermint::PublicKey::Ed25519(ed25519_public_key_bytes) =
+                            validator_public_key
+                        else {
+                            // If the public key is not Ed25519, we can return None or handle accordingly.
+                            return None;
+                        };
+
+                        Some((msg, signature.clone(), *ed25519_public_key_bytes))
+                    })
+                    .map(|value| {
+                        if let Some((msg, signature, public_key)) = value {
+                            // TODO(rano): produce correct signature hints for garaga verifier.
+                            vec![]
+                        } else {
+                            // only return hints for the valid signatures
+                            vec![]
+                        }
+                    })
+                    .collect()
+            };
 
             let serialized_signature_hints = encoding
                 .encode(&signature_hints)
