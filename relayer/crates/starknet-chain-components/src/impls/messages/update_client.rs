@@ -166,8 +166,8 @@ where
                             let product![
                                 product![p_ry_twisted, p_s, p_py_twisted, p_msg],
                                 p_msm_hint,
-                                p_sqrt_Rx_hint,
-                                p_sqrt_Px_hint
+                                p_sqrt_rx_hint,
+                                p_sqrt_px_hint
                             ]: Product![
                                 Product![U256, U256, U256, Vec<u8>],
                                 Vec<Felt>,
@@ -178,7 +178,7 @@ where
                             assert_eq!(p_msg, msg);
 
                             encoding
-                                .encode(&product![p_msm_hint, p_sqrt_Rx_hint, p_sqrt_Px_hint])
+                                .encode(&product![p_msm_hint, p_sqrt_rx_hint, p_sqrt_px_hint])
                                 .unwrap()
                         } else {
                             // only return hints for the valid signatures
