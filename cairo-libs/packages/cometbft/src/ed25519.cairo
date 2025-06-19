@@ -2,7 +2,7 @@ use alexandria_math::ed25519::verify_signature;
 use garaga::signatures::eddsa_25519::{
     EdDSASignature, EdDSASignatureWithHint, is_valid_eddsa_signature,
 };
-
+use ibc_utils::numeric::reverse_u256;
 
 pub trait Ed25519Verifier {
     fn assert_signature(
@@ -25,7 +25,7 @@ pub impl GaragaEd25519Verifier of Ed25519Verifier {
         let [sign_r, sign_s] = signature;
 
         let signature = EdDSASignature {
-            Ry_twisted: sign_r, s: sign_s, Py_twisted: public_key, msg: msg,
+            Ry_twisted: reverse_u256(sign_r), s: reverse_u256(sign_s), Py_twisted: reverse_u256(public_key), msg: msg,
         };
 
         let (msm_hint, sqrt_Rx_hint, sqrt_Px_hint) = Serde::deserialize(ref hints).unwrap();
