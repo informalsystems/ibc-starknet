@@ -25,7 +25,10 @@ pub impl GaragaEd25519Verifier of Ed25519Verifier {
         let [sign_r, sign_s] = signature;
 
         let signature = EdDSASignature {
-            Ry_twisted: reverse_u256(sign_r), s: reverse_u256(sign_s), Py_twisted: reverse_u256(public_key), msg: msg,
+            Ry_twisted: reverse_u256(sign_r),
+            s: reverse_u256(sign_s),
+            Py_twisted: reverse_u256(public_key),
+            msg: msg,
         };
 
         let (msm_hint, sqrt_Rx_hint, sqrt_Px_hint) = Serde::deserialize(ref hints).unwrap();
