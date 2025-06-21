@@ -19,6 +19,7 @@ mod preset {
             (ViaCairo, Vec<u8>): EncodeList,
             (ViaCairo, Vec<u32>): EncodeList,
             (ViaCairo, Vec<Felt>): EncodeList,
+            (ViaCairo, Vec<Vec<Felt>>): EncodeList,
             (ViaCairo, bool): EncodeBool,
             (ViaCairo, u8): EncodeFromU128,
             (ViaCairo, u64): EncodeFromU128,

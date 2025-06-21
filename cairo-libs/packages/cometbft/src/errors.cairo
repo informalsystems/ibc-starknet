@@ -13,4 +13,5 @@ pub mod CometErrors {
     pub const CHAIN_ID_MISMATCH: felt252 = 'ICS07: chain id mismatch';
     pub const NON_MONOTONIC_HEIGHT: felt252 = 'ICS07: non-monotonic height';
     pub const INVALID_NEXT_VALIDATOR_SET: felt252 = 'ICS07: invalid next val set';
+    pub const INVALID_SIGNATURE_HINTS_LENGTH: felt252 = 'ICS07: sign hint len mismatch';
 }
