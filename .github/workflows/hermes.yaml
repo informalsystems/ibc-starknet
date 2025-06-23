@@ -26,6 +26,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+
       - uses: actions/checkout@v4
 
       - name: Checkout Madara repo
