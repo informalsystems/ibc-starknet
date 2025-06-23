@@ -2,7 +2,6 @@ pub use canonical_vote_impl::CanonicalVoteAsProtoMessage;
 use cometbft::errors::CometErrors;
 use cometbft::utils::Fraction;
 use core::sha256::compute_sha256_byte_array;
-use ibc_utils::bytes::SpanU8TryIntoU256;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{
     BoolAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, U64AsProtoMessage,
@@ -327,20 +326,7 @@ pub impl PublicKeyImpl of PublicKeyTrait {
     fn verify(self: @PublicKey, msg: Span<u8>, signature: Span<u8>, hint: Span<felt252>) {
         match self.sum {
             Sum::Ed25519(pk) => {
-                assert(signature.len() == 64, CometErrors::INVALID_SIGNATURE_LENGTH);
-                assert(pk.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
-
-                let r_sign: u256 = signature
-                    .slice(0, 32)
-                    .try_into()
-                    .unwrap(); // Never fails as length is 32.
-                let s_sign: u256 = signature
-                    .slice(32, 32)
-                    .try_into()
-                    .unwrap(); // Never fails as length is 32.
-                let pubkey: u256 = pk.span().try_into().unwrap(); // Never fails as length is 32.
-
-                Ed25519Verifier::assert_signature(msg, [r_sign, s_sign], pubkey, hint);
+                Ed25519Verifier::assert_signature(msg, signature, pk.span(), hint);
             },
             _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
         }
