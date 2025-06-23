@@ -135,17 +135,6 @@ where
                     })
                     .map(|value| {
                         if let Some((msg, signature, public_key)) = value {
-                            {
-                                // verify ed25519 signature using standard rust libraries
-                                // TODO(rano): remove this assert when PR is ready.
-                                use ed25519_dalek::{Signature, Verifier, VerifyingKey};
-                                let public_key = VerifyingKey::from_bytes(&public_key)
-                                    .expect("Invalid public key");
-                                let signature_to_verify = Signature::from_bytes(&signature);
-
-                                public_key.verify(&msg, &signature_to_verify).unwrap();
-                            }
-
                             let ry_twisted = BigUint::from_bytes_le(&signature[0..32]);
                             let s = BigUint::from_bytes_le(&signature[32..64]);
                             let py_twisted = BigUint::from_bytes_le(&public_key);
