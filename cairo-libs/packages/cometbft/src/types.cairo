@@ -682,7 +682,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
                 let verified = false;
                 let non_absent_commit_vote = NonAbsentCommitVote { signed_vote, verified };
-                // TODO(rano): pass hints as array of felt252
+
                 votes.append((non_absent_commit_vote, signature_hint.clone()));
             }
         }
