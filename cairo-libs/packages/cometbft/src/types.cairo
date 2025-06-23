@@ -325,9 +325,7 @@ pub struct PublicKey {
 pub impl PublicKeyImpl of PublicKeyTrait {
     fn verify(self: @PublicKey, msg: Span<u8>, signature: Span<u8>, hint: Span<felt252>) {
         match self.sum {
-            Sum::Ed25519(pk) => {
-                Ed25519Verifier::assert_signature(msg, signature, pk.span(), hint);
-            },
+            Sum::Ed25519(pk) => Ed25519Verifier::assert_signature(msg, signature, pk.span(), hint),
             _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
         }
     }
