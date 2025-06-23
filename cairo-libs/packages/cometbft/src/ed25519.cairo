@@ -33,8 +33,7 @@ pub impl GaragaEd25519Verifier of Ed25519Verifier {
         assert(signature.len() == 64, CometErrors::INVALID_SIGNATURE_LENGTH);
         assert(public_key.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
 
-        let Ry_twisted: u256 = U256AsLittleEndian::from_bytes(signature.slice(0, 32))
-            .unwrap();
+        let Ry_twisted: u256 = U256AsLittleEndian::from_bytes(signature.slice(0, 32)).unwrap();
         let s: u256 = U256AsLittleEndian::from_bytes(signature.slice(32, 64)).unwrap();
         let Py_twisted: u256 = U256AsLittleEndian::from_bytes(public_key).unwrap();
 
