@@ -19,7 +19,7 @@ pub impl AlexandriaEd25519Verifier of Ed25519Verifier {
         assert(public_key.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
 
         let r_sign: u256 = U256AsBigEndian::from_bytes(signature.slice(0, 32)).unwrap();
-        let s_sign: u256 = U256AsBigEndian::from_bytes(signature.slice(32, 64)).unwrap();
+        let s_sign: u256 = U256AsBigEndian::from_bytes(signature.slice(32, 32)).unwrap();
         let pubkey: u256 = U256AsBigEndian::from_bytes(public_key).unwrap();
 
         assert(verify_signature(msg, [r_sign, s_sign].span(), pubkey), 'invalid alexandria ed25519')
@@ -34,7 +34,7 @@ pub impl GaragaEd25519Verifier of Ed25519Verifier {
         assert(public_key.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
 
         let Ry_twisted: u256 = U256AsLittleEndian::from_bytes(signature.slice(0, 32)).unwrap();
-        let s: u256 = U256AsLittleEndian::from_bytes(signature.slice(32, 64)).unwrap();
+        let s: u256 = U256AsLittleEndian::from_bytes(signature.slice(32, 32)).unwrap();
         let Py_twisted: u256 = U256AsLittleEndian::from_bytes(public_key).unwrap();
 
         let signature = EdDSASignature { Ry_twisted, s, Py_twisted, msg };
