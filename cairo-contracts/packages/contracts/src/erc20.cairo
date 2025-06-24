@@ -59,11 +59,11 @@ pub mod ERC20Mintable {
     #[abi(embed_v0)]
     impl ERC20MetadataImpl of IERC20Metadata<ContractState> {
         fn name(self: @ContractState) -> ByteArray {
-            self.erc20.name()
+            self.erc20.ERC20_name.read()
         }
 
         fn symbol(self: @ContractState) -> ByteArray {
-            self.erc20.symbol()
+            self.erc20.ERC20_symbol.read()
         }
 
         fn decimals(self: @ContractState) -> u8 {

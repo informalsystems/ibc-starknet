@@ -27,13 +27,13 @@ test = "snforge test"
 [workspace.dependencies]
 assert_macros = "2.11.4"
 starknet      = "2.11.4"
-snforge_std   = "0.44.0"
+snforge_std   = "0.45.0"
 
 # external dependencies
-openzeppelin_access  = "1.0.0"
-openzeppelin_token   = "1.0.0"
-openzeppelin_testing = "4.1.0"
-openzeppelin_utils   = "1.0.0"
+openzeppelin_access  = "2.0.0"
+openzeppelin_token   = "2.0.0"
+openzeppelin_testing = "4.2.0"
+openzeppelin_utils   = "2.0.0"
 alexandria_math      = "0.5.1"
 garaga               = { git = "https://github.com/keep-starknet-strange/garaga.git" }
 
