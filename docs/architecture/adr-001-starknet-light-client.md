@@ -65,7 +65,7 @@ pub struct ConsensusState {
 }
 
 pub struct Header {
-    pub starknet_header: BlockHeader,
+    pub starknet_header: StarknetBlockHeader,
     
     pub contract_trie_root: Felt,
     pub class_trie_root: Felt,
@@ -79,12 +79,12 @@ pub struct Header {
 
 ```rust
 fn verify_header(
-    header: Header, // untrusted; given by the relayer
+    header: StarknetBlockHeader, // untrusted; given by the relayer
     contract_trie_root: Felt, // untrusted; given by the relayer
     class_trie_root: Felt, // untrusted; given by the relayer
     ibc_core_contract_address: Felt, // trusted; given by the ibc module
-    ibc_core_contract_root: Felt, // untrusted; given by the relayer
-    proof: StarknetStorageProof, // untrusted; given by the relayer
+    ibc_core_trie_root: Felt, // untrusted; given by the relayer
+    contract_trie_root_proof: StarknetStorageProof, // untrusted; given by the relayer
 ) -> Felt {
     assert!(header.verify_signature());
 
@@ -101,9 +101,9 @@ fn verify_header(
 
     // contract_trie_root is now trusted
 
-    assert!(proof.verify(contract_trie_root, ibc_core_contract_address, ibc_core_contract_root));
+    assert!(contract_trie_root_proof.verify(contract_trie_root, ibc_core_contract_address, ibc_core_trie_root));
 
-    // ibc_core_contract_root is now trusted
+    // ibc_core_trie_root is now trusted
 }
 ```
 
@@ -111,13 +111,13 @@ fn verify_header(
 
 ```rust
 fn verify_membership(
-    ibc_core_contract_trie_root: Felt, // trusted; given by the ibc module
+    ibc_core_trie_root: Felt, // trusted; given by the ibc module
     key: Felt, // trusted; given by the ibc module
     // if value is None, we are checking for non-membership
     value: Option<Felt>, // untrusted; given by the relayer
-    proof: StarknetStorageProof, // untrusted; given by the relayer
+    membership_proof: StarknetStorageProof, // untrusted; given by the relayer
 ) -> bool {
-    assert!(proof.verify(contract_root, key, value));
+    assert!(membership_proof.verify(ibc_core_trie_root, key, value));
 
     // value is now trusted
 }
