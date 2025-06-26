@@ -82,7 +82,7 @@ fn verify_header(
     client_state: ClientState, // trusted; given by the ibc module
 
     header: Header, // untrusted; given by the relayer
-) -> Felt {
+) {
     let Header {
         starknet_block_header,
         contract_trie_root,
@@ -128,7 +128,7 @@ fn verify_membership(
     // if value is None, we are checking for non-membership
     value: Option<Felt>, // untrusted; given by the relayer
     membership_proof: StarknetStorageProof, // untrusted; given by the relayer
-) -> bool {
+) {
     let ConsensusState {
         ibc_core_trie_root,
         ...
