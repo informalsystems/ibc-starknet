@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use hermes_prelude::*;
 use ibc_core::client::types::Height;
 use ibc_core::host::types::identifiers::ChainId;
@@ -10,4 +12,5 @@ pub struct StarknetClientState {
     pub latest_height: Height,
     pub chain_id: ChainId,
     pub pub_key: Vec<u8>,
+    pub ibc_contract_address: Vec<u8>,
 }

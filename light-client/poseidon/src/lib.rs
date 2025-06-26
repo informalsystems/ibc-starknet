@@ -1,3 +1,7 @@
+#![no_std]
+
+extern crate alloc;
+
 pub mod hades;
 pub mod poseidon_3;
 

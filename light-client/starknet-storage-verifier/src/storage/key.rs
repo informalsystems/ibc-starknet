@@ -59,5 +59,5 @@ pub fn starknet_storage_key<const N: usize>(parts: [KeyPart<'_>; N]) -> Felt {
         .map(|part| part.hash())
         .into_iter()
         .reduce(|acc, e| pedersen_hash(&acc, &e))
-        .unwrap()
+        .expect("failed to reduce storage key parts")
 }

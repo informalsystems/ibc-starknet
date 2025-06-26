@@ -1,3 +1,6 @@
+use alloc::string::String;
+use core::fmt::Write;
+
 use indexmap::IndexMap;
 use starknet_core::types::{MerkleNode, StorageProof};
 use starknet_crypto::{pedersen_hash, Felt};
@@ -17,7 +20,7 @@ pub fn verify_starknet_merkle_proof(
 
     // This check also ensures that the first 5 bits is always 0.
     if path >= Felt::ELEMENT_UPPER_BOUND {
-        return Err(StorageError::CommitmentPathExceedUpper(path));
+        return Err(StorageError::CommitmentPathExceedUpper);
     }
 
     let mut remaining_length: u8 = 251;
@@ -25,9 +28,7 @@ pub fn verify_starknet_merkle_proof(
     // Use to_bits_be, which starts from the most significant bit, i.e. reverse order
     let mut path_bits = &path.to_bits_be()[5..];
 
-    let mut current_node = nodes
-        .get(&root)
-        .ok_or_else(|| StorageError::MissingRootProofNode(root.to_hex_string()))?;
+    let mut current_node = nodes.get(&root).ok_or(StorageError::MissingRootProofNode)?;
 
     // Keep iterating until all path bits are consumed.
     while !path_bits.is_empty() {
@@ -39,10 +40,14 @@ pub fn verify_starknet_merkle_proof(
                 let next_bit = path_bits[0];
 
                 let next_root = if next_bit { node.right } else { node.left };
+                let alt_next_root = if next_bit { node.left } else { node.right };
 
-                current_node = nodes
-                    .get(&next_root)
-                    .ok_or_else(|| StorageError::MissingProofNode(next_root.to_hex_string()))?;
+                current_node = match nodes.get(&next_root) {
+                    Some(n) => n,
+                    None => nodes
+                        .get(&alt_next_root)
+                        .ok_or(StorageError::MissingProofNode)?,
+                };
 
                 // Slice out the one bit and continue with the next iteration.
 
@@ -58,7 +63,7 @@ pub fn verify_starknet_merkle_proof(
 
                 // We should at most go down 251 depth. So if the length is greater than that, it is malformed.
                 if node_length > remaining_length {
-                    return Err(StorageError::InvalidEdgeNode(node_length, remaining_length));
+                    return Err(StorageError::InvalidEdgeNode);
                 }
 
                 // The node length must not be zero, or else we can get stuck in an infinite loop and cannot proceed.
@@ -77,7 +82,7 @@ pub fn verify_starknet_merkle_proof(
                 // Check that the bits that we skip must all be 0.
                 for i in 0..(skip_length) {
                     if node_path_bits[usize::from(i)] {
-                        return Err(StorageError::NonZeroBit(i, node.path));
+                        return Err(StorageError::NonZeroBit);
                     }
                 }
 
@@ -99,9 +104,7 @@ pub fn verify_starknet_merkle_proof(
                         // If there is no remaining length after this, we have reached the bottom of the tree
 
                         if node.child == Felt::ZERO {
-                            return Err(StorageError::ChildNodeWithZeroValue(
-                                node.path.to_hex_string(),
-                            ));
+                            return Err(StorageError::ChildNodeWithZeroValue);
                         }
 
                         if value == node.child {
@@ -111,19 +114,15 @@ pub fn verify_starknet_merkle_proof(
                         } else {
                             // Failed if the leaf node contains a different value.
 
-                            return Err(StorageError::ChildNodeMismatchValue(
-                                node.path.to_hex_string(),
-                                node.child.to_hex_string(),
-                                value,
-                            ));
+                            return Err(StorageError::ChildNodeMismatchValue);
                         }
                     } else {
                         // If there are remaining length, this means that there is still a sub-branch
                         // beneath that contains two non-zero nodes.
 
-                        current_node = nodes.get(&node.child).ok_or_else(|| {
-                            StorageError::MissingProofNode(node.child.to_hex_string())
-                        })?;
+                        current_node = nodes
+                            .get(&node.child)
+                            .ok_or(StorageError::ChildNodeMismatchValue)?;
 
                         // Slice out the bits that we have traversed and continue with the next iteration.
 
@@ -138,7 +137,7 @@ pub fn verify_starknet_merkle_proof(
                     // Otherwise, the path don't match and the expected value is not zero.
                     // Then we failed to prove that a non-zero value is present in the tree.
 
-                    return Err(StorageError::MissingValue(node.clone()));
+                    return Err(StorageError::MissingValue);
                 }
             }
         }
@@ -162,10 +161,14 @@ pub fn verify_starknet_storage_proof(
     // is not at the first position.
 
     if storage_proof.contracts_proof.contract_leaves_data.len() != 1 {
-        return Err(StorageError::Generic(format!(
+        let mut text = String::new();
+        write!(
+            &mut text,
             "storage proof should contain exactly 1 contract proof, but it contains {}",
             storage_proof.contracts_proof.contract_leaves_data.len()
-        )));
+        )
+        .expect("Failed to write to string");
+        return Err(StorageError::Generic(text));
     }
 
     // Get the state details about the contract, which contains the

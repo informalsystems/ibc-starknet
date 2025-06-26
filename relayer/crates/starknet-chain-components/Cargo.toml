@@ -19,6 +19,7 @@ hermes-core                      = { workspace = true }
 hermes-cosmos-core               = { workspace = true }
 hermes-cairo-encoding-components = { workspace = true }
 poseidon                         = { workspace = true }
+starknet-storage-verifier        = { workspace = true, features = [ "ibc" ] }
 
 ibc        = { workspace = true }
 ibc-proto  = { workspace = true }

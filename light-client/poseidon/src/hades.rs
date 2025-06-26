@@ -1,5 +1,7 @@
-use std::sync::LazyLock;
+use alloc::string::String;
+use core::fmt::Write;
 
+use sha2::Digest;
 use starknet_types_core::felt::Felt;
 
 use super::poseidon_3::{FULL_ROUNDS, MDS, PARTIAL_ROUNDS, RATE_PLUS_1};
@@ -9,22 +11,22 @@ use super::poseidon_3::{FULL_ROUNDS, MDS, PARTIAL_ROUNDS, RATE_PLUS_1};
 
 pub const FN_NAME: &str = "Hades";
 
-pub static ROUND_CONSTANTS: LazyLock<[Felt; RATE_PLUS_1 * (FULL_ROUNDS + PARTIAL_ROUNDS)]> =
-    LazyLock::new(|| {
-        core::array::from_fn(|idx| {
-            // https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/cairo/common/poseidon_utils.py#L15
-            let value = format!("{FN_NAME}{idx}");
+const N: usize = RATE_PLUS_1 * (FULL_ROUNDS + PARTIAL_ROUNDS);
+// TODO: Optimize by precomputing the constants
+pub fn round_constants() -> [Felt; N] {
+    core::array::from_fn(|idx| {
+        let mut value = String::new();
+        write!(&mut value, "{FN_NAME}{idx}").expect("Failed to write to string");
 
-            let hash = {
-                use sha2::Digest;
-                let mut hasher = sha2::Sha256::new();
-                hasher.update(value);
-                hasher.finalize()
-            };
+        let hash = {
+            let mut hasher = sha2::Sha256::new();
+            hasher.update(value);
+            hasher.finalize()
+        };
 
-            Felt::from_bytes_be(&hash.into())
-        })
-    });
+        Felt::from_bytes_be(&hash.into())
+    })
+}
 
 pub const HADES_PERM_3: HadesPermutate<RATE_PLUS_1, FULL_ROUNDS, PARTIAL_ROUNDS> =
     HadesPermutate { mds: MDS };
@@ -54,7 +56,8 @@ impl<const DIM: usize, const FULL_ROUNDS: usize, const PARTIAL_ROUNDS: usize>
         round_idx: usize,
     ) -> [Felt; DIM] {
         // Add-Round Key
-        let mut values = core::array::from_fn(|i| values[i] + ROUND_CONSTANTS[round_idx * DIM + i]);
+        let mut values =
+            core::array::from_fn(|i| values[i] + round_constants()[round_idx * DIM + i]);
 
         // Perform the cube operation (x^3) in the field.
         fn cube(x: Felt) -> Felt {
@@ -104,7 +107,7 @@ mod tests {
 
     #[test]
     fn test_hades_ark() {
-        let actual = ROUND_CONSTANTS[12];
+        let actual = round_constants()[12];
 
         // https://github.com/starkware-industries/poseidon/blob/main/poseidon3.txt#L28
         let expected_num =

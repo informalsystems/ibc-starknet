@@ -715,7 +715,7 @@ dependencies = [
  "rand_core",
  "rayon",
  "sha2 0.10.8",
- "thiserror 1.0.69",
+ "thiserror",
 ]
 
 [[package]]
@@ -739,7 +739,7 @@ dependencies = [
  "schemars",
  "serde",
  "serde_json",
- "thiserror 1.0.69",
+ "thiserror",
 ]
 
 [[package]]
@@ -774,7 +774,7 @@ dependencies = [
  "serde-json-wasm",
  "sha2 0.10.8",
  "static_assertions",
- "thiserror 1.0.69",
+ "thiserror",
 ]
 
 [[package]]
@@ -1163,7 +1163,7 @@ dependencies = [
  "serde_json",
  "sha2 0.10.8",
  "sha3",
- "thiserror 1.0.69",
+ "thiserror",
  "uuid",
 ]
 
@@ -1658,13 +1658,13 @@ dependencies = [
 [[package]]
 name = "ibc-client-cw"
 version = "0.56.0"
-source = "git+https://github.com/informalsystems/cosmwasm-ibc.git?branch=starknet/demo2#7d37df42469728747fde966d6e4789bc87404b42"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b9620ac23289491d842beeacd4512feb3e1610ba031bbceec9cffe46e07fb8c"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
  "cw-storage-plus",
  "derive_more 1.0.0",
- "ibc-client-tendermint",
  "ibc-client-wasm-types",
  "ibc-core",
  "prost",
@@ -1683,6 +1683,7 @@ dependencies = [
  "ibc-client-cw",
  "ibc-client-starknet-types",
  "ibc-core",
+ "poseidon",
  "prost",
  "prost-types",
  "serde",
@@ -3381,7 +3382,7 @@ dependencies = [
  "starknet-crypto",
  "starknet-providers",
  "starknet-signers",
- "thiserror 1.0.69",
+ "thiserror",
 ]
 
 [[package]]
@@ -3409,7 +3410,7 @@ dependencies = [
  "starknet-accounts",
  "starknet-core 0.13.0",
  "starknet-providers",
- "thiserror 1.0.69",
+ "thiserror",
 ]
 
 [[package]]
@@ -3524,7 +3525,7 @@ dependencies = [
  "serde_json",
  "serde_with",
  "starknet-core 0.13.0",
- "thiserror 1.0.69",
+ "thiserror",
  "url",
 ]
 
@@ -3542,7 +3543,7 @@ dependencies = [
  "rand",
  "starknet-core 0.13.0",
  "starknet-crypto",
- "thiserror 1.0.69",
+ "thiserror",
 ]
 
 [[package]]
@@ -3557,7 +3558,6 @@ dependencies = [
  "starknet-crypto",
  "starknet-macros",
  "starknet-storage-verifier",
- "thiserror 2.0.12",
 ]
 
 [[package]]
@@ -3739,16 +3739,7 @@ version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6aaf5339b578ea85b50e080feb250a3e8ae8cfcdff9a461c9ec2904bc923f52"
 dependencies = [
- "thiserror-impl 1.0.69",
-]
-
-[[package]]
-name = "thiserror"
-version = "2.0.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "567b8a2dae586314f7be2a752ec7474332959c6460e02bde30d702a66d488708"
-dependencies = [
- "thiserror-impl 2.0.12",
+ "thiserror-impl",
 ]
 
 [[package]]
@@ -3756,17 +3747,6 @@ name = "thiserror-impl"
 version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.98",
-]
-
-[[package]]
-name = "thiserror-impl"
-version = "2.0.12"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f7cf42b4507d8ea322120659672cf1b9dbb93f8f2d4ecfd6e51350ff5b17a1d"
 dependencies = [
  "proc-macro2",
  "quote",

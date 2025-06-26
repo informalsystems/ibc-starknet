@@ -1,6 +1,6 @@
 mod keys;
 mod paths;
-mod utils;
+pub mod utils;
 
 pub use keys::*;
 pub use paths::*;

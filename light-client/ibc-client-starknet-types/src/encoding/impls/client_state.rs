@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::EncodeChainIdField;
 use hermes_encoding_components::impls::{CombineEncoders, DecodeFrom, EncodeField};
@@ -29,6 +31,10 @@ delegate_components! {
                     symbol!("pub_key"),
                     EncodeByteField<3>,
                 >,
+                EncodeField<
+                    symbol!("ibc_contract_address"),
+                    EncodeByteField<4>,
+                >,
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
@@ -36,21 +42,25 @@ delegate_components! {
                 DecodeRequiredProtoField<1, UseContext>,
                 EncodeChainIdField<2>,
                 EncodeByteField<3>,
+                EncodeByteField<4>,
             ]>
         >,
     }
 }
 
 impl Transformer for EncodeStarknetClientState {
-    type From = Product![Height, ChainId, Vec<u8>];
+    type From = Product![Height, ChainId, Vec<u8>, Vec<u8>];
 
     type To = StarknetClientState;
 
-    fn transform(product![latest_height, chain_id, pub_key]: Self::From) -> Self::To {
+    fn transform(
+        product![latest_height, chain_id, pub_key, ibc_contract_address]: Self::From,
+    ) -> Self::To {
         StarknetClientState {
             latest_height,
             chain_id,
             pub_key,
+            ibc_contract_address,
         }
     }
 }

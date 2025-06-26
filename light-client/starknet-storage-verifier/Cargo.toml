@@ -19,7 +19,7 @@ poseidon = { workspace = true }
 
 # External dependencies
 indexmap  = { workspace = true }
-thiserror = { workspace = true }
+#thiserror = { workspace = true }
 
 # Ibc dependencies
 ibc-core = { workspace = true, optional = true }

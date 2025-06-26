@@ -1,7 +1,9 @@
+use std::marker::PhantomData;
+
 use hermes_core::chain_components::traits::{
     CanQueryBlock, CanQueryChainHeight, CreateClientPayloadBuilder,
-    CreateClientPayloadBuilderComponent, HasChainId, HasCreateClientPayloadOptionsType,
-    HasCreateClientPayloadType,
+    CreateClientPayloadBuilderComponent, HasAddressType, HasChainId,
+    HasCreateClientPayloadOptionsType, HasCreateClientPayloadType,
 };
 use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use hermes_prelude::*;
@@ -10,7 +12,8 @@ use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
 
-use crate::traits::HasStarknetProofSigner;
+use crate::impls::StarknetAddress;
+use crate::traits::{CanQueryContractAddress, HasStarknetProofSigner};
 use crate::types::{
     StarknetChainStatus, StarknetConsensusState, StarknetCreateClientPayload,
     StarknetCreateClientPayloadOptions, WasmStarknetConsensusState,
@@ -27,6 +30,8 @@ where
             CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryBlock<Block = StarknetChainStatus>
+        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasAddressType<Address = StarknetAddress>
         + CanQueryChainHeight<Height = u64>
         + HasChainId<ChainId = ChainId>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
@@ -53,12 +58,15 @@ where
             },
         };
 
+        let ibc_core_address = chain.query_contract_address(PhantomData).await?;
+
         Ok(StarknetCreateClientPayload {
             latest_height: Height::new(0, block.height).map_err(Chain::raise_error)?,
             chain_id: chain.chain_id().clone(),
             client_state_wasm_code_hash: create_client_options.wasm_code_hash.into(),
             consensus_state,
             proof_signer_pub_key: chain.proof_signer().public_key.serialize().to_vec(),
+            ibc_contract_address: ibc_core_address.to_bytes_be().to_vec(),
         })
     }
 }

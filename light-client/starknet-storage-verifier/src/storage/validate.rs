@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use indexmap::IndexMap;
 use starknet_core::types::{ContractsProof, MerkleNode, StorageProof};
 use starknet_crypto::{pedersen_hash, Felt};
@@ -84,7 +86,7 @@ fn validate_merkle_node_parent(
         }
     }
 
-    Err(StorageError::MissingParentNode(hash.to_hex_string()))
+    Err(StorageError::MissingParentNode)
 }
 
 fn validate_merkle_node(node_hash: &Felt, node: &MerkleNode) -> Result<(), StorageError> {
@@ -93,11 +95,7 @@ fn validate_merkle_node(node_hash: &Felt, node: &MerkleNode) -> Result<(), Stora
             let expected = pedersen_hash(&node.left, &node.right);
 
             if &expected != node_hash {
-                return Err(StorageError::MismatchBinaryHash(
-                    node.clone().into(),
-                    expected,
-                    *node_hash,
-                ));
+                return Err(StorageError::MismatchBinaryHash);
             }
         }
 
@@ -105,11 +103,7 @@ fn validate_merkle_node(node_hash: &Felt, node: &MerkleNode) -> Result<(), Stora
             let expected = pedersen_hash(&node.child, &node.path) + node.length;
 
             if &expected != node_hash {
-                return Err(StorageError::MismatchEdgeHash(
-                    node.clone().into(),
-                    expected,
-                    *node_hash,
-                ));
+                return Err(StorageError::MismatchEdgeHash);
             }
         }
     }
@@ -121,7 +115,7 @@ fn validate_contracts_proof(contracts_proof: &ContractsProof) -> Result<(), Stor
     for contract_leaf in contracts_proof.contract_leaves_data.iter() {
         let storage_root = contract_leaf
             .storage_root
-            .ok_or_else(|| StorageError::MissingStorageRoot(contract_leaf.clone()))?;
+            .ok_or(StorageError::MissingStorageRoot)?;
 
         let contract_hash = pedersen_hash(
             &pedersen_hash(
@@ -144,12 +138,7 @@ fn validate_contracts_proof(contracts_proof: &ContractsProof) -> Result<(), Stor
                 }
                 _ => None,
             })
-            .ok_or_else(|| {
-                StorageError::MissingContractHash(
-                    contract_hash.to_hex_string(),
-                    contract_leaf.clone().into(),
-                )
-            })?;
+            .ok_or(StorageError::MissingContractHash)?;
     }
 
     Ok(())
