@@ -65,8 +65,8 @@ pub struct ConsensusState {
 }
 
 pub struct Header {
-    pub starknet_header: StarknetBlockHeader,
-    
+    pub starknet_block_header: StarknetBlockHeader,
+
     pub contract_trie_root: Felt,
     pub class_trie_root: Felt,
 
@@ -79,18 +79,29 @@ pub struct Header {
 
 ```rust
 fn verify_header(
-    header: StarknetBlockHeader, // untrusted; given by the relayer
-    contract_trie_root: Felt, // untrusted; given by the relayer
-    class_trie_root: Felt, // untrusted; given by the relayer
-    ibc_core_contract_address: Felt, // trusted; given by the ibc module
-    ibc_core_trie_root: Felt, // untrusted; given by the relayer
-    contract_trie_root_proof: StarknetStorageProof, // untrusted; given by the relayer
+    client_state: ClientState, // trusted; given by the ibc module
+
+    header: Header, // untrusted; given by the relayer
 ) -> Felt {
-    assert!(header.verify_signature());
+    let Header {
+        starknet_block_header,
+        contract_trie_root,
+        class_trie_root,
+        contract_trie_root_proof,
+        ibc_core_trie_root,
+    } = header;
+
+    let ClientState {
+        ibc_core_contract_address,
+        ...
+    } = client_state;
+
+
+    assert!(starknet_block_header.verify_signature());
 
     // header is now trusted
 
-    let expected_state_root = header.state_root;
+    let expected_state_root = starknet_block_header.state_root;
 
     let actual_state_root = compute_global_state_root(contract_trie_root, class_trie_root);
 
@@ -111,12 +122,18 @@ fn verify_header(
 
 ```rust
 fn verify_membership(
-    ibc_core_trie_root: Felt, // trusted; given by the ibc module
+    consensus_state: ConsensusState, // trusted; given by the ibc module
     key: Felt, // trusted; given by the ibc module
+
     // if value is None, we are checking for non-membership
     value: Option<Felt>, // untrusted; given by the relayer
     membership_proof: StarknetStorageProof, // untrusted; given by the relayer
 ) -> bool {
+    let ConsensusState {
+        ibc_core_trie_root,
+        ...
+    } = consensus_state;
+
     assert!(membership_proof.verify(ibc_core_trie_root, key, value));
 
     // value is now trusted
