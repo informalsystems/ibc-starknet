@@ -18,7 +18,7 @@ workspace = true
 poseidon = { workspace = true }
 
 # External dependencies
-indexmap  = { workspace = true }
+indexmap = { workspace = true }
 #thiserror = { workspace = true }
 
 # Ibc dependencies
