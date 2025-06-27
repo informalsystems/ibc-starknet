@@ -1724,7 +1724,6 @@ dependencies = [
  "ibc-proto",
  "prost",
  "serde",
- "tendermint",
 ]
 
 [[package]]
@@ -3715,9 +3714,9 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "tendermint"
-version = "0.40.4"
+version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc997743ecfd4864bbca8170d68d9b2bee24653b034210752c2d883ef4b838b1"
+checksum = "37d513ce7f9e41c67ab2dd3d554ef65f36fbcc61745af1e1f93eafdeefa1ce37"
 dependencies = [
  "bytes",
  "digest 0.10.7",
@@ -3743,9 +3742,9 @@ dependencies = [
 
 [[package]]
 name = "tendermint-light-client-verifier"
-version = "0.40.4"
+version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "548421907264a3a580634d71459a6ceda0dc569f24c9675adfab17465edf8511"
+checksum = "7affc5fffe9df158185e15bce3e47fc3a0c901e6708f3b7d33f0867d7aef8ce1"
 dependencies = [
  "derive_more 0.99.20",
  "flex-error",
