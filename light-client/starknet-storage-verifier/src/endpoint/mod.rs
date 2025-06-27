@@ -1,7 +1,6 @@
-use starknet::providers::ProviderError;
-use starknet::providers::{jsonrpc::HttpTransport, JsonRpcClient, Provider, Url};
-use starknet_core::types::{ConfirmedBlockId, Felt};
-use starknet_core::types::{ContractStorageKeys, StorageProof};
+use starknet::providers::jsonrpc::HttpTransport;
+use starknet::providers::{JsonRpcClient, Provider, ProviderError, Url};
+use starknet_core::types::{ConfirmedBlockId, ContractStorageKeys, Felt, StorageProof};
 
 const SEPOLIA_RPC_ENDPOINT: &str = "https://starknet-sepolia.reddio.com/rpc/v0_8";
 const MAINNET_RPC_ENDPOINT: &str = "https://starknet-mainnet.reddio.com/rpc/v0_8";

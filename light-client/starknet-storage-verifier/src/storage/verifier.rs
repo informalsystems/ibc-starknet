@@ -1,3 +1,5 @@
+use alloc::format;
+
 use indexmap::IndexMap;
 use starknet_core::types::{MerkleNode, StorageProof};
 use starknet_core::utils::cairo_short_string_to_felt;
@@ -5,8 +7,6 @@ use starknet_crypto::{pedersen_hash, poseidon_hash_many, Felt};
 
 use crate::storage::validate::validate_storage_proof;
 use crate::StorageError;
-
-use alloc::format;
 
 const GLOBAL_STATE_VERSION: &str = "STARKNET_STATE_V0";
 

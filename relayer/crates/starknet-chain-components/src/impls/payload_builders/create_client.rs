@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use core::marker::PhantomData;
 
 use hermes_core::chain_components::traits::{
     CanQueryBlock, CanQueryChainHeight, CreateClientPayloadBuilder,
@@ -11,9 +11,10 @@ use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
+use starknet_v14::core::types::StorageProof;
 
 use crate::impls::StarknetAddress;
-use crate::traits::{CanQueryContractAddress, HasStarknetProofSigner};
+use crate::traits::{CanQueryContractAddress, CanQueryStorageProof, HasStarknetProofSigner};
 use crate::types::{
     StarknetChainStatus, StarknetConsensusState, StarknetCreateClientPayload,
     StarknetCreateClientPayloadOptions, WasmStarknetConsensusState,
@@ -31,6 +32,7 @@ where
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryBlock<Block = StarknetChainStatus>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + CanQueryStorageProof<StorageProof = StorageProof>
         + HasAddressType<Address = StarknetAddress>
         + CanQueryChainHeight<Height = u64>
         + HasChainId<ChainId = ChainId>
@@ -46,7 +48,22 @@ where
 
         let block = chain.query_block(&height).await?;
 
-        let root = Vec::from(block.block_hash.to_bytes_be());
+        let storage_proof = chain
+            .query_storage_proof(
+                &height,
+                &chain.query_contract_address(PhantomData).await?,
+                &[],
+            )
+            .await?;
+
+        let contract_root = storage_proof
+            .contracts_proof
+            .contract_leaves_data
+            .first()
+            .and_then(|leaf| leaf.storage_root)
+            .unwrap();
+
+        let root = contract_root.to_bytes_be().to_vec();
 
         let consensus_state = WasmStarknetConsensusState {
             consensus_state: StarknetConsensusState {
