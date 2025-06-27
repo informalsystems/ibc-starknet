@@ -195,14 +195,23 @@ pub fn decode_2_complement_32(value: @u32) -> i32 {
     }
 }
 
+pub fn reverse_u256(mut value: u256) -> u256 {
+    let mut reversed = 0;
+
+    let mut span = [0; 32].span();
+
+    while let Some(_) = span.pop_front() {
+        reversed *= 0x100;
+        reversed += value & 0xFF;
+        value /= 0x100;
+    }
+
+    reversed
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{
-        decode_2_complement_128, decode_2_complement_64, encode_2_complement_128,
-        encode_2_complement_64, next_power_of_two, u32_from_big_endian, u32_from_little_endian,
-        u32_to_big_endian, u32_to_little_endian, u64_from_big_endian, u64_from_little_endian,
-        u64_to_big_endian, u64_to_little_endian,
-    };
+    use super::*;
 
     #[test]
     fn test_128_encode_decode_2_complement_zero() {
@@ -404,5 +413,21 @@ mod tests {
         let decoded = u32_from_big_endian(bytes);
         let encoded = u32_to_big_endian(decoded);
         assert_eq!(encoded, bytes, "invalid encoded value");
+    }
+
+    #[test]
+    fn test_reverse_u256() {
+        // with leading zeros
+        let value: u256 = 0x1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF;
+        let reversed = reverse_u256(value);
+        let expected: u256 = 0xEFCDAB9078563412EFCDAB9078563412EFCDAB90785634120000000000000000;
+        assert_eq!(reversed, expected, "reverse_u256 failed");
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_reverse_u256_roundtrip(x: u256) {
+        let roundtrip = reverse_u256(reverse_u256(x));
+        assert_eq!(roundtrip, x, "reverse_u256 roundtrip failed");
     }
 }

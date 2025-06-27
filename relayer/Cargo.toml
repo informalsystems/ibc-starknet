@@ -61,6 +61,7 @@ sha256                      = { version = "1.6.0" }
 ureq                        = { version = "3.0.11" }
 indexmap                    = { version = "2.9.0" }
 humantime                   = { version = "2.1.0" }
+garaga                      = { version = "0.18.1", package = "garaga_rs", default-features = false }
 
 ibc                       = { version = "0.56.0" }
 ibc-proto                 = { version = "0.51.1" }
@@ -156,6 +157,8 @@ ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types"
 starknet-block-verifier = { path = "../light-client/starknet-block-verifier" }
 
 poseidon = { path = "../light-client/poseidon" }
+
+garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", rev = "5c5859e" }
 
 cgp             = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-core        = { git = "https://github.com/contextgeneric/cgp.git" }
