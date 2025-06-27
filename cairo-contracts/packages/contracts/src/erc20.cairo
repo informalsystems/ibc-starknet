@@ -55,15 +55,16 @@ pub mod ERC20Mintable {
         self._set_decimals(decimals);
     }
 
+    // https://docs.openzeppelin.com/contracts-cairo/2.0.0/erc20#the_storage_approach
 
     #[abi(embed_v0)]
     impl ERC20MetadataImpl of IERC20Metadata<ContractState> {
         fn name(self: @ContractState) -> ByteArray {
-            self.erc20.name()
+            self.erc20.ERC20_name.read()
         }
 
         fn symbol(self: @ContractState) -> ByteArray {
-            self.erc20.symbol()
+            self.erc20.ERC20_symbol.read()
         }
 
         fn decimals(self: @ContractState) -> u8 {

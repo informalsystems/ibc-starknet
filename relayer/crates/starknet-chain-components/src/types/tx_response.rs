@@ -1,6 +1,6 @@
 use starknet::core::types::{
-    ExecutionResult, RevertedInvocation, TransactionReceipt, TransactionReceiptWithBlockInfo,
-    TransactionTrace,
+    ExecutionResources, ExecutionResult, RevertedInvocation, TransactionReceipt,
+    TransactionReceiptWithBlockInfo, TransactionTrace,
 };
 
 #[derive(Debug)]
@@ -57,6 +57,16 @@ impl TxResponse {
                     None
                 }
             }
+        }
+    }
+
+    pub fn execution_resources(&self) -> &ExecutionResources {
+        match &self.receipt.receipt {
+            TransactionReceipt::Invoke(receipt) => &receipt.execution_resources,
+            TransactionReceipt::L1Handler(receipt) => &receipt.execution_resources,
+            TransactionReceipt::Declare(receipt) => &receipt.execution_resources,
+            TransactionReceipt::Deploy(receipt) => &receipt.execution_resources,
+            TransactionReceipt::DeployAccount(receipt) => &receipt.execution_resources,
         }
     }
 }

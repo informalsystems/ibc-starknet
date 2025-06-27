@@ -1,5 +1,7 @@
 use core::time::Duration;
 
+use hermes_core::logging_components::traits::CanLog;
+use hermes_core::logging_components::types::LevelInfo;
 use hermes_core::relayer_components::transaction::traits::{
     HasTxHashType, HasTxResponseType, TxResponseQuerier, TxResponseQuerierComponent,
 };
@@ -20,6 +22,7 @@ where
         + HasTxResponseType<TxResponse = TxResponse>
         + HasStarknetClient<Client: Provider>
         + HasRuntime<Runtime: CanSleep>
+        + CanLog<LevelInfo>
         + CanRaiseAsyncError<ProviderError>,
 {
     async fn query_tx_response(
@@ -41,7 +44,20 @@ where
                 // We may not need this when we transition to a production chain.
                 chain.runtime().sleep(Duration::from_secs(1)).await;
 
-                Ok(Some(TxResponse { receipt, trace }))
+                let tx_response = TxResponse { receipt, trace };
+
+                chain
+                    .log(
+                        &format!(
+                            "[{}] {:?}",
+                            tx_hash.to_fixed_hex_string(),
+                            tx_response.execution_resources(),
+                        ),
+                        &LevelInfo,
+                    )
+                    .await;
+
+                Ok(Some(tx_response))
             }
             Err(ProviderError::StarknetError(StarknetError::TransactionHashNotFound)) => Ok(None),
             Err(e) => Err(Chain::raise_error(e)),
