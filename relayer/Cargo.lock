@@ -521,7 +521,7 @@ dependencies = [
  "anyhow",
  "cairo-lang-utils",
  "const-fnv1a-hash",
- "convert_case 0.7.1",
+ "convert_case",
  "derivative",
  "itertools",
  "lalrpop",
@@ -612,7 +612,7 @@ dependencies = [
  "cairo-lang-sierra",
  "cairo-lang-sierra-to-casm",
  "cairo-lang-utils",
- "convert_case 0.7.1",
+ "convert_case",
  "itertools",
  "num-bigint",
  "num-integer",
@@ -941,12 +941,6 @@ checksum = "7c74b8349d32d297c9134b8c88677813a227df8f779daa29bfc29c183fe3dca6"
 
 [[package]]
 name = "convert_case"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
-
-[[package]]
-name = "convert_case"
 version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bb402b8d4c85569410425650ce3eddc7d698ed96d39a73f941b08fb63082f1e7"
@@ -1202,10 +1196,8 @@ version = "0.99.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6edb4b64a43d977b8e99788fe3a04d483834fba1215a7e02caa415b626497f7f"
 dependencies = [
- "convert_case 0.4.0",
  "proc-macro2",
  "quote",
- "rustc_version",
  "syn 2.0.104",
 ]
 
@@ -3028,7 +3020,7 @@ name = "ibc-client-starknet-types"
 version = "0.1.0"
 dependencies = [
  "cgp",
- "derive_more 0.99.20",
+ "derive_more 2.0.1",
  "hermes-cosmos-encoding-components",
  "hermes-encoding-components",
  "hermes-prelude",
