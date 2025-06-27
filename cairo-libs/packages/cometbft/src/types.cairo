@@ -1,9 +1,7 @@
-use alexandria_math::ed25519::verify_signature;
 pub use canonical_vote_impl::CanonicalVoteAsProtoMessage;
 use cometbft::errors::CometErrors;
 use cometbft::utils::Fraction;
 use core::sha256::compute_sha256_byte_array;
-use ibc_utils::bytes::SpanU8TryIntoU256;
 use protobuf::primitives::array::{ByteArrayAsProtoMessage, BytesAsProtoMessage};
 use protobuf::primitives::numeric::{
     BoolAsProtoMessage, I32AsProtoMessage, I64AsProtoMessage, U64AsProtoMessage,
@@ -14,6 +12,7 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
 use protobuf::types::wkt::{Duration, Timestamp};
+use crate::ed25519::GaragaEd25519Verifier as Ed25519Verifier;
 use crate::light_client::Header as LcHeader;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
@@ -324,27 +323,9 @@ pub struct PublicKey {
 
 #[generate_trait]
 pub impl PublicKeyImpl of PublicKeyTrait {
-    fn verify(self: @PublicKey, msg: Span<u8>, signature: Span<u8>) {
+    fn verify(self: @PublicKey, msg: Span<u8>, signature: Span<u8>, hint: Span<felt252>) {
         match self.sum {
-            Sum::Ed25519(pk) => {
-                assert(signature.len() == 64, CometErrors::INVALID_SIGNATURE_LENGTH);
-                assert(pk.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
-
-                let r_sign = signature
-                    .slice(0, 32)
-                    .try_into()
-                    .unwrap(); // Never fails as length is 32.
-                let s_sign = signature
-                    .slice(32, 32)
-                    .try_into()
-                    .unwrap(); // Never fails as length is 32.
-                let pubkey = pk.span().try_into().unwrap(); // Never fails as length is 32.
-
-                assert(
-                    verify_signature(msg, array![r_sign, s_sign].span(), pubkey),
-                    CometErrors::INVALID_ED25519_SIGNATURE,
-                );
-            },
+            Sum::Ed25519(pk) => Ed25519Verifier::assert_signature(msg, signature, pk.span(), hint),
             _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
         }
     }
@@ -456,8 +437,10 @@ pub impl ValidatorImpl of ValidatorTrait {
         assert(self.address == @self.pub_key.address(), 'invalid validator ID');
     }
 
-    fn verify_signature(self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>) {
-        self.pub_key.verify(sign_bytes, signature);
+    fn verify_signature(
+        self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>, hints: Span<felt252>,
+    ) {
+        self.pub_key.verify(sign_bytes, signature, hints);
     }
 }
 
@@ -661,19 +644,27 @@ impl AccountIdSerde of Serde<AccountId> {
 
 #[derive(Drop, Debug, Clone, PartialEq)]
 pub struct NonAbsentCommitVotes {
-    votes: Array<NonAbsentCommitVote>,
+    votes: Array<(NonAbsentCommitVote, Array<felt252>)>,
 }
 
 #[generate_trait]
 pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
-    fn new(signed_header: SignedHeader) -> NonAbsentCommitVotes {
+    fn new(
+        signed_header: SignedHeader, mut signature_hints: Array<Array<felt252>>,
+    ) -> NonAbsentCommitVotes {
         let mut votes = ArrayTrait::new();
 
         let commit = signed_header.commit;
 
         let mut signatures = commit.signatures.span();
+        let mut signature_hints = signature_hints.span();
 
-        while let Some(signature) = signatures.pop_front() {
+        assert(
+            signatures.len() == signature_hints.len(), CometErrors::INVALID_SIGNATURE_HINTS_LENGTH,
+        );
+
+        while let (Some(signature), Some(signature_hint)) =
+            (signatures.pop_front(), signature_hints.pop_front()) {
             let block_id_flag = signature.block_id_flag;
             if block_id_flag == @BlockIdFlag::Commit {
                 let signed_vote = SignedVote {
@@ -691,7 +682,8 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
                 let verified = false;
                 let non_absent_commit_vote = NonAbsentCommitVote { signed_vote, verified };
-                votes.append(non_absent_commit_vote);
+
+                votes.append((non_absent_commit_vote, signature_hint.clone()));
             }
         }
 
@@ -701,7 +693,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
     fn has_voted(self: @NonAbsentCommitVotes, validator: @Validator) -> bool {
         let mut votes_span = self.votes.span();
         let mut result = false;
-        while let Option::Some(ith_vote) = votes_span.pop_front() {
+        while let Option::Some((ith_vote, signature_hints)) = votes_span.pop_front() {
             if ith_vote.validator_id() == validator.address {
                 if *(ith_vote.verified) {
                     result = false;
@@ -717,7 +709,10 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
                 validator.validate_id();
 
-                validator.verify_signature(signed_bytes.span(), signature.span());
+                validator
+                    .verify_signature(
+                        signed_bytes.span(), signature.span(), signature_hints.span(),
+                    );
 
                 // TODO: set verified field to true
 

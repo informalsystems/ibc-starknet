@@ -30,6 +30,7 @@ overflow-checks = true
 cgp            = { version = "0.4.0" }
 cgp-error-eyre = { version = "0.4.0" }
 
+ibc                         = { version = "0.56.0" }
 starknet                    = { version = "0.13.0" }
 starknet-v14                = { version = "0.14.0", package = "starknet" }
 starknet-types-core         = { version = "0.1.8" }
@@ -57,17 +58,16 @@ http                        = { version = "1.3" }
 futures                     = { version = "0.3.31", default-features = false }
 tiny-bip39                  = { version = "1.0" }
 hex                         = { version = "0.4.3" }
-sha256                      = { version = "1.6" }
 ureq                        = { version = "3.0" }
 indexmap                    = { version = "2.10" }
 humantime                   = { version = "2.2" }
 time                        = { version = "0.3" }
-
-ibc                       = { version = "0.56.0" }
-ibc-proto                 = { version = "0.51.1" }
-ibc-client-starknet-types = { version = "0.1.0" }
-tendermint                = { version = "0.40" }
-tendermint-rpc            = { version = "0.40" }
+sha256                      = { version = "1.6" }
+garaga                      = { version = "0.18.1", package = "garaga_rs", default-features = false }
+ibc-proto                   = { version = "0.51.1" }
+ibc-client-starknet-types   = { version = "0.1.0" }
+tendermint                  = { version = "0.40" }
+tendermint-rpc              = { version = "0.40" }
 
 hermes-prelude                      = { version = "0.1.0" }
 hermes-core                         = { version = "0.1.0" }
@@ -157,6 +157,8 @@ ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types"
 starknet-block-verifier = { path = "../light-client/starknet-block-verifier" }
 
 poseidon = { path = "../light-client/poseidon" }
+
+garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", rev = "5c5859e" }
 
 cgp             = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 cgp-core        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
