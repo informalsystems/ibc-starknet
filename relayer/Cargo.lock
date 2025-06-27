@@ -1698,7 +1698,7 @@ dependencies = [
 [[package]]
 name = "garaga_rs"
 version = "0.18.1"
-source = "git+https://github.com/keep-starknet-strange/garaga#5c5859e6dc5515f542c310cb38a149602e774112"
+source = "git+https://github.com/keep-starknet-strange/garaga?rev=5c5859e#5c5859e6dc5515f542c310cb38a149602e774112"
 dependencies = [
  "arbitrary",
  "getrandom 0.3.2",
