@@ -68,7 +68,7 @@ impl ClientStateCommon for ClientState {
         &self,
         _prefix: &CommitmentPrefix,
         proof: &CommitmentProofBytes,
-        _root: &CommitmentRoot,
+        root: &CommitmentRoot,
         path: PathBytes,
         value: Vec<u8>,
     ) -> Result<(), ClientError> {
@@ -93,12 +93,12 @@ impl ClientStateCommon for ClientState {
 
         // TODO: Verify that the root matches the one in the storage proof
 
-        let contract_address = Felt::from_bytes_be_slice(self.0.ibc_contract_address.as_slice());
+        // commitment root is: contract_storage_root.to_bytes_be()
+        let contract_root = Felt::from_bytes_be_slice(root.as_bytes());
 
-        verify_starknet_storage_proof(&storage_proof, &contract_address, felt_path, felt_value)
-            .map_err(|e| {
-                ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
-            })
+        verify_starknet_storage_proof(&storage_proof, contract_root, felt_path, felt_value).map_err(
+            |e| ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership),
+        )
     }
 
     fn verify_non_membership_raw(
@@ -128,12 +128,13 @@ impl ClientStateCommon for ClientState {
 
         // TODO: Verify that the root matches the one in the storage proof
 
-        let contract_address = Felt::from_bytes_be_slice(self.0.ibc_contract_address.as_slice());
+        // commitment root is: contract_storage_root.to_bytes_be()
+        let contract_root = Felt::from_bytes_be_slice(root.as_bytes());
 
         // For non-membership proof, the expected value is a zero value
         let value = Felt::ZERO;
 
-        verify_starknet_storage_proof(&storage_proof, &contract_address, felt_path, value).map_err(
+        verify_starknet_storage_proof(&storage_proof, contract_root, felt_path, value).map_err(
             |e| ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership),
         )
     }
