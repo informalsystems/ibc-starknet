@@ -5,7 +5,7 @@ use starknet_core::types::{
 use starknet_crypto::{pedersen_hash, Felt};
 use starknet_macros::felt;
 use starknet_storage_verifier::verifier::{
-    verify_starknet_merkle_proof, verify_starknet_storage_proof,
+    verify_starknet_contract_proof, verify_starknet_merkle_proof, verify_starknet_storage_proof,
 };
 
 #[test]
@@ -118,8 +118,14 @@ fn test_verify_starknet_storage_proof() {
     let contract_address: Felt =
         felt!("0x4017d0ad6ddbc7e97208e2639fc5bbf9856b4ede9a66a5995aec87b0d45837c");
 
+    let state_root = felt!("0x2bba45af2d71e57b1f82f1668bc53184762e6212c22e69f9949e3a607022fd2");
+
     let verification_result =
-        verify_starknet_storage_proof(&storage_proof, &contract_address, key, value);
+        verify_starknet_contract_proof(&storage_proof, state_root, contract_address).and_then(
+            |contract_root| {
+                verify_starknet_storage_proof(&storage_proof, contract_root, key, value)
+            },
+        );
 
     assert!(
         verification_result.is_ok(),
@@ -321,8 +327,14 @@ fn test_verify_starknet_storage_proof_failure() {
     let contract_address: Felt =
         felt!("0x4017d0ad6ddbc7e97208e2639fc5bbf9856b4ede9a66a5995aec87b0d45837c");
 
+    let state_root = felt!("0x2bba45af2d71e57b1f82f1668bc53184762e6212c22e69f9949e3a607022fd2");
+
     let verification_result =
-        verify_starknet_storage_proof(&storage_proof, &contract_address, key, value);
+        verify_starknet_contract_proof(&storage_proof, state_root, contract_address).and_then(
+            |contract_root| {
+                verify_starknet_storage_proof(&storage_proof, contract_root, key, value)
+            },
+        );
 
     assert!(
         verification_result.is_err(),

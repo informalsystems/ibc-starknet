@@ -2,6 +2,8 @@
 
 extern crate alloc;
 
+#[cfg(feature = "endpoint")]
+pub mod endpoint;
 mod error;
 #[cfg(feature = "ibc")]
 pub mod ibc;

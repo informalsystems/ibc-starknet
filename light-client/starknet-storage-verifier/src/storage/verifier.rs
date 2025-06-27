@@ -1,12 +1,14 @@
-use alloc::string::String;
-use core::fmt::Write;
-
 use indexmap::IndexMap;
 use starknet_core::types::{MerkleNode, StorageProof};
-use starknet_crypto::{pedersen_hash, Felt};
+use starknet_core::utils::cairo_short_string_to_felt;
+use starknet_crypto::{pedersen_hash, poseidon_hash_many, Felt};
 
 use crate::storage::validate::validate_storage_proof;
 use crate::StorageError;
+
+use alloc::format;
+
+const GLOBAL_STATE_VERSION: &str = "STARKNET_STATE_V0";
 
 pub fn verify_starknet_merkle_proof(
     nodes: &IndexMap<Felt, MerkleNode>,
@@ -146,29 +148,41 @@ pub fn verify_starknet_merkle_proof(
     Err(StorageError::InvalidProof)
 }
 
-pub fn verify_starknet_storage_proof(
+/// Verifies a Starknet proof for a contract's state root.
+///
+/// On success, returns the contract's storage root.
+pub fn verify_starknet_contract_proof(
     storage_proof: &StorageProof,
-    contract_address: &Felt,
-    path: Felt,
-    value: Felt,
-) -> Result<(), StorageError> {
+    state_root: Felt,
+    contract_address: Felt,
+) -> Result<Felt, StorageError> {
     // Validate that all hash inside the storage proofs are derived correctly,
     // and all nodes parents converge to the stated roots.
     validate_storage_proof(storage_proof)?;
+
+    let global_roots = &storage_proof.global_roots;
+
+    let actual_state_root = poseidon_hash_many([
+        &cairo_short_string_to_felt(GLOBAL_STATE_VERSION).unwrap(),
+        &storage_proof.global_roots.contracts_tree_root,
+        &storage_proof.global_roots.classes_tree_root,
+    ]);
+
+    if actual_state_root != state_root {
+        return Err(StorageError::Generic(format!(
+            "The state root in the storage proof does not match the expected state root. Expected: {state_root:x?}, Actual: {actual_state_root:x?}",
+        )));
+    }
 
     // We assume that the storage proof only contains one contract proof.
     // If there is more than one, it may fail if the contract of interest
     // is not at the first position.
 
     if storage_proof.contracts_proof.contract_leaves_data.len() != 1 {
-        let mut text = String::new();
-        write!(
-            &mut text,
+        return Err(StorageError::Generic(format!(
             "storage proof should contain exactly 1 contract proof, but it contains {}",
             storage_proof.contracts_proof.contract_leaves_data.len()
-        )
-        .expect("Failed to write to string");
-        return Err(StorageError::Generic(text));
+        )));
     }
 
     // Get the state details about the contract, which contains the
@@ -178,15 +192,11 @@ pub fn verify_starknet_storage_proof(
         .contract_leaves_data
         .first()
         .ok_or(StorageError::MissingContractLeafNode)?;
+
     // Get the state root of the contract.
     let contract_root = contract_leaf
         .storage_root
         .ok_or(StorageError::MissingContractStorageRoot)?;
-
-    let contract_storage_proof = storage_proof
-        .contracts_storage_proofs
-        .first()
-        .ok_or(StorageError::MissingContractStorageProof)?;
 
     // The contract hash needs to be calculated manually and is not stored in the storage proof.
     let contract_hash = pedersen_hash(
@@ -202,9 +212,34 @@ pub fn verify_starknet_storage_proof(
     verify_starknet_merkle_proof(
         &storage_proof.contracts_proof.nodes,
         storage_proof.global_roots.contracts_tree_root,
-        *contract_address,
+        contract_address,
         contract_hash,
     )?;
+
+    Ok(contract_root)
+}
+
+pub fn verify_starknet_storage_proof(
+    storage_proof: &StorageProof,
+    contract_root: Felt,
+    path: Felt,
+    value: Felt,
+) -> Result<(), StorageError> {
+    // Validate that all hash inside the storage proofs are derived correctly,
+    // and all nodes parents converge to the stated roots.
+    validate_storage_proof(storage_proof)?;
+
+    if storage_proof.contracts_storage_proofs.len() != 1 {
+        return Err(StorageError::Generic(format!(
+            "storage proof should contain exactly 1 contract storage proof, but it contains {}",
+            storage_proof.contracts_storage_proofs.len()
+        )));
+    }
+
+    let contract_storage_proof = storage_proof
+        .contracts_storage_proofs
+        .first()
+        .ok_or(StorageError::MissingContractStorageProof)?;
 
     // Verify the value within the contract, with the Merkle proof for that contract.
     verify_starknet_merkle_proof(contract_storage_proof, contract_root, path, value)?;
