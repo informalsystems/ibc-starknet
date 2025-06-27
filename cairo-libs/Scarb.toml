@@ -29,7 +29,7 @@ snforge_std   = "0.44.0"
 
 # external dependencies
 alexandria_math = { version = "0.5.1" }
-garaga          = { git = "https://github.com/keep-starknet-strange/garaga.git" }
+garaga          = { git = "https://github.com/keep-starknet-strange/garaga.git", rev = "5c5859e" }
 
 # internal dependencies
 protobuf  = { path = "packages/protobuf" }

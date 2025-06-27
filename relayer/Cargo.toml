@@ -158,7 +158,7 @@ starknet-block-verifier = { path = "../light-client/starknet-block-verifier" }
 
 poseidon = { path = "../light-client/poseidon" }
 
-garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga" }
+garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", rev = "5c5859e" }
 
 cgp             = { git = "https://github.com/contextgeneric/cgp.git" }
 cgp-core        = { git = "https://github.com/contextgeneric/cgp.git" }
