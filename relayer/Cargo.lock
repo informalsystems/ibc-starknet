@@ -2393,6 +2393,7 @@ dependencies = [
  "sha256",
  "starknet 0.13.0",
  "starknet 0.14.0",
+ "starknet-storage-verifier",
  "tendermint",
  "time",
  "tonic",
@@ -5723,6 +5724,18 @@ dependencies = [
  "starknet-core 0.13.0",
  "starknet-crypto",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "starknet-storage-verifier"
+version = "0.1.0"
+dependencies = [
+ "ibc-core",
+ "indexmap 2.9.0",
+ "poseidon",
+ "starknet-core 0.13.0",
+ "starknet-crypto",
+ "starknet-macros",
 ]
 
 [[package]]

@@ -1,14 +1,16 @@
+use alloc::vec;
+use alloc::vec::Vec;
+
 use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::ConvertIbcAny;
 use hermes_encoding_components::impls::ConvertVia;
 use hermes_encoding_components::traits::{CanDecode, Converter};
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
-use ibc_client_cw::context::client_ctx::CwClientExecution;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use ibc_client_starknet_types::StarknetClientState as ClientStateType;
 use ibc_core::client::context::client_state::ClientStateExecution;
 use ibc_core::client::context::prelude::ClientStateCommon;
-use ibc_core::client::context::ExtClientExecutionContext;
+use ibc_core::client::context::{ClientExecutionContext, ExtClientExecutionContext};
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
 use ibc_core::host::types::identifiers::ClientId;
@@ -20,9 +22,9 @@ use super::ClientState;
 use crate::encoding::context::StarknetLightClientEncoding;
 use crate::ConsensusState as StarknetConsensusState;
 
-impl<'a, E> ClientStateExecution<E> for ClientState
+impl<E> ClientStateExecution<E> for ClientState
 where
-    E: CwClientExecution<'a, ClientStateMut = Self, ConsensusStateRef = StarknetConsensusState>
+    E: ClientExecutionContext<ClientStateMut = Self, ConsensusStateRef = StarknetConsensusState>
         + ExtClientExecutionContext,
 {
     fn initialise(
@@ -56,29 +58,6 @@ where
 
         let raw_header = signed_header.header;
 
-        let header_digest = ctx.checksum(&raw_header);
-
-        let deps = ctx.deps_mut().ok_or_else(|| ClientError::ClientSpecific {
-            description: "missing Deps from context".to_owned(),
-        })?;
-
-        match deps.api.secp256k1_verify(
-            header_digest.as_slice(),
-            &signed_header.signature,
-            &self.0.pub_key,
-        ) {
-            Ok(true) => {}
-            Ok(false) => {
-                return Err(ClientError::ClientSpecific {
-                    description: "Header signature not valid".to_owned(),
-                })
-            }
-            Err(e) => {
-                return Err(ClientError::ClientSpecific {
-                    description: format!("Header signature verification failed:{e} "),
-                })
-            }
-        }
         let header: StarknetHeader = <StarknetLightClientEncoding as CanDecode<
             ViaProtobuf,
             StarknetHeader,
@@ -94,6 +73,7 @@ where
             latest_height,
             chain_id: self.0.chain_id.clone(),
             pub_key: self.0.pub_key.clone(),
+            ibc_contract_address: self.0.ibc_contract_address.clone(),
         }
         .into();
 

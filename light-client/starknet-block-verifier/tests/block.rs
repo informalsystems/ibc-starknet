@@ -2,9 +2,9 @@ use starknet_block_verifier::*;
 use starknet_crypto::Felt;
 
 fn read_json<T: serde::de::DeserializeOwned>(path: &str) -> T {
-    let file = std::fs::File::open(path).unwrap();
+    let file = std::fs::File::open(path).expect("Failed to open file");
     let reader = std::io::BufReader::new(file);
-    serde_json::from_reader(reader).unwrap()
+    serde_json::from_reader(reader).expect("Failed to read JSON")
 }
 
 #[rstest::fixture]

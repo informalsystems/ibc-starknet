@@ -1,3 +1,6 @@
+use alloc::string::String;
+use alloc::vec::Vec;
+
 use serde::{Deserialize, Serialize};
 use starknet_crypto::{poseidon_hash_many, verify, Felt};
 

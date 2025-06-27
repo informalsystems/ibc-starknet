@@ -96,6 +96,16 @@ pub fn ibc_path_to_storage_key(path: Path) -> Felt {
             ])
         }
 
+        Path::ClientState(client_state_path) => {
+            // TODO
+            Felt::ZERO
+        }
+
+        Path::ClientConsensusState(client_consensus_state_path) => {
+            // TODO
+            Felt::ZERO
+        }
+
         _ => unimplemented!(),
     }
 }

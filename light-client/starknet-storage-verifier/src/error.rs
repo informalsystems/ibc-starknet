@@ -1,4 +1,7 @@
-use std::num::TryFromIntError;
+use core::num::TryFromIntError;
+/*use core::fmt::Write;
+use alloc::boxed::Box;
+use alloc::string::String;
 
 use starknet_core::types::{BinaryNode, ContractLeafData, EdgeNode};
 use starknet_crypto::Felt;
@@ -46,10 +49,55 @@ pub enum StorageError {
     NonZeroBit(u8, Felt),
     #[error("invalid edge node with 0 node length")]
     ZeroEdgeNode,
+}*/
+
+#[derive(Debug)]
+pub enum StorageError {
+    ChildNodeWithZeroValue,
+
+    ChildNodeMismatchValue,
+
+    CommitmentPathExceedUpper,
+
+    Generic(alloc::string::String),
+
+    InvalidEdgeNode,
+
+    InvalidProof,
+
+    MismatchBinaryHash,
+
+    MismatchEdgeHash,
+
+    MismatchPathSize,
+
+    MissingContractLeafNode,
+
+    MissingContractStorageProof,
+
+    MissingContractStorageRoot,
+
+    MissingStorageRoot,
+
+    MissingContractHash,
+
+    MissingParentNode,
+
+    MissingRootProofNode,
+
+    MissingProofNode,
+
+    MissingValue,
+
+    NonZeroBit,
+
+    ZeroEdgeNode,
+
+    TryFromIntError,
 }
 
 impl From<TryFromIntError> for StorageError {
-    fn from(e: TryFromIntError) -> Self {
-        Self::Generic(format!("generic storage error: {e}"))
+    fn from(_e: TryFromIntError) -> Self {
+        Self::TryFromIntError
     }
 }

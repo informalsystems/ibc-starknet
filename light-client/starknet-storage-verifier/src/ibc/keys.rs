@@ -1,3 +1,6 @@
+use alloc::vec;
+use alloc::vec::Vec;
+
 use ibc_core::host::types::identifiers::{ChannelId, ConnectionId, PortId, Sequence};
 use poseidon::Poseidon3Hasher;
 use starknet_crypto::Felt;

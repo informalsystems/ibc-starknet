@@ -12,7 +12,6 @@ let
       outputHashes = {
         "cgp-0.4.0" = "sha256-YaK4YaT/1jbudEh7YnQkH2KrPmjbSI5vBL8HYU1eREg=";
         "hermes-cosmos-encoding-components-0.1.0" = "sha256-4gB3VDFB4oiHfN1DFsVBoqCzLrkp392jIQpaAoVNQ4k=";
-        "ibc-client-cw-0.56.0" = "sha256-DA3AB8ejUrx4ksBtN/vaOznjpKE0+0F6vGA7JmWyHWA=";
         "ibc-0.56.0" = "sha256-7DPIqu/zs0szjmtJTfXI2eQ0HEkRyvGjArcMZsFWMT4=";
       };
     };
@@ -21,6 +20,7 @@ let
 
     nativeBuildInputs = [
       rust
+      nixpkgs.binaryen
     ];
 
     buildPhase = ''
@@ -29,7 +29,7 @@ let
 
     installPhase = ''
       mkdir -p $out
-      cp target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm $out/
+      wasm-opt -Oz -o $out/ibc_client_starknet_cw.wasm target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm
     '';
   };
 in

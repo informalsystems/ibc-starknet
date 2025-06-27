@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use hermes_prelude::*;
 use ibc_core::client::types::Height;
 

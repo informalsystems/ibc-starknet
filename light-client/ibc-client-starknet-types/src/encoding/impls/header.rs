@@ -1,3 +1,5 @@
+use alloc::vec::Vec;
+
 use cgp::core::component::UseContext;
 use hermes_encoding_components::impls::{CombineEncoders, DecodeFrom, EncodeField};
 use hermes_encoding_components::traits::{MutDecoderComponent, MutEncoderComponent, Transformer};

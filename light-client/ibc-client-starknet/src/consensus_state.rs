@@ -33,7 +33,7 @@ impl From<ConsensusState> for Any {
     fn from(consensus_state: ConsensusState) -> Self {
         let any: ProstAny = StarknetLightClientEncoding
             .convert(&consensus_state.0)
-            .unwrap();
+            .expect("failed to convert ConsensusState to Any");
 
         Self {
             type_url: any.type_url,

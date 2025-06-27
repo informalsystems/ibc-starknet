@@ -1,5 +1,5 @@
-use ibc_client_cw::context::client_ctx::CwClientValidation;
 use ibc_core::client::context::client_state::ClientStateValidation;
+use ibc_core::client::context::ClientValidationContext;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Status;
 use ibc_core::host::types::identifiers::ClientId;
@@ -8,9 +8,9 @@ use ibc_core::primitives::proto::Any;
 use super::ClientState;
 use crate::ConsensusState;
 
-impl<'a, V> ClientStateValidation<V> for ClientState
+impl<V> ClientStateValidation<V> for ClientState
 where
-    V: CwClientValidation<'a, ClientStateRef = Self, ConsensusStateRef = ConsensusState>,
+    V: ClientValidationContext<ClientStateRef = Self, ConsensusStateRef = ConsensusState>,
 {
     fn verify_client_message(
         &self,

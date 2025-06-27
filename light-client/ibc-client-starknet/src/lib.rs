@@ -1,3 +1,7 @@
+#![no_std]
+
+extern crate alloc;
+
 mod client_state;
 mod consensus_state;
 pub mod encoding;
