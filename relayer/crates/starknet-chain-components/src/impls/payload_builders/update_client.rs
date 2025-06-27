@@ -58,12 +58,18 @@ where
             )
             .await?;
 
+        if block.block_hash != storage_proof.global_roots.block_hash {
+            return Err(Chain::raise_error(
+                "block hash does not match between block and storage proof",
+            ));
+        }
+
         let contract_root = storage_proof
             .contracts_proof
             .contract_leaves_data
             .first()
             .and_then(|leaf| leaf.storage_root)
-            .unwrap();
+            .ok_or_else(|| Chain::raise_error("contract root not found in storage proof"))?;
 
         let root = contract_root.to_bytes_be().to_vec();
 
