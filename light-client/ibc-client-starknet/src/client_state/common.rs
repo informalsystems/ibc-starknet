@@ -17,10 +17,9 @@ use ibc_core::host::types::identifiers::ClientType;
 use ibc_core::host::types::path::{Path, PathBytes};
 use ibc_core::primitives::proto::Any;
 use ibc_core::primitives::Timestamp;
-use poseidon::Poseidon3Hasher;
 use prost::Message;
 use starknet_core::types::StorageProof;
-use starknet_crypto::Felt;
+use starknet_crypto::{poseidon_hash_many, Felt};
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_storage_verifier::verifier::verify_starknet_storage_proof;
 
@@ -146,13 +145,13 @@ fn get_felt_from_value(value: &Vec<u8>, path: &Path) -> Result<Felt, ClientError
             let connection_end = ConnectionEnd::decode(value.as_slice()).unwrap();
             let felts = connection_end_to_felts(&connection_end);
 
-            Ok(Poseidon3Hasher::digest(&felts))
+            Ok(poseidon_hash_many(&felts))
         }
         Path::ChannelEnd(_) => {
             let channel = Channel::decode(value.as_slice()).unwrap();
             let felts = channel_to_felts(&channel);
 
-            Ok(Poseidon3Hasher::digest(&felts))
+            Ok(poseidon_hash_many(&felts))
         }
         Path::Commitment(_) => {
             assert!(value.len() == 32, "commitment must be 32 bytes");
@@ -169,7 +168,7 @@ fn get_felt_from_value(value: &Vec<u8>, path: &Path) -> Result<Felt, ClientError
                 .map(|v| Felt::from(*v))
                 .collect::<Vec<Felt>>();
 
-            Ok(Poseidon3Hasher::digest(&felts))
+            Ok(poseidon_hash_many(&felts))
         }
         Path::Receipt(_) => {
             assert!(value.len() == 32, "receipt must be 32 bytes");
@@ -186,7 +185,7 @@ fn get_felt_from_value(value: &Vec<u8>, path: &Path) -> Result<Felt, ClientError
                 .map(|v| Felt::from(*v))
                 .collect::<Vec<Felt>>();
 
-            Ok(Poseidon3Hasher::digest(&felts))
+            Ok(poseidon_hash_many(&felts))
         }
         Path::Ack(_) => {
             assert!(value.len() == 32, "acknowledgement must be 32 bytes");
@@ -203,7 +202,7 @@ fn get_felt_from_value(value: &Vec<u8>, path: &Path) -> Result<Felt, ClientError
                 .map(|v| Felt::from(*v))
                 .collect::<Vec<Felt>>();
 
-            Ok(Poseidon3Hasher::digest(&felts))
+            Ok(poseidon_hash_many(&felts))
         }
         _ => {
             let mut text = String::new();

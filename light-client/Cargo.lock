@@ -1701,7 +1701,6 @@ dependencies = [
  "ibc-client-cw",
  "ibc-client-starknet-types",
  "ibc-core",
- "poseidon",
  "prost",
  "prost-types",
  "serde",
@@ -3648,13 +3647,7 @@ version = "0.1.0"
 dependencies = [
  "ibc-core",
  "indexmap 2.10.0",
-<<<<<<< HEAD
- "poseidon",
  "serde_json",
-||||||| 42517ee8
- "poseidon",
-=======
->>>>>>> main
  "starknet",
  "starknet-core 0.13.0",
  "starknet-crypto",

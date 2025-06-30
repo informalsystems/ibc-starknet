@@ -2428,12 +2428,8 @@ dependencies = [
  "sha256",
  "starknet 0.13.0",
  "starknet 0.14.0",
-<<<<<<< HEAD
- "starknet-storage-verifier",
-||||||| 42517ee8
-=======
  "starknet-crypto",
->>>>>>> main
+ "starknet-storage-verifier",
  "tendermint",
  "time",
  "tonic",
@@ -5889,7 +5885,6 @@ version = "0.1.0"
 dependencies = [
  "ibc-core",
  "indexmap 2.10.0",
- "poseidon",
  "starknet-core 0.13.0",
  "starknet-crypto",
  "starknet-macros",

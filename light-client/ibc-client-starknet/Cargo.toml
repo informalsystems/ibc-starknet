@@ -16,7 +16,6 @@ workspace = true
 [dependencies]
 # internal dependencies
 starknet-storage-verifier = { workspace = true, features = [ "ibc" ] }
-poseidon                  = { workspace = true }
 
 # external dependencies
 derive_more                         = { workspace = true }
