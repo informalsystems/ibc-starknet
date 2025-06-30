@@ -1,7 +1,4 @@
-use indexmap::IndexMap;
-use starknet_core::types::{
-    BinaryNode, ContractLeafData, ContractsProof, EdgeNode, GlobalRoots, MerkleNode, StorageProof,
-};
+use starknet_core::types::StorageProof;
 use starknet_crypto::{pedersen_hash, Felt};
 use starknet_macros::felt;
 use starknet_storage_verifier::validate::validate_storage_proof;
