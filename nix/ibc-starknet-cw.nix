@@ -12,7 +12,6 @@ let
       outputHashes = {
         "cgp-0.4.0" = "sha256-YaK4YaT/1jbudEh7YnQkH2KrPmjbSI5vBL8HYU1eREg=";
         "hermes-cosmos-encoding-components-0.1.0" = "sha256-rYDX+VsORm3EdaeKzBr2g6ODkILCxp8w/IFpgGcezAk=";
-        "ibc-client-cw-0.56.0" = "sha256-DA3AB8ejUrx4ksBtN/vaOznjpKE0+0F6vGA7JmWyHWA=";
         "ibc-0.56.0" = "sha256-7DPIqu/zs0szjmtJTfXI2eQ0HEkRyvGjArcMZsFWMT4=";
       };
     };
