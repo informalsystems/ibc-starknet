@@ -87,11 +87,12 @@ impl Block {
         let l1_data_availability_byte: u8 = self.l1_da_mode.into();
 
         let concat_bytes = [
-            self.transactions.len().to_be_bytes(),
-            self.transaction_receipts
+            (self.transactions.len() as u64).to_be_bytes(),
+            (self
+                .transaction_receipts
                 .iter()
                 .map(|receipt| receipt.events.len())
-                .sum::<usize>()
+                .sum::<usize>() as u64)
                 .to_be_bytes(),
             self.state_diff_length.unwrap_or_default().to_be_bytes(),
             [
