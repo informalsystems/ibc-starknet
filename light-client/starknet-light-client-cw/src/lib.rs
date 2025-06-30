@@ -1,13 +1,11 @@
+use cosmwasm_schema::cw_serde;
 use cosmwasm_std::{Response, StdResult};
 use starknet_block_verifier::{Block, Signature};
-use starknet_core::types::Felt;
-use starknet_core::types::StorageProof;
+use starknet_core::types::{Felt, StorageProof};
 use starknet_storage_verifier::validate::validate_storage_proof;
 use starknet_storage_verifier::verifier::verify_starknet_global_contract_root;
 use sylvia::ctx::{InstantiateCtx, QueryCtx};
 use sylvia::{contract, serde_json};
-
-use cosmwasm_schema::cw_serde;
 
 #[cw_serde]
 pub enum ContractResponse {
