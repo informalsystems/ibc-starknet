@@ -34,6 +34,7 @@ starknet        = { workspace = true, optional = true }
 starknet                  = { version = "0.14.0" }
 starknet-storage-verifier = { path = ".", features = [ "ibc" ] }
 tokio                     = { version = "1.44", features = [ "full" ] }
+serde_json                = { workspace = true }
 
 [features]
 ibc      = [ "dep:ibc-core" ]

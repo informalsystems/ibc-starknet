@@ -3616,6 +3616,7 @@ dependencies = [
  "ibc-core",
  "indexmap 2.9.0",
  "poseidon",
+ "serde_json",
  "starknet",
  "starknet-core 0.13.0",
  "starknet-crypto",
