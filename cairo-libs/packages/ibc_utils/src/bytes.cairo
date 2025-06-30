@@ -219,6 +219,68 @@ pub impl SpanU8TryIntoU256 of TryInto<Span<u8>, u256> {
     }
 }
 
+pub trait Endian<T> {
+    fn from_bytes(self: Span<u8>) -> Option<T>;
+    fn to_bytes(self: T) -> Array<u8>;
+}
+
+pub impl U256AsLittleEndian of Endian<u256> {
+    fn from_bytes(mut self: Span<u8>) -> Option<u256> {
+        if (self.len() != 32) {
+            return None;
+        }
+
+        let mut ret: u256 = 0_u256;
+
+        while let Some(i) = self.pop_back() {
+            ret = ret * 0x100 + (*i).into();
+        }
+
+        Some(ret)
+    }
+
+    fn to_bytes(self: u256) -> Array<u8> {
+        let mut output: Array<u8> = array![];
+        let mut value = self;
+
+        let mut iter = [0; 32].span();
+
+        while let Some(_) = iter.pop_front() {
+            output.append((value % 0x100).try_into().unwrap());
+            value /= 0x100;
+        }
+
+        output
+    }
+}
+
+pub impl U256AsBigEndian of Endian<u256> {
+    fn from_bytes(mut self: Span<u8>) -> Option<u256> {
+        if (self.len() != 32) {
+            return None;
+        }
+
+        let mut ret: u256 = 0_u256;
+
+        while let Some(i) = self.pop_front() {
+            ret = ret * 0x100 + (*i).into();
+        }
+
+        Some(ret)
+    }
+
+    fn to_bytes(self: u256) -> Array<u8> {
+        let mut little_endian = U256AsLittleEndian::to_bytes(self).span();
+
+        let mut output: Array<u8> = array![];
+
+        while let Some(i) = little_endian.pop_back() {
+            output.append(*i);
+        }
+
+        output
+    }
+}
 
 pub impl Slice8U32IntoArrayU8 of Into<[u32; 8], Array<u8>> {
     fn into(self: [u32; 8]) -> Array<u8> {
@@ -238,7 +300,7 @@ pub impl Slice8U32IntoArrayU8 of Into<[u32; 8], Array<u8>> {
 
 #[cfg(test)]
 mod tests {
-    use super::SpanU32IntoArrayU8;
+    use super::{SpanU32IntoArrayU8, U256AsBigEndian, U256AsLittleEndian};
 
     #[test]
     fn test_u32_8_to_array_u8() {
@@ -285,5 +347,51 @@ mod tests {
         ar_u8.append(0xF0);
 
         assert_eq!(ar_u8, SpanU32IntoArrayU8::into(ar_u32.span()));
+    }
+
+    #[test]
+    fn test_big_endian_u256() {
+        let number: u256 = 0x1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF_u256;
+        let expected_bytes = [
+            0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF, 0x12, 0x34, 0x56, 0x78, 0x90, 0xAB,
+            0xCD, 0xEF, 0x12, 0x34, 0x56, 0x78, 0x90, 0xAB, 0xCD, 0xEF, 0x12, 0x34, 0x56, 0x78,
+            0x90, 0xAB, 0xCD, 0xEF,
+        ];
+
+        let bytes = U256AsBigEndian::to_bytes(number);
+        assert_eq!(bytes.span(), expected_bytes.span());
+        let decoded = U256AsBigEndian::from_bytes(bytes.span()).unwrap();
+        assert_eq!(decoded, number)
+    }
+
+    #[test]
+    fn test_little_endian_u256() {
+        let number: u256 = 0x1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF1234567890ABCDEF_u256;
+        let expected_bytes = [
+            0xEF, 0xCD, 0xAB, 0x90, 0x78, 0x56, 0x34, 0x12, 0xEF, 0xCD, 0xAB, 0x90, 0x78, 0x56,
+            0x34, 0x12, 0xEF, 0xCD, 0xAB, 0x90, 0x78, 0x56, 0x34, 0x12, 0xEF, 0xCD, 0xAB, 0x90,
+            0x78, 0x56, 0x34, 0x12,
+        ];
+
+        let bytes = U256AsLittleEndian::to_bytes(number);
+        assert_eq!(bytes.span(), expected_bytes.span());
+        let decoded = U256AsLittleEndian::from_bytes(bytes.span()).unwrap();
+        assert_eq!(decoded, number);
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_big_endian_u256(number: u256) {
+        let bytes = U256AsBigEndian::to_bytes(number);
+        let decoded = U256AsBigEndian::from_bytes(bytes.span()).unwrap();
+        assert_eq!(decoded, number);
+    }
+
+    #[test]
+    #[fuzzer]
+    fn fuzz_little_endian_u256(number: u256) {
+        let bytes = U256AsLittleEndian::to_bytes(number);
+        let decoded = U256AsLittleEndian::from_bytes(bytes.span()).unwrap();
+        assert_eq!(decoded, number);
     }
 }

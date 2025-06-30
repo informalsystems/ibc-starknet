@@ -25,10 +25,11 @@ test = "snforge test"
 [workspace.dependencies]
 starknet      = "2.11.4"
 assert_macros = "2.11.4"
-snforge_std   = "0.44.0"
+snforge_std   = "0.45.0"
 
 # external dependencies
 alexandria_math = { version = "0.5.1" }
+garaga          = { git = "https://github.com/keep-starknet-strange/garaga.git", rev = "5c5859e" }
 
 # internal dependencies
 protobuf  = { path = "packages/protobuf" }

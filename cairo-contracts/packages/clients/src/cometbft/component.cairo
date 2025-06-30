@@ -48,6 +48,12 @@ pub mod CometClientComponent {
     #[derive(Debug, Drop, starknet::Event)]
     pub enum Event {}
 
+    #[derive(Serde, Drop)]
+    pub struct MessageWithHint {
+        client_message: ClientMessage,
+        serialized_hints: Array<felt252>,
+    }
+
     // -----------------------------------------------------------
     // IClientHandler
     // -----------------------------------------------------------
@@ -452,16 +458,32 @@ pub mod CometClientComponent {
             client_message: Array<felt252>,
         ) {
             let mut span = client_message.span();
-            match Serde::<ClientMessage>::deserialize(ref span).unwrap() {
+
+            let MessageWithHint {
+                client_message, serialized_hints,
+            } = Serde::<MessageWithHint>::deserialize(ref span).unwrap();
+
+            let mut serialized_hints = serialized_hints.span();
+
+            match client_message {
                 ClientMessage::Update(message) => {
                     let header: CometHeader = CometHeaderImpl::deserialize(message);
-                    self._verify_update_header(client_sequence, header);
+                    let hints: Array<Array<felt252>> = Serde::deserialize(ref serialized_hints)
+                        .unwrap();
+                    self._verify_update_header(client_sequence, header, hints);
                 },
                 ClientMessage::Misbehaviour(message) => {
                     let misbehaviour: Misbehaviour = MisbehaviourImpl::deserialize(message);
+                    let (hints_1, hints_2) = Serde::deserialize(ref serialized_hints).unwrap();
                     misbehaviour.validate_basic();
-                    self._verify_misbehaviour_header(client_sequence, misbehaviour.header_1);
-                    self._verify_misbehaviour_header(client_sequence, misbehaviour.header_2);
+                    self
+                        ._verify_misbehaviour_header(
+                            client_sequence, misbehaviour.header_1, hints_1,
+                        );
+                    self
+                        ._verify_misbehaviour_header(
+                            client_sequence, misbehaviour.header_2, hints_2,
+                        );
                 },
             }
         }
@@ -472,7 +494,12 @@ pub mod CometClientComponent {
             client_message: Array<felt252>,
         ) -> bool {
             let mut span = client_message.span();
-            match Serde::<ClientMessage>::deserialize(ref span).unwrap() {
+
+            let MessageWithHint {
+                client_message, ..,
+            } = Serde::<MessageWithHint>::deserialize(ref span).unwrap();
+
+            match client_message {
                 ClientMessage::Update(message) => {
                     let header: CometHeader = CometHeaderImpl::deserialize(message);
                     self._verify_misbehaviour_on_update(client_sequence, header)
@@ -844,7 +871,10 @@ pub mod CometClientComponent {
         }
 
         fn _verify_update_header(
-            self: @ComponentState<TContractState>, client_sequence: u64, header: CometHeader,
+            self: @ComponentState<TContractState>,
+            client_sequence: u64,
+            header: CometHeader,
+            signature_hints: Array<Array<felt252>>,
         ) {
             let trusted_height = header.trusted_height;
 
@@ -879,12 +909,17 @@ pub mod CometClientComponent {
             let options = Options { trust_threshold, trusting_period, clock_drift };
 
             ICometLibraryDispatcher { class_hash: read_raw_key::<'comet-library'>() }
-                .verify_update_header(untrusted_block_state, trusted_block_state, options, now)
+                .verify_update_header(
+                    untrusted_block_state, trusted_block_state, options, now, signature_hints,
+                );
         }
 
 
         fn _verify_misbehaviour_header(
-            self: @ComponentState<TContractState>, client_sequence: u64, header: CometHeader,
+            self: @ComponentState<TContractState>,
+            client_sequence: u64,
+            header: CometHeader,
+            signature_hints: Array<Array<felt252>>,
         ) {
             let trusted_height = header.trusted_height;
 
@@ -920,7 +955,7 @@ pub mod CometClientComponent {
 
             ICometLibraryDispatcher { class_hash: read_raw_key::<'comet-library'>() }
                 .verify_misbehaviour_header(
-                    untrusted_block_state, trusted_block_state, options, now,
+                    untrusted_block_state, trusted_block_state, options, now, signature_hints,
                 )
         }
 
