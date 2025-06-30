@@ -5,7 +5,6 @@ use starknet_core::types::{MerkleNode, StorageProof};
 use starknet_core::utils::cairo_short_string_to_felt;
 use starknet_crypto::{pedersen_hash, poseidon_hash_many, Felt};
 
-use crate::storage::validate::validate_storage_proof;
 use crate::StorageError;
 
 const GLOBAL_STATE_VERSION: &str = "STARKNET_STATE_V0";
@@ -148,24 +147,19 @@ pub fn verify_starknet_merkle_proof(
     Err(StorageError::InvalidProof)
 }
 
-/// Verifies a Starknet proof for a contract's state root.
+/// Validates a Starknet global contract state root against the state root.
 ///
-/// On success, returns the contract's storage root.
-pub fn verify_starknet_contract_proof(
+/// On success, returns the global contract state root.
+pub fn verify_starknet_global_contract_root(
     storage_proof: &StorageProof,
     state_root: Felt,
-    contract_address: Felt,
 ) -> Result<Felt, StorageError> {
-    // Validate that all hash inside the storage proofs are derived correctly,
-    // and all nodes parents converge to the stated roots.
-    validate_storage_proof(storage_proof)?;
-
     let global_roots = &storage_proof.global_roots;
 
     let actual_state_root = poseidon_hash_many([
         &cairo_short_string_to_felt(GLOBAL_STATE_VERSION).unwrap(),
-        &storage_proof.global_roots.contracts_tree_root,
-        &storage_proof.global_roots.classes_tree_root,
+        &global_roots.contracts_tree_root,
+        &global_roots.classes_tree_root,
     ]);
 
     if actual_state_root != state_root {
@@ -174,6 +168,17 @@ pub fn verify_starknet_contract_proof(
         )));
     }
 
+    Ok(global_roots.contracts_tree_root)
+}
+
+/// Verifies a Starknet storage proof for a contract's state root against global contract state root.
+///
+/// On success, returns the contract's storage root.
+pub fn verify_starknet_contract_proof(
+    storage_proof: &StorageProof,
+    global_contract_trie_root: Felt,
+    contract_address: Felt,
+) -> Result<Felt, StorageError> {
     // We assume that the storage proof only contains one contract proof.
     // If there is more than one, it may fail if the contract of interest
     // is not at the first position.
@@ -219,16 +224,13 @@ pub fn verify_starknet_contract_proof(
     Ok(contract_root)
 }
 
+/// Verifies a Starknet storage proof for a contract's storage value against the contract's storage root.
 pub fn verify_starknet_storage_proof(
     storage_proof: &StorageProof,
     contract_root: Felt,
     path: Felt,
     value: Felt,
 ) -> Result<(), StorageError> {
-    // Validate that all hash inside the storage proofs are derived correctly,
-    // and all nodes parents converge to the stated roots.
-    validate_storage_proof(storage_proof)?;
-
     if storage_proof.contracts_storage_proofs.len() != 1 {
         return Err(StorageError::Generic(format!(
             "storage proof should contain exactly 1 contract storage proof, but it contains {}",
