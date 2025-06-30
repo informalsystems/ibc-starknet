@@ -5893,7 +5893,7 @@ name = "starknet-storage-verifier"
 version = "0.1.0"
 dependencies = [
  "ibc-core",
- "indexmap 2.9.0",
+ "indexmap 2.10.0",
  "poseidon",
  "starknet-core 0.13.0",
  "starknet-crypto",
