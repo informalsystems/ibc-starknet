@@ -5,9 +5,9 @@ use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_type_components::traits::HasDenomType;
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use hermes_prelude::*;
-use poseidon::Poseidon3Hasher;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
+use starknet_crypto::poseidon_hash_many;
 
 use crate::impls::StarknetAddress;
 use crate::traits::{
@@ -40,7 +40,7 @@ where
             .encode(prefixed_denom)
             .map_err(Chain::raise_error)?;
 
-        let ibc_prefixed_denom_key = Poseidon3Hasher::digest(&denom_serialized);
+        let ibc_prefixed_denom_key = poseidon_hash_many(&denom_serialized);
 
         let output = chain
             .call_contract(

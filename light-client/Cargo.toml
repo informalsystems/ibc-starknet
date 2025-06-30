@@ -6,7 +6,6 @@ members = [
   "./ibc-client-starknet-types",
   "./starknet-block-verifier",
   "./starknet-storage-verifier",
-  "./poseidon",
 ]
 
 [workspace.package]
@@ -23,7 +22,6 @@ ibc-client-starknet       = { version = "0.1.0" }
 ibc-client-starknet-cw    = { version = "0.1.0" }
 ibc-client-starknet-types = { version = "0.1.0" }
 starknet-storage-verifier = { version = "0.1.0" }
-poseidon                  = { version = "0.1.0" }
 
 # external dependencies
 derive_more = { version = "2", features = [ "from", "try_into" ] }
@@ -80,7 +78,6 @@ ibc-client-starknet       = { path = "./ibc-client-starknet" }
 ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
 ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
 starknet-storage-verifier = { path = "./starknet-storage-verifier" }
-poseidon                  = { path = "./poseidon" }
 
 ibc                         = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
 ibc-core                    = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
