@@ -24,28 +24,27 @@ ibc-client-starknet-types = { version = "0.1.0" }
 starknet-storage-verifier = { version = "0.1.0" }
 
 # external dependencies
-derive_more = { version = "0.99.11", features = [ "from", "try_into" ] }
-indexmap    = { version = "2.9.0" }
-prost       = { version = "0.13.1" }
-prost-types = { version = "0.13.1" }
+derive_more = { version = "2", features = [ "from", "try_into" ] }
+indexmap    = { version = "2.10" }
+prost       = { version = "0.13.5" }
+prost-types = { version = "0.13.5" }
 rstest      = { version = "0.25" }
-serde       = { version = "1.0.210", features = [ "derive" ] }
+serde       = { version = "1.0", features = [ "derive" ] }
 serde_json  = { version = "1.0" }
-sha2        = { version = "0.10.8" }
-thiserror   = { version = "2.0.12" }
-ureq        = { version = "3.0.11", default-features = false }
+sha2        = { version = "0.10.9" }
+thiserror   = { version = "2.0" }
+ureq        = { version = "3.0", default-features = false }
 
 starknet            = { version = "0.14.0" }
 starknet-core       = { version = "0.13.0" }
 starknet-crypto     = { version = "0.7.4" }
-starknet-macros     = { version = "0.2.2" }
-starknet-types-core = { version = "0.1.7" }
+starknet-macros     = { version = "0.2.3" }
+starknet-types-core = { version = "0.1.8" }
 
 # ibc depedenencies
 ibc-core      = { version = "0.56.0", default-features = false, features = [ "borsh", "schema" ] }
 ibc-client-cw = { version = "0.56.0", default-features = false }
 ibc-proto     = { version = "0.51.1", default-features = false }
-tendermint    = { version = "0.40.0", default-features = false }
 
 cgp                                 = { version = "0.4.0" }
 hermes-prelude                      = { version = "0.1.0" }
@@ -93,22 +92,22 @@ ibc-core-client             = { git = "https://github.com/cosmos/ibc-rs", rev = 
 ibc-core-channel-types      = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
 ibc-core-handler-types      = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
 
-cgp             = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-core        = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-extra       = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-async       = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-async-macro = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-component   = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-macro       = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-macro-lib   = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-type        = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-field       = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-error       = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-error-extra = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-run         = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-runtime     = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git" }
-cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git" }
+cgp             = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-core        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-extra       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-async       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-async-macro = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-component   = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-macro       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-macro-lib   = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-type        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-field       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-error       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-error-extra = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-run         = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-runtime     = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
+cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 
 hermes-prelude                      = { git = "https://github.com/informalsystems/hermes-sdk.git" }
 hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git" }
