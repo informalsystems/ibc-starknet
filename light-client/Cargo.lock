@@ -2596,14 +2596,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "poseidon"
-version = "0.1.0"
-dependencies = [
- "sha2 0.10.9",
- "starknet-types-core",
-]
-
-[[package]]
 name = "potential_utf"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3588,7 +3580,6 @@ version = "0.1.0"
 dependencies = [
  "ibc-core",
  "indexmap 2.10.0",
- "poseidon",
  "starknet",
  "starknet-core 0.13.0",
  "starknet-crypto",

@@ -23,7 +23,6 @@ hermes-starknet-chain-components = { workspace = true }
 hermes-starknet-test-components  = { workspace = true }
 hermes-starknet-chain-context    = { workspace = true }
 hermes-starknet-relayer          = { workspace = true }
-poseidon                         = { workspace = true }
 
 ibc            = { workspace = true }
 ibc-proto      = { workspace = true }

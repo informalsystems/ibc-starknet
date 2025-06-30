@@ -2420,7 +2420,6 @@ dependencies = [
  "ibc-proto",
  "indexmap 2.10.0",
  "num-bigint",
- "poseidon",
  "prost-types",
  "secp256k1",
  "serde",
@@ -2429,6 +2428,7 @@ dependencies = [
  "sha256",
  "starknet 0.13.0",
  "starknet 0.14.0",
+ "starknet-crypto",
  "tendermint",
  "time",
  "tonic",
@@ -2516,7 +2516,6 @@ dependencies = [
  "hermes-starknet-test-components",
  "ibc",
  "ibc-proto",
- "poseidon",
  "prost",
  "prost-types",
  "rand 0.8.5",
@@ -4426,14 +4425,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8a2f0d8d040d7848a709caf78912debcc3f33ee4b3cac47d73d1e1069e83507"
 dependencies = [
  "portable-atomic",
-]
-
-[[package]]
-name = "poseidon"
-version = "0.1.0"
-dependencies = [
- "sha2 0.10.9",
- "starknet-types-core",
 ]
 
 [[package]]
