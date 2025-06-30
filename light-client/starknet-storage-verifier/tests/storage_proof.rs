@@ -137,18 +137,9 @@ fn test_verify_starknet_storage_proof_failure() -> Result<(), Box<dyn core::erro
 
     let state_root = felt!("0x2bba45af2d71e57b1f82f1668bc53184762e6212c22e69f9949e3a607022fd2");
 
-    validate_storage_proof(&storage_proof)?;
-    let global_contract_trie_root =
-        verify_starknet_global_contract_root(&storage_proof, state_root)?;
-    let contract_root = verify_starknet_contract_proof(
-        &storage_proof,
-        global_contract_trie_root,
-        contract_address,
-    )?;
-
     assert!(matches!(
-        verify_starknet_storage_proof(&storage_proof, contract_root, key, value),
-        Err(StorageError::MismatchBinaryHash),
+        validate_storage_proof(&storage_proof),
+        Err(StorageError::MismatchBinaryHash)
     ));
 
     Ok(())
