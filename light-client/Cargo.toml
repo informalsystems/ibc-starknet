@@ -21,6 +21,7 @@ repository   = "https://github.com/informalsystems/ibc-starknet"
 ibc-client-starknet       = { version = "0.1.0" }
 ibc-client-starknet-cw    = { version = "0.1.0" }
 ibc-client-starknet-types = { version = "0.1.0" }
+starknet-block-verifier   = { version = "0.1.0" }
 starknet-storage-verifier = { version = "0.1.0" }
 
 # external dependencies
@@ -77,6 +78,7 @@ redundant_clone               = "deny"
 ibc-client-starknet       = { path = "./ibc-client-starknet" }
 ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
 ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
+starknet-block-verifier   = { path = "./starknet-block-verifier" }
 starknet-storage-verifier = { path = "./starknet-storage-verifier" }
 
 ibc                         = { git = "https://github.com/cosmos/ibc-rs", rev = "230e7a5e" }
