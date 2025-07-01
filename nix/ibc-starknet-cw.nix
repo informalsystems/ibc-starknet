@@ -25,11 +25,13 @@ let
 
     buildPhase = ''
       RUSTFLAGS='-C link-arg=-s' cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown --release --lib --locked
+      RUSTFLAGS='-C link-arg=-s' cargo build -p starknet-light-client-cw --target wasm32-unknown-unknown --release --lib --locked
     '';
 
     installPhase = ''
       mkdir -p $out
-      wasm-opt -Oz --enable-bulk-memory-opt -o $out/ibc_client_starknet_cw.wasm target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm
+      wasm-opt -Oz -o $out/ibc_client_starknet_cw.wasm target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm
+      wasm-opt -Oz -o $out/starknet_light_client_cw.wasm target/wasm32-unknown-unknown/release/starknet_light_client_cw.wasm
     '';
   };
 in
