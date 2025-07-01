@@ -3839,8 +3839,6 @@ name = "starknet-light-client-cw"
 version = "0.1.0"
 dependencies = [
  "cosmwasm-schema 3.0.1",
- "cosmwasm-std",
- "serde",
  "starknet-block-verifier",
  "starknet-core 0.13.0",
  "starknet-storage-verifier",
