@@ -29,7 +29,7 @@ let
 
     installPhase = ''
       mkdir -p $out
-      wasm-opt -Oz -o $out/ibc_client_starknet_cw.wasm target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm
+      wasm-opt -Oz --enable-bulk-memory-opt -o $out/ibc_client_starknet_cw.wasm target/wasm32-unknown-unknown/release/ibc_client_starknet_cw.wasm
     '';
   };
 in
