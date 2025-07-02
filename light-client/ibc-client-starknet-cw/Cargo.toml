@@ -31,3 +31,4 @@ std = [
   "ibc-core/std",
   "ibc-client-cw/std",
 ]
+library = [  ]
