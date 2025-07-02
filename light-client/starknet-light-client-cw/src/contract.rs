@@ -1,7 +1,10 @@
 use starknet_block_verifier::{Block, Signature};
 use starknet_core::types::{Felt, StorageProof};
 use starknet_storage_verifier::validate::validate_storage_proof;
-use starknet_storage_verifier::verifier::verify_starknet_global_contract_root;
+use starknet_storage_verifier::verifier::{
+    verify_starknet_contract_proof, verify_starknet_global_contract_root,
+    verify_starknet_storage_proof,
+};
 use sylvia::ctx::{InstantiateCtx, QueryCtx};
 use sylvia::cw_std::{Binary, Response, StdError, StdResult};
 use sylvia::{contract, serde_json};
@@ -30,8 +33,6 @@ impl StarknetLightClientLibraryContract {
         signature: Binary,
         pub_key: Binary,
     ) -> StdResult<ContractResponse> {
-        // ctx.deps.querier.query_wasm_smart(contract_addr, msg);
-
         let header: Block = serde_json::from_slice(&header)
             .map_err(|e| StdError::generic_err(format!("Invalid block header: {e}")))?;
 
@@ -43,7 +44,7 @@ impl StarknetLightClientLibraryContract {
 
         header
             .verify_signature(&signature, &pub_key)
-            .map_err(|e| StdError::generic_err(format!("Block header validation failed: {e}")))?;
+            .map_err(|e| StdError::generic_err(format!("Block header verification failed: {e}")))?;
 
         Ok(ContractResponse::StateRoot(
             header.state_root.to_fixed_hex_string(),
@@ -58,6 +59,10 @@ impl StarknetLightClientLibraryContract {
     ) -> StdResult<ContractResponse> {
         let storage_proof: StorageProof = serde_json::from_slice(&storage_proof)
             .map_err(|e| StdError::generic_err(format!("Invalid storage proof: {e}")))?;
+
+        validate_storage_proof(&storage_proof)
+            .map_err(|e| StdError::generic_err(format!("Storage proof validation failed: {e}")))?;
+
         Ok(ContractResponse::ValidStorageProof)
     }
 
@@ -74,8 +79,9 @@ impl StarknetLightClientLibraryContract {
             .map_err(|e| StdError::generic_err(format!("Invalid state root: {e}")))?;
 
         let global_contract_trie_root =
-            verify_starknet_global_contract_root(&storage_proof, state_root)
-                .map_err(|e| StdError::generic_err(format!("Verification failed: {e}")))?;
+            verify_starknet_global_contract_root(&storage_proof, state_root).map_err(|e| {
+                StdError::generic_err(format!("Global contract root verification failed: {e}"))
+            })?;
 
         Ok(ContractResponse::GlobalContractTrieRoot(
             global_contract_trie_root.to_fixed_hex_string(),
@@ -99,9 +105,12 @@ impl StarknetLightClientLibraryContract {
         let contract_address: Felt = serde_json::from_slice(&contract_address)
             .map_err(|e| StdError::generic_err(format!("Invalid contract address: {e}")))?;
 
-        let contract_root =
-            verify_starknet_global_contract_root(&storage_proof, global_contract_trie_root)
-                .map_err(|e| StdError::generic_err(format!("Verification failed: {e}")))?;
+        let contract_root = verify_starknet_contract_proof(
+            &storage_proof,
+            global_contract_trie_root,
+            contract_address,
+        )
+        .map_err(|e| StdError::generic_err(format!("Contract root verification failed: {e}")))?;
 
         Ok(ContractResponse::ContractRoot(
             contract_root.to_fixed_hex_string(),
@@ -126,8 +135,8 @@ impl StarknetLightClientLibraryContract {
         let value: Felt = serde_json::from_slice(&value)
             .map_err(|e| StdError::generic_err(format!("Invalid value: {e}")))?;
 
-        validate_storage_proof(&storage_proof)
-            .map_err(|e| StdError::generic_err(format!("Storage proof validation failed: {e}")))?;
+        verify_starknet_storage_proof(&storage_proof, contract_root, path, value)
+            .map_err(|e| StdError::generic_err(format!("Failed to verify storage proof: {e}")))?;
 
         Ok(ContractResponse::CorrectStorageProof)
     }
