@@ -105,7 +105,7 @@ where
         let quantity_u128 = amount as u128;
         StarknetAmount {
             quantity: quantity_u128.into(),
-            token_address: denom.clone(),
+            token_address: *denom,
         }
     }
 }
