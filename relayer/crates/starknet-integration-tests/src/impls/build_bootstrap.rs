@@ -77,12 +77,12 @@ where
 
         let user_wallet_a = wallets
             .get("user-a")
-            .ok_or_else(|| Bootstrap::raise_error("expect relayer wallet to be present"))?
+            .ok_or_else(|| Bootstrap::raise_error("expect user A wallet to be present"))?
             .clone();
 
         let user_wallet_b = wallets
             .get("user-b")
-            .ok_or_else(|| Bootstrap::raise_error("expect relayer wallet to be present"))?
+            .ok_or_else(|| Bootstrap::raise_error("expect user B wallet to be present"))?
             .clone();
 
         let json_rpc_url = Url::parse(&format!(
