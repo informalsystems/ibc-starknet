@@ -6,11 +6,12 @@ use hermes_cosmos_encoding_components::impls::ConvertIbcAny;
 use hermes_encoding_components::impls::ConvertVia;
 use hermes_encoding_components::traits::{CanDecode, Converter};
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
+use ibc_client_cw::context::CwClientExecution;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
 use ibc_client_starknet_types::StarknetClientState as ClientStateType;
 use ibc_core::client::context::client_state::ClientStateExecution;
 use ibc_core::client::context::prelude::ClientStateCommon;
-use ibc_core::client::context::{ClientExecutionContext, ExtClientExecutionContext};
+use ibc_core::client::context::ExtClientExecutionContext;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
 use ibc_core::host::types::identifiers::ClientId;
@@ -22,9 +23,9 @@ use super::ClientState;
 use crate::encoding::context::StarknetLightClientEncoding;
 use crate::ConsensusState as StarknetConsensusState;
 
-impl<E> ClientStateExecution<E> for ClientState
+impl<'a, E> ClientStateExecution<E> for ClientState
 where
-    E: ClientExecutionContext<ClientStateMut = Self, ConsensusStateRef = StarknetConsensusState>
+    E: CwClientExecution<'a, ClientStateMut = Self, ConsensusStateRef = StarknetConsensusState>
         + ExtClientExecutionContext,
 {
     fn initialise(

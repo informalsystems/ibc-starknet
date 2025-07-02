@@ -3,9 +3,9 @@ use alloc::vec::Vec;
 use core::fmt::Write;
 use core::str::FromStr;
 
+use ibc_client_cw::context::CwClientValidation;
 use ibc_core::channel::types::proto::v1::Channel;
 use ibc_core::client::context::client_state::ClientStateValidation;
-use ibc_core::client::context::ClientValidationContext;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Status;
 use ibc_core::commitment_types::commitment::{
@@ -28,9 +28,9 @@ use crate::encoding::channel::channel_to_felts;
 use crate::encoding::connection::connection_end_to_felts;
 use crate::ConsensusState;
 
-impl<V> ClientStateValidation<V> for ClientState
+impl<'a, V> ClientStateValidation<V> for ClientState
 where
-    V: ClientValidationContext<ClientStateRef = Self, ConsensusStateRef = ConsensusState>,
+    V: CwClientValidation<'a, ClientStateRef = Self, ConsensusStateRef = ConsensusState>,
 {
     fn verify_client_message(
         &self,
