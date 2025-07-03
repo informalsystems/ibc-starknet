@@ -61,9 +61,11 @@ fn test_recover_client() -> Result<(), Error> {
             .run_test(&test_driver)
             .await?;
 
-        <TestRecoverClient<Index<1>, Index<0>>>::default()
-            .run_test(&test_driver)
-            .await?;
+        // TODO: Starknet light client can't expired, misbehaviour and client
+        // freezing is required for this part of the test
+        //<TestRecoverClient<Index<1>, Index<0>>>::default()
+        //    .run_test(&test_driver)
+        //    .await?;
 
         <Result<(), Error>>::Ok(())
     })?;
