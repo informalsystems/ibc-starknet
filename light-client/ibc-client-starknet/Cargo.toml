@@ -38,6 +38,10 @@ ibc-client-cw             = { workspace = true }
 starknet-crypto = { workspace = true }
 starknet-core   = { workspace = true }
 
+cosmwasm-std = { version = "2.2.0" }
+
+starknet-light-client-cw = { path = "../starknet-light-client-cw", features = [ "library" ] }
+
 [features]
 default = [ "std" ]
 std = [
