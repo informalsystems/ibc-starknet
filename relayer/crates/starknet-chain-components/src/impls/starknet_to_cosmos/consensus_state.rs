@@ -6,6 +6,8 @@ use tendermint::Time;
 
 use crate::types::CometConsensusState;
 
+const NANOS_PER_SEC: u64 = 1_000_000_000;
+
 pub struct ProvideCometConsensusState;
 
 #[cgp_provider(ConsensusStateFieldComponent)]
@@ -17,7 +19,7 @@ where
 {
     fn consensus_state_timestamp(consensus_state: &CometConsensusState) -> Counterparty::Time {
         let timestamp = consensus_state.timestamp;
-        let (secs, nanos) = (timestamp / 1_000_000_000, timestamp % 1_000_000_000);
+        let (secs, nanos) = (timestamp / NANOS_PER_SEC, timestamp % NANOS_PER_SEC);
         Time::from_unix_timestamp(secs as i64, nanos as u32)
             .expect("failed to convert timestamp in CometConsensusState")
     }

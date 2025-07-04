@@ -66,11 +66,7 @@ where
     }
 
     fn client_state_has_expired(_client_state: &Chain::ClientState, elapsed: Duration) -> bool {
-        // TODO: Properly define how to identify expired client. To simulate passing test uncomment
-        // this since client recovery test uses a trusting period of 40 seconds.
-        //if elapsed.as_secs() > 40 {
-        //    return true;
-        //}
+        // WasmStarknetClientState can't expire
         false
     }
 
