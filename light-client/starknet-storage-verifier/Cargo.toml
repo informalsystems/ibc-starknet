@@ -23,13 +23,13 @@ ibc-core = { workspace = true, optional = true }
 
 # Starknet dependencies
 starknet-core           = { workspace = true }
-starknet-crypto         = { workspace = true }
 starknet-macros         = { workspace = true }
 starknet                = { workspace = true, optional = true }
 starknet-block-verifier = { workspace = true }
 
 [dev-dependencies]
-starknet                  = { version = "0.14.0" }
+starknet                  = { workspace = true }
+starknet-crypto           = { workspace = true }
 starknet-storage-verifier = { path = ".", features = [ "ibc" ] }
 tokio                     = { version = "1.44", features = [ "full" ] }
 serde_json                = { workspace = true }

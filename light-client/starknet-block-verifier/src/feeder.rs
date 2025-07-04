@@ -2,7 +2,7 @@ use alloc::string::{String, ToString};
 use core::fmt::Write;
 
 use serde::de::DeserializeOwned;
-use starknet_crypto::Felt;
+use starknet_core::types::Felt;
 
 use crate::{Block, Signature, MAINNET_FEEDER_URL, SEPOLIA_FEEDER_URL};
 

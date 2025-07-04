@@ -15,7 +15,8 @@ workspace = true
 
 [dependencies]
 serde           = { workspace = true }
-starknet-crypto = { workspace = true }
+starknet-core   = { workspace = true }
+starknet-crypto = { workspace = true, optional = true }
 ureq            = { workspace = true, optional = true, features = [ "json", "rustls" ] }
 
 [dev-dependencies]
@@ -26,4 +27,4 @@ starknet-block-verifier = { path = ".", features = [ "feeder", "crypto" ] }
 
 [features]
 feeder = [ "dep:ureq" ]
-crypto = [  ]
+crypto = [ "dep:starknet-crypto" ]

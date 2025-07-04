@@ -5652,6 +5652,7 @@ name = "starknet-block-verifier"
 version = "0.1.0"
 dependencies = [
  "serde",
+ "starknet-core 0.13.0",
  "starknet-crypto",
  "ureq",
 ]
@@ -5888,7 +5889,6 @@ dependencies = [
  "indexmap 2.10.0",
  "starknet-block-verifier",
  "starknet-core 0.13.0",
- "starknet-crypto",
  "starknet-macros",
 ]
 

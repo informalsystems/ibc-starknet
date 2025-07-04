@@ -1,6 +1,6 @@
 use ibc_core::host::types::path::Path;
 use starknet_block_verifier::StarknetCryptoFunctions;
-use starknet_crypto::Felt;
+use starknet_core::types::Felt;
 
 use crate::ibc::keys::{connection_key, next_sequence_key, packet_key};
 use crate::storage::key::{starknet_storage_key, KeyPart};
@@ -10,7 +10,7 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(path: Path) -> Felt {
         Path::Connection(connection_path) => {
             let key = connection_key::<C>(connection_path.0);
 
-            starknet_storage_key([
+            starknet_storage_key::<2, C>([
                 KeyPart::Field(b"connection_ends_commitments"),
                 KeyPart::Map(key),
             ])
@@ -19,7 +19,7 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(path: Path) -> Felt {
         Path::ChannelEnd(channel_end_path) => {
             let key = next_sequence_key::<C>("channelEnds", channel_end_path.0, channel_end_path.1);
 
-            starknet_storage_key([
+            starknet_storage_key::<2, C>([
                 KeyPart::Field(b"channel_ends_commitments"),
                 KeyPart::Map(key),
             ])
@@ -33,7 +33,7 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(path: Path) -> Felt {
                 commitment_path.sequence,
             );
 
-            starknet_storage_key([
+            starknet_storage_key::<2, C>([
                 KeyPart::Field(b"packet_commitments_commitments"),
                 KeyPart::Map(key),
             ])
@@ -47,7 +47,7 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(path: Path) -> Felt {
                 ack_path.sequence,
             );
 
-            starknet_storage_key([
+            starknet_storage_key::<2, C>([
                 KeyPart::Field(b"packet_acks_commitments"),
                 KeyPart::Map(key),
             ])
@@ -61,7 +61,7 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(path: Path) -> Felt {
                 receipt_path.sequence,
             );
 
-            starknet_storage_key([
+            starknet_storage_key::<2, C>([
                 KeyPart::Field(b"packet_receipts_commitments"),
                 KeyPart::Map(key),
             ])
@@ -71,7 +71,7 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(path: Path) -> Felt {
             // Compute the Map's key
             let key = next_sequence_key::<C>("nextSequenceSend", seq_send_path.0, seq_send_path.1);
 
-            starknet_storage_key([
+            starknet_storage_key::<2, C>([
                 KeyPart::Field(b"send_sequences_commitments"),
                 KeyPart::Map(key),
             ])
@@ -81,7 +81,7 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(path: Path) -> Felt {
             // Compute the Map's key
             let key = next_sequence_key::<C>("nextSequenceRecv", seq_recv_path.0, seq_recv_path.1);
 
-            starknet_storage_key([
+            starknet_storage_key::<2, C>([
                 KeyPart::Field(b"recv_sequences_commitments"),
                 KeyPart::Map(key),
             ])
@@ -91,7 +91,7 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(path: Path) -> Felt {
             // Compute the Map's key
             let key = next_sequence_key::<C>("nextSequenceAck", seq_ack_path.0, seq_ack_path.1);
 
-            starknet_storage_key([
+            starknet_storage_key::<2, C>([
                 KeyPart::Field(b"ack_sequences_commitments"),
                 KeyPart::Map(key),
             ])

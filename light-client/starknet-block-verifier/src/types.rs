@@ -2,7 +2,7 @@ use alloc::string::String;
 use alloc::vec::Vec;
 
 use serde::{Deserialize, Serialize};
-use starknet_crypto::Felt;
+use starknet_core::types::Felt;
 
 use crate::StarknetCryptoFunctions;
 
@@ -158,7 +158,7 @@ impl Block {
         &self,
         signature: &Signature,
         public_key: &Felt,
-    ) -> Result<bool, starknet_crypto::VerifyError> {
+    ) -> Result<bool, C::Error> {
         Ok(self.validate::<C>()
             && signature.block_hash == self.block_hash
             && C::verify(

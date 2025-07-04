@@ -24,8 +24,8 @@ fn test_verify_starknet_storage_proof() -> Result<(), Box<dyn core::error::Error
 
     validate_storage_proof::<StarknetCryptoLib>(&storage_proof)?;
     let global_contract_trie_root =
-        verify_starknet_global_contract_root(&storage_proof, state_root)?;
-    let contract_root = verify_starknet_contract_proof(
+        verify_starknet_global_contract_root::<StarknetCryptoLib>(&storage_proof, state_root)?;
+    let contract_root = verify_starknet_contract_proof::<StarknetCryptoLib>(
         &storage_proof,
         global_contract_trie_root,
         contract_address,

@@ -36,7 +36,7 @@ ibc-client-starknet-types = { workspace = true }
 ibc-client-cw             = { workspace = true }
 
 # starknet dependencies
-starknet-core   = { workspace = true }
+starknet-core = { workspace = true }
 
 cosmwasm-std = { version = "2.2.0" }
 
