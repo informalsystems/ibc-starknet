@@ -22,7 +22,8 @@ ureq            = { workspace = true, optional = true, features = [ "json", "rus
 starknet                = { workspace = true }
 serde_json              = { workspace = true }
 rstest                  = { workspace = true }
-starknet-block-verifier = { path = ".", features = [ "feeder" ] }
+starknet-block-verifier = { path = ".", features = [ "feeder", "crypto" ] }
 
 [features]
 feeder = [ "dep:ureq" ]
+crypto = [  ]

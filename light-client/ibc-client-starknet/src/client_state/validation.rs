@@ -3,7 +3,6 @@ use alloc::vec::Vec;
 use core::fmt::Write;
 use core::str::FromStr;
 
-use cosmwasm_std::{to_json_binary, QueryRequest, WasmQuery};
 use ibc_client_cw::context::CwClientValidation;
 use ibc_core::channel::types::proto::v1::Channel;
 use ibc_core::client::context::client_state::ClientStateValidation;
@@ -19,11 +18,10 @@ use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::host::types::path::{Path, PathBytes};
 use ibc_core::primitives::proto::Any;
 use prost::Message;
+use starknet_block_verifier::{StarknetCryptoEmpty as StarknetCrypto, StarknetCryptoFunctions};
 use starknet_core::types::{Felt, StorageProof};
-use starknet_crypto::poseidon_hash_many;
-use starknet_light_client_cw::contract::sv::QueryMsg::VerifyStarknetStorageProof;
-use starknet_light_client_cw::types::ContractResponse;
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
+use starknet_storage_verifier::validate::validate_storage_proof;
 use starknet_storage_verifier::verifier::verify_starknet_storage_proof;
 
 use super::ClientState;
@@ -92,8 +90,8 @@ where
                 description: e.to_string(),
             })
         })?;
-        let felt_value = get_felt_from_value(&value, &processed_path)?;
-        let felt_path = ibc_path_to_storage_key(processed_path);
+        let felt_value = get_felt_from_value::<StarknetCrypto>(&value, &processed_path)?;
+        let felt_path = ibc_path_to_storage_key::<StarknetCrypto>(processed_path);
 
         let storage_proof: StorageProof = serde_json::from_slice(proof.as_ref()).map_err(|e| {
             ClientError::Decoding(DecodingError::InvalidJson {
@@ -101,39 +99,21 @@ where
             })
         })?;
 
+        validate_storage_proof::<StarknetCrypto>(&storage_proof).map_err(|e| {
+            ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+        })?;
+
         // TODO: Verify that the root matches the one in the storage proof
 
         // commitment root is: contract_storage_root.to_bytes_be()
         let contract_root = Felt::from_bytes_be_slice(root.as_bytes());
 
-        let querier = ctx.deps_mut().unwrap().querier;
-
-        let wasm_query = WasmQuery::Smart {
-            contract_addr: String::new(), // TODO: Set the correct contract address
-            msg: to_json_binary(&VerifyStarknetStorageProof {
-                storage_proof: serde_json::to_vec(&storage_proof).unwrap().into(),
-                contract_root: serde_json::to_vec(&contract_root).unwrap().into(),
-                path: serde_json::to_vec(&felt_path).unwrap().into(),
-                value: serde_json::to_vec(&felt_value).unwrap().into(),
-            })
-            .unwrap(),
-        };
-
-        let custom_wasm_query: ContractResponse = querier
-            .query(&QueryRequest::Wasm(wasm_query))
+        verify_starknet_storage_proof(&storage_proof, contract_root, felt_path, felt_value)
             .map_err(|e| {
-                ClientError::Decoding(DecodingError::InvalidJson {
-                    description: e.to_string(),
-                })
+                ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
             })?;
 
-        if let ContractResponse::CorrectStorageProof = custom_wasm_query {
-            Ok(())
-        } else {
-            Err(ClientError::FailedICS23Verification(
-                CommitmentError::FailedToVerifyMembership,
-            ))
-        }
+        Ok(())
     }
 
     fn verify_non_membership_raw(
@@ -154,12 +134,16 @@ where
                 description: e.to_string(),
             })
         })?;
-        let felt_path = ibc_path_to_storage_key(processed_path);
+        let felt_path = ibc_path_to_storage_key::<StarknetCrypto>(processed_path);
 
         let storage_proof: StorageProof = serde_json::from_slice(proof.as_ref()).map_err(|e| {
             ClientError::Decoding(DecodingError::InvalidJson {
                 description: e.to_string(),
             })
+        })?;
+
+        validate_storage_proof::<StarknetCrypto>(&storage_proof).map_err(|e| {
+            ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
         })?;
 
         // TODO: Verify that the root matches the one in the storage proof
@@ -170,50 +154,31 @@ where
         // For non-membership proof, the expected value is a zero value
         let felt_value = Felt::ZERO;
 
-        let querier = ctx.deps_mut().unwrap().querier;
-
-        let wasm_query = WasmQuery::Smart {
-            contract_addr: String::new(), // TODO: Set the correct contract address
-            msg: to_json_binary(&VerifyStarknetStorageProof {
-                storage_proof: serde_json::to_vec(&storage_proof).unwrap().into(),
-                contract_root: serde_json::to_vec(&contract_root).unwrap().into(),
-                path: serde_json::to_vec(&felt_path).unwrap().into(),
-                value: serde_json::to_vec(&felt_value).unwrap().into(),
-            })
-            .unwrap(),
-        };
-
-        let custom_wasm_query: ContractResponse = querier
-            .query(&QueryRequest::Wasm(wasm_query))
+        verify_starknet_storage_proof(&storage_proof, contract_root, felt_path, felt_value)
             .map_err(|e| {
-                ClientError::Decoding(DecodingError::InvalidJson {
-                    description: e.to_string(),
-                })
+                ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
             })?;
 
-        if let ContractResponse::CorrectStorageProof = custom_wasm_query {
-            Ok(())
-        } else {
-            Err(ClientError::FailedICS23Verification(
-                CommitmentError::FailedToVerifyMembership,
-            ))
-        }
+        Ok(())
     }
 }
 
-fn get_felt_from_value(value: &Vec<u8>, path: &Path) -> Result<Felt, ClientError> {
+fn get_felt_from_value<C: StarknetCryptoFunctions>(
+    value: &Vec<u8>,
+    path: &Path,
+) -> Result<Felt, ClientError> {
     match path {
         Path::Connection(_) => {
             let connection_end = ConnectionEnd::decode(value.as_slice()).unwrap();
             let felts = connection_end_to_felts(&connection_end);
 
-            Ok(poseidon_hash_many(&felts))
+            Ok(C::poseidon_hash_many(&felts))
         }
         Path::ChannelEnd(_) => {
             let channel = Channel::decode(value.as_slice()).unwrap();
             let felts = channel_to_felts(&channel);
 
-            Ok(poseidon_hash_many(&felts))
+            Ok(C::poseidon_hash_many(&felts))
         }
         Path::Commitment(_) => {
             assert!(value.len() == 32, "commitment must be 32 bytes");
@@ -230,7 +195,7 @@ fn get_felt_from_value(value: &Vec<u8>, path: &Path) -> Result<Felt, ClientError
                 .map(|v| Felt::from(*v))
                 .collect::<Vec<Felt>>();
 
-            Ok(poseidon_hash_many(&felts))
+            Ok(C::poseidon_hash_many(&felts))
         }
         Path::Receipt(_) => {
             assert!(value.len() == 32, "receipt must be 32 bytes");
@@ -247,7 +212,7 @@ fn get_felt_from_value(value: &Vec<u8>, path: &Path) -> Result<Felt, ClientError
                 .map(|v| Felt::from(*v))
                 .collect::<Vec<Felt>>();
 
-            Ok(poseidon_hash_many(&felts))
+            Ok(C::poseidon_hash_many(&felts))
         }
         Path::Ack(_) => {
             assert!(value.len() == 32, "acknowledgement must be 32 bytes");
@@ -264,7 +229,7 @@ fn get_felt_from_value(value: &Vec<u8>, path: &Path) -> Result<Felt, ClientError
                 .map(|v| Felt::from(*v))
                 .collect::<Vec<Felt>>();
 
-            Ok(poseidon_hash_many(&felts))
+            Ok(C::poseidon_hash_many(&felts))
         }
         _ => {
             let mut text = String::new();

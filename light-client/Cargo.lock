@@ -1790,7 +1790,7 @@ dependencies = [
 [[package]]
 name = "ibc-client-cw"
 version = "0.56.0"
-source = "git+https://github.com/informalsystems/cosmwasm-ibc?rev=b7cbcb5#b7cbcb56b4e26a2afc2461aa204bc4705e66e098"
+source = "git+https://github.com/informalsystems/cosmwasm-ibc?rev=306059b#306059b90f533155e7d499be4303582c34f838f0"
 dependencies = [
  "cosmwasm-schema 2.2.2",
  "cosmwasm-std",
@@ -1806,6 +1806,7 @@ name = "ibc-client-starknet"
 version = "0.1.0"
 dependencies = [
  "cgp",
+ "cosmwasm-std",
  "derive_more 2.0.1",
  "hermes-cosmos-encoding-components",
  "hermes-encoding-components",
@@ -1818,8 +1819,9 @@ dependencies = [
  "prost-types",
  "serde",
  "serde_json",
+ "starknet-block-verifier",
  "starknet-core 0.13.0",
- "starknet-crypto",
+ "starknet-light-client-cw",
  "starknet-storage-verifier",
 ]
 
@@ -3900,6 +3902,7 @@ dependencies = [
  "indexmap 2.10.0",
  "serde_json",
  "starknet",
+ "starknet-block-verifier",
  "starknet-core 0.13.0",
  "starknet-crypto",
  "starknet-macros",

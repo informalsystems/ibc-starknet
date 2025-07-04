@@ -13,6 +13,7 @@ use hermes_prelude::*;
 use ibc::core::host::types::path::{ClientStatePath, Path};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
+use starknet_block_verifier::StarknetCryptoLib;
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_v14::core::types::StorageProof;
 
@@ -119,7 +120,7 @@ where
 
         let ibc_path = Path::ClientState(ClientStatePath::new(client_id.clone()));
 
-        let felt_path: Felt = ibc_path_to_storage_key(ibc_path);
+        let felt_path: Felt = ibc_path_to_storage_key::<StarknetCryptoLib>(ibc_path);
 
         // key == path
         let storage_proof: StorageProof = chain

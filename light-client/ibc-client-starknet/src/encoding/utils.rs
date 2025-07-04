@@ -1,6 +1,6 @@
 use alloc::vec::Vec;
 
-use starknet_crypto::Felt;
+use starknet_core::types::Felt;
 
 pub fn packed_str_to_felt(s: &str) -> Felt {
     // Pack ASCII chars into a u256 (31 bytes max for felt252)

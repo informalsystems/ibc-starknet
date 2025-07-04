@@ -2,7 +2,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 
 use ibc_core::connection::types::proto::v1::ConnectionEnd;
-use starknet_crypto::Felt;
+use starknet_core::types::Felt;
 
 use crate::encoding::utils::{packed_bytes_to_felt, packed_str_to_felt, parse_client_id};
 

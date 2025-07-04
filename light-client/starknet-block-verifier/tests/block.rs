@@ -41,14 +41,14 @@ fn mainnet_public_key() -> Felt {
 fn test_sepolia(sepolia_block: Block, sepolia_signature: Signature, sepolia_public_key: Felt) {
     assert_eq!(sepolia_block.block_number, 785794);
 
-    assert!(sepolia_block.validate());
+    assert!(sepolia_block.validate::<StarknetCryptoLib>());
 
     assert_eq!(sepolia_block.block_hash, sepolia_signature.block_hash);
 
     assert_eq!(sepolia_public_key, SEPOLIA_PUBLIC_KEY);
 
     assert!(sepolia_block
-        .verify_signature(&sepolia_signature, &sepolia_public_key)
+        .verify_signature::<StarknetCryptoLib>(&sepolia_signature, &sepolia_public_key)
         .unwrap());
 }
 
@@ -56,13 +56,13 @@ fn test_sepolia(sepolia_block: Block, sepolia_signature: Signature, sepolia_publ
 fn test_mainnet(mainnet_block: Block, mainnet_signature: Signature, mainnet_public_key: Felt) {
     assert_eq!(mainnet_block.block_number, 1415244);
 
-    assert!(mainnet_block.validate());
+    assert!(mainnet_block.validate::<StarknetCryptoLib>());
 
     assert_eq!(mainnet_block.block_hash, mainnet_signature.block_hash);
 
     assert_eq!(mainnet_public_key, MAINNET_PUBLIC_KEY);
 
     assert!(mainnet_block
-        .verify_signature(&mainnet_signature, &mainnet_public_key)
+        .verify_signature::<StarknetCryptoLib>(&mainnet_signature, &mainnet_public_key)
         .unwrap());
 }

@@ -1,4 +1,4 @@
-use starknet_block_verifier::{Block, Signature};
+use starknet_block_verifier::{Block, Signature, StarknetCryptoEmpty};
 use starknet_core::types::{Felt, StorageProof};
 use starknet_storage_verifier::validate::validate_storage_proof;
 use starknet_storage_verifier::verifier::{
@@ -43,7 +43,7 @@ impl StarknetLightClientLibraryContract {
             .map_err(|e| StdError::generic_err(format!("Invalid public key: {e}")))?;
 
         header
-            .verify_signature(&signature, &pub_key)
+            .verify_signature::<StarknetCryptoEmpty>(&signature, &pub_key)
             .map_err(|e| StdError::generic_err(format!("Block header verification failed: {e}")))?;
 
         Ok(ContractResponse::StateRoot(
@@ -60,7 +60,7 @@ impl StarknetLightClientLibraryContract {
         let storage_proof: StorageProof = serde_json::from_slice(&storage_proof)
             .map_err(|e| StdError::generic_err(format!("Invalid storage proof: {e}")))?;
 
-        validate_storage_proof(&storage_proof)
+        validate_storage_proof::<StarknetCryptoEmpty>(&storage_proof)
             .map_err(|e| StdError::generic_err(format!("Storage proof validation failed: {e}")))?;
 
         Ok(ContractResponse::ValidStorageProof)
