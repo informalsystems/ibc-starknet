@@ -1,16 +1,20 @@
+use alloc::vec::Vec;
+
 use indexmap::IndexMap;
-use starknet_core::types::{ContractsProof, MerkleNode, StorageProof};
-use starknet_crypto::{pedersen_hash, Felt};
+use starknet_block_verifier::StarknetCryptoFunctions;
+use starknet_core::types::{ContractsProof, Felt, MerkleNode, StorageProof};
 
 use crate::StorageError;
 
-pub fn validate_storage_proof(proof: &StorageProof) -> Result<(), StorageError> {
-    validate_merkle_node_map(
+pub fn validate_storage_proof<C: StarknetCryptoFunctions>(
+    proof: &StorageProof,
+) -> Result<(), StorageError> {
+    validate_merkle_node_map::<C>(
         &proof.classes_proof,
         &[proof.global_roots.classes_tree_root],
     )?;
 
-    validate_merkle_node_map(
+    validate_merkle_node_map::<C>(
         &proof.contracts_proof.nodes,
         &[proof.global_roots.contracts_tree_root],
     )?;
@@ -23,20 +27,20 @@ pub fn validate_storage_proof(proof: &StorageProof) -> Result<(), StorageError> 
         .collect::<Vec<_>>();
 
     for storage_entry in proof.contracts_storage_proofs.iter() {
-        validate_merkle_node_map(storage_entry, &contract_roots)?;
+        validate_merkle_node_map::<C>(storage_entry, &contract_roots)?;
     }
 
-    validate_contracts_proof(&proof.contracts_proof)?;
+    validate_contracts_proof::<C>(&proof.contracts_proof)?;
 
     Ok(())
 }
 
-fn validate_merkle_node_map(
+fn validate_merkle_node_map<C: StarknetCryptoFunctions>(
     node_map: &IndexMap<Felt, MerkleNode>,
     roots: &[Felt],
 ) -> Result<(), StorageError> {
     for (hash, node) in node_map.iter() {
-        validate_merkle_node(hash, node)?;
+        validate_merkle_node::<C>(hash, node)?;
     }
 
     for (hash, node) in node_map.iter() {
@@ -84,32 +88,27 @@ fn validate_merkle_node_parent(
         }
     }
 
-    Err(StorageError::MissingParentNode(hash.to_hex_string()))
+    Err(StorageError::MissingParentNode)
 }
 
-fn validate_merkle_node(node_hash: &Felt, node: &MerkleNode) -> Result<(), StorageError> {
+fn validate_merkle_node<C: StarknetCryptoFunctions>(
+    node_hash: &Felt,
+    node: &MerkleNode,
+) -> Result<(), StorageError> {
     match node {
         MerkleNode::BinaryNode(node) => {
-            let expected = pedersen_hash(&node.left, &node.right);
+            let expected = C::pedersen_hash(&node.left, &node.right);
 
             if &expected != node_hash {
-                return Err(StorageError::MismatchBinaryHash(
-                    node.clone().into(),
-                    expected,
-                    *node_hash,
-                ));
+                return Err(StorageError::MismatchBinaryHash);
             }
         }
 
         MerkleNode::EdgeNode(node) => {
-            let expected = pedersen_hash(&node.child, &node.path) + node.length;
+            let expected = C::pedersen_hash(&node.child, &node.path) + node.length;
 
             if &expected != node_hash {
-                return Err(StorageError::MismatchEdgeHash(
-                    node.clone().into(),
-                    expected,
-                    *node_hash,
-                ));
+                return Err(StorageError::MismatchEdgeHash);
             }
         }
     }
@@ -117,15 +116,17 @@ fn validate_merkle_node(node_hash: &Felt, node: &MerkleNode) -> Result<(), Stora
     Ok(())
 }
 
-fn validate_contracts_proof(contracts_proof: &ContractsProof) -> Result<(), StorageError> {
+fn validate_contracts_proof<C: StarknetCryptoFunctions>(
+    contracts_proof: &ContractsProof,
+) -> Result<(), StorageError> {
     for contract_leaf in contracts_proof.contract_leaves_data.iter() {
         let storage_root = contract_leaf
             .storage_root
-            .ok_or_else(|| StorageError::MissingStorageRoot(contract_leaf.clone()))?;
+            .ok_or(StorageError::MissingStorageRoot)?;
 
-        let contract_hash = pedersen_hash(
-            &pedersen_hash(
-                &pedersen_hash(&contract_leaf.class_hash, &storage_root),
+        let contract_hash = C::pedersen_hash(
+            &C::pedersen_hash(
+                &C::pedersen_hash(&contract_leaf.class_hash, &storage_root),
                 &contract_leaf.nonce,
             ),
             &Felt::ZERO,
@@ -144,12 +145,7 @@ fn validate_contracts_proof(contracts_proof: &ContractsProof) -> Result<(), Stor
                 }
                 _ => None,
             })
-            .ok_or_else(|| {
-                StorageError::MissingContractHash(
-                    contract_hash.to_hex_string(),
-                    contract_leaf.clone().into(),
-                )
-            })?;
+            .ok_or(StorageError::MissingContractHash)?;
     }
 
     Ok(())

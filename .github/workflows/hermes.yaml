@@ -99,6 +99,7 @@ jobs:
           export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_RawStore.contract_class.json"
 
           export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
+          export STARKNET_LC_WASMLIB_PATH="$(nix build ..#starknet-light-client-cw --print-out-paths)/starknet_light_client_cw.wasm"
 
           cargo run --quiet --example contract_size "$ERC20_CONTRACT"
           cargo run --quiet --example contract_size "$ICS20_CONTRACT"

@@ -1,15 +1,14 @@
+use alloc::string::ToString;
+
 use ibc_core::client::context::client_state::ClientStateCommon;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
-use ibc_core::commitment_types::commitment::{
-    CommitmentPrefix, CommitmentProofBytes, CommitmentRoot,
-};
 use ibc_core::host::types::identifiers::ClientType;
 use ibc_core::host::types::path::{Path, PathBytes};
 use ibc_core::primitives::proto::Any;
 use ibc_core::primitives::Timestamp;
 
-use super::ClientState;
+use crate::client_state::ClientState;
 
 impl ClientStateCommon for ClientState {
     fn verify_consensus_state(
@@ -21,7 +20,7 @@ impl ClientStateCommon for ClientState {
     }
 
     fn client_type(&self) -> ClientType {
-        "blind-001".parse().unwrap()
+        "blind-001".parse().expect("Invalid client type")
     }
 
     fn latest_height(&self) -> Height {
@@ -32,39 +31,7 @@ impl ClientStateCommon for ClientState {
         Ok(())
     }
 
-    fn verify_upgrade_client(
-        &self,
-        upgraded_client_state: Any,
-        upgraded_consensus_state: Any,
-        proof_upgrade_client: CommitmentProofBytes,
-        proof_upgrade_consensus_state: CommitmentProofBytes,
-        root: &CommitmentRoot,
-    ) -> Result<(), ClientError> {
-        Ok(())
-    }
-
     fn serialize_path(&self, path: Path) -> Result<PathBytes, ClientError> {
         Ok(path.to_string().as_bytes().to_vec().into())
-    }
-
-    fn verify_membership_raw(
-        &self,
-        prefix: &CommitmentPrefix,
-        proof: &CommitmentProofBytes,
-        root: &CommitmentRoot,
-        path: PathBytes,
-        value: Vec<u8>,
-    ) -> Result<(), ClientError> {
-        Ok(())
-    }
-
-    fn verify_non_membership_raw(
-        &self,
-        prefix: &CommitmentPrefix,
-        proof: &CommitmentProofBytes,
-        root: &CommitmentRoot,
-        path: PathBytes,
-    ) -> Result<(), ClientError> {
-        Ok(())
     }
 }

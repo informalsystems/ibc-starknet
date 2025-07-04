@@ -1,4 +1,4 @@
-use starknet_crypto::Felt;
+use starknet_core::types::Felt;
 
 pub const MAINNET_FEEDER_URL: &str = "https://alpha-mainnet.starknet.io";
 pub const SEPOLIA_FEEDER_URL: &str = "https://alpha-sepolia.starknet.io";

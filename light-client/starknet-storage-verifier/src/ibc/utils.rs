@@ -1,4 +1,7 @@
-use starknet_crypto::Felt;
+use alloc::vec;
+use alloc::vec::Vec;
+
+use starknet_core::types::Felt;
 
 pub fn serialize_to_felts(value: impl AsRef<[u8]>) -> Vec<Felt> {
     let bytes = value.as_ref();

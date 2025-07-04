@@ -1,5 +1,5 @@
 [package]
-name         = "ibc-client-starknet-cw"
+name         = "starknet-light-client-cw"
 authors      = { workspace = true }
 edition      = { workspace = true }
 license      = { workspace = true }
@@ -7,7 +7,7 @@ repository   = { workspace = true }
 rust-version = { workspace = true }
 version      = { workspace = true }
 readme       = "./../README.md"
-keywords     = [ "ibc", "light-client", "starknet", "CosmWasm" ]
+keywords     = [ "light-client", "starknet", "CosmWasm" ]
 description  = "Starknet IBC wasm light-client"
 
 [lib]
@@ -17,18 +17,13 @@ crate-type = [ "cdylib", "rlib" ]
 workspace = true
 
 [dependencies]
-# ibc dependencies
-ibc-core            = { workspace = true }
-ibc-client-cw       = { workspace = true }
-ibc-client-starknet = { workspace = true }
-
 # cosmwasm dependencies
-cosmwasm-std = { version = "2.2.0" }
+starknet-block-verifier   = { workspace = true }
+starknet-storage-verifier = { workspace = true }
+starknet-core             = { workspace = true }
+
+sylvia          = { version = "1.3" }
+cosmwasm-schema = { version = "3.0" }
 
 [features]
-default = [ "std" ]
-std = [
-  "ibc-core/std",
-  "ibc-client-cw/std",
-]
 library = [  ]
