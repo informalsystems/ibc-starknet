@@ -1,10 +1,12 @@
 use hermes_core::chain_components::traits::{
     CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
     ProvideCreateClientPayloadOptionsType, ProvideCreateClientPayloadType,
-    ProvideUpdateClientPayloadType, UpdateClientPayloadTypeComponent,
+    ProvideRecoverClientPayloadType, ProvideUpdateClientPayloadType,
+    RecoverClientPayloadTypeComponent, UpdateClientPayloadTypeComponent,
 };
 use hermes_prelude::*;
 
+use crate::impls::StarknetRecoverClientPayload;
 use crate::types::{
     StarknetCreateClientPayload, StarknetCreateClientPayloadOptions, StarknetUpdateClientPayload,
 };
@@ -30,4 +32,9 @@ impl<Chain: Async, Counterparty> ProvideUpdateClientPayloadType<Chain, Counterpa
     for ProvideStarknetPayloadTypes
 {
     type UpdateClientPayload = StarknetUpdateClientPayload;
+}
+
+#[cgp_provider(RecoverClientPayloadTypeComponent)]
+impl<Chain: Async> ProvideRecoverClientPayloadType<Chain> for ProvideStarknetPayloadTypes {
+    type RecoverClientPayload = StarknetRecoverClientPayload;
 }

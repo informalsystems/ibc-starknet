@@ -10,6 +10,9 @@ pub use block::*;
 mod client;
 pub use client::*;
 
+mod client_status;
+pub use client_status::*;
+
 mod commitment_proof;
 pub use commitment_proof::*;
 

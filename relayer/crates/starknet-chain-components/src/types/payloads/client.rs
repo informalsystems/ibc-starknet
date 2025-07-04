@@ -16,7 +16,7 @@ pub struct StarknetCreateClientPayload {
     pub proof_signer_pub_key: Vec<u8>,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct StarknetCreateClientPayloadOptions {
     pub wasm_code_hash: [u8; 32],
 }

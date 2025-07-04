@@ -70,8 +70,8 @@ where
         false // todo
     }
 
-    fn client_state_has_expired(_client_state: &CometClientState, _elapsed: Duration) -> bool {
-        false // todo
+    fn client_state_has_expired(client_state: &CometClientState, elapsed: Duration) -> bool {
+        client_state.trusting_period < elapsed
     }
 
     fn client_state_chain_id(client_state: &CometClientState) -> ChainId {

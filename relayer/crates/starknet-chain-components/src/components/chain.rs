@@ -22,19 +22,21 @@ mod preset {
         ChannelOpenInitEventComponent, ChannelOpenInitMessageBuilderComponent,
         ChannelOpenTryEventComponent, ChannelOpenTryMessageBuilderComponent,
         ChannelOpenTryPayloadBuilderComponent, ChannelOpenTryPayloadTypeComponent,
-        ClientIdTypeComponent, ClientStateFieldsComponent, ClientStateQuerierComponent,
-        ClientStateTypeComponent, ClientStateWithProofsQuerierComponent,
-        CommitmentPrefixTypeComponent, CommitmentProofBytesGetterComponent,
-        CommitmentProofHeightGetterComponent, CommitmentProofTypeProviderComponent,
-        ConnectionEndQuerierComponent, ConnectionEndTypeComponent,
-        ConnectionEndWithProofsQuerierComponent, ConnectionIdTypeComponent,
-        ConnectionOpenAckMessageBuilderComponent, ConnectionOpenAckPayloadBuilderComponent,
-        ConnectionOpenAckPayloadTypeComponent, ConnectionOpenConfirmMessageBuilderComponent,
-        ConnectionOpenConfirmPayloadBuilderComponent, ConnectionOpenConfirmPayloadTypeComponent,
-        ConnectionOpenInitEventComponent, ConnectionOpenInitMessageBuilderComponent,
-        ConnectionOpenInitPayloadBuilderComponent, ConnectionOpenInitPayloadTypeComponent,
-        ConnectionOpenTryEventComponent, ConnectionOpenTryMessageBuilderComponent,
-        ConnectionOpenTryPayloadBuilderComponent, ConnectionOpenTryPayloadTypeComponent,
+        ClientIdTypeComponent, ClientRecoveryComponent, ClientStateFieldsComponent,
+        ClientStateQuerierComponent, ClientStateTypeComponent,
+        ClientStateWithProofsQuerierComponent, ClientStatusMethodsComponent,
+        ClientStatusQuerierComponent, ClientStatusTypeComponent, CommitmentPrefixTypeComponent,
+        CommitmentProofBytesGetterComponent, CommitmentProofHeightGetterComponent,
+        CommitmentProofTypeProviderComponent, ConnectionEndQuerierComponent,
+        ConnectionEndTypeComponent, ConnectionEndWithProofsQuerierComponent,
+        ConnectionIdTypeComponent, ConnectionOpenAckMessageBuilderComponent,
+        ConnectionOpenAckPayloadBuilderComponent, ConnectionOpenAckPayloadTypeComponent,
+        ConnectionOpenConfirmMessageBuilderComponent, ConnectionOpenConfirmPayloadBuilderComponent,
+        ConnectionOpenConfirmPayloadTypeComponent, ConnectionOpenInitEventComponent,
+        ConnectionOpenInitMessageBuilderComponent, ConnectionOpenInitPayloadBuilderComponent,
+        ConnectionOpenInitPayloadTypeComponent, ConnectionOpenTryEventComponent,
+        ConnectionOpenTryMessageBuilderComponent, ConnectionOpenTryPayloadBuilderComponent,
+        ConnectionOpenTryPayloadTypeComponent, ConsensusStateFieldComponent,
         ConsensusStateHeightQuerierComponent, ConsensusStateHeightsQuerierComponent,
         ConsensusStateQuerierComponent, ConsensusStateTypeComponent,
         ConsensusStateWithProofsQuerierComponent, CounterpartyChainIdQuerierComponent,
@@ -48,18 +50,18 @@ mod preset {
         InitChannelOptionsTypeComponent, InitConnectionOptionsTypeComponent,
         MessageResponseExtractorComponent, MessageSenderComponent, MessageTypeProviderComponent,
         OutgoingPacketFilterComponent, OutgoingPacketTypeComponent,
-        PacketAckCommitmentQuerierComponent, PacketCommitmentQuerierComponent,
-        PacketCommitmentTypeComponent, PacketDstChannelIdGetterComponent,
-        PacketDstPortIdGetterComponent, PacketFromSendPacketEventBuilderComponent,
-        PacketFromWriteAckEventBuilderComponent, PacketIsClearedQuerierComponent,
-        PacketIsReceivedQuerierComponent, PacketReceiptQuerierComponent,
-        PacketReceiptTypeComponent, PacketSequenceGetterComponent,
+        OverrideCreateClientPayloadOptionsComponent, PacketAckCommitmentQuerierComponent,
+        PacketCommitmentQuerierComponent, PacketCommitmentTypeComponent,
+        PacketDstChannelIdGetterComponent, PacketDstPortIdGetterComponent,
+        PacketFromSendPacketEventBuilderComponent, PacketFromWriteAckEventBuilderComponent,
+        PacketIsClearedQuerierComponent, PacketIsReceivedQuerierComponent,
+        PacketReceiptQuerierComponent, PacketReceiptTypeComponent, PacketSequenceGetterComponent,
         PacketSrcChannelIdGetterComponent, PacketSrcPortIdGetterComponent,
         PacketTimeoutHeightGetterComponent, PacketTimeoutTimestampGetterComponent,
         PortIdTypeComponent, ReceivePacketMessageBuilderComponent,
         ReceivePacketPayloadBuilderComponent, ReceivePacketPayloadTypeComponent,
-        SendPacketEventComponent, SequenceTypeComponent, TimeoutTypeComponent,
-        TimeoutUnorderedPacketMessageBuilderComponent,
+        RecoverClientPayloadTypeComponent, SendPacketEventComponent, SequenceTypeComponent,
+        TimeMeasurerComponent, TimeoutTypeComponent, TimeoutUnorderedPacketMessageBuilderComponent,
         TimeoutUnorderedPacketPayloadBuilderComponent, TimeoutUnorderedPacketPayloadTypeComponent,
         UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
         UpdateClientPayloadTypeComponent, WriteAckEventComponent,
@@ -109,17 +111,19 @@ mod preset {
         GetContractAddressFromField, GetCounterpartyCosmosHeightFromStarknetMessage,
         GetOrCreateCosmosTokenAddressOnStarknet, GetStarknetBlockEvents,
         GetStarknetCommitmentPrefix, IbcTransferTimeoutAfterSeconds, InvokeStarknetContract,
-        ProvideFeltSelector, ProvidePollAssertDuration, ProvideStarknetBlockType,
-        ProvideStarknetChainStatusType, ProvideStarknetHeight, ProvideStarknetIbcClientTypes,
+        ProvideFeltSelector, ProvideNoCreateClientMessageOptionsOverride,
+        ProvidePollAssertDuration, ProvideStarknetBlockType, ProvideStarknetChainStatusType,
+        ProvideStarknetClientStatus, ProvideStarknetHeight, ProvideStarknetIbcClientTypes,
         ProvideStarknetPayloadTypes, ProvideStarknetWallet, ProvideTokenAddressDenom,
         QueryChannelEndFromStarknet, QueryCometClientState, QueryCometConsensusState,
         QueryConnectionEndFromStarknet, QueryCosmosChainIdFromStarknetChannelId,
         QueryErc20TokenBalance, QueryPacketIsReceivedOnStarknet, QueryStarknetAckCommitment,
-        QueryStarknetBlock, QueryStarknetChainStatus, QueryStarknetNonce,
-        QueryStarknetPacketCommitment, QueryStarknetPacketReceipt, QueryStarknetWalletBalance,
-        QueryTransactionReceipt, ReadPacketSrcStarknetFields, SendStarknetMessages,
-        StarknetAddress, StarknetMessage, TransferErc20Token, UseStarknetCommitmentProof,
-        UseStarknetContractTypes, UseStarknetEvents, UseU256Amount,
+        QueryStarknetBlock, QueryStarknetChainStatus, QueryStarknetClientStatus,
+        QueryStarknetNonce, QueryStarknetPacketCommitment, QueryStarknetPacketReceipt,
+        QueryStarknetWalletBalance, QueryTransactionReceipt, ReadPacketSrcStarknetFields,
+        RecoverStarknetClient, SendStarknetMessages, StarknetAddress, StarknetMessage,
+        TransferErc20Token, UseStarknetCommitmentProof, UseStarknetContractTypes,
+        UseStarknetEvents, UseU256Amount,
     };
     use crate::traits::{
         BlobTypeProviderComponent, ContractAddressQuerierComponent, ContractCallerComponent,
@@ -209,6 +213,7 @@ mod preset {
                 SequenceTypeComponent,
                 OutgoingPacketTypeComponent,
                 TimeTypeComponent,
+                TimeMeasurerComponent,
                 TimeoutTypeComponent,
             ]:
                 ProvideCosmosChainTypes,
@@ -223,13 +228,20 @@ mod preset {
             [
                 ClientStateTypeComponent,
                 ConsensusStateTypeComponent,
+                ConsensusStateFieldComponent,
                 ClientStateFieldsComponent,
             ]:
                 ProvideStarknetIbcClientTypes,
             [
+                ClientStatusTypeComponent,
+                ClientStatusMethodsComponent,
+            ]:
+                ProvideStarknetClientStatus,
+            [
                 CreateClientPayloadTypeComponent,
                 CreateClientPayloadOptionsTypeComponent,
                 UpdateClientPayloadTypeComponent,
+                RecoverClientPayloadTypeComponent
             ]:
                 ProvideStarknetPayloadTypes,
             // FIXME: define our own Starknet init channel options type
@@ -331,12 +343,16 @@ mod preset {
                 UseStarknetEvents,
             CreateClientMessageOptionsTypeComponent:
                 ProvideNoCreateClientMessageOptionsType,
+            OverrideCreateClientPayloadOptionsComponent:
+                ProvideNoCreateClientMessageOptionsOverride,
             CreateClientPayloadBuilderComponent:
                 BuildStarknetCreateClientPayload,
             UpdateClientMessageBuilderComponent:
                 BuildUpdateCometClientMessage,
             CreateClientMessageBuilderComponent:
                 BuildCreateCometClientMessage,
+            ClientRecoveryComponent:
+                RecoverStarknetClient,
             UpdateClientPayloadBuilderComponent:
                 BuildStarknetUpdateClientPayload,
             [
@@ -344,6 +360,8 @@ mod preset {
                 ClientStateWithProofsQuerierComponent,
             ]:
                 QueryCometClientState,
+            ClientStatusQuerierComponent:
+                QueryStarknetClientStatus,
             [
                 ConsensusStateQuerierComponent,
                 ConsensusStateWithProofsQuerierComponent,

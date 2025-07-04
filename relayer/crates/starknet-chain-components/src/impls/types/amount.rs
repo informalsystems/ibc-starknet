@@ -73,7 +73,8 @@ where
 impl<ChainDriver> RandomAmountGenerator<ChainDriver> for UseU256Amount
 where
     ChainDriver: HasChainType + HasRuntime,
-    ChainDriver::Chain: HasAmountType<Amount = StarknetAmount>,
+    ChainDriver::Chain:
+        HasAmountType<Amount = StarknetAmount> + HasDenomType<Denom = StarknetAddress>,
     ChainDriver::Runtime: CanGenerateRandom<u128>,
 {
     async fn random_amount(
@@ -93,6 +94,18 @@ where
         StarknetAmount {
             quantity: quantity.into(),
             token_address: max.token_address,
+        }
+    }
+
+    async fn fixed_amount(
+        chain_driver: &ChainDriver,
+        amount: usize,
+        denom: &StarknetAddress,
+    ) -> StarknetAmount {
+        let quantity_u128 = amount as u128;
+        StarknetAmount {
+            quantity: quantity_u128.into(),
+            token_address: *denom,
         }
     }
 }
