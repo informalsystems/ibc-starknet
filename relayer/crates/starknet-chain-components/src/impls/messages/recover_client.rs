@@ -43,7 +43,7 @@ where
             .expect("Failed to query contract address");
 
         let calldata = encoding
-            .encode(&product![subject_client.clone(), substitute_client.clone(),])
+            .encode(&product![subject_client.clone(), substitute_client.clone()])
             .expect("Failed to encode subject and substitute client IDs to Vec<Felt>");
 
         StarknetMessage::new(*contract_address, selector!("recover_client"), calldata)
