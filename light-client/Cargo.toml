@@ -55,18 +55,6 @@ hermes-protobuf-encoding-components = { version = "0.1.0" }
 hermes-cosmos-encoding-components   = { version = "0.1.0" }
 hermes-wasm-encoding-components     = { version = "0.1.0" }
 
-[profile.release]
-# Optimize for size.
-opt-level = 'z'
-# Link-Time Optimization.
-lto = true
-# Reduce code generation units.
-codegen-units = 1
-# Abort on panic.
-panic = 'abort'
-# Strip symbols from the binary.
-strip = true
-
 [workspace.lints.rust]
 unsafe_code          = "forbid"
 dead_code            = "deny"
