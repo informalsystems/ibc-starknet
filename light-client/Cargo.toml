@@ -6,7 +6,7 @@ members = [
   "./ibc-client-starknet-types",
   "./starknet-block-verifier",
   "./starknet-storage-verifier",
-  "./starknet-light-client-cw",
+  "./starknet-crypto-lib",
 ]
 
 [workspace.package]
@@ -22,8 +22,9 @@ repository   = "https://github.com/informalsystems/ibc-starknet"
 ibc-client-starknet       = { version = "0.1.0" }
 ibc-client-starknet-cw    = { version = "0.1.0" }
 ibc-client-starknet-types = { version = "0.1.0" }
-starknet-block-verifier   = { version = "0.1.0" }
-starknet-storage-verifier = { version = "0.1.0" }
+starknet-block-verifier   = { version = "0.1.0", default-features = false }
+starknet-storage-verifier = { version = "0.1.0", default-features = false }
+starknet-crypto-lib       = { version = "0.1.0", default-features = false }
 
 # external dependencies
 derive_more = { version = "2", features = [ "from", "try_into" ] }
@@ -93,6 +94,7 @@ ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
 ibc-client-starknet-types = { path = "./ibc-client-starknet-types" }
 starknet-block-verifier   = { path = "./starknet-block-verifier" }
 starknet-storage-verifier = { path = "./starknet-storage-verifier" }
+starknet-crypto-lib       = { path = "./starknet-crypto-lib" }
 
 ibc                         = { git = "https://github.com/cosmos/ibc-rs", rev = "5e8a08e6" }
 ibc-core                    = { git = "https://github.com/cosmos/ibc-rs", rev = "5e8a08e6" }

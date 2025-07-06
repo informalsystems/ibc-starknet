@@ -1,5 +1,5 @@
-use starknet_block_verifier::StarknetCryptoFunctions;
 use starknet_core::types::Felt;
+use starknet_crypto_lib::funcs::StarknetCryptoFunctions;
 
 /// Each variant denotes components of a Starknet storage path.
 ///

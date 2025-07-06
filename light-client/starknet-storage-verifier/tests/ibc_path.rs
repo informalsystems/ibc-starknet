@@ -1,4 +1,4 @@
-use starknet_block_verifier::StarknetCryptoLib;
+use starknet_crypto_lib::funcs::StarknetCryptoLib;
 use starknet_macros::felt;
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 

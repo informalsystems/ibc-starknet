@@ -1821,7 +1821,7 @@ dependencies = [
  "serde_json",
  "starknet-block-verifier",
  "starknet-core 0.13.0",
- "starknet-light-client-cw",
+ "starknet-crypto-lib",
  "starknet-storage-verifier",
 ]
 
@@ -3732,7 +3732,7 @@ dependencies = [
  "starknet",
  "starknet-block-verifier",
  "starknet-core 0.13.0",
- "starknet-crypto",
+ "starknet-crypto-lib",
  "ureq",
 ]
 
@@ -3828,23 +3828,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "starknet-crypto-lib"
+version = "0.1.0"
+dependencies = [
+ "cosmwasm-schema 3.0.1",
+ "starknet-core 0.13.0",
+ "starknet-crypto",
+ "sylvia",
+]
+
+[[package]]
 name = "starknet-curve"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bcde6bd74269b8161948190ace6cf069ef20ac6e79cd2ba09b320efa7500b6de"
 dependencies = [
  "starknet-types-core",
-]
-
-[[package]]
-name = "starknet-light-client-cw"
-version = "0.1.0"
-dependencies = [
- "cosmwasm-schema 3.0.1",
- "starknet-block-verifier",
- "starknet-core 0.13.0",
- "starknet-storage-verifier",
- "sylvia",
 ]
 
 [[package]]
@@ -3903,9 +3902,9 @@ dependencies = [
  "indexmap 2.10.0",
  "serde_json",
  "starknet",
- "starknet-block-verifier",
  "starknet-core 0.13.0",
  "starknet-crypto",
+ "starknet-crypto-lib",
  "starknet-macros",
  "starknet-storage-verifier",
  "tokio",

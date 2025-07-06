@@ -13,7 +13,7 @@ use hermes_prelude::*;
 use ibc::core::host::types::path::{ClientStatePath, Path};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
-use starknet_block_verifier::StarknetCryptoLib;
+use starknet_crypto_lib::funcs::StarknetCryptoLib;
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_v14::core::types::StorageProof;
 

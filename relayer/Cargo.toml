@@ -109,8 +109,9 @@ hermes-starknet-chain-context       = { version = "0.1.0" }
 hermes-starknet-relayer             = { version = "0.1.0" }
 hermes-starknet-integration-tests   = { version = "0.1.0" }
 
-starknet-block-verifier   = { version = "0.1.0" }
-starknet-storage-verifier = { version = "0.1.0" }
+starknet-block-verifier   = { version = "0.1.0", default-features = false }
+starknet-storage-verifier = { version = "0.1.0", default-features = false }
+starknet-crypto-lib       = { version = "0.1.0", default-features = false }
 
 [workspace.lints.rust]
 unsafe_code          = "forbid"
@@ -156,6 +157,7 @@ ibc-core-handler-types      = { git = "https://github.com/cosmos/ibc-rs", rev = 
 ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types" }
 starknet-block-verifier   = { path = "../light-client/starknet-block-verifier" }
 starknet-storage-verifier = { path = "../light-client/starknet-storage-verifier" }
+starknet-crypto-lib       = { path = "../light-client/starknet-crypto-lib" }
 
 garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", rev = "5c5859e" }
 

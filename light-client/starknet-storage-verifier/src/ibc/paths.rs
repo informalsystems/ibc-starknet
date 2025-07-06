@@ -1,6 +1,6 @@
 use ibc_core::host::types::path::Path;
-use starknet_block_verifier::StarknetCryptoFunctions;
 use starknet_core::types::Felt;
+use starknet_crypto_lib::funcs::StarknetCryptoFunctions;
 
 use crate::ibc::keys::{connection_key, next_sequence_key, packet_key};
 use crate::storage::key::{starknet_storage_key, KeyPart};

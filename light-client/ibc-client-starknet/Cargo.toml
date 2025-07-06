@@ -17,6 +17,7 @@ workspace = true
 # internal dependencies
 starknet-storage-verifier = { workspace = true, features = [ "ibc" ] }
 starknet-block-verifier   = { workspace = true }
+starknet-crypto-lib       = { workspace = true, features = [ "library" ] }
 
 # external dependencies
 derive_more                         = { workspace = true }
@@ -39,8 +40,6 @@ ibc-client-cw             = { workspace = true }
 starknet-core = { workspace = true }
 
 cosmwasm-std = { version = "2.2.0" }
-
-starknet-light-client-cw = { path = "../starknet-light-client-cw", features = [ "library" ] }
 
 [features]
 default = [ "std" ]

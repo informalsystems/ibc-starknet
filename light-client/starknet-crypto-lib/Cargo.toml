@@ -1,5 +1,5 @@
 [package]
-name         = "starknet-light-client-cw"
+name         = "starknet-crypto-lib"
 authors      = { workspace = true }
 edition      = { workspace = true }
 license      = { workspace = true }
@@ -8,7 +8,7 @@ rust-version = { workspace = true }
 version      = { workspace = true }
 readme       = "./../README.md"
 keywords     = [ "light-client", "starknet", "CosmWasm" ]
-description  = "Starknet IBC wasm light-client"
+description  = "Starknet Crypto Library as Cosmwasm Smart Contract"
 
 [lib]
 crate-type = [ "cdylib", "rlib" ]
@@ -18,9 +18,8 @@ workspace = true
 
 [dependencies]
 # cosmwasm dependencies
-starknet-block-verifier   = { workspace = true }
-starknet-storage-verifier = { workspace = true }
-starknet-core             = { workspace = true }
+starknet-core   = { workspace = true }
+starknet-crypto = { workspace = true }
 
 sylvia          = { version = "1.3" }
 cosmwasm-schema = { version = "3.0" }

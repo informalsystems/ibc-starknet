@@ -34,10 +34,8 @@ impl StarknetCryptoFunctions for StarknetCryptoEmpty {
     }
 }
 
-#[cfg(feature = "crypto")]
 pub struct StarknetCryptoLib;
 
-#[cfg(feature = "crypto")]
 impl StarknetCryptoFunctions for StarknetCryptoLib {
     type Error = starknet_crypto::VerifyError;
 

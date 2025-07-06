@@ -1,8 +1,8 @@
 use alloc::vec::Vec;
 
 use indexmap::IndexMap;
-use starknet_block_verifier::StarknetCryptoFunctions;
 use starknet_core::types::{ContractsProof, Felt, MerkleNode, StorageProof};
+use starknet_crypto_lib::funcs::StarknetCryptoFunctions;
 
 use crate::StorageError;
 

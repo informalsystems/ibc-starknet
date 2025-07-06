@@ -1,9 +1,9 @@
 use alloc::format;
 
 use indexmap::IndexMap;
-use starknet_block_verifier::StarknetCryptoFunctions;
 use starknet_core::types::{Felt, MerkleNode, StorageProof};
 use starknet_core::utils::cairo_short_string_to_felt;
+use starknet_crypto_lib::funcs::StarknetCryptoFunctions;
 
 use crate::StorageError;
 
