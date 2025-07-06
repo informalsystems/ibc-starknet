@@ -2,7 +2,7 @@
 //! key paths are the same as the ones in the Cairo contract.
 
 use ibc_core::host::types::identifiers::{ChannelId, ConnectionId, PortId, Sequence};
-use starknet_crypto_lib::funcs::StarknetCryptoLib;
+use starknet_crypto_lib::StarknetCryptoLib;
 use starknet_macros::felt;
 use starknet_storage_verifier::ibc::{connection_key, next_sequence_key, packet_key};
 

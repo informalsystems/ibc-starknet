@@ -1,5 +1,5 @@
 use starknet_core::types::Felt;
-use starknet_crypto_lib::funcs::StarknetCryptoFunctions;
+use starknet_crypto_lib::StarknetCryptoFunctions;
 
 /// Each variant denotes components of a Starknet storage path.
 ///

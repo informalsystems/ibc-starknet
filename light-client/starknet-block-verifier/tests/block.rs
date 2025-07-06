@@ -1,6 +1,6 @@
 use starknet_block_verifier::*;
 use starknet_core::types::Felt;
-use starknet_crypto_lib::funcs::StarknetCryptoLib;
+use starknet_crypto_lib::StarknetCryptoLib;
 
 fn read_json<T: serde::de::DeserializeOwned>(path: &str) -> T {
     let file = std::fs::File::open(path).expect("Failed to open file");

@@ -3,7 +3,7 @@ use alloc::vec::Vec;
 
 use ibc_core::host::types::identifiers::{ChannelId, ConnectionId, PortId, Sequence};
 use starknet_core::types::Felt;
-use starknet_crypto_lib::funcs::StarknetCryptoFunctions;
+use starknet_crypto_lib::StarknetCryptoFunctions;
 
 use super::utils::{serialize_byte_array, serialize_to_felts};
 

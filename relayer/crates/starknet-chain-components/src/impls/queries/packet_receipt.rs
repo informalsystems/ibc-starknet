@@ -14,7 +14,7 @@ use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence as IbcSe
 use ibc::core::host::types::path::{Path, ReceiptPath};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
-use starknet_crypto_lib::funcs::StarknetCryptoLib;
+use starknet_crypto_lib::StarknetCryptoLib;
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_v14::core::types::StorageProof;
 

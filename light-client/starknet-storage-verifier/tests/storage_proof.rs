@@ -1,6 +1,6 @@
 use starknet_core::types::StorageProof;
 use starknet_crypto::{pedersen_hash, Felt};
-use starknet_crypto_lib::funcs::StarknetCryptoLib;
+use starknet_crypto_lib::StarknetCryptoLib;
 use starknet_macros::felt;
 use starknet_storage_verifier::validate::validate_storage_proof;
 use starknet_storage_verifier::verifier::{

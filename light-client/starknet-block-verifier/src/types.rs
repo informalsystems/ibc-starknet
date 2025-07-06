@@ -3,7 +3,7 @@ use alloc::vec::Vec;
 
 use serde::{Deserialize, Serialize};
 use starknet_core::types::Felt;
-use starknet_crypto_lib::funcs::StarknetCryptoFunctions;
+use starknet_crypto_lib::StarknetCryptoFunctions;
 
 pub const STARKNET_GAS_PRICES0: &[u8] = b"STARKNET_GAS_PRICES0";
 pub const STARKNET_BLOCK_HASH1: &[u8] = b"STARKNET_BLOCK_HASH1";

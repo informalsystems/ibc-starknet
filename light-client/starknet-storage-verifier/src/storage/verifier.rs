@@ -3,7 +3,7 @@ use alloc::format;
 use indexmap::IndexMap;
 use starknet_core::types::{Felt, MerkleNode, StorageProof};
 use starknet_core::utils::cairo_short_string_to_felt;
-use starknet_crypto_lib::funcs::StarknetCryptoFunctions;
+use starknet_crypto_lib::StarknetCryptoFunctions;
 
 use crate::StorageError;
 

@@ -19,7 +19,7 @@ use ibc_core::host::types::path::{Path, PathBytes};
 use ibc_core::primitives::proto::Any;
 use prost::Message;
 use starknet_core::types::{Felt, StorageProof};
-use starknet_crypto_lib::funcs::{StarknetCryptoEmpty as StarknetCrypto, StarknetCryptoFunctions};
+use starknet_crypto_lib::{StarknetCryptoEmpty as StarknetCrypto, StarknetCryptoFunctions};
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_storage_verifier::validate::validate_storage_proof;
 use starknet_storage_verifier::verifier::verify_starknet_storage_proof;
