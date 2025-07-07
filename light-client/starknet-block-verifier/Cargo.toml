@@ -17,7 +17,7 @@ workspace = true
 serde               = { workspace = true }
 starknet-core       = { workspace = true }
 ureq                = { workspace = true, optional = true, features = [ "json", "rustls" ] }
-starknet-crypto-lib = { workspace = true, features = [ "library" ] }
+starknet-crypto-lib = { workspace = true }
 
 [dev-dependencies]
 starknet                = { workspace = true }

@@ -26,7 +26,7 @@ let
 
     buildPhase = ''
       RUSTFLAGS='-C link-arg=-s' cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown --release --lib --locked
-      RUSTFLAGS='-C link-arg=-s' cargo build -p starknet-crypto-lib --target wasm32-unknown-unknown --release --lib --locked
+      RUSTFLAGS='-C link-arg=-s' cargo build -p starknet-crypto-lib --features contract --target wasm32-unknown-unknown --release --lib --locked
     '';
 
     installPhase = ''

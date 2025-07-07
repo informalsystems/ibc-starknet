@@ -6,7 +6,7 @@ use crate::funcs::{StarknetCryptoFunctions, StarknetCryptoLib};
 
 pub struct StarknetLightClientLibraryContract {}
 
-#[cfg_attr(not(feature = "library"), sylvia::entry_points)]
+#[sylvia::entry_points]
 #[sylvia::contract]
 impl StarknetLightClientLibraryContract {
     pub const fn new() -> Self {

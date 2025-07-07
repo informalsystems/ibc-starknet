@@ -1,4 +1,5 @@
+#[cfg(feature = "contract")]
 pub mod contract;
-mod funcs;
 
+mod funcs;
 pub use funcs::*;
