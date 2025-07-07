@@ -1,6 +1,6 @@
 use hermes_core::chain_components::traits::{
-    ChannelEndTypeComponent, ChannelIdTypeComponent, ClientIdTypeComponent,
-    ConnectionEndTypeComponent, ConnectionIdTypeComponent,
+    ChannelEndTypeComponent, ChannelIdTypeComponent, ClientIdTypeComponent, ClientStatus,
+    ClientStatusTypeComponent, ConnectionEndTypeComponent, ConnectionIdTypeComponent,
 };
 use hermes_prelude::*;
 
@@ -15,5 +15,6 @@ delegate_components! {
         ChannelIdTypeComponent: ChannelId,
         ConnectionEndTypeComponent: ConnectionEnd,
         ChannelEndTypeComponent: ChannelEnd,
+        ClientStatusTypeComponent: ClientStatus,
     }
 }

@@ -4,11 +4,13 @@ mod preset {
     use hermes_core::chain_components::traits::{
         AckPacketMessageBuilderComponent, ChannelOpenAckMessageBuilderComponent,
         ChannelOpenConfirmMessageBuilderComponent, ChannelOpenInitMessageBuilderComponent,
-        ChannelOpenTryMessageBuilderComponent, ClientStateFieldsComponent,
+        ChannelOpenTryMessageBuilderComponent, ClientRecoveryComponent, ClientStateFieldsComponent,
         ClientStateQuerierComponent, ClientStateTypeComponent,
-        ClientStateWithProofsQuerierComponent, ConnectionOpenAckMessageBuilderComponent,
-        ConnectionOpenConfirmMessageBuilderComponent, ConnectionOpenInitMessageBuilderComponent,
-        ConnectionOpenTryMessageBuilderComponent, ConsensusStateHeightsQuerierComponent,
+        ClientStateWithProofsQuerierComponent, ClientStatusMethodsComponent,
+        ClientStatusQuerierComponent, ClientStatusTypeComponent,
+        ConnectionOpenAckMessageBuilderComponent, ConnectionOpenConfirmMessageBuilderComponent,
+        ConnectionOpenInitMessageBuilderComponent, ConnectionOpenTryMessageBuilderComponent,
+        ConsensusStateFieldComponent, ConsensusStateHeightsQuerierComponent,
         ConsensusStateQuerierComponent, ConsensusStateTypeComponent,
         ConsensusStateWithProofsQuerierComponent, CounterpartyMessageHeightGetterComponent,
         CreateClientMessageBuilderComponent, CreateClientMessageOptionsTypeComponent,
@@ -31,15 +33,19 @@ mod preset {
     use crate::impls::{
         BuildStarknetCreateClientMessage, BuildStarknetToCosmosConnectionHandshake,
         BuildStarknetUpdateClientMessage, ConvertCosmosIbcAmountFromStarknet,
-        GetCosmosCounterpartyMessageStarknetHeight, QueryStarknetConsensusStateHeightsFromGrpc,
-        ReadPacketDstStarknetFields,
+        GetCosmosCounterpartyMessageStarknetHeight, ProvideCometConsensusState,
+        QueryStarknetConsensusStateHeightsFromGrpc, ReadPacketDstStarknetFields,
     };
     use crate::types::{CometConsensusState, UseCometClientState};
 
     cgp_preset! {
         StarknetToCosmosComponents {
             [
+                ClientRecoveryComponent,
+                ClientStatusTypeComponent,
+                ClientStatusMethodsComponent,
                 ClientStateQuerierComponent,
+                ClientStatusQuerierComponent,
                 ClientStateWithProofsQuerierComponent,
                 ConsensusStateQuerierComponent,
                 ConsensusStateWithProofsQuerierComponent,
@@ -62,6 +68,8 @@ mod preset {
                 ClientStateFieldsComponent,
             ]:
                 UseCometClientState,
+            ConsensusStateFieldComponent:
+                ProvideCometConsensusState,
             ConsensusStateTypeComponent:
                 WithType<CometConsensusState>,
             UpdateClientMessageBuilderComponent:
