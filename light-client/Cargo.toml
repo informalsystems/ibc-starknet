@@ -76,6 +76,17 @@ trait_duplication_in_bounds   = "deny"
 use_self                      = "deny"
 redundant_clone               = "deny"
 
+[profile.release]
+opt-level        = 3
+debug            = false
+rpath            = false
+lto              = true
+debug-assertions = false
+codegen-units    = 1
+panic            = 'abort'
+incremental      = false
+overflow-checks  = true
+
 [patch.crates-io]
 ibc-client-starknet       = { path = "./ibc-client-starknet" }
 ibc-client-starknet-cw    = { path = "./ibc-client-starknet-cw" }
