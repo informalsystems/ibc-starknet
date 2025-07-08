@@ -14,7 +14,7 @@ pub async fn init_starknet_setup(runtime: &HermesRuntime) -> Result<StarknetTest
 
     let (wasm_code_hash, wasm_client_byte_code) = load_wasm_client(&wasm_client_code_path).await?;
 
-    let wasm_additional_byte_code = std::env::var("STARKNET_WASM_CLIENT_PATH").map_or_else(
+    let wasm_additional_byte_code = std::env::var("STARKNET_CRYPTO_LIB").map_or_else(
         |_| Ok(Vec::new()),
         |paths_str| paths_str.split(',').map(std::fs::read).collect(),
     )?;
