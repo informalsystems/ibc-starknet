@@ -54,6 +54,7 @@ pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<Starknet
 pub async fn init_osmosis_bootstrap(
     runtime: &HermesRuntime,
     wasm_client_byte_code: Vec<u8>,
+    wasm_additional_byte_code: Vec<Vec<u8>>,
 ) -> Result<OsmosisBootstrap, Error> {
     let timestamp = SystemTime::now()
         .duration_since(SystemTime::UNIX_EPOCH)?
@@ -71,6 +72,7 @@ pub async fn init_osmosis_bootstrap(
         staking_denom_prefix: "stake".into(),
         transfer_denom_prefix: "coin".into(),
         wasm_client_byte_code,
+        wasm_additional_byte_code,
         governance_proposal_authority: "osmo10d07y265gmmuvt4z0w9aw880jnsr700jjeq4qp".into(), // TODO: don't hard code this
         dynamic_gas: Some(DynamicGasConfig {
             multiplier: 1.1,

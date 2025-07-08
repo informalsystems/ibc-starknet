@@ -96,6 +96,7 @@ hermes-any-counterparty             = { version = "0.1.0" }
 hermes-wasm-client-components       = { version = "0.1.0" }
 hermes-wasm-test-components         = { version = "0.1.0" }
 hermes-wasm-encoding-components     = { version = "0.1.0" }
+hermes-wasm-chain-components        = { version = "0.1.0" }
 hermes-cli-components               = { version = "0.1.0" }
 hermes-cli                          = { version = "0.1.0" }
 hermes-starknet-cli                 = { version = "0.1.0" }
@@ -179,38 +180,39 @@ cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e
 cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 cgp-error-eyre  = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 
-hermes-core                          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-prelude                       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-relayer-components-extra      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-runtime-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-async-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-tokio-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-runtime                       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-error                         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-encoding-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cosmos                        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cosmos-core                   = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cosmos-encoding-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cosmos-integration-tests      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-comet-light-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-comet-light-client-context    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-wasm-test-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-wasm-client-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-wasm-encoding-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cli-components                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cli                           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
-hermes-cli-framework                 = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "5004dc7" }
+hermes-core                          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-prelude                       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-relayer-components-extra      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-runtime-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-async-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-tokio-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-runtime                       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-error                         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-encoding-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cosmos                        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cosmos-core                   = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cosmos-encoding-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cosmos-integration-tests      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-comet-light-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-comet-light-client-context    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-wasm-test-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-wasm-client-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-wasm-encoding-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-wasm-chain-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cli-components                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cli                           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }
+hermes-cli-framework                 = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-wasm-upload-and-deploy-components" }

@@ -14,9 +14,23 @@ pub async fn init_starknet_setup(runtime: &HermesRuntime) -> Result<StarknetTest
 
     let (wasm_code_hash, wasm_client_byte_code) = load_wasm_client(&wasm_client_code_path).await?;
 
+    let wasm_additional_byte_code = match std::env::var("STARKNET_CRYPTO_LIB") {
+        Ok(paths_str) => {
+            let paths: Vec<&str> = paths_str.split(',').collect();
+
+            let mut byte_code = Vec::with_capacity(paths.len());
+            for path in paths {
+                byte_code.push(tokio::fs::read(path).await?);
+            }
+            byte_code
+        }
+        Err(_) => vec![],
+    };
+
     let starknet_bootstrap = init_starknet_bootstrap(runtime).await?;
 
-    let cosmos_bootstrap = init_osmosis_bootstrap(runtime, wasm_client_byte_code).await?;
+    let cosmos_bootstrap =
+        init_osmosis_bootstrap(runtime, wasm_client_byte_code, wasm_additional_byte_code).await?;
 
     let starknet_builder = StarknetBuilder::new(
         runtime.clone(),
