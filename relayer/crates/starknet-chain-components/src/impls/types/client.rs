@@ -2,13 +2,18 @@ use core::time::Duration;
 
 use hermes_core::chain_components::traits::{
     ClientStateFieldsComponent, ClientStateFieldsGetter, ClientStateTypeComponent,
-    ConsensusStateTypeComponent, HasChainIdType, HasClientStateType, HasHeightType,
+    ConsensusStateFieldComponent, ConsensusStateFieldGetter, ConsensusStateTypeComponent,
+    HasChainIdType, HasClientStateType, HasConsensusStateType, HasHeightType, HasTimeType,
     ProvideClientStateType, ProvideConsensusStateType,
 };
+use hermes_cosmos_core::tendermint_proto;
 use hermes_prelude::*;
 use ibc::core::host::types::identifiers::ChainId;
+use tendermint::Time;
 
 use crate::types::{WasmStarknetClientState, WasmStarknetConsensusState};
+
+pub struct StarknetRecoverClientPayload;
 
 pub struct ProvideStarknetIbcClientTypes;
 
@@ -24,6 +29,24 @@ impl<Chain: Async, Counterparty> ProvideConsensusStateType<Chain, Counterparty>
     for ProvideStarknetIbcClientTypes
 {
     type ConsensusState = WasmStarknetConsensusState;
+}
+
+#[cgp_provider(ConsensusStateFieldComponent)]
+impl<Chain, Counterparty> ConsensusStateFieldGetter<Chain, Counterparty>
+    for ProvideStarknetIbcClientTypes
+where
+    Chain: HasConsensusStateType<Counterparty, ConsensusState = WasmStarknetConsensusState>,
+    Counterparty: HasTimeType<Time = Time>,
+{
+    fn consensus_state_timestamp(
+        consensus_state: &WasmStarknetConsensusState,
+    ) -> Counterparty::Time {
+        let protobuf_time: tendermint_proto::google::protobuf::Timestamp =
+            consensus_state.consensus_state.time.into();
+        protobuf_time
+            .try_into()
+            .expect("failed to convert Tendermint Protobuf Timestamp to Tendermint Time")
+    }
 }
 
 #[cgp_provider(ClientStateFieldsComponent)]
@@ -42,7 +65,8 @@ where
         false
     }
 
-    fn client_state_has_expired(_client_state: &Chain::ClientState, _elapsed: Duration) -> bool {
+    fn client_state_has_expired(_client_state: &Chain::ClientState, elapsed: Duration) -> bool {
+        // WasmStarknetClientState can't expire
         false
     }
 

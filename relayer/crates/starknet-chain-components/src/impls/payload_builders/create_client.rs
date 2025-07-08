@@ -1,9 +1,11 @@
 use core::marker::PhantomData;
+use core::time::Duration;
 
 use hermes_core::chain_components::traits::{
     CanQueryBlock, CanQueryChainHeight, CreateClientPayloadBuilder,
     CreateClientPayloadBuilderComponent, HasAddressType, HasChainId,
     HasCreateClientPayloadOptionsType, HasCreateClientPayloadType,
+    OverrideCreateClientPayloadOptionsComponent, ProvideOverrideCreateClientPayloadOptions,
 };
 use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use hermes_prelude::*;
@@ -91,5 +93,24 @@ where
             proof_signer_pub_key: chain.proof_signer().public_key.serialize().to_vec(),
             ibc_contract_address: ibc_core_address.to_bytes_be().to_vec(),
         })
+    }
+}
+
+pub struct ProvideNoCreateClientMessageOptionsOverride;
+
+#[cgp_provider(OverrideCreateClientPayloadOptionsComponent)]
+impl<Chain, Counterparty> ProvideOverrideCreateClientPayloadOptions<Chain, Counterparty>
+    for ProvideNoCreateClientMessageOptionsOverride
+where
+    Chain: HasCreateClientPayloadOptionsType<
+        Counterparty,
+        CreateClientPayloadOptions = StarknetCreateClientPayloadOptions,
+    >,
+{
+    fn override_create_client_payload_options(
+        payload_options: &StarknetCreateClientPayloadOptions,
+        _new_period: Duration,
+    ) -> StarknetCreateClientPayloadOptions {
+        payload_options.clone()
     }
 }

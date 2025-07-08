@@ -3,6 +3,7 @@ use hermes_core::test_components::test_case::traits::test_case::TestCase;
 use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_ibc_test_suite::tests::clearing::TestPacketClearing;
+use hermes_ibc_test_suite::tests::recover_client::TestRecoverClient;
 use hermes_ibc_test_suite::tests::transfer::TestIbcTransfer;
 
 use crate::utils::init_starknet_test_driver;
@@ -42,6 +43,29 @@ fn test_packet_clearing() -> Result<(), Error> {
         <TestPacketClearing<Index<1>, Index<0>>>::default()
             .run_test(&test_driver)
             .await?;
+
+        <Result<(), Error>>::Ok(())
+    })?;
+
+    Ok(())
+}
+
+#[test]
+fn test_recover_client() -> Result<(), Error> {
+    let runtime = init_test_runtime();
+
+    runtime.runtime.clone().block_on(async move {
+        let test_driver = init_starknet_test_driver(&runtime).await?;
+
+        <TestRecoverClient<Index<0>, Index<1>>>::default()
+            .run_test(&test_driver)
+            .await?;
+
+        // TODO: Starknet light client can't expired, misbehaviour and client
+        // freezing is required for this part of the test
+        //<TestRecoverClient<Index<1>, Index<0>>>::default()
+        //    .run_test(&test_driver)
+        //    .await?;
 
         <Result<(), Error>>::Ok(())
     })?;
