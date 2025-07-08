@@ -59,18 +59,14 @@ where
             .await
             .map_err(App::raise_error)?;
 
-        let wasm_additional_byte_code = match &args.wasm_additional_byte_code {
-            Some(paths_str) => {
-                let paths: Vec<&str> = paths_str.split(',').collect();
-
-                let mut byte_code = Vec::with_capacity(paths.len());
-                for path in paths {
-                    byte_code.push(tokio::fs::read(path).await.map_err(App::raise_error)?);
-                }
-                byte_code
-            }
-            None => vec![],
-        };
+        let wasm_additional_byte_code = args
+            .wasm_additional_byte_code
+            .as_ref()
+            .map_or_else(
+                || Ok(Vec::new()),
+                |paths_str| paths_str.split(',').map(std::fs::read).collect(),
+            )
+            .map_err(App::raise_error)?;
 
         info!(
             target: "hermes::cli",
