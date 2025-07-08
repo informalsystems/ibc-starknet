@@ -115,8 +115,8 @@ impl Block {
     /// Computes the Starknet 0.13.5 gas commitment.
     ///
     /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L234-L242
-    pub fn gas_commitment<C: StarknetCryptoFunctions>(&self) -> Felt {
-        C::poseidon_hash_many(&[
+    pub fn gas_commitment<C: StarknetCryptoFunctions>(&self, crypto_lib: &C) -> Felt {
+        crypto_lib.poseidon_hash_many(&[
             Felt::from_bytes_be_slice(STARKNET_GAS_PRICES0),
             self.l1_gas_price.price_in_wei,
             self.l1_gas_price.price_in_fri,
@@ -130,8 +130,8 @@ impl Block {
     /// Computes the Starknet 0.13.5 block hash.
     ///
     /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L111-L116
-    pub fn compute_hash<C: StarknetCryptoFunctions>(&self) -> Felt {
-        C::poseidon_hash_many(&[
+    pub fn compute_hash<C: StarknetCryptoFunctions>(&self, crypto_lib: &C) -> Felt {
+        crypto_lib.poseidon_hash_many(&[
             Felt::from_bytes_be_slice(STARKNET_BLOCK_HASH1),
             self.block_number.into(),
             self.state_root,
@@ -142,25 +142,26 @@ impl Block {
             self.transaction_commitment,
             self.event_commitment,
             self.receipt_commitment.unwrap_or(Felt::ZERO),
-            self.gas_commitment::<C>(),
+            self.gas_commitment(crypto_lib),
             Felt::from_bytes_be_slice(self.starknet_version.as_bytes()),
             Felt::ZERO,
             self.parent_block_hash,
         ])
     }
 
-    pub fn validate<C: StarknetCryptoFunctions>(&self) -> bool {
-        self.block_hash == self.compute_hash::<C>()
+    pub fn validate<C: StarknetCryptoFunctions>(&self, crypto_lib: &C) -> bool {
+        self.block_hash == self.compute_hash(crypto_lib)
     }
 
     pub fn verify_signature<C: StarknetCryptoFunctions>(
         &self,
+        crypto_lib: &C,
         signature: &Signature,
         public_key: &Felt,
     ) -> Result<bool, C::Error> {
-        Ok(self.validate::<C>()
+        Ok(self.validate(crypto_lib)
             && signature.block_hash == self.block_hash
-            && C::verify(
+            && crypto_lib.verify(
                 public_key,
                 &signature.block_hash,
                 &signature.signature[0],

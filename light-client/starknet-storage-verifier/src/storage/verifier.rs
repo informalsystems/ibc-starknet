@@ -151,12 +151,13 @@ pub fn verify_starknet_merkle_proof(
 ///
 /// On success, returns the global contract state root.
 pub fn verify_starknet_global_contract_root<C: StarknetCryptoFunctions>(
+    crypto_lib: &C,
     storage_proof: &StorageProof,
     state_root: Felt,
 ) -> Result<Felt, StorageError> {
     let global_roots = &storage_proof.global_roots;
 
-    let actual_state_root = C::poseidon_hash_many(&[
+    let actual_state_root = crypto_lib.poseidon_hash_many(&[
         cairo_short_string_to_felt(GLOBAL_STATE_VERSION).unwrap(),
         global_roots.contracts_tree_root,
         global_roots.classes_tree_root,
@@ -175,6 +176,7 @@ pub fn verify_starknet_global_contract_root<C: StarknetCryptoFunctions>(
 ///
 /// On success, returns the contract's storage root.
 pub fn verify_starknet_contract_proof<C: StarknetCryptoFunctions>(
+    crypto_lib: &C,
     storage_proof: &StorageProof,
     global_contract_trie_root: Felt,
     contract_address: Felt,
@@ -204,9 +206,9 @@ pub fn verify_starknet_contract_proof<C: StarknetCryptoFunctions>(
         .ok_or(StorageError::MissingContractStorageRoot)?;
 
     // The contract hash needs to be calculated manually and is not stored in the storage proof.
-    let contract_hash = C::pedersen_hash(
-        &C::pedersen_hash(
-            &C::pedersen_hash(&contract_leaf.class_hash, &contract_root),
+    let contract_hash = crypto_lib.pedersen_hash(
+        &crypto_lib.pedersen_hash(
+            &crypto_lib.pedersen_hash(&contract_leaf.class_hash, &contract_root),
             &contract_leaf.nonce,
         ),
         &Felt::ZERO,

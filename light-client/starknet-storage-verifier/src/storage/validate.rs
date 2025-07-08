@@ -7,14 +7,17 @@ use starknet_crypto_lib::StarknetCryptoFunctions;
 use crate::StorageError;
 
 pub fn validate_storage_proof<C: StarknetCryptoFunctions>(
+    crypto_lib: &C,
     proof: &StorageProof,
 ) -> Result<(), StorageError> {
-    validate_merkle_node_map::<C>(
+    validate_merkle_node_map(
+        crypto_lib,
         &proof.classes_proof,
         &[proof.global_roots.classes_tree_root],
     )?;
 
-    validate_merkle_node_map::<C>(
+    validate_merkle_node_map(
+        crypto_lib,
         &proof.contracts_proof.nodes,
         &[proof.global_roots.contracts_tree_root],
     )?;
@@ -27,20 +30,21 @@ pub fn validate_storage_proof<C: StarknetCryptoFunctions>(
         .collect::<Vec<_>>();
 
     for storage_entry in proof.contracts_storage_proofs.iter() {
-        validate_merkle_node_map::<C>(storage_entry, &contract_roots)?;
+        validate_merkle_node_map(crypto_lib, storage_entry, &contract_roots)?;
     }
 
-    validate_contracts_proof::<C>(&proof.contracts_proof)?;
+    validate_contracts_proof(crypto_lib, &proof.contracts_proof)?;
 
     Ok(())
 }
 
 fn validate_merkle_node_map<C: StarknetCryptoFunctions>(
+    crypto_lib: &C,
     node_map: &IndexMap<Felt, MerkleNode>,
     roots: &[Felt],
 ) -> Result<(), StorageError> {
     for (hash, node) in node_map.iter() {
-        validate_merkle_node::<C>(hash, node)?;
+        validate_merkle_node(crypto_lib, hash, node)?;
     }
 
     for (hash, node) in node_map.iter() {
@@ -92,12 +96,13 @@ fn validate_merkle_node_parent(
 }
 
 fn validate_merkle_node<C: StarknetCryptoFunctions>(
+    crypto_lib: &C,
     node_hash: &Felt,
     node: &MerkleNode,
 ) -> Result<(), StorageError> {
     match node {
         MerkleNode::BinaryNode(node) => {
-            let expected = C::pedersen_hash(&node.left, &node.right);
+            let expected = crypto_lib.pedersen_hash(&node.left, &node.right);
 
             if &expected != node_hash {
                 return Err(StorageError::MismatchBinaryHash);
@@ -105,7 +110,7 @@ fn validate_merkle_node<C: StarknetCryptoFunctions>(
         }
 
         MerkleNode::EdgeNode(node) => {
-            let expected = C::pedersen_hash(&node.child, &node.path) + node.length;
+            let expected = crypto_lib.pedersen_hash(&node.child, &node.path) + node.length;
 
             if &expected != node_hash {
                 return Err(StorageError::MismatchEdgeHash);
@@ -117,6 +122,7 @@ fn validate_merkle_node<C: StarknetCryptoFunctions>(
 }
 
 fn validate_contracts_proof<C: StarknetCryptoFunctions>(
+    crypto_lib: &C,
     contracts_proof: &ContractsProof,
 ) -> Result<(), StorageError> {
     for contract_leaf in contracts_proof.contract_leaves_data.iter() {
@@ -124,9 +130,9 @@ fn validate_contracts_proof<C: StarknetCryptoFunctions>(
             .storage_root
             .ok_or(StorageError::MissingStorageRoot)?;
 
-        let contract_hash = C::pedersen_hash(
-            &C::pedersen_hash(
-                &C::pedersen_hash(&contract_leaf.class_hash, &storage_root),
+        let contract_hash = crypto_lib.pedersen_hash(
+            &crypto_lib.pedersen_hash(
+                &crypto_lib.pedersen_hash(&contract_leaf.class_hash, &storage_root),
                 &contract_leaf.nonce,
             ),
             &Felt::ZERO,

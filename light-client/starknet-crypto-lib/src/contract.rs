@@ -6,7 +6,7 @@ use crate::funcs::{StarknetCryptoFunctions, StarknetCryptoLib};
 
 pub struct StarknetLightClientLibraryContract {}
 
-#[sylvia::entry_points]
+#[cfg_attr(feature = "contract", sylvia::entry_points)]
 #[sylvia::contract]
 impl StarknetLightClientLibraryContract {
     pub const fn new() -> Self {
@@ -20,7 +20,7 @@ impl StarknetLightClientLibraryContract {
 
     #[sv::msg(query)]
     pub fn starknet_keccak(&self, ctx: QueryCtx<'_>, input: Binary) -> StdResult<String> {
-        let hash = StarknetCryptoLib::starknet_keccak(&input);
+        let hash = StarknetCryptoLib.starknet_keccak(&input);
         Ok(hash.to_fixed_hex_string())
     }
 
@@ -29,7 +29,7 @@ impl StarknetLightClientLibraryContract {
         let x_felt = Felt::from_hex(&x).map_err(|e| StdError::generic_err(e.to_string()))?;
         let y_felt = Felt::from_hex(&y).map_err(|e| StdError::generic_err(e.to_string()))?;
 
-        let hash = StarknetCryptoLib::pedersen_hash(&x_felt, &y_felt);
+        let hash = StarknetCryptoLib.pedersen_hash(&x_felt, &y_felt);
         Ok(hash.to_fixed_hex_string())
     }
 
@@ -42,7 +42,7 @@ impl StarknetLightClientLibraryContract {
             })
             .collect::<Result<Vec<Felt>, StdError>>()?;
 
-        let hash = StarknetCryptoLib::poseidon_hash_many(&felts);
+        let hash = StarknetCryptoLib.poseidon_hash_many(&felts);
 
         Ok(hash.to_fixed_hex_string())
     }
@@ -63,7 +63,8 @@ impl StarknetLightClientLibraryContract {
         let r_felt = Felt::from_hex(&r).map_err(|e| StdError::generic_err(e.to_string()))?;
         let s_felt = Felt::from_hex(&s).map_err(|e| StdError::generic_err(e.to_string()))?;
 
-        StarknetCryptoLib::verify(&public_key_felt, &message_felt, &r_felt, &s_felt)
+        StarknetCryptoLib
+            .verify(&public_key_felt, &message_felt, &r_felt, &s_felt)
             .map_err(|e| StdError::generic_err(e.to_string()))
     }
 }

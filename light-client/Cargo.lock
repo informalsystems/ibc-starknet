@@ -1740,7 +1740,6 @@ name = "ibc-client-starknet"
 version = "0.1.0"
 dependencies = [
  "cgp",
- "cosmwasm-std",
  "derive_more 2.0.1",
  "hermes-cosmos-encoding-components",
  "hermes-encoding-components",
@@ -3699,6 +3698,8 @@ name = "starknet-crypto-lib"
 version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",
+ "cosmwasm-std",
+ "serde",
  "starknet-core 0.13.0",
  "starknet-crypto",
  "sylvia",

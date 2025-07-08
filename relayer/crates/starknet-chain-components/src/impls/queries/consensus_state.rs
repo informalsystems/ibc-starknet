@@ -153,7 +153,7 @@ where
             consensus_height.revision_height(),
         ));
 
-        let felt_path: Felt = ibc_path_to_storage_key::<StarknetCryptoLib>(ibc_path);
+        let felt_path: Felt = ibc_path_to_storage_key(&StarknetCryptoLib, ibc_path);
 
         // key == path
         let storage_proof: StorageProof = chain

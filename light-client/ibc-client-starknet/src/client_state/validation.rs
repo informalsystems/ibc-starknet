@@ -19,7 +19,7 @@ use ibc_core::host::types::path::{Path, PathBytes};
 use ibc_core::primitives::proto::Any;
 use prost::Message;
 use starknet_core::types::{Felt, StorageProof};
-use starknet_crypto_lib::{StarknetCryptoEmpty as StarknetCrypto, StarknetCryptoFunctions};
+use starknet_crypto_lib::{StarknetCryptoCw, StarknetCryptoFunctions};
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_storage_verifier::validate::validate_storage_proof;
 use starknet_storage_verifier::verifier::verify_starknet_storage_proof;
@@ -80,6 +80,13 @@ where
         path: PathBytes,
         value: Vec<u8>,
     ) -> Result<(), ClientError> {
+        let starknet_crypto_cw = {
+            let cw_deps_mut = ctx
+                .deps_mut()
+                .expect("membership verification should have mutable deps in CW context");
+            StarknetCryptoCw::new(cw_deps_mut.querier, cw_deps_mut.storage)
+        };
+
         let path_bytes = path.into_vec();
         let processed_path = Path::from_str(
             alloc::str::from_utf8(path_bytes.as_ref())
@@ -90,8 +97,8 @@ where
                 description: e.to_string(),
             })
         })?;
-        let felt_value = get_felt_from_value::<StarknetCrypto>(&value, &processed_path)?;
-        let felt_path = ibc_path_to_storage_key::<StarknetCrypto>(processed_path);
+        let felt_value = get_felt_from_value(&starknet_crypto_cw, &value, &processed_path)?;
+        let felt_path = ibc_path_to_storage_key(&starknet_crypto_cw, processed_path);
 
         let storage_proof: StorageProof = serde_json::from_slice(proof.as_ref()).map_err(|e| {
             ClientError::Decoding(DecodingError::InvalidJson {
@@ -99,7 +106,7 @@ where
             })
         })?;
 
-        validate_storage_proof::<StarknetCrypto>(&storage_proof).map_err(|e| {
+        validate_storage_proof(&starknet_crypto_cw, &storage_proof).map_err(|e| {
             ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
         })?;
 
@@ -124,6 +131,13 @@ where
         root: &CommitmentRoot,
         path: PathBytes,
     ) -> Result<(), ClientError> {
+        let starknet_crypto_cw = {
+            let cw_deps_mut = ctx
+                .deps_mut()
+                .expect("membership verification should have mutable deps in CW context");
+            StarknetCryptoCw::new(cw_deps_mut.querier, cw_deps_mut.storage)
+        };
+
         let path_bytes = path.into_vec();
         let processed_path = Path::from_str(
             alloc::str::from_utf8(path_bytes.as_ref())
@@ -134,7 +148,7 @@ where
                 description: e.to_string(),
             })
         })?;
-        let felt_path = ibc_path_to_storage_key::<StarknetCrypto>(processed_path);
+        let felt_path = ibc_path_to_storage_key(&starknet_crypto_cw, processed_path);
 
         let storage_proof: StorageProof = serde_json::from_slice(proof.as_ref()).map_err(|e| {
             ClientError::Decoding(DecodingError::InvalidJson {
@@ -142,7 +156,7 @@ where
             })
         })?;
 
-        validate_storage_proof::<StarknetCrypto>(&storage_proof).map_err(|e| {
+        validate_storage_proof(&starknet_crypto_cw, &storage_proof).map_err(|e| {
             ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
         })?;
 
@@ -164,6 +178,7 @@ where
 }
 
 fn get_felt_from_value<C: StarknetCryptoFunctions>(
+    crypto_lib: &C,
     value: &Vec<u8>,
     path: &Path,
 ) -> Result<Felt, ClientError> {
@@ -172,13 +187,13 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
             let connection_end = ConnectionEnd::decode(value.as_slice()).unwrap();
             let felts = connection_end_to_felts(&connection_end);
 
-            Ok(C::poseidon_hash_many(&felts))
+            Ok(crypto_lib.poseidon_hash_many(&felts))
         }
         Path::ChannelEnd(_) => {
             let channel = Channel::decode(value.as_slice()).unwrap();
             let felts = channel_to_felts(&channel);
 
-            Ok(C::poseidon_hash_many(&felts))
+            Ok(crypto_lib.poseidon_hash_many(&felts))
         }
         Path::Commitment(_) => {
             assert!(value.len() == 32, "commitment must be 32 bytes");
@@ -195,7 +210,7 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
                 .map(|v| Felt::from(*v))
                 .collect::<Vec<Felt>>();
 
-            Ok(C::poseidon_hash_many(&felts))
+            Ok(crypto_lib.poseidon_hash_many(&felts))
         }
         Path::Receipt(_) => {
             assert!(value.len() == 32, "receipt must be 32 bytes");
@@ -212,7 +227,7 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
                 .map(|v| Felt::from(*v))
                 .collect::<Vec<Felt>>();
 
-            Ok(C::poseidon_hash_many(&felts))
+            Ok(crypto_lib.poseidon_hash_many(&felts))
         }
         Path::Ack(_) => {
             assert!(value.len() == 32, "acknowledgement must be 32 bytes");
@@ -229,7 +244,7 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
                 .map(|v| Felt::from(*v))
                 .collect::<Vec<Felt>>();
 
-            Ok(C::poseidon_hash_many(&felts))
+            Ok(crypto_lib.poseidon_hash_many(&felts))
         }
         _ => {
             let mut text = String::new();
