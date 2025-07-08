@@ -34,7 +34,7 @@ where
         storage_keys: &[Felt],
     ) -> Result<Chain::StorageProof, Chain::Error> {
         let request = QueryStorageProofRequest {
-            block_id: BlockId::Number(*height), // FIXME: Madara currently only supports querying storage proof from latest block
+            block_id: BlockId::Number(*height),
             contract_addresses: vec![contract_address.0],
             contracts_storage_keys: vec![ContractStorageKey {
                 contract_address: contract_address.0,
