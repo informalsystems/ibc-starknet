@@ -35,6 +35,10 @@ delegate_components! {
                     symbol!("ibc_contract_address"),
                     EncodeByteField<4>,
                 >,
+                EncodeField<
+                    symbol!("starknet_crypto_cw_address"),
+                    EncodeByteField<5>,
+                >,
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
@@ -43,24 +47,32 @@ delegate_components! {
                 EncodeChainIdField<2>,
                 EncodeByteField<3>,
                 EncodeByteField<4>,
+                EncodeByteField<5>,
             ]>
         >,
     }
 }
 
 impl Transformer for EncodeStarknetClientState {
-    type From = Product![Height, ChainId, Vec<u8>, Vec<u8>];
+    type From = Product![Height, ChainId, Vec<u8>, Vec<u8>, Vec<u8>];
 
     type To = StarknetClientState;
 
     fn transform(
-        product![latest_height, chain_id, pub_key, ibc_contract_address]: Self::From,
+        product![
+            latest_height,
+            chain_id,
+            pub_key,
+            ibc_contract_address,
+            starknet_crypto_cw_address
+        ]: Self::From,
     ) -> Self::To {
         StarknetClientState {
             latest_height,
             chain_id,
             pub_key,
             ibc_contract_address,
+            starknet_crypto_cw_address,
         }
     }
 }

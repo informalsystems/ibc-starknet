@@ -39,11 +39,15 @@ where
     ) -> Result<CosmosMessage, Chain::Error> {
         let encoding = Counterparty::default_encoding();
 
+        // TODO(rano): Use the actual Starknet Crypto contract address
+        let starknet_crypto_cw_address = "contract_address_placeholder".to_string().into_bytes();
+
         let starknet_client_state = StarknetClientState {
             latest_height: payload.latest_height,
             chain_id: payload.chain_id,
             pub_key: payload.proof_signer_pub_key,
             ibc_contract_address: payload.ibc_contract_address,
+            starknet_crypto_cw_address,
         };
 
         let client_state = WasmStarknetClientState {

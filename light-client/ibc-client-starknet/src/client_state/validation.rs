@@ -80,8 +80,9 @@ where
         path: PathBytes,
         value: Vec<u8>,
     ) -> Result<(), ClientError> {
-        // TODO: make starknet_crypto_lib_addr a field of ClientState
-        let starknet_crypto_lib_addr = String::from("dummy");
+        let starknet_crypto_lib_addr = String::from_utf8(self.0.starknet_crypto_cw_address.clone())
+            .map_err(Into::into)
+            .map_err(ClientError::Decoding)?;
 
         let starknet_crypto_cw = {
             StarknetCryptoCw::new(
@@ -136,8 +137,9 @@ where
         root: &CommitmentRoot,
         path: PathBytes,
     ) -> Result<(), ClientError> {
-        // TODO: make starknet_crypto_lib_addr a field of ClientState
-        let starknet_crypto_lib_addr = String::from("dummy");
+        let starknet_crypto_lib_addr = String::from_utf8(self.0.starknet_crypto_cw_address.clone())
+            .map_err(Into::into)
+            .map_err(ClientError::Decoding)?;
 
         let starknet_crypto_cw = {
             StarknetCryptoCw::new(

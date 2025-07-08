@@ -13,4 +13,5 @@ pub struct StarknetClientState {
     pub chain_id: ChainId,
     pub pub_key: Vec<u8>,
     pub ibc_contract_address: Vec<u8>,
+    pub starknet_crypto_cw_address: Vec<u8>,
 }
