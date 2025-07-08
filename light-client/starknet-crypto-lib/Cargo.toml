@@ -21,11 +21,9 @@ workspace = true
 starknet-core   = { workspace = true }
 starknet-crypto = { workspace = true }
 
-sylvia          = { version = "1.3.6", optional = true }
+sylvia          = { version = "1.3.6", optional = true, default-features = false }
 cosmwasm-schema = { version = "2.2.2", optional = true }
-cosmwasm-std    = { version = "2.2.2", optional = true }
-serde           = { version = "1.0", optional = true }
 
 [features]
-cosmwasm = [ "dep:sylvia", "dep:cosmwasm-schema", "dep:cosmwasm-std", "dep:serde" ]
-contract = [ "cosmwasm" ]
+cosmwasm = [ "dep:sylvia" ]
+contract = [ "cosmwasm", "dep:cosmwasm-schema", "dep:sylvia" ]

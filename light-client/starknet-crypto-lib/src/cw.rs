@@ -1,5 +1,5 @@
-use cosmwasm_std::{from_json, to_json_vec, Addr, QuerierWrapper, StdError, Storage};
 use starknet_core::types::Felt;
+use sylvia::cw_std::{from_json, to_json_vec, Addr, QuerierWrapper, StdError, Storage};
 use sylvia::types::BoundQuerier;
 
 use crate::contract::sv::Querier;
