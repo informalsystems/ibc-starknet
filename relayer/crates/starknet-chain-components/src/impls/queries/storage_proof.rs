@@ -5,7 +5,7 @@ use hermes_core::logging_components::types::LevelTrace;
 use hermes_prelude::*;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use starknet::core::types::Felt;
+use starknet::core::types::{BlockId, Felt};
 use starknet_v14::core::types::StorageProof;
 
 use crate::impls::{CanValidateStorageProof, StarknetAddress};
@@ -34,7 +34,7 @@ where
         storage_keys: &[Felt],
     ) -> Result<Chain::StorageProof, Chain::Error> {
         let request = QueryStorageProofRequest {
-            block_id: "latest", // FIXME: Madara currently only supports querying storage proof from latest block
+            block_id: BlockId::Number(*height), // FIXME: Madara currently only supports querying storage proof from latest block
             contract_addresses: vec![contract_address.0],
             contracts_storage_keys: vec![ContractStorageKey {
                 contract_address: contract_address.0,
@@ -64,7 +64,7 @@ where
 
 #[derive(Serialize)]
 pub struct QueryStorageProofRequest {
-    pub block_id: &'static str,
+    pub block_id: BlockId,
     pub contract_addresses: Vec<Felt>,
     pub contracts_storage_keys: Vec<ContractStorageKey>,
 }

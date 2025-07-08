@@ -15,7 +15,8 @@ where
         + HasJsonRpcUrl
         + CanLog<LevelTrace>
         + CanRaiseAsyncError<ureq::Error>
-        + CanRaiseAsyncError<serde_json::Error>,
+        + CanRaiseAsyncError<serde_json::Error>
+        + CanRaiseAsyncError<String>,
     Request: Async + Serialize,
     Response: Async + for<'a> Deserialize<'a>,
 {
@@ -62,7 +63,18 @@ where
         let rpc_response: JsonRpcResponse<Response> =
             serde_json::from_str(&response_string).map_err(Context::raise_error)?;
 
-        Ok(rpc_response.result)
+        match rpc_response.data {
+            ResponseData::Error(err) => {
+                context
+                    .log(&format!("json rpc error: {err:?}"), &LevelTrace)
+                    .await;
+                Err(Context::raise_error(format!(
+                    "json rpc error: code: {}, message: {}, data: {:?}",
+                    err.code, err.message, err.data
+                )))
+            }
+            ResponseData::Result(result) => Ok(result),
+        }
     }
 }
 
@@ -77,5 +89,22 @@ pub struct JsonRpcRequest<'a, T> {
 #[derive(Debug, Deserialize)]
 pub struct JsonRpcResponse<T> {
     pub jsonrpc: String,
-    pub result: T,
+    #[serde(flatten)]
+    pub data: ResponseData<T>,
+}
+
+#[derive(Debug, Deserialize)]
+pub enum ResponseData<T> {
+    #[serde(rename = "result")]
+    Result(T),
+    #[serde(rename = "error")]
+    Error(JsonRpcError),
+}
+
+#[derive(Debug, Deserialize)]
+pub struct JsonRpcError {
+    pub code: i64,
+    pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data: Option<serde_json::Value>,
 }
