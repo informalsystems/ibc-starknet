@@ -1,39 +1,18 @@
 use starknet_core::types::Felt;
-use sylvia::cw_std::{from_json, to_json_vec, Addr, QuerierWrapper, StdError, Storage};
+use sylvia::cw_std::{Addr, QuerierWrapper, StdError};
 use sylvia::types::BoundQuerier;
 
 use crate::contract::sv::Querier;
 use crate::funcs::StarknetCryptoFunctions;
 
 pub struct StarknetCryptoCw<'a> {
-    lib_addr: Addr,
+    lib_addr: String,
     querier: QuerierWrapper<'a>,
 }
 
 impl<'a> StarknetCryptoCw<'a> {
-    const LIB_ADDR_VAR: &'static [u8] = b"STARKNET_CRYPTO_LIB_ADDR";
-
-    pub fn new(querier: QuerierWrapper<'a>, storage: &'a dyn Storage) -> Self {
-        Self {
-            lib_addr: Self::get_lib_contract(storage).unwrap(),
-            querier,
-        }
-    }
-
-    pub fn get_lib_contract(storage: &'a dyn Storage) -> Result<Addr, StdError> {
-        from_json(
-            storage
-                .get(Self::LIB_ADDR_VAR)
-                .ok_or_else(|| StdError::not_found("STARKNET_CRYPTO_LIB_ADDR"))?,
-        )
-    }
-
-    pub fn set_lib_contract(
-        storage: &'a mut dyn Storage,
-        contract_address: Addr,
-    ) -> Result<(), StdError> {
-        storage.set(Self::LIB_ADDR_VAR, &to_json_vec(&contract_address)?);
-        Ok(())
+    pub fn new(lib_addr: String, querier: QuerierWrapper<'a>) -> Self {
+        Self { lib_addr, querier }
     }
 }
 
@@ -41,7 +20,7 @@ impl StarknetCryptoFunctions for StarknetCryptoCw<'_> {
     type Error = StdError;
 
     fn starknet_keccak(&self, input: &[u8]) -> Felt {
-        let felt_hex = BoundQuerier::borrowed(&self.lib_addr, &self.querier)
+        let felt_hex = BoundQuerier::borrowed(&Addr::unchecked(&self.lib_addr), &self.querier)
             .starknet_keccak(input.into())
             .unwrap();
 
@@ -49,7 +28,7 @@ impl StarknetCryptoFunctions for StarknetCryptoCw<'_> {
     }
 
     fn pedersen_hash(&self, x: &Felt, y: &Felt) -> Felt {
-        let felt_hex = BoundQuerier::borrowed(&self.lib_addr, &self.querier)
+        let felt_hex = BoundQuerier::borrowed(&Addr::unchecked(&self.lib_addr), &self.querier)
             .pedersen_hash(x.to_fixed_hex_string(), y.to_fixed_hex_string())
             .unwrap();
 
@@ -62,7 +41,7 @@ impl StarknetCryptoFunctions for StarknetCryptoCw<'_> {
             .map(|felt| felt.to_fixed_hex_string())
             .collect();
 
-        let felt_hex = BoundQuerier::borrowed(&self.lib_addr, &self.querier)
+        let felt_hex = BoundQuerier::borrowed(&Addr::unchecked(&self.lib_addr), &self.querier)
             .poseidon_hash_many(input_hex)
             .unwrap();
 
@@ -76,7 +55,7 @@ impl StarknetCryptoFunctions for StarknetCryptoCw<'_> {
         r: &Felt,
         s: &Felt,
     ) -> Result<bool, Self::Error> {
-        BoundQuerier::borrowed(&self.lib_addr, &self.querier).verify(
+        BoundQuerier::borrowed(&Addr::unchecked(&self.lib_addr), &self.querier).verify(
             public_key.to_fixed_hex_string(),
             message.to_fixed_hex_string(),
             r.to_fixed_hex_string(),
