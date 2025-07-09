@@ -2,6 +2,7 @@ use hermes_core::test_components::setup::traits::CanBuildTestDriver;
 use hermes_cosmos::error::Error;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_prelude::CanRaiseError;
+use hermes_starknet_chain_components::types::WasmAddress;
 use hermes_starknet_relayer::contexts::StarknetBuilder;
 
 use crate::contexts::{StarknetTestDriver, StarknetTestSetup};
@@ -24,6 +25,12 @@ pub async fn init_starknet_setup(runtime: &HermesRuntime) -> Result<StarknetTest
     let cosmos_bootstrap =
         init_osmosis_bootstrap(runtime, wasm_client_byte_code, wasm_additional_byte_code).await?;
 
+    let cw_address_file_path = cosmos_bootstrap
+        .chain_store_dir
+        .join("wasm-addresses.env")
+        .display()
+        .to_string();
+
     let starknet_builder = StarknetBuilder::new(
         runtime.clone(),
         cosmos_bootstrap.cosmos_builder.clone(),
@@ -35,6 +42,7 @@ pub async fn init_starknet_setup(runtime: &HermesRuntime) -> Result<StarknetTest
         cosmos_bootstrap,
         starknet_builder,
         wasm_code_hash,
+        WasmAddress::ContractAddressPath(cw_address_file_path),
     );
 
     Ok(setup)

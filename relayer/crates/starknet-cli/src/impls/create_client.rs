@@ -7,7 +7,9 @@ use hermes_cosmos::chain_components::types::CosmosCreateClientOptions;
 use hermes_cosmos::error::HermesError;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::types::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_components::types::{
+    CreateWasmStarknetMessageOptions, StarknetCreateClientPayloadOptions, WasmAddress,
+};
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hex::FromHex;
 use ibc::clients::tendermint::types::TrustThreshold;
@@ -36,6 +38,9 @@ pub struct CreateStarknetClientArgs {
 
     #[clap(long = "wasm-code-hash")]
     pub wasm_code_hash: String,
+
+    #[clap(long = "crypto-cw-address")]
+    pub crypto_cw_address: String,
 }
 
 #[cgp_provider(CreateClientOptionsParserComponent)]
@@ -81,9 +86,22 @@ impl CreateClientOptionsParser<StarknetApp, CreateStarknetClientArgs, Index<1>, 
         args: &CreateStarknetClientArgs,
         _target_chain: &CosmosChain,
         _counterparty_chain: &StarknetChain,
-    ) -> Result<((), StarknetCreateClientPayloadOptions), HermesError> {
+    ) -> Result<
+        (
+            CreateWasmStarknetMessageOptions,
+            StarknetCreateClientPayloadOptions,
+        ),
+        HermesError,
+    > {
         let wasm_code_hash = <[u8; 32]>::from_hex(&args.wasm_code_hash)?;
 
-        Ok(((), StarknetCreateClientPayloadOptions { wasm_code_hash }))
+        let cw_address = args.crypto_cw_address.clone();
+
+        Ok((
+            CreateWasmStarknetMessageOptions {
+                crypto_cw_address: WasmAddress::ContractAddress(cw_address),
+            },
+            StarknetCreateClientPayloadOptions { wasm_code_hash },
+        ))
     }
 }

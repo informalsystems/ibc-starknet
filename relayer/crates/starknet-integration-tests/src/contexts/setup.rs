@@ -25,7 +25,9 @@ use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos::integration_tests::impls::UseCosmosInitChannelOptions;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::types::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_components::types::{
+    CreateWasmStarknetMessageOptions, StarknetCreateClientPayloadOptions, WasmAddress,
+};
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_relayer::contexts::{
     CosmosStarknetBiRelay, CosmosToStarknetRelay, StarknetBuilder, StarknetCosmosBiRelay,
@@ -49,7 +51,8 @@ pub struct StarknetTestSetup {
     pub init_connection_options: CosmosInitConnectionOptions,
     pub cosmos_create_client_payload_options: CosmosCreateClientOptions,
     pub starknet_create_client_payload_options: StarknetCreateClientPayloadOptions,
-    pub create_client_message_options: (),
+    pub cosmos_create_client_message_options: (),
+    pub starknet_create_client_message_options: CreateWasmStarknetMessageOptions,
 }
 
 impl StarknetTestSetup {
@@ -58,6 +61,7 @@ impl StarknetTestSetup {
         osmosis_bootstrap: OsmosisBootstrap,
         starknet_builder: StarknetBuilder,
         wasm_code_hash: [u8; 32],
+        crypto_cw_address: WasmAddress,
     ) -> Self {
         Self {
             starknet_bootstrap,
@@ -70,7 +74,10 @@ impl StarknetTestSetup {
             init_channel_options: Default::default(),
             init_connection_options: Default::default(),
             cosmos_create_client_payload_options: Default::default(),
-            create_client_message_options: (),
+            cosmos_create_client_message_options: (),
+            starknet_create_client_message_options: CreateWasmStarknetMessageOptions {
+                crypto_cw_address,
+            },
         }
     }
 }
@@ -124,10 +131,10 @@ delegate_components! {
             InitConnectionOptionsGetterAtComponent<Index<0>, Index<1>>,
             InitConnectionOptionsGetterAtComponent<Index<1>, Index<0>>,
         ]: UseField<symbol!("init_connection_options")>,
-        [
-            CreateClientMessageOptionsGetterAtComponent<Index<0>, Index<1>>,
-            CreateClientMessageOptionsGetterAtComponent<Index<1>, Index<0>>,
-        ]: UseField<symbol!("create_client_message_options")>,
+        CreateClientMessageOptionsGetterAtComponent<Index<1>, Index<0>>:
+            UseField<symbol!("starknet_create_client_message_options")>,
+        CreateClientMessageOptionsGetterAtComponent<Index<0>, Index<1>>:
+            UseField<symbol!("cosmos_create_client_message_options")>,
         CreateClientPayloadOptionsGetterAtComponent<Index<0>, Index<1>>:
             UseField<symbol!("starknet_create_client_payload_options")>,
         CreateClientPayloadOptionsGetterAtComponent<Index<1>, Index<0>>:

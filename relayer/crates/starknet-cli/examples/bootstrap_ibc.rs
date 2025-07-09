@@ -20,7 +20,9 @@ use hermes_cosmos::chain_components::types::{
 use hermes_cosmos::error::Error;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
-use hermes_starknet_chain_components::types::StarknetCreateClientPayloadOptions;
+use hermes_starknet_chain_components::types::{
+    CreateWasmStarknetMessageOptions, StarknetCreateClientPayloadOptions, WasmAddress,
+};
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_cli::contexts::StarknetApp;
 use hermes_starknet_relayer::contexts::{CosmosToStarknetRelay, StarknetToCosmosRelay};
@@ -50,6 +52,9 @@ pub const STARKNET_ETH: Felt =
 
 pub const WASM_CODE_HASH_HEX: &str =
     "6be4d4cbb85ea2d7e0b17b7053e613af11e041617bdb163107dfd29f706318ef";
+
+// TODO: Fill once the crypto wasm contract has been instantiated in Osmosis testnet
+pub const CRYPTO_WASM_ADDRESS: &str = "TBD";
 
 fn main() -> Result<(), Error> {
     let _ = stable_eyre::install();
@@ -143,7 +148,11 @@ fn main() -> Result<(), Error> {
                 &StarknetCreateClientPayloadOptions {
                     wasm_code_hash: <[u8; 32]>::from_hex(WASM_CODE_HASH_HEX).expect("valid hex"),
                 },
-                &(),
+                &CreateWasmStarknetMessageOptions {
+                    crypto_cw_address: WasmAddress::ContractAddress(
+                        CRYPTO_WASM_ADDRESS.to_string(),
+                    ),
+                },
             )
             .await?
         };

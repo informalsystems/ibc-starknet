@@ -12,7 +12,8 @@ use ibc_client_starknet_types::StarknetClientState;
 use prost_types::Any;
 
 use crate::types::{
-    StarknetCreateClientPayload, WasmStarknetClientState, WasmStarknetConsensusState,
+    CreateWasmStarknetMessageOptions, StarknetCreateClientPayload, WasmStarknetClientState,
+    WasmStarknetConsensusState,
 };
 
 pub struct BuildStarknetCreateClientMessage;
@@ -22,8 +23,10 @@ impl<Chain, Counterparty, Encoding> CreateClientMessageBuilder<Chain, Counterpar
     for BuildStarknetCreateClientMessage
 where
     Chain: HasMessageType<Message = CosmosMessage>
-        + HasCreateClientMessageOptionsType<Counterparty>
-        + CanRaiseAsyncError<Encoding::Error>,
+        + HasCreateClientMessageOptionsType<
+            Counterparty,
+            CreateClientMessageOptions = CreateWasmStarknetMessageOptions,
+        > + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasCreateClientPayloadType<Chain, CreateClientPayload = StarknetCreateClientPayload>
         + HasClientStateType<Chain, ClientState = WasmStarknetClientState>
         + HasConsensusStateType<Chain, ConsensusState = WasmStarknetConsensusState>
@@ -33,14 +36,16 @@ where
         + CanConvert<Counterparty::ConsensusState, Any>,
 {
     async fn build_create_client_message(
-        _chain: &Chain,
-        _options: &Chain::CreateClientMessageOptions,
+        chain: &Chain,
+        options: &CreateWasmStarknetMessageOptions,
         payload: StarknetCreateClientPayload,
     ) -> Result<CosmosMessage, Chain::Error> {
         let encoding = Counterparty::default_encoding();
 
-        // TODO(rano): Use the actual Starknet Crypto contract address
-        let starknet_crypto_cw_address = "contract_address_placeholder".to_string().into_bytes();
+        let starknet_crypto_cw_address = options
+            .crypto_cw_address
+            .get_contract_address()
+            .into_bytes();
 
         let starknet_client_state = StarknetClientState {
             latest_height: payload.latest_height,

@@ -36,7 +36,9 @@ mod preset {
         GetCosmosCounterpartyMessageStarknetHeight, ProvideCometConsensusState,
         QueryStarknetConsensusStateHeightsFromGrpc, ReadPacketDstStarknetFields,
     };
-    use crate::types::{CometConsensusState, UseCometClientState};
+    use crate::types::{
+        CometConsensusState, ProvidCreateWasmStarknetMessageOptionsType, UseCometClientState,
+    };
 
     cgp_preset! {
         StarknetToCosmosComponents {
@@ -51,7 +53,6 @@ mod preset {
                 ConsensusStateWithProofsQuerierComponent,
                 CreateClientPayloadTypeComponent,
                 UpdateClientPayloadTypeComponent,
-                CreateClientMessageOptionsTypeComponent,
                 CreateClientPayloadOptionsTypeComponent,
                 CreateClientPayloadBuilderComponent,
                 UpdateClientPayloadBuilderComponent,
@@ -61,6 +62,8 @@ mod preset {
                 ChannelOpenConfirmMessageBuilderComponent,
             ]:
                 CosmosToCosmosComponents::Provider,
+            CreateClientMessageOptionsTypeComponent:
+                ProvidCreateWasmStarknetMessageOptionsType,
             CreateClientMessageBuilderComponent:
                 BuildStarknetCreateClientMessage,
             [
