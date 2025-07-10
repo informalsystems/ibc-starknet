@@ -19,7 +19,7 @@ use ibc_core::host::types::path::{Path, PathBytes};
 use ibc_core::primitives::proto::Any;
 use prost::Message;
 use starknet_core::types::{Felt, StorageProof};
-use starknet_crypto_lib::{StarknetCryptoCw, StarknetCryptoFunctions};
+use starknet_crypto_lib::{StarknetCryptoFunctions, StarknetCryptoLib};
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_storage_verifier::validate::validate_storage_proof;
 use starknet_storage_verifier::verifier::verify_starknet_storage_proof;
@@ -80,18 +80,7 @@ where
         path: PathBytes,
         value: Vec<u8>,
     ) -> Result<(), ClientError> {
-        let starknet_crypto_lib_addr = String::from_utf8(self.0.starknet_crypto_cw_address.clone())
-            .map_err(Into::into)
-            .map_err(ClientError::Decoding)?;
-
-        let starknet_crypto_cw = {
-            StarknetCryptoCw::new(
-                starknet_crypto_lib_addr,
-                ctx.deps_mut()
-                    .expect("membership verification should have mutable deps in CW context")
-                    .querier,
-            )
-        };
+        let starknet_crypto_cw = StarknetCryptoLib;
 
         let path_bytes = path.into_vec();
         let processed_path = Path::from_str(
@@ -137,18 +126,7 @@ where
         root: &CommitmentRoot,
         path: PathBytes,
     ) -> Result<(), ClientError> {
-        let starknet_crypto_lib_addr = String::from_utf8(self.0.starknet_crypto_cw_address.clone())
-            .map_err(Into::into)
-            .map_err(ClientError::Decoding)?;
-
-        let starknet_crypto_cw = {
-            StarknetCryptoCw::new(
-                starknet_crypto_lib_addr,
-                ctx.deps_mut()
-                    .expect("membership verification should have mutable deps in CW context")
-                    .querier,
-            )
-        };
+        let starknet_crypto_cw = StarknetCryptoLib;
 
         let path_bytes = path.into_vec();
         let processed_path = Path::from_str(
