@@ -181,7 +181,7 @@ where
         let cw_address_file_path = cosmos_chain_driver
             .chain_node_config
             .chain_home_dir
-            .join("wasm-addresses.env")
+            .join("../wasm-addresses.env")
             .display()
             .to_string();
 
