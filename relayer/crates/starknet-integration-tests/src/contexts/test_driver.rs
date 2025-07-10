@@ -185,10 +185,9 @@ where
             .display()
             .to_string();
 
-        let cw_address_file = std::fs::read_to_string(
-            cosmos_chain_driver.chain_node_config.chain_home_dir.clone(),
-        )
-        .map_err(|e| Setup::raise_error(format!("failed to read wasm-addresses.env: {e}")))?;
+        let cw_address_file = std::fs::read_to_string(cw_address_file_path)
+            .map_err(|e| Setup::raise_error(format!("failed to read wasm-addresses.env: {e}")))?;
+
         let cw_address = cw_address_file
             .trim()
             .split_once('=')
