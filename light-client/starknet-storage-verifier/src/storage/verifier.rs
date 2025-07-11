@@ -41,14 +41,10 @@ pub fn verify_starknet_merkle_proof(
                 let next_bit = path_bits[0];
 
                 let next_root = if next_bit { node.right } else { node.left };
-                let alt_next_root = if next_bit { node.left } else { node.right };
 
-                current_node = match nodes.get(&next_root) {
-                    Some(n) => n,
-                    None => nodes
-                        .get(&alt_next_root)
-                        .ok_or(StorageError::MissingProofNode)?,
-                };
+                current_node = nodes
+                    .get(&next_root)
+                    .ok_or(StorageError::MissingProofNode)?;
 
                 // Slice out the one bit and continue with the next iteration.
 
@@ -105,6 +101,8 @@ pub fn verify_starknet_merkle_proof(
                         // If there is no remaining length after this, we have reached the bottom of the tree
 
                         if node.child == Felt::ZERO {
+                            // A leaf node with value 0 should have been pruned from the tree.
+                            // Reaching here with a zero value indicates an invalid tree structure.
                             return Err(StorageError::ChildNodeWithZeroValue);
                         }
 
@@ -131,11 +129,11 @@ pub fn verify_starknet_merkle_proof(
                         path_bits = &path_bits[node_length.into()..];
                     }
                 } else if value == Felt::ZERO {
-                    // If the path don't match, then that implies the value is 0. If the expected value is also 0,
-                    // then we get a non-membership proof
+                    // If the path doesn't match, then that implies the value is 0. If the expected value is also 0,
+                    // then we get a successful non-membership proof.
                     return Ok(());
                 } else {
-                    // Otherwise, the path don't match and the expected value is not zero.
+                    // Otherwise, the path doesn't match and the expected value is not zero.
                     // Then we failed to prove that a non-zero value is present in the tree.
 
                     return Err(StorageError::MissingValue);
@@ -218,7 +216,7 @@ pub fn verify_starknet_contract_proof<C: StarknetCryptoFunctions>(
     // contract address being the path.
     verify_starknet_merkle_proof(
         &storage_proof.contracts_proof.nodes,
-        storage_proof.global_roots.contracts_tree_root,
+        global_contract_trie_root,
         contract_address,
         contract_hash,
     )?;
