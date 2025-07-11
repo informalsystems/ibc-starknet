@@ -152,8 +152,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanRaiseAsyncError<Encoding::Error>
-        + HasOutgoingPacketType<Counterparty, OutgoingPacket = IbcPacket>
-        + HasAsyncErrorType,
+        + HasOutgoingPacketType<Counterparty, OutgoingPacket = IbcPacket>,
     Counterparty: HasHeightType<Height = Height>
         + HasCommitmentProofType<CommitmentProof = CosmosCommitmentProof>
         + HasTimeoutUnorderedPacketPayloadType<

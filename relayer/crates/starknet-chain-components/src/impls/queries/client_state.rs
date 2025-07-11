@@ -100,8 +100,7 @@ where
         + CanQueryClientState<Counterparty>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
-        + CanRaiseAsyncError<serde_json::Error>
-        + HasAsyncErrorType,
+        + CanRaiseAsyncError<serde_json::Error>,
     Counterparty: HasClientStateType<Chain, ClientState = CometClientState> + HasHeightType,
 {
     async fn query_client_state_with_proofs(

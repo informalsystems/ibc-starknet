@@ -20,8 +20,7 @@ use crate::types::{PrefixedDenom, StarknetMessageResponse};
 impl<Chain, Encoding> CosmosTokenAddressOnStarknetQuerier<Chain>
     for CreateCosmosTokenAddressOnStarknet
 where
-    Chain: HasAsyncErrorType
-        + HasEncoding<AsFelt, Encoding = Encoding>
+    Chain: HasEncoding<AsFelt, Encoding = Encoding>
         + HasAddressType<Address = StarknetAddress>
         + HasDenomType<Denom = StarknetAddress>
         + CanSendSingleMessage<Message = StarknetMessage, MessageResponse = StarknetMessageResponse>
