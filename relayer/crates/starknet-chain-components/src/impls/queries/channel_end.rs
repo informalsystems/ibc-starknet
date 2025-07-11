@@ -135,10 +135,9 @@ where
         // key == path
         let storage_proof: StorageProof = chain
             .query_storage_proof(height, &contract_address, &[felt_path])
-            .await
-            .unwrap();
+            .await?;
 
-        let storage_proof_bytes = serde_json::to_vec(&storage_proof).unwrap();
+        let storage_proof_bytes = serde_json::to_vec(&storage_proof).map_err(Chain::raise_error)?;
 
         let dummy_proof = StarknetCommitmentProof {
             proof_height: block.height,

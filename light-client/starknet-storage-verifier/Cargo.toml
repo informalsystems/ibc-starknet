@@ -16,7 +16,6 @@ workspace = true
 [dependencies]
 # External dependencies
 indexmap = { workspace = true }
-#thiserror = { workspace = true }
 
 # Ibc dependencies
 ibc-core = { workspace = true, optional = true }

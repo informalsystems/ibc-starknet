@@ -22,17 +22,17 @@ impl StarknetCryptoFunctions for StarknetCryptoCw<'_> {
     fn starknet_keccak(&self, input: &[u8]) -> Felt {
         let felt_hex = BoundQuerier::borrowed(&Addr::unchecked(&self.lib_addr), &self.querier)
             .starknet_keccak(input.into())
-            .unwrap();
+            .expect("failed Starknet keccak hash");
 
-        Felt::from_hex(&felt_hex).unwrap()
+        Felt::from_hex(&felt_hex).expect("failed to convert hex to Felt)
     }
 
     fn pedersen_hash(&self, x: &Felt, y: &Felt) -> Felt {
         let felt_hex = BoundQuerier::borrowed(&Addr::unchecked(&self.lib_addr), &self.querier)
             .pedersen_hash(x.to_fixed_hex_string(), y.to_fixed_hex_string())
-            .unwrap();
+            .expect("failed pedersen hash");
 
-        Felt::from_hex(&felt_hex).unwrap()
+        Felt::from_hex(&felt_hex).expect("failed to convert hex to Felt)
     }
 
     fn poseidon_hash_many(&self, inputs: &[Felt]) -> Felt {
@@ -43,9 +43,9 @@ impl StarknetCryptoFunctions for StarknetCryptoCw<'_> {
 
         let felt_hex = BoundQuerier::borrowed(&Addr::unchecked(&self.lib_addr), &self.querier)
             .poseidon_hash_many(input_hex)
-            .unwrap();
+            .expect("failed poseidon hash");
 
-        Felt::from_hex(&felt_hex).unwrap()
+        Felt::from_hex(&felt_hex).expect("failed to convert hex to Felt)
     }
 
     fn verify(
