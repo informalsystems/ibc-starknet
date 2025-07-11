@@ -146,7 +146,6 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(crypto_lib: &C, path:
 
         // Note: ibc-go deprecates the use of client_proof and consensus_proof.
         // We return a dummy value for these paths for API compatibility reasons.
-
         Path::ClientState(client_state_path) => {
             // TODO
             Felt::ZERO
