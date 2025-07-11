@@ -93,8 +93,7 @@ where
         // key == path
         let storage_proof: StorageProof = chain
             .query_storage_proof(height, &contract_address, &[felt_path])
-            .await
-            .unwrap();
+            .await?;
 
         let storage_proof_bytes = serde_json::to_vec(&storage_proof).unwrap();
 
