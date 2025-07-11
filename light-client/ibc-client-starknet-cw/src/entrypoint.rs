@@ -1,6 +1,6 @@
+use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response};
 use ibc_client_cw::context::Context;
 use ibc_client_cw::types::{ContractError, InstantiateMsg, QueryMsg, SudoMsg};
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response};
 
 use crate::client_type::StarknetClient;
 
