@@ -1,6 +1,5 @@
-use alloc::vec::Vec;
-
 use starknet_core::types::Felt;
+use starknet_core::utils::cairo_short_string_to_felt;
 
 pub fn packed_str_to_felt(s: &str) -> Felt {
     // Pack ASCII chars into a u256 (31 bytes max for felt252)
@@ -15,17 +14,14 @@ pub fn packed_str_to_felt(s: &str) -> Felt {
 
 pub fn parse_client_id(s: &str) -> (Felt, Felt) {
     // e.g., "07-tendermint-0"
-    let parts: Vec<&str> = s.split('-').collect();
-    assert!(parts.len() >= 3);
-
-    let client_type_str = parts[1];
-    let sequence: u64 = parts[2].parse().unwrap();
+    let (client_type_str, sequence_str) = s.rsplit_once('-').expect("Invalid client ID format");
 
     let client_type = match client_type_str {
-        "tendermint" => Felt::from_dec_str("3820028427552332600290323295860").unwrap(),
-        "wasm" => Felt::from_dec_str("13572566809670509").unwrap(),
+        "07-tendermint" | "08-wasm" => cairo_short_string_to_felt(client_type_str).unwrap(), // short_string!(x)
         _ => panic!("Unknown client type"),
     };
+
+    let sequence: u64 = sequence_str.parse().unwrap();
 
     (client_type, Felt::from(sequence))
 }
