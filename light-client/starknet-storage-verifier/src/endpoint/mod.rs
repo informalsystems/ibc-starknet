@@ -10,7 +10,7 @@ pub struct Endpoint(pub JsonRpcClient<HttpTransport>);
 impl Endpoint {
     pub fn new(endpoint: impl AsRef<str>) -> Self {
         Self(JsonRpcClient::new(HttpTransport::new(
-            Url::parse(endpoint.as_ref()).unwrap(),
+            Url::parse(endpoint.as_ref()).expect("failed to parse url"),
         )))
     }
 
