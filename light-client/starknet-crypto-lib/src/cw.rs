@@ -24,7 +24,7 @@ impl StarknetCryptoFunctions for StarknetCryptoCw<'_> {
             .starknet_keccak(input.into())
             .expect("failed Starknet keccak hash");
 
-        Felt::from_hex(&felt_hex).expect("failed to convert hex to Felt)
+        Felt::from_hex(&felt_hex).expect("failed to convert hex to Felt")
     }
 
     fn pedersen_hash(&self, x: &Felt, y: &Felt) -> Felt {
@@ -32,7 +32,7 @@ impl StarknetCryptoFunctions for StarknetCryptoCw<'_> {
             .pedersen_hash(x.to_fixed_hex_string(), y.to_fixed_hex_string())
             .expect("failed pedersen hash");
 
-        Felt::from_hex(&felt_hex).expect("failed to convert hex to Felt)
+        Felt::from_hex(&felt_hex).expect("failed to convert hex to Felt")
     }
 
     fn poseidon_hash_many(&self, inputs: &[Felt]) -> Felt {
@@ -45,7 +45,7 @@ impl StarknetCryptoFunctions for StarknetCryptoCw<'_> {
             .poseidon_hash_many(input_hex)
             .expect("failed poseidon hash");
 
-        Felt::from_hex(&felt_hex).expect("failed to convert hex to Felt)
+        Felt::from_hex(&felt_hex).expect("failed to convert hex to Felt")
     }
 
     fn verify(
