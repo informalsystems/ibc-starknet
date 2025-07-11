@@ -144,8 +144,19 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(crypto_lib: &C, path:
             )
         }
 
-        // Note: `proof_client` and `proof_consensus` are deprecated by ibc-go.
-        // So, we do not support them.
+        // Note: ibc-go deprecates the use of client_proof and consensus_proof.
+        // We return a dummy value for these paths for API compatibility reasons.
+
+        Path::ClientState(client_state_path) => {
+            // TODO
+            Felt::ZERO
+        }
+
+        Path::ClientConsensusState(client_consensus_state_path) => {
+            // TODO
+            Felt::ZERO
+        }
+
         _ => unimplemented!(),
     }
 }
