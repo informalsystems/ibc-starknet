@@ -77,7 +77,7 @@ use_self                      = "deny"
 redundant_clone               = "deny"
 
 [profile.release]
-opt-level        = 3
+opt-level        = 'z'
 debug            = false
 rpath            = false
 lto              = true
