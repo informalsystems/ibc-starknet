@@ -47,7 +47,7 @@ where
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanCallContract
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
-        + CanRaiseAsyncError<String>
+        + CanRaiseAsyncError<serde_json::Error>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasSequenceType<Chain, Sequence = IbcSequence>,
 

@@ -88,7 +88,7 @@ where
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanCallContract
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
-        + CanRaiseAsyncError<String>
+        + CanRaiseAsyncError<serde_json::Error>
         + CanRaiseAsyncError<Encoding::Error>,
     Encoding: CanEncode<ViaCairo, ConnectionId>
         + CanDecode<ViaCairo, ConnectionEnd>

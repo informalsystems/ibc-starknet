@@ -127,7 +127,7 @@ where
         + CanQueryConsensusState<Counterparty>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
-        + CanRaiseAsyncError<String>
+        + CanRaiseAsyncError<serde_json::Error>
         + HasAsyncErrorType,
     Counterparty: HasConsensusStateType<Chain, ConsensusState = CometConsensusState>
         + HasHeightType<Height = IbcHeight>,
