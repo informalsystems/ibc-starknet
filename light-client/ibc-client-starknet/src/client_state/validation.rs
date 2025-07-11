@@ -174,13 +174,15 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
 ) -> Result<Felt, ClientError> {
     match path {
         Path::Connection(_) => {
-            let connection_end = ConnectionEnd::decode(value.as_slice()).unwrap();
+            let connection_end = ConnectionEnd::decode(value.as_slice())
+                .map_err(|e| ClientError::Decoding(e.into()))?;
             let felts = connection_end_to_felts(&connection_end);
 
             Ok(crypto_lib.poseidon_hash_many(&felts))
         }
         Path::ChannelEnd(_) => {
-            let channel = Channel::decode(value.as_slice()).unwrap();
+            let channel =
+                Channel::decode(value.as_slice()).map_err(|e| ClientError::Decoding(e.into()))?;
             let felts = channel_to_felts(&channel);
 
             Ok(crypto_lib.poseidon_hash_many(&felts))

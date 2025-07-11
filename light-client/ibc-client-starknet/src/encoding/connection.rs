@@ -17,7 +17,10 @@ pub fn connection_end_to_felts(connection_end: &ConnectionEnd) -> Vec<Felt> {
     felts.push(seq);
 
     // 3. counterparty.client_id
-    let counterparty = connection_end.clone().counterparty.expect("missing counterparty in connection end");
+    let counterparty = connection_end
+        .clone()
+        .counterparty
+        .expect("missing counterparty in connection end");
     let (cp_client_type, cp_seq) = parse_client_id(&counterparty.client_id);
     felts.push(cp_client_type);
     felts.push(cp_seq);
@@ -39,7 +42,12 @@ pub fn connection_end_to_felts(connection_end: &ConnectionEnd) -> Vec<Felt> {
     }
 
     // 5. prefix = "ibc"
-    let prefix_felt = packed_bytes_to_felt(&counterparty.prefix.expect("connection end is missing prefix").key_prefix);
+    let prefix_felt = packed_bytes_to_felt(
+        &counterparty
+            .prefix
+            .expect("connection end is missing prefix")
+            .key_prefix,
+    );
     felts.push(prefix_felt);
 
     // 6. version.identifier = "1"
