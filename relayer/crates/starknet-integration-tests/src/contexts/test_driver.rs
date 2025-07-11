@@ -31,8 +31,7 @@ use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::StarknetRecoverClientPayload;
 use hermes_starknet_chain_components::types::{
-    ChannelId, ClientId, ConnectionId, CreateWasmStarknetMessageOptions,
-    StarknetCreateClientPayloadOptions, WasmAddress,
+    ChannelId, ClientId, ConnectionId, StarknetCreateClientPayloadOptions,
 };
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_relayer::contexts::{
@@ -62,7 +61,7 @@ pub struct StarknetTestDriver {
     pub create_client_payload_options_a: StarknetCreateClientPayloadOptions,
     pub create_client_payload_options_b: CosmosCreateClientOptions,
     pub create_client_message_options_a: (),
-    pub create_client_message_options_b: CreateWasmStarknetMessageOptions,
+    pub create_client_message_options_b: (),
     pub recover_client_payload_options_a: StarknetRecoverClientPayload,
     pub recover_client_payload_options_b: CosmosRecoverClientPayload,
 }
@@ -178,26 +177,6 @@ where
 
         let relay_driver_a_b = StarknetCosmosRelayDriver { birelay };
 
-        let cw_address_file_path = cosmos_chain_driver
-            .chain_node_config
-            .chain_home_dir
-            .join("../wasm-addresses.env")
-            .display()
-            .to_string();
-
-        let cw_address_file = std::fs::read_to_string(cw_address_file_path)
-            .map_err(|e| Setup::raise_error(format!("failed to read wasm-addresses.env: {e}")))?;
-
-        let cw_address = cw_address_file
-            .trim()
-            .split_once('=')
-            .map(|(_, v)| v.trim().to_string())
-            .ok_or_else(|| {
-                Setup::raise_error(format!(
-                    "failed to extract wasm contract address from file content: {cw_address_file}"
-                ))
-            })?;
-
         let driver = StarknetTestDriver {
             relay_driver_a_b,
             relay_driver_b_a,
@@ -214,9 +193,7 @@ where
             create_client_payload_options_a: create_client_payload_options_a.clone(),
             create_client_payload_options_b: create_client_payload_options_b.clone(),
             create_client_message_options_a: (),
-            create_client_message_options_b: CreateWasmStarknetMessageOptions {
-                crypto_cw_address: WasmAddress::ContractAddress(cw_address),
-            },
+            create_client_message_options_b: (),
             recover_client_payload_options_a: starknet_recover_client_payload,
             recover_client_payload_options_b: cosmos_recover_client_payload,
         };

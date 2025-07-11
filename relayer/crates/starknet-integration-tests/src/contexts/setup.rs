@@ -25,9 +25,7 @@ use hermes_cosmos::integration_tests::contexts::CosmosChainDriver;
 use hermes_cosmos::integration_tests::impls::UseCosmosInitChannelOptions;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::types::{
-    CreateWasmStarknetMessageOptions, StarknetCreateClientPayloadOptions, WasmAddress,
-};
+use hermes_starknet_chain_components::types::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_relayer::contexts::{
     CosmosStarknetBiRelay, CosmosToStarknetRelay, StarknetBuilder, StarknetCosmosBiRelay,
@@ -52,7 +50,7 @@ pub struct StarknetTestSetup {
     pub cosmos_create_client_payload_options: CosmosCreateClientOptions,
     pub starknet_create_client_payload_options: StarknetCreateClientPayloadOptions,
     pub cosmos_create_client_message_options: (),
-    pub starknet_create_client_message_options: CreateWasmStarknetMessageOptions,
+    pub starknet_create_client_message_options: (),
 }
 
 impl StarknetTestSetup {
@@ -61,7 +59,6 @@ impl StarknetTestSetup {
         osmosis_bootstrap: OsmosisBootstrap,
         starknet_builder: StarknetBuilder,
         wasm_code_hash: [u8; 32],
-        crypto_cw_address: WasmAddress,
     ) -> Self {
         Self {
             starknet_bootstrap,
@@ -75,9 +72,7 @@ impl StarknetTestSetup {
             init_connection_options: Default::default(),
             cosmos_create_client_payload_options: Default::default(),
             cosmos_create_client_message_options: (),
-            starknet_create_client_message_options: CreateWasmStarknetMessageOptions {
-                crypto_cw_address,
-            },
+            starknet_create_client_message_options: (),
         }
     }
 }

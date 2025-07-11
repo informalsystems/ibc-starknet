@@ -20,9 +20,7 @@ use hermes_cosmos::chain_components::types::{
 use hermes_cosmos::error::Error;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
-use hermes_starknet_chain_components::types::{
-    CreateWasmStarknetMessageOptions, StarknetCreateClientPayloadOptions, WasmAddress,
-};
+use hermes_starknet_chain_components::types::StarknetCreateClientPayloadOptions;
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_cli::contexts::StarknetApp;
 use hermes_starknet_relayer::contexts::{CosmosToStarknetRelay, StarknetToCosmosRelay};
@@ -148,11 +146,7 @@ fn main() -> Result<(), Error> {
                 &StarknetCreateClientPayloadOptions {
                     wasm_code_hash: <[u8; 32]>::from_hex(WASM_CODE_HASH_HEX).expect("valid hex"),
                 },
-                &CreateWasmStarknetMessageOptions {
-                    crypto_cw_address: WasmAddress::ContractAddress(
-                        CRYPTO_WASM_ADDRESS.to_string(),
-                    ),
-                },
+                &(),
             )
             .await?
         };

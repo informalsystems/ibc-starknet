@@ -75,7 +75,6 @@ where
             chain_id: self.0.chain_id.clone(),
             pub_key: self.0.pub_key.clone(),
             ibc_contract_address: self.0.ibc_contract_address.clone(),
-            starknet_crypto_cw_address: self.0.starknet_crypto_cw_address.clone(),
         }
         .into();
 

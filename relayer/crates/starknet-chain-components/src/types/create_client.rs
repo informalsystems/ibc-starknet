@@ -30,11 +30,11 @@ impl WasmAddress {
     }
 }
 
-pub struct ProvidCreateWasmStarknetMessageOptionsType;
+pub struct ProvideCreateWasmStarknetMessageOptionsType;
 
 #[cgp_provider(CreateClientMessageOptionsTypeComponent)]
 impl<Chain, Counterparty> ProvideCreateClientMessageOptionsType<Chain, Counterparty>
-    for ProvidCreateWasmStarknetMessageOptionsType
+    for ProvideCreateWasmStarknetMessageOptionsType
 where
     Chain: Async,
 {
