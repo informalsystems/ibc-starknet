@@ -23,7 +23,7 @@ ibc-client-cw       = { workspace = true }
 ibc-client-starknet = { workspace = true }
 
 # cosmwasm dependencies
-cosmwasm-std = { version = "2.2.0" }
+cosmwasm-std = { version = "2.2.2", default-features = false }
 
 [features]
 default = [ "std" ]
@@ -31,3 +31,4 @@ std = [
   "ibc-core/std",
   "ibc-client-cw/std",
 ]
+library = [  ]

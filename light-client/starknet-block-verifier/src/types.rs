@@ -1,5 +1,9 @@
+use alloc::string::String;
+use alloc::vec::Vec;
+
 use serde::{Deserialize, Serialize};
-use starknet_crypto::{poseidon_hash_many, verify, Felt};
+use starknet_core::types::Felt;
+use starknet_crypto_lib::StarknetCryptoFunctions;
 
 pub const STARKNET_GAS_PRICES0: &[u8] = b"STARKNET_GAS_PRICES0";
 pub const STARKNET_BLOCK_HASH1: &[u8] = b"STARKNET_BLOCK_HASH1";
@@ -84,11 +88,12 @@ impl Block {
         let l1_data_availability_byte: u8 = self.l1_da_mode.into();
 
         let concat_bytes = [
-            self.transactions.len().to_be_bytes(),
-            self.transaction_receipts
+            (self.transactions.len() as u64).to_be_bytes(),
+            (self
+                .transaction_receipts
                 .iter()
                 .map(|receipt| receipt.events.len())
-                .sum::<usize>()
+                .sum::<usize>() as u64)
                 .to_be_bytes(),
             self.state_diff_length.unwrap_or_default().to_be_bytes(),
             [
@@ -110,8 +115,8 @@ impl Block {
     /// Computes the Starknet 0.13.5 gas commitment.
     ///
     /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L234-L242
-    pub fn gas_commitment(&self) -> Felt {
-        poseidon_hash_many(&[
+    pub fn gas_commitment<C: StarknetCryptoFunctions>(&self, crypto_lib: &C) -> Felt {
+        crypto_lib.poseidon_hash_many(&[
             Felt::from_bytes_be_slice(STARKNET_GAS_PRICES0),
             self.l1_gas_price.price_in_wei,
             self.l1_gas_price.price_in_fri,
@@ -125,8 +130,8 @@ impl Block {
     /// Computes the Starknet 0.13.5 block hash.
     ///
     /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L111-L116
-    pub fn compute_hash(&self) -> Felt {
-        poseidon_hash_many(&[
+    pub fn compute_hash<C: StarknetCryptoFunctions>(&self, crypto_lib: &C) -> Felt {
+        crypto_lib.poseidon_hash_many(&[
             Felt::from_bytes_be_slice(STARKNET_BLOCK_HASH1),
             self.block_number.into(),
             self.state_root,
@@ -137,25 +142,26 @@ impl Block {
             self.transaction_commitment,
             self.event_commitment,
             self.receipt_commitment.unwrap_or(Felt::ZERO),
-            self.gas_commitment(),
+            self.gas_commitment(crypto_lib),
             Felt::from_bytes_be_slice(self.starknet_version.as_bytes()),
             Felt::ZERO,
             self.parent_block_hash,
         ])
     }
 
-    pub fn validate(&self) -> bool {
-        self.block_hash == self.compute_hash()
+    pub fn validate<C: StarknetCryptoFunctions>(&self, crypto_lib: &C) -> bool {
+        self.block_hash == self.compute_hash(crypto_lib)
     }
 
-    pub fn verify_signature(
+    pub fn verify_signature<C: StarknetCryptoFunctions>(
         &self,
+        crypto_lib: &C,
         signature: &Signature,
         public_key: &Felt,
-    ) -> Result<bool, starknet_crypto::VerifyError> {
-        Ok(self.validate()
+    ) -> Result<bool, C::Error> {
+        Ok(self.validate(crypto_lib)
             && signature.block_hash == self.block_hash
-            && verify(
+            && crypto_lib.verify(
                 public_key,
                 &signature.block_hash,
                 &signature.signature[0],

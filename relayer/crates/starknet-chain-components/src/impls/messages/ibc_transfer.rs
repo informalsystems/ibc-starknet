@@ -27,8 +27,7 @@ pub struct BuildStarknetIbcTransferMessage;
 impl<Chain, Counterparty, Encoding> IbcTokenTransferMessageBuilder<Chain, Counterparty>
     for BuildStarknetIbcTransferMessage
 where
-    Chain: HasAsyncErrorType
-        + HasAmountType<Amount = StarknetAmount>
+    Chain: HasAmountType<Amount = StarknetAmount>
         + HasMemoType<Memo = Option<String>>
         + HasMessageType<Message = StarknetMessage>
         + HasChannelIdType<Counterparty, ChannelId = ChannelId>

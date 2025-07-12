@@ -19,8 +19,7 @@ use crate::types::PrefixedDenom;
 #[cgp_new_provider(CosmosTokenAddressOnStarknetQuerierComponent)]
 impl<Chain, Encoding> CosmosTokenAddressOnStarknetQuerier<Chain> for GetCosmosTokenAddressOnStarknet
 where
-    Chain: HasAsyncErrorType
-        + HasEncoding<AsFelt, Encoding = Encoding>
+    Chain: HasEncoding<AsFelt, Encoding = Encoding>
         + HasDenomType<Denom = StarknetAddress>
         + CanQueryContractAddress<symbol!("ibc_ics20_contract_address")>
         + CanRaiseAsyncError<Encoding::Error>

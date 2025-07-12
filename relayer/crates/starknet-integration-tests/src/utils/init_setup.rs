@@ -16,7 +16,7 @@ pub async fn init_starknet_setup(runtime: &HermesRuntime) -> Result<StarknetTest
 
     let starknet_bootstrap = init_starknet_bootstrap(runtime).await?;
 
-    let cosmos_bootstrap = init_osmosis_bootstrap(runtime, wasm_client_byte_code).await?;
+    let cosmos_bootstrap = init_osmosis_bootstrap(runtime, wasm_client_byte_code, vec![]).await?;
 
     let starknet_builder = StarknetBuilder::new(
         runtime.clone(),

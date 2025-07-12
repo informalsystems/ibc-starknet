@@ -1869,7 +1869,7 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 [[package]]
 name = "hermes-any-counterparty"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -1889,7 +1889,7 @@ dependencies = [
 [[package]]
 name = "hermes-async-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "async-trait",
  "cgp",
@@ -1914,7 +1914,7 @@ dependencies = [
 [[package]]
 name = "hermes-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -1926,7 +1926,7 @@ dependencies = [
 [[package]]
 name = "hermes-chain-type-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -1935,7 +1935,7 @@ dependencies = [
 [[package]]
 name = "hermes-cli"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "clap",
@@ -1962,7 +1962,7 @@ dependencies = [
 [[package]]
 name = "hermes-cli-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "clap",
@@ -1978,7 +1978,7 @@ dependencies = [
 [[package]]
 name = "hermes-cli-framework"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "clap",
@@ -1998,7 +1998,7 @@ dependencies = [
 [[package]]
 name = "hermes-comet-light-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -2008,7 +2008,7 @@ dependencies = [
 [[package]]
 name = "hermes-comet-light-client-context"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "eyre",
@@ -2025,7 +2025,7 @@ dependencies = [
 [[package]]
 name = "hermes-core"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-chain-components",
@@ -2042,7 +2042,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "hermes-comet-light-client-context",
  "hermes-core",
@@ -2057,7 +2057,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-chain-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "bech32 0.9.1",
  "bitcoin",
@@ -2106,7 +2106,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-chain-preset"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2118,7 +2118,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-core"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "hermes-comet-light-client-components",
  "hermes-core",
@@ -2128,6 +2128,7 @@ dependencies = [
  "hermes-cosmos-test-components",
  "hermes-protobuf-encoding-components",
  "hermes-tracing-logging-components",
+ "hermes-wasm-chain-components",
  "hermes-wasm-client-components",
  "hermes-wasm-encoding-components",
  "hermes-wasm-test-components",
@@ -2141,7 +2142,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -2156,7 +2157,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-integration-tests"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "eyre",
@@ -2182,7 +2183,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "dirs-next",
@@ -2219,7 +2220,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hdpath",
@@ -2247,7 +2248,7 @@ dependencies = [
 [[package]]
 name = "hermes-cosmos-wasm-relayer"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "eyre",
@@ -2260,6 +2261,7 @@ dependencies = [
  "hermes-error",
  "hermes-prelude",
  "hermes-runtime",
+ "hermes-wasm-chain-components",
  "http 1.3.1",
  "ibc",
  "ibc-proto",
@@ -2284,7 +2286,7 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -2293,7 +2295,7 @@ dependencies = [
 [[package]]
 name = "hermes-error"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "eyre",
@@ -2305,7 +2307,7 @@ dependencies = [
 [[package]]
 name = "hermes-ibc-test-suite"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-chain-components",
@@ -2321,7 +2323,7 @@ dependencies = [
 [[package]]
 name = "hermes-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -2330,7 +2332,7 @@ dependencies = [
 [[package]]
 name = "hermes-prelude"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "cgp-async",
@@ -2339,7 +2341,7 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -2351,7 +2353,7 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "futures",
@@ -2366,7 +2368,7 @@ dependencies = [
 [[package]]
 name = "hermes-relayer-components-extra"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "futures",
@@ -2380,7 +2382,7 @@ dependencies = [
 [[package]]
 name = "hermes-runtime"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-async-runtime-components",
@@ -2395,7 +2397,7 @@ dependencies = [
 [[package]]
 name = "hermes-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -2432,6 +2434,8 @@ dependencies = [
  "starknet 0.13.0",
  "starknet 0.14.0",
  "starknet-crypto",
+ "starknet-crypto-lib",
+ "starknet-storage-verifier",
  "tendermint",
  "time",
  "tonic",
@@ -2604,7 +2608,7 @@ dependencies = [
 [[package]]
 name = "hermes-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-chain-type-components",
@@ -2618,7 +2622,7 @@ dependencies = [
 [[package]]
 name = "hermes-tokio-runtime-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "futures",
@@ -2635,7 +2639,7 @@ dependencies = [
 [[package]]
 name = "hermes-tracing-logging-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2648,9 +2652,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "hermes-wasm-chain-components"
+version = "0.1.0"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
+dependencies = [
+ "hermes-core",
+ "hermes-cosmos-chain-components",
+ "hermes-prelude",
+ "ibc",
+ "ibc-proto",
+ "prost",
+ "sha2 0.10.9",
+ "tendermint-proto",
+ "tokio",
+]
+
+[[package]]
 name = "hermes-wasm-client-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2670,7 +2690,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2685,7 +2705,7 @@ dependencies = [
 [[package]]
 name = "hermes-wasm-test-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=5004dc7#5004dc7dcf5d00150fefb004582b0e2254c9ae48"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?branch=luca_joss/add-wasm-upload-and-deploy-components#3c924ab3e0b51b42f189c9989dac4bd21fbcd001"
 dependencies = [
  "cgp",
  "hermes-core",
@@ -2693,6 +2713,7 @@ dependencies = [
  "hermes-cosmos-test-components",
  "hermes-prelude",
  "hermes-test-components",
+ "hermes-wasm-chain-components",
  "ibc",
  "ibc-proto",
  "prost",
@@ -2983,7 +3004,7 @@ dependencies = [
 [[package]]
 name = "ibc"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "ibc-apps",
  "ibc-clients",
@@ -2996,7 +3017,7 @@ dependencies = [
 [[package]]
 name = "ibc-app-nft-transfer"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "ibc-app-nft-transfer-types",
  "ibc-core",
@@ -3006,7 +3027,7 @@ dependencies = [
 [[package]]
 name = "ibc-app-nft-transfer-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "base64 0.22.1",
  "borsh",
@@ -3027,7 +3048,7 @@ dependencies = [
 [[package]]
 name = "ibc-app-transfer"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "ibc-app-transfer-types",
  "ibc-core",
@@ -3037,7 +3058,7 @@ dependencies = [
 [[package]]
 name = "ibc-app-transfer-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "borsh",
  "derive_more 1.0.0",
@@ -3055,7 +3076,7 @@ dependencies = [
 [[package]]
 name = "ibc-apps"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "ibc-app-nft-transfer",
  "ibc-app-transfer",
@@ -3079,7 +3100,7 @@ dependencies = [
 [[package]]
 name = "ibc-client-tendermint"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "derive_more 1.0.0",
  "ibc-client-tendermint-types",
@@ -3096,7 +3117,7 @@ dependencies = [
 [[package]]
 name = "ibc-client-tendermint-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "borsh",
  "displaydoc",
@@ -3114,7 +3135,7 @@ dependencies = [
 [[package]]
 name = "ibc-client-wasm-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "base64 0.22.1",
  "displaydoc",
@@ -3129,7 +3150,7 @@ dependencies = [
 [[package]]
 name = "ibc-clients"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "ibc-client-tendermint",
  "ibc-client-wasm-types",
@@ -3138,7 +3159,7 @@ dependencies = [
 [[package]]
 name = "ibc-core"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "ibc-core-channel",
  "ibc-core-client",
@@ -3154,7 +3175,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-channel"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "ibc-core-channel-types",
  "ibc-core-client",
@@ -3169,7 +3190,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-channel-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "borsh",
  "derive_more 1.0.0",
@@ -3192,7 +3213,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-client"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "ibc-core-client-context",
  "ibc-core-client-types",
@@ -3205,7 +3226,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-client-context"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "derive_more 1.0.0",
  "displaydoc",
@@ -3221,7 +3242,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-client-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "borsh",
  "derive_more 1.0.0",
@@ -3241,7 +3262,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-commitment-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "borsh",
  "derive_more 1.0.0",
@@ -3260,7 +3281,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-connection"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "ibc-client-wasm-types",
  "ibc-core-client",
@@ -3274,7 +3295,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-connection-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "borsh",
  "derive_more 1.0.0",
@@ -3295,7 +3316,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-handler"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "ibc-core-channel",
  "ibc-core-client",
@@ -3310,7 +3331,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-handler-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "borsh",
  "derive_more 1.0.0",
@@ -3334,7 +3355,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-host"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "derive_more 1.0.0",
  "displaydoc",
@@ -3352,7 +3373,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-host-cosmos"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "borsh",
  "derive_more 1.0.0",
@@ -3376,7 +3397,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-host-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "base64 0.22.1",
  "borsh",
@@ -3393,7 +3414,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-router"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "derive_more 1.0.0",
  "displaydoc",
@@ -3407,7 +3428,7 @@ dependencies = [
 [[package]]
 name = "ibc-core-router-types"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "borsh",
  "derive_more 1.0.0",
@@ -3426,7 +3447,7 @@ dependencies = [
 [[package]]
 name = "ibc-derive"
 version = "0.10.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3436,7 +3457,7 @@ dependencies = [
 [[package]]
 name = "ibc-primitives"
 version = "0.56.0"
-source = "git+https://github.com/cosmos/ibc-rs?rev=230e7a5e#230e7a5e6a5f4e22784924b6c36a9044551096ee"
+source = "git+https://github.com/cosmos/ibc-rs?rev=d28b8715#d28b871593d6ede2b1f811ce415d850ab77035d5"
 dependencies = [
  "borsh",
  "derive_more 1.0.0",
@@ -5654,7 +5675,8 @@ name = "starknet-block-verifier"
 version = "0.1.0"
 dependencies = [
  "serde",
- "starknet-crypto",
+ "starknet-core 0.13.0",
+ "starknet-crypto-lib",
  "ureq",
 ]
 
@@ -5788,6 +5810,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "starknet-crypto-lib"
+version = "0.1.0"
+dependencies = [
+ "starknet-core 0.13.0",
+ "starknet-crypto",
+]
+
+[[package]]
 name = "starknet-curve"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5880,6 +5910,17 @@ dependencies = [
  "starknet-core 0.13.0",
  "starknet-crypto",
  "thiserror 1.0.69",
+]
+
+[[package]]
+name = "starknet-storage-verifier"
+version = "0.1.0"
+dependencies = [
+ "ibc-core",
+ "indexmap 2.10.0",
+ "starknet-core 0.13.0",
+ "starknet-crypto-lib",
+ "starknet-macros",
 ]
 
 [[package]]

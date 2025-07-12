@@ -18,33 +18,35 @@ hermes-prelude                   = { workspace = true }
 hermes-core                      = { workspace = true }
 hermes-cosmos-core               = { workspace = true }
 hermes-cairo-encoding-components = { workspace = true }
+starknet-storage-verifier        = { workspace = true, features = [ "ibc" ] }
+starknet-crypto-lib              = { workspace = true }
 
 ibc        = { workspace = true }
 ibc-proto  = { workspace = true }
 tendermint = { workspace = true }
 
 cairo-lang-starknet-classes = { workspace = true }
+crypto-bigint               = { version = "0.5.5" }
+derive_more                 = { version = "2.0", features = [ "constructor", "deref", "display", "from", "from_str" ], default-features = false }
+futures                     = { workspace = true }
+garaga                      = { workspace = true }
 http                        = { workspace = true }
+humantime-serde             = { workspace = true }
 ibc-client-starknet-types   = { workspace = true }
+indexmap                    = { workspace = true }
+num-bigint                  = { version = "0.4" }
 prost-types                 = { workspace = true }
 secp256k1                   = { workspace = true }
-humantime-serde             = { workspace = true }
 serde                       = { workspace = true }
 serde_json                  = { workspace = true }
 sha2                        = { workspace = true }
 starknet                    = { workspace = true }
 starknet-v14                = { workspace = true }
 starknet-crypto             = { workspace = true }
+time                        = { workspace = true }
 tonic                       = { workspace = true }
-futures                     = { workspace = true }
 ureq                        = { workspace = true }
 url                         = { workspace = true }
-indexmap                    = { workspace = true }
-garaga                      = { workspace = true }
-num-bigint                  = { version = "0.4" }
-time                        = { workspace = true }
-crypto-bigint               = { version = "0.5.5" }
-derive_more                 = { version = "2.0", features = [ "constructor", "deref", "display", "from", "from_str" ], default-features = false }
 
 [dev-dependencies]
 sha256 = { workspace = true }

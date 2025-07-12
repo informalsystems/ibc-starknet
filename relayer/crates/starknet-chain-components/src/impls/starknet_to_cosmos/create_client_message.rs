@@ -43,6 +43,7 @@ where
             latest_height: payload.latest_height,
             chain_id: payload.chain_id,
             pub_key: payload.proof_signer_pub_key,
+            ibc_contract_address: payload.ibc_contract_address,
         };
 
         let client_state = WasmStarknetClientState {

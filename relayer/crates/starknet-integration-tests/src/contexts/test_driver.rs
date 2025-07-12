@@ -140,7 +140,7 @@ where
         + HasChainDriverTypeAt<Index<0>, ChainDriver = StarknetChainDriver>
         + HasChainDriverTypeAt<Index<1>, ChainDriver = CosmosChainDriver>
         + HasTestDriverType<TestDriver = StarknetTestDriver>
-        + HasAsyncErrorType,
+        + CanRaiseAsyncError<String>,
 {
     async fn build_driver_with_binary_channel(
         _setup: &Setup,

@@ -39,6 +39,13 @@ jobs:
           path: madara
           ref: e6fca12103a97238b5b5a87b5a22342804caac4c # chore/bump-blockifier
 
+      - name: Checkout Osmosis repo
+        uses: actions/checkout@v4
+        with:
+          repository: osmosis-labs/osmosis
+          path: osmosis
+          ref: v28.0.0 # the one used in cosmos.nix
+
       - uses: cachix/install-nix-action@v30
         with:
           extra_nix_config: |
@@ -79,6 +86,18 @@ jobs:
           cd madara
           nix develop -c cargo install --path madara/crates/node
 
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.23
+
+      - name: Install Osmosis
+        run: |
+          cd osmosis
+          # apply patch
+          git apply ../.github/workflows/patches/osmosis-gas-increase.patch
+          make install
+
       - name: Run Integration Tests
         env:
           RUST_BACKTRACE: 1
@@ -110,7 +129,6 @@ jobs:
           cargo run --quiet --example contract_size "$PROTOBUF_LIB_CONTRACT"
 
           nix shell \
-            ..#osmosis \
             ..#wasm-simapp \
             ..#rust \
             ..#cargo-nextest \

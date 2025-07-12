@@ -14,9 +14,10 @@ description  = "Starknet block header verifier"
 workspace = true
 
 [dependencies]
-serde           = { workspace = true }
-starknet-crypto = { workspace = true }
-ureq            = { workspace = true, optional = true, features = [ "json", "rustls" ] }
+serde               = { workspace = true }
+starknet-core       = { workspace = true }
+ureq                = { workspace = true, optional = true, features = [ "json", "rustls" ] }
+starknet-crypto-lib = { workspace = true }
 
 [dev-dependencies]
 starknet                = { workspace = true }

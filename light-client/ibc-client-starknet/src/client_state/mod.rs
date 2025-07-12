@@ -1,5 +1,4 @@
 pub mod common;
-pub mod cw;
 pub mod execution;
 pub mod validation;
 
@@ -34,7 +33,7 @@ impl From<ClientState> for Any {
     fn from(client_state: ClientState) -> Self {
         let any = StarknetLightClientEncoding
             .convert(&client_state.0)
-            .unwrap();
+            .expect("failed to convert ClientState to Any");
 
         Self {
             type_url: any.type_url,

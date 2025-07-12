@@ -1,5 +1,7 @@
+use alloc::string::{String, ToString};
 use core::array::TryFromSliceError;
 use core::convert::Infallible;
+use core::fmt::Write;
 use core::num::{ParseIntError, TryFromIntError};
 use core::str::Utf8Error;
 
@@ -135,9 +137,9 @@ impl ErrorRaiser<StarknetLightClientEncoding, UnsupportedWireType>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: UnsupportedWireType) -> ClientError {
-        ClientError::ClientSpecific {
-            description: format!("{e:?}"),
-        }
+        let mut text = String::new();
+        write!(&mut text, "{e:?}").expect("Failed to write to string");
+        ClientError::ClientSpecific { description: text }
     }
 }
 
@@ -146,9 +148,9 @@ impl ErrorRaiser<StarknetLightClientEncoding, InvalidWireType>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: InvalidWireType) -> ClientError {
-        ClientError::ClientSpecific {
-            description: format!("{e:?}"),
-        }
+        let mut text = String::new();
+        write!(&mut text, "{e:?}").expect("Failed to write to string");
+        ClientError::ClientSpecific { description: text }
     }
 }
 
@@ -157,9 +159,9 @@ impl ErrorRaiser<StarknetLightClientEncoding, RequiredFieldTagNotFound>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: RequiredFieldTagNotFound) -> ClientError {
-        ClientError::ClientSpecific {
-            description: format!("{e:?}"),
-        }
+        let mut text = String::new();
+        write!(&mut text, "{e:?}").expect("Failed to write to string");
+        ClientError::ClientSpecific { description: text }
     }
 }
 
@@ -168,9 +170,9 @@ impl ErrorRaiser<StarknetLightClientEncoding, TypeUrlMismatchError>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: TypeUrlMismatchError) -> ClientError {
-        ClientError::ClientSpecific {
-            description: format!("{e:?}"),
-        }
+        let mut text = String::new();
+        write!(&mut text, "{e:?}").expect("Failed to write to string");
+        ClientError::ClientSpecific { description: text }
     }
 }
 
@@ -179,9 +181,9 @@ impl ErrorRaiser<StarknetLightClientEncoding, IdentifierError>
     for StarknetLightClientEncodingContextComponents
 {
     fn raise_error(e: IdentifierError) -> ClientError {
-        ClientError::ClientSpecific {
-            description: format!("{e:?}"),
-        }
+        let mut text = String::new();
+        write!(&mut text, "{e:?}").expect("Failed to write to string");
+        ClientError::ClientSpecific { description: text }
     }
 }
 
