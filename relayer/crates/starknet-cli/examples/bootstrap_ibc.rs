@@ -51,9 +51,6 @@ pub const STARKNET_ETH: Felt =
 pub const WASM_CODE_HASH_HEX: &str =
     "6be4d4cbb85ea2d7e0b17b7053e613af11e041617bdb163107dfd29f706318ef";
 
-// TODO: Fill once the crypto wasm contract has been instantiated in Osmosis testnet
-pub const CRYPTO_WASM_ADDRESS: &str = "TBD";
-
 fn main() -> Result<(), Error> {
     let _ = stable_eyre::install();
 

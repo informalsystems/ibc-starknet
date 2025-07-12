@@ -33,7 +33,7 @@ where
         + CanConvert<Counterparty::ConsensusState, Any>,
 {
     async fn build_create_client_message(
-        chain: &Chain,
+        _chain: &Chain,
         _options: &Chain::CreateClientMessageOptions,
         payload: StarknetCreateClientPayload,
     ) -> Result<CosmosMessage, Chain::Error> {

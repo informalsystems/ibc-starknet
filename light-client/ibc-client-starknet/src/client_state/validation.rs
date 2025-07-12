@@ -105,8 +105,6 @@ where
             ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
         })?;
 
-        // TODO: Verify that the root matches the one in the storage proof
-
         // commitment root is: contract_storage_root.to_bytes_be()
         let contract_root = Felt::from_bytes_be_slice(root.as_bytes());
 
@@ -149,8 +147,6 @@ where
         validate_storage_proof(&starknet_crypto_cw, &storage_proof).map_err(|e| {
             ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
         })?;
-
-        // TODO: Verify that the root matches the one in the storage proof
 
         // commitment root is: contract_storage_root.to_bytes_be()
         let contract_root = Felt::from_bytes_be_slice(root.as_bytes());
