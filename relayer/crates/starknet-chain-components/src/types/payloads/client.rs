@@ -25,7 +25,4 @@ pub struct StarknetCreateClientPayloadOptions {
 #[derive(Debug)]
 pub struct StarknetUpdateClientPayload {
     pub header: StarknetHeader,
-
-    // FIXME: only needed for demo2
-    pub signature: Vec<u8>,
 }

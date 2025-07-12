@@ -32,9 +32,9 @@ mod preset {
 
     use crate::impls::{
         BuildStarknetCreateClientMessage, BuildStarknetToCosmosConnectionHandshake,
-        BuildStarknetUpdateClientMessage, ConvertCosmosIbcAmountFromStarknet,
-        GetCosmosCounterpartyMessageStarknetHeight, ProvideCometConsensusState,
-        QueryStarknetConsensusStateHeightsFromGrpc, ReadPacketDstStarknetFields,
+        ConvertCosmosIbcAmountFromStarknet, GetCosmosCounterpartyMessageStarknetHeight,
+        ProvideCometConsensusState, QueryStarknetConsensusStateHeightsFromGrpc,
+        ReadPacketDstStarknetFields,
     };
     use crate::types::{CometConsensusState, UseCometClientState};
 
@@ -55,6 +55,7 @@ mod preset {
                 CreateClientPayloadOptionsTypeComponent,
                 CreateClientPayloadBuilderComponent,
                 UpdateClientPayloadBuilderComponent,
+                UpdateClientMessageBuilderComponent,
                 ChannelOpenInitMessageBuilderComponent,
                 ChannelOpenTryMessageBuilderComponent,
                 ChannelOpenAckMessageBuilderComponent,
@@ -72,8 +73,6 @@ mod preset {
                 ProvideCometConsensusState,
             ConsensusStateTypeComponent:
                 WithType<CometConsensusState>,
-            UpdateClientMessageBuilderComponent:
-                BuildStarknetUpdateClientMessage,
             ConsensusStateHeightsQuerierComponent:
                 QueryStarknetConsensusStateHeightsFromGrpc,
             CounterpartyMessageHeightGetterComponent:

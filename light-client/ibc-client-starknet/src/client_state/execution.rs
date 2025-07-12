@@ -7,7 +7,7 @@ use hermes_encoding_components::impls::ConvertVia;
 use hermes_encoding_components::traits::{CanDecode, Converter};
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc_client_cw::context::CwClientExecution;
-use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
+use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_client_starknet_types::{
     StarknetClientState as ClientStateType, StarknetConsensusState as StarknetConsensusStateType,
 };
@@ -53,18 +53,10 @@ where
         client_id: &ClientId,
         header: Any,
     ) -> Result<Vec<Height>, ClientError> {
-        let signed_header: SignedStarknetHeader =
-            <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
-                &StarknetLightClientEncoding,
-                &header,
-            )?;
-
-        let raw_header = signed_header.header;
-
-        let header: StarknetHeader = <StarknetLightClientEncoding as CanDecode<
-            ViaProtobuf,
-            StarknetHeader,
-        >>::decode(&StarknetLightClientEncoding, &raw_header)?;
+        let header: StarknetHeader = <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
+            &StarknetLightClientEncoding,
+            &header,
+        )?;
 
         let current_height = header.height();
 

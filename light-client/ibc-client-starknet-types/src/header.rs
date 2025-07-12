@@ -11,7 +11,6 @@ use crate::StarknetConsensusState;
 // use starknet_core::types::StorageProof;
 
 pub const STARKNET_HEADER_TYPE_URL: &str = "/StarknetHeader";
-pub const SIGNED_STARKNET_HEADER_TYPE_URL: &str = "/SignedStarknetHeader";
 
 #[derive(Debug, Clone, HasField)]
 pub struct StarknetHeader {
@@ -21,12 +20,6 @@ pub struct StarknetHeader {
     pub block_header: Vec<u8>,
     pub block_signature: Vec<u8>,
     pub storage_proof: Vec<u8>,
-}
-
-#[derive(Debug, Clone, HasField)]
-pub struct SignedStarknetHeader {
-    pub header: Vec<u8>,
-    pub signature: Vec<u8>,
 }
 
 impl StarknetHeader {

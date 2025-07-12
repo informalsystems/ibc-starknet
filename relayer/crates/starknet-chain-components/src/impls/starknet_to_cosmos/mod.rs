@@ -18,6 +18,3 @@ pub use packet_fields::*;
 
 mod query_consensus_state_height;
 pub use query_consensus_state_height::*;
-
-mod update_client_message;
-pub use update_client_message::*;
