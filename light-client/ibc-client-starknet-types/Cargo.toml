@@ -25,6 +25,11 @@ hermes-encoding-components          = { workspace = true }
 hermes-protobuf-encoding-components = { workspace = true }
 hermes-cosmos-encoding-components   = { workspace = true }
 
+starknet-core = { workspace = true }
+
+starknet-block-verifier   = { workspace = true }
+starknet-storage-verifier = { workspace = true }
+
 [features]
 default = [ "std" ]
 std = [  ]

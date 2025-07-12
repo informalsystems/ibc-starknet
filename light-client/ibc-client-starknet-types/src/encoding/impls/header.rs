@@ -7,10 +7,8 @@ use hermes_prelude::*;
 use hermes_protobuf_encoding_components::impls::{
     DecodeRequiredProtoField, EncodeByteField, EncodeLengthDelimitedProtoField,
 };
-use ibc_core::client::types::Height;
 
 use crate::header::{SignedStarknetHeader, StarknetHeader};
-use crate::StarknetConsensusState;
 
 pub struct EncodeStarknetHeader;
 
@@ -19,33 +17,39 @@ delegate_components! {
         MutEncoderComponent:
             CombineEncoders<Product![
                 EncodeField<
-                    symbol!("height"),
-                    EncodeLengthDelimitedProtoField<1, UseContext>,
+                    symbol!("block_header"),
+                    EncodeByteField<1>,
                 >,
                 EncodeField<
-                    symbol!("consensus_state"),
-                    EncodeLengthDelimitedProtoField<2, UseContext>,
+                    symbol!("block_signature"),
+                    EncodeByteField<2>,
+                >,
+                EncodeField<
+                    symbol!("storage_proof"),
+                    EncodeByteField<3>,
                 >,
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
             CombineEncoders<Product![
-                DecodeRequiredProtoField<1, UseContext>,
-                DecodeRequiredProtoField<2, UseContext>,
+                EncodeByteField<1>,
+                EncodeByteField<2>,
+                EncodeByteField<3>,
             ]>
         >,
     }
 }
 
 impl Transformer for EncodeStarknetHeader {
-    type From = Product![Height, StarknetConsensusState];
+    type From = Product![Vec<u8>, Vec<u8>, Vec<u8>];
 
     type To = StarknetHeader;
 
-    fn transform(product![height, consensus_state]: Self::From) -> Self::To {
+    fn transform(product![block_header, block_signature, storage_proof]: Self::From) -> Self::To {
         StarknetHeader {
-            height,
-            consensus_state,
+            block_header,
+            block_signature,
+            storage_proof,
         }
     }
 }

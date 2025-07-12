@@ -38,6 +38,7 @@ where
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<ProviderError>
+        + CanRaiseAsyncError<ureq::Error>
         + CanRaiseAsyncError<Encoding::Error>,
     Encoding: Async + CanEncode<ViaProtobuf, StarknetHeader, Encoded = Vec<u8>>,
 {
@@ -48,6 +49,17 @@ where
         _client_state: Chain::ClientState,
     ) -> Result<Chain::UpdateClientPayload, Chain::Error> {
         let block = chain.query_block(target_height).await?;
+
+        // TODO(rano): find the feeder endpoint dynamically.
+        let feeder_endpoint = starknet_block_verifier::Endpoint("".to_string());
+
+        let block_header = feeder_endpoint
+            .get_block_header(Some(*target_height))
+            .map_err(Chain::raise_error)?;
+
+        let block_signature = feeder_endpoint
+            .get_signature(Some(*target_height))
+            .map_err(Chain::raise_error)?;
 
         // TODO(rano): we actually need to pass the block header along with contract root.
         let storage_proof = chain
@@ -83,8 +95,12 @@ where
         let height = Height::new(0, *target_height).unwrap();
 
         let header = StarknetHeader {
-            height,
-            consensus_state,
+            // block: block_header,
+            // signature: block_signature,
+            // storage_proof,
+            block_header: vec![], // Placeholder, adjust as needed
+            block_signature: vec![],
+            storage_proof: vec![],
         };
 
         let encoded_header = Chain::default_encoding()

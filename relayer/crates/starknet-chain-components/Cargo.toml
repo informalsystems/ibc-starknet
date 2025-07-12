@@ -18,6 +18,7 @@ hermes-prelude                   = { workspace = true }
 hermes-core                      = { workspace = true }
 hermes-cosmos-core               = { workspace = true }
 hermes-cairo-encoding-components = { workspace = true }
+starknet-block-verifier          = { workspace = true, features = [ "feeder" ] }
 starknet-storage-verifier        = { workspace = true, features = [ "ibc" ] }
 starknet-crypto-lib              = { workspace = true }
 

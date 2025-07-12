@@ -8,7 +8,9 @@ use hermes_encoding_components::traits::{CanDecode, Converter};
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc_client_cw::context::CwClientExecution;
 use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
-use ibc_client_starknet_types::StarknetClientState as ClientStateType;
+use ibc_client_starknet_types::{
+    StarknetClientState as ClientStateType, StarknetConsensusState as StarknetConsensusStateType,
+};
 use ibc_core::client::context::client_state::ClientStateExecution;
 use ibc_core::client::context::prelude::ClientStateCommon;
 use ibc_core::client::context::ExtClientExecutionContext;
@@ -64,17 +66,17 @@ where
             StarknetHeader,
         >>::decode(&StarknetLightClientEncoding, &raw_header)?;
 
-        let current_height = header.height;
+        let current_height = header.height();
 
         let latest_height = core::cmp::max(self.latest_height(), current_height);
 
-        let new_consensus_state = header.consensus_state;
+        let new_consensus_state = StarknetConsensusStateType::from(header);
 
         let new_client_state = ClientStateType {
             latest_height,
             chain_id: self.0.chain_id.clone(),
-            pub_key: self.0.pub_key.clone(),
             ibc_contract_address: self.0.ibc_contract_address.clone(),
+            sequencer_public_key: self.0.sequencer_public_key.clone(),
         }
         .into();
 
