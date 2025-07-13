@@ -107,11 +107,6 @@ where
             .encode(&header)
             .map_err(Chain::raise_error)?;
 
-        let signature = chain
-            .proof_signer()
-            .sign(&encoded_header)
-            .map_err(Chain::raise_error)?;
-
-        Ok(StarknetUpdateClientPayload { header, signature })
+        Ok(StarknetUpdateClientPayload { header })
     }
 }

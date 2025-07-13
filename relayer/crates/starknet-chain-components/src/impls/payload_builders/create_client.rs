@@ -40,6 +40,7 @@ where
         + HasChainId<ChainId = ChainId>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<&'static str>
+        + CanRaiseAsyncError<ureq::Error>
         + CanRaiseAsyncError<ClientError>,
 {
     async fn build_create_client_payload(
@@ -85,13 +86,21 @@ where
 
         let ibc_core_address = chain.query_contract_address(PhantomData).await?;
 
+        let feeder_endpoint = starknet_block_verifier::Endpoint("".to_string());
+
+        let sequencer_public_key = feeder_endpoint
+            .get_public_key(Some(height))
+            .map_err(Chain::raise_error)?
+            .to_bytes_be()
+            .to_vec();
+
         Ok(StarknetCreateClientPayload {
             latest_height: Height::new(0, block.height).map_err(Chain::raise_error)?,
             chain_id: chain.chain_id().clone(),
             client_state_wasm_code_hash: create_client_options.wasm_code_hash.into(),
             consensus_state,
-            proof_signer_pub_key: chain.proof_signer().public_key.serialize().to_vec(),
             ibc_contract_address: ibc_core_address.to_bytes_be().to_vec(),
+            sequencer_public_key,
         })
     }
 }
