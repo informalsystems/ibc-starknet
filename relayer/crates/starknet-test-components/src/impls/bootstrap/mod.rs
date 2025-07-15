@@ -1,8 +1,14 @@
 mod bootstrap_chain;
 pub use bootstrap_chain::*;
 
+mod cosmos_sdk_config;
+pub use cosmos_sdk_config::*;
+
 mod deploy_contracts;
 pub use deploy_contracts::*;
+
+mod osmosis_start;
+pub use osmosis_start::*;
 
 mod start_all;
 pub use start_all::*;
