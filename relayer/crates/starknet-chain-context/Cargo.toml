@@ -22,6 +22,8 @@ hermes-starknet-chain-components = { workspace = true }
 hermes-cairo-encoding-components = { workspace = true }
 hermes-starknet-test-components  = { workspace = true }
 
+starknet-block-verifier = { workspace = true }
+
 starknet                    = { workspace = true }
 starknet-v14                = { workspace = true }
 futures                     = { workspace = true }

@@ -89,7 +89,7 @@ delegate_components! {
         OutputTypeComponent:
             WithType<()>,
         BootstrapLoaderComponent:
-            UseDelegate<StarknetBoostrapLoaders>,
+            UseDelegate<StarknetBootstrapLoaders>,
         ConfigPathGetterComponent:
             GetDefaultConfigField,
         ConfigLoaderComponent:
@@ -164,10 +164,10 @@ delegate_components! {
     }
 }
 
-pub struct StarknetBoostrapLoaders;
+pub struct StarknetBootstrapLoaders;
 
 delegate_components! {
-    StarknetBoostrapLoaders {
+    StarknetBootstrapLoaders {
         StarknetChain: LoadStarknetBootstrap,
         CosmosChain: LoadOsmosisBootstrap,
     }
@@ -263,6 +263,11 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
             json_rpc_url: format!(
                 "http://{}:{}/",
                 chain_driver.node_config.rpc_addr, chain_driver.node_config.rpc_port
+            ),
+            feeder_gateway_url: format!(
+                "http://{}:{}/",
+                chain_driver.node_config.rpc_addr,
+                chain_driver.node_config.rpc_port + 1
             ),
             relayer_wallet: relayer_wallet_path,
             poll_interval: chain_driver.chain.poll_interval,

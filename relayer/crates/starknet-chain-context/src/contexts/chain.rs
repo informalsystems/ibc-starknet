@@ -41,14 +41,14 @@ use hermes_starknet_chain_components::impls::{
 };
 use hermes_starknet_chain_components::traits::{
     AccountFromSignerBuilderComponent, ContractCallerComponent, ContractDeclarerComponent,
-    ContractDeployerComponent, ContractInvokerComponent, InvokeContractMessageBuilderComponent,
-    JsonRpcRequestSenderComponent, JsonRpcUrlGetterComponent, MerkleProofTypeProviderComponent,
-    ReqwestClientGetterComponent, StarknetAccountTypeProviderComponent,
-    StarknetClientGetterComponent, StarknetClientTypeProviderComponent,
-    StarknetMerkleProofVerifierComponent, StarknetProofSignerGetterComponent,
-    StarknetProofSignerTypeProviderComponent, StarknetStorageProofVerifierComponent,
-    StorageKeyTypeProviderComponent, StorageProofQuerierComponent,
-    StorageProofTypeProviderComponent,
+    ContractDeployerComponent, ContractInvokerComponent, FeederGatewayEndpointGetterComponent,
+    InvokeContractMessageBuilderComponent, JsonRpcRequestSenderComponent,
+    JsonRpcUrlGetterComponent, MerkleProofTypeProviderComponent, ReqwestClientGetterComponent,
+    StarknetAccountTypeProviderComponent, StarknetClientGetterComponent,
+    StarknetClientTypeProviderComponent, StarknetMerkleProofVerifierComponent,
+    StarknetProofSignerGetterComponent, StarknetProofSignerTypeProviderComponent,
+    StarknetStorageProofVerifierComponent, StorageKeyTypeProviderComponent,
+    StorageProofQuerierComponent, StorageProofTypeProviderComponent,
 };
 use hermes_starknet_chain_components::types::StarknetWallet;
 use ibc::core::host::types::identifiers::ChainId;
@@ -77,6 +77,7 @@ pub struct StarknetChainFields {
     pub starknet_client: Arc<JsonRpcClient<HttpTransport>>,
     pub rpc_client: Agent,
     pub json_rpc_url: Url,
+    pub feeder_gateway_endpoint: starknet_block_verifier::Endpoint,
     pub ibc_client_contract_address: OnceLock<StarknetAddress>,
     pub ibc_core_contract_address: OnceLock<StarknetAddress>,
     pub ibc_ics20_contract_address: OnceLock<StarknetAddress>,
@@ -124,6 +125,8 @@ delegate_components! {
             UseField<symbol!("poll_interval")>,
         ReqwestClientGetterComponent:
             UseField<symbol!("rpc_client")>,
+        FeederGatewayEndpointGetterComponent:
+            UseField<symbol!("feeder_gateway_endpoint")>,
         JsonRpcUrlGetterComponent:
             UseField<symbol!("json_rpc_url")>,
         LoggerComponent:

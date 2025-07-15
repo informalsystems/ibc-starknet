@@ -11,6 +11,7 @@ const GET_BLOCK_PATH: &str = "get_block";
 const GET_PUBLIC_KEY: &str = "get_public_key";
 const GET_SIGNATURE: &str = "get_signature";
 
+#[derive(Debug, Clone)]
 pub struct Endpoint(pub String);
 
 impl Endpoint {

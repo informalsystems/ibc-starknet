@@ -96,6 +96,16 @@ where
 
         let rpc_client = ureq::agent();
 
+        let feeder_gateway_url = Url::parse(&format!(
+            "http://{}:{}/",
+            node_config.rpc_addr,
+            node_config.rpc_port + 1
+        ))
+        .map_err(Bootstrap::raise_error)?;
+
+        let feeder_gateway_endpoint =
+            starknet_block_verifier::Endpoint::new(feeder_gateway_url.as_str());
+
         // Wait for the chain to be ready.
         for _ in 0..10 {
             match starknet_client.block_number().await {
@@ -131,6 +141,7 @@ where
                 starknet_client,
                 rpc_client,
                 json_rpc_url,
+                feeder_gateway_endpoint,
                 ibc_client_contract_address: OnceLock::new(),
                 ibc_core_contract_address: OnceLock::new(),
                 ibc_ics20_contract_address: OnceLock::new(),
