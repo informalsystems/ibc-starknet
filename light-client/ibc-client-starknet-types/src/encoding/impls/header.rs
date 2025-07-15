@@ -55,9 +55,9 @@ where
         + CanRaiseAsyncError<InvalidWireType>
         + for<'a> CanRaiseAsyncError<<Vec<u8> as TryFrom<&'a [u8]>>::Error>,
 {
-    fn decode_mut<'a>(
+    fn decode_mut(
         encoding: &Encoding,
-        buffer: &mut Encoding::DecodeBuffer<'a>,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<StarknetHeader, Encoding::Error> {
         let block_header: Vec<u8> =
             <EncodeByteField<0> as MutDecoder<_, Strategy, _>>::decode_mut(encoding, buffer)?;
