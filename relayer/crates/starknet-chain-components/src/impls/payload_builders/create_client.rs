@@ -16,7 +16,9 @@ use ibc::primitives::Timestamp;
 use starknet_v14::core::types::StorageProof;
 
 use crate::impls::StarknetAddress;
-use crate::traits::{CanQueryContractAddress, CanQueryStorageProof, HasStarknetProofSigner};
+use crate::traits::{
+    CanQueryContractAddress, CanQueryStorageProof, HasFeederGatewayEndpoint, HasStarknetProofSigner,
+};
 use crate::types::{
     StarknetChainStatus, StarknetConsensusState, StarknetCreateClientPayload,
     StarknetCreateClientPayloadOptions, WasmStarknetConsensusState,
@@ -34,6 +36,7 @@ where
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryBlock<Block = StarknetChainStatus>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasFeederGatewayEndpoint
         + CanQueryStorageProof<StorageProof = StorageProof>
         + HasAddressType<Address = StarknetAddress>
         + CanQueryChainHeight<Height = u64>
@@ -86,7 +89,7 @@ where
 
         let ibc_core_address = chain.query_contract_address(PhantomData).await?;
 
-        let feeder_endpoint = starknet_block_verifier::Endpoint("".to_string());
+        let feeder_endpoint = chain.feeder_gateway_endpoint();
 
         let sequencer_public_key = feeder_endpoint
             .get_public_key(Some(height))

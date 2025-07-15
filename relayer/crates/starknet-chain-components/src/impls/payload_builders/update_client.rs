@@ -16,7 +16,8 @@ use starknet::providers::ProviderError;
 use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
-    CanQueryContractAddress, CanQueryStorageProof, HasStarknetClient, HasStarknetProofSigner,
+    CanQueryContractAddress, CanQueryStorageProof, HasFeederGatewayEndpoint, HasStarknetClient,
+    HasStarknetProofSigner,
 };
 use crate::types::{StarknetChainStatus, StarknetConsensusState, StarknetUpdateClientPayload};
 
@@ -33,6 +34,7 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanQueryStorageProof<StorageProof = StorageProof>
         + HasStarknetClient
+        + HasFeederGatewayEndpoint
         + CanRaiseAsyncError<&'static str>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
@@ -51,8 +53,7 @@ where
     ) -> Result<Chain::UpdateClientPayload, Chain::Error> {
         let block = chain.query_block(target_height).await?;
 
-        // TODO(rano): find the feeder endpoint dynamically.
-        let feeder_endpoint = starknet_block_verifier::Endpoint("".to_string());
+        let feeder_endpoint = chain.feeder_gateway_endpoint();
 
         let block_header = feeder_endpoint
             .get_block_header(Some(*target_height))
