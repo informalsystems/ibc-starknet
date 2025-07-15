@@ -49,3 +49,4 @@ url         = { workspace = true }
 [dev-dependencies]
 cairo-lang-starknet-classes = { workspace = true }
 starknet-v14                = { workspace = true }
+starknet-crypto-lib        = { workspace = true }

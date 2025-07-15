@@ -2533,6 +2533,7 @@ dependencies = [
  "starknet 0.13.0",
  "starknet 0.14.0",
  "starknet-block-verifier",
+ "starknet-crypto-lib",
  "tendermint-rpc",
  "tiny-bip39",
  "tokio",
