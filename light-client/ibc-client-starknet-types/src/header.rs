@@ -1,35 +1,50 @@
-use alloc::vec::Vec;
-
 use hermes_prelude::*;
 use ibc_core::client::types::Height;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
 use ibc_core::primitives::Timestamp;
+use serde::{Deserialize, Serialize};
+use starknet_block_verifier::{Block, Signature};
+use starknet_core::types::StorageProof;
 
 use crate::StarknetConsensusState;
 
-// use starknet_block_verifier::{Block, Signature};
-// use starknet_core::types::StorageProof;
-
 pub const STARKNET_HEADER_TYPE_URL: &str = "/StarknetHeader";
 
-#[derive(Debug, Clone, HasField)]
+#[derive(Debug, Clone, HasField, Serialize, Deserialize)]
 pub struct StarknetHeader {
-    // pub block_header: Block,
-    // pub block_signature: Signature,
-    // pub storage_proof: StorageProof,
-    pub block_header: Vec<u8>,
-    pub block_signature: Vec<u8>,
-    pub storage_proof: Vec<u8>,
+    pub block_header: Block,
+    pub block_signature: Signature,
+    pub storage_proof: StorageProof,
 }
 
 impl StarknetHeader {
     pub fn height(&self) -> Height {
-        todo!()
+        Height::new(0, self.block_header.block_number).expect("Block number exceeds u64 range")
+    }
+
+    pub fn timestamp(&self) -> Timestamp {
+        Timestamp::from_unix_timestamp(self.block_header.timestamp, 0)
+            .expect("Timestamp exceeds u64 range")
+    }
+
+    pub fn commitment_root(&self) -> CommitmentRoot {
+        self.storage_proof
+            .contracts_proof
+            .contract_leaves_data
+            .first()
+            .and_then(|leaf| leaf.storage_root)
+            .expect("contract root not found in storage proof")
+            .to_bytes_be()
+            .to_vec()
+            .into()
     }
 }
 
 impl From<StarknetHeader> for StarknetConsensusState {
     fn from(header: StarknetHeader) -> Self {
-        todo!()
+        Self {
+            root: header.commitment_root(),
+            time: header.timestamp(),
+        }
     }
 }

@@ -4,8 +4,7 @@ use alloc::vec::Vec;
 use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::ConvertIbcAny;
 use hermes_encoding_components::impls::ConvertVia;
-use hermes_encoding_components::traits::{CanDecode, Converter};
-use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
+use hermes_encoding_components::traits::Converter;
 use ibc_client_cw::context::CwClientExecution;
 use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_client_starknet_types::{

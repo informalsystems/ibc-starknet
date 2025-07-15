@@ -39,6 +39,7 @@ where
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<ProviderError>
         + CanRaiseAsyncError<ureq::Error>
+        + CanRaiseAsyncError<serde_json::Error>
         + CanRaiseAsyncError<Encoding::Error>,
     Encoding: Async + CanEncode<ViaProtobuf, StarknetHeader, Encoded = Vec<u8>>,
 {
@@ -61,7 +62,6 @@ where
             .get_signature(Some(*target_height))
             .map_err(Chain::raise_error)?;
 
-        // TODO(rano): we actually need to pass the block header along with contract root.
         let storage_proof = chain
             .query_storage_proof(
                 target_height,
@@ -95,12 +95,9 @@ where
         let height = Height::new(0, *target_height).unwrap();
 
         let header = StarknetHeader {
-            // block: block_header,
-            // signature: block_signature,
-            // storage_proof,
-            block_header: vec![], // Placeholder, adjust as needed
-            block_signature: vec![],
-            storage_proof: vec![],
+            block_header,
+            block_signature,
+            storage_proof,
         };
 
         let encoded_header = Chain::default_encoding()

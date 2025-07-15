@@ -187,6 +187,17 @@ impl ErrorRaiser<StarknetLightClientEncoding, IdentifierError>
     }
 }
 
+#[cgp_provider(ErrorRaiserComponent)]
+impl ErrorRaiser<StarknetLightClientEncoding, serde_json::Error>
+    for StarknetLightClientEncodingContextComponents
+{
+    fn raise_error(e: serde_json::Error) -> ClientError {
+        let mut text = String::new();
+        write!(&mut text, "{e:?}").expect("Failed to write to string");
+        ClientError::ClientSpecific { description: text }
+    }
+}
+
 pub trait CanUseStarknetLightClientEncoding:
     Async
     + CanEncodeAndDecode<ViaProtobuf, Any>
