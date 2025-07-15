@@ -9,7 +9,7 @@ use cgp::core::error::{
     ErrorRaiser, ErrorRaiserComponent, ErrorTypeProvider, ErrorTypeProviderComponent,
 };
 use hermes_encoding_components::traits::{
-    CanConvert, CanConvertBothWays, CanEncodeAndDecode, CanEncodeAndDecodeMut,
+    CanConvertBothWays, CanEncodeAndDecode, CanEncodeAndDecodeMut,
 };
 use hermes_prelude::*;
 use hermes_protobuf_encoding_components::impls::{

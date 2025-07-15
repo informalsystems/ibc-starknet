@@ -1,15 +1,11 @@
 use alloc::vec::Vec;
 
-use cgp::core::component::UseContext;
-use hermes_encoding_components::impls::{CombineEncoders, DecodeFrom, EncodeField};
 use hermes_encoding_components::traits::{
-    CanDecodeMut, CanEncodeMut, HasEncodeBufferType, MutDecoder, MutDecoderComponent, MutEncoder,
-    MutEncoderComponent, Transformer,
+    HasEncodeBufferType, MutDecoder, MutDecoderComponent, MutEncoder, MutEncoderComponent,
 };
 use hermes_prelude::*;
 use hermes_protobuf_encoding_components::impls::{
-    DecodeRequiredProtoField, EncodeByteField, EncodeLengthDelimitedHeader,
-    EncodeLengthDelimitedProtoField, HasProtoChunksDecodeBuffer, InvalidWireType,
+    EncodeByteField, EncodeLengthDelimitedHeader, HasProtoChunksDecodeBuffer, InvalidWireType,
 };
 use prost::bytes::BufMut;
 
