@@ -50,16 +50,12 @@ fn test_starknet_feeder_gateway_signature() -> Result<(), Error> {
         )
         .unwrap());
 
-        // can't call `get_block` yet as we are using `0.13.5` block header
-        // and, madara uses `0.13.2` block header
-
         let block_header = endpoint.get_block_header(Some(block.height)).unwrap();
         let block_signature = endpoint.get_signature(Some(block.height)).unwrap();
         let public_key = endpoint.get_public_key(Some(block.height)).unwrap();
 
-        info!("block_header: {block_header:?}");
         assert_eq!(block_header.block_number, block.height);
-        assert_eq!(block_header.starknet_version, "0.13.2");
+        assert_eq!(block_header.starknet_version, "0.13.2"); // madara still uses `0.13.2` block header
         assert!(block_header
             .verify_signature(&StarknetCryptoLib, &block_signature, &public_key)
             .unwrap());
