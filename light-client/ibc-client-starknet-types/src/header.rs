@@ -9,6 +9,7 @@ use crate::StarknetConsensusState;
 
 pub const STARKNET_HEADER_TYPE_URL: &str = "/StarknetHeader";
 
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Debug, Clone, HasField)]
 pub struct StarknetHeader {
     pub block_header: Block,
