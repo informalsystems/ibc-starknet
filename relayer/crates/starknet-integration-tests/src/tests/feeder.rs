@@ -2,8 +2,9 @@ use hermes_core::chain_components::traits::{CanQueryBlock, CanQueryChainStatus};
 use hermes_core::test_components::bootstrap::traits::CanBootstrapChain;
 use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
-use hermes_starknet_chain_components::traits::HasFeederGatewayEndpoint;
+use hermes_starknet_chain_components::traits::HasFeederGatewayUrl;
 use starknet::core::crypto::{ecdsa_verify, Signature};
+use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
 use starknet_crypto_lib::StarknetCryptoLib;
 use tracing::info;
 
@@ -30,7 +31,8 @@ fn test_starknet_feeder_gateway_signature() -> Result<(), Error> {
 
         info!("block: {block}");
 
-        let endpoint = chain.feeder_gateway_endpoint();
+        let endpoint_url = chain.feeder_gateway_url();
+        let endpoint = FeederGatewayEndpoint::new(endpoint_url.as_str());
 
         let public_key = endpoint.get_public_key(Some(block.height)).unwrap();
 

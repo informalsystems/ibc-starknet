@@ -24,8 +24,6 @@ hermes-starknet-test-components  = { workspace = true }
 hermes-starknet-chain-context    = { workspace = true }
 hermes-starknet-relayer          = { workspace = true }
 
-starknet-block-verifier = { workspace = true, features = [ "feeder" ] }
-
 ibc            = { workspace = true }
 ibc-proto      = { workspace = true }
 tendermint-rpc = { workspace = true }
@@ -49,4 +47,5 @@ url         = { workspace = true }
 [dev-dependencies]
 cairo-lang-starknet-classes = { workspace = true }
 starknet-v14                = { workspace = true }
+starknet-block-verifier     = { workspace = true, features = [ "feeder" ] }
 starknet-crypto-lib         = { workspace = true }

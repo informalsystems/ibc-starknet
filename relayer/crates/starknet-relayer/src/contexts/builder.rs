@@ -343,8 +343,7 @@ impl StarknetBuilder {
         let starknet_rpc_client =
             Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url.clone())));
 
-        let feeder_gateway_endpoint =
-            starknet_block_verifier::Endpoint::new(&chain_config.feeder_gateway_url);
+        let feeder_gateway_url = Url::parse(&chain_config.feeder_gateway_url)?;
 
         let chain_id_felt = starknet_rpc_client.chain_id().await?;
 
@@ -432,7 +431,7 @@ impl StarknetBuilder {
                 signer: relayer_wallet,
                 rpc_client,
                 json_rpc_url,
-                feeder_gateway_endpoint,
+                feeder_gateway_url,
             }),
         };
 

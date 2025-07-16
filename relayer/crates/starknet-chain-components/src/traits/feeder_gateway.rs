@@ -1,10 +1,10 @@
 use hermes_prelude::*;
-use starknet_block_verifier::Endpoint;
+use url::Url;
 
 #[cgp_getter {
-    name: FeederGatewayEndpointGetterComponent,
-    provider: FeederGatewayEndpointGetter,
+    name: FeederGatewayUrlGetterComponent,
+    provider: FeederGatewayUrlGetter,
 }]
-pub trait HasFeederGatewayEndpoint {
-    fn feeder_gateway_endpoint(&self) -> &Endpoint;
+pub trait HasFeederGatewayUrl {
+    fn feeder_gateway_url(&self) -> &Url;
 }

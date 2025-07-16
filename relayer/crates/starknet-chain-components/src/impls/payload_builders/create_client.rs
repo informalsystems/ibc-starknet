@@ -13,11 +13,12 @@ use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
+use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
 use starknet_v14::core::types::StorageProof;
 
 use crate::impls::StarknetAddress;
 use crate::traits::{
-    CanQueryContractAddress, CanQueryStorageProof, HasFeederGatewayEndpoint, HasStarknetProofSigner,
+    CanQueryContractAddress, CanQueryStorageProof, HasFeederGatewayUrl, HasStarknetProofSigner,
 };
 use crate::types::{
     StarknetChainStatus, StarknetConsensusState, StarknetCreateClientPayload,
@@ -36,7 +37,7 @@ where
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryBlock<Block = StarknetChainStatus>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-        + HasFeederGatewayEndpoint
+        + HasFeederGatewayUrl
         + CanQueryStorageProof<StorageProof = StorageProof>
         + HasAddressType<Address = StarknetAddress>
         + CanQueryChainHeight<Height = u64>
@@ -89,7 +90,7 @@ where
 
         let ibc_core_address = chain.query_contract_address(PhantomData).await?;
 
-        let feeder_endpoint = chain.feeder_gateway_endpoint();
+        let feeder_endpoint = FeederGatewayEndpoint::new(chain.feeder_gateway_url().as_str());
 
         let sequencer_public_key = feeder_endpoint
             .get_public_key(Some(height))

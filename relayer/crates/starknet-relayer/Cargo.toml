@@ -21,8 +21,6 @@ hermes-cosmos                    = { workspace = true }
 hermes-starknet-chain-context    = { workspace = true }
 hermes-starknet-chain-components = { workspace = true }
 
-starknet-block-verifier = { workspace = true, features = [ "feeder" ] }
-
 starknet = { workspace = true }
 
 eyre    = { workspace = true }
