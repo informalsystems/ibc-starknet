@@ -2,7 +2,6 @@ use hermes_prelude::*;
 use ibc_core::client::types::Height;
 use ibc_core::commitment_types::commitment::CommitmentRoot;
 use ibc_core::primitives::Timestamp;
-use serde::{Deserialize, Serialize};
 use starknet_block_verifier::{Block, Signature};
 use starknet_core::types::StorageProof;
 
@@ -10,7 +9,7 @@ use crate::StarknetConsensusState;
 
 pub const STARKNET_HEADER_TYPE_URL: &str = "/StarknetHeader";
 
-#[derive(Debug, Clone, HasField, Serialize, Deserialize)]
+#[derive(Debug, Clone, HasField)]
 pub struct StarknetHeader {
     pub block_header: Block,
     pub block_signature: Signature,

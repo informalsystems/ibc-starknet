@@ -24,7 +24,7 @@ hermes-starknet-test-components  = { workspace = true }
 hermes-starknet-chain-context    = { workspace = true }
 hermes-starknet-relayer          = { workspace = true }
 
-starknet-block-verifier = { workspace = true }
+starknet-block-verifier = { workspace = true, features = [ "feeder" ] }
 
 ibc            = { workspace = true }
 ibc-proto      = { workspace = true }

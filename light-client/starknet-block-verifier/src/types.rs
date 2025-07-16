@@ -17,13 +17,12 @@ pub struct Signature {
     pub signature: [Felt; 2],
 }
 
-#[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum L1DataAvailabilityMode {
     #[serde(alias = "Calldata")]
     Calldata,
     #[serde(alias = "Blob")]
-    #[default]
     Blob,
 }
 
@@ -37,7 +36,7 @@ impl From<L1DataAvailabilityMode> for u8 {
     }
 }
 
-#[derive(Debug, Copy, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GasPrices {
     pub price_in_wei: Felt,
     pub price_in_fri: Felt,

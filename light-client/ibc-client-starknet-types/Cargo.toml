@@ -18,7 +18,7 @@ ibc-proto                           = { workspace = true }
 ibc-core                            = { workspace = true }
 derive_more                         = { workspace = true }
 prost                               = { workspace = true }
-serde                               = { workspace = true }
+serde                               = { workspace = true, optional = true }
 serde_json                          = { workspace = true }
 cgp                                 = { workspace = true }
 hermes-prelude                      = { workspace = true }
@@ -35,5 +35,6 @@ starknet-storage-verifier = { workspace = true }
 default = [ "std" ]
 std = [  ]
 serde = [
+  "dep:serde",
   "ibc-core/serde",
 ]
