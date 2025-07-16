@@ -93,17 +93,15 @@ where
 
         let sequencer_public_key = feeder_endpoint
             .get_public_key(Some(height))
-            .map_err(Chain::raise_error)?
-            .to_bytes_be()
-            .to_vec();
+            .map_err(Chain::raise_error)?;
 
         Ok(StarknetCreateClientPayload {
             latest_height: Height::new(0, block.height).map_err(Chain::raise_error)?,
             chain_id: chain.chain_id().clone(),
             client_state_wasm_code_hash: create_client_options.wasm_code_hash.into(),
             consensus_state,
+            sequencer_public_key: sequencer_public_key.to_bytes_be().to_vec(),
             ibc_contract_address: ibc_core_address.to_bytes_be().to_vec(),
-            sequencer_public_key,
         })
     }
 }

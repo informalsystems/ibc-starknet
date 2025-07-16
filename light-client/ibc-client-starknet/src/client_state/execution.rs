@@ -66,8 +66,8 @@ where
         let new_client_state = ClientStateType {
             latest_height,
             chain_id: self.0.chain_id.clone(),
-            ibc_contract_address: self.0.ibc_contract_address.clone(),
             sequencer_public_key: self.0.sequencer_public_key.clone(),
+            ibc_contract_address: self.0.ibc_contract_address.clone(),
         }
         .into();
 

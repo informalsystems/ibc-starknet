@@ -11,8 +11,8 @@ pub struct StarknetCreateClientPayload {
     pub chain_id: ChainId,
     pub client_state_wasm_code_hash: Vec<u8>,
     pub consensus_state: WasmStarknetConsensusState,
-    pub ibc_contract_address: Vec<u8>,
     pub sequencer_public_key: Vec<u8>,
+    pub ibc_contract_address: Vec<u8>,
 }
 
 #[derive(Clone, Debug)]
