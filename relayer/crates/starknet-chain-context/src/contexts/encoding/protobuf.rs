@@ -16,7 +16,7 @@ use hermes_starknet_chain_components::types::{
 use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::commitment_types::commitment::CommitmentRoot;
 use ibc::primitives::Timestamp;
-use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
+use ibc_client_starknet_types::header::StarknetHeader;
 
 use crate::impls::HandleStarknetChainError;
 
@@ -37,7 +37,6 @@ pub trait CanUseStarknetProtobufEncoding:
     + CanEncodeAndDecode<ViaProtobuf, WasmClientState>
     + CanEncodeAndDecode<ViaProtobuf, WasmConsensusState>
     + CanEncodeAndDecode<ViaProtobuf, StarknetHeader>
-    + CanEncodeAndDecode<ViaProtobuf, SignedStarknetHeader>
     + CanEncodeAndDecode<ViaAny, StarknetHeader>
     + CanConvertBothWays<StarknetClientState, Any>
     + CanConvertBothWays<StarknetConsensusState, Any>

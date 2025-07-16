@@ -46,5 +46,6 @@ url         = { workspace = true }
 
 [dev-dependencies]
 cairo-lang-starknet-classes = { workspace = true }
-starknet-block-verifier     = { workspace = true, features = [ "feeder" ] }
 starknet-v14                = { workspace = true }
+starknet-block-verifier     = { workspace = true, features = [ "feeder" ] }
+starknet-crypto-lib         = { workspace = true }

@@ -2433,6 +2433,7 @@ dependencies = [
  "sha256",
  "starknet 0.13.0",
  "starknet 0.14.0",
+ "starknet-block-verifier",
  "starknet-crypto",
  "starknet-crypto-lib",
  "starknet-storage-verifier",
@@ -2531,6 +2532,7 @@ dependencies = [
  "starknet 0.13.0",
  "starknet 0.14.0",
  "starknet-block-verifier",
+ "starknet-crypto-lib",
  "tendermint-rpc",
  "tiny-bip39",
  "tokio",
@@ -3096,6 +3098,10 @@ dependencies = [
  "ibc-core",
  "ibc-proto",
  "prost",
+ "serde_json",
+ "starknet-block-verifier",
+ "starknet-core 0.13.0",
+ "starknet-storage-verifier",
 ]
 
 [[package]]

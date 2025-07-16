@@ -21,11 +21,8 @@ mod preset {
 
     use crate::encoding::impls::client_state::EncodeStarknetClientState;
     use crate::encoding::impls::consensus_state::EncodeStarknetConsensusState;
-    use crate::encoding::impls::header::{EncodeSignedStarknetHeader, EncodeStarknetHeader};
-    use crate::header::{
-        SignedStarknetHeader, StarknetHeader, SIGNED_STARKNET_HEADER_TYPE_URL,
-        STARKNET_HEADER_TYPE_URL,
-    };
+    use crate::encoding::impls::header::EncodeStarknetHeader;
+    use crate::header::{StarknetHeader, STARKNET_HEADER_TYPE_URL};
     use crate::{
         StarknetClientState, StarknetConsensusState, STARKNET_CLIENT_STATE_TYPE_URL,
         STARKNET_CONSENSUS_STATE_TYPE_URL,
@@ -74,14 +71,12 @@ mod preset {
                 (ViaProtobuf, StarknetClientState),
                 (ViaProtobuf, StarknetConsensusState),
                 (ViaProtobuf, StarknetHeader),
-                (ViaProtobuf, SignedStarknetHeader),
             ]: EncodeProtoWithMutBuffer,
 
             [
                 (ViaAny, StarknetClientState),
                 (ViaAny, StarknetConsensusState),
                 (ViaAny, StarknetHeader),
-                (ViaAny, SignedStarknetHeader),
             ]: EncodeViaAny<ViaProtobuf>,
         }
     }
@@ -103,9 +98,6 @@ mod preset {
 
             (ViaProtobuf, StarknetHeader):
                 EncodeStarknetHeader,
-
-            (ViaProtobuf, SignedStarknetHeader):
-                EncodeSignedStarknetHeader,
         }
     }
 
@@ -115,14 +107,12 @@ mod preset {
                 (StarknetClientState, Any),
                 (StarknetConsensusState, Any),
                 (StarknetHeader, Any),
-                (SignedStarknetHeader, Any),
             ]: EncodeAsAnyProtobuf<ViaProtobuf, UseContext>,
 
             [
                 (Any, StarknetClientState),
                 (Any, StarknetConsensusState),
                 (Any, StarknetHeader),
-                (Any, SignedStarknetHeader),
             ]: DecodeAsAnyProtobuf<ViaProtobuf, UseContext>,
         }
     }
@@ -143,11 +133,5 @@ mod preset {
         StarknetLightClientTypeUrlSchemas,
         StarknetHeader,
         STARKNET_HEADER_TYPE_URL,
-    );
-
-    impl_type_url!(
-        StarknetLightClientTypeUrlSchemas,
-        SignedStarknetHeader,
-        SIGNED_STARKNET_HEADER_TYPE_URL,
     );
 }

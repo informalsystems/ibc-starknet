@@ -13,10 +13,13 @@ use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
+use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
 use starknet_v14::core::types::StorageProof;
 
 use crate::impls::StarknetAddress;
-use crate::traits::{CanQueryContractAddress, CanQueryStorageProof, HasStarknetProofSigner};
+use crate::traits::{
+    CanQueryContractAddress, CanQueryStorageProof, HasFeederGatewayUrl, HasStarknetProofSigner,
+};
 use crate::types::{
     StarknetChainStatus, StarknetConsensusState, StarknetCreateClientPayload,
     StarknetCreateClientPayloadOptions, WasmStarknetConsensusState,
@@ -34,12 +37,14 @@ where
         > + HasCreateClientPayloadType<Counterparty, CreateClientPayload = StarknetCreateClientPayload>
         + CanQueryBlock<Block = StarknetChainStatus>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasFeederGatewayUrl
         + CanQueryStorageProof<StorageProof = StorageProof>
         + HasAddressType<Address = StarknetAddress>
         + CanQueryChainHeight<Height = u64>
         + HasChainId<ChainId = ChainId>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<&'static str>
+        + CanRaiseAsyncError<ureq::Error>
         + CanRaiseAsyncError<ClientError>,
 {
     async fn build_create_client_payload(
@@ -85,12 +90,18 @@ where
 
         let ibc_core_address = chain.query_contract_address(PhantomData).await?;
 
+        let feeder_endpoint = FeederGatewayEndpoint::new(chain.feeder_gateway_url().as_str());
+
+        let sequencer_public_key = feeder_endpoint
+            .get_public_key(Some(height))
+            .map_err(Chain::raise_error)?;
+
         Ok(StarknetCreateClientPayload {
             latest_height: Height::new(0, block.height).map_err(Chain::raise_error)?,
             chain_id: chain.chain_id().clone(),
             client_state_wasm_code_hash: create_client_options.wasm_code_hash.into(),
             consensus_state,
-            proof_signer_pub_key: chain.proof_signer().public_key.serialize().to_vec(),
+            sequencer_public_key: sequencer_public_key.to_bytes_be().to_vec(),
             ibc_contract_address: ibc_core_address.to_bytes_be().to_vec(),
         })
     }

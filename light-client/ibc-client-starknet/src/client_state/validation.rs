@@ -3,7 +3,12 @@ use alloc::vec::Vec;
 use core::fmt::Write;
 use core::str::FromStr;
 
+use cgp::core::component::UseContext;
+use hermes_cosmos_encoding_components::impls::ConvertIbcAny;
+use hermes_encoding_components::impls::ConvertVia;
+use hermes_encoding_components::traits::Converter;
 use ibc_client_cw::context::CwClientValidation;
+use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_core::channel::types::proto::v1::Channel;
 use ibc_core::client::context::client_state::ClientStateValidation;
 use ibc_core::client::types::error::ClientError;
@@ -18,15 +23,20 @@ use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::host::types::path::{Path, PathBytes};
 use ibc_core::primitives::proto::Any;
 use prost::Message;
+use prost_types::Any as ProstAny;
 use starknet_core::types::{Felt, StorageProof};
 use starknet_crypto_lib::{StarknetCryptoFunctions, StarknetCryptoLib};
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_storage_verifier::validate::validate_storage_proof;
-use starknet_storage_verifier::verifier::verify_starknet_storage_proof;
+use starknet_storage_verifier::verifier::{
+    verify_starknet_contract_proof, verify_starknet_global_contract_root,
+    verify_starknet_storage_proof,
+};
 
 use super::ClientState;
 use crate::encoding::channel::channel_to_felts;
 use crate::encoding::connection::connection_end_to_felts;
+use crate::encoding::context::StarknetLightClientEncoding;
 use crate::ConsensusState;
 
 impl<'a, V> ClientStateValidation<V> for ClientState
@@ -39,6 +49,55 @@ where
         client_id: &ClientId,
         client_message: Any,
     ) -> Result<(), ClientError> {
+        let starknet_crypto_cw = StarknetCryptoLib;
+
+        let header: StarknetHeader = <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
+            &StarknetLightClientEncoding,
+            &client_message,
+        )?;
+
+        let StarknetHeader {
+            block_header,
+            block_signature,
+            storage_proof,
+        } = header;
+
+        let sequencer_public_key = Felt::from_bytes_be_slice(&self.0.sequencer_public_key);
+        let ibc_contract_address = Felt::from_bytes_be_slice(&self.0.ibc_contract_address);
+
+        // 1. verify the block header
+        block_header
+            .verify_signature(&starknet_crypto_cw, &block_signature, &sequencer_public_key)
+            .map_err(|e| ClientError::FailedToVerifyHeader {
+                description: e.to_string(),
+            })?;
+
+        // 2. validate the storage proof with correct merkle nodes
+        validate_storage_proof(&starknet_crypto_cw, &storage_proof).map_err(|e| {
+            ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+        })?;
+
+        // 3. verify the global contract storage root is correct
+        let global_contract_trie_root = verify_starknet_global_contract_root(
+            &starknet_crypto_cw,
+            &storage_proof,
+            block_header.state_root,
+        )
+        .map_err(|e| {
+            ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+        })?;
+
+        // 4. verify the contract storage root is correct
+        verify_starknet_contract_proof(
+            &starknet_crypto_cw,
+            &storage_proof,
+            global_contract_trie_root,
+            ibc_contract_address,
+        )
+        .map_err(|e| {
+            ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+        })?;
+
         Ok(())
     }
 

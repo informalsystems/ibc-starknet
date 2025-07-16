@@ -2,14 +2,13 @@ use hermes_core::chain_components::traits::{
     HasIbcChainTypes, HasMessageType, HasUpdateClientPayloadType, UpdateClientMessageBuilder,
     UpdateClientMessageBuilderComponent,
 };
-use hermes_core::encoding_components::traits::{CanConvert, CanEncode, HasDefaultEncoding};
+use hermes_core::encoding_components::traits::{CanConvert, HasDefaultEncoding};
 use hermes_core::encoding_components::types::AsBytes;
 use hermes_cosmos_core::chain_components::traits::{CosmosMessage, ToCosmosMessage};
 use hermes_cosmos_core::chain_components::types::CosmosUpdateClientMessage;
-use hermes_cosmos_core::protobuf_encoding_components::types::strategy::ViaProtobuf;
 use hermes_prelude::*;
 use ibc::core::host::types::identifiers::ClientId;
-use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
+use ibc_client_starknet_types::header::StarknetHeader;
 use prost_types::Any;
 
 use crate::types::StarknetUpdateClientPayload;
@@ -25,9 +24,7 @@ where
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasUpdateClientPayloadType<Chain, UpdateClientPayload = StarknetUpdateClientPayload>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>,
-    Encoding: Async
-        + CanEncode<ViaProtobuf, StarknetHeader, Encoded = Vec<u8>>
-        + CanConvert<SignedStarknetHeader, Any>,
+    Encoding: Async + CanConvert<StarknetHeader, Any>,
 {
     async fn build_update_client_message(
         _chain: &Chain,
@@ -36,17 +33,8 @@ where
     ) -> Result<Vec<CosmosMessage>, Chain::Error> {
         let encoding = Counterparty::default_encoding();
 
-        let encoded_header = encoding
-            .encode(&payload.header)
-            .map_err(Chain::raise_error)?;
-
-        let signed_header = SignedStarknetHeader {
-            header: encoded_header,
-            signature: payload.signature,
-        };
-
         let signed_header_any: Any = encoding
-            .convert(&signed_header)
+            .convert(&payload.header)
             .map_err(Chain::raise_error)?;
 
         let update_client_message = CosmosUpdateClientMessage {

@@ -28,7 +28,7 @@ delegate_components! {
                     EncodeChainIdField<2>,
                 >,
                 EncodeField<
-                    symbol!("pub_key"),
+                    symbol!("sequencer_public_key"),
                     EncodeByteField<3>,
                 >,
                 EncodeField<
@@ -54,12 +54,17 @@ impl Transformer for EncodeStarknetClientState {
     type To = StarknetClientState;
 
     fn transform(
-        product![latest_height, chain_id, pub_key, ibc_contract_address,]: Self::From,
+        product![
+            latest_height,
+            chain_id,
+            sequencer_public_key,
+            ibc_contract_address,
+        ]: Self::From,
     ) -> Self::To {
         StarknetClientState {
             latest_height,
             chain_id,
-            pub_key,
+            sequencer_public_key,
             ibc_contract_address,
         }
     }

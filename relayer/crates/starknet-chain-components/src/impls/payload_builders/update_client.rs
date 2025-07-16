@@ -13,10 +13,12 @@ use ibc::core::client::types::Height;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::StarknetHeader;
 use starknet::providers::ProviderError;
+use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
 use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
-    CanQueryContractAddress, CanQueryStorageProof, HasStarknetClient, HasStarknetProofSigner,
+    CanQueryContractAddress, CanQueryStorageProof, HasFeederGatewayUrl, HasStarknetClient,
+    HasStarknetProofSigner,
 };
 use crate::types::{StarknetChainStatus, StarknetConsensusState, StarknetUpdateClientPayload};
 
@@ -33,11 +35,14 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanQueryStorageProof<StorageProof = StorageProof>
         + HasStarknetClient
+        + HasFeederGatewayUrl
         + CanRaiseAsyncError<&'static str>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<ProviderError>
+        + CanRaiseAsyncError<ureq::Error>
+        + CanRaiseAsyncError<serde_json::Error>
         + CanRaiseAsyncError<Encoding::Error>,
     Encoding: Async + CanEncode<ViaProtobuf, StarknetHeader, Encoded = Vec<u8>>,
 {
@@ -49,7 +54,17 @@ where
     ) -> Result<Chain::UpdateClientPayload, Chain::Error> {
         let block = chain.query_block(target_height).await?;
 
-        // TODO(rano): we actually need to pass the block header along with contract root.
+        let feeder_endpoint_url = chain.feeder_gateway_url();
+        let feeder_endpoint = FeederGatewayEndpoint::new(feeder_endpoint_url.as_str());
+
+        let block_header = feeder_endpoint
+            .get_block_header(Some(*target_height))
+            .map_err(Chain::raise_error)?;
+
+        let block_signature = feeder_endpoint
+            .get_signature(Some(*target_height))
+            .map_err(Chain::raise_error)?;
+
         let storage_proof = chain
             .query_storage_proof(
                 target_height,
@@ -83,19 +98,15 @@ where
         let height = Height::new(0, *target_height).unwrap();
 
         let header = StarknetHeader {
-            height,
-            consensus_state,
+            block_header,
+            block_signature,
+            storage_proof,
         };
 
         let encoded_header = Chain::default_encoding()
             .encode(&header)
             .map_err(Chain::raise_error)?;
 
-        let signature = chain
-            .proof_signer()
-            .sign(&encoded_header)
-            .map_err(Chain::raise_error)?;
-
-        Ok(StarknetUpdateClientPayload { header, signature })
+        Ok(StarknetUpdateClientPayload { header })
     }
 }
