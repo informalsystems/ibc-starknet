@@ -135,14 +135,19 @@ impl Block {
                 self.l1_data_gas_price.price_in_fri,
             ]
         } else if self.hash_version() == STARKNET_BLOCK_HASH1 {
+            let l2_gas_price = self
+                .l2_gas_price
+                .as_ref()
+                .expect("expected L2 gas price to be present");
+
             vec![crypto_lib.poseidon_hash_many(&[
                 Felt::from_bytes_be_slice(STARKNET_GAS_PRICES0),
                 self.l1_gas_price.price_in_wei,
                 self.l1_gas_price.price_in_fri,
                 self.l1_data_gas_price.price_in_wei,
                 self.l1_data_gas_price.price_in_fri,
-                self.l2_gas_price.as_ref().unwrap().price_in_wei,
-                self.l2_gas_price.as_ref().unwrap().price_in_fri,
+                l2_gas_price.price_in_wei,
+                l2_gas_price.price_in_fri,
             ])]
         } else {
             unreachable!()
