@@ -10,6 +10,9 @@ pub use client_id::*;
 mod client_state;
 pub use client_state::*;
 
+mod create_client;
+pub use create_client::*;
+
 mod commitment_proof;
 pub use commitment_proof::*;
 
@@ -27,9 +30,6 @@ pub use event::*;
 
 mod events;
 pub use events::*;
-
-mod membership_proof_signer;
-pub use membership_proof_signer::*;
 
 mod message_response;
 pub use message_response::*;

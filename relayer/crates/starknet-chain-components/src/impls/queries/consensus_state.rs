@@ -15,13 +15,16 @@ use ibc::core::client::types::Height as IbcHeight;
 use ibc::core::host::types::path::{ClientConsensusStatePath, Path};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
+use starknet_crypto_lib::StarknetCryptoLib;
+use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
+use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
-    CanCallContract, CanQueryContractAddress, HasBlobType, HasSelectorType, HasStarknetProofSigner,
+    CanCallContract, CanQueryContractAddress, CanQueryStorageProof, HasBlobType, HasSelectorType,
+    HasStarknetProofSigner, HasStorageKeyType, HasStorageProofType,
 };
 use crate::types::{
-    ClientId, CometConsensusState, Height, MembershipVerifierContainer, StarknetChainStatus,
-    StarknetCommitmentProof,
+    ClientId, CometConsensusState, Height, StarknetChainStatus, StarknetCommitmentProof,
 };
 #[derive(Debug)]
 pub struct ConsensusStateNotFound {
@@ -114,14 +117,17 @@ impl<Chain, Counterparty> ConsensusStateWithProofsQuerier<Chain, Counterparty>
     for QueryCometConsensusState
 where
     Chain: HasClientIdType<Counterparty, ClientId = ClientId>
+        + CanQueryStorageProof
+        + HasStorageKeyType<StorageKey = Felt>
+        + HasStorageProofType<StorageProof = StorageProof>
         + HasHeightType<Height = u64>
         + CanQueryBlock<Block = StarknetChainStatus>
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryConsensusState<Counterparty>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
-        + CanRaiseAsyncError<String>
-        + HasAsyncErrorType,
+        + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+        + CanRaiseAsyncError<serde_json::Error>,
     Counterparty: HasConsensusStateType<Chain, ConsensusState = CometConsensusState>
         + HasHeightType<Height = IbcHeight>,
 {
@@ -132,41 +138,32 @@ where
         consensus_height: &Counterparty::Height,
         query_height: &Chain::Height,
     ) -> Result<(Counterparty::ConsensusState, Chain::CommitmentProof), Chain::Error> {
-        // FIXME: properly fetch consensus state with proofs
+        let contract_address = chain.query_contract_address(PhantomData).await?;
+
         let consensus_state = chain
             .query_consensus_state(tag, client_id, consensus_height, query_height)
             .await?;
 
         let block = chain.query_block(query_height).await?;
 
-        // FIXME: CometConsensusState can't be encoded to protobuf
-        let protobuf_encoded_consensus_state = Vec::new();
-        // let protobuf_encoded_consensus_state = Counterparty::default_encoding()
-        //     .encode(&consensus_state)
-        //     .map_err(Chain::raise_error)?;
+        let ibc_path = Path::ClientConsensusState(ClientConsensusStatePath::new(
+            client_id.clone(),
+            consensus_height.revision_number(),
+            consensus_height.revision_height(),
+        ));
 
-        let unsigned_membership_proof_bytes = MembershipVerifierContainer {
-            state_root: block.block_hash.to_bytes_be().to_vec(),
-            prefix: chain.ibc_commitment_prefix().clone(),
-            path: Path::ClientConsensusState(ClientConsensusStatePath::new(
-                client_id.clone(),
-                consensus_height.revision_number(),
-                consensus_height.revision_height(),
-            ))
-            .to_string()
-            .into(),
-            value: Some(protobuf_encoded_consensus_state),
-        }
-        .canonical_bytes();
+        let felt_path: Felt = ibc_path_to_storage_key(&StarknetCryptoLib, ibc_path);
 
-        let signed_bytes = chain
-            .proof_signer()
-            .sign(&unsigned_membership_proof_bytes)
-            .map_err(Chain::raise_error)?;
+        // key == path
+        let storage_proof: StorageProof = chain
+            .query_storage_proof(query_height, &contract_address, &[felt_path])
+            .await?;
+
+        let storage_proof_bytes = serde_json::to_vec(&storage_proof).map_err(Chain::raise_error)?;
 
         let proof = StarknetCommitmentProof {
             proof_height: block.height,
-            proof_bytes: signed_bytes,
+            proof_bytes: storage_proof_bytes,
         };
 
         Ok((consensus_state, proof))

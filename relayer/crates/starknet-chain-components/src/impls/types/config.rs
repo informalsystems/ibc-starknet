@@ -15,6 +15,7 @@ pub struct StarknetRelayerConfig {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct StarknetChainConfig {
     pub json_rpc_url: String,
+    pub feeder_gateway_url: String,
     pub relayer_wallet: String,
     #[serde(with = "humantime_serde")]
     pub poll_interval: Duration,

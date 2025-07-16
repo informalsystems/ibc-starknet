@@ -27,7 +27,7 @@ mod preset {
     use ibc::core::commitment_types::commitment::CommitmentRoot;
     use ibc::primitives::Timestamp;
     use ibc_client_starknet_types::encoding::components::StarknetLightClientEncodingComponents;
-    use ibc_client_starknet_types::header::{SignedStarknetHeader, StarknetHeader};
+    use ibc_client_starknet_types::header::StarknetHeader;
     use prost_types::Any;
 
     use crate::types::{
@@ -77,12 +77,10 @@ mod preset {
                 (ViaProtobuf, StarknetClientState),
                 (ViaProtobuf, StarknetConsensusState),
                 (ViaProtobuf, StarknetHeader),
-                (ViaProtobuf, SignedStarknetHeader),
 
                 (ViaAny, StarknetClientState),
                 (ViaAny, StarknetConsensusState),
                 (ViaAny, StarknetHeader),
-                (ViaAny, SignedStarknetHeader),
             ]:
                 StarknetLightClientEncodingComponents::Provider,
 
@@ -115,7 +113,6 @@ mod preset {
                 (ViaProtobuf, StarknetClientState),
                 (ViaProtobuf, StarknetConsensusState),
                 (ViaProtobuf, StarknetHeader),
-                (ViaProtobuf, SignedStarknetHeader),
                 (ViaProtobuf, CommitmentRoot),
                 (ViaProtobuf, Timestamp),
             ]:
@@ -132,12 +129,6 @@ mod preset {
                 EncodeViaClientMessage,
 
             (Any, StarknetHeader):
-                DecodeViaClientMessage,
-
-            (SignedStarknetHeader, Any):
-                EncodeViaClientMessage,
-
-            (Any, SignedStarknetHeader):
                 DecodeViaClientMessage,
 
             [
@@ -178,7 +169,6 @@ mod preset {
                 StarknetClientState,
                 StarknetConsensusState,
                 StarknetHeader,
-                SignedStarknetHeader,
             ]:
                 StarknetLightClientEncodingComponents::Provider,
 

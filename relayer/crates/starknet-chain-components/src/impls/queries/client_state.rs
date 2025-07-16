@@ -13,14 +13,15 @@ use hermes_prelude::*;
 use ibc::core::host::types::path::{ClientStatePath, Path};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
+use starknet_crypto_lib::StarknetCryptoLib;
+use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
+use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
-    CanCallContract, CanQueryContractAddress, HasBlobType, HasSelectorType, HasStarknetProofSigner,
+    CanCallContract, CanQueryContractAddress, CanQueryStorageProof, HasBlobType, HasSelectorType,
+    HasStarknetProofSigner, HasStorageKeyType, HasStorageProofType,
 };
-use crate::types::{
-    ClientId, CometClientState, MembershipVerifierContainer, StarknetChainStatus,
-    StarknetCommitmentProof,
-};
+use crate::types::{ClientId, CometClientState, StarknetChainStatus, StarknetCommitmentProof};
 
 pub struct QueryCometClientState;
 
@@ -89,14 +90,17 @@ impl<Chain, Counterparty> ClientStateWithProofsQuerier<Chain, Counterparty>
     for QueryCometClientState
 where
     Chain: HasClientIdType<Counterparty, ClientId = ClientId>
+        + CanQueryStorageProof
+        + HasStorageKeyType<StorageKey = Felt>
+        + HasStorageProofType<StorageProof = StorageProof>
         + HasHeightType<Height = u64>
         + CanQueryBlock<Block = StarknetChainStatus>
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryClientState<Counterparty>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
-        + CanRaiseAsyncError<String>
-        + HasAsyncErrorType,
+        + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
+        + CanRaiseAsyncError<serde_json::Error>,
     Counterparty: HasClientStateType<Chain, ClientState = CometClientState> + HasHeightType,
 {
     async fn query_client_state_with_proofs(
@@ -105,37 +109,28 @@ where
         client_id: &Chain::ClientId,
         query_height: &Chain::Height,
     ) -> Result<(Counterparty::ClientState, Chain::CommitmentProof), Chain::Error> {
-        // FIXME: properly fetch client state with proofs
+        let contract_address = chain.query_contract_address(PhantomData).await?;
+
         let client_state = chain
             .query_client_state(tag, client_id, query_height)
             .await?;
 
         let block = chain.query_block(query_height).await?;
 
-        // FIXME: CometClientState can't be encoded to protobuf
-        let protobuf_encoded_client_state = Vec::new();
-        // let protobuf_encoded_client_state = Counterparty::default_encoding()
-        //     .encode(&client_state)
-        //     .map_err(Chain::raise_error)?;
+        let ibc_path = Path::ClientState(ClientStatePath::new(client_id.clone()));
 
-        let unsigned_membership_proof_bytes = MembershipVerifierContainer {
-            state_root: block.block_hash.to_bytes_be().to_vec(),
-            prefix: chain.ibc_commitment_prefix().clone(),
-            path: Path::ClientState(ClientStatePath::new(client_id.clone()))
-                .to_string()
-                .into(),
-            value: Some(protobuf_encoded_client_state),
-        }
-        .canonical_bytes();
+        let felt_path: Felt = ibc_path_to_storage_key(&StarknetCryptoLib, ibc_path);
 
-        let signed_bytes = chain
-            .proof_signer()
-            .sign(&unsigned_membership_proof_bytes)
-            .map_err(Chain::raise_error)?;
+        // key == path
+        let storage_proof: StorageProof = chain
+            .query_storage_proof(query_height, &contract_address, &[felt_path])
+            .await?;
+
+        let storage_proof_bytes = serde_json::to_vec(&storage_proof).map_err(Chain::raise_error)?;
 
         let proof = StarknetCommitmentProof {
             proof_height: block.height,
-            proof_bytes: signed_bytes,
+            proof_bytes: storage_proof_bytes,
         };
 
         Ok((client_state, proof))

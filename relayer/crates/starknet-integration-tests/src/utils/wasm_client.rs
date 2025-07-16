@@ -15,7 +15,7 @@ pub async fn load_wasm_client(wasm_client_code_path: &str) -> Result<([u8; 32], 
     };
 
     let wasm_client_byte_code_gzip = {
-        let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::best());
         encoder.write_all(&wasm_client_byte_code)?;
         encoder.finish()?
     };

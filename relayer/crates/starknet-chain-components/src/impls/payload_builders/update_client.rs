@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use hermes_core::chain_components::traits::{
     CanQueryBlock, HasClientStateType, HasHeightType, HasUpdateClientPayloadType,
     UpdateClientPayloadBuilder, UpdateClientPayloadBuilderComponent,
@@ -11,8 +13,13 @@ use ibc::core::client::types::Height;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::StarknetHeader;
 use starknet::providers::ProviderError;
+use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
+use starknet_v14::core::types::StorageProof;
 
-use crate::traits::{HasStarknetClient, HasStarknetProofSigner};
+use crate::traits::{
+    CanQueryContractAddress, CanQueryStorageProof, HasFeederGatewayUrl, HasStarknetClient,
+    HasStarknetProofSigner,
+};
 use crate::types::{StarknetChainStatus, StarknetConsensusState, StarknetUpdateClientPayload};
 
 pub struct BuildStarknetUpdateClientPayload;
@@ -25,12 +32,17 @@ where
         + HasClientStateType<Counterparty>
         + HasUpdateClientPayloadType<Counterparty, UpdateClientPayload = StarknetUpdateClientPayload>
         + CanQueryBlock<Block = StarknetChainStatus>
+        + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + CanQueryStorageProof<StorageProof = StorageProof>
         + HasStarknetClient
+        + HasFeederGatewayUrl
         + CanRaiseAsyncError<&'static str>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>
         + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<ProviderError>
+        + CanRaiseAsyncError<ureq::Error>
+        + CanRaiseAsyncError<serde_json::Error>
         + CanRaiseAsyncError<Encoding::Error>,
     Encoding: Async + CanEncode<ViaProtobuf, StarknetHeader, Encoded = Vec<u8>>,
 {
@@ -42,7 +54,39 @@ where
     ) -> Result<Chain::UpdateClientPayload, Chain::Error> {
         let block = chain.query_block(target_height).await?;
 
-        let root = Vec::from(block.block_hash.to_bytes_be());
+        let feeder_endpoint_url = chain.feeder_gateway_url();
+        let feeder_endpoint = FeederGatewayEndpoint::new(feeder_endpoint_url.as_str());
+
+        let block_header = feeder_endpoint
+            .get_block_header(Some(*target_height))
+            .map_err(Chain::raise_error)?;
+
+        let block_signature = feeder_endpoint
+            .get_signature(Some(*target_height))
+            .map_err(Chain::raise_error)?;
+
+        let storage_proof = chain
+            .query_storage_proof(
+                target_height,
+                &chain.query_contract_address(PhantomData).await?,
+                &[],
+            )
+            .await?;
+
+        if block.block_hash != storage_proof.global_roots.block_hash {
+            return Err(Chain::raise_error(
+                "block hash does not match between block and storage proof",
+            ));
+        }
+
+        let contract_root = storage_proof
+            .contracts_proof
+            .contract_leaves_data
+            .first()
+            .and_then(|leaf| leaf.storage_root)
+            .ok_or_else(|| Chain::raise_error("contract root not found in storage proof"))?;
+
+        let root = contract_root.to_bytes_be().to_vec();
 
         let consensus_state = StarknetConsensusState {
             root: root.into(),
@@ -54,19 +98,15 @@ where
         let height = Height::new(0, *target_height).unwrap();
 
         let header = StarknetHeader {
-            height,
-            consensus_state,
+            block_header,
+            block_signature,
+            storage_proof,
         };
 
         let encoded_header = Chain::default_encoding()
             .encode(&header)
             .map_err(Chain::raise_error)?;
 
-        let signature = chain
-            .proof_signer()
-            .sign(&encoded_header)
-            .map_err(Chain::raise_error)?;
-
-        Ok(StarknetUpdateClientPayload { header, signature })
+        Ok(StarknetUpdateClientPayload { header })
     }
 }

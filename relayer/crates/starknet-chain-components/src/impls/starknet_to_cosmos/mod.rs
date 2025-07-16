@@ -1,6 +1,9 @@
 mod connection_message;
 pub use connection_message::*;
 
+mod consensus_state;
+pub use consensus_state::*;
+
 mod counterparty_message_height;
 pub use counterparty_message_height::*;
 

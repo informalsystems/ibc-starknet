@@ -1,8 +1,15 @@
+use alloc::string::String;
+use alloc::vec;
+use alloc::vec::Vec;
+
 use serde::{Deserialize, Serialize};
-use starknet_crypto::{poseidon_hash_many, verify, Felt};
+use starknet_core::types::Felt;
+use starknet_crypto_lib::StarknetCryptoFunctions;
+
+pub const STARKNET_BLOCK_HASH0: &[u8] = b"STARKNET_BLOCK_HASH0";
+pub const STARKNET_BLOCK_HASH1: &[u8] = b"STARKNET_BLOCK_HASH1";
 
 pub const STARKNET_GAS_PRICES0: &[u8] = b"STARKNET_GAS_PRICES0";
-pub const STARKNET_BLOCK_HASH1: &[u8] = b"STARKNET_BLOCK_HASH1";
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Signature {
@@ -10,13 +17,12 @@ pub struct Signature {
     pub signature: [Felt; 2],
 }
 
-#[derive(Debug, Copy, Clone, Default, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum L1DataAvailabilityMode {
     #[serde(alias = "Calldata")]
     Calldata,
     #[serde(alias = "Blob")]
-    #[default]
     Blob,
 }
 
@@ -30,7 +36,7 @@ impl From<L1DataAvailabilityMode> for u8 {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct GasPrices {
     pub price_in_wei: Felt,
     pub price_in_fri: Felt,
@@ -67,7 +73,8 @@ pub struct Block {
 
     pub l1_gas_price: GasPrices,
     pub l1_data_gas_price: GasPrices,
-    pub l2_gas_price: GasPrices,
+
+    pub l2_gas_price: Option<GasPrices>,
 
     pub parent_block_hash: Felt,
 
@@ -77,6 +84,14 @@ pub struct Block {
 }
 
 impl Block {
+    pub fn hash_version(&self) -> &'static [u8] {
+        if self.l2_gas_price.is_some() {
+            STARKNET_BLOCK_HASH1
+        } else {
+            STARKNET_BLOCK_HASH0
+        }
+    }
+
     /// Computes the concatenated counts of the block.
     ///
     /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L204-L208
@@ -84,11 +99,12 @@ impl Block {
         let l1_data_availability_byte: u8 = self.l1_da_mode.into();
 
         let concat_bytes = [
-            self.transactions.len().to_be_bytes(),
-            self.transaction_receipts
+            (self.transactions.len() as u64).to_be_bytes(),
+            (self
+                .transaction_receipts
                 .iter()
                 .map(|receipt| receipt.events.len())
-                .sum::<usize>()
+                .sum::<usize>() as u64)
                 .to_be_bytes(),
             self.state_diff_length.unwrap_or_default().to_be_bytes(),
             [
@@ -110,24 +126,42 @@ impl Block {
     /// Computes the Starknet 0.13.5 gas commitment.
     ///
     /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L234-L242
-    pub fn gas_commitment(&self) -> Felt {
-        poseidon_hash_many(&[
-            Felt::from_bytes_be_slice(STARKNET_GAS_PRICES0),
-            self.l1_gas_price.price_in_wei,
-            self.l1_gas_price.price_in_fri,
-            self.l1_data_gas_price.price_in_wei,
-            self.l1_data_gas_price.price_in_fri,
-            self.l2_gas_price.price_in_wei,
-            self.l2_gas_price.price_in_fri,
-        ])
+    pub fn gas_commitment<C: StarknetCryptoFunctions>(&self, crypto_lib: &C) -> Vec<Felt> {
+        if self.hash_version() == STARKNET_BLOCK_HASH0 {
+            vec![
+                self.l1_gas_price.price_in_wei,
+                self.l1_gas_price.price_in_fri,
+                self.l1_data_gas_price.price_in_wei,
+                self.l1_data_gas_price.price_in_fri,
+            ]
+        } else if self.hash_version() == STARKNET_BLOCK_HASH1 {
+            let l2_gas_price = self
+                .l2_gas_price
+                .as_ref()
+                .expect("expected L2 gas price to be present");
+
+            vec![crypto_lib.poseidon_hash_many(&[
+                Felt::from_bytes_be_slice(STARKNET_GAS_PRICES0),
+                self.l1_gas_price.price_in_wei,
+                self.l1_gas_price.price_in_fri,
+                self.l1_data_gas_price.price_in_wei,
+                self.l1_data_gas_price.price_in_fri,
+                l2_gas_price.price_in_wei,
+                l2_gas_price.price_in_fri,
+            ])]
+        } else {
+            unreachable!()
+        }
     }
 
     /// Computes the Starknet 0.13.5 block hash.
     ///
     /// https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L111-L116
-    pub fn compute_hash(&self) -> Felt {
-        poseidon_hash_many(&[
-            Felt::from_bytes_be_slice(STARKNET_BLOCK_HASH1),
+    pub fn compute_hash<C: StarknetCryptoFunctions>(&self, crypto_lib: &C) -> Felt {
+        let mut elems = vec![];
+
+        elems.extend_from_slice(&[
+            Felt::from_bytes_be_slice(self.hash_version()),
             self.block_number.into(),
             self.state_root,
             self.sequencer_address,
@@ -137,25 +171,32 @@ impl Block {
             self.transaction_commitment,
             self.event_commitment,
             self.receipt_commitment.unwrap_or(Felt::ZERO),
-            self.gas_commitment(),
+        ]);
+
+        elems.extend_from_slice(&self.gas_commitment(crypto_lib));
+
+        elems.extend_from_slice(&[
             Felt::from_bytes_be_slice(self.starknet_version.as_bytes()),
             Felt::ZERO,
             self.parent_block_hash,
-        ])
+        ]);
+
+        crypto_lib.poseidon_hash_many(&elems)
     }
 
-    pub fn validate(&self) -> bool {
-        self.block_hash == self.compute_hash()
+    pub fn validate<C: StarknetCryptoFunctions>(&self, crypto_lib: &C) -> bool {
+        self.block_hash == self.compute_hash(crypto_lib)
     }
 
-    pub fn verify_signature(
+    pub fn verify_signature<C: StarknetCryptoFunctions>(
         &self,
+        crypto_lib: &C,
         signature: &Signature,
         public_key: &Felt,
-    ) -> Result<bool, starknet_crypto::VerifyError> {
-        Ok(self.validate()
+    ) -> Result<bool, C::Error> {
+        Ok(self.validate(crypto_lib)
             && signature.block_hash == self.block_hash
-            && verify(
+            && crypto_lib.verify(
                 public_key,
                 &signature.block_hash,
                 &signature.signature[0],

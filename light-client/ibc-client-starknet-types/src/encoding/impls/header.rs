@@ -1,84 +1,72 @@
-use cgp::core::component::UseContext;
-use hermes_encoding_components::impls::{CombineEncoders, DecodeFrom, EncodeField};
-use hermes_encoding_components::traits::{MutDecoderComponent, MutEncoderComponent, Transformer};
-use hermes_prelude::*;
-use hermes_protobuf_encoding_components::impls::{
-    DecodeRequiredProtoField, EncodeByteField, EncodeLengthDelimitedProtoField,
+use alloc::vec::Vec;
+
+use hermes_encoding_components::traits::{
+    HasDecodeBufferType, HasEncodeBufferType, MutDecoder, MutDecoderComponent, MutEncoder,
+    MutEncoderComponent,
 };
-use ibc_core::client::types::Height;
+use hermes_prelude::*;
+use hermes_protobuf_encoding_components::impls::EncodeByteField;
 
-use crate::header::{SignedStarknetHeader, StarknetHeader};
-use crate::StarknetConsensusState;
-
+use crate::header::StarknetHeader;
 pub struct EncodeStarknetHeader;
 
-delegate_components! {
-    EncodeStarknetHeader {
-        MutEncoderComponent:
-            CombineEncoders<Product![
-                EncodeField<
-                    symbol!("height"),
-                    EncodeLengthDelimitedProtoField<1, UseContext>,
-                >,
-                EncodeField<
-                    symbol!("consensus_state"),
-                    EncodeLengthDelimitedProtoField<2, UseContext>,
-                >,
-            ]>,
-        MutDecoderComponent: DecodeFrom<
-            Self,
-            CombineEncoders<Product![
-                DecodeRequiredProtoField<1, UseContext>,
-                DecodeRequiredProtoField<2, UseContext>,
-            ]>
-        >,
+#[cgp_provider(MutEncoderComponent)]
+impl<Encoding, Strategy> MutEncoder<Encoding, Strategy, StarknetHeader> for EncodeStarknetHeader
+where
+    Encoding: HasEncodeBufferType + CanRaiseAsyncError<serde_json::Error>,
+    EncodeByteField<1>: MutEncoder<Encoding, Strategy, Vec<u8>>,
+    EncodeByteField<2>: MutEncoder<Encoding, Strategy, Vec<u8>>,
+    EncodeByteField<3>: MutEncoder<Encoding, Strategy, Vec<u8>>,
+{
+    fn encode_mut(
+        encoding: &Encoding,
+        value: &StarknetHeader,
+        buffer: &mut Encoding::EncodeBuffer,
+    ) -> Result<(), Encoding::Error> {
+        let StarknetHeader {
+            block_header,
+            block_signature,
+            storage_proof,
+        } = value;
+
+        let block_header = serde_json::to_vec(block_header).map_err(Encoding::raise_error)?;
+        let block_signature = serde_json::to_vec(block_signature).map_err(Encoding::raise_error)?;
+        let storage_proof = serde_json::to_vec(storage_proof).map_err(Encoding::raise_error)?;
+
+        <EncodeByteField<1>>::encode_mut(encoding, &block_header, buffer)?;
+        <EncodeByteField<2>>::encode_mut(encoding, &block_signature, buffer)?;
+        <EncodeByteField<3>>::encode_mut(encoding, &storage_proof, buffer)?;
+
+        Ok(())
     }
 }
 
-impl Transformer for EncodeStarknetHeader {
-    type From = Product![Height, StarknetConsensusState];
+#[cgp_provider(MutDecoderComponent)]
+impl<Encoding, Strategy> MutDecoder<Encoding, Strategy, StarknetHeader> for EncodeStarknetHeader
+where
+    Encoding: HasDecodeBufferType + CanRaiseAsyncError<serde_json::Error>,
+    EncodeByteField<1>: MutDecoder<Encoding, Strategy, Vec<u8>>,
+    EncodeByteField<2>: MutDecoder<Encoding, Strategy, Vec<u8>>,
+    EncodeByteField<3>: MutDecoder<Encoding, Strategy, Vec<u8>>,
+{
+    fn decode_mut(
+        encoding: &Encoding,
+        buffer: &mut Encoding::DecodeBuffer<'_>,
+    ) -> Result<StarknetHeader, Encoding::Error> {
+        let block_header = <EncodeByteField<1>>::decode_mut(encoding, buffer)?;
+        let block_signature = <EncodeByteField<2>>::decode_mut(encoding, buffer)?;
+        let storage_proof = <EncodeByteField<3>>::decode_mut(encoding, buffer)?;
 
-    type To = StarknetHeader;
+        let block_header = serde_json::from_slice(&block_header).map_err(Encoding::raise_error)?;
+        let block_signature =
+            serde_json::from_slice(&block_signature).map_err(Encoding::raise_error)?;
+        let storage_proof =
+            serde_json::from_slice(&storage_proof).map_err(Encoding::raise_error)?;
 
-    fn transform(product![height, consensus_state]: Self::From) -> Self::To {
-        StarknetHeader {
-            height,
-            consensus_state,
-        }
-    }
-}
-
-pub struct EncodeSignedStarknetHeader;
-
-delegate_components! {
-    EncodeSignedStarknetHeader {
-        MutEncoderComponent:
-            CombineEncoders<Product![
-                EncodeField<
-                    symbol!("header"),
-                    EncodeByteField<1>,
-                >,
-                EncodeField<
-                    symbol!("signature"),
-                    EncodeByteField<2>,
-                >,
-            ]>,
-        MutDecoderComponent: DecodeFrom<
-            Self,
-            CombineEncoders<Product![
-                EncodeByteField<1>,
-                EncodeByteField<2>,
-            ]>
-        >,
-    }
-}
-
-impl Transformer for EncodeSignedStarknetHeader {
-    type From = Product![Vec<u8>, Vec<u8>];
-
-    type To = SignedStarknetHeader;
-
-    fn transform(product![header, signature]: Self::From) -> Self::To {
-        SignedStarknetHeader { header, signature }
+        Ok(StarknetHeader {
+            block_header,
+            block_signature,
+            storage_proof,
+        })
     }
 }

@@ -32,6 +32,9 @@ pub struct BootstrapOsmosisChainArgs {
     #[clap(long = "wasm-client-code-path")]
     pub wasm_client_code_path: String,
 
+    #[clap(long = "wasm-additional-byte-code")]
+    pub wasm_additional_byte_code: Option<String>,
+
     #[clap(long = "governance-proposal-authority")]
     pub governance_proposal_authority: String,
 }
@@ -56,6 +59,15 @@ where
             .await
             .map_err(App::raise_error)?;
 
+        let wasm_additional_byte_code = args
+            .wasm_additional_byte_code
+            .as_ref()
+            .map_or_else(
+                || Ok(Vec::new()),
+                |paths_str| paths_str.split(',').map(std::fs::read).collect(),
+            )
+            .map_err(App::raise_error)?;
+
         info!(
             target: "hermes::cli",
             wasm_code_hash = %hex::encode(wasm_code_hash),
@@ -78,6 +90,7 @@ where
                 denom: args.staking_denom.clone(),
             }),
             wasm_client_byte_code,
+            wasm_additional_byte_code,
             governance_proposal_authority: args.governance_proposal_authority.clone(),
         };
 

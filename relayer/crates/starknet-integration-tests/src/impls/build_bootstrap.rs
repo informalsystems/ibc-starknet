@@ -77,12 +77,12 @@ where
 
         let user_wallet_a = wallets
             .get("user-a")
-            .ok_or_else(|| Bootstrap::raise_error("expect relayer wallet to be present"))?
+            .ok_or_else(|| Bootstrap::raise_error("expect user A wallet to be present"))?
             .clone();
 
         let user_wallet_b = wallets
             .get("user-b")
-            .ok_or_else(|| Bootstrap::raise_error("expect relayer wallet to be present"))?
+            .ok_or_else(|| Bootstrap::raise_error("expect user B wallet to be present"))?
             .clone();
 
         let json_rpc_url = Url::parse(&format!(
@@ -95,6 +95,13 @@ where
             Arc::new(JsonRpcClient::new(HttpTransport::new(json_rpc_url.clone())));
 
         let rpc_client = ureq::agent();
+
+        let feeder_gateway_url = Url::parse(&format!(
+            "http://{}:{}/",
+            node_config.rpc_addr,
+            node_config.rpc_port + 1
+        ))
+        .map_err(Bootstrap::raise_error)?;
 
         // Wait for the chain to be ready.
         for _ in 0..10 {
@@ -131,6 +138,7 @@ where
                 starknet_client,
                 rpc_client,
                 json_rpc_url,
+                feeder_gateway_url,
                 ibc_client_contract_address: OnceLock::new(),
                 ibc_core_contract_address: OnceLock::new(),
                 ibc_ics20_contract_address: OnceLock::new(),

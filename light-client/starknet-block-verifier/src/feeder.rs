@@ -1,5 +1,8 @@
+use alloc::string::{String, ToString};
+use core::fmt::Write;
+
 use serde::de::DeserializeOwned;
-use starknet_crypto::Felt;
+use starknet_core::types::Felt;
 
 use crate::{Block, Signature, MAINNET_FEEDER_URL, SEPOLIA_FEEDER_URL};
 
@@ -8,6 +11,7 @@ const GET_BLOCK_PATH: &str = "get_block";
 const GET_PUBLIC_KEY: &str = "get_public_key";
 const GET_SIGNATURE: &str = "get_signature";
 
+#[derive(Debug, Clone)]
 pub struct Endpoint(pub String);
 
 impl Endpoint {
@@ -28,7 +32,9 @@ impl Endpoint {
         path: &'static str,
         block_number: Option<u64>,
     ) -> Result<T, ureq::Error> {
-        let mut req = ureq::get(&format!("{}/feeder_gateway/{}", self.0, path));
+        let mut text = String::new();
+        write!(&mut text, "{}/feeder_gateway/{path}", self.0).expect("Failed to write to string");
+        let mut req = ureq::get(&text);
 
         if let Some(block_number) = block_number {
             req = req.query("blockNumber", block_number.to_string());

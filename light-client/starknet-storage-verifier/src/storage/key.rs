@@ -1,5 +1,5 @@
-use starknet_core::utils::starknet_keccak;
-use starknet_crypto::{pedersen_hash, Felt};
+use starknet_core::types::Felt;
+use starknet_crypto_lib::StarknetCryptoFunctions;
 
 /// Each variant denotes components of a Starknet storage path.
 ///
@@ -44,20 +44,23 @@ pub enum KeyPart<'a> {
 }
 
 impl KeyPart<'_> {
-    pub fn hash(&self) -> Felt {
+    pub fn hash<C: StarknetCryptoFunctions>(&self, crypto_lib: &C) -> Felt {
         match self {
-            Self::Field(name) => starknet_keccak(name),
+            Self::Field(name) => crypto_lib.starknet_keccak(name),
             Self::Map(name) => *name,
             Self::Vec(name) => (*name).into(),
         }
     }
 }
 
-pub fn starknet_storage_key<const N: usize>(parts: [KeyPart<'_>; N]) -> Felt {
+pub fn starknet_storage_key<const N: usize, C: StarknetCryptoFunctions>(
+    crypto_lib: &C,
+    parts: [KeyPart<'_>; N],
+) -> Felt {
     // left-associative nesting of hashes
     parts
-        .map(|part| part.hash())
+        .map(|part| part.hash(crypto_lib))
         .into_iter()
-        .reduce(|acc, e| pedersen_hash(&acc, &e))
-        .unwrap()
+        .reduce(|acc, e| crypto_lib.pedersen_hash(&acc, &e))
+        .expect("failed to reduce storage key parts")
 }

@@ -22,3 +22,4 @@ hermes-starknet-chain-components = { workspace = true }
 
 starknet = { workspace = true }
 serde    = { workspace = true }
+toml     = { workspace = true }
