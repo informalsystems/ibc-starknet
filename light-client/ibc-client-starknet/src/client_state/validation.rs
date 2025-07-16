@@ -63,7 +63,7 @@ where
         } = header;
 
         let sequencer_public_key = Felt::from_bytes_be_slice(&self.0.sequencer_public_key);
-        let felt_ibc_contract_address = Felt::from_bytes_be_slice(&self.0.ibc_contract_address);
+        let ibc_contract_address = Felt::from_bytes_be_slice(&self.0.ibc_contract_address);
 
         // 1. verify the block header
         block_header
@@ -92,7 +92,7 @@ where
             &starknet_crypto_cw,
             &storage_proof,
             global_contract_trie_root,
-            felt_ibc_contract_address,
+            ibc_contract_address,
         )
         .map_err(|e| {
             ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
