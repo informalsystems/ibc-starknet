@@ -2,78 +2,80 @@
 
 ## Changelog
 
-- 2025-06-25: Initial version
+- 2025-06-25: Initial version.
+- 2025-07-17: Revision with the working implementation.
 
 ## Context
 
 We are building an IBC between Cosmos-SDK chains and Starknet. For this, we need
 a light client of Starknet that can verify the validity of Starknet block
-headers and the vector commitments of the committed IBC values.
+headers and the vector commitments of the committed IBC key-values.
+
+There are mainly two components to the IBC light client:
+
+1. Verifying an untrusted vector commitment root to be trusted.
+   - Conventionally, this is done by signature verification. This can be
+     multi-sig or validator set signature.
+2. Verify the membership of an IBC key-value against the trusted vector
+   commitment root.
+   - Conventionally, this is done by Merkle tree membership proof verification
+     against the trusted vector commitment root.
 
 ## Decision
 
-After discussing different approaches, we have decided to implement a light
-client by verifying the signature of the Starknet centralized sequencer for each
-block header.
+Starknet centralized sequencer generates block headers along with signatures.
+The latest version of Starknet now supports storage proofs against a block.
+These two features enable us to build an IBC light client for Starknet:
 
-The signature verification is done by:
+1. Verify the block header signature against the centralized sequencer's public
+   key.
+2. Verify the storage proof against the state root present in block header.
+   1. Verify the computed state root hash from global contract and class storage
+      root match.
+   2. Verify the contract storage root against the global contract root using a
+      Merkle proof.
+   3. Verify the IBC contract key-value against the contract storage root using
+      a Merkle proof.
 
-- [hashing the block header](https://github.com/informalsystems/ibc-starknet/blob/3e6f71ed02f68e343b03b79d686ac6f10e7aef7a/light-client/starknet-block-verifier/src/types.rs#L128)
-  following the Starknet sequencer implementation.
-- and then verifying the
-  [signature of the sequencer for the hashed value](https://github.com/informalsystems/ibc-starknet/blob/3e6f71ed02f68e343b03b79d686ac6f10e7aef7a/light-client/starknet-block-verifier/src/types.rs#L158-L163).
+We implement the IBC protocol in a Starknet contract (written in Cairo). So, we
+only need to track the storage root of that particular deployed contract, not
+necessarily the global state root of Starknet. Thus, we perform 1, 2a, 2b in
+client update and discard the block header along with its state root and
+maintain only the storage root of the IBC contract. This way, when we verify
+multiple IBC packets, we can avoid re-performing 2a. and 2b. for each of the
+packets.
 
-The full implementation can be found at
-[starknet-block-verifier](https://github.com/informalsystems/ibc-starknet/blob/3e6f71ed02f68e343b03b79d686ac6f10e7aef7a/light-client/starknet-block-verifier/src/types.rs#L151)
-crate.
+### Data Types
 
-Once we have verified the block header, we can trust the state root in it.
+Starknet ClientState stores chain identifier, the public key of the centralized
+sequencer and the contract address of the IBC contract. The public key and the
+contract address should remain immutable for the lifetime of the client state.
+They can only be updated by a ClientUpgrade.
 
-This trusted state root is then used to verify the vector commitments of the
-committed IBC values following the block structure and the Merkle tree of
-Starknet key-value storage.
-
-Now there are three parts to the vector commitment verification given a trusted
-state root:
-
-- the committed IBC values are stored in the ibc-core contract storage, which
-  has its own trie root.
-- this Merkle root is then stored in a global trie storage mapping each deployed
-  contract to its storage root hash.
-- the state root of the block header is then computed using the global
-  `contract_trie_root` and `class_trie_root`.
-
-Note that, for a different IBC key-value, only the first step is different. The
-following two steps are always the same a trusted state root. So, to avoid
-unnecessary repeated computed, we decided to include the last two steps in the
-client update and store only the trie root of the ibc-core contract storage.
-
-### Client Types
-
-```rust
+````rust
 pub struct ClientState {
-    pub chain_id: Felt,
-    pub max_clock_drift: u64,
-    pub latest_height: u64,
-
-    pub ibc_core_contract_address: Felt,
+    pub latest_height: Height,
+    pub chain_id: ChainId,
+    pub sequencer_public_key: Felt,
+    pub ibc_contract_address: Felt,
 }
+
+Starknet ConsensusState stores the trusted IBC contract root and the timestamp of the latest block header.
 
 pub struct ConsensusState {
+    pub ibc_contract_root: Felt,
     pub timestamp: u64,
-    pub ibc_core_trie_root: Felt,
 }
 
+Starknet Header is a combination of the block header, the sequencer's signature, and the storage proof for the IBC contract. The storage proof contains the global class and contract roots, and the contract storage proof for the IBC contract storage root.
+
+```rust
 pub struct Header {
-    pub starknet_block_header: StarknetBlockHeader,
-
-    pub contract_trie_root: Felt,
-    pub class_trie_root: Felt,
-
-    pub contract_trie_root_proof: ContractStorageProof,
-    pub ibc_core_trie_root: Felt,
+    pub block_header: BlockHeader,
+    pub block_signature: Signature,
+    pub storage_proof: StorageProof,
 }
-```
+````
 
 ### Verifying the Block Header
 
@@ -84,26 +86,26 @@ fn verify_header(
     header: Header, // untrusted; given by the relayer
 ) {
     let Header {
-        starknet_block_header,
-        contract_trie_root,
-        class_trie_root,
-        contract_trie_root_proof,
-        ibc_core_trie_root,
+        block_header,
+        block_signature,
+        storage_proof,
     } = header;
 
     let ClientState {
-        ibc_core_contract_address,
+        sequencer_public_key,
+        ibc_contract_address,
         ...
     } = client_state;
 
-
-    assert!(starknet_block_header.verify_signature());
+    assert!(starknet_block_header.verify_signature(block_signature, sequencer_public_key));
 
     // header is now trusted
 
     let expected_state_root = starknet_block_header.state_root;
 
-    let actual_state_root = compute_global_state_root(contract_trie_root, class_trie_root);
+    let (global_class_root, global_contract_root) = storage_proof.global_roots();
+
+    let actual_state_root = compute_global_state_root(global_class_root, global_contract_root);
 
     assert_eq!(
         expected_state_root, actual_state_root,
@@ -112,9 +114,17 @@ fn verify_header(
 
     // contract_trie_root is now trusted
 
-    assert!(contract_trie_root_proof.verify(contract_trie_root, ibc_core_contract_address, ibc_core_trie_root));
+    let contract_proof = storage_proof.contract_proof();
+    let ibc_contract_root = storage_proof.contract_root();
 
-    // ibc_core_trie_root is now trusted
+    assert!(verify_starknet_merkle_proof(
+      contract_proof,
+      global_contract_root,
+      ibc_contract_address,
+      ibc_contract_root
+    ));
+
+    // `ibc_contract_root` is now trusted and can be stored in `ConsensusState`
 }
 ```
 
@@ -122,19 +132,21 @@ fn verify_header(
 
 ```rust
 fn verify_membership(
-    consensus_state: ConsensusState, // trusted; given by the ibc module
+    ibc_contract_root: Felt, // trusted; given by the ibc module
     key: Felt, // trusted; given by the ibc module
 
     // if value is None, we are checking for non-membership
     value: Option<Felt>, // untrusted; given by the relayer
-    membership_proof: StarknetStorageProof, // untrusted; given by the relayer
+    storage_proof: StorageProof, // untrusted; given by the relayer
 ) {
-    let ConsensusState {
-        ibc_core_trie_root,
-        ...
-    } = consensus_state;
+    let membership_proof = storage_proot.membership_proof();
 
-    assert!(membership_proof.verify(ibc_core_trie_root, key, value));
+    assert!(verify_starknet_merkle_proof(
+      membership_proof,
+      ibc_contract_root,
+      key,
+      value
+    ));
 
     // value is now trusted
 }
@@ -142,44 +154,37 @@ fn verify_membership(
 
 ## Status
 
-Proposed
+Accepted
 
 ## Consequences
 
 ### Positive
 
-This enables us to have a working IBC light client for Starknet. By storing only
-the trusted ibc-core contract trie root, we can efficiently verify the IBC
-key-value membership without needing to re-verify the entire vector commitment
-for each IBC key-value.
+By storing only the trusted ibc contract root, we can efficiently verify the IBC
+key-value membership without needing to re-verifying the entire storage proof
+against the state root for each IBC key-value.
 
 ### Negative
 
-N/A
+If we need to track other contract storage roots, we will need to maintain their
+contract addresses as part of ClientState and track their storage roots in
+ConsensusState.
 
 ### Neutral
 
-N/A
+This enables us to have a working IBC light client for Starknet without any
+extra trust assumption.
 
 ## References
 
-We have already implemented block header verification and Starknet storage proof
-verification.
+We have implemented block header verification and Starknet storage proof
+verification as library.
 
 - [starknet-block-verifier](https://github.com/informalsystems/ibc-starknet/tree/main/light-client/starknet-block-verifier)
 - [starknet-storage-verifier](https://github.com/informalsystems/ibc-starknet/tree/main/light-client/starknet-storage-verifier)
 
-But the implementations may need some adjustments to fit this ADR.
+These libraries are used in the IBC light client implementation.
 
-- We verify the Starknet storage proofs only against the `contract_trie_root`.
-  We need to add the step of verifying the state root recomputed from the global
-  `contract_trie_root` and `class_trie_root`.
-  - The `compute_global_state_root` function can be implemented following
-    reference implementation in
-    [starkware-libs/sequencer](https://github.com/starkware-libs/sequencer/blob/12a461e6604f29538b24d68903cbd33f44fdf2fe/crates/apollo_starknet_os_program/src/cairo/starkware/starknet/core/os/state/commitment.cairo#L34).
-- We verify the Starknet storage proofs directly against the
-  `contract_trie_root`. But we want to move the verification of ibc-core
-  contract trie-root in the client update step. So, we need to split the two
-  ([1](https://github.com/informalsystems/ibc-starknet/blob/3e6f71ed02f68e343b03b79d686ac6f10e7aef7a/light-client/starknet-storage-verifier/src/storage/verifier.rs#L199),
-  [2](https://github.com/informalsystems/ibc-starknet/blob/3e6f71ed02f68e343b03b79d686ac6f10e7aef7a/light-client/starknet-storage-verifier/src/storage/verifier.rs#L207))
-  merkle tree verification steps into two separate functions.
+- [verify_client_message](https://github.com/informalsystems/ibc-starknet/blob/7fbbd89/light-client/ibc-client-starknet/src/client_state/validation.rs#L46)
+- [verify_membership_raw](https://github.com/informalsystems/ibc-starknet/blob/7fbbd89/light-client/ibc-client-starknet/src/client_state/validation.rs#133)
+- [verify_non_membership_raw](https://github.com/informalsystems/ibc-starknet/blob/7fbbd89/light-client/ibc-client-starknet/src/client_state/validation.rs#178)
