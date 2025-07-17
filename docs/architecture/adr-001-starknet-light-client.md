@@ -180,8 +180,8 @@ extra trust assumption.
 We have implemented block header verification and Starknet storage proof
 verification as library.
 
-- [starknet-block-verifier](https://github.com/informalsystems/ibc-starknet/tree/main/light-client/starknet-block-verifier)
-- [starknet-storage-verifier](https://github.com/informalsystems/ibc-starknet/tree/main/light-client/starknet-storage-verifier)
+- [starknet-block-verifier](https://github.com/informalsystems/ibc-starknet/tree/7fbbd89/light-client/starknet-block-verifier)
+- [starknet-storage-verifier](https://github.com/informalsystems/ibc-starknet/tree/7fbbd89/light-client/starknet-storage-verifier)
 
 These libraries are used in the IBC light client implementation.
 
