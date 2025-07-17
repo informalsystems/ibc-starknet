@@ -197,5 +197,5 @@ verification as library.
 These libraries are used in the IBC light client implementation.
 
 - [verify_client_message](https://github.com/informalsystems/ibc-starknet/blob/7fbbd89/light-client/ibc-client-starknet/src/client_state/validation.rs#L46)
-- [verify_membership_raw](https://github.com/informalsystems/ibc-starknet/blob/7fbbd89/light-client/ibc-client-starknet/src/client_state/validation.rs#133)
-- [verify_non_membership_raw](https://github.com/informalsystems/ibc-starknet/blob/7fbbd89/light-client/ibc-client-starknet/src/client_state/validation.rs#178)
+- [verify_membership_raw](https://github.com/informalsystems/ibc-starknet/blob/7fbbd89/light-client/ibc-client-starknet/src/client_state/validation.rs#L133)
+- [verify_non_membership_raw](https://github.com/informalsystems/ibc-starknet/blob/7fbbd89/light-client/ibc-client-starknet/src/client_state/validation.rs#L178)
