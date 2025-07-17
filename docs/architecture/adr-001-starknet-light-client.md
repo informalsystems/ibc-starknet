@@ -7,7 +7,7 @@
 
 ## Context
 
-We are implementing IBC protocol between Starknet and Cosmos-SDK chains. For
+We are implementing the IBC protocol between Starknet and Cosmos-SDK chains. For
 this, we need a light client of Starknet that can verify the validity of
 Starknet block headers and the vector commitments of the committed IBC
 key-values.
@@ -49,10 +49,10 @@ packets.
 
 ### Data Types
 
-Starknet ClientState stores the latest height, chain identifier, the public key
-of the centralized sequencer and the contract address of the IBC contract. The
-chain identifier, public key and the contract address must remain immutable for
-the normal lifetime of the client state.
+Starknet ClientState stores the latest height, the chain identifier, the public
+key of the centralized sequencer and the contract address of the IBC contract.
+The chain identifier, public key and the contract address must remain immutable
+for the normal lifetime of the client state.
 
 They can only be updated by a ClientUpgrade.
 
@@ -181,8 +181,8 @@ Accepted
 
 ### Positive
 
-By storing only the trusted ibc contract root, we can efficiently verify the IBC
-key-value membership without needing to re-verifying the entire storage proof
+By storing only the trusted IBC contract root, we can efficiently verify the IBC
+key-value membership without needing to re-verify the entire storage proof
 against the state root for each IBC key-value.
 
 ### Negative
@@ -199,7 +199,7 @@ additional trust assumption.
 ## References
 
 We have implemented block header verification and Starknet storage proof
-verification as library.
+verification as a library.
 
 - [starknet-block-verifier](https://github.com/informalsystems/ibc-starknet/tree/7fbbd89/light-client/starknet-block-verifier)
 - [starknet-storage-verifier](https://github.com/informalsystems/ibc-starknet/tree/7fbbd89/light-client/starknet-storage-verifier)
