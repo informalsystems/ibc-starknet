@@ -41,10 +41,10 @@ These two features enable us to build an IBC light client for Starknet:
 
 We implement the IBC protocol in a Starknet contract (written in Cairo). So, we
 only need to track the storage root of that particular deployed contract, not
-necessarily the global state root of Starknet. Thus, we perform 1, 2a, 2b in
+necessarily the global state root of Starknet. Thus, we perform 1, 2i, 2ii in
 client update and discard the block header along with its state root and
 maintain only the storage root of the IBC contract. This way, when we verify
-multiple IBC packets, we can avoid re-performing 2a. and 2b. for each of the
+multiple IBC packets, we can avoid re-performing 2i and 2ii. for each of the
 packets.
 
 ### Data Types
@@ -162,6 +162,16 @@ fn verify_membership(
     // value is now trusted
 }
 ```
+
+### Client Expiration
+
+If a block header is signed by the sequencer, it is considered valid for
+eternity. So there is no need for expiration.
+
+### Client Misbehavior
+
+A misbehavior is when the centralized sequencer key signed two different headers
+at the same height.
 
 ## Status
 
