@@ -135,7 +135,7 @@ fn verify_header(
       ibc_contract_root
     ));
 
-    // `ibc_contract_root` is now trusted and can be stored in `ConsensusState`
+    // ibc_contract_root is now trusted and can be stored as part of ConsensusState
 }
 ```
 
