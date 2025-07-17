@@ -7,11 +7,12 @@
 
 ## Context
 
-We are building an IBC between Cosmos-SDK chains and Starknet. For this, we need
-a light client of Starknet that can verify the validity of Starknet block
-headers and the vector commitments of the committed IBC key-values.
+We are implementing IBC protocol between Starknet and Cosmos-SDK chains. For
+this, we need a light client of Starknet that can verify the validity of
+Starknet block headers and the vector commitments of the committed IBC
+key-values.
 
-There are mainly two components to the IBC light client:
+There are mainly two components to an IBC light client:
 
 1. Verifying an untrusted vector commitment root to be trusted.
    - Conventionally, this is done by signature verification. This can be
@@ -29,7 +30,8 @@ These two features enable us to build an IBC light client for Starknet:
 
 1. Verify the block header signature against the centralized sequencer's public
    key.
-2. Verify the storage proof against the state root present in block header.
+2. Verify the storage proof against the state root present in the trusted block
+   header.
    1. Verify the computed state root hash from global contract and class storage
       root match.
    2. Verify the contract storage root against the global contract root using a
@@ -47,27 +49,36 @@ packets.
 
 ### Data Types
 
-Starknet ClientState stores chain identifier, the public key of the centralized
-sequencer and the contract address of the IBC contract. The public key and the
-contract address should remain immutable for the lifetime of the client state.
+Starknet ClientState stores the latest height, chain identifier, the public key
+of the centralized sequencer and the contract address of the IBC contract. The
+chain identifier, public key and the contract address must remain immutable for
+the normal lifetime of the client state.
+
 They can only be updated by a ClientUpgrade.
 
-````rust
+```rust
 pub struct ClientState {
     pub latest_height: Height,
     pub chain_id: ChainId,
     pub sequencer_public_key: Felt,
     pub ibc_contract_address: Felt,
 }
+```
 
-Starknet ConsensusState stores the trusted IBC contract root and the timestamp of the latest block header.
+Starknet ConsensusState stores the trusted IBC contract root and the timestamp
+of the latest block header.
 
+```rust
 pub struct ConsensusState {
     pub ibc_contract_root: Felt,
     pub timestamp: u64,
 }
+```
 
-Starknet Header is a combination of the block header, the sequencer's signature, and the storage proof for the IBC contract. The storage proof contains the global class and contract roots, and the contract storage proof for the IBC contract storage root.
+Starknet Header is a combination of the block header, the sequencer's signature,
+and the storage proof for the IBC contract. The storage proof contains the
+global class and contract roots, and the contract storage proof for the IBC
+contract storage root.
 
 ```rust
 pub struct Header {
@@ -75,9 +86,9 @@ pub struct Header {
     pub block_signature: Signature,
     pub storage_proof: StorageProof,
 }
-````
+```
 
-### Verifying the Block Header
+### Verifying Block Header and IBC Contract Storage Root
 
 ```rust
 fn verify_header(
@@ -128,7 +139,7 @@ fn verify_header(
 }
 ```
 
-### Verifying the IBC Key-Value Membership
+### Verifying Membership proof of IBC Key-Value
 
 ```rust
 fn verify_membership(
@@ -173,7 +184,7 @@ ConsensusState.
 ### Neutral
 
 This enables us to have a working IBC light client for Starknet without any
-extra trust assumption.
+additional trust assumption.
 
 ## References
 
