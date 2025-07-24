@@ -150,7 +150,7 @@ fn verify_membership(
     value: Option<Felt>, // untrusted; given by the relayer
     storage_proof: StorageProof, // untrusted; given by the relayer
 ) {
-    let membership_proof = storage_proot.membership_proof();
+    let membership_proof = storage_proof.membership_proof();
 
     assert!(verify_starknet_merkle_proof(
       membership_proof,
