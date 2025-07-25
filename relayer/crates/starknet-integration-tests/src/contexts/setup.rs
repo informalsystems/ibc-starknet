@@ -1,3 +1,6 @@
+use core::time::Duration;
+use std::env::var;
+
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
 use cgp::core::field::Index;
 use hermes_core::relayer_components::multi::traits::birelay_at::BiRelayTypeProviderAtComponent;
@@ -60,6 +63,18 @@ impl StarknetTestSetup {
         starknet_builder: StarknetBuilder,
         wasm_code_hash: [u8; 32],
     ) -> Self {
+        let cosmos_create_client_payload_options =
+            if let Ok(raw_trusting_period) = var("NEW_TRUSTING_PERIOD") {
+                let new_trusting_period = raw_trusting_period
+                    .parse::<u64>()
+                    .expect("NEW_TRUSTING_PERIOD should be set to a u64 value");
+                CosmosCreateClientOptions {
+                    trusting_period: Duration::from_secs(new_trusting_period),
+                    ..Default::default()
+                }
+            } else {
+                Default::default()
+            };
         Self {
             starknet_bootstrap,
             osmosis_bootstrap,
@@ -70,7 +85,7 @@ impl StarknetTestSetup {
             port_id: PortId::transfer(),
             init_channel_options: Default::default(),
             init_connection_options: Default::default(),
-            cosmos_create_client_payload_options: Default::default(),
+            cosmos_create_client_payload_options,
             cosmos_create_client_message_options: (),
             starknet_create_client_message_options: (),
         }
