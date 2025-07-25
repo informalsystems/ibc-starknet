@@ -1,5 +1,6 @@
 pub mod erc20;
 pub mod feeder;
+pub mod modified_test_suite;
 pub mod packet_commitment;
 pub mod raw_storage;
 pub mod test_suite;
