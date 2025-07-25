@@ -108,11 +108,11 @@ fn verify_header(
         ...
     } = client_state;
 
-    assert!(starknet_block_header.verify_signature(block_signature, sequencer_public_key));
+    assert!(block_header.verify_signature(block_signature, sequencer_public_key));
 
     // header is now trusted
 
-    let expected_state_root = starknet_block_header.state_root;
+    let expected_state_root = block_header.state_root;
 
     let (global_class_root, global_contract_root) = storage_proof.global_roots();
 
