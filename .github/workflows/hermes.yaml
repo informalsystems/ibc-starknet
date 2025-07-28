@@ -119,7 +119,8 @@ jobs:
               --workspace \
               --retries 2 \
               --test-threads=$TEST_THREADS \
-              --success-output=final
+              --success-output=final \
+              --filter-expr '!(test(modified_test_suite::))'
 
   modified-starknet-integration-tests:
     name: Run Starknet Integration Tests
@@ -189,6 +190,7 @@ jobs:
           RUST_LOG: debug
           TEST_THREADS: 4
           NEW_TRUSTING_PERIOD: 30
+          COSMOS_REFRESH_RATE: 20
         working-directory: ./relayer
         run: |
           export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
