@@ -11,7 +11,8 @@ use hermes_core::test_components::chain_driver::impls::WaitChainReachHeight;
 use hermes_core::test_components::chain_driver::traits::{
     ChainGetterComponent, ChainProcessTaker, ChainProcessTakerComponent,
     ChainStartupWaiterComponent, ChainTypeProviderComponent, DenomGetter, DenomGetterComponent,
-    RandomAmountGeneratorComponent, RelayerWallet, StakingDenom, TransferDenom, UserWallet,
+    RandomAmountGeneratorComponent, RelayerWallet, SetupUpgradeClientTestResultTypeProvider,
+    SetupUpgradeClientTestResultTypeProviderComponent, StakingDenom, TransferDenom, UserWallet,
     WalletGetterComponent,
 };
 use hermes_cosmos::error::impls::UseHermesError;
@@ -21,6 +22,7 @@ use hermes_starknet_chain_components::impls::{StarknetAddress, UseU256Amount};
 use hermes_starknet_chain_components::types::StarknetWallet;
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_chain_context::impls::HandleStarknetChainError;
+use hermes_starknet_test_components::impls::StarknetProposalSetupClientUpgradeResult;
 use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
 use tokio::process::Child;
 
@@ -64,6 +66,13 @@ delegate_components! {
         RandomAmountGeneratorComponent:
             UseU256Amount,
     }
+}
+
+#[cgp_provider(SetupUpgradeClientTestResultTypeProviderComponent)]
+impl SetupUpgradeClientTestResultTypeProvider<StarknetChainDriver>
+    for StarknetChainDriverComponents
+{
+    type SetupUpgradeClientTestResult = StarknetProposalSetupClientUpgradeResult;
 }
 
 #[cgp_provider(DenomGetterComponent<TransferDenom>)]

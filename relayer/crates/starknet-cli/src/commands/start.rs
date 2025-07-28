@@ -43,4 +43,10 @@ pub struct StartRelayerArgs {
 
     #[clap(long = "stop-after-blocks", required = false)]
     stop_after_blocks: Option<humantime::Duration>,
+
+    #[clap(long = "refresh-rate-a-to-b", required = false)]
+    refresh_rate_a_to_b: Option<humantime::Duration>,
+
+    #[clap(long = "refresh-rate-b-to-a", required = false)]
+    refresh_rate_b_to_a: Option<humantime::Duration>,
 }

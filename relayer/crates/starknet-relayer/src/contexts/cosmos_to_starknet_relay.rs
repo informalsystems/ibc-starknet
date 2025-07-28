@@ -1,6 +1,7 @@
 use alloc::collections::BTreeSet;
 use alloc::sync::Arc;
 use core::ops::Deref;
+use core::time::Duration;
 
 use futures::lock::Mutex;
 use hermes_core::relayer_components::multi::traits::chain_at::{
@@ -43,6 +44,8 @@ pub struct CosmosToStarknetRelayFields {
     pub client_id_a: CosmosClientId,
     pub client_id_b: StarknetClientId,
     pub packet_lock_mutex: PacketMutexOf<CosmosToStarknetRelay>,
+    pub refresh_rate_a_to_b: Option<Duration>,
+    pub refresh_rate_b_to_a: Option<Duration>,
 }
 
 pub trait HasCosmosToStarknetRelayFields: Send + Sync + 'static {
@@ -70,6 +73,8 @@ impl CosmosToStarknetRelay {
         dst_chain: StarknetChain,
         src_client_id: CosmosClientId,
         dst_client_id: StarknetClientId,
+        refresh_rate_a_to_b: Option<Duration>,
+        refresh_rate_b_to_a: Option<Duration>,
     ) -> Self {
         Self {
             fields: Arc::new(CosmosToStarknetRelayFields {
@@ -79,6 +84,8 @@ impl CosmosToStarknetRelay {
                 client_id_a: src_client_id,
                 client_id_b: dst_client_id,
                 packet_lock_mutex: Arc::new(Mutex::new(BTreeSet::new())),
+                refresh_rate_a_to_b,
+                refresh_rate_b_to_a,
             }),
         }
     }

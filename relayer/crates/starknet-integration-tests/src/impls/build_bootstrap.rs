@@ -1,5 +1,7 @@
 use alloc::collections::BTreeMap;
 use alloc::sync::Arc;
+use core::time::Duration;
+use std::env::var;
 use std::sync::OnceLock;
 
 use cgp::extra::runtime::HasRuntime;
@@ -128,6 +130,16 @@ where
         )
         .expect("valid key pair");
 
+        let client_refresh_rate = var("STARKNET_REFRESH_RATE")
+            .map(|refresh_str| {
+                Duration::from_secs(
+                    refresh_str
+                        .parse::<u64>()
+                        .expect("failed to parse {refresh_str} to seconds"),
+                )
+            })
+            .ok();
+
         let chain = StarknetChain {
             fields: Arc::new(StarknetChainFields {
                 runtime: runtime.clone(),
@@ -148,6 +160,7 @@ where
                 block_time: core::time::Duration::from_secs(1),
                 nonce_mutex: Arc::new(Mutex::new(())),
                 signer: relayer_wallet.clone(),
+                client_refresh_rate,
             }),
         };
 
