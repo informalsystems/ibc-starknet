@@ -37,6 +37,7 @@ pub struct StarknetChainDriver {
     pub wallets: BTreeMap<String, StarknetWallet>,
     pub chain_processes: Vec<Child>,
     pub relayer_wallet: StarknetWallet,
+    pub relayer_2_wallet: StarknetWallet,
     pub user_wallet_a: StarknetWallet,
     pub user_wallet_b: StarknetWallet,
 }

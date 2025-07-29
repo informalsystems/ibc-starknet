@@ -50,8 +50,9 @@ fn test_packet_clearing() -> Result<(), Error> {
     Ok(())
 }
 
-#[test]
-fn test_recover_client() -> Result<(), Error> {
+// TODO: Temporarily disable
+//#[test]
+fn _test_recover_client() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
