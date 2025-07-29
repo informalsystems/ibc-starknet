@@ -355,10 +355,17 @@ impl StarknetBuilder {
 
         let wallet_path = PathBuf::from(chain_config.relayer_wallet.clone());
 
+        let wallet_path_2 = PathBuf::from(chain_config.relayer_wallet_2.clone());
+
         let wallet_str = self.runtime.read_file_as_string(&wallet_path).await?;
+
+        let wallet_str_2 = self.runtime.read_file_as_string(&wallet_path_2).await?;
 
         let relayer_wallet: StarknetWallet = toml::from_str(&wallet_str)
             .map_err(|e| eyre!("Failed to parse relayer wallet: {e}"))?;
+
+        let relayer_wallet_2: StarknetWallet = toml::from_str(&wallet_str_2)
+            .map_err(|e| eyre!("Failed to parse relayer wallet 2: {e}"))?;
 
         let proof_signer = Secp256k1KeyPair::from_mnemonic(
             bip39::Mnemonic::from_entropy(
@@ -429,6 +436,8 @@ impl StarknetBuilder {
                 block_time: chain_config.block_time,
                 nonce_mutex: Arc::new(Mutex::new(())),
                 signer: relayer_wallet,
+                signer_mutex: Arc::new(Mutex::new(0)),
+                additional_signers: vec![relayer_wallet_2],
                 rpc_client,
                 json_rpc_url,
                 feeder_gateway_url,

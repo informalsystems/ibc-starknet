@@ -75,6 +75,11 @@ where
             .ok_or_else(|| Bootstrap::raise_error("expect relayer wallet to be present"))?
             .clone();
 
+        let relayer_wallet_2 = wallets
+            .get("relayer-2")
+            .ok_or_else(|| Bootstrap::raise_error("expect relayer-2 wallet to be present"))?
+            .clone();
+
         let user_wallet_a = wallets
             .get("user-a")
             .ok_or_else(|| Bootstrap::raise_error("expect user A wallet to be present"))?
@@ -148,6 +153,8 @@ where
                 block_time: core::time::Duration::from_secs(1),
                 nonce_mutex: Arc::new(Mutex::new(())),
                 signer: relayer_wallet.clone(),
+                additional_signers: vec![relayer_wallet_2.clone()],
+                signer_mutex: Arc::new(Mutex::new(0)),
             }),
         };
 

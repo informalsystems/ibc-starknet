@@ -259,6 +259,12 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
             .display()
             .to_string();
 
+        let relayer_wallet_path_2 = chain_driver
+            .chain_store_dir
+            .join("wallets/relayer-2.toml")
+            .display()
+            .to_string();
+
         let chain_config = StarknetChainConfig {
             json_rpc_url: format!(
                 "http://{}:{}/",
@@ -270,6 +276,7 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
                 chain_driver.node_config.rpc_port + 1
             ),
             relayer_wallet: relayer_wallet_path,
+            relayer_wallet_2: relayer_wallet_path_2,
             poll_interval: chain_driver.chain.poll_interval,
             block_time: chain_driver.chain.block_time,
             contract_addresses,

@@ -19,9 +19,12 @@ use hermes_core::encoding_components::traits::{
 };
 use hermes_core::encoding_components::types::AsBytes;
 use hermes_core::logging_components::traits::LoggerComponent;
-use hermes_core::relayer_components::transaction::impls::GetGlobalNonceMutex;
+use hermes_core::relayer_components::transaction::impls::{
+    GetGlobalNonceMutex, GetGlobalSignerMutex, SignerWithIndexGetter,
+};
 use hermes_core::relayer_components::transaction::traits::{
     DefaultSignerGetterComponent, NonceAllocationMutexGetterComponent, NonceQuerierComponent,
+    SignerGetterComponent, SignerMutexGetterComponent,
 };
 use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -87,6 +90,8 @@ pub struct StarknetChainFields {
     pub proof_signer: Secp256k1KeyPair,
     pub nonce_mutex: Arc<Mutex<()>>,
     pub signer: StarknetWallet,
+    pub additional_signers: Vec<StarknetWallet>,
+    pub signer_mutex: Arc<Mutex<usize>>,
 }
 
 impl Deref for StarknetChain {
@@ -142,6 +147,10 @@ delegate_components! {
             UseField<symbol!("proof_signer")>,
         DefaultSignerGetterComponent:
             UseField<symbol!("signer")>,
+        SignerMutexGetterComponent:
+            GetGlobalSignerMutex<symbol!("signer_mutex"), symbol!("additional_signers")>,
+        SignerGetterComponent:
+            SignerWithIndexGetter<symbol!("signer"), symbol!("additional_signers")>,
         NonceAllocationMutexGetterComponent:
             GetGlobalNonceMutex<symbol!("nonce_mutex")>,
         BlockTimeQuerierComponent:
