@@ -94,21 +94,18 @@ pub mod ChannelHandlerComponent {
         fn chan_open_try(
             ref self: ComponentState<TContractState>, msg: MsgChanOpenTry,
         ) -> ChannelId {
-            self.assert_authorized_relayer();
             let channel_sequence = self.read_next_channel_sequence();
             self.chan_open_try_validate(@msg);
             self.chan_open_try_execute(channel_sequence, msg)
         }
 
         fn chan_open_ack(ref self: ComponentState<TContractState>, msg: MsgChanOpenAck) {
-            self.assert_authorized_relayer();
             let chan_end_on_a = self.read_channel_end(@msg.port_id_on_a, @msg.chan_id_on_a);
             self.chan_open_ack_validate(@chan_end_on_a, @msg);
             self.chan_open_ack_execute(chan_end_on_a, msg);
         }
 
         fn chan_open_confirm(ref self: ComponentState<TContractState>, msg: MsgChanOpenConfirm) {
-            self.assert_authorized_relayer();
             let chan_end_on_b = self.read_channel_end(@msg.port_id_on_b, @msg.chan_id_on_b);
             self.chan_open_confirm_validate(@chan_end_on_b, @msg);
             self.chan_open_confirm_execute(chan_end_on_b, msg);
@@ -121,7 +118,6 @@ pub mod ChannelHandlerComponent {
         }
 
         fn recv_packet(ref self: ComponentState<TContractState>, msg: MsgRecvPacket) {
-            self.assert_authorized_relayer();
             let chan_end_on_b = self
                 .read_channel_end(@msg.packet.port_id_on_b, @msg.packet.chan_id_on_b);
             self.recv_packet_validate(msg.clone(), chan_end_on_b.clone());
@@ -129,7 +125,6 @@ pub mod ChannelHandlerComponent {
         }
 
         fn ack_packet(ref self: ComponentState<TContractState>, msg: MsgAckPacket) {
-            self.assert_authorized_relayer();
             let chan_end_on_a = self
                 .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
             self.ack_packet_validate(msg.clone(), chan_end_on_a.clone());
@@ -137,7 +132,6 @@ pub mod ChannelHandlerComponent {
         }
 
         fn timeout_packet(ref self: ComponentState<TContractState>, msg: MsgTimeoutPacket) {
-            self.assert_authorized_relayer();
             let chan_end_on_a = self
                 .read_channel_end(@msg.packet.port_id_on_a, @msg.packet.chan_id_on_a);
             self.timeout_packet_validate(msg.clone(), chan_end_on_a.clone());
@@ -1135,15 +1129,6 @@ pub mod ChannelHandlerComponent {
                     msg.proof_unreceived_on_b,
                     root_on_b,
                 );
-        }
-
-        fn assert_authorized_relayer(self: @ComponentState<TContractState>) {
-            let client_comp = get_dep_component!(self, ClientHandler);
-
-            assert(
-                client_comp.in_allowed_relayers(get_caller_address()),
-                ClientErrors::UNAUTHORIZED_RELAYER,
-            );
         }
     }
 
