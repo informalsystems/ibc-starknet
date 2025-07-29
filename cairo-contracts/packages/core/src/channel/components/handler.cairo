@@ -9,8 +9,7 @@ pub mod ChannelHandlerComponent {
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,
     };
-    use starknet::{get_block_number, get_block_timestamp, get_caller_address};
-    use starknet_ibc_core::channel::ChannelHandlerComponent::ClientHandlerComponent::ClientReaderTrait;
+    use starknet::{get_block_number, get_block_timestamp};
     use starknet_ibc_core::channel::{
         Acknowledgement, AppVersion, ChannelEnd, ChannelEndTrait, ChannelErrors,
         ChannelEventEmitterComponent, ChannelOrdering, IChannelHandler, IChannelQuery, MsgAckPacket,
@@ -18,8 +17,7 @@ pub mod ChannelHandlerComponent {
         MsgTimeoutPacket, Packet, PacketTrait, Receipt, ReceiptTrait,
     };
     use starknet_ibc_core::client::{
-        ClientContract, ClientContractTrait, ClientErrors, ClientHandlerComponent, Height,
-        HeightImpl,
+        ClientContract, ClientContractTrait, ClientHandlerComponent, Height, HeightImpl,
     };
     use starknet_ibc_core::commitment::{
         Commitment, CommitmentZero, StateProof, compute_ack_commitment, compute_packet_commitment,
