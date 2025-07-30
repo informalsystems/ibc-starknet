@@ -189,7 +189,7 @@ jobs:
           RUST_BACKTRACE: 1
           RUST_LOG: debug
           TEST_THREADS: 4
-          NEW_TRUSTING_PERIOD: 30
+          COSMOS_TRUSTING_PERIOD: 30
           COSMOS_REFRESH_RATE: 20
         working-directory: ./relayer
         run: |
