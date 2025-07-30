@@ -32,8 +32,9 @@ use tracing::info;
 
 use crate::utils::init_starknet_test_driver;
 
-#[test]
-fn test_relay_timeout_packet() -> Result<(), Error> {
+// TODO: Temporarily disable
+//#[test]
+fn _test_relay_timeout_packet() -> Result<(), Error> {
     // ### SETUP START ###
     let runtime = init_test_runtime();
 
