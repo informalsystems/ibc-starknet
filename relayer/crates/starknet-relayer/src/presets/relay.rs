@@ -57,9 +57,9 @@ mod preset {
                     PacketMutexGetterComponent:
                         UseField<symbol!("packet_lock_mutex")>,
                     RefreshRateAtoBGetterComponent:
-                        UseField<symbol!("refresh_rate_a_to_b")>,
+                        UseField<symbol!("refresh_rate_a")>,
                     RefreshRateBtoAGetterComponent:
-                        UseField<symbol!("refresh_rate_b_to_a")>,
+                        UseField<symbol!("refresh_rate_b")>,
                     Components: DefaultRelayPreset::Provider,
                 }
             }
