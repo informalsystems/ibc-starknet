@@ -180,39 +180,39 @@ cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e
 cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 cgp-error-eyre  = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 
-hermes-core                          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-prelude                       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-relayer-components-extra      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-runtime-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-async-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-tokio-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-runtime                       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-error                         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-encoding-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cosmos                        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cosmos-core                   = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cosmos-encoding-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cosmos-integration-tests      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-comet-light-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-comet-light-client-context    = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-wasm-test-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-wasm-client-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-wasm-encoding-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-wasm-chain-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cli-components                = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cli                           = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
-hermes-cli-framework                 = { git = "https://github.com/informalsystems/hermes-sdk.git", branch = "luca_joss/add-configurable-refresh-rate" } #rev = "81088bf" }
+hermes-core                          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-prelude                       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-relayer-components-extra      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-runtime-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-async-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-tokio-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-runtime                       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-error                         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-encoding-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cosmos                        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cosmos-core                   = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cosmos-encoding-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cosmos-integration-tests      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-comet-light-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-comet-light-client-context    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-wasm-test-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-wasm-client-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-wasm-encoding-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-wasm-chain-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cli-components                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cli                           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
+hermes-cli-framework                 = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "1ebfd55" }
