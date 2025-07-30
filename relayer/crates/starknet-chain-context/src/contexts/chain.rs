@@ -87,6 +87,7 @@ pub struct StarknetChainFields {
     pub proof_signer: Secp256k1KeyPair,
     pub nonce_mutex: Arc<Mutex<()>>,
     pub signer: StarknetWallet,
+    pub client_refresh_rate: Option<Duration>,
 }
 
 impl Deref for StarknetChain {

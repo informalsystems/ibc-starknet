@@ -156,7 +156,12 @@ fn test_relay_timeout_packet() -> Result<(), Error> {
         );
 
         birelay
-            .auto_bi_relay(Some(Duration::from_secs(10)), Some(Duration::from_secs(0)))
+            .auto_bi_relay(
+                Some(Duration::from_secs(10)),
+                Some(Duration::from_secs(0)),
+                None,
+                None,
+            )
             .await?;
 
         // ### SETUP DONE ###

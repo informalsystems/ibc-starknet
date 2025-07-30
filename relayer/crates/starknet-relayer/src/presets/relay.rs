@@ -11,6 +11,9 @@ mod preset {
         ChainGetterAtComponent, ChainTypeProviderAtComponent,
     };
     use hermes_core::relayer_components::multi::traits::client_id_at::ClientIdAtGetterComponent;
+    use hermes_core::relayer_components::multi::traits::refresh_rate::{
+        RefreshRateAtoBGetterComponent, RefreshRateBtoAGetterComponent,
+    };
     use hermes_core::relayer_components::relay::impls::PacketMutexGetterComponent;
     use hermes_core::runtime_components::traits::{
         RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -53,6 +56,10 @@ mod preset {
                         UseField<symbol!("client_id_b")>,
                     PacketMutexGetterComponent:
                         UseField<symbol!("packet_lock_mutex")>,
+                    RefreshRateAtoBGetterComponent:
+                        UseField<symbol!("refresh_rate_a")>,
+                    RefreshRateBtoAGetterComponent:
+                        UseField<symbol!("refresh_rate_b")>,
                     Components: DefaultRelayPreset::Provider,
                 }
             }

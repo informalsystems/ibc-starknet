@@ -53,6 +53,8 @@ fn test_relay_update_clients() -> Result<(), Error> {
             cosmos_chain.clone(),
             starknet_client_id.clone(),
             cosmos_client_id.clone(),
+            None, // client refresh is not needed for this test
+            None, // client refresh is not needed for this test
         );
 
         {

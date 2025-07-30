@@ -1,6 +1,9 @@
 mod assert;
 pub use assert::*;
 
+mod client_refresh_rate;
+pub use client_refresh_rate::*;
+
 mod commitment_prefix;
 pub use commitment_prefix::*;
 

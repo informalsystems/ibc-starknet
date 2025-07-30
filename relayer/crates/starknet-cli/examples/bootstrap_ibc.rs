@@ -193,6 +193,8 @@ fn main() -> Result<(), Error> {
             cosmos_chain.clone(),
             starknet_client_id.clone(),
             cosmos_client_id.clone(),
+            None, // Client refresh is not needed for bootstrapping
+            None, // Client refresh is not needed for bootstrapping
         );
 
         let cosmos_to_starknet_relay = CosmosToStarknetRelay::new(
@@ -201,6 +203,8 @@ fn main() -> Result<(), Error> {
             starknet_chain.clone(),
             cosmos_client_id.clone(),
             starknet_client_id.clone(),
+            None, // Client refresh is not needed for bootstrapping
+            None, // Client refresh is not needed for bootstrapping
         );
 
         {
