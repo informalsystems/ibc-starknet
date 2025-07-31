@@ -76,11 +76,10 @@ mod preset {
     use hermes_core::relayer_components::error::traits::RetryableErrorComponent;
     use hermes_core::relayer_components::transaction::impls::PollTimeoutGetterComponent;
     use hermes_core::relayer_components::transaction::traits::{
-        ClientRefreshRateGetterComponent, MessagesWithSignerAndNonceSenderComponent,
-        MessagesWithSignerSenderComponent, NonceAllocatorComponent, NonceQuerierComponent,
-        NonceTypeProviderComponent, SignerTypeProviderComponent, TxHashTypeProviderComponent,
-        TxMessageResponseParserComponent, TxResponsePollerComponent, TxResponseQuerierComponent,
-        TxResponseTypeProviderComponent,
+        MessagesWithSignerAndNonceSenderComponent, MessagesWithSignerSenderComponent,
+        NonceAllocatorComponent, NonceQuerierComponent, NonceTypeProviderComponent,
+        SignerTypeProviderComponent, TxHashTypeProviderComponent, TxMessageResponseParserComponent,
+        TxResponsePollerComponent, TxResponseQuerierComponent, TxResponseTypeProviderComponent,
     };
     use hermes_core::test_components::chain::impls::{
         PollAssertEventualAmount, ProvideDefaultMemo, SendIbcTransferMessage,
@@ -111,8 +110,8 @@ mod preset {
         DeclareSierraContract, DeployStarknetContract, FilterStarknetPackets,
         GetContractAddressFromField, GetCounterpartyCosmosHeightFromStarknetMessage,
         GetOrCreateCosmosTokenAddressOnStarknet, GetStarknetBlockEvents,
-        GetStarknetClientRefreshRate, GetStarknetCommitmentPrefix, IbcTransferTimeoutAfterSeconds,
-        InvokeStarknetContract, ProvideFeltSelector, ProvideNoCreateClientMessageOptionsOverride,
+        GetStarknetCommitmentPrefix, IbcTransferTimeoutAfterSeconds, InvokeStarknetContract,
+        ProvideFeltSelector, ProvideNoCreateClientMessageOptionsOverride,
         ProvidePollAssertDuration, ProvideStarknetBlockType, ProvideStarknetChainStatusType,
         ProvideStarknetClientStatus, ProvideStarknetHeight, ProvideStarknetIbcClientTypes,
         ProvideStarknetPayloadTypes, ProvideStarknetWallet, ProvideTokenAddressDenom,
@@ -316,8 +315,6 @@ mod preset {
                 QueryStarknetNonce,
             IbcCommitmentPrefixGetterComponent:
                 GetStarknetCommitmentPrefix,
-            ClientRefreshRateGetterComponent:
-                GetStarknetClientRefreshRate,
             RetryableErrorComponent:
                 ReturnRetryable<false>,
             TransferTokenMessageBuilderComponent:

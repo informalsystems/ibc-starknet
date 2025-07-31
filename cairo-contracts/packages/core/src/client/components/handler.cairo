@@ -71,10 +71,6 @@ pub mod ClientHandlerComponent {
         fn update_client(
             ref self: ComponentState<TContractState>, msg: MsgUpdateClient,
         ) -> UpdateResponse {
-            assert(
-                self.in_allowed_relayers(get_caller_address()), ClientErrors::UNAUTHORIZED_RELAYER,
-            );
-
             let mut client = self.get_client(msg.client_id.client_type);
 
             let client_id = msg.client_id.clone();
@@ -121,10 +117,6 @@ pub mod ClientHandlerComponent {
             client_type: felt252,
             client_address: ContractAddress,
         ) {
-            assert(
-                self.in_allowed_relayers(get_caller_address()), ClientErrors::UNAUTHORIZED_RELAYER,
-            );
-
             self.write_supported_client(client_type, client_address);
         }
     }

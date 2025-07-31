@@ -253,9 +253,15 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
                 .and_then(|hashes| hashes.iter().cloned().next()),
         };
 
-        let relayer_wallet_path = chain_driver
+        let relayer_wallet_path_1 = chain_driver
             .chain_store_dir
             .join("wallets/relayer.toml")
+            .display()
+            .to_string();
+
+        let relayer_wallet_path_2 = chain_driver
+            .chain_store_dir
+            .join("wallets/relayer-2.toml")
             .display()
             .to_string();
 
@@ -269,7 +275,8 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
                 chain_driver.node_config.rpc_addr,
                 chain_driver.node_config.rpc_port + 1
             ),
-            relayer_wallet: relayer_wallet_path,
+            relayer_wallet_1: relayer_wallet_path_1,
+            relayer_wallet_2: relayer_wallet_path_2,
             poll_interval: chain_driver.chain.poll_interval,
             block_time: chain_driver.chain.block_time,
             contract_addresses,
