@@ -11,6 +11,7 @@ use ibc_client_cw::context::CwClientValidation;
 use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_core::channel::types::proto::v1::Channel;
 use ibc_core::client::context::client_state::ClientStateValidation;
+use ibc_core::client::context::prelude::ClientStateCommon;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Status;
 use ibc_core::commitment_types::commitment::{
@@ -20,7 +21,9 @@ use ibc_core::commitment_types::error::CommitmentError;
 use ibc_core::connection::types::proto::v1::ConnectionEnd;
 use ibc_core::host::types::error::DecodingError;
 use ibc_core::host::types::identifiers::ClientId;
-use ibc_core::host::types::path::{Path, PathBytes};
+use ibc_core::host::types::path::{
+    Path, PathBytes, UpgradeClientStatePath, UpgradeConsensusStatePath,
+};
 use ibc_core::primitives::proto::Any;
 use prost::Message;
 use prost_types::Any as ProstAny;
@@ -127,6 +130,91 @@ where
         proof_upgrade_consensus_state: CommitmentProofBytes,
         root: &CommitmentRoot,
     ) -> Result<(), ClientError> {
+        let starknet_crypto_cw = StarknetCryptoLib;
+
+        let latest_height = self.latest_height();
+
+        let upgraded_client_state = V::ClientStateRef::try_from(upgraded_client_state)?;
+
+        let upgraded_consensus_state = V::ConsensusStateRef::try_from(upgraded_consensus_state)?;
+
+        // the light client must be updated till before the upgraded height.
+        // this is to avoid dropping any pending packets.
+
+        let upgraded_client_path = UpgradeClientStatePath {
+            upgrade_path: String::new(),
+            height: latest_height.revision_height() + 1,
+        }
+        .into();
+
+        let upgraded_consensus_path = UpgradeConsensusStatePath {
+            upgrade_path: String::new(),
+            height: latest_height.revision_height() + 1,
+        }
+        .into();
+
+        // commitment root is: contract_storage_root.to_bytes_be()
+        let contract_root = Felt::from_bytes_be_slice(root.as_bytes());
+
+        {
+            let felt_value = get_felt_from_value(
+                &starknet_crypto_cw,
+                // FIXME(rano): use correct values here
+                &alloc::vec![],
+                &upgraded_client_path,
+            )?;
+            let felt_path = ibc_path_to_storage_key(&starknet_crypto_cw, upgraded_client_path);
+
+            let storage_proof: StorageProof = serde_json::from_slice(proof_upgrade_client.as_ref())
+                .map_err(|e| {
+                    ClientError::Decoding(DecodingError::InvalidJson {
+                        description: e.to_string(),
+                    })
+                })?;
+
+            validate_storage_proof(&starknet_crypto_cw, &storage_proof).map_err(|e| {
+                ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+            })?;
+
+            verify_starknet_storage_proof(&storage_proof, contract_root, felt_path, felt_value)
+                .map_err(|e| {
+                    ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+                })?;
+        }
+
+        {
+            {
+                let felt_value = get_felt_from_value(
+                    &starknet_crypto_cw,
+                    // FIXME(rano): use correct values here
+                    &alloc::vec![],
+                    &upgraded_consensus_path,
+                )?;
+                let felt_path =
+                    ibc_path_to_storage_key(&starknet_crypto_cw, upgraded_consensus_path);
+
+                let storage_proof: StorageProof = serde_json::from_slice(
+                    proof_upgrade_consensus_state.as_ref(),
+                )
+                .map_err(|e| {
+                    ClientError::Decoding(DecodingError::InvalidJson {
+                        description: e.to_string(),
+                    })
+                })?;
+
+                validate_storage_proof(&starknet_crypto_cw, &storage_proof).map_err(|e| {
+                    ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+                })?;
+
+                verify_starknet_storage_proof(&storage_proof, contract_root, felt_path, felt_value)
+                    .map_err(|e| {
+                        ClientError::FailedICS23Verification(
+                            CommitmentError::FailedToVerifyMembership,
+                        )
+                    })?;
+            }
+        }
+
         Ok(())
     }
 
