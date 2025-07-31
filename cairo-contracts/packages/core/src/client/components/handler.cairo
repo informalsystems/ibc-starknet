@@ -159,8 +159,7 @@ pub mod ClientHandlerComponent {
 
             self.emit_schedule_upgrade_event(upgraded_client_state, upgraded_consensus_state);
         }
-
-        // TODO(rano): implement read, update, delete methods for upgraded states 
+        // TODO(rano): implement read, update, delete methods for upgraded states
     }
 
     // -----------------------------------------------------------
