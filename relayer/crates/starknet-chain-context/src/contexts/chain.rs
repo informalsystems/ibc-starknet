@@ -23,12 +23,14 @@ use hermes_core::relayer_components::transaction::impls::{
     GetGlobalNonceMutex, GetGlobalSignerMutex, SignerWithIndexGetter,
 };
 use hermes_core::relayer_components::transaction::traits::{
-    DefaultSignerGetterComponent, NonceAllocationMutexGetterComponent, NonceQuerierComponent,
-    SignerGetterComponent, SignerMutexGetterComponent,
+    ClientRefreshRateGetterComponent, DefaultSignerGetterComponent,
+    NonceAllocationMutexGetterComponent, NonceQuerierComponent, SignerGetterComponent,
+    SignerMutexGetterComponent,
 };
 use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
+use hermes_cosmos::chain_components::impls::GetFirstSignerAsDefault;
 use hermes_cosmos::chain_components::types::Secp256k1KeyPair;
 use hermes_cosmos::chain_preset::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos::error::impls::UseHermesError;
@@ -39,8 +41,8 @@ use hermes_starknet_chain_components::components::{
     StarknetChainComponents, StarknetToCosmosComponents,
 };
 use hermes_starknet_chain_components::impls::{
-    QueryStarknetStorageProof, SendJsonRpcRequestWithReqwest, StarknetAddress,
-    VerifyStarknetMerkleProof, VerifyStarknetStorageProof,
+    GetStarknetClientRefreshRate, QueryStarknetStorageProof, SendJsonRpcRequestWithReqwest,
+    StarknetAddress, VerifyStarknetMerkleProof, VerifyStarknetStorageProof,
 };
 use hermes_starknet_chain_components::traits::{
     AccountFromSignerBuilderComponent, ContractCallerComponent, ContractDeclarerComponent,
@@ -89,8 +91,8 @@ pub struct StarknetChainFields {
     pub block_time: Duration,
     pub proof_signer: Secp256k1KeyPair,
     pub nonce_mutex: Arc<Mutex<()>>,
-    pub signer: StarknetWallet,
-    pub additional_signers: Vec<StarknetWallet>,
+    pub signers: Vec<StarknetWallet>,
+    pub client_refresh_rate: Option<Duration>,
     pub signer_mutex: Arc<Mutex<usize>>,
 }
 
@@ -146,13 +148,15 @@ delegate_components! {
         StarknetProofSignerGetterComponent:
             UseField<symbol!("proof_signer")>,
         DefaultSignerGetterComponent:
-            UseField<symbol!("signer")>,
+            GetFirstSignerAsDefault<symbol!("signers")>,
         SignerMutexGetterComponent:
-            GetGlobalSignerMutex<symbol!("signer_mutex"), symbol!("additional_signers")>,
+            GetGlobalSignerMutex<symbol!("signer_mutex"), symbol!("signers")>,
         SignerGetterComponent:
-            SignerWithIndexGetter<symbol!("signer"), symbol!("additional_signers")>,
+            SignerWithIndexGetter<symbol!("signers")>,
         NonceAllocationMutexGetterComponent:
             GetGlobalNonceMutex<symbol!("nonce_mutex")>,
+        ClientRefreshRateGetterComponent:
+            GetStarknetClientRefreshRate,
         BlockTimeQuerierComponent:
             UseField<symbol!("block_time")>,
         StarknetAccountTypeProviderComponent:

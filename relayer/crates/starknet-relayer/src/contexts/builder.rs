@@ -1,7 +1,9 @@
 use alloc::sync::Arc;
 use core::marker::PhantomData;
 use core::ops::Deref;
+use core::time::Duration;
 use std::collections::HashSet;
+use std::env::var;
 use std::path::PathBuf;
 use std::sync::OnceLock;
 
@@ -134,19 +136,21 @@ impl RelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildComponen
         dst_chain_id: &ChainId,
         src_client_id: &ClientId,
         dst_client_id: &ClientId,
+        refresh_rate_a: Option<Duration>,
+        refresh_rate_b: Option<Duration>,
     ) -> Result<StarknetToCosmosRelay, HermesError> {
         let src_chain = build.build_chain(src_chain_id).await?;
 
         let dst_chain = build.cosmos_builder.build_chain(dst_chain_id).await?;
 
-        Ok(
-            build.build_starknet_to_cosmos_relay(
-                src_chain,
-                dst_chain,
-                src_client_id,
-                dst_client_id,
-            ),
-        )
+        Ok(build.build_starknet_to_cosmos_relay(
+            src_chain,
+            dst_chain,
+            src_client_id,
+            dst_client_id,
+            refresh_rate_a,
+            refresh_rate_b,
+        ))
     }
 }
 
@@ -159,19 +163,21 @@ impl RelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildComponen
         dst_chain_id: &ChainId,
         src_client_id: &ClientId,
         dst_client_id: &ClientId,
+        refresh_rate_a: Option<Duration>,
+        refresh_rate_b: Option<Duration>,
     ) -> Result<CosmosToStarknetRelay, HermesError> {
         let src_chain = build.cosmos_builder.build_chain(dst_chain_id).await?;
 
         let dst_chain = build.build_chain(src_chain_id).await?;
 
-        Ok(
-            build.build_cosmos_to_starknet_relay(
-                src_chain,
-                dst_chain,
-                src_client_id,
-                dst_client_id,
-            ),
-        )
+        Ok(build.build_cosmos_to_starknet_relay(
+            src_chain,
+            dst_chain,
+            src_client_id,
+            dst_client_id,
+            refresh_rate_a,
+            refresh_rate_b,
+        ))
     }
 }
 
@@ -184,15 +190,17 @@ impl RelayFromChainsBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBui
         dst_client_id: &ClientId,
         src_chain: StarknetChain,
         dst_chain: CosmosChain,
+        refresh_rate_a: Option<Duration>,
+        refresh_rate_b: Option<Duration>,
     ) -> Result<StarknetToCosmosRelay, HermesError> {
-        Ok(
-            build.build_starknet_to_cosmos_relay(
-                src_chain,
-                dst_chain,
-                src_client_id,
-                dst_client_id,
-            ),
-        )
+        Ok(build.build_starknet_to_cosmos_relay(
+            src_chain,
+            dst_chain,
+            src_client_id,
+            dst_client_id,
+            refresh_rate_a,
+            refresh_rate_b,
+        ))
     }
 }
 
@@ -205,15 +213,17 @@ impl RelayFromChainsBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBui
         dst_client_id: &ClientId,
         src_chain: CosmosChain,
         dst_chain: StarknetChain,
+        refresh_rate_a: Option<Duration>,
+        refresh_rate_b: Option<Duration>,
     ) -> Result<CosmosToStarknetRelay, HermesError> {
-        Ok(
-            build.build_cosmos_to_starknet_relay(
-                src_chain,
-                dst_chain,
-                src_client_id,
-                dst_client_id,
-            ),
-        )
+        Ok(build.build_cosmos_to_starknet_relay(
+            src_chain,
+            dst_chain,
+            src_client_id,
+            dst_client_id,
+            refresh_rate_a,
+            refresh_rate_b,
+        ))
     }
 }
 
@@ -225,6 +235,8 @@ impl BiRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildCompon
         chain_id_b: &ChainId,
         client_id_a: &ClientId,
         client_id_b: &ClientId,
+        refresh_rate_a: Option<Duration>,
+        refresh_rate_b: Option<Duration>,
     ) -> Result<StarknetCosmosBiRelay, HermesError> {
         let starknet_chain = build.build_chain(chain_id_a).await?;
         let cosmos_chain = build.cosmos_builder.build_chain(chain_id_b).await?;
@@ -235,6 +247,8 @@ impl BiRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildCompon
             cosmos_chain.clone(),
             client_id_a.clone(),
             client_id_b.clone(),
+            refresh_rate_b,
+            refresh_rate_a,
         );
 
         let relay_b_to_a = CosmosToStarknetRelay::new(
@@ -243,6 +257,8 @@ impl BiRelayBuilder<StarknetBuilder, Index<0>, Index<1>> for StarknetBuildCompon
             starknet_chain,
             client_id_b.clone(),
             client_id_a.clone(),
+            refresh_rate_a,
+            refresh_rate_b,
         );
 
         let birelay = StarknetCosmosBiRelay {
@@ -263,6 +279,8 @@ impl BiRelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildCompon
         chain_id_b: &ChainId,
         client_id_a: &ClientId,
         client_id_b: &ClientId,
+        refresh_rate_a: Option<Duration>,
+        refresh_rate_b: Option<Duration>,
     ) -> Result<CosmosStarknetBiRelay, HermesError> {
         let starknet_chain = build.build_chain(chain_id_a).await?;
         let cosmos_chain = build.cosmos_builder.build_chain(chain_id_b).await?;
@@ -273,6 +291,8 @@ impl BiRelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildCompon
             starknet_chain.clone(),
             client_id_b.clone(),
             client_id_a.clone(),
+            refresh_rate_a,
+            refresh_rate_b,
         );
 
         let relay_b_to_a = StarknetToCosmosRelay::new(
@@ -281,6 +301,8 @@ impl BiRelayBuilder<StarknetBuilder, Index<1>, Index<0>> for StarknetBuildCompon
             cosmos_chain,
             client_id_a.clone(),
             client_id_b.clone(),
+            refresh_rate_b,
+            refresh_rate_a,
         );
 
         let birelay = CosmosStarknetBiRelay {
@@ -422,6 +444,16 @@ impl StarknetBuilder {
 
         let rpc_client = ureq::agent();
 
+        let client_refresh_rate = var("STARKNET_REFRESH_RATE")
+            .map(|refresh_str| {
+                Duration::from_secs(
+                    refresh_str
+                        .parse::<u64>()
+                        .expect("failed to parse {refresh_str} to seconds"),
+                )
+            })
+            .ok();
+
         let context = StarknetChain {
             fields: Arc::new(StarknetChainFields {
                 runtime: self.runtime.clone(),
@@ -435,12 +467,12 @@ impl StarknetBuilder {
                 poll_interval: chain_config.poll_interval,
                 block_time: chain_config.block_time,
                 nonce_mutex: Arc::new(Mutex::new(())),
-                signer: relayer_wallet,
+                signers: vec![relayer_wallet, relayer_wallet_2],
                 signer_mutex: Arc::new(Mutex::new(0)),
-                additional_signers: vec![relayer_wallet_2],
                 rpc_client,
                 json_rpc_url,
                 feeder_gateway_url,
+                client_refresh_rate,
             }),
         };
 
@@ -453,6 +485,8 @@ impl StarknetBuilder {
         dst_chain: CosmosChain,
         src_client_id: &ClientId,
         dst_client_id: &ClientId,
+        refresh_rate_a: Option<Duration>,
+        refresh_rate_b: Option<Duration>,
     ) -> StarknetToCosmosRelay {
         StarknetToCosmosRelay::new(
             self.runtime.clone(),
@@ -460,6 +494,8 @@ impl StarknetBuilder {
             dst_chain,
             src_client_id.clone(),
             dst_client_id.clone(),
+            refresh_rate_a,
+            refresh_rate_b,
         )
     }
 
@@ -469,6 +505,8 @@ impl StarknetBuilder {
         dst_chain: StarknetChain,
         src_client_id: &ClientId,
         dst_client_id: &ClientId,
+        refresh_rate_a: Option<Duration>,
+        refresh_rate_b: Option<Duration>,
     ) -> CosmosToStarknetRelay {
         CosmosToStarknetRelay::new(
             self.runtime.clone(),
@@ -476,6 +514,8 @@ impl StarknetBuilder {
             dst_chain,
             src_client_id.clone(),
             dst_client_id.clone(),
+            refresh_rate_a,
+            refresh_rate_b,
         )
     }
 }

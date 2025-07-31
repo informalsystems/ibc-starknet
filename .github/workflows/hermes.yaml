@@ -119,7 +119,115 @@ jobs:
               --workspace \
               --retries 2 \
               --test-threads=$TEST_THREADS \
-              --success-output=final
+              --success-output=final \
+              --filter-expr '!(test(modified_test_suite::))'
+
+  modified-starknet-integration-tests:
+    name: Run Starknet Integration Tests
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-14]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        if: ${{ matrix.os != 'macos-14' }}
+        uses: jlumbroso/free-disk-space@main
+
+      - uses: actions/checkout@v4
+
+      - name: Checkout Madara repo
+        uses: actions/checkout@v4
+        with:
+          repository: madara-alliance/madara
+          path: madara
+          ref: e6fca12103a97238b5b5a87b5a22342804caac4c # chore/bump-blockifier
+
+      - uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - uses: cachix/cachix-action@v15
+        with:
+          name: ibc-starknet
+          extraPullNames: hermes-sdk,cosmos-nix
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Install Scarb
+        uses: software-mansion/setup-scarb@v1
+        with:
+          tool-versions: cairo-contracts/.tool-versions
+          scarb-lock: cairo-contracts/Scarb.lock
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+          workspaces: |
+            relayer
+            light-client
+            madara/madara
+
+      - name: Build Cairo contracts
+        working-directory: ./cairo-contracts
+        run: |
+          scarb --profile release build -p starknet_ibc_contracts
+
+      - name: Build Madara contracts
+        working-directory: ./madara-contracts
+        run: |
+          scarb --profile release build
+
+      - name: Install Madara
+        run: |
+          cd madara
+          nix develop -c cargo install --path madara/crates/node
+
+      - name: Run Integration Tests
+        env:
+          RUST_BACKTRACE: 1
+          RUST_LOG: debug
+          TEST_THREADS: 4
+          COSMOS_TRUSTING_PERIOD: 30
+          COSMOS_REFRESH_RATE: 20
+        working-directory: ./relayer
+        run: |
+          export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
+          export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_TransferApp.contract_class.json"
+          export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_CometClient.contract_class.json"
+          export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_IBCCore.contract_class.json"
+          export STARKNET_BIN="$HOME/.cargo/bin/madara"
+
+          export COMET_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_CometLib.contract_class.json"
+          export ICS23_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_Ics23Lib.contract_class.json"
+          export PROTOBUF_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_ProtobufLib.contract_class.json"
+
+          export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_RawStore.contract_class.json"
+
+          export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
+
+          cargo run --quiet --example contract_size "$ERC20_CONTRACT"
+          cargo run --quiet --example contract_size "$ICS20_CONTRACT"
+          cargo run --quiet --example contract_size "$COMET_CLIENT_CONTRACT"
+          cargo run --quiet --example contract_size "$IBC_CORE_CONTRACT"
+
+          cargo run --quiet --example contract_size "$COMET_LIB_CONTRACT"
+          cargo run --quiet --example contract_size "$ICS23_LIB_CONTRACT"
+          cargo run --quiet --example contract_size "$PROTOBUF_LIB_CONTRACT"
+
+          nix shell \
+            ..#osmosis \
+            ..#wasm-simapp \
+            ..#rust \
+            ..#cargo-nextest \
+            -c \
+            cargo nextest run --release \
+              --workspace \
+              --retries 2 \
+              --test-threads=$TEST_THREADS \
+              --success-output=final \
+              -- modified_test_suite
 
   lint-relayer:
     name: Lint Relayer Code
