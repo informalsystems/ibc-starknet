@@ -12,7 +12,7 @@ use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_core::channel::types::proto::v1::Channel;
 use ibc_core::client::context::client_state::ClientStateValidation;
 use ibc_core::client::context::prelude::ClientStateCommon;
-use ibc_core::client::types::error::ClientError;
+use ibc_core::client::types::error::{ClientError, UpgradeClientError};
 use ibc_core::client::types::Status;
 use ibc_core::commitment_types::commitment::{
     CommitmentPrefix, CommitmentProofBytes, CommitmentRoot,
@@ -132,24 +132,29 @@ where
     ) -> Result<(), ClientError> {
         let starknet_crypto_cw = StarknetCryptoLib;
 
-        let latest_height = self.latest_height();
-
         let upgraded_client_state = V::ClientStateRef::try_from(upgraded_client_state)?;
 
         let upgraded_consensus_state = V::ConsensusStateRef::try_from(upgraded_consensus_state)?;
 
-        // the light client must be updated till before the upgraded height.
-        // this is to avoid dropping any pending packets.
+        let upgraded_height = upgraded_client_state.latest_height();
+        let latest_height = self.latest_height();
+
+        if latest_height >= upgraded_height {
+            Err(UpgradeClientError::InsufficientUpgradeHeight {
+                upgraded_height,
+                client_height: latest_height,
+            })?;
+        }
 
         let upgraded_client_path = UpgradeClientStatePath {
             upgrade_path: String::new(),
-            height: latest_height.revision_height() + 1,
+            height: upgraded_height.revision_height(),
         }
         .into();
 
         let upgraded_consensus_path = UpgradeConsensusStatePath {
             upgrade_path: String::new(),
-            height: latest_height.revision_height() + 1,
+            height: upgraded_height.revision_height(),
         }
         .into();
 
