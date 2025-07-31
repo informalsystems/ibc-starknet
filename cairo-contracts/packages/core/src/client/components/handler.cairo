@@ -1,21 +1,27 @@
 #[starknet::component]
 pub mod ClientHandlerComponent {
     use core::num::traits::Zero;
+    use openzeppelin_access::ownable::OwnableComponent;
+    use openzeppelin_access::ownable::OwnableComponent::InternalTrait;
     use starknet::storage::{
         IntoIterRange, Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess,
         StoragePointerReadAccess, Vec,
     };
     use starknet::{ContractAddress, get_caller_address, get_tx_info};
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
-    use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient, IRegisterRelayer};
+    use starknet_ibc_core::client::interface::{
+        IClientHandler, IRegisterClient, IRegisterRelayer, IScheduleUpgrade,
+    };
     use starknet_ibc_core::client::{
         ClientContract, ClientContractHandlerTrait, ClientErrors, ClientEventEmitterComponent,
-        CreateResponse, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient,
-        MsgUpgradeClient, UpdateResponse,
+        CreateResponse, Height, MsgCreateClient, MsgRecoverClient, MsgScheduleUpgrade,
+        MsgUpdateClient, MsgUpgradeClient, StarknetClientState, StarknetConsensusState,
+        UpdateResponse,
     };
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
     use starknet_ibc_utils::governance::IBCGovernanceComponent;
     use starknet_ibc_utils::governance::IBCGovernanceComponent::GovernanceInternalTrait;
+    use starknet_ibc_utils::{ComputeKey, ValidateBasic};
 
     #[storage]
     pub struct Storage {
@@ -23,6 +29,10 @@ pub mod ClientHandlerComponent {
         // to be replaced after Comet client contract is implemented.
         allowed_relayers: Vec<ContractAddress>,
         supported_clients: Map<felt252, ContractAddress>,
+        upgraded_states: Map<u64, (StarknetClientState, StarknetConsensusState)>,
+        // commitments for the upgraded client state and consensus state
+        upgraded_client_state_commitments: Map<u64, felt252>,
+        upgraded_consensus_state_commitments: Map<u64, felt252>,
     }
 
     #[event]
@@ -105,6 +115,49 @@ pub mod ClientHandlerComponent {
             client.upgrade(msg);
 
             self.emit_upgrade_client_event();
+        }
+    }
+
+    // -----------------------------------------------------------
+    // Schedule Upgrade
+    // -----------------------------------------------------------
+
+    #[embeddable_as(CoreScheduleUpgrade)]
+    pub impl CoreScheduleUpgradeImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
+    > of IScheduleUpgrade<ComponentState<TContractState>> {
+        fn schedule_upgrade(ref self: ComponentState<TContractState>, msg: MsgScheduleUpgrade) {
+            {
+                // only admin can schedule an upgrade
+                let ownable = get_dep_component!(@self, Ownable);
+                ownable.assert_only_owner();
+            }
+
+            msg.validate_basic();
+
+            let MsgScheduleUpgrade { upgraded_client_state, upgraded_consensus_state } = msg;
+
+            let upgraded_height = upgraded_client_state.latest_height;
+
+            self
+                .upgraded_states
+                .write(
+                    upgraded_height,
+                    (upgraded_client_state.clone(), upgraded_consensus_state.clone()),
+                );
+
+            self
+                .upgraded_client_state_commitments
+                .write(upgraded_height, upgraded_client_state.key());
+            self
+                .upgraded_consensus_state_commitments
+                .write(upgraded_height, upgraded_consensus_state.key());
+
+            self.emit_schedule_upgrade_event(upgraded_client_state, upgraded_consensus_state);
         }
     }
 
@@ -276,6 +329,17 @@ pub mod ClientHandlerComponent {
             let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
 
             event_emitter.emit_upgrade_client_event();
+        }
+
+        fn emit_schedule_upgrade_event(
+            ref self: ComponentState<TContractState>,
+            upgraded_client_state: StarknetClientState,
+            upgraded_consensus_state: StarknetConsensusState,
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter
+                .emit_schedule_upgrade_event(upgraded_client_state, upgraded_consensus_state);
         }
     }
 }

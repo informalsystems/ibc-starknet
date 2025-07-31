@@ -3,9 +3,11 @@ use core::num::traits::{CheckedAdd, OverflowingMul, Zero};
 use core::traits::PartialOrd;
 use ibc_utils::bytes::{IntoArrayU32, U64IntoArrayU32};
 use protobuf::types::wkt::{Duration as ProtoDuration, Timestamp as ProtoTimestamp};
+use starknet::ContractAddress;
 use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::commitment::U32CollectorImpl;
 use starknet_ibc_core::host::ClientId;
+use starknet_ibc_utils::ComputeKey;
 
 const NANOS_PER_SEC: u32 = 1_000_000_000;
 
@@ -317,6 +319,24 @@ pub impl DurationToProto of TryInto<Duration, ProtoDuration> {
         Some(ProtoDuration { seconds, nanos })
     }
 }
+
+#[derive(Clone, Debug, Drop, Serde, starknet::Store)]
+pub struct StarknetClientState {
+    pub latest_height: u64,
+    pub chain_id: ByteArray,
+    pub sequencer_public_key: felt252,
+    pub ibc_contract_address: ContractAddress,
+}
+
+#[derive(Clone, Debug, Drop, Serde, starknet::Store)]
+pub struct StarknetConsensusState {
+    pub root: felt252,
+    pub time: u64,
+}
+
+
+pub impl ClientStateKeyImpl of ComputeKey<StarknetClientState> {}
+pub impl ConsensusStateKeyImpl of ComputeKey<StarknetConsensusState> {}
 
 #[cfg(test)]
 mod tests {

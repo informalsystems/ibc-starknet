@@ -14,4 +14,7 @@ pub mod ClientErrors {
     pub const OVERFLOWED_DURATION: felt252 = 'ICS02: overflowed duration';
     pub const RELAYER_ALREADY_REGISTERED: felt252 = 'ICS02: rly already registered';
     pub const UNAUTHORIZED_RELAYER: felt252 = 'ICS02: unauthorized relayer';
+    pub const UPGRADE_HEIGHT_IN_PAST: felt252 = 'ICS02: past upgrade height';
+    pub const UPGRADE_TIMESTAMP_IN_PAST: felt252 = 'ICS02: past upgrade timestamp';
+    pub const UPGRADE_ROOT_IS_NON_ZERO: felt252 = 'ICS02: non-zero upgrade root';
 }

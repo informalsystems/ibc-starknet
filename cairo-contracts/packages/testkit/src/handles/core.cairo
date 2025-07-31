@@ -9,8 +9,8 @@ use starknet_ibc_core::channel::{
 use starknet_ibc_core::client::{
     CreateResponse, IClientHandlerDispatcher, IClientHandlerDispatcherTrait,
     IRegisterClientDispatcher, IRegisterClientDispatcherTrait, IRegisterRelayerDispatcher,
-    IRegisterRelayerDispatcherTrait, MsgCreateClient, MsgRecoverClient, MsgUpdateClient,
-    UpdateResponse,
+    IRegisterRelayerDispatcherTrait, IScheduleUpgradeDispatcher, IScheduleUpgradeDispatcherTrait,
+    MsgCreateClient, MsgRecoverClient, MsgScheduleUpgrade, MsgUpdateClient, UpdateResponse,
 };
 use starknet_ibc_core::commitment::Commitment;
 use starknet_ibc_core::connection::{
@@ -62,6 +62,10 @@ pub impl CoreHandleImpl of CoreHandle {
         IRouterDispatcher { contract_address: *self.address }
     }
 
+    fn schedule_upgrade_dispatcher(self: @CoreContract) -> IScheduleUpgradeDispatcher {
+        IScheduleUpgradeDispatcher { contract_address: *self.address }
+    }
+
     fn register_client_dispatcher(self: @CoreContract) -> IRegisterClientDispatcher {
         IRegisterClientDispatcher { contract_address: *self.address }
     }
@@ -80,6 +84,10 @@ pub impl CoreHandleImpl of CoreHandle {
 
     fn recover_client(self: @CoreContract, msg: MsgRecoverClient) {
         self.client_handler_dispatcher().recover_client(msg)
+    }
+
+    fn schedule_upgrade(self: @CoreContract, msg: MsgScheduleUpgrade) {
+        self.schedule_upgrade_dispatcher().schedule_upgrade(msg)
     }
 
     fn register_relayer(self: @CoreContract, relayer_address: ContractAddress) {
