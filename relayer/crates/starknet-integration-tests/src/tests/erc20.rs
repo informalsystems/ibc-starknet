@@ -54,7 +54,7 @@ fn test_erc20_transfer() -> Result<(), Error> {
         let initial_supply = 1000u32;
 
         let token_address = {
-            let relayer_address = chain_driver.relayer_wallet.account_address;
+            let relayer_address = chain_driver.relayer_wallet_1.account_address;
 
             let deploy_message = DeployErc20TokenMessage {
                 name: "token".into(),
@@ -94,10 +94,10 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
         {
             // Test local ERC20 token transfer
-            let sender_wallet = chain_driver.relayer_wallet.clone();
+            let sender_wallet = chain_driver.relayer_wallet_1.clone();
             let sender_address = sender_wallet.account_address;
 
-            let recipient_address = chain_driver.relayer_2_wallet.account_address;
+            let recipient_address = chain_driver.relayer_wallet_2.account_address;
 
             info!("sender address: {:?}", sender_address);
             info!("recipient address: {:?}", recipient_address);
@@ -144,7 +144,7 @@ fn test_erc20_transfer() -> Result<(), Error> {
         // ### SETUP DONE ###
         {
             // Test local ERC20 token transfer
-            let account_address = chain_driver.relayer_wallet.account_address;
+            let account_address = chain_driver.relayer_wallet_1.account_address;
 
             let recipient_address = chain_driver.user_wallet_a.account_address;
 
@@ -186,7 +186,6 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             match &erc20_events[0] {
                 Erc20Event::Transfer(transfer) => {
-                    //assert_eq!(transfer.from, account_address);
                     assert_eq!(transfer.to, recipient_address);
                     assert_eq!(transfer.value, transfer_amount);
                 }
@@ -207,10 +206,6 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             info!("recipient balance transfer: {}", recipient_balance_b);
 
-            /*assert_eq!(
-                sender_balance_b.quantity,
-                sender_balance_a.quantity - transfer_amount
-            );*/
             assert_eq!(
                 recipient_balance_b.quantity,
                 recipient_balance_a.quantity + transfer_amount

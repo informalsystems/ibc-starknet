@@ -375,7 +375,7 @@ impl StarknetBuilder {
             return Err(eyre!("Starknet Starknet chain has a different ID as configured. Expected: {expected_chain_id}, got: {chain_id}").into());
         }
 
-        let wallet_path = PathBuf::from(chain_config.relayer_wallet.clone());
+        let wallet_path = PathBuf::from(chain_config.relayer_wallet_1.clone());
 
         let wallet_path_2 = PathBuf::from(chain_config.relayer_wallet_2.clone());
 

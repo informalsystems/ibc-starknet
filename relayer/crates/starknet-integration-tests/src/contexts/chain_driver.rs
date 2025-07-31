@@ -36,8 +36,8 @@ pub struct StarknetChainDriver {
     pub node_config: StarknetNodeConfig,
     pub wallets: BTreeMap<String, StarknetWallet>,
     pub chain_processes: Vec<Child>,
-    pub relayer_wallet: StarknetWallet,
-    pub relayer_2_wallet: StarknetWallet,
+    pub relayer_wallet_1: StarknetWallet,
+    pub relayer_wallet_2: StarknetWallet,
     pub user_wallet_a: StarknetWallet,
     pub user_wallet_b: StarknetWallet,
 }
@@ -57,7 +57,7 @@ delegate_components! {
         ChainGetterComponent:
             UseField<symbol!("chain")>,
         WalletGetterComponent<RelayerWallet>:
-            UseField<symbol!("relayer_wallet")>,
+            UseField<symbol!("relayer_wallet_1")>,
         WalletGetterComponent<UserWallet<0>>:
             UseField<symbol!("user_wallet_a")>,
         WalletGetterComponent<UserWallet<1>>:
