@@ -1,7 +1,7 @@
 #[starknet::contract]
 mod RawStore {
     use starknet::storage_access::StorageAddress;
-    use starknet::syscalls::{storage_write_syscall, storage_read_syscall};
+    use starknet::syscalls::{storage_read_syscall, storage_write_syscall};
 
     #[storage]
     struct Storage {}
