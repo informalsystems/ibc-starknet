@@ -144,6 +144,22 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(crypto_lib: &C, path:
             )
         }
 
+        Path::UpgradeClientState(upgrade_client_state_path) => starknet_storage_key(
+            crypto_lib,
+            [
+                KeyPart::Field(b"upgraded_client_state_commitments"),
+                KeyPart::Map(upgrade_client_state_path.height.into()),
+            ],
+        ),
+
+        Path::UpgradeConsensusState(upgrade_consensus_state_path) => starknet_storage_key(
+            crypto_lib,
+            [
+                KeyPart::Field(b"upgraded_consensus_state_commitments"),
+                KeyPart::Map(upgrade_consensus_state_path.height.into()),
+            ],
+        ),
+
         // Note: ibc-go deprecates the use of client_proof and consensus_proof.
         // We return a dummy value for these paths for API compatibility reasons.
         Path::ClientState(client_state_path) => {

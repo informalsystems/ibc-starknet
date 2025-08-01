@@ -1,4 +1,5 @@
 use alloc::string::{String, ToString};
+use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt::Write;
 use core::str::FromStr;
@@ -9,9 +10,11 @@ use hermes_encoding_components::impls::ConvertVia;
 use hermes_encoding_components::traits::Converter;
 use ibc_client_cw::context::CwClientValidation;
 use ibc_client_starknet_types::header::StarknetHeader;
+use ibc_client_starknet_types::{StarknetClientState, StarknetConsensusState};
 use ibc_core::channel::types::proto::v1::Channel;
 use ibc_core::client::context::client_state::ClientStateValidation;
-use ibc_core::client::types::error::ClientError;
+use ibc_core::client::context::prelude::ClientStateCommon;
+use ibc_core::client::types::error::{ClientError, UpgradeClientError};
 use ibc_core::client::types::Status;
 use ibc_core::commitment_types::commitment::{
     CommitmentPrefix, CommitmentProofBytes, CommitmentRoot,
@@ -20,8 +23,10 @@ use ibc_core::commitment_types::error::CommitmentError;
 use ibc_core::connection::types::proto::v1::ConnectionEnd;
 use ibc_core::host::types::error::DecodingError;
 use ibc_core::host::types::identifiers::ClientId;
-use ibc_core::host::types::path::{Path, PathBytes};
-use ibc_core::primitives::proto::Any;
+use ibc_core::host::types::path::{
+    Path, PathBytes, UpgradeClientStatePath, UpgradeConsensusStatePath,
+};
+use ibc_core::primitives::proto::{Any, Protobuf};
 use prost::Message;
 use prost_types::Any as ProstAny;
 use starknet_core::types::{Felt, StorageProof};
@@ -121,12 +126,101 @@ where
     fn verify_upgrade_client(
         &self,
         ctx: &V,
-        upgraded_client_state: Any,
-        upgraded_consensus_state: Any,
+        upgraded_client_state_any: Any,
+        upgraded_consensus_state_any: Any,
         proof_upgrade_client: CommitmentProofBytes,
         proof_upgrade_consensus_state: CommitmentProofBytes,
         root: &CommitmentRoot,
     ) -> Result<(), ClientError> {
+        let starknet_crypto_cw = StarknetCryptoLib;
+
+        let upgraded_client_state = V::ClientStateRef::try_from(upgraded_client_state_any.clone())?;
+
+        let upgraded_consensus_state =
+            V::ConsensusStateRef::try_from(upgraded_consensus_state_any.clone())?;
+
+        let upgraded_height = upgraded_client_state.latest_height();
+        let latest_height = self.latest_height();
+
+        if latest_height >= upgraded_height {
+            Err(UpgradeClientError::InsufficientUpgradeHeight {
+                upgraded_height,
+                client_height: latest_height,
+            })?;
+        }
+
+        let upgraded_client_path = UpgradeClientStatePath {
+            upgrade_path: String::new(),
+            height: upgraded_height.revision_height(),
+        }
+        .into();
+
+        let upgraded_consensus_path = UpgradeConsensusStatePath {
+            upgrade_path: String::new(),
+            height: upgraded_height.revision_height(),
+        }
+        .into();
+
+        // commitment root is: contract_storage_root.to_bytes_be()
+        let contract_root = Felt::from_bytes_be_slice(root.as_bytes());
+
+        {
+            let felt_value = get_felt_from_value(
+                &starknet_crypto_cw,
+                &upgraded_client_state_any.value,
+                &upgraded_client_path,
+            )?;
+            let felt_path = ibc_path_to_storage_key(&starknet_crypto_cw, upgraded_client_path);
+
+            let storage_proof: StorageProof = serde_json::from_slice(proof_upgrade_client.as_ref())
+                .map_err(|e| {
+                    ClientError::Decoding(DecodingError::InvalidJson {
+                        description: e.to_string(),
+                    })
+                })?;
+
+            validate_storage_proof(&starknet_crypto_cw, &storage_proof).map_err(|e| {
+                ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+            })?;
+
+            verify_starknet_storage_proof(&storage_proof, contract_root, felt_path, felt_value)
+                .map_err(|e| {
+                    ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+                })?;
+        }
+
+        {
+            {
+                let felt_value = get_felt_from_value(
+                    &starknet_crypto_cw,
+                    &upgraded_consensus_state_any.value,
+                    &upgraded_consensus_path,
+                )?;
+                let felt_path =
+                    ibc_path_to_storage_key(&starknet_crypto_cw, upgraded_consensus_path);
+
+                let storage_proof: StorageProof = serde_json::from_slice(
+                    proof_upgrade_consensus_state.as_ref(),
+                )
+                .map_err(|e| {
+                    ClientError::Decoding(DecodingError::InvalidJson {
+                        description: e.to_string(),
+                    })
+                })?;
+
+                validate_storage_proof(&starknet_crypto_cw, &storage_proof).map_err(|e| {
+                    ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+                })?;
+
+                verify_starknet_storage_proof(&storage_proof, contract_root, felt_path, felt_value)
+                    .map_err(|e| {
+                        ClientError::FailedICS23Verification(
+                            CommitmentError::FailedToVerifyMembership,
+                        )
+                    })?;
+            }
+        }
+
         Ok(())
     }
 
@@ -290,6 +384,49 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
                 .iter()
                 .map(|v| Felt::from(*v))
                 .collect::<Vec<Felt>>();
+
+            Ok(crypto_lib.poseidon_hash_many(&felts))
+        }
+        Path::UpgradeClientState(_) => {
+            let upgrade_client_state: ClientState = ClientState::decode_vec(value.as_slice())
+                .map_err(|e| ClientError::Decoding(e.into()))?;
+
+            // TODO(rano): cairo serialize the client state
+            let mut felts = vec![];
+
+            {
+                let StarknetClientState {
+                    latest_height,
+                    chain_id,
+                    sequencer_public_key,
+                    ibc_contract_address,
+                } = upgrade_client_state.0;
+
+                let chain_id_bytes = chain_id.as_str().as_bytes();
+                felts.push(Felt::from(latest_height.revision_number()));
+                felts.push(Felt::from(latest_height.revision_height()));
+                felts.push(Felt::from(chain_id_bytes.len() as u32));
+                for byte in chain_id_bytes {
+                    felts.push(Felt::from(*byte));
+                }
+                felts.push(Felt::from_bytes_be_slice(&sequencer_public_key));
+                felts.push(Felt::from_bytes_be_slice(&ibc_contract_address));
+            }
+
+            Ok(crypto_lib.poseidon_hash_many(&felts))
+        }
+        Path::UpgradeConsensusState(_) => {
+            let upgrade_consensus_state: ConsensusState = ConsensusState::decode(value.as_slice())
+                .map_err(|e| ClientError::Decoding(e.into()))?;
+
+            let mut felts = vec![];
+
+            {
+                let StarknetConsensusState { root, time } = upgrade_consensus_state.0;
+
+                felts.push(Felt::from_bytes_be_slice(root.as_bytes()));
+                felts.push(Felt::from(time.nanoseconds()));
+            }
 
             Ok(crypto_lib.poseidon_hash_many(&felts))
         }
