@@ -193,7 +193,7 @@ where
             {
                 let felt_value = get_felt_from_value(
                     &starknet_crypto_cw,
-                    &upgraded_client_state_any.value,
+                    &upgraded_consensus_state_any.value,
                     &upgraded_consensus_path,
                 )?;
                 let felt_path =
