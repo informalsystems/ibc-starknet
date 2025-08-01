@@ -70,12 +70,13 @@ pub struct MsgScheduleUpgrade {
 
 impl MsgScheduleUpgradeValidateBasic of ValidateBasic<MsgScheduleUpgrade> {
     fn validate_basic(self: @MsgScheduleUpgrade) {
-        let BlockInfo { block_number, block_timestamp, .. } = get_block_info().unbox();
+        let BlockInfo { block_timestamp, .. } = get_block_info().unbox();
 
-        assert(
-            @block_number < self.upgraded_client_state.latest_height,
-            ClientErrors::UPGRADE_HEIGHT_IN_PAST,
-        );
+        // note: this is suppressed as new chain upgrade may start from a past block number
+        // assert(
+        //     @block_number < self.upgraded_client_state.latest_height,
+        //     ClientErrors::UPGRADE_HEIGHT_IN_PAST,
+        // );
 
         assert(
             @block_timestamp < self.upgraded_consensus_state.time,

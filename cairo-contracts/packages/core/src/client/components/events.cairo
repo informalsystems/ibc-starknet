@@ -50,7 +50,7 @@ pub mod ClientEventEmitterComponent {
     #[derive(Debug, Drop, starknet::Event)]
     pub struct ScheduleUpgradeEvent {
         #[key]
-        pub upgraded_height: u64,
+        pub upgraded_height: Height,
         pub upgraded_client_state: StarknetClientState,
         pub upgraded_consensus_state: StarknetConsensusState,
     }

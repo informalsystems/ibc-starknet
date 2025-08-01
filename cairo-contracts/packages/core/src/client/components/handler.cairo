@@ -141,21 +141,22 @@ pub mod ClientHandlerComponent {
 
             let MsgScheduleUpgrade { upgraded_client_state, upgraded_consensus_state } = msg;
 
-            let upgraded_height = upgraded_client_state.latest_height;
+            // FIXME(rano): should we use the revision number as key as well ?
+            let upgraded_revision_height = upgraded_client_state.latest_height.revision_height;
 
             self
                 .upgraded_states
                 .write(
-                    upgraded_height,
+                    upgraded_revision_height,
                     (upgraded_client_state.clone(), upgraded_consensus_state.clone()),
                 );
 
             self
                 .upgraded_client_state_commitments
-                .write(upgraded_height, upgraded_client_state.key());
+                .write(upgraded_revision_height, upgraded_client_state.key());
             self
                 .upgraded_consensus_state_commitments
-                .write(upgraded_height, upgraded_consensus_state.key());
+                .write(upgraded_revision_height, upgraded_consensus_state.key());
 
             self.emit_schedule_upgrade_event(upgraded_client_state, upgraded_consensus_state);
         }
