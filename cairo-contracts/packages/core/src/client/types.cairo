@@ -338,7 +338,7 @@ pub struct StarknetConsensusState {
 
 pub impl ClientStateKeyImpl of ComputeKey<StarknetClientState> {
     fn key(self: @StarknetClientState) -> felt252 {
-        let mut data: Array<felt252> = array!['StarknetClientState'];
+        let mut data: Array<felt252> = array![];
         data.append((*self.latest_height.revision_number).into());
         data.append((*self.latest_height.revision_height).into());
 
@@ -361,7 +361,7 @@ pub impl ClientStateKeyImpl of ComputeKey<StarknetClientState> {
 
 pub impl ConsensusStateKeyImpl of ComputeKey<StarknetConsensusState> {
     fn key(self: @StarknetConsensusState) -> felt252 {
-        let mut data: Array<felt252> = array!['StarknetConsensusState'];
+        let mut data: Array<felt252> = array![];
         data.append(*self.root);
         data.append((*self.time).into());
         poseidon_hash_span(data.span())
@@ -398,5 +398,24 @@ mod tests {
     fn test_duration_as_nanos() {
         let duration = Duration { seconds: 1, nanos: 1 };
         assert_eq!(duration.as_nanos(), 1_000_000_001);
+    }
+
+    #[test]
+    fn test_upgraded_client_state_key() {
+        let client_state = StarknetClientState {
+            latest_height: Height { revision_number: 1, revision_height: 2 },
+            chain_id: "test_chain",
+            sequencer_public_key: 0x12345,
+            ibc_contract_address: 0x1234567890abcdef1234567890abcdef.try_into().unwrap(),
+        };
+        let key = client_state.key();
+        assert_eq!(key, 0x169fbc70ba7fabf23544e9cf34f4d179830b924ee790f631f243b9195294125);
+    }
+
+    #[test]
+    fn test_upgraded_consensus_state_key() {
+        let consensus_state = StarknetConsensusState { root: 0x12345, time: 67890 };
+        let key = consensus_state.key();
+        assert_eq!(key, 0x63bbd344c107adb53145910cb75ae2901f9bdea80967dfef54bed58ce4fff15);
     }
 }

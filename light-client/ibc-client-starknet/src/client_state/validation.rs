@@ -437,3 +437,81 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use ibc_core::client::types::Height;
+    use ibc_core::primitives::Timestamp;
+
+    use super::*;
+
+    #[test]
+    fn test_upgraded_client_state_key() {
+        let client_state = StarknetClientState {
+            latest_height: Height::new(1, 2).unwrap(),
+            chain_id: "test_chain".parse().unwrap(),
+            sequencer_public_key: Felt::from(0x12345).to_bytes_be().to_vec(),
+            ibc_contract_address: Felt::from_hex("0x1234567890abcdef1234567890abcdef")
+                .unwrap()
+                .to_bytes_be()
+                .to_vec(),
+        };
+        let mut felts = vec![];
+
+        {
+            let StarknetClientState {
+                latest_height,
+                chain_id,
+                sequencer_public_key,
+                ibc_contract_address,
+            } = client_state;
+
+            let chain_id_bytes = chain_id.as_str().as_bytes();
+
+            felts.push(Felt::from(latest_height.revision_number()));
+            felts.push(Felt::from(latest_height.revision_height()));
+            felts.push(Felt::from(chain_id_bytes.len() as u32));
+            for byte in chain_id_bytes {
+                felts.push(Felt::from(*byte));
+            }
+            felts.push(Felt::from_bytes_be_slice(&sequencer_public_key));
+            felts.push(Felt::from_bytes_be_slice(&ibc_contract_address));
+        }
+
+        let commitment = StarknetCryptoLib.poseidon_hash_many(&felts);
+
+        assert_eq!(
+            commitment,
+            Felt::from_hex("0x169fbc70ba7fabf23544e9cf34f4d179830b924ee790f631f243b9195294125")
+                .unwrap(),
+        );
+    }
+
+    #[test]
+    fn test_upgraded_consensus_state_key() {
+        let consensus_state = StarknetConsensusState {
+            root: Felt::from_hex("0x12345")
+                .unwrap()
+                .to_bytes_be()
+                .to_vec()
+                .into(),
+            time: Timestamp::from_nanoseconds(67890),
+        };
+        let mut felts = vec![];
+
+        {
+            let StarknetConsensusState { root, time } = consensus_state;
+
+            felts.push(Felt::from_bytes_be_slice(root.as_bytes()));
+            felts.push(Felt::from(time.nanoseconds()));
+        }
+
+        let commitment = StarknetCryptoLib.poseidon_hash_many(&felts);
+
+        assert_eq!(
+            commitment,
+            Felt::from_hex("0x63bbd344c107adb53145910cb75ae2901f9bdea80967dfef54bed58ce4fff15")
+                .unwrap(),
+        );
+    }
+}
