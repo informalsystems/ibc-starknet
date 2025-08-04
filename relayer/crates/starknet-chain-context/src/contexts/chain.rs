@@ -31,7 +31,6 @@ use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_cosmos::chain_components::impls::GetFirstSignerAsDefault;
-use hermes_cosmos::chain_components::types::Secp256k1KeyPair;
 use hermes_cosmos::chain_preset::delegate::DelegateCosmosChainComponents;
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
@@ -51,7 +50,6 @@ use hermes_starknet_chain_components::traits::{
     JsonRpcUrlGetterComponent, MerkleProofTypeProviderComponent, ReqwestClientGetterComponent,
     StarknetAccountTypeProviderComponent, StarknetClientGetterComponent,
     StarknetClientTypeProviderComponent, StarknetMerkleProofVerifierComponent,
-    StarknetProofSignerGetterComponent, StarknetProofSignerTypeProviderComponent,
     StarknetStorageProofVerifierComponent, StorageKeyTypeProviderComponent,
     StorageProofQuerierComponent, StorageProofTypeProviderComponent,
 };
@@ -89,7 +87,6 @@ pub struct StarknetChainFields {
     pub event_encoding: StarknetEventEncoding,
     pub poll_interval: Duration,
     pub block_time: Duration,
-    pub proof_signer: Secp256k1KeyPair,
     pub nonce_mutex: Arc<Mutex<()>>,
     pub signers: Vec<StarknetWallet>,
     pub client_refresh_rate: Option<Duration>,
@@ -143,10 +140,6 @@ delegate_components! {
             StarknetClientGetterComponent,
         ]:
             WithField<symbol!("starknet_client")>,
-        StarknetProofSignerTypeProviderComponent:
-            UseType<Secp256k1KeyPair>,
-        StarknetProofSignerGetterComponent:
-            UseField<symbol!("proof_signer")>,
         DefaultSignerGetterComponent:
             GetFirstSignerAsDefault<symbol!("signers")>,
         SignerMutexGetterComponent:

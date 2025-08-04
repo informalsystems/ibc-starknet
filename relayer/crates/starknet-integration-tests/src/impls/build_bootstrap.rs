@@ -160,7 +160,6 @@ where
                 ibc_core_contract_address: OnceLock::new(),
                 ibc_ics20_contract_address: OnceLock::new(),
                 event_encoding: Default::default(),
-                proof_signer,
                 poll_interval: core::time::Duration::from_millis(200),
                 block_time: core::time::Duration::from_secs(1),
                 nonce_mutex: Arc::new(Mutex::new(())),
