@@ -4,6 +4,11 @@ pub struct StarknetCreateClientEvent {
     pub client_id: ClientId,
 }
 
+#[derive(Debug)]
+pub struct StarknetUpdateClientEvent {
+    // TODO
+}
+
 pub struct StarknetConnectionOpenInitEvent {
     pub connection_id: ConnectionId,
 }

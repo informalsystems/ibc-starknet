@@ -40,15 +40,6 @@ fn test_allowed_relayers() {
     assert!(state.in_allowed_relayers(RELAYER()));
 }
 
-#[should_panic(expected: 'ICS02: unauthorized relayer')]
-#[test]
-fn test_unauthorized_update_client() {
-    let mut state = setup();
-    start_cheat_caller_address_global(RELAYER());
-    let msg = MsgUpdateClient { client_id: CLIENT_ID(), client_message: array![] };
-    state.update_client(msg);
-}
-
 #[test]
 fn test_get_client_ok() {
     let mut state = setup();

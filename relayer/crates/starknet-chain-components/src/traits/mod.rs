@@ -16,9 +16,6 @@ pub use json_rpc::*;
 mod messages;
 pub use messages::*;
 
-mod proof_signer;
-pub use proof_signer::*;
-
 mod queries;
 pub use queries::*;
 

@@ -6,7 +6,6 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_core::encoding_components::traits::{CanEncode, HasDefaultEncoding};
 use hermes_core::encoding_components::types::AsBytes;
-use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use hermes_cosmos_core::protobuf_encoding_components::types::strategy::ViaProtobuf;
 use hermes_prelude::*;
 use ibc::core::client::types::Height;
@@ -18,7 +17,6 @@ use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
     CanQueryContractAddress, CanQueryStorageProof, HasFeederGatewayUrl, HasStarknetClient,
-    HasStarknetProofSigner,
 };
 use crate::types::{StarknetChainStatus, StarknetConsensusState, StarknetUpdateClientPayload};
 
@@ -38,7 +36,6 @@ where
         + HasFeederGatewayUrl
         + CanRaiseAsyncError<&'static str>
         + HasDefaultEncoding<AsBytes, Encoding = Encoding>
-        + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<ProviderError>
         + CanRaiseAsyncError<ureq::Error>

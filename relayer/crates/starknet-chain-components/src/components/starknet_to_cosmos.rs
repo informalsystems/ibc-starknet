@@ -15,7 +15,8 @@ mod preset {
         ConsensusStateWithProofsQuerierComponent, CounterpartyMessageHeightGetterComponent,
         CreateClientMessageBuilderComponent, CreateClientMessageOptionsTypeComponent,
         CreateClientPayloadBuilderComponent, CreateClientPayloadOptionsTypeComponent,
-        CreateClientPayloadTypeComponent, PacketDstChannelIdGetterComponent,
+        CreateClientPayloadTypeComponent, MisbehaviourCheckerComponent,
+        MisbehaviourMessageBuilderComponent, PacketDstChannelIdGetterComponent,
         PacketDstPortIdGetterComponent, PacketSequenceGetterComponent,
         PacketSrcChannelIdGetterComponent, PacketSrcPortIdGetterComponent,
         PacketTimeoutHeightGetterComponent, PacketTimeoutTimestampGetterComponent,
@@ -32,7 +33,8 @@ mod preset {
 
     use crate::impls::{
         BuildStarknetCreateClientMessage, BuildStarknetToCosmosConnectionHandshake,
-        BuildStarknetUpdateClientMessage, ConvertCosmosIbcAmountFromStarknet,
+        BuildStarknetUpdateClientMessage, CheckCosmosMisbehaviourFromStarknet,
+        ConvertCosmosIbcAmountFromStarknet, CosmosFromStarknetMisbehaviourMessageBuilder,
         GetCosmosCounterpartyMessageStarknetHeight, ProvideCometConsensusState,
         QueryStarknetConsensusStateHeightsFromGrpc, ReadPacketDstStarknetFields,
     };
@@ -107,6 +109,10 @@ mod preset {
 
             IbcTransferredAmountConverterComponent:
                 ConvertCosmosIbcAmountFromStarknet,
+            MisbehaviourCheckerComponent:
+                CheckCosmosMisbehaviourFromStarknet,
+            MisbehaviourMessageBuilderComponent:
+                CosmosFromStarknetMisbehaviourMessageBuilder,
         }
     }
 }

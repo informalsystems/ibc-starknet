@@ -1,7 +1,7 @@
 use ibc::core::client::types::Height as CosmosHeight;
 use starknet::core::types::Felt;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct StarknetMessage {
     pub to: Felt,
     pub selector: Felt,

@@ -7,7 +7,6 @@ use hermes_core::chain_components::traits::{
     HasCreateClientPayloadOptionsType, HasCreateClientPayloadType,
     OverrideCreateClientPayloadOptionsComponent, ProvideOverrideCreateClientPayloadOptions,
 };
-use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use hermes_prelude::*;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height;
@@ -17,9 +16,7 @@ use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
 use starknet_v14::core::types::StorageProof;
 
 use crate::impls::StarknetAddress;
-use crate::traits::{
-    CanQueryContractAddress, CanQueryStorageProof, HasFeederGatewayUrl, HasStarknetProofSigner,
-};
+use crate::traits::{CanQueryContractAddress, CanQueryStorageProof, HasFeederGatewayUrl};
 use crate::types::{
     StarknetChainStatus, StarknetConsensusState, StarknetCreateClientPayload,
     StarknetCreateClientPayloadOptions, WasmStarknetConsensusState,
@@ -42,7 +39,6 @@ where
         + HasAddressType<Address = StarknetAddress>
         + CanQueryChainHeight<Height = u64>
         + HasChainId<ChainId = ChainId>
-        + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<ureq::Error>
         + CanRaiseAsyncError<ClientError>,

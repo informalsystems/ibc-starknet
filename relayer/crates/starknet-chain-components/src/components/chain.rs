@@ -44,11 +44,13 @@ mod preset {
         CreateClientEventComponent, CreateClientMessageBuilderComponent,
         CreateClientMessageOptionsTypeComponent, CreateClientPayloadBuilderComponent,
         CreateClientPayloadOptionsTypeComponent, CreateClientPayloadTypeComponent,
-        EventExtractorComponent, EventTypeProviderComponent, HeightAdjusterComponent,
-        HeightFieldComponent, HeightIncrementerComponent, HeightTypeProviderComponent,
+        EventExtractorComponent, EventTypeProviderComponent, EvidenceFieldsGetterComponent,
+        EvidenceTypeProviderComponent, HeightAdjusterComponent, HeightFieldComponent,
+        HeightIncrementerComponent, HeightTypeProviderComponent,
         IbcCommitmentPrefixGetterComponent, IncomingPacketFilterComponent,
         InitChannelOptionsTypeComponent, InitConnectionOptionsTypeComponent,
         MessageResponseExtractorComponent, MessageSenderComponent, MessageTypeProviderComponent,
+        MisbehaviourCheckerComponent, MisbehaviourMessageBuilderComponent,
         OutgoingPacketFilterComponent, OutgoingPacketTypeComponent,
         OverrideCreateClientPayloadOptionsComponent, PacketAckCommitmentQuerierComponent,
         PacketCommitmentQuerierComponent, PacketCommitmentTypeComponent,
@@ -63,8 +65,9 @@ mod preset {
         RecoverClientPayloadTypeComponent, SendPacketEventComponent, SequenceTypeComponent,
         TimeMeasurerComponent, TimeoutTypeComponent, TimeoutUnorderedPacketMessageBuilderComponent,
         TimeoutUnorderedPacketPayloadBuilderComponent, TimeoutUnorderedPacketPayloadTypeComponent,
-        UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
-        UpdateClientPayloadTypeComponent, WriteAckEventComponent,
+        UpdateClientEventComponent, UpdateClientMessageBuilderComponent,
+        UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
+        WriteAckEventComponent,
     };
     use hermes_core::chain_type_components::traits::{
         AddressTypeProviderComponent, AmountDenomGetterComponent, AmountTypeProviderComponent,
@@ -76,11 +79,10 @@ mod preset {
     use hermes_core::relayer_components::error::traits::RetryableErrorComponent;
     use hermes_core::relayer_components::transaction::impls::PollTimeoutGetterComponent;
     use hermes_core::relayer_components::transaction::traits::{
-        ClientRefreshRateGetterComponent, MessagesWithSignerAndNonceSenderComponent,
-        MessagesWithSignerSenderComponent, NonceAllocatorComponent, NonceQuerierComponent,
-        NonceTypeProviderComponent, SignerTypeProviderComponent, TxHashTypeProviderComponent,
-        TxMessageResponseParserComponent, TxResponsePollerComponent, TxResponseQuerierComponent,
-        TxResponseTypeProviderComponent,
+        MessagesWithSignerAndNonceSenderComponent, MessagesWithSignerSenderComponent,
+        NonceAllocatorComponent, NonceQuerierComponent, NonceTypeProviderComponent,
+        SignerTypeProviderComponent, TxHashTypeProviderComponent, TxMessageResponseParserComponent,
+        TxResponsePollerComponent, TxResponseQuerierComponent, TxResponseTypeProviderComponent,
     };
     use hermes_core::test_components::chain::impls::{
         PollAssertEventualAmount, ProvideDefaultMemo, SendIbcTransferMessage,
@@ -107,22 +109,23 @@ mod preset {
         BuildStarknetChannelHandshakeMessages, BuildStarknetConnectionHandshakeMessages,
         BuildStarknetCreateClientPayload, BuildStarknetIbcTransferMessage,
         BuildStarknetPacketMessages, BuildStarknetUpdateClientPayload,
-        BuildUpdateCometClientMessage, CallStarknetContract, ConvertStarknetTokenAddressFromCosmos,
-        DeclareSierraContract, DeployStarknetContract, FilterStarknetPackets,
-        GetContractAddressFromField, GetCounterpartyCosmosHeightFromStarknetMessage,
-        GetOrCreateCosmosTokenAddressOnStarknet, GetStarknetBlockEvents,
-        GetStarknetClientRefreshRate, GetStarknetCommitmentPrefix, IbcTransferTimeoutAfterSeconds,
+        BuildUpdateCometClientMessage, CallStarknetContract, CheckStarknetMisbehaviour,
+        ConvertStarknetTokenAddressFromCosmos, DeclareSierraContract, DeployStarknetContract,
+        FilterStarknetPackets, GetContractAddressFromField,
+        GetCounterpartyCosmosHeightFromStarknetMessage, GetOrCreateCosmosTokenAddressOnStarknet,
+        GetStarknetBlockEvents, GetStarknetCommitmentPrefix, IbcTransferTimeoutAfterSeconds,
         InvokeStarknetContract, ProvideFeltSelector, ProvideNoCreateClientMessageOptionsOverride,
         ProvidePollAssertDuration, ProvideStarknetBlockType, ProvideStarknetChainStatusType,
-        ProvideStarknetClientStatus, ProvideStarknetHeight, ProvideStarknetIbcClientTypes,
-        ProvideStarknetPayloadTypes, ProvideStarknetWallet, ProvideTokenAddressDenom,
-        QueryChannelEndFromStarknet, QueryCometClientState, QueryCometConsensusState,
-        QueryConnectionEndFromStarknet, QueryCosmosChainIdFromStarknetChannelId,
-        QueryErc20TokenBalance, QueryPacketIsReceivedOnStarknet, QueryStarknetAckCommitment,
-        QueryStarknetBlock, QueryStarknetChainStatus, QueryStarknetClientStatus,
-        QueryStarknetNonce, QueryStarknetPacketCommitment, QueryStarknetPacketReceipt,
-        QueryStarknetWalletBalance, QueryTransactionReceipt, ReadPacketSrcStarknetFields,
-        RecoverStarknetClient, SendStarknetMessages, StarknetAddress, StarknetMessage,
+        ProvideStarknetClientStatus, ProvideStarknetEvidenceType, ProvideStarknetHeight,
+        ProvideStarknetIbcClientTypes, ProvideStarknetPayloadTypes, ProvideStarknetWallet,
+        ProvideTokenAddressDenom, QueryChannelEndFromStarknet, QueryCometClientState,
+        QueryCometConsensusState, QueryConnectionEndFromStarknet,
+        QueryCosmosChainIdFromStarknetChannelId, QueryErc20TokenBalance,
+        QueryPacketIsReceivedOnStarknet, QueryStarknetAckCommitment, QueryStarknetBlock,
+        QueryStarknetChainStatus, QueryStarknetClientStatus, QueryStarknetNonce,
+        QueryStarknetPacketCommitment, QueryStarknetPacketReceipt, QueryStarknetWalletBalance,
+        QueryTransactionReceipt, ReadPacketSrcStarknetFields, RecoverStarknetClient,
+        SendStarknetMessages, StarknetAddress, StarknetMessage, StarknetMisbehaviourMessageBuilder,
         TransferErc20Token, UseStarknetCommitmentProof, UseStarknetContractTypes,
         UseStarknetEvents, UseU256Amount,
     };
@@ -266,6 +269,11 @@ mod preset {
             PacketReceiptTypeComponent:
                 ProvideBytesPacketReceipt,
             [
+                EvidenceTypeProviderComponent,
+                EvidenceFieldsGetterComponent,
+            ]:
+                ProvideStarknetEvidenceType,
+            [
                 PacketSrcPortIdGetterComponent,
                 PacketDstChannelIdGetterComponent,
                 PacketDstPortIdGetterComponent,
@@ -316,8 +324,6 @@ mod preset {
                 QueryStarknetNonce,
             IbcCommitmentPrefixGetterComponent:
                 GetStarknetCommitmentPrefix,
-            ClientRefreshRateGetterComponent:
-                GetStarknetClientRefreshRate,
             RetryableErrorComponent:
                 ReturnRetryable<false>,
             TransferTokenMessageBuilderComponent:
@@ -332,6 +338,7 @@ mod preset {
                 QueryStarknetWalletBalance,
             [
                 CreateClientEventComponent,
+                UpdateClientEventComponent,
                 ConnectionOpenInitEventComponent,
                 ConnectionOpenTryEventComponent,
                 ChannelOpenInitEventComponent,
@@ -473,6 +480,10 @@ mod preset {
                 QueryPacketIsReceivedOnStarknet,
             PacketIsClearedQuerierComponent:
                 QueryClearedPacketWithEmptyCommitment,
+            MisbehaviourCheckerComponent:
+                CheckStarknetMisbehaviour,
+            MisbehaviourMessageBuilderComponent:
+                StarknetMisbehaviourMessageBuilder,
         }
     }
 }

@@ -8,7 +8,6 @@ use hermes_core::chain_components::traits::{
     PacketCommitmentQuerierComponent,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
-use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use hermes_prelude::*;
 use ibc::core::host::types::identifiers::{PortId as IbcPortId, Sequence as IbcSequence};
 use ibc::core::host::types::path::{CommitmentPath, Path};
@@ -20,7 +19,7 @@ use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
     CanCallContract, CanQueryContractAddress, CanQueryStorageProof, HasBlobType, HasSelectorType,
-    HasStarknetProofSigner, HasStorageKeyType, HasStorageProofType,
+    HasStorageKeyType, HasStorageProofType,
 };
 use crate::types::{
     ChannelId, PortId as CairoPortId, Sequence, StarknetChainStatus, StarknetCommitmentProof,
@@ -48,7 +47,6 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanCallContract
-        + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanRaiseAsyncError<serde_json::Error>
         + CanRaiseAsyncError<Encoding::Error>,
     Encoding: CanEncode<ViaCairo, Product![CairoPortId, ChannelId, Sequence]>

@@ -8,7 +8,6 @@ use hermes_core::chain_components::traits::{
     HasClientStateType, HasCommitmentProofType, HasHeightType, HasIbcCommitmentPrefix,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
-use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use hermes_prelude::*;
 use ibc::core::host::types::path::{ClientStatePath, Path};
 use starknet::core::types::Felt;
@@ -19,7 +18,7 @@ use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
     CanCallContract, CanQueryContractAddress, CanQueryStorageProof, HasBlobType, HasSelectorType,
-    HasStarknetProofSigner, HasStorageKeyType, HasStorageProofType,
+    HasStorageKeyType, HasStorageProofType,
 };
 use crate::types::{ClientId, CometClientState, StarknetChainStatus, StarknetCommitmentProof};
 
@@ -98,7 +97,6 @@ where
         + HasIbcCommitmentPrefix<CommitmentPrefix = Vec<u8>>
         + HasCommitmentProofType<CommitmentProof = StarknetCommitmentProof>
         + CanQueryClientState<Counterparty>
-        + HasStarknetProofSigner<ProofSigner = Secp256k1KeyPair>
         + CanQueryContractAddress<symbol!("ibc_client_contract_address")>
         + CanRaiseAsyncError<serde_json::Error>,
     Counterparty: HasClientStateType<Chain, ClientState = CometClientState> + HasHeightType,

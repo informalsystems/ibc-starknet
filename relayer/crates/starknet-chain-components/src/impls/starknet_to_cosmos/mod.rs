@@ -13,6 +13,9 @@ pub use create_client_message::*;
 mod ibc_amount;
 pub use ibc_amount::*;
 
+mod misbehaviour;
+pub use misbehaviour::*;
+
 mod packet_fields;
 pub use packet_fields::*;
 

@@ -34,6 +34,9 @@ pub use json_rpc::*;
 mod messages;
 pub use messages::*;
 
+mod misbehaviour;
+pub use misbehaviour::*;
+
 mod packet_fields;
 pub use packet_fields::*;
 

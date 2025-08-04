@@ -6,7 +6,9 @@ mod preset {
     use hermes_core::encoding_components::traits::{EncodedTypeComponent, ProvideEncodedType};
     use hermes_prelude::*;
 
-    use crate::impls::{DecodeOptionalByClassHash, DecodeOptionalByContractAddress};
+    use crate::impls::{
+        DecodeOptionalByClassHash, DecodeOptionalByContractAddress, StarknetUpdateClientEvent,
+    };
     use crate::types::{
         AckIbcTransferEvent, AckStatusIbcTransferEvent, AcknowledgePacketEvent, ApprovalEvent,
         ChanOpenAckEvent, ChanOpenConfirmEvent, ChanOpenInitEvent, ChanOpenTryEvent,
@@ -76,6 +78,7 @@ mod preset {
                 (ViaCairo, WriteAcknowledgementEvent),
                 (ViaCairo, AcknowledgePacketEvent),
                 (ViaCairo, TimeoutPacketEvent),
+                (ViaCairo, StarknetUpdateClientEvent),
             ]:
                 DecodePacketRelayEvents,
             (ViaCairo, Option<Erc20Event>):
