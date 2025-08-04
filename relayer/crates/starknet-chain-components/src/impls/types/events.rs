@@ -4,6 +4,10 @@ pub struct StarknetCreateClientEvent {
     pub client_id: ClientId,
 }
 
+pub struct StarknetScheduleUpgradeEvent {
+    pub upgrade_height: u64,
+}
+
 pub struct StarknetConnectionOpenInitEvent {
     pub connection_id: ConnectionId,
 }
