@@ -7,7 +7,7 @@ use hermes_prelude::*;
 pub use ibc_client_starknet_types::StarknetClientState;
 use prost_types::Any;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct WasmStarknetClientState {
     pub client_state: StarknetClientState,
     pub wasm_code_hash: Vec<u8>,

@@ -18,7 +18,8 @@ use hermes_core::test_components::driver::traits::{
 use hermes_core::test_components::setup::traits::{
     BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent,
     CreateClientMessageOptionsGetterAtComponent, CreateClientPayloadOptionsGetterAtComponent,
-    HasTestDriverType, PortIdGetterAtComponent, RecoverClientPayloadOptionsGetterAtComponent,
+    FullNodeForkerComponent, HasTestDriverType, PortIdGetterAtComponent,
+    RecoverClientPayloadOptionsGetterAtComponent,
 };
 use hermes_core::test_components::test_case::traits::recover_client::RecoverClientHandlerComponent;
 use hermes_cosmos::chain_components::impls::CosmosRecoverClientPayload;
@@ -42,6 +43,7 @@ use ibc::core::host::types::identifiers::PortId;
 
 use super::{CosmosStarknetRelayDriver, StarknetCosmosRelayDriver};
 use crate::contexts::StarknetChainDriver;
+use crate::impls::ForkSecondFullNode;
 
 #[cgp_context(StarknetTestDriverComponents)]
 #[derive(HasField)]
@@ -74,6 +76,8 @@ delegate_components! {
             TracingLogger,
         RecoverClientHandlerComponent:
             RecoverStarknetClientHandler,
+        FullNodeForkerComponent:
+            ForkSecondFullNode,
         ChainTypeProviderAtComponent<Index<0>>:
             UseType<StarknetChain>,
         ChainTypeProviderAtComponent<Index<1>>:

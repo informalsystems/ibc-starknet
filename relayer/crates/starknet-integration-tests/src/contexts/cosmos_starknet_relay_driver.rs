@@ -21,7 +21,7 @@ use hermes_starknet_relayer::contexts::{
 };
 
 #[cgp_context(CosmosStarknetRelayDriverComponents)]
-#[derive(HasField)]
+#[derive(Clone, HasField)]
 pub struct CosmosStarknetRelayDriver {
     pub birelay: CosmosStarknetBiRelay,
 }
