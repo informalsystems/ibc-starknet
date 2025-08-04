@@ -1,4 +1,6 @@
-use crate::types::{ChannelId, ClientId, ConnectionId};
+use starknet_crypto::Felt;
+
+use crate::types::{ChannelId, ClientId, ConnectionId, Height};
 
 pub struct StarknetCreateClientEvent {
     pub client_id: ClientId,
@@ -6,7 +8,9 @@ pub struct StarknetCreateClientEvent {
 
 #[derive(Debug)]
 pub struct StarknetUpdateClientEvent {
-    // TODO
+    pub client_id: ClientId,
+    pub consensus_heights: Vec<Height>,
+    pub header: Vec<Felt>,
 }
 
 pub struct StarknetConnectionOpenInitEvent {

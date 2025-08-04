@@ -5,6 +5,7 @@ use hermes_core::encoding_components::traits::{
 };
 use hermes_prelude::*;
 use ibc::core::channel::types::channel::Order as ChannelOrdering;
+use ibc::core::host::types::identifiers::ClientId;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
@@ -335,6 +336,7 @@ where
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
+        // Only asserting non-empty as there is no data field in Cairo
         if !event.data.is_empty() {
             return Err(EventEncoding::raise_error(UnknownEvent { event }));
         }
@@ -394,6 +396,7 @@ where
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
+        // Only asserting non-empty as there is no data field in Cairo
         if !event.data.is_empty() {
             return Err(EventEncoding::raise_error(UnknownEvent { event }));
         }
@@ -419,7 +422,9 @@ where
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
         + CanRaiseAsyncError<CairoEncoding::Error>
         + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
-    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>> + CanDecode<ViaCairo, Product![]>,
+    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, Product![ClientId]>
+        + CanDecode<ViaCairo, Product![Vec<Height>, Vec<Felt>]>,
 {
     fn decode(
         event_encoding: &EventEncoding,
@@ -427,14 +432,18 @@ where
     ) -> Result<StarknetUpdateClientEvent, EventEncoding::Error> {
         let cairo_encoding = event_encoding.encoding();
 
-        let product![] = cairo_encoding
+        let product![client_id,] = cairo_encoding
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
-        if !event.data.is_empty() {
-            return Err(EventEncoding::raise_error(UnknownEvent { event }));
-        }
+        let product![consensus_heights, header,] = cairo_encoding
+            .decode(&event.data)
+            .map_err(EventEncoding::raise_error)?;
 
-        Ok(StarknetUpdateClientEvent {})
+        Ok(StarknetUpdateClientEvent {
+            client_id,
+            consensus_heights,
+            header,
+        })
     }
 }
