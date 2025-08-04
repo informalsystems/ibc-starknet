@@ -158,9 +158,31 @@ pub mod ClientHandlerComponent {
                 .upgraded_consensus_state_commitments
                 .write(upgraded_revision_height, upgraded_consensus_state.key());
 
-            self.emit_schedule_upgrade_event(upgraded_client_state, upgraded_consensus_state);
+            self.emit_schedule_upgrade_event(upgraded_client_state.latest_height);
         }
-        // TODO(rano): implement read, update, delete methods for upgraded states
+
+        fn get_scheduled_upgrade(
+            self: @ComponentState<TContractState>, upgraded_height: u64,
+        ) -> (StarknetClientState, StarknetConsensusState) {
+            let (client_state, consensus_state) = self.upgraded_states.read(upgraded_height);
+
+            (client_state, consensus_state)
+        }
+
+        fn unschedule_upgrade(ref self: ComponentState<TContractState>, upgraded_height: u64) {
+            {
+                // only admin can unschedule an upgrade
+                let ownable = get_dep_component!(@self, Ownable);
+                ownable.assert_only_owner();
+            }
+
+            // FIXME: cleanup the upgraded client and consensus states.
+            // self.upgraded_states.write(upgraded_height, (StarknetClientState::zero(),
+            // StarknetConsensusState::zero()));
+
+            self.upgraded_client_state_commitments.write(upgraded_height, 0);
+            self.upgraded_consensus_state_commitments.write(upgraded_height, 0);
+        }
     }
 
     // -----------------------------------------------------------
@@ -334,14 +356,11 @@ pub mod ClientHandlerComponent {
         }
 
         fn emit_schedule_upgrade_event(
-            ref self: ComponentState<TContractState>,
-            upgraded_client_state: StarknetClientState,
-            upgraded_consensus_state: StarknetConsensusState,
+            ref self: ComponentState<TContractState>, upgraded_height: Height,
         ) {
             let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
 
-            event_emitter
-                .emit_schedule_upgrade_event(upgraded_client_state, upgraded_consensus_state);
+            event_emitter.emit_schedule_upgrade_event(upgraded_height);
         }
     }
 }

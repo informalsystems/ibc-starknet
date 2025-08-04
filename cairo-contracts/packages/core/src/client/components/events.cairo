@@ -1,8 +1,6 @@
 #[starknet::component]
 pub mod ClientEventEmitterComponent {
-    use starknet_ibc_core::client::{
-        CreateResponse, Height, StarknetClientState, StarknetConsensusState,
-    };
+    use starknet_ibc_core::client::{CreateResponse, Height};
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
 
     #[storage]
@@ -51,8 +49,6 @@ pub mod ClientEventEmitterComponent {
     pub struct ScheduleUpgradeEvent {
         #[key]
         pub upgraded_height: Height,
-        pub upgraded_client_state: StarknetClientState,
-        pub upgraded_consensus_state: StarknetConsensusState,
     }
 
     #[generate_trait]
@@ -97,18 +93,9 @@ pub mod ClientEventEmitterComponent {
         }
 
         fn emit_schedule_upgrade_event(
-            ref self: ComponentState<TContractState>,
-            upgraded_client_state: StarknetClientState,
-            upgraded_consensus_state: StarknetConsensusState,
+            ref self: ComponentState<TContractState>, upgraded_height: Height,
         ) {
-            self
-                .emit(
-                    ScheduleUpgradeEvent {
-                        upgraded_height: upgraded_client_state.latest_height,
-                        upgraded_client_state,
-                        upgraded_consensus_state,
-                    },
-                );
+            self.emit(ScheduleUpgradeEvent { upgraded_height });
         }
     }
 }
