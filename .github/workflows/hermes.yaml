@@ -184,7 +184,7 @@ jobs:
           cd madara
           nix develop -c \
             cargo build --release --manifest-path madara/Cargo.toml --bin madara
-          mv madara/target/release/madara "$HOME/.cargo/bin/madara"
+          cp madara/target/release/madara "$HOME/.cargo/bin/madara"
           which madara
 
       - name: Run Integration Tests
