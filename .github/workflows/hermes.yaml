@@ -142,7 +142,7 @@ jobs:
         with:
           repository: madara-alliance/madara
           path: madara
-          ref: e6fca12103a97238b5b5a87b5a22342804caac4c # chore/bump-blockifier
+          ref: 67a2ac59af4c2d98216b8fb2ef1e538020cbf462 # main
 
       - uses: cachix/install-nix-action@v30
         with:
@@ -182,7 +182,10 @@ jobs:
       - name: Install Madara
         run: |
           cd madara
-          nix develop -c cargo install --path madara/crates/node
+          nix develop -c \
+            cargo build --release --manifest-path madara/Cargo.toml --bin madara
+          mv madara/target/release/madara "$HOME/.cargo/bin/madara"
+          which madara
 
       - name: Run Integration Tests
         env:
