@@ -19,4 +19,5 @@ pub mod ProtobufLib {
 
     #[abi(embed_v0)]
     impl ProtobufLibImpl = ProtobufLibComponent::ProtobufLib<ContractState>;
+    // note: there is no initializer because it is supposed to be used via library calls.
 }
