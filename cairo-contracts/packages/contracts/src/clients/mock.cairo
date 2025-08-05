@@ -60,7 +60,6 @@ pub mod MockClient {
         ics23_lib: ClassHash,
         protobuf_lib: ClassHash,
     ) {
-        assert(owner.is_non_zero(), MockErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
     }
 

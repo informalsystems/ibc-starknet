@@ -45,7 +45,6 @@ pub mod MockCometClient {
 
     #[constructor]
     fn constructor(ref self: ContractState, owner: ContractAddress) {
-        assert(owner.is_non_zero(), MockErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
     }
 }

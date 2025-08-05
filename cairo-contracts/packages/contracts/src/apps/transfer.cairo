@@ -71,7 +71,6 @@ pub mod TransferApp {
 
     #[constructor]
     fn constructor(ref self: ContractState, owner: ContractAddress, erc20_class_hash: ClassHash) {
-        assert(owner.is_non_zero(), TransferErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
         self.transferrable.initializer();
         self.transfer.initializer(erc20_class_hash);

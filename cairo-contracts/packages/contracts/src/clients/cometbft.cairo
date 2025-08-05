@@ -62,7 +62,6 @@ pub mod CometClient {
         ics23_lib: ClassHash,
         protobuf_lib: ClassHash,
     ) {
-        assert(owner.is_non_zero(), CometErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
 
         // store the library classes
