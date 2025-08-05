@@ -22,8 +22,8 @@ scarb = { workspace = true }
 
 [dependencies]
 # external dependencies
-openzeppelin_access = { workspace = true }
 starknet            = { workspace = true }
+openzeppelin_access = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_core  = { workspace = true }
