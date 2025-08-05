@@ -109,6 +109,13 @@ where
                     felt!("0x00177100ae65c71074126963e695e17adf5b360146f960378b5cdfd9ed69870b"),
                 ),
             ),
+            (
+                "relayer-2".into(),
+                StarknetWallet::from_signing_key(
+                    felt!("0x025073e0772b1e348a5da66ea67fb46f75ecdca1bd24dbbc98567cbf4a0e00b3"),
+                    felt!("0x07ae55c8093920562c1cbab9edeb4eb52f788b93cac1d5721bda20c96100d743"),
+                ),
+            ),
         ]);
 
         let chain_driver = bootstrap

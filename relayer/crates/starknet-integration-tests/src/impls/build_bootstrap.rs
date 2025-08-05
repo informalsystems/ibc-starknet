@@ -1,5 +1,7 @@
 use alloc::collections::BTreeMap;
 use alloc::sync::Arc;
+use core::time::Duration;
+use std::env::var;
 use std::sync::OnceLock;
 
 use cgp::extra::runtime::HasRuntime;
@@ -70,9 +72,14 @@ where
                 .map_err(Bootstrap::raise_error)?;
         }
 
-        let relayer_wallet = wallets
+        let relayer_wallet_1 = wallets
             .get("relayer")
             .ok_or_else(|| Bootstrap::raise_error("expect relayer wallet to be present"))?
+            .clone();
+
+        let relayer_wallet_2 = wallets
+            .get("relayer-2")
+            .ok_or_else(|| Bootstrap::raise_error("expect relayer-2 wallet to be present"))?
             .clone();
 
         let user_wallet_a = wallets
@@ -118,7 +125,7 @@ where
 
         let proof_signer = Secp256k1KeyPair::from_mnemonic(
             bip39::Mnemonic::from_entropy(
-                &relayer_wallet.signing_key.to_bytes_be(),
+                &relayer_wallet_1.signing_key.to_bytes_be(),
                 bip39::Language::English,
             )
             .expect("valid mnemonic")
@@ -127,6 +134,16 @@ where
             "strk",
         )
         .expect("valid key pair");
+
+        let client_refresh_rate = var("STARKNET_REFRESH_RATE")
+            .map(|refresh_str| {
+                Duration::from_secs(
+                    refresh_str
+                        .parse::<u64>()
+                        .expect("failed to parse {refresh_str} to seconds"),
+                )
+            })
+            .ok();
 
         let chain = StarknetChain {
             fields: Arc::new(StarknetChainFields {
@@ -143,11 +160,12 @@ where
                 ibc_core_contract_address: OnceLock::new(),
                 ibc_ics20_contract_address: OnceLock::new(),
                 event_encoding: Default::default(),
-                proof_signer,
                 poll_interval: core::time::Duration::from_millis(200),
                 block_time: core::time::Duration::from_secs(1),
                 nonce_mutex: Arc::new(Mutex::new(())),
-                signer: relayer_wallet.clone(),
+                signers: vec![relayer_wallet_1.clone(), relayer_wallet_2.clone()],
+                client_refresh_rate,
+                signer_mutex: Arc::new(Mutex::new(0)),
             }),
         };
 
@@ -159,7 +177,8 @@ where
             node_config,
             wallets,
             chain_processes,
-            relayer_wallet,
+            relayer_wallet_1,
+            relayer_wallet_2,
             user_wallet_a,
             user_wallet_b,
         };
