@@ -69,7 +69,7 @@ pub mod CometClientComponent {
             ref self: ComponentState<TContractState>, msg: MsgCreateClient,
         ) -> CreateResponse {
             {
-                let ownable = get_dep_component!(self, Ownable);
+                let ownable = get_dep_component!(@self, Ownable);
                 ownable.assert_only_owner();
             }
             let client_sequence = self.read_next_client_sequence();
@@ -86,7 +86,7 @@ pub mod CometClientComponent {
 
         fn recover_client(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
             {
-                let ownable = get_dep_component!(self, Ownable);
+                let ownable = get_dep_component!(@self, Ownable);
                 ownable.assert_only_owner();
             }
             self.recover_validate(msg.clone());
