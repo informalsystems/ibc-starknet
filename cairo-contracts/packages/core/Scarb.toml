@@ -24,6 +24,8 @@ scarb = { workspace = true }
 # external dependencies
 starknet = { workspace = true }
 
+openzeppelin_access = { workspace = true }
+
 # internal dependencies
 ics23     = { workspace = true }
 protobuf  = { workspace = true }

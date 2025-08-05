@@ -1,6 +1,8 @@
 #[starknet::component]
 pub mod ClientHandlerComponent {
     use core::num::traits::Zero;
+    use openzeppelin_access::ownable::OwnableComponent;
+    use openzeppelin_access::ownable::OwnableComponent::InternalTrait;
     use starknet::storage::{
         IntoIterRange, Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess,
         StoragePointerReadAccess, Vec,
@@ -14,8 +16,6 @@ pub mod ClientHandlerComponent {
         MsgUpgradeClient, UpdateResponse,
     };
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
-    use starknet_ibc_utils::governance::IBCGovernanceComponent;
-    use starknet_ibc_utils::governance::IBCGovernanceComponent::GovernanceInternalTrait;
 
     #[storage]
     pub struct Storage {
@@ -138,23 +138,21 @@ pub mod ClientHandlerComponent {
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
-        impl Governance: IBCGovernanceComponent::HasComponent<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of IRegisterRelayer<ComponentState<TContractState>> {
         fn register_relayer(
             ref self: ComponentState<TContractState>, relayer_address: ContractAddress,
         ) {
+            {
+                let ownable = get_dep_component_mut!(ref self, Ownable);
+                ownable.assert_only_owner();
+            }
+
             assert(relayer_address.is_non_zero(), ClientErrors::ZERO_RELAYER_ADDRESS);
 
             assert(
                 !self.in_allowed_relayers(relayer_address),
                 ClientErrors::RELAYER_ALREADY_REGISTERED,
-            );
-
-            let governor = get_dep_component!(@self, Governance).governor();
-
-            assert(
-                governor.is_zero() || governor == get_caller_address(),
-                ClientErrors::INVALID_GOVERNOR,
             );
 
             self.write_allowed_relayer(relayer_address);

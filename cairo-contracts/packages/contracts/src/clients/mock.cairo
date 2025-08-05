@@ -4,19 +4,13 @@ pub mod MockClient {
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::{ClassHash, ContractAddress};
     use starknet_ibc_clients::mock::{MockClientComponent, MockErrors};
-    use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
-    component!(path: IBCGovernanceComponent, storage: governance, event: IBCGovernanceEvent);
     component!(path: MockClientComponent, storage: client, event: MockClientEvent);
 
     #[abi(embed_v0)]
     impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
     impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
-
-    #[abi(embed_v0)]
-    impl IBCGovernanceImpl = IBCGovernanceComponent::Governance<ContractState>;
-    impl IBCGovernanceInternalImpl = IBCGovernanceComponent::GovernanceInternalImpl<ContractState>;
 
     #[abi(embed_v0)]
     impl MockClientHandlerImpl =
@@ -37,8 +31,6 @@ pub mod MockClient {
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
-        governance: IBCGovernanceComponent::Storage,
-        #[substorage(v0)]
         client: MockClientComponent::Storage,
     }
 
@@ -47,8 +39,6 @@ pub mod MockClient {
     pub enum Event {
         #[flat]
         OwnableEvent: OwnableComponent::Event,
-        #[flat]
-        IBCGovernanceEvent: IBCGovernanceComponent::Event,
         #[flat]
         MockClientEvent: MockClientComponent::Event,
     }
@@ -63,6 +53,5 @@ pub mod MockClient {
     ) {
         assert(owner.is_non_zero(), MockErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
-        self.governance.initializer();
     }
 }

@@ -1,6 +1,7 @@
 #[starknet::contract]
 pub mod IBCCore {
     use ibc_utils::storage::write_raw_key;
+    use openzeppelin_access::ownable::OwnableComponent;
     use starknet::ClassHash;
     use starknet_ibc_core::channel::{ChannelEventEmitterComponent, ChannelHandlerComponent};
     use starknet_ibc_core::client::{ClientEventEmitterComponent, ClientHandlerComponent};
@@ -8,17 +9,18 @@ pub mod IBCCore {
         ConnectionEventEmitterComponent, ConnectionHandlerComponent,
     };
     use starknet_ibc_core::router::RouterHandlerComponent;
-    use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
     // -----------------------------------------------------------
-    // Setup Governance Component
+    // Setup Ownable Component
     // -----------------------------------------------------------
 
-    component!(path: IBCGovernanceComponent, storage: governance, event: IBCGovernanceEvent);
+    component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
 
+    // Ownable Mixin
     #[abi(embed_v0)]
-    impl IBCGovernanceImpl = IBCGovernanceComponent::Governance<ContractState>;
-    impl IBCGovernanceInternalImpl = IBCGovernanceComponent::GovernanceInternalImpl<ContractState>;
+    impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
+    impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
+
 
     // -----------------------------------------------------------
     // Setup Client Components
@@ -95,7 +97,7 @@ pub mod IBCCore {
     #[storage]
     struct Storage {
         #[substorage(v0)]
-        governance: IBCGovernanceComponent::Storage,
+        ownable: OwnableComponent::Storage,
         #[substorage(v0)]
         client_emitter: ClientEventEmitterComponent::Storage,
         #[substorage(v0)]
@@ -116,7 +118,7 @@ pub mod IBCCore {
     #[derive(Debug, Drop, starknet::Event)]
     pub enum Event {
         #[flat]
-        IBCGovernanceEvent: IBCGovernanceComponent::Event,
+        OwnableEvent: OwnableComponent::Event,
         #[flat]
         ClientEventEmitterEvent: ClientEventEmitterComponent::Event,
         #[flat]
@@ -135,7 +137,10 @@ pub mod IBCCore {
 
     #[constructor]
     fn constructor(ref self: ContractState, protobuf_lib: ClassHash) {
-        self.governance.initializer();
+        // Deployer is the owner of the contract.
+        // This is the address of the contract that deploys this contract.
+        self.ownable.initializer(starknet::get_caller_address());
+
         self.client_handler.initializer();
         self.router_handler.initializer();
 
