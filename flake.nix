@@ -113,7 +113,7 @@
               pkg-config
               ;
 
-            nixfmt = nixpkgs.nixfmt-tree;
+            nixfmt = nixpkgs.nixfmt-rfc-style;
           };
 
           mac-deps = nixpkgs.lib.optional nixpkgs.stdenv.isDarwin [
@@ -124,18 +124,19 @@
           shell-deps = (builtins.attrValues starknet-pkgs) ++ (builtins.attrValues tools) ++ mac-deps;
         in
         {
-          packages = {
-            inherit
-              starknet-devnet
-              cairo
-              rust
-              rust-nightly
-              rust-wasm
-              ibc-starknet-cw
-              ;
-          }
-          // tools
-          // starknet-pkgs;
+          packages =
+            {
+              inherit
+                starknet-devnet
+                cairo
+                rust
+                rust-nightly
+                rust-wasm
+                ibc-starknet-cw
+                ;
+            }
+            // tools
+            // starknet-pkgs;
 
           devShells = {
             default = nixpkgs.mkShell { buildInputs = shell-deps; };
@@ -150,7 +151,7 @@
             rust-wasm = nixpkgs.mkShell { buildInputs = [ rust-wasm ] ++ shell-deps; };
           };
 
-          formatter = tools.nixfmt-tree;
+          formatter = tools.nixfmt;
         }
       );
 }

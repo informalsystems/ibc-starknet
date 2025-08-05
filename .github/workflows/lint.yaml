@@ -63,7 +63,8 @@ jobs:
 
       - name: Format Nix
         run: |
-          nix run .#nixfmt -- --ci
+          nix shell .#nixfmt -c \
+            nixfmt --check .
 
       - name: Format ts scripts
         run: |
