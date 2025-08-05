@@ -4,12 +4,12 @@ pub mod MockClientComponent {
     use ibc_utils::array::span_contains;
     use ibc_utils::storage::ArrayFelt252Store;
     use openzeppelin_access::ownable::OwnableComponent;
-    use openzeppelin_access::ownable::interface::IOwnable;
+    use openzeppelin_access::ownable::OwnableComponent::InternalTrait;
     use starknet::storage::{
         Map, StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
         StoragePointerWriteAccess,
     };
-    use starknet::{ContractAddress, get_block_number, get_block_timestamp, get_caller_address};
+    use starknet::{get_block_number, get_block_timestamp};
     use starknet_ibc_clients::mock::{
         MockClientState, MockClientStateImpl, MockConsensusState, MockConsensusStateImpl,
         MockConsensusStateZero, MockErrors, MockHeader, MockHeaderImpl,
@@ -54,7 +54,10 @@ pub mod MockClientComponent {
         fn create_client(
             ref self: ComponentState<TContractState>, msg: MsgCreateClient,
         ) -> CreateResponse {
-            self.assert_owner();
+            {
+                let ownable = get_dep_component!(self, Ownable);
+                ownable.assert_only_owner();
+            }
             let client_sequence = self.read_next_client_sequence();
             self.create_validate(client_sequence, @msg);
             self.create_execute(client_sequence, msg)
@@ -68,7 +71,10 @@ pub mod MockClientComponent {
         }
 
         fn recover_client(ref self: ComponentState<TContractState>, msg: MsgRecoverClient) {
-            self.assert_owner();
+            {
+                let ownable = get_dep_component!(self, Ownable);
+                ownable.assert_only_owner();
+            }
             self.recover_validate(msg.clone());
             self.recover_execute(msg)
         }
@@ -680,26 +686,6 @@ pub mod MockClientComponent {
                     get_block_number(),
                     get_block_timestamp(),
                 );
-        }
-    }
-
-    // -----------------------------------------------------------
-    // Client Owner
-    // -----------------------------------------------------------
-
-    #[generate_trait]
-    pub(crate) impl ClientOwnerImpl<
-        TContractState,
-        +HasComponent<TContractState>,
-        +Drop<TContractState>,
-        impl Ownable: OwnableComponent::HasComponent<TContractState>,
-    > of ClientOwnerTrait<TContractState> {
-        fn owner(self: @ComponentState<TContractState>) -> ContractAddress {
-            get_dep_component!(self, Ownable).owner()
-        }
-
-        fn assert_owner(self: @ComponentState<TContractState>) {
-            assert(self.owner() == get_caller_address(), MockErrors::INVALID_OWNER);
         }
     }
 
