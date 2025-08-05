@@ -47,7 +47,7 @@ sha2                        = { version = "0.10.9" }
 tonic                       = { version = "0.12" }
 prost                       = { version = "0.13.1" }
 prost-types                 = { version = "0.13.1" }
-cairo-lang-starknet-classes = { version = "2.11.4" }
+cairo-lang-starknet-classes = { version = "2.12.0" }
 clap                        = { version = "4.5" }
 toml                        = { version = "0.8.23" }
 oneline-eyre                = { version = "0.1.0" }
