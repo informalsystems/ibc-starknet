@@ -88,8 +88,10 @@ pub fn u32_to_bytes(self: u32, mode: ConvMode) -> Span<u8> {
     let mut val3 = self & 0xFF000000;
     if val3 != 0 {
         return array![
-            (val3 / 0x1000000).try_into().unwrap(), (val2 / 0x10000).try_into().unwrap(),
-            (val1 / 0x100).try_into().unwrap(), val0,
+            (val3 / 0x1000000).try_into().unwrap(),
+            (val2 / 0x10000).try_into().unwrap(),
+            (val1 / 0x100).try_into().unwrap(),
+            val0,
         ]
             .span();
     }

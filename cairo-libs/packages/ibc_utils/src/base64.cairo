@@ -164,8 +164,15 @@ mod tests {
     #[test]
     fn test_round_trip_base64() {
         let test_cases = array![
-            ("", ""), ("Man", "TWFu"), ("foobar", "Zm9vYmFy"), ("f", "Zg=="), ("foob", "Zm9vYg=="),
-            ("fo", "Zm8="), ("fooba", "Zm9vYmE="), ("hello", "aGVsbG8="), ("hi", "aGk="),
+            ("", ""),
+            ("Man", "TWFu"),
+            ("foobar", "Zm9vYmFy"),
+            ("f", "Zg=="),
+            ("foob", "Zm9vYg=="),
+            ("fo", "Zm8="),
+            ("fooba", "Zm9vYmE="),
+            ("hello", "aGVsbG8="),
+            ("hi", "aGk="),
             (
                 "The quick brown fox jumps over the lazy dog",
                 "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw==",
