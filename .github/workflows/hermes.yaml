@@ -41,7 +41,7 @@ jobs:
         with:
           repository: madara-alliance/madara
           path: madara
-          ref: 67a2ac59af4c2d98216b8fb2ef1e538020cbf462 # main
+          ref: ae38bba17477888eaf8d4b26d627ba3c2e76b886 # main
 
       - uses: cachix/install-nix-action@v30
         with:
@@ -153,7 +153,7 @@ jobs:
         with:
           repository: madara-alliance/madara
           path: madara
-          ref: 67a2ac59af4c2d98216b8fb2ef1e538020cbf462 # main
+          ref: ae38bba17477888eaf8d4b26d627ba3c2e76b886 # main
 
       - uses: cachix/install-nix-action@v30
         with:

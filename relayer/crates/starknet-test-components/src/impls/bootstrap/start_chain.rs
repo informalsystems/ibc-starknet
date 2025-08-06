@@ -57,7 +57,7 @@ where
             "sepolia",
             "--l1-sync-disabled",
             "--l2-sync-disabled",
-            "--gas-price",
+            "--l1-gas-price",
             "0",
             "--blob-gas-price",
             "0",
