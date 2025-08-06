@@ -1,8 +1,7 @@
-use core::str::FromStr;
-
 use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
+use core::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 use starknet_core::types::Felt;
@@ -94,7 +93,11 @@ pub struct StarknetVersion {
 
 impl StarknetVersion {
     pub const fn new(major: u8, minor: u8, patch: u8) -> Self {
-        Self { major, minor, patch }
+        Self {
+            major,
+            minor,
+            patch,
+        }
     }
 }
 
@@ -107,10 +110,13 @@ impl FromStr for StarknetVersion {
         let minor = iter.next().and_then(|s| s.parse().ok()).ok_or(())?;
         let patch = iter.next().and_then(|s| s.parse().ok()).ok_or(())?;
         iter.next().is_none().then_some(()).ok_or(())?;
-        Ok(Self { major, minor, patch })
+        Ok(Self {
+            major,
+            minor,
+            patch,
+        })
     }
 }
-
 
 impl Block {
     pub fn hash_version(&self) -> &'static [u8] {
