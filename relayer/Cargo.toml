@@ -31,6 +31,7 @@ cgp            = { version = "0.4.0" }
 cgp-error-eyre = { version = "0.4.0" }
 
 ibc                         = { version = "0.56.0" }
+ibc-client-tendermint       = { version = "0.56.0" }
 starknet                    = { version = "0.13.0" }
 starknet-v14                = { version = "0.14.0", package = "starknet" }
 starknet-crypto             = { version = "0.7.4" }
@@ -68,9 +69,12 @@ garaga                      = { version = "0.18.1", package = "garaga_rs", defau
 ibc-proto                   = { version = "0.51.1" }
 ibc-client-starknet-types   = { version = "0.1.0" }
 tendermint                  = { version = "0.40" }
+tendermint-light-client-verifier = { version = "0.40" }
+tendermint-proto            = { version = "0.40" }
 tendermint-rpc              = { version = "0.40" }
 
 hermes-prelude                      = { version = "0.1.0" }
+hermes-comet-light-client-context   = { version = "0.1.0" }
 hermes-core                         = { version = "0.1.0" }
 hermes-cosmos                       = { version = "0.1.0" }
 hermes-cosmos-core                  = { version = "0.1.0" }
