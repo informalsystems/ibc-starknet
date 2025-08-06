@@ -36,6 +36,13 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: Checkout Madara
+        uses: actions/checkout@v4
+        with:
+          repository: madara-alliance/madara
+          ref: f025e9d # main branch
+          path: madara
+
       - uses: cachix/install-nix-action@v30
         with:
           extra_nix_config: |
@@ -69,14 +76,6 @@ jobs:
           MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
           madara --help > /dev/null
-
-      - name: Checkout Madara
-        if: steps.madara-from-docker.outcome == 'failure'
-        uses: actions/checkout@v4
-        with:
-          repository: madara-alliance/madara
-          ref: f025e9d # main branch
-          path: madara
 
       - name: Build and Install Madara
         if: steps.madara-from-docker.outcome == 'failure'
@@ -158,6 +157,13 @@ jobs:
 
       - uses: actions/checkout@v4
 
+      - name: Checkout Madara
+        uses: actions/checkout@v4
+        with:
+          repository: madara-alliance/madara
+          ref: f025e9d # main branch
+          path: madara
+
       - uses: cachix/install-nix-action@v30
         with:
           extra_nix_config: |
@@ -191,14 +197,6 @@ jobs:
           MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
           madara --help > /dev/null
-
-      - name: Checkout Madara
-        if: steps.madara-from-docker.outcome == 'failure'
-        uses: actions/checkout@v4
-        with:
-          repository: madara-alliance/madara
-          ref: f025e9d # main branch
-          path: madara
 
       - name: Build and Install Madara
         if: steps.madara-from-docker.outcome == 'failure'
