@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: madara-alliance/madara
-          ref: f025e9d # main branch
+          ref: f025e9d8b0a77dbadb4bb8049ff3756619bf2611 # main branch
           path: madara
 
       - uses: cachix/install-nix-action@v30
@@ -161,7 +161,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: madara-alliance/madara
-          ref: f025e9d # main branch
+          ref: f025e9d8b0a77dbadb4bb8049ff3756619bf2611 # main branch
           path: madara
 
       - uses: cachix/install-nix-action@v30
