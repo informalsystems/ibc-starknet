@@ -63,7 +63,8 @@ jobs:
       - name: Install Madara
         run: |
           MADARA_REVISION=f025e9d # nightly revision
-          MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
+          DOCKER_PLATFORM=${{ matrix.os == 'macos-13' && 'darwin/amd64' || matrix.os == 'ubuntu-22.04-arm' && 'linux/arm64' || 'linux/amd64' }}
+          MADARA_DOCKER_PATH=`docker run --name madara-container --platform "${DOCKER_PLATFORM}" --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
           which madara
 
@@ -166,7 +167,8 @@ jobs:
       - name: Install Madara
         run: |
           MADARA_REVISION=f025e9d # nightly revision
-          MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
+          DOCKER_PLATFORM=${{ matrix.os == 'macos-13' && 'darwin/amd64' || matrix.os == 'ubuntu-22.04-arm' && 'linux/arm64' || 'linux/amd64' }}
+          MADARA_DOCKER_PATH=`docker run --name madara-container --platform "${DOCKER_PLATFORM}" --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
           which madara
 
