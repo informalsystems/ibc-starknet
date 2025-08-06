@@ -1,10 +1,12 @@
 use cometbft::light_client::Header as CometHeader;
+use cometbft::light_client::Misbehaviour as CometMisbehaviour;
 use ibc_utils::bytes::ByteArrayIntoArrayU8;
 use ibc_utils::storage::read_raw_key;
 use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};
 
 #[derive(Drop)]
 pub struct Misbehaviour {
+    pub client_id: ByteArray,
     pub header_1: CometHeader,
     pub header_2: CometHeader,
 }
@@ -14,22 +16,20 @@ pub impl MisbehaviourImpl of MisbehaviourTrait {
     fn deserialize(misbehaviour_header: Array<felt252>) -> Misbehaviour {
         let mut span = misbehaviour_header.span();
 
-        let (header_1_bytes, header_2_bytes) = Serde::<
-            (ByteArray, ByteArray),
-        >::deserialize(ref span)
-            .unwrap();
+        let byte_array = Serde::<ByteArray>::deserialize(ref span).unwrap();
 
         let protobuf_library_dispatcher = IProtobufLibraryDispatcher {
             class_hash: read_raw_key::<'protobuf-library'>(),
         };
 
-        let header_1 = protobuf_library_dispatcher
-            .comet_header_decode(ByteArrayIntoArrayU8::into(header_1_bytes));
+        let comet_misbehaviour = protobuf_library_dispatcher
+            .comet_misbehaviour_decode(ByteArrayIntoArrayU8::into(byte_array));
 
-        let header_2 = protobuf_library_dispatcher
-            .comet_header_decode(ByteArrayIntoArrayU8::into(header_2_bytes));
-
-        Misbehaviour { header_1, header_2 }
+        Misbehaviour {
+            client_id: comet_misbehaviour.client_id,
+            header_1: comet_misbehaviour.header_1,
+            header_2: comet_misbehaviour.header_2,
+        }
     }
 
 
