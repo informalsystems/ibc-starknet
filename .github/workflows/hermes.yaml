@@ -36,13 +36,6 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Checkout Madara repo
-        uses: actions/checkout@v4
-        with:
-          repository: madara-alliance/madara
-          path: madara
-          ref: ae38bba17477888eaf8d4b26d627ba3c2e76b886 # main
-
       - uses: cachix/install-nix-action@v30
         with:
           extra_nix_config: |
@@ -66,7 +59,13 @@ jobs:
           workspaces: |
             relayer
             light-client
-            madara/madara
+
+      - name: Install Madara
+        run: |
+          MADARA_REVISION=5ec6ea5 # nightly revision
+          MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
+          docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
+          which madara
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
@@ -77,14 +76,6 @@ jobs:
         working-directory: ./madara-contracts
         run: |
           scarb --profile release build
-
-      - name: Install Madara
-        run: |
-          cd madara
-          nix develop -c \
-            cargo build --release --manifest-path madara/Cargo.toml --bin madara
-          cp madara/target/release/madara "$HOME/.cargo/bin/madara"
-          which madara
 
       - name: Run Integration Tests
         env:
@@ -148,13 +139,6 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Checkout Madara repo
-        uses: actions/checkout@v4
-        with:
-          repository: madara-alliance/madara
-          path: madara
-          ref: ae38bba17477888eaf8d4b26d627ba3c2e76b886 # main
-
       - uses: cachix/install-nix-action@v30
         with:
           extra_nix_config: |
@@ -178,7 +162,13 @@ jobs:
           workspaces: |
             relayer
             light-client
-            madara/madara
+
+      - name: Install Madara
+        run: |
+          MADARA_REVISION=5ec6ea5 # nightly revision
+          MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
+          docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
+          which madara
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
@@ -189,14 +179,6 @@ jobs:
         working-directory: ./madara-contracts
         run: |
           scarb --profile release build
-
-      - name: Install Madara
-        run: |
-          cd madara
-          nix develop -c \
-            cargo build --release --manifest-path madara/Cargo.toml --bin madara
-          cp madara/target/release/madara "$HOME/.cargo/bin/madara"
-          which madara
 
       - name: Run Integration Tests
         env:
