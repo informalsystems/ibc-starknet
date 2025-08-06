@@ -22,13 +22,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-14]
+        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-13]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
       - name: Free Disk Space (Ubuntu)
-        if: ${{ matrix.os != 'macos-14' }}
+        if: ${{ matrix.os != 'macos-13' }}
         uses: jlumbroso/free-disk-space@main
+
+      - name: Setup Docker (macOS 13)
+        if: ${{ matrix.os == 'macos-13' }}
+        uses: douglascamata/setup-docker-macos-action@main
 
       - uses: actions/checkout@v4
 
@@ -130,13 +134,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-14]
+        os: [ubuntu-22.04, ubuntu-22.04-arm, macos-13]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
       - name: Free Disk Space (Ubuntu)
-        if: ${{ matrix.os != 'macos-14' }}
+        if: ${{ matrix.os != 'macos-13' }}
         uses: jlumbroso/free-disk-space@main
+
+      - name: Setup Docker (macOS 13)
+        if: ${{ matrix.os == 'macos-13' }}
+        uses: douglascamata/setup-docker-macos-action@main
 
       - uses: actions/checkout@v4
 
