@@ -59,14 +59,32 @@ jobs:
           workspaces: |
             relayer
             light-client
+            madara/madara
 
       - name: Install Madara
+        id: madara-from-docker
+        continue-on-error: true
         run: |
           MADARA_REVISION=f025e9d # nightly revision
-          DOCKER_PLATFORM=${{ matrix.os == 'macos-13' && 'darwin/amd64' || matrix.os == 'ubuntu-22.04-arm' && 'linux/arm64' || 'linux/amd64' }}
-          MADARA_DOCKER_PATH=`docker run --name madara-container --platform "${DOCKER_PLATFORM}" --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
+          MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
-          which madara
+          madara --help > /dev/null
+
+      - name: Checkout Madara
+        if: steps.madara-from-docker.outcome == 'failure'
+        uses: actions/checkout@v4
+        with:
+          repository: madara-alliance/madara
+          ref: f025e9d # main branch
+          path: madara
+
+      - name: Build and Install Madara
+        if: steps.madara-from-docker.outcome == 'failure'
+        run: |
+          cd madara
+          nix develop -c \
+            cargo build --release --manifest-path madara/Cargo.toml --bin madara
+          cp madara/target/release/madara "$HOME/.cargo/bin/madara"
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
@@ -163,14 +181,32 @@ jobs:
           workspaces: |
             relayer
             light-client
+            madara/madara
 
       - name: Install Madara
+        id: madara-from-docker
+        continue-on-error: true
         run: |
           MADARA_REVISION=f025e9d # nightly revision
-          DOCKER_PLATFORM=${{ matrix.os == 'macos-13' && 'darwin/amd64' || matrix.os == 'ubuntu-22.04-arm' && 'linux/arm64' || 'linux/amd64' }}
-          MADARA_DOCKER_PATH=`docker run --name madara-container --platform "${DOCKER_PLATFORM}" --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
+          MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
-          which madara
+          madara --help > /dev/null
+
+      - name: Checkout Madara
+        if: steps.madara-from-docker.outcome == 'failure'
+        uses: actions/checkout@v4
+        with:
+          repository: madara-alliance/madara
+          ref: f025e9d # main branch
+          path: madara
+
+      - name: Build and Install Madara
+        if: steps.madara-from-docker.outcome == 'failure'
+        run: |
+          cd madara
+          nix develop -c \
+            cargo build --release --manifest-path madara/Cargo.toml --bin madara
+          cp madara/target/release/madara "$HOME/.cargo/bin/madara"
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
