@@ -1,3 +1,5 @@
+use core::str::FromStr;
+
 use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
@@ -83,12 +85,44 @@ pub struct Block {
     pub starknet_version: String,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct StarknetVersion {
+    major: u8,
+    minor: u8,
+    patch: u8,
+}
+
+impl StarknetVersion {
+    pub const fn new(major: u8, minor: u8, patch: u8) -> Self {
+        Self { major, minor, patch }
+    }
+}
+
+impl FromStr for StarknetVersion {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut iter = s.splitn(3, '.');
+        let major = iter.next().and_then(|s| s.parse().ok()).ok_or(())?;
+        let minor = iter.next().and_then(|s| s.parse().ok()).ok_or(())?;
+        let patch = iter.next().and_then(|s| s.parse().ok()).ok_or(())?;
+        iter.next().is_none().then_some(()).ok_or(())?;
+        Ok(Self { major, minor, patch })
+    }
+}
+
+
 impl Block {
     pub fn hash_version(&self) -> &'static [u8] {
-        if self.l2_gas_price.is_some() {
-            STARKNET_BLOCK_HASH1
-        } else {
+        let current_starknet_version = StarknetVersion::from_str(&self.starknet_version)
+            .expect("Invalid Starknet version format");
+
+        // https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L60
+
+        if current_starknet_version < StarknetVersion::new(0, 13, 4) {
             STARKNET_BLOCK_HASH0
+        } else {
+            STARKNET_BLOCK_HASH1
         }
     }
 
