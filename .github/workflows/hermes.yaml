@@ -62,7 +62,7 @@ jobs:
 
       - name: Install Madara
         run: |
-          MADARA_REVISION=5ec6ea5 # nightly revision
+          MADARA_REVISION=f025e9d # nightly revision
           MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
           which madara
@@ -165,7 +165,7 @@ jobs:
 
       - name: Install Madara
         run: |
-          MADARA_REVISION=5ec6ea5 # nightly revision
+          MADARA_REVISION=f025e9d # nightly revision
           MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
           which madara
