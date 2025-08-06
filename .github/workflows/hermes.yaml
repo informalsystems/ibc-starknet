@@ -75,6 +75,7 @@ jobs:
           MADARA_REVISION=f025e9d # nightly revision
           MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
+          chmod u+x "${HOME}/.cargo/bin/madara"
           madara --help > /dev/null
 
       - name: Build and Install Madara
@@ -196,6 +197,7 @@ jobs:
           MADARA_REVISION=f025e9d # nightly revision
           MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
+          chmod u+x "${HOME}/.cargo/bin/madara"
           madara --help > /dev/null
 
       - name: Build and Install Madara
