@@ -19,4 +19,5 @@ pub mod Ics23Lib {
 
     #[abi(embed_v0)]
     impl Ics23LibImpl = Ics23LibComponent::Ics23Lib<ContractState>;
+    // note: there is no initializer because it is supposed to be used via library calls.
 }

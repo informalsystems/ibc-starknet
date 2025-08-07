@@ -11,7 +11,7 @@ use starknet_ibc_testkit::configs::{
     CoreConfig, CoreConfigTrait, MockClientConfig, MockClientConfigTrait, TransferAppConfig,
     TransferAppConfigTrait,
 };
-use starknet_ibc_testkit::dummies::{CLIENT_TYPE, OWNER, RELAYER, SN_USER, SUPPLY};
+use starknet_ibc_testkit::dummies::{ADMIN, CLIENT_TYPE, OWNER, RELAYER, SN_USER, SUPPLY};
 use starknet_ibc_testkit::handles::{AppHandle, ClientHandle, CoreContract, CoreHandle, ERC20Handle};
 
 #[derive(Drop, Serde)]
@@ -39,7 +39,7 @@ pub impl SetupImpl of SetupTrait {
     /// Deploys an instance of IBC core contract, and sets the owner to the core
     /// address.
     fn deploy_core(ref self: Setup, contract_name: ByteArray) -> CoreContract {
-        let core = CoreHandle::deploy(contract_name, self.protobuf_lib_class);
+        let core = CoreHandle::deploy(contract_name, ADMIN(), self.protobuf_lib_class);
         self.owner = core.address;
         core
     }
@@ -76,7 +76,7 @@ pub impl SetupImpl of SetupTrait {
 
     /// Deploys an instance of ICS-20 Token Transfer contract.
     fn deploy_transfer(self: @Setup, contract_name: ByteArray) -> AppContract {
-        AppHandle::deploy_transfer(contract_name, self.owner.clone(), *self.erc20_contract_class)
+        AppHandle::deploy_transfer(contract_name, *self.owner, *self.erc20_contract_class)
     }
 
     /// Sets up testing environment by deploying an instance of IBC core
@@ -96,11 +96,10 @@ pub impl SetupImpl of SetupTrait {
 
         let mut comet = setup.deploy_client(client_contract_name);
 
-        core.register_relayer(RELAYER());
-
-        start_cheat_caller_address(core.address, RELAYER());
+        start_cheat_caller_address(core.address, ADMIN());
 
         core.register_client(CLIENT_TYPE(), comet.address);
+        core.register_relayer(RELAYER());
 
         (core, comet)
     }
@@ -139,11 +138,10 @@ pub impl SetupImpl of SetupTrait {
 
         let comet = setup.deploy_client(client_contract_name);
 
-        core.register_relayer(RELAYER());
-
-        start_cheat_caller_address(core.address, RELAYER());
+        start_cheat_caller_address(core.address, ADMIN());
 
         core.register_client(CLIENT_TYPE(), comet.address);
+        core.register_relayer(RELAYER());
 
         let mut ics20 = setup.deploy_transfer(transfer_contract_name);
 

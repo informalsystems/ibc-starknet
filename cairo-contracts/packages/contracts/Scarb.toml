@@ -22,9 +22,10 @@ scarb = { workspace = true }
 
 [dependencies]
 # external dependencies
-openzeppelin_access = { workspace = true }
-openzeppelin_token  = { workspace = true }
-starknet            = { workspace = true }
+openzeppelin_access   = { workspace = true }
+openzeppelin_token    = { workspace = true }
+openzeppelin_upgrades = { workspace = true }
+starknet              = { workspace = true }
 
 # ibc dependencies
 starknet_ibc_apps    = { workspace = true }

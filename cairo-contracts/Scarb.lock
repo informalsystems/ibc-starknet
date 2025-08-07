@@ -82,6 +82,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "openzeppelin_upgrades"
+version = "2.0.0"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:560d57a9c3f3ec5a476e82fec8963c93c8df63a4ff9ff134f64ab8383bde3c61"
+
+[[package]]
 name = "openzeppelin_utils"
 version = "2.0.0"
 source = "registry+https://scarbs.xyz/"
@@ -168,6 +174,7 @@ dependencies = [
  "openzeppelin_access",
  "openzeppelin_testing",
  "openzeppelin_token",
+ "openzeppelin_upgrades",
  "snforge_std",
  "starknet_ibc_apps",
  "starknet_ibc_clients",
@@ -184,6 +191,7 @@ dependencies = [
  "cometbft",
  "ibc_utils",
  "ics23",
+ "openzeppelin_access",
  "openzeppelin_testing",
  "protobuf",
  "serde_json",
