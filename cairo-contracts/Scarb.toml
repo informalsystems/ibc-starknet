@@ -12,8 +12,8 @@ members = [
 [workspace.package]
 version       = "0.1.0"
 edition       = "2024_07"
-cairo-version = "2.11.4"
-scarb-version = "2.11.4"
+cairo-version = "2.12.0"
+scarb-version = "2.12.0"
 license       = "Apache-2.0"
 authors       = [ "Informal Systems <hello@informal.systems>" ]
 repository    = "https://github.com/informalsystems/ibc-starknet"
@@ -25,17 +25,17 @@ description   = "Cairo components and contracts for integrating Starknet with IB
 test = "snforge test"
 
 [workspace.dependencies]
-assert_macros = "2.11.4"
-starknet      = "2.11.4"
-snforge_std   = "0.45.0"
+assert_macros = "2.12.0"
+starknet      = "2.12.0"
+snforge_std   = "0.47.0"
 
 # external dependencies
 openzeppelin_access  = "2.0.0"
 openzeppelin_token   = "2.0.0"
-openzeppelin_testing = "4.2.0"
+openzeppelin_testing = "4.4.0"
 openzeppelin_utils   = "2.0.0"
-alexandria_math      = "0.5.1"
-garaga               = { git = "https://github.com/keep-starknet-strange/garaga.git", rev = "5c5859e" }
+alexandria_math      = "0.6.0"
+garaga               = { git = "https://github.com/keep-starknet-strange/garaga.git", rev = "ffb90e5" }
 
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }

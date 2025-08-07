@@ -1,6 +1,7 @@
 use alloc::string::String;
 use alloc::vec;
 use alloc::vec::Vec;
+use core::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 use starknet_core::types::Felt;
@@ -83,12 +84,62 @@ pub struct Block {
     pub starknet_version: String,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct StarknetVersion {
+    major: u8,
+    minor: u8,
+    patch: u8,
+}
+
+impl StarknetVersion {
+    pub const fn new(major: u8, minor: u8, patch: u8) -> Self {
+        Self {
+            major,
+            minor,
+            patch,
+        }
+    }
+}
+
+impl FromStr for StarknetVersion {
+    type Err = &'static str;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut iter = s.splitn(3, '.').map(|s| s.parse());
+        let major = iter
+            .next()
+            .ok_or("Missing major version")?
+            .map_err(|_| "Invalid major version")?;
+        let minor = iter
+            .next()
+            .ok_or("Missing minor version")?
+            .map_err(|_| "Invalid minor version")?;
+        let patch = iter
+            .next()
+            .ok_or("Missing patch version")?
+            .map_err(|_| "Invalid patch version")?;
+        iter.next()
+            .map(|_| Err("Too many version components"))
+            .unwrap_or(Ok(()))?;
+        Ok(Self {
+            major,
+            minor,
+            patch,
+        })
+    }
+}
+
 impl Block {
     pub fn hash_version(&self) -> &'static [u8] {
-        if self.l2_gas_price.is_some() {
-            STARKNET_BLOCK_HASH1
-        } else {
+        let current_starknet_version = StarknetVersion::from_str(&self.starknet_version)
+            .expect("Invalid Starknet version format");
+
+        // https://github.com/starkware-libs/sequencer/blob/c16dbb0/crates/starknet_api/src/block_hash/block_hash_calculator.rs#L60
+
+        if current_starknet_version < StarknetVersion::new(0, 13, 4) {
             STARKNET_BLOCK_HASH0
+        } else {
+            STARKNET_BLOCK_HASH1
         }
     }
 
@@ -202,5 +253,24 @@ impl Block {
                 &signature.signature[0],
                 &signature.signature[1],
             )?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_starknet_version_from_str() {
+        assert_eq!(
+            StarknetVersion::from_str("0.13.5").unwrap(),
+            StarknetVersion::new(0, 13, 5)
+        );
+        assert_eq!(
+            StarknetVersion::from_str("1.0.0").unwrap(),
+            StarknetVersion::new(1, 0, 0)
+        );
+        assert!(StarknetVersion::from_str("invalid").is_err());
+        assert!(StarknetVersion::from_str("1.2").is_err());
     }
 }

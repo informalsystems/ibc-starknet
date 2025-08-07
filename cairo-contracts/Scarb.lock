@@ -3,9 +3,9 @@ version = 1
 
 [[package]]
 name = "alexandria_math"
-version = "0.5.1"
+version = "0.6.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:a115109644f62742ed8a4e97bc55c0a82b450df64f8c137d78990c42b1178f25"
+checksum = "sha256:1e08ebba0ed9f7217b8efc283d2ad41730257cf41a47ca88a94fb0fafad22e9e"
 
 [[package]]
 name = "cometbft"
@@ -20,8 +20,8 @@ dependencies = [
 
 [[package]]
 name = "garaga"
-version = "0.18.1"
-source = "git+https://github.com/keep-starknet-strange/garaga.git?rev=5c5859e#5c5859e6dc5515f542c310cb38a149602e774112"
+version = "0.18.2"
+source = "git+https://github.com/keep-starknet-strange/garaga.git?rev=ffb90e5#ffb90e533497121ffa5284c7362dc56fa10b18c6"
 
 [[package]]
 name = "ibc_utils"
@@ -62,9 +62,9 @@ checksum = "sha256:87773ed6cd2318f169283ecbbb161890d1996260a80302d81ec45b70ee5e5
 
 [[package]]
 name = "openzeppelin_testing"
-version = "4.2.0"
+version = "4.4.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:c7a722ea85150147a7daeface39b9328d7d73ba1e73c065c5c7d92e845a240cc"
+checksum = "sha256:ae28f2b982898fbf158bb13aff4e266467c64469ac2b51ca8db65a42ba83f0d0"
 dependencies = [
  "snforge_std",
 ]
@@ -103,15 +103,15 @@ dependencies = [
 
 [[package]]
 name = "snforge_scarb_plugin"
-version = "0.45.0"
+version = "0.47.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:568482e8c40e7018d9ea729d6df3d5ec22b665cfff1e89181d8ad31bacca11cc"
+checksum = "sha256:3525e4502541043571678531fced28f753746cb59a8aa79811811218abef6c05"
 
 [[package]]
 name = "snforge_std"
-version = "0.45.0"
+version = "0.47.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:c08b359c266e45c4e71b71baa3c4af8dae7fc5416fc8168f0983e5c9a2ac0abe"
+checksum = "sha256:b8647adcd0f5c9631f88b5a523b2653a82f2349dde2af7213c75f1006fa3f71b"
 dependencies = [
  "snforge_scarb_plugin",
 ]
