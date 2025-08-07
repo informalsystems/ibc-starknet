@@ -57,7 +57,7 @@ fn test_starknet_feeder_gateway_signature() -> Result<(), Error> {
         let public_key = endpoint.get_public_key(Some(block.height)).unwrap();
 
         assert_eq!(block_header.block_number, block.height);
-        assert_eq!(block_header.starknet_version, "0.13.2"); // madara still uses `0.13.2` block header
+        assert_eq!(block_header.starknet_version, "0.14.0");
         assert!(block_header
             .verify_signature(&StarknetCryptoLib, &block_signature, &public_key)
             .unwrap());
