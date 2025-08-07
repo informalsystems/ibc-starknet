@@ -24,7 +24,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-22.04-arm, macos-13]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - name: Free Disk Space (Ubuntu)
         if: ${{ matrix.os != 'macos-13' }}
@@ -146,7 +146,7 @@ jobs:
       matrix:
         os: [ubuntu-22.04, ubuntu-22.04-arm, macos-13]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - name: Free Disk Space (Ubuntu)
         if: ${{ matrix.os != 'macos-13' }}
