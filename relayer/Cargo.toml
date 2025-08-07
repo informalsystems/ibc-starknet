@@ -64,7 +64,7 @@ indexmap                    = { version = "2.10" }
 humantime                   = { version = "2.2" }
 time                        = { version = "0.3" }
 sha256                      = { version = "1.6" }
-garaga                      = { version = "0.18.1", package = "garaga_rs", default-features = false }
+garaga                      = { version = "0.18.2", package = "garaga_rs" }
 ibc-proto                   = { version = "0.51.1" }
 ibc-client-starknet-types   = { version = "0.1.0" }
 tendermint                  = { version = "0.40" }
@@ -160,7 +160,7 @@ starknet-block-verifier   = { path = "../light-client/starknet-block-verifier" }
 starknet-storage-verifier = { path = "../light-client/starknet-storage-verifier" }
 starknet-crypto-lib       = { path = "../light-client/starknet-crypto-lib" }
 
-garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", rev = "5c5859e" }
+garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", rev = "ffb90e5" }
 
 cgp             = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 cgp-core        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }

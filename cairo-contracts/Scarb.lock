@@ -20,8 +20,8 @@ dependencies = [
 
 [[package]]
 name = "garaga"
-version = "0.18.1"
-source = "git+https://github.com/keep-starknet-strange/garaga.git?rev=5c5859e#5c5859e6dc5515f542c310cb38a149602e774112"
+version = "0.18.2"
+source = "git+https://github.com/keep-starknet-strange/garaga.git?rev=ffb90e5#ffb90e533497121ffa5284c7362dc56fa10b18c6"
 
 [[package]]
 name = "ibc_utils"

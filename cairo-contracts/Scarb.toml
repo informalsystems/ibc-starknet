@@ -35,7 +35,7 @@ openzeppelin_token   = "2.0.0"
 openzeppelin_testing = "4.4.0"
 openzeppelin_utils   = "2.0.0"
 alexandria_math      = "0.5.1"
-garaga               = { git = "https://github.com/keep-starknet-strange/garaga.git", rev = "5c5859e" }
+garaga               = { git = "https://github.com/keep-starknet-strange/garaga.git", rev = "ffb90e5" }
 
 # internal dependencies
 ics23      = { path = "../cairo-libs/packages/ics23" }
