@@ -49,22 +49,6 @@
         "type": "github"
       }
     },
-    "beaker-src": {
-      "flake": false,
-      "locked": {
-        "narHash": "sha256-ZLDuTwB8PG0rMiDcLRxCf/xuoFowgK+aat9mSZVp+Dw=",
-        "owner": "osmosis-labs",
-        "repo": "beaker",
-        "rev": "fc046f8fe9d8baecdd76404b57b31f5a4e100301",
-        "type": "github"
-      },
-      "original": {
-        "owner": "osmosis-labs",
-        "ref": "v0.1.8",
-        "repo": "beaker",
-        "type": "github"
-      }
-    },
     "cairo-nix": {
       "inputs": {
         "flake-utils": "flake-utils",
@@ -104,16 +88,16 @@
     "celestia-app-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1722019080,
-        "narHash": "sha256-NN3O1nN+LTxDzYBzXjksfKl9DMCbFy+MsuxPBKgv9Dc=",
+        "lastModified": 1730300893,
+        "narHash": "sha256-ui67KRaabQyZiV5QD4Qyaqobky++rAe9ppJ2yveoXOs=",
         "owner": "celestiaorg",
         "repo": "celestia-app",
-        "rev": "b6db108a444c234e4b4656031d876bc45421c5f3",
+        "rev": "06f24f5dbe48c29964e1d8cfb030cffd90797ded",
         "type": "github"
       },
       "original": {
         "owner": "celestiaorg",
-        "ref": "v1.14.0",
+        "ref": "v2.3.1",
         "repo": "celestia-app",
         "type": "github"
       }
@@ -121,15 +105,16 @@
     "celestia-node-src": {
       "flake": false,
       "locked": {
-        "narHash": "sha256-O5a8Dy7WOSaLzYHTZAZFHFeJwqOLyajcHmGEcphOpKg=",
+        "lastModified": 1725294938,
+        "narHash": "sha256-AiNd7dM8QK8KSL5CzMDZ2kdMKLAJF55IWMkF8X22Pio=",
         "owner": "celestiaorg",
         "repo": "celestia-node",
-        "rev": "e55e1c88708b46839867bcbbed9bcdd8a3ffa830",
+        "rev": "6744f648649ebb5fee1b27faf7aca96ecf4519b2",
         "type": "github"
       },
       "original": {
         "owner": "celestiaorg",
-        "ref": "v0.13.0",
+        "ref": "v0.16.0",
         "repo": "celestia-node",
         "type": "github"
       }
@@ -173,7 +158,6 @@
         "akash-src": "akash-src",
         "andromeda-src": "andromeda-src",
         "apalache-src": "apalache-src",
-        "beaker-src": "beaker-src",
         "celestia-app-src": "celestia-app-src",
         "celestia-node-src": "celestia-node-src",
         "cometbft-src": "cometbft-src",
@@ -196,6 +180,7 @@
         "gaia18-src": "gaia18-src",
         "gaia19-src": "gaia19-src",
         "gaia20-src": "gaia20-src",
+        "gaia23-src": "gaia23-src",
         "gaia5-src": "gaia5-src",
         "gaia6-ordered-src": "gaia6-ordered-src",
         "gaia6-src": "gaia6-src",
@@ -206,6 +191,7 @@
         "gomod2nix": "gomod2nix",
         "haqq-src": "haqq-src",
         "hermes-src": "hermes-src",
+        "ibc-go-v10-src": "ibc-go-v10-src",
         "ibc-go-v2-src": "ibc-go-v2-src",
         "ibc-go-v3-src": "ibc-go-v3-src",
         "ibc-go-v4-src": "ibc-go-v4-src",
@@ -235,7 +221,6 @@
         "provenance-src": "provenance-src",
         "regen-src": "regen-src",
         "relayer-src": "relayer-src",
-        "rollapp-evm-src": "rollapp-evm-src",
         "rust-overlay": "rust-overlay",
         "sbt-derivation": "sbt-derivation",
         "sconfig-src": "sconfig-src",
@@ -264,14 +249,15 @@
         "wasmvm_2_1_0-src": "wasmvm_2_1_0-src",
         "wasmvm_2_1_2-src": "wasmvm_2_1_2-src",
         "wasmvm_2_1_3-src": "wasmvm_2_1_3-src",
-        "wasmvm_2_1_4-src": "wasmvm_2_1_4-src"
+        "wasmvm_2_1_4-src": "wasmvm_2_1_4-src",
+        "wasmvm_2_2_3-src": "wasmvm_2_2_3-src"
       },
       "locked": {
-        "lastModified": 1738754233,
-        "narHash": "sha256-Z3xF0UsI1O+3AZYEAfNegW2UCB1jvlSH1UZzsY0+DL8=",
+        "lastModified": 1747829676,
+        "narHash": "sha256-zxAPAfFjDT0bJFtuRuJ7mJd+wXN83tUqrQrb44GIih8=",
         "owner": "informalsystems",
         "repo": "cosmos.nix",
-        "rev": "b7125841f14af672a4f656f5607f9cf8b8c67970",
+        "rev": "f027e5b304e8a1593a0da8677dfea5bef1a95f02",
         "type": "github"
       },
       "original": {
@@ -750,6 +736,23 @@
         "type": "github"
       }
     },
+    "gaia23-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1746478993,
+        "narHash": "sha256-mO4rCiSqFZZiDYvHEby083viOvJVjefqjz38Pt/xJ20=",
+        "owner": "cosmos",
+        "repo": "gaia",
+        "rev": "875b68be0df1e9e8940c568e93e7478edc55a27f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cosmos",
+        "ref": "v23.3.0",
+        "repo": "gaia",
+        "type": "github"
+      }
+    },
     "gaia5-src": {
       "flake": false,
       "locked": {
@@ -969,6 +972,23 @@
         "owner": "informalsystems",
         "ref": "v1.7.4",
         "repo": "hermes",
+        "type": "github"
+      }
+    },
+    "ibc-go-v10-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1746016806,
+        "narHash": "sha256-4y7Hm5pIad6Ahu3D95CfXfM2L8wJpaFrvZwQfWQlBK8=",
+        "owner": "cosmos",
+        "repo": "ibc-go",
+        "rev": "e120ef5d4778c3e659ce57b59f028b250be5bb2e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cosmos",
+        "ref": "v10.2.0",
+        "repo": "ibc-go",
         "type": "github"
       }
     },
@@ -1508,11 +1528,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1723603349,
-        "narHash": "sha256-VMg6N7MryOuvSJ8Sj6YydarnUCkL7cvMdrMcnsJnJCE=",
+        "lastModified": 1746576598,
+        "narHash": "sha256-FshoQvr6Aor5SnORVvh/ZdJ1Sa2U4ZrIMwKBX5k2wu0=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "daf7bb95821b789db24fc1ac21f613db0c1bf2cb",
+        "rev": "b3582c75c7f21ce0b429898980eddbbf05c68e55",
         "type": "github"
       },
       "original": {
@@ -1555,11 +1575,11 @@
     },
     "nixpkgs_6": {
       "locked": {
-        "lastModified": 1740547748,
-        "narHash": "sha256-Ly2fBL1LscV+KyCqPRufUBuiw+zmWrlJzpWOWbahplg=",
+        "lastModified": 1754393734,
+        "narHash": "sha256-fbnmAwTQkuXHKBlcL5Nq1sMAzd3GFqCOQgEQw6Hy0Ak=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "3a05eebede89661660945da1f151959900903b6a",
+        "rev": "a683adc19ff5228af548c6539dbc3440509bfed3",
         "type": "github"
       },
       "original": {
@@ -1571,11 +1591,11 @@
     },
     "nixpkgs_7": {
       "locked": {
-        "lastModified": 1736320768,
-        "narHash": "sha256-nIYdTAiKIGnFNugbomgBJR+Xv5F1ZQU+HfaBqJKroC0=",
+        "lastModified": 1744536153,
+        "narHash": "sha256-awS2zRgF4uTwrOKwwiJcByDzDOdo3Q1rPZbiHQg/N38=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "4bc9c909d9ac828a039f288cf872d16d38185db8",
+        "rev": "18dd725c29603f582cf1900e0d25f9f1063dbf11",
         "type": "github"
       },
       "original": {
@@ -1682,22 +1702,6 @@
         "type": "github"
       }
     },
-    "rollapp-evm-src": {
-      "flake": false,
-      "locked": {
-        "narHash": "sha256-bOH7QsNYjZVVHW7x5ysrO0IJmRNEUeE+bJRVPwdb5U8=",
-        "owner": "dymensionxyz",
-        "repo": "rollapp-evm",
-        "rev": "21b29f6e77f5c11a2036252d60819810abbbd7b8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "dymensionxyz",
-        "repo": "rollapp-evm",
-        "rev": "21b29f6e77f5c11a2036252d60819810abbbd7b8",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "cairo-nix": "cairo-nix",
@@ -1706,7 +1710,6 @@
         "flake-utils": "flake-utils_8",
         "nixpkgs": "nixpkgs_6",
         "rust-overlay": "rust-overlay_2",
-        "starknet-devnet-src": "starknet-devnet-src",
         "starknet-foundry-src": "starknet-foundry-src",
         "universal-sierra-compiler-src": "universal-sierra-compiler-src"
       }
@@ -1735,11 +1738,11 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "lastModified": 1754362243,
-        "narHash": "sha256-QHNTUdI6oIYuuazGuKGhVk5RCOM1nIzDUc/AGgL7Szw=",
+        "lastModified": 1754534980,
+        "narHash": "sha256-8cAquqasyPRvgJfKVKxz+gQ+SRoRxiHhX91Avtl9Rn8=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "3ec3244ffb877f1b7f5d2dbff19241982ab25ff2",
+        "rev": "89e92794124b93bddb5f8f92485ed924bd179287",
         "type": "github"
       },
       "original": {
@@ -1842,23 +1845,6 @@
         "owner": "public-awesome",
         "ref": "v3.0.0",
         "repo": "stargaze",
-        "type": "github"
-      }
-    },
-    "starknet-devnet-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1741256806,
-        "narHash": "sha256-Gk3L/PEQc3YF9WihTgUCvqsn7Zsjb2tCwHkhYxlDC3o=",
-        "owner": "0xSpaceShard",
-        "repo": "starknet-devnet-rs",
-        "rev": "c657668906e0186b8b570520e371ac89f247a40f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "0xSpaceShard",
-        "ref": "starknet-0.13.4",
-        "repo": "starknet-devnet-rs",
         "type": "github"
       }
     },
@@ -2358,6 +2344,23 @@
       "original": {
         "owner": "CosmWasm",
         "ref": "v2.1.4",
+        "repo": "wasmvm",
+        "type": "github"
+      }
+    },
+    "wasmvm_2_2_3-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1741173688,
+        "narHash": "sha256-pCmKTnYtPBlSBMC8EpfDww2JTBwAWRQ6uMEdLKP+TM0=",
+        "owner": "CosmWasm",
+        "repo": "wasmvm",
+        "rev": "215b331a6ec8041e8b421afbc9eaa0a6182cfae3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "CosmWasm",
+        "ref": "v2.2.3",
         "repo": "wasmvm",
         "type": "github"
       }
