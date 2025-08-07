@@ -8,11 +8,6 @@
     cairo-nix.url = "github:cairo-nix/cairo-nix";
     cosmos-nix.url = "github:informalsystems/cosmos.nix";
 
-    starknet-devnet-src = {
-      url = "github:0xSpaceShard/starknet-devnet-rs/starknet-0.13.4";
-      flake = false;
-    };
-
     cairo-src = {
       url = "github:starkware-libs/cairo/v2.11.4";
       flake = false;
@@ -61,13 +56,6 @@
 
           osmosis = cosmos-nix.osmosis;
 
-          starknet-devnet = import ./nix/starknet-devnet.nix {
-            inherit nixpkgs;
-            inherit (inputs) starknet-devnet-src;
-
-            inherit rust;
-          };
-
           cairo = import ./nix/cairo.nix {
             inherit nixpkgs;
             inherit (inputs) cairo-src;
@@ -95,7 +83,6 @@
 
           starknet-pkgs = {
             inherit
-              starknet-devnet
               cairo
               universal-sierra-compiler
               wasm-simapp
@@ -125,7 +112,6 @@
           packages =
             {
               inherit
-                starknet-devnet
                 cairo
                 rust
                 rust-nightly
