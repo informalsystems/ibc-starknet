@@ -149,8 +149,8 @@ pub mod IBCCore {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, owner: ContractAddress, protobuf_lib: ClassHash) {
-        self.ownable.initializer(owner);
+    fn constructor(ref self: ContractState, admin: ContractAddress, protobuf_lib: ClassHash) {
+        self.ownable.initializer(admin);
 
         self.client_handler.initializer();
         self.router_handler.initializer();

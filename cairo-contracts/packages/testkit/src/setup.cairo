@@ -16,7 +16,6 @@ use starknet_ibc_testkit::handles::{AppHandle, ClientHandle, CoreContract, CoreH
 
 #[derive(Drop, Serde)]
 pub struct Setup {
-    pub admin: ContractAddress,
     pub owner: ContractAddress,
     pub erc20_contract_class: ContractClass,
     pub comet_lib_class: ContractClass,
@@ -29,7 +28,6 @@ pub impl SetupImpl of SetupTrait {
     /// Initializes the test setup with default values.
     fn default() -> Setup {
         Setup {
-            admin: ADMIN(),
             owner: OWNER(),
             erc20_contract_class: declare_class("ERC20Mintable"),
             comet_lib_class: declare_class("CometLib"),
@@ -41,7 +39,7 @@ pub impl SetupImpl of SetupTrait {
     /// Deploys an instance of IBC core contract, and sets the owner to the core
     /// address.
     fn deploy_core(ref self: Setup, contract_name: ByteArray) -> CoreContract {
-        let core = CoreHandle::deploy(contract_name, self.admin, self.protobuf_lib_class);
+        let core = CoreHandle::deploy(contract_name, ADMIN(), self.protobuf_lib_class);
         self.owner = core.address;
         core
     }
@@ -98,11 +96,10 @@ pub impl SetupImpl of SetupTrait {
 
         let mut comet = setup.deploy_client(client_contract_name);
 
-        core.register_relayer(RELAYER());
-
-        start_cheat_caller_address(core.address, RELAYER());
+        start_cheat_caller_address(core.address, ADMIN());
 
         core.register_client(CLIENT_TYPE(), comet.address);
+        core.register_relayer(RELAYER());
 
         (core, comet)
     }
@@ -141,11 +138,10 @@ pub impl SetupImpl of SetupTrait {
 
         let comet = setup.deploy_client(client_contract_name);
 
-        core.register_relayer(RELAYER());
-
-        start_cheat_caller_address(core.address, RELAYER());
+        start_cheat_caller_address(core.address, ADMIN());
 
         core.register_client(CLIENT_TYPE(), comet.address);
+        core.register_relayer(RELAYER());
 
         let mut ics20 = setup.deploy_transfer(transfer_contract_name);
 

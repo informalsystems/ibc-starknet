@@ -12,7 +12,6 @@ use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
 use hermes_core::logging_components::traits::CanLog;
 use hermes_core::logging_components::types::LevelInfo;
-use hermes_core::relayer_components::transaction::traits::HasDefaultSigner;
 use hermes_core::runtime_components::traits::{ChildProcessOf, HasChildProcessType};
 use hermes_core::test_components::chain::traits::HasWalletType;
 use hermes_core::test_components::chain_driver::traits::{HasChain, HasChainType};
@@ -24,11 +23,10 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
 use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::{StarknetAddress, StarknetMessage};
 use hermes_starknet_chain_components::traits::{
-    CanBuildAccountFromSigner, CanDeclareContract, CanDeployContract, CanUseStarknetAccount,
-    ContractClassOf, HasBlobType, HasContractClassHashType, HasContractClassType,
+    CanDeclareContract, CanDeployContract, ContractClassOf, HasBlobType, HasContractClassHashType,
+    HasContractClassType,
 };
 use hermes_starknet_chain_components::types::{MsgRegisterApp, MsgRegisterClient, PortId};
-use starknet::accounts::Account;
 use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
@@ -89,18 +87,15 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasAddressType<Address = StarknetAddress>
         + HasBlobType<Blob = Vec<Felt>>
-        + HasDefaultSigner
-        + CanBuildAccountFromSigner
-        + CanUseStarknetAccount
         + CanDeployContract
         + CanDeclareContract
         + CanSendSingleMessage
         + HasChainContractFields
         + HasAsyncErrorType,
-    Chain::ContractClassHash: Eq + Debug + Hash + Copy,
+    Chain::ContractClassHash: Eq + Debug + Hash,
     CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanEncode<ViaCairo, Chain::Address>
-        + CanEncode<ViaCairo, Product![Chain::Address, Chain::ContractClassHash]>
+        + CanEncode<ViaCairo, Chain::ContractClassHash>
         + CanEncode<
             ViaCairo,
             Product![
@@ -204,14 +199,9 @@ where
             )
             .await;
 
-        let admin_account = chain.build_account_from_signer(chain.get_default_signer());
-
         let ibc_core_address = {
             let call_data = cairo_encoding
-                .encode(&product![
-                    admin_account.address().into(),
-                    protobuf_lib_class_hash
-                ])
+                .encode(&protobuf_lib_class_hash)
                 .map_err(Bootstrap::raise_error)?;
 
             chain
@@ -251,12 +241,20 @@ where
             .await;
 
         let ics20_contract_address = {
-            let call_data = cairo_encoding
-                .encode(&product![ibc_core_address, erc20_class_hash])
+            let owner_call_data = cairo_encoding
+                .encode(&ibc_core_address)
+                .map_err(Bootstrap::raise_error)?;
+
+            let erc20_call_data = cairo_encoding
+                .encode(&erc20_class_hash)
                 .map_err(Bootstrap::raise_error)?;
 
             chain
-                .deploy_contract(&ics20_class_hash, false, &call_data)
+                .deploy_contract(
+                    &ics20_class_hash,
+                    false,
+                    &[owner_call_data, erc20_call_data].concat(),
+                )
                 .await
                 .map_err(Bootstrap::raise_error)?
         };
