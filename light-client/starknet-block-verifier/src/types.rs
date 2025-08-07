@@ -102,14 +102,25 @@ impl StarknetVersion {
 }
 
 impl FromStr for StarknetVersion {
-    type Err = ();
+    type Err = &'static str;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let mut iter = s.splitn(3, '.');
-        let major = iter.next().and_then(|s| s.parse().ok()).ok_or(())?;
-        let minor = iter.next().and_then(|s| s.parse().ok()).ok_or(())?;
-        let patch = iter.next().and_then(|s| s.parse().ok()).ok_or(())?;
-        iter.next().is_none().then_some(()).ok_or(())?;
+        let mut iter = s.splitn(3, '.').map(|s| s.parse());
+        let major = iter
+            .next()
+            .ok_or("Missing major version")?
+            .map_err(|_| "Invalid major version")?;
+        let minor = iter
+            .next()
+            .ok_or("Missing minor version")?
+            .map_err(|_| "Invalid minor version")?;
+        let patch = iter
+            .next()
+            .ok_or("Missing patch version")?
+            .map_err(|_| "Invalid patch version")?;
+        iter.next()
+            .map(|_| Err("Too many version components"))
+            .unwrap_or(Ok(()))?;
         Ok(Self {
             major,
             minor,
@@ -242,5 +253,24 @@ impl Block {
                 &signature.signature[0],
                 &signature.signature[1],
             )?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_starknet_version_from_str() {
+        assert_eq!(
+            StarknetVersion::from_str("0.13.5").unwrap(),
+            StarknetVersion::new(0, 13, 5)
+        );
+        assert_eq!(
+            StarknetVersion::from_str("1.0.0").unwrap(),
+            StarknetVersion::new(1, 0, 0)
+        );
+        assert!(StarknetVersion::from_str("invalid").is_err());
+        assert!(StarknetVersion::from_str("1.2").is_err());
     }
 }
