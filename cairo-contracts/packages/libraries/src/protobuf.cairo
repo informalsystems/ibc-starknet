@@ -35,7 +35,7 @@ pub mod ProtobufLibComponent {
         ) -> Header {
             ProtoCodecImpl::decode(proto_bytes.span()).unwrap()
         }
-    
+
         fn comet_misbehaviour_decode(
             self: @ComponentState<TContractState>, proto_bytes: Array<u8>,
         ) -> Misbehaviour {

@@ -459,7 +459,6 @@ pub mod CometClientComponent {
         ) {
             let mut span = client_message.span();
 
-
             let MessageWithHint {
                 client_message, serialized_hints,
             } = Serde::<MessageWithHint>::deserialize(ref span).unwrap();
@@ -474,17 +473,13 @@ pub mod CometClientComponent {
                     self._verify_update_header(client_sequence, header, hints);
                 },
                 ClientMessage::Misbehaviour(message) => {
-                println!("verify_client_message misbehaviour");
                     let misbehaviour: Misbehaviour = MisbehaviourImpl::deserialize(message);
                     let (hints_1, hints_2) = Serde::deserialize(ref serialized_hints).unwrap();
-                println!("verify_client_message misbehaviour validate basic");
                     misbehaviour.validate_basic();
-                println!("verify_client_message misbehaviour validate header 1");
                     self
                         ._verify_misbehaviour_header(
                             client_sequence, misbehaviour.header_1, hints_1,
                         );
-                println!("verify_client_message misbehaviour validate header 2");
                     self
                         ._verify_misbehaviour_header(
                             client_sequence, misbehaviour.header_2, hints_2,
@@ -500,21 +495,17 @@ pub mod CometClientComponent {
         ) -> bool {
             let mut span = client_message.span();
 
-            println!("verify_misbehaviour deserialise");
             let MessageWithHint {
                 client_message, ..,
             } = Serde::<MessageWithHint>::deserialize(ref span).unwrap();
-                println!("verify_misbehaviour deserialise done");
 
             match client_message {
                 ClientMessage::Update(message) => {
-                    println!("verify_misbehaviour update call");
                     let header: CometHeader = CometHeaderImpl::deserialize(message);
                     self._verify_misbehaviour_on_update(client_sequence, header)
                 },
                 ClientMessage::Misbehaviour(message) => {
                     let misbehaviour: Misbehaviour = MisbehaviourImpl::deserialize(message);
-                    println!("verify_misbehaviour verify call");
                     misbehaviour.verify()
                 },
             }

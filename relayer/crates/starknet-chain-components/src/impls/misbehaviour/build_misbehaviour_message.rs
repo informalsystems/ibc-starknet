@@ -6,17 +6,17 @@ use hermes_core::chain_components::traits::{
     HasAddressType, HasChainId, HasEvidenceType, HasMessageType, MisbehaviourMessageBuilder,
     MisbehaviourMessageBuilderComponent,
 };
-use hermes_core::encoding_components::traits::{CanEncode, HasEncodedType, HasEncoding};
+use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use hermes_core::logging_components::traits::CanLog;
 use hermes_core::logging_components::types::LevelWarn;
 use hermes_prelude::*;
 use ibc::core::host::types::identifiers::ClientId;
 use ibc_client_tendermint::types::proto::v1::Misbehaviour;
 use ibc_proto::Protobuf;
-use starknet::core::types::{ByteArray, Felt};
+use starknet::core::types::{ByteArray, Felt, U256};
 use starknet::macros::selector;
 
-use crate::impls::{StarknetAddress, StarknetMessage, StarknetMisbehaviour};
+use crate::impls::{comet_signature_hints, StarknetAddress, StarknetMessage, StarknetMisbehaviour};
 use crate::traits::CanQueryContractAddress;
 use crate::types::ClientMessage;
 
@@ -34,6 +34,10 @@ where
         + HasMessageType
         + CanRaiseAsyncError<EncodingError>,
     Chain::Encoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
+        + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
+        + CanEncode<ViaCairo, Vec<Vec<Felt>>>
+        + CanEncode<ViaCairo, (Vec<Vec<Felt>>, Vec<Vec<Felt>>)>
         + CanEncode<ViaCairo, Product![ClientMessage, Vec<Felt>]>
         + CanEncode<ViaCairo, ByteArray>
         + CanEncode<ViaCairo, Product![ClientId, Vec<Felt>]>
@@ -61,6 +65,16 @@ where
         // So, we encode the Header as Protobuf bytes and then encode those bytes as
         // Cairo `ByteArray` which has more succinct `Vec<u8>` representation.
 
+        let signature_hint_1 =
+            comet_signature_hints(&evidence.evidence_1.clone().try_into().unwrap(), encoding);
+
+        let signature_hint_2 =
+            comet_signature_hints(&evidence.evidence_2.clone().try_into().unwrap(), encoding);
+
+        let serialized_signature_hints = encoding
+            .encode(&(signature_hint_1, signature_hint_2))
+            .map_err(Chain::raise_error)?;
+
         let protobuf_bytes = Protobuf::<Misbehaviour>::encode_vec(evidence.clone());
 
         let protobuf_byte_array: ByteArray = protobuf_bytes.into();
@@ -69,8 +83,10 @@ where
             .encode(&protobuf_byte_array)
             .map_err(Chain::raise_error)?;
 
-        let client_message_with_hints =
-            product![ClientMessage::Misbehaviour(raw_misbehaviour), vec![]];
+        let client_message_with_hints = product![
+            ClientMessage::Misbehaviour(raw_misbehaviour),
+            serialized_signature_hints
+        ];
 
         let client_message_felts = encoding
             .encode(&client_message_with_hints)

@@ -5,9 +5,11 @@ use hermes_core::chain_components::traits::{
     EvidenceTypeProviderComponent, HasClientIdType, HasEvidenceType,
 };
 use hermes_prelude::*;
-use ibc::core::host::types::{error::DecodingError, identifiers::ClientId};
-use ibc_proto::{ibc::lightclients::tendermint::v1::Header, Protobuf};
+use ibc::core::host::types::error::DecodingError;
+use ibc::core::host::types::identifiers::ClientId;
 use ibc_client_tendermint::types::proto::v1::Misbehaviour;
+use ibc_proto::ibc::lightclients::tendermint::v1::Header;
+use ibc_proto::Protobuf;
 
 #[derive(Clone, Debug)]
 pub struct StarknetMisbehaviour {
