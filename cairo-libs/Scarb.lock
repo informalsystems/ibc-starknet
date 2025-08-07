@@ -3,9 +3,9 @@ version = 1
 
 [[package]]
 name = "alexandria_math"
-version = "0.5.1"
+version = "0.6.0"
 source = "registry+https://scarbs.xyz/"
-checksum = "sha256:a115109644f62742ed8a4e97bc55c0a82b450df64f8c137d78990c42b1178f25"
+checksum = "sha256:1e08ebba0ed9f7217b8efc283d2ad41730257cf41a47ca88a94fb0fafad22e9e"
 
 [[package]]
 name = "cometbft"

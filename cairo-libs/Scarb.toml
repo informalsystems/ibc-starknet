@@ -28,7 +28,7 @@ assert_macros = "2.12.0"
 snforge_std   = "0.47.0"
 
 # external dependencies
-alexandria_math = { version = "0.5.1" }
+alexandria_math = { version = "0.6.0" }
 garaga          = { git = "https://github.com/keep-starknet-strange/garaga.git", rev = "ffb90e5" }
 
 # internal dependencies
