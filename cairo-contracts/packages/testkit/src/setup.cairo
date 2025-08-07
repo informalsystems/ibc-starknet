@@ -11,11 +11,12 @@ use starknet_ibc_testkit::configs::{
     CoreConfig, CoreConfigTrait, MockClientConfig, MockClientConfigTrait, TransferAppConfig,
     TransferAppConfigTrait,
 };
-use starknet_ibc_testkit::dummies::{CLIENT_TYPE, OWNER, RELAYER, SN_USER, SUPPLY};
+use starknet_ibc_testkit::dummies::{ADMIN, CLIENT_TYPE, OWNER, RELAYER, SN_USER, SUPPLY};
 use starknet_ibc_testkit::handles::{AppHandle, ClientHandle, CoreContract, CoreHandle, ERC20Handle};
 
 #[derive(Drop, Serde)]
 pub struct Setup {
+    pub admin: ContractAddress,
     pub owner: ContractAddress,
     pub erc20_contract_class: ContractClass,
     pub comet_lib_class: ContractClass,
@@ -28,6 +29,7 @@ pub impl SetupImpl of SetupTrait {
     /// Initializes the test setup with default values.
     fn default() -> Setup {
         Setup {
+            admin: ADMIN(),
             owner: OWNER(),
             erc20_contract_class: declare_class("ERC20Mintable"),
             comet_lib_class: declare_class("CometLib"),
@@ -39,7 +41,7 @@ pub impl SetupImpl of SetupTrait {
     /// Deploys an instance of IBC core contract, and sets the owner to the core
     /// address.
     fn deploy_core(ref self: Setup, contract_name: ByteArray) -> CoreContract {
-        let core = CoreHandle::deploy(contract_name, self.protobuf_lib_class);
+        let core = CoreHandle::deploy(contract_name, self.admin, self.protobuf_lib_class);
         self.owner = core.address;
         core
     }
@@ -76,7 +78,7 @@ pub impl SetupImpl of SetupTrait {
 
     /// Deploys an instance of ICS-20 Token Transfer contract.
     fn deploy_transfer(self: @Setup, contract_name: ByteArray) -> AppContract {
-        AppHandle::deploy_transfer(contract_name, self.owner.clone(), *self.erc20_contract_class)
+        AppHandle::deploy_transfer(contract_name, *self.owner, *self.erc20_contract_class)
     }
 
     /// Sets up testing environment by deploying an instance of IBC core
