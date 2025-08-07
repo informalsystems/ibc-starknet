@@ -149,9 +149,8 @@ pub mod IBCCore {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, protobuf_lib: ClassHash) {
-        // Deployer is the owner of the contract.
-        self.ownable.initializer(starknet::get_caller_address());
+    fn constructor(ref self: ContractState, owner: ContractAddress, protobuf_lib: ClassHash) {
+        self.ownable.initializer(owner);
 
         self.client_handler.initializer();
         self.router_handler.initializer();
