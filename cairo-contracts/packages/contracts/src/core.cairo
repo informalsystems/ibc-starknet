@@ -4,7 +4,7 @@ pub mod IBCCore {
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_upgrades::UpgradeableComponent;
     use openzeppelin_upgrades::interface::IUpgradeable;
-    use starknet::ClassHash;
+    use starknet::{ClassHash, ContractAddress};
     use starknet_ibc_core::channel::{ChannelEventEmitterComponent, ChannelHandlerComponent};
     use starknet_ibc_core::client::{ClientEventEmitterComponent, ClientHandlerComponent};
     use starknet_ibc_core::connection::{
