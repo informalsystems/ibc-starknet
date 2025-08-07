@@ -46,7 +46,7 @@ where
             "--gateway-port",
             &gateway_port.to_string(),
             "--chain-config-override",
-            "block_time=1s,pending_block_update_time=1s,chain_id=SN_SEPOLIA",
+            "block_time=1s,pending_block_update_time=1s,chain_id=IBC_SN_DEVNET",
             "--devnet",
             "--devnet-unsafe",
             "--gateway-enable",
