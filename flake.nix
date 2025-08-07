@@ -112,8 +112,6 @@
               openssl
               pkg-config
               ;
-
-            nixfmt = nixpkgs.nixfmt-rfc-style;
           };
 
           mac-deps = nixpkgs.lib.optional nixpkgs.stdenv.isDarwin [
@@ -151,7 +149,7 @@
             rust-wasm = nixpkgs.mkShell { buildInputs = [ rust-wasm ] ++ shell-deps; };
           };
 
-          formatter = tools.nixfmt;
+          formatter = nixpkgs.nixfmt-tree;
         }
       );
 }
