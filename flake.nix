@@ -109,18 +109,17 @@
           shell-deps = (builtins.attrValues starknet-pkgs) ++ (builtins.attrValues tools) ++ mac-deps;
         in
         {
-          packages =
-            {
-              inherit
-                cairo
-                rust
-                rust-nightly
-                rust-wasm
-                ibc-starknet-cw
-                ;
-            }
-            // tools
-            // starknet-pkgs;
+          packages = {
+            inherit
+              cairo
+              rust
+              rust-nightly
+              rust-wasm
+              ibc-starknet-cw
+              ;
+          }
+          // tools
+          // starknet-pkgs;
 
           devShells = {
             default = nixpkgs.mkShell { buildInputs = shell-deps; };
