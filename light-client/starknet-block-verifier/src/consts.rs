@@ -1,5 +1,6 @@
 use starknet_core::types::Felt;
 
+// https://docs.starknet.io/resources/version-notes/#starknet_v0_14_0_aug_18_25
 pub const MAINNET_FEEDER_URL: &str = "https://feeder.alpha-mainnet.starknet.io";
 pub const SEPOLIA_FEEDER_URL: &str = "https://feeder.alpha-sepolia.starknet.io";
 

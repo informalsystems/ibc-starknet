@@ -46,7 +46,7 @@ where
             "--gateway-port",
             &gateway_port.to_string(),
             "--chain-config-override",
-            "block_time=1s,pending_block_update_time=1s,chain_id=IBC_SN_DEVNET",
+            "block_time=1s,pending_block_update_time=1s,chain_id=IBC_SN_DEVNET,latest_protocol_version=0.14.0",
             "--devnet",
             "--devnet-unsafe",
             "--gateway-enable",
