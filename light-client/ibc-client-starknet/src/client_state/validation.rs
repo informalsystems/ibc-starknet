@@ -149,6 +149,9 @@ where
             })?;
         }
 
+        // by ibc-go convention, the `upgrade_path` is supposed to be the path used in the Upgrade module.
+        // we don't use it for Starknet as we commit the schedule directly in the IBC Starknet contract.
+
         let upgraded_client_path = UpgradeClientStatePath {
             upgrade_path: String::new(),
             height: upgraded_height.revision_height(),

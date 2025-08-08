@@ -181,8 +181,8 @@ mod tests {
     use alloc::string::String;
 
     use ibc_core::host::types::path::{UpgradeClientStatePath, UpgradeConsensusStatePath};
-    use starknet_crypto_lib::StarknetCryptoLib;
     use starknet::macros::felt;
+    use starknet_crypto_lib::StarknetCryptoLib;
 
     use super::*;
 
