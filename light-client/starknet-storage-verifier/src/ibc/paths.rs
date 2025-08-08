@@ -182,6 +182,7 @@ mod tests {
 
     use ibc_core::host::types::path::{UpgradeClientStatePath, UpgradeConsensusStatePath};
     use starknet_crypto_lib::StarknetCryptoLib;
+    use starknet::macros::felt;
 
     use super::*;
 
@@ -207,14 +208,12 @@ mod tests {
 
         assert_eq!(
             client_state_key,
-            Felt::from_hex("0x7f1877168ebc2b7ec579aa0f1514007124ad2c19fe35a56f3b12d2c68718a44")
-                .unwrap()
+            felt!("0x7f1877168ebc2b7ec579aa0f1514007124ad2c19fe35a56f3b12d2c68718a44")
         );
 
         assert_eq!(
             consensus_state_key,
-            Felt::from_hex("0xef005e48e802e8403a09622b8ffd8299020c511293a5ed773b0f5d80ab81b9")
-                .unwrap()
+            felt!("0xef005e48e802e8403a09622b8ffd8299020c511293a5ed773b0f5d80ab81b9")
         );
     }
 }
