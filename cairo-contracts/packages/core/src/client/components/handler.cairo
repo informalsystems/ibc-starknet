@@ -31,8 +31,9 @@ pub mod ClientHandlerComponent {
         supported_clients: Map<felt252, ContractAddress>,
         upgraded_states: Option<(u64, StarknetClientState, StarknetConsensusState)>,
         // commitments for the upgraded client state and consensus state
-        upgraded_client_state_commitments: felt252,
-        upgraded_consensus_state_commitments: felt252,
+        // note: this is a map on height to make sure final height is part of the path/key
+        upgraded_client_state_commitments: Map<u64, felt252>,
+        upgraded_consensus_state_commitments: Map<u64, felt252>,
     }
 
     #[event]
@@ -151,8 +152,10 @@ pub mod ClientHandlerComponent {
                     ),
                 );
 
-            self.upgraded_client_state_commitments.write(upgraded_client_state.key());
-            self.upgraded_consensus_state_commitments.write(upgraded_consensus_state.key());
+            self.upgraded_client_state_commitments.write(final_height, upgraded_client_state.key());
+            self
+                .upgraded_consensus_state_commitments
+                .write(final_height, upgraded_consensus_state.key());
 
             self.emit_schedule_upgrade_event(upgraded_client_state.latest_height);
         }
@@ -163,16 +166,21 @@ pub mod ClientHandlerComponent {
             self.upgraded_states.read().unwrap()
         }
 
-        fn unschedule_upgrade(ref self: ComponentState<TContractState>, upgraded_height: u64) {
+        fn unschedule_upgrade(ref self: ComponentState<TContractState>) {
             {
                 // only admin can unschedule an upgrade
                 let ownable = get_dep_component!(@self, Ownable);
                 ownable.assert_only_owner();
             }
 
+            let (final_height, _upgraded_client_state, _upgraded_consensus_state) = self
+                .upgraded_states
+                .read()
+                .unwrap();
+
             self.upgraded_states.write(None);
-            self.upgraded_client_state_commitments.write(0);
-            self.upgraded_consensus_state_commitments.write(0);
+            self.upgraded_client_state_commitments.write(final_height, 0);
+            self.upgraded_consensus_state_commitments.write(final_height, 0);
         }
     }
 
@@ -351,4 +359,3 @@ pub mod ClientHandlerComponent {
         }
     }
 }
-

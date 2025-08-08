@@ -23,7 +23,7 @@ pub trait IScheduleUpgrade<TContractState> {
     fn get_scheduled_upgrade(
         self: @TContractState, upgraded_height: u64,
     ) -> (u64, StarknetClientState, StarknetConsensusState);
-    fn unschedule_upgrade(ref self: TContractState, upgraded_height: u64);
+    fn unschedule_upgrade(ref self: TContractState);
 }
 
 #[starknet::interface]
