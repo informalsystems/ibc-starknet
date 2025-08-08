@@ -142,27 +142,13 @@ where
         let upgraded_height = upgraded_client_state.latest_height();
         let latest_height = self.latest_height();
 
-        if latest_height >= upgraded_height {
-            Err(UpgradeClientError::InsufficientUpgradeHeight {
-                upgraded_height,
-                client_height: latest_height,
-            })?;
-        }
+        let final_height = latest_height.revision_height();
 
-        // by ibc-go convention, the `upgrade_path` is supposed to be the path used in the Upgrade module.
-        // we don't use it for Starknet as we commit the schedule directly in the IBC Starknet contract.
+        let upgraded_client_path =
+            UpgradeClientStatePath::new_with_default_path(final_height).into();
 
-        let upgraded_client_path = UpgradeClientStatePath {
-            upgrade_path: String::new(),
-            height: upgraded_height.revision_height(),
-        }
-        .into();
-
-        let upgraded_consensus_path = UpgradeConsensusStatePath {
-            upgrade_path: String::new(),
-            height: upgraded_height.revision_height(),
-        }
-        .into();
+        let upgraded_consensus_path =
+            UpgradeConsensusStatePath::new_with_default_path(final_height).into();
 
         // commitment root is: contract_storage_root.to_bytes_be()
         let contract_root = Felt::from_bytes_be_slice(root.as_bytes());

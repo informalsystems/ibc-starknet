@@ -144,6 +144,8 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(crypto_lib: &C, path:
             )
         }
 
+        // by ibc-go convention, the `upgrade_path` is supposed to be the path used in the Upgrade module.
+        // we don't use it for Starknet as we commit the schedule directly in the IBC Starknet contract.
         Path::UpgradeClientState(upgrade_client_state_path) => starknet_storage_key(
             crypto_lib,
             [
