@@ -1,13 +1,12 @@
 use core::num::traits::Bounded;
 use openzeppelin_testing::spy_events;
-use snforge_std::{start_cheat_caller_address_global, test_address};
+use snforge_std::test_address;
+use starknet::storage::{StorageAsPointer, StoragePathEntry};
 use starknet_ibc_core::client::ClientHandlerComponent::{
     ClientInitializerImpl, ClientInternalImpl, ClientReaderTrait, ClientWriterTrait,
     CoreClientHandlerImpl, CoreRegisterClientImpl, EventEmitterImpl,
 };
-use starknet_ibc_core::client::{
-    ClientHandlerComponent, CreateResponse, Duration, DurationImpl, MsgUpdateClient,
-};
+use starknet_ibc_core::client::{ClientHandlerComponent, CreateResponse, Duration, DurationImpl};
 use starknet_ibc_testkit::dummies::{CLIENT, CLIENT_ID, CLIENT_TYPE, HEIGHT, RELAYER};
 use starknet_ibc_testkit::event_spy::ClientEventSpyExt;
 use starknet_ibc_testkit::mocks::MockClientHandler;
@@ -78,4 +77,27 @@ fn test_emit_update_client() {
 #[test]
 fn test_duration_max() {
     Duration { seconds: Bounded::MAX, nanos: Bounded::MAX }.as_nanos();
+}
+
+#[test]
+fn test_schedule_upgrade_keys() {
+    let mut state = COMPONENT_STATE();
+    assert_eq!(
+        state
+            .upgraded_client_state_commitments
+            .entry(42)
+            .as_ptr()
+            .__storage_pointer_address__
+            .into(),
+        0x7f1877168ebc2b7ec579aa0f1514007124ad2c19fe35a56f3b12d2c68718a44,
+    );
+    assert_eq!(
+        state
+            .upgraded_consensus_state_commitments
+            .entry(42)
+            .as_ptr()
+            .__storage_pointer_address__
+            .into(),
+        0xef005e48e802e8403a09622b8ffd8299020c511293a5ed773b0f5d80ab81b9,
+    )
 }

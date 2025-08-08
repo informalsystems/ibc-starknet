@@ -32,8 +32,8 @@ pub mod ClientHandlerComponent {
         upgraded_states: Option<(u64, StarknetClientState, StarknetConsensusState)>,
         // commitments for the upgraded client state and consensus state
         // note: this is a map on height to make sure final height is part of the path/key
-        upgraded_client_state_commitments: Map<u64, felt252>,
-        upgraded_consensus_state_commitments: Map<u64, felt252>,
+        pub(crate) upgraded_client_state_commitments: Map<u64, felt252>,
+        pub(crate) upgraded_consensus_state_commitments: Map<u64, felt252>,
     }
 
     #[event]

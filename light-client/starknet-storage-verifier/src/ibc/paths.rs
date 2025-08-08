@@ -175,3 +175,46 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(crypto_lib: &C, path:
         _ => unimplemented!(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use alloc::string::String;
+
+    use ibc_core::host::types::path::{UpgradeClientStatePath, UpgradeConsensusStatePath};
+    use starknet_crypto_lib::StarknetCryptoLib;
+
+    use super::*;
+
+    #[test]
+    fn test_upgraded_states_path() {
+        let upgraded_client_state_path = UpgradeClientStatePath {
+            upgrade_path: String::new(),
+            height: 42,
+        };
+
+        let upgraded_consensus_state_path = UpgradeConsensusStatePath {
+            upgrade_path: String::new(),
+            height: 42,
+        };
+
+        let crypto_lib = StarknetCryptoLib;
+
+        let client_state_key =
+            ibc_path_to_storage_key(&crypto_lib, upgraded_client_state_path.into());
+
+        let consensus_state_key =
+            ibc_path_to_storage_key(&crypto_lib, upgraded_consensus_state_path.into());
+
+        assert_eq!(
+            client_state_key,
+            Felt::from_hex("0x7f1877168ebc2b7ec579aa0f1514007124ad2c19fe35a56f3b12d2c68718a44")
+                .unwrap()
+        );
+
+        assert_eq!(
+            consensus_state_key,
+            Felt::from_hex("0xef005e48e802e8403a09622b8ffd8299020c511293a5ed773b0f5d80ab81b9")
+                .unwrap()
+        );
+    }
+}
