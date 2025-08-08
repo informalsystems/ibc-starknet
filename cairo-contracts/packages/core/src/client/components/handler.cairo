@@ -5,7 +5,7 @@ pub mod ClientHandlerComponent {
     use openzeppelin_access::ownable::OwnableComponent::InternalTrait;
     use starknet::storage::{
         IntoIterRange, Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess,
-        StoragePointerReadAccess, Vec,
+        StoragePointerReadAccess, StoragePointerWriteAccess, Vec,
     };
     use starknet::{ContractAddress, get_caller_address, get_tx_info};
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
@@ -29,10 +29,10 @@ pub mod ClientHandlerComponent {
         // to be replaced after Comet client contract is implemented.
         allowed_relayers: Vec<ContractAddress>,
         supported_clients: Map<felt252, ContractAddress>,
-        upgraded_states: Map<u64, (StarknetClientState, StarknetConsensusState)>,
+        upgraded_states: Option<(u64, StarknetClientState, StarknetConsensusState)>,
         // commitments for the upgraded client state and consensus state
-        upgraded_client_state_commitments: Map<u64, felt252>,
-        upgraded_consensus_state_commitments: Map<u64, felt252>,
+        upgraded_client_state_commitments: felt252,
+        upgraded_consensus_state_commitments: felt252,
     }
 
     #[event]
@@ -135,34 +135,32 @@ pub mod ClientHandlerComponent {
 
             msg.validate_basic();
 
-            let MsgScheduleUpgrade { upgraded_client_state, upgraded_consensus_state } = msg;
-
-            // FIXME(rano): should we use the revision number as key as well ?
-            let upgraded_revision_height = upgraded_client_state.latest_height.revision_height;
+            let MsgScheduleUpgrade {
+                final_height, upgraded_client_state, upgraded_consensus_state,
+            } = msg;
 
             self
                 .upgraded_states
                 .write(
-                    upgraded_revision_height,
-                    (upgraded_client_state.clone(), upgraded_consensus_state.clone()),
+                    Some(
+                        (
+                            final_height,
+                            upgraded_client_state.clone(),
+                            upgraded_consensus_state.clone(),
+                        ),
+                    ),
                 );
 
-            self
-                .upgraded_client_state_commitments
-                .write(upgraded_revision_height, upgraded_client_state.key());
-            self
-                .upgraded_consensus_state_commitments
-                .write(upgraded_revision_height, upgraded_consensus_state.key());
+            self.upgraded_client_state_commitments.write(upgraded_client_state.key());
+            self.upgraded_consensus_state_commitments.write(upgraded_consensus_state.key());
 
             self.emit_schedule_upgrade_event(upgraded_client_state.latest_height);
         }
 
         fn get_scheduled_upgrade(
             self: @ComponentState<TContractState>, upgraded_height: u64,
-        ) -> (StarknetClientState, StarknetConsensusState) {
-            let (client_state, consensus_state) = self.upgraded_states.read(upgraded_height);
-
-            (client_state, consensus_state)
+        ) -> (u64, StarknetClientState, StarknetConsensusState) {
+            self.upgraded_states.read().unwrap()
         }
 
         fn unschedule_upgrade(ref self: ComponentState<TContractState>, upgraded_height: u64) {
@@ -172,12 +170,9 @@ pub mod ClientHandlerComponent {
                 ownable.assert_only_owner();
             }
 
-            // FIXME: cleanup the upgraded client and consensus states.
-            // self.upgraded_states.write(upgraded_height, (StarknetClientState::zero(),
-            // StarknetConsensusState::zero()));
-
-            self.upgraded_client_state_commitments.write(upgraded_height, 0);
-            self.upgraded_consensus_state_commitments.write(upgraded_height, 0);
+            self.upgraded_states.write(None);
+            self.upgraded_client_state_commitments.write(0);
+            self.upgraded_consensus_state_commitments.write(0);
         }
     }
 
