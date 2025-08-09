@@ -184,6 +184,7 @@ dependencies = [
  "cometbft",
  "ibc_utils",
  "ics23",
+ "openzeppelin_access",
  "openzeppelin_testing",
  "protobuf",
  "serde_json",
@@ -237,6 +238,5 @@ dependencies = [
 name = "starknet_ibc_utils"
 version = "0.1.0"
 dependencies = [
- "openzeppelin_token",
  "snforge_std",
 ]

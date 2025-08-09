@@ -1,7 +1,11 @@
-use crate::types::{ChannelId, ClientId, ConnectionId};
+use crate::types::{ChannelId, ClientId, ConnectionId, Height};
 
 pub struct StarknetCreateClientEvent {
     pub client_id: ClientId,
+}
+
+pub struct StarknetScheduleUpgradeEvent {
+    pub upgrade_height: Height,
 }
 
 pub struct StarknetConnectionOpenInitEvent {

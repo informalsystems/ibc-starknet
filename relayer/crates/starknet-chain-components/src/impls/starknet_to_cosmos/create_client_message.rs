@@ -41,6 +41,7 @@ where
 
         let starknet_client_state = StarknetClientState {
             latest_height: payload.latest_height,
+            final_height: payload.final_height,
             chain_id: payload.chain_id,
             sequencer_public_key: payload.sequencer_public_key,
             ibc_contract_address: payload.ibc_contract_address,

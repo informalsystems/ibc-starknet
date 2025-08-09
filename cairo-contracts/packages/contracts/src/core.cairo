@@ -33,6 +33,9 @@ pub mod IBCCore {
     impl CoreClientHandlerImpl =
         ClientHandlerComponent::CoreClientHandler<ContractState>;
     #[abi(embed_v0)]
+    impl CoreScheduleUpgradeImpl =
+        ClientHandlerComponent::CoreScheduleUpgrade<ContractState>;
+    #[abi(embed_v0)]
     impl CoreRegisterClientImpl =
         ClientHandlerComponent::CoreRegisterClient<ContractState>;
     #[abi(embed_v0)]

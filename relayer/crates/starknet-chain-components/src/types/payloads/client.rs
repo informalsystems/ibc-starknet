@@ -8,6 +8,7 @@ use crate::types::WasmStarknetConsensusState;
 #[derive(Debug, HasField)]
 pub struct StarknetCreateClientPayload {
     pub latest_height: Height,
+    pub final_height: u64,
     pub chain_id: ChainId,
     pub client_state_wasm_code_hash: Vec<u8>,
     pub consensus_state: WasmStarknetConsensusState,

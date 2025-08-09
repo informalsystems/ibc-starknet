@@ -17,6 +17,7 @@ where
     EncodeByteField<1>: MutEncoder<Encoding, Strategy, Vec<u8>>,
     EncodeByteField<2>: MutEncoder<Encoding, Strategy, Vec<u8>>,
     EncodeByteField<3>: MutEncoder<Encoding, Strategy, Vec<u8>>,
+    EncodeByteField<4>: MutEncoder<Encoding, Strategy, Vec<u8>>,
 {
     fn encode_mut(
         encoding: &Encoding,
@@ -25,17 +26,20 @@ where
     ) -> Result<(), Encoding::Error> {
         let StarknetHeader {
             block_header,
+            final_height,
             block_signature,
             storage_proof,
         } = value;
 
         let block_header = serde_json::to_vec(block_header).map_err(Encoding::raise_error)?;
+        let final_height = serde_json::to_vec(final_height).map_err(Encoding::raise_error)?;
         let block_signature = serde_json::to_vec(block_signature).map_err(Encoding::raise_error)?;
         let storage_proof = serde_json::to_vec(storage_proof).map_err(Encoding::raise_error)?;
 
         <EncodeByteField<1>>::encode_mut(encoding, &block_header, buffer)?;
-        <EncodeByteField<2>>::encode_mut(encoding, &block_signature, buffer)?;
-        <EncodeByteField<3>>::encode_mut(encoding, &storage_proof, buffer)?;
+        <EncodeByteField<2>>::encode_mut(encoding, &final_height, buffer)?;
+        <EncodeByteField<3>>::encode_mut(encoding, &block_signature, buffer)?;
+        <EncodeByteField<4>>::encode_mut(encoding, &storage_proof, buffer)?;
 
         Ok(())
     }
@@ -48,16 +52,19 @@ where
     EncodeByteField<1>: MutDecoder<Encoding, Strategy, Vec<u8>>,
     EncodeByteField<2>: MutDecoder<Encoding, Strategy, Vec<u8>>,
     EncodeByteField<3>: MutDecoder<Encoding, Strategy, Vec<u8>>,
+    EncodeByteField<4>: MutDecoder<Encoding, Strategy, Vec<u8>>,
 {
     fn decode_mut(
         encoding: &Encoding,
         buffer: &mut Encoding::DecodeBuffer<'_>,
     ) -> Result<StarknetHeader, Encoding::Error> {
         let block_header = <EncodeByteField<1>>::decode_mut(encoding, buffer)?;
-        let block_signature = <EncodeByteField<2>>::decode_mut(encoding, buffer)?;
-        let storage_proof = <EncodeByteField<3>>::decode_mut(encoding, buffer)?;
+        let final_height = <EncodeByteField<2>>::decode_mut(encoding, buffer)?;
+        let block_signature = <EncodeByteField<3>>::decode_mut(encoding, buffer)?;
+        let storage_proof = <EncodeByteField<4>>::decode_mut(encoding, buffer)?;
 
         let block_header = serde_json::from_slice(&block_header).map_err(Encoding::raise_error)?;
+        let final_height = serde_json::from_slice(&final_height).map_err(Encoding::raise_error)?;
         let block_signature =
             serde_json::from_slice(&block_signature).map_err(Encoding::raise_error)?;
         let storage_proof =
@@ -65,6 +72,7 @@ where
 
         Ok(StarknetHeader {
             block_header,
+            final_height,
             block_signature,
             storage_proof,
         })

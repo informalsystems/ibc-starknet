@@ -106,15 +106,19 @@ pub mod client {
         IClientStateValidation, IClientStateValidationDispatcher,
         IClientStateValidationDispatcherTrait, IRegisterClient, IRegisterClientDispatcher,
         IRegisterClientDispatcherTrait, IRegisterRelayer, IRegisterRelayerDispatcher,
-        IRegisterRelayerDispatcherTrait,
+        IRegisterRelayerDispatcherTrait, IScheduleUpgrade, IScheduleUpgradeDispatcher,
+        IScheduleUpgradeDispatcherTrait,
     };
-    pub use msgs::{MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient};
+    pub use msgs::{
+        MsgCreateClient, MsgRecoverClient, MsgScheduleUpgrade, MsgUpdateClient, MsgUpgradeClient,
+    };
     pub use types::{
         CreateResponse, CreateResponseImpl, Duration, DurationImpl, DurationToProto, DurationTrait,
         Height, HeightImpl, HeightPartialOrd, HeightTrait, HeightZero, HeightsIntoUpdateResponse,
-        Status, StatusImpl, StatusTrait, StoreHeightArray, Timestamp, TimestampAdd, TimestampImpl,
-        TimestampIntoU128, TimestampPartialOrd, TimestampToProto, TimestampTrait, TimestampZero,
-        U64IntoTimestamp, UpdateResponse,
+        StarknetClientState, StarknetConsensusState, Status, StatusImpl, StatusTrait,
+        StoreHeightArray, Timestamp, TimestampAdd, TimestampImpl, TimestampIntoU128,
+        TimestampPartialOrd, TimestampToProto, TimestampTrait, TimestampZero, U64IntoTimestamp,
+        UpdateResponse,
     };
     mod components {
         pub mod events;
