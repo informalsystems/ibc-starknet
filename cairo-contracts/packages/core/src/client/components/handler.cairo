@@ -29,7 +29,8 @@ pub mod ClientHandlerComponent {
         // to be replaced after Comet client contract is implemented.
         allowed_relayers: Vec<ContractAddress>,
         supported_clients: Map<felt252, ContractAddress>,
-        upgraded_states: Option<(u64, StarknetClientState, StarknetConsensusState)>,
+        pub(crate) final_height: u64,
+        upgraded_states: Option<(StarknetClientState, StarknetConsensusState)>,
         // commitments for the upgraded client state and consensus state
         // note: this is a map on height to make sure final height is part of the path/key
         pub(crate) upgraded_client_state_commitments: Map<u64, felt252>,
@@ -140,17 +141,11 @@ pub mod ClientHandlerComponent {
                 final_height, upgraded_client_state, upgraded_consensus_state,
             } = msg;
 
+            self.final_height.write(final_height);
+
             self
                 .upgraded_states
-                .write(
-                    Some(
-                        (
-                            final_height,
-                            upgraded_client_state.clone(),
-                            upgraded_consensus_state.clone(),
-                        ),
-                    ),
-                );
+                .write(Some((upgraded_client_state.clone(), upgraded_consensus_state.clone())));
 
             self.upgraded_client_state_commitments.write(final_height, upgraded_client_state.key());
             self
@@ -160,9 +155,13 @@ pub mod ClientHandlerComponent {
             self.emit_schedule_upgrade_event(upgraded_client_state.latest_height);
         }
 
+        fn get_final_height(self: @ComponentState<TContractState>) -> u64 {
+            self.final_height.read()
+        }
+
         fn get_scheduled_upgrade(
-            self: @ComponentState<TContractState>, upgraded_height: u64,
-        ) -> (u64, StarknetClientState, StarknetConsensusState) {
+            self: @ComponentState<TContractState>,
+        ) -> (StarknetClientState, StarknetConsensusState) {
             self.upgraded_states.read().unwrap()
         }
 
@@ -173,11 +172,9 @@ pub mod ClientHandlerComponent {
                 ownable.assert_only_owner();
             }
 
-            let (final_height, _upgraded_client_state, _upgraded_consensus_state) = self
-                .upgraded_states
-                .read()
-                .unwrap();
+            let final_height = self.final_height.read();
 
+            self.final_height.write(0);
             self.upgraded_states.write(None);
             self.upgraded_client_state_commitments.write(final_height, 0);
             self.upgraded_consensus_state_commitments.write(final_height, 0);

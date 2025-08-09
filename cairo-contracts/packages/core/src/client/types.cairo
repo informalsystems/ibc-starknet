@@ -324,6 +324,7 @@ pub impl DurationToProto of TryInto<Duration, ProtoDuration> {
 #[derive(Clone, Debug, Drop, Serde, starknet::Store)]
 pub struct StarknetClientState {
     pub latest_height: Height,
+    pub final_height: u64,
     pub chain_id: ByteArray,
     pub sequencer_public_key: felt252,
     pub ibc_contract_address: ContractAddress,
@@ -341,6 +342,7 @@ pub impl ClientStateKeyImpl of ComputeKey<StarknetClientState> {
         let mut data: Array<felt252> = array![];
         data.append((*self.latest_height.revision_number).into());
         data.append((*self.latest_height.revision_height).into());
+        data.append((*self.final_height).into());
 
         {
             data.append(self.chain_id.len().into());
@@ -404,12 +406,13 @@ mod tests {
     fn test_upgraded_client_state_key() {
         let client_state = StarknetClientState {
             latest_height: Height { revision_number: 1, revision_height: 2 },
+            final_height: 3,
             chain_id: "test_chain",
             sequencer_public_key: 0x12345,
             ibc_contract_address: 0x1234567890abcdef1234567890abcdef.try_into().unwrap(),
         };
         let key = client_state.key();
-        assert_eq!(key, 0x169fbc70ba7fabf23544e9cf34f4d179830b924ee790f631f243b9195294125);
+        assert_eq!(key, 0x362d1520e188b61477f5863e9e942f0119c01188c7f88cce0188f72a41602ea);
     }
 
     #[test]

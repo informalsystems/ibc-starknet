@@ -58,18 +58,26 @@ where
         )?;
 
         let current_height = header.height();
+        let final_height = header.final_height;
 
         let latest_height = core::cmp::max(self.latest_height(), current_height);
 
         let new_consensus_state = StarknetConsensusStateType::from(header);
 
-        let new_client_state = ClientStateType {
-            latest_height,
-            chain_id: self.0.chain_id.clone(),
-            sequencer_public_key: self.0.sequencer_public_key.clone(),
-            ibc_contract_address: self.0.ibc_contract_address.clone(),
-        }
-        .into();
+        let new_client_state = if self.latest_height() < current_height {
+            // The header is more recent, update the client state.
+            ClientStateType {
+                latest_height: current_height,
+                final_height,
+                chain_id: self.0.chain_id.clone(),
+                sequencer_public_key: self.0.sequencer_public_key.clone(),
+                ibc_contract_address: self.0.ibc_contract_address.clone(),
+            }
+            .into()
+        } else {
+            // The header is not more recent, keep the existing client state.
+            self.clone()
+        };
 
         update_client_and_consensus_state(
             ctx,

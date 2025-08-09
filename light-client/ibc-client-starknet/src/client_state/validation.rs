@@ -14,7 +14,7 @@ use ibc_client_starknet_types::{StarknetClientState, StarknetConsensusState};
 use ibc_core::channel::types::proto::v1::Channel;
 use ibc_core::client::context::client_state::ClientStateValidation;
 use ibc_core::client::context::prelude::ClientStateCommon;
-use ibc_core::client::types::error::{ClientError, UpgradeClientError};
+use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Status;
 use ibc_core::commitment_types::commitment::{
     CommitmentPrefix, CommitmentProofBytes, CommitmentRoot,
@@ -31,6 +31,7 @@ use prost::Message;
 use prost_types::Any as ProstAny;
 use starknet_core::types::{Felt, StorageProof};
 use starknet_crypto_lib::{StarknetCryptoFunctions, StarknetCryptoLib};
+use starknet_macros::selector;
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_storage_verifier::validate::validate_storage_proof;
 use starknet_storage_verifier::verifier::{
@@ -63,9 +64,16 @@ where
 
         let StarknetHeader {
             block_header,
+            final_height,
             block_signature,
             storage_proof,
         } = header;
+
+        // TODO(rano): use a proper error type
+        // this is to make sure after a schedule upgrade, the client can't be updated after final_height.
+        // this way, any packet after the final_height will be rejected.
+        // only way to resume the client is to remove the scheduled upgrade on starknet after the upgrade is finished.
+        assert!(final_height == 0 || block_header.block_number <= final_height);
 
         let sequencer_public_key = Felt::from_bytes_be_slice(&self.0.sequencer_public_key);
         let ibc_contract_address = Felt::from_bytes_be_slice(&self.0.ibc_contract_address);
@@ -93,11 +101,21 @@ where
         })?;
 
         // 4. verify the contract storage root is correct
-        verify_starknet_contract_proof(
+        let contract_root = verify_starknet_contract_proof(
             &starknet_crypto_cw,
             &storage_proof,
             global_contract_trie_root,
             ibc_contract_address,
+        )
+        .map_err(|e| {
+            ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+        })?;
+
+        verify_starknet_storage_proof(
+            &storage_proof,
+            contract_root,
+            selector!("final_height"),
+            final_height.into(),
         )
         .map_err(|e| {
             ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
@@ -139,10 +157,12 @@ where
         let upgraded_consensus_state =
             V::ConsensusStateRef::try_from(upgraded_consensus_state_any.clone())?;
 
-        let upgraded_height = upgraded_client_state.latest_height();
         let latest_height = self.latest_height();
+        let final_height = self.0.final_height;
 
-        let final_height = latest_height.revision_height();
+        // TODO(rano): use proper error type
+        // the client must be updated till the final height.
+        assert!(latest_height.revision_height() == final_height);
 
         let upgraded_client_path =
             UpgradeClientStatePath::new_with_default_path(final_height).into();
@@ -386,6 +406,7 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
             {
                 let StarknetClientState {
                     latest_height,
+                    final_height,
                     chain_id,
                     sequencer_public_key,
                     ibc_contract_address,
@@ -394,6 +415,7 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
                 let chain_id_bytes = chain_id.as_str().as_bytes();
                 felts.push(Felt::from(latest_height.revision_number()));
                 felts.push(Felt::from(latest_height.revision_height()));
+                felts.push(Felt::from(final_height));
                 felts.push(Felt::from(chain_id_bytes.len() as u32));
                 for byte in chain_id_bytes {
                     felts.push(Felt::from(*byte));
@@ -438,6 +460,7 @@ mod tests {
     fn test_upgraded_client_state_key() {
         let client_state = StarknetClientState {
             latest_height: Height::new(1, 2).unwrap(),
+            final_height: 3,
             chain_id: "test_chain".parse().unwrap(),
             sequencer_public_key: Felt::from(0x12345).to_bytes_be().to_vec(),
             ibc_contract_address: Felt::from_hex("0x1234567890abcdef1234567890abcdef")
@@ -450,6 +473,7 @@ mod tests {
         {
             let StarknetClientState {
                 latest_height,
+                final_height,
                 chain_id,
                 sequencer_public_key,
                 ibc_contract_address,
@@ -459,6 +483,7 @@ mod tests {
 
             felts.push(Felt::from(latest_height.revision_number()));
             felts.push(Felt::from(latest_height.revision_height()));
+            felts.push(Felt::from(final_height));
             felts.push(Felt::from(chain_id_bytes.len() as u32));
             for byte in chain_id_bytes {
                 felts.push(Felt::from(*byte));
@@ -471,7 +496,7 @@ mod tests {
 
         assert_eq!(
             commitment,
-            Felt::from_hex("0x169fbc70ba7fabf23544e9cf34f4d179830b924ee790f631f243b9195294125")
+            Felt::from_hex("0x362d1520e188b61477f5863e9e942f0119c01188c7f88cce0188f72a41602ea")
                 .unwrap(),
         );
     }

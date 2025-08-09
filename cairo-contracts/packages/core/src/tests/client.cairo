@@ -82,6 +82,16 @@ fn test_duration_max() {
 #[test]
 fn test_schedule_upgrade_keys() {
     let mut state = COMPONENT_STATE();
+
+    assert_eq!(state.final_height.__base_address__.into(), selector!("final_height"));
+
+    assert_eq!(state.final_height.__storage_pointer_address__.into(), selector!("final_height"));
+
+    assert_eq!(
+        state.final_height.__storage_pointer_address__.into(),
+        0x30faa2222f968e83202b54d3d8135ee4204634ae65d21f20f86a2732cbabfca,
+    );
+
     assert_eq!(
         state
             .upgraded_client_state_commitments
