@@ -77,7 +77,6 @@ where
 
         let ibc_core_address = chain.query_contract_address(PhantomData).await?;
 
-        // TODO(rano): use a proper key for final_height
         let final_height_key = selector!("final_height");
 
         let final_height = {

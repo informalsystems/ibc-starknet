@@ -406,7 +406,6 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
             let upgrade_client_state: ClientState = ClientState::decode_vec(value.as_slice())
                 .map_err(|e| ClientError::Decoding(e.into()))?;
 
-            // TODO(rano): cairo serialize the client state
             let mut felts = vec![];
 
             {
