@@ -126,14 +126,15 @@ pub mod ClientHandlerComponent {
         +HasComponent<TContractState>,
         +Drop<TContractState>,
         impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>,
-        impl Ownable: OwnableComponent::HasComponent<TContractState>,
+        // FIXME(rano): uncomment after Ownable is implemented
+    // impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of IScheduleUpgrade<ComponentState<TContractState>> {
         fn schedule_upgrade(ref self: ComponentState<TContractState>, msg: MsgScheduleUpgrade) {
-            {
-                // only admin can schedule an upgrade
-                let ownable = get_dep_component!(@self, Ownable);
-                ownable.assert_only_owner();
-            }
+            // {
+            //     // only admin can schedule an upgrade
+            //     let ownable = get_dep_component!(@self, Ownable);
+            //     ownable.assert_only_owner();
+            // }
 
             msg.validate_basic();
 
@@ -166,11 +167,12 @@ pub mod ClientHandlerComponent {
         }
 
         fn unschedule_upgrade(ref self: ComponentState<TContractState>) {
-            {
-                // only admin can unschedule an upgrade
-                let ownable = get_dep_component!(@self, Ownable);
-                ownable.assert_only_owner();
-            }
+            // FIXME(rano): uncomment after Ownable is implemented
+            // {
+            //     // only admin can unschedule an upgrade
+            //     let ownable = get_dep_component!(@self, Ownable);
+            //     ownable.assert_only_owner();
+            // }
 
             let final_height = self.final_height.read();
 
