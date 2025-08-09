@@ -31,7 +31,6 @@ use prost::Message;
 use prost_types::Any as ProstAny;
 use starknet_core::types::{Felt, StorageProof};
 use starknet_crypto_lib::{StarknetCryptoFunctions, StarknetCryptoLib};
-use starknet_macros::selector;
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_storage_verifier::validate::validate_storage_proof;
 use starknet_storage_verifier::verifier::{
@@ -114,7 +113,14 @@ where
         verify_starknet_storage_proof(
             &storage_proof,
             contract_root,
-            selector!("final_height"),
+            // expansion of: selector!("final_height")
+            // to avoid import of: starknet_macros
+            Felt::from_raw([
+                282283167788747436,
+                16778837309615584552,
+                17246355766618278593,
+                8468359089124617139,
+            ]),
             final_height.into(),
         )
         .map_err(|e| {

@@ -1735,7 +1735,6 @@ dependencies = [
  "starknet-block-verifier",
  "starknet-core 0.13.0",
  "starknet-crypto-lib",
- "starknet-macros",
  "starknet-storage-verifier",
 ]
 

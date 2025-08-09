@@ -37,8 +37,7 @@ ibc-client-starknet-types = { workspace = true }
 ibc-client-cw             = { workspace = true }
 
 # starknet dependencies
-starknet-core   = { workspace = true }
-starknet-macros = { workspace = true, features = [ "use_imported_type" ] }
+starknet-core = { workspace = true }
 
 [features]
 default = [ "std" ]
