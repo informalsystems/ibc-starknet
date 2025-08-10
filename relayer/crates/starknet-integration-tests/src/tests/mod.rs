@@ -6,3 +6,4 @@ pub mod raw_storage;
 pub mod test_suite;
 pub mod timeout_packet;
 pub mod update_client;
+pub mod upgrade_client;

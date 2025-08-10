@@ -49,3 +49,4 @@ cairo-lang-starknet-classes = { workspace = true }
 starknet-v14                = { workspace = true }
 starknet-block-verifier     = { workspace = true, features = [ "feeder" ] }
 starknet-crypto-lib         = { workspace = true }
+starknet-crypto             = { workspace = true }
