@@ -170,7 +170,9 @@ fn test_erc20_transfer() -> Result<(), Error> {
                 &StarknetAmount::new(transfer_amount, token_address),
             )?;
 
-            let response = chain.send_message(message).await?;
+            let response = chain
+                .send_message_with_signer(&chain_driver.relayer_wallet_1, message)
+                .await?;
 
             info!("performed transfer of 100 tokens");
 
@@ -186,6 +188,7 @@ fn test_erc20_transfer() -> Result<(), Error> {
 
             match &erc20_events[0] {
                 Erc20Event::Transfer(transfer) => {
+                    assert_eq!(transfer.from, account_address);
                     assert_eq!(transfer.to, recipient_address);
                     assert_eq!(transfer.value, transfer_amount);
                 }
@@ -205,6 +208,11 @@ fn test_erc20_transfer() -> Result<(), Error> {
                 .await?;
 
             info!("recipient balance transfer: {}", recipient_balance_b);
+
+            assert_eq!(
+                sender_balance_b.quantity,
+                sender_balance_a.quantity - transfer_amount
+            );
 
             assert_eq!(
                 recipient_balance_b.quantity,

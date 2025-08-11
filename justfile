@@ -47,4 +47,4 @@ lint-cairo:
 
 lint-nix:
   cd ./relayer && \
-  nixfmt --check .
+  nix fmt -- --ci
