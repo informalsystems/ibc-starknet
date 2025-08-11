@@ -408,7 +408,7 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
                 ViaProtobuf,
                 StarknetClientState,
             >>::decode(
-                &StarknetLightClientEncoding, &value
+                &StarknetLightClientEncoding, value
             )?
             .into();
 
@@ -442,7 +442,7 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
                 <StarknetLightClientEncoding as CanDecode<
                     ViaProtobuf,
                     StarknetConsensusState,
-                >>::decode(&StarknetLightClientEncoding ,&value)
+                >>::decode(&StarknetLightClientEncoding, value)
                 ?
                 .into();
 
