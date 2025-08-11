@@ -82,9 +82,7 @@ jobs:
         if: steps.madara-from-docker.outcome == 'failure'
         run: |
           cd madara
-          nix develop -c \
-            cargo build --release --manifest-path madara/Cargo.toml --bin madara
-          cp madara/target/release/madara "$HOME/.cargo/bin/madara"
+          nix develop -c cargo install --path madara/node --bin madara --locked
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts
