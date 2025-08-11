@@ -2,8 +2,11 @@ use hermes_prelude::*;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc_client_starknet_types::header::StarknetHeader;
+use starknet_v14::core::types::StorageProof;
 
-use crate::types::WasmStarknetConsensusState;
+use crate::types::{
+    CairoStarknetClientState, CairoStarknetConsensusState, WasmStarknetConsensusState,
+};
 
 #[derive(Debug, HasField)]
 pub struct StarknetCreateClientPayload {
@@ -24,4 +27,12 @@ pub struct StarknetCreateClientPayloadOptions {
 #[derive(Debug)]
 pub struct StarknetUpdateClientPayload {
     pub header: StarknetHeader,
+}
+
+#[derive(Clone, Debug)]
+pub struct StarknetUpgradeClientPayload {
+    pub client_state: CairoStarknetClientState,
+    pub consensus_state: CairoStarknetConsensusState,
+    pub client_state_proof: StorageProof,
+    pub consensus_state_proof: StorageProof,
 }
