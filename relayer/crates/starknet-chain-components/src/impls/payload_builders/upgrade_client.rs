@@ -3,12 +3,16 @@ use core::marker::PhantomData;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
-    ClientUpgradePayloadBuilder, ClientUpgradePayloadBuilderComponent, HasHeightType,
-    HasUpgradeClientPayloadType,
+    ClientUpgradePayloadBuilder, ClientUpgradePayloadBuilderComponent, HasClientStateType,
+    HasConsensusStateType, HasHeightType, HasUpgradeClientPayloadType,
 };
-use hermes_core::encoding_components::traits::{CanDecode, HasEncodedType, HasEncoding};
+use hermes_core::encoding_components::traits::{
+    CanConvert, CanDecode, HasDefaultEncoding, HasEncodedType, HasEncoding,
+};
+use hermes_core::encoding_components::types::AsBytes;
 use hermes_cosmos_core::chain_components::impls::CosmosUpgradeClientPayload;
 use hermes_prelude::*;
+use ibc::core::channel::types::channel::Counterparty;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::path::{UpgradeClientStatePath, UpgradeConsensusStatePath};
 use ibc_proto::google::protobuf::Any;
@@ -23,33 +27,41 @@ use crate::traits::{
 };
 use crate::types::{
     CairoStarknetClientState, CairoStarknetConsensusState, StarknetUpgradeClientPayload,
+    WasmStarknetClientState, WasmStarknetConsensusState,
 };
 
 pub struct BuildStarknetUpgradeClientPayload;
 
 #[cgp_provider(ClientUpgradePayloadBuilderComponent)]
-impl<Chain, CounterParty, Encoding> ClientUpgradePayloadBuilder<Chain, CounterParty>
-    for BuildStarknetUpgradeClientPayload
+impl<Chain, CounterParty, CairoEncoding, ProtoEncoding>
+    ClientUpgradePayloadBuilder<Chain, CounterParty> for BuildStarknetUpgradeClientPayload
 where
     Chain: HasHeightType<Height = u64>
         + HasUpgradeClientPayloadType<UpgradeClientPayload = CosmosUpgradeClientPayload>
+        + HasClientStateType<Chain, ClientState = WasmStarknetClientState>
+        + HasConsensusStateType<Chain, ConsensusState = WasmStarknetConsensusState>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanQueryStorageProof<StorageProof = StorageProof, StorageKey = Felt>
         + CanCallContract
         + HasSelectorType<Selector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
-        + HasEncoding<AsFelt, Encoding = Encoding>
-        + CanRaiseAsyncError<Encoding::Error>,
-    Encoding: Async
+        + HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + HasDefaultEncoding<AsBytes, Encoding = ProtoEncoding>
+        + CanRaiseAsyncError<ProtoEncoding::Error>
+        + CanRaiseAsyncError<CairoEncoding::Error>,
+    CairoEncoding: Async
         + CanDecode<ViaCairo, u64>
         + CanDecode<ViaCairo, (CairoStarknetClientState, CairoStarknetConsensusState)>
         + HasEncodedType<Encoded = Vec<Felt>>,
+    ProtoEncoding:
+        Async + CanConvert<Chain::ClientState, Any> + CanConvert<Chain::ConsensusState, Any>,
 {
     async fn upgrade_client_payload(
         chain: &Chain,
         upgrade_height: &u64,
-    ) -> Result<Chain::UpgradeClientPayload, Chain::Error> {
-        let encoding = chain.encoding();
+    ) -> Result<CosmosUpgradeClientPayload, Chain::Error> {
+        let cairo_encoding = chain.encoding();
+        let proto_encoding = Chain::default_encoding();
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
 
@@ -63,7 +75,8 @@ where
                 )
                 .await?;
 
-            let onchain_final_height: u64 = encoding.decode(&output).map_err(Chain::raise_error)?;
+            let onchain_final_height: u64 =
+                cairo_encoding.decode(&output).map_err(Chain::raise_error)?;
 
             assert_eq!(onchain_final_height, *upgrade_height);
         }
@@ -77,10 +90,32 @@ where
             )
             .await?;
 
-        let (client_state, consensus_state): (
+        let (cairo_client_state, cairo_consensus_state): (
             CairoStarknetClientState,
             CairoStarknetConsensusState,
-        ) = encoding.decode(&output).map_err(Chain::raise_error)?;
+        ) = cairo_encoding.decode(&output).map_err(Chain::raise_error)?;
+
+        // TODO(rano): implement these two From
+        let starknet_client_state = cairo_client_state.into();
+        let starknet_consensus_state = cairo_consensus_state.into();
+
+        let wasm_client_state = WasmStarknetClientState {
+            client_state: starknet_client_state,
+            // pass correct wasm code hash
+            wasm_code_hash: vec![],
+        };
+
+        let wasm_consensus_state = WasmStarknetConsensusState {
+            consensus_state: starknet_consensus_state,
+        };
+
+        let client_state = proto_encoding
+            .convert(&wasm_client_state)
+            .map_err(Chain::raise_error)?;
+
+        let consensus_state = proto_encoding
+            .convert(&wasm_consensus_state)
+            .map_err(Chain::raise_error)?;
 
         let client_state_proof: StorageProof = {
             let ibc_path = UpgradeClientStatePath::new_with_default_path(*upgrade_height);
@@ -102,38 +137,14 @@ where
                 .await?
         };
 
-        Ok(StarknetUpgradeClientPayload {
+        Ok(CosmosUpgradeClientPayload {
             upgrade_height: Height::new(0, *upgrade_height).unwrap(),
-            client_state,
-            consensus_state,
-            client_state_proof,
-            consensus_state_proof,
-        }
-        .into())
-    }
-}
-
-impl From<StarknetUpgradeClientPayload> for CosmosUpgradeClientPayload {
-    fn from(payload: StarknetUpgradeClientPayload) -> Self {
-        // TODO(rano): transform starknet upgrade client payload to cosmos payload
-
-        // CairoStarknetClientState -> StarknetClientState -> WasmStarknetClientState -> Any
-        // same for ConsensusState
-
-        Self {
-            upgrade_height: payload.upgrade_height,
-            upgrade_client_state: Any {
-                type_url: String::new(),
-                value: vec![],
-            },
-            upgrade_consensus_state: Any {
-                type_url: String::new(),
-                value: vec![],
-            },
-            upgrade_client_state_proof: serde_json::to_vec(&payload.client_state_proof)
+            upgrade_client_state: client_state,
+            upgrade_consensus_state: consensus_state,
+            upgrade_client_state_proof: serde_json::to_vec(&client_state_proof)
                 .expect("Failed to serialize client state proof"),
-            upgrade_consensus_state_proof: serde_json::to_vec(&payload.consensus_state_proof)
+            upgrade_consensus_state_proof: serde_json::to_vec(&consensus_state_proof)
                 .expect("Failed to serialize consensus state proof"),
-        }
+        })
     }
 }
