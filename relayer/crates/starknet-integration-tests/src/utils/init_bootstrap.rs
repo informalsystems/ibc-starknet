@@ -37,7 +37,7 @@ pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<Starknet
         fields: Arc::new(StarknetBootstrapFields {
             runtime: runtime.clone(),
             chain_command_path,
-            chain_store_dir: format!("./test-data/{timestamp}").into(),
+            chain_store_dir: format!("./test-data/{timestamp}/starknet").into(),
             erc20_contract,
             ics20_contract,
             ibc_core_contract,

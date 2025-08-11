@@ -17,6 +17,7 @@ use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::commitment_types::commitment::CommitmentRoot;
 use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::StarknetHeader;
+use ibc_client_starknet_types::misbehaviour::StarknetMisbehaviour;
 
 use crate::impls::HandleStarknetChainError;
 
@@ -33,6 +34,7 @@ delegate_components! {
 pub trait CanUseStarknetProtobufEncoding:
     CanEncodeAndDecode<ViaProtobuf, StarknetClientState>
     + CanEncodeAndDecode<ViaProtobuf, StarknetConsensusState>
+    + CanEncodeAndDecode<ViaProtobuf, StarknetMisbehaviour>
     + CanEncodeAndDecode<ViaProtobuf, ClientMessage>
     + CanEncodeAndDecode<ViaProtobuf, WasmClientState>
     + CanEncodeAndDecode<ViaProtobuf, WasmConsensusState>

@@ -7,16 +7,19 @@ use hermes_core::chain_components::traits::{
     MisbehaviourMessageBuilderComponent,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
-use hermes_core::logging_components::traits::CanLog;
-use hermes_core::logging_components::types::LevelWarn;
 use hermes_prelude::*;
+use ibc::core::host::types::error::DecodingError;
 use ibc::core::host::types::identifiers::ClientId;
 use ibc_client_tendermint::types::proto::v1::Misbehaviour;
 use ibc_proto::Protobuf;
+use prost_types::Any;
 use starknet::core::types::{ByteArray, Felt, U256};
 use starknet::macros::selector;
+use tendermint_proto::Error as TendermintProtoError;
 
-use crate::impls::{comet_signature_hints, StarknetAddress, StarknetMessage, StarknetMisbehaviour};
+use crate::impls::{
+    comet_signature_hints, CosmosStarknetMisbehaviour, StarknetAddress, StarknetMessage,
+};
 use crate::traits::CanQueryContractAddress;
 use crate::types::ClientMessage;
 
@@ -24,15 +27,16 @@ use crate::types::ClientMessage;
 impl<Chain, Counterparty, EncodingError> MisbehaviourMessageBuilder<Chain, Counterparty>
     for StarknetMisbehaviourMessageBuilder
 where
-    Chain: HasEvidenceType<Evidence = StarknetMisbehaviour>
+    Chain: HasEvidenceType<Evidence = Any>
         + HasChainId
         + HasEncoding<AsFelt>
         + HasMessageType<Message = StarknetMessage>
         + HasAddressType<Address = StarknetAddress>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
-        + CanLog<LevelWarn>
         + HasMessageType
-        + CanRaiseAsyncError<EncodingError>,
+        + CanRaiseAsyncError<EncodingError>
+        + CanRaiseAsyncError<DecodingError>
+        + CanRaiseAsyncError<TendermintProtoError>,
     Chain::Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
         + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
@@ -47,13 +51,8 @@ where
         chain: &Chain,
         evidence: &Chain::Evidence,
     ) -> Result<Chain::Message, Chain::Error> {
-        // TODO
-        chain
-            .log(
-                &format!("StarknetMisbehaviourMessageBuilder {}", chain.chain_id()),
-                &LevelWarn,
-            )
-            .await;
+        let decoded_evidence: CosmosStarknetMisbehaviour =
+            Protobuf::decode(&*evidence.value).map_err(Chain::raise_error)?;
 
         let encoding = chain.encoding();
         let contract_address = chain.query_contract_address(PhantomData).await?;
@@ -65,17 +64,29 @@ where
         // So, we encode the Header as Protobuf bytes and then encode those bytes as
         // Cairo `ByteArray` which has more succinct `Vec<u8>` representation.
 
-        let signature_hint_1 =
-            comet_signature_hints(&evidence.evidence_1.clone().try_into().unwrap(), encoding);
+        let signature_hint_1 = comet_signature_hints(
+            &decoded_evidence
+                .evidence_1
+                .clone()
+                .try_into()
+                .map_err(Chain::raise_error)?,
+            encoding,
+        );
 
-        let signature_hint_2 =
-            comet_signature_hints(&evidence.evidence_2.clone().try_into().unwrap(), encoding);
+        let signature_hint_2 = comet_signature_hints(
+            &decoded_evidence
+                .evidence_2
+                .clone()
+                .try_into()
+                .map_err(Chain::raise_error)?,
+            encoding,
+        );
 
         let serialized_signature_hints = encoding
             .encode(&(signature_hint_1, signature_hint_2))
             .map_err(Chain::raise_error)?;
 
-        let protobuf_bytes = Protobuf::<Misbehaviour>::encode_vec(evidence.clone());
+        let protobuf_bytes = Protobuf::<Misbehaviour>::encode_vec(decoded_evidence.clone());
 
         let protobuf_byte_array: ByteArray = protobuf_bytes.into();
 
@@ -93,7 +104,10 @@ where
             .map_err(Chain::raise_error)?;
 
         let calldata = encoding
-            .encode(&product![evidence.client_id.clone(), client_message_felts])
+            .encode(&product![
+                decoded_evidence.client_id.clone(),
+                client_message_felts
+            ])
             .map_err(Chain::raise_error)?;
 
         Ok(StarknetMessage::new(

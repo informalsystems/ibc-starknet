@@ -19,8 +19,10 @@ use hermes_cosmos_core::tendermint_rpc::Client;
 use hermes_error::HermesError;
 use hermes_prelude::*;
 use ibc_client_tendermint::types::error::TendermintClientError;
+use ibc_client_tendermint::types::proto::v1::Misbehaviour;
 use ibc_proto::ibc::lightclients::tendermint::v1::Header;
-use prost::Message;
+use prost::{DecodeError, EncodeError, Message};
+use prost_types::Any;
 use starknet::core::types::{ByteArray, Felt};
 use tendermint::block::Height as TendermintHeight;
 use tendermint::error::Error as TendermintError;
@@ -28,11 +30,11 @@ use tendermint::validator::Set;
 use tendermint_light_client_verifier::types::{LightBlock, ValidatorSet};
 use tendermint_rpc::{Error as TendermintRpcError, Paging};
 
-use crate::impls::{StarknetMisbehaviour, StarknetUpdateClientEvent};
+use crate::impls::{CosmosStarknetMisbehaviour, StarknetUpdateClientEvent};
 use crate::types::ClientMessage;
 
 #[cgp_new_provider(MisbehaviourCheckerComponent)]
-impl<Chain, Counterparty> MisbehaviourChecker<Chain, Counterparty>
+impl<Chain, Counterparty, Encoding> MisbehaviourChecker<Chain, Counterparty>
     for CheckCosmosMisbehaviourFromStarknet
 where
     Chain: HasClientStateType<Counterparty>
@@ -41,6 +43,9 @@ where
         + HasRpcClient
         + CanLog<LevelWarn>
         + CanRaiseAsyncError<Counterparty::Error>
+        + CanRaiseAsyncError<Encoding::Error>
+        + CanRaiseAsyncError<DecodeError>
+        + CanRaiseAsyncError<EncodeError>
         + CanRaiseAsyncError<HermesError>
         + CanRaiseAsyncError<TendermintError>
         + CanRaiseAsyncError<TendermintClientError>
@@ -48,13 +53,14 @@ where
         + CanRaiseAsyncError<&'static str>,
     Counterparty: HasUpdateClientEvent<UpdateClientEvent = StarknetUpdateClientEvent>
         + HasChainId
-        + HasEvidenceType<Evidence = StarknetMisbehaviour>
-        + HasDefaultEncoding<AsFelt>
+        + HasEvidenceType<Evidence = Any>
+        + HasDefaultEncoding<AsFelt, Encoding = Encoding>
         + HasAsyncErrorType,
     TendermintClientState: From<Chain::ClientState>,
-    Counterparty::Encoding: HasEncodedType<Encoded = Vec<Felt>>
+    Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![ClientMessage, Vec<Felt>]>
-        + CanDecode<ViaCairo, ByteArray>,
+        + CanDecode<ViaCairo, ByteArray>
+        + HasAsyncErrorType,
     Chain::Runtime: CanSleep,
 {
     async fn check_misbehaviour(
@@ -65,10 +71,13 @@ where
         let encoding = Counterparty::default_encoding();
 
         let product![client_message, signature_hints,]: Product![ClientMessage, Vec<Felt>] =
-            encoding.decode(&update_client_event.header).unwrap();
+            encoding
+                .decode(&update_client_event.header)
+                .map_err(Chain::raise_error)?;
 
         let raw_header: Vec<u8> = if let ClientMessage::Update(header) = client_message {
-            let byte_array_header: ByteArray = encoding.decode(&header).unwrap();
+            let byte_array_header: ByteArray =
+                encoding.decode(&header).map_err(Chain::raise_error)?;
             byte_array_header.into()
         } else {
             return Err(Chain::raise_error(
@@ -76,7 +85,7 @@ where
             ));
         };
 
-        let header: Header = Header::decode(&*raw_header).unwrap();
+        let header: Header = Message::decode(&*raw_header).map_err(Chain::raise_error)?;
 
         let signed_header = header.clone().signed_header.ok_or_else(|| {
             Chain::raise_error("`signed_header` missing from `Header` in Update Client event")
@@ -264,7 +273,7 @@ where
                 None => (trusted_height, trusted_validator_set),
             };
 
-            return Ok(Some(StarknetMisbehaviour {
+            let evidence: Misbehaviour = CosmosStarknetMisbehaviour {
                 client_id: update_client_event.client_id.clone(),
                 evidence_1: header,
                 evidence_2: Header {
@@ -273,7 +282,12 @@ where
                     trusted_height: Some(latest_trusted_height),
                     trusted_validators: Some(latest_trusted_validator_set.into()),
                 },
-            }));
+            }
+            .into();
+
+            let evidence_any = Any::from_msg(&evidence).map_err(Chain::raise_error)?;
+
+            return Ok(Some(evidence_any));
         }
         chain
             .log(

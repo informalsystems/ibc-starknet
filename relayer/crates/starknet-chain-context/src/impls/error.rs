@@ -44,6 +44,7 @@ use starknet::core::types::contract::{ComputeClassHashError, JsonError};
 use starknet::core::types::{RevertedInvocation, StarknetError};
 use starknet::providers::ProviderError;
 use starknet::signers::local_wallet;
+use tendermint_proto::Error as TendermintProtoError;
 use url::ParseError;
 
 pub struct HandleStarknetChainError;
@@ -71,6 +72,7 @@ delegate_components! {
             DecodeError,
             ParseError,
             DecodingError,
+            TendermintProtoError,
             ClientError,
             ChannelError,
             TimestampError,

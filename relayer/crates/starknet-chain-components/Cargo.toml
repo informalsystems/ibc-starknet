@@ -39,7 +39,7 @@ futures                     = { workspace = true }
 garaga                      = { workspace = true }
 http                        = { workspace = true }
 humantime-serde             = { workspace = true }
-ibc-client-starknet-types   = { workspace = true }
+ibc-client-starknet-types   = { workspace = true, features = [ "serde" ] }
 indexmap                    = { workspace = true }
 num-bigint                  = { version = "0.4" }
 prost                       = { workspace = true }
