@@ -2,7 +2,9 @@ use core::marker::PhantomData;
 use core::time::Duration;
 
 use cgp::core::field::Index;
-use hermes_core::chain_components::traits::{CanQueryChainHeight, CanQueryChainStatus};
+use hermes_core::chain_components::traits::{
+    CanBuildClientUpgradePayload, CanQueryChainHeight, CanQueryChainStatus,
+};
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode};
 use hermes_core::relayer_components::relay::traits::{
     CanSendTargetUpdateClientMessage, DestinationTarget, SourceTarget,
@@ -13,6 +15,7 @@ use hermes_core::runtime_components::traits::CanSleep;
 use hermes_core::test_components::setup::traits::{CanSetupChain, CanSetupClients};
 use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
+use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::StarknetMessage;
 use hermes_starknet_chain_components::traits::CanCallContract;
@@ -230,6 +233,17 @@ fn test_upgrade_clients() -> Result<(), Error> {
 
         {
             // build upgrade client message for wasm light client
+
+            info!("building upgrade client payload from Starknet");
+
+            let client_upgrade_payload =
+                CanBuildClientUpgradePayload::<CosmosChain>::upgrade_client_payload(
+                    starknet_chain,
+                    &starknet_final_height,
+                )
+                .await?;
+
+            info!("client_upgrade_payload: {client_upgrade_payload:?}");
 
             // submit upgrade client message on Cosmos
 

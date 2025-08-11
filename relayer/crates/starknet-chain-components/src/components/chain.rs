@@ -65,7 +65,8 @@ mod preset {
         TimeMeasurerComponent, TimeoutTypeComponent, TimeoutUnorderedPacketMessageBuilderComponent,
         TimeoutUnorderedPacketPayloadBuilderComponent, TimeoutUnorderedPacketPayloadTypeComponent,
         UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
-        UpdateClientPayloadTypeComponent, WriteAckEventComponent,
+        UpdateClientPayloadTypeComponent, UpgradeClientPayloadTypeComponent,
+        WriteAckEventComponent,
     };
     use hermes_core::chain_type_components::traits::{
         AddressTypeProviderComponent, AmountDenomGetterComponent, AmountTypeProviderComponent,
@@ -242,7 +243,8 @@ mod preset {
                 CreateClientPayloadTypeComponent,
                 CreateClientPayloadOptionsTypeComponent,
                 UpdateClientPayloadTypeComponent,
-                RecoverClientPayloadTypeComponent
+                RecoverClientPayloadTypeComponent,
+                UpgradeClientPayloadTypeComponent,
             ]:
                 ProvideStarknetPayloadTypes,
             // FIXME: define our own Starknet init channel options type

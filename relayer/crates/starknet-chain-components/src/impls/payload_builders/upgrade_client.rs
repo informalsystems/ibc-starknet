@@ -11,6 +11,7 @@ use hermes_cosmos_core::chain_components::impls::CosmosUpgradeClientPayload;
 use hermes_prelude::*;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::path::{UpgradeClientStatePath, UpgradeConsensusStatePath};
+use ibc_proto::google::protobuf::Any;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 use starknet_crypto_lib::StarknetCryptoLib;
@@ -115,6 +116,24 @@ where
 impl From<StarknetUpgradeClientPayload> for CosmosUpgradeClientPayload {
     fn from(payload: StarknetUpgradeClientPayload) -> Self {
         // TODO(rano): transform starknet upgrade client payload to cosmos payload
-        todo!()
+
+        // CairoStarknetClientState -> StarknetClientState -> WasmStarknetClientState -> Any
+        // same for ConsensusState
+
+        Self {
+            upgrade_height: payload.upgrade_height,
+            upgrade_client_state: Any {
+                type_url: String::new(),
+                value: vec![],
+            },
+            upgrade_consensus_state: Any {
+                type_url: String::new(),
+                value: vec![],
+            },
+            upgrade_client_state_proof: serde_json::to_vec(&payload.client_state_proof)
+                .expect("Failed to serialize client state proof"),
+            upgrade_consensus_state_proof: serde_json::to_vec(&payload.consensus_state_proof)
+                .expect("Failed to serialize consensus state proof"),
+        }
     }
 }
