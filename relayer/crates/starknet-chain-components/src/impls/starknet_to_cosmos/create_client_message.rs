@@ -52,12 +52,16 @@ where
             wasm_code_hash: payload.client_state_wasm_code_hash,
         };
 
+        let consensus_state = WasmStarknetConsensusState {
+            consensus_state: payload.consensus_state,
+        };
+
         let client_state = encoding
             .convert(&client_state)
             .map_err(Chain::raise_error)?;
 
         let consensus_state = encoding
-            .convert(&payload.consensus_state)
+            .convert(&consensus_state)
             .map_err(Chain::raise_error)?;
 
         let message = CosmosCreateClientMessage {

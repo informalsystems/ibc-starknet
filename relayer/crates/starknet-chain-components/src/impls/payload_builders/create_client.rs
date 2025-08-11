@@ -27,7 +27,7 @@ use crate::traits::{
 };
 use crate::types::{
     StarknetChainStatus, StarknetConsensusState, StarknetCreateClientPayload,
-    StarknetCreateClientPayloadOptions, WasmStarknetConsensusState,
+    StarknetCreateClientPayloadOptions,
 };
 
 pub struct BuildStarknetCreateClientPayload;
@@ -88,14 +88,12 @@ where
 
         let root = contract_root.to_bytes_be().to_vec();
 
-        let consensus_state = WasmStarknetConsensusState {
-            consensus_state: StarknetConsensusState {
-                root: root.into(),
-                time: u64::try_from(block.time.unix_timestamp_nanos())
-                    .ok()
-                    .map(Timestamp::from_nanoseconds)
-                    .ok_or_else(|| Chain::raise_error("invalid timestamp"))?,
-            },
+        let consensus_state = StarknetConsensusState {
+            root: root.into(),
+            time: u64::try_from(block.time.unix_timestamp_nanos())
+                .ok()
+                .map(Timestamp::from_nanoseconds)
+                .ok_or_else(|| Chain::raise_error("invalid timestamp"))?,
         };
 
         let ibc_core_address = chain.query_contract_address(PhantomData).await?;

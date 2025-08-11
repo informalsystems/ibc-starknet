@@ -5,12 +5,12 @@ use hermes_core::chain_components::traits::{
     ProvideUpgradeClientPayloadType, RecoverClientPayloadTypeComponent,
     UpdateClientPayloadTypeComponent, UpgradeClientPayloadTypeComponent,
 };
-use hermes_cosmos_core::chain_components::impls::CosmosUpgradeClientPayload;
 use hermes_prelude::*;
 
 use crate::impls::StarknetRecoverClientPayload;
 use crate::types::{
     StarknetCreateClientPayload, StarknetCreateClientPayloadOptions, StarknetUpdateClientPayload,
+    StarknetUpgradeClientPayload,
 };
 
 pub struct ProvideStarknetPayloadTypes;
@@ -46,5 +46,5 @@ impl<Chain> ProvideUpgradeClientPayloadType<Chain> for ProvideStarknetPayloadTyp
 where
     Chain: Async,
 {
-    type UpgradeClientPayload = CosmosUpgradeClientPayload;
+    type UpgradeClientPayload = StarknetUpgradeClientPayload;
 }

@@ -25,16 +25,17 @@ mod preset {
     };
     use hermes_core::test_components::chain::traits::IbcTransferredAmountConverterComponent;
     use hermes_cosmos_core::chain_components::impls::{
-        BuildCosmosPacketMessages, CosmosPacketFieldReader, UpgradeClientWithGovernanceProposal,
+        BuildCosmosPacketMessages, CosmosPacketFieldReader,
     };
     use hermes_cosmos_core::chain_preset::presets::CosmosToCosmosComponents;
     use hermes_prelude::*;
 
     use crate::impls::{
         BuildStarknetCreateClientMessage, BuildStarknetToCosmosConnectionHandshake,
-        BuildStarknetUpdateClientMessage, ConvertCosmosIbcAmountFromStarknet,
-        GetCosmosCounterpartyMessageStarknetHeight, ProvideCometConsensusState,
-        QueryStarknetConsensusStateHeightsFromGrpc, ReadPacketDstStarknetFields,
+        BuildStarknetUpdateClientMessage, BuildStarknetUpgradeClientMessage,
+        ConvertCosmosIbcAmountFromStarknet, GetCosmosCounterpartyMessageStarknetHeight,
+        ProvideCometConsensusState, QueryStarknetConsensusStateHeightsFromGrpc,
+        ReadPacketDstStarknetFields,
     };
     use crate::types::{CometConsensusState, UseCometClientState};
 
@@ -75,7 +76,7 @@ mod preset {
             UpdateClientMessageBuilderComponent:
                 BuildStarknetUpdateClientMessage,
             ClientUpgradeComponent:
-                UpgradeClientWithGovernanceProposal,
+                BuildStarknetUpgradeClientMessage,
             ConsensusStateHeightsQuerierComponent:
                 QueryStarknetConsensusStateHeightsFromGrpc,
             CounterpartyMessageHeightGetterComponent:
