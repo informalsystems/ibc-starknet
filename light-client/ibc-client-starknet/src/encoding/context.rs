@@ -19,6 +19,7 @@ use hermes_protobuf_encoding_components::types::any::Any;
 use hermes_protobuf_encoding_components::types::strategy::{ViaAny, ViaProtobuf};
 use ibc_client_starknet_types::encoding::components::*;
 use ibc_client_starknet_types::header::StarknetHeader;
+use ibc_client_starknet_types::misbehaviour::StarknetMisbehaviour;
 use ibc_client_starknet_types::{StarknetClientState, StarknetConsensusState};
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
@@ -207,6 +208,7 @@ pub trait CanUseStarknetLightClientEncoding:
     + CanEncodeAndDecode<ViaProtobuf, StarknetHeader>
     + CanEncodeAndDecode<ViaAny, StarknetClientState>
     + CanEncodeAndDecode<ViaAny, StarknetConsensusState>
+    + CanEncodeAndDecode<ViaAny, StarknetMisbehaviour>
     + CanEncodeAndDecode<ViaAny, StarknetHeader>
     + CanConvertBothWays<Any, StarknetClientState>
     + CanConvertBothWays<Any, StarknetConsensusState>

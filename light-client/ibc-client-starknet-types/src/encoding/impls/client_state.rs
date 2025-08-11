@@ -6,7 +6,7 @@ use hermes_encoding_components::impls::{CombineEncoders, DecodeFrom, EncodeField
 use hermes_encoding_components::traits::{MutDecoderComponent, MutEncoderComponent, Transformer};
 use hermes_prelude::*;
 use hermes_protobuf_encoding_components::impls::{
-    DecodeRequiredProtoField, EncodeByteField, EncodeLengthDelimitedProtoField,
+    DecodeRequiredProtoField, EncodeByteField, EncodeLengthDelimitedProtoField, EncodeU64ProtoField,
 };
 use ibc_core::client::types::Height;
 use ibc_core::host::types::identifiers::ChainId;
@@ -35,6 +35,10 @@ delegate_components! {
                     symbol!("ibc_contract_address"),
                     EncodeByteField<4>,
                 >,
+                EncodeField<
+                    symbol!("is_frozen"),
+                    EncodeU64ProtoField<5>,
+                >,
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
@@ -43,13 +47,14 @@ delegate_components! {
                 EncodeChainIdField<2>,
                 EncodeByteField<3>,
                 EncodeByteField<4>,
+                EncodeU64ProtoField<5>,
             ]>
         >,
     }
 }
 
 impl Transformer for EncodeStarknetClientState {
-    type From = Product![Height, ChainId, Vec<u8>, Vec<u8>];
+    type From = Product![Height, ChainId, Vec<u8>, Vec<u8>, u8];
 
     type To = StarknetClientState;
 
@@ -59,6 +64,7 @@ impl Transformer for EncodeStarknetClientState {
             chain_id,
             sequencer_public_key,
             ibc_contract_address,
+            is_frozen,
         ]: Self::From,
     ) -> Self::To {
         StarknetClientState {
@@ -66,6 +72,7 @@ impl Transformer for EncodeStarknetClientState {
             chain_id,
             sequencer_public_key,
             ibc_contract_address,
+            is_frozen,
         }
     }
 }
