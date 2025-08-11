@@ -7,7 +7,8 @@ use core::str::FromStr;
 use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::ConvertIbcAny;
 use hermes_encoding_components::impls::ConvertVia;
-use hermes_encoding_components::traits::Converter;
+use hermes_encoding_components::traits::{CanDecode, Converter};
+use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc_client_cw::context::CwClientValidation;
 use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_client_starknet_types::{StarknetClientState, StarknetConsensusState};
@@ -26,7 +27,7 @@ use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::host::types::path::{
     Path, PathBytes, UpgradeClientStatePath, UpgradeConsensusStatePath,
 };
-use ibc_core::primitives::proto::{Any, Protobuf};
+use ibc_core::primitives::proto::Any;
 use prost::Message;
 use prost_types::Any as ProstAny;
 use starknet_core::types::{Felt, StorageProof};
@@ -403,8 +404,13 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
             Ok(crypto_lib.poseidon_hash_many(&felts))
         }
         Path::UpgradeClientState(_) => {
-            let upgrade_client_state: ClientState = ClientState::decode_vec(value.as_slice())
-                .map_err(|e| ClientError::Decoding(e.into()))?;
+            let upgrade_client_state: ClientState = <StarknetLightClientEncoding as CanDecode<
+                ViaProtobuf,
+                StarknetClientState,
+            >>::decode(
+                &StarknetLightClientEncoding, &value
+            )?
+            .into();
 
             let mut felts = vec![];
 
@@ -432,8 +438,13 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
             Ok(crypto_lib.poseidon_hash_many(&felts))
         }
         Path::UpgradeConsensusState(_) => {
-            let upgrade_consensus_state: ConsensusState = ConsensusState::decode(value.as_slice())
-                .map_err(|e| ClientError::Decoding(e.into()))?;
+            let upgrade_consensus_state: ConsensusState =
+                <StarknetLightClientEncoding as CanDecode<
+                    ViaProtobuf,
+                    StarknetConsensusState,
+                >>::decode(&StarknetLightClientEncoding ,&value)
+                ?
+                .into();
 
             let mut felts = vec![];
 

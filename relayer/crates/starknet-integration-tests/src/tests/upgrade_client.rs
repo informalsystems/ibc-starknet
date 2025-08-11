@@ -3,8 +3,8 @@ use core::time::Duration;
 
 use cgp::core::field::Index;
 use hermes_core::chain_components::traits::{
-    CanBuildClientUpgradePayload, CanQueryChainHeight, CanQueryChainStatus, CanSendSingleMessage,
-    ClientUpgrade, HasChainId,
+    CanBuildClientUpgradePayload, CanQueryChainHeight, CanQueryChainStatus,
+    CanQueryClientStateWithLatestHeight, CanSendSingleMessage, ClientUpgrade, HasChainId,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode};
 use hermes_core::relayer_components::relay::traits::{
@@ -268,6 +268,17 @@ fn test_upgrade_clients() -> Result<(), Error> {
                 .await?;
 
             cosmos_chain.send_message(client_upgrade_message).await?;
+
+            info!("client has been upgraded on Cosmos");
+
+            let upgraded_client_state = cosmos_chain
+                .query_client_state_with_latest_height(
+                    PhantomData::<StarknetChain>,
+                    &cosmos_client_id,
+                )
+                .await?;
+
+            info!("Upgraded starknet client state on Cosmos: {upgraded_client_state:?}");
 
             // unschedule_upgrade on starknet
         }
