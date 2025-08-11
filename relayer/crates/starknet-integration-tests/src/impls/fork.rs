@@ -91,13 +91,21 @@ async fn fork_cosmos_chain(driver: &StarknetTestDriver) -> Result<StarknetTestDr
         }),
     };
 
+    let cosmos_pid = driver
+        .cosmos_chain_driver
+        .chain_processes
+        .first()
+        .expect("Failed to retrieve Cosmos chain process")
+        .id()
+        .expect("failed to reterieve Cosmos chain process ID");
+
     // Stop full node
-    // `pkill` is used here instead of `Child::kill()` as the `kill()` method requires
+    // `kill` is used here instead of `Child::kill()` as the `kill()` method requires
     // the child process to be mutable.
     runtime
         .exec_command(
-            &PathBuf::from("pkill".to_string()),
-            &["-f", &driver.cosmos_chain_driver.chain.chain_id.to_string()],
+            &PathBuf::from("kill".to_string()),
+            &["-s", "9", &cosmos_pid.to_string()],
         )
         .await?;
 
@@ -323,11 +331,22 @@ async fn fork_starknet_chain(
     let chain_home_dir = driver.starknet_chain_driver.chain_store_dir.clone();
     let chain_node_config = driver.starknet_chain_driver.node_config.clone();
 
+    let starknet_pid = driver
+        .starknet_chain_driver
+        .chain_processes
+        .first()
+        .expect("Failed to retrieve Starknet chain process")
+        .id()
+        .expect("failed to reterieve Starknet chain process ID");
+
     // Stop full node
-    // `pkill` is used here instead of `Child::kill()` as the `kill()` method requires
+    // `kill` is used here instead of `Child::kill()` as the `kill()` method requires
     // the child process to be mutable.
     runtime
-        .exec_command(&PathBuf::from("pkill".to_string()), &["-f", "madara"])
+        .exec_command(
+            &PathBuf::from("kill".to_string()),
+            &["-s", "9", &starknet_pid.to_string()],
+        )
         .await?;
 
     driver
