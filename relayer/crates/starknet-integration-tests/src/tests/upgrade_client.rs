@@ -3,7 +3,8 @@ use core::time::Duration;
 
 use cgp::core::field::Index;
 use hermes_core::chain_components::traits::{
-    CanBuildClientUpgradePayload, CanQueryChainHeight, CanQueryChainStatus,
+    CanBuildClientUpgradePayload, CanQueryChainHeight, CanQueryChainStatus, CanSendSingleMessage,
+    ClientUpgrade, HasChainId,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode};
 use hermes_core::relayer_components::relay::traits::{
@@ -17,12 +18,12 @@ use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_cosmos::relayer::contexts::CosmosChain;
 use hermes_prelude::*;
-use hermes_starknet_chain_components::impls::StarknetMessage;
+use hermes_starknet_chain_components::impls::{BuildStarknetUpgradeClientMessage, StarknetMessage};
 use hermes_starknet_chain_components::traits::CanCallContract;
 use hermes_starknet_chain_components::types::{
     CairoStarknetClientState, CairoStarknetConsensusState, Height,
 };
-use hermes_starknet_chain_context::contexts::StarknetCairoEncoding;
+use hermes_starknet_chain_context::contexts::{StarknetCairoEncoding, StarknetChain};
 use hermes_starknet_relayer::contexts::StarknetToCosmosRelay;
 use ibc::primitives::Timestamp;
 use starknet::core::types::Felt;
@@ -116,15 +117,15 @@ fn test_upgrade_clients() -> Result<(), Error> {
                 starknet_final_height
             );
 
-            // FIXME(rano): build correct upgraded states
             let upgraded_client_state = CairoStarknetClientState {
                 latest_height: Height {
                     revision_number: 0,
-                    revision_height: starknet_final_height,
+                    revision_height: starknet_final_height + 1,
                 },
-                final_height: starknet_final_height,
-                chain_id: "dummy-chain".into(),
+                final_height: 0, // resetting
+                chain_id: starknet_chain.chain_id().as_str().into(),
                 sequencer_public_key: starknet_crypto::get_public_key(
+                    // TODO(rano): restart starknet chain with this key
                     &starknet_sequencer_private_key_2,
                 ),
                 ibc_contract_address: *ibc_core_contract_address,
@@ -245,7 +246,28 @@ fn test_upgrade_clients() -> Result<(), Error> {
 
             info!("client_upgrade_payload: {client_upgrade_payload:?}");
 
+            let client_upgrade_message = <BuildStarknetUpgradeClientMessage as ClientUpgrade<
+                CosmosChain,
+                StarknetChain,
+            >>::upgrade_client_message(
+                cosmos_chain, &cosmos_client_id, &client_upgrade_payload
+            )
+            .await?;
+
+            info!("client_upgrade_message: {client_upgrade_message:?}");
+
             // submit upgrade client message on Cosmos
+
+            info!(
+                "updating Starknet light client to the final height before upgrade: {}",
+                starknet_final_height
+            );
+
+            starknet_to_cosmos_relay
+                .send_target_update_client_messages(DestinationTarget, &starknet_final_height)
+                .await?;
+
+            cosmos_chain.send_message(client_upgrade_message).await?;
 
             // unschedule_upgrade on starknet
         }
