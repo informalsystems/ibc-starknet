@@ -7,7 +7,9 @@ use hermes_core::chain_components::traits::{
     HasUpgradeClientPayloadType,
 };
 use hermes_core::encoding_components::traits::{CanDecode, HasEncodedType, HasEncoding};
+use hermes_cosmos_core::chain_components::impls::CosmosUpgradeClientPayload;
 use hermes_prelude::*;
+use ibc::core::client::types::Height;
 use ibc::core::host::types::path::{UpgradeClientStatePath, UpgradeConsensusStatePath};
 use starknet::core::types::Felt;
 use starknet::macros::selector;
@@ -29,7 +31,7 @@ impl<Chain, CounterParty, Encoding> ClientUpgradePayloadBuilder<Chain, CounterPa
     for BuildStarknetUpgradeClientPayload
 where
     Chain: HasHeightType<Height = u64>
-        + HasUpgradeClientPayloadType<UpgradeClientPayload = StarknetUpgradeClientPayload>
+        + HasUpgradeClientPayloadType<UpgradeClientPayload = CosmosUpgradeClientPayload>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + CanQueryStorageProof<StorageProof = StorageProof, StorageKey = Felt>
         + CanCallContract
@@ -100,10 +102,19 @@ where
         };
 
         Ok(StarknetUpgradeClientPayload {
+            upgrade_height: Height::new(0, *upgrade_height).unwrap(),
             client_state,
             consensus_state,
             client_state_proof,
             consensus_state_proof,
-        })
+        }
+        .into())
+    }
+}
+
+impl From<StarknetUpgradeClientPayload> for CosmosUpgradeClientPayload {
+    fn from(payload: StarknetUpgradeClientPayload) -> Self {
+        // TODO(rano): transform starknet upgrade client payload to cosmos payload
+        todo!()
     }
 }

@@ -7,7 +7,7 @@ mod preset {
         ChannelOpenTryMessageBuilderComponent, ClientRecoveryComponent, ClientStateFieldsComponent,
         ClientStateQuerierComponent, ClientStateTypeComponent,
         ClientStateWithProofsQuerierComponent, ClientStatusMethodsComponent,
-        ClientStatusQuerierComponent, ClientStatusTypeComponent,
+        ClientStatusQuerierComponent, ClientStatusTypeComponent, ClientUpgradeComponent,
         ConnectionOpenAckMessageBuilderComponent, ConnectionOpenConfirmMessageBuilderComponent,
         ConnectionOpenInitMessageBuilderComponent, ConnectionOpenTryMessageBuilderComponent,
         ConsensusStateFieldComponent, ConsensusStateHeightsQuerierComponent,
@@ -25,7 +25,7 @@ mod preset {
     };
     use hermes_core::test_components::chain::traits::IbcTransferredAmountConverterComponent;
     use hermes_cosmos_core::chain_components::impls::{
-        BuildCosmosPacketMessages, CosmosPacketFieldReader,
+        BuildCosmosPacketMessages, CosmosPacketFieldReader, UpgradeClientWithGovernanceProposal,
     };
     use hermes_cosmos_core::chain_preset::presets::CosmosToCosmosComponents;
     use hermes_prelude::*;
@@ -74,6 +74,8 @@ mod preset {
                 WithType<CometConsensusState>,
             UpdateClientMessageBuilderComponent:
                 BuildStarknetUpdateClientMessage,
+            ClientUpgradeComponent:
+                UpgradeClientWithGovernanceProposal,
             ConsensusStateHeightsQuerierComponent:
                 QueryStarknetConsensusStateHeightsFromGrpc,
             CounterpartyMessageHeightGetterComponent:

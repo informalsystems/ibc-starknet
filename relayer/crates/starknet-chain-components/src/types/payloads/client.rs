@@ -31,6 +31,7 @@ pub struct StarknetUpdateClientPayload {
 
 #[derive(Clone, Debug)]
 pub struct StarknetUpgradeClientPayload {
+    pub upgrade_height: Height,
     pub client_state: CairoStarknetClientState,
     pub consensus_state: CairoStarknetConsensusState,
     pub client_state_proof: StorageProof,
