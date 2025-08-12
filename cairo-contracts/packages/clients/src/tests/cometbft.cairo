@@ -185,7 +185,7 @@ fn test_missing_client_processed_height() {
 fn test_empty_update_heights() {
     let mut state = setup();
     let heights = state.read_update_heights(0);
-    assert!(heights.len() == 0);
+    assert!(heights.is_empty());
 }
 
 #[test]

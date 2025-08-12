@@ -100,7 +100,7 @@ pub impl SerializerImpl of SerializerTrait<DefaultSerializer> {
     fn serialize_field<V, +Drop<V>, +Serialize<V>>(
         ref self: DefaultSerializer, field_name: ByteArray, field_value: V,
     ) {
-        if self.writer.len() == 0 {
+        if self.writer.is_empty() {
             self.formatter.begin_object(ref self.writer);
         } else if self.writer.at(self.writer.len() - 1) == @58 {
             self.formatter.begin_object(ref self.writer);
@@ -116,7 +116,7 @@ pub impl SerializerImpl of SerializerTrait<DefaultSerializer> {
     fn serialize_variant<V, +Drop<V>, +Serialize<V>>(
         ref self: DefaultSerializer, variant_name: ByteArray, variant_value: V,
     ) {
-        if self.writer.len() == 0 {
+        if self.writer.is_empty() {
             self.formatter.begin_object(ref self.writer);
         } else if self.writer.at(self.writer.len() - 1) == @58 {
             self.formatter.begin_object(ref self.writer);

@@ -7,7 +7,7 @@ pub mod ClientHandlerComponent {
         IntoIterRange, Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess,
         StoragePointerReadAccess, Vec,
     };
-    use starknet::{ContractAddress, get_caller_address, get_tx_info};
+    use starknet::{ContractAddress, get_tx_info};
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
     use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient, IRegisterRelayer};
     use starknet_ibc_core::client::{
