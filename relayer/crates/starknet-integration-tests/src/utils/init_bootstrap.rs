@@ -98,6 +98,8 @@ pub async fn load_contract_from_env(
 
 pub async fn create_test_uid() -> Result<u64, Error> {
     for _ in 0..60 {
+        tokio::fs::create_dir_all("./test-data").await?;
+
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
