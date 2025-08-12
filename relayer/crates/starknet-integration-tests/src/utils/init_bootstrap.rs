@@ -1,6 +1,8 @@
+use std::path::PathBuf;
 use std::sync::Arc;
 use std::time::SystemTime;
 
+use eyre::eyre;
 use hermes_core::runtime_components::traits::CanReadFileAsString;
 use hermes_cosmos::chain_components::types::{DynamicGasConfig, EipQueryType};
 use hermes_cosmos::error::Error;
@@ -10,14 +12,13 @@ use starknet::core::types::contract::SierraClass;
 
 use crate::contexts::{OsmosisBootstrap, StarknetBootstrap, StarknetBootstrapFields};
 
-pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<StarknetBootstrap, Error> {
+pub async fn init_starknet_bootstrap(
+    runtime: &HermesRuntime,
+    test_uid: u64,
+) -> Result<StarknetBootstrap, Error> {
     let chain_command_path = std::env::var("STARKNET_BIN")
         .unwrap_or("madara".into())
         .into();
-
-    let timestamp = SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)?
-        .as_secs();
 
     let erc20_contract = load_contract_from_env(runtime, "ERC20_CONTRACT").await?;
 
@@ -37,7 +38,7 @@ pub async fn init_starknet_bootstrap(runtime: &HermesRuntime) -> Result<Starknet
         fields: Arc::new(StarknetBootstrapFields {
             runtime: runtime.clone(),
             chain_command_path,
-            chain_store_dir: format!("./test-data/{timestamp}/starknet").into(),
+            chain_store_dir: format!("./test-data/{test_uid}/starknet").into(),
             erc20_contract,
             ics20_contract,
             ibc_core_contract,
@@ -55,18 +56,15 @@ pub async fn init_osmosis_bootstrap(
     runtime: &HermesRuntime,
     wasm_client_byte_code: Vec<u8>,
     wasm_additional_byte_code: Vec<Vec<u8>>,
+    test_uid: u64,
 ) -> Result<OsmosisBootstrap, Error> {
-    let timestamp = SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)?
-        .as_secs();
-
     let cosmos_builder = CosmosBuilder::new_with_default(runtime.clone());
 
     let osmosis_bootstrap = OsmosisBootstrap {
         runtime: runtime.clone(),
         cosmos_builder,
         should_randomize_identifiers: true,
-        chain_store_dir: format!("./test-data/{timestamp}/osmosis").into(),
+        chain_store_dir: format!("./test-data/{test_uid}/osmosis").into(),
         chain_command_path: "osmosisd".into(),
         account_prefix: "osmo".into(),
         staking_denom_prefix: "stake".into(),
@@ -96,4 +94,21 @@ pub async fn load_contract_from_env(
     let contract = serde_json::from_str(&contract_str)?;
 
     Ok(contract)
+}
+
+pub async fn create_test_uid() -> Result<u64, Error> {
+    for _ in 0..20 {
+        let timestamp = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)?
+            .as_secs();
+
+        let test_path: PathBuf = format!("./test-data/{timestamp}").into();
+
+        if tokio::fs::create_dir(&test_path).await.is_ok() {
+            return Ok(timestamp);
+        }
+
+        tokio::time::sleep(core::time::Duration::from_secs(1)).await;
+    }
+    Err(eyre!("Failed to create test data directory after 20 attempts").into())
 }
