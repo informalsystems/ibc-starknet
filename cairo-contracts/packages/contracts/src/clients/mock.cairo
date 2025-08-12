@@ -1,11 +1,10 @@
 #[starknet::contract]
 pub mod MockClient {
-    use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_upgrades::UpgradeableComponent;
     use openzeppelin_upgrades::interface::IUpgradeable;
     use starknet::{ClassHash, ContractAddress};
-    use starknet_ibc_clients::mock::{MockClientComponent, MockErrors};
+    use starknet_ibc_clients::mock::MockClientComponent;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);

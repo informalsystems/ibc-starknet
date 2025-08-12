@@ -1,9 +1,8 @@
 #[starknet::contract]
 pub mod MockCometClient {
-    use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use starknet::ContractAddress;
-    use starknet_ibc_clients::mock::{MockClientComponent, MockErrors};
+    use starknet_ibc_clients::mock::MockClientComponent;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: MockClientComponent, storage: client, event: MockClientEvent);

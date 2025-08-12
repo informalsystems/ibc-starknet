@@ -1,13 +1,10 @@
 #[starknet::contract]
 pub mod TransferApp {
-    use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
     use openzeppelin_upgrades::UpgradeableComponent;
     use openzeppelin_upgrades::interface::IUpgradeable;
     use starknet::{ClassHash, ContractAddress};
-    use starknet_ibc_apps::transfer::{
-        TokenTransferComponent, TransferErrors, TransferrableComponent,
-    };
+    use starknet_ibc_apps::transfer::{TokenTransferComponent, TransferrableComponent};
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
