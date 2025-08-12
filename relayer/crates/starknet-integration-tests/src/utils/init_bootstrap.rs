@@ -104,11 +104,17 @@ pub async fn create_test_uid() -> Result<u64, Error> {
 
         let test_path: PathBuf = format!("./test-data/{timestamp}").into();
 
-        if tokio::fs::create_dir(&test_path).await.is_ok() {
-            return Ok(timestamp);
+        match tokio::fs::create_dir(&test_path).await {
+            Ok(_) => {
+                return Ok(timestamp);
+            }
+            Err(e) => {
+                tracing::warn!(
+                    "Failed to create test data directory: {e}. Retrying after 1 second..."
+                );
+                tokio::time::sleep(core::time::Duration::from_secs(1)).await;
+            }
         }
-
-        tokio::time::sleep(core::time::Duration::from_secs(1)).await;
     }
     Err(eyre!("Failed to create test data directory after 60 attempts").into())
 }
