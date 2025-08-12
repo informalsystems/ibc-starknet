@@ -11,7 +11,6 @@ pub mod TransferErrors {
     pub const INVALID_PORT_ID: felt252 = 'ICS20: invalid port ID';
     pub const INVALID_DENOM: felt252 = 'ICS20: invalid denom';
     pub const INVALID_PACKET_DATA: felt252 = 'ICS20: invalid packet data';
-    pub const INVALID_OWNER: felt252 = 'ICS20: invalid owner';
     pub const MISSING_TRACE_PREFIX: felt252 = 'ICS20: missing trace prefix';
     pub const MISSING_TOKEN_DENOM: felt252 = 'ICS20: missing token denom';
     pub const EMPTY_ACK_STATUS: felt252 = 'ICS20: empty ack status';
