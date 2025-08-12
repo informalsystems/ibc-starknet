@@ -52,6 +52,10 @@ pub mod ClientHandlerComponent {
             // simplify the process. This avoids an additional registration step
             // for the relayer, as this setup is temporary.
             self.write_allowed_relayer(get_tx_info().deref().account_contract_address);
+
+            // Initialize final height and upgraded states as empty.
+            self.final_height.write(0);
+            self.upgraded_states.write(None);
         }
     }
 
