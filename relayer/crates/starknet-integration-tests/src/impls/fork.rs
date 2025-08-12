@@ -105,7 +105,7 @@ async fn fork_cosmos_chain(driver: &StarknetTestDriver) -> Result<StarknetTestDr
     runtime
         .exec_command(
             &PathBuf::from("kill".to_string()),
-            &["-s", "9", &cosmos_pid.to_string()],
+            &["-s", "KILL", &cosmos_pid.to_string()],
         )
         .await?;
 
@@ -345,7 +345,7 @@ async fn fork_starknet_chain(
     runtime
         .exec_command(
             &PathBuf::from("kill".to_string()),
-            &["-s", "9", &starknet_pid.to_string()],
+            &["-s", "KILL", &starknet_pid.to_string()],
         )
         .await?;
 
