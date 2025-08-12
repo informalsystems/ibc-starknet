@@ -29,7 +29,7 @@ fn decode_and_verify(data: @TestData, spec: @ProofSpec) {
     match p.proof {
         Proof::Exist(p) => { verify_existence(spec, @p, @key, @value); },
         Proof::NonExist(p) => {
-            assert(value.len() == 0, 'value must not exist');
+            assert(value.is_empty(), 'value must not exist');
             verify_non_existence(spec, @p, key);
         },
     };

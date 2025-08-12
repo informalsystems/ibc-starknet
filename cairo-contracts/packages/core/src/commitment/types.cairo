@@ -87,7 +87,7 @@ pub impl StateValueZero of Zero<StateValue> {
     }
 
     fn is_zero(self: @StateValue) -> bool {
-        self.value.len() == 0
+        self.value.is_empty()
     }
 
     fn is_non_zero(self: @StateValue) -> bool {
@@ -119,7 +119,7 @@ pub impl StateProofZero of Zero<StateProof> {
     }
 
     fn is_zero(self: @StateProof) -> bool {
-        self.proof.len() == 0
+        self.proof.is_empty()
     }
 
     fn is_non_zero(self: @StateProof) -> bool {

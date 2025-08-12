@@ -28,10 +28,12 @@ pub struct CoreContract {
 
 #[generate_trait]
 pub impl CoreHandleImpl of CoreHandle {
-    fn deploy(contract_name: ByteArray, protobuf_lib_class: ContractClass) -> CoreContract {
+    fn deploy(
+        contract_name: ByteArray, admin: ContractAddress, protobuf_lib_class: ContractClass,
+    ) -> CoreContract {
         let mut call_data = array![];
 
-        (protobuf_lib_class,).serialize(ref call_data);
+        (admin, protobuf_lib_class).serialize(ref call_data);
 
         let address = declare_and_deploy(contract_name, call_data);
 

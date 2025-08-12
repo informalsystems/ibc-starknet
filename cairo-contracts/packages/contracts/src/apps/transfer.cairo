@@ -1,15 +1,13 @@
 #[starknet::contract]
 pub mod TransferApp {
-    use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
+    use openzeppelin_upgrades::UpgradeableComponent;
+    use openzeppelin_upgrades::interface::IUpgradeable;
     use starknet::{ClassHash, ContractAddress};
-    use starknet_ibc_apps::transfer::{
-        TokenTransferComponent, TransferErrors, TransferrableComponent,
-    };
-    use starknet_ibc_utils::governance::IBCGovernanceComponent;
+    use starknet_ibc_apps::transfer::{TokenTransferComponent, TransferrableComponent};
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
-    component!(path: IBCGovernanceComponent, storage: governance, event: IBCGovernanceEvent);
+    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
     component!(path: TransferrableComponent, storage: transferrable, event: TransferrableEvent);
     component!(path: TokenTransferComponent, storage: transfer, event: TokenTransferEvent);
 
@@ -18,10 +16,7 @@ pub mod TransferApp {
     impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
     impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
 
-    // IBC Governance
-    #[abi(embed_v0)]
-    impl IBCGovernanceImpl = IBCGovernanceComponent::Governance<ContractState>;
-    impl IBCGovernanceInternalImpl = IBCGovernanceComponent::GovernanceInternalImpl<ContractState>;
+    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
 
     // Transferrable
     #[abi(embed_v0)]
@@ -51,7 +46,7 @@ pub mod TransferApp {
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
-        governance: IBCGovernanceComponent::Storage,
+        upgradeable: UpgradeableComponent::Storage,
         #[substorage(v0)]
         transferrable: TransferrableComponent::Storage,
         #[substorage(v0)]
@@ -64,7 +59,7 @@ pub mod TransferApp {
         #[flat]
         OwnableEvent: OwnableComponent::Event,
         #[flat]
-        IBCGovernanceEvent: IBCGovernanceComponent::Event,
+        UpgradeableEvent: UpgradeableComponent::Event,
         #[flat]
         TransferrableEvent: TransferrableComponent::Event,
         #[flat]
@@ -73,10 +68,16 @@ pub mod TransferApp {
 
     #[constructor]
     fn constructor(ref self: ContractState, owner: ContractAddress, erc20_class_hash: ClassHash) {
-        assert(owner.is_non_zero(), TransferErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
-        self.governance.initializer();
         self.transferrable.initializer();
         self.transfer.initializer(erc20_class_hash);
+    }
+
+    #[abi(embed_v0)]
+    impl UpgradeableImpl of IUpgradeable<ContractState> {
+        fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
+            self.ownable.assert_only_owner();
+            self.upgradeable.upgrade(new_class_hash);
+        }
     }
 }

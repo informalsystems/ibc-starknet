@@ -7,7 +7,7 @@ pub mod ClientHandlerComponent {
         IntoIterRange, Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess,
         StoragePointerReadAccess, StoragePointerWriteAccess, Vec,
     };
-    use starknet::{ContractAddress, get_caller_address, get_tx_info};
+    use starknet::{ContractAddress, get_tx_info};
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
     use starknet_ibc_core::client::interface::{
         IClientHandler, IRegisterClient, IRegisterRelayer, IScheduleUpgrade,
@@ -19,8 +19,6 @@ pub mod ClientHandlerComponent {
         UpdateResponse,
     };
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
-    use starknet_ibc_utils::governance::IBCGovernanceComponent;
-    use starknet_ibc_utils::governance::IBCGovernanceComponent::GovernanceInternalTrait;
     use starknet_ibc_utils::{ComputeKey, ValidateBasic};
 
     #[storage]
@@ -209,23 +207,21 @@ pub mod ClientHandlerComponent {
         TContractState,
         +HasComponent<TContractState>,
         +Drop<TContractState>,
-        impl Governance: IBCGovernanceComponent::HasComponent<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
     > of IRegisterRelayer<ComponentState<TContractState>> {
         fn register_relayer(
             ref self: ComponentState<TContractState>, relayer_address: ContractAddress,
         ) {
+            {
+                let ownable = get_dep_component_mut!(ref self, Ownable);
+                ownable.assert_only_owner();
+            }
+
             assert(relayer_address.is_non_zero(), ClientErrors::ZERO_RELAYER_ADDRESS);
 
             assert(
                 !self.in_allowed_relayers(relayer_address),
                 ClientErrors::RELAYER_ALREADY_REGISTERED,
-            );
-
-            let governor = get_dep_component!(@self, Governance).governor();
-
-            assert(
-                governor.is_zero() || governor == get_caller_address(),
-                ClientErrors::INVALID_GOVERNOR,
             );
 
             self.write_allowed_relayer(relayer_address);

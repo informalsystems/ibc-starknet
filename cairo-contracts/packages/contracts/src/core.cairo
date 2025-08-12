@@ -1,24 +1,35 @@
 #[starknet::contract]
 pub mod IBCCore {
     use ibc_utils::storage::write_raw_key;
-    use starknet::ClassHash;
+    use openzeppelin_access::ownable::OwnableComponent;
+    use openzeppelin_upgrades::UpgradeableComponent;
+    use openzeppelin_upgrades::interface::IUpgradeable;
+    use starknet::{ClassHash, ContractAddress};
     use starknet_ibc_core::channel::{ChannelEventEmitterComponent, ChannelHandlerComponent};
     use starknet_ibc_core::client::{ClientEventEmitterComponent, ClientHandlerComponent};
     use starknet_ibc_core::connection::{
         ConnectionEventEmitterComponent, ConnectionHandlerComponent,
     };
     use starknet_ibc_core::router::RouterHandlerComponent;
-    use starknet_ibc_utils::governance::IBCGovernanceComponent;
 
     // -----------------------------------------------------------
-    // Setup Governance Component
+    // Setup Ownable Component
     // -----------------------------------------------------------
 
-    component!(path: IBCGovernanceComponent, storage: governance, event: IBCGovernanceEvent);
+    component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
 
+    // Ownable Mixin
     #[abi(embed_v0)]
-    impl IBCGovernanceImpl = IBCGovernanceComponent::Governance<ContractState>;
-    impl IBCGovernanceInternalImpl = IBCGovernanceComponent::GovernanceInternalImpl<ContractState>;
+    impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
+    impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
+
+    // ------------------------------------------------------------
+    // Setup Upgradeable Component
+    // ------------------------------------------------------------
+
+    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
+
+    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
 
     // -----------------------------------------------------------
     // Setup Client Components
@@ -98,7 +109,9 @@ pub mod IBCCore {
     #[storage]
     struct Storage {
         #[substorage(v0)]
-        governance: IBCGovernanceComponent::Storage,
+        ownable: OwnableComponent::Storage,
+        #[substorage(v0)]
+        upgradeable: UpgradeableComponent::Storage,
         #[substorage(v0)]
         client_emitter: ClientEventEmitterComponent::Storage,
         #[substorage(v0)]
@@ -119,7 +132,9 @@ pub mod IBCCore {
     #[derive(Debug, Drop, starknet::Event)]
     pub enum Event {
         #[flat]
-        IBCGovernanceEvent: IBCGovernanceComponent::Event,
+        OwnableEvent: OwnableComponent::Event,
+        #[flat]
+        UpgradeableEvent: UpgradeableComponent::Event,
         #[flat]
         ClientEventEmitterEvent: ClientEventEmitterComponent::Event,
         #[flat]
@@ -137,13 +152,22 @@ pub mod IBCCore {
     }
 
     #[constructor]
-    fn constructor(ref self: ContractState, protobuf_lib: ClassHash) {
-        self.governance.initializer();
+    fn constructor(ref self: ContractState, admin: ContractAddress, protobuf_lib: ClassHash) {
+        self.ownable.initializer(admin);
+
         self.client_handler.initializer();
         self.router_handler.initializer();
 
         // store the library classes
         // not using storage keys, as these keys are read without contract context.
         write_raw_key::<'protobuf-library'>(protobuf_lib);
+    }
+
+    #[abi(embed_v0)]
+    impl UpgradeableImpl of IUpgradeable<ContractState> {
+        fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
+            self.ownable.assert_only_owner();
+            self.upgradeable.upgrade(new_class_hash);
+        }
     }
 }

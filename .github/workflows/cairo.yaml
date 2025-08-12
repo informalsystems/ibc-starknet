@@ -44,7 +44,6 @@ jobs:
           scarb test -w
 
   test-cairo-contracts:
-    needs: test-cairo-libs
     name: Test Cairo contracts
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -70,7 +69,7 @@ jobs:
       - name: Build and Test Cairo contracts
         working-directory: ./cairo-contracts
         run: |
-          scarb build
-          scarb lint -w
+          scarb build -w
           scarb build -p starknet_ibc_contracts
+          scarb lint -w
           scarb test -w
