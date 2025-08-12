@@ -224,12 +224,17 @@ fn test_upgrade_clients() -> Result<(), Error> {
             );
         }
 
-        // TODO(rano): rest of the steps
-
         {
-            info!("restarting starknet chain with the new sequencer key");
+            // updating the starknet client to final height
 
-            // restart starknet chain with starknet_sequencer_public_key_2
+            info!(
+                "updating Starknet light client to the final height before upgrade: {}",
+                starknet_final_height
+            );
+
+            starknet_to_cosmos_relay
+                .send_target_update_client_messages(DestinationTarget, &starknet_final_height)
+                .await?;
         }
 
         {
@@ -244,8 +249,6 @@ fn test_upgrade_clients() -> Result<(), Error> {
                 )
                 .await?;
 
-            info!("client_upgrade_payload: {client_upgrade_payload:?}");
-
             let client_upgrade_message = <BuildStarknetUpgradeClientMessage as ClientUpgrade<
                 CosmosChain,
                 StarknetChain,
@@ -254,18 +257,7 @@ fn test_upgrade_clients() -> Result<(), Error> {
             )
             .await?;
 
-            info!("client_upgrade_message: {client_upgrade_message:?}");
-
             // submit upgrade client message on Cosmos
-
-            info!(
-                "updating Starknet light client to the final height before upgrade: {}",
-                starknet_final_height
-            );
-
-            starknet_to_cosmos_relay
-                .send_target_update_client_messages(DestinationTarget, &starknet_final_height)
-                .await?;
 
             cosmos_chain.send_message(client_upgrade_message).await?;
 
@@ -279,12 +271,56 @@ fn test_upgrade_clients() -> Result<(), Error> {
                 .await?;
 
             info!("Upgraded starknet client state on Cosmos: {upgraded_client_state:?}");
+        }
 
-            // unschedule_upgrade on starknet
+        {
+            info!("restarting starknet chain with the new sequencer key");
+
+            // TODO(rano): implement restarting the starknet chain with the new sequencer key
         }
 
         {
             // try updating the client on Cosmos now
+
+            runtime.sleep(Duration::from_secs(5)).await;
+
+            info!("updating starknet light client after upgrade without unscheduling. should fail");
+
+            let post_upgrade_height = starknet_chain.query_chain_height().await?;
+
+            starknet_to_cosmos_relay
+                .send_target_update_client_messages(DestinationTarget, &post_upgrade_height)
+                .await
+                .unwrap_err();
+        }
+
+        {
+            info!("unscheduling upgrade on starknet");
+
+            starknet_chain
+                .send_message_with_signer(
+                    starknet_chain.get_default_signer(),
+                    StarknetMessage::new(
+                        **ibc_core_contract_address,
+                        selector!("unschedule_upgrade"),
+                        vec![],
+                    ),
+                )
+                .await?;
+        }
+
+        {
+            // try updating the client on Cosmos now
+
+            runtime.sleep(Duration::from_secs(5)).await;
+
+            info!("updating starknet light client after upgrade");
+
+            let post_upgrade_height = starknet_chain.query_chain_height().await?;
+
+            starknet_to_cosmos_relay
+                .send_target_update_client_messages(DestinationTarget, &post_upgrade_height)
+                .await?;
         }
 
         Ok(())
