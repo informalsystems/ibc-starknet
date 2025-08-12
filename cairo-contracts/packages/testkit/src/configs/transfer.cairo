@@ -86,8 +86,8 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
             amount: *self.amount,
             receiver,
             memo: EMPTY_MEMO(),
-            timeout_height_on_b: self.timeout_height.clone(),
-            timeout_timestamp_on_b: self.timeout_timestamp.clone(),
+            timeout_height_on_b: *self.timeout_height,
+            timeout_timestamp_on_b: *self.timeout_timestamp,
         }
     }
 
@@ -167,8 +167,8 @@ pub impl TransferAppConfigImpl of TransferAppConfigTrait {
             port_id_on_b: PORT_ID(),
             chan_id_on_b,
             data: serialized_data,
-            timeout_height_on_b: self.timeout_height.clone(),
-            timeout_timestamp_on_b: self.timeout_timestamp.clone(),
+            timeout_height_on_b: *self.timeout_height,
+            timeout_timestamp_on_b: *self.timeout_timestamp,
         }
     }
 

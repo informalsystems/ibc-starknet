@@ -61,7 +61,7 @@ pub impl StatusImpl of StatusTrait {
 
     fn is_frozen(self: @Status) -> bool {
         match self {
-            Status::Frozen => true,
+            Status::Frozen(_) => true,
             _ => false,
         }
     }

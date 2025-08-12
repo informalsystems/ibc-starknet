@@ -35,7 +35,7 @@ pub impl MockClientConfigImpl of MockClientConfigTrait {
         let mut serialized_client_state: Array<felt252> = ArrayTrait::new();
 
         let client_state = MockClientState {
-            latest_height: self.latest_height.clone(),
+            latest_height: *self.latest_height,
             trusting_period: *self.trusting_period,
             unbonding_period: *self.unbonding_period,
             max_clock_drift: *self.max_clock_drift,
@@ -49,7 +49,7 @@ pub impl MockClientConfigImpl of MockClientConfigTrait {
         let mut serialized_consensus_state: Array<felt252> = ArrayTrait::new();
 
         let consensus_state = MockConsensusState {
-            timestamp: self.latest_timestamp.clone().into(), root: STATE_ROOT(),
+            timestamp: (*self.latest_timestamp).into(), root: STATE_ROOT(),
         };
 
         Serde::serialize(@consensus_state, ref serialized_consensus_state);

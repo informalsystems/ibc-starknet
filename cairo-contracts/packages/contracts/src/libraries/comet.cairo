@@ -19,4 +19,5 @@ pub mod CometLib {
 
     #[abi(embed_v0)]
     impl CometLibImpl = CometLibComponent::CometLib<ContractState>;
+    // note: there is no initializer because it is supposed to be used via library calls.
 }

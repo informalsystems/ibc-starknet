@@ -1,22 +1,20 @@
 #[starknet::contract]
 pub mod MockClient {
-    use core::num::traits::Zero;
     use openzeppelin_access::ownable::OwnableComponent;
+    use openzeppelin_upgrades::UpgradeableComponent;
+    use openzeppelin_upgrades::interface::IUpgradeable;
     use starknet::{ClassHash, ContractAddress};
-    use starknet_ibc_clients::mock::{MockClientComponent, MockErrors};
-    use starknet_ibc_utils::governance::IBCGovernanceComponent;
+    use starknet_ibc_clients::mock::MockClientComponent;
 
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
-    component!(path: IBCGovernanceComponent, storage: governance, event: IBCGovernanceEvent);
+    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
     component!(path: MockClientComponent, storage: client, event: MockClientEvent);
 
     #[abi(embed_v0)]
     impl OwnableMixinImpl = OwnableComponent::OwnableMixinImpl<ContractState>;
     impl OwnableInternalImpl = OwnableComponent::InternalImpl<ContractState>;
 
-    #[abi(embed_v0)]
-    impl IBCGovernanceImpl = IBCGovernanceComponent::Governance<ContractState>;
-    impl IBCGovernanceInternalImpl = IBCGovernanceComponent::GovernanceInternalImpl<ContractState>;
+    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
 
     #[abi(embed_v0)]
     impl MockClientHandlerImpl =
@@ -37,7 +35,7 @@ pub mod MockClient {
         #[substorage(v0)]
         ownable: OwnableComponent::Storage,
         #[substorage(v0)]
-        governance: IBCGovernanceComponent::Storage,
+        upgradeable: UpgradeableComponent::Storage,
         #[substorage(v0)]
         client: MockClientComponent::Storage,
     }
@@ -48,7 +46,7 @@ pub mod MockClient {
         #[flat]
         OwnableEvent: OwnableComponent::Event,
         #[flat]
-        IBCGovernanceEvent: IBCGovernanceComponent::Event,
+        UpgradeableEvent: UpgradeableComponent::Event,
         #[flat]
         MockClientEvent: MockClientComponent::Event,
     }
@@ -61,8 +59,14 @@ pub mod MockClient {
         ics23_lib: ClassHash,
         protobuf_lib: ClassHash,
     ) {
-        assert(owner.is_non_zero(), MockErrors::ZERO_OWNER);
         self.ownable.initializer(owner);
-        self.governance.initializer();
+    }
+
+    #[abi(embed_v0)]
+    impl UpgradeableImpl of IUpgradeable<ContractState> {
+        fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
+            self.ownable.assert_only_owner();
+            self.upgradeable.upgrade(new_class_hash);
+        }
     }
 }
