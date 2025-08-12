@@ -97,7 +97,7 @@ pub async fn load_contract_from_env(
 }
 
 pub async fn create_test_uid() -> Result<u64, Error> {
-    for _ in 0..20 {
+    for _ in 0..60 {
         let timestamp = SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)?
             .as_secs();
@@ -110,5 +110,5 @@ pub async fn create_test_uid() -> Result<u64, Error> {
 
         tokio::time::sleep(core::time::Duration::from_secs(1)).await;
     }
-    Err(eyre!("Failed to create test data directory after 20 attempts").into())
+    Err(eyre!("Failed to create test data directory after 60 attempts").into())
 }
