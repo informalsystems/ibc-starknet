@@ -56,3 +56,37 @@ impl From<CairoStarknetConsensusState> for StarknetConsensusState {
         }
     }
 }
+
+impl From<StarknetClientState> for CairoStarknetClientState {
+    fn from(value: StarknetClientState) -> Self {
+        let StarknetClientState {
+            latest_height,
+            final_height,
+            chain_id,
+            sequencer_public_key,
+            ibc_contract_address,
+        } = value;
+
+        Self {
+            latest_height: Height {
+                revision_number: latest_height.revision_number(),
+                revision_height: latest_height.revision_height(),
+            },
+            final_height,
+            chain_id: ByteArray::from(chain_id.as_str()),
+            sequencer_public_key: Felt::from_bytes_be_slice(&sequencer_public_key),
+            ibc_contract_address: Felt::from_bytes_be_slice(&ibc_contract_address).into(),
+        }
+    }
+}
+
+impl From<StarknetConsensusState> for CairoStarknetConsensusState {
+    fn from(value: StarknetConsensusState) -> Self {
+        let StarknetConsensusState { root, time } = value;
+
+        Self {
+            root: Felt::from_bytes_be_slice(root.as_bytes()),
+            time,
+        }
+    }
+}

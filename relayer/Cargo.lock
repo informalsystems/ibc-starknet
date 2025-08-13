@@ -2513,6 +2513,7 @@ dependencies = [
  "eyre",
  "flate2",
  "futures",
+ "hermes-cairo-encoding-components",
  "hermes-core",
  "hermes-cosmos",
  "hermes-cosmos-core",
