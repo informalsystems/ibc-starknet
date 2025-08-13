@@ -65,9 +65,9 @@ mod preset {
         RecoverClientPayloadTypeComponent, SendPacketEventComponent, SequenceTypeComponent,
         TimeMeasurerComponent, TimeoutTypeComponent, TimeoutUnorderedPacketMessageBuilderComponent,
         TimeoutUnorderedPacketPayloadBuilderComponent, TimeoutUnorderedPacketPayloadTypeComponent,
-        UpdateClientEventComponent, UpdateClientMessageBuilderComponent,
-        UpdateClientPayloadBuilderComponent, UpdateClientPayloadTypeComponent,
-        WriteAckEventComponent,
+        UpdateClientEventComponent, UpdateClientEventFieldsComponent,
+        UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
+        UpdateClientPayloadTypeComponent, WriteAckEventComponent,
     };
     use hermes_core::chain_type_components::traits::{
         AddressTypeProviderComponent, AmountDenomGetterComponent, AmountTypeProviderComponent,
@@ -336,6 +336,7 @@ mod preset {
             [
                 CreateClientEventComponent,
                 UpdateClientEventComponent,
+                UpdateClientEventFieldsComponent,
                 ConnectionOpenInitEventComponent,
                 ConnectionOpenTryEventComponent,
                 ChannelOpenInitEventComponent,

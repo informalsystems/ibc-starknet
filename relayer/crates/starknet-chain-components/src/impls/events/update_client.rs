@@ -3,18 +3,30 @@ use core::marker::PhantomData;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_starknet_event::AsStarknetEvent;
 use hermes_core::chain_components::traits::{
-    EventExtractor, EventExtractorComponent, HasEventType, ProvideUpdateClientEvent,
-    UpdateClientEventComponent,
+    EventExtractor, EventExtractorComponent, HasClientIdType, HasEventType, HasUpdateClientEvent,
+    ProvideUpdateClientEvent, ProvideUpdateClientEventFields, UpdateClientEventComponent,
 };
 use hermes_core::encoding_components::traits::{CanDecode, HasEncodedType, HasEncoding};
 use hermes_prelude::*;
 
+use crate::components::StarknetChainComponents::re_exports::UpdateClientEventFieldsComponent;
 use crate::impls::{StarknetUpdateClientEvent, UseStarknetEvents};
-use crate::types::PacketRelayEvents;
+use crate::types::{ClientId, PacketRelayEvents};
 
 #[cgp_provider(UpdateClientEventComponent)]
 impl<Chain> ProvideUpdateClientEvent<Chain> for UseStarknetEvents {
     type UpdateClientEvent = StarknetUpdateClientEvent;
+}
+
+#[cgp_provider(UpdateClientEventFieldsComponent)]
+impl<Chain, Counterparty> ProvideUpdateClientEventFields<Chain, Counterparty> for UseStarknetEvents
+where
+    Chain: HasUpdateClientEvent<UpdateClientEvent = StarknetUpdateClientEvent>
+        + HasClientIdType<Counterparty, ClientId = ClientId>,
+{
+    fn client_id(chain: &Chain, event: &StarknetUpdateClientEvent) -> ClientId {
+        event.client_id.clone()
+    }
 }
 
 #[cgp_provider(EventExtractorComponent)]

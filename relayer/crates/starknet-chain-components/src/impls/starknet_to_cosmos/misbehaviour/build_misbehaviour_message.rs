@@ -1,7 +1,5 @@
-use alloc::str::FromStr;
-
 use hermes_core::chain_components::traits::{
-    HasChainId, HasEvidenceType, HasMessageType, MisbehaviourMessageBuilder,
+    HasChainId, HasClientIdType, HasEvidenceType, HasMessageType, MisbehaviourMessageBuilder,
     MisbehaviourMessageBuilderComponent,
 };
 use hermes_core::encoding_components::traits::{CanConvert, HasDefaultEncoding};
@@ -25,6 +23,7 @@ impl<Chain, Counterparty, Encoding> MisbehaviourMessageBuilder<Chain, Counterpar
 where
     Chain: HasEvidenceType<Evidence = Any>
         + HasChainId
+        + HasClientIdType<Counterparty, ClientId = ClientId>
         + HasDefaultSigner<Signer = Secp256k1KeyPair>
         + HasMessageType<Message = CosmosMessage>
         + CanRaiseAsyncError<Encoding::Error>,
@@ -33,15 +32,10 @@ where
 {
     async fn build_misbehaviour_message(
         chain: &Chain,
+        client_id: &Chain::ClientId,
         evidence: &Chain::Evidence,
     ) -> Result<Chain::Message, Chain::Error> {
         let encoding = Counterparty::default_encoding();
-
-        let decoded_evidence = encoding.convert(evidence).map_err(Chain::raise_error)?;
-
-        #[allow(deprecated)]
-        let client_id = ClientId::from_str(decoded_evidence.client_id.as_str())
-            .expect("Invalid client ID in evidence");
 
         let msg = SubmitMisbehaviour {
             client_id: client_id.clone(),
@@ -75,7 +69,7 @@ where
         };*/
 
         let message = SubmitMisbehaviour {
-            client_id,
+            client_id: client_id.clone(),
             evidence: any_wasm_message,
         };
 

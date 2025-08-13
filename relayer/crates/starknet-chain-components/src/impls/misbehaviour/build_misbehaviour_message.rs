@@ -3,8 +3,8 @@ use core::marker::PhantomData;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
-    HasAddressType, HasChainId, HasEvidenceType, HasMessageType, MisbehaviourMessageBuilder,
-    MisbehaviourMessageBuilderComponent,
+    HasAddressType, HasChainId, HasClientIdType, HasEvidenceType, HasMessageType,
+    MisbehaviourMessageBuilder, MisbehaviourMessageBuilderComponent,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use hermes_prelude::*;
@@ -29,6 +29,7 @@ impl<Chain, Counterparty, EncodingError> MisbehaviourMessageBuilder<Chain, Count
 where
     Chain: HasEvidenceType<Evidence = Any>
         + HasChainId
+        + HasClientIdType<Counterparty, ClientId = ClientId>
         + HasEncoding<AsFelt>
         + HasMessageType<Message = StarknetMessage>
         + HasAddressType<Address = StarknetAddress>
@@ -49,6 +50,7 @@ where
 {
     async fn build_misbehaviour_message(
         chain: &Chain,
+        client_id: &Chain::ClientId,
         evidence: &Chain::Evidence,
     ) -> Result<Chain::Message, Chain::Error> {
         let decoded_evidence: CosmosStarknetMisbehaviour =
@@ -104,10 +106,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let calldata = encoding
-            .encode(&product![
-                decoded_evidence.client_id.clone(),
-                client_message_felts
-            ])
+            .encode(&product![client_id.clone(), client_message_felts])
             .map_err(Chain::raise_error)?;
 
         Ok(StarknetMessage::new(
