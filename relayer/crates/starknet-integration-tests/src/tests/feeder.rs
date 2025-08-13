@@ -56,6 +56,13 @@ fn test_starknet_feeder_gateway_signature() -> Result<(), Error> {
         let block_signature = endpoint.get_signature(Some(block.height)).unwrap();
         let public_key = endpoint.get_public_key(Some(block.height)).unwrap();
 
+        let sequencer_private_key = chain_driver.node_config.sequencer_private_key;
+
+        assert_eq!(
+            starknet_crypto::get_public_key(&sequencer_private_key),
+            public_key
+        );
+
         assert_eq!(block_header.block_number, block.height);
         assert_eq!(block_header.starknet_version, "0.14.0");
         assert!(block_header

@@ -35,6 +35,7 @@ where
             .map_err(Bootstrap::raise_error)?;
 
         let rpc_port = chain_node_config.rpc_port;
+        let sequencer_private_key = chain_node_config.sequencer_private_key;
 
         let gateway_port = rpc_port + 1;
 
@@ -61,6 +62,8 @@ where
             "0",
             "--blob-gas-price",
             "0",
+            "--private-key",
+            &sequencer_private_key.to_hex_string(),
         ];
 
         let stdout_path = Runtime::join_file_path(
