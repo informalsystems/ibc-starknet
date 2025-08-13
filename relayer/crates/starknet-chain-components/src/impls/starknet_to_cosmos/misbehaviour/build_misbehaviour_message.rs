@@ -44,15 +44,6 @@ where
 
         let signer = chain.get_default_signer();
 
-        /*let misbehaviour_message = MsgSubmitMisbehaviour {
-            client_id: msg.client_id.to_string(),
-            misbehaviour: Some(evidence.clone()),
-            signer: signer.account().into(),
-        };
-
-        let any_misbehaviour = Any::from_msg(&misbehaviour_message)
-            .expect("failed to convert `MsgSubmitMisbehaviour` to `Any`");*/
-
         let wasm_message = ClientMessage {
             data: evidence.encode_to_vec(),
         };
@@ -63,18 +54,11 @@ where
             value: Protobuf::<RawClientMessage>::encode_vec(wasm_message),
         };
 
-        /*let message = CosmosUpdateClientMessage {
-            client_id: client_id.clone(),
-            header: any_wasm_message,
-        };*/
-
         let message = SubmitMisbehaviour {
             client_id: client_id.clone(),
             evidence: any_wasm_message,
         };
 
         Ok(message.to_cosmos_message())
-
-        //Ok(msg.to_cosmos_message())
     }
 }
