@@ -167,7 +167,7 @@ pub mod MockClientComponent {
             let mock_client_state: MockClientState = self.read_client_state(client_sequence);
 
             let latest_consensus_state = self
-                .read_consensus_state(client_sequence, mock_client_state.latest_height.clone());
+                .read_consensus_state(client_sequence, mock_client_state.latest_height);
 
             self._status(mock_client_state, latest_consensus_state, client_sequence)
         }
@@ -248,7 +248,7 @@ pub mod MockClientComponent {
             let mock_client_state: MockClientState = self.read_client_state(client_sequence);
 
             let latest_consensus_state = self
-                .read_consensus_state(client_sequence, mock_client_state.latest_height.clone());
+                .read_consensus_state(client_sequence, mock_client_state.latest_height);
 
             let status = self._status(mock_client_state, latest_consensus_state, client_sequence);
 
@@ -288,12 +288,10 @@ pub mod MockClientComponent {
                 .read_client_state(substitute_client_sequence);
 
             let subject_consensus_state = self
-                .read_consensus_state(
-                    subject_client_sequence, subject_client_state.latest_height.clone(),
-                );
+                .read_consensus_state(subject_client_sequence, subject_client_state.latest_height);
             let substitute_consensus_state = self
                 .read_consensus_state(
-                    substitute_client_sequence, substitute_client_state.latest_height.clone(),
+                    substitute_client_sequence, substitute_client_state.latest_height,
                 );
 
             let subject_status = self
@@ -332,7 +330,7 @@ pub mod MockClientComponent {
 
             let substitute_consensus_state = self
                 .read_consensus_state(
-                    substitute_client_sequence, substitute_client_state.latest_height.clone(),
+                    substitute_client_sequence, substitute_client_state.latest_height,
                 );
 
             let mut serialised_client_state = array![];
@@ -428,10 +426,10 @@ pub mod MockClientComponent {
             proof_upgrade_consensus: StateProof,
         ) {
             let comet_client_state: MockClientState = self.read_client_state(client_sequence);
-            let latest_height = comet_client_state.latest_height.clone();
+            let latest_height = comet_client_state.latest_height;
 
             let latest_consensus_state = self
-                .read_consensus_state(client_sequence, comet_client_state.latest_height.clone());
+                .read_consensus_state(client_sequence, comet_client_state.latest_height);
 
             let root = latest_consensus_state.root.clone();
 
@@ -468,7 +466,7 @@ pub mod MockClientComponent {
                 upgrade_consensus_state,
             );
 
-            let upgraded_height = upgraded_client_state.latest_height.clone();
+            let upgraded_height = upgraded_client_state.latest_height;
 
             assert(upgraded_height > latest_height, MockErrors::INVALID_UPGRADE_HEIGHT);
 
@@ -512,7 +510,7 @@ pub mod MockClientComponent {
 
             let mock_consensus_state = MockConsensusStateImpl::deserialize(consensus_state);
 
-            let mock_client_state_latest_height = mock_client_state.latest_height.clone();
+            let mock_client_state_latest_height = mock_client_state.latest_height;
 
             self
                 ._update_state(
@@ -559,27 +557,26 @@ pub mod MockClientComponent {
             // the new Heights array which are kept.
             while let Option::Some(height) = update_heights_span.pop_front() {
                 if check_in_progress {
-                    let consensus_state = self
-                        .read_consensus_state(client_sequence, height.clone());
+                    let consensus_state = self.read_consensus_state(client_sequence, *height);
 
                     if consensus_state
                         .status(client_state.trusting_period, client_state.max_clock_drift)
                         .is_expired() {
-                        self.remove_consensus_state(client_sequence, height.clone());
+                        self.remove_consensus_state(client_sequence, *height);
                     } else {
                         check_in_progress = false;
-                        heights_kept.append(height.clone());
+                        heights_kept.append(*height);
                     }
                 } else {
-                    heights_kept.append(height.clone());
+                    heights_kept.append(*height);
                 }
             }
             // Write directly since heights_kept is already sorted and is equal or
             // smaller to the previous one
             self.update_heights.write(client_sequence, heights_kept);
 
-            if !self.consensus_state_exists(client_sequence, header_height.clone()) {
-                client_state.update(header_height.clone());
+            if !self.consensus_state_exists(client_sequence, header_height) {
+                client_state.update(header_height);
 
                 let new_consensus_state: MockConsensusState = header.into();
 
@@ -627,7 +624,7 @@ pub mod MockClientComponent {
                 let mut update_heights_span = update_heights.span();
 
                 while let Option::Some(height) = update_heights_span.pop_front() {
-                    self.remove_consensus_state(subject_client_sequence, height.clone());
+                    self.remove_consensus_state(subject_client_sequence, *height);
                 }
 
                 self.update_heights.write(subject_client_sequence, array![]);
@@ -638,12 +635,12 @@ pub mod MockClientComponent {
                 substitute_consensus_state,
             );
 
-            let latest_height = substitute_client_state.latest_height.clone();
+            let latest_height = substitute_client_state.latest_height;
 
             let processed_height = self
-                .read_client_processed_height(substitute_client_sequence, latest_height.clone());
+                .read_client_processed_height(substitute_client_sequence, latest_height);
             let processed_time = self
-                .read_client_processed_time(substitute_client_sequence, latest_height.clone());
+                .read_client_processed_time(substitute_client_sequence, latest_height);
 
             self
                 ._update_state(
@@ -668,7 +665,7 @@ pub mod MockClientComponent {
                 let mut update_heights_span = update_heights.span();
 
                 while let Option::Some(height) = update_heights_span.pop_front() {
-                    self.remove_consensus_state(client_sequence, height.clone());
+                    self.remove_consensus_state(client_sequence, *height);
                 }
 
                 self.update_heights.write(client_sequence, array![]);
@@ -728,12 +725,12 @@ pub mod MockClientComponent {
         ) {
             self.write_client_state(client_sequence, client_state);
 
-            self.write_update_height(client_sequence, update_height.clone());
+            self.write_update_height(client_sequence, update_height);
 
             self
                 .write_consensus_state(
                     client_sequence,
-                    update_height.clone(),
+                    update_height,
                     consensus_state,
                     processed_height,
                     processed_time,
@@ -747,11 +744,11 @@ pub mod MockClientComponent {
 
             let target_consensus_state: MockConsensusState = header.into();
 
-            let previous_height = self.update_height_before(client_sequence, target_height.clone());
+            let previous_height = self.update_height_before(client_sequence, target_height);
 
             if previous_height == Some(target_height) {
                 let stored_consensus_state = self
-                    .read_consensus_state(client_sequence, target_height.clone());
+                    .read_consensus_state(client_sequence, target_height);
 
                 // stored consensus state should be the same from target consensus state
                 // negation of the correct condition is a misbehaviour case
@@ -761,7 +758,7 @@ pub mod MockClientComponent {
             } else {
                 if let Some(previous_height) = previous_height {
                     let previous_consensus_state = self
-                        .read_consensus_state(client_sequence, previous_height.clone());
+                        .read_consensus_state(client_sequence, previous_height);
 
                     // time should be monotonically increasing
                     // negation of the correct condition is a misbehaviour case
@@ -770,11 +767,11 @@ pub mod MockClientComponent {
                     }
                 }
 
-                let next_height = self.update_height_after(client_sequence, target_height.clone());
+                let next_height = self.update_height_after(client_sequence, target_height);
 
                 if let Some(next_height) = next_height {
                     let next_consensus_state = self
-                        .read_consensus_state(client_sequence, next_height.clone());
+                        .read_consensus_state(client_sequence, next_height);
 
                     // time should be monotonically increasing
                     // negation of the correct condition is a misbehaviour case
@@ -928,10 +925,8 @@ pub mod MockClientComponent {
             processed_height: u64,
             processed_time: u64,
         ) {
-            self.consensus_states.write((client_sequence, height.clone()), consensus_state);
-            self
-                .client_processed_heights
-                .write((client_sequence, height.clone()), processed_height);
+            self.consensus_states.write((client_sequence, height), consensus_state);
+            self.client_processed_heights.write((client_sequence, height), processed_height);
             self.client_processed_times.write((client_sequence, height), processed_time);
         }
 

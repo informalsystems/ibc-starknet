@@ -362,16 +362,13 @@ pub mod TokenTransferComponent {
                             sender,
                             msg.port_id_on_a.clone(),
                             msg.chan_id_on_a.clone(),
-                            erc20_token.clone(),
-                            msg.amount.clone(),
+                            *erc20_token,
+                            *msg.amount,
                             msg.memo.clone(),
                         );
                 },
                 Denom::Hosted(_) => {
-                    self
-                        .burn_validate(
-                            sender, msg.denom.clone(), msg.amount.clone(), msg.memo.clone(),
-                        );
+                    self.burn_validate(sender, msg.denom.clone(), *msg.amount, msg.memo.clone());
                 },
             }
         }
@@ -381,7 +378,7 @@ pub mod TokenTransferComponent {
         ) {
             match @msg.denom.base {
                 Denom::Native(erc20_token) => {
-                    self.escrow_execute(sender, erc20_token.clone(), msg.amount, msg.memo.clone());
+                    self.escrow_execute(sender, *erc20_token, msg.amount, msg.memo.clone());
                 },
                 Denom::Hosted(_) => {
                     self.burn_execute(sender, msg.denom.clone(), msg.amount, msg.memo.clone());
@@ -410,7 +407,7 @@ pub mod TokenTransferComponent {
                 sender: Participant::Native(get_caller_address()),
                 receiver: Participant::External(msg.receiver.clone()),
                 denom: msg.denom.clone(),
-                amount: msg.amount.clone(),
+                amount: *msg.amount,
                 memo: msg.memo.clone(),
             };
 
@@ -423,8 +420,8 @@ pub mod TokenTransferComponent {
                 port_id_on_b,
                 chan_id_on_b,
                 data,
-                timeout_height_on_b: msg.timeout_height_on_b.clone(),
-                timeout_timestamp_on_b: msg.timeout_timestamp_on_b.clone(),
+                timeout_height_on_b: *msg.timeout_height_on_b,
+                timeout_timestamp_on_b: *msg.timeout_timestamp_on_b,
             }
         }
     }
@@ -469,15 +466,12 @@ pub mod TokenTransferComponent {
                             receiver,
                             packet.port_id_on_a.clone(),
                             packet.chan_id_on_a.clone(),
-                            erc20_token.clone(),
-                            packet_data.amount.clone(),
+                            *erc20_token,
+                            *packet_data.amount,
                         );
                 },
                 Denom::Hosted(_) => {
-                    self
-                        .mint_validate(
-                            receiver, packet_data.denom.clone(), packet_data.amount.clone(),
-                        );
+                    self.mint_validate(receiver, packet_data.denom.clone(), *packet_data.amount);
                 },
             }
         }
@@ -497,7 +491,7 @@ pub mod TokenTransferComponent {
                             receiver,
                             packet.port_id_on_a,
                             packet.chan_id_on_a,
-                            erc20_token.clone(),
+                            *erc20_token,
                             packet_data.amount,
                         )
                 },
@@ -671,14 +665,14 @@ pub mod TokenTransferComponent {
                             sender.unwrap(),
                             packet.port_id_on_a.clone(),
                             packet.chan_id_on_a.clone(),
-                            erc20_token.clone(),
-                            packet_data.amount.clone(),
+                            *erc20_token,
+                            *packet_data.amount,
                         )
                 },
                 Denom::Hosted(_) => {
                     self
                         .mint_validate(
-                            sender.unwrap(), packet_data.denom.clone(), packet_data.amount.clone(),
+                            sender.unwrap(), packet_data.denom.clone(), *packet_data.amount,
                         )
                 },
             };
@@ -754,14 +748,14 @@ pub mod TokenTransferComponent {
                             sender.unwrap(),
                             packet.port_id_on_a.clone(),
                             packet.chan_id_on_a.clone(),
-                            erc20_token.clone(),
-                            packet_data.amount.clone(),
+                            *erc20_token,
+                            *packet_data.amount,
                         )
                 },
                 Denom::Hosted(_) => {
                     self
                         .mint_execute(
-                            sender.unwrap(), packet_data.denom.clone(), packet_data.amount.clone(),
+                            sender.unwrap(), packet_data.denom.clone(), *packet_data.amount,
                         )
                 },
             };

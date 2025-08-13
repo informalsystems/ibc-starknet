@@ -22,7 +22,7 @@ pub impl ClientIdImpl of ClientIdTrait {
     fn validate(self: @ClientId, client_id_hash: felt252) {}
 
     fn to_byte_array(self: @ClientId) -> ByteArray {
-        let client_type = felt252_to_byte_array(self.client_type.clone());
+        let client_type = felt252_to_byte_array(*self.client_type);
         format!("{}-{}", client_type, self.sequence)
     }
 }

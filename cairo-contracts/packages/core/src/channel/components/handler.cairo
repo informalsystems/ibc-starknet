@@ -288,7 +288,7 @@ pub mod ChannelHandlerComponent {
             // channel handshake is allowed.
 
             assert(
-                conn_end_on_a.version.is_feature_supported(@(msg.ordering.clone().into())),
+                conn_end_on_a.version.is_feature_supported(@(*msg.ordering).into()),
                 ChannelErrors::UNSUPPORTED_ORDERING,
             );
 
@@ -362,7 +362,7 @@ pub mod ChannelHandlerComponent {
             assert(conn_end_on_b.is_open(), ConnectionErrors::INVALID_CONNECTION_STATE);
 
             assert(
-                conn_end_on_b.version.is_feature_supported(@(msg.ordering.clone().into())),
+                conn_end_on_b.version.is_feature_supported(@(*msg.ordering).into()),
                 ChannelErrors::UNSUPPORTED_ORDERING,
             );
 
@@ -371,7 +371,7 @@ pub mod ChannelHandlerComponent {
             client.verify_is_active(conn_end_on_b.client_id.sequence);
 
             let expected_chan_end_on_a = ChannelEndTrait::init(
-                msg.ordering.clone(),
+                *msg.ordering,
                 msg.port_id_on_b.clone(),
                 conn_end_on_b.counterparty.connection_id.clone(),
                 msg.version_on_a.clone(),
@@ -384,7 +384,7 @@ pub mod ChannelHandlerComponent {
                     msg.chan_id_on_a.clone(),
                     expected_chan_end_on_a,
                     msg.proof_chan_end_on_a.clone(),
-                    msg.proof_height_on_a.clone(),
+                    *msg.proof_height_on_a,
                 );
         }
 
@@ -463,7 +463,7 @@ pub mod ChannelHandlerComponent {
             client.verify_is_active(conn_end_on_a.client_id.sequence);
 
             let expected_chan_end_on_b = ChannelEndTrait::try_open(
-                chan_en_on_a.ordering.clone(),
+                *chan_en_on_a.ordering,
                 msg.port_id_on_a.clone(),
                 msg.chan_id_on_a.clone(),
                 conn_end_on_a.counterparty.connection_id.clone(),
@@ -477,7 +477,7 @@ pub mod ChannelHandlerComponent {
                     msg.chan_id_on_b.clone(),
                     expected_chan_end_on_b,
                     msg.proof_chan_end_on_b.clone(),
-                    msg.proof_height_on_b.clone(),
+                    *msg.proof_height_on_b,
                 );
         }
 
@@ -541,7 +541,7 @@ pub mod ChannelHandlerComponent {
             client.verify_is_active(conn_end_on_b.client_id.sequence);
 
             let expected_chan_end_on_a = ChannelEndTrait::open(
-                chan_end_on_b.ordering.clone(),
+                *chan_end_on_b.ordering,
                 msg.port_id_on_b.clone(),
                 msg.chan_id_on_b.clone(),
                 conn_end_on_b.counterparty.connection_id.clone(),
@@ -555,7 +555,7 @@ pub mod ChannelHandlerComponent {
                     chan_end_on_b.counterparty_channel_id().clone(),
                     expected_chan_end_on_a,
                     msg.proof_chan_end_on_a.clone(),
-                    msg.proof_height_on_a.clone(),
+                    *msg.proof_height_on_a,
                 );
         }
 
@@ -638,9 +638,7 @@ pub mod ChannelHandlerComponent {
             let json_packet_data = app.json_packet_data(packet.data.clone());
 
             let packet_commitment_on_a = compute_packet_commitment(
-                json_packet_data.span(),
-                packet.timeout_height_on_b.clone(),
-                packet.timeout_timestamp_on_b.clone(),
+                json_packet_data.span(), packet.timeout_height_on_b, packet.timeout_timestamp_on_b,
             );
 
             self
@@ -986,9 +984,7 @@ pub mod ChannelHandlerComponent {
             assert(packet_commitment.is_non_zero(), ChannelErrors::MISSING_PACKET_COMMITMENT);
 
             let expected_packet_commitment = compute_packet_commitment(
-                json_packet_data,
-                packet.timeout_height_on_b.clone(),
-                packet.timeout_timestamp_on_b.clone(),
+                json_packet_data, *packet.timeout_height_on_b, *packet.timeout_timestamp_on_b,
             );
 
             assert(
