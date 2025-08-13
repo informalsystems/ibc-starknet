@@ -169,11 +169,10 @@ pub mod ConnectionHandlerComponent {
                 msg.client_id_on_a.clone(),
                 msg.client_id_on_b.clone(),
                 msg.prefix_on_a.clone(),
-                msg.delay_period.clone(),
+                *msg.delay_period,
             );
 
-            let root_on_b = client
-                .consensus_state_root(client_sequence, msg.proof_height_on_a.clone());
+            let root_on_b = client.consensus_state_root(client_sequence, *msg.proof_height_on_a);
 
             client
                 .verify_membership(
@@ -257,8 +256,7 @@ pub mod ConnectionHandlerComponent {
                 conn_end_on_a.delay_period,
             );
 
-            let root_on_a = client
-                .consensus_state_root(client_sequence, msg.proof_height_on_b.clone());
+            let root_on_a = client.consensus_state_root(client_sequence, *msg.proof_height_on_b);
 
             client
                 .verify_membership(
@@ -331,8 +329,7 @@ pub mod ConnectionHandlerComponent {
                 conn_end_on_b.delay_period,
             );
 
-            let root_on_b = client
-                .consensus_state_root(client_sequence, msg.proof_height_on_a.clone());
+            let root_on_b = client.consensus_state_root(client_sequence, *msg.proof_height_on_a);
 
             client
                 .verify_membership(
