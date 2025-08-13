@@ -1,5 +1,6 @@
 #[starknet::contract]
 mod RawStore {
+    use starknet::SyscallResultTrait;
     use starknet::storage_access::StorageAddress;
     use starknet::syscalls::{storage_read_syscall, storage_write_syscall};
 
@@ -9,12 +10,12 @@ mod RawStore {
     #[external(v0)]
     fn set(ref self: ContractState, entries: Array<(StorageAddress, felt252)>) {
         for (key, value) in entries {
-            storage_write_syscall(0, key, value).unwrap();
+            storage_write_syscall(0, key, value).unwrap_syscall();
         }
     }
 
     #[external(v0)]
     fn get(ref self: ContractState, address: StorageAddress) -> felt252 {
-        storage_read_syscall(0, address).unwrap()
+        storage_read_syscall(0, address).unwrap_syscall()
     }
 }
