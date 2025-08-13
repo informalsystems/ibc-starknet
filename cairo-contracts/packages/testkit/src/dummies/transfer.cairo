@@ -34,6 +34,10 @@ pub const fn ERC20() -> ERC20Contract {
     }
 }
 
+pub const fn ADMIN() -> ContractAddress {
+    'ADMIN'.try_into().unwrap()
+}
+
 pub const fn OWNER() -> ContractAddress {
     'OWNER'.try_into().unwrap()
 }

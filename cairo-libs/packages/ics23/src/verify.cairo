@@ -26,13 +26,14 @@ pub fn verify_membership(
     let mut subvalue = value;
     let mut i = index;
     while i != proofs_len {
-        if let Proof::Exist(p) = proofs[i] {
-            let spec = specs[i];
-            subroot = p.calculate_root_for_spec(Option::Some(spec));
-            verify_existence(spec, p, keys[proofs_len - 1 - i], @subvalue);
-        } else {
+        let Proof::Exist(p) = proofs[i] else {
             panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
-        }
+        };
+
+        let spec = specs[i];
+        subroot = p.calculate_root_for_spec(Option::Some(spec));
+        verify_existence(spec, p, keys[proofs_len - 1 - i], @subvalue);
+
         subvalue = subroot.span().into();
         i += 1;
     }
@@ -53,13 +54,14 @@ pub fn verify_non_membership(
     let proof = proofs[0];
     let spec = specs[0];
     let key = keys[proofs_len - 1];
-    if let Proof::NonExist(p) = proof {
-        subroot = p.calculate_root();
-        verify_non_existence(spec, p, key.clone());
-        verify_membership(specs.clone(), proofs, root, keys.clone(), subroot.span().into(), 1)
-    } else {
+
+    let Proof::NonExist(p) = proof else {
         panic!("{}", ICS23Errors::INVALID_PROOF_TYPE);
-    }
+    };
+
+    subroot = p.calculate_root();
+    verify_non_existence(spec, p, key.clone());
+    verify_membership(specs.clone(), proofs, root, keys.clone(), subroot.span().into(), 1)
 }
 
 pub fn verify_existence(
@@ -299,7 +301,7 @@ fn order_from_padding(inner_spec: InnerSpec, inner_op: @InnerOp) -> u32 {
 
 fn left_branches_are_empty(inner_spec: InnerSpec, inner_op: @InnerOp) -> bool {
     let inner_spec_child_order = inner_spec.child_order.clone();
-    let child_size = inner_spec.child_size.clone();
+    let child_size = inner_spec.child_size;
     let inner_spec_empty_child = inner_spec.empty_child.clone();
     let left_branches = order_from_padding(inner_spec, inner_op);
     if left_branches.is_zero() {
@@ -314,7 +316,7 @@ fn left_branches_are_empty(inner_spec: InnerSpec, inner_op: @InnerOp) -> bool {
     for lb in 0..left_branches {
         for o in @inner_spec_child_order {
             if o == @lb {
-                let from = actual_prefix.unwrap() + child_size * o.clone();
+                let from = actual_prefix.unwrap() + child_size * *o;
                 let mut expected_prefix = ArrayTrait::new();
                 for i in from..from + child_size {
                     expected_prefix.append(*inner_op.prefix[i]);
@@ -334,7 +336,7 @@ fn right_branches_are_empty(inner_spec: @InnerSpec, inner_op: @InnerOp) -> bool 
         return false;
     }
 
-    let child_size = inner_spec.child_size.clone();
+    let child_size = *inner_spec.child_size;
     if inner_op.suffix.len() != child_size {
         return false;
     }

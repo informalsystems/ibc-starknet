@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: madara-alliance/madara
-          ref: 21357a80a8d9f627657ce9e5d2c01aa4937b8f2e # main branch
+          ref: 4118ad97fe2d70bacc239ce2ca4225752a49f628 # main branch
           path: madara
 
       - uses: cachix/install-nix-action@v30
@@ -72,7 +72,7 @@ jobs:
         id: madara-from-docker
         continue-on-error: true
         run: |
-          MADARA_REVISION=21357a8 # nightly revision
+          MADARA_REVISION=4118ad9 # nightly revision
           MADARA_DOCKER_PATH=`docker run --name madara-container --entrypoint which "ghcr.io/madara-alliance/madara:nightly-${MADARA_REVISION}" madara`
           docker cp "madara-container:${MADARA_DOCKER_PATH}" "${HOME}/.cargo/bin/madara"
           chmod u+x "${HOME}/.cargo/bin/madara"
@@ -82,9 +82,7 @@ jobs:
         if: steps.madara-from-docker.outcome == 'failure'
         run: |
           cd madara
-          nix develop -c \
-            cargo build --release --manifest-path madara/Cargo.toml --bin madara
-          cp madara/target/release/madara "$HOME/.cargo/bin/madara"
+          nix develop -c cargo install --path madara/node --bin madara --locked --force
 
       - name: Build Cairo contracts
         working-directory: ./cairo-contracts

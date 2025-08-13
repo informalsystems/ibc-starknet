@@ -418,7 +418,7 @@ pub impl AcknowledegementZero of Zero<Acknowledgement> {
     }
 
     fn is_zero(self: @Acknowledgement) -> bool {
-        self.ack.len() == 0
+        self.ack.is_empty()
     }
 
     fn is_non_zero(self: @Acknowledgement) -> bool {

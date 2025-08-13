@@ -34,7 +34,7 @@ pub fn decode_varint_from_u8_array(ref bytes: Array<u8>) -> (u64, u32) {
 
         num_of_read += 1;
         if num_of_read == 1 && byte < 0x80 {
-            value = byte.clone().try_into().unwrap();
+            value = byte.try_into().unwrap();
             break;
         }
 
