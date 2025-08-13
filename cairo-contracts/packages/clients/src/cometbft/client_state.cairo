@@ -56,8 +56,8 @@ pub impl CometClientStateImpl of CometClientStateTrait {
     ) -> bool {
         let mut substitute_client_state = other_client_state;
 
-        substitute_client_state.latest_height = self.latest_height.clone();
-        substitute_client_state.trusting_period = self.trusting_period.clone();
+        substitute_client_state.latest_height = *self.latest_height;
+        substitute_client_state.trusting_period = *self.trusting_period;
         substitute_client_state.status = self.status.clone();
         substitute_client_state.chain_id = self.chain_id.clone();
 

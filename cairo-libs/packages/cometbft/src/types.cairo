@@ -670,10 +670,10 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
                 let signed_vote = SignedVote {
                     vote: CanonicalVote {
                         vote_type: VoteType::Precommit,
-                        height: commit.height.clone().try_into().unwrap(),
-                        round: commit.round.clone().try_into().unwrap(),
+                        height: commit.height.try_into().unwrap(),
+                        round: commit.round.try_into().unwrap(),
                         block_id: commit.block_id.clone(),
-                        timestamp: signature.timestamp.clone(),
+                        timestamp: *signature.timestamp,
                         chain_id: signed_header.header.chain_id.clone(),
                     },
                     validator_address: signature.validator_address.clone(),

@@ -174,7 +174,7 @@ pub fn valid_commit_validate_full(signed_header: @SignedHeader, validators: @Val
 pub fn is_within_trust_period(
     trusted_header_time: @Timestamp, trusting_period: @Duration, now: Timestamp,
 ) {
-    let mut expires_at = trusted_header_time.clone();
+    let mut expires_at = *trusted_header_time;
     expires_at.seconds += *trusting_period.seconds;
     expires_at.nanos += *trusting_period.nanos;
 
@@ -213,7 +213,7 @@ pub fn is_monotonic_height(untrusted_height: @u64, trusted_height: @u64) {
 pub fn is_header_from_past(
     untrusted_header_time: @Timestamp, clock_drift: @Duration, now: Timestamp,
 ) {
-    let mut drifted = now.clone();
+    let mut drifted = now;
 
     drifted.seconds += *clock_drift.seconds;
     drifted.nanos += *clock_drift.nanos;
