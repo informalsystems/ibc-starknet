@@ -3,7 +3,6 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt::Write;
 use core::str::FromStr;
-use ibc_core::primitives::prelude::*;
 
 use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::ConvertIbcAny;
@@ -28,6 +27,7 @@ use ibc_core::host::types::identifiers::ClientId;
 use ibc_core::host::types::path::{
     Path, PathBytes, UpgradeClientStatePath, UpgradeConsensusStatePath,
 };
+use ibc_core::primitives::prelude::*;
 use ibc_core::primitives::proto::Any;
 use prost::Message;
 use prost_types::Any as ProstAny;
@@ -75,8 +75,11 @@ where
         // only way to resume the client is to remove the scheduled upgrade on starknet after the upgrade is finished.
         if final_height != 0 && final_height < block_header.block_number {
             return Err(ClientError::ClientSpecific {
-                description: format!("Updating client at height {} after upgrade final height ({final_height}); \
-                upgrade the Starknet Client or unschedule upgrade at Starknet", block_header.block_number),
+                description: format!(
+                    "Updating client at height {} after upgrade final height ({final_height}); \
+                upgrade the Starknet Client or unschedule upgrade at Starknet",
+                    block_header.block_number
+                ),
             });
         }
 
@@ -175,9 +178,12 @@ where
         // the client must be updated till the final height.
         if latest_height.revision_height() != final_height {
             return Err(ClientError::ClientSpecific {
-                description: format!("UpgradeClient requires latest client height to be {final_height}; \
+                description: format!(
+                    "UpgradeClient requires latest client height to be {final_height}; \
                 Current latest height is {}; \
-                Update Starknet client till {final_height}", latest_height.revision_height()),
+                Update Starknet client till {final_height}",
+                    latest_height.revision_height()
+                ),
             });
         }
 
