@@ -4,7 +4,6 @@ use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_ibc_test_suite::tests::clearing::TestPacketClearing;
 use hermes_ibc_test_suite::tests::transfer::TestIbcTransfer;
-use hermes_ibc_test_suite::tests::upgrade_client::TestUpgradeClient;
 
 use crate::utils::init_starknet_test_driver;
 
