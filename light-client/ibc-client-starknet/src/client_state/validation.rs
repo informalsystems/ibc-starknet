@@ -77,7 +77,7 @@ where
             return Err(ClientError::ClientSpecific {
                 description: format!(
                     "Updating client at height {} after upgrade final height ({final_height}); \
-                upgrade the Starknet Client or unschedule upgrade at Starknet",
+                    upgrade the Starknet Client or unschedule upgrade at Starknet",
                     block_header.block_number
                 ),
             });
@@ -180,8 +180,8 @@ where
             return Err(ClientError::ClientSpecific {
                 description: format!(
                     "UpgradeClient requires latest client height to be {final_height}; \
-                Current latest height is {}; \
-                Update Starknet client till {final_height}",
+                    Current latest height is {}; \
+                    Update Starknet client till {final_height}",
                     latest_height.revision_height()
                 ),
             });
