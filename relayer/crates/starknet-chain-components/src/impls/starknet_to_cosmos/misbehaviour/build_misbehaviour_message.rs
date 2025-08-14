@@ -1,19 +1,14 @@
 use hermes_core::chain_components::traits::{
-    HasChainId, HasClientIdType, HasEvidenceType, HasMessageType, MisbehaviourMessageBuilder,
+    HasClientIdType, HasEvidenceType, HasMessageType, MisbehaviourMessageBuilder,
     MisbehaviourMessageBuilderComponent,
 };
 use hermes_core::encoding_components::traits::{CanConvert, HasDefaultEncoding};
 use hermes_core::encoding_components::types::AsBytes;
-use hermes_core::relayer_components::transaction::traits::HasDefaultSigner;
 use hermes_cosmos_core::chain_components::impls::SubmitMisbehaviour;
 use hermes_cosmos_core::chain_components::traits::{CosmosMessage, ToCosmosMessage};
-use hermes_cosmos_core::chain_components::types::Secp256k1KeyPair;
 use hermes_prelude::*;
-use ibc::clients::wasm_types::client_message::{ClientMessage, WASM_CLIENT_MESSAGE_TYPE_URL};
+use ibc::clients::wasm_types::client_message::ClientMessage;
 use ibc::core::host::types::identifiers::ClientId;
-use ibc_client_starknet_types::misbehaviour::StarknetMisbehaviour;
-use ibc_proto::ibc::lightclients::wasm::v1::ClientMessage as RawClientMessage;
-use ibc_proto::Protobuf;
 use prost::Message;
 use prost_types::Any;
 
@@ -22,13 +17,11 @@ impl<Chain, Counterparty, Encoding> MisbehaviourMessageBuilder<Chain, Counterpar
     for CosmosFromStarknetMisbehaviourMessageBuilder
 where
     Chain: HasEvidenceType<Evidence = Any>
-        + HasChainId
         + HasClientIdType<Counterparty, ClientId = ClientId>
-        + HasDefaultSigner<Signer = Secp256k1KeyPair>
         + HasMessageType<Message = CosmosMessage>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty: HasDefaultEncoding<AsBytes, Encoding = Encoding>,
-    Encoding: CanConvert<Any, StarknetMisbehaviour> + HasAsyncErrorType,
+    Encoding: CanConvert<ClientMessage, Any> + HasAsyncErrorType,
 {
     async fn build_misbehaviour_message(
         chain: &Chain,
@@ -42,17 +35,14 @@ where
             evidence: evidence.clone(),
         };
 
-        let signer = chain.get_default_signer();
-
         let wasm_message = ClientMessage {
             data: evidence.encode_to_vec(),
         };
 
         // Convert Wasm ClientMessage to Any
-        let any_wasm_message = Any {
-            type_url: WASM_CLIENT_MESSAGE_TYPE_URL.to_owned(),
-            value: Protobuf::<RawClientMessage>::encode_vec(wasm_message),
-        };
+        let any_wasm_message = encoding
+            .convert(&wasm_message)
+            .map_err(Chain::raise_error)?;
 
         let message = SubmitMisbehaviour {
             client_id: client_id.clone(),
