@@ -34,12 +34,16 @@ use hermes_starknet_chain_components::types::{
     WasmStarknetClientState, WasmStarknetConsensusState,
 };
 use hermes_starknet_test_components::impls::StarknetProposalSetupClientUpgradeResult;
+use hermes_starknet_test_components::types::StarknetNodeConfig;
 use ibc::core::client::types::error::ClientError;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 use starknet_crypto::get_public_key;
+
+use crate::contexts::HasChainNodeConfig;
+
 pub struct StarknetHandleUpgradeClient;
 
 #[cgp_provider(UpgradeClientHandlerComponent)]
@@ -172,6 +176,7 @@ where
         + CanRaiseAsyncError<Encoding::Error>
         + CanRaiseAsyncError<ClientError>,
     ChainDriverA: HasChain<Chain = ChainA>
+        + HasChainNodeConfig<ChainNodeConfig = StarknetNodeConfig>
         + HasSetupUpgradeClientTestResultType<
             SetupUpgradeClientTestResult = StarknetProposalSetupClientUpgradeResult,
         >,
@@ -254,8 +259,10 @@ where
             .await
             .map_err(Driver::raise_error)?;
 
-        // FIXME(rano): use random bits to generate this
-        let sequencer_private_key = Felt::TWO;
+        let starknet_node_config = chain_driver_a.chain_node_config();
+
+        // Using a different private key by just incrementing the Felt value.
+        let sequencer_private_key = starknet_node_config.sequencer_private_key + 1;
         let sequencer_public_key = get_public_key(&sequencer_private_key);
 
         upgrade_client_state.latest_height = Height {
