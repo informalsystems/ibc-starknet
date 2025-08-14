@@ -3,6 +3,7 @@ use alloc::vec;
 use alloc::vec::Vec;
 use core::fmt::Write;
 use core::str::FromStr;
+use ibc_core::primitives::prelude::*;
 
 use cgp::core::component::UseContext;
 use hermes_cosmos_encoding_components::impls::ConvertIbcAny;
@@ -69,11 +70,15 @@ where
             storage_proof,
         } = header;
 
-        // TODO(rano): use a proper error type
         // this is to make sure after a schedule upgrade, the client can't be updated after final_height.
         // this way, any packet after the final_height will be rejected.
         // only way to resume the client is to remove the scheduled upgrade on starknet after the upgrade is finished.
-        assert!(final_height == 0 || block_header.block_number <= final_height);
+        if final_height != 0 && final_height < block_header.block_number {
+            return Err(ClientError::ClientSpecific {
+                description: format!("Updating client at height {} after upgrade final height ({final_height}); \
+                upgrade the Starknet Client or unschedule upgrade at Starknet", block_header.block_number),
+            });
+        }
 
         let sequencer_public_key = Felt::from_bytes_be_slice(&self.0.sequencer_public_key);
         let ibc_contract_address = Felt::from_bytes_be_slice(&self.0.ibc_contract_address);
@@ -167,9 +172,14 @@ where
         let latest_height = self.latest_height();
         let final_height = self.0.final_height;
 
-        // TODO(rano): use proper error type
         // the client must be updated till the final height.
-        assert!(latest_height.revision_height() == final_height);
+        if latest_height.revision_height() != final_height {
+            return Err(ClientError::ClientSpecific {
+                description: format!("UpgradeClient requires latest client height to be {final_height}; \
+                Current latest height is {}; \
+                Update Starknet client till {final_height}", latest_height.revision_height()),
+            });
+        }
 
         let upgraded_client_path =
             UpgradeClientStatePath::new_with_default_path(final_height).into();
