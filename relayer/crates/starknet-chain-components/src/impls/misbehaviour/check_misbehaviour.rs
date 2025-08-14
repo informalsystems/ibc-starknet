@@ -66,7 +66,7 @@ where
             .sleep(core::time::Duration::from_secs(1))
             .await;
 
-        let trusted_block = chain.query_block(&20).await?;
+        let trusted_block = chain.query_block(&target_height).await?;
 
         let feeder_endpoint_url = chain.feeder_gateway_url();
         let feeder_endpoint = FeederGatewayEndpoint::new(feeder_endpoint_url.as_str());
