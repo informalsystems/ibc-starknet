@@ -5,11 +5,9 @@ use hermes_core::encoding_components::traits::{
 };
 use hermes_prelude::*;
 use ibc::core::channel::types::channel::Order as ChannelOrdering;
-use ibc::core::host::types::identifiers::ClientId;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
 
-use crate::impls::StarknetUpdateClientEvent;
 use crate::types::{
     Acknowledgement, ChannelId, Height, Packet, PortId, Sequence, StarknetEvent, Timestamp,
     UnknownEvent,
@@ -22,7 +20,6 @@ pub enum PacketRelayEvents {
     WriteAcknowledgement(WriteAcknowledgementEvent),
     Acknowledge(AcknowledgePacketEvent),
     Timeout(TimeoutPacketEvent),
-    UpdateClient(StarknetUpdateClientEvent),
 }
 
 #[derive(Debug)]
@@ -100,7 +97,6 @@ where
         + CanDecode<Strategy, WriteAcknowledgementEvent>
         + CanDecode<Strategy, AcknowledgePacketEvent>
         + CanDecode<Strategy, TimeoutPacketEvent>
-        + CanDecode<Strategy, StarknetUpdateClientEvent>
         + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
 {
     fn decode(
@@ -123,8 +119,6 @@ where
             Ok(PacketRelayEvents::Acknowledge(encoding.decode(event)?))
         } else if selector == selector!("TimeoutPacketEvent") {
             Ok(PacketRelayEvents::Timeout(encoding.decode(event)?))
-        } else if selector == selector!("UpdateClientEvent") {
-            Ok(PacketRelayEvents::UpdateClient(encoding.decode(event)?))
         } else {
             Err(Encoding::raise_error(UnknownEvent { event }))
         }
@@ -410,40 +404,6 @@ where
             timeout_height_on_b,
             timeout_timestamp_on_b,
             channel_ordering,
-        })
-    }
-}
-
-#[cgp_provider(DecoderComponent)]
-impl<EventEncoding, CairoEncoding, Strategy>
-    Decoder<EventEncoding, Strategy, StarknetUpdateClientEvent> for DecodePacketRelayEvents
-where
-    EventEncoding: HasEncodedType<Encoded = StarknetEvent>
-        + HasEncoding<AsFelt, Encoding = CairoEncoding>
-        + CanRaiseAsyncError<CairoEncoding::Error>
-        + for<'a> CanRaiseAsyncError<UnknownEvent<'a>>,
-    CairoEncoding: HasEncodedType<Encoded = Vec<Felt>>
-        + CanDecode<ViaCairo, Product![ClientId]>
-        + CanDecode<ViaCairo, Product![Vec<Height>, Vec<Felt>]>,
-{
-    fn decode(
-        event_encoding: &EventEncoding,
-        event: &StarknetEvent,
-    ) -> Result<StarknetUpdateClientEvent, EventEncoding::Error> {
-        let cairo_encoding = event_encoding.encoding();
-
-        let product![client_id,] = cairo_encoding
-            .decode(&event.keys)
-            .map_err(EventEncoding::raise_error)?;
-
-        let product![consensus_heights, header,] = cairo_encoding
-            .decode(&event.data)
-            .map_err(EventEncoding::raise_error)?;
-
-        Ok(StarknetUpdateClientEvent {
-            client_id,
-            consensus_heights,
-            header,
         })
     }
 }

@@ -11,7 +11,7 @@ use hermes_prelude::*;
 
 use crate::components::StarknetChainComponents::re_exports::UpdateClientEventFieldsComponent;
 use crate::impls::{StarknetUpdateClientEvent, UseStarknetEvents};
-use crate::types::{ClientId, PacketRelayEvents};
+use crate::types::{ClientId, ClientRelayEvents};
 
 #[cgp_provider(UpdateClientEventComponent)]
 impl<Chain> ProvideUpdateClientEvent<Chain> for UseStarknetEvents {
@@ -34,7 +34,7 @@ impl<Chain, Encoding> EventExtractor<Chain, StarknetUpdateClientEvent> for UseSt
 where
     Chain: HasEventType + HasEncoding<AsStarknetEvent, Encoding = Encoding>,
     Encoding:
-        HasEncodedType<Encoded = Chain::Event> + CanDecode<ViaCairo, Option<PacketRelayEvents>>,
+        HasEncodedType<Encoded = Chain::Event> + CanDecode<ViaCairo, Option<ClientRelayEvents>>,
 {
     fn try_extract_from_event(
         chain: &Chain,
@@ -44,8 +44,7 @@ where
         let event = chain.encoding().decode(event).ok()??;
 
         match event {
-            PacketRelayEvents::UpdateClient(event) => Some(event),
-            _ => None,
+            ClientRelayEvents::UpdateClient(event) => Some(event),
         }
     }
 }
