@@ -30,47 +30,51 @@ overflow-checks = true
 cgp            = { version = "0.4.0" }
 cgp-error-eyre = { version = "0.4.0" }
 
-ibc                         = { version = "0.56.0" }
-starknet                    = { version = "0.13.0" }
-starknet-v14                = { version = "0.14.0", package = "starknet" }
-starknet-crypto             = { version = "0.7.4" }
-starknet-types-core         = { version = "0.1.8" }
-url                         = { version = "2.5" }
-eyre                        = { version = "0.6.12" }
-tokio                       = { version = "1.45" }
-secp256k1                   = { version = "0.28.2" }
-humantime-serde             = { version = "1.1" }
-serde                       = { version = "1.0" }
-serde_json                  = { version = "1.0" }
-rand                        = { version = "0.8.5" }
-sha2                        = { version = "0.10.9" }
-tonic                       = { version = "0.12" }
-prost                       = { version = "0.13.1" }
-prost-types                 = { version = "0.13.1" }
-cairo-lang-starknet-classes = { version = "2.12.0" }
-clap                        = { version = "4.5" }
-toml                        = { version = "0.8.23" }
-oneline-eyre                = { version = "0.1.0" }
-stable-eyre                 = { version = "0.2.2" }
-tracing                     = { version = "0.1.41" }
-tracing-subscriber          = { version = "0.3.19" }
-flate2                      = { version = "1.1" }
-http                        = { version = "1.3" }
-futures                     = { version = "0.3.31", default-features = false }
-tiny-bip39                  = { version = "1.0" }
-hex                         = { version = "0.4.3" }
-ureq                        = { version = "3.0" }
-indexmap                    = { version = "2.10" }
-humantime                   = { version = "2.2" }
-time                        = { version = "0.3" }
-sha256                      = { version = "1.6" }
-garaga                      = { version = "0.18.2", package = "garaga_rs" }
-ibc-proto                   = { version = "0.51.1" }
-ibc-client-starknet-types   = { version = "0.1.0" }
-tendermint                  = { version = "0.40" }
-tendermint-rpc              = { version = "0.40" }
+ibc                              = { version = "0.56.0" }
+ibc-client-tendermint            = { version = "0.56.0" }
+starknet                         = { version = "0.13.0" }
+starknet-v14                     = { version = "0.14.0", package = "starknet" }
+starknet-crypto                  = { version = "0.7.4" }
+starknet-types-core              = { version = "0.1.8" }
+url                              = { version = "2.5" }
+eyre                             = { version = "0.6.12" }
+tokio                            = { version = "1.45" }
+secp256k1                        = { version = "0.28.2" }
+humantime-serde                  = { version = "1.1" }
+serde                            = { version = "1.0" }
+serde_json                       = { version = "1.0" }
+rand                             = { version = "0.8.5" }
+sha2                             = { version = "0.10.9" }
+tonic                            = { version = "0.12" }
+prost                            = { version = "0.13.1" }
+prost-types                      = { version = "0.13.1" }
+cairo-lang-starknet-classes      = { version = "2.12.0" }
+clap                             = { version = "4.5" }
+toml                             = { version = "0.8.23" }
+oneline-eyre                     = { version = "0.1.0" }
+stable-eyre                      = { version = "0.2.2" }
+tracing                          = { version = "0.1.41" }
+tracing-subscriber               = { version = "0.3.19" }
+flate2                           = { version = "1.1" }
+http                             = { version = "1.3" }
+futures                          = { version = "0.3.31", default-features = false }
+tiny-bip39                       = { version = "1.0" }
+hex                              = { version = "0.4.3" }
+ureq                             = { version = "3.0" }
+indexmap                         = { version = "2.10" }
+humantime                        = { version = "2.2" }
+time                             = { version = "0.3" }
+sha256                           = { version = "1.6" }
+garaga                           = { version = "0.18.2", package = "garaga_rs" }
+ibc-proto                        = { version = "0.51.1" }
+ibc-client-starknet-types        = { version = "0.1.0" }
+tendermint                       = { version = "0.40" }
+tendermint-light-client-verifier = { version = "0.40" }
+tendermint-proto                 = { version = "0.40" }
+tendermint-rpc                   = { version = "0.40" }
 
 hermes-prelude                      = { version = "0.1.0" }
+hermes-comet-light-client-context   = { version = "0.1.0" }
 hermes-core                         = { version = "0.1.0" }
 hermes-cosmos                       = { version = "0.1.0" }
 hermes-cosmos-core                  = { version = "0.1.0" }
@@ -180,39 +184,39 @@ cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e
 cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 cgp-error-eyre  = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 
-hermes-core                          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-prelude                       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-relayer-components-extra      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-runtime-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-async-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-tokio-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-runtime                       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-error                         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-encoding-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cosmos                        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cosmos-core                   = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cosmos-encoding-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cosmos-integration-tests      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-comet-light-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-comet-light-client-context    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-wasm-test-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-wasm-client-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-wasm-encoding-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-wasm-chain-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cli-components                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cli                           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
-hermes-cli-framework                 = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "4cc7a5b" }
+hermes-core                          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-prelude                       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-chain-components              = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-chain-type-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-relayer-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-relayer-components-extra      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-runtime-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-async-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-tokio-runtime-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-runtime                       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-error                         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-encoding-components           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-protobuf-encoding-components  = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-logging-components            = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-tracing-logging-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-test-components               = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-ibc-test-suite                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-any-counterparty              = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cosmos                        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cosmos-core                   = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cosmos-chain-components       = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cosmos-chain-preset           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cosmos-relayer                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cosmos-wasm-relayer           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cosmos-test-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cosmos-encoding-components    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cosmos-integration-tests      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-comet-light-client-components = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-comet-light-client-context    = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-wasm-test-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-wasm-client-components        = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-wasm-encoding-components      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-wasm-chain-components         = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cli-components                = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cli                           = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }
+hermes-cli-framework                 = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "b7c49de" }

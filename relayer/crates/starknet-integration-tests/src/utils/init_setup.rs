@@ -5,7 +5,9 @@ use hermes_prelude::CanRaiseError;
 use hermes_starknet_relayer::contexts::StarknetBuilder;
 
 use crate::contexts::{StarknetTestDriver, StarknetTestSetup};
-use crate::utils::{init_osmosis_bootstrap, init_starknet_bootstrap, load_wasm_client};
+use crate::utils::{
+    create_test_uid, init_osmosis_bootstrap, init_starknet_bootstrap, load_wasm_client,
+};
 
 pub async fn init_starknet_setup(runtime: &HermesRuntime) -> Result<StarknetTestSetup, Error> {
     let wasm_client_code_path = std::env::var("STARKNET_WASM_CLIENT_PATH").map_err(|_| {
@@ -14,9 +16,12 @@ pub async fn init_starknet_setup(runtime: &HermesRuntime) -> Result<StarknetTest
 
     let (wasm_code_hash, wasm_client_byte_code) = load_wasm_client(&wasm_client_code_path).await?;
 
-    let starknet_bootstrap = init_starknet_bootstrap(runtime).await?;
+    let test_uid = create_test_uid().await?;
 
-    let cosmos_bootstrap = init_osmosis_bootstrap(runtime, wasm_client_byte_code, vec![]).await?;
+    let starknet_bootstrap = init_starknet_bootstrap(runtime, test_uid).await?;
+
+    let cosmos_bootstrap =
+        init_osmosis_bootstrap(runtime, wasm_client_byte_code, vec![], test_uid).await?;
 
     let starknet_builder = StarknetBuilder::new(
         runtime.clone(),

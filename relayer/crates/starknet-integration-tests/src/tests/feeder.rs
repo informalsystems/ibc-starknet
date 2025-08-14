@@ -9,14 +9,16 @@ use starknet_crypto_lib::StarknetCryptoLib;
 use tracing::info;
 
 use crate::contexts::StarknetChainDriver;
-use crate::utils::init_starknet_bootstrap;
+use crate::utils::{create_test_uid, init_starknet_bootstrap};
 
 #[test]
 fn test_starknet_feeder_gateway_signature() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let starknet_bootstrap = init_starknet_bootstrap(&runtime).await?;
+        let test_uid = create_test_uid().await?;
+
+        let starknet_bootstrap = init_starknet_bootstrap(&runtime, test_uid).await?;
 
         let chain_driver: StarknetChainDriver =
             starknet_bootstrap.bootstrap_chain("starknet").await?;

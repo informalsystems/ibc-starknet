@@ -104,6 +104,7 @@ where
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
+        // Only asserting non-empty as there is no data field in Cairo
         if !event.data.is_empty() {
             return Err(EventEncoding::raise_error(UnknownEvent { event }));
         }
@@ -142,6 +143,7 @@ where
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
+        // Only asserting non-empty as there is no data field in Cairo
         if !event.data.is_empty() {
             return Err(EventEncoding::raise_error(UnknownEvent { event }));
         }
@@ -181,6 +183,7 @@ where
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
+        // Only asserting non-empty as there is no data field in Cairo
         if !event.data.is_empty() {
             return Err(EventEncoding::raise_error(UnknownEvent { event }));
         }
@@ -220,6 +223,7 @@ where
             .decode(&event.keys)
             .map_err(EventEncoding::raise_error)?;
 
+        // Only asserting non-empty as there is no data field in Cairo
         if !event.data.is_empty() {
             return Err(EventEncoding::raise_error(UnknownEvent { event }));
         }

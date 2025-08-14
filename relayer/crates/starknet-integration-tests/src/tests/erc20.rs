@@ -1,5 +1,3 @@
-use std::time::SystemTime;
-
 use hermes_core::chain_components::traits::CanSendSingleMessage;
 use hermes_core::encoding_components::traits::CanEncode;
 use hermes_core::relayer_components::transaction::impls::CanSendSingleMessageWithSigner;
@@ -19,7 +17,7 @@ use starknet::core::types::U256;
 use starknet::macros::selector;
 use tracing::info;
 
-use crate::utils::init_starknet_bootstrap;
+use crate::utils::{create_test_uid, init_starknet_bootstrap};
 
 #[test]
 fn test_erc20_transfer() -> Result<(), Error> {
@@ -27,11 +25,9 @@ fn test_erc20_transfer() -> Result<(), Error> {
     let runtime = init_test_runtime();
 
     runtime.runtime.clone().block_on(async move {
-        let timestamp = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)?
-            .as_secs();
+        let test_uid = create_test_uid().await?;
 
-        let bootstrap = init_starknet_bootstrap(&runtime).await?;
+        let bootstrap = init_starknet_bootstrap(&runtime, test_uid).await?;
 
         let chain_driver = bootstrap.bootstrap_chain("starknet").await?;
 

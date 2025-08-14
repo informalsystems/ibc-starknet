@@ -9,6 +9,7 @@ use hermes_encoding_components::impls::ConvertVia;
 use hermes_encoding_components::traits::Converter;
 use ibc_client_cw::context::CwClientValidation;
 use ibc_client_starknet_types::header::StarknetHeader;
+use ibc_client_starknet_types::misbehaviour::StarknetMisbehaviour;
 use ibc_core::channel::types::proto::v1::Channel;
 use ibc_core::client::context::client_state::ClientStateValidation;
 use ibc_core::client::types::error::ClientError;
@@ -107,10 +108,30 @@ where
         client_id: &ClientId,
         client_message: Any,
     ) -> Result<bool, ClientError> {
+        let starknet_crypto_cw = StarknetCryptoLib;
+
+        let evidence: StarknetMisbehaviour =
+            <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
+                &StarknetLightClientEncoding,
+                &client_message,
+            )?;
+
+        // Different block headers at the same height is a misbehaviour case
+        if evidence.header_1.block_signature != evidence.header_2.block_signature {
+            return Ok(true);
+        }
+
+        // TODO: Timestamp validation
+
         Ok(false)
     }
 
     fn status(&self, ctx: &V, client_id: &ClientId) -> Result<Status, ClientError> {
+        let client_state = ctx.client_state(client_id)?;
+        // We consider 0 as active and non-zero as frozen
+        if client_state.0.is_frozen > 0 {
+            return Ok(Status::Frozen);
+        }
         Ok(Status::Active)
     }
 

@@ -61,8 +61,10 @@ where
         client_state.client_state.latest_height.revision_height()
     }
 
-    fn client_state_is_frozen(_client_state: &Chain::ClientState) -> bool {
-        false
+    fn client_state_is_frozen(client_state: &WasmStarknetClientState) -> bool {
+        // We use u8 to define if the client is frozen. If the value is set to 0 it is
+        // not frozen. Any other value means the client is frozen
+        client_state.client_state.is_frozen != 0
     }
 
     fn client_state_has_expired(_client_state: &Chain::ClientState, elapsed: Duration) -> bool {

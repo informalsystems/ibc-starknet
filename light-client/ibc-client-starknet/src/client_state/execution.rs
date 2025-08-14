@@ -7,11 +7,12 @@ use hermes_encoding_components::impls::ConvertVia;
 use hermes_encoding_components::traits::Converter;
 use ibc_client_cw::context::CwClientExecution;
 use ibc_client_starknet_types::header::StarknetHeader;
+use ibc_client_starknet_types::misbehaviour::StarknetMisbehaviour;
 use ibc_client_starknet_types::{
     StarknetClientState as ClientStateType, StarknetConsensusState as StarknetConsensusStateType,
 };
 use ibc_core::client::context::client_state::ClientStateExecution;
-use ibc_core::client::context::prelude::ClientStateCommon;
+use ibc_core::client::context::prelude::{ClientStateCommon, ClientStateValidation};
 use ibc_core::client::context::ExtClientExecutionContext;
 use ibc_core::client::types::error::ClientError;
 use ibc_core::client::types::Height;
@@ -52,34 +53,52 @@ where
         client_id: &ClientId,
         header: Any,
     ) -> Result<Vec<Height>, ClientError> {
-        let header: StarknetHeader = <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
+        if let Ok(header) = <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
             &StarknetLightClientEncoding,
             &header,
-        )?;
+        ) {
+            // Specify the type to which `Any` should be decoded
+            let header: StarknetHeader = header;
+            let current_height = header.height();
 
-        let current_height = header.height();
+            let latest_height = core::cmp::max(self.latest_height(), current_height);
 
-        let latest_height = core::cmp::max(self.latest_height(), current_height);
+            let new_consensus_state = StarknetConsensusStateType::from(header);
 
-        let new_consensus_state = StarknetConsensusStateType::from(header);
+            let new_client_state = ClientStateType {
+                latest_height,
+                chain_id: self.0.chain_id.clone(),
+                sequencer_public_key: self.0.sequencer_public_key.clone(),
+                ibc_contract_address: self.0.ibc_contract_address.clone(),
+                is_frozen: self.0.is_frozen,
+            }
+            .into();
 
-        let new_client_state = ClientStateType {
-            latest_height,
-            chain_id: self.0.chain_id.clone(),
-            sequencer_public_key: self.0.sequencer_public_key.clone(),
-            ibc_contract_address: self.0.ibc_contract_address.clone(),
+            update_client_and_consensus_state(
+                ctx,
+                current_height,
+                client_id,
+                new_client_state,
+                new_consensus_state.into(),
+            )?;
+
+            Ok(vec![latest_height])
+        } else {
+            let client_state = ctx
+                .client_state(client_id)
+                .expect("Failed to retrieve client state");
+            let misbehaviour: StarknetMisbehaviour =
+                <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
+                    &StarknetLightClientEncoding,
+                    &header,
+                )?;
+            if client_state.check_for_misbehaviour(ctx, client_id, header.clone())? {
+                client_state.update_state_on_misbehaviour(ctx, client_id, header)?;
+            }
+
+            // TODO: Should we return latest height as well?
+            Ok(vec![])
         }
-        .into();
-
-        update_client_and_consensus_state(
-            ctx,
-            current_height,
-            client_id,
-            new_client_state,
-            new_consensus_state.into(),
-        )?;
-
-        Ok(vec![latest_height])
     }
 
     fn update_state_on_misbehaviour(
@@ -88,6 +107,30 @@ where
         client_id: &ClientId,
         client_message: Any,
     ) -> Result<(), ClientError> {
+        let evidence: StarknetMisbehaviour =
+            <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
+                &StarknetLightClientEncoding,
+                &client_message,
+            )?;
+
+        let new_consensus_state = StarknetConsensusStateType::from(evidence.header_1);
+
+        let new_client_state = ClientStateType {
+            latest_height: self.0.latest_height,
+            chain_id: self.0.chain_id.clone(),
+            sequencer_public_key: self.0.sequencer_public_key.clone(),
+            ibc_contract_address: self.0.ibc_contract_address.clone(),
+            is_frozen: 1,
+        }
+        .into();
+
+        update_client_and_consensus_state(
+            ctx,
+            self.latest_height(),
+            client_id,
+            new_client_state,
+            new_consensus_state.into(),
+        )?;
         Ok(())
     }
 

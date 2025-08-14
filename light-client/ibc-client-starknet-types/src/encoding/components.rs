@@ -22,7 +22,9 @@ mod preset {
     use crate::encoding::impls::client_state::EncodeStarknetClientState;
     use crate::encoding::impls::consensus_state::EncodeStarknetConsensusState;
     use crate::encoding::impls::header::EncodeStarknetHeader;
+    use crate::encoding::impls::misbehaviour::EncodeStarknetMisbehaviour;
     use crate::header::{StarknetHeader, STARKNET_HEADER_TYPE_URL};
+    use crate::misbehaviour::{StarknetMisbehaviour, STARKNET_MISBEHAVIOUR_TYPE_URL};
     use crate::{
         StarknetClientState, StarknetConsensusState, STARKNET_CLIENT_STATE_TYPE_URL,
         STARKNET_CONSENSUS_STATE_TYPE_URL,
@@ -71,12 +73,14 @@ mod preset {
                 (ViaProtobuf, StarknetClientState),
                 (ViaProtobuf, StarknetConsensusState),
                 (ViaProtobuf, StarknetHeader),
+                (ViaProtobuf, StarknetMisbehaviour),
             ]: EncodeProtoWithMutBuffer,
 
             [
                 (ViaAny, StarknetClientState),
                 (ViaAny, StarknetConsensusState),
                 (ViaAny, StarknetHeader),
+                (ViaAny, StarknetMisbehaviour),
             ]: EncodeViaAny<ViaProtobuf>,
         }
     }
@@ -98,6 +102,9 @@ mod preset {
 
             (ViaProtobuf, StarknetHeader):
                 EncodeStarknetHeader,
+
+            (ViaProtobuf, StarknetMisbehaviour):
+                EncodeStarknetMisbehaviour,
         }
     }
 
@@ -107,12 +114,14 @@ mod preset {
                 (StarknetClientState, Any),
                 (StarknetConsensusState, Any),
                 (StarknetHeader, Any),
+                (StarknetMisbehaviour, Any),
             ]: EncodeAsAnyProtobuf<ViaProtobuf, UseContext>,
 
             [
                 (Any, StarknetClientState),
                 (Any, StarknetConsensusState),
                 (Any, StarknetHeader),
+                (Any, StarknetMisbehaviour),
             ]: DecodeAsAnyProtobuf<ViaProtobuf, UseContext>,
         }
     }
@@ -133,5 +142,11 @@ mod preset {
         StarknetLightClientTypeUrlSchemas,
         StarknetHeader,
         STARKNET_HEADER_TYPE_URL,
+    );
+
+    impl_type_url!(
+        StarknetLightClientTypeUrlSchemas,
+        StarknetMisbehaviour,
+        STARKNET_MISBEHAVIOUR_TYPE_URL,
     );
 }

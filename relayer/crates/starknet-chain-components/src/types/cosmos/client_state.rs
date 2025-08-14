@@ -22,7 +22,7 @@ use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
 use crate::types::Height;
 
 // FIXME: use ibc-rs type
-#[derive(Debug, HasField, HasFields)]
+#[derive(Clone, Debug, HasField, HasFields)]
 pub struct CometClientState {
     pub latest_height: Height,
     pub trusting_period: Duration,
@@ -35,7 +35,7 @@ pub struct CometClientState {
     pub upgrade_path: Vec<String>,
 }
 
-#[derive(Debug, HasFields)]
+#[derive(Clone, Debug, HasFields)]
 pub enum ClientStatus {
     Active,
     Expired,
@@ -66,8 +66,8 @@ where
         .unwrap()
     }
 
-    fn client_state_is_frozen(_client_state: &CometClientState) -> bool {
-        false // todo
+    fn client_state_is_frozen(client_state: &CometClientState) -> bool {
+        matches!(client_state.status, ClientStatus::Frozen(_))
     }
 
     fn client_state_has_expired(client_state: &CometClientState, elapsed: Duration) -> bool {
