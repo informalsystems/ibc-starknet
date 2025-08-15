@@ -22,9 +22,6 @@ use hermes_core::test_components::setup::traits::{
     RecoverClientPayloadOptionsGetterAtComponent,
 };
 use hermes_core::test_components::test_case::traits::recover_client::RecoverClientHandlerComponent;
-use hermes_core::test_components::test_case::traits::upgrade_client::{
-    SetupUpgradeClientTestHandlerComponent, UpgradeClientHandlerComponent,
-};
 use hermes_cosmos::chain_components::impls::CosmosRecoverClientPayload;
 use hermes_cosmos::chain_components::types::CosmosCreateClientOptions;
 use hermes_cosmos::error::handlers::DebugError;
@@ -45,9 +42,7 @@ use hermes_starknet_test_components::impls::RecoverStarknetClientHandler;
 use ibc::core::host::types::identifiers::PortId;
 
 use super::{CosmosStarknetRelayDriver, StarknetCosmosRelayDriver};
-use crate::contexts::{
-    SetupStarknetUpgradeClientTest, StarknetChainDriver, StarknetHandleUpgradeClient,
-};
+use crate::contexts::StarknetChainDriver;
 use crate::impls::ForkSecondFullNode;
 
 #[cgp_context(StarknetTestDriverComponents)]
@@ -81,10 +76,6 @@ delegate_components! {
             TracingLogger,
         RecoverClientHandlerComponent:
             RecoverStarknetClientHandler,
-        SetupUpgradeClientTestHandlerComponent:
-            SetupStarknetUpgradeClientTest,
-        UpgradeClientHandlerComponent:
-            StarknetHandleUpgradeClient,
         [
             FullNodeForkerComponent,
             FullNodeHalterComponent,

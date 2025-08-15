@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
 use cgp::core::error::{ErrorRaiserComponent, ErrorTypeProviderComponent};
+use hermes_core::logging_components::traits::LoggerComponent;
 use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
@@ -15,16 +16,27 @@ use hermes_core::test_components::chain_driver::traits::{
     SetupUpgradeClientTestResultTypeProviderComponent, StakingDenom, TransferDenom, UserWallet,
     WalletGetterComponent,
 };
+use hermes_core::test_components::test_case::traits::upgrade_client::{
+    SetupUpgradeClientTestHandlerComponent, UpgradeClientHandlerComponent,
+};
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_cosmos::test_components::bootstrap::traits::ChainNodeConfigTypeComponent;
+use hermes_cosmos::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::{StarknetAddress, UseU256Amount};
 use hermes_starknet_chain_components::types::StarknetWallet;
 use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_chain_context::impls::HandleStarknetChainError;
-use hermes_starknet_test_components::impls::StarknetProposalSetupClientUpgradeResult;
+use hermes_starknet_test_components::impls::{
+    ProvideStarknetNodeConfigType, StarknetProposalSetupClientUpgradeResult,
+};
 use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
 use tokio::process::Child;
+
+use crate::contexts::{
+    ChainNodeConfigGetterComponent, SetupStarknetUpgradeClientTest, StarknetHandleUpgradeClient,
+};
 
 #[cgp_context(StarknetChainDriverComponents)]
 #[derive(HasField)]
@@ -62,10 +74,20 @@ delegate_components! {
             UseField<symbol!("user_wallet_a")>,
         WalletGetterComponent<UserWallet<1>>:
             UseField<symbol!("user_wallet_b")>,
+        ChainNodeConfigGetterComponent:
+            UseField<symbol!("node_config")>,
+        ChainNodeConfigTypeComponent:
+            ProvideStarknetNodeConfigType,
         ChainStartupWaiterComponent:
             WaitChainReachHeight<1>,
         RandomAmountGeneratorComponent:
             UseU256Amount,
+        SetupUpgradeClientTestHandlerComponent:
+            SetupStarknetUpgradeClientTest,
+        UpgradeClientHandlerComponent:
+            StarknetHandleUpgradeClient,
+        LoggerComponent:
+            TracingLogger,
     }
 }
 

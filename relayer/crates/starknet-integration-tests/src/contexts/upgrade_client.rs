@@ -12,14 +12,11 @@ use hermes_core::chain_components::traits::{
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use hermes_core::logging_components::traits::CanLog;
 use hermes_core::logging_components::types::LevelDebug;
-use hermes_core::relayer_components::multi::traits::chain_at::HasChainTypeAt;
-use hermes_core::relayer_components::multi::traits::client_id_at::HasClientIdAt;
 use hermes_core::relayer_components::transaction::impls::CanSendSingleMessageWithSigner;
 use hermes_core::relayer_components::transaction::traits::HasDefaultSigner;
 use hermes_core::test_components::chain_driver::traits::{
     HasChain, HasSetupUpgradeClientTestResultType,
 };
-use hermes_core::test_components::driver::traits::HasChainDriverAt;
 use hermes_core::test_components::test_case::traits::upgrade_client::{
     SetupUpgradeClientTestHandler, SetupUpgradeClientTestHandlerComponent, UpgradeClientHandler,
     UpgradeClientHandlerComponent,
@@ -47,23 +44,17 @@ use crate::contexts::HasChainNodeConfig;
 pub struct StarknetHandleUpgradeClient;
 
 #[cgp_provider(UpgradeClientHandlerComponent)]
-impl<Driver, ChainDriverA, ChainDriverB, ChainA, ChainB, Encoding>
-    UpgradeClientHandler<Driver, ChainDriverA, ChainA, ChainB> for StarknetHandleUpgradeClient
+impl<ChainDriverA, ChainDriverB, ChainA, ChainB, Encoding>
+    UpgradeClientHandler<ChainDriverA, ChainDriverB> for StarknetHandleUpgradeClient
 where
-    Driver: HasChainDriverAt<Index<0>, ChainDriver = ChainDriverA>
-        + HasChainDriverAt<Index<1>, ChainDriver = ChainDriverB>
-        + HasClientIdAt<Index<1>, Index<0>>
-        + HasChainTypeAt<Index<0>, Chain = ChainA>
-        + HasChainTypeAt<Index<1>, Chain = ChainB>
-        + CanLog<LevelDebug>
+    ChainDriverA: HasChain<Chain = ChainA>
+        + HasSetupUpgradeClientTestResultType<
+            SetupUpgradeClientTestResult = StarknetProposalSetupClientUpgradeResult,
+        > + CanLog<LevelDebug>
         + CanRaiseAsyncError<ChainA::Error>
         + CanRaiseAsyncError<ChainB::Error>
         + CanRaiseAsyncError<ClientError>
         + CanRaiseAsyncError<Encoding::Error>,
-    ChainDriverA: HasChain<Chain = ChainA>
-        + HasSetupUpgradeClientTestResultType<
-            SetupUpgradeClientTestResult = StarknetProposalSetupClientUpgradeResult,
-        >,
     ChainDriverB: HasChain<Chain = ChainB>,
     ChainA: CanBuildClientUpgradePayload<ChainB>
         + CanWaitChainReachHeight
@@ -85,25 +76,21 @@ where
     Encoding: CanDecode<ViaCairo, u64> + HasEncodedType<Encoded = Vec<Felt>> + HasAsyncErrorType,
 {
     async fn handle_upgrade_client(
-        driver: &Driver,
+        chain_driver_a: &ChainDriverA,
         setup_result: &StarknetProposalSetupClientUpgradeResult,
-    ) -> Result<(), Driver::Error> {
-        let chain_driver_a = driver.chain_driver_at(PhantomData::<Index<0>>);
-
+        chain_driver_b: &ChainDriverB,
+        client_id_b: &ChainB::ClientId,
+    ) -> Result<(), ChainDriverA::Error> {
         let chain_a = chain_driver_a.chain();
 
-        let chain_driver_b = driver.chain_driver_at(PhantomData::<Index<1>>);
-
         let chain_b = chain_driver_b.chain();
-
-        let client_id_b = driver.client_id_at(PhantomData::<(Index<1>, Index<0>)>);
 
         let encoding = chain_a.encoding();
 
         let ibc_core_contract_address = chain_a
             .query_contract_address(PhantomData)
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         let output = chain_a
             .call_contract(
@@ -113,14 +100,16 @@ where
                 None,
             )
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
-        let onchain_final_height: u64 = encoding.decode(&output).map_err(Driver::raise_error)?;
+        let onchain_final_height: u64 = encoding
+            .decode(&output)
+            .map_err(ChainDriverA::raise_error)?;
 
         chain_a
             .wait_chain_reach_height(&onchain_final_height)
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         // update till final height
         // starknet_to_cosmos_relay
@@ -130,22 +119,22 @@ where
         let upgrade_client_payload = chain_a
             .upgrade_client_payload(&onchain_final_height)
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         let upgrade_client_message = chain_b
             .upgrade_client_message(client_id_b, &upgrade_client_payload)
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         chain_b
             .send_message_with_signer(chain_b.get_default_signer(), upgrade_client_message)
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         let client_b_state = chain_b
             .query_client_state_with_latest_height(PhantomData, client_id_b)
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         // FIXME(rano): do some asserts
         // Assert the client has been upgraded to the new chain ID
@@ -161,25 +150,18 @@ where
 pub struct SetupStarknetUpgradeClientTest;
 
 #[cgp_provider(SetupUpgradeClientTestHandlerComponent)]
-impl<Driver, ChainDriverA, ChainDriverB, ChainA, ChainB, Encoding>
-    SetupUpgradeClientTestHandler<Driver, ChainDriverA, ChainA, ChainB>
-    for SetupStarknetUpgradeClientTest
+impl<ChainDriverA, ChainDriverB, ChainA, ChainB, Encoding>
+    SetupUpgradeClientTestHandler<ChainDriverA, ChainDriverB> for SetupStarknetUpgradeClientTest
 where
-    Driver: HasChainDriverAt<Index<0>, ChainDriver = ChainDriverA>
-        + HasChainDriverAt<Index<1>, ChainDriver = ChainDriverB>
-        + HasClientIdAt<Index<1>, Index<0>>
-        + HasChainTypeAt<Index<0>, Chain = ChainA>
-        + HasChainTypeAt<Index<1>, Chain = ChainB>
-        + CanLog<LevelDebug>
-        + CanRaiseAsyncError<ChainA::Error>
-        + CanRaiseAsyncError<ChainB::Error>
-        + CanRaiseAsyncError<Encoding::Error>
-        + CanRaiseAsyncError<ClientError>,
     ChainDriverA: HasChain<Chain = ChainA>
         + HasChainNodeConfig<ChainNodeConfig = StarknetNodeConfig>
         + HasSetupUpgradeClientTestResultType<
             SetupUpgradeClientTestResult = StarknetProposalSetupClientUpgradeResult,
-        >,
+        > + CanLog<LevelDebug>
+        + CanRaiseAsyncError<ChainA::Error>
+        + CanRaiseAsyncError<ChainB::Error>
+        + CanRaiseAsyncError<Encoding::Error>
+        + CanRaiseAsyncError<ClientError>,
     ChainDriverB: HasChain<Chain = ChainB>,
     ChainA: CanBuildClientUpgradePayload<ChainB>
         + CanQueryChainStatus<ChainStatus = StarknetChainStatus>
@@ -204,32 +186,28 @@ where
         + HasEncodedType<Encoded = Vec<Felt>>,
 {
     async fn setup_upgrade_client_test(
-        driver: &Driver,
-    ) -> Result<StarknetProposalSetupClientUpgradeResult, Driver::Error> {
-        let chain_driver_a = driver.chain_driver_at(PhantomData::<Index<0>>);
-
+        chain_driver_a: &ChainDriverA,
+        chain_driver_b: &ChainDriverB,
+        client_id_b: &ChainB::ClientId,
+    ) -> Result<StarknetProposalSetupClientUpgradeResult, ChainDriverA::Error> {
         let chain_a = chain_driver_a.chain();
 
-        let chain_driver_b = driver.chain_driver_at(PhantomData::<Index<1>>);
-
         let chain_b = chain_driver_b.chain();
-
-        let client_id_b = driver.client_id_at(PhantomData::<(Index<1>, Index<0>)>);
 
         let latest_height = chain_a
             .query_chain_height()
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         let chain_status = chain_a
             .query_chain_status()
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         let wasm_client_state = chain_b
             .query_client_state_with_latest_height(PhantomData, client_id_b)
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         let wasm_consensus_state = chain_b
             .query_consensus_state_with_latest_height(
@@ -241,7 +219,7 @@ where
                     .revision_height(),
             )
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         let mut upgrade_client_state: CairoStarknetClientState =
             wasm_client_state.client_state.into();
@@ -257,7 +235,7 @@ where
         let ibc_core_contract_address = chain_a
             .query_contract_address(PhantomData::<symbol!("ibc_core_contract_address")>)
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         let starknet_node_config = chain_driver_a.chain_node_config();
 
@@ -285,12 +263,12 @@ where
                 upgrade_client_state,
                 upgrade_consensus_state
             ])
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         let ibc_core_contract_address = chain_a
             .query_contract_address(PhantomData)
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         chain_a
             .send_message_with_signer(
@@ -302,7 +280,7 @@ where
                 ),
             )
             .await
-            .map_err(Driver::raise_error)?;
+            .map_err(ChainDriverA::raise_error)?;
 
         Ok(StarknetProposalSetupClientUpgradeResult {
             sequencer_private_key,
