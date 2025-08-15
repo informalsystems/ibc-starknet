@@ -18,3 +18,6 @@ pub use starknet_cosmos_relay_driver::*;
 
 mod test_driver;
 pub use test_driver::*;
+
+mod upgrade_client;
+pub use upgrade_client::*;

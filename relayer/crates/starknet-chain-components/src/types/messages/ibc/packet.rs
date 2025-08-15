@@ -74,8 +74,6 @@ impl Transformer for EncodePacket {
 
 #[derive(HasField, HasFields)]
 pub struct StateProof {
-    // TODO(rano): Array<u8> in Cairo
-    // Currently, Vec<u8> is serialized for ByteArray
     pub proof: Vec<u8>,
 }
 
@@ -88,8 +86,6 @@ pub struct MsgRecvPacket {
 
 #[derive(HasField, HasFields, Debug, Clone)]
 pub struct Acknowledgement {
-    // TODO(rano): Array<u8> in Cairo
-    // Currently, Vec<u8> is serialized for ByteArray
     pub ack: Vec<u8>,
 }
 

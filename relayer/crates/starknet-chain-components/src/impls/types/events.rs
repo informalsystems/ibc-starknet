@@ -6,6 +6,10 @@ pub struct StarknetCreateClientEvent {
     pub client_id: ClientId,
 }
 
+pub struct StarknetScheduleUpgradeEvent {
+    pub upgrade_height: Height,
+}
+
 #[derive(Debug)]
 pub struct StarknetUpdateClientEvent {
     pub client_id: ClientId,

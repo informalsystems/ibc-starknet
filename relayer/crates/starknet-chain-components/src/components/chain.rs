@@ -25,7 +25,8 @@ mod preset {
         ClientIdTypeComponent, ClientRecoveryComponent, ClientStateFieldsComponent,
         ClientStateQuerierComponent, ClientStateTypeComponent,
         ClientStateWithProofsQuerierComponent, ClientStatusMethodsComponent,
-        ClientStatusQuerierComponent, ClientStatusTypeComponent, CommitmentPrefixTypeComponent,
+        ClientStatusQuerierComponent, ClientStatusTypeComponent,
+        ClientUpgradePayloadBuilderComponent, CommitmentPrefixTypeComponent,
         CommitmentProofBytesGetterComponent, CommitmentProofHeightGetterComponent,
         CommitmentProofTypeProviderComponent, ConnectionEndQuerierComponent,
         ConnectionEndTypeComponent, ConnectionEndWithProofsQuerierComponent,
@@ -67,7 +68,8 @@ mod preset {
         TimeoutUnorderedPacketPayloadBuilderComponent, TimeoutUnorderedPacketPayloadTypeComponent,
         UpdateClientEventComponent, UpdateClientEventFieldsComponent,
         UpdateClientMessageBuilderComponent, UpdateClientPayloadBuilderComponent,
-        UpdateClientPayloadTypeComponent, WriteAckEventComponent,
+        UpdateClientPayloadTypeComponent, UpgradeClientPayloadTypeComponent,
+        WriteAckEventComponent,
     };
     use hermes_core::chain_type_components::traits::{
         AddressTypeProviderComponent, AmountDenomGetterComponent, AmountTypeProviderComponent,
@@ -109,9 +111,9 @@ mod preset {
         BuildStarknetChannelHandshakeMessages, BuildStarknetConnectionHandshakeMessages,
         BuildStarknetCreateClientPayload, BuildStarknetIbcTransferMessage,
         BuildStarknetPacketMessages, BuildStarknetUpdateClientPayload,
-        BuildUpdateCometClientMessage, CallStarknetContract, CheckStarknetMisbehaviour,
-        ConvertStarknetTokenAddressFromCosmos, DeclareSierraContract, DeployStarknetContract,
-        FilterStarknetPackets, GetContractAddressFromField,
+        BuildStarknetUpgradeClientPayload, BuildUpdateCometClientMessage, CallStarknetContract,
+        CheckStarknetMisbehaviour, ConvertStarknetTokenAddressFromCosmos, DeclareSierraContract,
+        DeployStarknetContract, FilterStarknetPackets, GetContractAddressFromField,
         GetCounterpartyCosmosHeightFromStarknetMessage, GetOrCreateCosmosTokenAddressOnStarknet,
         GetStarknetBlockEvents, GetStarknetCommitmentPrefix, IbcTransferTimeoutAfterSeconds,
         InvokeStarknetContract, ProvideFeltSelector, ProvideNoCreateClientMessageOptionsOverride,
@@ -245,7 +247,8 @@ mod preset {
                 CreateClientPayloadTypeComponent,
                 CreateClientPayloadOptionsTypeComponent,
                 UpdateClientPayloadTypeComponent,
-                RecoverClientPayloadTypeComponent
+                RecoverClientPayloadTypeComponent,
+                UpgradeClientPayloadTypeComponent,
             ]:
                 ProvideStarknetPayloadTypes,
             // FIXME: define our own Starknet init channel options type
@@ -363,6 +366,8 @@ mod preset {
                 RecoverStarknetClient,
             UpdateClientPayloadBuilderComponent:
                 BuildStarknetUpdateClientPayload,
+            ClientUpgradePayloadBuilderComponent:
+                BuildStarknetUpgradeClientPayload,
             [
                 ClientStateQuerierComponent,
                 ClientStateWithProofsQuerierComponent,

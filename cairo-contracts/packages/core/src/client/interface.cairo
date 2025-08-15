@@ -1,7 +1,8 @@
 use starknet::ContractAddress;
 use starknet_ibc_core::client::{
-    CreateResponse, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient, MsgUpgradeClient,
-    Status, Timestamp, UpdateResponse,
+    CreateResponse, Height, MsgCreateClient, MsgRecoverClient, MsgScheduleUpgrade, MsgUpdateClient,
+    MsgUpgradeClient, StarknetClientState, StarknetConsensusState, Status, Timestamp,
+    UpdateResponse,
 };
 use starknet_ibc_core::commitment::{StateProof, StateRoot, StateValue};
 
@@ -14,6 +15,16 @@ pub trait IClientHandler<TContractState> {
     fn recover_client(ref self: TContractState, msg: MsgRecoverClient);
 
     fn upgrade_client(ref self: TContractState, msg: MsgUpgradeClient);
+}
+
+#[starknet::interface]
+pub trait IScheduleUpgrade<TContractState> {
+    fn schedule_upgrade(ref self: TContractState, msg: MsgScheduleUpgrade);
+    fn get_final_height(self: @TContractState) -> u64;
+    fn get_scheduled_upgrade(
+        self: @TContractState,
+    ) -> (StarknetClientState, StarknetConsensusState);
+    fn unschedule_upgrade(ref self: TContractState);
 }
 
 #[starknet::interface]

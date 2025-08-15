@@ -14,6 +14,7 @@ pub mod ClientEventEmitterComponent {
         MisbehaviourEvent: MisbehaviourEvent,
         RecoverClientEvent: RecoverClientEvent,
         UpgradeClientEvent: UpgradeClientEvent,
+        ScheduleUpgradeEvent: ScheduleUpgradeEvent,
     }
 
     #[derive(Debug, Drop, starknet::Event)]
@@ -43,6 +44,12 @@ pub mod ClientEventEmitterComponent {
 
     #[derive(Debug, Drop, starknet::Event)]
     pub struct UpgradeClientEvent {}
+
+    #[derive(Debug, Drop, starknet::Event)]
+    pub struct ScheduleUpgradeEvent {
+        #[key]
+        pub upgraded_height: Height,
+    }
 
     #[generate_trait]
     pub impl ClientEventEmitterImpl<
@@ -83,6 +90,12 @@ pub mod ClientEventEmitterComponent {
 
         fn emit_upgrade_client_event(ref self: ComponentState<TContractState>) {
             self.emit(UpgradeClientEvent {});
+        }
+
+        fn emit_schedule_upgrade_event(
+            ref self: ComponentState<TContractState>, upgraded_height: Height,
+        ) {
+            self.emit(ScheduleUpgradeEvent { upgraded_height });
         }
     }
 }

@@ -10,6 +10,7 @@ pub const STARKNET_CLIENT_STATE_TYPE_URL: &str = "/StarknetClientState";
 #[derive(Clone, Debug, PartialEq, Eq, derive_more::From, HasField)]
 pub struct StarknetClientState {
     pub latest_height: Height,
+    pub final_height: u64,
     pub chain_id: ChainId,
     pub sequencer_public_key: Vec<u8>,
     pub ibc_contract_address: Vec<u8>,

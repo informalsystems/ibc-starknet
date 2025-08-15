@@ -144,6 +144,24 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(crypto_lib: &C, path:
             )
         }
 
+        // by ibc-go convention, the `upgrade_path` is supposed to be the path used in the Upgrade module.
+        // we don't use it for Starknet as we commit the schedule directly in the IBC Starknet contract.
+        Path::UpgradeClientState(upgrade_client_state_path) => starknet_storage_key(
+            crypto_lib,
+            [
+                KeyPart::Field(b"upgraded_client_state_commitments"),
+                KeyPart::Map(upgrade_client_state_path.height.into()),
+            ],
+        ),
+
+        Path::UpgradeConsensusState(upgrade_consensus_state_path) => starknet_storage_key(
+            crypto_lib,
+            [
+                KeyPart::Field(b"upgraded_consensus_state_commitments"),
+                KeyPart::Map(upgrade_consensus_state_path.height.into()),
+            ],
+        ),
+
         // Note: ibc-go deprecates the use of client_proof and consensus_proof.
         // We return a dummy value for these paths for API compatibility reasons.
         Path::ClientState(client_state_path) => {
@@ -157,5 +175,47 @@ pub fn ibc_path_to_storage_key<C: StarknetCryptoFunctions>(crypto_lib: &C, path:
         }
 
         _ => unimplemented!(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use alloc::string::String;
+
+    use ibc_core::host::types::path::{UpgradeClientStatePath, UpgradeConsensusStatePath};
+    use starknet::macros::felt;
+    use starknet_crypto_lib::StarknetCryptoLib;
+
+    use super::*;
+
+    #[test]
+    fn test_upgraded_states_path() {
+        let upgraded_client_state_path = UpgradeClientStatePath {
+            upgrade_path: String::new(),
+            height: 42,
+        };
+
+        let upgraded_consensus_state_path = UpgradeConsensusStatePath {
+            upgrade_path: String::new(),
+            height: 42,
+        };
+
+        let crypto_lib = StarknetCryptoLib;
+
+        let client_state_key =
+            ibc_path_to_storage_key(&crypto_lib, upgraded_client_state_path.into());
+
+        let consensus_state_key =
+            ibc_path_to_storage_key(&crypto_lib, upgraded_consensus_state_path.into());
+
+        assert_eq!(
+            client_state_key,
+            felt!("0x7f1877168ebc2b7ec579aa0f1514007124ad2c19fe35a56f3b12d2c68718a44")
+        );
+
+        assert_eq!(
+            consensus_state_key,
+            felt!("0xef005e48e802e8403a09622b8ffd8299020c511293a5ed773b0f5d80ab81b9")
+        );
     }
 }

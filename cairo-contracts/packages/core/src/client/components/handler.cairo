@@ -5,17 +5,21 @@ pub mod ClientHandlerComponent {
     use openzeppelin_access::ownable::OwnableComponent::InternalTrait;
     use starknet::storage::{
         IntoIterRange, Map, MutableVecTrait, StorageMapReadAccess, StorageMapWriteAccess,
-        StoragePointerReadAccess, Vec,
+        StoragePointerReadAccess, StoragePointerWriteAccess, Vec,
     };
     use starknet::{ContractAddress, get_tx_info};
     use starknet_ibc_core::client::ClientEventEmitterComponent::ClientEventEmitterTrait;
-    use starknet_ibc_core::client::interface::{IClientHandler, IRegisterClient, IRegisterRelayer};
+    use starknet_ibc_core::client::interface::{
+        IClientHandler, IRegisterClient, IRegisterRelayer, IScheduleUpgrade,
+    };
     use starknet_ibc_core::client::{
         ClientContract, ClientContractHandlerTrait, ClientErrors, ClientEventEmitterComponent,
-        CreateResponse, Height, MsgCreateClient, MsgRecoverClient, MsgUpdateClient,
-        MsgUpgradeClient, UpdateResponse,
+        CreateResponse, Height, MsgCreateClient, MsgRecoverClient, MsgScheduleUpgrade,
+        MsgUpdateClient, MsgUpgradeClient, StarknetClientState, StarknetConsensusState,
+        UpdateResponse,
     };
     use starknet_ibc_core::host::{ClientId, ClientIdImpl};
+    use starknet_ibc_utils::{ComputeKey, ValidateBasic};
 
     #[storage]
     pub struct Storage {
@@ -23,6 +27,12 @@ pub mod ClientHandlerComponent {
         // to be replaced after Comet client contract is implemented.
         allowed_relayers: Vec<ContractAddress>,
         supported_clients: Map<felt252, ContractAddress>,
+        pub(crate) final_height: u64,
+        upgraded_states: Option<(StarknetClientState, StarknetConsensusState)>,
+        // commitments for the upgraded client state and consensus state
+        // note: this is a map on height to make sure final height is part of the path/key
+        pub(crate) upgraded_client_state_commitments: Map<u64, felt252>,
+        pub(crate) upgraded_consensus_state_commitments: Map<u64, felt252>,
     }
 
     #[event]
@@ -42,6 +52,10 @@ pub mod ClientHandlerComponent {
             // simplify the process. This avoids an additional registration step
             // for the relayer, as this setup is temporary.
             self.write_allowed_relayer(get_tx_info().deref().account_contract_address);
+
+            // Initialize final height and upgraded states as empty.
+            self.final_height.write(0);
+            self.upgraded_states.write(None);
         }
     }
 
@@ -101,6 +115,71 @@ pub mod ClientHandlerComponent {
             client.upgrade(msg);
 
             self.emit_upgrade_client_event();
+        }
+    }
+
+    // -----------------------------------------------------------
+    // Schedule Upgrade
+    // -----------------------------------------------------------
+
+    #[embeddable_as(CoreScheduleUpgrade)]
+    pub impl CoreScheduleUpgradeImpl<
+        TContractState,
+        +HasComponent<TContractState>,
+        +Drop<TContractState>,
+        impl EventEmitter: ClientEventEmitterComponent::HasComponent<TContractState>,
+        impl Ownable: OwnableComponent::HasComponent<TContractState>,
+    > of IScheduleUpgrade<ComponentState<TContractState>> {
+        fn schedule_upgrade(ref self: ComponentState<TContractState>, msg: MsgScheduleUpgrade) {
+            {
+                // only admin can schedule an upgrade
+                let ownable = get_dep_component!(@self, Ownable);
+                ownable.assert_only_owner();
+            }
+
+            msg.validate_basic();
+
+            let MsgScheduleUpgrade {
+                final_height, upgraded_client_state, upgraded_consensus_state,
+            } = msg;
+
+            self.final_height.write(final_height);
+
+            self
+                .upgraded_states
+                .write(Some((upgraded_client_state.clone(), upgraded_consensus_state.clone())));
+
+            self.upgraded_client_state_commitments.write(final_height, upgraded_client_state.key());
+            self
+                .upgraded_consensus_state_commitments
+                .write(final_height, upgraded_consensus_state.key());
+
+            self.emit_schedule_upgrade_event(upgraded_client_state.latest_height);
+        }
+
+        fn get_final_height(self: @ComponentState<TContractState>) -> u64 {
+            self.final_height.read()
+        }
+
+        fn get_scheduled_upgrade(
+            self: @ComponentState<TContractState>,
+        ) -> (StarknetClientState, StarknetConsensusState) {
+            self.upgraded_states.read().unwrap()
+        }
+
+        fn unschedule_upgrade(ref self: ComponentState<TContractState>) {
+            {
+                // only admin can unschedule an upgrade
+                let ownable = get_dep_component!(@self, Ownable);
+                ownable.assert_only_owner();
+            }
+
+            let final_height = self.final_height.read();
+
+            self.final_height.write(0);
+            self.upgraded_states.write(None);
+            self.upgraded_client_state_commitments.write(final_height, 0);
+            self.upgraded_consensus_state_commitments.write(final_height, 0);
         }
     }
 
@@ -267,6 +346,13 @@ pub mod ClientHandlerComponent {
 
             event_emitter.emit_upgrade_client_event();
         }
+
+        fn emit_schedule_upgrade_event(
+            ref self: ComponentState<TContractState>, upgraded_height: Height,
+        ) {
+            let mut event_emitter = get_dep_component_mut!(ref self, EventEmitter);
+
+            event_emitter.emit_schedule_upgrade_event(upgraded_height);
+        }
     }
 }
-
