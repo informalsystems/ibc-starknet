@@ -25,9 +25,12 @@ use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_chain_context::impls::HandleStarknetChainError;
 use hermes_starknet_test_components::impls::{
     BootstrapStarknet, BuildChainAndDeployIbcContracts, DeployIbcContract,
-    ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType, StartStarknetSequencer,
+    ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType, StartStarknetForkedSequencer,
+    StartStarknetSequencer,
 };
-use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
+use hermes_starknet_test_components::traits::{
+    ChainForkedFullNodeStarterComponent, IbcContractsDeployerComponent,
+};
 use starknet::core::types::contract::SierraClass;
 
 use crate::contexts::StarknetChainDriver;
@@ -88,6 +91,8 @@ delegate_components! {
         ChainFullNodeStarterComponent:
             StartStarknetSequencer, // Start only Starknet as sequencer
             // StartStarknetStack, // Switch to this to start Starknet, Pathfinder, and Anvil
+        ChainForkedFullNodeStarterComponent:
+            StartStarknetForkedSequencer,
         IbcContractsDeployerComponent:
             DeployIbcContract,
         ChainDriverBuilderComponent:

@@ -18,6 +18,7 @@ use hermes_cosmos::relayer::contexts::{CosmosBuilder, CosmosChain};
 use hermes_cosmos::test_components::bootstrap::traits::CanStartChainFullNodes;
 use hermes_prelude::*;
 use hermes_starknet_chain_context::contexts::{StarknetChain, StarknetChainFields};
+use hermes_starknet_test_components::traits::CanStartChainForkedFullNodes;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 use tendermint_rpc::{HttpClient, Url};
@@ -465,10 +466,12 @@ async fn fork_starknet_chain(
 
     // Start the forked chain full node in the background, and return the child process handle
     let mut forked_chain_processes = fork_bootstrap
-        .start_chain_full_nodes(
+        .start_chain_forked_full_nodes(
             &fork_chain_home_dir,
             &fork_chain_node_config,
             &driver.starknet_chain_driver.genesis_config,
+            &starknet_chain_home_dir,
+            "10", // FIXME: Retrieve the correct block number for `--backup-every-n-blocks`
         )
         .await?;
 
