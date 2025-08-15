@@ -45,6 +45,7 @@ where
             chain_id: payload.chain_id,
             sequencer_public_key: payload.sequencer_public_key,
             ibc_contract_address: payload.ibc_contract_address,
+            is_frozen: 0,
         };
 
         let client_state = WasmStarknetClientState {

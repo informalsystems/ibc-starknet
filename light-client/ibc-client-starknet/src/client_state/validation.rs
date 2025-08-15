@@ -11,6 +11,7 @@ use hermes_encoding_components::traits::{CanDecode, Converter};
 use hermes_protobuf_encoding_components::types::strategy::ViaProtobuf;
 use ibc_client_cw::context::CwClientValidation;
 use ibc_client_starknet_types::header::StarknetHeader;
+use ibc_client_starknet_types::misbehaviour::StarknetMisbehaviour;
 use ibc_client_starknet_types::{StarknetClientState, StarknetConsensusState};
 use ibc_core::channel::types::proto::v1::Channel;
 use ibc_core::client::context::client_state::ClientStateValidation;
@@ -145,10 +146,30 @@ where
         client_id: &ClientId,
         client_message: Any,
     ) -> Result<bool, ClientError> {
+        let starknet_crypto_cw = StarknetCryptoLib;
+
+        let evidence: StarknetMisbehaviour =
+            <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
+                &StarknetLightClientEncoding,
+                &client_message,
+            )?;
+
+        // Different block headers at the same height is a misbehaviour case
+        if evidence.header_1.block_signature != evidence.header_2.block_signature {
+            return Ok(true);
+        }
+
+        // TODO: Timestamp validation
+
         Ok(false)
     }
 
     fn status(&self, ctx: &V, client_id: &ClientId) -> Result<Status, ClientError> {
+        let client_state = ctx.client_state(client_id)?;
+        // We consider 0 as active and non-zero as frozen
+        if client_state.0.is_frozen > 0 {
+            return Ok(Status::Frozen);
+        }
         Ok(Status::Active)
     }
 
@@ -437,6 +458,7 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
                     chain_id,
                     sequencer_public_key,
                     ibc_contract_address,
+                    is_frozen,
                 } = upgrade_client_state.0;
 
                 let chain_id_bytes = chain_id.as_str().as_bytes();
@@ -449,6 +471,7 @@ fn get_felt_from_value<C: StarknetCryptoFunctions>(
                 }
                 felts.push(Felt::from_bytes_be_slice(&sequencer_public_key));
                 felts.push(Felt::from_bytes_be_slice(&ibc_contract_address));
+                felts.push(Felt::from(is_frozen));
             }
 
             Ok(crypto_lib.poseidon_hash_many(&felts))
@@ -499,6 +522,7 @@ mod tests {
                 .unwrap()
                 .to_bytes_be()
                 .to_vec(),
+            is_frozen: 0,
         };
         let mut felts = vec![];
 
@@ -509,6 +533,7 @@ mod tests {
                 chain_id,
                 sequencer_public_key,
                 ibc_contract_address,
+                is_frozen,
             } = client_state;
 
             let chain_id_bytes = chain_id.as_str().as_bytes();
@@ -522,13 +547,14 @@ mod tests {
             }
             felts.push(Felt::from_bytes_be_slice(&sequencer_public_key));
             felts.push(Felt::from_bytes_be_slice(&ibc_contract_address));
+            felts.push(Felt::from(is_frozen));
         }
 
         let commitment = StarknetCryptoLib.poseidon_hash_many(&felts);
 
         assert_eq!(
             commitment,
-            Felt::from_hex("0x362d1520e188b61477f5863e9e942f0119c01188c7f88cce0188f72a41602ea")
+            Felt::from_hex("0xf22c4c0863743bc89db515f8da6272649c5c22fb4fd6142010aee424c4aca5")
                 .unwrap(),
         );
     }

@@ -117,9 +117,9 @@ impl ConsensusStateAsProtoName of ProtoName<ConsensusState> {
 
 #[derive(Default, Debug, Clone, Drop, PartialEq, Serde)]
 pub struct Misbehaviour {
-    client_id: ByteArray,
-    header_1: Header,
-    header_2: Header,
+    pub client_id: ByteArray,
+    pub header_1: Header,
+    pub header_2: Header,
 }
 
 impl MisbehaviourAsProtoMessage of ProtoMessage<Misbehaviour> {

@@ -328,6 +328,7 @@ pub struct StarknetClientState {
     pub chain_id: ByteArray,
     pub sequencer_public_key: felt252,
     pub ibc_contract_address: ContractAddress,
+    pub is_frozen: u8,
 }
 
 #[derive(Clone, Debug, Drop, Serde, starknet::Store)]
@@ -357,6 +358,7 @@ pub impl ClientStateKeyImpl of ComputeKey<StarknetClientState> {
 
         data.append(*self.sequencer_public_key);
         data.append((*self.ibc_contract_address).into());
+        data.append((*self.is_frozen).into());
         poseidon_hash_span(data.span())
     }
 }
@@ -410,9 +412,10 @@ mod tests {
             chain_id: "test_chain",
             sequencer_public_key: 0x12345,
             ibc_contract_address: 0x1234567890abcdef1234567890abcdef.try_into().unwrap(),
+            is_frozen: 0,
         };
         let key = client_state.key();
-        assert_eq!(key, 0x362d1520e188b61477f5863e9e942f0119c01188c7f88cce0188f72a41602ea);
+        assert_eq!(key, 0xf22c4c0863743bc89db515f8da6272649c5c22fb4fd6142010aee424c4aca5);
     }
 
     #[test]

@@ -136,6 +136,7 @@ mod preset {
                 (ViaCairo, Vec<validator::Info>),
                 (ViaCairo, Vec<block::CommitSig>),
                 (ViaCairo, Vec<ProofSpec>),
+                (ViaCairo, Vec<Height>),
             ]: EncodeList,
             [
                 (ViaCairo, ChainId),

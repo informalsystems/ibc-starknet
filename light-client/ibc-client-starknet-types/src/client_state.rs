@@ -14,4 +14,5 @@ pub struct StarknetClientState {
     pub chain_id: ChainId,
     pub sequencer_public_key: Vec<u8>,
     pub ibc_contract_address: Vec<u8>,
+    pub is_frozen: u8,
 }

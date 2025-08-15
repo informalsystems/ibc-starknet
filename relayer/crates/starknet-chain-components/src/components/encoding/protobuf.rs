@@ -28,6 +28,7 @@ mod preset {
     use ibc::primitives::Timestamp;
     use ibc_client_starknet_types::encoding::components::StarknetLightClientEncodingComponents;
     use ibc_client_starknet_types::header::StarknetHeader;
+    use ibc_client_starknet_types::misbehaviour::StarknetMisbehaviour;
     use prost_types::Any;
 
     use crate::types::{
@@ -77,10 +78,12 @@ mod preset {
                 (ViaProtobuf, StarknetClientState),
                 (ViaProtobuf, StarknetConsensusState),
                 (ViaProtobuf, StarknetHeader),
+                (ViaProtobuf, StarknetMisbehaviour),
 
                 (ViaAny, StarknetClientState),
                 (ViaAny, StarknetConsensusState),
                 (ViaAny, StarknetHeader),
+                (ViaAny, StarknetMisbehaviour),
             ]:
                 StarknetLightClientEncodingComponents::Provider,
 
@@ -113,6 +116,7 @@ mod preset {
                 (ViaProtobuf, StarknetClientState),
                 (ViaProtobuf, StarknetConsensusState),
                 (ViaProtobuf, StarknetHeader),
+                (ViaProtobuf, StarknetMisbehaviour),
                 (ViaProtobuf, CommitmentRoot),
                 (ViaProtobuf, Timestamp),
             ]:
@@ -136,6 +140,8 @@ mod preset {
                 (Any, StarknetClientState),
                 (StarknetConsensusState, Any),
                 (Any, StarknetConsensusState),
+                (StarknetMisbehaviour, Any),
+                (Any, StarknetMisbehaviour),
             ]:
                 StarknetLightClientEncodingComponents::Provider,
 
@@ -169,6 +175,7 @@ mod preset {
                 StarknetClientState,
                 StarknetConsensusState,
                 StarknetHeader,
+                StarknetMisbehaviour,
             ]:
                 StarknetLightClientEncodingComponents::Provider,
 

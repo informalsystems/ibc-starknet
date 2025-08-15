@@ -3,8 +3,7 @@ use std::net::{IpAddr, Ipv4Addr};
 
 use cgp::core::error::CanRaiseAsyncError;
 use hermes_core::runtime_components::traits::{
-    CanCreateDir, CanGenerateRandom, CanReserveTcpPort, HasChildProcessType, HasFilePathType,
-    HasRuntime,
+    CanCreateDir, CanReserveTcpPort, HasChildProcessType, HasFilePathType, HasRuntime,
 };
 use hermes_core::test_components::bootstrap::traits::{
     ChainBootstrapper, ChainBootstrapperComponent,
@@ -33,12 +32,7 @@ where
         + CanStartChainFullNodes
         + HasChainStoreDir
         + CanRaiseAsyncError<Runtime::Error>,
-    Runtime: HasChildProcessType
-        + CanReserveTcpPort
-        + HasFilePathType
-        + CanGenerateRandom<u32>
-        + CanGenerateRandom<u128>
-        + CanCreateDir,
+    Runtime: HasChildProcessType + CanReserveTcpPort + HasFilePathType + CanCreateDir,
     Bootstrap::Chain: HasWalletType<Wallet = StarknetWallet>,
 {
     async fn bootstrap_chain(
@@ -47,15 +41,10 @@ where
     ) -> Result<Bootstrap::ChainDriver, Bootstrap::Error> {
         let runtime = bootstrap.runtime();
 
-        let postfix = <Runtime as CanGenerateRandom<u32>>::generate_random(runtime).await;
-
-        let chain_home_dir = Runtime::join_file_path(
-            bootstrap.chain_store_dir(),
-            &Runtime::file_path_from_string(&format!("{chain_id_prefix}-{postfix}")),
-        );
+        let chain_home_dir = bootstrap.chain_store_dir();
 
         runtime
-            .create_dir(&chain_home_dir)
+            .create_dir(chain_home_dir)
             .await
             .map_err(Bootstrap::raise_error)?;
 
@@ -81,17 +70,8 @@ where
             .into(),
         };
 
-        // Arbitrarily chosen only for testing.
-        let sequencer_private_key = {
-            let low: Felt = <Runtime as CanGenerateRandom<u128>>::generate_random(runtime)
-                .await
-                .into();
-            let high: Felt = <Runtime as CanGenerateRandom<u128>>::generate_random(runtime)
-                .await
-                .into();
-
-            (high * felt!("0x100000000000000000000000000000000")) + low
-        };
+        // FIXME(rano): Arbitrarily chosen only for testing.
+        let sequencer_private_key = Felt::TWO;
 
         let node_config = StarknetNodeConfig {
             rpc_addr,
@@ -100,7 +80,7 @@ where
         };
 
         let chain_process = bootstrap
-            .start_chain_full_nodes(&chain_home_dir, &node_config, &genesis_config)
+            .start_chain_full_nodes(chain_home_dir, &node_config, &genesis_config)
             .await?;
 
         // For now, we hard code the wallets generated from madara

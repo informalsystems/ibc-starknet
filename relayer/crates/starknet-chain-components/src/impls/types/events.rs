@@ -1,3 +1,5 @@
+use starknet_crypto::Felt;
+
 use crate::types::{ChannelId, ClientId, ConnectionId, Height};
 
 pub struct StarknetCreateClientEvent {
@@ -6,6 +8,13 @@ pub struct StarknetCreateClientEvent {
 
 pub struct StarknetScheduleUpgradeEvent {
     pub upgrade_height: Height,
+}
+
+#[derive(Debug)]
+pub struct StarknetUpdateClientEvent {
+    pub client_id: ClientId,
+    pub consensus_heights: Vec<Height>,
+    pub header: Vec<Felt>,
 }
 
 pub struct StarknetConnectionOpenInitEvent {

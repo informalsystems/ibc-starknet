@@ -39,6 +39,10 @@ delegate_components! {
                     symbol!("ibc_contract_address"),
                     EncodeByteField<5>,
                 >,
+                EncodeField<
+                    symbol!("is_frozen"),
+                    EncodeU64ProtoField<6>,
+                >,
             ]>,
         MutDecoderComponent: DecodeFrom<
             Self,
@@ -48,13 +52,14 @@ delegate_components! {
                 EncodeChainIdField<3>,
                 EncodeByteField<4>,
                 EncodeByteField<5>,
+                EncodeU64ProtoField<6>,
             ]>
         >,
     }
 }
 
 impl Transformer for EncodeStarknetClientState {
-    type From = Product![Height, u64, ChainId, Vec<u8>, Vec<u8>];
+    type From = Product![Height, u64, ChainId, Vec<u8>, Vec<u8>, u8];
 
     type To = StarknetClientState;
 
@@ -65,6 +70,7 @@ impl Transformer for EncodeStarknetClientState {
             chain_id,
             sequencer_public_key,
             ibc_contract_address,
+            is_frozen,
         ]: Self::From,
     ) -> Self::To {
         StarknetClientState {
@@ -73,6 +79,7 @@ impl Transformer for EncodeStarknetClientState {
             chain_id,
             sequencer_public_key,
             ibc_contract_address,
+            is_frozen,
         }
     }
 }

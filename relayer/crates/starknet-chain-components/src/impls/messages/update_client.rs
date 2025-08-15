@@ -102,7 +102,7 @@ where
     }
 }
 
-fn comet_signature_hints<Encoding>(header: &Header, encoding: &Encoding) -> Vec<Vec<Felt>>
+pub fn comet_signature_hints<Encoding>(header: &Header, encoding: &Encoding) -> Vec<Vec<Felt>>
 where
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>

@@ -1,4 +1,4 @@
-use cometbft::light_client::{ClientState, Header};
+use cometbft::light_client::{ClientState, Header, Misbehaviour};
 use ics23::MerkleProof;
 use starknet_ibc_core::channel::ChannelEnd;
 use starknet_ibc_core::connection::ConnectionEnd;
@@ -6,6 +6,8 @@ use starknet_ibc_core::connection::ConnectionEnd;
 #[starknet::interface]
 pub trait IProtobuf<TContractState> {
     fn comet_header_decode(self: @TContractState, proto_bytes: Array<u8>) -> Header;
+
+    fn comet_misbehaviour_decode(self: @TContractState, proto_bytes: Array<u8>) -> Misbehaviour;
 
     fn comet_client_state_encode(self: @TContractState, value: ClientState) -> Array<u8>;
 
@@ -31,6 +33,12 @@ pub mod ProtobufLibComponent {
         fn comet_header_decode(
             self: @ComponentState<TContractState>, proto_bytes: Array<u8>,
         ) -> Header {
+            ProtoCodecImpl::decode(proto_bytes.span()).unwrap()
+        }
+
+        fn comet_misbehaviour_decode(
+            self: @ComponentState<TContractState>, proto_bytes: Array<u8>,
+        ) -> Misbehaviour {
             ProtoCodecImpl::decode(proto_bytes.span()).unwrap()
         }
 

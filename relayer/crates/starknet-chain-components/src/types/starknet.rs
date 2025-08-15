@@ -14,6 +14,7 @@ pub struct CairoStarknetClientState {
     pub chain_id: ByteArray,
     pub sequencer_public_key: Felt,
     pub ibc_contract_address: StarknetAddress,
+    pub is_frozen: u8,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, HasField, HasFields)]
@@ -30,6 +31,7 @@ impl From<CairoStarknetClientState> for StarknetClientState {
             chain_id,
             sequencer_public_key,
             ibc_contract_address,
+            is_frozen,
         } = state;
 
         Self {
@@ -42,6 +44,7 @@ impl From<CairoStarknetClientState> for StarknetClientState {
             chain_id: String::try_from(chain_id).unwrap().parse().unwrap(),
             sequencer_public_key: state.sequencer_public_key.to_bytes_be().to_vec(),
             ibc_contract_address: state.ibc_contract_address.to_bytes_be().to_vec(),
+            is_frozen,
         }
     }
 }
@@ -65,6 +68,7 @@ impl From<StarknetClientState> for CairoStarknetClientState {
             chain_id,
             sequencer_public_key,
             ibc_contract_address,
+            is_frozen,
         } = value;
 
         Self {
@@ -76,6 +80,7 @@ impl From<StarknetClientState> for CairoStarknetClientState {
             chain_id: ByteArray::from(chain_id.as_str()),
             sequencer_public_key: Felt::from_bytes_be_slice(&sequencer_public_key),
             ibc_contract_address: Felt::from_bytes_be_slice(&ibc_contract_address).into(),
+            is_frozen,
         }
     }
 }

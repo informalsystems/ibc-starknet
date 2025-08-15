@@ -20,6 +20,7 @@ hermes-cosmos                    = { workspace = true }
 ibc                              = { workspace = true }
 hermes-starknet-chain-components = { workspace = true }
 hermes-cairo-encoding-components = { workspace = true }
+tendermint-proto                 = { workspace = true }
 
 starknet                    = { workspace = true }
 starknet-v14                = { workspace = true }

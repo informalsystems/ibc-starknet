@@ -6,17 +6,19 @@ mod preset {
     use hermes_core::encoding_components::traits::{EncodedTypeComponent, ProvideEncodedType};
     use hermes_prelude::*;
 
-    use crate::impls::{DecodeOptionalByClassHash, DecodeOptionalByContractAddress};
+    use crate::impls::{
+        DecodeOptionalByClassHash, DecodeOptionalByContractAddress, StarknetUpdateClientEvent,
+    };
     use crate::types::{
         AckIbcTransferEvent, AckStatusIbcTransferEvent, AcknowledgePacketEvent, ApprovalEvent,
         ChanOpenAckEvent, ChanOpenConfirmEvent, ChanOpenInitEvent, ChanOpenTryEvent,
-        ChannelHandshakeEvents, ConnOpenAckEvent, ConnOpenConfirmEvent, ConnOpenInitEvent,
-        ConnOpenTryEvent, ConnectionHandshakeEvents, CreateIbcTokenEvent,
-        DecodeChannelHandshakeEvents, DecodeConnectionHandshakeEvents, DecodeErc20Events,
-        DecodeIbcTransferEvents, DecodePacketRelayEvents, Erc20Event, IbcTransferEvent,
-        PacketRelayEvents, ReceiveIbcTransferEvent, ReceivePacketEvent, SendIbcTransferEvent,
-        SendPacketEvent, StarknetEvent, TimeoutIbcTransferEvent, TimeoutPacketEvent, TransferEvent,
-        WriteAcknowledgementEvent,
+        ChannelHandshakeEvents, ClientRelayEvents, ConnOpenAckEvent, ConnOpenConfirmEvent,
+        ConnOpenInitEvent, ConnOpenTryEvent, ConnectionHandshakeEvents, CreateIbcTokenEvent,
+        DecodeChannelHandshakeEvents, DecodeClientRelayEvents, DecodeConnectionHandshakeEvents,
+        DecodeErc20Events, DecodeIbcTransferEvents, DecodePacketRelayEvents, Erc20Event,
+        IbcTransferEvent, PacketRelayEvents, ReceiveIbcTransferEvent, ReceivePacketEvent,
+        SendIbcTransferEvent, SendPacketEvent, StarknetEvent, TimeoutIbcTransferEvent,
+        TimeoutPacketEvent, TransferEvent, WriteAcknowledgementEvent,
     };
 
     cgp_preset! {
@@ -78,6 +80,11 @@ mod preset {
                 (ViaCairo, TimeoutPacketEvent),
             ]:
                 DecodePacketRelayEvents,
+            [
+                (ViaCairo, ClientRelayEvents),
+                (ViaCairo, StarknetUpdateClientEvent),
+            ]:
+                DecodeClientRelayEvents,
             (ViaCairo, Option<Erc20Event>):
                 DecodeOptionalByClassHash<symbol!("erc20_hashes")>,
             (ViaCairo, Option<IbcTransferEvent>):
@@ -86,6 +93,7 @@ mod preset {
                 (ViaCairo, Option<ConnectionHandshakeEvents>),
                 (ViaCairo, Option<ChannelHandshakeEvents>),
                 (ViaCairo, Option<PacketRelayEvents>),
+                (ViaCairo, Option<ClientRelayEvents>),
             ]:
                 DecodeOptionalByContractAddress<symbol!("ibc_core_contract_addresses")>,
         }

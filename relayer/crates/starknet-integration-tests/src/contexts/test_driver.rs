@@ -18,7 +18,8 @@ use hermes_core::test_components::driver::traits::{
 use hermes_core::test_components::setup::traits::{
     BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent,
     CreateClientMessageOptionsGetterAtComponent, CreateClientPayloadOptionsGetterAtComponent,
-    HasTestDriverType, PortIdGetterAtComponent, RecoverClientPayloadOptionsGetterAtComponent,
+    FullNodeForkerComponent, FullNodeHalterComponent, HasTestDriverType, PortIdGetterAtComponent,
+    RecoverClientPayloadOptionsGetterAtComponent,
 };
 use hermes_core::test_components::test_case::traits::recover_client::RecoverClientHandlerComponent;
 use hermes_core::test_components::test_case::traits::upgrade_client::{
@@ -47,6 +48,7 @@ use super::{CosmosStarknetRelayDriver, StarknetCosmosRelayDriver};
 use crate::contexts::{
     SetupStarknetUpgradeClientTest, StarknetChainDriver, StarknetHandleUpgradeClient,
 };
+use crate::impls::ForkSecondFullNode;
 
 #[cgp_context(StarknetTestDriverComponents)]
 #[derive(HasField)]
@@ -83,6 +85,11 @@ delegate_components! {
             SetupStarknetUpgradeClientTest,
         UpgradeClientHandlerComponent:
             StarknetHandleUpgradeClient,
+        [
+            FullNodeForkerComponent,
+            FullNodeHalterComponent,
+        ]:
+            ForkSecondFullNode,
         ChainTypeProviderAtComponent<Index<0>>:
             UseType<StarknetChain>,
         ChainTypeProviderAtComponent<Index<1>>:
