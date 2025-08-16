@@ -1,6 +1,8 @@
 use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 use rocket::serde::{Deserialize, Serialize};
-use starknet_crypto::{Felt, sign};
+use starknet_crypto::{Felt, poseidon_hash_many, sign};
+
+use crate::random_felt;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
@@ -8,6 +10,17 @@ pub struct Ed25519 {
     pub message: Vec<u8>,
     pub signature: Vec<u8>,
     pub public_key: Vec<u8>,
+}
+
+pub fn serialize_challenges(challenges: &[Ed25519]) -> Vec<Felt> {
+    let mut serialized = vec![Felt::from(challenges.len())];
+
+    for challenge in challenges {
+        serialized.extend(challenge.message.iter().map(|&byte| Felt::from(byte)));
+        serialized.extend(challenge.signature.iter().map(|&byte| Felt::from(byte)));
+        serialized.extend(challenge.public_key.iter().map(|&byte| Felt::from(byte)));
+    }
+    serialized
 }
 
 impl Ed25519 {
@@ -21,8 +34,10 @@ impl Ed25519 {
 
 pub fn attest(private_key: &Felt, challenges: &[Ed25519]) -> Option<(Felt, Felt)> {
     if challenges.iter().all(|challenge| challenge.verify()) {
-        let message = Felt::ZERO; // FIXME: hash the challenges
-        let k = Felt::TWO; // FIXME: randomize this
+        let message = poseidon_hash_many(&serialize_challenges(challenges));
+
+        let k = random_felt();
+
         sign(private_key, &message, &k)
             .map(|signature| (signature.r, signature.s))
             .ok()
