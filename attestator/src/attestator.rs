@@ -1,8 +1,8 @@
 use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 use rocket::serde::{Deserialize, Serialize};
-use starknet_crypto::{Felt, poseidon_hash_many, sign};
-
-use crate::random_felt;
+use starknet_core::crypto::ecdsa_sign;
+use starknet_core::types::Felt;
+use starknet_crypto::poseidon_hash_many;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(crate = "rocket::serde")]
@@ -36,9 +36,7 @@ pub fn attest(private_key: &Felt, challenges: &[Ed25519]) -> Option<(Felt, Felt)
     if challenges.iter().all(|challenge| challenge.verify()) {
         let message = poseidon_hash_many(&serialize_challenges(challenges));
 
-        let k = random_felt();
-
-        sign(private_key, &message, &k)
+        ecdsa_sign(private_key, &message)
             .map(|signature| (signature.r, signature.s))
             .ok()
     } else {
