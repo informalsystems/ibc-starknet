@@ -73,6 +73,7 @@ where
                 .encode(&protobuf_byte_array)
                 .map_err(Chain::raise_error)?;
 
+            // FIXME(rano): query attestators' endpoint `/attest`
             let signature_hints = comet_signature_hints(&header, encoding);
 
             let serialized_signature_hints = encoding
@@ -166,6 +167,8 @@ where
         })
         .map(|value| {
             if let Some((msg, signature, public_key)) = value {
+                // FIXME(rano): query attestators' endpoint `/attest`
+
                 let ry_twisted = BigUint::from_bytes_le(&signature[0..32]);
                 let s = BigUint::from_bytes_le(&signature[32..64]);
                 let py_twisted = BigUint::from_bytes_le(&public_key);
