@@ -95,7 +95,7 @@ where
             })?
         {
             return Err(ClientError::FailedToVerifyHeader {
-                description: "Invalid block header signature".to_string(),
+                description: "Invalid Starknet block header signature".to_string(),
             });
         }
 
