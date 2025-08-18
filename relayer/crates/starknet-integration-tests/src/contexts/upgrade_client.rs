@@ -112,7 +112,8 @@ where
             .map_err(ChainDriverA::raise_error)?;
 
         chain_a
-            .wait_chain_reach_height(&onchain_final_height)
+            // Starknet chain backup interval is 10. Making sure final_height block is present in restarted chain.
+            .wait_chain_reach_height(&(onchain_final_height + 10 * 2))
             .await
             .map_err(ChainDriverA::raise_error)?;
 
