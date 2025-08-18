@@ -1,4 +1,4 @@
-use cometbft::light_client::{Header as CometHeader, Misbehaviour as CometMisbehaviour};
+use cometbft::light_client::Header as CometHeader;
 use ibc_utils::bytes::ByteArrayIntoArrayU8;
 use ibc_utils::storage::read_raw_key;
 use starknet_ibc_libs::protobuf::{IProtobufDispatcherTrait, IProtobufLibraryDispatcher};

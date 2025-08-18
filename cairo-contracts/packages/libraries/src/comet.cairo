@@ -10,6 +10,7 @@ pub trait IComet<TContractState> {
         trusted: TrustedBlockState,
         options: Options,
         now: Timestamp,
+        hints_context: Span<felt252>,
         signature_hints: Array<Array<felt252>>,
     );
 
@@ -19,6 +20,7 @@ pub trait IComet<TContractState> {
         trusted: TrustedBlockState,
         options: Options,
         now: Timestamp,
+        hints_context: Span<felt252>,
         signature_hints: Array<Array<felt252>>,
     );
 }
@@ -41,9 +43,10 @@ pub mod CometLibComponent {
             trusted: TrustedBlockState,
             options: Options,
             now: Timestamp,
+            hints_context: Span<felt252>,
             signature_hints: Array<Array<felt252>>,
         ) {
-            verify_update_header(untrusted, trusted, options, now, signature_hints)
+            verify_update_header(untrusted, trusted, options, now, hints_context, signature_hints)
         }
 
         fn verify_misbehaviour_header(
@@ -52,9 +55,12 @@ pub mod CometLibComponent {
             trusted: TrustedBlockState,
             options: Options,
             now: Timestamp,
+            hints_context: Span<felt252>,
             signature_hints: Array<Array<felt252>>,
         ) {
-            verify_misbehaviour_header(untrusted, trusted, options, now, signature_hints)
+            verify_misbehaviour_header(
+                untrusted, trusted, options, now, hints_context, signature_hints,
+            )
         }
     }
 }

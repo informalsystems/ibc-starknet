@@ -12,15 +12,16 @@ pub impl ArrayByteArrayStore = ibc_utils::storage::StorePackingViaSerde<Array<By
 
 #[derive(Clone, Debug, Drop, PartialEq, Serde, starknet::Store)]
 pub struct CometClientState {
+    pub chain_id: ByteArray,
+    pub upgrade_path: Array<ByteArray>,
     pub latest_height: Height,
     pub trusting_period: Duration,
     pub unbonding_period: Duration,
     pub max_clock_drift: Duration,
     pub trust_level: Fraction,
     pub status: Status,
-    pub chain_id: ByteArray,
+    pub attestator_keys: Array<felt252>,
     pub proof_spec: Array<ProofSpec>,
-    pub upgrade_path: Array<ByteArray>,
 }
 
 #[generate_trait]
