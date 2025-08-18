@@ -177,22 +177,22 @@ where
 
         // Post-upgrade, unschedule the upgrade on Starknet
 
-        // let ibc_core_contract_address = chain_a
-        //     .query_contract_address(PhantomData)
-        //     .await
-        //     .map_err(ChainDriverA::raise_error)?;
+        let ibc_core_contract_address = chain_a
+            .query_contract_address(PhantomData)
+            .await
+            .map_err(ChainDriverA::raise_error)?;
 
-        // chain_a
-        //     .send_message_with_signer(
-        //         chain_a.get_default_signer(),
-        //         StarknetMessage::new(
-        //             *ibc_core_contract_address,
-        //             selector!("unschedule_upgrade"),
-        //             vec![],
-        //         ),
-        //     )
-        //     .await
-        //     .map_err(ChainDriverA::raise_error)?;
+        chain_a
+            .send_message_with_signer(
+                chain_a.get_default_signer(),
+                StarknetMessage::new(
+                    *ibc_core_contract_address,
+                    selector!("unschedule_upgrade"),
+                    vec![],
+                ),
+            )
+            .await
+            .map_err(ChainDriverA::raise_error)?;
 
         // Post-upgrade, Starknet client state must have upgraded
 
