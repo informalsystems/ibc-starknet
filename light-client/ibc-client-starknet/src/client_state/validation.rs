@@ -88,11 +88,16 @@ where
         let ibc_contract_address = Felt::from_bytes_be_slice(&self.0.ibc_contract_address);
 
         // 1. verify the block header
-        block_header
+        if !block_header
             .verify_signature(&starknet_crypto_cw, &block_signature, &sequencer_public_key)
             .map_err(|e| ClientError::FailedToVerifyHeader {
                 description: e.to_string(),
-            })?;
+            })?
+        {
+            return Err(ClientError::FailedToVerifyHeader {
+                description: "Invalid block header signature".to_string(),
+            });
+        }
 
         // 2. validate the storage proof with correct merkle nodes
         validate_storage_proof(&starknet_crypto_cw, &storage_proof).map_err(|e| {
