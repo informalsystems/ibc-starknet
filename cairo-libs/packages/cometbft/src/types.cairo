@@ -702,7 +702,9 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
         NonAbsentCommitVotes { votes }
     }
 
-    fn has_voted(self: @NonAbsentCommitVotes, validator: @Validator) -> bool {
+    fn has_voted(
+        self: @NonAbsentCommitVotes, validator: @Validator, hints_context: Span<felt252>,
+    ) -> bool {
         let mut votes_span = self.votes.span();
         let mut result = false;
         while let Option::Some((ith_vote, signature_hints)) = votes_span.pop_front() {
@@ -725,7 +727,7 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
                     .verify_signature(
                         signed_bytes.span(),
                         signature.span(),
-                        array![].span(),
+                        hints_context,
                         signature_hints.span(),
                     );
 

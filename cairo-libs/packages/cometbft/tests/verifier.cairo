@@ -93,7 +93,9 @@ fn test_verify_update_header() {
         ],
     ];
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
+    verify_update_header(
+        untrusted_block_state, trusted_block_state, options, now, array![].span(), signature_hints,
+    );
 }
 
 #[test]
@@ -132,7 +134,9 @@ fn test_verify_update_header_forged_header() {
 
     let mut signature_hints = array![array![]];
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
+    verify_update_header(
+        untrusted_block_state, trusted_block_state, options, now, array![].span(), signature_hints,
+    );
 }
 
 #[test]
@@ -171,7 +175,9 @@ fn test_verify_update_header_empty_signatures() {
 
     let mut signature_hints = array![];
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
+    verify_update_header(
+        untrusted_block_state, trusted_block_state, options, now, array![].span(), signature_hints,
+    );
 }
 
 #[test]
@@ -257,5 +263,7 @@ fn test_verify_update_header_2() {
         ],
     ];
 
-    verify_update_header(untrusted_block_state, trusted_block_state, options, now, signature_hints);
+    verify_update_header(
+        untrusted_block_state, trusted_block_state, options, now, array![].span(), signature_hints,
+    );
 }
