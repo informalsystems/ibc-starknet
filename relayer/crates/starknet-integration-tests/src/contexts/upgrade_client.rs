@@ -1,5 +1,4 @@
 use core::marker::PhantomData;
-use std::time::Duration;
 
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
@@ -41,6 +40,7 @@ use starknet::macros::selector;
 use starknet_crypto::get_public_key;
 
 use crate::contexts::HasChainNodeConfig;
+use crate::impls::fork_starknet_chain_with_sequencer_key;
 
 pub struct StarknetHandleUpgradeClient;
 
@@ -49,6 +49,7 @@ impl<ChainDriverA, ChainDriverB, ChainA, ChainB, Encoding>
     UpgradeClientHandler<ChainDriverA, ChainDriverB> for StarknetHandleUpgradeClient
 where
     ChainDriverA: HasChain<Chain = ChainA>
+        + HasChainNodeConfig<ChainNodeConfig = StarknetNodeConfig>
         + HasSetupUpgradeClientTestResultType<
             SetupUpgradeClientTestResult = StarknetProposalSetupClientUpgradeResult,
         > + CanRaiseAsyncError<ChainA::Error>
@@ -173,7 +174,8 @@ where
             .map_err(ChainDriverA::raise_error)?;
 
         // FIXME(rano): Restart starknet chain with the new sequencer key
-        std::thread::sleep(Duration::from_secs(3));
+        fork_starknet_chain_with_sequencer_key(chain_driver_a, &setup_result.sequencer_private_key)
+            .await?;
 
         // Post-upgrade, unschedule the upgrade on Starknet
 
@@ -261,7 +263,6 @@ impl<ChainDriverA, ChainDriverB, ChainA, ChainB, Encoding>
     SetupUpgradeClientTestHandler<ChainDriverA, ChainDriverB> for SetupStarknetUpgradeClientTest
 where
     ChainDriverA: HasChain<Chain = ChainA>
-        + HasChainNodeConfig<ChainNodeConfig = StarknetNodeConfig>
         + HasSetupUpgradeClientTestResultType<
             SetupUpgradeClientTestResult = StarknetProposalSetupClientUpgradeResult,
         > + CanRaiseAsyncError<ChainA::Error>
@@ -344,10 +345,8 @@ where
             .await
             .map_err(ChainDriverA::raise_error)?;
 
-        let starknet_node_config = chain_driver_a.chain_node_config();
-
-        // Using a different private key by just incrementing the Felt value.
-        let sequencer_private_key = starknet_node_config.sequencer_private_key + 1;
+        // An arbitrary chosen value for testing purposes
+        let sequencer_private_key = Felt::THREE;
         let sequencer_public_key = get_public_key(&sequencer_private_key);
 
         upgrade_client_state.latest_height = Height {
