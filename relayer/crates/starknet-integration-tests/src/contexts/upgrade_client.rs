@@ -6,8 +6,8 @@ use hermes_core::chain_components::impls::CanWaitChainReachHeight;
 use hermes_core::chain_components::traits::{
     CanBuildClientUpgradePayload, CanBuildUpdateClientMessage, CanBuildUpdateClientPayload,
     CanQueryChainHeight, CanQueryChainStatus, CanQueryClientStateWithLatestHeight,
-    CanQueryConsensusStateWithLatestHeight, CanUpgradeClient, HasClientStateFields,
-    HasClientStateType, HasConsensusStateType,
+    CanQueryConsensusStateWithLatestHeight, CanSendMessages, CanUpgradeClient,
+    HasClientStateFields, HasClientStateType, HasConsensusStateType,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use hermes_core::logging_components::traits::CanLog;
@@ -70,6 +70,7 @@ where
         + HasAsyncErrorType,
     ChainB: CanUpgradeClient<ChainA>
         + HasDefaultSigner
+        + CanSendMessages
         + CanSendSingleMessageWithSigner
         + CanQueryClientStateWithLatestHeight<ChainA>
         + CanBuildUpdateClientMessage<ChainA>,
@@ -111,10 +112,32 @@ where
             .await
             .map_err(ChainDriverA::raise_error)?;
 
-        // update till final height
-        // starknet_to_cosmos_relay
-        //         .send_target_update_client_messages(DestinationTarget, &onchain_final_height)
-        //         .await?;
+        // Must update client till final height
+        let client_b_state = chain_b
+            .query_client_state_with_latest_height(PhantomData, client_id_b)
+            .await
+            .map_err(ChainDriverA::raise_error)?;
+
+        let client_b_state_height = ChainA::client_state_latest_height(&client_b_state);
+
+        let client_b_update_payload = chain_a
+            .build_update_client_payload(
+                &client_b_state_height,
+                &onchain_final_height,
+                client_b_state,
+            )
+            .await
+            .map_err(ChainDriverA::raise_error)?;
+
+        let update_messages = chain_b
+            .build_update_client_message(client_id_b, client_b_update_payload)
+            .await
+            .map_err(ChainDriverA::raise_error)?;
+
+        chain_b
+            .send_messages(update_messages)
+            .await
+            .map_err(ChainDriverA::raise_error)?;
 
         let upgrade_client_payload = chain_a
             .upgrade_client_payload(&onchain_final_height)
@@ -136,12 +159,15 @@ where
             .await
             .map_err(ChainDriverA::raise_error)?;
 
-        // FIXME(rano): do some asserts
-        // Assert the client has been upgraded to the new chain ID
-        // assert_eq!(
-        //     ChainA::client_state_latest_height(&client_b_state),
-        //     setup_result.new_chain_id.clone(),
-        // );
+        // Assert the client has been upgraded to the upgraded height
+
+        // Starknet upgrade height is the immediate next height
+        let upgrade_height = onchain_final_height + 1;
+
+        assert_eq!(
+            ChainA::client_state_latest_height(&client_b_state),
+            upgrade_height,
+        );
 
         Ok(())
     }
