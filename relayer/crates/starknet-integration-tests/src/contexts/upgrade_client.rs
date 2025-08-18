@@ -169,6 +169,10 @@ where
             upgrade_height,
         );
 
+        // TODO(rano): restart starknet chain with the new sequencer key
+        // TODO(rano): unschedule the upgrade
+        // TODO(rano): update Starknet client after upgrade
+
         Ok(())
     }
 }
