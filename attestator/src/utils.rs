@@ -1,10 +1,8 @@
 pub fn u64_array_to_u8_array<const N: usize, const M: usize>(arr: &[u64; N]) -> [u8; M] {
+    assert_eq!(N * 8, M, "Size mismatch");
     let mut result = [0u8; M];
-    for (i, &n) in arr.iter().enumerate() {
-        let bytes = n.to_be_bytes();
-        let chunk_start = i * 8;
-        let chunk_end = chunk_start + 8;
-        result[chunk_start..chunk_end].copy_from_slice(&bytes);
+    for (i, &v) in arr.iter().enumerate() {
+        result[i * 8..i * 8 + 8].copy_from_slice(&v.to_be_bytes());
     }
     result
 }
