@@ -12,14 +12,14 @@ pub struct Ed25519 {
     pub public_key: Vec<u8>,
 }
 
-pub fn serialize_challenges(challenges: &[Ed25519]) -> Vec<Felt> {
-    let mut serialized = vec![Felt::from(challenges.len())];
+pub fn serialize_challenge(challenge: &Ed25519) -> Vec<Felt> {
+    let mut serialized = Vec::new();
 
-    for challenge in challenges {
-        serialized.extend(challenge.message.iter().map(|&byte| Felt::from(byte)));
-        serialized.extend(challenge.signature.iter().map(|&byte| Felt::from(byte)));
-        serialized.extend(challenge.public_key.iter().map(|&byte| Felt::from(byte)));
-    }
+    serialized.push(Felt::from(challenge.message.len()));
+    serialized.extend(challenge.message.iter().map(|&byte| Felt::from(byte)));
+    serialized.extend(challenge.signature.iter().map(|&byte| Felt::from(byte)));
+    serialized.extend(challenge.public_key.iter().map(|&byte| Felt::from(byte)));
+
     serialized
 }
 
@@ -32,12 +32,15 @@ impl Ed25519 {
     }
 }
 
-pub fn attest(private_key: &Felt, challenges: &[Ed25519]) -> Option<(Felt, Felt)> {
+pub fn attest(private_key: &Felt, challenges: &[Ed25519]) -> Option<Vec<(Felt, Felt)>> {
     if challenges.iter().all(|challenge| challenge.verify()) {
-        let message = poseidon_hash_many(&serialize_challenges(challenges));
-
-        ecdsa_sign(private_key, &message)
-            .map(|signature| (signature.r, signature.s))
+        challenges
+            .iter()
+            .map(|challenge| poseidon_hash_many(&serialize_challenge(challenge)))
+            .map(|message| {
+                ecdsa_sign(private_key, &message).map(|signature| (signature.r, signature.s))
+            })
+            .collect::<Result<Vec<_>, _>>()
             .ok()
     } else {
         None

@@ -11,7 +11,7 @@ use starknet_crypto::{Felt, get_public_key};
 static PRIVATE_KEY: OnceLock<Felt> = OnceLock::new();
 
 #[post("/attest", data = "<data>")]
-fn attest_api(data: Codec<Vec<Ed25519>>) -> Option<Codec<Vec<u8>>> {
+fn attest_api(data: Codec<Vec<Ed25519>>) -> Option<Codec<Vec<Vec<u8>>>> {
     let private_key = PRIVATE_KEY.get_or_init(|| {
         Felt::from_hex(
             &std::env::var("PRIVATE_KEY").expect("PRIVATE_KEY environment variable not set"),
@@ -23,7 +23,14 @@ fn attest_api(data: Codec<Vec<Ed25519>>) -> Option<Codec<Vec<u8>>> {
 
     let result = attest(private_key, &challenges);
 
-    result.map(|(r, s)| Codec([r.to_bytes_be(), s.to_bytes_be()].concat().to_vec()))
+    result.map(|signatures| {
+        Codec(
+            signatures
+                .into_iter()
+                .map(|(r, s)| [r.to_bytes_be(), s.to_bytes_be()].concat().to_vec())
+                .collect(),
+        )
+    })
 }
 
 #[get("/public_key")]
