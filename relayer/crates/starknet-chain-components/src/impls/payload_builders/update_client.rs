@@ -102,8 +102,7 @@ where
             chain
                 .log(
                     &format!(
-                        "final height({}) is less than target height({})",
-                        final_height, target_height
+                        "final height({final_height}) is less than target height({target_height})",
                     ),
                     &LevelWarn,
                 )
