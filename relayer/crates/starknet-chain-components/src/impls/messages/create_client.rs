@@ -59,15 +59,17 @@ where
         let client_type = short_string!("07-tendermint");
 
         let client_state = CometClientState {
+            chain_id: payload.client_state.chain_id,
             latest_height: height,
             trusting_period: payload.client_state.trusting_period,
             unbonding_period: payload.client_state.unbonding_period,
             max_clock_drift: payload.client_state.max_clock_drift,
             trust_level: payload.client_state.trust_level,
             status: ClientStatus::Active,
-            chain_id: payload.client_state.chain_id,
             proof_specs: payload.client_state.proof_specs,
             upgrade_path: payload.client_state.upgrade_path,
+            // FIXME(rano): query attestators' endpoint `/public_key`
+            attestator_keys: vec![],
         };
 
         let consensus_state = CometConsensusState {
