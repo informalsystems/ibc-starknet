@@ -11,7 +11,7 @@ use starknet_crypto::{Felt, get_public_key};
 static PRIVATE_KEY: OnceLock<Felt> = OnceLock::new();
 
 #[post("/attest", data = "<data>")]
-fn attest_api(data: Codec<Vec<Ed25519>>) -> Option<Codec<Vec<Vec<u8>>>> {
+fn attest_api(data: Codec<Vec<Ed25519>>) -> Option<Codec<Vec<(Felt, Felt)>>> {
     let private_key = PRIVATE_KEY.get_or_init(|| {
         Felt::from_hex(
             &std::env::var("PRIVATE_KEY").expect("PRIVATE_KEY environment variable not set"),
@@ -21,20 +21,15 @@ fn attest_api(data: Codec<Vec<Ed25519>>) -> Option<Codec<Vec<Vec<u8>>>> {
 
     let challenges = data.into_inner();
 
-    let result = attest(private_key, &challenges);
-
-    result.map(|signatures| {
-        Codec(
-            signatures
-                .into_iter()
-                .map(|(r, s)| [r.to_bytes_be(), s.to_bytes_be()].concat().to_vec())
-                .collect(),
-        )
-    })
+    challenges
+        .into_iter()
+        .map(|challenge| attest(private_key, &challenge))
+        .collect::<Option<Vec<_>>>()
+        .map(Codec)
 }
 
 #[get("/public_key")]
-fn public_key_api() -> Option<Codec<Vec<u8>>> {
+fn public_key_api() -> Codec<Felt> {
     let private_key = PRIVATE_KEY.get_or_init(|| {
         Felt::from_hex(
             &std::env::var("PRIVATE_KEY").expect("PRIVATE_KEY environment variable not set"),
@@ -42,9 +37,7 @@ fn public_key_api() -> Option<Codec<Vec<u8>>> {
         .expect("Invalid PRIVATE_KEY format")
     });
 
-    let public_key = get_public_key(private_key);
-
-    Some(Codec(public_key.to_bytes_be().to_vec()))
+    Codec(get_public_key(private_key))
 }
 
 #[launch]
