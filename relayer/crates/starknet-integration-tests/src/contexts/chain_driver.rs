@@ -16,6 +16,9 @@ use hermes_core::test_components::chain_driver::traits::{
     SetupUpgradeClientTestResultTypeProviderComponent, StakingDenom, TransferDenom, UserWallet,
     WalletGetterComponent,
 };
+use hermes_core::test_components::test_case::traits::node::{
+    FullNodeHalterComponent, FullNodeResumerComponent, ResumeFullNodeOptionsTypeProviderComponent,
+};
 use hermes_core::test_components::test_case::traits::upgrade_client::{
     SetupUpgradeClientTestHandlerComponent, UpgradeClientHandlerComponent,
 };
@@ -37,6 +40,7 @@ use tokio::process::Child;
 use crate::contexts::{
     ChainNodeConfigGetterComponent, SetupStarknetUpgradeClientTest, StarknetHandleUpgradeClient,
 };
+use crate::impls::{StarknetFullNodeHandler, StarknetFullNodeResumeOptions};
 
 #[cgp_context(StarknetChainDriverComponents)]
 #[derive(HasField)]
@@ -88,6 +92,13 @@ delegate_components! {
             StarknetHandleUpgradeClient,
         LoggerComponent:
             TracingLogger,
+        [
+            FullNodeHalterComponent,
+            FullNodeResumerComponent,
+        ]:
+            StarknetFullNodeHandler,
+        ResumeFullNodeOptionsTypeProviderComponent:
+            UseType<StarknetFullNodeResumeOptions>,
     }
 }
 

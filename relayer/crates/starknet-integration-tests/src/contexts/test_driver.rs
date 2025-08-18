@@ -18,7 +18,7 @@ use hermes_core::test_components::driver::traits::{
 use hermes_core::test_components::setup::traits::{
     BinaryChannelDriverBuilder, BinaryChannelDriverBuilderComponent,
     CreateClientMessageOptionsGetterAtComponent, CreateClientPayloadOptionsGetterAtComponent,
-    FullNodeForkerComponent, FullNodeHalterComponent, HasTestDriverType, PortIdGetterAtComponent,
+    FullNodeForkerComponent, HasTestDriverType, PortIdGetterAtComponent,
     RecoverClientPayloadOptionsGetterAtComponent,
 };
 use hermes_core::test_components::test_case::traits::recover_client::RecoverClientHandlerComponent;
@@ -76,10 +76,7 @@ delegate_components! {
             TracingLogger,
         RecoverClientHandlerComponent:
             RecoverStarknetClientHandler,
-        [
-            FullNodeForkerComponent,
-            FullNodeHalterComponent,
-        ]:
+        FullNodeForkerComponent:
             ForkSecondFullNode,
         ChainTypeProviderAtComponent<Index<0>>:
             UseType<StarknetChain>,

@@ -17,6 +17,7 @@ use hermes_core::relayer_components::transaction::traits::HasDefaultSigner;
 use hermes_core::test_components::chain_driver::traits::{
     HasChain, HasSetupUpgradeClientTestResultType,
 };
+use hermes_core::test_components::test_case::traits::node::{CanHaltFullNode, CanResumeFullNode};
 use hermes_core::test_components::test_case::traits::upgrade_client::{
     SetupUpgradeClientTestHandler, SetupUpgradeClientTestHandlerComponent, UpgradeClientHandler,
     UpgradeClientHandlerComponent,
@@ -40,7 +41,7 @@ use starknet::macros::selector;
 use starknet_crypto::get_public_key;
 
 use crate::contexts::HasChainNodeConfig;
-use crate::impls::fork_starknet_chain_with_sequencer_key;
+use crate::impls::StarknetFullNodeResumeOptions;
 
 pub struct StarknetHandleUpgradeClient;
 
@@ -52,7 +53,9 @@ where
         + HasChainNodeConfig<ChainNodeConfig = StarknetNodeConfig>
         + HasSetupUpgradeClientTestResultType<
             SetupUpgradeClientTestResult = StarknetProposalSetupClientUpgradeResult,
-        > + CanRaiseAsyncError<ChainA::Error>
+        > + CanHaltFullNode
+        + CanResumeFullNode<ResumeFullNodeOptions = StarknetFullNodeResumeOptions>
+        + CanRaiseAsyncError<ChainA::Error>
         + CanRaiseAsyncError<ChainB::Error>
         + CanRaiseAsyncError<ClientError>
         + CanRaiseAsyncError<Encoding::Error>,
@@ -174,9 +177,13 @@ where
             .await
             .map_err(ChainDriverA::raise_error)?;
 
+        let resume_options = StarknetFullNodeResumeOptions {
+            sequencer_private_key: setup_result.sequencer_private_key,
+        };
+
         // FIXME(rano): Restart starknet chain with the new sequencer key
-        fork_starknet_chain_with_sequencer_key(chain_driver_a, &setup_result.sequencer_private_key)
-            .await?;
+        chain_driver_a.halt_full_node().await?;
+        chain_driver_a.resume_full_node(&resume_options).await?;
 
         // Post-upgrade, unschedule the upgrade on Starknet
 
