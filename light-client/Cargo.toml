@@ -106,7 +106,7 @@ ibc-core-client             = { git = "https://github.com/cosmos/ibc-rs", rev = 
 ibc-core-channel-types      = { git = "https://github.com/cosmos/ibc-rs", rev = "d28b8715" }
 ibc-core-handler-types      = { git = "https://github.com/cosmos/ibc-rs", rev = "d28b8715" }
 
-ibc-client-cw = { git = "https://github.com/informalsystems/cosmwasm-ibc", rev = "306059b" }
+ibc-client-cw = { git = "https://github.com/informalsystems/cosmwasm-ibc", rev = "be19dae" }
 
 cgp             = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 cgp-core        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }

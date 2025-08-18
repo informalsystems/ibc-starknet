@@ -13,7 +13,7 @@ let
         "cgp-0.4.0" = "sha256-YaK4YaT/1jbudEh7YnQkH2KrPmjbSI5vBL8HYU1eREg=";
         "hermes-cosmos-encoding-components-0.1.0" = "sha256-cDwzZcTUSoryao9RRnDh76zb0Gasr72jeqrIhmQmhpc=";
         "ibc-0.56.0" = "sha256-6ebsNVErJrLnxijsRo+xqDMZQH+Ef160OyRFBNhCT4U=";
-        "ibc-client-cw-0.56.0" = "sha256-s07R9VZ9DsYmE9sQOABfebwmy16A2z7Hw+fE+kfqQSw=";
+        "ibc-client-cw-0.56.0" = "sha256-xJgM0wyKlN5gaCKgA+y9R/l4QpZ3GbNsoJ8ZrPLvvJ8=";
       };
     };
 

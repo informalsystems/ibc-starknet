@@ -1704,7 +1704,7 @@ dependencies = [
 [[package]]
 name = "ibc-client-cw"
 version = "0.56.0"
-source = "git+https://github.com/informalsystems/cosmwasm-ibc?rev=306059b#306059b90f533155e7d499be4303582c34f838f0"
+source = "git+https://github.com/informalsystems/cosmwasm-ibc?rev=be19dae#be19daee1e9105c2c355695f800e3a5d8d537f79"
 dependencies = [
  "cosmwasm-schema",
  "cosmwasm-std",
