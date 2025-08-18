@@ -323,9 +323,17 @@ pub struct PublicKey {
 
 #[generate_trait]
 pub impl PublicKeyImpl of PublicKeyTrait {
-    fn verify(self: @PublicKey, msg: Span<u8>, signature: Span<u8>, hint: Span<felt252>) {
+    fn verify(
+        self: @PublicKey,
+        msg: Span<u8>,
+        signature: Span<u8>,
+        hints_context: Span<felt252>,
+        hint: Span<felt252>,
+    ) {
         match self.sum {
-            Sum::Ed25519(pk) => Ed25519Verifier::assert_signature(msg, signature, pk.span(), hint),
+            Sum::Ed25519(pk) => Ed25519Verifier::assert_signature(
+                msg, signature, pk.span(), hints_context, hint,
+            ),
             _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
         }
     }
@@ -438,9 +446,13 @@ pub impl ValidatorImpl of ValidatorTrait {
     }
 
     fn verify_signature(
-        self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>, hints: Span<felt252>,
+        self: @Validator,
+        sign_bytes: Span<u8>,
+        signature: Span<u8>,
+        hints_context: Span<felt252>,
+        hints: Span<felt252>,
     ) {
-        self.pub_key.verify(sign_bytes, signature, hints);
+        self.pub_key.verify(sign_bytes, signature, hints_context, hints);
     }
 }
 
@@ -711,7 +723,10 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
                 validator
                     .verify_signature(
-                        signed_bytes.span(), signature.span(), signature_hints.span(),
+                        signed_bytes.span(),
+                        signature.span(),
+                        array![].span(),
+                        signature_hints.span(),
                     );
 
                 // TODO: set verified field to true
