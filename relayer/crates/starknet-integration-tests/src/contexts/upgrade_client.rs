@@ -1,4 +1,5 @@
 use core::marker::PhantomData;
+use std::time::Duration;
 
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
@@ -11,7 +12,7 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use hermes_core::logging_components::traits::CanLog;
-use hermes_core::logging_components::types::LevelDebug;
+use hermes_core::logging_components::types::LevelInfo;
 use hermes_core::relayer_components::transaction::impls::CanSendSingleMessageWithSigner;
 use hermes_core::relayer_components::transaction::traits::HasDefaultSigner;
 use hermes_core::test_components::chain_driver::traits::{
@@ -50,8 +51,7 @@ where
     ChainDriverA: HasChain<Chain = ChainA>
         + HasSetupUpgradeClientTestResultType<
             SetupUpgradeClientTestResult = StarknetProposalSetupClientUpgradeResult,
-        > + CanLog<LevelDebug>
-        + CanRaiseAsyncError<ChainA::Error>
+        > + CanRaiseAsyncError<ChainA::Error>
         + CanRaiseAsyncError<ChainB::Error>
         + CanRaiseAsyncError<ClientError>
         + CanRaiseAsyncError<Encoding::Error>,
@@ -62,6 +62,9 @@ where
         + CanBuildUpdateClientPayload<ChainB>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address"), Address = StarknetAddress>
         + CanCallContract
+        + HasDefaultSigner
+        + CanLog<LevelInfo>
+        + CanSendSingleMessageWithSigner<Message = StarknetMessage>
         + HasBlobType<Blob = Vec<Felt>>
         + HasSelectorType<Selector = Felt>
         + HasEncoding<AsFelt, Encoding = Encoding>
@@ -154,24 +157,98 @@ where
             .await
             .map_err(ChainDriverA::raise_error)?;
 
+        chain_a
+            .log(
+                &format!(
+                    "Upgraded Starknet client for upgrade height {}",
+                    setup_result.upgrade_height
+                ),
+                &LevelInfo,
+            )
+            .await;
+
         let client_b_state = chain_b
             .query_client_state_with_latest_height(PhantomData, client_id_b)
             .await
             .map_err(ChainDriverA::raise_error)?;
 
+        // FIXME(rano): Restart starknet chain with the new sequencer key
+        std::thread::sleep(Duration::from_secs(3));
+
+        // Post-upgrade, unschedule the upgrade on Starknet
+
+        // let ibc_core_contract_address = chain_a
+        //     .query_contract_address(PhantomData)
+        //     .await
+        //     .map_err(ChainDriverA::raise_error)?;
+
+        // chain_a
+        //     .send_message_with_signer(
+        //         chain_a.get_default_signer(),
+        //         StarknetMessage::new(
+        //             *ibc_core_contract_address,
+        //             selector!("unschedule_upgrade"),
+        //             vec![],
+        //         ),
+        //     )
+        //     .await
+        //     .map_err(ChainDriverA::raise_error)?;
+
+        // Post-upgrade, Starknet client state must have upgraded
+
+        let client_b_state = chain_b
+            .query_client_state_with_latest_height(PhantomData, client_id_b)
+            .await
+            .map_err(ChainDriverA::raise_error)?;
+
+        let client_b_state_height = ChainA::client_state_latest_height(&client_b_state);
+
         // Assert the client has been upgraded to the upgraded height
-
-        // Starknet upgrade height is the immediate next height
-        let upgrade_height = onchain_final_height + 1;
-
         assert_eq!(
-            ChainA::client_state_latest_height(&client_b_state),
-            upgrade_height,
+            client_b_state_height,
+            // Starknet upgrade height is the immediate next height
+            setup_result.upgrade_height,
         );
 
-        // TODO(rano): restart starknet chain with the new sequencer key
-        // TODO(rano): unschedule the upgrade
-        // TODO(rano): update Starknet client after upgrade
+        // Post-upgrade, update Starknet client must succeed
+
+        let chain_a_height = chain_a
+            .query_chain_height()
+            .await
+            .map_err(ChainDriverA::raise_error)?;
+
+        assert!(setup_result.upgrade_height < chain_a_height);
+
+        let client_b_update_payload = chain_a
+            .build_update_client_payload(&client_b_state_height, &chain_a_height, client_b_state)
+            .await
+            .map_err(ChainDriverA::raise_error)?;
+
+        let update_messages = chain_b
+            .build_update_client_message(client_id_b, client_b_update_payload)
+            .await
+            .map_err(ChainDriverA::raise_error)?;
+
+        chain_b
+            .send_messages(update_messages)
+            .await
+            .map_err(ChainDriverA::raise_error)?;
+
+        let client_b_state = chain_b
+            .query_client_state_with_latest_height(PhantomData, client_id_b)
+            .await
+            .map_err(ChainDriverA::raise_error)?;
+
+        let client_b_state_height = ChainA::client_state_latest_height(&client_b_state);
+
+        assert_eq!(client_b_state_height, chain_a_height);
+
+        chain_a
+            .log(
+                &format!("Updated Starknet client at post-upgrade height({chain_a_height})"),
+                &LevelInfo,
+            )
+            .await;
 
         Ok(())
     }
@@ -187,8 +264,7 @@ where
         + HasChainNodeConfig<ChainNodeConfig = StarknetNodeConfig>
         + HasSetupUpgradeClientTestResultType<
             SetupUpgradeClientTestResult = StarknetProposalSetupClientUpgradeResult,
-        > + CanLog<LevelDebug>
-        + CanRaiseAsyncError<ChainA::Error>
+        > + CanRaiseAsyncError<ChainA::Error>
         + CanRaiseAsyncError<ChainB::Error>
         + CanRaiseAsyncError<Encoding::Error>
         + CanRaiseAsyncError<ClientError>,
@@ -198,6 +274,7 @@ where
         + CanWaitChainReachHeight
         + HasDefaultSigner
         + CanSendSingleMessageWithSigner<Message = StarknetMessage>
+        + CanLog<LevelInfo>
         + CanQueryChainHeight<Height = u64>
         + CanBuildUpdateClientPayload<ChainB>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address"), Address = StarknetAddress>
@@ -312,7 +389,17 @@ where
             .await
             .map_err(ChainDriverA::raise_error)?;
 
+        chain_a
+            .log(
+                &format!(
+                    "Scheduled upgrade for Starknet client for upgrade height {upgrade_height}"
+                ),
+                &LevelInfo,
+            )
+            .await;
+
         Ok(StarknetProposalSetupClientUpgradeResult {
+            upgrade_height,
             sequencer_private_key,
         })
     }

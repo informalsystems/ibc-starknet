@@ -10,6 +10,8 @@ use hermes_core::encoding_components::traits::{
     CanDecode, CanEncode, HasDefaultEncoding, HasEncodedType, HasEncoding,
 };
 use hermes_core::encoding_components::types::AsBytes;
+use hermes_core::logging_components::traits::CanLog;
+use hermes_core::logging_components::types::LevelWarn;
 use hermes_cosmos_core::protobuf_encoding_components::types::strategy::ViaProtobuf;
 use hermes_prelude::*;
 use ibc::core::client::types::Height;
@@ -47,6 +49,7 @@ where
         + CanRaiseAsyncError<&'static str>
         + HasDefaultEncoding<AsBytes, Encoding = ProtoEncoding>
         + HasEncoding<AsFelt, Encoding = CairoEncoding>
+        + CanLog<LevelWarn>
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<ProviderError>
         + CanRaiseAsyncError<ureq::Error>
@@ -94,6 +97,18 @@ where
                 .decode(&output)
                 .map_err(Chain::raise_error)?
         };
+
+        if final_height != 0 && final_height < *target_height {
+            chain
+                .log(
+                    &format!(
+                        "final height({}) is less than target height({})",
+                        final_height, target_height
+                    ),
+                    &LevelWarn,
+                )
+                .await;
+        }
 
         let storage_proof = chain
             .query_storage_proof(target_height, &ibc_core_address, &[final_height_key])
