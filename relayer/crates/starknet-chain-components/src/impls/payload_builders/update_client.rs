@@ -14,20 +14,20 @@ use hermes_core::logging_components::traits::CanLog;
 use hermes_core::logging_components::types::LevelWarn;
 use hermes_cosmos_core::protobuf_encoding_components::types::strategy::ViaProtobuf;
 use hermes_prelude::*;
-use ibc::core::client::types::Height;
-use ibc::primitives::Timestamp;
 use ibc_client_starknet_types::header::StarknetHeader;
 use starknet::core::types::Felt;
+use starknet::core::utils::cairo_short_string_to_felt;
 use starknet::macros::selector;
 use starknet::providers::ProviderError;
 use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
+use starknet_crypto_lib::{StarknetCryptoFunctions, StarknetCryptoLib};
 use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
     CanCallContract, CanQueryContractAddress, CanQueryStorageProof, HasBlobType,
     HasFeederGatewayUrl, HasSelectorType, HasStarknetClient,
 };
-use crate::types::{StarknetChainStatus, StarknetConsensusState, StarknetUpdateClientPayload};
+use crate::types::{StarknetChainStatus, StarknetUpdateClientPayload};
 
 pub struct BuildStarknetUpdateClientPayload;
 
@@ -65,8 +65,6 @@ where
         target_height: &u64,
         _client_state: Chain::ClientState,
     ) -> Result<Chain::UpdateClientPayload, Chain::Error> {
-        let block = chain.query_block(target_height).await?;
-
         let feeder_endpoint_url = chain.feeder_gateway_url();
         let feeder_endpoint = FeederGatewayEndpoint::new(feeder_endpoint_url.as_str());
 
@@ -113,29 +111,11 @@ where
             .query_storage_proof(target_height, &ibc_core_address, &[final_height_key])
             .await?;
 
-        if block.block_hash != storage_proof.global_roots.block_hash {
+        if block_header.block_hash != storage_proof.global_roots.block_hash {
             return Err(Chain::raise_error(
                 "block hash does not match between block and storage proof",
             ));
         }
-
-        let contract_root = storage_proof
-            .contracts_proof
-            .contract_leaves_data
-            .first()
-            .and_then(|leaf| leaf.storage_root)
-            .ok_or_else(|| Chain::raise_error("contract root not found in storage proof"))?;
-
-        let root = contract_root.to_bytes_be().to_vec();
-
-        let consensus_state = StarknetConsensusState {
-            root: root.into(),
-            time: Timestamp::from_nanoseconds(
-                u64::try_from(block.time.unix_timestamp_nanos()).unwrap(),
-            ),
-        };
-
-        let height = Height::new(0, *target_height).unwrap();
 
         let header = StarknetHeader {
             block_header,
