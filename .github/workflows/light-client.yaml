@@ -47,7 +47,7 @@ jobs:
 
       - uses: taiki-e/cache-cargo-install-action@v2
         with:
-          tool: cosmwasm-check
+          tool: cosmwasm-check@3.0.1
 
       - name: Build CosmWasm light client contract
         working-directory: ./light-client
