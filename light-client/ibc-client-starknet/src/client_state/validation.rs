@@ -59,10 +59,16 @@ where
     ) -> Result<(), ClientError> {
         let starknet_crypto_cw = StarknetCryptoLib;
 
-        let header: StarknetHeader = <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
-            &StarknetLightClientEncoding,
-            &client_message,
-        )?;
+        let header: StarknetHeader = if let Ok(decoded_header) =
+            <ConvertVia<ProstAny, ConvertIbcAny, UseContext>>::convert(
+                &StarknetLightClientEncoding,
+                &client_message,
+            ) {
+            decoded_header
+        } else {
+            // TODO: Correctly handle the case when the message is not a StarknetHeader
+            return Ok(());
+        };
 
         let StarknetHeader {
             block_header,
