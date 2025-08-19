@@ -117,10 +117,27 @@ where
             .map_err(ChainDriverA::raise_error)?;
 
         chain_a
+            .log(
+                &format!(
+                    "Waiting till Starknet final height: {}",
+                    onchain_final_height
+                ),
+                &LevelInfo,
+            )
+            .await;
+
+        chain_a
             // Starknet chain backup interval is 10. Making sure final_height block is present in restarted chain.
             .wait_chain_reach_height(&(onchain_final_height + 10 * 2))
             .await
             .map_err(ChainDriverA::raise_error)?;
+
+        chain_a
+            .log(
+                &format!("Reached Starknet final height: {}", onchain_final_height),
+                &LevelInfo,
+            )
+            .await;
 
         // Must update client till final height
         let client_b_state = chain_b
@@ -148,6 +165,18 @@ where
             .send_messages(update_messages)
             .await
             .map_err(ChainDriverA::raise_error)?;
+
+        chain_a
+            .log(
+                &format!(
+                    "Updated Starknet client till final height: {}",
+                    onchain_final_height
+                ),
+                &LevelInfo,
+            )
+            .await;
+
+        // Upgrading the client
 
         let upgrade_client_payload = chain_a
             .upgrade_client_payload(&onchain_final_height)
