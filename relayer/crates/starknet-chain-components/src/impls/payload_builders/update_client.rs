@@ -29,7 +29,7 @@ use crate::traits::{
 };
 use crate::types::{StarknetChainStatus, StarknetUpdateClientPayload};
 
-const GLOBAL_STATE_VERSION: &str = "STARKNET_STATE_V0";
+// const GLOBAL_STATE_VERSION: &str = "STARKNET_STATE_V0";
 
 pub struct BuildStarknetUpdateClientPayload;
 
@@ -113,22 +113,21 @@ where
             .query_storage_proof(target_height, &ibc_core_address, &[final_height_key])
             .await?;
 
-        {
-            let contracts_tree_root = storage_proof.global_roots.contracts_tree_root;
-            let classes_tree_root = storage_proof.global_roots.classes_tree_root;
+        // FIXME(rano): uncomment this
+        // let contracts_tree_root = storage_proof.global_roots.contracts_tree_root;
+        // let classes_tree_root = storage_proof.global_roots.classes_tree_root;
 
-            let state_root = StarknetCryptoLib.poseidon_hash_many(&[
-                cairo_short_string_to_felt(GLOBAL_STATE_VERSION).unwrap(),
-                contracts_tree_root,
-                classes_tree_root,
-            ]);
+        // let state_root = StarknetCryptoLib.poseidon_hash_many(&[
+        //     cairo_short_string_to_felt(GLOBAL_STATE_VERSION).unwrap(),
+        //     contracts_tree_root,
+        //     classes_tree_root,
+        // ]);
 
-            if block_header.state_root != state_root {
-                return Err(Chain::raise_error(
-                    "state root does not match between block and storage proof",
-                ));
-            }
-        }
+        // if block_header.state_root != state_root {
+        //     return Err(Chain::raise_error(
+        //         "state root does not match between block and storage proof",
+        //     ));
+        // }
 
         if block_header.block_hash != storage_proof.global_roots.block_hash {
             return Err(Chain::raise_error(

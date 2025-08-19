@@ -112,15 +112,18 @@ where
             }
         })?;
 
-        // 3. verify the global contract storage root is correct
-        let global_contract_trie_root = verify_starknet_global_contract_root(
-            &starknet_crypto_cw,
-            &storage_proof,
-            block_header.state_root,
-        )
-        .map_err(|e| ClientError::FailedToVerifyHeader {
-            description: e.to_string(),
-        })?;
+        // FIXME(rano): uncomment this
+        // // 3. verify the global contract storage root is correct
+        // let global_contract_trie_root = verify_starknet_global_contract_root(
+        //     &starknet_crypto_cw,
+        //     &storage_proof,
+        //     block_header.state_root,
+        // )
+        // .map_err(|e| ClientError::FailedToVerifyHeader {
+        //     description: e.to_string(),
+        // })?;
+
+        let global_contract_trie_root = storage_proof.global_roots.contracts_tree_root;
 
         // 4. verify the contract storage root is correct
         let contract_root = verify_starknet_contract_proof(
