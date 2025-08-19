@@ -214,7 +214,10 @@ where
 
         // FIXME(rano): Restart starknet chain with the new sequencer key
         chain_driver_a.halt_full_node().await?;
-        chain_driver_a.resume_full_node(&resume_options).await?;
+        let chain_driver_a = chain_driver_a.resume_full_node(&resume_options).await?;
+
+        let chain_a = chain_driver_a.chain();
+        let encoding = chain_a.encoding();
 
         // the `public_key` should be updated
 
