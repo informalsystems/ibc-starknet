@@ -107,7 +107,9 @@ where
 
         // 2. validate the storage proof with correct merkle nodes
         validate_storage_proof(&starknet_crypto_cw, &storage_proof).map_err(|e| {
-            ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+            ClientError::FailedToVerifyHeader {
+                description: e.to_string(),
+            }
         })?;
 
         // 3. verify the global contract storage root is correct
@@ -116,8 +118,8 @@ where
             &storage_proof,
             block_header.state_root,
         )
-        .map_err(|e| {
-            ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+        .map_err(|e| ClientError::FailedToVerifyHeader {
+            description: e.to_string(),
         })?;
 
         // 4. verify the contract storage root is correct
@@ -127,8 +129,8 @@ where
             global_contract_trie_root,
             ibc_contract_address,
         )
-        .map_err(|e| {
-            ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+        .map_err(|e| ClientError::FailedToVerifyHeader {
+            description: e.to_string(),
         })?;
 
         verify_starknet_storage_proof(
@@ -144,8 +146,8 @@ where
             ]),
             final_height.into(),
         )
-        .map_err(|e| {
-            ClientError::FailedICS23Verification(CommitmentError::FailedToVerifyMembership)
+        .map_err(|e| ClientError::FailedToVerifyHeader {
+            description: e.to_string(),
         })?;
 
         Ok(())
