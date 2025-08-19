@@ -25,7 +25,7 @@ use hermes_core::test_components::test_case::traits::upgrade_client::{
 use hermes_prelude::*;
 use hermes_starknet_chain_components::impls::{StarknetAddress, StarknetMessage};
 use hermes_starknet_chain_components::traits::{
-    CanCallContract, CanQueryContractAddress, HasBlobType, HasSelectorType,
+    CanCallContract, CanQueryContractAddress, HasBlobType, HasFeederGatewayUrl, HasSelectorType,
 };
 use hermes_starknet_chain_components::types::{
     CairoStarknetClientState, CairoStarknetConsensusState, Height, StarknetChainStatus,
@@ -38,6 +38,7 @@ use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
 use starknet::core::types::Felt;
 use starknet::macros::selector;
+use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
 use starknet_crypto::get_public_key;
 
 use crate::contexts::HasChainNodeConfig;
@@ -63,6 +64,7 @@ where
     ChainA: CanBuildClientUpgradePayload<ChainB>
         + CanWaitChainReachHeight
         + CanQueryChainHeight<Height = u64>
+        + HasFeederGatewayUrl
         + CanBuildUpdateClientPayload<ChainB>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address"), Address = StarknetAddress>
         + CanCallContract
@@ -184,6 +186,17 @@ where
         // FIXME(rano): Restart starknet chain with the new sequencer key
         chain_driver_a.halt_full_node().await?;
         chain_driver_a.resume_full_node(&resume_options).await?;
+
+        // the `public_key` should be updated
+
+        let endpoint_url = chain_a.feeder_gateway_url();
+        let endpoint = FeederGatewayEndpoint::new(endpoint_url.as_str());
+        let public_key = endpoint.get_public_key(None).unwrap();
+
+        assert_eq!(
+            public_key,
+            get_public_key(&setup_result.sequencer_private_key)
+        );
 
         // Post-upgrade, unschedule the upgrade on Starknet
 
