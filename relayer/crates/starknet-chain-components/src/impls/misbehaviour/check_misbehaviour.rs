@@ -77,7 +77,7 @@ where
 
         chain
             .runtime()
-            .sleep(core::time::Duration::from_secs(1))
+            .sleep(core::time::Duration::from_secs(3))
             .await;
 
         let trusted_block = chain.query_block(&target_height).await?;

@@ -125,7 +125,7 @@ cgp-runtime     = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e
 cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 
-hermes-prelude                      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "ddab1b0" }
-hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "ddab1b0" }
-hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "ddab1b0" }
-hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "ddab1b0" }
+hermes-prelude                      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "76323b7" }
+hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "76323b7" }
+hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "76323b7" }
+hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "76323b7" }

@@ -437,7 +437,7 @@ async fn fork_starknet_chain(
         .relay_driver_a_b
         .birelay
         .runtime()
-        .sleep(core::time::Duration::from_secs(1))
+        .sleep(core::time::Duration::from_secs(3))
         .await;
 
     let mut node_chain_processes = node_bootstrap
