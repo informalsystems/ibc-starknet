@@ -1,15 +1,15 @@
 use hermes_core::runtime_components::traits::{CanCreateDir, CanStartChildProcess, HasRuntime};
 use hermes_core::test_components::chain_driver::traits::HasChainCommandPath;
 use hermes_cosmos_core::test_components::bootstrap::traits::{
-    ChainFullNodeStarter, ChainFullNodeStarterComponent, HasChainGenesisConfigType,
-    HasChainNodeConfigType,
+    HasChainGenesisConfigType, HasChainNodeConfigType,
 };
 use hermes_prelude::*;
 
+use crate::traits::{ChainForkedFullNodeStarter, ChainForkedFullNodeStarterComponent};
 use crate::types::StarknetNodeConfig;
 
-#[cgp_new_provider(ChainFullNodeStarterComponent)]
-impl<Bootstrap, Runtime> ChainFullNodeStarter<Bootstrap> for StartStarknetSequencer
+#[cgp_new_provider(ChainForkedFullNodeStarterComponent)]
+impl<Bootstrap, Runtime> ChainForkedFullNodeStarter<Bootstrap> for StartStarknetForkedSequencer
 where
     Bootstrap: HasRuntime<Runtime = Runtime>
         + HasChainNodeConfigType<ChainNodeConfig = StarknetNodeConfig>
@@ -18,11 +18,13 @@ where
         + CanRaiseAsyncError<Runtime::Error>,
     Runtime: CanStartChildProcess + CanCreateDir,
 {
-    async fn start_chain_full_nodes(
+    async fn start_chain_forked_full_nodes(
         bootstrap: &Bootstrap,
         chain_home_dir: &Runtime::FilePath,
         chain_node_config: &StarknetNodeConfig,
         chain_genesis_config: &Bootstrap::ChainGenesisConfig,
+        backup_dir: &Runtime::FilePath,
+        number_of_blocks: &str,
     ) -> Result<Vec<Runtime::ChildProcess>, Bootstrap::Error> {
         let chain_command = bootstrap.chain_command_path();
 
@@ -36,6 +38,7 @@ where
             .map_err(Bootstrap::raise_error)?;
 
         let rpc_port = chain_node_config.rpc_port;
+        let sequencer_private_key = chain_node_config.sequencer_private_key;
 
         let gateway_port = rpc_port + 1;
 
@@ -62,6 +65,13 @@ where
             "0",
             "--blob-gas-price",
             "0",
+            "--private-key",
+            &sequencer_private_key.to_hex_string(),
+            "--backup-dir",
+            &Runtime::file_path_to_string(backup_dir),
+            "--restore-from-latest-backup",
+            "--backup-every-n-blocks",
+            number_of_blocks,
         ];
 
         let stdout_path = Runtime::join_file_path(

@@ -6,9 +6,7 @@ use cgp::extra::runtime::HasRuntime;
 use eyre::eyre;
 use futures::lock::Mutex;
 use hermes_core::runtime_components::traits::{CanCreateDir, CanExecCommand, CanSleep};
-use hermes_core::test_components::setup::traits::{
-    FullNodeForker, FullNodeForkerComponent, FullNodeHalter, FullNodeHalterComponent,
-};
+use hermes_core::test_components::setup::traits::{FullNodeForker, FullNodeForkerComponent};
 use hermes_cosmos::error::HermesError;
 use hermes_cosmos::integration_tests::contexts::{
     CosmosBootstrap, CosmosBootstrapFields, CosmosChainDriver,
@@ -29,7 +27,7 @@ use crate::utils::load_contract_from_env;
 
 pub struct ForkSecondFullNode;
 
-#[cgp_provider(FullNodeHalterComponent)]
+/*#[cgp_provider(FullNodeHalterComponent)]
 impl FullNodeHalter<StarknetTestDriver> for ForkSecondFullNode {
     async fn halt_full_node(
         driver: &StarknetTestDriver,
@@ -68,7 +66,7 @@ impl FullNodeHalter<StarknetTestDriver> for ForkSecondFullNode {
 
         Ok(())
     }
-}
+}*/
 
 #[cgp_provider(FullNodeForkerComponent)]
 impl FullNodeForker<StarknetTestDriver> for ForkSecondFullNode {
@@ -323,6 +321,7 @@ async fn fork_cosmos_chain(driver: &StarknetTestDriver) -> Result<StarknetTestDr
         runtime: driver.starknet_chain_driver.runtime.clone(),
         chain: driver.starknet_chain_driver.chain.clone(),
         chain_store_dir: driver.starknet_chain_driver.chain_store_dir.clone(),
+        chain_command_path: driver.starknet_chain_driver.chain_command_path.clone(),
         genesis_config: driver.starknet_chain_driver.genesis_config.clone(),
         node_config: driver.starknet_chain_driver.node_config.clone(),
         wallets: driver.starknet_chain_driver.wallets.clone(),
@@ -552,6 +551,7 @@ async fn fork_starknet_chain(
         runtime: driver.starknet_chain_driver.runtime.clone(),
         chain: forked_starknet_chain,
         chain_store_dir: fork_chain_home_dir,
+        chain_command_path: driver.starknet_chain_driver.chain_command_path.clone(),
         genesis_config: driver.starknet_chain_driver.genesis_config.clone(),
         node_config: fork_chain_node_config,
         wallets: driver.starknet_chain_driver.wallets.clone(),

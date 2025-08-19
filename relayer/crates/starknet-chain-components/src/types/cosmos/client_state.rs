@@ -77,6 +77,10 @@ where
     fn client_state_chain_id(client_state: &CometClientState) -> ChainId {
         client_state.chain_id.clone()
     }
+
+    fn client_state_trusting_period(client_state: &CometClientState) -> Option<Duration> {
+        Some(client_state.trusting_period)
+    }
 }
 
 impl From<CometClientState> for IbcCometClientState {

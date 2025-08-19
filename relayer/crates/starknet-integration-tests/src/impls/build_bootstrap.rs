@@ -8,7 +8,7 @@ use cgp::extra::runtime::HasRuntime;
 use futures::lock::Mutex;
 use hermes_core::runtime_components::traits::{CanCreateDir, CanSleep, CanWriteStringToFile};
 use hermes_core::test_components::chain::traits::HasWalletType;
-use hermes_core::test_components::chain_driver::traits::HasChainType;
+use hermes_core::test_components::chain_driver::traits::{HasChainCommandPath, HasChainType};
 use hermes_core::test_components::driver::traits::HasChainDriverType;
 use hermes_cosmos::runtime::types::error::TokioRuntimeError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
@@ -38,6 +38,7 @@ where
         + HasChainType
         + HasChainGenesisConfigType<ChainGenesisConfig = StarknetGenesisConfig>
         + HasChainNodeConfigType<ChainNodeConfig = StarknetNodeConfig>
+        + HasChainCommandPath
         + CanRaiseAsyncError<TokioRuntimeError>
         + CanRaiseAsyncError<ProviderError>
         + CanRaiseAsyncError<ParseError>
@@ -56,6 +57,8 @@ where
         let runtime = bootstrap.runtime().clone();
 
         let chain_store_dir = bootstrap.chain_store_dir().clone();
+
+        let chain_command_path = bootstrap.chain_command_path().clone();
 
         runtime
             .create_dir(&chain_store_dir.join("wallets"))
@@ -173,6 +176,7 @@ where
             runtime,
             chain,
             chain_store_dir,
+            chain_command_path,
             genesis_config,
             node_config,
             wallets,

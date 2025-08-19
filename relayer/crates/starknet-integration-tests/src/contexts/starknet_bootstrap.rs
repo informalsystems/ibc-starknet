@@ -9,14 +9,16 @@ use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_core::test_components::bootstrap::traits::ChainBootstrapperComponent;
-use hermes_core::test_components::chain_driver::traits::ChainTypeProviderComponent;
+use hermes_core::test_components::chain_driver::traits::{
+    ChainCommandPathGetterComponent, ChainTypeProviderComponent,
+};
 use hermes_core::test_components::driver::traits::ChainDriverTypeProviderComponent;
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos_core::test_components::bootstrap::impls::BuildAndWaitChainDriver;
 use hermes_cosmos_core::test_components::bootstrap::traits::{
-    ChainCommandPathGetterComponent, ChainDriverBuilderComponent, ChainFullNodeStarterComponent,
-    ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent, ChainStoreDirGetterComponent,
+    ChainDriverBuilderComponent, ChainFullNodeStarterComponent, ChainGenesisConfigTypeComponent,
+    ChainNodeConfigTypeComponent, ChainStoreDirGetterComponent,
 };
 use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;
@@ -24,9 +26,12 @@ use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_chain_context::impls::HandleStarknetChainError;
 use hermes_starknet_test_components::impls::{
     BootstrapStarknet, BuildChainAndDeployIbcContracts, DeployIbcContract,
-    ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType, StartStarknetSequencer,
+    ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType, StartStarknetForkedSequencer,
+    StartStarknetSequencer,
 };
-use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
+use hermes_starknet_test_components::traits::{
+    ChainForkedFullNodeStarterComponent, IbcContractsDeployerComponent,
+};
 use starknet::core::types::contract::SierraClass;
 
 use crate::contexts::StarknetChainDriver;
@@ -80,6 +85,8 @@ delegate_components! {
         ChainFullNodeStarterComponent:
             StartStarknetSequencer, // Start only Starknet as sequencer
             // StartStarknetStack, // Switch to this to start Starknet, Pathfinder, and Anvil
+        ChainForkedFullNodeStarterComponent:
+            StartStarknetForkedSequencer,
         IbcContractsDeployerComponent:
             DeployIbcContract,
         ChainDriverBuilderComponent:

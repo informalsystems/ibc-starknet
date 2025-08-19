@@ -9,11 +9,15 @@ use hermes_core::runtime_components::traits::{
 };
 use hermes_core::test_components::chain_driver::impls::WaitChainReachHeight;
 use hermes_core::test_components::chain_driver::traits::{
-    ChainGetterComponent, ChainProcessTaker, ChainProcessTakerComponent,
-    ChainStartupWaiterComponent, ChainTypeProviderComponent, DenomGetter, DenomGetterComponent,
-    RandomAmountGeneratorComponent, RelayerWallet, SetupUpgradeClientTestResultTypeProvider,
+    ChainCommandPathGetter, ChainCommandPathGetterComponent, ChainGetterComponent,
+    ChainProcessTaker, ChainProcessTakerComponent, ChainStartupWaiterComponent,
+    ChainTypeProviderComponent, DenomGetter, DenomGetterComponent, RandomAmountGeneratorComponent,
+    RelayerWallet, SetupUpgradeClientTestResultTypeProvider,
     SetupUpgradeClientTestResultTypeProviderComponent, StakingDenom, TransferDenom, UserWallet,
     WalletGetterComponent,
+};
+use hermes_core::test_components::test_case::traits::node::{
+    FullNodeHalterComponent, FullNodeResumerComponent, ResumeFullNodeOptionsTypeProviderComponent,
 };
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
@@ -26,12 +30,15 @@ use hermes_starknet_test_components::impls::StarknetProposalSetupClientUpgradeRe
 use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
 use tokio::process::Child;
 
+use crate::impls::{StarknetFullNodeHandler, StarknetFullNodeResumeOptions};
+
 #[cgp_context(StarknetChainDriverComponents)]
 #[derive(HasField)]
 pub struct StarknetChainDriver {
     pub runtime: HermesRuntime,
     pub chain: StarknetChain,
     pub chain_store_dir: PathBuf,
+    pub chain_command_path: PathBuf,
     pub genesis_config: StarknetGenesisConfig,
     pub node_config: StarknetNodeConfig,
     pub wallets: BTreeMap<String, StarknetWallet>,
@@ -66,6 +73,13 @@ delegate_components! {
             WaitChainReachHeight<1>,
         RandomAmountGeneratorComponent:
             UseU256Amount,
+        [
+            FullNodeHalterComponent,
+            FullNodeResumerComponent,
+        ]:
+            StarknetFullNodeHandler,
+        ResumeFullNodeOptionsTypeProviderComponent:
+            UseType<StarknetFullNodeResumeOptions>,
     }
 }
 
@@ -94,5 +108,12 @@ impl DenomGetter<StarknetChainDriver, StakingDenom> for StarknetChainDriverCompo
 impl ChainProcessTaker<StarknetChainDriver> for StarknetChainDriverComponents {
     fn take_chain_process(chain_driver: &mut StarknetChainDriver) -> Vec<Child> {
         core::mem::take(&mut chain_driver.chain_processes)
+    }
+}
+
+#[cgp_provider(ChainCommandPathGetterComponent)]
+impl ChainCommandPathGetter<StarknetChainDriver> for StarknetChainDriverComponents {
+    fn chain_command_path(driver: &StarknetChainDriver) -> &PathBuf {
+        &driver.chain_command_path
     }
 }
