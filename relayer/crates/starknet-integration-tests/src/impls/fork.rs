@@ -19,7 +19,6 @@ use hermes_starknet_chain_context::contexts::{StarknetChain, StarknetChainFields
 use hermes_starknet_test_components::traits::CanStartChainForkedFullNodes;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
-use starknet_crypto::Felt;
 use tendermint_rpc::{HttpClient, Url};
 
 use crate::contexts::{
