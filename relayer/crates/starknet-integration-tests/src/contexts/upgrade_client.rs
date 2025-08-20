@@ -206,14 +206,14 @@ where
             sequencer_private_key: setup_result.sequencer_private_key,
         };
 
-        // FIXME(rano): Restart starknet chain with the new sequencer key
+        // Restart starknet chain with the new sequencer key
         chain_driver_a.halt_full_node().await?;
         let chain_driver_a = chain_driver_a.resume_full_node(&resume_options).await?;
 
         let chain_a = chain_driver_a.chain();
         let encoding = chain_a.encoding();
 
-        // the `public_key` should be updated
+        // Check the updated sequencer `public_key`
 
         let endpoint_url = chain_a.feeder_gateway_url();
         let endpoint = FeederGatewayEndpoint::new(endpoint_url.as_str());
