@@ -15,7 +15,7 @@ const {
     starknetRpc,
     ics20ContractAddress,
   },
-  args: [portId, channelId, amount, denom, osmosisAddress],
+  args: [portId, channelId, amount, tokenAddress, osmosisAddress],
 } = await new Command()
   .env("STARKNET_RPC=<value:string>", "Starknet RPC endpoint", {
     required: true,
@@ -28,7 +28,7 @@ const {
     },
   )
   .arguments(
-    "<portId:string> <channelId:string> <amount:number> <denom:string> <osmosisAddress:string>",
+    "<portId:string> <channelId:string> <amount:number> <tokenAddress:string> <osmosisAddress:string>",
   )
   .parse(Deno.args);
 
@@ -42,7 +42,26 @@ const accountAddress =
 const privateKey =
   "0x514977443078cf1e0c36bc88b89ada9a46061a5cf728f40274caea21d76f174";
 
-const account = new Account(provider, accountAddress, privateKey);
+let account = new Account(provider, accountAddress, privateKey);
+
+const tokenClass = await provider.getClassAt(tokenAddress);
+
+const tokenContract = new Contract(
+  tokenClass.abi,
+  tokenAddress,
+  provider,
+).typedv2(tokenClass.abi);
+
+console.log(tokenContract.abi);
+
+tokenContract.connect(account);
+
+const approveCall = await tokenContract.approve(
+  ics20ContractAddress,
+  cairo.uint256(amount),
+);
+
+console.log(approveCall);
 
 const ics20Class = await provider.getClassAt(ics20ContractAddress);
 const ics20Contract = new Contract(
@@ -51,32 +70,28 @@ const ics20Contract = new Contract(
   provider,
 ).typedv2(ics20Class.abi);
 
+account = new Account(provider, accountAddress, privateKey);
+
+ics20Contract.connect(account);
+
 let prefixedDenom = {
   trace_path: [],
   base: new CairoCustomEnum({
-    Native: { address: denom },
+    Native: { address: tokenAddress },
     Hosted: undefined,
   }),
 };
 
-let msgTransfer = {
-  port_id_on_a: { port_id: "transfer" },
-  chan_id_on_a: { channel_id: "channel-0" },
+const ics20TransferCall = await ics20Contract.send_transfer({
+  port_id_on_a: { port_id: portId },
+  chan_id_on_a: { channel_id: channelId },
   denom: prefixedDenom,
   amount: cairo.uint256(amount),
   receiver: osmosisAddress,
   memo: { memo: "sample memo" },
   // revision_number needs to be the cosmos one
-  timeout_height_on_b: { revision_number: 4090262314, revision_height: 5000 },
+  timeout_height_on_b: { revision_number: 2273009016, revision_height: 5000 },
   timeout_timestamp_on_b: { timestamp: 0 },
-};
+});
 
-ics20Contract.connect(account);
-
-const call = await ics20Contract.send_transfer(msgTransfer);
-
-console.log(call);
-
-const { suggestedMaxFee, unit } = await account.estimateInvokeFee(call);
-
-console.log(suggestedMaxFee, unit);
+console.log(ics20TransferCall);
