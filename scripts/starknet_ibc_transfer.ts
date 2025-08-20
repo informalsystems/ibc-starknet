@@ -22,7 +22,7 @@ const {
   })
   .env(
     "ICS20_CONTRACT_ADDRESS=<value:string>",
-    "IC20 contract address",
+    "ICS20 contract address",
     {
       required: true,
     },
