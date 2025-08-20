@@ -196,6 +196,12 @@ const ibc_prefixed_denom = {
 };
 ```
 
+## References:
+
+- [how does IBC Protocol work?][how-ibc-classic-works]
+- [ICS20 Specification][ics20-spec]
+- [Unerstand IBC denoms][ibc-denoms]
+
 [keplr]: https://www.keplr.app
 [cosmostation]: https://www.cosmostation.io/products/cosmostation_mobile
 [send-transfer]: ../cairo-contracts/packages/apps/src/transfer/components/transfer.cairo#L150
@@ -203,3 +209,6 @@ const ibc_prefixed_denom = {
 [starknet-ibc-transfer]: ../scripts/starknet_ibc_transfer.ts
 [ics20-events]: ../cairo-contracts/packages/apps/src/transfer/components/transfer.cairo#L41
 [create-ibc-token]: ../cairo-contracts/packages/apps/src/transfer/components/transfer.cairo#L274
+[how-ibc-classic-works]: https://ibcprotocol.dev/how-ibc-classic-works
+[ics20-spec]: https://github.com/cosmos/ibc/blob/main/spec/app/ics-020-fungible-token-transfer/README.md
+[ibc-denoms]: https://ida.interchain.io/tutorials/6-ibc-dev
