@@ -61,7 +61,33 @@ pub struct MsgTransfer {
 > user has approved the ICS20 application to spend on their behalf.
 
 We maintain a [typescript code][starknet-ibc-transfer] to showcase submitting
-`send_transfer` message.
+`send_transfer` message. One can use the script after bootstrapping the Starknet
+and Osmosis with packet relaying.
+
+```sh
+cd cairo-contracts
+scarb --profile release build -p starknet_ibc_contracts
+cd ../relayer
+
+export ERC20_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_ERC20Mintable.contract_class.json"
+export ICS20_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_TransferApp.contract_class.json"
+export COMET_CLIENT_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_CometClient.contract_class.json"
+export IBC_CORE_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_IBCCore.contract_class.json"
+export STARKNET_BIN="$HOME/.cargo/bin/madara"
+
+export COMET_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_CometLib.contract_class.json"
+export ICS23_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_Ics23Lib.contract_class.json"
+export PROTOBUF_LIB_CONTRACT="$(pwd)/../cairo-contracts/target/release/starknet_ibc_contracts_ProtobufLib.contract_class.json"
+
+export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_RawStore.contract_class.json"
+
+export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
+
+cargo run --bin hermes-devnet
+```
+
+Once the devnet is bootstrapped, one can use the logged information to execute
+the script.
 
 ### Receiving fungible tokens
 
