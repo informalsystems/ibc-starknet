@@ -52,8 +52,6 @@ const tokenContract = new Contract(
   provider,
 ).typedv2(tokenClass.abi);
 
-console.log(tokenContract.abi);
-
 tokenContract.connect(account);
 
 const approveCall = await tokenContract.approve(
@@ -84,8 +82,6 @@ let currentBlock = await provider.getBlock();
 
 // timeout is 10 mins in future
 let timestampTimeoutSecs = currentBlock.timestamp + (10 * 60);
-
-console.log("Timeout Timestamp:", timestampTimeoutSecs);
 
 const ics20TransferCall = await ics20Contract.send_transfer({
   port_id_on_a: { port_id: portId },
