@@ -42,7 +42,7 @@ const accountAddress =
 const privateKey =
   "0x514977443078cf1e0c36bc88b89ada9a46061a5cf728f40274caea21d76f174";
 
-let account = new Account(provider, accountAddress, privateKey);
+const account = new Account(provider, accountAddress, privateKey);
 
 const tokenClass = await provider.getClassAt(tokenAddress);
 
@@ -70,8 +70,6 @@ const ics20Contract = new Contract(
   provider,
 ).typedv2(ics20Class.abi);
 
-account = new Account(provider, accountAddress, privateKey);
-
 ics20Contract.connect(account);
 
 let prefixedDenom = {
@@ -82,6 +80,13 @@ let prefixedDenom = {
   }),
 };
 
+let currentBlock = await provider.getBlock();
+
+// timeout is 10 mins in future
+let timestampTimeoutSecs = currentBlock.timestamp + (10 * 60);
+
+console.log("Timeout Timestamp:", timestampTimeoutSecs);
+
 const ics20TransferCall = await ics20Contract.send_transfer({
   port_id_on_a: { port_id: portId },
   chan_id_on_a: { channel_id: channelId },
@@ -89,9 +94,10 @@ const ics20TransferCall = await ics20Contract.send_transfer({
   amount: cairo.uint256(amount),
   receiver: osmosisAddress,
   memo: { memo: "sample memo" },
-  // revision_number needs to be the cosmos one
-  timeout_height_on_b: { revision_number: 2273009016, revision_height: 5000 },
-  timeout_timestamp_on_b: { timestamp: 0 },
+  // if timeout_height is non-empty, revision_number needs to be the cosmos one
+  timeout_height_on_b: { revision_number: 0, revision_height: 0 },
+  // timeout_timestamp is in nanoseconds
+  timeout_timestamp_on_b: { timestamp: timestampTimeoutSecs * 10e9 },
 });
 
 console.log(ics20TransferCall);
