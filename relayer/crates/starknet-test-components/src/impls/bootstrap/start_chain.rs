@@ -53,7 +53,7 @@ where
             "--gateway-enable",
             "--feeder-gateway-enable",
             "--rpc-storage-proof-max-distance",
-            "300", // can generate storage proof for the last 300 blocks
+            "600", // can generate storage proof for the last 600 blocks
             "--preset",
             "sepolia",
             "--l1-sync-disabled",
