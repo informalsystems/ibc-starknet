@@ -7,19 +7,23 @@
 
 ## ICS20 on Starknet <> Osmosis
 
-For Osmosis, the ICS20 APIs are already handled by many wallets like Keplr and
-Cosmostation. In this documentation, we solely focus on the APIs exposed by the
-Starknet IBC implementation.
+For Osmosis, the ICS20 APIs are already handled by many wallets like
+[Keplr][keplr] and [Cosmostation][cosmostation]. In this documentation, we focus
+on the APIs exposed by the Starknet IBC implementation.
 
-To handle token transfers, the wallet application needs to communicate with the
-ICS20 contract deployed on Starknet.
+To initiate token transfers, the wallet application needs to communicate with
+the ICS20 contract deployed on Starknet.
 
-A short recap of ICS20:
+A short recap of ICS20 contact on Starknet:
 
-- sending native tokens will escrow the tokens in the ICS20 contract.
-- sending remote IBC tokens will burn the tokens in the ICS20 contract.
-- receiving native tokens will escrow the tokens in the ICS20 contract.
-- receiving remote IBC tokens will mint the tokens in the ICS20 contract.
+- sending native tokens (e.g. STRK, ETH) will escrow the tokens to the ICS20
+  contract.
+- receiving remote IBC tokens (e.g. OSMO, ATOM) will mint the tokens by the
+  ICS20 contract.
+- receiving native tokens (e.g. STRK, ETH) will unescrow the tokens from the
+  ICS20 contract.
+- sending remote IBC tokens (e.g. OSMO, ATOM) will burn the tokens by the ICS20
+  contract.
 
 ### Sending fungible tokens
 
@@ -52,19 +56,17 @@ pub struct MsgTransfer {
 - `timeout_timestamp_on_b` is the timeout UNIX timestamp in nanoseconds at
   Osmosis block after which the packet won't be included.
 
-#### Sending Starknet native tokens
+> [!NOTE]
+> Before transferring the tokens, the wallet application needs to ensure the
+> user has approved the ICS20 application to spend on their behalf.
 
-We need to use Native denom. Show how to form this in typescript.
-
-#### Sending back Osmosis tokens
-
-We need to use the TracePrefixed denom.
+We maintain a [typescript code][starknet-ibc-transfer] to showcase submitting
+`send_transfer` message.
 
 ### Receiving fungible tokens
 
-Considering a Cosmos wallet triggers a transfer from an Osmosis wallet to a
-Starknet wallet, there is nothing to be done on Starknet side to receive the
-tokens.
+Given a Cosmos wallet triggers a transfer from an Osmosis wallet to a Starknet
+wallet, there is nothing to be done on Starknet side to receive the tokens.
 
 But a Starknet wallet may want to listen to the events from the ICS20 contract:
 [`ICS20Events`][ics20-events]
@@ -89,16 +91,85 @@ pub enum Event {
 - `CreateTokenEvent` when a new token is created and minted in the ICS20
   contract.
 
-### IBC tokens
+These events provide more context on the IBC transfer information.
 
-#### Manual Register
+### IBC Token Representation
 
-If you need to register Osmosis tokens before transferring.
+#### Osmosis Token on Starknet
 
-#### IBC Token Metadata
+The remote (Osmosis) IBC tokens are created and minted by ICS20 contract as
+ERC20 tokens.
 
-Describe how the IBC tokens are represented.
+While creating an ERC20 tokens, we set its metadata as following:
 
-[send-transfer]: https://github.com/informalsystems/ibc-starknet/blob/4665d0d053d075fa65fb4d748b6d844274064dcd/cairo-contracts/packages/apps/src/transfer/components/transfer.cairo#L150
-[msg-transfer]: https://github.com/informalsystems/ibc-starknet/blob/4665d0d053d075fa65fb4d748b6d844274064dcd/cairo-contracts/packages/apps/src/transfer/types.cairo#L17
-[ics20-events]: https://github.com/informalsystems/ibc-starknet/blob/4665d0d053d075fa65fb4d748b6d844274064dcd/cairo-contracts/packages/apps/src/transfer/components/transfer.cairo#L41
+- name: the base denom from IBC prefixed denom.
+- symbol: name with `IBC/` prefix.
+- decimals: 0 (zero).
+
+We use 0 decimals because IBC-go conventionally uses base denom.
+
+So, when sending `1 OSMO` or `1e6 uOSMO` (in base denom) from Osmosis, the ICS20
+contract mints `1e6 IBC/uOSMO`.
+
+#### Starknet Token on Osmosis
+
+The Starknet IBC tokens are represented using base denom on Osmosis with 0
+decimals. The token address is used as denom.
+
+So sending a `1 STRK` from Starknet will mint
+`1e18 0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d` at
+Osmosis.
+
+#### Manual Token Registration
+
+The remote (Osmosis) token contracts are not deployed on Starknet unless there
+is a transfer from Osmosis.
+
+For UX purposes, we allow users to manually register and deploy these IBC tokens
+(with zero token supply) on Starknet before initiating a transfer from Osmosis.
+
+The IBC token registration and deployment are permissionless. One can invoke
+[`create_ibc_token`][create-ibc-token] entrypoint of ICS20 contract.
+
+The argument is an IBC `PrefixedDenom` at Starknet. So, to register `uOSMO` IBC
+token arriving at channel `channel-0` and port `transfer`, the argument would be
+`transfer/channel-0/uOSMO`.
+
+```ts
+const ibc_prefixed_denom = {
+  trace_path: [{
+    port_id: { port_id: "transfer" },
+    channel_id: { channel_id: "channel-0" },
+  }],
+  base: new CairoCustomEnum({
+    Native: undefined,
+    Hosted: "uOSMO",
+  }),
+};
+```
+
+Note that, the IBC prefixed denom prepends the port and channel. Suppose, the
+`uATOM` (native to Cosmohub) is represented as `transfer/channel-13/uATOM` on
+Osmosis. Its prefixed denom representation on Starknet would be
+`transfer/channel-0/transfer/channel-13/uATOM`. As `PrefixedDenom`, it would be:
+
+```rs
+const ibc_prefixed_denom = {
+  trace_path: [{
+    port_id: { port_id: "transfer" },
+    channel_id: { channel_id: "channel-0" },
+  }],
+  base: new CairoCustomEnum({
+    Native: undefined,
+    Hosted: "uOSMO",
+  }),
+};
+```
+
+[keplr]: https://www.keplr.app
+[cosmostation]: https://www.cosmostation.io/products/cosmostation_mobile
+[send-transfer]: ../cairo-contracts/packages/apps/src/transfer/components/transfer.cairo#L150
+[msg-transfer]: ../cairo-contracts/packages/apps/src/transfer/types.cairo#L17
+[starknet-ibc-transfer]: ../scripts/starknet_ibc_transfer.ts
+[ics20-events]: ../cairo-contracts/packages/apps/src/transfer/components/transfer.cairo#L41
+[create-ibc-token]: ../cairo-contracts/packages/apps/src/transfer/components/transfer.cairo#L274
