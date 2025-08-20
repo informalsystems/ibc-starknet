@@ -33,6 +33,10 @@ fn main() -> Result<(), Error> {
             "    RPC: {}",
             test_driver.starknet_chain_driver.node_config.rpc_port,
         );
+        info!(
+            "    Feeder: {}",
+            test_driver.starknet_chain_driver.node_config.rpc_port + 1,
+        );
 
         info!("Osmosis IBC info:");
         info!("  Client ID: {}", test_driver.client_id_b);
