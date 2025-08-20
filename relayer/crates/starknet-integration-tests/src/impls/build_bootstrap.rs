@@ -6,6 +6,7 @@ use std::sync::OnceLock;
 
 use cgp::extra::runtime::HasRuntime;
 use futures::lock::Mutex;
+use hermes_core::chain_type_components::impls::BatchConfig;
 use hermes_core::runtime_components::traits::{CanCreateDir, CanSleep, CanWriteStringToFile};
 use hermes_core::test_components::chain::traits::HasWalletType;
 use hermes_core::test_components::chain_driver::traits::{HasChainCommandPath, HasChainType};
@@ -18,6 +19,9 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
     HasChainNodeConfigType, HasChainStoreDir,
 };
 use hermes_prelude::*;
+use hermes_starknet_chain_components::impls::{
+    StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses,
+};
 use hermes_starknet_chain_components::types::StarknetWallet;
 use hermes_starknet_chain_context::contexts::{StarknetChain, StarknetChainFields};
 use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
@@ -147,6 +151,51 @@ where
                 )
             })
             .ok();
+        let relayer_wallet_path_1 = chain_store_dir
+            .join("wallets/relayer.toml")
+            .display()
+            .to_string();
+
+        let relayer_wallet_path_2 = chain_store_dir
+            .join("wallets/relayer-2.toml")
+            .display()
+            .to_string();
+
+        let contract_classes = StarknetContractClasses {
+            erc20: None,
+            ics20: None,
+            ibc_client: None,
+        };
+        let contract_addresses = StarknetContractAddresses {
+            ibc_client: None,
+            ibc_core: None,
+            ibc_ics20: None,
+        };
+
+        let block_time = core::time::Duration::from_secs(1);
+        let poll_interval = core::time::Duration::from_millis(200);
+
+        let chain_config = StarknetChainConfig {
+            json_rpc_url: format!("http://{}:{}/", node_config.rpc_addr, node_config.rpc_port),
+            feeder_gateway_url: format!(
+                "http://{}:{}/",
+                node_config.rpc_addr,
+                node_config.rpc_port + 1
+            ),
+            relayer_wallet_1: relayer_wallet_path_1,
+            relayer_wallet_2: relayer_wallet_path_2,
+            poll_interval,
+            block_time,
+            contract_addresses,
+            contract_classes,
+            batch_config: Some(BatchConfig {
+                max_message_count: 300,
+                max_tx_size: 1000000,
+                buffer_size: 1000000,
+                max_delay: Duration::from_secs(1),
+                sleep_time: Duration::from_millis(100),
+            }),
+        };
 
         let chain = StarknetChain {
             fields: Arc::new(StarknetChainFields {
@@ -155,6 +204,7 @@ where
                     .to_string()
                     .parse()
                     .map_err(Bootstrap::raise_error)?,
+                chain_config,
                 starknet_client,
                 rpc_client,
                 json_rpc_url,
@@ -163,8 +213,8 @@ where
                 ibc_core_contract_address: OnceLock::new(),
                 ibc_ics20_contract_address: OnceLock::new(),
                 event_encoding: Default::default(),
-                poll_interval: core::time::Duration::from_millis(200),
-                block_time: core::time::Duration::from_secs(1),
+                poll_interval,
+                block_time,
                 nonce_mutex: Arc::new(Mutex::new(())),
                 signers: vec![relayer_wallet_1.clone(), relayer_wallet_2.clone()],
                 client_refresh_rate,

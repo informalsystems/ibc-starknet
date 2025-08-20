@@ -518,6 +518,7 @@ async fn fork_starknet_chain(
         fields: Arc::new(StarknetChainFields {
             runtime: runtime.clone(),
             chain_id: driver.starknet_chain_driver.chain.chain_id.clone(),
+            chain_config: driver.starknet_chain_driver.chain.chain_config.clone(),
             starknet_client: forked_starknet_rpc_client,
             rpc_client,
             json_rpc_url: forked_json_rpc_url,
