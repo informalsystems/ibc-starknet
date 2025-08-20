@@ -37,6 +37,7 @@ console.log("Starknet IBC ICS20 Contract:", ics20ContractAddress);
 
 const provider = new RpcProvider({ nodeUrl: starknetRpc });
 
+// madara pre-deployed wallet
 const accountAddress =
   "0x8a1719e7ca19f3d91e8ef50a48fc456575f645497a1d55f30e3781f786afe4";
 const privateKey =
