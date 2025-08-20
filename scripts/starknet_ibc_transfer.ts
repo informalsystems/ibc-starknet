@@ -94,7 +94,7 @@ const ics20TransferCall = await ics20Contract.send_transfer({
   // if timeout_height is non-empty, revision_number needs to be the cosmos one
   timeout_height_on_b: { revision_number: 0, revision_height: 0 },
   // timeout_timestamp is in nanoseconds
-  timeout_timestamp_on_b: { timestamp: timestampTimeoutSecs * 10e9 },
+  timeout_timestamp_on_b: { timestamp: timestampTimeoutSecs * 1e9 },
 });
 
 console.log(ics20TransferCall);
