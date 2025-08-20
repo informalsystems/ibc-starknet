@@ -81,6 +81,8 @@ let prefixedDenom = {
 
 let currentBlock = await provider.getBlock();
 
+console.log(currentBlock);
+
 // timeout is 10 mins in future
 let timestampTimeoutSecs = currentBlock.timestamp + (10 * 60);
 

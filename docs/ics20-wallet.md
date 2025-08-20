@@ -83,7 +83,7 @@ export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_co
 
 export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
 
-cargo run --bin hermes-devnet
+cargo run --release --bin hermes-devnet
 ```
 
 Once the devnet is bootstrapped, one can use the logged information to execute
