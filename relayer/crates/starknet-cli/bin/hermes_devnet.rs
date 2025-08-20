@@ -1,6 +1,7 @@
 #![recursion_limit = "256"]
 
 use hermes_core::runtime_components::traits::CanSleep;
+use hermes_core::test_components::relay_driver::run::CanRunRelayerInBackground;
 use hermes_cosmos::error::types::Error;
 use hermes_cosmos::integration_tests::init::init_test_runtime;
 use hermes_starknet_integration_tests::utils::init_starknet_test_driver;
@@ -55,6 +56,15 @@ fn main() -> Result<(), Error> {
             "    gRPC: {}",
             test_driver.cosmos_chain_driver.chain_node_config.grpc_port,
         );
+
+        let _starknet_to_cosmos_handle = test_driver
+            .relay_driver_a_b
+            .run_relayer_in_background()
+            .await?;
+        let _cosmos_to_starknet_handle = test_driver
+            .relay_driver_b_a
+            .run_relayer_in_background()
+            .await?;
 
         runtime.sleep(core::time::Duration::from_secs(3600)).await;
 
