@@ -183,6 +183,10 @@ Osmosis. Its prefixed denom representation on Starknet would be
 const ibc_prefixed_denom = {
   trace_path: [{
     port_id: { port_id: "transfer" },
+    channel_id: { channel_id: "channel-13" },
+  },
+  {
+    port_id: { port_id: "transfer" },
     channel_id: { channel_id: "channel-0" },
   }],
   base: new CairoCustomEnum({
