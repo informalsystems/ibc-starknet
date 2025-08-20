@@ -119,8 +119,7 @@ where
         chain_a
             .log(
                 &format!(
-                    "Waiting till Starknet final height: {}",
-                    onchain_final_height
+                    "Waiting till Starknet final height: {onchain_final_height}"
                 ),
                 &LevelInfo,
             )
@@ -134,7 +133,7 @@ where
 
         chain_a
             .log(
-                &format!("Reached Starknet final height: {}", onchain_final_height),
+                &format!("Reached Starknet final height: {onchain_final_height}"),
                 &LevelInfo,
             )
             .await;
@@ -169,8 +168,7 @@ where
         chain_a
             .log(
                 &format!(
-                    "Updated Starknet client till final height: {}",
-                    onchain_final_height
+                    "Updated Starknet client till final height: {onchain_final_height}"
                 ),
                 &LevelInfo,
             )
