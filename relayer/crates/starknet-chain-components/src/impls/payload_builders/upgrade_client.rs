@@ -37,6 +37,7 @@ where
         + HasSelectorType<Selector = Felt>
         + HasBlobType<Blob = Vec<Felt>>
         + HasEncoding<AsFelt, Encoding = Encoding>
+        + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<Encoding::Error>,
     Encoding: Async
         + CanDecode<ViaCairo, u64>
@@ -81,7 +82,7 @@ where
             CairoStarknetConsensusState,
         ) = cairo_encoding.decode(&output).map_err(Chain::raise_error)?;
 
-        let starknet_client_state = cairo_client_state.into();
+        let starknet_client_state = cairo_client_state.try_into().map_err(Chain::raise_error)?;
         let starknet_consensus_state = cairo_consensus_state.into();
 
         let client_state_proof: StorageProof = {

@@ -23,8 +23,10 @@ pub struct CairoStarknetConsensusState {
     pub time: Timestamp,
 }
 
-impl From<CairoStarknetClientState> for StarknetClientState {
-    fn from(state: CairoStarknetClientState) -> Self {
+impl TryFrom<CairoStarknetClientState> for StarknetClientState {
+    type Error = String;
+
+    fn try_from(state: CairoStarknetClientState) -> Result<Self, Self::Error> {
         let CairoStarknetClientState {
             latest_height,
             final_height,
@@ -34,18 +36,24 @@ impl From<CairoStarknetClientState> for StarknetClientState {
             is_frozen,
         } = state;
 
-        Self {
-            latest_height: IbcHeight::new(
-                latest_height.revision_number,
-                latest_height.revision_height,
-            )
-            .unwrap(),
+        let latest_height =
+            IbcHeight::new(latest_height.revision_number, latest_height.revision_height)
+                .map_err(|e| format!("Invalid height: {:?}", e))?;
+
+        let chain_id_str = String::try_from(chain_id)
+            .map_err(|e| format!("Chain ID conversion failed: {:?}", e))?;
+        let chain_id = chain_id_str
+            .parse()
+            .map_err(|e| format!("Chain ID parse failed: {:?}", e))?;
+
+        Ok(Self {
+            latest_height,
             final_height,
-            chain_id: String::try_from(chain_id).unwrap().parse().unwrap(),
-            sequencer_public_key: state.sequencer_public_key.to_bytes_be().to_vec(),
-            ibc_contract_address: state.ibc_contract_address.to_bytes_be().to_vec(),
+            chain_id,
+            sequencer_public_key: sequencer_public_key.to_bytes_be().to_vec(),
+            ibc_contract_address: ibc_contract_address.to_bytes_be().to_vec(),
             is_frozen,
-        }
+        })
     }
 }
 
