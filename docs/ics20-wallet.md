@@ -198,9 +198,9 @@ const ibc_prefixed_denom = {
 
 ## References:
 
-- [how does IBC Protocol work?][how-ibc-classic-works]
+- [How does IBC Protocol work?][how-ibc-classic-works]
 - [ICS20 Specification][ics20-spec]
-- [Unerstand IBC denoms][ibc-denoms]
+- [Understand IBC denoms][ibc-denoms]
 
 [keplr]: https://www.keplr.app
 [cosmostation]: https://www.cosmostation.io/products/cosmostation_mobile
