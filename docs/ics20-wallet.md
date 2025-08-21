@@ -191,7 +191,7 @@ const ibc_prefixed_denom = {
   }],
   base: new CairoCustomEnum({
     Native: undefined,
-    Hosted: "uOSMO",
+    Hosted: "uATOM",
   }),
 };
 ```
