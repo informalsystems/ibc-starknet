@@ -37,7 +37,7 @@ use starknet_crypto_lib::{StarknetCryptoFunctions, StarknetCryptoLib};
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
 use starknet_storage_verifier::validate::validate_storage_proof;
 use starknet_storage_verifier::verifier::{
-    verify_starknet_contract_proof, verify_starknet_global_contract_root,
+    verify_starknet_contract_proof,
     verify_starknet_storage_proof,
 };
 
