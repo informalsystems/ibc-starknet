@@ -135,6 +135,7 @@ mod preset {
                 (ViaCairo, Vec<TracePrefix>),
                 (ViaCairo, Vec<validator::Info>),
                 (ViaCairo, Vec<block::CommitSig>),
+                (ViaCairo, Vec<Product![Felt, Felt, Felt]>),
                 (ViaCairo, Vec<ProofSpec>),
                 (ViaCairo, Vec<Height>),
             ]: EncodeList,

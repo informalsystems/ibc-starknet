@@ -118,6 +118,8 @@ starknet-block-verifier   = { version = "0.1.0", default-features = false }
 starknet-storage-verifier = { version = "0.1.0", default-features = false }
 starknet-crypto-lib       = { version = "0.1.0", default-features = false }
 
+attestator = { version = "0.1.0", default-features = false }
+
 [workspace.lints.rust]
 unsafe_code          = "forbid"
 dead_code            = "deny"
@@ -163,6 +165,8 @@ ibc-client-starknet-types = { path = "../light-client/ibc-client-starknet-types"
 starknet-block-verifier   = { path = "../light-client/starknet-block-verifier" }
 starknet-storage-verifier = { path = "../light-client/starknet-storage-verifier" }
 starknet-crypto-lib       = { path = "../light-client/starknet-crypto-lib" }
+
+attestator = { path = "../attestator" }
 
 garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", rev = "ffb90e5" }
 

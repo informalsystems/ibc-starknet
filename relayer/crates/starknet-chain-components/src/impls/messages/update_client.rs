@@ -1,5 +1,6 @@
 use core::marker::PhantomData;
 
+use attestator::{get_attestation, get_public_key, Ed25519};
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
@@ -41,6 +42,7 @@ where
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
         + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
+        + CanEncode<ViaCairo, Vec<Product![Felt, Felt, Felt]>>
         + CanEncode<ViaCairo, Vec<Vec<Felt>>>
         + CanEncode<ViaCairo, Product![ClientMessage, Vec<Felt>]>
         + CanEncode<ViaCairo, ByteArray>
@@ -108,6 +110,7 @@ where
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
         + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
+        + CanEncode<ViaCairo, Vec<Product![Felt, Felt, Felt]>>
         + CanEncode<ViaCairo, Vec<Vec<Felt>>>,
 {
     let signed_header = &header.signed_header;
@@ -167,46 +170,89 @@ where
         })
         .map(|value| {
             if let Some((msg, signature, public_key)) = value {
-                // FIXME(rano): query attestators' endpoint `/attest`
-
-                let ry_twisted = BigUint::from_bytes_le(&signature[0..32]);
-                let s = BigUint::from_bytes_le(&signature[32..64]);
-                let py_twisted = BigUint::from_bytes_le(&public_key);
-
-                let hint = garaga::calldata::signatures::eddsa_calldata_builder(
-                    ry_twisted,
-                    s,
-                    py_twisted,
-                    msg.clone(),
-                )
-                .unwrap();
-
-                let felt_hint = hint
-                    .into_iter()
-                    .map(|x| Felt::from_hex(&format!("{x:x}")).unwrap())
-                    .collect::<Vec<Felt>>();
-
-                let product![
-                    product![p_ry_twisted, p_s, p_py_twisted, p_msg],
-                    p_msm_hint,
-                    p_sqrt_rx_hint,
-                    p_sqrt_px_hint
-                ]: Product![
-                    Product![U256, U256, U256, Vec<u8>],
-                    Vec<Felt>,
-                    U256,
-                    U256
-                ] = encoding.decode(&felt_hint).unwrap();
-
-                assert_eq!(p_msg, msg);
-
-                encoding
-                    .encode(&product![p_msm_hint, p_sqrt_rx_hint, p_sqrt_px_hint])
-                    .unwrap()
+                compute_attestator_hints(encoding, &msg, &signature, &public_key)
             } else {
                 // only return hints for the valid signatures
                 vec![]
             }
         })
         .collect()
+}
+
+pub fn compute_garaga_hints<Encoding>(
+    encoding: &Encoding,
+    msg: &[u8],
+    signature: &[u8; 64],
+    public_key: &[u8; 32],
+) -> Vec<Felt>
+where
+    Encoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
+        + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>,
+{
+    let ry_twisted = BigUint::from_bytes_le(&signature[0..32]);
+    let s = BigUint::from_bytes_le(&signature[32..64]);
+    let py_twisted = BigUint::from_bytes_le(public_key);
+
+    let hint = garaga::calldata::signatures::eddsa_calldata_builder(
+        ry_twisted,
+        s,
+        py_twisted,
+        msg.to_vec(),
+    )
+    .unwrap();
+
+    let felt_hint = hint
+        .into_iter()
+        .map(|x| Felt::from_hex(&format!("{x:x}")).unwrap())
+        .collect::<Vec<Felt>>();
+
+    let product![
+        product![p_ry_twisted, p_s, p_py_twisted, p_msg],
+        p_msm_hint,
+        p_sqrt_rx_hint,
+        p_sqrt_px_hint
+    ]: Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256] =
+        encoding.decode(&felt_hint).unwrap();
+
+    assert_eq!(p_msg, msg);
+
+    encoding
+        .encode(&product![p_msm_hint, p_sqrt_rx_hint, p_sqrt_px_hint])
+        .unwrap()
+}
+
+pub fn compute_attestator_hints<Encoding>(
+    encoding: &Encoding,
+    msg: &[u8],
+    signature: &[u8; 64],
+    public_key: &[u8; 32],
+) -> Vec<Felt>
+where
+    Encoding:
+        HasEncodedType<Encoded = Vec<Felt>> + CanEncode<ViaCairo, Vec<Product![Felt, Felt, Felt]>>,
+{
+    // FIXME(rano): query attestators' endpoint `/attest`
+
+    let addrs = ["http://localhost:1234"];
+
+    let signatures: Vec<_> = addrs
+        .into_iter()
+        .map(|addr| {
+            let (r, s) = get_attestation(
+                addr,
+                &[Ed25519 {
+                    message: msg.to_vec(),
+                    signature: signature.to_vec(),
+                    public_key: public_key.to_vec(),
+                }],
+            )[0];
+
+            let public_key = get_public_key(addr);
+
+            product![public_key, r, s]
+        })
+        .collect();
+
+    encoding.encode(&signatures).unwrap()
 }

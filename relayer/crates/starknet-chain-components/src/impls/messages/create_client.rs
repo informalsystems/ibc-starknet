@@ -1,5 +1,6 @@
 use core::marker::PhantomData;
 
+use attestator::get_public_key;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
@@ -58,6 +59,10 @@ where
 
         let client_type = short_string!("07-tendermint");
 
+        let addrs = ["http://localhost:1234"];
+
+        let attestator_keys = addrs.into_iter().map(|addr| get_public_key(addr)).collect();
+
         let client_state = CometClientState {
             chain_id: payload.client_state.chain_id,
             latest_height: height,
@@ -69,7 +74,7 @@ where
             proof_specs: payload.client_state.proof_specs,
             upgrade_path: payload.client_state.upgrade_path,
             // FIXME(rano): query attestators' endpoint `/public_key`
-            attestator_keys: vec![],
+            attestator_keys,
         };
 
         let consensus_state = CometConsensusState {

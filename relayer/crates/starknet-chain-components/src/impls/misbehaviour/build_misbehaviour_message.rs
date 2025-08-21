@@ -41,6 +41,7 @@ where
     Chain::Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
         + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
+        + CanEncode<ViaCairo, Vec<Product![Felt, Felt, Felt]>>
         + CanEncode<ViaCairo, Vec<Vec<Felt>>>
         + CanEncode<ViaCairo, (Vec<Vec<Felt>>, Vec<Vec<Felt>>)>
         + CanEncode<ViaCairo, Product![ClientMessage, Vec<Felt>]>
