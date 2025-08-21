@@ -1,10 +1,7 @@
 use std::sync::OnceLock;
 
 use attestator::{Ed25519, attest};
-#[cfg(feature = "json")]
 use rocket::serde::json::Json as Codec;
-#[cfg(not(feature = "json"))]
-use rocket::serde::msgpack::MsgPack as Codec;
 use rocket::{get, launch, post, routes};
 use starknet_crypto::{Felt, get_public_key};
 

@@ -36,21 +36,15 @@ mod tests {
         let challenge = Ed25519 {
             message: vec![0xaf, 0x82],
             signature: [
-                0x6291d657deec2402,
-                0x4827e69c3abe01a3,
-                0x0ce548a284743a44,
-                0x5e3680d7db5ac3ac,
-                0x18ff9b538d16f290,
-                0xae67f760984dc659,
-                0x4a7c15e9716ed28d,
-                0xc027beceea1ec40a,
-            ],
+                0x6291d657deec24024827e69c3abe01a3,
+                0x0ce548a284743a445e3680d7db5ac3ac,
+                0x18ff9b538d16f290ae67f760984dc659,
+                0x4a7c15e9716ed28dc027beceea1ec40a,
+            ].into_iter().flat_map(|x: u128| x.to_be_bytes()).collect(),
             public_key: [
-                0xfc51cd8e6218a1a3,
-                0x8da47ed00230f058,
-                0x0816ed13ba3303ac,
-                0x5deb911548908025,
-            ],
+                0xfc51cd8e6218a1a38da47ed00230f058,
+                0x0816ed13ba3303ac5deb911548908025,
+            ].into_iter().flat_map(|x: u128| x.to_be_bytes()).collect(),
         };
 
         let [(r, s)] = get_attestation(addr, std::slice::from_ref(&challenge))
