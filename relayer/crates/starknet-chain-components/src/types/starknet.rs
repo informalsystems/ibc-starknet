@@ -40,8 +40,8 @@ impl TryFrom<CairoStarknetClientState> for StarknetClientState {
             IbcHeight::new(latest_height.revision_number, latest_height.revision_height)
                 .map_err(|e| format!("Invalid height: {e:?}"))?;
 
-        let chain_id_str = String::try_from(chain_id)
-            .map_err(|e| format!("Chain ID conversion failed: {e:?}"))?;
+        let chain_id_str =
+            String::try_from(chain_id).map_err(|e| format!("Chain ID conversion failed: {e:?}"))?;
         let chain_id = chain_id_str
             .parse()
             .map_err(|e| format!("Chain ID parse failed: {e:?}"))?;
