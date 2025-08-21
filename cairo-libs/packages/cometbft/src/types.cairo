@@ -12,7 +12,7 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
 use protobuf::types::wkt::{Duration, Timestamp};
-use crate::ed25519::GaragaEd25519Verifier as Ed25519Verifier;
+use crate::ed25519::AttestatorEd25519Verifier as Ed25519Verifier;
 use crate::light_client::Header as LcHeader;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
