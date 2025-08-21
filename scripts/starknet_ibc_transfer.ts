@@ -14,8 +14,16 @@ const {
   options: {
     starknetRpc,
     ics20ContractAddress,
+    privateKey,
   },
-  args: [portId, channelId, amount, tokenAddress, osmosisAddress],
+  args: [
+    portId,
+    channelId,
+    accountAddress,
+    amount,
+    tokenAddress,
+    osmosisAddress,
+  ],
 } = await new Command()
   .env("STARKNET_RPC=<value:string>", "Starknet RPC endpoint", {
     required: true,
@@ -27,8 +35,15 @@ const {
       required: true,
     },
   )
+  .env(
+    "PRIVATE_KEY=<value:string>",
+    "Private key for the account",
+    {
+      required: true,
+    },
+  )
   .arguments(
-    "<portId:string> <channelId:string> <amount:number> <tokenAddress:string> <osmosisAddress:string>",
+    "<portId:string> <channelId:string> <accountAddress:string> <amount:number> <tokenAddress:string> <osmosisAddress:string>",
   )
   .parse(Deno.args);
 
@@ -37,13 +52,11 @@ console.log("Starknet IBC ICS20 Contract:", ics20ContractAddress);
 
 const provider = new RpcProvider({ nodeUrl: starknetRpc });
 
-// madara pre-deployed wallet
-const accountAddress =
-  "0x8a1719e7ca19f3d91e8ef50a48fc456575f645497a1d55f30e3781f786afe4";
-const privateKey =
-  "0x514977443078cf1e0c36bc88b89ada9a46061a5cf728f40274caea21d76f174";
-
-const account = new Account(provider, accountAddress, privateKey);
+const account = new Account(
+  provider,
+  accountAddress,
+  privateKey,
+);
 
 const tokenClass = await provider.getClassAt(tokenAddress);
 
@@ -60,7 +73,11 @@ const approveCall = await tokenContract.approve(
   cairo.uint256(amount),
 );
 
-console.log(approveCall);
+const approveReceipt = await account.waitForTransaction(
+  approveCall.transaction_hash,
+);
+
+console.log(`Included in block ${approveReceipt.block_number}`);
 
 const ics20Class = await provider.getClassAt(ics20ContractAddress);
 const ics20Contract = new Contract(
@@ -79,12 +96,10 @@ let prefixedDenom = {
   }),
 };
 
-let currentBlock = await provider.getBlock();
-
-console.log(currentBlock);
+const currentBlock = await provider.getBlock();
 
 // timeout is 10 mins in future
-let timestampTimeoutSecs = currentBlock.timestamp + (10 * 60);
+const timestampTimeoutSecs = currentBlock.timestamp + (10 * 60);
 
 const ics20TransferCall = await ics20Contract.send_transfer({
   port_id_on_a: { port_id: portId },
@@ -99,4 +114,8 @@ const ics20TransferCall = await ics20Contract.send_transfer({
   timeout_timestamp_on_b: { timestamp: timestampTimeoutSecs * 1e9 },
 });
 
-console.log(ics20TransferCall);
+const ics20TransferReceipt = await account.waitForTransaction(
+  ics20TransferCall.transaction_hash,
+);
+
+console.log(`Included in block ${ics20TransferReceipt.block_number}`);
