@@ -115,6 +115,8 @@ jobs:
 
           export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
 
+          ROCKET_PORT=1234 PRIVATE_KEY=0x1234 cargo run --manifest-path ../attestator/Cargo.toml --bin attestator --release &
+
           cargo run --quiet --example contract_size "$ERC20_CONTRACT"
           cargo run --quiet --example contract_size "$ICS20_CONTRACT"
           cargo run --quiet --example contract_size "$COMET_CLIENT_CONTRACT"
