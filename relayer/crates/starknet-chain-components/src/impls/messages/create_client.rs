@@ -61,7 +61,7 @@ where
 
         let addrs = ["http://localhost:1234"];
 
-        let attestator_keys = addrs.into_iter().map(|addr| get_public_key(addr)).collect();
+        let attestator_keys = addrs.into_iter().map(get_public_key).collect();
 
         let client_state = CometClientState {
             chain_id: payload.client_state.chain_id,

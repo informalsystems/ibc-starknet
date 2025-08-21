@@ -40,11 +40,17 @@ mod tests {
                 0x0ce548a284743a445e3680d7db5ac3ac,
                 0x18ff9b538d16f290ae67f760984dc659,
                 0x4a7c15e9716ed28dc027beceea1ec40a,
-            ].into_iter().flat_map(|x: u128| x.to_be_bytes()).collect(),
+            ]
+            .into_iter()
+            .flat_map(|x: u128| x.to_be_bytes())
+            .collect(),
             public_key: [
                 0xfc51cd8e6218a1a38da47ed00230f058,
                 0x0816ed13ba3303ac5deb911548908025,
-            ].into_iter().flat_map(|x: u128| x.to_be_bytes()).collect(),
+            ]
+            .into_iter()
+            .flat_map(|x: u128| x.to_be_bytes())
+            .collect(),
         };
 
         let [(r, s)] = get_attestation(addr, std::slice::from_ref(&challenge))
