@@ -107,25 +107,15 @@ pub impl AttestatorEd25519VerifierImpl of Ed25519Verifier<AttestatorEd25519Verif
 
         let mut attestation_count = 0;
 
-        while let Some((pub_key, r, s)) = attestator_signatures.pop_front() {
-            let mut is_trusted = false;
-
-            while let Some(trusted_pub_key) = attestator_keys.pop_front() {
+        while let Some(trusted_pub_key) = attestator_keys.pop_front() {
+            while let Some((pub_key, r, s)) = attestator_signatures.pop_front() {
                 if trusted_pub_key == pub_key {
-                    is_trusted = true;
+                    if core::ecdsa::check_ecdsa_signature(attestation_hash, pub_key, r, s) {
+                        attestation_count += 1;
+                    }
                     break;
                 }
             }
-
-            if !is_trusted {
-                continue;
-            }
-
-            if !core::ecdsa::check_ecdsa_signature(attestation_hash, pub_key, r, s) {
-                continue;
-            }
-
-            attestation_count += 1;
         }
 
         assert(attestation_count * 2 > attestator_keys.len(), 'not enough ed25519 attestations');
