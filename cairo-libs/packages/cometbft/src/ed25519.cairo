@@ -5,7 +5,7 @@ use garaga::signatures::eddsa_25519::{
 use ibc_utils::bytes::{U256AsBigEndian, U256AsLittleEndian};
 use crate::errors::CometErrors;
 
-pub trait Ed25519Verifier {
+pub trait Ed25519Verifier<V> {
     fn assert_signature(
         msg: Span<u8>,
         signature: Span<u8>,
@@ -15,7 +15,10 @@ pub trait Ed25519Verifier {
     );
 }
 
-pub impl AlexandriaEd25519Verifier of Ed25519Verifier {
+pub struct AlexandriaEd25519Verifier {}
+
+
+pub impl AlexandriaEd25519VerifierImpl of Ed25519Verifier<AlexandriaEd25519Verifier> {
     fn assert_signature(
         msg: Span<u8>,
         signature: Span<u8>,
@@ -34,7 +37,9 @@ pub impl AlexandriaEd25519Verifier of Ed25519Verifier {
     }
 }
 
-pub impl GaragaEd25519Verifier of Ed25519Verifier {
+pub struct GaragaEd25519Verifier {}
+
+pub impl GaragaEd25519VerifierImpl of Ed25519Verifier<GaragaEd25519Verifier> {
     fn assert_signature(
         msg: Span<u8>,
         signature: Span<u8>,
@@ -61,7 +66,9 @@ pub impl GaragaEd25519Verifier of Ed25519Verifier {
     }
 }
 
-pub impl AttestatorEd25519Verifier of Ed25519Verifier {
+pub struct AttestatorEd25519Verifier {}
+
+pub impl AttestatorEd25519VerifierImpl of Ed25519Verifier<AttestatorEd25519Verifier> {
     fn assert_signature(
         mut msg: Span<u8>,
         mut signature: Span<u8>,

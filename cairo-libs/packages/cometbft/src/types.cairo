@@ -1,4 +1,4 @@
-pub use canonical_vote_impl::CanonicalVoteAsProtoMessage;
+use canonical_vote_impl::CanonicalVoteAsProtoMessage;
 use cometbft::errors::CometErrors;
 use cometbft::utils::Fraction;
 use core::sha256::compute_sha256_byte_array;
@@ -12,7 +12,7 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
 use protobuf::types::wkt::{Duration, Timestamp};
-use crate::ed25519::AttestatorEd25519Verifier as Ed25519Verifier;
+use crate::ed25519::{AttestatorEd25519Verifier, Ed25519Verifier};
 use crate::light_client::Header as LcHeader;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
@@ -323,7 +323,7 @@ pub struct PublicKey {
 
 #[generate_trait]
 pub impl PublicKeyImpl of PublicKeyTrait {
-    fn verify(
+    fn verify<V, +Ed25519Verifier<V>>(
         self: @PublicKey,
         msg: Span<u8>,
         signature: Span<u8>,
@@ -331,9 +331,9 @@ pub impl PublicKeyImpl of PublicKeyTrait {
         hint: Span<felt252>,
     ) {
         match self.sum {
-            Sum::Ed25519(pk) => Ed25519Verifier::assert_signature(
-                msg, signature, pk.span(), hints_context, hint,
-            ),
+            Sum::Ed25519(pk) => Ed25519Verifier::<
+                V,
+            >::assert_signature(msg, signature, pk.span(), hints_context, hint),
             _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
         }
     }
@@ -452,7 +452,9 @@ pub impl ValidatorImpl of ValidatorTrait {
         hints_context: Span<felt252>,
         hints: Span<felt252>,
     ) {
-        self.pub_key.verify(sign_bytes, signature, hints_context, hints);
+        self
+            .pub_key
+            .verify::<AttestatorEd25519Verifier>(sign_bytes, signature, hints_context, hints);
     }
 }
 
