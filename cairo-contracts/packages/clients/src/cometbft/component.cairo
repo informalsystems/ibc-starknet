@@ -901,7 +901,7 @@ pub mod CometClientComponent {
                     options,
                     now,
                     hints_context.span(),
-                    signature_hints,
+                    signature_hints.span(),
                 );
         }
 
@@ -954,7 +954,7 @@ pub mod CometClientComponent {
                     options,
                     now,
                     hints_context.span(),
-                    signature_hints,
+                    signature_hints.span(),
                 )
         }
 
