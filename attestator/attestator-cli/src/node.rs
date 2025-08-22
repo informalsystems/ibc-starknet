@@ -1,6 +1,6 @@
 use std::sync::OnceLock;
 
-use attestator::{Ed25519, attest};
+use attestator::Ed25519;
 use rocket::serde::json::Json as Codec;
 use rocket::{get, launch, post, routes};
 use starknet_crypto::{Felt, get_public_key};
@@ -20,7 +20,7 @@ fn attest_api(data: Codec<Vec<Ed25519>>) -> Option<Codec<Vec<(Felt, Felt)>>> {
 
     challenges
         .into_iter()
-        .map(|challenge| attest(private_key, &challenge))
+        .map(|challenge| challenge.attest(private_key))
         .collect::<Option<Vec<_>>>()
         .map(Codec)
 }

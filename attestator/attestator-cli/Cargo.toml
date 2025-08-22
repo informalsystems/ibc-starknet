@@ -1,0 +1,22 @@
+[package]
+name       = "attestator-cli"
+version    = { workspace = true }
+edition    = { workspace = true }
+license    = { workspace = true }
+keywords   = { workspace = true }
+repository = { workspace = true }
+authors    = { workspace = true }
+
+[[bin]]
+name = "attestator"
+path = "src/node.rs"
+
+[[bin]]
+name = "random-key"
+path = "src/random.rs"
+
+[dependencies]
+attestator       = { workspace = true }
+starknet-crypto  = { workspace = true }
+starknet-signers = { workspace = true }
+rocket           = { workspace = true, features = [ "json" ] }
