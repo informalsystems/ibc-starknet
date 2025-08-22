@@ -35,3 +35,5 @@ cairo-lang-starknet-classes = { workspace = true }
 ibc-client-starknet-types   = { workspace = true }
 ureq                        = { workspace = true }
 indexmap                    = { workspace = true }
+
+attestator = { workspace = true, features = [ "client" ] }

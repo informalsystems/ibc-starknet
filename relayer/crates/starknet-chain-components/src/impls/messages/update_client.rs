@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use attestator::{get_attestation, get_public_key, Ed25519};
+use attestator::{AttestatorClient, Ed25519};
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
@@ -253,19 +253,22 @@ where
 {
     let signatures: Vec<_> = attestator_addresses
         .iter()
-        .map(|addr| {
-            let (r, s) = get_attestation(
-                addr,
-                &[Ed25519 {
+        .map(|addr| AttestatorClient(addr.as_str()))
+        .flat_map(|client| {
+            // Error calls will be ignored: `.ok()?`
+            // This allows attestator network to be fault-tolerant.
+
+            let (r, s) = client
+                .get_attestation(&[Ed25519 {
                     message: msg.to_vec(),
                     signature: signature.to_vec(),
                     public_key: public_key.to_vec(),
-                }],
-            )[0];
+                }])
+                .ok()?[0];
 
-            let public_key = get_public_key(addr);
+            let public_key = client.get_public_key().ok()?;
 
-            product![public_key, r, s]
+            Some(product![public_key, r, s])
         })
         .collect();
 

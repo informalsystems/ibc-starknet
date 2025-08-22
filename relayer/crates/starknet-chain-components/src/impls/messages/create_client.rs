@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use attestator::get_public_key;
+use attestator::AttestatorClient;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
@@ -33,6 +33,7 @@ where
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<core::num::TryFromIntError>
+        + CanRaiseAsyncError<attestator::Error>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
         HasCreateClientPayloadType<Chain, CreateClientPayload = CosmosCreateClientPayload>,
@@ -69,8 +70,9 @@ where
 
         let attestator_keys = ed25519_attestator_addresses
             .iter()
-            .map(|addr| get_public_key(addr))
-            .collect();
+            .map(|addr| AttestatorClient(addr.as_ref()).get_public_key())
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(Chain::raise_error)?;
 
         let client_state = CometClientState {
             chain_id: payload.client_state.chain_id,

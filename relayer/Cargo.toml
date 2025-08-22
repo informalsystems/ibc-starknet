@@ -166,7 +166,7 @@ starknet-block-verifier   = { path = "../light-client/starknet-block-verifier" }
 starknet-storage-verifier = { path = "../light-client/starknet-storage-verifier" }
 starknet-crypto-lib       = { path = "../light-client/starknet-crypto-lib" }
 
-attestator = { path = "../attestator" }
+attestator = { path = "../attestator/attestator" }
 
 garaga_rs = { git = "https://github.com/keep-starknet-strange/garaga", rev = "ffb90e5" }
 

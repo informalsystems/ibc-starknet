@@ -79,6 +79,7 @@ delegate_components! {
             IdentifierError,
             ComputeClassHashError,
             StarknetSierraCompilationError,
+            attestator::Error,
         ]: ReportError,
         [
             <'a> &'a str,
