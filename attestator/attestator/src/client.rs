@@ -11,19 +11,17 @@ pub enum Error {
     InvalidSignature,
 }
 
-pub type Result<T> = core::result::Result<T, Error>;
-
 pub struct AttestatorClient<'a>(pub &'a str);
 
 impl AttestatorClient<'_> {
-    pub fn get_attestation(&self, challenges: &[Ed25519]) -> Result<Vec<(Felt, Felt)>> {
+    pub fn get_attestation(&self, challenges: &[Ed25519]) -> Result<Vec<(Felt, Felt)>, Error> {
         ureq::post(&format!("{}/attest", self.0))
             .send_json(challenges)
             .and_then(|mut resp| resp.body_mut().read_json())
             .map_err(|_| Error::InvalidSignature)
     }
 
-    pub fn get_public_key(&self) -> Result<Felt> {
+    pub fn get_public_key(&self) -> Result<Felt, Error> {
         ureq::get(&format!("{}/public_key", self.0))
             .call()
             .and_then(|mut resp| resp.body_mut().read_json())

@@ -10,7 +10,7 @@ members = [
 version    = "0.1.0"
 edition    = "2024"
 license    = "Apache-2.0"
-keywords   = [ "blockchain", "consensus", "cosmos", "ibc", "tendermint" ]
+keywords   = [ "blockchain", "attestator", "ed25519", "ibc", "tendermint" ]
 repository = "https://github.com/informalsystems/hermes-sdk"
 authors    = [ "Informal Systems <hello@informal.systems>" ]
 
