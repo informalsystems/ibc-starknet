@@ -23,7 +23,7 @@ pub fn verify_update_header(
     options: Options,
     now: Timestamp,
     hints_context: Span<felt252>,
-    signature_hints: Array<Array<felt252>>,
+    signature_hints: Span<Array<felt252>>,
 ) {
     verify_validator_sets(@untrusted);
     validate_against_trusted(@untrusted, @trusted, @options, now);
@@ -41,7 +41,7 @@ pub fn verify_misbehaviour_header(
     options: Options,
     now: Timestamp,
     hints_context: Span<felt252>,
-    signature_hints: Array<Array<felt252>>,
+    signature_hints: Span<Array<felt252>>,
 ) {
     verify_validator_sets(@untrusted);
     validate_against_trusted(@untrusted, @trusted, @options, now);
@@ -240,7 +240,7 @@ pub fn verify_commit_against_trusted(
     trusted: TrustedBlockState,
     options: Options,
     hints_context: Span<felt252>,
-    signature_hints: Array<Array<felt252>>,
+    signature_hints: Span<Array<felt252>>,
 ) {
     let trusted_next_height = trusted.height.checked_add(1);
     assert(trusted_next_height.is_some(), CometErrors::OVERFLOWED_BLOCK_HEIGHT);
@@ -269,7 +269,7 @@ pub fn check_enough_trust_and_signers(
     trusted_validators: ValidatorSet,
     trust_threshold: Fraction,
     hints_context: Span<felt252>,
-    signature_hints: Array<Array<felt252>>,
+    signature_hints: Span<Array<felt252>>,
 ) {
     let (trusted_power, untrusted_power) = voting_power_in_sets(
         untrusted_sh,
@@ -288,7 +288,7 @@ pub fn check_signers_overlap(
     untrusted_header: SignedHeader,
     untrusted_validators: ValidatorSet,
     hints_context: Span<felt252>,
-    signature_hints: Array<Array<felt252>>,
+    signature_hints: Span<Array<felt252>>,
 ) {
     let power = voting_power_in(
         untrusted_header, untrusted_validators, TWO_THIRDS, hints_context, signature_hints,
@@ -301,7 +301,7 @@ fn voting_power_in(
     validator_set: ValidatorSet,
     trust_threshold: Fraction,
     hints_context: Span<felt252>,
-    signature_hints: Array<Array<felt252>>,
+    signature_hints: Span<Array<felt252>>,
 ) -> VotingPowerTally {
     let mut votes = NonAbsentCommitVotesTrait::new(signed_header, signature_hints);
     voting_power_in_impl(
@@ -320,7 +320,7 @@ fn voting_power_in_sets(
     second_validator_set: ValidatorSet,
     second_trust_threshold: Fraction,
     hints_context: Span<felt252>,
-    signature_hints: Array<Array<felt252>>,
+    signature_hints: Span<Array<felt252>>,
 ) -> (VotingPowerTally, VotingPowerTally) {
     let mut votes = NonAbsentCommitVotesTrait::new(signed_header, signature_hints);
     let first_tally = voting_power_in_impl(

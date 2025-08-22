@@ -662,14 +662,13 @@ pub struct NonAbsentCommitVotes {
 #[generate_trait]
 pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
     fn new(
-        signed_header: SignedHeader, mut signature_hints: Array<Array<felt252>>,
+        signed_header: SignedHeader, mut signature_hints: Span<Array<felt252>>,
     ) -> NonAbsentCommitVotes {
         let mut votes = ArrayTrait::new();
 
         let commit = signed_header.commit;
 
         let mut signatures = commit.signatures.span();
-        let mut signature_hints = signature_hints.span();
 
         assert(
             signatures.len() == signature_hints.len(), CometErrors::INVALID_SIGNATURE_HINTS_LENGTH,

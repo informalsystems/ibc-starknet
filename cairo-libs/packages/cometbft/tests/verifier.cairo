@@ -80,7 +80,7 @@ fn test_verify_update_header() {
         next_validators: header_b.trusted_validator_set,
     };
 
-    let mut signature_hints = array![
+    let signature_hints = array![
         array![
             0x14, 0x8c47b3a76233d918b5b26650, 0x7046c077146ceef5bd5a9cd0, 0x1c0725137a073f62, 0x0,
             0xbafb4949da9388fbb985ab46, 0x98e154085ca0ec2c3155bde3, 0x6a0fc67575c4f06f, 0x0,
@@ -94,7 +94,12 @@ fn test_verify_update_header() {
     ];
 
     verify_update_header(
-        untrusted_block_state, trusted_block_state, options, now, array![].span(), signature_hints,
+        untrusted_block_state,
+        trusted_block_state,
+        options,
+        now,
+        array![].span(),
+        signature_hints.span(),
     );
 }
 
@@ -132,10 +137,13 @@ fn test_verify_update_header_forged_header() {
     // forged header
     untrusted_block_state.signed_header.header.next_validators_hash = array![0x1, 0x2];
 
-    let mut signature_hints = array![array![]];
-
     verify_update_header(
-        untrusted_block_state, trusted_block_state, options, now, array![].span(), signature_hints,
+        untrusted_block_state,
+        trusted_block_state,
+        options,
+        now,
+        array![].span(),
+        array![array![]].span(),
     );
 }
 
@@ -173,10 +181,8 @@ fn test_verify_update_header_empty_signatures() {
     // empty signatures
     untrusted_block_state.signed_header.commit.signatures = array![];
 
-    let mut signature_hints = array![];
-
     verify_update_header(
-        untrusted_block_state, trusted_block_state, options, now, array![].span(), signature_hints,
+        untrusted_block_state, trusted_block_state, options, now, array![].span(), array![].span(),
     );
 }
 
@@ -250,7 +256,7 @@ fn test_verify_update_header_2() {
         next_validators: header_b.trusted_validator_set,
     };
 
-    let mut signature_hints = array![
+    let signature_hints = array![
         array![
             0x14, 0x22f7112ecb3a47d3238afb43, 0xb83b38c8070e7b21a867f3ae, 0x68491d01f77894a1, 0x0,
             0x45d0f6d9198cf8ce61749971, 0x7994f31599884b3cca7e0692, 0x49df1dcf8cfef219, 0x0,
@@ -264,6 +270,11 @@ fn test_verify_update_header_2() {
     ];
 
     verify_update_header(
-        untrusted_block_state, trusted_block_state, options, now, array![].span(), signature_hints,
+        untrusted_block_state,
+        trusted_block_state,
+        options,
+        now,
+        array![].span(),
+        signature_hints.span(),
     );
 }
