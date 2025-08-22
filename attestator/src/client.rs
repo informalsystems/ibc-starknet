@@ -2,6 +2,7 @@ use starknet_crypto::Felt;
 
 use crate::Ed25519;
 
+// FIXME(rano): return Result with Err
 pub fn get_attestation(addr: &str, challenges: &[Ed25519]) -> Vec<(Felt, Felt)> {
     ureq::post(&format!("{}/attest", addr))
         .send_json(challenges)
@@ -11,6 +12,7 @@ pub fn get_attestation(addr: &str, challenges: &[Ed25519]) -> Vec<(Felt, Felt)> 
         .unwrap()
 }
 
+// FIXME(rano): return Result with Err
 pub fn get_public_key(addr: &str) -> Felt {
     ureq::get(&format!("{}/public_key", addr))
         .call()
