@@ -14,6 +14,10 @@ starknet-crypto = { workspace = true }
 serde           = { workspace = true, features = [ "derive" ] }
 thiserror       = { workspace = true }
 ureq            = { workspace = true, optional = true }
+serde_with      = { workspace = true, features = [ "hex" ] }
 
 [features]
 client = [ "ureq/json" ]
+
+[dev-dependencies]
+serde_json = { workspace = true }

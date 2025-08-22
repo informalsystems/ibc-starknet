@@ -261,8 +261,8 @@ where
             let (r, s) = client
                 .get_attestation(&[Ed25519 {
                     message: msg.to_vec(),
-                    signature: signature.to_vec(),
-                    public_key: public_key.to_vec(),
+                    signature: *signature,
+                    public_key: *public_key,
                 }])
                 .ok()?[0];
 
