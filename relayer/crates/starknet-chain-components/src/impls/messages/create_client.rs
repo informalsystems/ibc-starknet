@@ -15,7 +15,7 @@ use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
 use crate::impls::{from_vec_u8_to_be_u32_slice, StarknetAddress, StarknetMessage};
-use crate::traits::CanQueryContractAddress;
+use crate::traits::{CanQueryContractAddress, HasEd25519AttestatorAddresses};
 use crate::types::{ClientStatus, CometClientState, CometConsensusState, Height};
 
 pub struct BuildCreateCometClientMessage;
@@ -29,7 +29,9 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasEd25519AttestatorAddresses
         + CanRaiseAsyncError<String>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<core::num::TryFromIntError>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
@@ -59,9 +61,16 @@ where
 
         let client_type = short_string!("07-tendermint");
 
-        let addrs = ["http://localhost:1234"];
+        let ed25519_attestator_addresses = chain
+            .ed25519_attestator_addresses()
+            .as_ref()
+            .ok_or("No Ed25519 attestators")
+            .map_err(Chain::raise_error)?;
 
-        let attestator_keys = addrs.into_iter().map(get_public_key).collect();
+        let attestator_keys = ed25519_attestator_addresses
+            .iter()
+            .map(|addr| get_public_key(addr))
+            .collect();
 
         let client_state = CometClientState {
             chain_id: payload.client_state.chain_id,
@@ -73,7 +82,6 @@ where
             status: ClientStatus::Active,
             proof_specs: payload.client_state.proof_specs,
             upgrade_path: payload.client_state.upgrade_path,
-            // FIXME(rano): query attestators' endpoint `/public_key`
             attestator_keys,
         };
 

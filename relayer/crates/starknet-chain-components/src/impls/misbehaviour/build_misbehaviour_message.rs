@@ -20,7 +20,7 @@ use tendermint_proto::Error as TendermintProtoError;
 use crate::impls::{
     comet_signature_hints, CosmosStarknetMisbehaviour, StarknetAddress, StarknetMessage,
 };
-use crate::traits::CanQueryContractAddress;
+use crate::traits::{CanQueryContractAddress, HasEd25519AttestatorAddresses};
 use crate::types::ClientMessage;
 
 #[cgp_new_provider(MisbehaviourMessageBuilderComponent)]
@@ -34,7 +34,9 @@ where
         + HasMessageType<Message = StarknetMessage>
         + HasAddressType<Address = StarknetAddress>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasEd25519AttestatorAddresses
         + HasMessageType
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<EncodingError>
         + CanRaiseAsyncError<DecodingError>
         + CanRaiseAsyncError<TendermintProtoError>,
@@ -67,6 +69,12 @@ where
         // So, we encode the Header as Protobuf bytes and then encode those bytes as
         // Cairo `ByteArray` which has more succinct `Vec<u8>` representation.
 
+        let ed25519_attestator_addresses = chain
+            .ed25519_attestator_addresses()
+            .as_ref()
+            .ok_or("No Ed25519 attestators")
+            .map_err(Chain::raise_error)?;
+
         let signature_hint_1 = comet_signature_hints(
             &decoded_evidence
                 .evidence_1
@@ -74,6 +82,7 @@ where
                 .try_into()
                 .map_err(Chain::raise_error)?,
             encoding,
+            ed25519_attestator_addresses,
         );
 
         let signature_hint_2 = comet_signature_hints(
@@ -83,6 +92,7 @@ where
                 .try_into()
                 .map_err(Chain::raise_error)?,
             encoding,
+            ed25519_attestator_addresses,
         );
 
         let serialized_signature_hints = encoding

@@ -281,6 +281,7 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
             block_time: chain_driver.chain.block_time,
             contract_addresses,
             contract_classes,
+            ed25519_attestator_addresses: chain_driver.chain.ed25519_attestator_addresses.clone(),
         };
 
         let chain_config_str = to_string_pretty(&chain_config)?;
