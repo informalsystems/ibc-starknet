@@ -1,4 +1,6 @@
 use alexandria_math::ed25519::verify_signature;
+use core::dict::Felt252Dict;
+use core::nullable::{FromNullableResult, match_nullable};
 use garaga::signatures::eddsa_25519::{
     EdDSASignature, EdDSASignatureWithHint, is_valid_eddsa_signature,
 };
@@ -105,16 +107,27 @@ pub impl AttestatorEd25519VerifierImpl of Ed25519Verifier<AttestatorEd25519Verif
 
         let attestation_hash = core::poseidon::poseidon_hash_span(attestation_msg);
 
+        let mut signature_dict: Felt252Dict<Nullable<(felt252, felt252)>> = Default::default();
+
+        while let Some((pub_key, r, s)) = attestator_signatures.pop_front() {
+            signature_dict.insert(pub_key, NullableTrait::new((r, s)));
+        }
+
         let mut attestation_count = 0;
 
         while let Some(trusted_pub_key) = attestator_keys.pop_front() {
-            while let Some((pub_key, r, s)) = attestator_signatures.pop_front() {
-                if trusted_pub_key == pub_key {
-                    if core::ecdsa::check_ecdsa_signature(attestation_hash, pub_key, r, s) {
-                        attestation_count += 1;
-                    }
-                    break;
-                }
+            let value = signature_dict.get(trusted_pub_key);
+            if value.is_null() {
+                continue;
+            }
+
+            let (r, s) = match match_nullable(value) {
+                FromNullableResult::Null => { continue; },
+                FromNullableResult::NotNull(value) => value.unbox(),
+            };
+
+            if core::ecdsa::check_ecdsa_signature(attestation_hash, trusted_pub_key, r, s) {
+                attestation_count += 1;
             }
         }
 
