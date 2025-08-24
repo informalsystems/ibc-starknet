@@ -116,12 +116,7 @@ pub impl AttestatorEd25519VerifierImpl of Ed25519Verifier<AttestatorEd25519Verif
         let mut attestation_count = 0;
 
         while let Some(trusted_pub_key) = attestator_keys.pop_front() {
-            let value = signature_dict.get(trusted_pub_key);
-            if value.is_null() {
-                continue;
-            }
-
-            let (r, s) = match match_nullable(value) {
+            let (r, s) = match match_nullable(signature_dict.get(trusted_pub_key)) {
                 FromNullableResult::Null => { continue; },
                 FromNullableResult::NotNull(value) => value.unbox(),
             };
