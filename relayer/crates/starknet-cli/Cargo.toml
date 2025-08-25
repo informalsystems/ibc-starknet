@@ -16,6 +16,10 @@ workspace = true
 name = "hermes-starknet"
 path = "bin/hermes_starknet.rs"
 
+[[bin]]
+name = "hermes-devnet"
+path = "bin/hermes_devnet.rs"
+
 [dependencies]
 cgp                               = { workspace = true }
 cgp-error-eyre                    = { workspace = true }
