@@ -32,7 +32,6 @@ where
             Default::default(),
             Default::default(),
             Default::default(),
-            Default::default(),
         );
 
         let starknet_chain_config = config.starknet_chain_config.ok_or_else(|| {

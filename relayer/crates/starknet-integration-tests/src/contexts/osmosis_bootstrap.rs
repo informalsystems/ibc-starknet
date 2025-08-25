@@ -6,7 +6,9 @@ use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_core::test_components::bootstrap::traits::ChainBootstrapperComponent;
-use hermes_core::test_components::chain_driver::traits::ChainTypeProviderComponent;
+use hermes_core::test_components::chain_driver::traits::{
+    ChainCommandPathGetterComponent, ChainTypeProviderComponent,
+};
 use hermes_core::test_components::driver::traits::ChainDriverTypeProviderComponent;
 use hermes_cosmos::chain_components::types::DynamicGasConfig;
 use hermes_cosmos::error::handlers::DebugError;
@@ -27,8 +29,8 @@ use hermes_cosmos::test_components::bootstrap::impls::{
     NoModifyGenesisConfig,
 };
 use hermes_cosmos::test_components::bootstrap::traits::{
-    AccountPrefixGetterComponent, ChainCommandPathGetterComponent, ChainDriverBuilderComponent,
-    ChainFullNodeStarterComponent, ChainStoreDirGetterComponent, CometConfigModifierComponent,
+    AccountPrefixGetterComponent, ChainDriverBuilderComponent, ChainFullNodeStarterComponent,
+    ChainStoreDirGetterComponent, CometConfigModifierComponent,
     CosmosGenesisConfigModifierComponent, CosmosSdkConfigModifierComponent, DenomForStaking,
     DenomForTransfer, DenomPrefixGetterComponent, DynamicGasGetterComponent,
     RandomIdFlagGetterComponent, WalletConfigGeneratorComponent,

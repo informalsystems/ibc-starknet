@@ -1,6 +1,7 @@
 use hermes_core::runtime_components::traits::{CanCreateDir, CanStartChildProcess, HasRuntime};
+use hermes_core::test_components::chain_driver::traits::HasChainCommandPath;
 use hermes_cosmos_core::test_components::bootstrap::traits::{
-    HasChainCommandPath, HasChainGenesisConfigType, HasChainNodeConfigType,
+    HasChainGenesisConfigType, HasChainNodeConfigType,
 };
 use hermes_prelude::*;
 

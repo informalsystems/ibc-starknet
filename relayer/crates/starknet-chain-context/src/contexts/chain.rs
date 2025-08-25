@@ -12,6 +12,7 @@ use hermes_core::chain_components::traits::{
     BlockTimeQuerierComponent, ChainStatusQuerierComponent, MessageSenderComponent,
     PollIntervalGetterComponent,
 };
+use hermes_core::chain_type_components::impls::BatchConfig;
 use hermes_core::chain_type_components::traits::ChainIdGetterComponent;
 use hermes_core::encoding_components::traits::{
     DefaultEncodingGetter, DefaultEncodingGetterComponent, EncodingGetter, EncodingGetterComponent,
@@ -23,9 +24,9 @@ use hermes_core::relayer_components::transaction::impls::{
     GetGlobalNonceMutex, GetGlobalSignerMutex, SignerWithIndexGetter,
 };
 use hermes_core::relayer_components::transaction::traits::{
-    ClientRefreshRateGetterComponent, DefaultSignerGetterComponent,
-    NonceAllocationMutexGetterComponent, NonceQuerierComponent, SignerGetterComponent,
-    SignerMutexGetterComponent,
+    BatchConfigGetter, BatchConfigGetterComponent, ClientRefreshRateGetterComponent,
+    DefaultSignerGetterComponent, NonceAllocationMutexGetterComponent, NonceQuerierComponent,
+    SignerGetterComponent, SignerMutexGetterComponent,
 };
 use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
@@ -41,7 +42,7 @@ use hermes_starknet_chain_components::components::{
 };
 use hermes_starknet_chain_components::impls::{
     GetStarknetClientRefreshRate, QueryStarknetStorageProof, SendJsonRpcRequestWithReqwest,
-    StarknetAddress, VerifyStarknetMerkleProof, VerifyStarknetStorageProof,
+    StarknetAddress, StarknetChainConfig, VerifyStarknetMerkleProof, VerifyStarknetStorageProof,
 };
 use hermes_starknet_chain_components::traits::{
     AccountFromSignerBuilderComponent, ContractCallerComponent, ContractDeclarerComponent,
@@ -77,6 +78,7 @@ pub struct StarknetChain {
 pub struct StarknetChainFields {
     pub runtime: HermesRuntime,
     pub chain_id: ChainId,
+    pub chain_config: StarknetChainConfig,
     pub starknet_client: Arc<JsonRpcClient<HttpTransport>>,
     pub rpc_client: Agent,
     pub json_rpc_url: Url,
@@ -176,6 +178,21 @@ delegate_components! {
 delegate_components! {
     DelegateCosmosChainComponents {
         StarknetChain: StarknetToCosmosComponents::Provider,
+    }
+}
+
+#[cgp_provider(BatchConfigGetterComponent)]
+impl BatchConfigGetter<StarknetChain> for StarknetChainContextComponents {
+    fn batch_config(chain: &StarknetChain) -> BatchConfig {
+        if let Some(batch_config) = &chain.chain_config.batch_config {
+            batch_config.clone()
+        } else {
+            let default_batch_config = BatchConfig::default();
+            tracing::warn!(
+                "missing batch config, will use default values: {default_batch_config:?}"
+            );
+            default_batch_config
+        }
     }
 }
 
