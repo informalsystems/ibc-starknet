@@ -148,7 +148,7 @@ pub async fn comet_signature_hints<Chain, Encoding>(
     attestator_quorum_percentage: usize,
 ) -> Vec<Vec<Felt>>
 where
-    Chain: CanLog<LevelWarn>,
+    Chain: CanLog<LevelWarn> + CanLog<LevelDebug>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
         + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
@@ -288,7 +288,7 @@ pub async fn compute_attestator_hints<Chain, Encoding>(
     public_key: &[u8; 32],
 ) -> Vec<Felt>
 where
-    Chain: CanLog<LevelWarn>,
+    Chain: CanLog<LevelWarn> + CanLog<LevelDebug>,
     Encoding:
         HasEncodedType<Encoded = Vec<Felt>> + CanEncode<ViaCairo, Vec<Product![Felt, Felt, Felt]>>,
 {
@@ -339,7 +339,7 @@ where
             chain
                 .log(
                     &format!("Reached attestator quorum with {attestation_count} attestators"),
-                    &LevelWarn,
+                    &LevelDebug,
                 )
                 .await;
             break;
