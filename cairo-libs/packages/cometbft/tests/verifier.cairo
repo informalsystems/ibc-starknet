@@ -95,7 +95,7 @@ fn test_verify_update_header() {
 
     // private key: 0x1234
     let attestator_hints_context = array![
-        0x1, 0x26da8d11938b76025862be14fdb8b28438827f73e75e86f7bfa38b196951fa7,
+        0x100, 0x1, 0x26da8d11938b76025862be14fdb8b28438827f73e75e86f7bfa38b196951fa7,
     ];
     let attestator_hints = array![
         array![
@@ -283,7 +283,7 @@ fn test_verify_update_header_2() {
 
     // private key: 0x1234
     let attestator_hints_context = array![
-        0x1, 0x26da8d11938b76025862be14fdb8b28438827f73e75e86f7bfa38b196951fa7,
+        0x100, 0x1, 0x26da8d11938b76025862be14fdb8b28438827f73e75e86f7bfa38b196951fa7,
     ];
     let attestator_hints = array![
         array![
