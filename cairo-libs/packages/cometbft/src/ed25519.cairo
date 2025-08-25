@@ -126,7 +126,11 @@ pub impl AttestatorEd25519VerifierImpl of Ed25519Verifier<AttestatorEd25519Verif
             }
         }
 
-        assert(attestation_count * 2 > attestator_keys.len(), 'not enough ed25519 attestations');
+        assert(
+            attestation_count == attestator_keys.len() || attestation_count
+                * 2 > attestator_keys.len(),
+            'not enough ed25519 attestations',
+        );
     }
 }
 
