@@ -1,5 +1,6 @@
 use core::num::traits::zero::Zero;
-use starknet_ibc_core::client::ClientErrors;
+use starknet::{BlockInfo, get_block_info};
+use starknet_ibc_core::client::{ClientErrors, StarknetClientState, StarknetConsensusState};
 use starknet_ibc_core::commitment::StateProof;
 use starknet_ibc_core::host::ClientId;
 use starknet_ibc_utils::ValidateBasic;
@@ -59,4 +60,28 @@ pub struct MsgUpgradeClient {
 
 impl MsgUpgradeClientValidateBasic of ValidateBasic<MsgUpgradeClient> {
     fn validate_basic(self: @MsgUpgradeClient) {}
+}
+
+#[derive(Clone, Debug, Drop, Serde)]
+pub struct MsgScheduleUpgrade {
+    pub final_height: u64,
+    pub upgraded_client_state: StarknetClientState,
+    pub upgraded_consensus_state: StarknetConsensusState,
+}
+
+impl MsgScheduleUpgradeValidateBasic of ValidateBasic<MsgScheduleUpgrade> {
+    fn validate_basic(self: @MsgScheduleUpgrade) {
+        let BlockInfo { block_number, block_timestamp, .. } = get_block_info().unbox();
+
+        assert(@block_number <= self.final_height, ClientErrors::FINAL_HEIGHT_IN_PAST);
+
+        assert(
+            @block_timestamp < self.upgraded_consensus_state.time,
+            ClientErrors::UPGRADE_TIMESTAMP_IN_PAST,
+        );
+
+        assert(
+            self.upgraded_consensus_state.root.is_zero(), ClientErrors::UPGRADE_ROOT_IS_NON_ZERO,
+        );
+    }
 }

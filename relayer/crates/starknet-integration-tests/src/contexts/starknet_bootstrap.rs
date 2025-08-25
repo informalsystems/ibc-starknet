@@ -13,6 +13,7 @@ use hermes_core::test_components::chain_driver::traits::ChainTypeProviderCompone
 use hermes_core::test_components::driver::traits::ChainDriverTypeProviderComponent;
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_cosmos::test_components::bootstrap::traits::HasChainNodeConfigType;
 use hermes_cosmos_core::test_components::bootstrap::impls::BuildAndWaitChainDriver;
 use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainCommandPathGetterComponent, ChainDriverBuilderComponent, ChainFullNodeStarterComponent,
@@ -24,9 +25,12 @@ use hermes_starknet_chain_context::contexts::StarknetChain;
 use hermes_starknet_chain_context::impls::HandleStarknetChainError;
 use hermes_starknet_test_components::impls::{
     BootstrapStarknet, BuildChainAndDeployIbcContracts, DeployIbcContract,
-    ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType, StartStarknetSequencer,
+    ProvideStarknetGenesisConfigType, ProvideStarknetNodeConfigType, StartStarknetForkedSequencer,
+    StartStarknetSequencer,
 };
-use hermes_starknet_test_components::traits::IbcContractsDeployerComponent;
+use hermes_starknet_test_components::traits::{
+    ChainForkedFullNodeStarterComponent, IbcContractsDeployerComponent,
+};
 use starknet::core::types::contract::SierraClass;
 
 use crate::contexts::StarknetChainDriver;
@@ -43,6 +47,13 @@ impl Deref for StarknetBootstrap {
     fn deref(&self) -> &Self::Target {
         &self.fields
     }
+}
+
+#[cgp_getter {
+    provider: ChainNodeConfigGetter,
+}]
+pub trait HasChainNodeConfig: HasChainNodeConfigType {
+    fn chain_node_config(&self) -> &Self::ChainNodeConfig;
 }
 
 #[derive(HasField, Clone)]
@@ -80,6 +91,8 @@ delegate_components! {
         ChainFullNodeStarterComponent:
             StartStarknetSequencer, // Start only Starknet as sequencer
             // StartStarknetStack, // Switch to this to start Starknet, Pathfinder, and Anvil
+        ChainForkedFullNodeStarterComponent:
+            StartStarknetForkedSequencer,
         IbcContractsDeployerComponent:
             DeployIbcContract,
         ChainDriverBuilderComponent:
@@ -92,6 +105,8 @@ delegate_components! {
             UseField<symbol!("chain_command_path")>,
         ChainStoreDirGetterComponent:
             UseField<symbol!("chain_store_dir")>,
+        ChainNodeConfigGetterComponent:
+            UseField<symbol!("chain_node_config")>,
     }
 }
 
