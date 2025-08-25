@@ -21,6 +21,7 @@ pub struct CometClientState {
     pub chain_id: ByteArray,
     pub proof_spec: Array<ProofSpec>,
     pub upgrade_path: Array<ByteArray>,
+    pub attestator_keys: Array<felt252>,
 }
 
 #[generate_trait]

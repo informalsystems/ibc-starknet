@@ -145,6 +145,15 @@ where
             })
             .ok();
 
+        let ed25519_attestator_addresses = var("ED25519_ATTESTATORS")
+            .map(|attestator_list| {
+                attestator_list
+                    .split(',')
+                    .map(|s| s.trim().to_string())
+                    .collect::<Vec<_>>()
+            })
+            .ok();
+
         let chain = StarknetChain {
             fields: Arc::new(StarknetChainFields {
                 runtime: runtime.clone(),
@@ -166,6 +175,7 @@ where
                 signers: vec![relayer_wallet_1.clone(), relayer_wallet_2.clone()],
                 client_refresh_rate,
                 signer_mutex: Arc::new(Mutex::new(0)),
+                ed25519_attestator_addresses,
             }),
         };
 

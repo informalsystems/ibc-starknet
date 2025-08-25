@@ -22,9 +22,6 @@ pub use queries::*;
 mod rpc_client;
 pub use rpc_client::*;
 
-mod feeder_gateway;
-pub use feeder_gateway::*;
-
 mod transfer;
 pub use transfer::*;
 

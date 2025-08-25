@@ -6,6 +6,7 @@ on:
       - cairo-contracts/**
       - relayer/**
       - light-client/**
+      - attestator/**
       - .github/workflows/hermes.yaml
   push:
     branches:
@@ -66,6 +67,7 @@ jobs:
           workspaces: |
             relayer
             light-client
+            attestator
             madara/madara
 
       - name: Install Madara
@@ -114,6 +116,12 @@ jobs:
           export RAW_STORAGE_CONTRACT="$(pwd)/../madara-contracts/target/release/madara_contracts_RawStore.contract_class.json"
 
           export STARKNET_WASM_CLIENT_PATH="$(nix build ..#ibc-starknet-cw --print-out-paths)/ibc_client_starknet_cw.wasm"
+
+          ROCKET_PORT=1234 PRIVATE_KEY=0x1234 cargo run --manifest-path ../attestator/Cargo.toml --bin attestator --release --locked &
+          ROCKET_PORT=1235 PRIVATE_KEY=0x1235 cargo run --manifest-path ../attestator/Cargo.toml --bin attestator --release --locked &
+          ROCKET_PORT=1236 PRIVATE_KEY=0x1236 cargo run --manifest-path ../attestator/Cargo.toml --bin attestator --release --locked &
+
+          export ED25519_ATTESTATORS="http://localhost:1234,http://localhost:1235,http://localhost:1236"
 
           cargo run --quiet --example contract_size "$ERC20_CONTRACT"
           cargo run --quiet --example contract_size "$ICS20_CONTRACT"

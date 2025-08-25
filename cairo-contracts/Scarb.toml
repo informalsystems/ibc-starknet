@@ -89,3 +89,6 @@ starknet_ibc_core      = { workspace = true }
 starknet_ibc_clients   = { workspace = true }
 starknet_ibc_contracts = { workspace = true }
 starknet_ibc_utils     = { workspace = true }
+
+[cairo]
+sierra-replace-ids = true

@@ -22,12 +22,13 @@ pub fn verify_update_header(
     trusted: TrustedBlockState,
     options: Options,
     now: Timestamp,
-    signature_hints: Array<Array<felt252>>,
+    hints_context: Span<felt252>,
+    signature_hints: Span<Array<felt252>>,
 ) {
     verify_validator_sets(@untrusted);
     validate_against_trusted(@untrusted, @trusted, @options, now);
     verify_header_is_from_past(@untrusted, @options, now);
-    verify_commit_against_trusted(untrusted, trusted, options, signature_hints);
+    verify_commit_against_trusted(untrusted, trusted, options, hints_context, signature_hints);
 }
 
 /// Verifies a misbehaviour header received as the `header` field of `MsgUpdateClient`.
@@ -39,11 +40,12 @@ pub fn verify_misbehaviour_header(
     trusted: TrustedBlockState,
     options: Options,
     now: Timestamp,
-    signature_hints: Array<Array<felt252>>,
+    hints_context: Span<felt252>,
+    signature_hints: Span<Array<felt252>>,
 ) {
     verify_validator_sets(@untrusted);
     validate_against_trusted(@untrusted, @trusted, @options, now);
-    verify_commit_against_trusted(untrusted, trusted, options, signature_hints);
+    verify_commit_against_trusted(untrusted, trusted, options, hints_context, signature_hints);
 }
 
 pub fn verify_validator_sets(untrusted: @UntrustedBlockState) {
@@ -237,13 +239,17 @@ pub fn verify_commit_against_trusted(
     untrusted: UntrustedBlockState,
     trusted: TrustedBlockState,
     options: Options,
-    signature_hints: Array<Array<felt252>>,
+    hints_context: Span<felt252>,
+    signature_hints: Span<Array<felt252>>,
 ) {
     let trusted_next_height = trusted.height.checked_add(1);
     assert(trusted_next_height.is_some(), CometErrors::OVERFLOWED_BLOCK_HEIGHT);
     if untrusted.height() == @trusted_next_height.unwrap() {
         check_signers_overlap(
-            untrusted.signed_header.clone(), untrusted.validators.clone(), signature_hints,
+            untrusted.signed_header.clone(),
+            untrusted.validators.clone(),
+            hints_context,
+            signature_hints,
         );
     } else {
         check_enough_trust_and_signers(
@@ -251,6 +257,7 @@ pub fn verify_commit_against_trusted(
             untrusted.validators.clone(),
             trusted.next_validators,
             options.trust_threshold,
+            hints_context,
             signature_hints,
         );
     }
@@ -261,7 +268,8 @@ pub fn check_enough_trust_and_signers(
     untrusted_validators: ValidatorSet,
     trusted_validators: ValidatorSet,
     trust_threshold: Fraction,
-    signature_hints: Array<Array<felt252>>,
+    hints_context: Span<felt252>,
+    signature_hints: Span<Array<felt252>>,
 ) {
     let (trusted_power, untrusted_power) = voting_power_in_sets(
         untrusted_sh,
@@ -269,6 +277,7 @@ pub fn check_enough_trust_and_signers(
         trust_threshold,
         untrusted_validators,
         TWO_THIRDS,
+        hints_context,
         signature_hints,
     );
     assert(trusted_power.has_enough_power(), CometErrors::INSUFFICIENT_VOTING_POWER);
@@ -278,10 +287,11 @@ pub fn check_enough_trust_and_signers(
 pub fn check_signers_overlap(
     untrusted_header: SignedHeader,
     untrusted_validators: ValidatorSet,
-    signature_hints: Array<Array<felt252>>,
+    hints_context: Span<felt252>,
+    signature_hints: Span<Array<felt252>>,
 ) {
     let power = voting_power_in(
-        untrusted_header, untrusted_validators, TWO_THIRDS, signature_hints,
+        untrusted_header, untrusted_validators, TWO_THIRDS, hints_context, signature_hints,
     );
     assert(power.has_enough_power(), CometErrors::INSUFFICIENT_VOTING_POWER);
 }
@@ -290,11 +300,16 @@ fn voting_power_in(
     signed_header: SignedHeader,
     validator_set: ValidatorSet,
     trust_threshold: Fraction,
-    signature_hints: Array<Array<felt252>>,
+    hints_context: Span<felt252>,
+    signature_hints: Span<Array<felt252>>,
 ) -> VotingPowerTally {
     let mut votes = NonAbsentCommitVotesTrait::new(signed_header, signature_hints);
     voting_power_in_impl(
-        ref votes, validator_set.clone(), trust_threshold, validator_set.total_power(),
+        ref votes,
+        validator_set.clone(),
+        trust_threshold,
+        validator_set.total_power(),
+        hints_context,
     )
 }
 
@@ -304,7 +319,8 @@ fn voting_power_in_sets(
     first_trust_threshold: Fraction,
     second_validator_set: ValidatorSet,
     second_trust_threshold: Fraction,
-    signature_hints: Array<Array<felt252>>,
+    hints_context: Span<felt252>,
+    signature_hints: Span<Array<felt252>>,
 ) -> (VotingPowerTally, VotingPowerTally) {
     let mut votes = NonAbsentCommitVotesTrait::new(signed_header, signature_hints);
     let first_tally = voting_power_in_impl(
@@ -312,12 +328,14 @@ fn voting_power_in_sets(
         first_validator_set.clone(),
         first_trust_threshold,
         first_validator_set.total_power(),
+        hints_context,
     );
     let second_tally = voting_power_in_impl(
         ref votes,
         second_validator_set.clone(),
         second_trust_threshold,
         second_validator_set.total_power(),
+        hints_context,
     );
     (first_tally, second_tally)
 }
@@ -327,10 +345,11 @@ fn voting_power_in_impl(
     validator_set: ValidatorSet,
     trust_threshold: Fraction,
     total_voting_power: u64,
+    hints_context: Span<felt252>,
 ) -> VotingPowerTally {
     let mut power = VotingPowerTallyTrait::new(total_voting_power, trust_threshold);
     for validator in validator_set.validators {
-        if votes.has_voted(@validator) {
+        if votes.has_voted(@validator, hints_context) {
             power.tally(validator.voting_power);
             if power.has_enough_power() {
                 break;

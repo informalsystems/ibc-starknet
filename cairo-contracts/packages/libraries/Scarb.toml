@@ -48,9 +48,6 @@ ibc_utils     = { workspace = true }
 starknet_ibc_testkit   = { workspace = true }
 starknet_ibc_contracts = { workspace = true }
 
-[cairo]
-sierra-replace-ids = false
-
 [[target.starknet-contract]]
 allowed-libfuncs-list.name = "experimental"
 sierra                     = true

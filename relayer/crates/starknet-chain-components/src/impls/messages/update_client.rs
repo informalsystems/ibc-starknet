@@ -1,5 +1,6 @@
 use core::marker::PhantomData;
 
+use attestator::{AttestatorClient, Ed25519};
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
@@ -8,6 +9,8 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_core::logging_components::traits::CanLog;
+use hermes_core::logging_components::types::LevelWarn;
 use hermes_cosmos_core::chain_components::types::CosmosUpdateClientPayload;
 use hermes_prelude::*;
 use ibc::clients::tendermint::types::Header;
@@ -20,7 +23,7 @@ use tendermint::block::CommitSig;
 use tendermint::vote::{SignedVote, ValidatorIndex, Vote};
 
 use crate::impls::{StarknetAddress, StarknetMessage};
-use crate::traits::CanQueryContractAddress;
+use crate::traits::{CanQueryContractAddress, HasEd25519AttestatorAddresses};
 use crate::types::{ClientId, ClientMessage};
 
 pub struct BuildUpdateCometClientMessage;
@@ -35,12 +38,16 @@ where
         + HasClientIdType<Counterparty, ClientId = ClientId>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + CanLog<LevelWarn>
+        + HasEd25519AttestatorAddresses
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
         HasUpdateClientPayloadType<Chain, UpdateClientPayload = CosmosUpdateClientPayload>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
         + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
+        + CanEncode<ViaCairo, Vec<Product![Felt, Felt, Felt]>>
         + CanEncode<ViaCairo, Vec<Vec<Felt>>>
         + CanEncode<ViaCairo, Product![ClientMessage, Vec<Felt>]>
         + CanEncode<ViaCairo, ByteArray>
@@ -73,7 +80,14 @@ where
                 .encode(&protobuf_byte_array)
                 .map_err(Chain::raise_error)?;
 
-            let signature_hints = comet_signature_hints(&header, encoding);
+            let ed25519_attestator_addresses = chain
+                .ed25519_attestator_addresses()
+                .as_ref()
+                .ok_or("No Ed25519 attestators")
+                .map_err(Chain::raise_error)?;
+
+            let signature_hints =
+                comet_signature_hints(chain, &header, encoding, ed25519_attestator_addresses).await;
 
             let serialized_signature_hints = encoding
                 .encode(&signature_hints)
@@ -102,11 +116,18 @@ where
     }
 }
 
-pub fn comet_signature_hints<Encoding>(header: &Header, encoding: &Encoding) -> Vec<Vec<Felt>>
+pub async fn comet_signature_hints<Chain, Encoding>(
+    chain: &Chain,
+    header: &Header,
+    encoding: &Encoding,
+    attestator_addresses: &[String],
+) -> Vec<Vec<Felt>>
 where
+    Chain: CanLog<LevelWarn>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
         + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
+        + CanEncode<ViaCairo, Vec<Product![Felt, Felt, Felt]>>
         + CanEncode<ViaCairo, Vec<Vec<Felt>>>,
 {
     let signed_header = &header.signed_header;
@@ -117,7 +138,9 @@ where
         .map(|v| (v.address, v.pub_key))
         .collect();
 
-    signed_header
+    let mut hints: Vec<Vec<Felt>> = Vec::new();
+
+    for value in signed_header
         .commit
         .signatures
         .iter()
@@ -164,46 +187,122 @@ where
 
             Some((msg, signature, ed25519_public_key))
         })
-        .map(|value| {
-            if let Some((msg, signature, public_key)) = value {
-                let ry_twisted = BigUint::from_bytes_le(&signature[0..32]);
-                let s = BigUint::from_bytes_le(&signature[32..64]);
-                let py_twisted = BigUint::from_bytes_le(&public_key);
-
-                let hint = garaga::calldata::signatures::eddsa_calldata_builder(
-                    ry_twisted,
-                    s,
-                    py_twisted,
-                    msg.clone(),
+    {
+        if let Some((msg, signature, public_key)) = value {
+            hints.push(
+                compute_attestator_hints(
+                    chain,
+                    encoding,
+                    attestator_addresses,
+                    &msg,
+                    &signature,
+                    &public_key,
                 )
-                .unwrap();
+                .await,
+            );
+        } else {
+            // only return hints for the valid signatures
+            hints.push(vec![]);
+        }
+    }
 
-                let felt_hint = hint
-                    .into_iter()
-                    .map(|x| Felt::from_hex(&format!("{x:x}")).unwrap())
-                    .collect::<Vec<Felt>>();
+    hints
+}
 
-                let product![
-                    product![p_ry_twisted, p_s, p_py_twisted, p_msg],
-                    p_msm_hint,
-                    p_sqrt_rx_hint,
-                    p_sqrt_px_hint
-                ]: Product![
-                    Product![U256, U256, U256, Vec<u8>],
-                    Vec<Felt>,
-                    U256,
-                    U256
-                ] = encoding.decode(&felt_hint).unwrap();
+pub fn compute_garaga_hints<Encoding>(
+    encoding: &Encoding,
+    msg: &[u8],
+    signature: &[u8; 64],
+    public_key: &[u8; 32],
+) -> Vec<Felt>
+where
+    Encoding: HasEncodedType<Encoded = Vec<Felt>>
+        + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
+        + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>,
+{
+    let ry_twisted = BigUint::from_bytes_le(&signature[0..32]);
+    let s = BigUint::from_bytes_le(&signature[32..64]);
+    let py_twisted = BigUint::from_bytes_le(public_key);
 
-                assert_eq!(p_msg, msg);
+    let hint = garaga::calldata::signatures::eddsa_calldata_builder(
+        ry_twisted,
+        s,
+        py_twisted,
+        msg.to_vec(),
+    )
+    .unwrap();
 
-                encoding
-                    .encode(&product![p_msm_hint, p_sqrt_rx_hint, p_sqrt_px_hint])
-                    .unwrap()
-            } else {
-                // only return hints for the valid signatures
-                vec![]
+    let felt_hint = hint
+        .into_iter()
+        .map(|x| Felt::from_hex(&format!("{x:x}")).unwrap())
+        .collect::<Vec<Felt>>();
+
+    let product![
+        product![p_ry_twisted, p_s, p_py_twisted, p_msg],
+        p_msm_hint,
+        p_sqrt_rx_hint,
+        p_sqrt_px_hint
+    ]: Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256] =
+        encoding.decode(&felt_hint).unwrap();
+
+    assert_eq!(p_msg, msg);
+
+    encoding
+        .encode(&product![p_msm_hint, p_sqrt_rx_hint, p_sqrt_px_hint])
+        .unwrap()
+}
+
+pub async fn compute_attestator_hints<Chain, Encoding>(
+    chain: &Chain,
+    encoding: &Encoding,
+    attestator_addresses: &[String],
+    msg: &[u8],
+    signature: &[u8; 64],
+    public_key: &[u8; 32],
+) -> Vec<Felt>
+where
+    Chain: CanLog<LevelWarn>,
+    Encoding:
+        HasEncodedType<Encoded = Vec<Felt>> + CanEncode<ViaCairo, Vec<Product![Felt, Felt, Felt]>>,
+{
+    let mut signatures = Vec::new();
+
+    for client in attestator_addresses
+        .iter()
+        .map(|addr| AttestatorClient(addr.as_str()))
+    {
+        // Error calls will be ignored: `.ok()?`
+        // This allows attestator network to be fault-tolerant.
+
+        let (public_key, r, s) = match client.get_attestation(&[Ed25519 {
+            message: msg.to_vec(),
+            signature: *signature,
+            public_key: *public_key,
+        }]) {
+            Ok((public_key, signatures)) => {
+                if signatures.len() != 1 {
+                    chain
+                        .log(
+                            &format!("Unexpected number of signatures: {}", signatures.len()),
+                            &LevelWarn,
+                        )
+                        .await;
+                    continue;
+                } else {
+                    let (r, s) = signatures[0];
+                    (public_key, r, s)
+                }
             }
-        })
-        .collect()
+            Err(err) => {
+                chain
+                    .log(&format!("Failed to get attestation: {err}"), &LevelWarn)
+                    .await;
+                continue;
+            }
+        };
+
+        signatures.push(product![public_key, r, s]);
+    }
+
+    encoding.encode(&signatures).unwrap()
 }
