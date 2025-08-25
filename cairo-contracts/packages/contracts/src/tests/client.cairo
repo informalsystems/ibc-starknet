@@ -63,16 +63,13 @@ fn test_update_comet_client_ok() {
     // -----------------------------------------------------------
 
     // Update the client to a new height and time.
-    let updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_time = cfg.latest_timestamp.clone() + TIMESTAMP(1);
+    let updating_height = cfg.latest_height + HEIGHT(1);
+    let updating_time = cfg.latest_timestamp + TIMESTAMP(1);
 
     // Create a `MsgUpdateClient` message.
     let msg = cfg
         .dummy_msg_update_client(
-            create_resp.client_id,
-            create_resp.height,
-            updating_height.clone(),
-            updating_time.clone(),
+            create_resp.client_id, create_resp.height, updating_height, updating_time,
         );
 
     // Submit a `MsgUpdateClient` to the IBC core contract.
@@ -118,16 +115,13 @@ fn test_misbehaviour_comet_client_ok() {
     // -----------------------------------------------------------
 
     // Update the client to a new height and time.
-    let updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_time = cfg.latest_timestamp.clone() + TIMESTAMP(1);
+    let updating_height = cfg.latest_height + HEIGHT(1);
+    let updating_time = cfg.latest_timestamp + TIMESTAMP(1);
 
     // Create `MsgUpdateClient` messages with different state root.
     let (msg1, msg2) = cfg
         .dummy_msg_misbehaviour_client(
-            create_resp.client_id.clone(),
-            create_resp.height,
-            updating_height.clone(),
-            updating_time.clone(),
+            create_resp.client_id.clone(), create_resp.height, updating_height, updating_time,
         );
 
     // Submit `MsgUpdateClient`s to the IBC core contract.
@@ -170,7 +164,7 @@ fn test_client_recover_ok() {
     // Wait timeout and retrieve status
     // -----------------------------------------------------------
 
-    let new_timestamp = cfg.latest_timestamp.clone().as_secs() + 101;
+    let new_timestamp = cfg.latest_timestamp.as_secs() + 101;
     start_cheat_block_timestamp_global(new_timestamp);
     start_cheat_block_number_global(5);
     assert!(comet.status(0).is_expired());
@@ -216,7 +210,7 @@ fn test_client_expired() {
     // Wait timeout and retrieve status
     // -----------------------------------------------------------
 
-    start_cheat_block_timestamp_global(cfg.latest_timestamp.clone().as_secs() + 101);
+    start_cheat_block_timestamp_global(cfg.latest_timestamp.as_secs() + 101);
 
     // -----------------------------------------------------------
     // Check Results
@@ -246,7 +240,7 @@ fn test_client_recover_active_client() {
     // Don't wait enough time for timeout
     // -----------------------------------------------------------
 
-    let new_timestamp = cfg.latest_timestamp.clone().as_secs() + 50;
+    let new_timestamp = cfg.latest_timestamp.as_secs() + 50;
     start_cheat_block_timestamp_global(new_timestamp);
     start_cheat_block_number_global(5);
 
@@ -287,16 +281,13 @@ fn test_prune_consensus_state() {
     // -----------------------------------------------------------
 
     // Update the client to a new height and time.
-    let first_updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_time = cfg.latest_timestamp.clone() + TIMESTAMP(1);
+    let first_updating_height = cfg.latest_height + HEIGHT(1);
+    let updating_time = cfg.latest_timestamp + TIMESTAMP(1);
 
     // Create a `MsgUpdateClient` message.
     let msg = cfg
         .dummy_msg_update_client(
-            create_resp.client_id.clone(),
-            create_resp.height.clone(),
-            first_updating_height.clone(),
-            updating_time.clone(),
+            create_resp.client_id.clone(), create_resp.height, first_updating_height, updating_time,
         );
 
     // Submit a `MsgUpdateClient` to the IBC core contract.
@@ -306,7 +297,7 @@ fn test_prune_consensus_state() {
     // Wait for 55 seconds
     // -----------------------------------------------------------
 
-    let new_timestamp = cfg.latest_timestamp.clone().as_secs() + 55;
+    let new_timestamp = cfg.latest_timestamp.as_secs() + 55;
     start_cheat_block_timestamp_global(new_timestamp);
     start_cheat_block_number_global(5);
 
@@ -318,47 +309,44 @@ fn test_prune_consensus_state() {
     // -----------------------------------------------------------
 
     // Update the client to a new height and time.
-    let second_updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_time = cfg.latest_timestamp.clone() + TIMESTAMP(1);
+    let second_updating_height = cfg.latest_height + HEIGHT(1);
+    let updating_time = cfg.latest_timestamp + TIMESTAMP(1);
 
     // Create a `MsgUpdateClient` message.
     let msg = cfg
         .dummy_msg_update_client(
             create_resp.client_id.clone(),
-            create_resp.height.clone(),
-            second_updating_height.clone(),
-            updating_time.clone(),
-        );
-
-    // Submit a `MsgUpdateClient` to the IBC core contract.
-    core.update_client(msg.clone());
-
-    // -----------------------------------------------------------
-    // Wait for 55 seconds
-    // -----------------------------------------------------------
-
-    let new_timestamp = cfg.latest_timestamp.clone().as_secs() + 55;
-    start_cheat_block_timestamp_global(new_timestamp);
-    start_cheat_block_number_global(5);
-
-    cfg.latest_timestamp = (new_timestamp * 1_000_000_000).into();
-    cfg.latest_height.revision_height = cfg.latest_height.revision_height + 5;
-
-    // -----------------------------------------------------------
-    // Update Client
-    // -----------------------------------------------------------
-
-    // Update the client to a new height and time.
-    let third_updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_time = cfg.latest_timestamp.clone() + TIMESTAMP(1);
-
-    // Create a `MsgUpdateClient` message.
-    let msg = cfg
-        .dummy_msg_update_client(
-            create_resp.client_id,
             create_resp.height,
-            third_updating_height.clone(),
-            updating_time.clone(),
+            second_updating_height,
+            updating_time,
+        );
+
+    // Submit a `MsgUpdateClient` to the IBC core contract.
+    core.update_client(msg.clone());
+
+    // -----------------------------------------------------------
+    // Wait for 55 seconds
+    // -----------------------------------------------------------
+
+    let new_timestamp = cfg.latest_timestamp.as_secs() + 55;
+    start_cheat_block_timestamp_global(new_timestamp);
+    start_cheat_block_number_global(5);
+
+    cfg.latest_timestamp = (new_timestamp * 1_000_000_000).into();
+    cfg.latest_height.revision_height = cfg.latest_height.revision_height + 5;
+
+    // -----------------------------------------------------------
+    // Update Client
+    // -----------------------------------------------------------
+
+    // Update the client to a new height and time.
+    let third_updating_height = cfg.latest_height + HEIGHT(1);
+    let updating_time = cfg.latest_timestamp + TIMESTAMP(1);
+
+    // Create a `MsgUpdateClient` message.
+    let msg = cfg
+        .dummy_msg_update_client(
+            create_resp.client_id, create_resp.height, third_updating_height, updating_time,
         );
 
     // Submit a `MsgUpdateClient` to the IBC core contract.
@@ -368,7 +356,7 @@ fn test_prune_consensus_state() {
     // Wait for 50 seconds
     // -----------------------------------------------------------
 
-    let new_timestamp = cfg.latest_timestamp.clone().as_secs() + 50;
+    let new_timestamp = cfg.latest_timestamp.as_secs() + 50;
     start_cheat_block_timestamp_global(new_timestamp);
     start_cheat_block_number_global(5);
 
@@ -379,12 +367,12 @@ fn test_prune_consensus_state() {
     // Check Results
     // -----------------------------------------------------------
 
-    let third_consensus_state = comet.consensus_state_root(0, third_updating_height.clone());
+    let third_consensus_state = comet.consensus_state_root(0, third_updating_height);
     assert!(third_consensus_state.is_non_zero());
-    let second_consensus_state = comet.consensus_state_root(0, second_updating_height.clone());
+    let second_consensus_state = comet.consensus_state_root(0, second_updating_height);
     assert!(second_consensus_state.is_non_zero());
     // Should panic as the first consensus state has been pruned
-    comet.consensus_state_root(0, first_updating_height.clone());
+    comet.consensus_state_root(0, first_updating_height);
 }
 
 #[test]
@@ -409,16 +397,16 @@ fn test_prune_after_client_recover() {
     // -----------------------------------------------------------
 
     // Update the client to a new height and time.
-    let first_updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_time = cfg.latest_timestamp.clone() + TIMESTAMP(1);
+    let first_updating_height = cfg.latest_height + HEIGHT(1);
+    let updating_time = cfg.latest_timestamp + TIMESTAMP(1);
 
     // Create a `MsgUpdateClient` message.
     let msg = cfg
         .dummy_msg_update_client(
             subject_client.client_id.clone(),
-            subject_client.height.clone(),
-            first_updating_height.clone(),
-            updating_time.clone(),
+            subject_client.height,
+            first_updating_height,
+            updating_time,
         );
 
     // Submit a `MsgUpdateClient` to the IBC core contract.
@@ -428,7 +416,7 @@ fn test_prune_after_client_recover() {
     // Wait for 10 seconds
     // -----------------------------------------------------------
 
-    let new_timestamp = cfg.latest_timestamp.clone().as_secs() + 10;
+    let new_timestamp = cfg.latest_timestamp.as_secs() + 10;
     start_cheat_block_timestamp_global(new_timestamp);
     start_cheat_block_number_global(5);
 
@@ -440,16 +428,16 @@ fn test_prune_after_client_recover() {
     // -----------------------------------------------------------
 
     // Update the client to a new height and time.
-    let second_updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_time = cfg.latest_timestamp.clone() + TIMESTAMP(1);
+    let second_updating_height = cfg.latest_height + HEIGHT(1);
+    let updating_time = cfg.latest_timestamp + TIMESTAMP(1);
 
     // Create a `MsgUpdateClient` message.
     let msg = cfg
         .dummy_msg_update_client(
             subject_client.client_id.clone(),
-            subject_client.height.clone(),
-            second_updating_height.clone(),
-            updating_time.clone(),
+            subject_client.height,
+            second_updating_height,
+            updating_time,
         );
 
     // Submit a `MsgUpdateClient` to the IBC core contract.
@@ -459,7 +447,7 @@ fn test_prune_after_client_recover() {
     // Wait for 10 seconds
     // -----------------------------------------------------------
 
-    let new_timestamp = cfg.latest_timestamp.clone().as_secs() + 10;
+    let new_timestamp = cfg.latest_timestamp.as_secs() + 10;
     start_cheat_block_timestamp_global(new_timestamp);
     start_cheat_block_number_global(5);
 
@@ -471,16 +459,16 @@ fn test_prune_after_client_recover() {
     // -----------------------------------------------------------
 
     // Update the client to a new height and time.
-    let third_updating_height = cfg.latest_height.clone() + HEIGHT(1);
-    let updating_time = cfg.latest_timestamp.clone() + TIMESTAMP(1);
+    let third_updating_height = cfg.latest_height + HEIGHT(1);
+    let updating_time = cfg.latest_timestamp + TIMESTAMP(1);
 
     // Create a `MsgUpdateClient` message.
     let msg = cfg
         .dummy_msg_update_client(
             subject_client.client_id.clone(),
-            subject_client.height.clone(),
+            subject_client.height,
             third_updating_height,
-            updating_time.clone(),
+            updating_time,
         );
 
     // Submit a `MsgUpdateClient` to the IBC core contract.
@@ -490,7 +478,7 @@ fn test_prune_after_client_recover() {
     // Wait for 10 seconds
     // -----------------------------------------------------------
 
-    let new_timestamp = cfg.latest_timestamp.clone().as_secs() + 10;
+    let new_timestamp = cfg.latest_timestamp.as_secs() + 10;
     start_cheat_block_timestamp_global(new_timestamp);
     start_cheat_block_number_global(5);
 
@@ -501,18 +489,18 @@ fn test_prune_after_client_recover() {
     // Check consensus states have not yet been pruned
     // -----------------------------------------------------------
 
-    let first_consensus_state = comet.consensus_state_root(0, second_updating_height.clone());
+    let first_consensus_state = comet.consensus_state_root(0, second_updating_height);
     assert!(first_consensus_state.is_non_zero());
-    let second_consensus_state = comet.consensus_state_root(0, second_updating_height.clone());
+    let second_consensus_state = comet.consensus_state_root(0, second_updating_height);
     assert!(second_consensus_state.is_non_zero());
-    let third_consensus_state = comet.consensus_state_root(0, third_updating_height.clone());
+    let third_consensus_state = comet.consensus_state_root(0, third_updating_height);
     assert!(third_consensus_state.is_non_zero());
 
     // -----------------------------------------------------------
     // Wait timeout and retrieve status
     // -----------------------------------------------------------
 
-    let new_timestamp = cfg.latest_timestamp.clone().as_secs() + 101;
+    let new_timestamp = cfg.latest_timestamp.as_secs() + 101;
     start_cheat_block_timestamp_global(new_timestamp);
     start_cheat_block_number_global(5);
     assert!(comet.status(0).is_expired());
@@ -538,5 +526,5 @@ fn test_prune_after_client_recover() {
     assert!(comet.status(0).is_active());
 
     // Should panic as the first consensus state has been pruned
-    comet.consensus_state_root(0, third_updating_height.clone());
+    comet.consensus_state_root(0, third_updating_height);
 }

@@ -36,6 +36,7 @@ where
             .map_err(Bootstrap::raise_error)?;
 
         let rpc_port = chain_node_config.rpc_port;
+        let sequencer_private_key = chain_node_config.sequencer_private_key;
 
         let gateway_port = rpc_port + 1;
 
@@ -53,7 +54,7 @@ where
             "--gateway-enable",
             "--feeder-gateway-enable",
             "--rpc-storage-proof-max-distance",
-            "300", // can generate storage proof for the last 300 blocks
+            "600", // can generate storage proof for the last 600 blocks
             "--preset",
             "sepolia",
             "--l1-sync-disabled",
@@ -62,6 +63,12 @@ where
             "0",
             "--blob-gas-price",
             "0",
+            "--private-key",
+            &sequencer_private_key.to_hex_string(),
+            "--backup-every-n-blocks",
+            "2", // FIXME: Set the value to the desired number of blocks
+            "--backup-dir",
+            &Runtime::file_path_to_string(&starknet_home),
         ];
 
         let stdout_path = Runtime::join_file_path(

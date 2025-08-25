@@ -2493,7 +2493,6 @@ dependencies = [
  "hermes-cosmos",
  "hermes-prelude",
  "hermes-starknet-chain-components",
- "hermes-starknet-test-components",
  "ibc",
  "ibc-client-starknet-types",
  "indexmap 2.10.0",

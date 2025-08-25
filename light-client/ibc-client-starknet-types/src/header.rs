@@ -14,6 +14,7 @@ pub const STARKNET_HEADER_TYPE_URL: &str = "/StarknetHeader";
 pub struct StarknetHeader {
     pub block_header: Block,
     pub block_signature: Signature,
+    pub final_height: u64,
     pub storage_proof: StorageProof,
 }
 

@@ -15,6 +15,7 @@ use hermes_core::test_components::chain_driver::traits::{
 use hermes_core::test_components::driver::traits::ChainDriverTypeProviderComponent;
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
+use hermes_cosmos::test_components::bootstrap::traits::HasChainNodeConfigType;
 use hermes_cosmos_core::test_components::bootstrap::impls::BuildAndWaitChainDriver;
 use hermes_cosmos_core::test_components::bootstrap::traits::{
     ChainDriverBuilderComponent, ChainFullNodeStarterComponent, ChainGenesisConfigTypeComponent,
@@ -48,6 +49,13 @@ impl Deref for StarknetBootstrap {
     fn deref(&self) -> &Self::Target {
         &self.fields
     }
+}
+
+#[cgp_getter {
+    provider: ChainNodeConfigGetter,
+}]
+pub trait HasChainNodeConfig: HasChainNodeConfigType {
+    fn chain_node_config(&self) -> &Self::ChainNodeConfig;
 }
 
 #[derive(HasField, Clone)]
@@ -99,6 +107,8 @@ delegate_components! {
             UseField<symbol!("chain_command_path")>,
         ChainStoreDirGetterComponent:
             UseField<symbol!("chain_store_dir")>,
+        ChainNodeConfigGetterComponent:
+            UseField<symbol!("chain_node_config")>,
     }
 }
 

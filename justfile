@@ -48,3 +48,6 @@ lint-cairo:
 lint-nix:
   cd ./relayer && \
   nix fmt -- --ci
+
+clean-testdata:
+  rm -rf ./relayer/crates/starknet-integration-tests/test-data

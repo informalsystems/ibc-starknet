@@ -24,3 +24,6 @@ pub use query_consensus_state_height::*;
 
 mod update_client_message;
 pub use update_client_message::*;
+
+mod upgrade_client_message;
+pub use upgrade_client_message::*;
