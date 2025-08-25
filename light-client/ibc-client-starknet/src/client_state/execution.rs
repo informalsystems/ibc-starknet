@@ -60,19 +60,23 @@ where
             // Specify the type to which `Any` should be decoded
             let header: StarknetHeader = header;
             let current_height = header.height();
-
-            let latest_height = core::cmp::max(self.latest_height(), current_height);
+            let final_height = header.final_height;
 
             let new_consensus_state = StarknetConsensusStateType::from(header);
 
-            let new_client_state = ClientStateType {
-                latest_height,
-                chain_id: self.0.chain_id.clone(),
-                sequencer_public_key: self.0.sequencer_public_key.clone(),
-                ibc_contract_address: self.0.ibc_contract_address.clone(),
-                is_frozen: self.0.is_frozen,
-            }
-            .into();
+            let new_client_state = if self.latest_height() < current_height {
+                ClientStateType {
+                    latest_height: current_height,
+                    final_height,
+                    chain_id: self.0.chain_id.clone(),
+                    sequencer_public_key: self.0.sequencer_public_key.clone(),
+                    ibc_contract_address: self.0.ibc_contract_address.clone(),
+                    is_frozen: self.0.is_frozen,
+                }
+                .into()
+            } else {
+                self.clone()
+            };
 
             update_client_and_consensus_state(
                 ctx,
@@ -82,7 +86,7 @@ where
                 new_consensus_state.into(),
             )?;
 
-            Ok(vec![latest_height])
+            Ok(vec![current_height])
         } else {
             let client_state = ctx
                 .client_state(client_id)
@@ -117,6 +121,7 @@ where
 
         let new_client_state = ClientStateType {
             latest_height: self.0.latest_height,
+            final_height: self.0.final_height,
             chain_id: self.0.chain_id.clone(),
             sequencer_public_key: self.0.sequencer_public_key.clone(),
             ibc_contract_address: self.0.ibc_contract_address.clone(),

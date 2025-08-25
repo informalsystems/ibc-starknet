@@ -22,8 +22,7 @@ scarb = { workspace = true }
 
 [dependencies]
 # external dependencies
-openzeppelin_token = { workspace = true }
-starknet           = { workspace = true }
+starknet = { workspace = true }
 
 [dev-dependencies]
 assert_macros = { workspace = true }

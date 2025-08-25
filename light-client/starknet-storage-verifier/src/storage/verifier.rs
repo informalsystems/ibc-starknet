@@ -155,11 +155,15 @@ pub fn verify_starknet_global_contract_root<C: StarknetCryptoFunctions>(
 ) -> Result<Felt, StorageError> {
     let global_roots = &storage_proof.global_roots;
 
-    let actual_state_root = crypto_lib.poseidon_hash_many(&[
-        cairo_short_string_to_felt(GLOBAL_STATE_VERSION).unwrap(),
-        global_roots.contracts_tree_root,
-        global_roots.classes_tree_root,
-    ]);
+    let actual_state_root = if global_roots.classes_tree_root == Felt::ZERO {
+        global_roots.contracts_tree_root
+    } else {
+        crypto_lib.poseidon_hash_many(&[
+            cairo_short_string_to_felt(GLOBAL_STATE_VERSION).unwrap(),
+            global_roots.contracts_tree_root,
+            global_roots.classes_tree_root,
+        ])
+    };
 
     if actual_state_root != state_root {
         return Err(StorageError::Generic(format!(

@@ -16,6 +16,7 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
 };
 use hermes_prelude::*;
 use hermes_starknet_chain_components::types::StarknetWallet;
+use starknet::core::types::Felt;
 use starknet::macros::felt;
 
 use crate::types::{StarknetGenesisConfig, StarknetNodeConfig};
@@ -69,7 +70,14 @@ where
             .into(),
         };
 
-        let node_config = StarknetNodeConfig { rpc_addr, rpc_port };
+        // FIXME(rano): Arbitrarily chosen only for testing.
+        let sequencer_private_key = Felt::TWO;
+
+        let node_config = StarknetNodeConfig {
+            rpc_addr,
+            rpc_port,
+            sequencer_private_key,
+        };
 
         let chain_process = bootstrap
             .start_chain_full_nodes(chain_home_dir, &node_config, &genesis_config)

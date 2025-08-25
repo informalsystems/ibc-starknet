@@ -48,8 +48,6 @@ where
         port_id: &Chain::PortId,
         height: &Chain::Height,
     ) -> Result<Chain::ChannelEnd, Chain::Error> {
-        // TODO(rano): how to query at a specific height?
-
         let encoding = chain.encoding();
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
@@ -103,8 +101,6 @@ where
         port_id: &Chain::PortId,
         height: &Chain::Height,
     ) -> Result<(Chain::ChannelEnd, Chain::CommitmentProof), Chain::Error> {
-        // TODO(rano): how to query at a specific height?
-
         let encoding = chain.encoding();
 
         let contract_address = chain.query_contract_address(PhantomData).await?;

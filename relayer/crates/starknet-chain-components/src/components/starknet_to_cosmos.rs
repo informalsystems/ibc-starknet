@@ -7,7 +7,7 @@ mod preset {
         ChannelOpenTryMessageBuilderComponent, ClientRecoveryComponent, ClientStateFieldsComponent,
         ClientStateQuerierComponent, ClientStateTypeComponent,
         ClientStateWithProofsQuerierComponent, ClientStatusMethodsComponent,
-        ClientStatusQuerierComponent, ClientStatusTypeComponent,
+        ClientStatusQuerierComponent, ClientStatusTypeComponent, ClientUpgradeComponent,
         ConnectionOpenAckMessageBuilderComponent, ConnectionOpenConfirmMessageBuilderComponent,
         ConnectionOpenInitMessageBuilderComponent, ConnectionOpenTryMessageBuilderComponent,
         ConsensusStateFieldComponent, ConsensusStateHeightsQuerierComponent,
@@ -33,10 +33,11 @@ mod preset {
 
     use crate::impls::{
         BuildStarknetCreateClientMessage, BuildStarknetToCosmosConnectionHandshake,
-        BuildStarknetUpdateClientMessage, CheckCosmosMisbehaviourFromStarknet,
-        ConvertCosmosIbcAmountFromStarknet, CosmosFromStarknetMisbehaviourMessageBuilder,
-        GetCosmosCounterpartyMessageStarknetHeight, ProvideCometConsensusState,
-        QueryStarknetConsensusStateHeightsFromGrpc, ReadPacketDstStarknetFields,
+        BuildStarknetUpdateClientMessage, BuildStarknetUpgradeClientMessage,
+        CheckCosmosMisbehaviourFromStarknet, ConvertCosmosIbcAmountFromStarknet,
+        CosmosFromStarknetMisbehaviourMessageBuilder, GetCosmosCounterpartyMessageStarknetHeight,
+        ProvideCometConsensusState, QueryStarknetConsensusStateHeightsFromGrpc,
+        ReadPacketDstStarknetFields,
     };
     use crate::types::{CometConsensusState, UseCometClientState};
 
@@ -76,6 +77,8 @@ mod preset {
                 WithType<CometConsensusState>,
             UpdateClientMessageBuilderComponent:
                 BuildStarknetUpdateClientMessage,
+            ClientUpgradeComponent:
+                BuildStarknetUpgradeClientMessage,
             ConsensusStateHeightsQuerierComponent:
                 QueryStarknetConsensusStateHeightsFromGrpc,
             CounterpartyMessageHeightGetterComponent:
