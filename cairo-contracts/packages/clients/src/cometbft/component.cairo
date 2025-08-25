@@ -892,7 +892,10 @@ pub mod CometClientComponent {
             let options = Options { trust_threshold, trusting_period, clock_drift };
 
             let mut hints_context = array![];
-            Serde::serialize(@client_state.attestator_keys, ref hints_context);
+            Serde::serialize(
+                @(client_state.attestator_quorum_percentage, client_state.attestator_keys),
+                ref hints_context,
+            );
 
             ICometLibraryDispatcher { class_hash: read_raw_key::<'comet-library'>() }
                 .verify_update_header(

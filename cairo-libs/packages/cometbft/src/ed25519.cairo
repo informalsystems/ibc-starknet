@@ -81,7 +81,7 @@ pub impl AttestatorEd25519VerifierImpl of Ed25519Verifier<AttestatorEd25519Verif
         assert(signature.len() == 64, CometErrors::INVALID_SIGNATURE_LENGTH);
         assert(public_key.len() == 32, CometErrors::INVALID_PUBKEY_LENGTH);
 
-        let mut attestator_keys: Array<felt252> = Serde::deserialize(ref hints_context).unwrap();
+        let (attestator_quorum_percentage, mut attestator_keys): (u32, Array<felt252>) = Serde::deserialize(ref hints_context).unwrap();
 
         // Array((pub_key, r, s))
         let mut attestator_signatures: Array<(felt252, felt252, felt252)> = Serde::deserialize(
@@ -127,8 +127,8 @@ pub impl AttestatorEd25519VerifierImpl of Ed25519Verifier<AttestatorEd25519Verif
         }
 
         assert(
-            attestation_count == attestator_keys.len() || attestation_count
-                * 2 > attestator_keys.len(),
+            attestation_count >= attestator_keys.len() || attestation_count
+                * 100 >= attestator_keys.len() * attestator_quorum_percentage,
             'not enough ed25519 attestations',
         );
     }

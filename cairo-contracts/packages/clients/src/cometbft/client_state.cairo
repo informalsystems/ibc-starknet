@@ -22,6 +22,7 @@ pub struct CometClientState {
     pub proof_spec: Array<ProofSpec>,
     pub upgrade_path: Array<ByteArray>,
     pub attestator_keys: Array<felt252>,
+    pub attestator_quorum_percentage: u32,
 }
 
 #[generate_trait]

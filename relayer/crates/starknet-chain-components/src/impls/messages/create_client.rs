@@ -85,6 +85,7 @@ where
             proof_specs: payload.client_state.proof_specs,
             upgrade_path: payload.client_state.upgrade_path,
             attestator_keys,
+            attestator_quorum_percentage: 50, // hardcoded to 50%
         };
 
         let consensus_state = CometConsensusState {
