@@ -19,5 +19,8 @@ pub use start_anvil::*;
 mod start_chain;
 pub use start_chain::*;
 
+mod start_fork;
+pub use start_fork::*;
+
 mod start_pathfinder;
 pub use start_pathfinder::*;

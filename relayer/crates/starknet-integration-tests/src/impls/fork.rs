@@ -6,9 +6,7 @@ use cgp::extra::runtime::HasRuntime;
 use eyre::eyre;
 use futures::lock::Mutex;
 use hermes_core::runtime_components::traits::{CanCreateDir, CanExecCommand, CanSleep};
-use hermes_core::test_components::setup::traits::{
-    FullNodeForker, FullNodeForkerComponent, FullNodeHalter, FullNodeHalterComponent,
-};
+use hermes_core::test_components::setup::traits::{FullNodeForker, FullNodeForkerComponent};
 use hermes_cosmos::error::HermesError;
 use hermes_cosmos::integration_tests::contexts::{
     CosmosBootstrap, CosmosBootstrapFields, CosmosChainDriver,
@@ -18,6 +16,7 @@ use hermes_cosmos::relayer::contexts::{CosmosBuilder, CosmosChain};
 use hermes_cosmos::test_components::bootstrap::traits::CanStartChainFullNodes;
 use hermes_prelude::*;
 use hermes_starknet_chain_context::contexts::{StarknetChain, StarknetChainFields};
+use hermes_starknet_test_components::traits::CanStartChainForkedFullNodes;
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
 use tendermint_rpc::{HttpClient, Url};
@@ -28,47 +27,6 @@ use crate::contexts::{
 use crate::utils::load_contract_from_env;
 
 pub struct ForkSecondFullNode;
-
-#[cgp_provider(FullNodeHalterComponent)]
-impl FullNodeHalter<StarknetTestDriver> for ForkSecondFullNode {
-    async fn halt_full_node(
-        driver: &StarknetTestDriver,
-        chain_id: String,
-    ) -> Result<(), HermesError> {
-        let runtime = driver.cosmos_chain_driver.chain.runtime.clone();
-        let node_pid = if chain_id == driver.cosmos_chain_driver.chain.chain_id.to_string() {
-            driver
-                .cosmos_chain_driver
-                .chain_processes
-                .first()
-                .expect("Failed to retrieve Cosmos chain process")
-                .id()
-                .expect("failed to retrieve Cosmos chain process ID")
-        } else if chain_id == driver.starknet_chain_driver.chain.chain_id.to_string() {
-            driver
-                .starknet_chain_driver
-                .chain_processes
-                .first()
-                .expect("Failed to retrieve Starknet chain process")
-                .id()
-                .expect("failed to retrieve Starknet chain process ID")
-        } else {
-            return Err(eyre!("Unknown chain ID: {chain_id}").into());
-        };
-
-        // Stop full node
-        // `kill` is used here instead of `Child::kill()` as the `kill()` method requires
-        // the child process to be mutable.
-        runtime
-            .exec_command(
-                &PathBuf::from("kill".to_string()),
-                &["-s", "KILL", &node_pid.to_string()],
-            )
-            .await?;
-
-        Ok(())
-    }
-}
 
 #[cgp_provider(FullNodeForkerComponent)]
 impl FullNodeForker<StarknetTestDriver> for ForkSecondFullNode {
@@ -465,10 +423,12 @@ async fn fork_starknet_chain(
 
     // Start the forked chain full node in the background, and return the child process handle
     let mut forked_chain_processes = fork_bootstrap
-        .start_chain_full_nodes(
+        .start_chain_forked_full_nodes(
             &fork_chain_home_dir,
             &fork_chain_node_config,
             &driver.starknet_chain_driver.genesis_config,
+            &starknet_chain_home_dir,
+            "10", // FIXME: Retrieve the correct block number for `--backup-every-n-blocks`
         )
         .await?;
 
@@ -476,7 +436,7 @@ async fn fork_starknet_chain(
         .relay_driver_a_b
         .birelay
         .runtime()
-        .sleep(core::time::Duration::from_secs(1))
+        .sleep(core::time::Duration::from_secs(3))
         .await;
 
     let mut node_chain_processes = node_bootstrap

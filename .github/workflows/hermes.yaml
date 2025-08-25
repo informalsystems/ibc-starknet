@@ -34,10 +34,10 @@ jobs:
         if: ${{ matrix.os == 'macos-13' }}
         uses: douglascamata/setup-docker-macos-action@main
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Checkout Madara
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: madara-alliance/madara
           ref: 4118ad97fe2d70bacc239ce2ca4225752a49f628 # main branch
@@ -156,7 +156,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: cachix/install-nix-action@v30
         with:

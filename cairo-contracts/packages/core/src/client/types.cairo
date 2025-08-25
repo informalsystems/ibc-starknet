@@ -1,11 +1,14 @@
 use cometbft::ibc::Height as ProtoHeight;
 use core::num::traits::{CheckedAdd, OverflowingMul, Zero};
+use core::poseidon::poseidon_hash_span;
 use core::traits::PartialOrd;
-use ibc_utils::bytes::{IntoArrayU32, U64IntoArrayU32};
+use ibc_utils::bytes::{ByteArrayIntoArrayU8, IntoArrayU32, U64IntoArrayU32};
 use protobuf::types::wkt::{Duration as ProtoDuration, Timestamp as ProtoTimestamp};
+use starknet::ContractAddress;
 use starknet_ibc_core::client::ClientErrors;
 use starknet_ibc_core::commitment::U32CollectorImpl;
 use starknet_ibc_core::host::ClientId;
+use starknet_ibc_utils::ComputeKey;
 
 const NANOS_PER_SEC: u32 = 1_000_000_000;
 
@@ -318,6 +321,57 @@ pub impl DurationToProto of TryInto<Duration, ProtoDuration> {
     }
 }
 
+#[derive(Clone, Debug, Drop, Serde, starknet::Store)]
+pub struct StarknetClientState {
+    pub latest_height: Height,
+    pub final_height: u64,
+    pub chain_id: ByteArray,
+    pub sequencer_public_key: felt252,
+    pub ibc_contract_address: ContractAddress,
+    pub is_frozen: u8,
+}
+
+#[derive(Clone, Debug, Drop, Serde, starknet::Store)]
+pub struct StarknetConsensusState {
+    pub root: felt252,
+    pub time: u64,
+}
+
+
+pub impl ClientStateKeyImpl of ComputeKey<StarknetClientState> {
+    fn key(self: @StarknetClientState) -> felt252 {
+        let mut data: Array<felt252> = array![];
+        data.append((*self.latest_height.revision_number).into());
+        data.append((*self.latest_height.revision_height).into());
+        data.append((*self.final_height).into());
+
+        {
+            data.append(self.chain_id.len().into());
+
+            let mut index = 0;
+
+            while let Some(byte) = self.chain_id.at(index) {
+                data.append(byte.into());
+                index += 1;
+            }
+        }
+
+        data.append(*self.sequencer_public_key);
+        data.append((*self.ibc_contract_address).into());
+        data.append((*self.is_frozen).into());
+        poseidon_hash_span(data.span())
+    }
+}
+
+pub impl ConsensusStateKeyImpl of ComputeKey<StarknetConsensusState> {
+    fn key(self: @StarknetConsensusState) -> felt252 {
+        let mut data: Array<felt252> = array![];
+        data.append(*self.root);
+        data.append((*self.time).into());
+        poseidon_hash_span(data.span())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -348,5 +402,26 @@ mod tests {
     fn test_duration_as_nanos() {
         let duration = Duration { seconds: 1, nanos: 1 };
         assert_eq!(duration.as_nanos(), 1_000_000_001);
+    }
+
+    #[test]
+    fn test_upgraded_client_state_key() {
+        let client_state = StarknetClientState {
+            latest_height: Height { revision_number: 1, revision_height: 2 },
+            final_height: 3,
+            chain_id: "test_chain",
+            sequencer_public_key: 0x12345,
+            ibc_contract_address: 0x1234567890abcdef1234567890abcdef.try_into().unwrap(),
+            is_frozen: 0,
+        };
+        let key = client_state.key();
+        assert_eq!(key, 0xf22c4c0863743bc89db515f8da6272649c5c22fb4fd6142010aee424c4aca5);
+    }
+
+    #[test]
+    fn test_upgraded_consensus_state_key() {
+        let consensus_state = StarknetConsensusState { root: 0x12345, time: 67890 };
+        let key = consensus_state.key();
+        assert_eq!(key, 0x63bbd344c107adb53145910cb75ae2901f9bdea80967dfef54bed58ce4fff15);
     }
 }

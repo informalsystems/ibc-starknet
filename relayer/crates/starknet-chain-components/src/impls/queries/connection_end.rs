@@ -47,8 +47,6 @@ where
         connection_id: &Chain::ConnectionId,
         height: &Chain::Height,
     ) -> Result<Chain::ConnectionEnd, Chain::Error> {
-        // TODO(rano): how to query at a specific height?
-
         let encoding = chain.encoding();
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
@@ -97,8 +95,6 @@ where
         connection_id: &Chain::ConnectionId,
         height: &Chain::Height,
     ) -> Result<(Chain::ConnectionEnd, Chain::CommitmentProof), Chain::Error> {
-        // TODO(rano): how to query at a specific height?
-
         let encoding = chain.encoding();
 
         let contract_address = chain.query_contract_address(PhantomData).await?;
