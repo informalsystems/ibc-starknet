@@ -14,7 +14,10 @@ pub enum Error {
 pub struct AttestatorClient<'a>(pub &'a str);
 
 impl AttestatorClient<'_> {
-    pub fn get_attestation(&self, challenges: &[Ed25519]) -> Result<Vec<(Felt, Felt)>, Error> {
+    pub fn get_attestation(
+        &self,
+        challenges: &[Ed25519],
+    ) -> Result<(Felt, Vec<(Felt, Felt)>), Error> {
         ureq::post(&format!("{}/attest", self.0))
             .send_json(challenges)
             .and_then(|mut resp| resp.body_mut().read_json())

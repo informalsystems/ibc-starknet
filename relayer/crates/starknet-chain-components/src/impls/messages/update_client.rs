@@ -9,6 +9,8 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_core::logging_components::traits::CanLog;
+use hermes_core::logging_components::types::LevelWarn;
 use hermes_cosmos_core::chain_components::types::CosmosUpdateClientPayload;
 use hermes_prelude::*;
 use ibc::clients::tendermint::types::Header;
@@ -36,6 +38,7 @@ where
         + HasClientIdType<Counterparty, ClientId = ClientId>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + CanLog<LevelWarn>
         + HasEd25519AttestatorAddresses
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<Encoding::Error>,
@@ -84,7 +87,7 @@ where
                 .map_err(Chain::raise_error)?;
 
             let signature_hints =
-                comet_signature_hints(&header, encoding, ed25519_attestator_addresses);
+                comet_signature_hints(chain, &header, encoding, ed25519_attestator_addresses).await;
 
             let serialized_signature_hints = encoding
                 .encode(&signature_hints)
@@ -113,12 +116,14 @@ where
     }
 }
 
-pub fn comet_signature_hints<Encoding>(
+pub async fn comet_signature_hints<Chain, Encoding>(
+    chain: &Chain,
     header: &Header,
     encoding: &Encoding,
     attestator_addresses: &[String],
 ) -> Vec<Vec<Felt>>
 where
+    Chain: CanLog<LevelWarn>,
     Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
         + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
@@ -133,7 +138,9 @@ where
         .map(|v| (v.address, v.pub_key))
         .collect();
 
-    signed_header
+    let mut hints: Vec<Vec<Felt>> = Vec::new();
+
+    for value in signed_header
         .commit
         .signatures
         .iter()
@@ -180,21 +187,26 @@ where
 
             Some((msg, signature, ed25519_public_key))
         })
-        .map(|value| {
-            if let Some((msg, signature, public_key)) = value {
+    {
+        if let Some((msg, signature, public_key)) = value {
+            hints.push(
                 compute_attestator_hints(
+                    chain,
                     encoding,
                     attestator_addresses,
                     &msg,
                     &signature,
                     &public_key,
                 )
-            } else {
-                // only return hints for the valid signatures
-                vec![]
-            }
-        })
-        .collect()
+                .await,
+            );
+        } else {
+            // only return hints for the valid signatures
+            hints.push(vec![]);
+        }
+    }
+
+    hints
 }
 
 pub fn compute_garaga_hints<Encoding>(
@@ -240,7 +252,8 @@ where
         .unwrap()
 }
 
-pub fn compute_attestator_hints<Encoding>(
+pub async fn compute_attestator_hints<Chain, Encoding>(
+    chain: &Chain,
     encoding: &Encoding,
     attestator_addresses: &[String],
     msg: &[u8],
@@ -248,29 +261,48 @@ pub fn compute_attestator_hints<Encoding>(
     public_key: &[u8; 32],
 ) -> Vec<Felt>
 where
+    Chain: CanLog<LevelWarn>,
     Encoding:
         HasEncodedType<Encoded = Vec<Felt>> + CanEncode<ViaCairo, Vec<Product![Felt, Felt, Felt]>>,
 {
-    let signatures: Vec<_> = attestator_addresses
+    let mut signatures = Vec::new();
+
+    for client in attestator_addresses
         .iter()
         .map(|addr| AttestatorClient(addr.as_str()))
-        .flat_map(|client| {
-            // Error calls will be ignored: `.ok()?`
-            // This allows attestator network to be fault-tolerant.
+    {
+        // Error calls will be ignored: `.ok()?`
+        // This allows attestator network to be fault-tolerant.
 
-            let (r, s) = client
-                .get_attestation(&[Ed25519 {
-                    message: msg.to_vec(),
-                    signature: *signature,
-                    public_key: *public_key,
-                }])
-                .ok()?[0];
+        let (public_key, r, s) = match client.get_attestation(&[Ed25519 {
+            message: msg.to_vec(),
+            signature: *signature,
+            public_key: *public_key,
+        }]) {
+            Ok((public_key, signatures)) => {
+                if signatures.len() != 1 {
+                    chain
+                        .log(
+                            &format!("Unexpected number of signatures: {}", signatures.len()),
+                            &LevelWarn,
+                        )
+                        .await;
+                    continue;
+                } else {
+                    let (r, s) = signatures[0];
+                    (public_key, r, s)
+                }
+            }
+            Err(err) => {
+                chain
+                    .log(&format!("Failed to get attestation: {err}"), &LevelWarn)
+                    .await;
+                continue;
+            }
+        };
 
-            let public_key = client.get_public_key().ok()?;
-
-            Some(product![public_key, r, s])
-        })
-        .collect();
+        signatures.push(product![public_key, r, s]);
+    }
 
     encoding.encode(&signatures).unwrap()
 }

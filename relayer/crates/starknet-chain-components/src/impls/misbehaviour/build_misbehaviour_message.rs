@@ -7,6 +7,8 @@ use hermes_core::chain_components::traits::{
     MisbehaviourMessageBuilder, MisbehaviourMessageBuilderComponent,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
+use hermes_core::logging_components::traits::CanLog;
+use hermes_core::logging_components::types::LevelWarn;
 use hermes_prelude::*;
 use ibc::core::host::types::error::DecodingError;
 use ibc::core::host::types::identifiers::ClientId;
@@ -35,6 +37,7 @@ where
         + HasAddressType<Address = StarknetAddress>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEd25519AttestatorAddresses
+        + CanLog<LevelWarn>
         + HasMessageType
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<EncodingError>
@@ -76,6 +79,7 @@ where
             .map_err(Chain::raise_error)?;
 
         let signature_hint_1 = comet_signature_hints(
+            chain,
             &decoded_evidence
                 .evidence_1
                 .clone()
@@ -83,9 +87,11 @@ where
                 .map_err(Chain::raise_error)?,
             encoding,
             ed25519_attestator_addresses,
-        );
+        )
+        .await;
 
         let signature_hint_2 = comet_signature_hints(
+            chain,
             &decoded_evidence
                 .evidence_2
                 .clone()
@@ -93,7 +99,8 @@ where
                 .map_err(Chain::raise_error)?,
             encoding,
             ed25519_attestator_addresses,
-        );
+        )
+        .await;
 
         let serialized_signature_hints = encoding
             .encode(&(signature_hint_1, signature_hint_2))
