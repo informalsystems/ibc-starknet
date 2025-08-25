@@ -3,12 +3,13 @@ use core::marker::PhantomData;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
-    HasAddressType, HasChainId, HasClientIdType, HasEvidenceType, HasMessageType,
-    MisbehaviourMessageBuilder, MisbehaviourMessageBuilderComponent,
+    CanQueryClientStateWithLatestHeight, HasAddressType, HasChainId, HasClientIdType,
+    HasClientStateType, HasEvidenceType, HasMessageType, MisbehaviourMessageBuilder,
+    MisbehaviourMessageBuilderComponent,
 };
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use hermes_core::logging_components::traits::CanLog;
-use hermes_core::logging_components::types::LevelWarn;
+use hermes_core::logging_components::types::{LevelDebug, LevelWarn};
 use hermes_prelude::*;
 use ibc::core::host::types::error::DecodingError;
 use ibc::core::host::types::identifiers::ClientId;
@@ -23,7 +24,7 @@ use crate::impls::{
     comet_signature_hints, CosmosStarknetMisbehaviour, StarknetAddress, StarknetMessage,
 };
 use crate::traits::{CanQueryContractAddress, HasEd25519AttestatorAddresses};
-use crate::types::ClientMessage;
+use crate::types::{ClientMessage, CometClientState};
 
 #[cgp_new_provider(MisbehaviourMessageBuilderComponent)]
 impl<Chain, Counterparty, EncodingError> MisbehaviourMessageBuilder<Chain, Counterparty>
@@ -35,14 +36,17 @@ where
         + HasEncoding<AsFelt>
         + HasMessageType<Message = StarknetMessage>
         + HasAddressType<Address = StarknetAddress>
+        + CanQueryClientStateWithLatestHeight<Counterparty>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEd25519AttestatorAddresses
         + CanLog<LevelWarn>
+        + CanLog<LevelDebug>
         + HasMessageType
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<EncodingError>
         + CanRaiseAsyncError<DecodingError>
         + CanRaiseAsyncError<TendermintProtoError>,
+    Counterparty: HasClientStateType<Chain, ClientState = CometClientState>,
     Chain::Encoding: HasEncodedType<Encoded = Vec<Felt>>
         + CanDecode<ViaCairo, Product![Product![U256, U256, U256, Vec<u8>], Vec<Felt>, U256, U256]>
         + CanEncode<ViaCairo, Product![Vec<Felt>, U256, U256]>
@@ -78,6 +82,20 @@ where
             .ok_or("No Ed25519 attestators")
             .map_err(Chain::raise_error)?;
 
+        let client_state = chain
+            .query_client_state_with_latest_height(PhantomData, client_id)
+            .await?;
+
+        let attestator_keys = client_state.attestator_keys;
+
+        if attestator_keys.len() != ed25519_attestator_addresses.len() {
+            return Err(Chain::raise_error(
+                "Attestator keys and addresses length mismatch",
+            ));
+        }
+
+        let attestator_quorum_percentage = client_state.attestator_quorum_percentage;
+
         let signature_hint_1 = comet_signature_hints(
             chain,
             &decoded_evidence
@@ -87,6 +105,7 @@ where
                 .map_err(Chain::raise_error)?,
             encoding,
             ed25519_attestator_addresses,
+            attestator_quorum_percentage,
         )
         .await;
 
@@ -99,6 +118,7 @@ where
                 .map_err(Chain::raise_error)?,
             encoding,
             ed25519_attestator_addresses,
+            attestator_quorum_percentage,
         )
         .await;
 

@@ -35,7 +35,7 @@ pub struct CometClientState {
     pub proof_specs: ProofSpecs,
     pub upgrade_path: Vec<String>,
     pub attestator_keys: Vec<Felt>,
-    pub attestator_quorum_percentage: u32,
+    pub attestator_quorum_percentage: usize,
 }
 
 #[derive(Clone, Debug, HasFields)]
