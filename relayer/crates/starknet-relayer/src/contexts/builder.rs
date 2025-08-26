@@ -441,6 +441,15 @@ impl StarknetBuilder {
             })
             .ok();
 
+        let ed25519_attestator_addresses = var("ED25519_ATTESTATORS")
+            .map(|attestator_list| {
+                attestator_list
+                    .split(',')
+                    .map(|x| x.trim().to_string())
+                    .collect()
+            })
+            .ok();
+
         let context = StarknetChain {
             fields: Arc::new(StarknetChainFields {
                 runtime: self.runtime.clone(),
@@ -459,6 +468,7 @@ impl StarknetBuilder {
                 json_rpc_url,
                 feeder_gateway_url,
                 client_refresh_rate,
+                ed25519_attestator_addresses,
             }),
         };
 

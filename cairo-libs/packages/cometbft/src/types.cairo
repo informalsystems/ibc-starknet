@@ -1,4 +1,4 @@
-pub use canonical_vote_impl::CanonicalVoteAsProtoMessage;
+use canonical_vote_impl::CanonicalVoteAsProtoMessage;
 use cometbft::errors::CometErrors;
 use cometbft::utils::Fraction;
 use core::sha256::compute_sha256_byte_array;
@@ -12,7 +12,7 @@ use protobuf::types::message::{
 };
 use protobuf::types::tag::{ProtobufTag, WireType};
 use protobuf::types::wkt::{Duration, Timestamp};
-use crate::ed25519::GaragaEd25519Verifier as Ed25519Verifier;
+use crate::ed25519::{AttestatorEd25519Verifier, Ed25519Verifier};
 use crate::light_client::Header as LcHeader;
 
 #[derive(Default, Debug, Copy, Drop, PartialEq, Serde)]
@@ -323,9 +323,17 @@ pub struct PublicKey {
 
 #[generate_trait]
 pub impl PublicKeyImpl of PublicKeyTrait {
-    fn verify(self: @PublicKey, msg: Span<u8>, signature: Span<u8>, hint: Span<felt252>) {
+    fn verify<V, +Ed25519Verifier<V>>(
+        self: @PublicKey,
+        msg: Span<u8>,
+        signature: Span<u8>,
+        hints_context: Span<felt252>,
+        hint: Span<felt252>,
+    ) {
         match self.sum {
-            Sum::Ed25519(pk) => Ed25519Verifier::assert_signature(msg, signature, pk.span(), hint),
+            Sum::Ed25519(pk) => Ed25519Verifier::<
+                V,
+            >::assert_signature(msg, signature, pk.span(), hints_context, hint),
             _ => core::panic_with_felt252(CometErrors::UNSUPPORTED_PUBKEY_TYPE),
         }
     }
@@ -438,9 +446,15 @@ pub impl ValidatorImpl of ValidatorTrait {
     }
 
     fn verify_signature(
-        self: @Validator, sign_bytes: Span<u8>, signature: Span<u8>, hints: Span<felt252>,
+        self: @Validator,
+        sign_bytes: Span<u8>,
+        signature: Span<u8>,
+        hints_context: Span<felt252>,
+        hints: Span<felt252>,
     ) {
-        self.pub_key.verify(sign_bytes, signature, hints);
+        self
+            .pub_key
+            .verify::<AttestatorEd25519Verifier>(sign_bytes, signature, hints_context, hints);
     }
 }
 
@@ -650,14 +664,13 @@ pub struct NonAbsentCommitVotes {
 #[generate_trait]
 pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
     fn new(
-        signed_header: SignedHeader, mut signature_hints: Array<Array<felt252>>,
+        signed_header: SignedHeader, mut signature_hints: Span<Array<felt252>>,
     ) -> NonAbsentCommitVotes {
         let mut votes = ArrayTrait::new();
 
         let commit = signed_header.commit;
 
         let mut signatures = commit.signatures.span();
-        let mut signature_hints = signature_hints.span();
 
         assert(
             signatures.len() == signature_hints.len(), CometErrors::INVALID_SIGNATURE_HINTS_LENGTH,
@@ -690,7 +703,9 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
         NonAbsentCommitVotes { votes }
     }
 
-    fn has_voted(self: @NonAbsentCommitVotes, validator: @Validator) -> bool {
+    fn has_voted(
+        self: @NonAbsentCommitVotes, validator: @Validator, hints_context: Span<felt252>,
+    ) -> bool {
         let mut votes_span = self.votes.span();
         let mut result = false;
         while let Option::Some((ith_vote, signature_hints)) = votes_span.pop_front() {
@@ -711,7 +726,10 @@ pub impl NonAbsentCommitVotesImpl of NonAbsentCommitVotesTrait {
 
                 validator
                     .verify_signature(
-                        signed_bytes.span(), signature.span(), signature_hints.span(),
+                        signed_bytes.span(),
+                        signature.span(),
+                        hints_context,
+                        signature_hints.span(),
                     );
 
                 // TODO: set verified field to true

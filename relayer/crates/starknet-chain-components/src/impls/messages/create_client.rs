@@ -1,5 +1,6 @@
 use core::marker::PhantomData;
 
+use attestator::AttestatorClient;
 use hermes_cairo_encoding_components::strategy::ViaCairo;
 use hermes_cairo_encoding_components::types::as_felt::AsFelt;
 use hermes_core::chain_components::traits::{
@@ -14,7 +15,7 @@ use starknet::core::types::Felt;
 use starknet::macros::{selector, short_string};
 
 use crate::impls::{from_vec_u8_to_be_u32_slice, StarknetAddress, StarknetMessage};
-use crate::traits::CanQueryContractAddress;
+use crate::traits::{CanQueryContractAddress, HasEd25519AttestatorAddresses};
 use crate::types::{ClientStatus, CometClientState, CometConsensusState, Height};
 
 pub struct BuildCreateCometClientMessage;
@@ -28,8 +29,11 @@ where
         + HasAddressType<Address = StarknetAddress>
         + HasEncoding<AsFelt, Encoding = Encoding>
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
+        + HasEd25519AttestatorAddresses
         + CanRaiseAsyncError<String>
+        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<core::num::TryFromIntError>
+        + CanRaiseAsyncError<ureq::Error>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
         HasCreateClientPayloadType<Chain, CreateClientPayload = CosmosCreateClientPayload>,
@@ -58,6 +62,18 @@ where
 
         let client_type = short_string!("07-tendermint");
 
+        let ed25519_attestator_addresses = chain
+            .ed25519_attestator_addresses()
+            .as_ref()
+            .ok_or("No Ed25519 attestators")
+            .map_err(Chain::raise_error)?;
+
+        let attestator_keys = ed25519_attestator_addresses
+            .iter()
+            .map(|addr| AttestatorClient(addr.as_ref()).get_public_key())
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(Chain::raise_error)?;
+
         let client_state = CometClientState {
             latest_height: height,
             trusting_period: payload.client_state.trusting_period,
@@ -68,6 +84,8 @@ where
             chain_id: payload.client_state.chain_id,
             proof_specs: payload.client_state.proof_specs,
             upgrade_path: payload.client_state.upgrade_path,
+            attestator_keys,
+            attestator_quorum_percentage: 50, // hardcoded to 50%
         };
 
         let consensus_state = CometConsensusState {

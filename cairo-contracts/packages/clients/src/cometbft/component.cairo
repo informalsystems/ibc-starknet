@@ -891,9 +891,20 @@ pub mod CometClientComponent {
 
             let options = Options { trust_threshold, trusting_period, clock_drift };
 
+            let mut hints_context = array![];
+            Serde::serialize(
+                @(client_state.attestator_quorum_percentage, client_state.attestator_keys),
+                ref hints_context,
+            );
+
             ICometLibraryDispatcher { class_hash: read_raw_key::<'comet-library'>() }
                 .verify_update_header(
-                    untrusted_block_state, trusted_block_state, options, now, signature_hints,
+                    untrusted_block_state,
+                    trusted_block_state,
+                    options,
+                    now,
+                    hints_context.span(),
+                    signature_hints.span(),
                 );
         }
 
@@ -936,9 +947,20 @@ pub mod CometClientComponent {
 
             let options = Options { trust_threshold, trusting_period, clock_drift };
 
+            let mut hints_context = array![];
+            Serde::serialize(
+                @(client_state.attestator_quorum_percentage, client_state.attestator_keys),
+                ref hints_context,
+            );
+
             ICometLibraryDispatcher { class_hash: read_raw_key::<'comet-library'>() }
                 .verify_misbehaviour_header(
-                    untrusted_block_state, trusted_block_state, options, now, signature_hints,
+                    untrusted_block_state,
+                    trusted_block_state,
+                    options,
+                    now,
+                    hints_context.span(),
+                    signature_hints.span(),
                 )
         }
 

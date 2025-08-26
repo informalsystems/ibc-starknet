@@ -18,6 +18,7 @@ use ibc::core::commitment_types::specs::ProofSpecs;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::proto::Any;
 use ibc_proto::ics23::{InnerSpec, LeafOp, ProofSpec};
+use starknet_crypto::Felt;
 
 use crate::types::Height;
 
@@ -33,6 +34,8 @@ pub struct CometClientState {
     pub chain_id: ChainId,
     pub proof_specs: ProofSpecs,
     pub upgrade_path: Vec<String>,
+    pub attestator_keys: Vec<Felt>,
+    pub attestator_quorum_percentage: usize,
 }
 
 #[derive(Clone, Debug, HasFields)]
