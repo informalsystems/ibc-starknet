@@ -67,9 +67,9 @@ where
 {
     fn erc20_hashes(&self) -> &OnceLock<HashSet<Chain::ContractClassHash>>;
 
-    fn ics20_hashes(&self) -> &OnceLock<HashSet<Chain::ContractClassHash>>;
+    fn ics20_contract_addresses(&self) -> &OnceLock<HashSet<Chain::Address>>;
 
-    fn ibc_client_hashes(&self) -> &OnceLock<HashSet<Chain::ContractClassHash>>;
+    fn ibc_client_contract_addresses(&self) -> &OnceLock<HashSet<Chain::Address>>;
 
     fn ibc_core_contract_addresses(&self) -> &OnceLock<HashSet<Chain::Address>>;
 }
@@ -344,17 +344,17 @@ where
             })?;
 
         event_encoding
-            .ics20_hashes()
-            .set([ics20_class_hash].into())
+            .ics20_contract_addresses()
+            .set([ics20_contract_address].into())
             .map_err(|_| {
-                Bootstrap::raise_error("failed to set ics20_class_hash on event encoding")
+                Bootstrap::raise_error("failed to set ics20_contract_address on event encoding")
             })?;
 
         event_encoding
-            .ibc_client_hashes()
-            .set([comet_client_class_hash].into())
+            .ibc_client_contract_addresses()
+            .set([comet_client_address].into())
             .map_err(|_| {
-                Bootstrap::raise_error("failed to set comet_client_class_hash on event encoding")
+                Bootstrap::raise_error("failed to set comet_client_address on event encoding")
             })?;
 
         event_encoding

@@ -86,9 +86,10 @@ mod preset {
             ]:
                 DecodeClientRelayEvents,
             (ViaCairo, Option<Erc20Event>):
+                // Only used in erc20 e2e test
                 DecodeOptionalByClassHash<symbol!("erc20_hashes")>,
             (ViaCairo, Option<IbcTransferEvent>):
-                DecodeOptionalByClassHash<symbol!("ics20_hashes")>,
+                DecodeOptionalByContractAddress<symbol!("ics20_contract_addresses")>,
             [
                 (ViaCairo, Option<ConnectionHandshakeEvents>),
                 (ViaCairo, Option<ChannelHandshakeEvents>),

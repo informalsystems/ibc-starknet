@@ -399,12 +399,12 @@ impl StarknetBuilder {
             .set(HashSet::from_iter(contract_classes.erc20))
             .unwrap();
         event_encoding
-            .ics20_hashes
-            .set(HashSet::from_iter(contract_classes.ics20))
+            .ics20_contract_addresses
+            .set(HashSet::from_iter(contract_addresses.ibc_ics20))
             .unwrap();
         event_encoding
-            .ibc_client_hashes
-            .set(HashSet::from_iter(contract_classes.ibc_client))
+            .ibc_client_contract_addresses
+            .set(HashSet::from_iter(contract_addresses.ibc_client))
             .unwrap();
         event_encoding
             .ibc_core_contract_addresses
