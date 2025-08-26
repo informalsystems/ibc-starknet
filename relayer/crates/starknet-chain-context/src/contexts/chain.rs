@@ -46,13 +46,14 @@ use hermes_starknet_chain_components::impls::{
 };
 use hermes_starknet_chain_components::traits::{
     AccountFromSignerBuilderComponent, ContractCallerComponent, ContractDeclarerComponent,
-    ContractDeployerComponent, ContractInvokerComponent, FeederGatewayUrlGetterComponent,
-    InvokeContractMessageBuilderComponent, JsonRpcRequestSenderComponent,
-    JsonRpcUrlGetterComponent, MerkleProofTypeProviderComponent, ReqwestClientGetterComponent,
-    StarknetAccountTypeProviderComponent, StarknetClientGetterComponent,
-    StarknetClientTypeProviderComponent, StarknetMerkleProofVerifierComponent,
-    StarknetStorageProofVerifierComponent, StorageKeyTypeProviderComponent,
-    StorageProofQuerierComponent, StorageProofTypeProviderComponent,
+    ContractDeployerComponent, ContractInvokerComponent, Ed25519AttestatorAddressesGetterComponent,
+    FeederGatewayUrlGetterComponent, InvokeContractMessageBuilderComponent,
+    JsonRpcRequestSenderComponent, JsonRpcUrlGetterComponent, MerkleProofTypeProviderComponent,
+    ReqwestClientGetterComponent, StarknetAccountTypeProviderComponent,
+    StarknetClientGetterComponent, StarknetClientTypeProviderComponent,
+    StarknetMerkleProofVerifierComponent, StarknetStorageProofVerifierComponent,
+    StorageKeyTypeProviderComponent, StorageProofQuerierComponent,
+    StorageProofTypeProviderComponent,
 };
 use hermes_starknet_chain_components::types::StarknetWallet;
 use ibc::core::host::types::identifiers::ChainId;
@@ -93,6 +94,7 @@ pub struct StarknetChainFields {
     pub signers: Vec<StarknetWallet>,
     pub client_refresh_rate: Option<Duration>,
     pub signer_mutex: Arc<Mutex<usize>>,
+    pub ed25519_attestator_addresses: Option<Vec<String>>,
 }
 
 impl Deref for StarknetChain {
@@ -142,6 +144,8 @@ delegate_components! {
             StarknetClientGetterComponent,
         ]:
             WithField<symbol!("starknet_client")>,
+        Ed25519AttestatorAddressesGetterComponent:
+            UseField<symbol!("ed25519_attestator_addresses")>,
         DefaultSignerGetterComponent:
             GetFirstSignerAsDefault<symbol!("signers")>,
         SignerMutexGetterComponent:

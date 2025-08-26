@@ -507,6 +507,11 @@ async fn fork_starknet_chain(
             signers: driver.starknet_chain_driver.chain.signers.clone(),
             client_refresh_rate: driver.starknet_chain_driver.chain.client_refresh_rate,
             signer_mutex: Arc::new(Mutex::new(0)),
+            ed25519_attestator_addresses: driver
+                .starknet_chain_driver
+                .chain
+                .ed25519_attestator_addresses
+                .clone(),
         }),
     };
 

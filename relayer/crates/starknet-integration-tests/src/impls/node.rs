@@ -194,6 +194,10 @@ impl FullNodeResumer<StarknetChainDriver> for StarknetFullNodeHandler {
                 signers: chain_driver.chain.signers.clone(),
                 client_refresh_rate: chain_driver.chain.client_refresh_rate,
                 signer_mutex: Arc::new(Mutex::new(0)),
+                ed25519_attestator_addresses: chain_driver
+                    .chain
+                    .ed25519_attestator_addresses
+                    .clone(),
             }),
         };
 

@@ -55,6 +55,9 @@ time                        = { workspace = true }
 tonic                       = { workspace = true }
 ureq                        = { workspace = true }
 url                         = { workspace = true }
+rand                        = { workspace = true }
+
+attestator = { workspace = true, features = [ "client" ] }
 
 [dev-dependencies]
 sha256 = { workspace = true }

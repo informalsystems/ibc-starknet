@@ -290,6 +290,7 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
                 max_delay: Duration::from_secs(1),
                 sleep_time: Duration::from_millis(100),
             }),
+            ed25519_attestator_addresses: chain_driver.chain.ed25519_attestator_addresses.clone(),
         };
 
         let chain_config_str = to_string_pretty(&chain_config)?;
