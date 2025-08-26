@@ -12,7 +12,6 @@ ed25519-dalek   = { workspace = true }
 starknet-core   = { workspace = true }
 starknet-crypto = { workspace = true }
 serde           = { workspace = true, features = [ "derive" ] }
-thiserror       = { workspace = true }
 ureq            = { workspace = true, optional = true }
 serde_with      = { workspace = true, features = [ "hex" ] }
 

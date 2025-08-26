@@ -1,15 +1,6 @@
 use starknet_crypto::Felt;
-use thiserror::Error;
 
 use crate::Ed25519;
-
-#[derive(Error, Debug)]
-pub enum Error {
-    #[error("No Public Key")]
-    MissingPublicKey,
-    #[error("Invalid Signature")]
-    InvalidSignature,
-}
 
 pub struct AttestatorClient<'a>(pub &'a str);
 
@@ -17,18 +8,18 @@ impl AttestatorClient<'_> {
     pub fn get_attestation(
         &self,
         challenges: &[Ed25519],
-    ) -> Result<(Felt, Vec<(Felt, Felt)>), Error> {
-        ureq::post(&format!("{}/attest", self.0))
-            .send_json(challenges)
-            .and_then(|mut resp| resp.body_mut().read_json())
-            .map_err(|_| Error::InvalidSignature)
+    ) -> Result<(Felt, Vec<(Felt, Felt)>), ureq::Error> {
+        Ok(ureq::post(&format!("{}/attest", self.0))
+            .send_json(challenges)?
+            .body_mut()
+            .read_json()?)
     }
 
-    pub fn get_public_key(&self) -> Result<Felt, Error> {
-        ureq::get(&format!("{}/public_key", self.0))
-            .call()
-            .and_then(|mut resp| resp.body_mut().read_json())
-            .map_err(|_| Error::MissingPublicKey)
+    pub fn get_public_key(&self) -> Result<Felt, ureq::Error> {
+        Ok(ureq::get(&format!("{}/public_key", self.0))
+            .call()?
+            .body_mut()
+            .read_json()?)
     }
 }
 
@@ -55,6 +46,7 @@ mod tests {
         let [(r, s)] = client
             .get_attestation(std::slice::from_ref(&challenge))
             .unwrap()
+            .1
             .try_into()
             .unwrap();
 

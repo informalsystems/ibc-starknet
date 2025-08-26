@@ -33,7 +33,7 @@ where
         + CanRaiseAsyncError<String>
         + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<core::num::TryFromIntError>
-        + CanRaiseAsyncError<attestator::Error>
+        + CanRaiseAsyncError<ureq::Error>
         + CanRaiseAsyncError<Encoding::Error>,
     Counterparty:
         HasCreateClientPayloadType<Chain, CreateClientPayload = CosmosCreateClientPayload>,
