@@ -131,9 +131,7 @@ pub impl AttestatorEd25519VerifierImpl of Ed25519Verifier<AttestatorEd25519Verif
         }
 
         assert(
-            attestation_count >= attestator_keys.len() || attestation_count
-                * 100 >= attestator_keys.len()
-                * attestator_quorum_percentage,
+            attestation_count * 100 >= attestator_keys.len() * attestator_quorum_percentage,
             'not enough ed25519 attestations',
         );
     }
