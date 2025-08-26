@@ -175,6 +175,15 @@ where
         let block_time = core::time::Duration::from_secs(1);
         let poll_interval = core::time::Duration::from_millis(200);
 
+        let ed25519_attestator_addresses = var("ED25519_ATTESTATORS")
+            .map(|attestator_list| {
+                attestator_list
+                    .split(',')
+                    .map(|s| s.trim().to_string())
+                    .collect::<Vec<_>>()
+            })
+            .ok();
+
         let chain_config = StarknetChainConfig {
             json_rpc_url: format!("http://{}:{}/", node_config.rpc_addr, node_config.rpc_port),
             feeder_gateway_url: format!(
@@ -184,6 +193,7 @@ where
             ),
             relayer_wallet_1: relayer_wallet_path_1,
             relayer_wallet_2: relayer_wallet_path_2,
+            ed25519_attestator_addresses,
             poll_interval,
             block_time,
             contract_addresses,
@@ -197,15 +207,6 @@ where
             }),
         };
 
-        let ed25519_attestator_addresses = var("ED25519_ATTESTATORS")
-            .map(|attestator_list| {
-                attestator_list
-                    .split(',')
-                    .map(|s| s.trim().to_string())
-                    .collect::<Vec<_>>()
-            })
-            .ok();
-
         let chain = StarknetChain {
             fields: Arc::new(StarknetChainFields {
                 runtime: runtime.clone(),
@@ -213,6 +214,7 @@ where
                     .to_string()
                     .parse()
                     .map_err(Bootstrap::raise_error)?,
+                ed25519_attestator_addresses: chain_config.ed25519_attestator_addresses.clone(),
                 chain_config,
                 starknet_client,
                 rpc_client,
@@ -228,7 +230,6 @@ where
                 signers: vec![relayer_wallet_1.clone(), relayer_wallet_2.clone()],
                 client_refresh_rate,
                 signer_mutex: Arc::new(Mutex::new(0)),
-                ed25519_attestator_addresses,
             }),
         };
 
