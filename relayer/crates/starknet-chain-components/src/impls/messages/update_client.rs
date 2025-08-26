@@ -335,6 +335,8 @@ where
         };
 
         signatures.push(product![public_key, r, s]);
+        attestation_count += 1;
+
         if attestation_count * 100 >= attestator_quorum_percentage * attestator_addresses.len() {
             chain
                 .log(
@@ -344,7 +346,6 @@ where
                 .await;
             break;
         }
-        attestation_count += 1;
     }
 
     encoding.encode(&signatures).unwrap()
