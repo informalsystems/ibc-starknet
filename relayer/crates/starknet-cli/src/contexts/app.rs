@@ -245,14 +245,8 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
                 .erc20_hashes
                 .get()
                 .and_then(|hashes| hashes.iter().cloned().next()),
-            ics20: event_encoding
-                .ics20_hashes
-                .get()
-                .and_then(|hashes| hashes.iter().cloned().next()),
-            ibc_client: event_encoding
-                .ibc_client_hashes
-                .get()
-                .and_then(|hashes| hashes.iter().cloned().next()),
+            ics20: None,
+            ibc_client: None,
         };
 
         let relayer_wallet_path_1 = chain_driver

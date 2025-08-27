@@ -26,8 +26,8 @@ use crate::impls::HandleStarknetChainError;
 #[derive(HasField, Default, Clone)]
 pub struct StarknetEventEncoding {
     pub erc20_hashes: OnceLock<HashSet<Felt>>,
-    pub ics20_hashes: OnceLock<HashSet<Felt>>,
-    pub ibc_client_hashes: OnceLock<HashSet<Felt>>,
+    pub ics20_contract_addresses: OnceLock<HashSet<StarknetAddress>>,
+    pub ibc_client_contract_addresses: OnceLock<HashSet<StarknetAddress>>,
     pub ibc_core_contract_addresses: OnceLock<HashSet<StarknetAddress>>,
 }
 
