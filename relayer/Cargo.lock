@@ -553,7 +553,7 @@ dependencies = [
  "serde_json",
  "sha3",
  "smol_str",
- "starknet-types-core",
+ "starknet-types-core 0.1.8",
  "thiserror 2.0.12",
 ]
 
@@ -606,7 +606,7 @@ dependencies = [
  "itertools",
  "num-bigint",
  "num-traits",
- "starknet-types-core",
+ "starknet-types-core 0.1.8",
  "thiserror 2.0.12",
 ]
 
@@ -639,7 +639,7 @@ dependencies = [
  "serde_json",
  "sha3",
  "smol_str",
- "starknet-types-core",
+ "starknet-types-core 0.1.8",
  "thiserror 2.0.12",
 ]
 
@@ -1777,7 +1777,7 @@ dependencies = [
  "rayon",
  "sha2 0.10.9",
  "sha3",
- "starknet-types-core",
+ "starknet-types-core 0.1.8",
  "thiserror 2.0.12",
 ]
 
@@ -2588,7 +2588,7 @@ dependencies = [
  "serde_json",
  "stable-eyre",
  "starknet",
- "starknet-types-core",
+ "starknet-types-core 0.2.0",
  "tokio",
  "toml",
  "tracing",
@@ -5795,7 +5795,7 @@ dependencies = [
  "sha3",
  "starknet-core-derive",
  "starknet-crypto",
- "starknet-types-core",
+ "starknet-types-core 0.1.8",
 ]
 
 [[package]]
@@ -5818,7 +5818,7 @@ dependencies = [
  "sha3",
  "starknet-core-derive",
  "starknet-crypto",
- "starknet-types-core",
+ "starknet-types-core 0.1.8",
 ]
 
 [[package]]
@@ -5847,7 +5847,7 @@ dependencies = [
  "rfc6979",
  "sha2 0.10.9",
  "starknet-curve",
- "starknet-types-core",
+ "starknet-types-core 0.1.8",
  "zeroize",
 ]
 
@@ -5865,7 +5865,7 @@ version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bcde6bd74269b8161948190ace6cf069ef20ac6e79cd2ba09b320efa7500b6de"
 dependencies = [
- "starknet-types-core",
+ "starknet-types-core 0.1.8",
 ]
 
 [[package]]
@@ -5941,6 +5941,21 @@ dependencies = [
  "num-traits",
  "serde",
  "size-of",
+ "zeroize",
+]
+
+[[package]]
+name = "starknet-types-core"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5fa3d91e38f091dbc543d33589eb7716bed2a8eb1c20879e484561977832b60a"
+dependencies = [
+ "lambdaworks-crypto 0.10.0",
+ "lambdaworks-math 0.10.0",
+ "num-bigint",
+ "num-integer",
+ "num-traits",
+ "serde",
  "zeroize",
 ]
 
