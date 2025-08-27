@@ -121,12 +121,11 @@ where
             classes_tree_root,
         ]);
 
-        // FIXME: uncomment this when #468 is resolved
-        // if block_header.state_root != state_root {
-        //     return Err(Chain::raise_error(
-        //         "state root does not match between block and storage proof",
-        //     ));
-        // }
+        if block_header.state_root != state_root {
+            return Err(Chain::raise_error(
+                "state root does not match between block and storage proof",
+            ));
+        }
 
         if block_header.block_hash != storage_proof.global_roots.block_hash {
             return Err(Chain::raise_error(
