@@ -3,7 +3,7 @@ use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_client_starknet_types::{StarknetClientState, StarknetConsensusState};
-use starknet_v14::core::types::StorageProof;
+use starknet::core::types::StorageProof;
 
 #[derive(Debug, HasField)]
 pub struct StarknetCreateClientPayload {

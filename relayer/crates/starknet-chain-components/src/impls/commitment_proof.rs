@@ -4,8 +4,7 @@ use hermes_core::chain_type_components::traits::HasAddressType;
 use hermes_prelude::*;
 use indexmap::IndexMap;
 use starknet::core::crypto::pedersen_hash;
-use starknet::core::types::Felt;
-use starknet_v14::core::types::{MerkleNode, StorageProof};
+use starknet::core::types::{Felt, MerkleNode, StorageProof};
 
 use crate::impls::{CanValidateStorageProof, StarknetAddress};
 use crate::traits::{

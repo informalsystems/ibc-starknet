@@ -57,10 +57,9 @@ use hermes_starknet_chain_components::traits::{
 use hermes_starknet_chain_components::types::StarknetWallet;
 use ibc::core::host::types::identifiers::ChainId;
 use indexmap::IndexMap;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, MerkleNode, StorageProof};
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
-use starknet_v14::core::types::{MerkleNode, StorageProof};
 use ureq::Agent;
 use url::Url;
 

@@ -5,8 +5,7 @@ use hermes_core::logging_components::types::LevelTrace;
 use hermes_prelude::*;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
-use starknet::core::types::{BlockId, Felt};
-use starknet_v14::core::types::StorageProof;
+use starknet::core::types::{BlockId, Felt, StorageProof};
 
 use crate::impls::{CanValidateStorageProof, StarknetAddress};
 use crate::traits::{
