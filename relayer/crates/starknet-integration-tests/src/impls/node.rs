@@ -179,6 +179,7 @@ impl FullNodeResumer<StarknetChainDriver> for StarknetFullNodeHandler {
             fields: Arc::new(StarknetChainFields {
                 runtime: runtime.clone(),
                 chain_id: chain_driver.chain.chain_id.clone(),
+                chain_config: chain_driver.chain.chain_config.clone(),
                 starknet_client: forked_starknet_rpc_client,
                 rpc_client,
                 json_rpc_url: forked_json_rpc_url,
@@ -204,6 +205,7 @@ impl FullNodeResumer<StarknetChainDriver> for StarknetFullNodeHandler {
             runtime: chain_driver.runtime.clone(),
             chain: forked_starknet_chain,
             chain_store_dir: fork_chain_home_dir,
+            chain_command_path: chain_driver.chain_command_path.clone(),
             genesis_config: chain_driver.genesis_config.clone(),
             node_config: fork_chain_node_config,
             wallets: chain_driver.wallets.clone(),

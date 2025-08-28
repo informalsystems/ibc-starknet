@@ -1,7 +1,8 @@
 use hermes_core::runtime_components::traits::{CanStartChildProcess, HasFilePathType, HasRuntime};
+use hermes_core::test_components::chain_driver::traits::HasChainCommandPath;
 use hermes_cosmos_core::test_components::bootstrap::traits::{
-    ChainFullNodeStarter, ChainFullNodeStarterComponent, HasChainCommandPath,
-    HasChainGenesisConfigType, HasChainNodeConfigType,
+    ChainFullNodeStarter, ChainFullNodeStarterComponent, HasChainGenesisConfigType,
+    HasChainNodeConfigType,
 };
 use hermes_cosmos_core::test_components::bootstrap::types::{
     CosmosChainNodeConfig, CosmosGenesisConfig,
