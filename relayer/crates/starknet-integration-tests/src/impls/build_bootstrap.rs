@@ -6,9 +6,10 @@ use std::sync::OnceLock;
 
 use cgp::extra::runtime::HasRuntime;
 use futures::lock::Mutex;
+use hermes_core::chain_type_components::impls::BatchConfig;
 use hermes_core::runtime_components::traits::{CanCreateDir, CanSleep, CanWriteStringToFile};
 use hermes_core::test_components::chain::traits::HasWalletType;
-use hermes_core::test_components::chain_driver::traits::HasChainType;
+use hermes_core::test_components::chain_driver::traits::{HasChainCommandPath, HasChainType};
 use hermes_core::test_components::driver::traits::HasChainDriverType;
 use hermes_cosmos::runtime::types::error::TokioRuntimeError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
@@ -18,6 +19,9 @@ use hermes_cosmos_core::test_components::bootstrap::traits::{
     HasChainNodeConfigType, HasChainStoreDir,
 };
 use hermes_prelude::*;
+use hermes_starknet_chain_components::impls::{
+    StarknetChainConfig, StarknetContractAddresses, StarknetContractClasses,
+};
 use hermes_starknet_chain_components::types::StarknetWallet;
 use hermes_starknet_chain_context::contexts::{StarknetChain, StarknetChainFields};
 use hermes_starknet_test_components::types::{StarknetGenesisConfig, StarknetNodeConfig};
@@ -38,6 +42,7 @@ where
         + HasChainType
         + HasChainGenesisConfigType<ChainGenesisConfig = StarknetGenesisConfig>
         + HasChainNodeConfigType<ChainNodeConfig = StarknetNodeConfig>
+        + HasChainCommandPath
         + CanRaiseAsyncError<TokioRuntimeError>
         + CanRaiseAsyncError<ProviderError>
         + CanRaiseAsyncError<ParseError>
@@ -57,6 +62,8 @@ where
         let runtime = bootstrap.runtime().clone();
 
         let chain_store_dir = bootstrap.chain_store_dir().clone();
+
+        let chain_command_path = bootstrap.chain_command_path().clone();
 
         runtime
             .create_dir(&chain_store_dir.join("wallets"))
@@ -145,6 +152,29 @@ where
                 )
             })
             .ok();
+        let relayer_wallet_path_1 = chain_store_dir
+            .join("wallets/relayer.toml")
+            .display()
+            .to_string();
+
+        let relayer_wallet_path_2 = chain_store_dir
+            .join("wallets/relayer-2.toml")
+            .display()
+            .to_string();
+
+        let contract_classes = StarknetContractClasses {
+            erc20: None,
+            ics20: None,
+            ibc_client: None,
+        };
+        let contract_addresses = StarknetContractAddresses {
+            ibc_client: None,
+            ibc_core: None,
+            ibc_ics20: None,
+        };
+
+        let block_time = core::time::Duration::from_secs(1);
+        let poll_interval = core::time::Duration::from_millis(200);
 
         let ed25519_attestator_addresses = var("ED25519_ATTESTATORS")
             .map(|attestator_list| {
@@ -155,6 +185,29 @@ where
             })
             .map_err(Bootstrap::raise_error)?;
 
+        let chain_config = StarknetChainConfig {
+            json_rpc_url: format!("http://{}:{}/", node_config.rpc_addr, node_config.rpc_port),
+            feeder_gateway_url: format!(
+                "http://{}:{}/",
+                node_config.rpc_addr,
+                node_config.rpc_port + 1
+            ),
+            relayer_wallet_1: relayer_wallet_path_1,
+            relayer_wallet_2: relayer_wallet_path_2,
+            ed25519_attestator_addresses,
+            poll_interval,
+            block_time,
+            contract_addresses,
+            contract_classes,
+            batch_config: Some(BatchConfig {
+                max_message_count: 300,
+                max_tx_size: 1000000,
+                buffer_size: 1000000,
+                max_delay: Duration::from_secs(1),
+                sleep_time: Duration::from_millis(100),
+            }),
+        };
+
         let chain = StarknetChain {
             fields: Arc::new(StarknetChainFields {
                 runtime: runtime.clone(),
@@ -162,6 +215,8 @@ where
                     .to_string()
                     .parse()
                     .map_err(Bootstrap::raise_error)?,
+                ed25519_attestator_addresses: chain_config.ed25519_attestator_addresses.clone(),
+                chain_config,
                 starknet_client,
                 rpc_client,
                 json_rpc_url,
@@ -170,13 +225,12 @@ where
                 ibc_core_contract_address: OnceLock::new(),
                 ibc_ics20_contract_address: OnceLock::new(),
                 event_encoding: Default::default(),
-                poll_interval: core::time::Duration::from_millis(200),
-                block_time: core::time::Duration::from_secs(1),
+                poll_interval,
+                block_time,
                 nonce_mutex: Arc::new(Mutex::new(())),
                 signers: vec![relayer_wallet_1.clone(), relayer_wallet_2.clone()],
                 client_refresh_rate,
                 signer_mutex: Arc::new(Mutex::new(0)),
-                ed25519_attestator_addresses,
             }),
         };
 
@@ -184,6 +238,7 @@ where
             runtime,
             chain,
             chain_store_dir,
+            chain_command_path,
             genesis_config,
             node_config,
             wallets,

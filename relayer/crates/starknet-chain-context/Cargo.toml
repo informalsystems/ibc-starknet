@@ -25,11 +25,12 @@ tendermint-proto                 = { workspace = true }
 starknet                    = { workspace = true }
 futures                     = { workspace = true }
 url                         = { workspace = true }
+cairo-lang-starknet-classes = { workspace = true }
 eyre                        = { workspace = true }
+ibc-client-starknet-types   = { workspace = true }
+indexmap                    = { workspace = true }
 prost                       = { workspace = true }
 serde_json                  = { workspace = true }
 toml                        = { workspace = true }
-cairo-lang-starknet-classes = { workspace = true }
-ibc-client-starknet-types   = { workspace = true }
+tracing                     = { workspace = true }
 ureq                        = { workspace = true }
-indexmap                    = { workspace = true }
