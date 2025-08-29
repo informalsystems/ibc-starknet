@@ -6,7 +6,7 @@
     rust-overlay.url = "github:oxalica/rust-overlay";
     flake-utils.url = "github:numtide/flake-utils";
     cairo-nix.url = "github:cairo-nix/cairo-nix";
-    cosmos-nix.url = "github:informalsystems/cosmos.nix/luca_joss/bump-osmosis-to-30-0-1";
+    cosmos-nix.url = "github:informalsystems/cosmos.nix";
 
     cairo-src = {
       url = "github:starkware-libs/cairo/v2.11.4";
