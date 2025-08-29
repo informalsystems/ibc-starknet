@@ -8,6 +8,7 @@ on:
       - light-client/**
       - attestator/**
       - .github/workflows/hermes.yaml
+      - flake.lock
   push:
     branches:
       - main
