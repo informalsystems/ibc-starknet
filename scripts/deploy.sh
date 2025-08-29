@@ -54,12 +54,14 @@ declare() {
 
 deploy_core() {
     CORE_CLASS_HASH=$1
-    PROTOBUF_LIB_CLASS_HASH=$2
+    ADMIN_ADDRESS=$2
+    PROTOBUF_LIB_CLASS_HASH=$3
 
     output=$(
         starkli deploy --not-unique \
         $STARKLI_ARGS \
         "$CORE_CLASS_HASH" \
+        "$ADMIN_ADDRESS" \
         "$PROTOBUF_LIB_CLASS_HASH" \
         2>&1 | tee /dev/tty
     )
@@ -177,7 +179,11 @@ echo "  COMET LIB: $comet_lib_class_hash"
 echo "  ICS23 LIB: $ics23_lib_class_hash"
 echo "  PROTOBUF LIB: $protobuf_lib_class_hash"
 
-core_contract_address=$(deploy_core "$core_class_hash" "$protobuf_lib_class_hash")
+admin_address=$(jq -r .deployment.address < $STARKNET_ACCOUNT)
+
+echo "Admin address: $admin_address"
+
+core_contract_address=$(deploy_core "$core_class_hash" "$admin_address" "$protobuf_lib_class_hash")
 comet_contract_address=$(deploy_comet "$comet_class_hash" "$core_contract_address" "$comet_lib_class_hash" "$ics23_lib_class_hash" "$protobuf_lib_class_hash")
 ics20_contract_address=$(deploy_ics20 "$ics20_class_hash" "$core_contract_address" "$erc20_class_hash")
 
