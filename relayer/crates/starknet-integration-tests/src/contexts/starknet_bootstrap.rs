@@ -9,15 +9,17 @@ use hermes_core::runtime_components::traits::{
     RuntimeGetterComponent, RuntimeTypeProviderComponent,
 };
 use hermes_core::test_components::bootstrap::traits::ChainBootstrapperComponent;
-use hermes_core::test_components::chain_driver::traits::ChainTypeProviderComponent;
+use hermes_core::test_components::chain_driver::traits::{
+    ChainCommandPathGetterComponent, ChainTypeProviderComponent,
+};
 use hermes_core::test_components::driver::traits::ChainDriverTypeProviderComponent;
 use hermes_cosmos::error::impls::UseHermesError;
 use hermes_cosmos::runtime::types::runtime::HermesRuntime;
 use hermes_cosmos::test_components::bootstrap::traits::HasChainNodeConfigType;
 use hermes_cosmos_core::test_components::bootstrap::impls::BuildAndWaitChainDriver;
 use hermes_cosmos_core::test_components::bootstrap::traits::{
-    ChainCommandPathGetterComponent, ChainDriverBuilderComponent, ChainFullNodeStarterComponent,
-    ChainGenesisConfigTypeComponent, ChainNodeConfigTypeComponent, ChainStoreDirGetterComponent,
+    ChainDriverBuilderComponent, ChainFullNodeStarterComponent, ChainGenesisConfigTypeComponent,
+    ChainNodeConfigTypeComponent, ChainStoreDirGetterComponent,
 };
 use hermes_cosmos_core::tracing_logging_components::contexts::TracingLogger;
 use hermes_prelude::*;

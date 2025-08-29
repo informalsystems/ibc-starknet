@@ -10,9 +10,10 @@ use hermes_core::runtime_components::traits::{
 };
 use hermes_core::test_components::chain_driver::impls::WaitChainReachHeight;
 use hermes_core::test_components::chain_driver::traits::{
-    ChainGetterComponent, ChainProcessTaker, ChainProcessTakerComponent,
-    ChainStartupWaiterComponent, ChainTypeProviderComponent, DenomGetter, DenomGetterComponent,
-    RandomAmountGeneratorComponent, RelayerWallet, SetupUpgradeClientTestResultTypeProvider,
+    ChainCommandPathGetter, ChainCommandPathGetterComponent, ChainGetterComponent,
+    ChainProcessTaker, ChainProcessTakerComponent, ChainStartupWaiterComponent,
+    ChainTypeProviderComponent, DenomGetter, DenomGetterComponent, RandomAmountGeneratorComponent,
+    RelayerWallet, SetupUpgradeClientTestResultTypeProvider,
     SetupUpgradeClientTestResultTypeProviderComponent, StakingDenom, TransferDenom, UserWallet,
     WalletGetterComponent,
 };
@@ -48,6 +49,7 @@ pub struct StarknetChainDriver {
     pub runtime: HermesRuntime,
     pub chain: StarknetChain,
     pub chain_store_dir: PathBuf,
+    pub chain_command_path: PathBuf,
     pub genesis_config: StarknetGenesisConfig,
     pub node_config: StarknetNodeConfig,
     pub wallets: BTreeMap<String, StarknetWallet>,
@@ -127,5 +129,12 @@ impl DenomGetter<StarknetChainDriver, StakingDenom> for StarknetChainDriverCompo
 impl ChainProcessTaker<StarknetChainDriver> for StarknetChainDriverComponents {
     fn take_chain_process(chain_driver: &mut StarknetChainDriver) -> Vec<Child> {
         core::mem::take(&mut chain_driver.chain_processes)
+    }
+}
+
+#[cgp_provider(ChainCommandPathGetterComponent)]
+impl ChainCommandPathGetter<StarknetChainDriver> for StarknetChainDriverComponents {
+    fn chain_command_path(driver: &StarknetChainDriver) -> &PathBuf {
+        &driver.chain_command_path
     }
 }

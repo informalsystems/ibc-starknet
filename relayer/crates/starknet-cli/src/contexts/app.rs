@@ -1,3 +1,4 @@
+use core::time::Duration;
 use std::path::PathBuf;
 
 use cgp::core::component::UseDelegate;
@@ -20,6 +21,7 @@ use hermes_cli_components::traits::{
     CommandRunnerComponent, ConfigLoaderComponent, ConfigPathGetterComponent, ConfigTypeComponent,
     ConfigWriterComponent, OutputProducer, OutputProducerComponent, OutputTypeComponent,
 };
+use hermes_core::chain_type_components::impls::BatchConfig;
 use hermes_core::logging_components::traits::LoggerComponent;
 use hermes_core::relayer_components::error::traits::RetryableErrorComponent;
 use hermes_core::runtime_components::traits::{
@@ -275,6 +277,13 @@ impl ConfigUpdater<StarknetChainDriver, StarknetRelayerConfig> for UpdateStarkne
             block_time: chain_driver.chain.block_time,
             contract_addresses,
             contract_classes,
+            batch_config: Some(BatchConfig {
+                max_message_count: 300,
+                max_tx_size: 1000000,
+                buffer_size: 1000000,
+                max_delay: Duration::from_secs(1),
+                sleep_time: Duration::from_millis(100),
+            }),
             ed25519_attestator_addresses: chain_driver.chain.ed25519_attestator_addresses.clone(),
         };
 

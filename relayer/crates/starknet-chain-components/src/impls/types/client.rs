@@ -75,4 +75,8 @@ where
     fn client_state_chain_id(client_state: &WasmStarknetClientState) -> Chain::ChainId {
         client_state.client_state.chain_id.clone()
     }
+
+    fn client_state_trusting_period(client_state: &WasmStarknetClientState) -> Option<Duration> {
+        None
+    }
 }
