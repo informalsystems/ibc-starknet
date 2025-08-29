@@ -33,7 +33,12 @@ impl Endpoint {
         block_number: Option<u64>,
     ) -> Result<T, ureq::Error> {
         let mut text = String::new();
-        write!(&mut text, "{}/feeder_gateway/{path}", self.0).expect("Failed to write to string");
+        write!(
+            &mut text,
+            "{}/feeder_gateway/{path}",
+            self.0.trim_end_matches('/')
+        )
+        .expect("Failed to write to string");
         let mut req = ureq::get(&text);
 
         if let Some(block_number) = block_number {

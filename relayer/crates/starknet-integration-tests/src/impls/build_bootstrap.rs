@@ -1,7 +1,7 @@
 use alloc::collections::BTreeMap;
 use alloc::sync::Arc;
 use core::time::Duration;
-use std::env::var;
+use std::env::{var, VarError};
 use std::sync::OnceLock;
 
 use cgp::extra::runtime::HasRuntime;
@@ -48,6 +48,7 @@ where
         + CanRaiseAsyncError<ParseError>
         + CanRaiseAsyncError<IdentifierError>
         + CanRaiseAsyncError<toml::ser::Error>
+        + CanRaiseAsyncError<VarError>
         + CanRaiseAsyncError<&'static str>,
     Bootstrap::Chain: HasWalletType<Wallet = StarknetWallet>,
 {
@@ -182,7 +183,7 @@ where
                     .map(|s| s.trim().to_string())
                     .collect::<Vec<_>>()
             })
-            .ok();
+            .map_err(Bootstrap::raise_error)?;
 
         let chain_config = StarknetChainConfig {
             json_rpc_url: format!("http://{}:{}/", node_config.rpc_addr, node_config.rpc_port),

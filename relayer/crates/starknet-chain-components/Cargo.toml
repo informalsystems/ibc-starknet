@@ -49,7 +49,6 @@ serde                       = { workspace = true }
 serde_json                  = { workspace = true }
 sha2                        = { workspace = true }
 starknet                    = { workspace = true }
-starknet-v14                = { workspace = true }
 starknet-crypto             = { workspace = true }
 time                        = { workspace = true }
 tonic                       = { workspace = true }

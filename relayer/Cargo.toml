@@ -32,8 +32,7 @@ cgp-error-eyre = { version = "0.4.0" }
 
 ibc                              = { version = "0.56.0" }
 ibc-client-tendermint            = { version = "0.56.0" }
-starknet                         = { version = "0.13.0" }
-starknet-v14                     = { version = "0.14.0", package = "starknet" }
+starknet                         = { version = "0.14.0" }
 starknet-crypto                  = { version = "0.7.4" }
 starknet-types-core              = { version = "0.1.8" }
 url                              = { version = "2.5" }
