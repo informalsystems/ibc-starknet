@@ -30,5 +30,5 @@ pub trait HasFeederGatewayUrl {
     provider: Ed25519AttestatorAddressesGetter,
 }]
 pub trait HasEd25519AttestatorAddresses {
-    fn ed25519_attestator_addresses(&self) -> &Option<Vec<String>>;
+    fn ed25519_attestator_addresses(&self) -> &Vec<String>;
 }

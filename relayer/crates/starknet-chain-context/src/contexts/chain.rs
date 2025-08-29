@@ -91,7 +91,7 @@ pub struct StarknetChainFields {
     pub signers: Vec<StarknetWallet>,
     pub client_refresh_rate: Option<Duration>,
     pub signer_mutex: Arc<Mutex<usize>>,
-    pub ed25519_attestator_addresses: Option<Vec<String>>,
+    pub ed25519_attestator_addresses: Vec<String>,
 }
 
 impl Deref for StarknetChain {

@@ -16,7 +16,7 @@ pub struct StarknetRelayerConfig {
 pub struct StarknetChainConfig {
     pub json_rpc_url: String,
     pub feeder_gateway_url: String,
-    pub ed25519_attestator_addresses: Option<Vec<String>>,
+    pub ed25519_attestator_addresses: Vec<String>,
     pub relayer_wallet_1: String,
     pub relayer_wallet_2: String,
     #[serde(with = "humantime_serde")]
