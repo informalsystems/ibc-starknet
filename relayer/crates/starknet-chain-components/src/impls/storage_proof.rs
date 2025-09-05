@@ -1,8 +1,7 @@
 use hermes_prelude::{CanRaiseError, HasErrorType};
 use indexmap::IndexMap;
 use starknet::core::crypto::pedersen_hash;
-use starknet::core::types::Felt;
-use starknet_v14::core::types::{ContractsProof, MerkleNode, StorageProof};
+use starknet::core::types::{ContractsProof, Felt, MerkleNode, StorageProof};
 
 use crate::traits::HasStorageProofType;
 

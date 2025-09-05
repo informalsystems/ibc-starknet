@@ -10,11 +10,10 @@ use hermes_core::chain_components::traits::{
 use hermes_core::encoding_components::traits::{CanDecode, CanEncode, HasEncodedType, HasEncoding};
 use hermes_prelude::*;
 use ibc::core::host::types::path::{ClientStatePath, Path};
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, StorageProof};
 use starknet::macros::selector;
 use starknet_crypto_lib::StarknetCryptoLib;
 use starknet_storage_verifier::ibc::ibc_path_to_storage_key;
-use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
     CanCallContract, CanQueryContractAddress, CanQueryStorageProof, HasBlobType, HasSelectorType,

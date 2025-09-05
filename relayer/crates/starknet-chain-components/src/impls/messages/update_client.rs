@@ -84,11 +84,7 @@ where
                 .encode(&protobuf_byte_array)
                 .map_err(Chain::raise_error)?;
 
-            let ed25519_attestator_addresses = chain
-                .ed25519_attestator_addresses()
-                .as_ref()
-                .ok_or("No Ed25519 attestators")
-                .map_err(Chain::raise_error)?;
+            let ed25519_attestator_addresses = chain.ed25519_attestator_addresses();
 
             let client_state = chain
                 .query_client_state_with_latest_height(PhantomData, client_id)
