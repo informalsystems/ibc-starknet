@@ -1470,7 +1470,7 @@ checksum = "5971ac85611da7067dbfcabef3c70ebb5606018acd9e2a3903a0da507521e0d5"
 [[package]]
 name = "hermes-cosmos-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=fa1018a#fa1018a60ba7a7e8e75d9c4107006d1ee05769d7"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=0c93e1f#0c93e1f389d5d163de7b4f8bc90b08a60aee326d"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
@@ -1485,7 +1485,7 @@ dependencies = [
 [[package]]
 name = "hermes-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=fa1018a#fa1018a60ba7a7e8e75d9c4107006d1ee05769d7"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=0c93e1f#0c93e1f389d5d163de7b4f8bc90b08a60aee326d"
 dependencies = [
  "cgp",
  "hermes-prelude",
@@ -1494,7 +1494,7 @@ dependencies = [
 [[package]]
 name = "hermes-prelude"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=fa1018a#fa1018a60ba7a7e8e75d9c4107006d1ee05769d7"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=0c93e1f#0c93e1f389d5d163de7b4f8bc90b08a60aee326d"
 dependencies = [
  "cgp",
  "cgp-async",
@@ -1503,7 +1503,7 @@ dependencies = [
 [[package]]
 name = "hermes-protobuf-encoding-components"
 version = "0.1.0"
-source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=fa1018a#fa1018a60ba7a7e8e75d9c4107006d1ee05769d7"
+source = "git+https://github.com/informalsystems/hermes-sdk.git?rev=0c93e1f#0c93e1f389d5d163de7b4f8bc90b08a60aee326d"
 dependencies = [
  "cgp",
  "hermes-encoding-components",
