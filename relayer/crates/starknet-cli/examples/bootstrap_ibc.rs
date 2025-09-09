@@ -112,7 +112,7 @@ fn main() -> Result<(), Error> {
 
             // https://docs.starknet.io/chain-info/#current_limits
             // in seconds.
-            let starknet_block_time = 30;
+            let starknet_block_time = 6;
 
             StarknetToCosmosRelay::create_client(
                 SourceTarget,
