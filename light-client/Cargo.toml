@@ -37,11 +37,11 @@ serde_json  = { version = "1.0" }
 sha2        = { version = "0.10.9" }
 ureq        = { version = "3.0", default-features = false }
 
-starknet            = { version = "0.14.0" }
-starknet-core       = { version = "0.13.0" }
-starknet-crypto     = { version = "0.7.4" }
-starknet-macros     = { version = "0.2.3" }
-starknet-types-core = { version = "0.1.8" }
+starknet            = { version = "0.17.0" }
+starknet-core       = { version = "0.16.0" }
+starknet-crypto     = { version = "0.8.1" }
+starknet-macros     = { version = "0.2.5" }
+starknet-types-core = { version = "0.2.0" }
 
 # ibc depedenencies
 ibc-core      = { version = "0.56.0", default-features = false, features = [ "borsh", "schema" ] }
@@ -125,7 +125,7 @@ cgp-runtime     = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e
 cgp-sync        = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 cgp-inner       = { git = "https://github.com/contextgeneric/cgp.git", rev = "3e24278" }
 
-hermes-prelude                      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "0352fec" }
-hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "0352fec" }
-hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "0352fec" }
-hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "0352fec" }
+hermes-prelude                      = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "0c93e1f" }
+hermes-encoding-components          = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "0c93e1f" }
+hermes-protobuf-encoding-components = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "0c93e1f" }
+hermes-cosmos-encoding-components   = { git = "https://github.com/informalsystems/hermes-sdk.git", rev = "0c93e1f" }

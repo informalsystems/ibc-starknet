@@ -3,7 +3,7 @@ use hermes_core::chain_components::traits::{
 };
 use hermes_cosmos_core::chain_components::types::Time;
 use hermes_prelude::*;
-use starknet::core::types::{BlockId, MaybePendingBlockWithTxHashes};
+use starknet::core::types::{BlockId, MaybePreConfirmedBlockWithTxHashes};
 use starknet::providers::{Provider, ProviderError};
 
 use crate::traits::HasStarknetClient;
@@ -26,7 +26,7 @@ where
             .map_err(Chain::raise_error)?;
 
         match block {
-            MaybePendingBlockWithTxHashes::Block(block) => Ok(StarknetChainStatus {
+            MaybePreConfirmedBlockWithTxHashes::Block(block) => Ok(StarknetChainStatus {
                 height: block.block_number,
                 block_hash: block.block_hash,
                 time: i64::try_from(block.timestamp)
@@ -34,8 +34,8 @@ where
                     .and_then(|ts| Time::from_unix_timestamp(ts, 0).ok())
                     .ok_or_else(|| Chain::raise_error("invalid timestamp"))?,
             }),
-            MaybePendingBlockWithTxHashes::PendingBlock(_) => Err(Chain::raise_error(
-                "expected finalized block, but given pending block",
+            MaybePreConfirmedBlockWithTxHashes::PreConfirmedBlock(_) => Err(Chain::raise_error(
+                "expected finalized block, but given pre-confirmed block",
             )),
         }
     }

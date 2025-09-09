@@ -15,10 +15,9 @@ use ibc::core::client::types::error::ClientError;
 use ibc::core::client::types::Height;
 use ibc::core::host::types::identifiers::ChainId;
 use ibc::primitives::Timestamp;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, StorageProof};
 use starknet::macros::selector;
 use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
-use starknet_v14::core::types::StorageProof;
 
 use crate::impls::StarknetAddress;
 use crate::traits::{

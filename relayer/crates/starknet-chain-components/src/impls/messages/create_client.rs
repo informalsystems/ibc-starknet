@@ -31,7 +31,6 @@ where
         + CanQueryContractAddress<symbol!("ibc_core_contract_address")>
         + HasEd25519AttestatorAddresses
         + CanRaiseAsyncError<String>
-        + CanRaiseAsyncError<&'static str>
         + CanRaiseAsyncError<core::num::TryFromIntError>
         + CanRaiseAsyncError<ureq::Error>
         + CanRaiseAsyncError<Encoding::Error>,
@@ -62,11 +61,7 @@ where
 
         let client_type = short_string!("07-tendermint");
 
-        let ed25519_attestator_addresses = chain
-            .ed25519_attestator_addresses()
-            .as_ref()
-            .ok_or("No Ed25519 attestators")
-            .map_err(Chain::raise_error)?;
+        let ed25519_attestator_addresses = chain.ed25519_attestator_addresses();
 
         let attestator_keys = ed25519_attestator_addresses
             .iter()

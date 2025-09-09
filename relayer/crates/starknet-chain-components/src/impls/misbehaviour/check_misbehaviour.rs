@@ -17,11 +17,10 @@ use hermes_prelude::*;
 use ibc_client_starknet_types::header::StarknetHeader;
 use ibc_client_starknet_types::misbehaviour::StarknetMisbehaviour;
 use prost_types::Any;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, StorageProof};
 use starknet::macros::selector;
 use starknet::providers::Provider;
 use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
-use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
     CanCallContract, CanQueryContractAddress, CanQueryStorageProof, HasBlobType,
