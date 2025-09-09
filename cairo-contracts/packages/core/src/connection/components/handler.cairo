@@ -251,7 +251,7 @@ pub mod ConnectionHandlerComponent {
             let expected_conn_end_on_b = ConnectionEndTrait::try_open(
                 conn_end_on_a.counterparty.client_id.clone(),
                 conn_end_on_a.client_id.clone(),
-                msg.conn_id_on_b.clone(),
+                msg.conn_id_on_a.clone(),
                 conn_end_on_a.counterparty.prefix.clone(),
                 conn_end_on_a.delay_period,
             );

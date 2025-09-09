@@ -1053,8 +1053,8 @@ pub mod ChannelHandlerComponent {
 
             let paths = ack_path(
                 connection_end.counterparty.prefix,
-                msg.packet.port_id_on_a,
-                msg.packet.chan_id_on_a,
+                msg.packet.port_id_on_b,
+                msg.packet.chan_id_on_b,
                 msg.packet.seq_on_a,
             );
 
