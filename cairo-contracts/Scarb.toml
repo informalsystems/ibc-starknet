@@ -12,8 +12,8 @@ members = [
 [workspace.package]
 version       = "0.1.0"
 edition       = "2024_07"
-cairo-version = "2.12.0"
-scarb-version = "2.12.0"
+cairo-version = "2.12.2"
+scarb-version = "2.12.2"
 license       = "Apache-2.0"
 authors       = [ "Informal Systems <hello@informal.systems>" ]
 repository    = "https://github.com/informalsystems/ibc-starknet"
@@ -25,17 +25,17 @@ description   = "Cairo components and contracts for integrating Starknet with IB
 test = "snforge test"
 
 [workspace.dependencies]
-assert_macros = "2.12.0"
-starknet      = "2.12.0"
-snforge_std   = "0.48.0"
+assert_macros = "2.12.2"
+starknet      = "2.12.2"
+snforge_std   = "0.49.0"
 
 # external dependencies
 openzeppelin_access   = "2.0.0"
 openzeppelin_token    = "2.0.0"
 openzeppelin_upgrades = "2.0.0"
 openzeppelin_utils    = "2.0.0"
-openzeppelin_testing  = "4.5.0"
-alexandria_math       = "0.6.0"
+openzeppelin_testing  = "4.7.0"
+alexandria_math       = "0.6.1"
 garaga                = { git = "https://github.com/keep-starknet-strange/garaga.git", rev = "ffb90e5" }
 
 # internal dependencies

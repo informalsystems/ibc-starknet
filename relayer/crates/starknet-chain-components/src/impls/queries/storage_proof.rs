@@ -4,13 +4,12 @@ use hermes_core::logging_components::traits::CanLog;
 use hermes_core::logging_components::types::LevelTrace;
 use hermes_prelude::*;
 use serde::de::DeserializeOwned;
-use serde::Serialize;
-use starknet::core::types::{BlockId, Felt};
-use starknet_v14::core::types::StorageProof;
+use starknet::core::types::{ConfirmedBlockId, ContractStorageKeys, Felt, StorageProof};
+use starknet::providers::{Provider, ProviderError};
 
 use crate::impls::{CanValidateStorageProof, StarknetAddress};
 use crate::traits::{
-    CanSendJsonRpcRequest, HasStorageKeyType, HasStorageProofType, StorageProofQuerier,
+    HasStarknetClient, HasStorageKeyType, HasStorageProofType, StorageProofQuerier,
     StorageProofQuerierComponent,
 };
 
@@ -23,8 +22,8 @@ where
         + HasStorageProofType<StorageProof = StorageProof>
         + CanValidateStorageProof
         + CanLog<LevelTrace>
-        + CanSendJsonRpcRequest<QueryStorageProofRequest, Chain::StorageProof>
-        + CanRaiseError<serde_json::Error>,
+        + HasStarknetClient<Client: Provider>
+        + CanRaiseAsyncError<ProviderError>,
     Chain::StorageProof: DeserializeOwned,
 {
     async fn query_storage_proof(
@@ -33,44 +32,23 @@ where
         contract_address: &StarknetAddress,
         storage_keys: &[Felt],
     ) -> Result<Chain::StorageProof, Chain::Error> {
-        let request = QueryStorageProofRequest {
-            block_id: BlockId::Number(*height),
-            contract_addresses: vec![contract_address.0],
-            contracts_storage_keys: vec![ContractStorageKey {
-                contract_address: contract_address.0,
-                storage_keys: Vec::from(storage_keys),
-            }],
-        };
+        let provider = chain.provider();
 
-        let storage_proof = chain
-            .send_json_rpc_request("starknet_getStorageProof", &request)
-            .await?;
-
-        let storage_proof_str =
-            serde_json::to_string_pretty(&storage_proof).map_err(Chain::raise_error)?;
-
-        chain
-            .log(
-                &format!("fetched storage proof: {storage_proof_str}"),
-                &LevelTrace,
+        let storage_proof = provider
+            .get_storage_proof(
+                ConfirmedBlockId::Number(*height),
+                [],
+                [contract_address.0],
+                [ContractStorageKeys {
+                    contract_address: contract_address.0,
+                    storage_keys: storage_keys.to_vec(),
+                }],
             )
-            .await;
+            .await
+            .map_err(Chain::raise_error)?;
 
         // Chain::verify_storage_proof(&storage_proof)?;
 
         Ok(storage_proof)
     }
-}
-
-#[derive(Serialize)]
-pub struct QueryStorageProofRequest {
-    pub block_id: BlockId,
-    pub contract_addresses: Vec<Felt>,
-    pub contracts_storage_keys: Vec<ContractStorageKey>,
-}
-
-#[derive(Serialize)]
-pub struct ContractStorageKey {
-    pub contract_address: Felt,
-    pub storage_keys: Vec<Felt>,
 }

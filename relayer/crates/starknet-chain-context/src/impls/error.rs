@@ -2,6 +2,7 @@ use core::array::TryFromSliceError;
 use core::convert::Infallible;
 use core::num::{ParseIntError, TryFromIntError};
 use core::str::Utf8Error;
+use std::env::VarError;
 use std::string::FromUtf8Error;
 
 use cairo_lang_starknet_classes::casm_contract_class::StarknetSierraCompilationError;
@@ -77,6 +78,7 @@ delegate_components! {
             ChannelError,
             TimestampError,
             IdentifierError,
+            VarError,
             ComputeClassHashError,
             StarknetSierraCompilationError,
         ]: ReportError,

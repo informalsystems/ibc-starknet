@@ -441,14 +441,7 @@ impl StarknetBuilder {
             })
             .ok();
 
-        let ed25519_attestator_addresses = var("ED25519_ATTESTATORS")
-            .map(|attestator_list| {
-                attestator_list
-                    .split(',')
-                    .map(|x| x.trim().to_string())
-                    .collect()
-            })
-            .ok();
+        let ed25519_attestator_addresses = chain_config.ed25519_attestator_addresses.clone();
 
         let context = StarknetChain {
             fields: Arc::new(StarknetChainFields {

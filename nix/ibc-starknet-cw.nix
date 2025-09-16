@@ -11,7 +11,7 @@ let
       lockFile = ./../light-client/Cargo.lock;
       outputHashes = {
         "cgp-0.4.0" = "sha256-YaK4YaT/1jbudEh7YnQkH2KrPmjbSI5vBL8HYU1eREg=";
-        "hermes-cosmos-encoding-components-0.1.0" = "sha256-7lWbYqCShtdpMr2zM2tdPrCLNQgj0u/A6vERXM/IsFs=";
+        "hermes-cosmos-encoding-components-0.1.0" = "sha256-WLhdFcAi3WVg/ZrMC/2UISstLaJAfeGhEtJQ7+xjhOE=";
         "ibc-0.56.0" = "sha256-6ebsNVErJrLnxijsRo+xqDMZQH+Ef160OyRFBNhCT4U=";
         "ibc-client-cw-0.56.0" = "sha256-xJgM0wyKlN5gaCKgA+y9R/l4QpZ3GbNsoJ8ZrPLvvJ8=";
       };
@@ -25,8 +25,8 @@ let
     ];
 
     buildPhase = ''
-      RUSTFLAGS='-C link-arg=-s' cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown --release --lib --locked
-      RUSTFLAGS='-C link-arg=-s' cargo build -p starknet-crypto-lib --features contract --target wasm32-unknown-unknown --release --lib --locked
+      cargo build -p ibc-client-starknet-cw --target wasm32-unknown-unknown --release --lib --locked
+      cargo build -p starknet-crypto-lib --features contract --target wasm32-unknown-unknown --release --lib --locked
     '';
 
     installPhase = ''

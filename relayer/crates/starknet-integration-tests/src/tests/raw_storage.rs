@@ -13,9 +13,8 @@ use hermes_starknet_chain_components::traits::{
     CanQueryStorageProof, CanVerifyStarknetStorageProof, HasBlobType, HasContractClassHashType,
     HasSelectorType, HasStorageKeyType, HasStorageProofType,
 };
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, StorageProof};
 use starknet::macros::{felt, selector};
-use starknet_v14::core::types::StorageProof;
 use tracing::info;
 
 use crate::contexts::StarknetChainDriver;

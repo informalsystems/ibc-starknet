@@ -15,13 +15,12 @@ use hermes_core::logging_components::types::LevelWarn;
 use hermes_cosmos_core::protobuf_encoding_components::types::strategy::ViaProtobuf;
 use hermes_prelude::*;
 use ibc_client_starknet_types::header::StarknetHeader;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, StorageProof};
 use starknet::core::utils::cairo_short_string_to_felt;
 use starknet::macros::selector;
 use starknet::providers::ProviderError;
 use starknet_block_verifier::Endpoint as FeederGatewayEndpoint;
 use starknet_crypto_lib::{StarknetCryptoFunctions, StarknetCryptoLib};
-use starknet_v14::core::types::StorageProof;
 
 use crate::traits::{
     CanCallContract, CanQueryContractAddress, CanQueryStorageProof, HasBlobType,
@@ -122,12 +121,11 @@ where
             classes_tree_root,
         ]);
 
-        // FIXME: uncomment this when #468 is resolved
-        // if block_header.state_root != state_root {
-        //     return Err(Chain::raise_error(
-        //         "state root does not match between block and storage proof",
-        //     ));
-        // }
+        if block_header.state_root != state_root {
+            return Err(Chain::raise_error(
+                "state root does not match between block and storage proof",
+            ));
+        }
 
         if block_header.block_hash != storage_proof.global_roots.block_hash {
             return Err(Chain::raise_error(

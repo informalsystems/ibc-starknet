@@ -58,10 +58,9 @@ use hermes_starknet_chain_components::traits::{
 use hermes_starknet_chain_components::types::StarknetWallet;
 use ibc::core::host::types::identifiers::ChainId;
 use indexmap::IndexMap;
-use starknet::core::types::Felt;
+use starknet::core::types::{Felt, MerkleNode, StorageProof};
 use starknet::providers::jsonrpc::HttpTransport;
 use starknet::providers::JsonRpcClient;
-use starknet_v14::core::types::{MerkleNode, StorageProof};
 use ureq::Agent;
 use url::Url;
 
@@ -94,7 +93,7 @@ pub struct StarknetChainFields {
     pub signers: Vec<StarknetWallet>,
     pub client_refresh_rate: Option<Duration>,
     pub signer_mutex: Arc<Mutex<usize>>,
-    pub ed25519_attestator_addresses: Option<Vec<String>>,
+    pub ed25519_attestator_addresses: Vec<String>,
 }
 
 impl Deref for StarknetChain {

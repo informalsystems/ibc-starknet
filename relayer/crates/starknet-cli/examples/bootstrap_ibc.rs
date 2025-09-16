@@ -48,8 +48,10 @@ pub const STARKNET_STRK: Felt =
 pub const STARKNET_ETH: Felt =
     Felt::from_hex_unchecked("0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7");
 
+// sha256sum light-client.wasm
+// osmosisd q ibc-wasm checksums --node https://rpc.testnet.osmosis.zone
 pub const WASM_CODE_HASH_HEX: &str =
-    "6be4d4cbb85ea2d7e0b17b7053e613af11e041617bdb163107dfd29f706318ef";
+    "2438343554210a2adeb661aafacca6b4fa4d124dd63ab5b364c293d604de79fa";
 
 fn main() -> Result<(), Error> {
     let _ = stable_eyre::install();
@@ -110,7 +112,7 @@ fn main() -> Result<(), Error> {
 
             // https://docs.starknet.io/chain-info/#current_limits
             // in seconds.
-            let starknet_block_time = 30;
+            let starknet_block_time = 6;
 
             StarknetToCosmosRelay::create_client(
                 SourceTarget,
